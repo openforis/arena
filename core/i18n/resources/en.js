@@ -511,6 +511,10 @@ $t(common.cantUndoWarning)`,
       insertNewRecords: 'Insert new records',
       updateExistingRecords: 'Update existing records',
     },
+    options: {
+      header: 'Options',
+      insertMissingNodes: 'Insert missing entities or attributes',
+    },
     selectCSVFileToImport: 'Select CSV file to import',
   },
 
@@ -1237,6 +1241,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     dataImport: {
       emptyFile: 'The file you are trying to import is empty',
       invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
+      invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
       invalidCode: 'Invalid code in column {{headers}}: {{code}}',
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
       invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
@@ -1441,6 +1446,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+    record: {
+      entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
+    },
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',

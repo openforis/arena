@@ -19,7 +19,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import { ButtonDownload } from '@webapp/components'
-import { ButtonGroup } from '@webapp/components/form'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
 
 const importTypes = {
@@ -35,22 +35,35 @@ export const DataImportCsvView = () => {
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
 
-  const [cycle, setCycle] = useState(surveyCycle)
-  const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
-  const [dataImportType, setDataImportType] = useState(importTypes.updateExistingRecords)
-  const [importCompleteResult, setImportCompleteResult] = useState(null)
+  const [state, setState] = useState({
+    cycle: surveyCycle,
+    dataImportType: importTypes.updateExistingRecords,
+    importCompleteResult: null,
+    insertMissingNodes: null,
+    insertMissingNodesDisabled: false,
+    selectedEntityDefUuid: null,
+  })
+  const { cycle, dataImportType, importCompleteResult, insertMissingNodes, selectedEntityDefUuid } = state
 
-  const onEntitySelect = (entityDef) => setSelectedEntityDefUuid(NodeDef.getUuid(entityDef))
+  const insertMissingNodesDisabled = dataImportType === importTypes.insertNewRecords
+
+  const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
+
+  const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
 
   const onDataImportTypeChange = useCallback(
     (value) => {
-      setDataImportType(value)
-      if (value === importTypes.insertNewRecords) {
-        const nodeDefRoot = Survey.getNodeDefRoot(survey)
-        setSelectedEntityDefUuid(NodeDef.getUuid(nodeDefRoot))
-      }
+      setState((statePrev) => {
+        const stateNext = { ...statePrev, dataImportType: value }
+        if (value === importTypes.insertNewRecords) {
+          const nodeDefRoot = Survey.getNodeDefRoot(survey)
+          stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
+          stateNext.insertMissingNodes = false
+        }
+        return stateNext
+      })
     },
-    [survey, setDataImportType, setSelectedEntityDefUuid]
+    [survey]
   )
 
   const startImportJob = async (file) => {
@@ -60,6 +73,7 @@ export const DataImportCsvView = () => {
       cycle,
       entityDefUuid: selectedEntityDefUuid,
       insertNewRecords: dataImportType === importTypes.insertNewRecords,
+      insertMissingNodes,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -67,7 +81,7 @@ export const DataImportCsvView = () => {
         autoHide: true,
         onComplete: async (jobCompleted) => {
           const importCompleteResult = JobSerialized.getResult(jobCompleted)
-          setImportCompleteResult(importCompleteResult)
+          setState((statePrev) => ({ ...statePrev, importCompleteResult }))
         },
       })
     )
@@ -81,7 +95,7 @@ export const DataImportCsvView = () => {
     <div className="form">
       {surveyCycleKeys.length > 1 && (
         <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
-          <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
+          <CycleSelector surveyCycleKey={cycle} onChange={setStateProp('cycle')} />
         </FormItem>
       )}
 
@@ -110,6 +124,16 @@ export const DataImportCsvView = () => {
         disabled={!selectedEntityDefUuid}
       />
 
+      <fieldset>
+        <legend>{i18n.t('dataImportView.options.header')}</legend>
+        <Checkbox
+          checked={insertMissingNodes}
+          disabled={insertMissingNodesDisabled}
+          label={i18n.t('dataImportView.options.insertMissingNodes')}
+          onChange={setStateProp('insertMissingNodes')}
+        />
+      </fieldset>
+
       <UploadButton
         inputFieldId={TestId.recordsImport.importDataBtn}
         label={i18n.t('dataImportView.selectCSVFileToImport')}
@@ -121,7 +145,7 @@ export const DataImportCsvView = () => {
       {importCompleteResult && (
         <DataImportCompleteDialog
           importCompleteResult={importCompleteResult}
-          onClose={() => setImportCompleteResult(null)}
+          onClose={() => setStateProp('importCompleteResult')(null)}
         />
       )}
     </div>

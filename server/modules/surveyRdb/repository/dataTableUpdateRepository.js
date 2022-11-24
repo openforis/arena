@@ -11,20 +11,21 @@ const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
 // ==== parsing
 
-const _hasTable = NodeDef.isMultiple
+const _hasTable = (nodeDef) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)
 
 const _getType = (nodeDef, node) => {
   const created = Node.isCreated(node)
-  const updated = Node.isUpdated(node)
   const deleted = Node.isDeleted(node)
+  const withTable = _hasTable(nodeDef)
 
-  if (created && _hasTable(nodeDef)) {
-    return types.insert
-  }
-  if (deleted && _hasTable(nodeDef)) {
-    return types.delete
-  }
-  if ((updated || created) && !_hasTable(nodeDef)) {
+  if (withTable) {
+    if (created) {
+      return types.insert
+    }
+    if (deleted) {
+      return types.delete
+    }
+  } else if (!deleted) {
     return types.update
   }
   return null
@@ -49,19 +50,22 @@ const _getColumnNames = ({ nodeDef, type }) =>
       ]
     : DataCol.getNames(nodeDef)
 
-const _getColValues = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) =>
-  type === types.insert
-    ? [
-        Node.getUuid(node),
-        ...(NodeDef.isRoot(nodeDef)
-          ? [Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record), Record.getOwnerUuid(record)]
-          : []),
-        Node.getUuid(ancestorMultipleEntity),
-        ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
-          ? DataCol.getValues(survey, nodeDef, node)
-          : []),
-      ]
-    : DataCol.getValues(survey, nodeDef, node)
+const _getColValues = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
+  if (type !== types.insert) {
+    return DataCol.getValues(survey, nodeDef, node)
+  }
+  const colValues = [Node.getUuid(node)]
+  if (NodeDef.isRoot(nodeDef)) {
+    colValues.push(
+      ...[Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record), Record.getOwnerUuid(record)]
+    )
+  }
+  colValues.push(Node.getUuid(ancestorMultipleEntity))
+  if (NodeDef.isMultipleAttribute(nodeDef)) {
+    colValues.push(...DataCol.getValues(survey, nodeDef, node))
+  }
+  return colValues
+}
 
 const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
   let currentParent = nodes[Node.getParentUuid(node)]
@@ -85,11 +89,11 @@ const _toUpdates = ({ survey, record, nodes }) => {
     if (!NodeDef.isRoot(nodeDef) && NodeDef.isSingleEntity(nodeDef)) {
       return updatesAcc
     }
-    const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
-    const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
-    const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
     const type = _getType(nodeDef, node)
     if (type) {
+      const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+      const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
+      const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
       updatesAcc.push({
         type,
         schemaName: SchemaRdb.getName(Survey.getId(survey)),

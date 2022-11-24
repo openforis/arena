@@ -189,7 +189,7 @@ export default class DataImportJob extends Job {
 
   async onRowItem({ valuesByDefUuid }) {
     const { context, tx } = this
-    const { survey, entityDefUuid } = context
+    const { survey, entityDefUuid, insertMissingNodes } = context
 
     const { record, newRecord } = (await this.getOrFetchRecord({ valuesByDefUuid })) || {}
 
@@ -199,6 +199,7 @@ export default class DataImportJob extends Job {
           survey,
           entityDefUuid,
           valuesByDefUuid,
+          insertMissingNodes,
         })(record)
 
         this.currentRecord = recordUpdated
@@ -210,7 +211,7 @@ export default class DataImportJob extends Job {
         if (nodesArray.length > 0) {
           await this.recordsValidationBatchPersister.addItem([recordUuid, Record.getValidation(this.currentRecord)])
 
-          this.updatedValues += nodesArray.length
+          this.updatedValues += nodesArray.filter(NodeDef.isAttribute).length
 
           this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
 
@@ -226,8 +227,9 @@ export default class DataImportJob extends Job {
           this.updatedRecordsUuids.add(recordUuid)
         }
       } catch (e) {
-        const { params } = e
-        this._addError(Validation.messageKeys.dataImport.errorUpdatingValues, params)
+        const { key, params } = e
+        const errorKey = key || Validation.messageKeys.dataImport.errorUpdatingValues
+        this._addError(errorKey, params)
       }
     }
     this.incrementProcessedItems()

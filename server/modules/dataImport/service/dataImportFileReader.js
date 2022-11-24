@@ -19,10 +19,18 @@ const numericValueConverter = ({ value, headers }) => {
   if (Number.isNaN(numericVal)) {
     throw new SystemError('validationErrors.dataImport.invalidNumber', { value: val, headers })
   }
+  return numericVal
 }
 
 const valueConverterByNodeDefType = {
-  [NodeDef.nodeDefType.boolean]: singlePropValueConverter,
+  [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
+    const val = singlePropValueConverter({ value })
+    const possibleBooleanValues = ['true', 'false', '1', '0']
+    if (!possibleBooleanValues.includes(String(val).toLocaleLowerCase())) {
+      throw new SystemError('validationErrors.dataImport.invalidBoolean', { value: val, headers })
+    }
+    return String(['true', '1'].includes(String(val).toLocaleLowerCase()))
+  },
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value, headers }) => {
     const code = value[Node.valuePropsCode.code]
 
@@ -113,7 +121,7 @@ const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTota
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
 
-        if (!row.hasOwnProperty(header)) return valuesByDefUuidAcc
+        if (!Object.prototype.hasOwnProperty.call(row, header)) return valuesByDefUuidAcc
 
         const cellValue = row[header]
         if (Objects.isEmpty(cellValue)) return valuesByDefUuidAcc

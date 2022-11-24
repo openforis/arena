@@ -107,7 +107,12 @@ const _getOrCreateEntityByKeys =
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
     if (!insertMissingNodes) {
-      throw new SystemError('record.entityNotFound', { entityName: NodeDef.getName(entityDef) })
+      const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
+      const keyValues = keyDefs.map((keyDef) => {
+        const keyDefUuid = NodeDef.getUuid(keyDef)
+        return valuesByDefUuid[keyDefUuid]
+      })
+      throw new SystemError('appErrors.record.entityNotFound', { entityName: NodeDef.getName(entityDef), keyValues })
     }
 
     // insert missing entity node (with keys)
