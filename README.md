@@ -1,109 +1,91 @@
 # OpenForis Arena - The cloud platform from OpenForis
 
-## Prerequisites
+## Installation
 
-First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replacement).
+### Prerequisites
 
-Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using LTS version 14.x).
-
-### GitHub packages: authentication
-
-Arena requires some GitHub packages (@openforis/arena-core and @openforis/arena-server).
-In order to do that, you must use a token with (at least) the `read:packages` scope.
-
-You can authenticate to GitHub Packages with npm by either editing your per-user ~/.npmrc file to include your personal access token or by logging in to npm on the command line using your username and personal access token.
-
-To authenticate by adding your personal access token to your ~/.npmrc file, edit the ~/.npmrc file for your project to include the following line, replacing TOKEN with your personal access token. Create a new ~/.npmrc file if one doesn't exist and replace TOKEN with your personal access token.
-
-```shell
-//npm.pkg.github.com/:_authToken=TOKEN
-```
-
-To authenticate by logging in to npm, use the npm login command, replacing USERNAME with your GitHub username, TOKEN with your personal access token, and PUBLIC-EMAIL-ADDRESS with your email address.
-
-If GitHub Packages is not your default package registry for using npm and you want to use the npm audit command, we recommend you use the --scope flag with the owner of the package when you authenticate to GitHub Packages.
-
-```shell
-$ npm login --scope=@OWNER --registry=https://npm.pkg.github.com
-
-> Username: USERNAME
-> Password: TOKEN
-> Email: PUBLIC-EMAIL-ADDRESS
-```
-
-> For more information see [Authenticating to GitHub Packages](https://docs.github.com/en/packages/guides/configuring-npm-for-use-with-github-packages#authenticating-to-github-packages)
-
-## Development
-
-To install local database:
-
+- [download and install Docker](https://www.docker.com/). Docker is an open platform for developing, shipping, and running applications.
+- Install a local database (PostgreSQL) as a Docker container. Run this command from command line; it will create also a database named 'arena' and a user 'arena' with password 'arena' and will make the DBMS listen on port 5444 (you can change those parameters as you wish):
 ```shell script
 sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
 ```
+You can also use an already existing PostgreSQL database installed in a different way and configure Arena to connect to it.
 
-In order to access Arena when it's installed on a remote server, you need to request access to it or being invited to it.
-To simplify this process when working locally, you can insert a test user with System Administrator rights (username: test@openforis-arena.org - password: test) directly into the database running this SQL script with the SQL client you prefer:
+### Prepare a file with the parameters to pass to Arena
 
-```
-INSERT INTO "user" (name, email, PASSWORD, status)
-VALUES ('Tester', 'test@openforis-arena.org', '$2a$10$6y2oUZVrQ7aXed.47h4sHeJA8VVA2dW9ObtO/XLveXSzQKBvTOyou', 'ACCEPTED');
-
-INSERT INTO auth_group_user (user_uuid, group_uuid)
-SELECT u.uuid, g.uuid
-FROM "user" u
-    JOIN auth_group g ON u.email = 'test@openforis-arena.org' AND g.name = 'systemAdmin';
-```
-
-To restart local database:
+The file (call it arena.env) must be a text file with this content:
 
 ```shell script
-docker container restart arena-db
+# Default web server port
+ARENA_PORT=9090
+
+# DB
+## specify the connection parameters as a URL in the format postgres://user:password@host:port/database
+# DATABASE_URL=postgres://arena:arena@localhost:5444/arena
+## or one by one
+PGHOST=localhost
+PGPORT=5444
+PGDATABASE=arena
+PGUSER=arena
+PGPASSWORD=arena
+
+# temporary uploaded files folder
+TEMP_FOLDER=/home/your_user/openforis/arena/upload
+
+# Email service (Arena uses Sendgrid to send emails)
+ADMIN_EMAIL= # change it with the email address used to send emails
+SENDGRID_API_KEY= # get it from https://sendgrid.com/
+
+# Analysis
+ANALYSIS_OUTPUT_DIR=/home/your_user/openforis/arena/analysis
+
+# Server
+## HTTP Session
+## Secret used to sign the session ID cookie 
+SESSION_ID_COOKIE_SECRET=my-cookie-secret-key
+
+## Set to true if http requests must be forwarded to https
+USE_HTTPS=false
+
+# RStudio Server
+RSTUDIO_DOWNLOAD_SERVER_URL=
+RSTUDIO_SERVER_URL=
+RSTUDIO_PROXY_SERVER_URL=
+RSTUDIO_POOL_SERVER_URL=
+RSTUDIO_POOL_SERVICE_KEY=
+
+# reCAPTCHA v2 keys (get it from https://www.google.com/recaptcha/about/)
+RECAPTCHA_SITE_KEY=
+RECAPTCHA_SECRET_KEY=
+
+# MAP
+## Planet Lab Maps API key (get it from https://www.planet.com/markets/mapping/)
+MAP_API_KEY_PLANET=
+
 ```
 
-To install dependencies:
+### Install and run Arena
 
-```shell
-yarn
-npm rebuild node-sass # Sometimes needed
-```
-
-To run the server and the Web app in parallel with "hot reload" on any changes:
-
-```shell
-yarn watch
-```
-
-## The .env file
-
-The .env file is needed for development and locally running the stack.
-
-must be added to the root directory of the project and must match the template `.env.template`.
-
-## Running the test suite
-
-The following runs the test suite with an isolated Dockerized DB instance.
-
-Note: What's tested is the **committed** code only. Uncommitted changes are ignored.
-
-```shell
-yarn test:docker
-```
-
-## Run R Studio Server locally
-
-To install RStudio Server as a Docker container run the following command:
-
-- replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable
-- replace YOUR_IP with your machine ip address
-
+Arena will be installed as a Docker container.
+Run this command from command line:
 ```shell script
-docker run -d --name arena-rstudio ---network="host" -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+sudo docker run --env-file ./arena.env openforis/arena:latest
 ```
+You can run this command in the same folder where you have defined the arena.env file or specify its path in the command, in the '--env-file' parameter.
+Arena will start on the port specified in the arena.env file (9090 by default).
+You can use the same command to start up Arena again once you stop it.
 
-To restart RStudio server run
+## Open Arena in the browser
 
-```shell script
-docker container restart arena-rstudio
-```
+Open this address in your browser:
+http://localhost:9090
 
-Visit http://localhost:8787 in your browser to access the rStudio server instance.
+If the installation process was successful, the Arena login form should appear.
+
+# Documentation
+
+You can find the Arena documentation in the [OpenForis website](https://openforis.org/tools/arena/)
+
+### License
+
+Arena is [MIT licensed](./LICENSE).
