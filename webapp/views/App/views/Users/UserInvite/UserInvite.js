@@ -73,7 +73,7 @@ const UserInviteComponent = () => {
             {i18n.t('userInviteView.messageOptional')}
             <ButtonIconInfo
               title="userInviteView.messageInfo"
-              onClick={() => window.open('https://www.markdownguide.org/basic-syntax', 'markdown-guide')}
+              onClick={() => window.open('https://www.markdownguide.org/basic-syntax', 'markdown-guide', 'noopener')}
             />
           </div>
         }
