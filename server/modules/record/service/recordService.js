@@ -4,6 +4,8 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
+import * as PromiseUtils from '@core/promiseUtils'
+import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -11,7 +13,6 @@ import * as Node from '@core/record/node'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as ValidationResult from '@core/validation/validationResult'
 import i18n from '@core/i18n/i18nFactory'
 
@@ -179,9 +180,21 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
       warnings,
       record_step: RecordValidationReportItem.getRecordStep(item),
       record_cycle: Number(RecordValidationReportItem.getRecordCycle(item)) + 1,
+      record_owner_name: RecordValidationReportItem.getRecordOwnerName(item),
+      record_date_created: DateUtils.formatDateTimeExport(RecordValidationReportItem.getRecordDateCreated(item)),
+      record_date_modified: DateUtils.formatDateTimeExport(RecordValidationReportItem.getRecordDateModified(item)),
     }
   }
-  const headers = ['path', 'errors', 'warnings', 'record_step', 'record_cycle']
+  const headers = [
+    'path',
+    'errors',
+    'warnings',
+    'record_step',
+    'record_cycle',
+    'record_owner_name',
+    'record_date_created',
+    'record_date_modified',
+  ]
   const streamTransformer = CSVWriter.transformToStream(res, headers, { objectTransformer })
 
   await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
