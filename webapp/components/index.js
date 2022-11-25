@@ -8,6 +8,8 @@ export {
   ButtonIconEdit,
   ButtonIconFilter,
   ButtonIconGear,
+  ButtonIconView,
+  ButtonIconEditOrView,
   ButtonNew,
   ButtonSave,
   ButtonInvite,
