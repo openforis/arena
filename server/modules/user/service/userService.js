@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { marked } from 'marked'
 
 import { db } from '@server/db/db'
 
@@ -121,7 +122,7 @@ export const inviteUser = async (
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
   const message = UserGroupInvitation.getMessage(invitation)
-  const messageParam = message ? `<hr><p>${message}</p><hr>` : undefined
+  const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
 
   const emailParams = {
     serverUrl,
