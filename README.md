@@ -1,4 +1,9 @@
-# OpenForis Arena - The cloud platform from OpenForis
+# Open Foris Arena
+Online platform for survey design, data management, utilization and processing.
+
+Arena is a cloud-based platform for storing and processing data collected in field inventories or questionnaires. It provides a fast and flexible way to set up a survey and start entering data for a team. It offers tools for data quality assurance with the help of data validation and reporting methods. Arena also offers multilingual data entry forms, multi-cycle data management, and computing of new result attributes and running statistical analysis with integrated connection to RStudio Server or local installation of RStudio.
+
+Arena also offers a map with access to very-high resolution satellite images. The Arena Map can be used, for example, for verifying locations of collected data, and for conducting sample-based image interpretation.
 
 ## Installation
 
@@ -20,7 +25,8 @@ The file (call it arena.env) must be a text file with this content:
 ARENA_PORT=9090
 
 # DB
-## specify the connection parameters as a URL in the format postgres://user:password@host:port/database
+## specify the connection parameters as a URL in the format
+## postgres://user:password@host:port/database
 # DATABASE_URL=postgres://arena:arena@localhost:5444/arena
 ## or one by one
 PGHOST=localhost
@@ -77,14 +83,14 @@ You can use the same command to start up Arena again once you stop it.
 
 ## Open Arena in the browser
 
-Open this address in your browser:
+Once you started Arena with the previous command, you can open this address in your browser:
 http://localhost:9090
 
 If the installation process was successful, the Arena login form should appear.
 
 # Documentation
 
-You can find the Arena documentation in the [OpenForis website](https://openforis.org/tools/arena/)
+You can find the Arena documentation in the [Open Foris website](https://openforis.org/tools/arena/).
 
 ### License
 
