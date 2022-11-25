@@ -13,14 +13,13 @@ import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import Markdown from '@webapp/components/markdown'
+import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
 
 import { TestId } from '@webapp/utils/testId'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import { useInviteUser } from './store'
-import { Button } from '@webapp/components'
 
 const UserInviteComponent = () => {
   const { userInvite, onUpdate, onInvite } = useInviteUser()
@@ -68,7 +67,17 @@ const UserInviteComponent = () => {
         </FormItem>
       )}
 
-      <FormItem label={i18n.t('userInviteView.messageOptional')}>
+      <FormItem
+        label={
+          <div>
+            {i18n.t('userInviteView.messageOptional')}
+            <ButtonIconInfo
+              title="userInviteView.messageInfo"
+              onClick={() => window.open('https://www.markdownguide.org/basic-syntax', 'markdown-guide')}
+            />
+          </div>
+        }
+      >
         <Input
           id={TestId.userInvite.message}
           inputType="textarea"

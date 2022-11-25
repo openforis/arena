@@ -731,9 +731,11 @@ $t(common.cantUndoWarning)`,
         <li>submit records to “Cleansing” phase</li>`,
     },
     messageOptional: 'Message (optional)',
+    messageInfo: `The message will appear in the email sent to the user. 
+It can be simple text or Markdown language (https://www.markdownguide.org).`,
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
-      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)***, ***$t(authGroups.surveyManager.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
   },
 
