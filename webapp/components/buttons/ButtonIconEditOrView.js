@@ -6,8 +6,12 @@ import { ButtonIconEdit } from './ButtonIconEdit'
 import { ButtonIconView } from './ButtonIconView'
 
 export const ButtonIconEditOrView = (props) => {
-  const { canEdit } = props
-  return canEdit ? <ButtonIconEdit {...props} /> : <ButtonIconView {...props} />
+  const {
+    canEdit,
+    label: _label, // ignore label prop
+    ...otherProps
+  } = props
+  return canEdit ? <ButtonIconEdit {...otherProps} /> : <ButtonIconView {...otherProps} />
 }
 
 ButtonIconEditOrView.propTypes = {
@@ -17,4 +21,5 @@ ButtonIconEditOrView.propTypes = {
 
 ButtonIconEditOrView.defaultProps = {
   ...Button.defaultProps,
+  showLabel: true,
 }

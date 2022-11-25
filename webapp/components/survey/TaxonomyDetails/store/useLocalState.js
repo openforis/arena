@@ -3,6 +3,8 @@ import { useParams } from 'react-router'
 
 import { useIsTaxonomiesRoute, useOnBrowserBack } from '@webapp/components/hooks'
 
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+
 import { useActions } from './actions'
 import { State } from './state'
 
@@ -13,6 +15,7 @@ export const useLocalState = (props) => {
   const taxonomyUuid = taxonomyUuidParam || taxonomyUuidProp
 
   const isTaxonomiesRoute = useIsTaxonomiesRoute()
+  const canEdit = useAuthCanEditSurvey()
 
   const [state, setState] = useState({})
 
@@ -29,7 +32,7 @@ export const useLocalState = (props) => {
     const deleteTaxonomyIfEmpty = useCallback(async () => Actions.deleteTaxonomyIfEmpty({ taxonomyUuid }), [])
 
     useOnBrowserBack({
-      active: taxonomyEmpty && !deleted,
+      active: canEdit && taxonomyEmpty && !deleted,
       onBack: deleteTaxonomyIfEmpty,
     })
   }
