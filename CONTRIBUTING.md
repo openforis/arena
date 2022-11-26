@@ -1,10 +1,10 @@
-# OpenForis Arena - The cloud platform from OpenForis
+# Contributing to Open Foris Arena
 
 ## Prerequisites
 
 First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replacement).
 
-Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using LTS version 14.x).
+Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using LTS version 18.x).
 
 ### GitHub packages: authentication
 
