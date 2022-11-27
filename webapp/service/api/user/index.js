@@ -17,10 +17,20 @@ export const acceptAccessRequest = async ({ accessRequestAccept }) => {
   return { errorKey, errorParams, validation, userInvited, survey }
 }
 
+// ==== READ
 export const fetchUserSurveys = async ({ userUuid }) => {
   const {
     data: { surveys },
   } = await axios.get(`/api/user/${userUuid}/surveys`)
 
   return { surveys }
+}
+
+// ==== UPDATE
+export const changeUserPassword = async ({ form }) => {
+  const {
+    data: { validation },
+  } = await axios.post(`/api/user/change-password`, form)
+
+  return { validation }
 }

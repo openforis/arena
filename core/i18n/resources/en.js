@@ -240,6 +240,8 @@ Do you want to proceed?`,
     validationReport: 'Validation report',
 
     users: 'Users',
+    user: 'User Profile',
+    userPasswordChange: 'Change password',
     userInvite: 'Invite user',
     usersSurvey: 'Users list',
     usersList: 'Users list (all)',
@@ -656,6 +658,14 @@ $t(common.cantUndoWarning)`,
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+  },
+
+  userPasswordChangeView: {
+    oldPassword: 'Old password',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm new password',
+    changePassword: 'Change password',
+    passwordChangedSuccessfully: 'Password changed successfully!',
   },
 
   userInviteView: {
@@ -1341,6 +1351,14 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emailInvalid: '$t(validationErrors.user.emailInvalid)',
       roleRequired: 'Role is required',
       surveyNameRequired: 'Survey name is required',
+    },
+
+    userPasswordChange: {
+      oldPasswordRequired: 'Old password is required',
+      oldPasswordWrong: 'Old password is wrong',
+      newPasswordRequired: 'New password is required',
+      confirmPasswordRequired: 'Confirm password is required',
+      confirmedPasswordNotMatching: 'New password and confirm password do not match',
     },
   },
 

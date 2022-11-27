@@ -304,6 +304,19 @@ export const init = (app) => {
     }
   })
 
+  app.post('/user/change-password', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const passwordChangeForm = Request.getBody(req)
+
+      const validation = await UserService.updateUserPassword({ user, passwordChangeForm })
+
+      res.json({ validation })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
   app.delete('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserRemovePermission, async (req, res, next) => {
     try {

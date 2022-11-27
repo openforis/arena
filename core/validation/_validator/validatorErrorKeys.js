@@ -160,4 +160,12 @@ export const ValidatorErrorKeys = {
     roleRequired: 'validationErrors.userAccessRequestAccept.roleRequired',
     surveyNameRequired: 'validationErrors.userAccessRequestAccept.surveyNameRequired',
   },
+
+  userPasswordChange: {
+    oldPasswordRequired: 'validationErrors.userPasswordChange.oldPasswordRequired',
+    oldPasswordWrong: 'validationErrors.userPasswordChange.oldPasswordWrong',
+    newPasswordRequired: 'validationErrors.userPasswordChange.newPasswordRequired',
+    confirmPasswordRequired: 'validationErrors.userPasswordChange.confirmPasswordRequired',
+    confirmedPasswordNotMatching: 'validationErrors.userPasswordChange.confirmedPasswordNotMatching',
+  },
 }
