@@ -495,7 +495,13 @@ $t(common.cantUndoWarning)`,
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadTemplate: 'Download template',
     forceImportFromAnotherSurvey: 'Force import from another survey',
-    importComplete: 'Import complete. {{insertedRecords}} records imported',
+    importComplete: `## Import complete:
+
+- {{rowsProcessed}} rows processed
+- {{updatedValues}} values updated
+- {{insertedRecords}} records created
+- {{updatedRecords}} records updated
+    `,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',
@@ -504,6 +510,10 @@ $t(common.cantUndoWarning)`,
       label: 'Import type',
       insertNewRecords: 'Insert new records',
       updateExistingRecords: 'Update existing records',
+    },
+    options: {
+      header: 'Options',
+      insertMissingNodes: 'Insert missing entities or attributes',
     },
     selectCSVFileToImport: 'Select CSV file to import',
   },
@@ -1227,8 +1237,22 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
-      emptyFile: 'The file you are trying to import is empty',
+      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
+    },
+
+    dataImport: {
+      emptyFile: 'The file you are trying to import is empty',
+      invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
+      invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
+      invalidCode: 'Invalid code in column {{headers}}: {{code}}',
+      invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
+      invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
+      invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
+      missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
+      errorUpdatingValues: 'Error updating values',
+      recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
+      recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 
     expressions: {
@@ -1425,6 +1449,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+    record: {
+      entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
+    },
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',

@@ -214,7 +214,15 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
   return job
 }
 
-export const startCSVDataImportJob = ({ user, surveyId, filePath, cycle, entityDefUuid, insertNewRecords = false }) => {
+export const startCSVDataImportJob = ({
+  user,
+  surveyId,
+  filePath,
+  cycle,
+  entityDefUuid,
+  insertNewRecords = false,
+  insertMissingNodes = false,
+}) => {
   const job = new DataImportJob({
     user,
     surveyId,
@@ -222,6 +230,7 @@ export const startCSVDataImportJob = ({ user, surveyId, filePath, cycle, entityD
     cycle,
     entityDefUuid,
     insertNewRecords,
+    insertMissingNodes,
   })
   JobManager.executeJobThread(job)
   return job

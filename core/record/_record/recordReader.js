@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Records } from '@openforis/arena-core'
+import { Nodes, Records } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
@@ -217,21 +217,23 @@ export const findChildByKeyValues =
         return sibling
       }
       const keyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey)
-      return keyDefs.every((keyDef) => {
-        const keyDefUuid = NodeDef.getUuid(keyDef)
-        const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
-        const keyAttributeValue = Node.getValue(keyAttribute)
-        const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
+      return keyDefs
+        .filter((keyDef) => Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef)))
+        .every((keyDef) => {
+          const keyDefUuid = NodeDef.getUuid(keyDef)
+          const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
+          const keyAttributeValue = Node.getValue(keyAttribute)
+          const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
 
-        return NodeValues.isValueEqual({
-          survey,
-          nodeDef: keyDef,
-          record,
-          parentNode: sibling,
-          value: keyAttributeValue,
-          valueSearch: keyAttributeValueSearch,
+          return NodeValues.isValueEqual({
+            survey,
+            nodeDef: keyDef,
+            record,
+            parentNode: sibling,
+            value: keyAttributeValue,
+            valueSearch: keyAttributeValueSearch,
+          })
         })
-      })
     })
   }
 
@@ -249,7 +251,9 @@ export const findDescendantByKeyValues =
     const entityDef = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
     const hierarchyToVisit = [...NodeDef.getMetaHierarchy(entityDef), descendantDefUuid]
     hierarchyToVisit.shift()
-    hierarchyToVisit.some((nodeDefUuid) => {
+
+    while (hierarchyToVisit.length && currentNode) {
+      const nodeDefUuid = hierarchyToVisit.shift()
       const descendant = findChildByKeyValues({
         survey,
         parentNode: currentNode,
@@ -257,12 +261,8 @@ export const findDescendantByKeyValues =
         keyValuesByDefUuid,
       })(record)
 
-      if (!descendant) {
-        currentNode = null
-        return false // break the loop
-      }
       currentNode = descendant
-    })
+    }
     return currentNode
   }
 

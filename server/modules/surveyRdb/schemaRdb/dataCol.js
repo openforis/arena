@@ -9,7 +9,7 @@ export const getName = NodeDefTable.getColumnName
 
 export const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
-  const valueFn = valueFnProcessor(survey, nodeDefCol, nodeCol)
+  const valueFn = valueFnProcessor({ survey, nodeDefCol, nodeCol })
   const values = getNames(nodeDefCol).map((columnName) => valueFn(nodeCol, columnName))
   return values
 }

@@ -8,10 +8,10 @@ export class RecordsValidationBatchPersister extends BatchPersister {
     super(
       async (recordUuidsAndValidations) =>
         RecordManager.updateRecordValidationsFromValues(this.surveyId, recordUuidsAndValidations, this.tx),
-      BATCH_SIZE
+      BATCH_SIZE,
+      tx
     )
 
     this.surveyId = surveyId
-    this.tx = tx
   }
 }
