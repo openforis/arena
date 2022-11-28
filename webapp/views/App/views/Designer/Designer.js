@@ -11,14 +11,13 @@ import CategoryList from '@webapp/components/survey/CategoryList'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 
 import { appModules, designerModules } from '@webapp/app/appModules'
-import { useAuthCanEditSurvey, useAuthCanUseAnalysis } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
 
 const Designer = () => {
   const canEditSurvey = useAuthCanEditSurvey()
-  const canAnalyzeRecords = useAuthCanUseAnalysis()
 
   return (
     <SurveyDefsLoader draft={canEditSurvey} validate={canEditSurvey}>
@@ -46,32 +45,28 @@ const Designer = () => {
             component: SurveyHierarchy,
             path: designerModules.surveyHierarchy.path,
           },
-          ...(canAnalyzeRecords
-            ? [
-                // Category
-                {
-                  component: CategoryList,
-                  path: designerModules.categories.path,
-                },
-                {
-                  component: CategoryDetails,
-                  path: designerModules.category.path,
-                },
-                {
-                  component: CategoryDetails,
-                  path: `${designerModules.category.path}/:categoryUuid`,
-                },
-                // Taxonomy
-                {
-                  component: TaxonomyList,
-                  path: designerModules.taxonomies.path,
-                },
-                {
-                  component: TaxonomyDetails,
-                  path: `${designerModules.taxonomy.path}/:taxonomyUuid`,
-                },
-              ]
-            : []),
+          // Category
+          {
+            component: CategoryList,
+            path: designerModules.categories.path,
+          },
+          {
+            component: CategoryDetails,
+            path: designerModules.category.path,
+          },
+          {
+            component: CategoryDetails,
+            path: `${designerModules.category.path}/:categoryUuid`,
+          },
+          // Taxonomy
+          {
+            component: TaxonomyList,
+            path: designerModules.taxonomies.path,
+          },
+          {
+            component: TaxonomyDetails,
+            path: `${designerModules.taxonomy.path}/:taxonomyUuid`,
+          },
         ]}
       />
     </SurveyDefsLoader>

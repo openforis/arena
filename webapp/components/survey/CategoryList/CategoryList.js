@@ -16,10 +16,11 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
+import { Button, ButtonDelete, ButtonIconEditOrView } from '@webapp/components'
+
 import TableHeaderLeft from './TableHeaderLeft'
 
 import { useActions, useLocalState } from './store'
-import { Button, ButtonDelete, ButtonIconEdit } from '@webapp/components/buttons'
 
 const CategoryList = (props) => {
   const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
@@ -115,16 +116,17 @@ const CategoryList = (props) => {
     })
   }
 
+  // DETAILS
+  columns.push({
+    key: 'details',
+    renderItem: ({ item: category }) => (
+      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} />
+    ),
+    width: '75px',
+  })
+
   if (canEdit) {
     columns.push(
-      // EDIT
-      {
-        key: 'edit',
-        renderItem: ({ item: category }) => (
-          <ButtonIconEdit size="small" onClick={() => Actions.edit({ category })} label="common.edit" />
-        ),
-        width: '75px',
-      },
       // DELETE
       {
         key: 'delete',

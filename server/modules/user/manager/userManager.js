@@ -28,6 +28,7 @@ export const {
   fetchUserProfilePicture,
   fetchSystemAdministratorsEmail,
   updateNamePasswordAndStatus,
+  updatePassword,
   resetUsersPrefsSurveyCycle,
   importNewUser,
 } = UserRepository

@@ -5,25 +5,9 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as UserValidator from '@core/user/userValidator'
 import * as User from '@core/user/user'
-
-const validPasswordRe = new RegExp(/^\S+$/)
-const passwordStrengthRe = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d).{8,}$/)
+import { UserPasswordValidator } from '@core/user/userPasswordValidator'
 
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
-
-const _validatePassword = (propName, item) => {
-  const password = getProp(propName)(item)
-
-  if (!validPasswordRe.test(password)) {
-    return { key: Validation.messageKeys.user.passwordInvalid }
-  }
-
-  if (!passwordStrengthRe.test(password)) {
-    return { key: Validation.messageKeys.user.passwordUnsafe }
-  }
-
-  return null
-}
 
 const _validatePasswordConfirm = (propName, item) => {
   const { password } = item
@@ -46,7 +30,10 @@ export const validateResetPasswordObj = async (obj) =>
   Validator.validate(obj, {
     [User.keysProps.title]: [Validator.validateRequired(Validation.messageKeys.user.titleRequired)],
     name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
-    password: [Validator.validateRequired(Validation.messageKeys.user.passwordRequired), _validatePassword],
+    password: [
+      Validator.validateRequired(Validation.messageKeys.user.passwordRequired),
+      UserPasswordValidator.validatePassword,
+    ],
     passwordConfirm: [_validatePasswordConfirm],
   })
 

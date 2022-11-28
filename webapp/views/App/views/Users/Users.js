@@ -14,6 +14,7 @@ import UsersListSurvey from './UsersListSurvey'
 import UserInvite from './UserInvite'
 import UserEdit from './UserEdit'
 import { UsersAccessRequest } from './UsersAccessRequest'
+import UserPasswordChange from './UserPasswordChange'
 
 const Users = () => {
   const user = useUser()
@@ -55,6 +56,10 @@ const Users = () => {
         {
           component: UserEdit,
           path: `${userModules.user.path}/:userUuid`,
+        },
+        {
+          component: UserPasswordChange,
+          path: userModules.userPasswordChange.path,
         },
       ]}
     />

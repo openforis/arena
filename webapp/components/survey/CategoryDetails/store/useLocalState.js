@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useIsCategoriesRoute, useOnBrowserBack } from '@webapp/components/hooks'
 
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+
 import { useActions } from './actions'
 import { State } from './state'
 
@@ -9,6 +11,7 @@ export const useLocalState = (props) => {
   const { categoryUuid, onCategoryUpdate } = props
 
   const inCategoriesPath = useIsCategoriesRoute()
+  const canEdit = useAuthCanEditSurvey()
 
   const [state, setState] = useState({})
 
@@ -26,7 +29,7 @@ export const useLocalState = (props) => {
     const cleanupCategory = useCallback(async () => Actions.cleanupCategory({ categoryUuid }), [])
 
     useOnBrowserBack({
-      active: !categoryCleaned,
+      active: canEdit && !categoryCleaned,
       onBack: cleanupCategory,
     })
   }

@@ -9,12 +9,15 @@ $borderColor: $greyBorder;
 }
 
 .category__header {
-  display: grid;
-  grid-template-columns: 1fr repeat(4, 12rem);
-  column-gap: 1rem;
+  display: flex;
+  gap: 1rem;
 
-  .form-item.check {
-    display: flex;
+  .form-item {
+    width: 100%;
+
+    &.check {
+      display: flex;
+    }
   }
 }
 
