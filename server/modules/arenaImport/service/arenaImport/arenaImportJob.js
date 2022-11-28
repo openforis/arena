@@ -90,7 +90,7 @@ export default class ArenaImportJob extends Job {
         this.logDebug(`skipping 'temporary' flag remove for survey ${surveyId}`)
       }
     }
-    await FileUtils.rmdir(filePath)
+    FileUtils.deleteFile(filePath)
   }
 }
 

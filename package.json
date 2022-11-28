@@ -2,8 +2,8 @@
   "license": "MIT",
   "name": "open-foris-arena",
   "engines": {
-    "node": "^14.17.0",
-    "yarn": "^1.22.5"
+    "node": "^18.12.1",
+    "yarn": "^1.22.19"
   },
   "scripts": {
     "build-dev": "cross-env NODE_ENV=development webpack --mode development --config webpack.config.babel.js",
