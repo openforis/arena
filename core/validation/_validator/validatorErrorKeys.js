@@ -44,6 +44,8 @@ export const ValidatorErrorKeys = {
   },
 
   dataImport: {
+    emptyFile: 'validationErrors.dataImport.emptyFile',
+    errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },

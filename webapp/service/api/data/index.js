@@ -25,8 +25,15 @@ export const startCollectRecordsImportJob = async ({
   return job
 }
 
-export const startDataImportFromCsvJob = async ({ surveyId, cycle, entityDefUuid, file, insertNewRecords }) => {
-  const formData = objectToFormData({ cycle, entityDefUuid, file, insertNewRecords })
+export const startDataImportFromCsvJob = async ({
+  surveyId,
+  cycle,
+  entityDefUuid,
+  file,
+  insertNewRecords = false,
+  insertMissingNodes = false,
+}) => {
+  const formData = objectToFormData({ cycle, entityDefUuid, file, insertNewRecords, insertMissingNodes })
 
   const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcsv`, formData)
   const { job } = data

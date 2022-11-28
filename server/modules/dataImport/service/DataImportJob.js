@@ -10,6 +10,7 @@ import * as Validation from '@core/validation/validation'
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+
 import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
@@ -19,6 +20,15 @@ import { DataImportFileReader } from './dataImportFileReader'
 export default class DataImportJob extends Job {
   constructor(params) {
     super(DataImportJob.type, params)
+
+    this.insertedRecordsUuids = new Set()
+    this.updatedRecordsUuids = new Set()
+    this.updatedValues = 0
+
+    this.currentRecord = null
+    this.nodesUpdateBatchPersister = null
+    this.nodesInsertBatchPersister = null
+    this.recordsValidationBatchPersister = null
   }
 
   async execute() {
@@ -35,6 +45,14 @@ export default class DataImportJob extends Job {
     await this.fetchRecordsSummary()
 
     await this.startCsvReader()
+
+    if (!this.hasErrors() && this.processed === 0) {
+      // Error: empty file
+      this._addError(Validation.messageKeys.dataImport.emptyFile)
+    }
+    if (this.hasErrors()) {
+      await this.setStatusFailed()
+    }
   }
 
   validateParameters() {
@@ -85,27 +103,34 @@ export default class DataImportJob extends Job {
   async startCsvReader() {
     const { entityDefUuid, filePath, survey } = this.context
 
-    const reader = await DataImportFileReader.createReader({
-      filePath,
-      survey,
-      entityDefUuid,
-      onRowItem: (item) => this.onRowItem(item),
-      onTotalChange: (total) => (this.total = total),
-    })
+    try {
+      const reader = await DataImportFileReader.createReader({
+        filePath,
+        survey,
+        entityDefUuid,
+        onRowItem: (item) => this.onRowItem(item),
+        onTotalChange: (total) => (this.total = total),
+      })
 
-    await reader.start()
+      await reader.start()
+    } catch (e) {
+      const errorKey = e.key || e.toString()
+      const errorParams = e.params
+      this._addError(errorKey, errorParams)
+    }
   }
 
   async getOrFetchRecord({ valuesByDefUuid }) {
-    const { user } = this
-    const { cycle, insertNewRecords, recordsSummary, survey } = this.context
+    const { cycle, insertNewRecords, recordsSummary, survey, surveyId, user } = this.context
 
     // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+
     const recordSummary = recordsSummary.find((record) =>
       rootKeyDefs.every((rootKeyDef) => {
         const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
         const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+
         return NodeValues.isValueEqual({
           survey,
           nodeDef: rootKeyDef,
@@ -114,6 +139,7 @@ export default class DataImportJob extends Job {
         })
       })
     )
+
     const keyValues = rootKeyDefs
       .map((rootKeyDef) => {
         const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
@@ -124,27 +150,25 @@ export default class DataImportJob extends Job {
     if (insertNewRecords) {
       // check if record with the same key values already exists
       if (recordSummary) {
-        this.addError({
-          error: Validation.newInstance(false, {}, [
-            { key: Validation.messageKeys.dataImport.recordAlreadyExisting, params: { keyValues } },
-          ]),
-        })
+        this._addError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues })
         return null
       }
       const recordToInsert = Record.newRecord(user, cycle)
       const record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, this.tx)
       this.currentRecord = await RecordManager.initNewRecord({ user, survey, record }, this.tx)
-      return this.currentRecord
+
+      this.insertedRecordsUuids.add(Record.getUuid(record))
+
+      return {
+        newRecord: true,
+        record: this.currentRecord,
+      }
     }
 
     // insertNewRecords === false : updating existing record
 
     if (!recordSummary) {
-      this.addError({
-        error: Validation.newInstance(false, {}, [
-          { key: Validation.messageKeys.dataImport.recordNotFound, params: { keyValues } },
-        ]),
-      })
+      this._addError(Validation.messageKeys.dataImport.recordNotFound, { keyValues })
       return null
     }
 
@@ -153,44 +177,88 @@ export default class DataImportJob extends Job {
     // avoid loading the same record multiple times
     if (this.currentRecord?.uuid !== recordUuid) {
       this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
-        { surveyId: this.surveyId, recordUuid, draft: false },
+        { surveyId, recordUuid, draft: false },
         this.tx
       )
     }
-    return this.currentRecord
+    return {
+      newRecord: false,
+      record: this.currentRecord,
+    }
   }
 
   async onRowItem({ valuesByDefUuid }) {
-    const { survey, entityDefUuid } = this.context
+    const { context, tx } = this
+    const { survey, entityDefUuid, insertMissingNodes } = context
 
-    const record = await this.getOrFetchRecord({ valuesByDefUuid })
+    const { record, newRecord } = (await this.getOrFetchRecord({ valuesByDefUuid })) || {}
+
     if (record) {
-      const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
-        survey,
-        entityDefUuid,
-        valuesByDefUuid,
-      })(record)
+      try {
+        const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
+          survey,
+          entityDefUuid,
+          valuesByDefUuid,
+          insertMissingNodes,
+        })(record)
 
-      this.currentRecord = recordUpdated
+        this.currentRecord = recordUpdated
 
-      await this.recordsValidationBatchPersister.addItem([
-        Record.getUuid(this.currentRecord),
-        Record.getValidation(this.currentRecord),
-      ])
-      const nodesArray = Object.values(nodesUpdated)
-      nodesArray.sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
-      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+        const recordUuid = Record.getUuid(this.currentRecord)
+
+        const nodesArray = Object.values(nodesUpdated)
+
+        if (nodesArray.length > 0) {
+          await this.recordsValidationBatchPersister.addItem([recordUuid, Record.getValidation(this.currentRecord)])
+
+          this.updatedValues += nodesArray.filter(NodeDef.isAttribute).length
+
+          this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
+
+          await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
+          await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+        }
+
+        // update counts
+        if (newRecord) {
+          this.updatedValues += Record.getNodesArray(record).length
+        } else if (nodesArray.length > 0) {
+          this.updatedValues += nodesArray.length
+          this.updatedRecordsUuids.add(recordUuid)
+        }
+      } catch (e) {
+        const { key, params } = e
+        const errorKey = key || Validation.messageKeys.dataImport.errorUpdatingValues
+        this._addError(errorKey, params)
+      }
     }
     this.incrementProcessedItems()
   }
 
-  async beforeEnd() {
-    if (this.isRunning()) {
-      await this.recordsValidationBatchPersister.flush()
-      await this.nodesInsertBatchPersister.flush()
-      await this.nodesUpdateBatchPersister.flush()
-    }
+  async beforeSuccess() {
+    await this.nodesInsertBatchPersister.flush()
+    await this.nodesUpdateBatchPersister.flush()
+    await this.recordsValidationBatchPersister.flush()
+
+    const {
+      insertedRecordsUuids,
+      updatedRecordsUuids: updatedRecordsByUuid,
+      processed: rowsProcessed,
+      updatedValues,
+    } = this
+
+    this.setResult({
+      insertedRecords: insertedRecordsUuids.size,
+      updatedRecords: updatedRecordsByUuid.size,
+      rowsProcessed,
+      updatedValues,
+    })
+  }
+
+  _addError(key, params = {}) {
+    this.addError({
+      error: Validation.newInstance(false, {}, [{ key, params }]),
+    })
   }
 }
 

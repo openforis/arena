@@ -11,10 +11,10 @@ export class NodesInsertBatchPersister extends BatchPersister {
           { user: this.user, surveyId: this.surveyId, nodes, systemActivity: true },
           this.tx
         ),
-      BATCH_SIZE
+      BATCH_SIZE,
+      tx
     )
     this.user = user
     this.surveyId = surveyId
-    this.tx = tx
   }
 }
