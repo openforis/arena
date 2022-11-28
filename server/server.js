@@ -4,6 +4,7 @@ import { SRSs } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import * as UserService from '@server/modules/user/service/userService'
 
 import * as appCluster from './system/appCluster'
 
@@ -13,6 +14,8 @@ const initialize = async () => {
 
   // initialize SRSs
   await SRSs.init()
+
+  await UserService.insertSystemAdminUserIfNotExisting()
 
   await appCluster.run()
 }
