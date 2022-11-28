@@ -15,8 +15,8 @@ export const validateUser = async (user) =>
     [User.keys.authGroupsUuids]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })
 
-export const validateInvitation = async (userInvite) =>
-  Validator.validate(userInvite, {
+export const validateInvitation = async (invitation) =>
+  Validator.validate(invitation, {
     [UserInvite.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
     [UserInvite.keys.groupUuid]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   })
