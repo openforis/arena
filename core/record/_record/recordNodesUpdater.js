@@ -9,6 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
+import SystemError from '@core/systemError'
 
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
@@ -102,11 +103,19 @@ const _getOrCreateEntityByKeys =
     if (entity) {
       return { entity, updateResult: null }
     }
-    if (!insertMissingNodes) {
-      throw new Error('entity not found')
-    }
-    // insert entity node (with keys)
+    // entity doesn't exist
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+
+    if (!insertMissingNodes) {
+      const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
+      const keyValues = keyDefs.map((keyDef) => {
+        const keyDefUuid = NodeDef.getUuid(keyDef)
+        return valuesByDefUuid[keyDefUuid]
+      })
+      throw new SystemError('appErrors.record.entityNotFound', { entityName: NodeDef.getName(entityDef), keyValues })
+    }
+
+    // insert missing entity node (with keys)
     const entityParentDef = Survey.getNodeDefAncestorMultipleEntity(entityDef)(survey)
     const entityParent = RecordReader.findDescendantByKeyValues({
       survey,
@@ -114,7 +123,10 @@ const _getOrCreateEntityByKeys =
       keyValuesByDefUuid: valuesByDefUuid,
     })(record)
     if (!entityParent) {
-      throw new Error('cannot find ancestor node to create entity into')
+      throw new SystemError('record.cannotFindAncestorForEntity', {
+        entityName: NodeDef.getName(entityDef),
+        ancestorName: NodeDef.getName(entityParentDef),
+      })
     }
     const { entity: entityInserted, updateResult } = _addEntityAndKeyValues({
       survey,

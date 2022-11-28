@@ -25,6 +25,7 @@ const LanguagesEditor = (props) => {
       </label>
 
       <InputChips
+        className="lanuages_editor__input_chips"
         idInput={idInput}
         items={appLanguages}
         selection={selection}

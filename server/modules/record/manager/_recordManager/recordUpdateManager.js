@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as PromiseUtils from '@core/promiseUtils'
+import * as ObjectUtils from '@core/objectUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -312,9 +313,9 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
   }
 }
 
-export const persistNodesToRDB = async ({ survey, record, nodes }, t) => {
+export const persistNodesToRDB = async ({ survey, record, nodesArray }, t) => {
   // include ancestor nodes (used to find the correct rdb table to update)
-  const nodesAndDependentsAndAncestors = Object.values(nodes).reduce((nodesAcc, node) => {
+  const nodesAndDependentsAndAncestors = nodesArray.reduce((nodesAcc, node) => {
     Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
     return nodesAcc
   }, {})
@@ -322,11 +323,13 @@ export const persistNodesToRDB = async ({ survey, record, nodes }, t) => {
   await DataTableUpdateRepository.updateTables({ survey, record, nodes: nodesAndDependentsAndAncestors }, t)
 
   // Merge updated nodes with existing ones (remove created/updated flags nodes)
+  const nodes = ObjectUtils.toUuidIndexedObj(nodesArray)
   return Record.mergeNodes(nodes, true)(record)
 }
 
 const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {
-  const nodesToValidate = Object.values(nodes).reduce(
+  const nodesArray = Object.values(nodes)
+  const nodesToValidate = nodesArray.reduce(
     (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
     {}
   )
@@ -345,7 +348,7 @@ const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValida
 
   // 4. update survey rdb
   if (!Record.isPreview(recordUpdated)) {
-    recordUpdated = await persistNodesToRDB({ survey, record: recordUpdated, nodes }, t)
+    recordUpdated = await persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, t)
   }
   return recordUpdated
 }
