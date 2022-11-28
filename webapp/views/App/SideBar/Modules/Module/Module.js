@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -8,10 +8,9 @@ import * as SideBarModule from '../utils'
 import ModuleLink from '../ModuleLink'
 import SubModules from '../SubModules'
 
-const Module = (props) => {
+const Module = forwardRef((props, ref) => {
   const { surveyInfo, module, pathname, sideBarOpened, isOver, onMouseEnter } = props
 
-  const elementRef = SideBarModule.getElementRef(module)
   const isModuleHome = SideBarModule.isHome(module)
   const isSurveySelectionRequired = SideBarModule.isSurveySelectionRequired(module)
 
@@ -27,7 +26,7 @@ const Module = (props) => {
     <div
       className={`sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
       data-testid={TestId.sidebar.module(SideBarModule.getKey(module))}
-      ref={elementRef}
+      ref={ref}
       onMouseEnter={
         isModuleHome || sideBarOpened
           ? null
@@ -54,7 +53,7 @@ const Module = (props) => {
       )}
     </div>
   )
-}
+})
 
 Module.propTypes = {
   surveyInfo: PropTypes.object,

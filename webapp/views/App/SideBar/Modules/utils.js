@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import * as R from 'ramda'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -20,7 +19,6 @@ const keys = {
   uri: 'uri',
   icon: 'icon',
   root: 'root',
-  elementRef: 'elementRef',
   children: 'children',
   hidden: 'hidden',
   external: 'external',
@@ -32,7 +30,6 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
   [keys.uri]: module.uri ? module.uri : appModuleUri(module),
   [keys.icon]: module.icon,
   [keys.root]: root,
-  [keys.elementRef]: useRef(null),
   [keys.children]: children ? children.map((childModule) => getModule({ module: childModule, root: false })) : [],
   [keys.hidden]: hidden,
   [keys.external]: module.external,
@@ -42,6 +39,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
   const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
   const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
   const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
+  const canImportRecords = Authorizer.canImportRecords(user, surveyInfo)
 
   return [
     // home
@@ -65,7 +63,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
         ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
         ...(Authorizer.canUseCharts(user, surveyInfo) ? [dataModules.charts] : []),
         ...(canExportRecords ? [dataModules.export] : []),
-        ...(canEditSurvey ? [dataModules.import] : []),
+        ...(canImportRecords ? [dataModules.import] : []),
         ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
       ],
       hidden: Survey.isTemplate(surveyInfo),
@@ -108,6 +106,3 @@ export const isActive = (pathname) => (module) => {
   // Module home is active when page is on dashboard
   return isHome(module) ? pathname === appModuleUri(homeModules.dashboard) : R.startsWith(module.uri, pathname)
 }
-
-export const getElementRef = R.prop(keys.elementRef)
-export const getDomElement = R.pipe(getElementRef, R.prop('current'))
