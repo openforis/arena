@@ -22,7 +22,7 @@ import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordManager/recordCreationManager'
 export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
 
-export const { insertNode } = RecordUpdateManager
+export const { insertNode, persistNodesToRDB } = RecordUpdateManager
 
 // ==== READ
 
