@@ -42,6 +42,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
   const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
   const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
   const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
+  const canImportRecords = Authorizer.canImportRecords(user, surveyInfo)
 
   return [
     // home
@@ -65,7 +66,7 @@ export const getModulesHierarchy = (user, surveyInfo) => {
         ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
         ...(Authorizer.canUseCharts(user, surveyInfo) ? [dataModules.charts] : []),
         ...(canExportRecords ? [dataModules.export] : []),
-        ...(canEditSurvey ? [dataModules.import] : []),
+        ...(canImportRecords ? [dataModules.import] : []),
         ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
       ],
       hidden: Survey.isTemplate(surveyInfo),
