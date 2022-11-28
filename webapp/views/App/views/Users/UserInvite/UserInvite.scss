@@ -1,13 +1,13 @@
 @import '~@webapp/style/vars';
 
 .user-invite {
-  width: 50%;
+  width: 70%;
   margin: auto;
   padding-top: 1rem;
   grid-row-gap: 1.5rem;
 
   .form-item {
-    grid-template-columns: 0.1fr 0.9fr;
+    grid-template-columns: 0.2fr 0.8fr;
 
     .tooltip {
       &:hover {
