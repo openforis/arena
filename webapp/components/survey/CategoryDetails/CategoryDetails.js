@@ -81,27 +81,29 @@ const CategoryDetails = (props) => {
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
             label="common.csvExport"
           />
-          <ButtonMenu
-            label="categoryEdit.templateForDataImport"
-            iconClassName="icon-download2 icon-14px"
-            popupComponent={
-              <>
-                <ButtonDownload
-                  className="btn-transparent"
-                  testId={TestId.categoryDetails.templateForDataImportBtn}
-                  href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                  label="categoryEdit.templateForDataImport"
-                />
-                <ButtonDownload
-                  className="btn-transparent"
-                  testId={TestId.categoryDetails.templateForDataImportGenericBtn}
-                  href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                  requestParams={{ generic: true }}
-                  label="categoryEdit.templateForDataImportGeneric"
-                />
-              </>
-            }
-          />
+          {!readOnly && (
+            <ButtonMenu
+              label="categoryEdit.templateForDataImport"
+              iconClassName="icon-download2 icon-14px"
+              popupComponent={
+                <>
+                  <ButtonDownload
+                    className="btn-transparent"
+                    testId={TestId.categoryDetails.templateForDataImportBtn}
+                    href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                    label="categoryEdit.templateForDataImport"
+                  />
+                  <ButtonDownload
+                    className="btn-transparent"
+                    testId={TestId.categoryDetails.templateForDataImportGenericBtn}
+                    href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                    requestParams={{ generic: true }}
+                    label="categoryEdit.templateForDataImportGeneric"
+                  />
+                </>
+              }
+            />
+          )}
 
           {Category.isReportingData(category) && (
             <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
