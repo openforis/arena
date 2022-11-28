@@ -13,14 +13,13 @@ import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import Markdown from '@webapp/components/markdown'
+import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
 
 import { TestId } from '@webapp/utils/testId'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import { useInviteUser } from './store'
-import { Button } from '@webapp/components'
 
 const UserInviteComponent = () => {
   const { userInvite, onUpdate, onInvite } = useInviteUser()
@@ -67,6 +66,26 @@ const UserInviteComponent = () => {
           <ul dangerouslySetInnerHTML={{ __html: i18n.t(`userInviteView.groupPermissions.${selectedGroupName}`) }} />
         </FormItem>
       )}
+
+      <FormItem
+        label={
+          <div>
+            {i18n.t('userInviteView.messageOptional')}
+            <ButtonIconInfo
+              title="userInviteView.messageInfo"
+              onClick={() => window.open('https://www.markdownguide.org/basic-syntax', 'markdown-guide', 'noopener')}
+            />
+          </div>
+        }
+      >
+        <Input
+          id={TestId.userInvite.message}
+          inputType="textarea"
+          onChange={(value) => onUpdate({ name: UserInvite.keys.message, value })}
+          validation={Validation.getFieldValidation(UserInvite.keys.message)(validation)}
+          value={UserInvite.getMessage(userInvite)}
+        />
+      </FormItem>
 
       <div className="user-invite__buttons">
         <Button
