@@ -9,6 +9,7 @@ import { useI18n, useLang } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
+import { Button, ButtonIconEditOrView } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
@@ -41,23 +42,23 @@ const Row = (props) => {
       </div>
 
       {(canSelect || selected) && (
-        <button type="button" className="btn btn-s" onClick={() => Actions.select({ state })}>
-          <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`} />
-          {selected ? i18n.t(`common.selected`) : i18n.t(`common.select`)}
-        </button>
+        <Button
+          iconClassName={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px `}
+          label={selected ? 'common.selected' : 'common.select'}
+          onClick={() => Actions.select({ state })}
+          size="small"
+        />
       )}
 
+      <ButtonIconEditOrView onClick={() => Actions.edit({ state })} canEdit={canEdit} />
+
       {canEdit && (
-        <button type="button" className="btn btn-s" onClick={() => Actions.edit({ state })}>
-          <span className="icon icon-pencil2 icon-12px icon-left" />
-          {i18n.t('common.edit')}
-        </button>
-      )}
-      {canEdit && (
-        <button type="button" className="btn btn-s" onClick={() => Actions.delete({ state })}>
-          <span className="icon icon-bin2 icon-12px icon-left" />
-          {i18n.t('common.delete')}
-        </button>
+        <Button
+          iconClassName="icon-bin2 icon-12px"
+          label="common.delete"
+          onClick={() => Actions.delete({ state })}
+          size="small"
+        />
       )}
     </>
   )
