@@ -29,6 +29,7 @@ export const formats = {
   dateDefault: 'dd/MM/yyyy',
   dateISO: 'yyyy-MM-dd',
   datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
+  datetimeExport: 'yyyy-MM-dd HH:mm:ss',
   datetimeDisplay: 'dd/MM/yyyy HH:mm:ss',
   datetimeISO: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`,
   timeStorage: 'HH:mm',
@@ -121,6 +122,8 @@ export const formatDateTimeDefault = (date) => format(date, formats.datetimeDefa
 export const formatDateTimeISO = (date) => format(addOrSubtractTimezoneOffset(date), formats.datetimeISO)
 
 export const formatDateTimeDisplay = (date) => format(date, formats.datetimeDisplay)
+
+export const formatDateTimeExport = (date) => format(date, formats.datetimeExport)
 
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 

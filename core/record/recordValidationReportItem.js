@@ -7,6 +7,9 @@ import * as NodeKeys from '@core/record/nodeKeys'
 
 const keys = {
   recordCycle: 'recordCycle',
+  recordDateCreated: 'recordDateCreated',
+  recordDateModified: 'recordDateModified',
+  recordOwnerName: 'recordOwnerName',
   recordOwnerUuid: 'recordOwnerUuid',
   recordStep: 'recordStep',
   recordUuid: 'recordUuid',
@@ -20,6 +23,9 @@ const keys = {
 
 export const getRecordCycle = R.prop(keys.recordCycle)
 export const getRecordStep = R.prop(keys.recordStep)
+export const getRecordDateCreated = R.prop(keys.recordDateCreated)
+export const getRecordDateModified = R.prop(keys.recordDateModified)
+export const getRecordOwnerName = R.prop(keys.recordOwnerName)
 export const getRecordOwnerUuid = R.prop(keys.recordOwnerUuid)
 export const getRecordUuid = R.prop(keys.recordUuid)
 const getNodeUuid = R.prop(keys.nodeUuid)
