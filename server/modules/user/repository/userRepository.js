@@ -235,6 +235,17 @@ export const updateNamePasswordAndStatus = async ({ userUuid, name, password, st
     camelize
   )
 
+export const updatePassword = async ({ userUuid, password }, client = db) =>
+  client.one(
+    `
+    UPDATE "user" u
+    SET password = $2
+    WHERE u.uuid = $1
+    RETURNING ${columnsCommaSeparated}`,
+    [userUuid, password],
+    camelize
+  )
+
 // ==== PREFS
 
 export const updateUserPrefs = async (user, client = db) =>

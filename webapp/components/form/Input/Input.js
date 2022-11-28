@@ -125,7 +125,7 @@ Input.propTypes = {
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
   title: PropTypes.string,
-  type: PropTypes.oneOf(['text', 'number']),
+  type: PropTypes.oneOf(['text', 'number', 'password']),
   validation: PropTypes.object,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   numberFormat: PropTypes.shape({

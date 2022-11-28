@@ -81,6 +81,18 @@ const UserPopupMenu = (props) => {
       <Separator />
 
       <Link
+        data-testid={TestId.header.passwordChangeBtn}
+        to={appModuleUri(userModules.userPasswordChange)}
+        onClick={onClose}
+        className="btn-s btn-transparent"
+      >
+        <span className="icon icon-pencil icon-12px icon-left" />
+        {i18n.t('appModules.userPasswordChange')}
+      </Link>
+
+      <Separator />
+
+      <Link
         data-testid={TestId.header.surveyListBtn}
         to={appModuleUri(homeModules.surveyList)}
         onClick={onClose}
