@@ -39,7 +39,6 @@ PGPASSWORD=arena
 TEMP_FOLDER=/home/your_user/openforis/arena/upload
 
 # Email service (Arena uses Sendgrid to send emails)
-ADMIN_EMAIL= # change it with the email address used to send emails
 SENDGRID_API_KEY= # get it from https://sendgrid.com/
 
 # Analysis
@@ -68,6 +67,14 @@ RECAPTCHA_SECRET_KEY=
 ## Planet Lab Maps API key (get it from https://www.planet.com/markets/mapping/)
 MAP_API_KEY_PLANET=
 
+# System Admin user email address
+# used to create default system admin user when DB is empty
+# and to send emails to the users
+ADMIN_EMAIL=
+# Admin user password: used only when default system admin user is created the first time
+# it MUST BE DELETED after the first startup
+ADMIN_PASSWORD=
+
 ```
 
 ### Install and run Arena
@@ -87,6 +94,8 @@ Once you started Arena with the previous command, you can open this address in y
 http://localhost:9090
 
 If the installation process was successful, the Arena login form should appear.
+
+When Arena starts up the first time, a system admnistrator user is created using the parameters ADMIN_EMAIL and ADMIN_PASSWORD specified in the arena.env file, so you can use that email address and password to access Arena the first time. The password can be changed using the **Change password** function in Arena.
 
 # Documentation
 
