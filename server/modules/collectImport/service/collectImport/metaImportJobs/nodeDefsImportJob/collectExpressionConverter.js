@@ -1,3 +1,4 @@
+import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
@@ -19,7 +20,7 @@ const convert = ({ survey, nodeDefCurrent, expression }) => {
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
     // predefined variables
-    { pattern: '\\$this', replace: 'this' },
+    { pattern: '\\$this', replace: Expression.thisVariable },
     { pattern: '\\$context', replace: 'parent(this)' },
     // not function
     { pattern: /not\(/, replace: '!(' },
