@@ -30,20 +30,23 @@ export const importNewUser = async (
       name,
       password,
       status,
-      User.newPrefs(surveyId, surveyCycleKey),
+      User.newPrefs({ surveyId, surveyCycleKey }),
       User.newProps({ title }),
       profilePicture,
     ],
     camelize
   )
 
-export const insertUser = async ({ surveyId, surveyCycleKey, email, password, status, title }, client = db) =>
+export const insertUser = async (
+  { email, password, status, surveyId = null, surveyCycleKey = null, title = null },
+  client = db
+) =>
   client.one(
     `
     INSERT INTO "user" AS u (email, password, status, prefs, props)
     VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
     RETURNING ${columnsCommaSeparated}`,
-    [email, password, status, User.newPrefs(surveyId, surveyCycleKey), User.newProps({ title })],
+    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), title ? User.newProps({ title }) : null],
     camelize
   )
 
@@ -205,6 +208,20 @@ export const fetchSystemAdministratorsEmail = async (client = db) =>
   `,
     [AuthGroup.groupNames.systemAdmin],
     (row) => row.email
+  )
+
+export const countSystemAdministrators = async (client = db) =>
+  client.one(
+    `
+    SELECT COUNT (*)
+    FROM "user" u 
+    JOIN auth_group_user gu ON gu.user_uuid = u.uuid
+    JOIN auth_group g
+      ON g.uuid = gu.group_uuid
+    WHERE g.name = $1
+  `,
+    [AuthGroup.groupNames.systemAdmin],
+    (row) => Number(row.count)
   )
 
 // ==== UPDATE

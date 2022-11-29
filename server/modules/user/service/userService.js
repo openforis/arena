@@ -15,11 +15,13 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { Countries } from '@core/Countries'
+import * as ProcessUtils from '@core/processUtils'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
+import * as Log from '@server/log/log'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as AuthManager from '../../auth/manager/authManager'
@@ -29,6 +31,9 @@ import * as UserPasswordUtils from './userPasswordUtils'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
+import { SystemAdminUserValidator } from './systemAdminUserValidator'
+
+const Logger = Log.getLogger('UserService')
 
 // ====== CREATE
 
@@ -186,6 +191,34 @@ export const inviteUser = async (
     }
   })
 }
+
+export const insertSystemAdminUserIfNotExisting = async (client = db) =>
+  client.tx(async (t) => {
+    Logger.debug('checking if admin users exist...')
+    const aminsCount = await UserManager.countSystemAdministrators(t)
+    Logger.info(`${aminsCount} admin users found; skipping admin user insert`)
+    if (aminsCount > 0) {
+      return null
+    }
+
+    const email = ProcessUtils.ENV.adminEmail
+    const password = ProcessUtils.ENV.adminPassword
+    if (!email && !password)
+      throw new SystemError('Cannot create system admin user: email or password not specified in environment variables')
+
+    const validation = await SystemAdminUserValidator.validate({ email, password })
+    if (Validation.isNotValid(validation))
+      throw new SystemError('Cannot create admin user: email or password are not valid')
+
+    const existingUser = await UserManager.fetchUserByEmail(email, t)
+    if (existingUser) throw new SystemError(`Cannot crate system admin user: user with email ${email} already exists`)
+
+    Logger.debug(`inserting system admin user with email: ${email}`)
+    const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
+    const user = await UserManager.insertSystemAdminUser({ email, password: passwordEncrypted }, t)
+    Logger.info(`system admin user with email ${email} inserted successfully!`)
+    return user
+  })
 
 /**
  * Generates a new reset password uuid.
