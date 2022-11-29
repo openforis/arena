@@ -11,6 +11,8 @@ export {
   ButtonIconGear,
   ButtonIconInfo,
   ButtonIconView,
+  ButtonManage,
+  ButtonMenu,
   ButtonNew,
   ButtonSave,
   ButtonInvite,
