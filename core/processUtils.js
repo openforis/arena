@@ -29,7 +29,6 @@ const ENV = {
   pgDatabase,
   pgSsl: process.env.PGSSL === 'true',
   // EMAIL
-  adminEmail: process.env.ADMIN_EMAIL,
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
@@ -47,6 +46,13 @@ const ENV = {
   reCaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
   // Map
   mapApiKeyPlanet: process.env.MAP_API_KEY_PLANET,
+  // SYSTEM ADMIN USER
+  // - admin email address
+  //   used to create default system admin user when DB is empty
+  //   and to send emails to the users)
+  adminEmail: process.env.ADMIN_EMAIL,
+  // - admin user password
+  adminPassword: process.env.ADMIN_PASSWORD,
 }
 
 module.exports = {

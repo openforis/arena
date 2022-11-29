@@ -25,6 +25,7 @@ import * as UserInvitationManager from './userInvitationManager'
 export const {
   countUsers,
   countUsersBySurveyId,
+  countSystemAdministrators,
   fetchUserProfilePicture,
   fetchSystemAdministratorsEmail,
   updateNamePasswordAndStatus,
@@ -100,6 +101,20 @@ export const insertUser = async (
     )
 
     return newUser
+  })
+
+export const insertSystemAdminUser = async ({ email, password }, client = db) =>
+  client.tx(async (t) => {
+    const newUser = await UserRepository.insertUser(
+      {
+        email,
+        password,
+        status: User.userStatus.ACCEPTED,
+      },
+      t
+    )
+    const sysAdminGroup = await AuthGroupRepository.fetchGroupByName({ name: AuthGroup.groupNames.systemAdmin }, t)
+    await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(sysAdminGroup), User.getUuid(newUser), t)
   })
 
 export const generateResetPasswordUuid = async (email, client = db) => {
