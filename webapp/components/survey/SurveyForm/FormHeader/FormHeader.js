@@ -8,7 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -18,12 +18,12 @@ import {
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
-import { ButtonDownload } from '@webapp/components/buttons'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import FormEntryActions from '../components/formEntryActions'
 import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
+import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 
 const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef, analysis } = props
@@ -32,7 +32,6 @@ const FormHeader = (props) => {
   const navigate = useNavigate()
   const i18n = useI18n()
 
-  const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
@@ -83,14 +82,8 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        {edit && canEditSurvey && (
-          <ButtonDownload
-            testId={TestId.surveyForm.schemaSummary}
-            href={`/api/survey/${surveyId}/schema-summary/`}
-            requestParams={{ cycle: surveyCycleKey }}
-            label={'surveyForm.schemaSummary'}
-          />
-        )}
+        {edit && canEditSurvey && <SurveySchemaSummaryDownloadButton />}
+
         <NodeDefLabelSwitch
           className="btn-s btn-transparent"
           labelType={nodeDefLabelType}

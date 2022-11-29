@@ -44,6 +44,8 @@ export const ValidatorErrorKeys = {
   },
 
   dataImport: {
+    emptyFile: 'validationErrors.dataImport.emptyFile',
+    errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },
@@ -159,5 +161,13 @@ export const ValidatorErrorKeys = {
     emailInvalid: 'validationErrors.userAccessRequestAccept.emailInvalid',
     roleRequired: 'validationErrors.userAccessRequestAccept.roleRequired',
     surveyNameRequired: 'validationErrors.userAccessRequestAccept.surveyNameRequired',
+  },
+
+  userPasswordChange: {
+    oldPasswordRequired: 'validationErrors.userPasswordChange.oldPasswordRequired',
+    oldPasswordWrong: 'validationErrors.userPasswordChange.oldPasswordWrong',
+    newPasswordRequired: 'validationErrors.userPasswordChange.newPasswordRequired',
+    confirmPasswordRequired: 'validationErrors.userPasswordChange.confirmPasswordRequired',
+    confirmedPasswordNotMatching: 'validationErrors.userPasswordChange.confirmedPasswordNotMatching',
   },
 }

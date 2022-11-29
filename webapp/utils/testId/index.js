@@ -217,6 +217,7 @@ export const TestId = {
   userInvite: {
     email: 'invite-user-name',
     group: 'invite-user-group',
+    message: 'invite-user-message',
     submitBtn: 'Send invitation',
   },
   validationReport: {

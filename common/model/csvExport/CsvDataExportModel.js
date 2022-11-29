@@ -69,23 +69,35 @@ export class CsvDataExportModel {
 
     return attributeDefs.reduce((acc, nodeDef) => {
       const columnsGetter = columnsByNodeDefType[NodeDef.getType(nodeDef)]
+
       const columnsPerAttribute = columnsGetter
         ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
         : [getMainColumn({ nodeDef })]
-      return [...acc, ...columnsPerAttribute]
+
+      if (NodeDef.isKey(nodeDef)) {
+        columnsPerAttribute.forEach((col) => {
+          col.key = true
+        })
+      }
+      acc.push(...columnsPerAttribute)
+      return acc
     }, [])
   }
 
   _extractAncestorsKeysColumns() {
     const ancestorsKeyColumns = []
 
-    Survey.visitAncestors(this.nodeDefContext, (nodeDefAncestor) => {
-      const ancestorKeyDefs = Survey.getNodeDefKeys(nodeDefAncestor)(this.survey)
-      const ancestorKeyColumns = this._createColumnsFromAttributeDefs({
-        attributeDefs: ancestorKeyDefs,
-      })
-      ancestorsKeyColumns.unshift(...ancestorKeyColumns)
-    })(this.survey)
+    Survey.visitAncestors(
+      this.nodeDefContext,
+      (nodeDefAncestor) => {
+        const ancestorKeyDefs = Survey.getNodeDefKeys(nodeDefAncestor)(this.survey)
+        const ancestorKeyColumns = this._createColumnsFromAttributeDefs({
+          attributeDefs: ancestorKeyDefs,
+        })
+        ancestorsKeyColumns.unshift(...ancestorKeyColumns)
+      },
+      false
+    )(this.survey)
 
     return ancestorsKeyColumns
   }
@@ -97,8 +109,9 @@ export class CsvDataExportModel {
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext, includeAnalysis)(this.survey)
       : [this.nodeDefContext] // Multiple attribute
 
-    descendantDefs = descendantDefs.filter((nodeDef) => includeFiles || !NodeDef.isFile(nodeDef))
-
+    if (!includeFiles) {
+      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
+    }
     return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 

@@ -240,6 +240,8 @@ Do you want to proceed?`,
     validationReport: 'Validation report',
 
     users: 'Users',
+    user: 'User Profile',
+    userPasswordChange: 'Change password',
     userInvite: 'Invite user',
     usersSurvey: 'Users list',
     usersList: 'Users list (all)',
@@ -495,7 +497,13 @@ $t(common.cantUndoWarning)`,
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadTemplate: 'Download template',
     forceImportFromAnotherSurvey: 'Force import from another survey',
-    importComplete: 'Import complete. {{insertedRecords}} records imported',
+    importComplete: `## Import complete:
+
+- {{rowsProcessed}} rows processed
+- {{updatedValues}} values updated
+- {{insertedRecords}} records created
+- {{updatedRecords}} records updated
+    `,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',
@@ -504,6 +512,10 @@ $t(common.cantUndoWarning)`,
       label: 'Import type',
       insertNewRecords: 'Insert new records',
       updateExistingRecords: 'Update existing records',
+    },
+    options: {
+      header: 'Options',
+      insertMissingNodes: 'Insert missing entities or attributes',
     },
     selectCSVFileToImport: 'Select CSV file to import',
   },
@@ -658,6 +670,14 @@ $t(common.cantUndoWarning)`,
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
+  userPasswordChangeView: {
+    oldPassword: 'Old password',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm new password',
+    changePassword: 'Change password',
+    passwordChangedSuccessfully: 'Password changed successfully!',
+  },
+
   userInviteView: {
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     groupPermissions: {
@@ -730,9 +750,12 @@ $t(common.cantUndoWarning)`,
         <li>edit existing records (own surveys)</li>
         <li>submit records to “Cleansing” phase</li>`,
     },
+    messageOptional: 'Message (optional)',
+    messageInfo: `The message will appear in the email sent to the user. 
+It can be simple text or Markdown language (https://www.markdownguide.org).`,
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
-      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)***, ***$t(authGroups.surveyManager.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
   },
 
@@ -1224,8 +1247,22 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
-      emptyFile: 'The file you are trying to import is empty',
+      emptyFile: '$t(validationErrors.dataImport.emptyFile)',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
+    },
+
+    dataImport: {
+      emptyFile: 'The file you are trying to import is empty',
+      invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
+      invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
+      invalidCode: 'Invalid code in column {{headers}}: {{code}}',
+      invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
+      invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
+      invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
+      missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
+      errorUpdatingValues: 'Error updating values',
+      recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
+      recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 
     expressions: {
@@ -1342,6 +1379,14 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       roleRequired: 'Role is required',
       surveyNameRequired: 'Survey name is required',
     },
+
+    userPasswordChange: {
+      oldPasswordRequired: 'Old password is required',
+      oldPasswordWrong: 'Old password is wrong',
+      newPasswordRequired: 'New password is required',
+      confirmPasswordRequired: 'Confirm password is required',
+      confirmedPasswordNotMatching: 'New password and confirm password do not match',
+    },
   },
 
   // ====== Jobs
@@ -1422,6 +1467,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+    record: {
+      entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
+    },
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
@@ -1530,6 +1578,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       </p>`,
     temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
     userInviteCommon: `<p>You have been invited to join the survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
+      {{-message}}
       <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
       </p>`,

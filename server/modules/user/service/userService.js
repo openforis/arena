@@ -1,4 +1,5 @@
 import * as fs from 'fs'
+import { marked } from 'marked'
 
 import { db } from '@server/db/db'
 
@@ -14,11 +15,13 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { Countries } from '@core/Countries'
+import * as ProcessUtils from '@core/processUtils'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
+import * as Log from '@server/log/log'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as AuthManager from '../../auth/manager/authManager'
@@ -26,6 +29,11 @@ import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
+import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
+import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
+import { SystemAdminUserValidator } from './systemAdminUserValidator'
+
+const Logger = Log.getLogger('UserService')
 
 // ====== CREATE
 
@@ -104,10 +112,10 @@ const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
 }
 
 export const inviteUser = async (
-  { user, surveyId, surveyCycleKey, userToInvite: userToInviteParam, serverUrl, repeatInvitation = false },
+  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
   client = db
 ) => {
-  const groupUuid = UserGroupInvitation.getGroupUuid(userToInviteParam)
+  const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
   const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
   const groupName = AuthGroup.getName(group)
 
@@ -117,15 +125,19 @@ export const inviteUser = async (
 
   _checkCanInviteToGroup({ user, group, surveyInfo })
 
-  const email = UserGroupInvitation.getEmail(userToInviteParam)
+  const email = UserGroupInvitation.getEmail(invitation)
   const userToInvite = await UserManager.fetchUserByEmail(email)
   const lang = User.getLang(user)
+  const message = UserGroupInvitation.getMessage(invitation)
+  const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
+
   const emailParams = {
     serverUrl,
     surveyName: Survey.getName(surveyInfo),
     surveyLabel: Survey.getLabel(surveyInfo, lang),
     groupLabel: `$t(authGroups.${groupName}.label)`,
     groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
+    message: messageParam,
   }
 
   return client.tx(async (t) => {
@@ -179,6 +191,34 @@ export const inviteUser = async (
     }
   })
 }
+
+export const insertSystemAdminUserIfNotExisting = async (client = db) =>
+  client.tx(async (t) => {
+    Logger.debug('checking if admin users exist...')
+    const aminsCount = await UserManager.countSystemAdministrators(t)
+    Logger.info(`${aminsCount} admin users found; skipping admin user insert`)
+    if (aminsCount > 0) {
+      return null
+    }
+
+    const email = ProcessUtils.ENV.adminEmail
+    const password = ProcessUtils.ENV.adminPassword
+    if (!email && !password)
+      throw new SystemError('Cannot create system admin user: email or password not specified in environment variables')
+
+    const validation = await SystemAdminUserValidator.validate({ email, password })
+    if (Validation.isNotValid(validation))
+      throw new SystemError('Cannot create admin user: email or password are not valid')
+
+    const existingUser = await UserManager.fetchUserByEmail(email, t)
+    if (existingUser) throw new SystemError(`Cannot crate system admin user: user with email ${email} already exists`)
+
+    Logger.debug(`inserting system admin user with email: ${email}`)
+    const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
+    const user = await UserManager.insertSystemAdminUser({ email, password: passwordEncrypted }, t)
+    Logger.info(`system admin user with email ${email} inserted successfully!`)
+    return user
+  })
 
 /**
  * Generates a new reset password uuid.
@@ -436,7 +476,7 @@ export const updateUser = async (user, surveyId, userToUpdate, file) => {
 export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, title }) => {
   const user = await findResetPasswordUserByUuid(resetPasswordUuid)
   if (user) {
-    const passwordEncrypted = await UserPasswordUtils.encryptPassword(password)
+    const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
     await db.tx(async (t) => {
       await UserManager.updateNamePasswordAndStatus(
         { userUuid: User.getUuid(user), name, password: passwordEncrypted, status: User.userStatus.ACCEPTED, title },
@@ -447,6 +487,32 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
   } else {
     throw new Error(`User password reset not found or expired: ${resetPasswordUuid}`)
   }
+}
+
+export const updateUserPassword = async ({ user, passwordChangeForm }) => {
+  const validation = await UserPasswordChangeFormValidator.validate(passwordChangeForm)
+  if (Validation.isNotValid(validation)) {
+    return validation
+  }
+  // check old password
+  const oldUser = await UserManager.fetchUserByUuidWithPassword(User.getUuid(user))
+  const oldPasswordEncrypted = User.getPassword(oldUser)
+  const oldPasswordParam = UserPasswordChangeForm.getOldPassword(passwordChangeForm)
+
+  if (!UserPasswordUtils.comparePassword(oldPasswordParam, oldPasswordEncrypted)) {
+    // password not matching the existing one
+    return Validation.newInstance(false, {
+      [UserPasswordChangeForm.keys.oldPassword]: Validation.newInstance(false, {}, [
+        ValidationResult.newInstance(Validation.messageKeys.userPasswordChange.oldPasswordWrong),
+      ]),
+    })
+  }
+  // store new password
+  const newPassword = UserPasswordChangeForm.getNewPassword(passwordChangeForm)
+  const newPasswordEncrypted = UserPasswordUtils.encryptPassword(newPassword)
+  await UserManager.updatePassword({ userUuid: User.getUuid(user), password: newPasswordEncrypted })
+
+  return null // no validation errors => ok
 }
 
 // DELETE

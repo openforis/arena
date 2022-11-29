@@ -177,6 +177,10 @@ export const userModules = {
     key: 'user',
     path: 'user',
   },
+  userPasswordChange: {
+    key: 'userPasswordChange',
+    path: 'userPasswordChange',
+  },
   userInvite: {
     key: 'userInvite',
     path: 'userInvite',

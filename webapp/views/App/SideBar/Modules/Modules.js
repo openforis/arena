@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as SideBarModule from './utils'
@@ -10,41 +10,61 @@ const Modules = (props) => {
   const { user, surveyInfo, pathname, sideBarOpened } = props
 
   const [overSidebar, setOverSidebar] = useState(false)
+  const moduleElementsByKeyRef = useRef({})
+
+  // Popup menu module
+  const [modulePopupMenu, setModulePopupMenu] = useState(null)
 
   const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo).filter(
     (module) => !SideBarModule.isHidden(module)
   )
 
-  // Popup menu module
-  const [modulePopupMenu, setModulePopupMenu] = useState(null)
+  const setModuleElementRef = ({ key, ref }) => {
+    moduleElementsByKeyRef.current[key] = ref
+  }
+
+  const onMouseEnter = useCallback(() => {
+    if (!sideBarOpened) {
+      setOverSidebar(true)
+    }
+  }, [sideBarOpened])
+
+  const onMouseLeave = useCallback(() => {
+    if (!sideBarOpened) {
+      setOverSidebar(false)
+    }
+  }, [sideBarOpened])
+
+  const moduleElement = modulePopupMenu ? moduleElementsByKeyRef.current[SideBarModule.getKey(modulePopupMenu)] : null
 
   return (
     <div
       className={`sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}
-      onMouseEnter={() => {
-        setOverSidebar(true)
-      }}
-      onMouseLeave={() => {
-        setOverSidebar(false)
-      }}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
-      {modulesHierarchy.map((module) => (
-        <Module
-          key={SideBarModule.getKey(module)}
-          surveyInfo={surveyInfo}
-          module={module}
-          pathname={pathname}
-          sideBarOpened={sideBarOpened}
-          isOver={modulePopupMenu && SideBarModule.getKey(module) === SideBarModule.getKey(modulePopupMenu)}
-          onMouseEnter={() => {
-            setModulePopupMenu(module)
-          }}
-        />
-      ))}
+      {modulesHierarchy.map((module) => {
+        const key = SideBarModule.getKey(module)
+        return (
+          <Module
+            key={key}
+            surveyInfo={surveyInfo}
+            module={module}
+            pathname={pathname}
+            sideBarOpened={sideBarOpened}
+            isOver={modulePopupMenu && key === SideBarModule.getKey(modulePopupMenu)}
+            onMouseEnter={() => {
+              setModulePopupMenu(module)
+            }}
+            ref={(ref) => setModuleElementRef({ key, ref })}
+          />
+        )
+      })}
 
       {modulePopupMenu && (
         <PopupMenu
           module={modulePopupMenu}
+          moduleElement={moduleElement}
           pathname={pathname}
           overSidebar={overSidebar}
           onClose={() => {

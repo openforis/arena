@@ -20,10 +20,10 @@ export const init = (app) => {
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
     try {
       const { surveyId, surveyCycleKey, repeatInvitation = false } = Request.getParams(req)
-      const userToInvite = Request.getBody(req)
+      const invitation = Request.getBody(req)
 
       if (!repeatInvitation) {
-        const validation = await UserValidator.validateInvitation(userToInvite)
+        const validation = await UserValidator.validateInvitation(invitation)
 
         if (!Validation.isValid(validation)) {
           res.json({ errorKey: 'appErrors.userInvalid' })
@@ -34,7 +34,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
       try {
-        await UserService.inviteUser({ user, surveyId, surveyCycleKey, userToInvite, serverUrl, repeatInvitation })
+        await UserService.inviteUser({ user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation })
         Response.sendOk(res)
       } catch (e) {
         const errorKey = e.key || 'appErrors.generic'
@@ -299,6 +299,19 @@ export const init = (app) => {
       await UserService.updateUserPrefs(userToUpdate)
 
       Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/user/change-password', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const passwordChangeForm = Request.getBody(req)
+
+      const validation = await UserService.updateUserPassword({ user, passwordChangeForm })
+
+      res.json({ validation })
     } catch (error) {
       next(error)
     }

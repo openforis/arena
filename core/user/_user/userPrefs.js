@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 
@@ -23,14 +25,16 @@ const surveyCyclePrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSu
 const surveyLangPrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
 
 // ====== CREATE
-export const newPrefs = (surveyId, surveyCycleKey) => ({
-  [keysPrefs.surveys]: {
-    [keysPrefs.current]: surveyId,
-    [surveyId]: {
-      [keysSurveyPrefs.cycle]: surveyCycleKey,
-    },
-  },
-})
+export const newPrefs = ({ surveyId = null, surveyCycleKey = null }) => {
+  let obj = {}
+  if (!Objects.isEmpty(surveyId)) {
+    obj = assocPrefSurveyCurrent(surveyId)(obj)
+  }
+  if (!Objects.isEmpty(surveyCycleKey)) {
+    obj = assocPrefSurveyCycle(surveyId, surveyCycleKey)(obj)
+  }
+  return obj[keys.prefs]
+}
 
 // ====== READ
 export const getPrefSurveyCurrent = R.path(pathSurveyCurrent)

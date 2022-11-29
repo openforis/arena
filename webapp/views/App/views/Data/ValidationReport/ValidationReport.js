@@ -9,10 +9,10 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import Table from '@webapp/components/Table'
+import { ButtonBack, ButtonDownload } from '@webapp/components/buttons'
 
 import RowHeader from './RowHeader'
 import Row from './Row'
-import { ButtonBack, ButtonDownload } from '@webapp/components/buttons'
 
 const ValidationReport = () => {
   const navigate = useNavigate()

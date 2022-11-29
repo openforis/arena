@@ -8,10 +8,9 @@ import * as SideBarModule from '../utils'
 import SubModules from '../SubModules'
 
 const PopupMenu = (props) => {
-  const { module, pathname, onClose, overSidebar } = props
+  const { module, moduleElement, pathname, onClose, overSidebar } = props
 
   const key = SideBarModule.getKey(module)
-  const moduleElement = SideBarModule.getDomElement(module)
 
   // Used to check if mouse is over popup-menu
   const overPopupRef = useRef(false)

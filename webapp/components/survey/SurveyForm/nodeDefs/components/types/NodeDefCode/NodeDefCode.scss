@@ -7,6 +7,8 @@
   align-items: flex-start;
 
   .form-input-chip {
+    width: 100%;
+
     .form-input {
       width: auto;
       border: none;
@@ -21,11 +23,12 @@
   }
 
   .dropdown-wrapper,
-  .dropdown {
+  .dropdown,
+  .form-input-chip .dropdown {
     width: 100%;
   }
   .dropdown {
-    height: 29px;
+    height: 34px;
   }
 }
 

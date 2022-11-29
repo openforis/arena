@@ -12,6 +12,12 @@
     grid-template-columns: 0.2fr 0.7fr;
   }
 
+  .lanuages_editor__input_chips {
+    .dropdown {
+      width: 20rem;
+    }
+  }
+
   .cycle-selector {
     width: 10rem;
   }

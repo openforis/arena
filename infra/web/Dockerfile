@@ -1,6 +1,6 @@
 ############################################################
 
-ARG node_version=14.17.0
+ARG node_version=18.12.1
 
 FROM node:${node_version} AS base
 RUN apt update
