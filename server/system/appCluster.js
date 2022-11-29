@@ -1,12 +1,14 @@
 import * as express from 'express'
 import morgan from 'morgan'
 
+import { SRSs } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
@@ -33,11 +35,12 @@ export const run = async () => {
 
   const { arenaRoot } = ProcessUtils.ENV
 
-  const imgDir = `${arenaRoot}/web-resources/img`
+  // static resources
   app.use('/', express.static(dist))
   app.use('/app*', express.static(dist))
-  app.use('/img/', express.static(imgDir))
   app.use('/guest/*', express.static(dist))
+  const imgDir = `${arenaRoot}/web-resources/img`
+  app.use('/img/', express.static(imgDir))
 
   // ====== APIs
   authApi.init(app)
@@ -45,9 +48,15 @@ export const run = async () => {
 
   await ArenaServer.start(arenaApp)
 
-  // ====== schedulers
+  // ====== System Admin user creation
+  await UserService.insertSystemAdminUserIfNotExisting()
+
+  // ====== Schedulers
   await TempFilesCleanup.init()
   await UserResetPasswordCleanup.init()
   await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
+
+  // ====== Spatial Reference Systems (SRSs)
+  await SRSs.init()
 }
