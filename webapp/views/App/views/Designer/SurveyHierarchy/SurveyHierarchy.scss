@@ -10,7 +10,9 @@
   width: 100%;
 }
 
-.survey-hierarchy__label-selector {
+.survey-hierarchy__button-bar {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   bottom: 10px;
   right: 10px;
