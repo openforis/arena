@@ -17,6 +17,8 @@ export const keysSurveyPrefs = {
   language: 'language',
 }
 
+const getPrefs = R.propOr({}, keys.prefs)
+
 const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
 const surveyPrefsPath = ({ surveyId }) => [keys.prefs, keysPrefs.surveys, String(surveyId)]
 const surveyPrefPath = ({ surveyId, key }) => [...surveyPrefsPath({ surveyId }), key]
@@ -26,14 +28,14 @@ const surveyLangPrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSur
 
 // ====== CREATE
 export const newPrefs = ({ surveyId = null, surveyCycleKey = null }) => {
-  let obj = {}
+  let tempUser = {}
   if (!Objects.isEmpty(surveyId)) {
-    obj = assocPrefSurveyCurrent(surveyId)(obj)
+    tempUser = assocPrefSurveyCurrent(surveyId)(tempUser)
   }
   if (!Objects.isEmpty(surveyCycleKey)) {
-    obj = assocPrefSurveyCycle(surveyId, surveyCycleKey)(obj)
+    tempUser = assocPrefSurveyCycle(surveyId, surveyCycleKey)(tempUser)
   }
-  return obj[keys.prefs]
+  return getPrefs(tempUser)
 }
 
 // ====== READ

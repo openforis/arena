@@ -14,7 +14,7 @@ export const keysProps = {
 export const titleKeys = ['mr', 'ms', 'preferNotToSay']
 
 // ====== CREATE
-export const newProps = ({ title, mapApiKeyByProvider = null }) => ({
+export const newProps = ({ title = null, mapApiKeyByProvider = null }) => ({
   ...(!A.isEmpty(title) ? { title } : {}),
   ...(!A.isEmpty(mapApiKeyByProvider) ? { mapApiKeyByProvider } : {}),
 })

@@ -46,7 +46,7 @@ export const insertUser = async (
     INSERT INTO "user" AS u (email, password, status, prefs, props)
     VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
     RETURNING ${columnsCommaSeparated}`,
-    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), title ? User.newProps({ title }) : null],
+    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), User.newProps({ title })],
     camelize
   )
 
@@ -294,8 +294,12 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 `)
 }
 
-/**
+/**.
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones
+ *
+ * @param surveyId
+ * @param cycleKeysDeleted
+ * @param client
  */
 export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
   const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysSurveyPrefs.cycle}}'`
