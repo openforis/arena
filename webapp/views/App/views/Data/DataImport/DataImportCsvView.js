@@ -6,19 +6,16 @@ import * as JobSerialized from '@common/job/jobSerialized'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import UploadButton from '@webapp/components/form/uploadButton'
-
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
-import { TestId } from '@webapp/utils/testId'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { ButtonDownload } from '@webapp/components'
+import { Button, ButtonDownload, Dropzone } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
 
@@ -26,6 +23,8 @@ const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
   insertNewRecords: 'insertNewRecords',
 }
+
+const fileMaxSize = 20 * 1024 * 1024 // 20MB
 
 export const DataImportCsvView = () => {
   const i18n = useI18n()
@@ -38,12 +37,13 @@ export const DataImportCsvView = () => {
   const [state, setState] = useState({
     cycle: surveyCycle,
     dataImportType: importTypes.updateExistingRecords,
+    file: null,
     importCompleteResult: null,
     insertMissingNodes: null,
     insertMissingNodesDisabled: false,
     selectedEntityDefUuid: null,
   })
-  const { cycle, dataImportType, importCompleteResult, insertMissingNodes, selectedEntityDefUuid } = state
+  const { cycle, dataImportType, file, importCompleteResult, insertMissingNodes, selectedEntityDefUuid } = state
 
   const insertMissingNodesDisabled = dataImportType === importTypes.insertNewRecords
 
@@ -66,7 +66,11 @@ export const DataImportCsvView = () => {
     [survey]
   )
 
-  const startImportJob = async (file) => {
+  const onFilesDrop = (files) => {
+    setStateProp('file')(files[0])
+  }
+
+  const onStartImport = async () => {
     const job = await API.startDataImportFromCsvJob({
       surveyId,
       file,
@@ -85,10 +89,6 @@ export const DataImportCsvView = () => {
         },
       })
     )
-  }
-
-  const onFileChange = async (file) => {
-    await startImportJob(file)
   }
 
   return (
@@ -134,13 +134,23 @@ export const DataImportCsvView = () => {
         />
       </fieldset>
 
-      <UploadButton
-        inputFieldId={TestId.recordsImport.importDataBtn}
-        label={i18n.t('dataImportView.selectCSVFileToImport')}
-        accept=".csv"
-        onChange={(files) => onFileChange(files[0])}
-        disabled={!selectedEntityDefUuid}
-      />
+      {selectedEntityDefUuid && (
+        <>
+          <Dropzone
+            maxSize={fileMaxSize}
+            accept={{ 'text/csv': ['.csv'] }}
+            onDrop={onFilesDrop}
+            droppedFiles={file ? [file] : []}
+          />
+
+          <Button
+            className="btn-primary"
+            disabled={!file}
+            label={'dataImportView.startImport'}
+            onClick={onStartImport}
+          />
+        </>
+      )}
 
       {importCompleteResult && (
         <DataImportCompleteDialog
