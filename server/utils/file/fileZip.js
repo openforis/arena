@@ -77,9 +77,7 @@ export default class FileZip {
 
 export const extractZip = async (src, extractedPath) => {
   // the clean and create the destination folder
-  if (FileUtils.existsDir(extractedPath)) {
-    await FileUtils.rmdir(extractedPath)
-  }
+  await FileUtils.rmdir(extractedPath)
   await FileUtils.mkdir(extractedPath)
 
   let fileZip = null
