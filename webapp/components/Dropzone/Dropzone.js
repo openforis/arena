@@ -23,8 +23,15 @@ const Dropzone = (props) => {
         <div className={classNames('dropzone', { disabled })} {...getRootProps()}>
           <input {...getInputProps()} />
           <p>{i18n.t('dropzone.message')}</p>
-          {acceptedExtensions.length > 0 && <em>{i18n.t('dropzone.acceptedFilesMessage', { acceptedExtensions })}</em>}
-          {droppedFiles.length > 0 && (
+          {acceptedExtensions.length > 0 && (
+            <em>
+              {i18n.t('dropzone.acceptedFilesMessage', {
+                acceptedExtensions,
+                maxSize: FileUtils.toHumanReadableFileSize(maxSize),
+              })}
+            </em>
+          )}
+          {droppedFiles?.length > 0 && (
             <aside>
               <h5>{i18n.t('common.file', { count: droppedFiles.length })}</h5>
               <ul>

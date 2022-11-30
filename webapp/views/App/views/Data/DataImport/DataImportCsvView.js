@@ -140,10 +140,15 @@ export const DataImportCsvView = () => {
             maxSize={fileMaxSize}
             accept={{ 'text/csv': ['.csv'] }}
             onDrop={onFilesDrop}
-            droppedFiles={file ? [file] : null}
+            droppedFiles={file ? [file] : []}
           />
 
-          <Button label={'dataImportView.startImport'} onClick={onStartImport} />
+          <Button
+            className="btn-primary"
+            disabled={!file}
+            label={'dataImportView.startImport'}
+            onClick={onStartImport}
+          />
         </>
       )}
 

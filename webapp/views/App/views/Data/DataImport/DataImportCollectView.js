@@ -112,7 +112,12 @@ export const CollectDataImportView = () => {
 
         <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
-        <Button label="dataImportView.startImport" disabled={!file} onClick={onStartImportClick} />
+        <Button
+          className="btn-primary"
+          disabled={!file}
+          label="dataImportView.startImport"
+          onClick={onStartImportClick}
+        />
       </div>
     </div>
   )
