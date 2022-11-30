@@ -113,7 +113,7 @@ const getThisVariable = ({ mode, variables, nodeDefCurrent }) => {
   return {
     ...getJsVariables(nodeDefCurrent),
     label: `this (${NodeDef.getName(nodeDefCurrent)})`,
-    value: 'this',
+    value: Expression.thisVariable,
   }
 }
 
