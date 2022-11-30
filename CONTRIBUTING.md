@@ -42,17 +42,8 @@ sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES
 ```
 
 In order to access Arena when it's installed on a remote server, you need to request access to it or being invited to it.
-To simplify this process when working locally, you can insert a test user with System Administrator rights (username: test@openforis-arena.org - password: test) directly into the database running this SQL script with the SQL client you prefer:
-
-```
-INSERT INTO "user" (name, email, PASSWORD, status)
-VALUES ('Tester', 'test@openforis-arena.org', '$2a$10$6y2oUZVrQ7aXed.47h4sHeJA8VVA2dW9ObtO/XLveXSzQKBvTOyou', 'ACCEPTED');
-
-INSERT INTO auth_group_user (user_uuid, group_uuid)
-SELECT u.uuid, g.uuid
-FROM "user" u
-    JOIN auth_group g ON u.email = 'test@openforis-arena.org' AND g.name = 'systemAdmin';
-```
+When working locally, it is possible to insert a system admin user by passing the environment variables ADMIN_EMAIL and ADMIN_PASSWORD.
+The user will be created on the first startup.
 
 To restart local database:
 
@@ -94,10 +85,9 @@ yarn test:docker
 To install RStudio Server as a Docker container run the following command:
 
 - replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable
-- replace YOUR_IP with your machine ip address
 
 ```shell script
-docker run -d --name arena-rstudio ---network="host" -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+docker run -d --name arena-rstudio --network=host -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
 ```
 
 To restart RStudio server run

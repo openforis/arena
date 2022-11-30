@@ -97,6 +97,24 @@ If the installation process was successful, the Arena login form should appear.
 
 When Arena starts up the first time, a system admnistrator user is created using the parameters ADMIN_EMAIL and ADMIN_PASSWORD specified in the arena.env file, so you can use that email address and password to access Arena the first time. The password can be changed using the **Change password** function in Arena.
 
+## Run R Studio Server locally
+
+To install RStudio Server as a Docker container run the following command:
+
+- replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable
+
+```shell script
+docker run -d --name arena-rstudio --network=host -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+```
+
+To restart RStudio server run
+
+```shell script
+docker container restart arena-rstudio
+```
+
+Visit http://localhost:8787 in your browser to access the rStudio server instance.
+
 # Documentation
 
 You can find the Arena documentation in the [Open Foris website](https://openforis.org/tools/arena/).
