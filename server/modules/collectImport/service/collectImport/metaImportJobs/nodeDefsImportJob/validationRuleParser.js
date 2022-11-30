@@ -10,6 +10,13 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as CollectSurvey from '../../model/collectSurvey'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
+const jsOperatorByCollectOperator = {
+  gt: '>',
+  gte: '>=',
+  lt: '<',
+  lte: '<=',
+}
+
 const collectCheckType = {
   check: 'check',
   compare: 'compare',
@@ -18,38 +25,62 @@ const collectCheckType = {
   unique: 'unique',
 }
 
-const checkExpressionParserByType = {
-  [collectCheckType.compare]: (collectCheck) => {
-    const attributeToOperator = {
-      gt: '>',
-      gte: '>=',
-      lt: '<',
-      lte: '<=',
+const collectConstantDateValueRegExp = /(\d{4})(\d{2})(\d{2})/ // date in yyyyMMdd format
+const collectConstantTimeValueRegExp = /(\d{2})(\d{2})/ // time in mmss format
+
+const operandConverterByNodeDefType = {
+  [NodeDef.nodeDefType.date]: ({ collectOperand }) => {
+    // convert constant date values to Arena format
+    const match = String(collectOperand).trim().match(collectConstantDateValueRegExp)
+    if (match) {
+      // eslint-disable-next-line no-unused-vars
+      const [_, year, month, day] = match
+      return JSON.stringify(`${year}-${month}-${day}`)
     }
+    return collectOperand
+  },
+  [NodeDef.nodeDefType.time]: ({ collectOperand }) => {
+    // convert constant time values to Arena format
+    const match = String(collectOperand).trim().match(collectConstantTimeValueRegExp)
+    if (match) {
+      // eslint-disable-next-line no-unused-vars
+      const [_, minute, second] = match
+      return JSON.stringify(`${minute}:${second}`)
+    }
+    return collectOperand
+  },
+}
+
+const checkExpressionParserByType = {
+  [collectCheckType.compare]: ({ collectCheck, nodeDef }) => {
     const attributes = CollectSurvey.getAttributes(collectCheck)
-    const exprParts = Object.entries(attributes).reduce((accParts, [attrName, attribute]) => {
-      const operator = attributeToOperator[attrName]
+    const exprParts = Object.entries(attributes).reduce((accParts, [collectOperator, collectRightOperand]) => {
+      const operator = jsOperatorByCollectOperator[collectOperator]
       if (operator) {
-        accParts.push(`$this ${operator} ${attribute}`)
+        const operandConverter = operandConverterByNodeDefType[NodeDef.getType(nodeDef)]
+        const rightOperand = operandConverter
+          ? operandConverter({ collectOperand: collectRightOperand })
+          : collectRightOperand
+        accParts.push(`$this ${operator} ${rightOperand}`)
       }
       return accParts
     }, [])
 
     return exprParts.join(' and ')
   },
-  [collectCheckType.check]: (collectCheck) => {
+  [collectCheckType.check]: ({ collectCheck }) => {
     const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
-  [collectCheckType.distance]: (collectCheck) => {
+  [collectCheckType.distance]: ({ collectCheck }) => {
     const { max, to } = CollectSurvey.getAttributes(collectCheck)
     return `distance from $this to ${to} must be <= ${max}m`
   },
-  [collectCheckType.pattern]: (collectCheck) => {
+  [collectCheckType.pattern]: ({ collectCheck }) => {
     const { regex } = CollectSurvey.getAttributes(collectCheck)
     return regex
   },
-  [collectCheckType.unique]: (collectCheck) => {
+  [collectCheckType.unique]: ({ collectCheck }) => {
     const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
@@ -62,7 +93,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
     // xml element is not a valid check
     return null
   }
-  const collectExpr = checkExpressionParser(collectValidationRule)
+  const collectExpr = checkExpressionParser({ collectCheck: collectValidationRule, nodeDef: nodeDefCurrent })
 
   if (StringUtils.isBlank(collectExpr)) {
     // empty expression
@@ -75,7 +106,14 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
   let applyIfConverted = null
   let unique = false
 
-  if (checkType === collectCheckType.distance) {
+  if (checkType === collectCheckType.compare) {
+    exprConverted = CollectExpressionConverter.convert({
+      survey,
+      nodeDefCurrent,
+      expression: collectExpr,
+      advancedExpressionEditor: false,
+    })
+  } else if (checkType === collectCheckType.distance) {
     const { max, to } = CollectSurvey.getAttributes(collectValidationRule)
     const toExprConverted = CollectExpressionConverter.convert({
       survey,
