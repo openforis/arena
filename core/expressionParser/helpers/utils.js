@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import { trim, isNotBlank } from '@core/stringUtils'
 import { types } from './types'
+import { thisVariable } from '../expressionConstants'
 
 // ToString
 const binaryToString = (node) => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
@@ -24,7 +25,7 @@ const typeProps = {
     isValid: propValid('raw'),
   },
   [types.ThisExpression]: {
-    toString: () => 'this',
+    toString: () => thisVariable,
     isValid: () => true,
   },
   [types.CallExpression]: {

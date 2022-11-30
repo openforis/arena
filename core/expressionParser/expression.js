@@ -4,19 +4,18 @@ import { JavascriptExpressionParser } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import * as ExpressionConstants from './expressionConstants'
 import * as ExpressionUtils from './helpers/utils'
 
 import { types } from './helpers/types'
+
+const { modes, thisVariable } = ExpressionConstants
+export { modes, thisVariable }
 
 export { types } from './helpers/types'
 export { operators } from './helpers/operators'
 export { functionNames } from './helpers/functions'
 export { toSql } from './toSql'
-
-export const modes = {
-  json: 'json',
-  sql: 'sql',
-}
 
 export const getName = R.prop('name')
 
@@ -58,6 +57,7 @@ export const isCompound = isType(types.Compound)
 export const isBinary = isType(types.BinaryExpression)
 export const isIdentifier = isType(types.Identifier)
 export const isSequence = isType(types.SequenceExpression)
+export const isThis = isType(types.ThisExpression)
 
 // ====== Instance creators
 

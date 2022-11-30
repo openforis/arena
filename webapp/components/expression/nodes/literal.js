@@ -26,11 +26,9 @@ import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>
   nodeDef
-    ? !(
-        NodeDef.isBoolean(nodeDef) ||
-        NodeDef.isInteger(nodeDef) ||
-        NodeDef.isDecimal(nodeDef) ||
-        StringUtils.isBlank(value)
+    ? StringUtils.isBlank(value) ||
+      ![NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(
+        NodeDef.getType(nodeDef)
       )
     : false
 
@@ -51,8 +49,14 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => 
   }
   if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
     const nodeLeftOperand = A.prop(BinaryOperandType.left, expressionNodeParent)
+    if (Expression.isThis(nodeLeftOperand)) {
+      return nodeDefCurrent
+    }
     if (Expression.isIdentifier(nodeLeftOperand)) {
       const identifierName = A.prop('name', nodeLeftOperand)
+      if (identifierName === Expression.thisVariable) {
+        return nodeDefCurrent
+      }
       const nodeDef = Survey.getNodeDefByName(identifierName)(survey)
       if (!nodeDef) {
         const nameWithOutSubfix = identifierName.replace('_label', '')

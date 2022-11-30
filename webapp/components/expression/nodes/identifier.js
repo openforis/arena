@@ -9,7 +9,7 @@ import { Dropdown } from '@webapp/components/form'
 const findVariableByValue = ({ variables, value }) => variables.find((variable) => variable.value === value)
 
 const getSelectedVariable = ({ variables, node }) => {
-  const value = node.type === Expression.types.ThisExpression ? 'this' : node.name
+  const value = node.type === Expression.types.ThisExpression ? Expression.thisVariable : node.name
   const variable = findVariableByValue({ variables, value })
   if (!A.isEmpty(variable)) return variable
 
