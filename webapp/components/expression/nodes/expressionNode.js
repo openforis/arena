@@ -38,7 +38,9 @@ const ExpressionNode = (props) => {
 
   // transform a "this" expression into an Identifier expression
   const componentNode =
-    node.type === Expression.types.ThisExpression ? { type: Expression.types.Identifier, name: 'this' } : node
+    node.type === Expression.types.ThisExpression
+      ? { type: Expression.types.Identifier, name: Expression.thisVariable }
+      : node
   const componentFn = componentFns[componentNode.type]
   const component = componentFn(componentNode)
 
