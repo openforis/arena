@@ -8,10 +8,12 @@
   align-items: center;
 
   .form {
-    width: 35rem;
+    width: 40rem;
+    justify-items: center;
 
     .form-item {
-      grid-template-columns: 0.5fr 0.5fr;
+      width: 100%;
+      grid-template-columns: 0.3fr 0.7fr;
     }
 
     .entity-selector-tree {

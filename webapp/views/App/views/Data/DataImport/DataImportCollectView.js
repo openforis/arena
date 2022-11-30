@@ -3,8 +3,6 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import UploadButton from '@webapp/components/form/uploadButton'
-
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
@@ -12,11 +10,16 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
-import { TestId } from '@webapp/utils/testId'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { Button, Dropzone } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
+import { FileUtils } from '@webapp/utils/fileUtils'
+
+const fileMaxSize = 1 * 1024 * 1024 * 1024 // 1 GB
+const acceptedFileExtensions = ['collect-backup', 'collect-data']
+const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 
 export const CollectDataImportView = () => {
   const i18n = useI18n()
@@ -29,8 +32,9 @@ export const CollectDataImportView = () => {
   const [deleteAllRecords, setDeleteAllRecords] = useState(false)
   const [cycle, setCycle] = useState(surveyCycle)
   const [forceImport, setForceImport] = useState(false)
+  const [file, setFile] = useState(null)
 
-  const startImportJob = async (file) => {
+  const startImportJob = async () => {
     const job = await API.startCollectRecordsImportJob({
       surveyId,
       file,
@@ -55,7 +59,15 @@ export const CollectDataImportView = () => {
     )
   }
 
-  const onFileChange = async (file) => {
+  const onFilesDrop = async (files) => {
+    const _file = files.filter((file) => {
+      const extension = FileUtils.getExtension(file)
+      return acceptedFileExtensions.includes(extension)
+    })[0]
+    setFile(_file)
+  }
+
+  const onStartImportClick = async () => {
     if (deleteAllRecords) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
@@ -64,38 +76,47 @@ export const CollectDataImportView = () => {
               ? 'dataImportView.confirmDeleteAllRecordsInCycle'
               : 'dataImportView.confirmDeleteAllRecords',
           params: { cycle: Number(cycle) + 1 },
-          onOk: async () => startImportJob(file),
+          onOk: async () => startImportJob(),
         })
       )
     } else {
-      await startImportJob(file)
+      await startImportJob()
     }
   }
 
   return (
     <div className="data-import">
       <div className="form">
-        {canDeleteAllRecords && (
-          <FormItem label={i18n.t('dataImportView.deleteAllRecordsBeforeImport')}>
-            <Checkbox checked={deleteAllRecords} onChange={setDeleteAllRecords} />
-          </FormItem>
-        )}
+        <fieldset>
+          <legend>{i18n.t('dataImportView.options.header')}</legend>
+          {canDeleteAllRecords && (
+            <Checkbox
+              checked={deleteAllRecords}
+              label="dataImportView.deleteAllRecordsBeforeImport"
+              onChange={setDeleteAllRecords}
+            />
+          )}
 
-        {surveyCycleKeys.length > 1 && (
-          <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
-            <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
-          </FormItem>
-        )}
+          {surveyCycleKeys.length > 1 && (
+            <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
+              <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
+            </FormItem>
+          )}
 
-        <FormItem label={i18n.t('dataImportView.forceImportFromAnotherSurvey')}>
-          <Checkbox checked={forceImport} onChange={setForceImport} />
-        </FormItem>
+          <Checkbox
+            checked={forceImport}
+            label="dataImportView.forceImportFromAnotherSurvey"
+            onChange={setForceImport}
+          />
+        </fieldset>
 
-        <UploadButton
-          inputFieldId={TestId.recordsImport.importDataBtn}
-          label={i18n.t('dataImportView.importFromCollect')}
-          accept=".collect-backup,.collect-data"
-          onChange={(files) => onFileChange(files[0])}
+        <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
+
+        <Button
+          className="btn-primary"
+          disabled={!file}
+          label="dataImportView.startImport"
+          onClick={onStartImportClick}
         />
       </div>
     </div>
