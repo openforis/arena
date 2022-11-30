@@ -7,17 +7,18 @@ import * as RecordValidationReportItem from '@core/record/recordValidationReport
 import * as Authorizer from '@core/auth/authorizer'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
-import { useI18n, useLang } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
-import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 const Row = (props) => {
   const { rowNo, row } = props
 
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const user = useUser()
   const survey = useSurvey()
   const surveyInfo = useSurveyInfo()
@@ -39,7 +40,9 @@ const Row = (props) => {
   return (
     <>
       <div>{rowNo}</div>
-      <div data-value={path}>{path}</div>
+      <div data-value={path}>
+        <LabelWithTooltip label={path} />
+      </div>
       <div
         className="validation-report__message"
         data-testid={TestId.validationReport.cellMessages}
