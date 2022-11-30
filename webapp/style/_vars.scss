@@ -23,6 +23,10 @@ $black: #2f3138;
 $yellowHighlight: #f8f6cc;
 $white: #ffffff;
 
+$colorTextPrimary: darken($blue, 20%);
+$borderColorFocussed: darken($blue, 20%);
+$backgroundColorSecondary: $white;
+
 //z-indexes
 
 $zIndex1App: 1;

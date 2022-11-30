@@ -67,6 +67,8 @@ Please check also the Spam/Junk mail folder.`,
     exportAll: 'Export all',
     expression: 'Expression',
     false: 'False',
+    file: 'File',
+    file_plural: 'Files',
     formContainsErrors: 'Form contains errors',
     formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
@@ -178,6 +180,11 @@ Do you want to proceed?`,
 
   confirm: {
     strongConfirmInputLabel: 'To confirm type the following text: **{{strongConfirmRequiredText}}**',
+  },
+
+  dropzone: {
+    message: "Drag 'n' drop some files here, or click to select files",
+    acceptedFilesMessage: 'Only {{acceptedExtensions}} files will be accepted',
   },
 
   error: {
@@ -517,7 +524,7 @@ $t(common.cantUndoWarning)`,
       header: 'Options',
       insertMissingNodes: 'Insert missing entities or attributes',
     },
-    selectCSVFileToImport: 'Select CSV file to import',
+    startImport: 'Start import',
   },
 
   dataView: {
