@@ -1,6 +1,6 @@
 import './Dropzone.scss'
 
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'
@@ -9,19 +9,13 @@ import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 const Dropzone = (props) => {
-  const { accept, disabled, maxSize, multiple, onDrop: onDropProp } = props
+  const { accept, disabled, droppedFiles, maxSize, multiple, onDrop } = props
 
   const i18n = useI18n()
-  const [files, setFiles] = useState([])
 
   const acceptedExtensions = Object.values(accept)
     .flat()
     .join(` ${i18n.t('common.and')} `)
-
-  const onDrop = (acceptedFiles) => {
-    setFiles(acceptedFiles)
-    onDropProp(acceptedFiles)
-  }
 
   return (
     <ReactDropzone accept={accept} disabled={disabled} maxSize={maxSize} multiple={multiple} onDrop={onDrop}>
@@ -29,14 +23,14 @@ const Dropzone = (props) => {
         <div className={classNames('dropzone', { disabled })} {...getRootProps()}>
           <input {...getInputProps()} />
           <p>{i18n.t('dropzone.message')}</p>
-          <em>{i18n.t('dropzone.acceptedFilesMessage', { acceptedExtensions })}</em>
-          {files.length > 0 && (
+          {acceptedExtensions.length > 0 && <em>{i18n.t('dropzone.acceptedFilesMessage', { acceptedExtensions })}</em>}
+          {droppedFiles.length > 0 && (
             <aside>
-              <h5>{i18n.t('common.file', { count: files.length })}</h5>
+              <h5>{i18n.t('common.file', { count: droppedFiles.length })}</h5>
               <ul>
-                {files.map((file) => (
+                {droppedFiles.map((file) => (
                   <li key={file.name}>
-                    {file.name} - {FileUtils.humanReadableFileSize(file.size)}
+                    {file.name} - {FileUtils.toHumanReadableFileSize(file.size)}
                   </li>
                 ))}
               </ul>
@@ -54,6 +48,7 @@ Dropzone.propTypes = {
   maxSize: PropTypes.number,
   multiple: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
+  droppedFiles: PropTypes.array,
 }
 
 Dropzone.defaultProps = {
@@ -61,6 +56,7 @@ Dropzone.defaultProps = {
   disabled: false,
   maxSize: 50 * 1024 * 1024, // 50MB
   multiple: false,
+  droppedFiles: [],
 }
 
 export default Dropzone

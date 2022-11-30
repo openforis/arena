@@ -136,7 +136,12 @@ export const DataImportCsvView = () => {
 
       {selectedEntityDefUuid && (
         <>
-          <Dropzone maxSize={fileMaxSize} accept={{ 'text/csv': ['.csv'] }} onDrop={onFilesDrop} />
+          <Dropzone
+            maxSize={fileMaxSize}
+            accept={{ 'text/csv': ['.csv'] }}
+            onDrop={onFilesDrop}
+            droppedFiles={file ? [file] : null}
+          />
 
           <Button label={'dataImportView.startImport'} onClick={onStartImport} />
         </>

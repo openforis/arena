@@ -5,6 +5,7 @@ export const enTranslation = {
   common: {
     active: 'Active',
     add: 'Add',
+    and: 'and',
     appName: 'Arena',
     appNameFull: '$t(common.openForis) Arena',
     apply: 'Apply',

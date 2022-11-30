@@ -1,4 +1,9 @@
-// ======= File size
+const getExtension = (file) => {
+  const fileName = typeof file === 'string' ? file : file.name
+  const extension = fileName.split('.').pop()
+  return extension
+}
+
 /**
  * Format bytes as human-readable text.
  *
@@ -9,7 +14,7 @@
  *
  * @returns {string} - Formatted string.
  */
-const humanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) => {
+const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) => {
   const threshold = si ? 1000 : 1024
 
   if (Math.abs(bytes) < threshold) {
@@ -31,5 +36,6 @@ const humanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) =>
 }
 
 export const FileUtils = {
-  humanReadableFileSize,
+  getExtension,
+  toHumanReadableFileSize,
 }
