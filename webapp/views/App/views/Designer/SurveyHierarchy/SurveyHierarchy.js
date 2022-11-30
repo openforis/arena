@@ -6,12 +6,13 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
 
 import Tree from './Tree'
-import { useI18n } from '@webapp/store/system'
 
 const SurveyHierarchy = () => {
   const survey = useSurvey()
@@ -62,8 +63,9 @@ const SurveyHierarchy = () => {
           nodeDefLabelType={nodeDefLabelType}
         />
       </div>
-      <div className="survey-hierarchy__label-selector">
+      <div className="survey-hierarchy__button-bar">
         <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
+        <SurveySchemaSummaryDownloadButton />
       </div>
     </div>
   )
