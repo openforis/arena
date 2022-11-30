@@ -107,6 +107,7 @@ const NodeDefsSelectorAggregate = (props) => {
               onToggleAttribute={onToggleMeasure}
               lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
+              filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={[...measures.keys()]}
