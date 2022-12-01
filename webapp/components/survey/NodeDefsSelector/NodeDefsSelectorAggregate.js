@@ -42,6 +42,7 @@ const NodeDefsSelectorAggregate = (props) => {
     onChangeEntity,
     onChangeMeasures,
     onChangeDimensions,
+    showAnalysisAttributes,
   } = props
 
   const survey = useSurvey()
@@ -99,6 +100,7 @@ const NodeDefsSelectorAggregate = (props) => {
               nodeDefUuidsAttributes={dimensions}
               showAncestorsLabel={false}
               showMultipleAttributes={false}
+              showAnalysisAttributes={showAnalysisAttributes}
             />
           </ExpansionPanel>
 
@@ -113,6 +115,7 @@ const NodeDefsSelectorAggregate = (props) => {
               nodeDefUuidsAttributes={[...measures.keys()]}
               showAncestors={false}
               showMultipleAttributes={false}
+              showAnalysisAttributes={showAnalysisAttributes}
             />
           </ExpansionPanel>
 
@@ -148,11 +151,13 @@ NodeDefsSelectorAggregate.propTypes = {
   onChangeEntity: PropTypes.func.isRequired,
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
+  showAnalysisAttributes: PropTypes.bool,
 }
 
 NodeDefsSelectorAggregate.defaultProps = {
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
   nodeDefUuidEntity: null,
+  showAnalysisAttributes: false,
 }
 
 export default NodeDefsSelectorAggregate
