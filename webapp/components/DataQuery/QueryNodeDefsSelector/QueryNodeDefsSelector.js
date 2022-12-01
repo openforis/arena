@@ -29,6 +29,7 @@ const QueryNodeDefsSelector = (props) => {
       onChangeDimensions={(dimensionsUpdate) => {
         onChangeQuery(Query.assocDimensions(dimensionsUpdate)(query))
       }}
+      showAnalysisAttributes
     />
   ) : (
     <NodeDefsSelector
