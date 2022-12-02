@@ -3,6 +3,15 @@
   flex-direction: column;
 
   .button-bar {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+
+    div[role='row'] {
+      display: flex;
+      flex-direction: row;
+    }
+
     button {
       margin: 0 0.5rem;
       white-space: nowrap;
