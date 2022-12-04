@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -60,6 +60,7 @@ export const CoordinateAttributePopUp = (props) => {
     openPopupOfPoint,
   } = props
 
+  const popupRef = useRef(null)
   const i18n = useI18n()
   const map = useMap()
   const surveyInfo = useSurveyInfo()
@@ -71,21 +72,25 @@ export const CoordinateAttributePopUp = (props) => {
 
   const elevation = useElevation(pointLatLong, open)
 
-  const flyTo = (point) => {
-    const [longitude, latitude] = point.geometry.coordinates
-    map.flyTo([latitude, longitude], map.getMaxZoom())
-    map.once('zoomend', () => openPopupOfPoint(point))
-  }
+  const flyTo = useCallback(
+    (point) => {
+      popupRef.current?.close()
+      const [longitude, latitude] = point.geometry.coordinates
+      map.flyTo([latitude, longitude], map.getMaxZoom())
+      map.once('zoomend', () => openPopupOfPoint(point))
+    },
+    [map, openPopupOfPoint]
+  )
 
-  const onClickNext = () => {
+  const onClickNext = useCallback(() => {
     const nextPoint = getNextPoint(parentUuid)
     flyTo(nextPoint)
-  }
+  }, [flyTo, getNextPoint, parentUuid])
 
-  const onClickPrevious = () => {
+  const onClickPrevious = useCallback(() => {
     const previousPoint = getPreviousPoint(parentUuid)
     flyTo(previousPoint)
-  }
+  }, [flyTo, getPreviousPoint, parentUuid])
 
   const onEarthMapButtonClick = useCallback(() => {
     const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
@@ -94,7 +99,10 @@ export const CoordinateAttributePopUp = (props) => {
     window.open(earthMapUrl, 'EarthMap')
   }, [point.x, point.y, surveyInfo])
 
-  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
+  const path = useMemo(
+    () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
+    [ancestorsKeys, attributeDef, lang, survey]
+  )
 
   const content = `**${path}**
 * **X**: ${point.x}
@@ -108,6 +116,7 @@ export const CoordinateAttributePopUp = (props) => {
         add: () => setOpen(true),
         remove: () => setOpen(false),
       }}
+      ref={popupRef}
     >
       <div className="coordinate-attribute-popup-content">
         <Markdown source={content} />

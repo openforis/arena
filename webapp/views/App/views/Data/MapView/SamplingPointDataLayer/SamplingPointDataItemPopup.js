@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -27,6 +27,7 @@ export const SamplingPointDataItemPopup = (props) => {
   const { properties: pointProperties } = pointFeature
   const { itemUuid, itemCodes, itemPoint: point, recordUuid } = pointProperties
 
+  const popupRef = useRef(null)
   const i18n = useI18n()
   const map = useMap()
 
@@ -53,6 +54,7 @@ ${itemCodes
   * **elevation (m)**: ${elevation}`
 
   const flyToPoint = (point) => {
+    popupRef.current?.close()
     map.flyTo(point.latLng)
     map.once('zoomend', () => openPopupOfPoint(point))
   }
@@ -82,6 +84,7 @@ ${itemCodes
         add: () => setOpen(true),
         remove: () => setOpen(false),
       }}
+      ref={popupRef}
     >
       <Markdown source={content} />
       <div className="button-bar">

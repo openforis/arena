@@ -45,17 +45,23 @@ export const CoordinateAttributeDataLayer = (props) => {
     [currentPointShown]
   )
 
-  const getPointIndex = (uuid) => points.findIndex((item) => item.properties.parentUuid === uuid)
+  const getPointIndex = useCallback((uuid) => points.findIndex((item) => item.properties.parentUuid === uuid), [points])
 
-  const getNextPoint = (uuid) => {
-    const index = getPointIndex(uuid)
-    return points[(index + 1) % points.length]
-  }
+  const getNextPoint = useCallback(
+    (uuid) => {
+      const index = getPointIndex(uuid)
+      return points[(index + 1) % points.length]
+    },
+    [getPointIndex, points]
+  )
 
-  const getPreviousPoint = (uuid) => {
-    let index = getPointIndex(uuid)
-    return points[index > 0 ? index - 1 : points.length - 1]
-  }
+  const getPreviousPoint = useCallback(
+    (uuid) => {
+      const index = getPointIndex(uuid)
+      return points[index > 0 ? index - 1 : points.length - 1]
+    },
+    [getPointIndex, points]
+  )
 
   return (
     <LayersControl.Overlay name={layerName}>
