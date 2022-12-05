@@ -1,26 +1,45 @@
-# Open Foris Arena
-Online platform for survey design, data management, utilization and processing.
+# Quick reference
+
+-	**Maintained by**:  
+	[Open Foris Initiative](https://openforis.org)
+
+-   **Documentation**:  
+    [Open Foris Arena Website](https://openforis.org/tools/arena/)
+
+-   **Online platform**:  
+    [Open Foris Arena](https://www.openforis-arena.org)
+
+-	**Where to get help**:  
+	[Open Foris Support Forum](https://openforis.support)
+
+
+# What is Arena?
 
 Arena is a cloud-based platform for storing and processing data collected in field inventories or questionnaires. It provides a fast and flexible way to set up a survey and start entering data for a team. It offers tools for data quality assurance with the help of data validation and reporting methods. Arena also offers multilingual data entry forms, multi-cycle data management, and computing of new result attributes and running statistical analysis with integrated connection to RStudio Server or local installation of RStudio.
 
 Arena also offers a map with access to very-high resolution satellite images. The Arena Map can be used, for example, for verifying locations of collected data, and for conducting sample-based image interpretation.
 
-## Installation
 
-### Prerequisites
+![logo](https://openforis.org/wp-content/uploads/2021/03/of-arena-picto-260px.png)
+
+# Installation
+
+## Prerequisites
 
 - [download and install Docker](https://www.docker.com/). Docker is an open platform for developing, shipping, and running applications.
+
 - Install a local database (PostgreSQL) as a Docker container. Run this command from command line; it will create also a database named 'arena' and a user 'arena' with password 'arena' and will make the DBMS listen on port 5444 (you can change those parameters as you wish):
-```shell script
-sudo docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
+
+```console
+$ docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
 ```
 You can also use an already existing PostgreSQL database installed in a different way and configure Arena to connect to it.
 
-### Prepare a file with the parameters to pass to Arena
+## Prepare a file with the parameters to pass to Arena
 
-The file (call it arena.env) must be a text file with this content:
+The file (call it **arena.env**) must be a text file with this content:
 
-```shell script
+```properties
 # Default web server port
 ARENA_PORT=9090
 
@@ -74,15 +93,13 @@ ADMIN_EMAIL=
 # Admin user password: used only when default system admin user is created the first time
 # it MUST BE DELETED after the first startup
 ADMIN_PASSWORD=
-
 ```
 
-### Install and run Arena
+## Install and run Arena
 
-Arena will be installed as a Docker container.
-Run this command from command line:
-```shell script
-sudo docker run --env-file ./arena.env openforis/arena:latest
+Running the following command from command line will install Arena as a Docker container:
+```console
+$ docker run --env-file ./arena.env openforis/arena:latest
 ```
 You can run this command in the same folder where you have defined the arena.env file or specify its path in the command, in the '--env-file' parameter.
 Arena will start on the port specified in the arena.env file (9090 by default).
@@ -99,26 +116,20 @@ When Arena starts up the first time, a system admnistrator user is created using
 
 ## Run R Studio Server locally
 
-To install RStudio Server as a Docker container run the following command:
+To install RStudio Server as a Docker container run the following command (replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable):
 
-- replace ANALYSIS_OUTPUT_DIR with the value of the ANALYSIS_OUTPUT_DIR environment variable
-
-```shell script
-docker run -d --name arena-rstudio --network=host -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
+```console
+$ docker run -d --name arena-rstudio --network=host -v ANALYSIS_OUTPUT_DIR:/home/rstudio -e DISABLE_AUTH=true rocker/rstudio
 ```
 
 To restart RStudio server run
 
-```shell script
-docker container restart arena-rstudio
+```console
+$ docker container restart arena-rstudio
 ```
 
 Visit http://localhost:8787 in your browser to access the rStudio server instance.
 
-# Documentation
-
-You can find the Arena documentation in the [Open Foris website](https://openforis.org/tools/arena/).
-
-### License
+# License
 
 Arena is [MIT licensed](./LICENSE).
