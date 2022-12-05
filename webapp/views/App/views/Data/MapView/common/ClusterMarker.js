@@ -46,13 +46,11 @@ export const ClusterMarker = (props) => {
 
   const map = useMap()
 
-  const { properties, id } = cluster
+  const { geometry, id, properties } = cluster
   const { point_count: pointCount } = properties
+  const [longitude, latitude] = geometry.coordinates
 
-  const position = useMemo(() => {
-    const [longitude, latitude] = cluster.geometry.coordinates
-    return [latitude, longitude]
-  }, [cluster])
+  const position = useMemo(() => [latitude, longitude], [latitude, longitude])
 
   const markerRef = useRef(null)
   const [clusteredPoints, setClusteredPoints] = useState([])
