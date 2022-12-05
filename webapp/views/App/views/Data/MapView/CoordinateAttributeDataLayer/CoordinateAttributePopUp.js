@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -17,6 +17,7 @@ import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
 import { useElevation } from '../common/useElevation'
+import { useI18n } from '@webapp/store/system'
 
 /**
  * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -59,6 +60,8 @@ export const CoordinateAttributePopUp = (props) => {
     openPopupOfPoint,
   } = props
 
+  const popupRef = useRef(null)
+  const i18n = useI18n()
   const map = useMap()
   const surveyInfo = useSurveyInfo()
 
@@ -69,37 +72,43 @@ export const CoordinateAttributePopUp = (props) => {
 
   const elevation = useElevation(pointLatLong, open)
 
-  const flyTo = (point) => {
-    const [longitude, latitude] = point.geometry.coordinates
-    map.flyTo([latitude, longitude], map.getMaxZoom())
-    map.once('zoomend', () => openPopupOfPoint(point))
-  }
+  const flyTo = useCallback(
+    (point) => {
+      popupRef.current?.close()
+      const [longitude, latitude] = point.geometry.coordinates
+      map.flyTo([latitude, longitude], map.getMaxZoom())
+      map.once('zoomend', () => openPopupOfPoint(point))
+    },
+    [map, openPopupOfPoint]
+  )
 
-  const onClickNext = () => {
+  const onClickNext = useCallback(() => {
     const nextPoint = getNextPoint(parentUuid)
     flyTo(nextPoint)
-  }
-  
-  const onClickPrevious = () => {
+  }, [flyTo, getNextPoint, parentUuid])
+
+  const onClickPrevious = useCallback(() => {
     const previousPoint = getPreviousPoint(parentUuid)
     flyTo(previousPoint)
-  }
-  
-  const earthMapLink = () => {
+  }, [flyTo, getPreviousPoint, parentUuid])
+
+  const onEarthMapButtonClick = useCallback(() => {
     const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
     const geojson = L.rectangle(bounds).toGeoJSON()
-    const url = "https://earthmap.org/?polygon=" + JSON.stringify(geojson)
-    return url
-    
-  }
+    const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
+    window.open(earthMapUrl, 'EarthMap')
+  }, [point.x, point.y, surveyInfo])
 
-  const path = buildPath({ survey, attributeDef, ancestorsKeys, lang })
+  const path = useMemo(
+    () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
+    [ancestorsKeys, attributeDef, lang, survey]
+  )
 
   const content = `**${path}**
-* **x**: ${point.x}
-* **y**: ${point.y}
+* **X**: ${point.x}
+* **Y**: ${point.y}
 * **SRS**: ${point.srs}
-* **elevation (m)**: ${elevation}`
+* **${i18n.t('mapView.elevation')}**: ${elevation}`
 
   return (
     <Popup
@@ -107,27 +116,26 @@ export const CoordinateAttributePopUp = (props) => {
         add: () => setOpen(true),
         remove: () => setOpen(false),
       }}
+      ref={popupRef}
     >
       <div className="coordinate-attribute-popup-content">
         <Markdown source={content} />
 
         <div className="button-bar">
-          <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
+          <div role="row">
+            <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
 
-          <ButtonIconEdit
-            label="mapView.editRecord"
-            showLabel
-            onClick={() => onRecordEditClick({ recordUuid, parentUuid })}
-          />
-
-          <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
-        </div>
-        <div className="button-bar">
-          <ButtonIconGear 
-            label="Open in Earth Map"
-            showLabel
-            onClick={() => window.open(earthMapLink(), "EarthMap")}
+            <ButtonIconEdit
+              label="mapView.editRecord"
+              showLabel
+              onClick={() => onRecordEditClick({ recordUuid, parentUuid })}
             />
+
+            <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
+          </div>
+          <div role="row">
+            <ButtonIconGear label={i18n.t('mapView.openInEarthMap')} showLabel onClick={onEarthMapButtonClick} />
+          </div>
         </div>
       </div>
     </Popup>

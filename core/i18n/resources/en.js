@@ -575,8 +575,10 @@ $t(common.cantUndoWarning)`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
+    elevation: 'Elevation (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
+    openInEarthMap: 'Open in Earth Map',
     options: {
       showLocationMarkers: 'Show location markers',
       showMarkersLabels: `Show markers' labels`,
