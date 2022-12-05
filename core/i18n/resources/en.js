@@ -568,6 +568,7 @@ $t(common.cantUndoWarning)`,
     showValidationReport: 'Show validation report',
     sort: 'Sort records',
     dataVis: {
+      errorLoadingData: 'Error loading data',
       noData: 'This query returned no data',
     },
   },
