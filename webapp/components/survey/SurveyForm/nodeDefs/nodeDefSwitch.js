@@ -3,7 +3,11 @@ import './nodeDefs.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+import classNames from 'classnames'
 
+import { Objects } from '@openforis/arena-core'
+
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
@@ -25,7 +29,6 @@ import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefFormItem from './components/NodeDefFormItem'
-import classNames from 'classnames'
 
 class NodeDefSwitch extends React.Component {
   constructor(props) {
@@ -133,9 +136,32 @@ NodeDefSwitch.defaultProps = {
   canAddNode: false,
 }
 
+const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
+  const keyDefs = Survey.getNodeDefKeys(nodeDef)(survey)
+  if (Objects.isEmpty(keyDefs)) return false
+
+  const siblings = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
+  return (
+    siblings.length > 0 &&
+    siblings.some((sibling) => {
+      const keyValues = Record.getEntityKeyValues(survey, sibling)(record)
+      return keyValues.every((keyValue) => Objects.isEmpty(keyValue))
+    })
+  )
+}
+
+const _maxCountReached = ({ nodeDef, nodes }) => {
+  const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
+
+  if (Objects.isEmpty(maxCount)) return false
+
+  return nodes.length === Number(maxCount)
+}
+
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, entry, canEditRecord } = props
 
+  const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
   const nodeDefLabelType = SurveyFormState.getNodeDefLabelType(state)
@@ -157,13 +183,12 @@ const mapStateToProps = (state, props) => {
       )
     )(nodes)
 
-    const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
-
     const canAddNode =
       canEditRecord &&
       parentNode &&
       NodeDef.isMultiple(nodeDef) &&
-      (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
+      !_maxCountReached({ nodeDef, nodes }) &&
+      !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 
     return {
       nodes: nodesValidated,
