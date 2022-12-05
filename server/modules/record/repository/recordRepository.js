@@ -96,7 +96,7 @@ export const countRecordsBySurveyId = async (
 ) => {
   if (!A.isEmpty(search)) {
     const recordsWithSearch = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, nodeDefRoot, nodeDefKeys, search })
-    return { count: recordsWithSearch.length }
+    return recordsWithSearch.length
   }
   return client.one(
     `
@@ -162,7 +162,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       (nodeDefKey) =>
         ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$/search:value/%'`
     )
-    .join('OR ')
+    .join(' OR ')
 
   const recordsSelect = `
     SELECT 
@@ -180,6 +180,11 @@ export const fetchRecordsSummaryBySurveyId = async (
     ORDER BY r.date_created DESC
   `
 
+  const whereCondition = search
+    ? `WHERE ${nodeDefKeysSelectSearch} 
+                 OR u.name ilike '%$/search:value/%'`
+    : ''
+
   return client.map(
     `
     WITH r AS (${recordsSelect})
@@ -187,7 +192,8 @@ export const fetchRecordsSummaryBySurveyId = async (
       r.*,
       s.uuid AS survey_uuid,
       n.date_modified,
-      u.name as owner_name${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
+      u.name as owner_name
+      ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
     FROM  r
     -- GET SURVEY UUID
     JOIN survey s
@@ -210,7 +216,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
 
-    ${search ? `WHERE ${nodeDefKeysSelectSearch}` : ''}
+    ${whereCondition}
 
     ORDER BY ${
       Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
