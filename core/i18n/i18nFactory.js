@@ -25,7 +25,7 @@ const createParams = (lang) => ({
   },
 })
 
-export const createI18nPromise = (lang = defaultLanguage) => {
+export const createI18nAsync = (lang = defaultLanguage) => {
   // Import and require return different objects
   const createInstance = i18next.createInstance || i18next.default.createInstance
 
