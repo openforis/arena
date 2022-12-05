@@ -14,12 +14,14 @@ import { TestId } from '@webapp/utils/testId'
 import { Button, ButtonDelete, ButtonIconEdit } from '@webapp/components'
 import { useAuthCanDeleteRecords, useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { useI18n } from '@webapp/store/system'
 
 import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems, navigateToRecord }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const published = Survey.isPublished(surveyInfo)
 
@@ -58,7 +60,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
       {(totalCount > 0 || StringUtils.isNotBlank(search)) && (
         <input
           className="records__header-left__input-search"
-          placeholder="search..."
+          placeholder={i18n.t('dataView.records.filterPlaceholder')}
           defaultValue={search}
           onChange={(e) => handleSearch(e.target.value)}
         />
