@@ -16,6 +16,12 @@ $rowHeaderHeight: 45px;
     overflow-x: hidden;
     height: calc(100% - #{$rowHeaderHeight});
     top: $rowHeaderHeight;
+
+    .data-loading-error {
+      display: flex;
+      height: 100%;
+      align-items: center;
+    }
   }
 
   .table__row-header {

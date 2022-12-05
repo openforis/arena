@@ -7,7 +7,7 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import { getUrl } from './useFetchData'
 
-const initialState = { data: null, loading: false, loaded: false }
+const initialState = { data: null, loading: false, loaded: false, error: false }
 
 export const useFetchCount = ({ setCount }) => {
   const surveyId = useSurveyId()
@@ -16,14 +16,16 @@ export const useFetchCount = ({ setCount }) => {
   return {
     fetchCount: useCallback(
       async ({ query }) => {
-        setCount({ ...initialState, loading: true })
+        setCount({ ...initialState, loading: true, loaded: false })
         try {
           const { data } = await axios.post(`${getUrl({ surveyId, query })}/count`, {
             cycle,
             query: A.stringify(query),
           })
           setCount({ data, loading: false, loaded: true })
-        } catch (e) {}
+        } catch (e) {
+          setCount({ loading: false, loaded: true, error: true })
+        }
       },
       [cycle, surveyId, setCount]
     ),

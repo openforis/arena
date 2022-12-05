@@ -22,8 +22,9 @@ export const useDataQuery = ({ query, limitData = true }) => {
   const hasSelection = Query.hasSelection(query)
   const mode = Query.getMode(query)
   const dataEmpty = data ? A.isEmpty(data.data) : true
-  const dataLoaded = data ? data.loaded && hasSelection : false
-  const dataLoading = data ? data.loading : false
+  const dataLoaded = (data?.loaded && hasSelection) || false
+  const dataLoading = data?.loading || false
+  const dataLoadingError = data?.error || false
 
   const entityDefUuid = Query.getEntityDefUuid(query)
   const attributeDefUuids = Query.getAttributeDefUuids(query)
@@ -55,6 +56,7 @@ export const useDataQuery = ({ query, limitData = true }) => {
     dataEmpty,
     dataLoaded,
     dataLoading,
+    dataLoadingError,
     limit,
     offset,
     setLimit,

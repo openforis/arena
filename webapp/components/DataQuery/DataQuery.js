@@ -18,9 +18,19 @@ const DataQuery = (props) => {
   const { query, onChangeQuery } = props
 
   const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
-  const { count, data, dataEmpty, dataLoaded, dataLoading, limit, offset, setLimit, setOffset, setData } = useDataQuery(
-    { query }
-  )
+  const {
+    count,
+    data,
+    dataEmpty,
+    dataLoaded,
+    dataLoading,
+    dataLoadingError,
+    limit,
+    offset,
+    setLimit,
+    setOffset,
+    setData,
+  } = useDataQuery({ query })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
@@ -54,18 +64,18 @@ const DataQuery = (props) => {
           )}
         </div>
 
-        {dataLoaded && (
-          <Visualizer
-            query={query}
-            data={data}
-            dataEmpty={dataEmpty}
-            nodeDefLabelType={nodeDefLabelType}
-            nodeDefsSelectorVisible={nodeDefsSelectorVisible}
-            offset={offset}
-            onChangeQuery={onChangeQuery}
-            setData={setData}
-          />
-        )}
+        <Visualizer
+          query={query}
+          data={data}
+          dataEmpty={dataEmpty}
+          dataLoading={dataLoading}
+          dataLoadingError={dataLoadingError}
+          nodeDefLabelType={nodeDefLabelType}
+          nodeDefsSelectorVisible={nodeDefsSelectorVisible}
+          offset={offset}
+          onChangeQuery={onChangeQuery}
+          setData={setData}
+        />
       </div>
     </div>
   )
