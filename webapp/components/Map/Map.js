@@ -50,7 +50,7 @@ export const Map = (props) => {
         <MapContainer
           center={centerPositionLatLon}
           doubleClickZoom={false}
-          zoom={initialZoomLevel}
+          zoom={INITIAL_ZOOM_LEVEL}
           eventHandlers={mapEventHandlers}
         >
           <ScaleControl position="topleft" />
