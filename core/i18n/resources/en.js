@@ -732,6 +732,7 @@ $t(common.cantUndoWarning)`,
         <li>Data: 
           <ul>
             $t(userInviteView.groupPermissions.dataCleanserData)
+            <li>access Map tool</li>
           </ul>
         </li>
         <li>Analysis:
@@ -1584,10 +1585,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
   emails: {
     signature: `<p>Thank you,<br>
-      The $t(common.appNameFull) team
+      $t(common.appNameFull) platform
       </p>`,
     temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
-    userInviteCommon: `<p>You have been invited to join the survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
+    userInviteCommon: `<p>You have been invited by {{invitingUserName}} to join the $t(common.appNameFull) survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
       {{-message}}
       <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
@@ -1599,7 +1600,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              <p><a href="{{urlResetPassword}}">Click here to complete your registration to $t(common.appNameFull)</a></p>
              <p>If it doesn't work, please copy and paste the following link in your browser: {{urlResetPassword}}</p>
              $t(emails.temporaryMsg)
-             <p><i>You have received this email because you have requested access to $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
+             <p><i>You have received this email because {{invitingUserName}} invited you to access $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
              <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
              <p>$t(common.raiseTicketInSupportForum)</p>
              $t(emails.signature)`,
