@@ -5,8 +5,8 @@ import * as i18nFactory from '@core/i18n/i18nFactory'
 
 sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
 
-export const sendEmail = async ({ to, msgKey, msgParams = {}, lang = 'en' }) => {
-  const i18n = await i18nFactory.createI18nPromise(lang)
+export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
+  const i18n = i18nParam ? i18nParam : await i18nFactory.createI18nAsync(lang)
 
   const from = ProcessUtils.ENV.adminEmail
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
