@@ -31,7 +31,7 @@ L.Marker.prototype.options.icon = L.icon({
 })
 // end of workaround
 
-const initialZoomLevel = 3
+const INITIAL_ZOOM_LEVEL = 3
 
 export const Map = (props) => {
   const { editable, layers, markerPoint, markerTitle, showOptions } = props
