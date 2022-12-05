@@ -86,7 +86,7 @@ export const CoordinateAttributePopUp = (props) => {
   }
   
   const earthMapLink = () => {
-    const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
+    const bounds = SamplingPolygon.getBounds(surveyInfo, pointLatLong.y, pointLatLong.x)
     const geojson = L.rectangle(bounds).toGeoJSON()
     const url = "https://earthmap.org/?polygon=" + JSON.stringify(geojson)
     return url
@@ -124,7 +124,7 @@ export const CoordinateAttributePopUp = (props) => {
         </div>
         <div className="button-bar">
           <ButtonIconGear 
-            label="Open in Earth Map"
+            label="mapView.openInEarthMap"
             showLabel
             onClick={() => window.open(earthMapLink(), "EarthMap")}
             />
