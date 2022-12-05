@@ -34,17 +34,27 @@ export const useCoordinateAttributeDataLayer = (props) => {
   const survey = useSurvey()
   const map = useMap()
 
-  const nodeDefParent = Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey)
-  const ancestorsKeyAttributes = Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey)
+  const nodeDefParent = useMemo(
+    () => Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey),
+    [attributeDef, survey]
+  )
+  const ancestorsKeyAttributes = useMemo(
+    () => Survey.getNodeDefAncestorsKeyAttributes(attributeDef)(survey),
+    [attributeDef, survey]
+  )
 
   const { query, points, editedRecordQuery } = state
 
-  const layerInnerName = Survey.getNodeDefPath({
-    nodeDef: attributeDef,
-    showLabels: true,
-    labelLang: lang,
-    includeRootEntity: false,
-  })(survey)
+  const layerInnerName = useMemo(
+    () =>
+      Survey.getNodeDefPath({
+        nodeDef: attributeDef,
+        showLabels: true,
+        labelLang: lang,
+        includeRootEntity: false,
+      })(survey),
+    [attributeDef, lang, survey]
+  )
 
   // add icon close to layer name
   const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
