@@ -6,24 +6,30 @@ import ReactSelect, { components } from 'react-select'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
+import Markdown from '@webapp/components/markdown'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import { LabelWithTooltip } from '../LabelWithTooltip'
 import { useDropdown } from './useDropdown'
 
-const OptionComponent = (props) => {
-  const { data = {} } = props
-  const { description, label, icon, value } = data
+const OptionComponent =
+  ({ markdownInLabels }) =>
+  (optionProps) => {
+    const { data = {} } = optionProps
+    const { description: dataDescription, label: dataLabel, icon, value } = data
 
-  return (
-    <div data-testid={TestId.dropdown.dropDownItem(value)}>
-      <components.Option {...props}>
-        <LabelWithTooltip className="dropdown-option__label" label={label} />
-        {description && <span className="dropdown-option__description">{description}</span>}
-        {icon && <span className="dropdown-option__icon">{icon}</span>}
-      </components.Option>
-    </div>
-  )
-}
+    const label = dataLabel && markdownInLabels ? <Markdown source={dataLabel} /> : dataLabel
+    const description = dataDescription && markdownInLabels ? <Markdown source={dataDescription} /> : dataDescription
+
+    return (
+      <div data-testid={TestId.dropdown.dropDownItem(value)}>
+        <components.Option {...optionProps}>
+          <LabelWithTooltip className="dropdown-option__label" label={label} />
+          {description && <span className="dropdown-option__description">{description}</span>}
+          {icon && <span className="dropdown-option__icon">{icon}</span>}
+        </components.Option>
+      </div>
+    )
+  }
 
 const Dropdown = (props) => {
   const {
@@ -39,6 +45,7 @@ const Dropdown = (props) => {
     itemLabel,
     itemValue,
     items: itemsProp,
+    markdownInLabels,
     menuPlacement,
     multiple,
     onBeforeChange,
@@ -90,7 +97,7 @@ const Dropdown = (props) => {
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
-        components={{ Option: OptionComponent }}
+        components={{ Option: OptionComponent({ markdownInLabels }) }}
         defaultValue={defaultValue}
         inputId={inputId}
         isClearable={clearable && !readOnly}
@@ -126,6 +133,7 @@ Dropdown.propTypes = {
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  markdownInLabels: PropTypes.bool,
   menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
   multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
@@ -151,6 +159,7 @@ Dropdown.defaultProps = {
   itemIcon: 'icon',
   itemLabel: 'label',
   itemValue: 'value',
+  markdownInLabels: false,
   menuPlacement: 'auto',
   multiple: false,
   onBeforeChange: null,

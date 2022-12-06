@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+import * as StringUtils from '@core/stringUtils'
+
 export const LabelWithTooltip = (props) => {
   const { className, label, style, children } = props
 
@@ -9,7 +11,7 @@ export const LabelWithTooltip = (props) => {
 
   // detect when ellipsis is active and show a tooltip in that case
   const [ellipsed, setEllipsed] = useState(false)
-  const tooltip = ellipsed ? label : null
+  const tooltip = ellipsed && StringUtils.isString(label) ? label : null
 
   useEffect(() => {
     const labelEl = labelRef?.current

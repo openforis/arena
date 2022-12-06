@@ -22,6 +22,7 @@ const SurveyDropdown = (props) => {
     <Dropdown
       className="survey-dropdown"
       items={options}
+      markdownInLabels
       onChange={(item) => onChange(item.value)}
       placeholder={i18n.t('common.cloneFrom')}
       selection={selectedOption}

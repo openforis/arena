@@ -5,11 +5,26 @@ import * as Survey from '@core/survey/survey'
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 
+const getSurveyLabel = (surveyInfo) => {
+  // label will be: survey_name - survey_label
+
+  // survey name in bold (markdown)
+  const parts = [`**${Survey.getName(surveyInfo)}**`]
+
+  // survey label in survey default language
+  const label = Survey.getDefaultLabel(surveyInfo)
+  if (label) {
+    parts.push(label)
+  }
+
+  return parts.join(' - ')
+}
+
 const toOption = (surveyInfo) => {
   if (!surveyInfo) return null
 
   return {
-    label: Survey.getDefaultLabel(surveyInfo) || Survey.getName(surveyInfo),
+    label: getSurveyLabel(surveyInfo),
     description: Survey.getDefaultDescription(surveyInfo),
     value: Survey.getIdSurveyInfo(surveyInfo),
   }
