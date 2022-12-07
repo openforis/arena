@@ -1176,11 +1176,6 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@esri/proj-codes@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.9.0.tgz#7e393bbc9a243fdeacf601733d3568368e4046a2"
-  integrity sha512-7wSuiLDERoGHQeAyqdcBtntnCw/UmpAwizZRl3YXIUepoS1m56BMbCwOspKTe4RbJLGzfJJojimoVyy/z4DOfw==
-
 "@esri/proj-codes@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-3.0.0.tgz#c7d1cef10609f3e169ec8b640bee6bf685241bf4"
@@ -1203,7 +1198,7 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
-"@godaddy/terminus@^4.10.2":
+"@godaddy/terminus@^4.11.2":
   version "4.11.2"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.11.2.tgz#86e8e0c40ad64eb62f5e2c3ee5c20beff97d9a2d"
   integrity sha512-e/kbOWpGKME42eltM/wXM3RxSUOrfureZxEd6Dt6NXyFoJ7E8lnmm7znXydJsL3B7ky4HRFZI+eHrep54NZbeQ==
@@ -1635,44 +1630,29 @@
     proj4 "^2.8.0"
     uuid "^9.0.0"
 
-"@openforis/arena-core@^0.0.83":
-  version "0.0.83"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.83/ddbc12d241529ae2bb6e16182be5a30997dad74a#ddbc12d241529ae2bb6e16182be5a30997dad74a"
-  integrity sha512-yyN8Boxx0Vek5vK5jQL1nDzQ4dJnuz+YxjYQ9tYbubRhh4fxmCkRpeXlmOnLvGqe7bY2X2qcu/G7ElmqwyZUVw==
+"@openforis/arena-server@^0.1.22":
+  version "0.1.22"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.22/039c88f1eeb55378058a7f0b99d9bf811848eb7e#039c88f1eeb55378058a7f0b99d9bf811848eb7e"
+  integrity sha512-/SA8J5L8qRvQ9nX2Fag6RD+iSCgZjcFuVNjnP2CRHyCwZe0lIcncbj6u8oxKqHQT7UJPdkQeR2o87yUnHEWApg==
   dependencies:
-    "@esri/proj-codes" "^2.9.0"
-    date-fns "^2.28.0"
-    jsep "^1.3.4"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    proj4 "^2.8.0"
-    uuid "^8.3.2"
-
-"@openforis/arena-server@^0.1.21":
-  version "0.1.21"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.21/45900ee9e4456d52dd77bcbfa6a60eb61a4103e4#45900ee9e4456d52dd77bcbfa6a60eb61a4103e4"
-  integrity sha512-L4t203gEQ8v/KdSR56paK671qGCgCaTL7wrDW6sbBu16nBXJnFBCj7Iqr/qMMzjCzaaQSvkm1cq2zy9xIe3rTg==
-  dependencies:
-    "@godaddy/terminus" "^4.10.2"
-    "@openforis/arena-core" "^0.0.83"
+    "@godaddy/terminus" "^4.11.2"
+    "@openforis/arena-core" "^0.0.121"
     bcryptjs "^2.4.3"
-    body-parser "^1.20.0"
+    body-parser "^1.20.1"
     compression "^1.7.4"
-    connect-pg-simple "^7.0.0"
+    connect-pg-simple "^8.0.0"
     cookie-parser "^1.4.6"
     db-migrate "^0.11.13"
     db-migrate-pg "^1.2.2"
-    express "^4.18.1"
-    express-fileupload "^1.3.1"
+    express "^4.18.2"
+    express-fileupload "^1.4.0"
     express-session "^1.17.2"
     lodash.throttle "^4.1.1"
-    log4js "^6.4.6"
-    passport "^0.5.2"
+    log4js "^6.7.1"
+    passport "^0.6.0"
     passport-local "^1.0.0"
-    pg-promise "^10.11.1"
-    socket.io "^4.5.0"
+    pg-promise "^10.15.4"
+    socket.io "^4.5.4"
 
 "@pmmmwh/react-refresh-webpack-plugin@^0.5.10":
   version "0.5.10"
@@ -2021,7 +2001,7 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/pg@^8.6.1":
+"@types/pg@^8.6.1", "@types/pg@^8.6.5":
   version "8.6.5"
   resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.6.5.tgz#2dce9cb468a6a5e0f1296a59aea3ac75dd27b702"
   integrity sha512-tOkGtAqRVkHa/PVZicq67zuujI4Oorfglsr2IbKofDwBSysnaqSx7W1mDqFqdkGE6Fbgh+PZAl0r/BWON/mozw==
@@ -3057,7 +3037,7 @@ bn.js@^4.0.0, bn.js@^4.11.9:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
 
-body-parser@1.20.1, body-parser@^1.20.0:
+body-parser@1.20.1, body-parser@^1.20.1:
   version "1.20.1"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.20.1.tgz#b1812a8912c195cd371a3ee5e66faa2338a5c668"
   integrity sha512-jWi7abTbYwajOytWCQc37VulmWiRae5RyTpaCyDcS5/lMdtwSz5lOpDE67srw/HYe35f1z3fDQw+3txg7gNtWw==
@@ -3700,6 +3680,14 @@ connect-pg-simple@^7.0.0:
   dependencies:
     "@types/pg" "^8.6.1"
     pg "^8.7.1"
+
+connect-pg-simple@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/connect-pg-simple/-/connect-pg-simple-8.0.0.tgz#f005051ef693b1e8fb8c3d5eb5e16e10ab3972b2"
+  integrity sha512-pBDa23RA1LCkwvRrPOh5xevB+Nknh1UDuhFOKsUrkUDodYqfiQT18P2qXc4lk/TqCMB6hI06B8KNncHh91bZMQ==
+  dependencies:
+    "@types/pg" "^8.6.5"
+    pg "^8.8.0"
 
 console-control-strings@^1.0.0, console-control-strings@^1.1.0:
   version "1.1.0"
@@ -4397,7 +4385,7 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@^2.28.0, date-fns@^2.29.3:
+date-fns@^2.29.3:
   version "2.29.3"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.3.tgz#27402d2fc67eb442b511b70bbdf98e6411cd68a8"
   integrity sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==
@@ -5459,7 +5447,7 @@ exposify@~0.5.0:
     through2 "~0.4.0"
     transformify "~0.1.1"
 
-express-fileupload@^1.3.1:
+express-fileupload@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/express-fileupload/-/express-fileupload-1.4.0.tgz#be9d70a881d6c2b1ce668df86e4f89ddbf238ec7"
   integrity sha512-RjzLCHxkv3umDeZKeFeMg8w7qe0V09w3B7oGZprr/oO2H/ISCgNzuqzn7gV3HRWb37GjRk429CCpSLS2KNTqMQ==
@@ -5480,7 +5468,7 @@ express-session@^1.17.2, express-session@^1.17.3:
     safe-buffer "5.2.1"
     uid-safe "~2.1.5"
 
-express@^4.17.3, express@^4.18.1:
+express@^4.17.3, express@^4.18.1, express@^4.18.2:
   version "4.18.2"
   resolved "https://registry.yarnpkg.com/express/-/express-4.18.2.tgz#3fabe08296e930c796c19e3c516979386ba9fd59"
   integrity sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==
@@ -7512,7 +7500,7 @@ jsdom@^16.6.0:
     ws "^7.4.6"
     xml-name-validator "^3.0.0"
 
-jsep@^1.3.4, jsep@^1.3.7:
+jsep@^1.3.7:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/jsep/-/jsep-1.3.7.tgz#fee6a03ea2bbf61ae5264313a18231e02ab612b3"
   integrity sha512-NFbZTr1t13fPKw53swmZFKwBkEDWDnno7uLJk+a+Rw9tGDTkGgnGdZJ8A/o3gR1+XaAXmSsbpfIBIBgqRBZWDA==
@@ -8077,10 +8065,21 @@ log-update@^4.0.0:
     slice-ansi "^4.0.0"
     wrap-ansi "^6.2.0"
 
-log4js@^6.4.6, log4js@^6.6.0:
+log4js@^6.6.0:
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/log4js/-/log4js-6.7.0.tgz#fff671a74b2f6e956d135c3c756c79072809a23b"
   integrity sha512-KA0W9ffgNBLDj6fZCq/lRbgR6ABAodRIDHrZnS48vOtfKa4PzWImb0Md1lmGCdO3n3sbCm/n1/WmrNlZ8kCI3Q==
+  dependencies:
+    date-format "^4.0.14"
+    debug "^4.3.4"
+    flatted "^3.2.7"
+    rfdc "^1.3.0"
+    streamroller "^3.1.3"
+
+log4js@^6.7.1:
+  version "6.7.1"
+  resolved "https://registry.yarnpkg.com/log4js/-/log4js-6.7.1.tgz#06e12b1ac915dd1067146ffad8215f666f7d2c51"
+  integrity sha512-lzbd0Eq1HRdWM2abSD7mk6YIVY0AogGJzb/z+lqzRk+8+XJP+M6L1MS5FUSc3jjGru4dbKjEMJmqlsoYYpuivQ==
   dependencies:
     date-format "^4.0.14"
     debug "^4.3.4"
@@ -9213,13 +9212,14 @@ passport-strategy@1.x.x:
   resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
   integrity sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==
 
-passport@^0.5.2:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/passport/-/passport-0.5.3.tgz#e69b46c9bb3290660bc2b3299330d78710b198cc"
-  integrity sha512-gGc+70h4gGdBWNsR3FuV3byLDY6KBTJAIExGFXTpQaYfbbcHCBlRRKx7RBQSpqEqc5Hh2qVzRs7ssvSfOpkUEA==
+passport@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/passport/-/passport-0.6.0.tgz#e869579fab465b5c0b291e841e6cc95c005fac9d"
+  integrity sha512-0fe+p3ZnrWRW74fe8+SvCyf4a3Pb2/h7gFkQ8yTJpAO50gDzlfjZUZTO1k5Eg9kUct22OxHLqDZoKUWRHOh9ug==
   dependencies:
     passport-strategy "1.x.x"
     pause "0.0.1"
+    utils-merge "^1.0.1"
 
 patch-text@~1.0.2:
   version "1.0.2"
@@ -9328,6 +9328,16 @@ pg-promise@^10.11.1:
     pg-minify "1.6.2"
     spex "3.2.0"
 
+pg-promise@^10.15.4:
+  version "10.15.4"
+  resolved "https://registry.yarnpkg.com/pg-promise/-/pg-promise-10.15.4.tgz#b8b5055489f375a43e5d3edbff1d41ddb3817b2f"
+  integrity sha512-BKlHCMCdNUmF6gagVbehRWSEiVcZzPVltEx14OJExR9Iz9/1R6KETDWLLGv2l6yRqYFnEZZy1VDjRhArzeIGrw==
+  dependencies:
+    assert-options "0.8.0"
+    pg "8.8.0"
+    pg-minify "1.6.2"
+    spex "3.2.0"
+
 pg-protocol@*, pg-protocol@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/pg-protocol/-/pg-protocol-1.5.0.tgz#b5dd452257314565e2d54ab3c132adc46565a6a0"
@@ -9351,7 +9361,7 @@ pg-types@^2.1.0, pg-types@^2.2.0:
     postgres-date "~1.0.4"
     postgres-interval "^1.1.0"
 
-pg@8.8.0, pg@^8.0.3, pg@^8.7.1, pg@^8.7.3:
+pg@8.8.0, pg@^8.0.3, pg@^8.7.1, pg@^8.7.3, pg@^8.8.0:
   version "8.8.0"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.8.0.tgz#a77f41f9d9ede7009abfca54667c775a240da686"
   integrity sha512-UXYN0ziKj+AeNNP7VDMwrehpACThH7LUl/p8TDFpEUuSejCUIwGSfxpHsPvtM6/WXFy6SU4E5RG4IJV/TZAGjw==
@@ -11023,7 +11033,7 @@ socket.io-parser@~4.2.1:
     "@socket.io/component-emitter" "~3.1.0"
     debug "~4.3.1"
 
-socket.io@^4.5.0:
+socket.io@^4.5.4:
   version "4.5.4"
   resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-4.5.4.tgz#a4513f06e87451c17013b8d13fdfaf8da5a86a90"
   integrity sha512-m3GC94iK9MfIEeIBfbhJs5BqFibMtkRk8ZpKwG2QwxV0m/eEhPIV4ara6XCF1LWNAus7z58RodiZlAH71U3EhQ==
@@ -12119,7 +12129,7 @@ utila@~0.4:
   resolved "https://registry.yarnpkg.com/utila/-/utila-0.4.0.tgz#8a16a05d445657a3aea5eecc5b12a4fa5379772c"
   integrity sha512-Z0DbgELS9/L/75wZbro8xAnT50pBVFQZ+hUEueGDU5FN51YSCYM+jdxsfCiHjwNP/4LCDD0i/graKpeBnOXKRA==
 
-utils-merge@1.0.1:
+utils-merge@1.0.1, utils-merge@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
