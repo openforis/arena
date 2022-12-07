@@ -67,7 +67,10 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
 /**
  * Generates a new reset password uuid.
  * It returns an object like { uuid } if the reset password uuid has been generated without problems
- * or an object like { error } if an error occurred
+ * or an object like { error } if an error occurred.
+ *
+ * @param {!string} email - Email of the user.
+ * @param {!string} serverUrl - Address of the server.
  */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
@@ -218,7 +221,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
         user,
         surveyId: Survey.getId(survey),
         surveyCycleKey: Survey.cycleOneKey,
-        userToInvite: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
+        invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
         serverUrl,
       },
       t
