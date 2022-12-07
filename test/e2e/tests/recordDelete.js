@@ -7,7 +7,7 @@ export default () =>
   describe('Record delete', () => {
     gotoRecords()
 
-    describe.each(Array.from(Array(records.length).keys().reverse()))(`Delete record %s`, (idx) => {
+    describe.each(Array.from(Array(records.length).keys()).reverse())(`Delete record %s`, (idx) => {
       test(`Delete record at index ${idx}`, async () => {
         await page.click(getSelector(TestId.records.tableRowDeleteButton(idx)))
         await page.waitForSelector(getSelector(TestId.modal.modal))
