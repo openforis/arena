@@ -29,7 +29,7 @@ const valueFormattersByType = {
 }
 
 const Row = (props) => {
-  const { row: record, rowNo, selected, navigateToRecord, onRecordsUpdate } = props
+  const { idx, row: record, rowNo, selected, navigateToRecord, onRecordsUpdate } = props
   const nodeDefKeys = useNodeDefRootKeys()
 
   const i18n = useI18n()
@@ -114,7 +114,12 @@ const Row = (props) => {
           onClick={onEditButtonClick}
         />
         {canDelete && (
-          <ButtonDelete title="dataView.records.deleteRecord" showLabel={false} onClick={onDeleteButtonClick} />
+          <ButtonDelete
+            testId={TestId.records.tableRowDeleteButton(idx)}
+            title="dataView.records.deleteRecord"
+            showLabel={false}
+            onClick={onDeleteButtonClick}
+          />
         )}
       </div>
     </>
