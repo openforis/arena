@@ -53,9 +53,12 @@ export const init = (app) => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromRecordThread(socketId)
 
-      req.logout()
-
-      Response.sendOk(res)
+      req.logout((err) => {
+        if (err) {
+          return next(err)
+        }
+        Response.sendOk(res)
+      })
     } catch (error) {
       next(error)
     }
