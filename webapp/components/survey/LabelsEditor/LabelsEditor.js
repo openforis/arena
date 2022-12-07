@@ -46,7 +46,8 @@ const LabelsEditor = (props) => {
   const languagesSorted = sortLanguages({ languages, preferredLanguage })
 
   const canToggleEditor = languages.length > MAX_PREVIEW_LANGUAGES
-  const showLanguageBadge = languages.length > 1
+  const languagesToEdit = editingLabels ? languagesSorted : [preferredLanguage]
+  const showLanguageBadge = languagesToEdit.length > 1
 
   return (
     <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>
@@ -56,7 +57,7 @@ const LabelsEditor = (props) => {
       </div>
       <div className="labels-editor__labels">
         <ValidationTooltip validation={validation}>
-          {(editingLabels ? languagesSorted : [preferredLanguage]).map((lang) => (
+          {languagesToEdit.map((lang) => (
             <Label
               key={lang}
               inputFieldIdPrefix={inputFieldIdPrefix}
