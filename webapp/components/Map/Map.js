@@ -31,6 +31,8 @@ L.Marker.prototype.options.icon = L.icon({
 })
 // end of workaround
 
+const INITIAL_ZOOM_LEVEL = 3
+
 export const Map = (props) => {
   const { editable, layers, markerPoint, markerTitle, showOptions } = props
   const { centerPositionLatLon, mapEventHandlers, markerPointUpdated, onMarkerPointUpdated, onSaveClick } =
@@ -45,7 +47,12 @@ export const Map = (props) => {
       {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
 
       <MapContextProvider>
-        <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={4} eventHandlers={mapEventHandlers}>
+        <MapContainer
+          center={centerPositionLatLon}
+          doubleClickZoom={false}
+          zoom={INITIAL_ZOOM_LEVEL}
+          eventHandlers={mapEventHandlers}
+        >
           <ScaleControl position="topleft" />
           <MapLayersControl layers={layers} />
           <MapMarker
