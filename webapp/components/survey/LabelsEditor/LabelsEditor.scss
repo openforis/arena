@@ -1,3 +1,5 @@
+@import '~@webapp/style/vars';
+
 .labels-editor {
   display: grid;
   grid-column-gap: 1rem;
@@ -9,7 +11,6 @@
   .labels-editor-label {
     text-align: end;
   }
-
 }
 
 .labels-editor__btn-toggle {
@@ -34,4 +35,11 @@
   position: absolute;
   right: 0;
   text-transform: uppercase;
+  background-color: rgba($blue, 0.1);
+  font-size: 0.5rem;
+
+  &:hover {
+    background-color: rgba($blue, 0.5);
+    font-size: 0.7rem;
+  }
 }
