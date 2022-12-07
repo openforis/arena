@@ -8,7 +8,7 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanDeleteRecord, useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+import { useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
 import { RecordActions, useRecord } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
@@ -31,7 +31,6 @@ const RecordEntryButtons = () => {
 
   const canPromote = useAuthCanPromoteRecord(record)
   const canDemote = useAuthCanDemoteRecord(record)
-  const canDelete = useAuthCanDeleteRecord(record)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 
@@ -92,23 +91,6 @@ const RecordEntryButtons = () => {
           />
         )}
       </div>
-
-      {canDelete && (
-        <Button
-          className="btn-s btn-danger"
-          testId={TestId.record.deleteBtn}
-          onClick={() =>
-            dispatch(
-              DialogConfirmActions.showDialogConfirm({
-                key: 'surveyForm.formEntryActions.confirmDelete',
-                onOk: () => dispatch(RecordActions.deleteRecord({ navigate })),
-              })
-            )
-          }
-          iconClassName="icon-bin icon-12px icon-left"
-          label="common.delete"
-        />
-      )}
     </>
   )
 }
