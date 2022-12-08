@@ -9,7 +9,8 @@ const toOption = (surveyInfo) => {
   if (!surveyInfo) return null
 
   return {
-    label: Survey.getDefaultLabel(surveyInfo) || Survey.getName(surveyInfo),
+    name: Survey.getName(surveyInfo),
+    label: Survey.getDefaultLabel(surveyInfo),
     description: Survey.getDefaultDescription(surveyInfo),
     value: Survey.getIdSurveyInfo(surveyInfo),
   }
@@ -30,14 +31,14 @@ export const useSurveyDropdownOptions = () => {
       const surveyOptions = surveys.map(toOption)
       const templateOptions = templates.map(toOption)
 
-      // sort surveys and labels by label
-      const sortByLabelFn = (a, b) => {
-        if (a.label < b.label) return -1
-        if (a.label > b.label) return 1
+      // sort surveys and templates by name
+      const sortByNameFn = (a, b) => {
+        if (a.name < b.name) return -1
+        if (a.name > b.name) return 1
         return 0
       }
-      surveyOptions.sort(sortByLabelFn)
-      templateOptions.sort(sortByLabelFn)
+      surveyOptions.sort(sortByNameFn)
+      templateOptions.sort(sortByNameFn)
 
       setOptions([
         {
