@@ -9,6 +9,7 @@ import Error from '@webapp/views/Guest/Error'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
 import { useResetPassword } from './store/hooks'
+import { Button } from '@webapp/components'
 
 const ResetPassword = () => {
   const i18n = useI18n()
@@ -18,9 +19,15 @@ const ResetPassword = () => {
     onChangeUser,
     onChangeUserTitle,
     onSubmit,
+    navigateToHomePage,
   } = useResetPassword()
 
-  if (!user || !user.email) return null
+  if (!user || !user.email)
+    return (
+      <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+        <Button className="btn-goto-home" label="common.goToHomePage" onClick={navigateToHomePage} />
+      </form>
+    )
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">

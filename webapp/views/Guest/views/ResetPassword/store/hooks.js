@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 
 import { LoginValidator } from '@webapp/store/login'
 import * as Validation from '@core/validation/validation'
-import { appModuleUri } from '@webapp/app/appModules'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { NotificationActions } from '@webapp/store/ui'
 
 import * as actions from './actions'
@@ -30,6 +30,8 @@ export const useResetPassword = () => {
     { name, title, password }
   )
 
+  const navigateToHomePage = () => navigate(appModuleUri(homeModules.dashboard))
+
   const onChangeUser = (event) => actions.updateUser(event)(dispatch)
   const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)
 
@@ -50,7 +52,11 @@ export const useResetPassword = () => {
   }, [])
 
   useOnUpdate(() => {
-    actions.initUser(userFetched)(dispatch)
+    if (userFetched) {
+      actions.initUser(userFetched)(dispatch)
+    } else {
+      dispatchRedux(NotificationActions.notifyError({ key: 'resetPasswordView.forgotPasswordLinkInvalid' }))
+    }
   }, [userFetched])
 
   useOnUpdate(() => {
@@ -63,5 +69,6 @@ export const useResetPassword = () => {
     onChangeUser,
     onChangeUserTitle,
     onSubmit,
+    navigateToHomePage,
   }
 }
