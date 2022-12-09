@@ -59,7 +59,11 @@ export const AcceptRequestPanel = (props) => {
       </FormItem>
 
       <div className="button-bar">
-        <Button label="usersAccessRequestView.acceptRequest.acceptRequestAndCreateSurvey" onClick={onSubmit} />
+        <Button
+          className="btn-primary"
+          label="usersAccessRequestView.acceptRequest.acceptRequestAndCreateSurvey"
+          onClick={onSubmit}
+        />
       </div>
     </div>
   )
