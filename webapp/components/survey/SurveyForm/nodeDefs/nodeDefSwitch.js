@@ -198,11 +198,13 @@ const mapStateToProps = (state, props) => {
     }
   }
 
+  const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
+
   return {
     surveyInfo,
     label,
     lang,
-    applicable: parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true,
+    applicable,
     ...(entry && record ? mapEntryProps() : {}),
   }
 }
