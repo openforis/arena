@@ -17,16 +17,20 @@ const getMapTileForwardUrl = (req) => {
 
 export const init = (app) => {
   // ==== READ
-  app.get('/geo/srs/find', async (req, res) => {
-    const { codeOrName } = Request.getParams(req)
+  app.get('/survey/:surveyId/geo/srs/find', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { codeOrName } = Request.getParams(req)
 
-    const srss = SRSs.findSRSByCodeOrName(codeOrName)
+      const srss = SRSs.findSRSByCodeOrName(codeOrName)
 
-    res.json({ srss })
+      res.json({ srss })
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.get(
-    '/geo/map/:provider/tile/:z/:y/:x',
+    '/survey/:surveyId/geo/map/:provider/tile/:z/:y/:x',
     AuthMiddleware.requireMapUsePermission,
     // createProxyMiddleware({ router: getForwardUrl, changeOrigin: true, secure: false })
     async (req, res) => {
@@ -42,39 +46,56 @@ export const init = (app) => {
     }
   )
 
-  app.get('/geo/map/:provider/available_montly_periods', AuthMiddleware.requireMapUsePermission, async (req, res) => {
-    const { provider } = Request.getParams(req)
-    try {
-      if (provider === MapUtils.mapProviders.planet) {
-        const periods = await PlanetApi.fetchAvailableMonthlyMosaicsPeriods()
-        res.json(periods)
-        return
+  app.get(
+    '/survey/:surveyId/geo/map/:provider/available_montly_periods',
+    AuthMiddleware.requireMapUsePermission,
+    async (req, res, next) => {
+      const { provider } = Request.getParams(req)
+      try {
+        if (provider === MapUtils.mapProviders.planet) {
+          const periods = await PlanetApi.fetchAvailableMonthlyMosaicsPeriods()
+          res.json(periods)
+          return
+        }
+      } catch (error) {
+        next(error)
+      } finally {
+        // error or provider not supported
+        res.json([])
       }
-    } finally {
-      // error or provider not supported
-      res.json([])
     }
-  })
+  )
 
-  app.get('/geo/map/elevation/:lat/:lng', AuthMiddleware.requireMapUsePermission, async (req, res) => {
-    const { lat, lng } = Request.getParams(req)
-    const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
-    const { data } = await axios.get(url)
-    const elevation = data?.results?.[0]?.elevation
-    res.json(elevation)
-  })
-
-  app.get('/geo/map/wmts/getCapabilities/:url', AuthMiddleware.requireMapUsePermission, async (req, res) => {
-    const { url } = Request.getParams(req)
-    const decodedUrl = decodeURIComponent(url)
-    let dataRes, data
+  app.get('/survey/:surveyId/geo/map/elevation', AuthMiddleware.requireMapUsePermission, async (req, res) => {
     try {
-      dataRes = await axios.get(decodedUrl)
-      data = dataRes.data
-    } finally {
-      const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
-      const json = JSON.parse(jsonstring)
-      res.json(json)
+      const { lat, lng } = Request.getParams(req)
+      const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
+      const { data } = await axios.get(url, { timeout: 5000 })
+      const elevation = data?.results?.[0]?.elevation
+
+      res.json(elevation)
+    } catch (error) {
+      res.json(null)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/geo/map/wmts/capabilities',
+    AuthMiddleware.requireMapUsePermission,
+    async (req, res, next) => {
+      const { url } = Request.getParams(req)
+      const decodedUrl = decodeURIComponent(url)
+      let dataRes, data
+      try {
+        dataRes = await axios.get(decodedUrl)
+        data = dataRes.data
+      } catch (error) {
+        next(error)
+      } finally {
+        const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
+        const json = JSON.parse(jsonstring)
+        res.json(json)
+      }
+    }
+  )
 }

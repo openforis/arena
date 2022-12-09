@@ -38,7 +38,7 @@ export {
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
 } from './data'
-export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey } from './map'
+export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
 export {
   fetchNodeDef,

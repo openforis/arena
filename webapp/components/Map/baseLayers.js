@@ -27,12 +27,12 @@ const _getPeriodKey = (period) => {
   )
 }
 
-const getArenaMapUrl = ({ provider, period }) =>
-  `/api/geo/map/${provider}/tile/{z}/{y}/{x}?period=${_getPeriodKey(period)}`
+const getArenaMapUrl = ({ surveyId, provider, period }) =>
+  `/api/survey/${surveyId}/geo/map/${provider}/tile/{z}/{y}/{x}?period=${_getPeriodKey(period)}`
 
 export const baseLayerUrlByProviderFunction = {
-  [baseLayerProviders.planet]: ({ period = planetDefaultPeriod }) =>
-    getArenaMapUrl({ provider: baseLayerProviders.planet, period }),
+  [baseLayerProviders.planet]: ({ surveyId, period = planetDefaultPeriod }) =>
+    getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period }),
 }
 
 export const baseLayers = [

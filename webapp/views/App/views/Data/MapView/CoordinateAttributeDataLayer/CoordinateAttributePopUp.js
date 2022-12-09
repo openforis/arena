@@ -20,8 +20,14 @@ import { useElevation } from '../common/useElevation'
 import { useI18n } from '@webapp/store/system'
 
 /**
- * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
- * e.g. Cluster [123] -> Plot [4]
+ * Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
+ * E.g. Cluster [123] -> Plot [4].
+ *
+ * @param root0
+ * @param root0.survey
+ * @param root0.attributeDef
+ * @param root0.ancestorsKeys
+ * @param root0.lang
  */
 const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   const pathParts = []
@@ -70,7 +76,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const elevation = useElevation(pointLatLong, open)
+  const elevation = useElevation({ surveyId: Survey.getIdSurveyInfo(surveyInfo), point: pointLatLong, active: open })
 
   const flyTo = useCallback(
     (point) => {

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import * as API from '@webapp/service/api'
 import { Points } from '@openforis/arena-core'
 
-export const useElevation = (point, active = true) => {
+export const useElevation = ({ surveyId, point, active = true }) => {
   const pointLatLng = Points.toLatLong(point)
   const { y: lat, x: lng } = pointLatLng
 
@@ -11,13 +11,13 @@ export const useElevation = (point, active = true) => {
 
   useEffect(() => {
     const fetchElevation = async () => {
-      const elev = await API.fetchElevation({ lat, lng })
+      const elev = await API.fetchElevation({ surveyId, lat, lng })
       setElevation(elev === null ? 'error' : elev)
     }
     if (active) {
       fetchElevation()
     }
-  }, [active, lat, lng])
+  }, [active, lat, lng, surveyId])
 
   return elevation
 }
