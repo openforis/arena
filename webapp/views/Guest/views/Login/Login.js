@@ -6,11 +6,12 @@ import { Link } from 'react-router-dom'
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { EmailInput } from '@webapp/components/form'
+
 import Error from '@webapp/views/Guest/Error'
 
+import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
-import { EmailInput } from '@webapp/components/form'
 
 const Login = () => {
   const error = useSelector(LoginState.getError)
