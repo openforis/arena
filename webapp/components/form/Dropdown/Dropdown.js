@@ -10,20 +10,26 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import { LabelWithTooltip } from '../LabelWithTooltip'
 import { useDropdown } from './useDropdown'
 
-const OptionComponent = (props) => {
-  const { data = {} } = props
-  const { description, label, icon, value } = data
+const OptionComponent =
+  ({ renderOptionLabel }) =>
+  (reactSelectProps) => {
+    const { data = {} } = reactSelectProps
+    const { description, label, icon, value } = data
 
-  return (
-    <div data-testid={TestId.dropdown.dropDownItem(value)}>
-      <components.Option {...props}>
-        <LabelWithTooltip className="dropdown-option__label" label={label} />
-        {description && <span className="dropdown-option__description">{description}</span>}
-        {icon && <span className="dropdown-option__icon">{icon}</span>}
-      </components.Option>
-    </div>
-  )
-}
+    return (
+      <div data-testid={TestId.dropdown.dropDownItem(value)}>
+        <components.Option {...reactSelectProps}>
+          {renderOptionLabel ? (
+            renderOptionLabel({ data })
+          ) : (
+            <LabelWithTooltip className="dropdown-option__label" label={label} />
+          )}
+          {description && <span className="dropdown-option__description">{description}</span>}
+          {icon && <span className="dropdown-option__icon">{icon}</span>}
+        </components.Option>
+      </div>
+    )
+  }
 
 const Dropdown = (props) => {
   const {
@@ -45,6 +51,7 @@ const Dropdown = (props) => {
     onChange: onChangeProp,
     placeholder,
     readOnly,
+    renderOptionLabel,
     searchable,
     selection,
     testId,
@@ -90,7 +97,7 @@ const Dropdown = (props) => {
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
-        components={{ Option: OptionComponent }}
+        components={{ Option: OptionComponent({ renderOptionLabel }) }}
         defaultValue={defaultValue}
         inputId={inputId}
         isClearable={clearable && !readOnly}
@@ -132,6 +139,7 @@ Dropdown.propTypes = {
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
+  renderOptionLabel: PropTypes.func,
   searchable: PropTypes.bool,
   selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
   testId: PropTypes.string,
@@ -156,6 +164,7 @@ Dropdown.defaultProps = {
   onBeforeChange: null,
   placeholder: undefined,
   readOnly: false, // TODO: investigate why there are both disabled and readOnly
+  renderOptionLabel: null,
   searchable: true,
   selection: undefined,
   testId: null,

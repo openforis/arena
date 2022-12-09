@@ -24,6 +24,20 @@ const SurveyDropdown = (props) => {
       items={options}
       onChange={(item) => onChange(item.value)}
       placeholder={i18n.t('common.cloneFrom')}
+      renderOptionLabel={({ data }) => {
+        const { name, label } = data
+        return (
+          <div className="dropdown-option__label">
+            <span className="survey-name">{name}</span>
+            {label && (
+              <>
+                <span> - </span>
+                <span className="survey-label">{label}</span>
+              </>
+            )}
+          </div>
+        )
+      }}
       selection={selectedOption}
       testId={TestId.surveyCreate.surveyCloneFrom}
     />
