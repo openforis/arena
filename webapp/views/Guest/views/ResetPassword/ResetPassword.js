@@ -1,6 +1,8 @@
 import './ResetPassword.scss'
 import React from 'react'
 
+import * as User from '@core/user/user'
+
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
 
@@ -12,7 +14,7 @@ const ResetPassword = () => {
   const i18n = useI18n()
 
   const {
-    state: { user, error },
+    state: { initialUser, user, error },
     onChangeUser,
     onChangeUserTitle,
     onSubmit,
@@ -24,10 +26,17 @@ const ResetPassword = () => {
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       <input value={user.email} readOnly type="text" name="email" />
 
-      <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
-
-      <input defaultValue={user.name} onChange={onChangeUser} name="name" placeholder={i18n.t('loginView.yourName')} />
-
+      {!User.hasAccepted(initialUser) && (
+        <>
+          <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
+          <input
+            defaultValue={user.name}
+            onChange={onChangeUser}
+            name="name"
+            placeholder={i18n.t('loginView.yourName')}
+          />
+        </>
+      )}
       <input
         defaultValue={user.password}
         onChange={onChangeUser}

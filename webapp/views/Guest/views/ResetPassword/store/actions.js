@@ -1,9 +1,9 @@
 import * as actionTypes from './actionTypes'
 
-export const initUser = ({ name, email }) => (dispatch) =>
+export const initUser = (user) => (dispatch) =>
   dispatch({
     type: actionTypes.USER_INIT,
-    payload: { name, email },
+    payload: user,
   })
 
 export const updateUser = (event) => (dispatch) =>

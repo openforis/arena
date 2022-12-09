@@ -17,10 +17,13 @@ export const useResetPassword = () => {
   const { uuid } = useParams()
   const navigate = useNavigate()
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { name, password, passwordConfirm, props = {} } = state.user
+  const { user } = state
+  const { name, password, passwordConfirm, props = {} } = user
   const { title } = props
 
-  const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
+  const { data: { user: userFetched } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(
+    `/auth/reset-password/${uuid}`
+  )
 
   const { data: { result: resetComplete = false } = {}, dispatch: dispatchPostResetPassword } = useAsyncPutRequest(
     `/auth/reset-password/${uuid}`,
@@ -47,8 +50,8 @@ export const useResetPassword = () => {
   }, [])
 
   useOnUpdate(() => {
-    actions.initUser(user)(dispatch)
-  }, [user])
+    actions.initUser(userFetched)(dispatch)
+  }, [userFetched])
 
   useOnUpdate(() => {
     navigate(appModuleUri())
