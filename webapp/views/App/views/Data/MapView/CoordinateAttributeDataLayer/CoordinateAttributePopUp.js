@@ -99,11 +99,11 @@ export const CoordinateAttributePopUp = (props) => {
   }, [flyTo, getPreviousPoint, parentUuid])
 
   const onEarthMapButtonClick = useCallback(() => {
-    const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
+    const bounds = SamplingPolygon.getBounds(surveyInfo, pointLatLong.y, pointLatLong.x)
     const geojson = L.rectangle(bounds).toGeoJSON()
     const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
     window.open(earthMapUrl, 'EarthMap')
-  }, [point.x, point.y, surveyInfo])
+  }, [pointLatLong.x, pointLatLong.y, surveyInfo])
 
   const path = useMemo(
     () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
@@ -140,7 +140,7 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <ButtonIconGear label={i18n.t('mapView.openInEarthMap')} showLabel onClick={onEarthMapButtonClick} />
+            <ButtonIconGear label="mapView.openInEarthMap" showLabel onClick={onEarthMapButtonClick} />
           </div>
         </div>
       </div>
