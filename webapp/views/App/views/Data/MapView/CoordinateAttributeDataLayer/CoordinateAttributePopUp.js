@@ -20,8 +20,14 @@ import { useElevation } from '../common/useElevation'
 import { useI18n } from '@webapp/store/system'
 
 /**
- * builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
- * e.g. Cluster [123] -> Plot [4]
+ * Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
+ * E.g. Cluster [123] -> Plot [4].
+ *
+ * @param root0
+ * @param root0.survey
+ * @param root0.attributeDef
+ * @param root0.ancestorsKeys
+ * @param root0.lang
  */
 const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   const pathParts = []
@@ -93,11 +99,11 @@ export const CoordinateAttributePopUp = (props) => {
   }, [flyTo, getPreviousPoint, parentUuid])
 
   const onEarthMapButtonClick = useCallback(() => {
-    const bounds = SamplingPolygon.getBounds(surveyInfo, point.y, point.x)
+    const bounds = SamplingPolygon.getBounds(surveyInfo, pointLatLong.y, pointLatLong.x)
     const geojson = L.rectangle(bounds).toGeoJSON()
     const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
     window.open(earthMapUrl, 'EarthMap')
-  }, [point.x, point.y, surveyInfo])
+  }, [pointLatLong.x, pointLatLong.y, surveyInfo])
 
   const path = useMemo(
     () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
@@ -134,7 +140,7 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <ButtonIconGear label={i18n.t('mapView.openInEarthMap')} showLabel onClick={onEarthMapButtonClick} />
+            <ButtonIconGear label="mapView.openInEarthMap" showLabel onClick={onEarthMapButtonClick} />
           </div>
         </div>
       </div>
