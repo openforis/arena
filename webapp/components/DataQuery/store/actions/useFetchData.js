@@ -8,7 +8,7 @@ import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 export const throttleTime = 250
 export const getUrl = ({ surveyId, query }) => `/api/surveyRdb/${surveyId}/${Query.getEntityDefUuid(query)}/query`
 
-const initialState = { data: null, loading: false, loaded: false }
+const initialState = { data: null, loading: false, loaded: false, error: false }
 
 export const useFetchData = ({ setData }) => {
   const surveyId = useSurveyId()
@@ -17,7 +17,7 @@ export const useFetchData = ({ setData }) => {
   return {
     fetchData: useCallback(
       async ({ offset, limit, query }) => {
-        setData((dataPrev) => ({ ...dataPrev, loading: true }))
+        setData((dataPrev) => ({ ...dataPrev, loading: true, loaded: false, error: false }))
         try {
           const { data } = await axios.post(getUrl({ surveyId, query }), {
             cycle,
@@ -26,7 +26,9 @@ export const useFetchData = ({ setData }) => {
             offset,
           })
           setData({ data, loading: false, loaded: true })
-        } catch (e) {}
+        } catch (e) {
+          setData({ data: null, loading: false, loaded: true, error: true })
+        }
       },
       [cycle, surveyId, setData]
     ),

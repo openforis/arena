@@ -8,11 +8,12 @@ const _transformObj =
   (options = {}) =>
   (obj) => {
     const { removeNewLines = true } = options
-    return Object.entries(obj).reduce(
-      (objAcc, [key, value]) =>
-        Object.assign(objAcc, { [key]: removeNewLines ? StringUtils.removeNewLines(value) : value }),
-      {}
-    )
+    if (!removeNewLines) return obj
+
+    Object.entries(obj).forEach(([key, value]) => {
+      obj[key] = StringUtils.removeNewLines(value)
+    })
+    return obj
   }
 
 export const transformToStream = (stream, columns = null, options = {}) => {

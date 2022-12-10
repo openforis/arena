@@ -382,9 +382,9 @@ $t(common.cantUndoWarning)`,
       newTemplate: 'New Template',
       newTemplateFromScratch: 'New Template From Scratch',
       survey: 'Survey',
-      survey_plural: 'Surveys',
+      survey_other: 'Surveys',
       template: 'Template',
-      template_plural: 'Templates',
+      template_other: 'Templates',
       error: 'Error creating new survey',
       errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
     },
@@ -551,6 +551,7 @@ $t(common.cantUndoWarning)`,
       demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
       demoteAllRecordsFromCleansing: 'Cleansing -> Entry',
       editRecord: 'Edit record',
+      filterPlaceholder: 'Filter by keys or owner',
       viewRecord: 'View record',
       owner: 'Owner',
       step: 'Step',
@@ -567,6 +568,7 @@ $t(common.cantUndoWarning)`,
     showValidationReport: 'Show validation report',
     sort: 'Sort records',
     dataVis: {
+      errorLoadingData: 'Error loading data',
       noData: 'This query returned no data',
     },
   },
@@ -574,6 +576,7 @@ $t(common.cantUndoWarning)`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
+    elevation: 'Elevation (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     openInEarthMap: 'Open in Earth Map',
@@ -733,6 +736,7 @@ $t(common.cantUndoWarning)`,
         <li>Data: 
           <ul>
             $t(userInviteView.groupPermissions.dataCleanserData)
+            <li>access Map tool</li>
           </ul>
         </li>
         <li>Analysis:
@@ -1585,10 +1589,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
   emails: {
     signature: `<p>Thank you,<br>
-      The $t(common.appNameFull) team
+      $t(common.appNameFull) platform
       </p>`,
     temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
-    userInviteCommon: `<p>You have been invited to join the survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
+    userInviteCommon: `<p>You have been invited by {{invitingUserName}} to join the $t(common.appNameFull) survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
       {{-message}}
       <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
         <ul>{{groupPermissions}}</ul>
@@ -1600,7 +1604,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              <p><a href="{{urlResetPassword}}">Click here to complete your registration to $t(common.appNameFull)</a></p>
              <p>If it doesn't work, please copy and paste the following link in your browser: {{urlResetPassword}}</p>
              $t(emails.temporaryMsg)
-             <p><i>You have received this email because you have requested access to $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
+             <p><i>You have received this email because {{invitingUserName}} invited you to access $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
              <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
              <p>$t(common.raiseTicketInSupportForum)</p>
              $t(emails.signature)`,
