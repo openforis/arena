@@ -84,17 +84,13 @@ export const init = (app) => {
     AuthMiddleware.requireMapUsePermission,
     async (req, res, next) => {
       const { url } = Request.getParams(req)
-      const decodedUrl = decodeURIComponent(url)
-      let dataRes, data
       try {
-        dataRes = await axios.get(decodedUrl)
-        data = dataRes.data
-      } catch (error) {
-        next(error)
-      } finally {
+        const { data } = await axios.get(url)
         const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
         const json = JSON.parse(jsonstring)
         res.json(json)
+      } catch (error) {
+        next(error)
       }
     }
   )
