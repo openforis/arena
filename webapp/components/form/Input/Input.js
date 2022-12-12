@@ -15,6 +15,7 @@ export const Input = React.forwardRef((props, ref) => {
     id,
     inputType,
     maxLength,
+    name,
     onChange,
     onFocus,
     onBlur,
@@ -78,6 +79,7 @@ export const Input = React.forwardRef((props, ref) => {
           }}
           id={id}
           data-testid={id}
+          name={name}
           onValueChange={onFormattedValueChange}
           onFocus={onFocus}
           onBlur={onBlur}
@@ -98,6 +100,7 @@ export const Input = React.forwardRef((props, ref) => {
           disabled,
           id,
           maxLength,
+          name,
           onBlur,
           onChange: onChangeEvent,
           onFocus,
@@ -119,6 +122,7 @@ Input.propTypes = {
   id: PropTypes.string,
   inputType: PropTypes.oneOf(['input', 'textarea']),
   maxLength: PropTypes.number,
+  name: PropTypes.string,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
@@ -144,6 +148,7 @@ Input.defaultProps = {
   id: null,
   inputType: 'input',
   maxLength: null,
+  name: undefined,
   onChange: null,
   onFocus: () => {},
   onBlur: () => {},
