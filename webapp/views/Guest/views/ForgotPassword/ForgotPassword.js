@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import { useFormObject } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { EmailInput } from '@webapp/components/form'
+
 import Error from '@webapp/views/Guest/Error'
 
+import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
 const ForgotPassword = () => {
@@ -44,13 +46,12 @@ const ForgotPassword = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      <input
+      <EmailInput
         value={formObject.email}
-        onChange={(event) => {
+        onChange={(value) => {
           dispatch(LoginActions.setLoginError(null))
-          setObjectField('email', event.target.value)
+          setObjectField('email', value)
         }}
-        type="text"
         name="username"
         placeholder={i18n.t('loginView.yourEmail')}
       />
