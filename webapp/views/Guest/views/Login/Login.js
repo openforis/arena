@@ -6,9 +6,11 @@ import { Link } from 'react-router-dom'
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { EmailInput } from '@webapp/components/form'
+
 import Error from '@webapp/views/Guest/Error'
 
+import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
 const Login = () => {
@@ -32,10 +34,9 @@ const Login = () => {
     }
   }
 
-  const onChangeEmail = (event) => {
-    const emailChanged = event.target.value
-    dispatch(LoginActions.setEmail(emailChanged))
-    setObjectField('email', emailChanged)
+  const onChangeEmail = (value) => {
+    dispatch(LoginActions.setEmail(value))
+    setObjectField('email', value)
   }
 
   const onChangePassword = (event) => {
@@ -45,13 +46,7 @@ const Login = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      <input
-        defaultValue={formObject.email}
-        onChange={onChangeEmail}
-        type="text"
-        name="email"
-        placeholder={i18n.t('loginView.yourEmail')}
-      />
+      <EmailInput onChange={onChangeEmail} name="email" placeholder={i18n.t('loginView.yourEmail')} value={email} />
 
       <input
         defaultValue={formObject.password}
