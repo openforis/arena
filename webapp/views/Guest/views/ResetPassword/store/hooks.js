@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 
 import { LoginValidator } from '@webapp/store/login'
 import * as Validation from '@core/validation/validation'
-import { appModuleUri } from '@webapp/app/appModules'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { NotificationActions } from '@webapp/store/ui'
 
 import * as actions from './actions'
@@ -17,15 +17,20 @@ export const useResetPassword = () => {
   const { uuid } = useParams()
   const navigate = useNavigate()
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { name, password, passwordConfirm, props = {} } = state.user
+  const { user } = state
+  const { name, password, passwordConfirm, props = {} } = user
   const { title } = props
 
-  const { data: { user } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(`/auth/reset-password/${uuid}`)
+  const { data: { user: userFetched } = {}, dispatch: getResetPasswordUser } = useAsyncGetRequest(
+    `/auth/reset-password/${uuid}`
+  )
 
   const { data: { result: resetComplete = false } = {}, dispatch: dispatchPostResetPassword } = useAsyncPutRequest(
     `/auth/reset-password/${uuid}`,
     { name, title, password }
   )
+
+  const navigateToHomePage = () => navigate(appModuleUri(homeModules.dashboard))
 
   const onChangeUser = (event) => actions.updateUser(event)(dispatch)
   const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)
@@ -47,8 +52,12 @@ export const useResetPassword = () => {
   }, [])
 
   useOnUpdate(() => {
-    actions.initUser(user)(dispatch)
-  }, [user])
+    if (userFetched) {
+      actions.initUser(userFetched)(dispatch)
+    } else {
+      dispatchRedux(NotificationActions.notifyError({ key: 'resetPasswordView.forgotPasswordLinkInvalid' }))
+    }
+  }, [userFetched])
 
   useOnUpdate(() => {
     navigate(appModuleUri())
@@ -60,5 +69,6 @@ export const useResetPassword = () => {
     onChangeUser,
     onChangeUserTitle,
     onSubmit,
+    navigateToHomePage,
   }
 }
