@@ -22,7 +22,7 @@ const ExpressionsProp = (props) => {
 
   const getExpressionIndex = (expression) => R.findIndex(NodeDefExpression.isEqual(expression), values)
 
-  const onDelete = (expression) => {
+  const onDelete = (expression, callback = null) => {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
         key: 'nodeDefEdit.expressionsProp.confirmDelete',
@@ -30,18 +30,20 @@ const ExpressionsProp = (props) => {
           const index = getExpressionIndex(expression)
           const newValues = R.remove(index, 1, values)
           onChange(newValues)
+          callback?.()
         },
       })
     )
   }
 
-  const onUpdate = (expression) => {
+  const onUpdate = (expression, callback = null) => {
     if (NodeDefExpression.isEmpty(expression)) {
-      onDelete(expression)
+      onDelete(expression, callback)
     } else {
       const index = getExpressionIndex(expression)
       const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
       onChange(newValues)
+      callback?.()
     }
   }
 

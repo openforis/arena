@@ -140,8 +140,9 @@
 }
 
 .expression-editor-popup__footer {
-  text-align: center;
-  align-self: end;
+  display: flex;
+  justify-content: center;
+  gap: 5rem;
   margin-top: 2rem;
 
   > button {

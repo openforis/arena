@@ -1,6 +1,6 @@
 import './expressionEditor.scss'
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -13,6 +13,7 @@ import { useI18n } from '@webapp/store/system'
 import ExpressionEditorPopup from './expressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
   const {
@@ -37,10 +38,18 @@ const ExpressionEditor = (props) => {
 
   const [edit, setEdit] = useState(false)
 
-  const applyChange = (_query) => {
-    if (onChange) onChange(_query)
-    setEdit(false)
-  }
+  const onClose = useCallback(() => setEdit(false), [])
+
+  const applyChange = useCallback(
+    (_query) => {
+      if (onChange) {
+        onChange(_query, onClose)
+      } else {
+        onClose()
+      }
+    },
+    [onChange, onClose]
+  )
 
   const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`
 
@@ -66,7 +75,7 @@ const ExpressionEditor = (props) => {
           isContextParent={isContextParent}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
-          onClose={() => setEdit(false)}
+          onClose={onClose}
           onChange={applyChange}
           types={types}
           header={popupHeader}
@@ -78,15 +87,13 @@ const ExpressionEditor = (props) => {
               {query}
             </div>
           )}
-          <button
-            type="button"
-            className="btn btn-s btn-edit"
+          <Button
+            className="btn-s btn-edit"
             id={`${idPrefix}-edit-btn`}
-            data-testid={TestId.expressionEditor.editBtn(qualifier)}
+            testId={TestId.expressionEditor.editBtn(qualifier)}
             onClick={() => setEdit(true)}
-          >
-            <span className="icon icon-pencil2 icon-14px" />
-          </button>
+            iconClassName="icon-pencil2 icon-14px"
+          />
         </div>
       )}
     </div>
