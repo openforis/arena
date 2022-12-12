@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -25,7 +26,7 @@ const NodeDefLabelSwitch = (props) => {
   const label = labelType === NodeDef.NodeDefLabelTypes.label ? 'common.showNames' : 'common.showLabels'
 
   return (
-    <button type="button" className={className} onClick={onChange}>
+    <button type="button" className={classNames('btn-transparent', className)} onClick={onChange}>
       {i18n.t(label)}
     </button>
   )

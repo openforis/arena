@@ -51,11 +51,7 @@ const SurveyHierarchy = () => {
       <div className="survey-hierarchy__button-bar">
         <SurveySchemaSummaryDownloadButton />
 
-        <NodeDefLabelSwitch
-          className="btn-s btn-transparent"
-          labelType={nodeDefLabelType}
-          onChange={toggleLabelFunction}
-        />
+        <NodeDefLabelSwitch className="btn-s" labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
       </div>
 
       <div className="survey-hierarchy__center">
