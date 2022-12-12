@@ -115,6 +115,7 @@
     "bluebird": "^3.7.2",
     "buffer": "^6.0.3",
     "camelize": "^1.0.0",
+    "circle-to-polygon": "^2.2.0",
     "classnames": "^2.3.1",
     "cluster": "^0.7.7",
     "codemirror": "^5.65.5",
