@@ -17,7 +17,8 @@ const SurveySchemaSummaryDownloadButton = (props) => {
       testId={TestId.surveyForm.schemaSummary}
       href={`/api/survey/${surveyId}/schema-summary/`}
       requestParams={{ cycle: surveyCycleKey }}
-      label={'surveyForm.schemaSummary'}
+      label="surveyForm.schemaSummary"
+      title="surveyForm.schemaSummaryTitle"
     />
   )
 }
