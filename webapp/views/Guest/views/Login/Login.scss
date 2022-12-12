@@ -1,5 +1,11 @@
 @import 'webapp/style/vars';
 
+.guest__form {
+  .form-input {
+    padding: 20px 5px;
+  }
+}
+
 .guest-login__btn-request-access,
 .guest-login__btn-forgot-pwd {
   justify-self: center;
