@@ -1,73 +1,80 @@
 @import 'webapp/style/vars';
 
 .survey-hierarchy {
-  display: grid;
-  grid-template-columns: 1fr 240px;
-}
-
-.survey-hierarchy__attributes {
-  height: 100%;
-  width: 100%;
-}
-
-.survey-hierarchy__button-bar {
   display: flex;
   flex-direction: column;
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-}
+  gap: 0.5rem;
 
-.survey-hierarchy__tree {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-
-  svg {
-    position: absolute;
-  }
-
-  .node {
-    cursor: pointer;
-    font-size: 0.8rem;
-    letter-spacing: 0;
-    padding: 0.2rem 0.5rem;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-
-  .node-grid {
+  .survey-hierarchy__button-bar {
     display: flex;
-    align-items: center;
-    border: 1px solid $greyBorder;
-    justify-content: space-between;
-    transition: background-color 1s ease;
-    background-color: white;
-    height: 38px;
-    padding: 6px;
-
-    .btn {
-      transform: rotate(-90deg);
-      padding: 0.3rem;
-    }
-
-    &.node-virtual {
-      background-color: $grey;
-    }
-
-    &.highlight {
-      background-color: $blueLightActive;
-    }
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.5rem;
   }
 
-  .link {
-    fill: none;
-    stroke: $blueLightActive;
-    stroke-width: 1px;
+  .survey-hierarchy__center {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    height: 100%;
+
+    .survey-hierarchy__tree {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      overflow: auto;
+
+      svg {
+        position: absolute;
+        height: 100%;
+      }
+
+      .node {
+        cursor: pointer;
+        font-size: 0.8rem;
+        letter-spacing: 0;
+        padding: 0.2rem 0.5rem;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .node-grid {
+        display: flex;
+        align-items: center;
+        border: 1px solid $greyBorder;
+        justify-content: space-between;
+        transition: background-color 1s ease;
+        background-color: white;
+        height: 38px;
+        padding: 6px;
+
+        .btn {
+          transform: rotate(-90deg);
+          padding: 0.3rem;
+        }
+
+        &.node-virtual {
+          background-color: $grey;
+        }
+
+        &.highlight {
+          background-color: $blueLightActive;
+        }
+      }
+
+      .link {
+        fill: none;
+        stroke: $blueLightActive;
+        stroke-width: 1px;
+      }
+    }
+
+    .survey-hierarchy__attributes {
+      height: 100%;
+      width: 100%;
+    }
   }
 }
