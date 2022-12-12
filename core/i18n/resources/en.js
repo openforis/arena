@@ -1054,6 +1054,7 @@ $t(common.appNameFull)
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
     schemaSummary: 'Schema summary',
+    schemaSummaryTitle: 'Export schema summary to CSV',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
     movePageUp: 'Move page up',
