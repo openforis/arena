@@ -4,6 +4,12 @@ import * as actionTypes from './actionTypes'
 export default (state, action) => {
   switch (action.type) {
     case actionTypes.USER_INIT:
+      return {
+        ...state,
+        error: null,
+        initialUser: action.payload,
+        user: { ...state.user, ...action.payload },
+      }
     case actionTypes.USER_UPDATE:
       return {
         ...state,
