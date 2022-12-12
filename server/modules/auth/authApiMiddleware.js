@@ -114,7 +114,7 @@ export const requireRecordAnalysisPermission = requireSurveyPermission(Authorize
 export const requireRecordsExportPermission = requireSurveyPermission(Authorizer.canExportRecords)
 
 // Map
-export const requireMapUsePermission = requirePermission(Authorizer.canUseMap)
+export const requireMapUsePermission = requireSurveyPermission(Authorizer.canUseMap)
 
 // User
 export const requireUserInvitePermission = requireSurveyPermission(Authorizer.canInviteUsers)

@@ -44,9 +44,12 @@ export const fetchAvailableMapPeriods = async ({ provider, periodType }) => {
   return null
 }
 
-export const fetchElevation = async ({ lat, lng }) => {
+export const fetchElevation = async ({ surveyId, lat, lng }) => {
   try {
-    const { data } = await axios.get(`/api/geo/map/elevation/${lat}/${lng}`)
+    const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/elevation`, {
+      params: { lat, lng },
+      timeout: 5000,
+    })
     return data
   } catch {
     return null
@@ -59,5 +62,17 @@ export const testMapApiKey = async ({ provider, apiKey }) => {
     return mosaics.length > 0
   } catch (_e) {
     return false
+  }
+}
+
+/* Query the user given url through our server to avoid CORS violations. The layer urls are not proxied through our server yet, but maybe they should. 
+   If you get CORS problems, that will be the solution.
+*/
+export const fetchMapWmtsCapabilities = async ({ surveyId, url }) => {
+  try {
+    const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/wmts/capabilities/`, { params: { url } })
+    return data
+  } catch {
+    return null
   }
 }

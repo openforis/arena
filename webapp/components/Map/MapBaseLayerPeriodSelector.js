@@ -14,6 +14,7 @@ import * as API from '@webapp/service/api'
 import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContextBaseLayer } from './MapContext'
 import { Checkbox } from '../form'
+import { useSurveyId } from '@webapp/store/survey'
 
 const getPeriodValue = (period) => {
   const { year, month, yearTo } = period
@@ -50,6 +51,8 @@ export const MapBaseLayerPeriodSelector = () => {
     falseColorLeftChecked: false,
     falseColorRightChecked: false,
   })
+
+  const surveyId = useSurveyId()
 
   const apiKey = User.getMapApiKey({ provider })(user)
 
@@ -133,14 +136,24 @@ export const MapBaseLayerPeriodSelector = () => {
         const proc = isLeft ? procLeft : procRight
         const baseLayerUrlFunction = baseLayerUrlByProviderFunction[provider]
         if (baseLayerUrlFunction) {
-          const url = `${baseLayerUrlFunction({ period, apiKey })}&proc=${proc}`
+          const url = `${baseLayerUrlFunction({ surveyId, period, apiKey })}&proc=${proc}`
           if (layer._url !== url) {
             layer.setUrl(url)
           }
         }
       }
     },
-    [apiKey, getLayer, periodByValue, procLeft, procRight, provider, selectedPeriodValueLeft, selectedPeriodValueRight]
+    [
+      apiKey,
+      getLayer,
+      periodByValue,
+      procLeft,
+      procRight,
+      provider,
+      selectedPeriodValueLeft,
+      selectedPeriodValueRight,
+      surveyId,
+    ]
   )
 
   // update layers on selections change
