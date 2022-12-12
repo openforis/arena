@@ -77,7 +77,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const elevation = useElevation(pointLatLong, open)
+  const elevation = useElevation({ surveyId: Survey.getIdSurveyInfo(surveyInfo), point: pointLatLong, active: open })
 
   const flyTo = useCallback(
     (point) => {
