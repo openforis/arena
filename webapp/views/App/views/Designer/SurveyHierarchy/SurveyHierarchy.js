@@ -48,24 +48,32 @@ const SurveyHierarchy = () => {
 
   return (
     <div className="survey-hierarchy">
-      <div className="survey-hierarchy__tree" ref={treeRef} />
+      <div className="survey-hierarchy__button-bar">
+        <SurveySchemaSummaryDownloadButton />
 
-      <div className="survey-hierarchy__attributes">
-        <NodeDefsSelector
-          hierarchy={hierarchy}
-          nodeDefUuidEntity={selectedNodeDefUuid}
-          onChangeEntity={(nodeDefUuidEntity) => {
-            tree.expandToNode(nodeDefUuidEntity)
-            setSelectedNodeDefUuid(nodeDefUuidEntity)
-          }}
-          canSelectAttributes={false}
-          showAncestors={false}
-          nodeDefLabelType={nodeDefLabelType}
+        <NodeDefLabelSwitch
+          className="btn-s btn-transparent"
+          labelType={nodeDefLabelType}
+          onChange={toggleLabelFunction}
         />
       </div>
-      <div className="survey-hierarchy__button-bar">
-        <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
-        <SurveySchemaSummaryDownloadButton />
+
+      <div className="survey-hierarchy__center">
+        <div className="survey-hierarchy__tree" ref={treeRef} />
+
+        <div className="survey-hierarchy__attributes">
+          <NodeDefsSelector
+            hierarchy={hierarchy}
+            nodeDefUuidEntity={selectedNodeDefUuid}
+            onChangeEntity={(nodeDefUuidEntity) => {
+              tree.expandToNode(nodeDefUuidEntity)
+              setSelectedNodeDefUuid(nodeDefUuidEntity)
+            }}
+            canSelectAttributes={false}
+            showAncestors={false}
+            nodeDefLabelType={nodeDefLabelType}
+          />
+        </div>
       </div>
     </div>
   )
