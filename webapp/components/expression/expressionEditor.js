@@ -41,9 +41,9 @@ const ExpressionEditor = (props) => {
   const onClose = useCallback(() => setEdit(false), [])
 
   const applyChange = useCallback(
-    (_query) => {
+    ({ query }) => {
       if (onChange) {
-        onChange(_query, onClose)
+        onChange({ query, callback: onClose })
       } else {
         onClose()
       }
@@ -89,10 +89,10 @@ const ExpressionEditor = (props) => {
           )}
           <Button
             className="btn-s btn-edit"
-            id={`${idPrefix}-edit-btn`}
-            testId={TestId.expressionEditor.editBtn(qualifier)}
-            onClick={() => setEdit(true)}
             iconClassName="icon-pencil2 icon-14px"
+            id={`${idPrefix}-edit-btn`}
+            onClick={() => setEdit(true)}
+            testId={TestId.expressionEditor.editBtn(qualifier)}
           />
         </div>
       )}
