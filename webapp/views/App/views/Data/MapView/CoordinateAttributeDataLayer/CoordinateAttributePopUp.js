@@ -18,6 +18,7 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
 import { useElevation } from '../common/useElevation'
 import { useI18n } from '@webapp/store/system'
+const circleToPolygon = require("circle-to-polygon");
 
 /**
  * Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -99,8 +100,15 @@ export const CoordinateAttributePopUp = (props) => {
   }, [flyTo, getPreviousPoint, parentUuid])
 
   const onEarthMapButtonClick = useCallback(() => {
-    const bounds = SamplingPolygon.getBounds(surveyInfo, pointLatLong.y, pointLatLong.x)
-    const geojson = L.rectangle(bounds).toGeoJSON()
+    let geojson
+    const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
+    if (isCircle) {
+      const radius = SamplingPolygon.getRadius(surveyInfo)
+      geojson = circleToPolygon([pointLatLong.x, pointLatLong.y], radius)
+    } else {
+      const bounds = SamplingPolygon.getBounds(surveyInfo, pointLatLong.y, pointLatLong.x)
+      geojson = L.rectangle(bounds).toGeoJSON()
+    }
     const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
     window.open(earthMapUrl, 'EarthMap')
   }, [pointLatLong.x, pointLatLong.y, surveyInfo])
