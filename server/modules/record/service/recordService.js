@@ -81,7 +81,7 @@ export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
   return await RecordManager.updateRecordStepInTransaction({ user, surveyId, record, stepId })
 }
 
-export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
+export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notifySameUser = false }) => {
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
@@ -91,8 +91,8 @@ export const deleteRecord = async (socketId, user, surveyId, recordUuid) => {
   // Notify other users viewing or editing the record it has been deleted
   const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
   socketIds.forEach((socketIdCurrent) => {
-    if (socketIdCurrent !== socketId) {
-      WebSocketServer.notifyUser(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
+    if (socketIdCurrent !== socketId || notifySameUser) {
+      WebSocketServer.notifySocket(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
     }
   })
   RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
@@ -136,12 +136,13 @@ export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
 }
 
 export const checkOut = async (socketId, user, surveyId, recordUuid) => {
-  const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
 
   if (Record.isPreview(record)) {
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
+  } else if (Record.isEmpty(record)) {
+    await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
   }
-
   RecordServiceThreads.dissocSocket(socketId)
 }
 

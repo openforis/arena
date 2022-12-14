@@ -11,7 +11,7 @@ import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 
-import { useOnUpdate, useQuery, useWebSocket } from '@webapp/components/hooks'
+import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import { State } from './state'
 
@@ -60,28 +60,27 @@ export const useLocalState = (props) => {
   }
 
   // Add websocket event listeners
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
     eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodeValidationsUpdate,
     eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), []),
   })
-
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdateCompleted,
     eventHandler: useCallback((content) => dispatch(RecordActions.nodesUpdateCompleted(content)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.recordDelete,
     eventHandler: useCallback(() => dispatch(RecordActions.recordDeleted(navigate)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.recordSessionExpired,
     eventHandler: useCallback(() => dispatch(RecordActions.sessionExpired(navigate)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.applicationError,
     eventHandler: useCallback(({ key, params }) => dispatch(RecordActions.applicationError(navigate, key, params)), []),
   })

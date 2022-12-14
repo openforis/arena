@@ -310,3 +310,5 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
 }
 
 export const isNodeEmpty = (node) => (record) => !findDescendantOrSelf(node, Node.hasUserInputValue)(record)
+
+export const isEmpty = (record) => isNodeEmpty(getRootNode(record))
