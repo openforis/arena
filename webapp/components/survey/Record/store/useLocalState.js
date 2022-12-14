@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router'
@@ -40,23 +40,6 @@ export const useLocalState = (props) => {
   const recordLoadError = useSelector(RecordState.getRecordLoadError)
   const editable = useAuthCanEditRecord(record)
 
-  const recordFetchCompleteRef = useRef(false)
-  const recordFetchedSuccessfullyRef = useRef(false)
-
-  if ((recordLoadError || record) && !recordFetchCompleteRef.current) {
-    recordFetchCompleteRef.current = true
-    recordFetchedSuccessfullyRef.current = !!record
-  }
-
-  const componentUnload = () => {
-    if (recordFetchedSuccessfullyRef.current) {
-      dispatch(RecordActions.checkOutRecord(recordUuid))
-    }
-
-    // Remove beforeunload event listener
-    window.removeEventListener('beforeunload', componentUnload)
-  }
-
   // Add websocket event listeners
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
@@ -83,7 +66,14 @@ export const useLocalState = (props) => {
     eventHandler: useCallback(({ key, params }) => dispatch(RecordActions.applicationError(navigate, key, params)), []),
   })
 
-  const componentLoad = () => {
+  const onComponentUnload = () => {
+    dispatch(RecordActions.checkOutRecord(recordUuid))
+
+    // Remove beforeunload event listener
+    window.removeEventListener('beforeunload', onComponentUnload)
+  }
+
+  const onComponentLoad = () => {
     // Check in record
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
@@ -91,12 +81,12 @@ export const useLocalState = (props) => {
     dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }))
 
     // Add beforeunload event listener
-    window.addEventListener('beforeunload', componentUnload)
+    window.addEventListener('beforeunload', onComponentUnload)
   }
 
   useEffect(() => {
-    componentLoad()
-    return componentUnload
+    onComponentLoad()
+    return onComponentUnload
   }, [])
 
   useOnUpdate(() => {
