@@ -27,8 +27,13 @@ export const formatDecimal = (value, decimalDigits = NaN) => {
   if (Number.isNaN(value) || value === null) return null
   const num = new BigNumber(value)
 
-  if (decimalDigits >= 0) {
+  if (decimalDigits > 0) {
+    // round to fixed number of decimal digits
     return num.toFormat(decimalDigits)
+  }
+  if (decimalDigits === 0) {
+    // format as integer
+    return num.toFormat(0, { groupSeparator: '' })
   }
   return num.toString()
 }
