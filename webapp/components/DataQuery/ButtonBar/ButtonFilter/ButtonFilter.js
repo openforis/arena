@@ -38,7 +38,7 @@ const ButtonFilter = (props) => {
           mode={Expression.modes.sql}
           types={[ExpressionEditorType.basic]}
           header={i18n.t('dataView.filterRecords.expressionEditorHeader')}
-          onChange={(_, expr) => {
+          onChange={({ expr }) => {
             onChangeQuery(Query.assocFilter(expr))
             Actions.closePanels()
           }}

@@ -80,7 +80,7 @@ const ExpressionProp = (props) => {
             nodeDefUuidCurrent={nodeDefUuidCurrent}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
             query={NodeDefExpression.getExpression(expression)}
-            onChange={(expr) => onUpdate(NodeDefExpression.assocExpression(expr)(expression))}
+            onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocExpression(query)(expression), callback)}
             isContextParent={isContextParent}
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
@@ -101,7 +101,7 @@ const ExpressionProp = (props) => {
               nodeDefUuidCurrent={nodeDefUuidCurrent}
               excludeCurrentNodeDef={excludeCurrentNodeDef}
               query={NodeDefExpression.getApplyIf(expression)}
-              onChange={(expr) => onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))}
+              onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
               isContextParent={isContextParent}
               canBeConstant={false}
               types={expressionEditorTypes}
