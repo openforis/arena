@@ -23,6 +23,12 @@ export const checkInRecord =
       draft,
     })
 
+    if (!record) {
+      dispatch({ type: ActionTypes.recordLoadError, error: 'recordView.recordNotFound' })
+      dispatch(LoaderActions.hideLoader())
+      return
+    }
+
     // This is used by dataQuery when user is editing a specific entity
     if (pageNodeUuid) {
       const state = getState()

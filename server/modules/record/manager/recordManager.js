@@ -86,6 +86,8 @@ export const fetchRecordAndNodesByUuid = async (
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  if (!record) return null
+
   const nodes = await NodeRepository.fetchNodesByRecordUuid(
     { surveyId, recordUuid, includeRefData: fetchForUpdate, draft },
     client

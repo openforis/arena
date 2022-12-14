@@ -4,6 +4,7 @@ export {
   recordCreate,
   recordDelete,
   recordLoad,
+  recordLoadError,
   recordUuidPreviewUpdate,
   validationsUpdate,
 } from './actionTypes'

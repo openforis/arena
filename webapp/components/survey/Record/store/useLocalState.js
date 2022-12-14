@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
@@ -12,8 +11,6 @@ import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 
 import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/hooks'
-
-import { State } from './state'
 
 export const useLocalState = (props) => {
   const {
@@ -40,18 +37,19 @@ export const useLocalState = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
 
   const record = useSelector(RecordState.getRecord)
+  const recordLoadError = useSelector(RecordState.getRecordLoadError)
   const editable = useAuthCanEditRecord(record)
 
-  const [state, setState] = useState(() => State.create({ preview }))
-  const loadedRef = useRef(false)
+  const recordFetchCompleteRef = useRef(false)
+  const recordFetchedSuccessfullyRef = useRef(false)
 
-  if (record && !State.isLoaded(state)) {
-    loadedRef.current = true
-    setState(A.pipe(State.assocLoaded(true), State.assocEditable(editable)))
+  if ((recordLoadError || record) && !recordFetchCompleteRef.current) {
+    recordFetchCompleteRef.current = true
+    recordFetchedSuccessfullyRef.current = !!record
   }
 
   const componentUnload = () => {
-    if (loadedRef.current) {
+    if (recordFetchedSuccessfullyRef.current) {
       dispatch(RecordActions.checkOutRecord(recordUuid))
     }
 
@@ -105,5 +103,5 @@ export const useLocalState = (props) => {
     dispatch(RecordActions.cycleChanged(navigate))
   }, [surveyCycleKey])
 
-  return { state }
+  return { editable, preview, record, recordLoadError }
 }
