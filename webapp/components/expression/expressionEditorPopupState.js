@@ -106,11 +106,8 @@ export const useExpressionEditorPopupState = (props) => {
     // With this, we can always open the query (i.e. the expression)
     // in advanced editor directly.
     const { exprDraft, queryDraft } = state
-    if (advanced) {
-      onChange(`${queryDraft.trimRight()}\n`, exprDraft)
-    } else {
-      onChange(queryDraft, exprDraft)
-    }
+    const queryUpdated = advanced ? `${queryDraft.trimEnd()}\n` : queryDraft
+    onChange({ query: queryUpdated, expr: exprDraft })
   }
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)

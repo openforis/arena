@@ -16,6 +16,7 @@ import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
+import { Button } from '../buttons'
 
 const ExpressionEditorPopup = (props) => {
   const {
@@ -99,21 +100,25 @@ const ExpressionEditorPopup = (props) => {
         )}
 
         <div className="expression-editor-popup__footer">
-          <button type="button" className="btn btn-s" onClick={() => onChange('')} aria-disabled={R.isEmpty(query)}>
-            <span className="icon icon-undo2 icon-12px" />
-            {i18n.t('common.reset')}
-          </button>
+          <Button
+            disabled={R.isEmpty(query)}
+            iconClassName="icon-undo2 icon-12px"
+            label="common.reset"
+            onClick={() => onChange('')}
+            size="small"
+          />
 
-          <button
-            type="button"
-            className="btn btn-s btn-primary"
-            data-testid={TestId.expressionEditor.applyBtn}
+          <Button
+            className="btn-primary"
+            disabled={!expressionCanBeApplied}
+            iconClassName="icon-checkmark icon-12px"
+            label="common.apply"
             onClick={onApply}
-            aria-disabled={!expressionCanBeApplied}
-          >
-            <span className="icon icon-checkmark icon-12px" />
-            {i18n.t('common.apply')}
-          </button>
+            size="small"
+            testId={TestId.expressionEditor.applyBtn}
+          />
+
+          <Button label="common.cancel" onClick={onClose} size="small" />
         </div>
       </div>
     </PanelRight>

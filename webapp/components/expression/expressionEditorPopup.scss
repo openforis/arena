@@ -94,7 +94,7 @@
 
       .identifier,
       .dropdown-literal {
-        width: 40rem;
+        width: 30rem;
         max-width: 40rem;
       }
     }
@@ -106,6 +106,7 @@
     .btn-switch-operand {
       font-size: 0.75rem;
       margin: 0 0.1rem;
+      height: 32px;
       align-self: flex-end;
     }
 
@@ -140,8 +141,9 @@
 }
 
 .expression-editor-popup__footer {
-  text-align: center;
-  align-self: end;
+  display: flex;
+  justify-content: center;
+  gap: 5rem;
   margin-top: 2rem;
 
   > button {
