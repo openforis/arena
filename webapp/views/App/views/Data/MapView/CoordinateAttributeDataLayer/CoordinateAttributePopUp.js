@@ -18,18 +18,10 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
 import { useElevation } from '../common/useElevation'
 import { useI18n } from '@webapp/store/system'
-const circleToPolygon = require("circle-to-polygon");
+const circleToPolygon = require('circle-to-polygon')
 
-/**
- * Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
- * E.g. Cluster [123] -> Plot [4].
- *
- * @param root0
- * @param root0.survey
- * @param root0.attributeDef
- * @param root0.ancestorsKeys
- * @param root0.lang
- */
+// Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
+// E.g. Cluster [123] -> Plot [4].
 const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   const pathParts = []
 
@@ -44,7 +36,7 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
         return NodeDef.getParentUuid(ancestorKeyDef) === NodeDef.getUuid(nodeDef)
       })
       if (ancestorKeys.length > 0) {
-        pathPart += `[${ancestorKeys.join(',')}]`
+        pathPart += ` [${ancestorKeys.join(', ')}]`
       }
     }
     pathParts.unshift(pathPart)
@@ -148,7 +140,7 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <ButtonIconGear label="mapView.openInEarthMap" showLabel onClick={onEarthMapButtonClick} />
+            <ButtonIconGear label="mapView.openInEarthMap" showLabel size="small" onClick={onEarthMapButtonClick} />
           </div>
         </div>
       </div>
