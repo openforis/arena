@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import * as A from '@core/arena'
 
+import { Objects } from '@openforis/arena-core'
+
 import {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
@@ -343,16 +345,22 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
       i.props,
       i.props_draft,
       i.uuid,
-      i.level_uuid
+      i.level_uuid,
+      ROW_NUMBER () OVER (partition by i.parent_uuid order by i.id) AS index
     FROM
        ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN
        ${getSurveyDBSchema(surveyId)}.category_level l
     ON
       i.level_uuid = l.uuid
+    ORDER BY l.category_uuid, i.id
     `,
     [],
-    (indexItem) => dbTransformCallback(indexItem, draft, true)
+    (row) => {
+      const rowTransformed = dbTransformCallback(row, draft, true)
+      Objects.setInPath({ obj: rowTransformed, path: ['props', 'index'], value: Number(row.index) })
+      return rowTransformed
+    }
   )
 
 export const { generateCategoryExportStreamAndHeaders } = CategoryExportRepository
