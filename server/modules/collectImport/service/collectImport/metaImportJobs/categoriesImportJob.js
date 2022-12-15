@@ -1,8 +1,10 @@
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as ObjectUtils from '@core/objectUtils'
 
 import Job from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
@@ -13,7 +15,7 @@ import * as CollectSurvey from '../model/collectSurvey'
 
 /**
  * Inserts a category for each code list in the Collect survey.
- * Saves the list of inserted categories in the "categories" context property
+ * Saves the list of inserted categories in the "categories" context property.
  */
 export default class CategoriesImportJob extends Job {
   constructor(params) {
@@ -25,7 +27,7 @@ export default class CategoriesImportJob extends Job {
 
   async execute() {
     const { tx } = this
-    const { collectSurvey, defaultLanguage } = this.context
+    const { collectSurvey, defaultLanguage, survey } = this.context
 
     const categories = []
 
@@ -66,6 +68,7 @@ export default class CategoriesImportJob extends Job {
     this.setContext({
       categories,
       qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel,
+      survey: Survey.assocCategories(ObjectUtils.toUuidIndexedObj(categories))(survey),
     })
   }
 

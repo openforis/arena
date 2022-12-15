@@ -438,8 +438,7 @@ export default class NodeDefsImportJob extends Job {
    * @param nodeDef
    */
   async addSpecifyTextAttribute(parentNodeDef, nodeDef) {
-    const categories = this.getContextProp('categories', {})
-    const category = R.find((category) => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
     const categoryName = Category.getName(category)
     const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
 
@@ -570,9 +569,9 @@ export default class NodeDefsImportJob extends Job {
   }
 
   get survey() {
-    const { surveyId } = this.context
+    const { survey } = this.context
     // dependency graph generation not necessary
-    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })({ id: surveyId })
+    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })(survey)
   }
 }
 

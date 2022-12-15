@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Category from '../category'
 import * as NodeDef from '../nodeDef'
 import * as SurveyInfo from './surveyInfo'
@@ -46,3 +48,6 @@ export const getSamplingPointDataNodeDefs = (survey) => {
 
 // ====== UPDATE
 export const assocCategories = (newCategories) => R.assoc(categories, newCategories)
+
+export const assocCategory = (category) => (survey) =>
+  Objects.assocPath({ obj: survey, path: [categories, Category.getUuid(category)], value: category })

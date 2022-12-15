@@ -1,10 +1,12 @@
 import * as R from 'ramda'
 
+import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
 import { languageCodesISO639part2 } from '@core/app/languages'
+import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import Job from '@server/job/job'
@@ -21,7 +23,7 @@ const fixedColumns = ['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name'
 
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
- * Saves the list of inserted taxonomies in the "taxonomies" context property
+ * Saves the list of inserted taxonomies in the "taxonomies" context property.
  */
 export default class TaxonomiesImportJob extends Job {
   constructor(params) {
@@ -37,7 +39,7 @@ export default class TaxonomiesImportJob extends Job {
 
   async execute() {
     const { tx } = this
-    const { collectSurveyFileZip } = this.context
+    const { collectSurveyFileZip, survey } = this.context
 
     const taxonomies = []
 
@@ -61,7 +63,10 @@ export default class TaxonomiesImportJob extends Job {
       this.incrementProcessedItems()
     }
 
-    this.setContext({ taxonomies })
+    this.setContext({
+      taxonomies, // TODO check if it's needed to put taxonomies in context
+      survey: Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))(survey),
+    })
   }
 
   async importTaxonomyFromSpeciesFile(speciesFileName, tx) {
