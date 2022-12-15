@@ -358,7 +358,12 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     [],
     (row) => {
       const rowTransformed = dbTransformCallback(row, draft, true)
-      Objects.setInPath({ obj: rowTransformed, path: ['props', 'index'], value: Number(row.index) })
+      Objects.setInPath({
+        obj: rowTransformed,
+        path: [CategoryItem.keys.props, CategoryItem.keysProps.index],
+        value: Number(row.index),
+      })
+      delete rowTransformed['index']
       return rowTransformed
     }
   )

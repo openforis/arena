@@ -2,6 +2,8 @@ import * as R from 'ramda'
 import pgPromise from 'pg-promise'
 import * as toSnakeCase from 'to-snake-case'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
@@ -245,7 +247,8 @@ export const fetchTaxaWithVernacularNames = async (
               vn.names
             ) FILTER (WHERE vn.lang IS NOT NULL),
             '{}'
-          ) as vernacular_names
+          ) as vernacular_names,
+        ROW_NUMBER () OVER (partition by t.taxonomy_uuid order by t.id) AS index
       FROM
           ${getSurveyDBSchema(surveyId)}.taxon t
       ${
@@ -269,7 +272,16 @@ export const fetchTaxaWithVernacularNames = async (
       OFFSET $/offset/
     `,
     { taxonomyUuid, offset },
-    (record) => DB.transformCallback(record, draft, true, backup)
+    (row) => {
+      const rowTransformed = DB.transformCallback(row, draft, true, backup)
+      Objects.setInPath({
+        obj: rowTransformed,
+        path: [Taxon.keys.props, Taxon.propKeys.index],
+        value: Number(row.index),
+      })
+      delete rowTransformed['index']
+      return rowTransformed
+    }
   )
 
 export const fetchTaxaWithVernacularNamesStream = ({
