@@ -17,6 +17,8 @@ const initialState = {
   exprDraftValid: true,
 }
 
+const ADVANCED_EXPRESSION_SUFFIX = '\n'
+
 export const useExpressionEditorPopupState = (props) => {
   const {
     canBeConstant,
@@ -37,10 +39,9 @@ export const useExpressionEditorPopupState = (props) => {
   // An encoding trick. Newlines can only appear in a textarea,
   // so denote advanced mode expressions as anything that contains a newline.
   // The editing component ensures that all intermediate values will contain one.
-  const initialAdvanced = editorType === ExpressionEditorType.advanced || /\n/.test(query)
-  const [advanced, setAdvancedEditor] = useState(initialAdvanced)
+  const initialAdvanced =
+    editorType === ExpressionEditorType.advanced || new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query)
   const [state, setState] = useState(initialState)
-  const [expressionCanBeApplied, setExpressionCanBeApplied] = useState(false)
 
   // OnMount initialize state
   useEffect(() => {
@@ -49,10 +50,13 @@ export const useExpressionEditorPopupState = (props) => {
     const queryDraft = Expression.toString(exprDraft, mode)
 
     setState({
-      query: advanced ? query.trimRight() : queryDraft,
-      queryDraft: advanced ? query.trimRight() : queryDraft,
+      advanced: initialAdvanced,
+      query: initialAdvanced ? query.trimRight() : queryDraft,
+      queryDraft: initialAdvanced ? query.trimRight() : queryDraft,
+      queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
+      expressionCanBeApplied: false,
     })
   }, [])
 
@@ -60,13 +64,13 @@ export const useExpressionEditorPopupState = (props) => {
     const queryDraft = Expression.toString(exprDraft, mode)
     const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
 
-    setExpressionCanBeApplied(query !== queryDraft && exprDraftValid)
-
     setState((prevState) => ({
       ...prevState,
       queryDraft,
       exprDraft,
       exprDraftValid,
+      expressionCanBeApplied: query !== queryDraft && exprDraftValid,
+      queryIsBasic: true,
     }))
   }
 
@@ -79,25 +83,28 @@ export const useExpressionEditorPopupState = (props) => {
       queryDraft,
       exprDraft,
       exprDraftValid,
+      queryIsBasic: false,
     }))
   }
 
   const resetDraftQuery = () => {
-    setExpressionCanBeApplied(query !== '')
-
     setState((prevState) => ({
       ...prevState,
       queryDraft: '',
       exprDraft: ExpressionParser.parseQuery('', mode, canBeConstant),
       exprDraftValid: true,
+      expressionCanBeApplied: query !== '',
     }))
   }
 
   const onToggleAdvancedEditor = () => {
-    if (advanced) {
+    const { advanced, queryIsBasic } = state
+
+    if (advanced && !queryIsBasic) {
       resetDraftQuery()
     }
-    setAdvancedEditor(!advanced)
+    const queryIsBasicNext = queryIsBasic || (advanced && !queryIsBasic)
+    setState((prevState) => ({ ...prevState, advanced: !advanced, queryIsBasic: queryIsBasicNext }))
   }
 
   const onApply = () => {
@@ -105,10 +112,13 @@ export const useExpressionEditorPopupState = (props) => {
     // the query was written with this advanced expression editor.
     // With this, we can always open the query (i.e. the expression)
     // in advanced editor directly.
-    const { exprDraft, queryDraft } = state
-    const queryUpdated = advanced ? `${queryDraft.trimEnd()}\n` : queryDraft
+    const { advanced, exprDraft, queryDraft } = state
+    const queryUpdated = advanced ? `${queryDraft.trimEnd()}${ADVANCED_EXPRESSION_SUFFIX}` : queryDraft
     onChange({ query: queryUpdated, expr: exprDraft })
   }
+
+  const setExpressionCanBeApplied = (expressionCanBeApplied) =>
+    setState((prevState) => ({ ...prevState, expressionCanBeApplied }))
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
@@ -125,8 +135,6 @@ export const useExpressionEditorPopupState = (props) => {
 
   return {
     ...state,
-    advanced,
-    expressionCanBeApplied,
     nodeDefCurrent,
     onApply,
     onToggleAdvancedEditor,
