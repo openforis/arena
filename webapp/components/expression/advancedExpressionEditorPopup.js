@@ -111,9 +111,7 @@ AdvancedExpressionEditorPopup.propTypes = {
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
-  setExpressionCanBeApplied: PropTypes.func.isRequired,
   updateDraftQuery: PropTypes.func.isRequired,
-  variables: PropTypes.arrayOf(Object).isRequired, // variables grouped by parent entity
 }
 
 AdvancedExpressionEditorPopup.defaultProps = {
