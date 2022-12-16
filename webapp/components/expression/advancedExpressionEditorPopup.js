@@ -1,12 +1,10 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import CodeMirror from 'codemirror/lib/codemirror'
 import 'codemirror/addon/hint/show-hint'
 
-import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -16,37 +14,50 @@ import { TestId } from '@webapp/utils/testId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
-const AdvancedExpressionEditorPopup = function (props) {
-  const {
-    query,
-    mode,
-    setExpressionCanBeApplied,
-    variables,
-    nodeDefCurrent,
-    excludeCurrentNodeDef,
-    isContextParent,
-    updateDraftQuery,
-  } = props
+const AdvancedExpressionEditorPopup = (props) => {
+  const { query, mode, nodeDefCurrent, excludeCurrentNodeDef, isContextParent, updateDraftQuery } = props
 
   const inputRef = useRef()
   const i18n = useI18n()
   const survey = useSurvey()
 
   const [errorMessage, setErrorMessage] = useState(null)
+  const editorRef = useRef(null)
 
-  const variablesVisible = excludeCurrentNodeDef
-    ? variables
-        .filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent))
-        .map((group) => ({
-          ...group,
-          options: group.options?.filter((variable) => variable.value !== NodeDef.getName(nodeDefCurrent)),
-        }))
-    : variables
+  const validateEditorValue = useCallback(
+    (value) => {
+      const newErrorMessage =
+        value === ''
+          ? null
+          : NodeDefExpressionValidator.validate({
+              survey,
+              nodeDefCurrent,
+              exprString: value,
+              isContextParent,
+              selfReferenceAllowed: !excludeCurrentNodeDef,
+            })
+      setErrorMessage(newErrorMessage)
+      const valid = !newErrorMessage
+      return valid
+    },
+    [excludeCurrentNodeDef, isContextParent, nodeDefCurrent, survey]
+  )
 
-  const variablesIds = variablesVisible
-    .map((variable) => (variable.options ? variable.options : [variable]))
-    .flatMap(A.prop('value'))
+  const onEditorChange = useCallback(
+    (cm) => {
+      const value = cm.getValue()
+      const valueTrimmed = value.trim()
 
+      const valid = validateEditorValue(valueTrimmed)
+
+      if (valid && valueTrimmed !== query) {
+        updateDraftQuery(valueTrimmed)
+      }
+    },
+    [query, updateDraftQuery, validateEditorValue]
+  )
+
+  // initialize CodeMirror text area
   useEffect(() => {
     const editor = CodeMirror.fromTextArea(inputRef.current, {
       lineNumbers: false,
@@ -57,31 +68,20 @@ const AdvancedExpressionEditorPopup = function (props) {
     })
     editor.setSize('100%', 'auto')
 
-    editor.setValue(query)
+    editor.on('change', onEditorChange)
 
-    editor.on('change', (cm) => {
-      const exprString = cm.getValue()
-      const valueTrimmed = exprString.trim()
-      const newErrorMessage =
-        valueTrimmed === ''
-          ? null
-          : NodeDefExpressionValidator.validate({
-              survey,
-              nodeDefCurrent,
-              exprString,
-              isContextParent,
-              selfReferenceAllowed: !excludeCurrentNodeDef,
-            })
-      setErrorMessage(newErrorMessage)
-      const valid = !newErrorMessage
-      setExpressionCanBeApplied(query !== exprString && valid)
-      if (valid) {
-        updateDraftQuery(valueTrimmed)
-      }
-    })
+    editorRef.current = editor
 
     return () => editor.toTextArea()
-  }, [query, ...variablesIds])
+  }, [])
+
+  // handle query prop change
+  useEffect(() => {
+    const editor = editorRef.current
+    if (editor.getValue() !== query) {
+      editor.setValue(query)
+    }
+  }, [query])
 
   return (
     <>

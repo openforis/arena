@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
@@ -74,18 +74,22 @@ export const useExpressionEditorPopupState = (props) => {
     }))
   }
 
-  const updateDraftQuery = (queryDraft) => {
-    const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
-    const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
+  const updateDraftQuery = useCallback(
+    (queryDraft) => {
+      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
+      const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
 
-    setState((prevState) => ({
-      ...prevState,
-      queryDraft,
-      exprDraft,
-      exprDraftValid,
-      queryIsBasic: false,
-    }))
-  }
+      setState((prevState) => ({
+        ...prevState,
+        queryDraft,
+        exprDraft,
+        exprDraftValid,
+        expressionCanBeApplied: queryDraft !== prevState.query,
+        queryIsBasic: false,
+      }))
+    },
+    [canBeConstant, mode]
+  )
 
   const resetDraftQuery = () => {
     setState((prevState) => ({
@@ -117,9 +121,6 @@ export const useExpressionEditorPopupState = (props) => {
     onChange({ query: queryUpdated, expr: exprDraft })
   }
 
-  const setExpressionCanBeApplied = (expressionCanBeApplied) =>
-    setState((prevState) => ({ ...prevState, expressionCanBeApplied }))
-
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
@@ -139,7 +140,6 @@ export const useExpressionEditorPopupState = (props) => {
     onApply,
     onToggleAdvancedEditor,
     resetDraftQuery,
-    setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
     variables,

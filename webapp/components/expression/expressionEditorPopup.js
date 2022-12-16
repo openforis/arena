@@ -44,7 +44,6 @@ const ExpressionEditorPopup = (props) => {
     onApply,
     onToggleAdvancedEditor,
     queryDraft,
-    setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
     variables,
@@ -80,9 +79,7 @@ const ExpressionEditorPopup = (props) => {
             excludeCurrentNodeDef={excludeCurrentNodeDef}
             isContextParent={isContextParent}
             query={queryDraft}
-            setExpressionCanBeApplied={setExpressionCanBeApplied}
             updateDraftQuery={updateDraftQuery}
-            variables={variables}
             mode={mode}
           />
         ) : (
