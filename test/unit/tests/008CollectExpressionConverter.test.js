@@ -79,6 +79,10 @@ describe('CollectExpressionConverter Test', () => {
       n: 'plot_id',
     },
     {
+      q: `idm:samplingPointData('region', cluster_id)`,
+      r: `categoryItemProp('sampling_point_data', 'region', cluster_id)`,
+    },
+    {
       q: `idm:samplingPointData('region', cluster_id, plot_id)`,
       r: `categoryItemProp('sampling_point_data', 'region', cluster_id, plot_id)`,
       n: 'plot_id',
