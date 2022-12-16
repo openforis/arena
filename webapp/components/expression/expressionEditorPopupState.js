@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
@@ -16,6 +16,8 @@ const initialState = {
   exprDraft: null,
   exprDraftValid: true,
 }
+
+const ADVANCED_EXPRESSION_SUFFIX = '\n'
 
 export const useExpressionEditorPopupState = (props) => {
   const {
@@ -37,10 +39,9 @@ export const useExpressionEditorPopupState = (props) => {
   // An encoding trick. Newlines can only appear in a textarea,
   // so denote advanced mode expressions as anything that contains a newline.
   // The editing component ensures that all intermediate values will contain one.
-  const initialAdvanced = editorType === ExpressionEditorType.advanced || /\n/.test(query)
-  const [advanced, setAdvancedEditor] = useState(initialAdvanced)
+  const initialAdvanced =
+    editorType === ExpressionEditorType.advanced || new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query)
   const [state, setState] = useState(initialState)
-  const [expressionCanBeApplied, setExpressionCanBeApplied] = useState(false)
 
   // OnMount initialize state
   useEffect(() => {
@@ -49,10 +50,13 @@ export const useExpressionEditorPopupState = (props) => {
     const queryDraft = Expression.toString(exprDraft, mode)
 
     setState({
-      query: advanced ? query.trimRight() : queryDraft,
-      queryDraft: advanced ? query.trimRight() : queryDraft,
+      advanced: initialAdvanced,
+      query: initialAdvanced ? query.trimRight() : queryDraft,
+      queryDraft: initialAdvanced ? query.trimRight() : queryDraft,
+      queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
+      expressionCanBeApplied: false,
     })
   }, [])
 
@@ -60,44 +64,51 @@ export const useExpressionEditorPopupState = (props) => {
     const queryDraft = Expression.toString(exprDraft, mode)
     const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
 
-    setExpressionCanBeApplied(query !== queryDraft && exprDraftValid)
-
     setState((prevState) => ({
       ...prevState,
       queryDraft,
       exprDraft,
       exprDraftValid,
+      expressionCanBeApplied: query !== queryDraft && exprDraftValid,
+      queryIsBasic: true,
     }))
   }
 
-  const updateDraftQuery = (queryDraft) => {
-    const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
-    const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
+  const updateDraftQuery = useCallback(
+    (queryDraft) => {
+      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
+      const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
 
-    setState((prevState) => ({
-      ...prevState,
-      queryDraft,
-      exprDraft,
-      exprDraftValid,
-    }))
-  }
+      setState((prevState) => ({
+        ...prevState,
+        queryDraft,
+        exprDraft,
+        exprDraftValid,
+        expressionCanBeApplied: queryDraft !== prevState.query,
+        queryIsBasic: false,
+      }))
+    },
+    [canBeConstant, mode]
+  )
 
   const resetDraftQuery = () => {
-    setExpressionCanBeApplied(query !== '')
-
     setState((prevState) => ({
       ...prevState,
       queryDraft: '',
       exprDraft: ExpressionParser.parseQuery('', mode, canBeConstant),
       exprDraftValid: true,
+      expressionCanBeApplied: query !== '',
     }))
   }
 
   const onToggleAdvancedEditor = () => {
-    if (advanced) {
+    const { advanced, queryIsBasic } = state
+
+    if (advanced && !queryIsBasic) {
       resetDraftQuery()
     }
-    setAdvancedEditor(!advanced)
+    const queryIsBasicNext = queryIsBasic || (advanced && !queryIsBasic)
+    setState((prevState) => ({ ...prevState, advanced: !advanced, queryIsBasic: queryIsBasicNext }))
   }
 
   const onApply = () => {
@@ -105,8 +116,8 @@ export const useExpressionEditorPopupState = (props) => {
     // the query was written with this advanced expression editor.
     // With this, we can always open the query (i.e. the expression)
     // in advanced editor directly.
-    const { exprDraft, queryDraft } = state
-    const queryUpdated = advanced ? `${queryDraft.trimEnd()}\n` : queryDraft
+    const { advanced, exprDraft, queryDraft } = state
+    const queryUpdated = advanced ? `${queryDraft.trimEnd()}${ADVANCED_EXPRESSION_SUFFIX}` : queryDraft
     onChange({ query: queryUpdated, expr: exprDraft })
   }
 
@@ -125,13 +136,10 @@ export const useExpressionEditorPopupState = (props) => {
 
   return {
     ...state,
-    advanced,
-    expressionCanBeApplied,
     nodeDefCurrent,
     onApply,
     onToggleAdvancedEditor,
     resetDraftQuery,
-    setExpressionCanBeApplied,
     updateDraftExpr,
     updateDraftQuery,
     variables,

@@ -23,8 +23,6 @@ import * as NodeDefUiProps from './nodeDefUIProps'
 import { SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
-// Edit actions
-// Entry actions
 import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
@@ -67,7 +65,9 @@ class NodeDefSwitch extends React.Component {
   }
 
   onMouseEnter() {
-    this.setIsHovering(true)
+    if (!this.state.isHovering) {
+      this.setIsHovering(true)
+    }
   }
 
   onMouseLeave() {
