@@ -1,0 +1,39 @@
+@import 'webapp/style/vars';
+
+.data-import {
+  .main-container {
+    display: grid;
+    grid-template-columns: 1fr 330px;
+    gap: 2rem;
+
+    .entity-selector-tree {
+      background-color: $white;
+    }
+
+    .buttons-container,
+    .bottom-container {
+      gap: 2rem;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      align-self: center;
+    }
+
+    .bottom-container {
+      display: flex;
+      flex-direction: column;
+      grid-column-end: span 2;
+      align-items: center;
+
+      .dropzone {
+        width: 100%;
+      }
+
+      button {
+        width: 10rem;
+      }
+    }
+  }
+}
