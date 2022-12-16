@@ -185,7 +185,7 @@ Do you want to proceed?`,
   },
 
   dropzone: {
-    message: "Drag 'n' drop some files here, or click to select files",
+    message: 'Drag and drop a file here, or click to select it',
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
   },
 
