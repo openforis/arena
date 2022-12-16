@@ -19,7 +19,8 @@ export const CoordinateAttributeDataLayer = (props) => {
     points,
   } = useCoordinateAttributeDataLayer(props)
 
-  const [currentPointShown, setCurrentPointShown] = useState(null)
+  const [state, setState] = useState({})
+  const { currentPointShown, currentPointPopupOpen } = state
 
   // Have a Reference to points for opening popups automatically
   const markerRefs = useRef([])
@@ -36,10 +37,10 @@ export const CoordinateAttributeDataLayer = (props) => {
       } else {
         if (currentPointShown) {
           // unmount current marker
-          await setCurrentPointShown(null)
+          await setState({ currentPointShown: null })
         }
         // marker is not visible (it's clustered); add it to the map as CoordinateAttributeMarker
-        setCurrentPointShown(point)
+        setState({ currentPointShown: point, currentPointPopupOpen: true })
       }
     },
     [currentPointShown]
@@ -61,6 +62,11 @@ export const CoordinateAttributeDataLayer = (props) => {
       return points[index > 0 ? index - 1 : points.length - 1]
     },
     [getPointIndex, points]
+  )
+
+  const onCurrentPointPopupClose = useCallback(
+    () => setState((statePrev) => ({ ...statePrev, currentPointPopupOpen: false })),
+    []
   )
 
   return (
@@ -112,7 +118,8 @@ export const CoordinateAttributeDataLayer = (props) => {
             getNextPoint={getNextPoint}
             getPreviousPoint={getPreviousPoint}
             openPopupOfPoint={openPopupOfPoint}
-            popupOpen={true}
+            popupOpen={currentPointPopupOpen}
+            onPopupClose={onCurrentPointPopupClose}
           />
         )}
       </LayerGroup>
