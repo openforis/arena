@@ -10,6 +10,7 @@ const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
 
 const keys = {
   recordEdit: 'recordEdit',
+  recordLoadError: 'recordLoadError',
   recordPreviewUuid: 'recordPreviewUuid',
   insideMap: 'insideMap',
 }
@@ -18,17 +19,21 @@ const keys = {
 
 export const getRecord = R.pipe(getState, R.prop(keys.recordEdit))
 
-export const getRecordUuid = R.pipe(getRecord, Record.getUuid)
+export const getRecordLoadError = R.pipe(getState, R.prop(keys.recordLoadError))
 
 export const getRecordUuidPreview = R.pipe(getState, R.prop(keys.recordPreviewUuid))
 
 export const isInsideMap = R.pipe(getState, R.prop(keys.insideMap))
+
+export const getRecordUuid = R.pipe(getRecord, Record.getUuid)
 
 // ====== UPDATE
 
 export const reset = () => ({})
 
 export const assocRecord = R.assoc(keys.recordEdit)
+
+export const assocRecordLoadError = R.assoc(keys.recordLoadError)
 
 export const assocRecordUuidPreview = R.assoc(keys.recordPreviewUuid)
 

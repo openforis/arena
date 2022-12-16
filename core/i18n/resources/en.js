@@ -480,6 +480,8 @@ $t(common.cantUndoWarning)`,
   recordView: {
     justDeleted: 'This record has just been deleted',
     sessionExpired: 'Record session has expired',
+    errorLoadingRecord: 'Error loading record: {{details}}',
+    recordNotFound: 'Record not found',
   },
 
   dataExplorerView: {
