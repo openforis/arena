@@ -2,24 +2,22 @@ import React from 'react'
 
 import SurveyForm from '@webapp/components/survey/SurveyForm'
 
-import { State, useLocalState } from './store'
+import { useLocalState } from './store'
+import { useI18n } from '@webapp/store/system'
 
 const Record = (props) => {
   const { recordUuid, pageNodeUuid, insideMap = false } = props
-  const { state } = useLocalState({ recordUuid, pageNodeUuid, insideMap })
+  const { editable, preview, record, recordLoadError } = useLocalState({ recordUuid, pageNodeUuid, insideMap })
 
-  if (!State.isLoaded(state)) {
+  const i18n = useI18n()
+
+  if (recordLoadError) {
+    return <div>{i18n.t('recordView.errorLoadingRecord', { details: i18n.t(recordLoadError) })}</div>
+  }
+  if (!record) {
     return null
   }
-  return (
-    <SurveyForm
-      draft={State.isPreview(state)}
-      preview={State.isPreview(state)}
-      edit={false}
-      entry
-      canEditRecord={State.isEditable(state)}
-    />
-  )
+  return <SurveyForm draft={preview} preview={preview} edit={false} entry canEditRecord={editable} />
 }
 
 export default Record

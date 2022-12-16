@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
 
-import { useOnUpdate, useQuery, useWebSocket } from '@webapp/components/hooks'
-
-import { State } from './state'
+import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/hooks'
 
 export const useLocalState = (props) => {
   const {
@@ -40,53 +37,43 @@ export const useLocalState = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
 
   const record = useSelector(RecordState.getRecord)
+  const recordLoadError = useSelector(RecordState.getRecordLoadError)
   const editable = useAuthCanEditRecord(record)
 
-  const [state, setState] = useState(() => State.create({ preview }))
-  const loadedRef = useRef(false)
-
-  if (record && !State.isLoaded(state)) {
-    loadedRef.current = true
-    setState(A.pipe(State.assocLoaded(true), State.assocEditable(editable)))
-  }
-
-  const componentUnload = () => {
-    if (loadedRef.current) {
-      dispatch(RecordActions.checkOutRecord(recordUuid))
-    }
-
-    // Remove beforeunload event listener
-    window.removeEventListener('beforeunload', componentUnload)
-  }
-
   // Add websocket event listeners
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
     eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodeValidationsUpdate,
     eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), []),
   })
-
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdateCompleted,
     eventHandler: useCallback((content) => dispatch(RecordActions.nodesUpdateCompleted(content)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.recordDelete,
     eventHandler: useCallback(() => dispatch(RecordActions.recordDeleted(navigate)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.recordSessionExpired,
     eventHandler: useCallback(() => dispatch(RecordActions.sessionExpired(navigate)), []),
   })
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.applicationError,
     eventHandler: useCallback(({ key, params }) => dispatch(RecordActions.applicationError(navigate, key, params)), []),
   })
 
-  const componentLoad = () => {
+  const onComponentUnload = () => {
+    dispatch(RecordActions.checkOutRecord(recordUuid))
+
+    // Remove beforeunload event listener
+    window.removeEventListener('beforeunload', onComponentUnload)
+  }
+
+  const onComponentLoad = () => {
     // Check in record
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
@@ -94,17 +81,17 @@ export const useLocalState = (props) => {
     dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }))
 
     // Add beforeunload event listener
-    window.addEventListener('beforeunload', componentUnload)
+    window.addEventListener('beforeunload', onComponentUnload)
   }
 
   useEffect(() => {
-    componentLoad()
-    return componentUnload
+    onComponentLoad()
+    return onComponentUnload
   }, [])
 
   useOnUpdate(() => {
     dispatch(RecordActions.cycleChanged(navigate))
   }, [surveyCycleKey])
 
-  return { state }
+  return { editable, preview, record, recordLoadError }
 }

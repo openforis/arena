@@ -10,6 +10,7 @@ import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'
 
 import * as ActionTypes from './actionTypes'
+import * as RecordState from '../state'
 
 export const checkInRecord =
   ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }) =>
@@ -22,6 +23,12 @@ export const checkInRecord =
     } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`, {
       draft,
     })
+
+    if (!record) {
+      dispatch({ type: ActionTypes.recordLoadError, error: 'recordView.recordNotFound' })
+      dispatch(LoaderActions.hideLoader())
+      return
+    }
 
     // This is used by dataQuery when user is editing a specific entity
     if (pageNodeUuid) {
@@ -72,8 +79,10 @@ export const checkInRecord =
 
 export const checkOutRecord = (recordUuid) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
+  const record = RecordState.getRecord(getState())
   // Checkout can be called after logout, therefore checking if survey still exists in state
-  if (surveyId) {
+  if (surveyId && record) {
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
   }
+  dispatch({ type: ActionTypes.recordCheckedOut, recordUuid })
 }
