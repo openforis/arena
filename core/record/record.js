@@ -58,7 +58,7 @@ export const {
 } = RecordReader
 
 // ==== utils
-export const { isNodeApplicable, isNodeEmpty } = RecordReader
+export const { isNodeApplicable, isNodeEmpty, isEmpty } = RecordReader
 
 // ==== dependency
 export const { getDependentNodePointers, getParentCodeAttribute, getDependentCodeAttributes } = RecordReader

@@ -139,9 +139,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/record', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, recordUuid } = Request.getParams(req)
+      const { surveyId, recordUuid } = Request.getParams(req)
 
-      const record = await RecordService.fetchRecordAndNodesByUuid({ surveyId, cycle, recordUuid })
+      const record = await RecordService.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
       res.json(record)
     } catch (error) {
       next(error)
@@ -335,7 +335,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const socketId = Request.getSocketId(req)
 
-      await RecordService.deleteRecord(socketId, user, surveyId, recordUuid)
+      await RecordService.deleteRecord({ socketId, user, surveyId, recordUuid })
 
       sendOk(res)
     } catch (error) {

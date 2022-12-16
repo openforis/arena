@@ -82,10 +82,12 @@ export {
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (
-  { surveyId, recordUuid, draft = true, fetchForUpdate = true },
+  { surveyId, recordUuid, draft = false, fetchForUpdate = true },
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  if (!record) return null
+
   const nodes = await NodeRepository.fetchNodesByRecordUuid(
     { surveyId, recordUuid, includeRefData: fetchForUpdate, draft },
     client
