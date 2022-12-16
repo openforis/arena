@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-export const useWebSocket = ({ eventName, eventHandler }) => {
+export const useOnWebSocketEvent = ({ eventName, eventHandler }) => {
   useEffect(() => {
     AppWebSocket.on(eventName, eventHandler)
 

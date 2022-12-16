@@ -23,7 +23,9 @@ const actionHandlers = {
   [RecordActions.recordCreate]: (state, { record }) => RecordState.assocRecord(record)(state),
   [RecordActions.recordLoad]: (state, { record, insideMap }) =>
     A.pipe(RecordState.assocRecord(record), RecordState.assocInsideMap(insideMap))(state),
+  [RecordActions.recordLoadError]: (state, { error }) => RecordState.assocRecordLoadError(error)(state),
   [RecordActions.recordDelete]: (state) => RecordState.assocRecord(null)(state),
+  [RecordActions.recordCheckedOut]: RecordState.reset,
 
   // Node updates
   [RecordActions.nodesUpdate]: (state, { nodes }) => RecordState.mergeRecordNodes(nodes)(state),

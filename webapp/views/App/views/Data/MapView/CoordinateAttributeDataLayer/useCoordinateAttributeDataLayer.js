@@ -13,7 +13,7 @@ import * as Node from '@core/record/node'
 import { useDataQuery } from '@webapp/components/DataQuery/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { useWebSocket } from '@webapp/components/hooks'
+import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
@@ -106,7 +106,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
   }, [dataFetched])
 
   // listen to websocket nodesUpdate events to detect edited record updates
-  useWebSocket({
+  useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
     eventHandler: useCallback(
       (nodesUpdated) => {

@@ -28,7 +28,7 @@ export { useRequest } from './useRequest'
 export { useShouldShowFirstTimeHelp } from './useShouldShowFirstTimeHelp'
 export { useSRSs } from './useSRSs'
 export { useQuery } from './useQuery'
-export { useWebSocket } from './useWebSocket'
+export { useOnWebSocketEvent } from './useOnWebSocketEvent'
 // confirm dialog
 export { useConfirm, useConfirmDelete } from './useConfirm'
 // notification dialogs
