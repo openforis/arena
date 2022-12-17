@@ -1,37 +1,37 @@
 @import 'webapp/style/vars';
 
+.app-module > :first-child.data-import .form .form-item.entity-form-item {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+
+  .form-label {
+    justify-self: center;
+  }
+}
+
 .data-import {
   .main-container {
     display: grid;
-    grid-template-columns: 1fr 330px;
+    grid-template-columns: 0.6fr 0.4fr;
     gap: 2rem;
 
     .entity-selector-tree {
       background-color: $white;
     }
 
-    .buttons-container,
-    .bottom-container {
-      gap: 2rem;
-    }
-
     .buttons-container {
       display: flex;
       flex-direction: column;
       align-self: center;
-    }
-
-    .bottom-container {
-      display: flex;
-      flex-direction: column;
-      grid-column-end: span 2;
       align-items: center;
+      min-width: 30rem;
+      gap: 2rem;
 
-      .dropzone {
-        width: 100%;
+      .download-template-btn {
+        width: 20rem;
       }
 
-      button {
+      .start-btn {
         width: 10rem;
       }
     }

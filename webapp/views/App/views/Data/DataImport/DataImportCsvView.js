@@ -113,7 +113,7 @@ export const DataImportCsvView = () => {
           </FormItem>
         )}
 
-        <FormItem label={i18n.t('dataImportView.importIntoEntity')}>
+        <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoEntity')}>
           <EntitySelectorTree
             nodeDefUuidActive={selectedEntityDefUuid}
             onSelect={onEntitySelect}
@@ -123,6 +123,7 @@ export const DataImportCsvView = () => {
       </div>
       <div className="buttons-container">
         <ButtonDownload
+          className="download-template-btn"
           href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
           label="dataImportView.downloadTemplate"
           disabled={!selectedEntityDefUuid}
@@ -136,8 +137,7 @@ export const DataImportCsvView = () => {
             onChange={setStateProp('insertMissingNodes')}
           />
         </Accordion>
-      </div>
-      <div className="bottom-container">
+
         {selectedEntityDefUuid && (
           <>
             <Dropzone
@@ -148,20 +148,20 @@ export const DataImportCsvView = () => {
             />
 
             <Button
-              className="btn-primary"
+              className="btn-primary start-btn"
               disabled={!file}
               label={'dataImportView.startImport'}
               onClick={onStartImport}
             />
           </>
         )}
-        {importCompleteResult && (
-          <DataImportCompleteDialog
-            importCompleteResult={importCompleteResult}
-            onClose={() => setStateProp('importCompleteResult')(null)}
-          />
-        )}
       </div>
+      {importCompleteResult && (
+        <DataImportCompleteDialog
+          importCompleteResult={importCompleteResult}
+          onClose={() => setStateProp('importCompleteResult')(null)}
+        />
+      )}
     </div>
   )
 }
