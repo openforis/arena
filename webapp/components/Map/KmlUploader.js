@@ -9,13 +9,11 @@ import L from 'leaflet'
 
 require('./L.KML')
 
-import JSZip from 'jszip'
+import { ZipForEach } from '@webapp/utils/zipUtils'
 import shp from 'shpjs'
-const pathmodule = require('path')
 
 export const KmlUploader = () => {
   const map = useMap()
-  const jszip = new JSZip()
 
   const i18n = useI18n()
 
@@ -81,34 +79,9 @@ export const KmlUploader = () => {
   }
 
   const processKMZFile = async (file) => {
-    const MAX_FILES = 10000
-    const MAX_SIZE = 1000000000 // 1 GB
-    let fileCount = 0
-    let totalSize = 0
-    let targetDirectory = '/archive_tmp'
     const kmlList = []
     let promises = []
-    await jszip.loadAsync(file)
-    jszip.forEach((relativePath, fileEntry) => {
-      fileCount++
-      if (fileCount > MAX_FILES) {
-        throw new Error('Reached max. number of files')
-      }
-      // Prevent ZipSlip path traversal (S6096)
-      const resolvedPath = pathmodule.join(targetDirectory, fileEntry.name)
-      if (!resolvedPath.startsWith(targetDirectory)) {
-        throw new Error('Path traversal detected')
-      }
-      jszip
-        .file(fileEntry.name)
-        .async('nodebuffer')
-        .then(function (content) {
-          totalSize += content.length
-          if (totalSize > MAX_SIZE) {
-            throw new Error('Reached max. size')
-          }
-        })
-
+    ZipForEach(file, (relativePath, fileEntry) => {
       promises.push(
         new Promise((resolve) => {
           if (relativePath.endsWith('.kml')) {
