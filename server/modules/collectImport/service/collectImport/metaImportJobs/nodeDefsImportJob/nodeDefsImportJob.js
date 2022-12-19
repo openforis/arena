@@ -16,7 +16,6 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import * as CollectImportJobContext from '../../collectImportJobContext'
 import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
 import * as CollectSurvey from '../../model/collectSurvey'
 import NodeDefUniqueNameGenerator from '../../model/nodeDefUniqueNameGenerator'
@@ -361,7 +360,7 @@ export default class NodeDefsImportJob extends Job {
         const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
           ? Survey.samplingPointDataCategoryName
           : listName
-        const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
+        const category = Survey.getCategoryByName(categoryName)(this.survey)
 
         const layoutCollect = CollectSurvey.getUiAttribute('layoutType')(collectNodeDef)
         const renderType =
@@ -385,7 +384,7 @@ export default class NodeDefsImportJob extends Job {
       }
       case NodeDef.nodeDefType.taxon: {
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
-        const taxonomy = CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
+        const taxonomy = Survey.getTaxonomyByName(taxonomyName)(this.survey)
 
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy),
