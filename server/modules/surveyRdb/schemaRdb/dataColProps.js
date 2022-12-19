@@ -1,8 +1,6 @@
 import * as R from 'ramda'
 import * as camelize from 'camelize'
 
-import { PointFactory, Points } from '@openforis/arena-core'
-
 import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
@@ -88,7 +86,6 @@ const props = {
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: ({ survey, nodeDefCol, nodeCol }) => {
-      // Return (node, columnName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
@@ -103,16 +100,18 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]:
-      ({ nodeCol }) =>
-      () => {
-        const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
-        const point = PointFactory.createInstance({ srs, x, y })
-        if (point && Points.isValid(point)) {
-          return Points.toString(point)
-        }
-        return null
-      },
+    [colValueProcessor]: () => (node, columnName) => {
+      if (columnName.endsWith('_x')) {
+        return Node.getCoordinateX(node)
+      }
+      if (columnName.endsWith('_y')) {
+        return Node.getCoordinateY(node)
+      }
+      if (columnName.endsWith('_srs')) {
+        return Node.getCoordinateSrs(node)
+      }
+      return null
+    },
   },
 
   [nodeDefType.file]: {

@@ -37,9 +37,6 @@ const columnTransformByNodeDefType = {
     // transform not applied
     return namesFull
   },
-  [NodeDef.nodeDefType.coordinate]: ({ nameFull, alias }) => [
-    `'SRID=EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
-  ],
   [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`],
   [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
 }

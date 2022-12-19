@@ -12,6 +12,14 @@ const columnsByNodeDefType = {
         : []),
     ]
   },
+  [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return [
+      { header: `${nodeDefName}_srs`, nodeDef, valueProp: Node.valuePropsCoordinate.srs },
+      { header: `${nodeDefName}_x`, nodeDef, valueProp: Node.valuePropsCoordinate.x },
+      { header: `${nodeDefName}_y`, nodeDef, valueProp: Node.valuePropsCoordinate.y },
+    ]
+  },
   [NodeDef.nodeDefType.taxon]: ({ nodeDef, includeTaxonScientificName }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [

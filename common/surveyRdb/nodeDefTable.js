@@ -21,6 +21,7 @@ export const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nod
 
 const colsByType = {
   [NodeDef.nodeDefType.code]: ['', '_label'],
+  [NodeDef.nodeDefType.coordinate]: ['_x', '_y', '_srs'],
   [NodeDef.nodeDefType.taxon]: ['', '_scientific_name'], // ?, 'vernacular_names?'],
   [NodeDef.nodeDefType.file]: ['_file_uuid', '_file_name'],
 }
@@ -54,11 +55,11 @@ export const getNodeDefsByColumnNames = ({ nodeDefs, includeExtendedCols }) =>
 
 export const extractColumnName = (nodeDef, col) =>
   R.replace(
-        // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
-        `${toSnakeCase(NodeDef.getName(nodeDef))}_`,
-        '',
-        col
-      )
+    // TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
+    `${toSnakeCase(NodeDef.getName(nodeDef))}_`,
+    '',
+    col
+  )
 
 export const extractNodeDefNameFromViewName = R.pipe(
   R.defaultTo(''),

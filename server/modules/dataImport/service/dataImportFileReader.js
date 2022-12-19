@@ -1,4 +1,4 @@
-import { Objects, Points } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import { CsvDataExportModel } from '@common/model/csvExport'
 
@@ -45,12 +45,10 @@ const valueConverterByNodeDefType = {
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
     return { [Node.valuePropsCode.code]: code }
   },
-  [NodeDef.nodeDefType.coordinate]: ({ value, headers }) => {
-    const point = Points.parse(value)
-    if (!point) {
-      throw new SystemError('validationErrors.dataImport.invalidCoordinate', { value, headers })
-    }
-    const { x, y, srs: srsId } = point
+  [NodeDef.nodeDefType.coordinate]: ({ value }) => {
+    const srsId = value[Node.valuePropsCoordinate.srs]
+    const x = value[Node.valuePropsCoordinate.x]
+    const y = value[Node.valuePropsCoordinate.y]
     return Node.newNodeValueCoordinate({ x, y, srsId })
   },
   [NodeDef.nodeDefType.date]: singlePropValueConverter,
@@ -98,6 +96,14 @@ const validateHeaders =
 
 /**
  * Creates a CSV reader that transforms every row extracting a node value for each column associated to a node definition.
+ *
+ * @param {!object} params - The parameters object.
+ * @param {!string} [params.filePath] - File path to be read.
+ * @param {!object} [params.survey] - The survey object.
+ * @param {!string} [params.entityDefUuid] - The UUID of the entity definition where data will be imported.
+ * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
+ * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
+ * @returns {Promise} - Result promise. It resolves when the file is fully read.
  */
 const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTotalChange }) => {
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
