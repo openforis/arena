@@ -92,12 +92,12 @@ export const KmlUploader = () => {
     jszip.forEach((relativePath, fileEntry) => {
       fileCount++
       if (fileCount > MAX_FILES) {
-        throw 'Reached max. number of files'
+        throw new Error('Reached max. number of files')
       }
       // Prevent ZipSlip path traversal (S6096)
       const resolvedPath = pathmodule.join(targetDirectory, fileEntry.name)
       if (!resolvedPath.startsWith(targetDirectory)) {
-        throw 'Path traversal detected'
+        throw new Error('Path traversal detected')
       }
       jszip
         .file(fileEntry.name)
@@ -105,7 +105,7 @@ export const KmlUploader = () => {
         .then(function (content) {
           totalSize += content.length
           if (totalSize > MAX_SIZE) {
-            throw 'Reached max. size'
+            throw new Error('Reached max. size')
           }
         })
 
