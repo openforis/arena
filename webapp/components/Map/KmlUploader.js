@@ -81,8 +81,7 @@ export const KmlUploader = () => {
   const processKMZFile = async (file) => {
     const kmlList = []
     let promises = []
-    ZipForEach(file, (relativePath, fileEntry) => {
-      console.log("loopå")
+    await ZipForEach(file, (relativePath, fileEntry) => {
       promises.push(
         new Promise((resolve) => {
           if (relativePath.endsWith('.kml')) {
@@ -93,7 +92,6 @@ export const KmlUploader = () => {
       )
     })
     await Promise.all(promises)
-    console.log(kmlList)
     addKMLLayers(kmlList)
   }
 
