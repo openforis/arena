@@ -64,9 +64,7 @@ export default class CategoriesImportJob extends Job {
     // Validate categories (after all items have been persisted)
     await CategoryManager.validateCategories(this.surveyId, this.tx)
 
-    // Set categories in context
     this.setContext({
-      categories,
       qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel,
       survey: Survey.assocCategories(ObjectUtils.toUuidIndexedObj(categories))(survey),
     })
