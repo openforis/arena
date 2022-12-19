@@ -7,26 +7,27 @@ export const ZipForEach = async (file, callback) => {
   let fileCount = 0
   let totalSize = 0
   let targetDirectory = '/archive_tmp'
-  await jszip.loadAsync(file)
-  jszip.forEach((relativePath, fileEntry) => {
-    fileCount++
-    if (fileCount > MAX_FILES) {
-      throw new Error('Reached max. number of files')
-    }
-    // Prevent ZipSlip path traversal (S6096)
-    const resolvedPath = targetDirectory + '/' + fileEntry.name
-    if (!resolvedPath.startsWith(targetDirectory)) {
-      throw new Error('Path traversal detected')
-    }
-    jszip
-      .file(fileEntry.name)
-      .async('nodebuffer')
-      .then(function (content) {
-        totalSize += content.length
-        if (totalSize > MAX_SIZE) {
-          throw new Error('Reached max. size')
-        }
-      })
-    callback(relativePath, fileEntry)
+  await jszip.loadAsync(file).then((zip) => {
+    zip.forEach((relativePath, fileEntry) => {
+      fileCount++
+      if (fileCount > MAX_FILES) {
+        throw new Error('Reached max. number of files')
+      }
+      // Prevent ZipSlip path traversal (S6096)
+      const resolvedPath = targetDirectory + '/' + fileEntry.name
+      if (!resolvedPath.startsWith(targetDirectory)) {
+        throw new Error('Path traversal detected')
+      }
+      zip
+        .file(fileEntry.name)
+        .async('nodebuffer')
+        .then(function (content) {
+          totalSize += content.length
+          if (totalSize > MAX_SIZE) {
+            throw new Error('Reached max. size')
+          }
+        })
+      callback(relativePath, fileEntry)
+    })
   })
 }
