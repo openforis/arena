@@ -64,7 +64,6 @@ export default class TaxonomiesImportJob extends Job {
     }
 
     this.setContext({
-      taxonomies, // TODO check if it's needed to put taxonomies in context
       survey: Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))(survey),
     })
   }
