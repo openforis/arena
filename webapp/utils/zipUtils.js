@@ -1,4 +1,5 @@
 import JSZip from 'jszip'
+import path from 'path'
 
 export const ZipForEach = async (file, callback) => {
   const jszip = new JSZip()
@@ -14,7 +15,7 @@ export const ZipForEach = async (file, callback) => {
         throw new Error('Reached max. number of files')
       }
       // Prevent ZipSlip path traversal (S6096)
-      const resolvedPath = targetDirectory + '/' + fileEntry.name
+      const resolvedPath = path.join(targetDirectory, fileEntry.name)
       if (!resolvedPath.startsWith(targetDirectory)) {
         throw new Error('Path traversal detected')
       }
