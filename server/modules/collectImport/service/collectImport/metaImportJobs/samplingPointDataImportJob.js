@@ -102,8 +102,14 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
   // overridden from Job
   async beforeEnd() {
+    const { survey } = this.context
+
     await super.beforeEnd()
-    // Assoc imported category to context categories (to be used by NodeDefsImportJob)
-    this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))
+
+    const surveyUpdated = Survey.assocCategory(this.category)(survey)
+
+    const contextUpdated = CollectImportJobContext.assocSurvey(surveyUpdated)(this.context)
+
+    this.setContext(contextUpdated)
   }
 }

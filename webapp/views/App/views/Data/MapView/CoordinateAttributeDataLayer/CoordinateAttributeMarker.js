@@ -20,6 +20,7 @@ export const CoordinateAttributeMarker = (props) => {
     pointFeature,
     getNextPoint,
     getPreviousPoint,
+    onPopupClose,
     openPopupOfPoint,
     popupOpen,
     setMarkerByParentUuid,
@@ -61,6 +62,7 @@ export const CoordinateAttributeMarker = (props) => {
         color={markersColor}
         fillColor={markersColor}
         fillOpacity={fillOpacity}
+        eventHandlers={{ popupclose: onPopupClose }}
       >
         {showMarkersLabels && <MarkerTooltip color={markersColor}>{ancestorsKeys.join(' - ')}</MarkerTooltip>}
 
@@ -88,6 +90,7 @@ CoordinateAttributeMarker.propTypes = {
   pointFeature: PropTypes.any,
   getNextPoint: PropTypes.func,
   getPreviousPoint: PropTypes.func,
+  onPopupClose: PropTypes.func,
   openPopupOfPoint: PropTypes.func,
   popupOpen: PropTypes.bool,
   setMarkerByParentUuid: PropTypes.func,

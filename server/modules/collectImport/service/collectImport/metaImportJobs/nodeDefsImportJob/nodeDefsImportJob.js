@@ -16,7 +16,6 @@ import Job from '@server/job/job'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import * as CollectImportJobContext from '../../collectImportJobContext'
 import * as CollectImportReportManager from '../../../../manager/collectImportReportManager'
 import * as CollectSurvey from '../../model/collectSurvey'
 import NodeDefUniqueNameGenerator from '../../model/nodeDefUniqueNameGenerator'
@@ -361,7 +360,7 @@ export default class NodeDefsImportJob extends Job {
         const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
           ? Survey.samplingPointDataCategoryName
           : listName
-        const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
+        const category = Survey.getCategoryByName(categoryName)(this.survey)
 
         const layoutCollect = CollectSurvey.getUiAttribute('layoutType')(collectNodeDef)
         const renderType =
@@ -385,7 +384,7 @@ export default class NodeDefsImportJob extends Job {
       }
       case NodeDef.nodeDefType.taxon: {
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
-        const taxonomy = CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
+        const taxonomy = Survey.getTaxonomyByName(taxonomyName)(this.survey)
 
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy),
@@ -438,8 +437,7 @@ export default class NodeDefsImportJob extends Job {
    * @param nodeDef
    */
   async addSpecifyTextAttribute(parentNodeDef, nodeDef) {
-    const categories = this.getContextProp('categories', {})
-    const category = R.find((category) => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
     const categoryName = Category.getName(category)
     const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
 
@@ -570,9 +568,9 @@ export default class NodeDefsImportJob extends Job {
   }
 
   get survey() {
-    const { surveyId } = this.context
+    const { survey } = this.context
     // dependency graph generation not necessary
-    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })({ id: surveyId })
+    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })(survey)
   }
 }
 
