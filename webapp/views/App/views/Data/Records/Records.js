@@ -10,6 +10,8 @@ import { useSurveyCycleKey, useNodeDefRootKeys } from '@webapp/store/survey'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import Table from '@webapp/components/Table'
+import { useOnWebSocketEvent } from '@webapp/components/hooks'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import HeaderLeft from './HeaderLeft'
 import RowHeader from './RowHeader'
@@ -29,9 +31,16 @@ const Records = () => {
     (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`),
     [navigate]
   )
-  const onRecordsUpdate = useCallback(() => {
+  const refreshData = useCallback(() => {
     setRecordsRequestedAt(Date.now())
   }, [setRecordsRequestedAt])
+
+  const onRecordsUpdate = refreshData
+
+  useOnWebSocketEvent({
+    eventName: WebSocketEvents.recordDelete,
+    eventHandler: refreshData,
+  })
 
   return (
     <Table

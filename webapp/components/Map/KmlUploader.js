@@ -9,12 +9,11 @@ import L from 'leaflet'
 
 require('./L.KML')
 
-import JSZip from 'jszip'
+import { ZipForEach } from '@webapp/utils/zipUtils'
 import shp from 'shpjs'
 
 export const KmlUploader = () => {
   const map = useMap()
-  const jszip = new JSZip()
 
   const i18n = useI18n()
 
@@ -82,12 +81,11 @@ export const KmlUploader = () => {
   const processKMZFile = async (file) => {
     const kmlList = []
     let promises = []
-    await jszip.loadAsync(file)
-    jszip.forEach((relativePath, file) => {
+    await ZipForEach(file, (relativePath, fileEntry) => {
       promises.push(
         new Promise((resolve) => {
           if (relativePath.endsWith('.kml')) {
-            resolve(file.async('string').then((data) => kmlList.push(data)))
+            resolve(fileEntry.async('string').then((data) => kmlList.push(data)))
           }
           resolve()
         })

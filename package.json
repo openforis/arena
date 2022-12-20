@@ -145,6 +145,7 @@
     "ncp": "^2.0.0",
     "node-schedule": "^2.1.0",
     "node-stream-zip": "^1.15.0",
+    "path": "^0.12.7",
     "pg": "^8.7.3",
     "pg-promise": "^10.11.1",
     "pg-query-stream": "^4.2.3",

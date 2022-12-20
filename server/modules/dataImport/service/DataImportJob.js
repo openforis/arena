@@ -183,10 +183,7 @@ export default class DataImportJob extends Job {
 
     // avoid loading the same record multiple times
     if (this.currentRecord?.uuid !== recordUuid) {
-      this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid(
-        { surveyId, recordUuid, draft: false },
-        this.tx
-      )
+      this.currentRecord = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, this.tx)
     }
     return {
       newRecord: false,

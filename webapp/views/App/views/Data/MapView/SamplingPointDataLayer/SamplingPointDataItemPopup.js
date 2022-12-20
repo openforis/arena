@@ -31,11 +31,13 @@ export const SamplingPointDataItemPopup = (props) => {
   const i18n = useI18n()
   const map = useMap()
 
+  const userCanCreateRecords = useAuthCanCreateRecord()
   const survey = useSurvey()
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   const canCreateRecord =
-    useAuthCanCreateRecord() &&
+    userCanCreateRecords &&
+    itemCodes.length === 1 && // first level
     Survey.isPublished(surveyInfo) &&
     Survey.canRecordBeIdentifiedBySamplingPointDataItem(survey)
 
@@ -48,10 +50,10 @@ ${itemCodes
   .map((code, index) => `* **${i18n.t('mapView.samplingPointItemPopup.levelCode', { level: index + 1 })}**: ${code}`)
   .join('\n')}
 * **${i18n.t('mapView.samplingPointItemPopup.location')}**:
-  * **x**: ${point.x}
-  * **y**: ${point.y}
+  * **X**: ${point.x}
+  * **Y**: ${point.y}
   * **SRS**: ${point.srs}
-  * **elevation (m)**: ${elevation}`
+  * **${i18n.t('mapView.elevation')}**: ${elevation}`
 
   const flyToPoint = (point) => {
     popupRef.current?.close()

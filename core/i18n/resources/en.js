@@ -480,6 +480,8 @@ $t(common.cantUndoWarning)`,
   recordView: {
     justDeleted: 'This record has just been deleted',
     sessionExpired: 'Record session has expired',
+    errorLoadingRecord: 'Error loading record: {{details}}',
+    recordNotFound: 'Record not found',
   },
 
   dataExplorerView: {
@@ -949,6 +951,7 @@ $t(common.appNameFull)
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
+      taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
     },
     basicProps: {
       key: 'Key',

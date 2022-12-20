@@ -249,6 +249,7 @@ export const {
   getCategoryByName,
   getSamplingPointDataCategory,
   getSamplingPointDataNodeDefs,
+  assocCategory,
   assocCategories,
 } = SurveyCategories
 
