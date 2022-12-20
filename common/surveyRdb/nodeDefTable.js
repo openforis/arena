@@ -21,7 +21,7 @@ export const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nod
 
 const colsByType = {
   [NodeDef.nodeDefType.code]: ['', '_label'],
-  [NodeDef.nodeDefType.coordinate]: ['_x', '_y', '_srs'],
+  [NodeDef.nodeDefType.coordinate]: ['', '_x', '_y', '_srs'],
   [NodeDef.nodeDefType.taxon]: ['', '_scientific_name'], // ?, 'vernacular_names?'],
   [NodeDef.nodeDefType.file]: ['_file_uuid', '_file_name'],
 }
