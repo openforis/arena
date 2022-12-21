@@ -156,7 +156,7 @@ export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
 export const isSingle = R.pipe(isMultiple, R.not)
 
-const isType = (type) => R.pipe(getType, R.equals(type))
+const isType = (type) => (nodeDef) => getType(nodeDef) === type
 
 export const isEntity = isType(nodeDefType.entity)
 export const isSingleEntity = (nodeDef) => isEntity(nodeDef) && isSingle(nodeDef)
