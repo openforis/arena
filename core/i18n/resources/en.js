@@ -529,6 +529,13 @@ $t(common.cantUndoWarning)`,
       insertMissingNodes: 'Insert missing entities or attributes',
     },
     startImport: 'Start import',
+    steps: {
+      selectImportType: 'Select Import Type',
+      selectCycle: 'Select Cycle',
+      selectEntity: 'Select Entity',
+      selectFile: 'Select File',
+      startImport: 'Start import',
+    },
   },
 
   dataView: {
