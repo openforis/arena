@@ -1,8 +1,11 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 import { transform, stringify } from 'csv'
+import { Transform } from 'json2csv'
 
 import * as StringUtils from '@core/stringUtils'
+
+const defaultOptions = { objectTransformer: null, removeNewLines: true }
 
 const _transformObj =
   (options = {}) =>
@@ -37,3 +40,15 @@ export const writeToStream = (stream, data, options = {}) =>
   })
 
 export const writeToFile = (filePath, data) => writeToStream(fs.createWriteStream(filePath), data)
+
+export const createJson2CsvTransform = ({ fields, options: optionsParam = defaultOptions }) => {
+  const options = { ...defaultOptions, ...optionsParam }
+  const { objectTransformer = null } = options
+  const transformer = objectTransformer || _transformObj(options)
+  const opts = { fields, transforms: [transformer] }
+  const transformOpts = {
+    objectMode: true,
+    highWaterMark: 512,
+  }
+  return new Transform(opts, transformOpts)
+}
