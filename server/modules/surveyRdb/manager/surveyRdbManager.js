@@ -112,8 +112,8 @@ export const fetchViewData = async (params) => {
       : _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
 
     await db.stream(result, (dbStream) => {
-      const json2csvTransform = CSVWriter.createJson2CsvTransform({ fields, options: { removeNewLines: false } })
-      dbStream.pipe(json2csvTransform).pipe(streamOutput)
+      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
+      dbStream.pipe(csvTransform).pipe(streamOutput)
     })
     return null
   }
@@ -174,9 +174,10 @@ export const fetchViewDataAgg = async (params) => {
   })
 
   if (streamOutput) {
-    await db.stream(result, (stream) => {
+    await db.stream(result, (dbStream) => {
       const fields = _getExportFieldsAgg({ survey, query })
-      stream.pipe(CSVWriter.transformToStream(streamOutput, fields))
+      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
+      dbStream.pipe(csvTransform).pipe(streamOutput)
     })
     return null
   }

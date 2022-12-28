@@ -175,7 +175,8 @@ export const exportCategoryToStream = async ({ surveyId, categoryUuid, draft, ou
   })
 
   return client.stream(categoryStream, (dbStream) => {
-    dbStream.pipe(CSVWriter.transformToStream(outputStream, headers))
+    const csvTransform = CSVWriter.transformJsonToCsv({ fields: headers })
+    dbStream.pipe(csvTransform).pipe(outputStream)
   })
 }
 
