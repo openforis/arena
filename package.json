@@ -131,6 +131,7 @@
     "file-saver": "^2.0.5",
     "i18next": "^21.8.14",
     "is-valid-coordinates": "^1.0.0",
+    "json2csv": "^5.0.7",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.10.1",
     "jwk-to-pem": "^2.0.5",

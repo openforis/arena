@@ -33,8 +33,8 @@ export const getUuid = R.propOr(null, keys.uuid)
 export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
-export const isKeyTrue = (key) => R.pipe(R.propOr(false, key), R.equals(true))
-export const isPropTrue = (prop) => R.pipe(getProp(prop), R.equals(true))
+export const isKeyTrue = (key) => (obj) => !!R.propOr(false, key)(obj)
+export const isPropTrue = (prop) => (obj) => !!getProp(prop)(obj)
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
 

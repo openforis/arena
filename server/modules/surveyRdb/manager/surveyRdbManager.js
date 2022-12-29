@@ -117,7 +117,8 @@ export const fetchViewData = async (params) => {
       : _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
 
     await db.stream(result, (dbStream) => {
-      dbStream.pipe(CSVWriter.transformToStream(streamOutput, fields))
+      const json2csvTransform = CSVWriter.createJson2CsvTransform({ fields, options: { removeNewLines: false } })
+      dbStream.pipe(json2csvTransform).pipe(streamOutput)
     })
     return null
   }
