@@ -27,7 +27,7 @@ const importTypes = {
   insertNewRecords: 'insertNewRecords',
 }
 
-const fileMaxSize = 20 * 1024 * 1024 // 20MB
+const fileMaxSize = 20 // 20MB
 
 export const DataImportCsvView = () => {
   const i18n = useI18n()
