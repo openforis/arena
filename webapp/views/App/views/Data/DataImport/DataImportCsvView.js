@@ -23,6 +23,7 @@ import { Accordion, Button, ButtonDownload, Dropzone, Stepper } from '@webapp/co
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
@@ -30,6 +31,12 @@ const importTypes = {
 }
 
 const fileMaxSize = 20 // 20MB
+
+const allowedLabelTypes = [
+  NodeDef.NodeDefLabelTypes.label,
+  NodeDef.NodeDefLabelTypes.name,
+  NodeDef.NodeDefLabelTypes.labelAndName,
+]
 
 export const DataImportCsvView = () => {
   const i18n = useI18n()
@@ -48,10 +55,19 @@ export const DataImportCsvView = () => {
     importCompleteResult: null,
     insertMissingNodes: null,
     insertMissingNodesDisabled: false,
+    nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedEntityDefUuid: null,
   })
 
-  const { cycle, dataImportType, file, importCompleteResult, insertMissingNodes, selectedEntityDefUuid } = state
+  const {
+    cycle,
+    dataImportType,
+    file,
+    importCompleteResult,
+    insertMissingNodes,
+    nodeDefLabelType,
+    selectedEntityDefUuid,
+  } = state
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 
@@ -60,6 +76,12 @@ export const DataImportCsvView = () => {
   const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
 
   const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
+
+  const onNodeDefLabelTypeChange = () => {
+    const nodeDefLabelTypeNext =
+      allowedLabelTypes[(allowedLabelTypes.indexOf(nodeDefLabelType) + 1) % allowedLabelTypes.length]
+    setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
+  }
 
   const onDataImportTypeChange = useCallback(
     (value) => {
@@ -128,11 +150,19 @@ export const DataImportCsvView = () => {
 
           {dataImportType && (
             <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoEntity')}>
-              <EntitySelectorTree
-                nodeDefUuidActive={selectedEntityDefUuid}
-                onSelect={onEntitySelect}
-                isDisabled={() => dataImportType === importTypes.insertNewRecords}
-              />
+              <>
+                <EntitySelectorTree
+                  nodeDefLabelType={nodeDefLabelType}
+                  nodeDefUuidActive={selectedEntityDefUuid}
+                  onSelect={onEntitySelect}
+                  isDisabled={() => dataImportType === importTypes.insertNewRecords}
+                />
+                <NodeDefLabelSwitch
+                  allowedLabelTypes={allowedLabelTypes}
+                  labelType={nodeDefLabelType}
+                  onChange={onNodeDefLabelTypeChange}
+                />
+              </>
             </FormItem>
           )}
         </div>
