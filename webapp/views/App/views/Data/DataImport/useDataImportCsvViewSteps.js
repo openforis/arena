@@ -1,16 +1,16 @@
 const stepKeys = {
-  selectImportType: 'selectImportType',
   selectCyle: 'selectCycle',
+  selectImportType: 'selectImportType',
   selectEntity: 'selectEntity',
   selectFile: 'selectFile',
   startImport: 'startImport',
 }
 
-const getStepKeysFiltered = ({ surveyCycleKeys }) =>
-  Object.values(stepKeys).filter((stepKey) => surveyCycleKeys.length > 1 || stepKey !== stepKeys.selectCyle)
+const getStepKeysFiltered = ({ canSelectCycle }) =>
+  Object.values(stepKeys).filter((stepKey) => canSelectCycle || stepKey !== stepKeys.selectCyle)
 
-const determineActiveStep = ({ surveyCycleKeys, state }) => {
-  const stepKeysFiltered = getStepKeysFiltered({ surveyCycleKeys })
+const determineActiveStep = ({ canSelectCycle, state }) => {
+  const stepKeysFiltered = getStepKeysFiltered({ canSelectCycle })
   const getStepIndex = (stepKey) => stepKeysFiltered.indexOf(stepKey)
 
   const { cycle, dataImportType, file, selectedEntityDefUuid } = state
@@ -30,10 +30,10 @@ const determineActiveStep = ({ surveyCycleKeys, state }) => {
   return getStepIndex(stepKeys.startImport)
 }
 
-export const useDataImportCsvViewSteps = ({ surveyCycleKeys, state }) => {
-  const activeStep = determineActiveStep({ surveyCycleKeys, state })
+export const useDataImportCsvViewSteps = ({ canSelectCycle, state }) => {
+  const activeStep = determineActiveStep({ canSelectCycle, state })
 
-  const steps = getStepKeysFiltered({ surveyCycleKeys }).map((key) => ({ key, label: `dataImportView.steps.${key}` }))
+  const steps = getStepKeysFiltered({ canSelectCycle }).map((key) => ({ key, label: `dataImportView.steps.${key}` }))
 
   return {
     activeStep,

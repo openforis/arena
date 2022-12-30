@@ -3,6 +3,8 @@ import './DataImportCsvView.scss'
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import * as Survey from '@core/survey/survey'
@@ -37,8 +39,10 @@ export const DataImportCsvView = () => {
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
 
+  const canSelectCycle = surveyCycleKeys.length > 1
+
   const [state, setState] = useState({
-    cycle: surveyCycle,
+    cycle: canSelectCycle ? null : surveyCycle,
     dataImportType: null,
     file: null,
     importCompleteResult: null,
@@ -49,7 +53,7 @@ export const DataImportCsvView = () => {
 
   const { cycle, dataImportType, file, importCompleteResult, insertMissingNodes, selectedEntityDefUuid } = state
 
-  const { activeStep, steps } = useDataImportCsvViewSteps({ state, surveyCycleKeys })
+  const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 
   const insertMissingNodesDisabled = dataImportType === importTypes.insertNewRecords
 
@@ -103,20 +107,22 @@ export const DataImportCsvView = () => {
 
       <div className="internal-container">
         <div className="form">
-          <FormItem label={i18n.t('dataImportView.importType.label')}>
-            <ButtonGroup
-              selectedItemKey={dataImportType}
-              onChange={onDataImportTypeChange}
-              items={Object.values(importTypes).map((importType) => ({
-                key: importType,
-                label: i18n.t(`dataImportView.importType.${importType}`),
-              }))}
-            />
-          </FormItem>
-
-          {dataImportType && surveyCycleKeys.length > 1 && (
+          {canSelectCycle && (
             <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
               <CycleSelector surveyCycleKey={cycle} onChange={setStateProp('cycle')} />
+            </FormItem>
+          )}
+
+          {!Objects.isEmpty(cycle) && (
+            <FormItem label={i18n.t('dataImportView.importType.label')}>
+              <ButtonGroup
+                selectedItemKey={dataImportType}
+                onChange={onDataImportTypeChange}
+                items={Object.values(importTypes).map((importType) => ({
+                  key: importType,
+                  label: i18n.t(`dataImportView.importType.${importType}`),
+                }))}
+              />
             </FormItem>
           )}
 
