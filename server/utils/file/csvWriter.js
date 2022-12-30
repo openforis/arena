@@ -1,6 +1,4 @@
-import * as fs from 'fs'
 import * as R from 'ramda'
-import { transform, stringify } from 'csv'
 import { Transform } from 'json2csv'
 
 import * as StringUtils from '@core/stringUtils'
@@ -19,33 +17,22 @@ const _transformObj =
     return obj
   }
 
-export const transformToStream = (stream, columns = null, options = {}) => {
-  const { objectTransformer = null } = options
-  const transformFunction = objectTransformer || _transformObj(options)
-  const transformer = transform(transformFunction)
-  transformer
-    // eslint-disable-next-line camelcase
-    .pipe(stringify({ quoted_string: true, header: true, columns }))
-    .pipe(stream)
-  return transformer
-}
-
-export const writeToStream = (stream, data, options = {}) =>
+export const writeItemsToStream = (stream, data, options = defaultOptions) =>
   new Promise((resolve, reject) => {
-    const transformer = transformToStream(stream, R.pipe(R.head, R.keys)(data), options)
-    transformer.on('error', reject).on('finish', resolve)
+    const fields = R.pipe(R.head, R.keys)(data)
+    const transform = transformJsonToCsv({ fields, options })
+    transform.pipe(stream)
+    transform.on('error', reject).on('finish', resolve)
 
-    data.forEach((row) => transformer.write(row))
-    transformer.end()
+    data.forEach((row) => transform.write(row))
+    transform.end()
   })
 
-export const writeToFile = (filePath, data) => writeToStream(fs.createWriteStream(filePath), data)
-
-export const createJson2CsvTransform = ({ fields, options: optionsParam = defaultOptions }) => {
+export const transformJsonToCsv = ({ fields, options: optionsParam = defaultOptions }) => {
   const options = { ...defaultOptions, ...optionsParam }
   const { objectTransformer = null } = options
-  const transformer = objectTransformer || _transformObj(options)
-  const opts = { fields, transforms: [transformer] }
+  const transform = objectTransformer || _transformObj(options)
+  const opts = { fields, transforms: [transform] }
   const transformOpts = {
     objectMode: true,
     highWaterMark: 512,
