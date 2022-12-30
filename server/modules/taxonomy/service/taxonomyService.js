@@ -43,8 +43,9 @@ export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) 
 
   const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
 
-  await db.stream(taxaStream, (stream) => {
-    stream.pipe(CSVWriter.transformToStream(output, headers))
+  await db.stream(taxaStream, (dbStream) => {
+    const csvTransform = CSVWriter.transformJsonToCsv({ fields: headers })
+    dbStream.pipe(csvTransform).pipe(output)
   })
 }
 

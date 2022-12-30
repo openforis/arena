@@ -189,7 +189,8 @@ export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = 
 
 export const exportUsersIntoStream = async ({ outputStream }) => {
   const headers = ['email', 'name', 'status', 'last_login_time']
-  const transformer = CSVWriter.transformToStream(outputStream, headers)
+  const transformer = CSVWriter.transformJsonToCsv({ fields: headers })
+  transformer.pipe(outputStream)
   await UserRepository.fetchUsersIntoStream({ transformer })
 }
 
@@ -256,9 +257,10 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
   })
 
-  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({
-    transformer: CSVWriter.transformToStream(outputStream, headers, { objectTransformer }),
-  })
+  const transformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
+  transformer.pipe(outputStream)
+
+  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({ transformer })
 }
 
 // ==== UPDATE

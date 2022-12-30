@@ -5,6 +5,7 @@ import * as toSnakeCase from 'to-snake-case'
 export { toSnakeCase }
 
 export const NEW_LINE = '\r\n'
+const NEW_LINE_REG_EX = /\r\n|\r|\n/g
 
 export const nbsp = '\u00A0'
 
@@ -37,7 +38,7 @@ export const capitalizeFirstLetter = (text) => text.charAt(0).toUpperCase() + te
 
 export const removeNewLines = (value) => {
   if (!isString(value)) return value
-  return value.split(/\r\n|\r|\n/g).join(' ')
+  return value.replaceAll(NEW_LINE_REG_EX, ' ')
 }
 
 export const nullToEmpty = (value) => (value === null ? '' : value)
