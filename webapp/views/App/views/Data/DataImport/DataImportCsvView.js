@@ -77,11 +77,11 @@ export const DataImportCsvView = () => {
 
   const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
 
-  const onNodeDefLabelTypeChange = () => {
+  const onNodeDefLabelTypeChange = useCallback(() => {
     const nodeDefLabelTypeNext =
       allowedLabelTypes[(allowedLabelTypes.indexOf(nodeDefLabelType) + 1) % allowedLabelTypes.length]
     setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
-  }
+  }, [nodeDefLabelType])
 
   const onDataImportTypeChange = useCallback(
     (value) => {

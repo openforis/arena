@@ -228,6 +228,7 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
     firstPart = name
   } else {
     const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+
     if (!StringUtils.isBlank(label)) {
       if (type === NodeDefLabelTypes.label) {
         firstPart = label
