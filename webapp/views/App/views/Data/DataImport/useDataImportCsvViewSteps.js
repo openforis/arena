@@ -1,3 +1,5 @@
+import { Objects } from '@openforis/arena-core'
+
 const stepKeys = {
   selectCyle: 'selectCycle',
   selectImportType: 'selectImportType',
@@ -15,11 +17,11 @@ const determineActiveStep = ({ canSelectCycle, state }) => {
 
   const { cycle, dataImportType, file, selectedEntityDefUuid } = state
 
+  if (Objects.isEmpty(cycle)) {
+    return getStepIndex(stepKeys.selectCyle)
+  }
   if (!dataImportType) {
     return getStepIndex(stepKeys.selectImportType)
-  }
-  if (!cycle) {
-    return getStepIndex(stepKeys.selectCyle)
   }
   if (!selectedEntityDefUuid) {
     return getStepIndex(stepKeys.selectEntity)
@@ -32,8 +34,9 @@ const determineActiveStep = ({ canSelectCycle, state }) => {
 
 export const useDataImportCsvViewSteps = ({ canSelectCycle, state }) => {
   const activeStep = determineActiveStep({ canSelectCycle, state })
+  const stepKeysFiltered = getStepKeysFiltered({ canSelectCycle })
 
-  const steps = getStepKeysFiltered({ canSelectCycle }).map((key) => ({ key, label: `dataImportView.steps.${key}` }))
+  const steps = stepKeysFiltered.map((key) => ({ key, label: `dataImportView.steps.${key}` }))
 
   return {
     activeStep,
