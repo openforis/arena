@@ -1,4 +1,3 @@
-import * as R from 'ramda'
 import { Transform } from 'json2csv'
 
 import * as StringUtils from '@core/stringUtils'
@@ -17,14 +16,14 @@ const _transformObj =
     return obj
   }
 
-export const writeItemsToStream = (stream, data, options = defaultOptions) =>
+export const writeItemsToStream = ({ outputStream, items, fields: fieldsParam = null, options = defaultOptions }) =>
   new Promise((resolve, reject) => {
-    const fields = R.pipe(R.head, R.keys)(data)
+    const fields = fieldsParam || Object.keys(items)[0]
     const transform = transformJsonToCsv({ fields, options })
-    transform.pipe(stream)
+    transform.pipe(outputStream)
     transform.on('error', reject).on('finish', resolve)
 
-    data.forEach((row) => transform.write(row))
+    items.forEach((row) => transform.write(row))
     transform.end()
   })
 

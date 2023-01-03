@@ -11,8 +11,12 @@ import { RecordActions } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDelete, ButtonIconEdit } from '@webapp/components'
-import { useAuthCanDeleteRecords, useAuthCanUpdateRecordsStep } from '@webapp/store/user/hooks'
+import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit } from '@webapp/components'
+import {
+  useAuthCanDeleteRecords,
+  useAuthCanExportRecordsList,
+  useAuthCanUpdateRecordsStep,
+} from '@webapp/store/user/hooks'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
 
@@ -23,10 +27,12 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const navigate = useNavigate()
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
 
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
+  const canExportRecordsSummary = useAuthCanExportRecordsList()
 
   const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
   const onDeleteConfirm = useCallback(
@@ -88,6 +94,13 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
         // Delete selected records
         canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
       }
+      {canExportRecordsSummary && (
+        <ButtonDownload
+          testId={TestId.records.exportBtn}
+          href={`/api/survey/${surveyId}/records/summary/export`}
+          label="common.export"
+        />
+      )}
     </div>
   )
 }

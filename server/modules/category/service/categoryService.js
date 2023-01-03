@@ -48,7 +48,7 @@ export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res
   const fileName = 'category_import_template.csv'
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  await CSVWriter.writeItemsToStream(res, templateData)
+  await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
 }
 
 export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res }) => {
@@ -61,7 +61,7 @@ export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, dra
 
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  await CSVWriter.writeItemsToStream(res, templateData)
+  await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
 }
 
 export const exportAllCategories = ({ user, surveyId, draft }) => {

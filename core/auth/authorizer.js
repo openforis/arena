@@ -67,6 +67,7 @@ export const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
 // READ
 export const canViewRecord = _hasSurveyPermission(permissions.recordView)
 export const canViewAllRecords = _hasSurveyPermission(permissions.recordCleanse)
+export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
 
 // UPDATE
 export const canEditRecord = (user, record) => {

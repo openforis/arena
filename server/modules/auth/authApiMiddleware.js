@@ -106,6 +106,7 @@ export const requireSurveyRdbRefreshPermission = requirePermission(Authorizer.ca
 
 // Record
 export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
+export const requireRecordListExportPermission = requireSurveyPermission(Authorizer.canExportRecordsList)
 export const requireRecordCreatePermission = requireSurveyPermission(Authorizer.canCreateRecord)
 export const requireRecordEditPermission = requireRecordPermission(Authorizer.canEditRecord)
 export const requireRecordsEditPermission = requireRecordsPermission(Authorizer.canEditRecord)

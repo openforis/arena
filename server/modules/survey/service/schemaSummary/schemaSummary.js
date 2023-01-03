@@ -83,5 +83,5 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
     }
   })
 
-  await CSVWriter.writeItemsToStream(outputStream, items, { removeNewLines: false })
+  await CSVWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false } })
 }

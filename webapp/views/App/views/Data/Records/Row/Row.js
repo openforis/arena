@@ -101,8 +101,8 @@ const Row = (props) => {
           </div>
         )
       })}
-      <div>{DateUtils.getRelativeDate(i18n, Record.getDateCreated(record))}</div>
-      <div>{DateUtils.getRelativeDate(i18n, Record.getDateModified(record))}</div>
+      <div>{DateUtils.formatDateTimeDisplay(Record.getDateCreated(record))}</div>
+      <div>{DateUtils.formatDateTimeDisplay(Record.getDateModified(record))}</div>
       <div>{Record.getOwnerName(record)}</div>
       <div>{Record.getStep(record)}</div>
       <div>{R.pipe(Validation.getValidation, Validation.getErrorsCount)(record)}</div>

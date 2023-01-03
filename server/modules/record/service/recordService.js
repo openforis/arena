@@ -4,6 +4,7 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
+import * as A from '@core/arena'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
@@ -15,6 +16,7 @@ import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
 import * as ValidationResult from '@core/validation/validationResult'
 import i18n from '@core/i18n/i18nFactory'
+import * as Validation from '@core/validation/validation'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
@@ -32,16 +34,7 @@ import { ValidationUtils } from '@core/validation/validationUtils'
 
 const Logger = Log.getLogger('RecordService')
 
-/**
- * ======.
- * RECORD
- * ======.
- *
- * @param socketId
- * @param user
- * @param surveyId
- * @param recordToCreate
- */
+// RECORD
 export const createRecord = async (socketId, user, surveyId, recordToCreate) => {
   Logger.debug('create record: ', recordToCreate)
 
@@ -75,6 +68,50 @@ export const {
   fetchRecordCreatedCountsByDates,
   updateRecordsStep,
 } = RecordManager
+
+export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
+  const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, cycle })
+
+  const valueFormattersByType = {
+    [NodeDef.nodeDefType.date]: ({ value }) =>
+      DateUtils.convertDate({
+        dateStr: value,
+        formatFrom: DateUtils.formats.datetimeISO,
+        formatTo: DateUtils.formats.dateDefault,
+      }),
+  }
+
+  const objectTransformer = (recordSummary) => {
+    const validation = Validation.getValidation(recordSummary)
+    return {
+      step: Record.getStep(recordSummary),
+      ...nodeDefKeys.reduce((keysAcc, nodeDef) => {
+        const name = NodeDef.getName(nodeDef)
+        const value = recordSummary[A.camelize(name)]
+        const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
+        return { ...keysAcc, [name]: value && formatter ? formatter({ value }) : value }
+      }, {}),
+      data_created: DateUtils.formatDateTimeExport(Record.getDateCreated(recordSummary)),
+      date_modified: DateUtils.formatDateTimeExport(Record.getDateModified(recordSummary)),
+      owner_name: Record.getOwnerName(recordSummary),
+      errors: Validation.getErrorsCount(validation),
+      warnings: Validation.getWarningsCount(validation),
+    }
+  }
+
+  Response.setContentTypeFile({ res, fileName: 'records.csv', contentType: Response.contentTypes.csv })
+
+  const fields = [
+    ...nodeDefKeys.map(NodeDef.getName),
+    'step',
+    'owner_name',
+    'data_created',
+    'date_modified',
+    'errors',
+    'warnings',
+  ]
+  return CSVWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
+}
 
 export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
@@ -238,17 +275,7 @@ export const startCSVDataImportJob = ({
   return job
 }
 
-/**
- * ======.
- * NODE
- * ======.
- *
- * @param socketId
- * @param user
- * @param surveyId
- * @param recordUuid
- * @param msg
- */
+// NODE
 const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
   RecordServiceThreads.assocSocket(recordUuid, socketId)
 
