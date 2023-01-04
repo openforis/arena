@@ -1,5 +1,3 @@
-import { SRSs } from '@openforis/arena-core'
-
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
@@ -31,11 +29,6 @@ export default class DataImportJob extends Job {
     this.nodesUpdateBatchPersister = null
     this.nodesInsertBatchPersister = null
     this.recordsValidationBatchPersister = null
-  }
-
-  async onStart() {
-    await super.onStart()
-    await SRSs.init()
   }
 
   async execute() {

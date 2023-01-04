@@ -17,22 +17,11 @@ import { TestId } from '@webapp/utils/testId'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 const EntitySelectorTreeNode = (props) => {
-  const {
-    expanded,
-    getLabelSuffix,
-    isDisabled,
-    nodeDef,
-    nodeDefLabelType: nodeDefLabelTypeProp,
-    nodeDefUuidActive,
-    onlyPages,
-    onSelect,
-  } = props
+  const { expanded, getLabelSuffix, isDisabled, nodeDef, nodeDefUuidActive, onlyPages, onSelect } = props
 
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
-  const nodeDefLabelTypeState = useNodeDefLabelType()
-  const nodeDefLabelType = nodeDefLabelTypeProp || nodeDefLabelTypeState
-  const label = useNodeDefLabel(nodeDef, nodeDefLabelType)
+  const label = useNodeDefLabel(nodeDef, useNodeDefLabelType())
   const record = useRecord()
   const pagesUuidMap = usePagesUuidMap()
 
@@ -109,7 +98,6 @@ const EntitySelectorTreeNode = (props) => {
             getLabelSuffix={getLabelSuffix}
             isDisabled={isDisabled}
             nodeDef={nodeDefChild}
-            nodeDefLabelType={nodeDefLabelType}
             nodeDefUuidActive={nodeDefUuidActive}
             onlyPages={onlyPages}
             onSelect={onSelect}
@@ -124,14 +112,12 @@ EntitySelectorTreeNode.propTypes = {
   getLabelSuffix: PropTypes.func.isRequired,
   isDisabled: PropTypes.func.isRequired,
   nodeDef: PropTypes.object.isRequired,
-  nodeDefLabelType: PropTypes.string,
   nodeDefUuidActive: PropTypes.string,
   onlyPages: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
 }
 
 EntitySelectorTreeNode.defaultProps = {
-  nodeDefLabelType: null,
   nodeDefUuidActive: null,
 }
 
