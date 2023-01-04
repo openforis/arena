@@ -9,11 +9,9 @@ import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 const Dropzone = (props) => {
-  const { accept, disabled, droppedFiles, maxSize: maxSizeMB, multiple, onDrop } = props
+  const { accept, disabled, droppedFiles, maxSize, multiple, onDrop } = props
 
   const i18n = useI18n()
-
-  const maxSize = maxSizeMB * 1000 * 1000
 
   const acceptedExtensions = Object.values(accept)
     .flat()
@@ -29,7 +27,7 @@ const Dropzone = (props) => {
             <em>
               {i18n.t('dropzone.acceptedFilesMessage', {
                 acceptedExtensions,
-                maxSize: FileUtils.toHumanReadableFileSize(maxSize, { decimalPlaces: 0 }),
+                maxSize: FileUtils.toHumanReadableFileSize(maxSize),
               })}
             </em>
           )}
@@ -54,7 +52,7 @@ const Dropzone = (props) => {
 Dropzone.propTypes = {
   accept: PropTypes.object,
   disabled: PropTypes.bool,
-  maxSize: PropTypes.number, // max file size in MB
+  maxSize: PropTypes.number,
   multiple: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
   droppedFiles: PropTypes.array,
@@ -63,7 +61,7 @@ Dropzone.propTypes = {
 Dropzone.defaultProps = {
   accept: {},
   disabled: false,
-  maxSize: 50, // 50MB
+  maxSize: 50 * 1024 * 1024, // 50MB
   multiple: false,
   droppedFiles: [],
 }

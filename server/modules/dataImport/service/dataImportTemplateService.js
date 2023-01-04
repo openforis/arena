@@ -34,13 +34,7 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
   const exportModel = new CsvDataExportModel({
     survey,
     nodeDefContext: entityDef,
-    options: {
-      includeAnalysis: false,
-      includeCategoryItemsLabels: false,
-      includeFiles: false,
-      includeReadOnlyAttributes: false,
-      includeTaxonScientificName: false,
-    },
+    options: { includeFiles: false, includeCategoryItemsLabels: false, includeTaxonScientificName: false },
   })
   return exportModel.columns.reduce((acc, column) => {
     const { header, nodeDef, valueProp } = column

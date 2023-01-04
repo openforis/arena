@@ -51,14 +51,9 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
     if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDefCol)) {
       // keep only code column
       return [NodeDef.getName(nodeDefCol)]
+    } else {
+      return new ColumnNodeDef(viewDataNodeDef, nodeDefCol).names
     }
-    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const columnNames = columnNodeDef.names
-    if (NodeDef.isCoordinate(nodeDefCol)) {
-      // exclude geometry column
-      return columnNames.filter((name) => name !== columnNodeDef.name)
-    }
-    return columnNames
   })
   // Cycle is 0-based
   return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]

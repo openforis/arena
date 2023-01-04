@@ -17,7 +17,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
-const fileMaxSize = 1000 // 1 GB
+const fileMaxSize = 1 * 1024 * 1024 * 1024 // 1 GB
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 

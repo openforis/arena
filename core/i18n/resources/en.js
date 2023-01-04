@@ -144,7 +144,6 @@ Do you want to proceed?`,
     select: 'Select',
     selected: 'Selected',
     showLabels: 'Show labels',
-    showLabelsAndNames: 'Show labels and names',
     showNames: 'Show names',
     srs: 'SRS',
     status: 'Status',
@@ -186,7 +185,7 @@ Do you want to proceed?`,
   },
 
   dropzone: {
-    message: 'Drag and drop a file here, or click to select it',
+    message: "Drag 'n' drop some files here, or click to select files",
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
   },
 
@@ -530,13 +529,6 @@ $t(common.cantUndoWarning)`,
       insertMissingNodes: 'Insert missing entities or attributes',
     },
     startImport: 'Start import',
-    steps: {
-      selectImportType: 'Select Import Type',
-      selectCycle: 'Select Cycle',
-      selectEntity: 'Select Entity',
-      selectFile: 'Select File',
-      startImport: 'Start import',
-    },
   },
 
   dataView: {
@@ -1108,7 +1100,6 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       },
     },
     nodeDefCoordinate: {
-      srs: 'SRS',
       x: 'X',
       y: 'Y',
       showOnMap: 'Show on map',

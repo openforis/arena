@@ -50,7 +50,6 @@ export const keys = {
 export const NodeDefLabelTypes = {
   name: 'name',
   label: 'label',
-  labelAndName: 'labelAndName',
 }
 
 export const propKeys = {
@@ -222,24 +221,16 @@ export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 // Utils
 export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
   let firstPart = null
-  const name = getName(nodeDef)
 
   if (type === NodeDefLabelTypes.name) {
-    firstPart = name
+    firstPart = getName(nodeDef)
   } else {
-    const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-
-    if (!StringUtils.isBlank(label)) {
-      if (type === NodeDefLabelTypes.label) {
-        firstPart = label
-      } else if (type === NodeDefLabelTypes.labelAndName && !StringUtils.isBlank(label)) {
-        firstPart = `${label} [${name}]`
-      }
+    let label = R.path([keys.props, propKeys.labels, lang], nodeDef)
+    if (StringUtils.isBlank(label)) {
+      firstPart = getName(nodeDef)
+    } else {
+      firstPart = label
     }
-  }
-  // default to name
-  if (StringUtils.isBlank(firstPart)) {
-    firstPart = name
   }
 
   const suffix = isVirtual(nodeDef) ? ' (V)' : isAnalysis(nodeDef) && isAttribute(nodeDef) ? ' (C)' : ''
