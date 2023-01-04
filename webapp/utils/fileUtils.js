@@ -14,7 +14,7 @@ const getExtension = (file) => {
  *
  * @returns {string} - Formatted string.
  */
-const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) => {
+const toHumanReadableFileSize = (bytes, { si = true, decimalPlaces = 1 } = {}) => {
   const threshold = si ? 1000 : 1024
 
   if (Math.abs(bytes) < threshold) {

@@ -88,7 +88,6 @@ const props = {
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: ({ survey, nodeDefCol, nodeCol }) => {
-      // Return (node, columnName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
@@ -103,16 +102,19 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]:
-      ({ nodeCol }) =>
-      () => {
-        const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol)]
-        const point = PointFactory.createInstance({ srs, x, y })
-        if (point && Points.isValid(point)) {
-          return Points.toString(point)
-        }
-        return null
-      },
+    [colValueProcessor]: () => (node, columnName) => {
+      const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
+
+      if (columnName.endsWith('_x')) return x
+      if (columnName.endsWith('_y')) return y
+      if (columnName.endsWith('_srs')) return srs
+
+      const point = PointFactory.createInstance({ srs, x, y })
+      if (point && Points.isValid(point)) {
+        return Points.toString(point)
+      }
+      return null
+    },
   },
 
   [nodeDefType.file]: {

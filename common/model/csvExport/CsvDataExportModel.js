@@ -12,6 +12,14 @@ const columnsByNodeDefType = {
         : []),
     ]
   },
+  [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return [
+      { header: `${nodeDefName}_srs`, nodeDef, valueProp: Node.valuePropsCoordinate.srs },
+      { header: `${nodeDefName}_x`, nodeDef, valueProp: Node.valuePropsCoordinate.x },
+      { header: `${nodeDefName}_y`, nodeDef, valueProp: Node.valuePropsCoordinate.y },
+    ]
+  },
   [NodeDef.nodeDefType.taxon]: ({ nodeDef, includeTaxonScientificName }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
@@ -32,7 +40,13 @@ const columnsByNodeDefType = {
 
 const getMainColumn = ({ nodeDef }) => ({ header: NodeDef.getName(nodeDef), nodeDef })
 
-const DEFAULT_OPTIONS = { includeCategoryItemsLabels: true, includeTaxonScientificName: true, includeFiles: true }
+const DEFAULT_OPTIONS = {
+  includeAnalysis: true,
+  includeCategoryItemsLabels: true,
+  includeReadOnlyAttributes: true,
+  includeTaxonScientificName: true,
+  includeFiles: true,
+}
 
 const RECORD_CYCLE_HEADER = 'record_cycle'
 
@@ -40,7 +54,7 @@ export class CsvDataExportModel {
   constructor({ survey, nodeDefContext, options = DEFAULT_OPTIONS }) {
     this.survey = survey
     this.nodeDefContext = nodeDefContext
-    this.options = options
+    this.options = { ...DEFAULT_OPTIONS, ...options }
     this.columns = []
 
     this.init()
@@ -103,15 +117,18 @@ export class CsvDataExportModel {
   }
 
   _extractAttributeDefsColumns() {
-    const { includeFiles, includeAnalysis } = this.options
+    const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = this.options
 
     let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext, includeAnalysis)(this.survey)
       : [this.nodeDefContext] // Multiple attribute
 
-    if (!includeFiles) {
-      descendantDefs = descendantDefs.filter((nodeDef) => !NodeDef.isFile(nodeDef))
-    }
+    descendantDefs = descendantDefs.filter((nodeDef) => {
+      if (!includeFiles && NodeDef.isFile(nodeDef)) return false
+      if (!includeReadOnlyAttributes && NodeDef.isReadOnly(nodeDef)) return false
+      return true
+    })
+
     return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
   }
 
