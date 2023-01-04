@@ -9,7 +9,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as DateUtils from '@core/dateUtils'
-import { useI18n } from '@webapp/store/system'
 import { useNodeDefRootKeys } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -32,7 +31,6 @@ const Row = (props) => {
   const { idx, row: record, rowNo, selected, navigateToRecord, onRecordsUpdate } = props
   const nodeDefKeys = useNodeDefRootKeys()
 
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const canEdit = useAuthCanEditRecord(record)
