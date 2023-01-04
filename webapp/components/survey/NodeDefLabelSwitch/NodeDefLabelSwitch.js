@@ -19,19 +19,11 @@ export const useNodeDefLabelSwitch = () => {
   return { nodeDefLabelType, toggleLabelFunction }
 }
 
-const buttonLabelKeysByType = {
-  [NodeDef.NodeDefLabelTypes.label]: 'common.showLabels',
-  [NodeDef.NodeDefLabelTypes.name]: 'common.showNames',
-  [NodeDef.NodeDefLabelTypes.labelAndName]: 'common.showLabelsAndNames',
-}
-
 const NodeDefLabelSwitch = (props) => {
-  const { allowedLabelTypes, className, onChange, labelType } = props
+  const { className, onChange, labelType } = props
   const i18n = useI18n()
 
-  const allowedTypeValues = Object.values(allowedLabelTypes)
-  const labelTypeNext = allowedTypeValues[(allowedTypeValues.indexOf(labelType) + 1) % allowedTypeValues.length]
-  const label = buttonLabelKeysByType[labelTypeNext]
+  const label = labelType === NodeDef.NodeDefLabelTypes.label ? 'common.showNames' : 'common.showLabels'
 
   return (
     <button type="button" className={classNames('btn-transparent', className)} onClick={onChange}>
@@ -43,12 +35,10 @@ const NodeDefLabelSwitch = (props) => {
 NodeDefLabelSwitch.propTypes = {
   className: PropTypes.string,
   labelType: PropTypes.string.isRequired,
-  allowedLabelTypes: PropTypes.array,
   onChange: PropTypes.func.isRequired,
 }
 
 NodeDefLabelSwitch.defaultProps = {
-  allowedLabelTypes: [NodeDef.NodeDefLabelTypes.label, NodeDef.NodeDefLabelTypes.name],
   className: '',
 }
 
