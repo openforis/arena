@@ -58,6 +58,7 @@ export const useAuthCanDemoteRecord = (record) => {
 }
 export const useAuthCanDeleteAllRecords = () => useAuthCanEditSurvey()
 export const useAuthCanUpdateRecordsStep = () => Authorizer.canUpdateRecordsStep(useUser(), useSurveyInfo())
+export const useAuthCanExportRecordsList = () => Authorizer.canExportRecordsList(useUser(), useSurveyInfo())
 
 // ====== Auth / Map
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())

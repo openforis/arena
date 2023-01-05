@@ -17,6 +17,7 @@ import {
   requireRecordCreatePermission,
   requireRecordViewPermission,
   requireRecordsEditPermission,
+  requireRecordListExportPermission,
 } from '../../auth/authApiMiddleware'
 import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
@@ -173,6 +174,16 @@ export const init = (app) => {
         search,
       })
       res.json(recordsSummary)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/records/summary/export', requireRecordListExportPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle } = Request.getParams(req)
+
+      await RecordService.exportRecordsSummaryToCsv({ res, surveyId, cycle })
     } catch (error) {
       next(error)
     }
