@@ -132,6 +132,7 @@ export const TestId = {
   records: {
     addBtn: 'record-add-btn',
     cellNodeDef: (name) => `${name}-cell`,
+    exportBtn: 'records-export-btn',
     tableModule: 'records/summary',
     tableRowDeleteButton: (index) => `records/summary/${index}/delete-btn`,
   },

@@ -45,7 +45,7 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
 
 const writeDataImportTemplateToStream = async ({ surveyId, cycle, entityDefUuid, outputStream }) => {
   const dataImportTemplate = await extractDataImportTemplate({ surveyId, cycle, entityDefUuid })
-  await CSVWriter.writeItemsToStream(outputStream, [dataImportTemplate])
+  await CSVWriter.writeItemsToStream({ outputStream, items: [dataImportTemplate] })
 }
 
 export const DataImportTemplateService = {
