@@ -2,43 +2,84 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
+const columnDataType = {
+  boolean: 'boolean',
+  numeric: 'numeric',
+  text: 'text',
+}
+
+const getMainColumn = ({ nodeDef, dataType }) => ({ header: NodeDef.getName(nodeDef), nodeDef, dataType })
+
 const columnsByNodeDefType = {
+  [NodeDef.nodeDefType.boolean]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.boolean })],
   [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
-      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsCode.code },
+      { header: nodeDefName, nodeDef, dataType: columnDataType.text, valueProp: Node.valuePropsCode.code },
       ...(includeCategoryItemsLabels
-        ? [{ header: `${nodeDefName}_label`, nodeDef, valueProp: Node.valuePropsCode.label }]
+        ? [
+            {
+              header: `${nodeDefName}_label`,
+              nodeDef,
+              dataType: columnDataType.text,
+              valueProp: Node.valuePropsCode.label,
+            },
+          ]
         : []),
     ]
   },
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
-      { header: `${nodeDefName}_srs`, nodeDef, valueProp: Node.valuePropsCoordinate.srs },
-      { header: `${nodeDefName}_x`, nodeDef, valueProp: Node.valuePropsCoordinate.x },
-      { header: `${nodeDefName}_y`, nodeDef, valueProp: Node.valuePropsCoordinate.y },
+      {
+        header: `${nodeDefName}_srs`,
+        nodeDef,
+        dataType: columnDataType.text,
+        valueProp: Node.valuePropsCoordinate.srs,
+      },
+      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
+      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
     ]
   },
-  [NodeDef.nodeDefType.taxon]: ({ nodeDef, includeTaxonScientificName }) => {
-    const nodeDefName = NodeDef.getName(nodeDef)
-    return [
-      { header: nodeDefName, nodeDef, valueProp: Node.valuePropsTaxon.code },
-      ...(includeTaxonScientificName
-        ? [{ header: `${nodeDefName}_scientific_name`, nodeDef, valueProp: Node.valuePropsTaxon }]
-        : []),
-    ]
-  },
+  [NodeDef.nodeDefType.date]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.text })],
+  [NodeDef.nodeDefType.decimal]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.numeric })],
   [NodeDef.nodeDefType.file]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
-      { header: `${nodeDefName}_file_uuid`, nodeDef, valueProp: Node.valuePropsFile.fileUuid },
-      { header: `${nodeDefName}_file_name`, nodeDef, valueProp: Node.valuePropsFile.fileName },
+      {
+        header: `${nodeDefName}_file_uuid`,
+        nodeDef,
+        dataType: columnDataType.text,
+        valueProp: Node.valuePropsFile.fileUuid,
+      },
+      {
+        header: `${nodeDefName}_file_name`,
+        nodeDef,
+        dataType: columnDataType.text,
+        valueProp: Node.valuePropsFile.fileName,
+      },
     ]
   },
+  [NodeDef.nodeDefType.integer]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.numeric })],
+  [NodeDef.nodeDefType.taxon]: ({ nodeDef, includeTaxonScientificName }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    return [
+      { header: nodeDefName, nodeDef, dataType: columnDataType.text, valueProp: Node.valuePropsTaxon.code },
+      ...(includeTaxonScientificName
+        ? [
+            {
+              header: `${nodeDefName}_scientific_name`,
+              nodeDef,
+              dataType: columnDataType.text,
+              valueProp: Node.valuePropsTaxon,
+            },
+          ]
+        : []),
+    ]
+  },
+  [NodeDef.nodeDefType.text]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.text })],
+  [NodeDef.nodeDefType.time]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.text })],
 }
-
-const getMainColumn = ({ nodeDef }) => ({ header: NodeDef.getName(nodeDef), nodeDef })
 
 const DEFAULT_OPTIONS = {
   includeAnalysis: true,
@@ -86,7 +127,7 @@ export class CsvDataExportModel {
 
       const columnsPerAttribute = columnsGetter
         ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
-        : [getMainColumn({ nodeDef })]
+        : []
 
       if (NodeDef.isKey(nodeDef)) {
         columnsPerAttribute.forEach((col) => {
@@ -140,3 +181,5 @@ export class CsvDataExportModel {
     return this.columns.find((column) => column.header === header)
   }
 }
+
+CsvDataExportModel.columnDataType = columnDataType
