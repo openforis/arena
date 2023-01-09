@@ -11,6 +11,7 @@ const { nodeDefType } = NodeDef
 
 const columnNamesSuffixByType = {
   [nodeDefType.code]: ['', '_label'],
+  [nodeDefType.coordinate]: ['', '_x', '_y', '_srs'],
   [nodeDefType.taxon]: ['', '_scientific_name'],
   [nodeDefType.file]: ['_file_uuid', '_file_name'],
 }
@@ -18,7 +19,7 @@ const columnNamesSuffixByType = {
 const colTypesByType = {
   [nodeDefType.boolean]: [SQL.types.varchar],
   [nodeDefType.code]: [SQL.types.varchar, SQL.types.varchar],
-  [nodeDefType.coordinate]: [SQL.types.geometryPoint],
+  [nodeDefType.coordinate]: [SQL.types.geometryPoint, SQL.types.decimal, SQL.types.decimal, SQL.types.varchar],
   [nodeDefType.date]: [SQL.types.date],
   [nodeDefType.decimal]: [SQL.types.decimal],
   [nodeDefType.entity]: [SQL.types.uuid],
@@ -36,7 +37,7 @@ const getColumnNames = (nodeDef, tableNodeDef = null) => {
   }
   const colsSuffix = columnNamesSuffixByType[NodeDef.getType(nodeDef)]
   if (colsSuffix) {
-    return colsSuffix.map((col) => `${nodeDefName}${col}`)
+    return colsSuffix.map((colSuffix) => `${nodeDefName}${colSuffix}`)
   }
   if (NodeDef.isEntity(nodeDef)) {
     return [`${nodeDefName}_uuid`]
@@ -82,7 +83,7 @@ export default class ColumnNodeDef {
   }
 
   get namesFull() {
-    return SQL.addAlias(this.table.alias, this.names)
+    return SQL.addAlias(this.table.alias, ...this.names)
   }
 
   get nameFull() {

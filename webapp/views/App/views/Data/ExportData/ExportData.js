@@ -7,9 +7,8 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
 import { useDispatch } from 'react-redux'
-import { Button, ExpansionPanel } from '@webapp/components'
+import { Accordion, Button } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 const ExportData = () => {
@@ -30,22 +29,25 @@ const ExportData = () => {
 
   return (
     <div className="export">
-      <ExpansionPanel className="options" buttonLabel="dataExportView.options.header" startClosed>
-        <FormItem className="check" label={i18n.t('dataExportView.options.includeCategoryItemsLabels')}>
-          <Checkbox
-            checked={options.includeCategoryItemsLabels}
-            onChange={onOptionChange('includeCategoryItemsLabels')}
-          />
-        </FormItem>
-        <FormItem className="check" label={i18n.t('dataExportView.options.includeCategories')}>
-          <Checkbox checked={options.includeCategories} onChange={onOptionChange('includeCategories')} />
-        </FormItem>
+      <Accordion className="options" title="dataExportView.options.header">
+        <Checkbox
+          checked={options.includeCategoryItemsLabels}
+          label={i18n.t('dataExportView.options.includeCategoryItemsLabels')}
+          onChange={onOptionChange('includeCategoryItemsLabels')}
+        />
+        <Checkbox
+          checked={options.includeCategories}
+          label={i18n.t('dataExportView.options.includeCategories')}
+          onChange={onOptionChange('includeCategories')}
+        />
         {canAnalyzeRecords && (
-          <FormItem className="check" label={i18n.t('dataExportView.options.includeResultVariables')}>
-            <Checkbox checked={options.includeAnalysis} onChange={onOptionChange('includeAnalysis')} />
-          </FormItem>
+          <Checkbox
+            checked={options.includeAnalysis}
+            label={i18n.t('dataExportView.options.includeResultVariables')}
+            onChange={onOptionChange('includeAnalysis')}
+          />
         )}
-      </ExpansionPanel>
+      </Accordion>
 
       <Button
         testId={TestId.dataExport.prepareExport}

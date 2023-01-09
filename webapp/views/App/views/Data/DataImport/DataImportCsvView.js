@@ -1,5 +1,9 @@
+import './DataImportCsvView.scss'
+
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
+
+import { Objects } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -15,16 +19,24 @@ import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { Button, ButtonDownload, Dropzone } from '@webapp/components'
+import { Accordion, Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
+import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
   insertNewRecords: 'insertNewRecords',
 }
 
-const fileMaxSize = 20 * 1024 * 1024 // 20MB
+const fileMaxSize = 20 // 20MB
+
+const allowedLabelTypes = [
+  NodeDef.NodeDefLabelTypes.label,
+  NodeDef.NodeDefLabelTypes.name,
+  NodeDef.NodeDefLabelTypes.labelAndName,
+]
 
 export const DataImportCsvView = () => {
   const i18n = useI18n()
@@ -34,22 +46,42 @@ export const DataImportCsvView = () => {
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
 
+  const canSelectCycle = surveyCycleKeys.length > 1
+
   const [state, setState] = useState({
-    cycle: surveyCycle,
-    dataImportType: importTypes.updateExistingRecords,
+    cycle: canSelectCycle ? null : surveyCycle,
+    dataImportType: null,
     file: null,
     importCompleteResult: null,
     insertMissingNodes: null,
     insertMissingNodesDisabled: false,
+    nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedEntityDefUuid: null,
   })
-  const { cycle, dataImportType, file, importCompleteResult, insertMissingNodes, selectedEntityDefUuid } = state
+
+  const {
+    cycle,
+    dataImportType,
+    file,
+    importCompleteResult,
+    insertMissingNodes,
+    nodeDefLabelType,
+    selectedEntityDefUuid,
+  } = state
+
+  const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 
   const insertMissingNodesDisabled = dataImportType === importTypes.insertNewRecords
 
   const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
 
   const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
+
+  const onNodeDefLabelTypeChange = useCallback(() => {
+    const nodeDefLabelTypeNext =
+      allowedLabelTypes[(allowedLabelTypes.indexOf(nodeDefLabelType) + 1) % allowedLabelTypes.length]
+    setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
+  }, [nodeDefLabelType])
 
   const onDataImportTypeChange = useCallback(
     (value) => {
@@ -92,66 +124,82 @@ export const DataImportCsvView = () => {
   }
 
   return (
-    <div className="form">
-      {surveyCycleKeys.length > 1 && (
-        <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
-          <CycleSelector surveyCycleKey={cycle} onChange={setStateProp('cycle')} />
-        </FormItem>
-      )}
+    <div className="main-container">
+      <Stepper activeStep={activeStep} steps={steps} />
 
-      <FormItem label={i18n.t('dataImportView.importType.label')}>
-        <ButtonGroup
-          selectedItemKey={dataImportType}
-          onChange={onDataImportTypeChange}
-          items={Object.values(importTypes).map((importType) => ({
-            key: importType,
-            label: i18n.t(`dataImportView.importType.${importType}`),
-          }))}
-        />
-      </FormItem>
+      <div className="internal-container">
+        <div className="form">
+          {canSelectCycle && (
+            <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
+              <CycleSelector surveyCycleKey={cycle} onChange={setStateProp('cycle')} />
+            </FormItem>
+          )}
 
-      <FormItem label={i18n.t('dataImportView.importIntoEntity')}>
-        <EntitySelectorTree
-          nodeDefUuidActive={selectedEntityDefUuid}
-          onSelect={onEntitySelect}
-          isDisabled={() => dataImportType === importTypes.insertNewRecords}
-        />
-      </FormItem>
+          {!Objects.isEmpty(cycle) && (
+            <FormItem label={i18n.t('dataImportView.importType.label')}>
+              <ButtonGroup
+                selectedItemKey={dataImportType}
+                onChange={onDataImportTypeChange}
+                items={Object.values(importTypes).map((importType) => ({
+                  key: importType,
+                  label: i18n.t(`dataImportView.importType.${importType}`),
+                }))}
+              />
+            </FormItem>
+          )}
 
-      <ButtonDownload
-        href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
-        label="dataImportView.downloadTemplate"
-        disabled={!selectedEntityDefUuid}
-      />
+          {dataImportType && (
+            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoEntity')}>
+              <>
+                <EntitySelectorTree
+                  nodeDefLabelType={nodeDefLabelType}
+                  nodeDefUuidActive={selectedEntityDefUuid}
+                  onSelect={onEntitySelect}
+                  isDisabled={() => dataImportType === importTypes.insertNewRecords}
+                />
+                <NodeDefLabelSwitch
+                  allowedLabelTypes={allowedLabelTypes}
+                  labelType={nodeDefLabelType}
+                  onChange={onNodeDefLabelTypeChange}
+                />
+              </>
+            </FormItem>
+          )}
+        </div>
+        {selectedEntityDefUuid && (
+          <div className="buttons-container">
+            <ButtonDownload
+              className="download-template-btn"
+              href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
+              label="dataImportView.downloadTemplate"
+              disabled={!selectedEntityDefUuid}
+            />
 
-      <fieldset>
-        <legend>{i18n.t('dataImportView.options.header')}</legend>
-        <Checkbox
-          checked={insertMissingNodes}
-          disabled={insertMissingNodesDisabled}
-          label={i18n.t('dataImportView.options.insertMissingNodes')}
-          onChange={setStateProp('insertMissingNodes')}
-        />
-      </fieldset>
+            <Accordion title="dataImportView.options.header">
+              <Checkbox
+                checked={insertMissingNodes}
+                disabled={insertMissingNodesDisabled}
+                label={i18n.t('dataImportView.options.insertMissingNodes')}
+                onChange={setStateProp('insertMissingNodes')}
+              />
+            </Accordion>
 
-      {selectedEntityDefUuid && (
-        <>
-          <Dropzone
-            maxSize={fileMaxSize}
-            accept={{ 'text/csv': ['.csv'] }}
-            onDrop={onFilesDrop}
-            droppedFiles={file ? [file] : []}
-          />
+            <Dropzone
+              maxSize={fileMaxSize}
+              accept={{ 'text/csv': ['.csv'] }}
+              onDrop={onFilesDrop}
+              droppedFiles={file ? [file] : []}
+            />
 
-          <Button
-            className="btn-primary"
-            disabled={!file}
-            label={'dataImportView.startImport'}
-            onClick={onStartImport}
-          />
-        </>
-      )}
-
+            <Button
+              className="btn-primary start-btn"
+              disabled={!file}
+              label={'dataImportView.startImport'}
+              onClick={onStartImport}
+            />
+          </div>
+        )}
+      </div>
       {importCompleteResult && (
         <DataImportCompleteDialog
           importCompleteResult={importCompleteResult}

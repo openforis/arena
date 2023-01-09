@@ -1,8 +1,9 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import { ViewDataNodeDef } from '@common/model/db'
-import * as ApiRoutes from '@common/apiRoutes'
 import * as PromiseUtils from '@core/promiseUtils'
+
+import * as ApiRoutes from '@common/apiRoutes'
+import { CsvDataExportModel } from '@common/model/csvExport'
 
 import RFileSystem from './rFileSystem'
 import {
@@ -19,16 +20,10 @@ const dataConversionTypes = {
   asNumeric: 'asNumeric',
 }
 
-const conversionTypeByNodeDefType = {
-  [NodeDef.nodeDefType.boolean]: dataConversionTypes.asLogical,
-  [NodeDef.nodeDefType.code]: dataConversionTypes.asCharacter,
-  [NodeDef.nodeDefType.coordinate]: dataConversionTypes.asCharacter,
-  [NodeDef.nodeDefType.date]: dataConversionTypes.asCharacter,
-  [NodeDef.nodeDefType.decimal]: dataConversionTypes.asNumeric,
-  [NodeDef.nodeDefType.integer]: dataConversionTypes.asNumeric,
-  [NodeDef.nodeDefType.taxon]: dataConversionTypes.asCharacter,
-  [NodeDef.nodeDefType.text]: dataConversionTypes.asCharacter,
-  [NodeDef.nodeDefType.time]: dataConversionTypes.asCharacter,
+const conversionTypeByColumnDataType = {
+  [CsvDataExportModel.columnDataType.boolean]: dataConversionTypes.asLogical,
+  [CsvDataExportModel.columnDataType.numeric]: dataConversionTypes.asNumeric,
+  [CsvDataExportModel.columnDataType.text]: dataConversionTypes.asCharacter,
 }
 
 const conversionFunctionByType = {
@@ -84,28 +79,30 @@ export default class RFileReadData extends RFileSystem {
   async appendContentToConvertDataTypes({ entityDef }) {
     const { survey } = this.rChain
 
-    const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
-
-    const columnsByConversionType = {}
-    viewDataNodeDef.columnNodeDefs.forEach((columnNodeDef) => {
-      if (
-        !NodeDef.isSingleAttribute(columnNodeDef.nodeDef) ||
-        NodeDef.isAnalysis(columnNodeDef.nodeDef) ||
-        !conversionTypeByNodeDefType[NodeDef.getType(columnNodeDef.nodeDef)]
-      )
-        return
-
-      const { nodeDef, names: columnNames } = columnNodeDef
-      const conversionType = conversionTypeByNodeDefType[NodeDef.getType(nodeDef)]
-      const columns = columnsByConversionType[conversionType] || []
-      columns.push(...columnNames)
-      columnsByConversionType[conversionType] = columns
+    const csvDataExportModel = new CsvDataExportModel({
+      survey,
+      nodeDefContext: entityDef,
+      options: { includeFiles: false },
     })
+
+    const headersByConversionType = csvDataExportModel.columns.reduce((acc, column) => {
+      const { header, nodeDef, dataType } = column
+
+      const conversionType = conversionTypeByColumnDataType[dataType]
+
+      if (!NodeDef.isSingleAttribute(nodeDef) || NodeDef.isAnalysis(nodeDef) || !conversionType) {
+        return acc
+      }
+      const headersWithinType = acc[conversionType] || []
+      headersWithinType.push(header)
+      acc[conversionType] = headersWithinType
+      return acc
+    }, {})
 
     const dfEntity = NodeDef.getName(entityDef)
 
     const content = []
-    Object.entries(columnsByConversionType).forEach(([conversionType, columnNames]) => {
+    Object.entries(headersByConversionType).forEach(([conversionType, columnNames]) => {
       if (columnNames.length === 0) return
 
       content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))

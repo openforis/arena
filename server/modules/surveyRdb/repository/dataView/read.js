@@ -37,9 +37,19 @@ const columnTransformByNodeDefType = {
     // transform not applied
     return namesFull
   },
-  [NodeDef.nodeDefType.coordinate]: ({ nameFull, alias }) => [
-    `'SRID=EPSG:' || ST_SRID(${nameFull}) || ';POINT(' || ST_X(${nameFull}) || ' ' || ST_Y(${nameFull}) || ')' AS ${alias}`,
-  ],
+  [NodeDef.nodeDefType.coordinate]: ({ nameFull, alias, streamMode }) => {
+    const srsIdValue = `ST_SRID(${nameFull})`
+    const xValue = `ST_X(${nameFull})`
+    const yValue = `ST_Y(${nameFull})`
+    return [
+      ...(streamMode
+        ? []
+        : [`'SRID=EPSG:' || ${srsIdValue} || ';POINT(' || ${xValue} || ' ' || ${yValue} || ')' AS ${alias}`]),
+      `${xValue} AS ${alias}_x`,
+      `${yValue} AS ${alias}_y`,
+      `${srsIdValue} AS ${alias}_srs`,
+    ]
+  },
   [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`],
   [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
 }
