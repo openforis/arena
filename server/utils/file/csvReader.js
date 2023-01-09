@@ -13,10 +13,8 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       let headers = null
       let total = 0
 
-      /**
-       * Executes the specified function fn in a try catch.
-       * Calls "reject" if the execution throws an error.
-       */
+      // Executes the specified function fn in a try catch.
+      // Cancels the execution and calls "reject" if the execution of the speciied function throws an error.
       const _tryOrCancel = async (fnPromise) => {
         try {
           await fnPromise
@@ -70,7 +68,11 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         else processQueue()
       }
 
-      stream.pipe(csvParser()).on('data', onData).on('end', onEnd).on('error', reject)
+      stream
+        .pipe(csvParser({ skip_empty_lines: true, skip_records_with_empty_values: true }))
+        .on('data', onData)
+        .on('end', onEnd)
+        .on('error', reject)
     })
 
   const cancel = () => {

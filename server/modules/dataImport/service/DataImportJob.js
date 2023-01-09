@@ -1,4 +1,4 @@
-import { SRSs } from '@openforis/arena-core'
+import { Objects, SRSs } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -133,6 +133,17 @@ export default class DataImportJob extends Job {
     // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
 
+    const rootKeyValuesAsString = rootKeyDefs.map((rootKeyDef) => {
+      const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+      return JSON.stringify(keyValueInRow)
+    })
+
+    // check root keys are not empty
+    if (rootKeyValuesAsString.some(Objects.isEmpty)) {
+      this._addError(Validation.messageKeys.dataImport.recordKeysMissing)
+      return null
+    }
+
     const recordSummary = recordsSummary.find((record) =>
       rootKeyDefs.every((rootKeyDef) => {
         const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
@@ -147,17 +158,12 @@ export default class DataImportJob extends Job {
       })
     )
 
-    const keyValues = rootKeyDefs
-      .map((rootKeyDef) => {
-        const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-        return JSON.stringify(keyValueInRow)
-      })
-      .join(',')
+    const keyValuesString = rootKeyValuesAsString.join(',')
 
     if (insertNewRecords) {
       // check if record with the same key values already exists
       if (recordSummary) {
-        this._addError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues })
+        this._addError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues: keyValuesString })
         return null
       }
       const recordToInsert = Record.newRecord(user, cycle)
@@ -175,7 +181,7 @@ export default class DataImportJob extends Job {
     // insertNewRecords === false : updating existing record
 
     if (!recordSummary) {
-      this._addError(Validation.messageKeys.dataImport.recordNotFound, { keyValues })
+      this._addError(Validation.messageKeys.dataImport.recordNotFound, { keyValues: keyValuesString })
       return null
     }
 
