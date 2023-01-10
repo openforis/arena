@@ -1284,6 +1284,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
       invalidCode: 'Invalid code in column {{headers}}: {{code}}',
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
+      invalidDate: 'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as dd/MM/yyyy',
       invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
       invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',

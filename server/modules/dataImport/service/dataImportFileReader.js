@@ -7,12 +7,17 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Node from '@core/record/node'
+import * as DateUtils from '@core/dateUtils'
 
 import * as CSVReader from '@server/utils/file/csvReader'
 
 const VALUE_PROP_DEFAULT = 'value'
 
+const allowedDateFormats = [DateUtils.formats.dateDefault, DateUtils.formats.dateISO, 'dd-MM-yyyy']
+const allowedBooleanValues = ['true', 'false', '1', '0']
+
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
+
 const numericValueConverter = ({ value, headers }) => {
   const val = singlePropValueConverter({ value })
   const numericVal = Number(val)
@@ -25,8 +30,7 @@ const numericValueConverter = ({ value, headers }) => {
 const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
-    const possibleBooleanValues = ['true', 'false', '1', '0']
-    if (!possibleBooleanValues.includes(String(val).toLocaleLowerCase())) {
+    if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
       throw new SystemError('validationErrors.dataImport.invalidBoolean', { value: val, headers })
     }
     return String(['true', '1'].includes(String(val).toLocaleLowerCase()))
@@ -51,7 +55,18 @@ const valueConverterByNodeDefType = {
     const y = value[Node.valuePropsCoordinate.y]
     return Node.newNodeValueCoordinate({ x, y, srsId })
   },
-  [NodeDef.nodeDefType.date]: singlePropValueConverter,
+  [NodeDef.nodeDefType.date]: ({ value, headers }) => {
+    const val = singlePropValueConverter({ value })
+    let dateParsed = null
+    allowedDateFormats.some((format) => {
+      dateParsed = DateUtils.parse(val, format)
+      return DateUtils.isValidDateObject(dateParsed)
+    })
+    if (!DateUtils.isValidDateObject(dateParsed)) {
+      throw new SystemError('validationErrors.dataImport.invalidDate', { headers, value: val })
+    }
+    return DateUtils.formatDateISO(dateParsed)
+  },
   [NodeDef.nodeDefType.decimal]: numericValueConverter,
   [NodeDef.nodeDefType.integer]: numericValueConverter,
   [NodeDef.nodeDefType.taxon]: ({ survey, nodeDef, value, headers }) => {
