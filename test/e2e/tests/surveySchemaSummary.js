@@ -77,6 +77,8 @@ export default () =>
           'label_en',
           'label_fr',
           'key',
+          'categoryName',
+          'taxonomyName',
           'multiple',
           'readOnly',
           'applyIf',

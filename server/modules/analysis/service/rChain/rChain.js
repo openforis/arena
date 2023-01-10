@@ -3,6 +3,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ObjectUtils from '@core/objectUtils'
 
 import * as Chain from '@common/analysis/chain'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
@@ -176,7 +177,7 @@ class RChain {
     const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId: this.surveyId })
 
     this._survey = Survey.assocCategories(categories)(this.survey)
-    this._survey = Survey.assocTaxonomies(taxonomies)(this.survey)
+    this._survey = Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))(this.survey)
     this._chain = await AnalysisManager.fetchChain({
       surveyId: this.surveyId,
       chainUuid: this.chainUuid,
