@@ -82,10 +82,10 @@ export default class RFileReadData extends RFileSystem {
     const csvDataExportModel = new CsvDataExportModel({
       survey,
       nodeDefContext: entityDef,
-      options: { includeFiles: false },
+      options: { includeAncestorAttributes: true, includeFiles: false },
     })
 
-    const headersByConversionType = csvDataExportModel.columns.reduce((acc, column) => {
+    const columnNamesByConversionType = csvDataExportModel.columns.reduce((acc, column) => {
       const { header, nodeDef, dataType } = column
 
       const conversionType = conversionTypeByColumnDataType[dataType]
@@ -93,6 +93,7 @@ export default class RFileReadData extends RFileSystem {
       if (!NodeDef.isSingleAttribute(nodeDef) || NodeDef.isAnalysis(nodeDef) || !conversionType) {
         return acc
       }
+
       const headersWithinType = acc[conversionType] || []
       headersWithinType.push(header)
       acc[conversionType] = headersWithinType
@@ -102,7 +103,7 @@ export default class RFileReadData extends RFileSystem {
     const dfEntity = NodeDef.getName(entityDef)
 
     const content = []
-    Object.entries(headersByConversionType).forEach(([conversionType, columnNames]) => {
+    Object.entries(columnNamesByConversionType).forEach(([conversionType, columnNames]) => {
       if (columnNames.length === 0) return
 
       content.push(setVar(dfEntity, conversionFunctionByType[conversionType](dfEntity, columnNames)))

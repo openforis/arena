@@ -83,6 +83,7 @@ const columnsByNodeDefType = {
 
 const DEFAULT_OPTIONS = {
   includeAnalysis: true,
+  includeAncestorAttributes: false,
   includeCategoryItemsLabels: true,
   includeReadOnlyAttributes: true,
   includeTaxonScientificName: true,
@@ -108,18 +109,18 @@ export class CsvDataExportModel {
   _initColumns() {
     const { addCycle } = this.options
 
-    const descendantAttributeColumns = this._extractAttributeDefsColumns()
+    const ancestorsColumns = this._extractAncestorsColumns()
 
-    const ancestorsKeyColumns = this._extractAncestorsKeysColumns()
+    const attributeDefsColumns = this._extractAttributeDefsColumns(this.nodeDefContext)
 
     this.columns = [
       ...(addCycle ? [{ header: RECORD_CYCLE_HEADER }] : []),
-      ...ancestorsKeyColumns,
-      ...descendantAttributeColumns,
+      ...ancestorsColumns,
+      ...attributeDefsColumns,
     ]
   }
 
-  _createColumnsFromAttributeDefs({ attributeDefs }) {
+  _createColumnsFromAttributeDefs(attributeDefs) {
     const { includeCategoryItemsLabels, includeTaxonScientificName } = this.options
 
     return attributeDefs.reduce((acc, nodeDef) => {
@@ -139,38 +140,40 @@ export class CsvDataExportModel {
     }, [])
   }
 
-  _extractAncestorsKeysColumns() {
-    const ancestorsKeyColumns = []
+  _extractAncestorsColumns() {
+    const { includeAncestorAttributes } = this.options
+
+    const ancestorsColumns = []
 
     Survey.visitAncestors(
       this.nodeDefContext,
       (nodeDefAncestor) => {
-        const ancestorKeyDefs = Survey.getNodeDefKeys(nodeDefAncestor)(this.survey)
-        const ancestorKeyColumns = this._createColumnsFromAttributeDefs({
-          attributeDefs: ancestorKeyDefs,
-        })
-        ancestorsKeyColumns.unshift(...ancestorKeyColumns)
+        const ancestorColumns = includeAncestorAttributes
+          ? // include all ancestors attributes
+            this._extractAttributeDefsColumns(nodeDefAncestor)
+          : // include only ancestors key attributes
+            this._createColumnsFromAttributeDefs(Survey.getNodeDefKeys(nodeDefAncestor)(this.survey))
+        ancestorsColumns.unshift(...ancestorColumns)
       },
       false
     )(this.survey)
 
-    return ancestorsKeyColumns
+    return ancestorsColumns
   }
 
-  _extractAttributeDefsColumns() {
+  _extractAttributeDefsColumns(nodeDefContext) {
     const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = this.options
 
-    let descendantDefs = NodeDef.isEntity(this.nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDefContext, includeAnalysis)(this.survey)
-      : [this.nodeDefContext] // Multiple attribute
+    let descendantDefs = NodeDef.isEntity(nodeDefContext)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(this.survey)
+      : [nodeDefContext] // Multiple attribute
 
-    descendantDefs = descendantDefs.filter((nodeDef) => {
-      if (!includeFiles && NodeDef.isFile(nodeDef)) return false
-      if (!includeReadOnlyAttributes && NodeDef.isReadOnly(nodeDef)) return false
-      return true
-    })
+    descendantDefs = descendantDefs.filter(
+      (nodeDef) =>
+        (includeFiles || !NodeDef.isFile(nodeDef)) && (includeReadOnlyAttributes || !NodeDef.isReadOnly(nodeDef))
+    )
 
-    return this._createColumnsFromAttributeDefs({ attributeDefs: descendantDefs })
+    return this._createColumnsFromAttributeDefs(descendantDefs)
   }
 
   get headers() {
