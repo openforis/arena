@@ -29,7 +29,11 @@ const RowHeader = (props) => {
         <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.dateCreated} />
         {i18n.t('common.dateCreated')}
       </div>
-      <div>{i18n.t('common.dateLastModified')}</div>
+      <div>
+        {' '}
+        <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.dateModified} />
+        {i18n.t('common.dateLastModified')}
+      </div>
       <div>{i18n.t('dataView.records.owner')}</div>
       <div>
         <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.step} />
