@@ -164,14 +164,27 @@ export const fetchRecordsSummaryBySurveyId = async (
     )
     .join(' OR ')
 
+  const schema = getSurveyDBSchema(surveyId)
+
+  const nodeLastModifiedDateSelect = `
+    SELECT
+      record_uuid, to_char(MAX(date_modified),'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS date_modified
+    FROM ${schema}.node
+    GROUP BY record_uuid
+  `
   const recordsSelect = `
     SELECT 
         r.uuid, 
         r.owner_uuid, 
         r.step, 
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 
-        r.validation
-    FROM ${getSurveyDBSchema(surveyId)}.record r
+        r.validation,
+        node_last_modified.date_modified
+    FROM ${schema}.record r
+      -- GET LAST MODIFIED NODE DATE
+      LEFT OUTER JOIN 
+        node_last_modified
+        ON r.uuid = node_last_modified.record_uuid
     WHERE 
       r.preview = FALSE 
       ${A.isNull(cycle) ? '' : 'AND r.cycle = $/cycle/'}
@@ -186,12 +199,12 @@ export const fetchRecordsSummaryBySurveyId = async (
     : ''
 
   return client.map(
-    `
-    WITH r AS (${recordsSelect})
+    `WITH 
+      node_last_modified AS (${nodeLastModifiedDateSelect}),
+      r AS (${recordsSelect})
     SELECT 
       r.*,
       s.uuid AS survey_uuid,
-      n.date_modified,
       u.name as owner_name
       ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
     FROM  r
@@ -201,16 +214,6 @@ export const fetchRecordsSummaryBySurveyId = async (
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_uuid = u.uuid
-    -- GET LAST MODIFIED NODE DATE
-    LEFT OUTER JOIN (
-         SELECT 
-           record_uuid, ${DbUtils.selectDate('MAX(date_modified)', 'date_modified')}
-         FROM ${getSurveyDBSchema(surveyId)}.node
-         WHERE
-           record_uuid IN (select uuid from r)
-         GROUP BY record_uuid
-    ) as n
-      ON r.uuid = n.record_uuid
     -- join with root entity table to get node key values 
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
