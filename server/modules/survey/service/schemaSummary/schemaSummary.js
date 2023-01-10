@@ -87,6 +87,8 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
         {}
       ),
       key: String(NodeDef.isKey(nodeDef)),
+      categoryName: getCategoryName(nodeDef),
+      taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       applyIf,
@@ -96,8 +98,6 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
       cycle: String(NodeDef.getCycles(nodeDef).map((val) => String(Number(val) + 1))), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
-      categoryName: getCategoryName(nodeDef),
-      taxonomyName: getTaxonomyName(nodeDef),
     }
   })
 
