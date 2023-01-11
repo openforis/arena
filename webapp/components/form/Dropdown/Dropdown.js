@@ -2,7 +2,7 @@ import './dropdown.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactSelect, { components } from 'react-select'
+import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
@@ -99,6 +99,7 @@ const Dropdown = (props) => {
         classNamePrefix="dropdown"
         components={{ Option: OptionComponent({ renderOptionLabel }) }}
         defaultValue={defaultValue}
+        filterOption={createFilter({ stringify: (option) => option.label })}
         inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
