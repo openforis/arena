@@ -75,6 +75,8 @@ export const getRelativeDate = (i18n, date) => {
   return i18n.t('common.date.aMomentAgo')
 }
 
+export const isValidDateObject = fnsIsValid
+
 /**.
  * Checks if the date is valid. Takes into account leap years
  * (i.e. 2015/2/29 is not valid).
@@ -93,7 +95,7 @@ export const isValidDate = (year, month, day) => {
   const date = new Date(year, month - 1, day)
 
   return (
-    Boolean(fnsIsValid(date)) &&
+    Boolean(isValidDateObject(date)) &&
     date.getFullYear() === Number(year) &&
     date.getMonth() + 1 === Number(month) &&
     date.getDate() === Number(day)
@@ -107,7 +109,7 @@ export const isValidTime = (hour = '', minutes = '') =>
 
 export const isValidDateInFormat = (dateStr, format) => {
   const parsed = parse(dateStr, format)
-  return fnsIsValid(parsed)
+  return isValidDateObject(parsed)
 }
 
 const addOrSubtractTimezoneOffset = (date, add = true) => {
@@ -134,7 +136,7 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, a
     return null
   }
   const dateParsed = parse(dateStr, formatFrom)
-  if (!fnsIsValid(dateParsed)) {
+  if (!isValidDateObject(dateParsed)) {
     return null
   }
   const dateAdjusted = adjustTimezoneDifference ? addOrSubtractTimezoneOffset(dateParsed, false) : dateParsed
