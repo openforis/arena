@@ -13,7 +13,14 @@ import * as CSVReader from '@server/utils/file/csvReader'
 
 const VALUE_PROP_DEFAULT = 'value'
 
-const allowedDateFormats = [DateUtils.formats.dateDefault, DateUtils.formats.dateISO, 'dd-MM-yyyy']
+const allowedDateFormats = [
+  DateUtils.formats.dateISO,
+  'yyyy.MM.dd',
+  'yyyy/MM/dd',
+  DateUtils.formats.dateDefault,
+  'dd-MM-yyyy',
+  'dd.MM.yyyy',
+]
 const allowedBooleanValues = ['true', 'false', '1', '0']
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
