@@ -204,7 +204,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   let survey = R.pipe(
     Survey.assocNodeDefs({ nodeDefs }),
     Survey.assocCategories(categories),
-    Survey.assocTaxonomies(taxonomies)
+    Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
   )(surveyDb)
 
   if (validate) {

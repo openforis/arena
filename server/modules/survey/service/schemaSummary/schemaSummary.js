@@ -3,6 +3,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
 import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
@@ -53,6 +55,20 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
     return 0
   })
 
+  const getCategoryName = (nodeDef) => {
+    if (!NodeDef.isCode(nodeDef)) return ''
+
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+    return Category.getName(category) || ''
+  }
+
+  const getTaxonomyName = (nodeDef) => {
+    if (!NodeDef.isTaxon(nodeDef)) return ''
+
+    const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
+    return Taxonomy.getName(taxonomy) || ''
+  }
+
   const items = nodeDefs.map((nodeDef) => {
     const { uuid, type } = nodeDef
 
@@ -71,6 +87,8 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
         {}
       ),
       key: String(NodeDef.isKey(nodeDef)),
+      categoryName: getCategoryName(nodeDef),
+      taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       applyIf,
