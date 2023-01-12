@@ -47,7 +47,7 @@ class EntityBuilder extends NodeBuilder {
       node = R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
     } else {
       node = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode)
-      record = await RecordManager.persistNode(user, survey, record, node, null, null, true, t)
+      record = await RecordManager.persistNode({ user, survey, record, node, system: true }, t)
     }
 
     for (const childBuilder of this.childBuilders) {
@@ -88,7 +88,7 @@ class AttributeBuilder extends NodeBuilder {
       ? Node.assocValue(this.value)(nodeInRecord)
       : Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode, this.value)
 
-    return await RecordManager.persistNode(user, survey, record, nodeToPersist, null, null, true, t)
+    return await RecordManager.persistNode({ user, survey, record, node: nodeToPersist, system: true }, t)
   }
 }
 

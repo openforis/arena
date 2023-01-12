@@ -137,14 +137,14 @@ class RecordUpdateThread extends Thread {
         break
 
       case messageTypes.nodePersist:
-        this.record = await RecordManager.persistNode(
-          msg.user,
-          this.survey,
-          this.record,
-          msg.node,
-          this.handleNodesUpdated.bind(this),
-          this.handleNodesValidationUpdated.bind(this)
-        )
+        this.record = await RecordManager.persistNode({
+          user: msg.user,
+          survey: this.survey,
+          record: this.record,
+          node: msg.node,
+          nodesUpdateListener: this.handleNodesUpdated.bind(this),
+          nodesValidationListener: this.handleNodesValidationUpdated.bind(this),
+        })
         break
 
       case messageTypes.nodeDelete:

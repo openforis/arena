@@ -23,7 +23,7 @@ const getContext = () => {
 }
 const _persistNode = async (node) => {
   const { survey, record } = getContext()
-  global.applicableRecord = await RecordManager.persistNode(getContextUser(), survey, record, node)
+  global.applicableRecord = await RecordManager.persistNode({ user: getContextUser(), survey, record, node })
 }
 
 const _deleteNode = async (parentNode, childNodeName, childNodePosition) => {

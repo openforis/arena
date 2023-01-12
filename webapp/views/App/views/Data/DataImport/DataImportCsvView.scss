@@ -15,10 +15,15 @@
     flex-direction: column;
     gap: 2rem;
   }
+
   .internal-container {
     display: grid;
     grid-template-columns: 0.6fr 0.4fr;
     gap: 2rem;
+
+    .btn-group {
+      gap: 1rem;
+    }
 
     .entity-selector-tree {
       background-color: $white;

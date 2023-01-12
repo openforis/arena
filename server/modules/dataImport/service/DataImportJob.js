@@ -168,7 +168,10 @@ export default class DataImportJob extends Job {
       }
       const recordToInsert = Record.newRecord(user, cycle)
       const record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, this.tx)
-      this.currentRecord = await RecordManager.initNewRecord({ user, survey, record }, this.tx)
+      this.currentRecord = await RecordManager.initNewRecord(
+        { user, survey, record, createMultipleEntities: false },
+        this.tx
+      )
 
       this.insertedRecordsUuids.add(Record.getUuid(record))
 
