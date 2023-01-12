@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import * as Survey from '@core/survey/survey'
 import * as StringUtils from '@core/stringUtils'
 
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
@@ -27,6 +27,8 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const navigate = useNavigate()
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
+  const cycle = useSurveyCycleKey()
+
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
 
@@ -98,6 +100,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
         <ButtonDownload
           testId={TestId.records.exportBtn}
           href={`/api/survey/${surveyId}/records/summary/export`}
+          requestParams={{ cycle }}
           label="common.export"
         />
       )}
