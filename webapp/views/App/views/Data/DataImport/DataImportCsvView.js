@@ -83,7 +83,7 @@ export const DataImportCsvView = () => {
     setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
   }, [nodeDefLabelType])
 
-  const onDataImportTypeChange = useCallback(
+  const onImportTypeChange = useCallback(
     (value) => {
       setState((statePrev) => {
         const stateNext = { ...statePrev, dataImportType: value }
@@ -91,7 +91,10 @@ export const DataImportCsvView = () => {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
           stateNext.insertMissingNodes = false
+        } else {
+          stateNext.selectedEntityDefUuid = null
         }
+        stateNext.file = null
         return stateNext
       })
     },
@@ -139,7 +142,7 @@ export const DataImportCsvView = () => {
             <FormItem label={i18n.t('dataImportView.importType.label')}>
               <ButtonGroup
                 selectedItemKey={dataImportType}
-                onChange={onDataImportTypeChange}
+                onChange={onImportTypeChange}
                 items={Object.values(importTypes).map((importType) => ({
                   key: importType,
                   label: i18n.t(`dataImportView.importType.${importType}`),
