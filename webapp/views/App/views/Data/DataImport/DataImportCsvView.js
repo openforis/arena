@@ -19,7 +19,7 @@ import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { Accordion, Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
+import { Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
@@ -53,8 +53,7 @@ export const DataImportCsvView = () => {
     dataImportType: null,
     file: null,
     importCompleteResult: null,
-    insertMissingNodes: null,
-    insertMissingNodesDisabled: false,
+    preventAddingNewEntityData: false,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedEntityDefUuid: null,
   })
@@ -64,14 +63,12 @@ export const DataImportCsvView = () => {
     dataImportType,
     file,
     importCompleteResult,
-    insertMissingNodes,
+    preventAddingNewEntityData,
     nodeDefLabelType,
     selectedEntityDefUuid,
   } = state
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
-
-  const insertMissingNodesDisabled = dataImportType === importTypes.insertNewRecords
 
   const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
 
@@ -90,7 +87,7 @@ export const DataImportCsvView = () => {
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
-          stateNext.insertMissingNodes = false
+          stateNext.preventAddingNewEntityData = false
         } else {
           stateNext.selectedEntityDefUuid = null
         }
@@ -112,7 +109,7 @@ export const DataImportCsvView = () => {
       cycle,
       entityDefUuid: selectedEntityDefUuid,
       insertNewRecords: dataImportType === importTypes.insertNewRecords,
-      insertMissingNodes,
+      insertMissingNodes: !preventAddingNewEntityData,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -178,14 +175,16 @@ export const DataImportCsvView = () => {
               disabled={!selectedEntityDefUuid}
             />
 
-            <Accordion title="dataImportView.options.header">
-              <Checkbox
-                checked={insertMissingNodes}
-                disabled={insertMissingNodesDisabled}
-                label={i18n.t('dataImportView.options.insertMissingNodes')}
-                onChange={setStateProp('insertMissingNodes')}
-              />
-            </Accordion>
+            {dataImportType === importTypes.updateExistingRecords && (
+              <fieldset>
+                <legend>{i18n.t('dataImportView.options.header')}</legend>
+                <Checkbox
+                  checked={preventAddingNewEntityData}
+                  label={i18n.t('dataImportView.options.preventAddingNewEntityData')}
+                  onChange={setStateProp('preventAddingNewEntityData')}
+                />
+              </fieldset>
+            )}
 
             <Dropzone
               maxSize={fileMaxSize}

@@ -527,7 +527,7 @@ $t(common.cantUndoWarning)`,
     },
     options: {
       header: 'Options',
-      insertMissingNodes: 'Insert missing entities or attributes',
+      preventAddingNewEntityData: 'Prevent adding new entity data',
     },
     startImport: 'Start import',
     steps: {
