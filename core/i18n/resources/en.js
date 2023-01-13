@@ -531,6 +531,11 @@ $t(common.cantUndoWarning)`,
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
     },
     startImport: 'Start import',
+    startImportConfirm: `By pressing 'Ok' you will start the import process.
+
+**It won't be possible to rollback the changes.**
+
+Are you sure you want to continue?`,
     steps: {
       selectImportType: 'Select Import Type',
       selectCycle: 'Select Cycle',

@@ -16,6 +16,7 @@ import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
+import { useConfirm } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
@@ -45,6 +46,7 @@ export const DataImportCsvView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
+  const confirm = useConfirm()
 
   const canSelectCycle = surveyCycleKeys.length > 1
 
@@ -107,25 +109,28 @@ export const DataImportCsvView = () => {
   }
 
   const onStartImport = async () => {
-    const job = await API.startDataImportFromCsvJob({
-      surveyId,
-      file,
-      cycle,
-      entityDefUuid: selectedEntityDefUuid,
-      insertNewRecords: dataImportType === importTypes.insertNewRecords,
-      insertMissingNodes: !preventAddingNewEntityData,
-      updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
-    })
-    dispatch(
-      JobActions.showJobMonitor({
-        job,
-        autoHide: true,
-        onComplete: async (jobCompleted) => {
-          const importCompleteResult = JobSerialized.getResult(jobCompleted)
-          setState((statePrev) => ({ ...statePrev, importCompleteResult }))
-        },
+    const startJob = async () => {
+      const job = await API.startDataImportFromCsvJob({
+        surveyId,
+        file,
+        cycle,
+        entityDefUuid: selectedEntityDefUuid,
+        insertNewRecords: dataImportType === importTypes.insertNewRecords,
+        insertMissingNodes: !preventAddingNewEntityData,
+        updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
       })
-    )
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          autoHide: true,
+          onComplete: async (jobCompleted) => {
+            const importCompleteResult = JobSerialized.getResult(jobCompleted)
+            setState((statePrev) => ({ ...statePrev, importCompleteResult }))
+          },
+        })
+      )
+    }
+    confirm({ key: 'dataImportView.startImportConfirm', onOk: startJob })
   }
 
   return (
