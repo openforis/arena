@@ -14,6 +14,7 @@ import SystemError from '@core/systemError'
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
 import RecordUpdateResult from './RecordUpdateResult'
+import { NodeValueFormatter } from '../nodeValueFormatter'
 
 const { createNodeAndDescendants, createRootEntity } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
@@ -108,13 +109,19 @@ const _getOrCreateEntityByKeys =
 
     if (!insertMissingNodes) {
       const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
-      const keyValues = keyDefs
+      const keyValuePairs = keyDefs
         .map((keyDef) => {
           const keyDefUuid = NodeDef.getUuid(keyDef)
-          return valuesByDefUuid[keyDefUuid]
+          const keyDefName = NodeDef.getName(keyDef)
+          const value = valuesByDefUuid[keyDefUuid]
+          const keyValue = NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
+          return `${keyDefName}=${keyValue}`
         })
         .join(',')
-      throw new SystemError('appErrors.record.entityNotFound', { entityName: NodeDef.getName(entityDef), keyValues })
+      throw new SystemError('appErrors.record.entityNotFound', {
+        entityName: NodeDef.getName(entityDef),
+        keyValues: keyValuePairs,
+      })
     }
 
     // insert missing entity node (with keys)

@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValues } from '@core/record/nodeValues'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Validation from '@core/validation/validation'
 
 import Job from '@server/job/job'
@@ -133,13 +134,16 @@ export default class DataImportJob extends Job {
     // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
 
-    const rootKeyValuesAsString = rootKeyDefs.map((rootKeyDef) => {
-      const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-      return JSON.stringify(keyValueInRow)
-    })
+    const rootKeyValuesFormatted = rootKeyDefs.map((rootKeyDef) =>
+      NodeValueFormatter.format({
+        survey,
+        nodeDef: rootKeyDef,
+        value: valuesByDefUuid[NodeDef.getUuid(rootKeyDef)],
+      })
+    )
 
     // check root keys are not empty
-    if (rootKeyValuesAsString.some(Objects.isEmpty)) {
+    if (rootKeyValuesFormatted.some(Objects.isEmpty)) {
       this._addError(Validation.messageKeys.dataImport.recordKeysMissing)
       return null
     }
@@ -158,12 +162,18 @@ export default class DataImportJob extends Job {
       })
     )
 
-    const keyValuesString = rootKeyValuesAsString.join(',')
+    const keyNameValuesPairs = rootKeyDefs
+      .map((keyDef, index) => {
+        const name = NodeDef.getName(keyDef)
+        const value = rootKeyValuesFormatted[index]
+        return `${name}=${value}`
+      })
+      .join(',')
 
     if (insertNewRecords) {
       // check if record with the same key values already exists
       if (recordSummary) {
-        this._addError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues: keyValuesString })
+        this._addError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues: keyNameValuesPairs })
         return null
       }
       const recordToInsert = Record.newRecord(user, cycle)
@@ -184,13 +194,13 @@ export default class DataImportJob extends Job {
     // insertNewRecords === false : updating existing record
 
     if (!recordSummary) {
-      this._addError(Validation.messageKeys.dataImport.recordNotFound, { keyValues: keyValuesString })
+      this._addError(Validation.messageKeys.dataImport.recordNotFound, { keyValues: keyNameValuesPairs })
       return null
     }
 
     if (!updateRecordsInAnalysis && Record.isInAnalysisStep(recordSummary)) {
       this._addError(Validation.messageKeys.dataImport.recordInAnalysisStepCannotBeUpdated, {
-        keyValues: keyValuesString,
+        keyValues: keyNameValuesPairs,
       })
       return null
     }
