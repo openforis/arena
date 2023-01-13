@@ -128,7 +128,7 @@ export default class DataImportJob extends Job {
   }
 
   async getOrFetchRecord({ valuesByDefUuid }) {
-    const { cycle, insertNewRecords, recordsSummary, survey, surveyId, user } = this.context
+    const { cycle, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = this.context
 
     // fetch record by root entity key values
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
@@ -185,6 +185,13 @@ export default class DataImportJob extends Job {
 
     if (!recordSummary) {
       this._addError(Validation.messageKeys.dataImport.recordNotFound, { keyValues: keyValuesString })
+      return null
+    }
+
+    if (!updateRecordsInAnalysis && Record.isInAnalysisStep(recordSummary)) {
+      this._addError(Validation.messageKeys.dataImport.recordInAnalysisStepCannotBeUpdated, {
+        keyValues: keyValuesString,
+      })
       return null
     }
 

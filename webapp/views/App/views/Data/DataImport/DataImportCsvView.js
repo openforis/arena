@@ -53,8 +53,9 @@ export const DataImportCsvView = () => {
     dataImportType: null,
     file: null,
     importCompleteResult: null,
-    preventAddingNewEntityData: false,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
+    preventAddingNewEntityData: false,
+    preventUpdatingRecordsInAnalysis: true,
     selectedEntityDefUuid: null,
   })
 
@@ -63,8 +64,9 @@ export const DataImportCsvView = () => {
     dataImportType,
     file,
     importCompleteResult,
-    preventAddingNewEntityData,
     nodeDefLabelType,
+    preventAddingNewEntityData,
+    preventUpdatingRecordsInAnalysis,
     selectedEntityDefUuid,
   } = state
 
@@ -88,7 +90,9 @@ export const DataImportCsvView = () => {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
           stateNext.preventAddingNewEntityData = false
+          stateNext.preventUpdatingRecordsInAnalysis = false
         } else {
+          stateNext.preventUpdatingRecordsInAnalysis = true
           stateNext.selectedEntityDefUuid = null
         }
         stateNext.file = null
@@ -110,6 +114,7 @@ export const DataImportCsvView = () => {
       entityDefUuid: selectedEntityDefUuid,
       insertNewRecords: dataImportType === importTypes.insertNewRecords,
       insertMissingNodes: !preventAddingNewEntityData,
+      updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
     })
     dispatch(
       JobActions.showJobMonitor({
@@ -182,6 +187,11 @@ export const DataImportCsvView = () => {
                   checked={preventAddingNewEntityData}
                   label={i18n.t('dataImportView.options.preventAddingNewEntityData')}
                   onChange={setStateProp('preventAddingNewEntityData')}
+                />
+                <Checkbox
+                  checked={preventUpdatingRecordsInAnalysis}
+                  label={i18n.t('dataImportView.options.preventUpdatingRecordsInAnalysis')}
+                  onChange={setStateProp('preventUpdatingRecordsInAnalysis')}
                 />
               </fieldset>
             )}

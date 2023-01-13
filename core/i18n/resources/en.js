@@ -528,6 +528,7 @@ $t(common.cantUndoWarning)`,
     options: {
       header: 'Options',
       preventAddingNewEntityData: 'Prevent adding new entity data',
+      preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
     },
     startImport: 'Start import',
     steps: {
@@ -1291,6 +1292,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
       errorUpdatingValues: 'Error updating values',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
+      recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
       recordKeysMissing: 'Missing record key value',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
