@@ -16,10 +16,11 @@ import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
+import { useConfirm } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { Accordion, Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
+import { Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
@@ -45,6 +46,7 @@ export const DataImportCsvView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
+  const confirm = useConfirm()
 
   const canSelectCycle = surveyCycleKeys.length > 1
 
@@ -53,9 +55,9 @@ export const DataImportCsvView = () => {
     dataImportType: null,
     file: null,
     importCompleteResult: null,
-    insertMissingNodes: null,
-    insertMissingNodesDisabled: false,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
+    preventAddingNewEntityData: false,
+    preventUpdatingRecordsInAnalysis: true,
     selectedEntityDefUuid: null,
   })
 
@@ -64,14 +66,13 @@ export const DataImportCsvView = () => {
     dataImportType,
     file,
     importCompleteResult,
-    insertMissingNodes,
     nodeDefLabelType,
+    preventAddingNewEntityData,
+    preventUpdatingRecordsInAnalysis,
     selectedEntityDefUuid,
   } = state
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
-
-  const insertMissingNodesDisabled = dataImportType === importTypes.insertNewRecords
 
   const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
 
@@ -83,15 +84,20 @@ export const DataImportCsvView = () => {
     setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
   }, [nodeDefLabelType])
 
-  const onDataImportTypeChange = useCallback(
+  const onImportTypeChange = useCallback(
     (value) => {
       setState((statePrev) => {
         const stateNext = { ...statePrev, dataImportType: value }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
-          stateNext.insertMissingNodes = false
+          stateNext.preventAddingNewEntityData = false
+          stateNext.preventUpdatingRecordsInAnalysis = false
+        } else {
+          stateNext.preventUpdatingRecordsInAnalysis = true
+          stateNext.selectedEntityDefUuid = null
         }
+        stateNext.file = null
         return stateNext
       })
     },
@@ -103,24 +109,28 @@ export const DataImportCsvView = () => {
   }
 
   const onStartImport = async () => {
-    const job = await API.startDataImportFromCsvJob({
-      surveyId,
-      file,
-      cycle,
-      entityDefUuid: selectedEntityDefUuid,
-      insertNewRecords: dataImportType === importTypes.insertNewRecords,
-      insertMissingNodes,
-    })
-    dispatch(
-      JobActions.showJobMonitor({
-        job,
-        autoHide: true,
-        onComplete: async (jobCompleted) => {
-          const importCompleteResult = JobSerialized.getResult(jobCompleted)
-          setState((statePrev) => ({ ...statePrev, importCompleteResult }))
-        },
+    const startJob = async () => {
+      const job = await API.startDataImportFromCsvJob({
+        surveyId,
+        file,
+        cycle,
+        entityDefUuid: selectedEntityDefUuid,
+        insertNewRecords: dataImportType === importTypes.insertNewRecords,
+        insertMissingNodes: !preventAddingNewEntityData,
+        updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
       })
-    )
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          autoHide: true,
+          onComplete: async (jobCompleted) => {
+            const importCompleteResult = JobSerialized.getResult(jobCompleted)
+            setState((statePrev) => ({ ...statePrev, importCompleteResult }))
+          },
+        })
+      )
+    }
+    confirm({ key: 'dataImportView.startImportConfirm', onOk: startJob })
   }
 
   return (
@@ -139,7 +149,7 @@ export const DataImportCsvView = () => {
             <FormItem label={i18n.t('dataImportView.importType.label')}>
               <ButtonGroup
                 selectedItemKey={dataImportType}
-                onChange={onDataImportTypeChange}
+                onChange={onImportTypeChange}
                 items={Object.values(importTypes).map((importType) => ({
                   key: importType,
                   label: i18n.t(`dataImportView.importType.${importType}`),
@@ -175,14 +185,21 @@ export const DataImportCsvView = () => {
               disabled={!selectedEntityDefUuid}
             />
 
-            <Accordion title="dataImportView.options.header">
-              <Checkbox
-                checked={insertMissingNodes}
-                disabled={insertMissingNodesDisabled}
-                label={i18n.t('dataImportView.options.insertMissingNodes')}
-                onChange={setStateProp('insertMissingNodes')}
-              />
-            </Accordion>
+            {dataImportType === importTypes.updateExistingRecords && (
+              <fieldset>
+                <legend>{i18n.t('dataImportView.options.header')}</legend>
+                <Checkbox
+                  checked={preventAddingNewEntityData}
+                  label={i18n.t('dataImportView.options.preventAddingNewEntityData')}
+                  onChange={setStateProp('preventAddingNewEntityData')}
+                />
+                <Checkbox
+                  checked={preventUpdatingRecordsInAnalysis}
+                  label={i18n.t('dataImportView.options.preventUpdatingRecordsInAnalysis')}
+                  onChange={setStateProp('preventUpdatingRecordsInAnalysis')}
+                />
+              </fieldset>
+            )}
 
             <Dropzone
               maxSize={fileMaxSize}

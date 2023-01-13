@@ -105,7 +105,12 @@ describe('Applicable Test', () => {
     const record = global.applicableRecord
     const nodePlotNo = RecordUtils.findNodeByPath('cluster/plot[1]/plot_no')(survey, record)
     const nodePlotNoUpdated = Node.assocValue(11)(nodePlotNo)
-    const recordUpdated = await RecordManager.persistNode(getContextUser(), survey, record, nodePlotNoUpdated)
+    const recordUpdated = await RecordManager.persistNode({
+      user: getContextUser(),
+      survey,
+      record,
+      node: nodePlotNoUpdated,
+    })
 
     const nodeTree = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]')(survey, recordUpdated)
     const nodeTreeDbh = RecordUtils.findNodeByPath('cluster/plot[1]/tree[1]/tree_dbh')(survey, recordUpdated)

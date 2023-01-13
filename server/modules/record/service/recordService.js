@@ -261,6 +261,7 @@ export const startCSVDataImportJob = ({
   entityDefUuid,
   insertNewRecords = false,
   insertMissingNodes = false,
+  updateRecordsInAnalysis = false,
 }) => {
   const job = new DataImportJob({
     user,
@@ -270,6 +271,7 @@ export const startCSVDataImportJob = ({
     entityDefUuid,
     insertNewRecords,
     insertMissingNodes,
+    updateRecordsInAnalysis,
   })
   JobManager.executeJobThread(job)
   return job

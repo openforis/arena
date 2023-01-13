@@ -95,7 +95,8 @@ export const init = (app) => {
   app.post('/survey/:surveyId/record/importfromcsv', requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, cycle, entityDefUuid, insertNewRecords, insertMissingNodes } = Request.getParams(req)
+      const { surveyId, cycle, entityDefUuid, insertNewRecords, insertMissingNodes, updateRecordsInAnalysis } =
+        Request.getParams(req)
       const filePath = Request.getFilePath(req)
 
       const job = RecordService.startCSVDataImportJob({
@@ -106,6 +107,7 @@ export const init = (app) => {
         entityDefUuid,
         insertNewRecords,
         insertMissingNodes,
+        updateRecordsInAnalysis,
       })
       const jobSerialized = JobUtils.jobToJSON(job)
       res.json({ job: jobSerialized })

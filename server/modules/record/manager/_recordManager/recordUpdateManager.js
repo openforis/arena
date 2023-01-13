@@ -34,14 +34,26 @@ import * as NodeUpdateManager from './nodeUpdateManager'
 // ==== CREATE
 
 export const initNewRecord = async (
-  { user, survey, record, nodesUpdateListener = null, nodesValidationListener = null },
+  { user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, createMultipleEntities = true },
   client = db
 ) => {
   const rootNodeDef = Survey.getNodeDefRoot(survey)
 
   const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
 
-  return persistNode(user, survey, record, rootNode, nodesUpdateListener, nodesValidationListener, true, client)
+  return persistNode(
+    {
+      user,
+      survey,
+      record,
+      node: rootNode,
+      nodesUpdateListener,
+      nodesValidationListener,
+      system: true,
+      createMultipleEntities,
+    },
+    client
+  )
 }
 
 // ==== UPDATE
@@ -148,24 +160,28 @@ export const { insertNode, updateNode } = NodeUpdateManager
 
 // inserts/updates a node and validate records uniqueness
 export const persistNode = async (
-  user,
-  survey,
-  record,
-  node,
-  nodesUpdateListener = null,
-  nodesValidationListener = null,
-  system = false,
-  t = db
+  {
+    user,
+    survey,
+    record,
+    node,
+    nodesUpdateListener = null,
+    nodesValidationListener = null,
+    system = false,
+    createMultipleEntities = true,
+  },
+  client = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
     node,
-    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, system, t),
+    (user, survey, record, node, t) =>
+      NodeUpdateManager.persistNode({ user, survey, record, node, system, createMultipleEntities }, t),
     nodesUpdateListener,
     nodesValidationListener,
-    t
+    client
   )
 
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents

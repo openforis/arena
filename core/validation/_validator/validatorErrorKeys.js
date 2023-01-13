@@ -44,6 +44,7 @@ export const ValidatorErrorKeys = {
   },
 
   dataImport: {
+    recordInAnalysisStepCannotBeUpdated: 'validationErrors.dataImport.recordInAnalysisStepCannotBeUpdated',
     emptyFile: 'validationErrors.dataImport.emptyFile',
     errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',

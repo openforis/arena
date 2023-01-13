@@ -527,9 +527,15 @@ $t(common.cantUndoWarning)`,
     },
     options: {
       header: 'Options',
-      insertMissingNodes: 'Insert missing entities or attributes',
+      preventAddingNewEntityData: 'Prevent adding new entity data',
+      preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
     },
     startImport: 'Start import',
+    startImportConfirm: `By pressing 'Ok' you will start the import process.
+
+**It won't be possible to rollback the changes.**
+
+Are you sure you want to continue?`,
     steps: {
       selectImportType: 'Select Import Type',
       selectCycle: 'Select Cycle',
@@ -1291,6 +1297,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
       errorUpdatingValues: 'Error updating values',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
+      recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
       recordKeysMissing: 'Missing record key value',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
