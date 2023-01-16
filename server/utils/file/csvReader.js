@@ -28,7 +28,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
 
       const _extractValidHeaders = (row) => {
         // remove last empty columns
-        const headers = []
+        const _headers = []
         let nonEmptyHeaderFound = false
         for (let index = row.length - 1; index >= 0; index--) {
           const header = StringUtils.trim(row[index])
@@ -38,16 +38,15 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
               reject(new SystemError('appErrors.csv.emptyHeaderFound', { columnPosition: index + 1 }))
               break
             }
-            delete headers[index]
           } else {
             nonEmptyHeaderFound = true
-            headers.unshift(header)
+            _headers.unshift(header)
           }
         }
         if (!nonEmptyHeaderFound) {
           reject(new SystemError('appErrors.csv.emptyHeadersFound'))
         }
-        return headers
+        return _headers
       }
 
       const _indexRowByHeaders = (row) =>
