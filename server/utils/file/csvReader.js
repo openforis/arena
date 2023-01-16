@@ -1,5 +1,7 @@
 import { parse as csvParser } from 'csv'
 
+import { SystemError } from '@openforis/arena-core'
+
 import Queue from '@core/queue'
 import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from './fileUtils'
@@ -24,6 +26,30 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
         }
       }
 
+      const _extractValidHeaders = (row) => {
+        // remove last empty columns
+        const headers = []
+        let nonEmptyHeaderFound = false
+        for (let index = row.length - 1; index >= 0; index--) {
+          const header = StringUtils.trim(row[index])
+
+          if (StringUtils.isBlank(header)) {
+            if (nonEmptyHeaderFound) {
+              reject(new SystemError('appErrors.csv.emptyHeaderFound', { columnPosition: index + 1 }))
+              break
+            }
+            delete headers[index]
+          } else {
+            nonEmptyHeaderFound = true
+            headers.unshift(header)
+          }
+        }
+        if (!nonEmptyHeaderFound) {
+          reject(new SystemError('appErrors.csv.emptyHeadersFound'))
+        }
+        return headers
+      }
+
       const _indexRowByHeaders = (row) =>
         headers
           ? headers.reduce(
@@ -45,7 +71,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
               if (onRow) await _tryOrCancel(onRow(_indexRowByHeaders(row)))
             } else {
               // Process headers
-              headers = row
+              headers = _extractValidHeaders(row)
               if (onHeaders) await _tryOrCancel(onHeaders(headers))
             }
           }
@@ -69,7 +95,7 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       }
 
       stream
-        .pipe(csvParser({ skip_empty_lines: true, skip_records_with_empty_values: true }))
+        .pipe(csvParser({ relaxColumnCount: true, skip_empty_lines: true, skip_records_with_empty_values: true }))
         .on('data', onData)
         .on('end', onEnd)
         .on('error', reject)
