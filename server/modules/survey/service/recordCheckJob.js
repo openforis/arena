@@ -166,8 +166,11 @@ export default class RecordCheckJob extends Job {
     }
   }
 
-  // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
-  // Returns an indexed object with all the inserted nodes.
+  /**
+   * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
+   *
+   * Returns an indexed object with all the inserted nodes.
+   */
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
     const nodesUpdated = {}
     let recordUpdated = { ...record }
