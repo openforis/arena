@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { SRSs } from '@openforis/arena-core'
+import { Objects, SRSs } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -37,9 +37,9 @@ export default class RecordCheckJob extends Job {
     await PromiseUtils.each(recordsUuidAndCycle, async ({ uuid: recordUuid, cycle }) => {
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
-      const { noUpdates } = surveyAndNodeDefs
+      const { requiresCheck } = surveyAndNodeDefs
 
-      if (!noUpdates) {
+      if (requiresCheck) {
         await this._checkRecord(surveyAndNodeDefs, recordUuid)
       }
 
@@ -60,8 +60,8 @@ export default class RecordCheckJob extends Job {
     let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
-      this.logDebug('fetching survey...')
-      const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      this.logDebug(`fetching survey for cycle ${cycle}...`)
+      let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         this.tx
       )
@@ -90,12 +90,21 @@ export default class RecordCheckJob extends Job {
         }
       })
 
+      const requiresCheck = nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+      if (requiresCheck) {
+        this.logDebug('survey has been updated: record check necessary')
+        // fetch survey reference data (used later for record validation)
+        survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+          { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+          this.tx
+        )
+      }
       surveyAndNodeDefs = {
         survey,
         nodeDefAddedUuids,
         nodeDefUpdatedUuids,
         nodeDefDeletedUuids,
-        noUpdates: nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length === 0,
+        requiresCheck,
       }
       this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
     }
@@ -166,11 +175,8 @@ export default class RecordCheckJob extends Job {
     }
   }
 
-  /**
-   * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
-   *
-   * Returns an indexed object with all the inserted nodes.
-   */
+  // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
+  // Returns an indexed object with all the inserted nodes.
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
     const nodesUpdated = {}
     let recordUpdated = { ...record }
@@ -208,18 +214,8 @@ export default class RecordCheckJob extends Job {
   }
 }
 
-/**
- * Inserts a missing single node in a specified parent node.
- *
- * Returns an indexed object with all the inserted nodes.
- *
- * @param survey
- * @param childDef
- * @param record
- * @param parentNode
- * @param user
- * @param tx
- */
+// Inserts a missing single node in a specified parent node.
+// Returns an indexed object with all the inserted nodes.
 const _insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
   if (!NodeDef.isSingle(childDef)) {
     // multiple node: don't insert it
@@ -254,20 +250,15 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
 const _clearRecordKeysValidation = (record) => {
   const validationRecord = Record.getValidation(record)
 
-  return R.pipe(
-    Validation.getFieldValidations,
-    Object.entries,
-    R.reduce(
-      (validationAcc, [nodeUuid, validationNode]) =>
-        R.assoc(
-          nodeUuid,
-          Validation.dissocFieldValidation(RecordValidation.keys.recordKeys)(validationNode)
-        )(validationAcc),
-      {}
-    ),
-    (fieldValidationsUpdated) => Validation.setFieldValidations(fieldValidationsUpdated)(validationRecord),
-    (validationRecordUpdated) => Validation.assocValidation(validationRecordUpdated)(record)
-  )(validationRecord)
+  const validationNodes = Object.values(Validation.getFieldValidations(validationRecord))
+  validationNodes.forEach((validationNode) => {
+    Objects.dissocPath({
+      obj: validationNode,
+      path: [Validation.keys.fields, RecordValidation.keys.recordKeys],
+      sideEffect: true,
+    })
+  })
+  return record
 }
 
 const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, tx) => {
