@@ -1491,6 +1491,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
     cantUpdateStep: `Can't update step`,
+    csv: {
+      emptyHeaderFound: 'Empty header found at column {{columnPosition}}',
+      emptyHeaders: 'Empty headers found',
+    },
     entryDataNotFound: 'Entry data not found: {{entryName}}',
     generic: 'Unexpected error: {{text}}',
     importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
