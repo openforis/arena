@@ -222,11 +222,13 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
   client = db
 ) => {
-  const [survey, categoryItemsRefData, taxaIndexRefData] = await Promise.all([
-    fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced, validate, includeDeleted, backup }, client),
-    CategoryRepository.fetchIndex(surveyId, draft, client),
-    TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client),
-  ])
+  const survey = await fetchSurveyAndNodeDefsBySurveyId(
+    { surveyId, cycle, draft, advanced, validate, includeDeleted, backup },
+    client
+  )
+  const categoryItemsRefData = await CategoryRepository.fetchIndex(surveyId, draft, client)
+  const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client)
+
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 

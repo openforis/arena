@@ -47,7 +47,16 @@ export default class RecordCheckJob extends Job {
     })
   }
 
+  _cleanSurveysCache(cycleToKeep) {
+    Object.keys(this.surveyAndNodeDefsByCycle).forEach((cycleInCache) => {
+      if (cycleInCache !== cycleToKeep) {
+        delete this.surveyAndNodeDefsByCycle[cycleInCache]
+      }
+    })
+  }
+
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
+    this._cleanSurveysCache(cycle)
     let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
@@ -159,6 +168,11 @@ export default class RecordCheckJob extends Job {
    * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
    *
    * Returns an indexed object with all the inserted nodes.
+   *
+   * @param root0
+   * @param root0.survey
+   * @param root0.nodeDefAddedUuids
+   * @param root0.record
    */
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
     const nodesUpdated = {}
@@ -201,6 +215,13 @@ export default class RecordCheckJob extends Job {
  * Inserts a missing single node in a specified parent node.
  *
  * Returns an indexed object with all the inserted nodes.
+ *
+ * @param survey
+ * @param childDef
+ * @param record
+ * @param parentNode
+ * @param user
+ * @param tx
  */
 const _insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
   if (!NodeDef.isSingle(childDef)) {
