@@ -99,9 +99,11 @@
     "yarn-audit-fix": "^9.3.2"
   },
   "dependencies": {
+    "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.10.15",
+    "@mui/x-date-pickers": "^5.0.14",
     "@openforis/arena-core": "^0.0.125",
     "@openforis/arena-server": "^0.1.22",
     "@sendgrid/mail": "^7.7.0",

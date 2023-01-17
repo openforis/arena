@@ -1,23 +1,40 @@
 import './DateInput.scss'
 
-import React, { useRef } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { TextField } from '@mui/material'
 
-import ReactDateInput from './ReactDateInput'
+import * as DateUtils from '@core/dateUtils'
+
+const format = DateUtils.formats.dateDefault
 
 const DateInput = (props) => {
-  const { disabled, value, onChange } = props
+  const { disabled, value, onChange: onChangeProp } = props
 
-  const inputField = useRef()
+  const dateValue = DateUtils.parse(value, format)
+
+  const onChange = useCallback(
+    (date) => {
+      if (date === null) {
+        onChangeProp(null)
+      }
+      if (DateUtils.isValidDateObject(date)) {
+        const dateFormatted = DateUtils.format(date, format)
+        onChangeProp(dateFormatted)
+      }
+    },
+    [onChangeProp]
+  )
 
   return (
-    <ReactDateInput
-      ref={inputField}
+    <DatePicker
+      className="date-picker"
       disabled={disabled}
-      format="DDMMYYYY"
-      separator="/"
+      inputFormat={format}
       onChange={onChange}
-      date={value}
+      renderInput={(params) => <TextField {...params} className="date-picker__text-field" autoComplete="off" />}
+      value={dateValue}
     />
   )
 }
