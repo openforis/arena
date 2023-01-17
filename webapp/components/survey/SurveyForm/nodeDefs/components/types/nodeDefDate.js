@@ -23,6 +23,9 @@ const NodeDefDate = (props) => {
   const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display })
 
   const handleChangeDateInput = (newDate) => {
+    if (!newDate) {
+      updateNode(nodeDef, node, null)
+    }
     const newDateFormatted = DateUtils.convertDate({
       dateStr: newDate,
       formatFrom: dateFormat.display,
