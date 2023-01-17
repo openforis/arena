@@ -60,10 +60,12 @@ export default class RecordCheckJob extends Job {
     let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
+      this.logDebug('fetching survey...')
       const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
         { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         this.tx
       )
+      this.logDebug('survey fetched')
 
       // 2. determine new, updated or deleted node defs
       const nodeDefAddedUuids = []
@@ -93,7 +95,7 @@ export default class RecordCheckJob extends Job {
         nodeDefAddedUuids,
         nodeDefUpdatedUuids,
         nodeDefDeletedUuids,
-        noUpdates: [...nodeDefAddedUuids, ...nodeDefUpdatedUuids, ...nodeDefDeletedUuids].length === 0,
+        noUpdates: nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length === 0,
       }
       this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
     }
@@ -168,11 +170,6 @@ export default class RecordCheckJob extends Job {
    * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
    *
    * Returns an indexed object with all the inserted nodes.
-   *
-   * @param root0
-   * @param root0.survey
-   * @param root0.nodeDefAddedUuids
-   * @param root0.record
    */
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
     const nodesUpdated = {}
