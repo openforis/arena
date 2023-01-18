@@ -24,13 +24,13 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 // ============== UTILS
 
 // camelize all but "meta"
-const dbTransformCallback = (node) =>
-  A.pipe(
-    // do not camelize meta properties
-    A.camelizePartial({ skip: [Node.keys.meta] }),
-    // cast id to Number
-    A.assoc('id', Number(node.id))
-  )(node)
+const dbTransformCallback = (node) => {
+  // do not camelize meta properties
+  const nodeTransformed = A.camelizePartial({ skip: [Node.keys.meta] })(node)
+  // cast id to Number
+  nodeTransformed.id = Number(node.id)
+  return nodeTransformed
+}
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
 /**
@@ -154,7 +154,11 @@ export const fetchNodesByRecordUuid = async (
     order by n.date_created
     `,
     [recordUuid],
-    (row) => ({ ...dbTransformCallback(row), recordUuid })
+    (row) => {
+      const rowTransformed = dbTransformCallback(row)
+      rowTransformed.recordUuid = recordUuid
+      return rowTransformed
+    }
   )
 
 export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
@@ -209,7 +213,8 @@ export const updateNode = async (
 
   // fetch node with ref data
   const node = await fetchNodeWithRefDataByUuid({ surveyId, nodeUuid, draft }, client)
-  return { ...node, [Node.keys.updated]: true }
+  node[Node.keys.updated] = true
+  return node
 }
 
 export const updateNodes = async ({ surveyId, nodes }, client = db) => {
