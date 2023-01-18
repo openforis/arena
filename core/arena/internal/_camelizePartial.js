@@ -16,7 +16,8 @@ const _walk = ({ object, skip = [], limitToLevel = null }) => {
     const keyTransformed = skipped ? key : _camelCase(key)
     const valueTranformed =
       skipped || nextLimitToLevel === 0 ? value : _walk({ object: value, limitToLevel: nextLimitToLevel })
-    return { ...objAcc, [keyTransformed]: valueTranformed }
+    objAcc[keyTransformed] = valueTranformed
+    return objAcc
   }, {})
 }
 
