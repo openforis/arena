@@ -65,7 +65,6 @@ export default class RecordCheckJob extends Job {
         { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         this.tx
       )
-      this.logDebug('survey fetched')
 
       // 2. determine new, updated or deleted node defs
       const nodeDefAddedUuids = []
@@ -92,12 +91,13 @@ export default class RecordCheckJob extends Job {
 
       const requiresCheck = nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
       if (requiresCheck) {
-        this.logDebug('survey has been updated: record check necessary')
+        this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
         // fetch survey reference data (used later for record validation)
         survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
           { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
           this.tx
         )
+        this.logDebug('survey fetched')
       }
       surveyAndNodeDefs = {
         survey,
@@ -114,6 +114,8 @@ export default class RecordCheckJob extends Job {
 
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
+
+    this.logDebug(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId: this.surveyId, recordUuid }, this.tx)
@@ -171,8 +173,10 @@ export default class RecordCheckJob extends Job {
 
     const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
     if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(nodesToValidate)) {
+      this.logDebug(`validating record ${recordUuid}`)
       await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, nodesToValidate, this.tx)
     }
+    this.logDebug('record check complete')
   }
 
   // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
@@ -276,7 +280,6 @@ const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, t
   })
 
   // Record keys uniqueness must be validated after RDB generation
-
   await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
 }
 
