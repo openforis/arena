@@ -30,7 +30,7 @@ export const useDropdown = ({
 
   const getOptionDescription = useCallback((item) => getProperty(itemDescription)(item), [itemDescription])
   const getOptionIcon = useCallback((item) => getProperty(itemIcon)(item), [itemIcon])
-  const getOptionLabel = useCallback((item) => getProperty(itemLabel)(item), [itemLabel])
+  const getOptionLabel = useCallback((item) => String(getProperty(itemLabel)(item)), [itemLabel])
   const getOptionValue = useCallback((item) => getProperty(itemValue)(item), [itemValue])
 
   const asyncItemsLoading = itemsProp && !Array.isArray(itemsProp)
