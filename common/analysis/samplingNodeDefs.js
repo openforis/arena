@@ -45,6 +45,14 @@ const getAllEntityAreaNodeDefs = ({ survey, chain }) => {
   })
 }
 
+const getEntityAreaNodeDefDefaultScript = ({ nodeDefParent, baseUnitNodeDef }) => {
+  const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
+  const name = getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef })
+  const parentName = NodeDef.getName(nodeDefParent)
+  const defaultValue = isBaseUnit ? '1' : 'NA'
+  return `${parentName}$${name} <- ${defaultValue}`
+}
+
 const newEntityAreaNodeDef = ({ nodeDefParent, baseUnitNodeDef, chainUuid, cycleKeys }) => {
   const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
   const name = getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef })
@@ -52,9 +60,7 @@ const newEntityAreaNodeDef = ({ nodeDefParent, baseUnitNodeDef, chainUuid, cycle
   const props = {
     [NodeDef.propKeys.name]: name,
   }
-  const parentName = NodeDef.getName(nodeDefParent)
-  const defaultValue = isBaseUnit ? '1' : 'NA'
-  const script = `${parentName}$${name} <- ${defaultValue}`
+  const script = getEntityAreaNodeDefDefaultScript({ nodeDefParent, baseUnitNodeDef })
 
   const advancedProps = {
     [NodeDef.keysPropsAdvanced.chainUuid]: chainUuid,
