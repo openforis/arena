@@ -49,12 +49,7 @@ const DateInput = (props) => {
       inputFormat={format}
       onChange={onChange}
       renderInput={(params) => (
-        <TextField
-          {...params}
-          className="date-picker__text-field"
-          autoComplete="off"
-          error={params.error || errorRef.current}
-        />
+        <TextField {...params} className="date-picker__text-field" autoComplete="off" error={errorRef.current} />
       )}
       value={dateValue}
     />

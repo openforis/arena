@@ -23,17 +23,15 @@ const NodeDefDate = (props) => {
   const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display })
 
   const handleChangeDateInput = (newDate) => {
-    if (!newDate) {
-      updateNode(nodeDef, node, null)
-    }
-    const newDateFormatted = DateUtils.convertDate({
-      dateStr: newDate,
-      formatFrom: dateFormat.display,
-      formatTo: dateFormat.storage,
-    })
-    if (DateUtils.isValidDateInFormat(newDateFormatted, dateFormat.storage)) {
-      updateNode(nodeDef, node, newDateFormatted)
-    }
+    const newDateFormatted = newDate
+      ? DateUtils.convertDate({
+          dateStr: newDate,
+          formatFrom: dateFormat.display,
+          formatTo: dateFormat.storage,
+        })
+      : null
+
+    updateNode(nodeDef, node, newDateFormatted)
   }
 
   return (
