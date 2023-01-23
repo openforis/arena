@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -45,8 +46,23 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
   return NodeDef.newNodeDef(nodeDefParent, nodeDefType, cycleKeys, props, advancedProps, analysis, virtual)
 }
 
+const updateNodeDef = ({ survey, chain, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef }) => {
+  const name = getName({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
+  const script = getScript({
+    survey,
+    chain,
+    estimatedOfNodeDef: areaBasedEstimatedOfNodeDef,
+  })
+
+  return A.pipe(
+    NodeDef.assocProp({ key: NodeDef.propKeys.name, value: name }),
+    NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.script, value: script })
+  )(nodeDefAreaBasedEstimate)
+}
+
 export const AreaBasedEstimatedOfNodeDef = {
   getName,
   getScript,
   newNodeDef,
+  updateNodeDef,
 }

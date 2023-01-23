@@ -32,31 +32,26 @@ const _fixUpdatedAreaBasedEstimatedOfNodeDef = async (
   { user, survey, chain, nodeDef, areaBasedEstimatedOfNodeDef },
   tx
 ) => {
-  const surveyId = Survey.getId(survey)
-
-  const name = AreaBasedEstimatedOfNodeDef.getName({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
-  const script = AreaBasedEstimatedOfNodeDef.getScript({
+  const nodeDefUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({
     survey,
     chain,
-    estimatedOfNodeDef: areaBasedEstimatedOfNodeDef,
+    nodeDefAreaBasedEstimate: nodeDef,
+    areaBasedEstimatedOfNodeDef,
   })
 
-  Logger.info(
-    `Fixing node def '${NodeDef.getName(nodeDef)}' with uuid '${NodeDef.getUuid(nodeDef)}'; new name: '${name}'`
-  )
+  const oldName = NodeDef.getName(nodeDef)
+  const newName = NodeDef.getName(nodeDefUpdated)
+
+  Logger.info(`Fixing node def '${oldName}' with uuid '${NodeDef.getUuid(nodeDef)}'; new name: '${newName}'`)
 
   return NodeDefService.updateNodeDefProps(
     {
       user,
-      surveyId,
+      surveyId: Survey.getId(survey),
       nodeDefUuid: NodeDef.getUuid(nodeDef),
       parentUuid: NodeDef.getParentUuid(nodeDef),
-      props: {
-        [NodeDef.propKeys.name]: name,
-      },
-      propsAdvanced: {
-        [NodeDef.keysPropsAdvanced.script]: script,
-      },
+      props: NodeDef.getProps(nodeDefUpdated),
+      propsAdvanced: NodeDef.getPropsAdvanced(nodeDefUpdated),
     },
     tx
   )
