@@ -14,6 +14,7 @@ import NodeDefCode from './components/types/NodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 import NodeDefDate from './components/types/nodeDefDate'
+import NodeDefTime from './components/types/nodeDefTime'
 
 const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
 
@@ -48,8 +49,8 @@ const propsUI = {
   },
 
   [time]: {
+    component: NodeDefTime,
     icon: <span className="icon icon-clock icon-left" />,
-    numberFormat: NumberFormats.time(),
     defaultValue: '',
   },
 

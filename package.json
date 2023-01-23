@@ -159,7 +159,6 @@
     "react": "^17.0.1",
     "react-ace": "^10.1.0",
     "react-avatar-editor": "^13.0.0",
-    "react-calendar": "^3.7.0",
     "react-dom": "^17.0.1",
     "react-dropzone": "^14.2.3",
     "react-google-recaptcha": "^2.1.0",

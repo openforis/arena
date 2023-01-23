@@ -8,7 +8,7 @@ import { TextField } from '@mui/material'
 import * as DateUtils from '@core/dateUtils'
 
 const format = DateUtils.formats.dateDefault
-const validDateLength = 10
+const validDateStringLength = 10
 
 const DateInput = (props) => {
   const { disabled, value, onChange: onChangeProp } = props
@@ -32,7 +32,7 @@ const DateInput = (props) => {
         applyChange(null)
       } else if (
         selectedFromCalendar ||
-        (keyboardInputValue.length === validDateLength && DateUtils.isValidDateObject(date))
+        (keyboardInputValue.length === validDateStringLength && DateUtils.isValidDateObject(date))
       ) {
         applyChange(DateUtils.format(date, format))
       } else {
