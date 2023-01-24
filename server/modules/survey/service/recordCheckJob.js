@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { SRSs } from '@openforis/arena-core'
+import { Objects, SRSs } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -37,9 +37,9 @@ export default class RecordCheckJob extends Job {
     await PromiseUtils.each(recordsUuidAndCycle, async ({ uuid: recordUuid, cycle }) => {
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
-      const { noUpdates } = surveyAndNodeDefs
+      const { requiresCheck } = surveyAndNodeDefs
 
-      if (!noUpdates) {
+      if (requiresCheck) {
         await this._checkRecord(surveyAndNodeDefs, recordUuid)
       }
 
@@ -47,11 +47,21 @@ export default class RecordCheckJob extends Job {
     })
   }
 
+  _cleanSurveysCache(cycleToKeep) {
+    Object.keys(this.surveyAndNodeDefsByCycle).forEach((cycleInCache) => {
+      if (cycleInCache !== cycleToKeep) {
+        delete this.surveyAndNodeDefsByCycle[cycleInCache]
+      }
+    })
+  }
+
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
+    this._cleanSurveysCache(cycle)
     let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
-      const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      this.logDebug(`fetching survey for cycle ${cycle}...`)
+      let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
         this.tx
       )
@@ -79,12 +89,22 @@ export default class RecordCheckJob extends Job {
         }
       })
 
+      const requiresCheck = nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
+      if (requiresCheck) {
+        this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
+        // fetch survey reference data (used later for record validation)
+        survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+          { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+          this.tx
+        )
+        this.logDebug('survey fetched')
+      }
       surveyAndNodeDefs = {
         survey,
         nodeDefAddedUuids,
         nodeDefUpdatedUuids,
         nodeDefDeletedUuids,
-        noUpdates: [...nodeDefAddedUuids, ...nodeDefUpdatedUuids, ...nodeDefDeletedUuids].length === 0,
+        requiresCheck,
       }
       this.surveyAndNodeDefsByCycle[cycle] = surveyAndNodeDefs
     }
@@ -94,6 +114,8 @@ export default class RecordCheckJob extends Job {
 
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
+
+    this.logDebug(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId: this.surveyId, recordUuid }, this.tx)
@@ -151,15 +173,14 @@ export default class RecordCheckJob extends Job {
 
     const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
     if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(nodesToValidate)) {
+      this.logDebug(`validating record ${recordUuid}`)
       await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, nodesToValidate, this.tx)
     }
+    this.logDebug('record check complete')
   }
 
-  /**
-   * Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
-   *
-   * Returns an indexed object with all the inserted nodes.
-   */
+  // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.
+  // Returns an indexed object with all the inserted nodes.
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record }) {
     const nodesUpdated = {}
     let recordUpdated = { ...record }
@@ -197,11 +218,8 @@ export default class RecordCheckJob extends Job {
   }
 }
 
-/**
- * Inserts a missing single node in a specified parent node.
- *
- * Returns an indexed object with all the inserted nodes.
- */
+// Inserts a missing single node in a specified parent node.
+// Returns an indexed object with all the inserted nodes.
 const _insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
   if (!NodeDef.isSingle(childDef)) {
     // multiple node: don't insert it
@@ -236,20 +254,15 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
 const _clearRecordKeysValidation = (record) => {
   const validationRecord = Record.getValidation(record)
 
-  return R.pipe(
-    Validation.getFieldValidations,
-    Object.entries,
-    R.reduce(
-      (validationAcc, [nodeUuid, validationNode]) =>
-        R.assoc(
-          nodeUuid,
-          Validation.dissocFieldValidation(RecordValidation.keys.recordKeys)(validationNode)
-        )(validationAcc),
-      {}
-    ),
-    (fieldValidationsUpdated) => Validation.setFieldValidations(fieldValidationsUpdated)(validationRecord),
-    (validationRecordUpdated) => Validation.assocValidation(validationRecordUpdated)(record)
-  )(validationRecord)
+  const validationNodes = Object.values(Validation.getFieldValidations(validationRecord))
+  validationNodes.forEach((validationNode) => {
+    Objects.dissocPath({
+      obj: validationNode,
+      path: [Validation.keys.fields, RecordValidation.keys.recordKeys],
+      sideEffect: true,
+    })
+  })
+  return record
 }
 
 const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, tx) => {
@@ -267,7 +280,6 @@ const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, t
   })
 
   // Record keys uniqueness must be validated after RDB generation
-
   await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
 }
 

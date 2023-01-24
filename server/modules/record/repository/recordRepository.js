@@ -260,6 +260,7 @@ export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
     SELECT uuid, cycle 
     FROM ${getSurveyDBSchema(surveyId)}.record 
     WHERE preview = FALSE
+    ORDER BY cycle
   `)
 
 export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>

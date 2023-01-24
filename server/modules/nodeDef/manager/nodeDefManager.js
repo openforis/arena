@@ -12,6 +12,8 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
+import * as ChainRepository from '@server/modules/analysis/repository/chain'
 
 export {
   addNodeDefsCycles,
@@ -131,6 +133,31 @@ export const fetchNodeDefsBySurveyId = async (
 
 // ======= UPDATE
 
+const _updateNodeDefAreaBasedEstimate = async (
+  { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef },
+  client = db
+) => {
+  const surveyId = Survey.getId(survey)
+  const chainUuid = NodeDef.getChainUuid(nodeDefAreaBasedEstimate)
+  const chain = await ChainRepository.fetchChain({ surveyId, chainUuid }, client)
+
+  let nodeDefAreaBasedEstimateUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({
+    survey,
+    chain,
+    nodeDefAreaBasedEstimate,
+    areaBasedEstimatedOfNodeDef,
+  })
+  nodeDefAreaBasedEstimateUpdated = await NodeDefRepository.updateNodeDefProps(
+    surveyId,
+    NodeDef.getUuid(nodeDefAreaBasedEstimate),
+    NodeDef.getParentUuid(nodeDefAreaBasedEstimate),
+    NodeDef.getProps(nodeDefAreaBasedEstimateUpdated),
+    NodeDef.getPropsAdvanced(nodeDefAreaBasedEstimateUpdated),
+    client
+  )
+  return nodeDefAreaBasedEstimateUpdated
+}
+
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
@@ -194,6 +221,17 @@ export const updateNodeDefProps = async (
       )
     }
 
+    const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
+    if (nameUpdated) {
+      const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDefPrev)(survey)
+      if (nodeDefAreaBasedEstimate) {
+        const nodeDefAreaBasedEstimateUpdated = await _updateNodeDefAreaBasedEstimate(
+          { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef: nodeDef },
+          t
+        )
+        nodeDefsUpdated[nodeDefUuid] = nodeDefAreaBasedEstimateUpdated
+      }
+    }
     const logContent = {
       uuid: nodeDefUuid,
       ...(R.isEmpty(props) ? {} : { props }),
