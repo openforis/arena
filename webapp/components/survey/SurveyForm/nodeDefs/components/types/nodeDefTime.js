@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
 
-import TimeInput from '@webapp/components/form/TimeInput'
+import { TimeInput } from '@webapp/components/form/DateTimeInput'
 
 const NodeDefTime = (props) => {
   const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props

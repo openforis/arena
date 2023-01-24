@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
 
-import DateInput from '@webapp/components/form/DateInput'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 import * as DateUtils from '@core/dateUtils'
 
 const dateFormat = {
