@@ -38,7 +38,8 @@ export const formats = {
 const normalizeDateTimeValue = (length) => (value) =>
   R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val) => val.padStart(length, '0'))(value)
 
-export const format = (date, format, options) => (date ? dateFnsFormat(date, format, options) : null)
+export const format = (date, format = formats.dateDefault, options = null) =>
+  date ? dateFnsFormat(date, format, options) : null
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
