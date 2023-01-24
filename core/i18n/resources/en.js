@@ -527,6 +527,7 @@ $t(common.cantUndoWarning)`,
     },
     options: {
       header: 'Options',
+      abortOnErrors: 'Abort on errors',
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
     },

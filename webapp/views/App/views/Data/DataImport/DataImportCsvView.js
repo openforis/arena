@@ -31,6 +31,12 @@ const importTypes = {
   insertNewRecords: 'insertNewRecords',
 }
 
+const options = {
+  abortOnErrors: { onlyWhenUpdatingRecords: false },
+  preventAddingNewEntityData: { onlyWhenUpdatingRecords: true },
+  preventUpdatingRecordsInAnalysis: { onlyWhenUpdatingRecords: true },
+}
+
 const fileMaxSize = 20 // 20MB
 
 const allowedLabelTypes = [
@@ -56,9 +62,11 @@ export const DataImportCsvView = () => {
     file: null,
     importCompleteResult: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
+    selectedEntityDefUuid: null,
+    // options
+    abortOnErrors: false,
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
-    selectedEntityDefUuid: null,
   })
 
   const {
@@ -67,14 +75,20 @@ export const DataImportCsvView = () => {
     file,
     importCompleteResult,
     nodeDefLabelType,
+    selectedEntityDefUuid,
+    // options
+    abortOnErrors,
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
-    selectedEntityDefUuid,
   } = state
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 
-  const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
+  const availableOptions = Object.keys(options).filter(
+    (optionKey) => !options[optionKey].onlyWhenUpdatingRecords || dataImportType === importTypes.updateExistingRecords
+  )
+
+  const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
   const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
 
@@ -82,7 +96,7 @@ export const DataImportCsvView = () => {
     const nodeDefLabelTypeNext =
       allowedLabelTypes[(allowedLabelTypes.indexOf(nodeDefLabelType) + 1) % allowedLabelTypes.length]
     setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
-  }, [nodeDefLabelType])
+  }, [nodeDefLabelType, setStateProp])
 
   const onImportTypeChange = useCallback(
     (value) => {
@@ -118,6 +132,7 @@ export const DataImportCsvView = () => {
         insertNewRecords: dataImportType === importTypes.insertNewRecords,
         insertMissingNodes: !preventAddingNewEntityData,
         updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+        abortOnErrors,
       })
       dispatch(
         JobActions.showJobMonitor({
@@ -185,21 +200,17 @@ export const DataImportCsvView = () => {
               disabled={!selectedEntityDefUuid}
             />
 
-            {dataImportType === importTypes.updateExistingRecords && (
-              <fieldset>
-                <legend>{i18n.t('dataImportView.options.header')}</legend>
+            <fieldset>
+              <legend>{i18n.t('dataImportView.options.header')}</legend>
+              {availableOptions.map((optionKey) => (
                 <Checkbox
-                  checked={preventAddingNewEntityData}
-                  label={i18n.t('dataImportView.options.preventAddingNewEntityData')}
-                  onChange={setStateProp('preventAddingNewEntityData')}
+                  key={optionKey}
+                  checked={state[optionKey]}
+                  label={i18n.t(`dataImportView.options.${optionKey}`)}
+                  onChange={setStateProp(optionKey)}
                 />
-                <Checkbox
-                  checked={preventUpdatingRecordsInAnalysis}
-                  label={i18n.t('dataImportView.options.preventUpdatingRecordsInAnalysis')}
-                  onChange={setStateProp('preventUpdatingRecordsInAnalysis')}
-                />
-              </fieldset>
-            )}
+              ))}
+            </fieldset>
 
             <Dropzone
               maxSize={fileMaxSize}
