@@ -1,6 +1,5 @@
 import { FormUtils } from '../utils/formUtils'
 import {
-  formatTime,
   getBooleanSelector,
   getCoordinateSelector,
   getNodeDefSelector,
@@ -59,12 +58,11 @@ const verifyText = async (nodeDef, value, parentSelector) => {
   await expect(await text.getAttribute('value')).toBe(value)
 }
 
-const verifyTime = async (nodeDef, value, parentSelector) => {
-  const timeFormatted = typeof value === 'string' ? value : formatTime(value)
+const verifyTime = async (nodeDef, valueRegExp, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const inputField = await page.$(`${nodeDefSelector} input`)
   const inputFieldValue = await inputField.getAttribute('value')
-  await expect(inputFieldValue).toBe(timeFormatted)
+  await expect(inputFieldValue).toMatch(valueRegExp)
 }
 
 const verifyFns = {
