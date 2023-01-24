@@ -58,7 +58,7 @@ export default class DataImportJob extends Job {
       // Error: empty file
       this._addError(Validation.messageKeys.dataImport.emptyFile)
     }
-    if (this.hasErrors()) {
+    if (this.hasErrors() && this.abortOnErrors) {
       await this.setStatusFailed()
     }
   }
@@ -125,6 +125,7 @@ export default class DataImportJob extends Job {
       const errorKey = e.key || e.toString()
       const errorParams = e.params
       this._addError(errorKey, errorParams)
+      await this.setStatusFailed()
     }
   }
 
