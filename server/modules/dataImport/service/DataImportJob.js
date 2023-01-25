@@ -58,8 +58,10 @@ export default class DataImportJob extends Job {
       // Error: empty file
       this._addError(Validation.messageKeys.dataImport.emptyFile)
     }
-    if (this.hasErrors() && this.abortOnErrors) {
-      await this.setStatusFailed()
+    if (this.isRunning() && this.hasErrors() && this.context.abortOnErrors) {
+      this.logDebug('Errors found and abortOnErrors is true: aborting transaction')
+      this.setStatusFailed()
+      throw new Error('abort_transaction')
     }
   }
 
@@ -125,7 +127,6 @@ export default class DataImportJob extends Job {
       const errorKey = e.key || e.toString()
       const errorParams = e.params
       this._addError(errorKey, errorParams)
-      await this.setStatusFailed()
     }
   }
 
@@ -218,7 +219,7 @@ export default class DataImportJob extends Job {
     }
   }
 
-  async onRowItem({ valuesByDefUuid }) {
+  async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
     const { survey, entityDefUuid, insertMissingNodes } = context
 
@@ -226,6 +227,9 @@ export default class DataImportJob extends Job {
 
     if (record) {
       try {
+        errors.forEach((error) => {
+          this._addError(error.key || error.toString(), error.params)
+        })
         const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
           survey,
           entityDefUuid,
@@ -272,6 +276,7 @@ export default class DataImportJob extends Job {
     await this.recordsValidationBatchPersister.flush()
 
     const {
+      errors,
       insertedRecordsUuids,
       updatedRecordsUuids: updatedRecordsByUuid,
       processed: rowsProcessed,
@@ -279,6 +284,7 @@ export default class DataImportJob extends Job {
     } = this
 
     this.setResult({
+      errors,
       insertedRecords: insertedRecordsUuids.size,
       updatedRecords: updatedRecordsByUuid.size,
       rowsProcessed,

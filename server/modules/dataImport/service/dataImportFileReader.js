@@ -165,17 +165,22 @@ const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTota
       }, {})
 
       // prepare attribute values
+      const errors = []
       const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, valueTemp]) => {
         const headers = valueTemp._headers
         delete valueTemp._headers
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         const valueConverter = valueConverterByNodeDefType[NodeDef.getType(nodeDef)]
-        const nodeValue = valueConverter({ survey, nodeDef, value: valueTemp, headers })
-        acc[nodeDefUuid] = nodeValue
+        try {
+          const nodeValue = valueConverter({ survey, nodeDef, value: valueTemp, headers })
+          acc[nodeDefUuid] = nodeValue
+        } catch (error) {
+          errors.push(error)
+        }
         return acc
       }, {})
 
-      await onRowItem({ valuesByDefUuid })
+      await onRowItem({ valuesByDefUuid, errors })
     },
     onTotalChange
   )
