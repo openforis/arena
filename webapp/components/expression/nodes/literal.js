@@ -16,7 +16,7 @@ import { useI18n, useLang } from '@webapp/store/system'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Input } from '@webapp/components/form/Input'
-import DateInput from '@webapp/components/form/DateInput'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { TestId } from '@webapp/utils/testId'
 

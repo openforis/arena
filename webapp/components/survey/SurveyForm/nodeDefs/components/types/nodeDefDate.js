@@ -1,12 +1,10 @@
-import './nodeDefDate.scss'
-
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'
 
-import DateInput from '@webapp/components/form/DateInput'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 import * as DateUtils from '@core/dateUtils'
 
 const dateFormat = {
@@ -22,16 +20,20 @@ const NodeDefDate = (props) => {
   const dateStr = Node.getValue(node, null)
   const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display })
 
-  const handleChangeDateInput = (newDate) => {
-    const newDateFormatted = DateUtils.convertDate({
-      dateStr: newDate,
-      formatFrom: dateFormat.display,
-      formatTo: dateFormat.storage,
-    })
-    if (DateUtils.isValidDateInFormat(newDateFormatted, dateFormat.storage)) {
+  const handleChangeDateInput = useCallback(
+    (newDate) => {
+      const newDateFormatted = newDate
+        ? DateUtils.convertDate({
+            dateStr: newDate,
+            formatFrom: dateFormat.display,
+            formatTo: dateFormat.storage,
+          })
+        : null
+
       updateNode(nodeDef, node, newDateFormatted)
-    }
-  }
+    },
+    [node, nodeDef, updateNode]
+  )
 
   return (
     <div className="survey-form__node-def-date">

@@ -99,9 +99,11 @@
     "yarn-audit-fix": "^9.3.2"
   },
   "dependencies": {
+    "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.10.15",
+    "@mui/x-date-pickers": "^5.0.14",
     "@openforis/arena-core": "^0.0.126",
     "@openforis/arena-server": "^0.1.22",
     "@sendgrid/mail": "^7.7.0",
@@ -157,7 +159,6 @@
     "react": "^17.0.1",
     "react-ace": "^10.1.0",
     "react-avatar-editor": "^13.0.0",
-    "react-calendar": "^3.7.0",
     "react-dom": "^17.0.1",
     "react-dropzone": "^14.2.3",
     "react-google-recaptcha": "^2.1.0",
