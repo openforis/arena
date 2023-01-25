@@ -64,7 +64,7 @@ const verifyTime = async (nodeDef, valueRegExpOrDate, parentSelector) => {
   const inputField = await page.$(`${nodeDefSelector} input`)
   const inputFieldValue = await inputField.getAttribute('value')
   if (typeof valueRegExpOrDate === 'string') {
-    await expect(inputFieldValue).toMatch(valueRegExpOrDate)
+    await expect(inputFieldValue).toMatch(new RegExp(valueRegExpOrDate))
   } else {
     const timeFormatted = formatTime(valueRegExpOrDate)
     await expect(inputFieldValue).toBe(timeFormatted)
