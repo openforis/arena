@@ -1,6 +1,5 @@
 import { FormUtils } from '../utils/formUtils'
 import {
-  formatDate,
   formatTime,
   getBooleanSelector,
   getCoordinateSelector,
@@ -9,6 +8,7 @@ import {
   getTextSelector,
   parseValue,
 } from './utils'
+import * as DateUtils from '../../../../core/dateUtils'
 
 const verifyBoolean = async (nodeDef, value, parentSelector) => {
   const span = await page.$(`${getBooleanSelector(nodeDef, parentSelector, value)} span`)
@@ -38,13 +38,10 @@ const verifyCoordinate = async (nodeDef, value, parentSelector) => {
 
 const verifyDate = async (nodeDef, value, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-  const year = await page.$(`${nodeDefSelector} input.input-year`)
-  const month = await page.$(`${nodeDefSelector} input.input-month`)
-  const day = await page.$(`${nodeDefSelector} input.input-day`)
-  const values = formatDate(value)
-  await expect(await year.getAttribute('value')).toBe(values[0])
-  await expect(await month.getAttribute('value')).toBe(values[1])
-  await expect(await day.getAttribute('value')).toBe(values[2])
+  const inputField = await page.$(`${nodeDefSelector} input`)
+  const inputFieldValue = await inputField.getAttribute('value')
+  const dateFormatted = DateUtils.format(value)
+  await expect(inputFieldValue).toBe(dateFormatted)
 }
 
 const verifyTaxon = async (nodeDef, value, parentSelector) => {
@@ -62,12 +59,15 @@ const verifyText = async (nodeDef, value, parentSelector) => {
   await expect(await text.getAttribute('value')).toBe(value)
 }
 
-const verifyTime = async (nodeDef, value, parentSelector) => {
-  if (typeof value === 'string') {
-    const text = await page.$(getTextSelector(nodeDef, parentSelector))
-    await expect(await text.getAttribute('value')).toMatch(new RegExp(value))
+const verifyTime = async (nodeDef, valueRegExpOrDate, parentSelector) => {
+  const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
+  const inputField = await page.$(`${nodeDefSelector} input`)
+  const inputFieldValue = await inputField.getAttribute('value')
+  if (typeof valueRegExpOrDate === 'string') {
+    await expect(inputFieldValue).toMatch(new RegExp(valueRegExpOrDate))
   } else {
-    await verifyText(nodeDef, formatTime(value), parentSelector)
+    const timeFormatted = formatTime(valueRegExpOrDate)
+    await expect(inputFieldValue).toBe(timeFormatted)
   }
 }
 
