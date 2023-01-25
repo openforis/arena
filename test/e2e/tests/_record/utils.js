@@ -21,6 +21,9 @@ export const getCoordinateSelector = (nodeDef, parentSelector) => {
   return { xSelector, ySelector, srsTestId }
 }
 
+export const getDateTimeInputSelector = (nodeDef, parentSelector) =>
+  `${getNodeDefSelector(nodeDef, parentSelector)} input`
+
 export const getTaxonSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const _selector = (field) =>

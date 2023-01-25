@@ -59,7 +59,7 @@ export default () =>
         // it is possible the default value was set one minute after the startTime was initialized in the test
         const date = new Date(startTime)
         date.setMinutes(date.getMinutes() + 1)
-        return new RegExp(`(${formatTime(startTime)})|(${formatTime(date)})`)
+        return `(${formatTime(startTime)})|(${formatTime(date)})`
       })
       verifyAttribute(cluster_date, () => startTime)
 
