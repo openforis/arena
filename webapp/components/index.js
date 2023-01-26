@@ -18,7 +18,6 @@ export {
   ButtonInvite,
 } from './buttons'
 
-import Accordion from './Accordion'
 import Dropzone from './Dropzone'
 import ExpansionPanel from './expansionPanel'
 import ImageProgressive from './ImageProgressive'
@@ -28,7 +27,7 @@ import PanelRight from './PanelRight'
 import ProgressBar from './progressBar'
 import Stepper from './Stepper'
 
-export { Accordion, Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper }
+export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper }
 
 export { Map } from './Map'
 export { Slider } from './Slider'

@@ -7,7 +7,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
 import { useDispatch } from 'react-redux'
-import { Accordion, Button } from '@webapp/components'
+import { Button, ExpansionPanel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
@@ -29,7 +29,7 @@ const ExportData = () => {
 
   return (
     <div className="export">
-      <Accordion className="options" title="dataExportView.options.header">
+      <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
         <Checkbox
           checked={options.includeCategoryItemsLabels}
           label={i18n.t('dataExportView.options.includeCategoryItemsLabels')}
@@ -47,7 +47,7 @@ const ExportData = () => {
             onChange={onOptionChange('includeAnalysis')}
           />
         )}
-      </Accordion>
+      </ExpansionPanel>
 
       <Button
         testId={TestId.dataExport.prepareExport}

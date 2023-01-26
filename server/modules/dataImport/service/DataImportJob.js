@@ -276,7 +276,6 @@ export default class DataImportJob extends Job {
     await this.recordsValidationBatchPersister.flush()
 
     const {
-      errors,
       insertedRecordsUuids,
       updatedRecordsUuids: updatedRecordsByUuid,
       processed: rowsProcessed,
@@ -284,7 +283,6 @@ export default class DataImportJob extends Job {
     } = this
 
     this.setResult({
-      errors,
       insertedRecords: insertedRecordsUuids.size,
       updatedRecords: updatedRecordsByUuid.size,
       rowsProcessed,

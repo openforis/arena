@@ -9,44 +9,9 @@
 .app-job-monitor__job-errors {
   justify-self: stretch;
 
-  .header,
-  .row {
-    display: grid;
-    grid-template-columns: 0.35fr 0.65fr;
-    font-size: 0.85rem;
-  }
-
-  .header {
-    font-weight: 600;
-    text-transform: uppercase;
-    border-bottom: 1px solid $greyBorder;
-
-    > * {
-      padding: 0.3rem 0.5rem;
-    }
-  }
-
-  .body {
+  .expansion-panel__content {
+    height: 18rem;
     max-height: calc(35vh - 2px);
-    overflow-y: auto;
-  }
-
-  .row {
-    border-bottom: 1px solid rgba($greyBorder, 0.8);
-
-    > * {
-      padding: 0.3rem 0.5rem;
-      word-break: break-all;
-    }
-
-    .item {
-      border-left: 1px solid rgba($greyBorder, 0.8);
-    }
-
-    .item-error {
-      border-left: 1px solid rgba($greyBorder, 0.8);
-      border-right: 1px solid rgba($greyBorder, 0.8);
-    }
 
     .validation-field_message {
       color: inherit;

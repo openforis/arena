@@ -509,13 +509,16 @@ $t(common.cantUndoWarning)`,
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadTemplate: 'Download template',
     forceImportFromAnotherSurvey: 'Force import from another survey',
-    importComplete: `## Import complete:
-
+    importCompleteSummary: `
 - {{rowsProcessed}} rows processed
 - {{updatedValues}} values updated
 - {{insertedRecords}} records created
 - {{updatedRecords}} records updated
-    `,
+`,
+    importCompleteSuccessfully: `## Import complete:
+$t(dataImportView.importCompleteSummary)`,
+    importCompleteWithErrors: `## Import complete (with errors):
+$t(dataImportView.importCompleteSummary)`,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',

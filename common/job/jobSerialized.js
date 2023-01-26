@@ -32,14 +32,11 @@ export const getInnerJobs = R.propOr([], keys.innerJobs)
 export const getProgressPercent = R.propOr(0, keys.progressPercent)
 export const getResult = R.prop(keys.result)
 export const getErrors = (job) => {
-  if (!isFailed(job)) {
-    return []
-  }
-
   const errors = R.propOr([], keys.errors, job)
   // If errors is empty, get errors from failed inner job (if any)
   return R.isEmpty(errors) ? R.pipe(getInnerJobs, R.find(isFailed), R.propOr([], keys.errors))(job) : errors
 }
+export const hasErrors = (job) => !R.isEmpty(getErrors(job))
 
 // ===== READ (status)
 export const getStatus = R.prop(keys.status)

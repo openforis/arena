@@ -103,6 +103,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.10.15",
+    "@mui/x-data-grid": "^5.17.20",
     "@mui/x-date-pickers": "^5.0.14",
     "@openforis/arena-core": "^0.0.126",
     "@openforis/arena-server": "^0.1.22",

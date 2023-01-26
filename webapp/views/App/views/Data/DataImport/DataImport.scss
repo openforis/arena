@@ -28,4 +28,10 @@
     width: 30rem;
     margin: 10vh auto auto auto;
   }
+
+  &.with-errors {
+    .modal-content {
+      width: 60rem;
+    }
+  }
 }

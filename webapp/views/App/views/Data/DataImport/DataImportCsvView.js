@@ -5,8 +5,6 @@ import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as JobSerialized from '@common/job/jobSerialized'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -22,7 +20,7 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import { Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
+import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
@@ -60,7 +58,7 @@ export const DataImportCsvView = () => {
     cycle: canSelectCycle ? null : surveyCycle,
     dataImportType: null,
     file: null,
-    importCompleteResult: null,
+    jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedEntityDefUuid: null,
     // options
@@ -73,7 +71,7 @@ export const DataImportCsvView = () => {
     cycle,
     dataImportType,
     file,
-    importCompleteResult,
+    jobCompleted,
     nodeDefLabelType,
     selectedEntityDefUuid,
     // options
@@ -138,9 +136,8 @@ export const DataImportCsvView = () => {
         JobActions.showJobMonitor({
           job,
           autoHide: true,
-          onComplete: async (jobCompleted) => {
-            const importCompleteResult = JobSerialized.getResult(jobCompleted)
-            setState((statePrev) => ({ ...statePrev, importCompleteResult }))
+          onComplete: (jobCompleted) => {
+            setState((statePrev) => ({ ...statePrev, jobCompleted }))
           },
         })
       )
@@ -228,11 +225,8 @@ export const DataImportCsvView = () => {
           </div>
         )}
       </div>
-      {importCompleteResult && (
-        <DataImportCompleteDialog
-          importCompleteResult={importCompleteResult}
-          onClose={() => setStateProp('importCompleteResult')(null)}
-        />
+      {jobCompleted && (
+        <DataImportCompleteDialog job={jobCompleted} onClose={() => setStateProp('jobCompleted')(null)} />
       )}
     </div>
   )
