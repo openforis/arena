@@ -41,7 +41,14 @@ const JobMonitor = () => {
         <JobProgress job={job} />
         <JobErrors job={job} openPanel={jobEnded && !hasInnerJobs} />
 
-        {hasInnerJobs && <InnerJobs innerJobs={innerJobs} panelStartClosed={!jobEnded} openPanel={jobEnded} />}
+        {hasInnerJobs && (
+          <InnerJobs
+            currentJobIndex={JobSerialized.getCurrentInnerJobIndex(job)}
+            innerJobs={innerJobs}
+            panelStartClosed={!jobEnded}
+            openPanel={jobEnded}
+          />
+        )}
       </ModalBody>
 
       <ModalFooter>

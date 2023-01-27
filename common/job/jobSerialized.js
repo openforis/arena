@@ -6,6 +6,7 @@ export const keys = {
   userUuid: 'userUuid',
   surveyId: 'surveyId',
   innerJobs: 'innerJobs',
+  currentInnerJobIndex: 'currentInnerJobIndex',
 
   // Status
   status: 'status',
@@ -31,6 +32,7 @@ export const keys = {
 export const getUuid = R.prop(keys.uuid)
 export const getType = R.prop(keys.type)
 export const getInnerJobs = R.propOr([], keys.innerJobs)
+export const getCurrentInnerJobIndex = R.propOr(-1, keys.currentInnerJobIndex)
 export const getProgressPercent = R.propOr(0, keys.progressPercent)
 export const getResult = R.prop(keys.result)
 export const getErrors = (job) => {
@@ -44,6 +46,7 @@ export const hasErrors = (job) => !R.isEmpty(getErrors(job))
 export const getStatus = R.prop(keys.status)
 
 const _isPropTrue = (prop) => R.pipe(R.prop(prop), R.equals(true))
+export const isPending = _isPropTrue(keys.pending)
 export const isRunning = _isPropTrue(keys.running)
 export const isSucceeded = _isPropTrue(keys.succeeded)
 export const isFailed = _isPropTrue(keys.failed)

@@ -7,30 +7,33 @@ import { ExpansionPanel } from '@webapp/components'
 
 import InnerJob from './InnerJob'
 
-const InnerJobs = ({ innerJobs, openPanel, panelStartClosed }) => (
+const InnerJobs = ({ currentJobIndex, innerJobs, openPanel, panelStartClosed }) => (
   <ExpansionPanel
     className="app-job-monitor__inner-jobs"
     buttonLabel="common.details"
     open={openPanel}
     startClosed={panelStartClosed}
   >
-    {innerJobs.map((innerJob, i) => (
+    {innerJobs.map((innerJob, index) => (
       <InnerJob
         key={`${JobSerialized.getUuid(innerJob)}-${JobSerialized.getType(innerJob)}`}
+        isCurrentJob={currentJobIndex === index}
         innerJob={innerJob}
-        index={i}
+        index={index}
       />
     ))}
   </ExpansionPanel>
 )
 
 InnerJobs.propTypes = {
+  currentJobIndex: PropTypes.number,
   innerJobs: PropTypes.array,
   openPanel: PropTypes.bool,
   panelStartClosed: PropTypes.bool,
 }
 
 InnerJobs.defaultProps = {
+  currentJobIndex: 0,
   innerJobs: [],
   openPanel: undefined,
   panelStartClosed: true,

@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
 
-const InnerJob = ({ innerJob, index }) => {
+const InnerJob = ({ isCurrentJob, innerJob, index }) => {
   const i18n = useI18n()
   const elementRef = useRef(null)
 
@@ -24,7 +24,9 @@ const InnerJob = ({ innerJob, index }) => {
         <div className="name">
           {index + 1}. {i18n.t(`jobs.${JobSerialized.getType(innerJob)}`)}
         </div>
-        <JobProgress job={innerJob} />
+        {(isCurrentJob || JobSerialized.isEnded(innerJob)) && (
+          <JobProgress isCurrentJob={isCurrentJob} job={innerJob} />
+        )}
       </div>
       <JobErrors job={innerJob} />
     </>
@@ -32,8 +34,13 @@ const InnerJob = ({ innerJob, index }) => {
 }
 
 InnerJob.propTypes = {
+  isCurrentJob: PropTypes.bool,
   innerJob: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
+}
+
+InnerJob.defaultProps = {
+  isCurrentJob: false,
 }
 
 export default InnerJob
