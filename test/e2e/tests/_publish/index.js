@@ -11,7 +11,7 @@ export const publishWithErrors = (...errors) =>
   test('Survey Publish with errors', async () => {
     await publish()
 
-    await page.waitForSelector(TestId.modal.itemError)
+    await page.waitForSelector(TestId.jobMonitor.errorItem)
     await Promise.all(errors.map((error) => expect(page).toHaveText(error)))
 
     await page.click(TestId.modal.close)

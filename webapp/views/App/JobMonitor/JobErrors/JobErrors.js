@@ -55,6 +55,7 @@ const JobErrors = ({ job, openPanel }) => {
           errorKey,
           error,
         }))}
+        getRowClassName={() => 'error-item'}
         getRowId={(row) => row.errorKey}
       />
     </ExpansionPanel>
