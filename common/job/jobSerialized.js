@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 export const keys = {
   type: 'type',
+  uuid: 'uuid',
   userUuid: 'userUuid',
   surveyId: 'surveyId',
   innerJobs: 'innerJobs',
@@ -27,6 +28,7 @@ export const keys = {
 }
 
 // ===== READ
+export const getUuid = R.prop(keys.uuid)
 export const getType = R.prop(keys.type)
 export const getInnerJobs = R.propOr([], keys.innerJobs)
 export const getProgressPercent = R.propOr(0, keys.progressPercent)

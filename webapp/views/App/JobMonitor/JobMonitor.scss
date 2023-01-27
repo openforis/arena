@@ -17,30 +17,36 @@
       color: inherit;
     }
   }
+
+  .data-grid {
+    background-color: white;
+  }
 }
 
 .app-job-monitor__inner-jobs {
-  max-height: 45vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 2rem;
-  padding: 2rem 1.5rem 0 1.5rem;
-  background-color: white;
+  .expansion-panel__content {
+    max-height: 45vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem 0.5rem 0 0.5rem;
+    background-color: white;
 
-  .job {
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-
-    .name {
-      font-size: 0.9rem;
+    .expansion-panel__content {
+      padding: 0;
     }
-  }
 
-  > div {
-    margin-bottom: 2rem;
-  }
+    .job {
+      display: grid;
+      grid-template-columns: 0.5fr 0.5fr;
+      margin-bottom: 1rem;
 
-  .app-job-monitor__job-errors {
-    padding: 0 1rem 2rem 1rem;
+      .name {
+        font-size: 0.9rem;
+      }
+    }
+
+    .app-job-monitor__job-errors {
+      padding: 0 1rem 2rem 1rem;
+    }
   }
 }

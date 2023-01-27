@@ -29,15 +29,19 @@ const JobMonitor = () => {
 
   if (!job || JobSerialized.isCanceled(job)) return null
 
+  const innerJobs = JobSerialized.getInnerJobs(job)
+  const hasInnerJobs = innerJobs.length > 0
+  const jobEnded = JobSerialized.isEnded(job)
+
   return (
     <Modal className="app-job-monitor" closeOnEsc={false}>
       <ModalHeader>{i18n.t(`jobs.${JobSerialized.getType(job)}`)}</ModalHeader>
 
       <ModalBody>
         <JobProgress job={job} />
-        <JobErrors job={job} />
+        <JobErrors job={job} openPanel={jobEnded && !hasInnerJobs} />
 
-        <InnerJobs innerJobs={JobSerialized.getInnerJobs(job)} />
+        {hasInnerJobs && <InnerJobs innerJobs={innerJobs} panelStartClosed={!jobEnded} openPanel={jobEnded} />}
       </ModalBody>
 
       <ModalFooter>

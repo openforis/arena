@@ -26,8 +26,9 @@ import LoadingBar from './LoadingBar'
 import PanelRight from './PanelRight'
 import ProgressBar from './progressBar'
 import Stepper from './Stepper'
+import Table from './Table'
 
-export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper }
+export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper, Table }
 
 export { Map } from './Map'
 export { Slider } from './Slider'

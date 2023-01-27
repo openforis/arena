@@ -4,7 +4,7 @@ import React from 'react'
 import classNames from 'classnames'
 
 const ProgressBar = (props) => {
-  const { progress, className = '', showText } = props
+  const { progress, className, showText } = props
 
   return (
     <div className={classNames('progress-bar', className, { running: progress > 0 })}>
