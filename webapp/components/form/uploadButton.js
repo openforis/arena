@@ -46,7 +46,7 @@ const UploadButton = (props) => {
 
       <button
         type="button"
-        className={className || 'btn btn-s'}
+        className={className}
         aria-disabled={disabled}
         onClick={() => {
           // First reset current value, then trigger click event
@@ -75,7 +75,7 @@ UploadButton.propTypes = {
 
 UploadButton.defaultProps = {
   accept: null, // E.g. .txt, .xls (null = all type of files are accepted)
-  className: null, // Custom css class
+  className: 'btn', // Custom css class
   disabled: false,
   inputFieldId: null,
   label: null,

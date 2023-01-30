@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
@@ -74,15 +74,13 @@ const Header = (props) => {
         {canEdit && (
           <ButtonMenu
             iconClassName="icon-cog icon-14px"
-            popupComponent={
-              <>
-                <Button
-                  className="btn-transparent"
-                  label="extraProp.editor.title"
-                  onClick={Actions.toggleEditExtraPropertiesPanel}
-                />
-              </>
-            }
+            items={[
+              {
+                key: 'extra-props-edit',
+                label: 'extraProp.editor.title',
+                onClick: Actions.toggleEditExtraPropertiesPanel,
+              },
+            ]}
           />
         )}
       </div>

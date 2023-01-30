@@ -19,6 +19,16 @@ $borderColor: $greyBorder;
       display: flex;
     }
   }
+
+  .btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .import-btn,
+  .export-btn {
+    white-space: nowrap;
+  }
 }
 
 .category__levels {
