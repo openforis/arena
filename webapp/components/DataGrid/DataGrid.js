@@ -18,6 +18,7 @@ const DataGrid = (props) => {
     className,
     columns: columnsProp,
     disableSelectionOnClick,
+    getRowClassName,
     getRowId,
     initialState,
     rows,
@@ -37,6 +38,7 @@ const DataGrid = (props) => {
       columns={columns}
       components={components}
       disableSelectionOnClick={disableSelectionOnClick}
+      getRowClassName={getRowClassName}
       getRowId={getRowId}
       initialState={initialState}
       rows={rows}
@@ -51,6 +53,7 @@ DataGrid.propTypes = {
   className: PropTypes.string,
   columns: PropTypes.array.isRequired,
   disableSelectionOnClick: PropTypes.bool,
+  getRowClassName: PropTypes.func,
   getRowId: PropTypes.func,
   initialState: PropTypes.object,
   rows: PropTypes.array.isRequired,
