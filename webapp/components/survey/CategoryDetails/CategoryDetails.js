@@ -14,7 +14,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonDownload, MenuButton } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, UploadButton } from '@webapp/components/form'
 
@@ -71,37 +71,47 @@ const CategoryDetails = (props) => {
 
           {!readOnly && (
             <UploadButton
+              className="import-btn"
               label={i18n.t('common.csvImport')}
               accept=".csv"
               onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
             />
           )}
           <ButtonDownload
+            className="export-btn"
             testId={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
             label="common.csvExport"
           />
           {!readOnly && (
-            <ButtonMenu
+            <MenuButton
               label="categoryEdit.templateForDataImport"
               iconClassName="icon-download2 icon-14px"
-              popupComponent={
-                <>
-                  <ButtonDownload
-                    className="btn-transparent"
-                    testId={TestId.categoryDetails.templateForDataImportBtn}
-                    href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                    label="categoryEdit.templateForDataImport"
-                  />
-                  <ButtonDownload
-                    className="btn-transparent"
-                    testId={TestId.categoryDetails.templateForDataImportGenericBtn}
-                    href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                    requestParams={{ generic: true }}
-                    label="categoryEdit.templateForDataImportGeneric"
-                  />
-                </>
-              }
+              items={[
+                {
+                  key: 'data-import-template-download',
+                  content: (
+                    <ButtonDownload
+                      className="btn-transparent"
+                      testId={TestId.categoryDetails.templateForDataImportBtn}
+                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                      label="categoryEdit.templateForDataImport"
+                    />
+                  ),
+                },
+                {
+                  key: 'data-import-generic-template-download',
+                  content: (
+                    <ButtonDownload
+                      className="btn-transparent"
+                      testId={TestId.categoryDetails.templateForDataImportGenericBtn}
+                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                      requestParams={{ generic: true }}
+                      label="categoryEdit.templateForDataImportGeneric"
+                    />
+                  ),
+                },
+              ]}
             />
           )}
 
@@ -111,22 +121,20 @@ const CategoryDetails = (props) => {
             </FormItem>
           )}
           {!readOnly && !Category.isReportingData(category) && (
-            <ButtonMenu
+            <MenuButton
               iconClassName="icon-cog icon-14px"
-              popupComponent={
-                <>
-                  <Button
-                    className="btn-transparent"
-                    label="categoryEdit.convertToReportingDataCategory.buttonLabel"
-                    onClick={() => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate })}
-                  />
-                  <Button
-                    className="btn-transparent"
-                    label="extraProp.editor.title"
-                    onClick={Actions.toggleEditExtraPropertiesPanel}
-                  />
-                </>
-              }
+              items={[
+                {
+                  key: 'convert-to-report-data-category',
+                  label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
+                  onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
+                },
+                {
+                  key: 'extra-props-editor',
+                  label: 'extraProp.editor.title',
+                  onClick: Actions.toggleEditExtraPropertiesPanel,
+                },
+              ]}
             />
           )}
         </div>

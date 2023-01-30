@@ -19,6 +19,11 @@ $borderColor: $greyBorder;
       display: flex;
     }
   }
+
+  .import-btn,
+  .export-btn {
+    white-space: nowrap;
+  }
 }
 
 .category__levels {

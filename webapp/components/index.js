@@ -16,6 +16,7 @@ export {
   ButtonNew,
   ButtonSave,
   ButtonInvite,
+  MenuButton,
 } from './buttons'
 
 import Accordion from './Accordion'

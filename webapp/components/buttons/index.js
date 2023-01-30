@@ -15,3 +15,5 @@ export { ButtonManage } from './ButtonManage'
 export { ButtonMenu } from './ButtonMenu'
 export { ButtonNew } from './ButtonNew'
 export { ButtonSave } from './ButtonSave'
+
+export { MenuButton } from './MenuButton'
