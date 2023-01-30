@@ -73,5 +73,5 @@ MenuButton.propTypes = {
       onClick: PropTypes.func,
     })
   ),
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
 }

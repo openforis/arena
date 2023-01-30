@@ -20,6 +20,11 @@ $borderColor: $greyBorder;
     }
   }
 
+  .btn {
+    display: flex;
+    align-items: center;
+  }
+
   .import-btn,
   .export-btn {
     white-space: nowrap;
