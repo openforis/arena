@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ButtonDownload, MenuButton } from '@webapp/components/buttons'
+import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
@@ -72,7 +72,7 @@ const Header = (props) => {
           label="common.csvExport"
         />
         {canEdit && (
-          <MenuButton
+          <ButtonMenu
             iconClassName="icon-cog icon-14px"
             items={[
               {

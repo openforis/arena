@@ -16,7 +16,7 @@ import { TestId } from '@webapp/utils/testId'
 import { useConfirmDelete } from '@webapp/components/hooks'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { Button, ButtonMenu } from '@webapp/components'
 
 const SurveyInfo = () => {
   const i18n = useI18n()
@@ -75,39 +75,38 @@ const SurveyInfo = () => {
 
           {canExportSurvey && (
             <ButtonMenu
-              testId={TestId.dashboard.surveyExportBtn}
-              className="btn-menu-export"
-              buttonClassName="btn-transparent"
+              className="btn-s btn-transparent btn-menu-export"
               iconClassName="icon-download2 icon-14px"
+              testId={TestId.dashboard.surveyExportBtn}
               title="common.export"
-              popupComponent={
-                <>
-                  <ButtonDownload
-                    testId={TestId.dashboard.surveyExportOnlySurveyBtn}
-                    className="btn-transparent"
-                    onClick={() => dispatch(SurveyActions.exportSurvey())}
-                    label="common.export"
-                  />
-                  {!Survey.isTemplate(surveyInfo) && (
-                    <>
-                      <ButtonDownload
-                        testId={TestId.dashboard.surveyExportWithDataBtn}
-                        className="btn-transparent"
-                        onClick={() => dispatch(SurveyActions.exportSurvey({ includeData: true }))}
-                        label="homeView.dashboard.exportWithData"
-                      />
-                      <ButtonDownload
-                        testId={TestId.dashboard.surveyExportWithDataNoActivityLogBtn}
-                        className="btn-transparent"
-                        onClick={() =>
-                          dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false }))
-                        }
-                        label="homeView.dashboard.exportWithDataNoActivityLog"
-                      />
-                    </>
-                  )}
-                </>
-              }
+              items={[
+                {
+                  key: 'survey-export',
+                  className: 'btn-transparent',
+                  label: 'common.export',
+                  onClick: () => dispatch(SurveyActions.exportSurvey()),
+                  testId: TestId.dashboard.surveyExportOnlySurveyBtn,
+                },
+                ...(!Survey.isTemplate(surveyInfo)
+                  ? [
+                      {
+                        key: 'survey-export-with-data',
+                        className: 'btn-transparent',
+                        label: 'homeView.dashboard.exportWithData',
+                        onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
+                        testId: TestId.dashboard.surveyExportWithDataBtn,
+                      },
+                      {
+                        key: 'survey-export-without-data',
+                        className: 'btn-transparent',
+                        label: 'homeView.dashboard.exportWithDataNoActivityLog',
+                        onClick: () =>
+                          dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
+                        testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
+                      },
+                    ]
+                  : []),
+              ]}
             />
           )}
           {canEditSurvey && (

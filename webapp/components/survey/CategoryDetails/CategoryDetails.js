@@ -14,7 +14,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDownload, MenuButton } from '@webapp/components'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, UploadButton } from '@webapp/components/form'
 
@@ -84,7 +84,7 @@ const CategoryDetails = (props) => {
             label="common.csvExport"
           />
           {!readOnly && (
-            <MenuButton
+            <ButtonMenu
               label="categoryEdit.templateForDataImport"
               iconClassName="icon-download2 icon-14px"
               items={[
@@ -121,7 +121,7 @@ const CategoryDetails = (props) => {
             </FormItem>
           )}
           {!readOnly && !Category.isReportingData(category) && (
-            <MenuButton
+            <ButtonMenu
               iconClassName="icon-cog icon-14px"
               items={[
                 {
