@@ -1,4 +1,5 @@
 import * as PromiseUtils from '../../../../core/promiseUtils'
+import * as DateUtils from '../../../../core/dateUtils'
 
 import { TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
@@ -6,6 +7,7 @@ import {
   formatTime,
   getBooleanSelector,
   getCoordinateSelector,
+  getDateTimeInputSelector,
   getNodeDefSelector,
   getTaxonSelector,
   getTextSelector,
@@ -39,6 +41,9 @@ const enterCoordinate = async (nodeDef, value, parentSelector) => {
   await FormUtils.selectDropdownItem({ testId: srsTestId, value: value.srs, parentSelector })
 }
 
+const enterDate = async (nodeDef, value, parentSelector) =>
+  page.fill(getDateTimeInputSelector(nodeDef, parentSelector), DateUtils.format(value))
+
 const enterTaxon = async (nodeDef, value, parentSelector) => {
   const { codeSelector } = getTaxonSelector(nodeDef, parentSelector)
 
@@ -66,12 +71,14 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
 
-const enterTime = async (nodeDef, value, parentSelector) => enterText(nodeDef, formatTime(value), parentSelector)
+const enterTime = async (nodeDef, value, parentSelector) =>
+  page.fill(getDateTimeInputSelector(nodeDef, parentSelector), formatTime(value))
 
 const enterFns = {
   boolean: enterBoolean,
   code: enterCode,
   coordinate: enterCoordinate,
+  date: enterDate,
   decimal: enterText,
   integer: enterText,
   taxon: enterTaxon,

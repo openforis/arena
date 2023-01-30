@@ -1,4 +1,5 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import * as DateUtils from '../../../../core/dateUtils'
 import { tree } from '../../mock/nodeDefs'
 
 // ==== value parser
@@ -20,6 +21,9 @@ export const getCoordinateSelector = (nodeDef, parentSelector) => {
   return { xSelector, ySelector, srsTestId }
 }
 
+export const getDateTimeInputSelector = (nodeDef, parentSelector) =>
+  `${getNodeDefSelector(nodeDef, parentSelector)} input`
+
 export const getTaxonSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const _selector = (field) =>
@@ -36,15 +40,4 @@ export const getTextSelector = (nodeDef, parentSelector) =>
 export const getTreeSelector = (treeIdx) => getSelector(TestId.surveyForm.entityRowData(tree.name, treeIdx))
 
 // ==== format utils
-export const formatTime = (date) => {
-  const hours = `${date.getHours()}`.padStart(2, '0')
-  const minutes = `${date.getMinutes()}`.padStart(2, '0')
-  return `${hours}:${minutes}`
-}
-
-export const formatDate = (date) => {
-  const year = `${date.getFullYear()}`
-  const month = `${date.getMonth() + 1}`.padStart(2, '0')
-  const day = `${date.getDate()}`.padStart(2, '0')
-  return [year, month, day]
-}
+export const formatTime = (date) => DateUtils.format(date, DateUtils.formats.timeStorage)
