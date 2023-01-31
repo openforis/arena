@@ -61,6 +61,8 @@ Please check also the Spam/Junk mail folder.`,
     entity: 'Entity',
     error: 'Error',
     error_plural: 'Errors',
+    errorFound: '1 error found',
+    errorFound_other: '{{count}} errors found',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     expand: 'Expand',
@@ -509,6 +511,9 @@ $t(common.cantUndoWarning)`,
     confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadTemplate: 'Download template',
+    errors: {
+      rowNum: 'Row #',
+    },
     forceImportFromAnotherSurvey: 'Force import from another survey',
     importCompleteSummary: `
 - {{rowsProcessed}} rows processed
@@ -519,7 +524,7 @@ $t(common.cantUndoWarning)`,
     importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.importCompleteSummary)`,
     importCompleteWithErrors: `## Import complete (with errors):
-$t(dataImportView.importCompleteSummary)`,
+- {{rowsProcessed}} rows processed`,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',
@@ -548,6 +553,14 @@ Are you sure you want to continue?`,
       selectFile: 'Select File',
       startImport: 'Start import',
     },
+    validateFile: 'Validate file',
+    validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
+- {{rowsProcessed}} rows processed`,
+    validationCompleteSuccessfully: `## Validation complete
+- {{rowsProcessed}} rows processed
+- {{updatedValues}} values would be updated
+- {{insertedRecords}} records would be created
+- {{updatedRecords}} records would be updated`,
   },
 
   dataView: {

@@ -25,7 +25,7 @@ const getCustomCloseButtonComponent = ({ closeButton, job }) => {
 const JobMonitor = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const { job, closeButton } = useJob()
+  const { job, closeButton, errorKeyHeaderName } = useJob()
 
   if (!job || JobSerialized.isCanceled(job)) return null
 
@@ -39,7 +39,7 @@ const JobMonitor = () => {
 
       <ModalBody>
         <JobProgress job={job} />
-        <JobErrors job={job} openPanel={jobEnded && !hasInnerJobs} />
+        <JobErrors errorKeyHeaderName={errorKeyHeaderName} job={job} openPanel={jobEnded && !hasInnerJobs} />
 
         {hasInnerJobs && (
           <InnerJobs

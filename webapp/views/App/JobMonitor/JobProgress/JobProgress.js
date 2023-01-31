@@ -14,12 +14,13 @@ const colorByJobStatus = {
 
 const JobProgress = ({ isCurrentJob, job }) => {
   const color = colorByJobStatus[JobSerialized.getStatus(job)]
+  const progressPercent = JobSerialized.getProgressPercent(job)
 
   return (
     <ProgressBar
       color={color}
       indeterminate={isCurrentJob && JobSerialized.isPending(job)}
-      progress={JobSerialized.getProgressPercent(job)}
+      progress={progressPercent}
       className={JobSerialized.getStatus(job)}
     />
   )
@@ -31,7 +32,7 @@ JobProgress.propTypes = {
 }
 
 JobProgress.defaultProps = {
-  isCurrentJob: false,
+  isCurrentJob: true,
   job: {},
 }
 

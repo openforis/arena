@@ -5,7 +5,7 @@ import classNames from 'classnames'
 
 const FooterWithExport = () => (
   <GridFooterContainer>
-    <GridToolbarExport />
+    <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
     <GridFooter />
   </GridFooterContainer>
 )
@@ -17,6 +17,7 @@ const DataGrid = (props) => {
     checkboxSelection,
     className,
     columns: columnsProp,
+    density,
     disableSelectionOnClick,
     getRowClassName,
     getRowId,
@@ -37,6 +38,7 @@ const DataGrid = (props) => {
       className={classNames('data-grid', className)}
       columns={columns}
       components={components}
+      density={density}
       disableSelectionOnClick={disableSelectionOnClick}
       getRowClassName={getRowClassName}
       getRowId={getRowId}
@@ -52,6 +54,7 @@ DataGrid.propTypes = {
   checkboxSelection: PropTypes.bool,
   className: PropTypes.string,
   columns: PropTypes.array.isRequired,
+  density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
   disableSelectionOnClick: PropTypes.bool,
   getRowClassName: PropTypes.func,
   getRowId: PropTypes.func,
@@ -63,6 +66,7 @@ DataGrid.defaultProps = {
   allowExportToCsv: false,
   autoPageSize: false,
   checkboxSelection: false,
+  density: 'standard',
   disableSelectionOnClick: true,
 }
 

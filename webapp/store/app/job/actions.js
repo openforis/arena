@@ -8,9 +8,9 @@ export const JOB_START = 'app/job/start'
 export const JOB_UPDATE = 'app/job/update'
 
 export const showJobMonitor =
-  ({ job, onComplete = null, autoHide = false, closeButton = null }) =>
+  ({ job, onComplete = null, autoHide = false, closeButton = null, errorKeyHeaderName = undefined }) =>
   (dispatch) =>
-    dispatch({ type: JOB_START, job, onComplete, autoHide, closeButton })
+    dispatch({ type: JOB_START, job, onComplete, autoHide, closeButton, errorKeyHeaderName })
 
 export const updateJob =
   ({ job }) =>

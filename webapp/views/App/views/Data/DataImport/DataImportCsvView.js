@@ -110,28 +110,34 @@ export const DataImportCsvView = () => {
     setStateProp('file')(files[0])
   }
 
-  const onStartImport = async () => {
-    const startJob = async () => {
-      const job = await API.startDataImportFromCsvJob({
-        surveyId,
-        file,
-        cycle,
-        entityDefUuid: selectedEntityDefUuid,
-        insertNewRecords: dataImportType === importTypes.insertNewRecords,
-        insertMissingNodes: !preventAddingNewEntityData,
-        updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+  const startImportJob = async ({ dryRun = false } = {}) => {
+    const job = await API.startDataImportFromCsvJob({
+      surveyId,
+      file,
+      cycle,
+      entityDefUuid: selectedEntityDefUuid,
+      dryRun,
+      insertNewRecords: dataImportType === importTypes.insertNewRecords,
+      insertMissingNodes: !preventAddingNewEntityData,
+      updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+    })
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        autoHide: true,
+        errorKeyHeaderName: 'dataImportView.errors.rowNum',
+        onComplete: (jobCompleted) => {
+          setState((statePrev) => ({ ...statePrev, jobCompleted }))
+        },
       })
-      dispatch(
-        JobActions.showJobMonitor({
-          job,
-          autoHide: true,
-          onComplete: (jobCompleted) => {
-            setState((statePrev) => ({ ...statePrev, jobCompleted }))
-          },
-        })
-      )
-    }
-    confirm({ key: 'dataImportView.startImportConfirm', onOk: startJob })
+    )
+  }
+  const onValidateFileClick = async () => {
+    await startImportJob({ dryRun: true })
+  }
+
+  const onStartImportClick = () => {
+    confirm({ key: 'dataImportView.startImportConfirm', onOk: startImportJob })
   }
 
   return (
@@ -206,11 +212,13 @@ export const DataImportCsvView = () => {
               droppedFiles={file ? [file] : []}
             />
 
+            <Button disabled={!file} label={'dataImportView.validateFile'} onClick={onValidateFileClick} />
+
             <Button
               className="btn-primary start-btn"
               disabled={!file}
               label={'dataImportView.startImport'}
-              onClick={onStartImport}
+              onClick={onStartImportClick}
             />
           </div>
         )}

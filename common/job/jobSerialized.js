@@ -40,7 +40,8 @@ export const getErrors = (job) => {
   // If errors is empty, get errors from failed inner job (if any)
   return R.isEmpty(errors) ? R.pipe(getInnerJobs, R.find(isFailed), R.propOr([], keys.errors))(job) : errors
 }
-export const hasErrors = (job) => !R.isEmpty(getErrors(job))
+export const getErrorsCount = (job) => Object.keys(getErrors(job)).length
+export const hasErrors = (job) => getErrorsCount(job) > 0
 
 // ===== READ (status)
 export const getStatus = R.prop(keys.status)

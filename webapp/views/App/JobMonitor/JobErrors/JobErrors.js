@@ -16,13 +16,14 @@ const validationWrapper = (fields) => ({
   fields,
 })
 
-const JobErrors = ({ job, openPanel }) => {
+const JobErrors = ({ errorKeyHeaderName, job, openPanel }) => {
   const errors = JobSerialized.getErrors(job)
+  const errorsCount = JobSerialized.getErrorsCount(job)
 
   const i18n = useI18n()
   const survey = useSurvey()
 
-  if (errors.length === 0) return null
+  if (errorsCount === 0) return null
 
   return (
     <ExpansionPanel buttonLabel="common.error_plural" className="app-job-monitor__job-errors" startClosed={!openPanel}>
@@ -30,11 +31,11 @@ const JobErrors = ({ job, openPanel }) => {
         allowExportToCsv
         autoPageSize
         columns={[
-          { field: 'errorKey', headerName: i18n.t('common.item') },
+          { field: 'errorKey', headerName: i18n.t(errorKeyHeaderName) },
           {
             field: 'error',
             flex: 1,
-            headerName: i18n.t('common.error', { count: errors.length }),
+            headerName: i18n.t('common.error', { count: errorsCount }),
             renderCell: ({ value }) => (
               <ValidationFieldMessages validation={validationWrapper(value)} showKeys={false} />
             ),
@@ -46,6 +47,7 @@ const JobErrors = ({ job, openPanel }) => {
             },
           },
         ]}
+        density="compact"
         initialState={{
           sorting: {
             sortModel: [{ field: 'errorKey', sort: 'asc' }],
@@ -63,11 +65,13 @@ const JobErrors = ({ job, openPanel }) => {
 }
 
 JobErrors.propTypes = {
+  errorKeyHeaderName: PropTypes.string,
   job: PropTypes.object,
   openPanel: PropTypes.bool,
 }
 
 JobErrors.defaultProps = {
+  errorKeyHeaderName: 'common.item',
   job: {},
   openPanel: true,
 }
