@@ -31,5 +31,4 @@ ButtonDownload.defaultProps = {
   href: null,
   iconClassName: 'icon-download2 icon-14px',
   label: 'common.download',
-  size: 'small',
 }
