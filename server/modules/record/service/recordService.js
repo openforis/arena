@@ -262,7 +262,7 @@ export const startCSVDataImportJob = ({
   insertNewRecords = false,
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
-  abortOnErrors = false,
+  abortOnErrors = true,
 }) => {
   const job = new DataImportJob({
     user,

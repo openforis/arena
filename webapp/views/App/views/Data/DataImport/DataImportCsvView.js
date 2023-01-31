@@ -29,11 +29,7 @@ const importTypes = {
   insertNewRecords: 'insertNewRecords',
 }
 
-const options = {
-  abortOnErrors: { onlyWhenUpdatingRecords: false },
-  preventAddingNewEntityData: { onlyWhenUpdatingRecords: true },
-  preventUpdatingRecordsInAnalysis: { onlyWhenUpdatingRecords: true },
-}
+const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
 
 const fileMaxSize = 20 // 20MB
 
@@ -62,7 +58,6 @@ export const DataImportCsvView = () => {
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedEntityDefUuid: null,
     // options
-    abortOnErrors: false,
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
   })
@@ -75,16 +70,11 @@ export const DataImportCsvView = () => {
     nodeDefLabelType,
     selectedEntityDefUuid,
     // options
-    abortOnErrors,
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
   } = state
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
-
-  const availableOptions = Object.keys(options).filter(
-    (optionKey) => !options[optionKey].onlyWhenUpdatingRecords || dataImportType === importTypes.updateExistingRecords
-  )
 
   const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
@@ -130,7 +120,6 @@ export const DataImportCsvView = () => {
         insertNewRecords: dataImportType === importTypes.insertNewRecords,
         insertMissingNodes: !preventAddingNewEntityData,
         updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
-        abortOnErrors,
       })
       dispatch(
         JobActions.showJobMonitor({
@@ -197,18 +186,19 @@ export const DataImportCsvView = () => {
               disabled={!selectedEntityDefUuid}
             />
 
-            <fieldset>
-              <legend>{i18n.t('dataImportView.options.header')}</legend>
-              {availableOptions.map((optionKey) => (
-                <Checkbox
-                  key={optionKey}
-                  checked={state[optionKey]}
-                  label={i18n.t(`dataImportView.options.${optionKey}`)}
-                  onChange={setStateProp(optionKey)}
-                />
-              ))}
-            </fieldset>
-
+            {dataImportType === importTypes.updateExistingRecords && (
+              <fieldset>
+                <legend>{i18n.t('dataImportView.options.header')}</legend>
+                {optionsRecordUpdate.map((optionKey) => (
+                  <Checkbox
+                    key={optionKey}
+                    checked={state[optionKey]}
+                    label={i18n.t(`dataImportView.options.${optionKey}`)}
+                    onChange={setStateProp(optionKey)}
+                  />
+                ))}
+              </fieldset>
+            )}
             <Dropzone
               maxSize={fileMaxSize}
               accept={{ 'text/csv': ['.csv'] }}

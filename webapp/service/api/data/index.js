@@ -33,7 +33,7 @@ export const startDataImportFromCsvJob = async ({
   insertNewRecords = false,
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
-  abortOnErrors = false,
+  abortOnErrors = true,
 }) => {
   const formData = objectToFormData({
     cycle,
