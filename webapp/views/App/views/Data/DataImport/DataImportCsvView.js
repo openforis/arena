@@ -18,7 +18,7 @@ import { useConfirm } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
+import { Button, ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
@@ -199,7 +199,7 @@ export const DataImportCsvView = () => {
                   <Checkbox
                     key={optionKey}
                     checked={state[optionKey]}
-                    label={i18n.t(`dataImportView.options.${optionKey}`)}
+                    label={`dataImportView.options.${optionKey}`}
                     onChange={setStateProp(optionKey)}
                   />
                 ))}
@@ -212,7 +212,10 @@ export const DataImportCsvView = () => {
               droppedFiles={file ? [file] : []}
             />
 
-            <Button disabled={!file} label={'dataImportView.validateFile'} onClick={onValidateFileClick} />
+            <div>
+              <Button disabled={!file} label={'dataImportView.validateFile'} onClick={onValidateFileClick} />
+              <ButtonIconInfo title="dataImportView.validateFileInfo" />
+            </div>
 
             <Button
               className="btn-primary start-btn"
