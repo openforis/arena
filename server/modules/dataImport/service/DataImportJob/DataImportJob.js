@@ -18,8 +18,8 @@ import { DataImportFileReader } from './dataImportFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
 
 export default class DataImportJob extends Job {
-  constructor(params) {
-    super(DataImportJob.type, params)
+  constructor(params, type = DataImportJob.type) {
+    super(type, params)
 
     this.insertedRecordsUuids = new Set()
     this.updatedRecordsUuids = new Set()
@@ -128,9 +128,25 @@ export default class DataImportJob extends Job {
     }
   }
 
+  async persistUpdatedNodes({ nodesUpdated }) {
+    const { context, currentRecord: record, tx } = this
+    const { dryRun, survey } = context
+
+    const nodesArray = Object.values(nodesUpdated)
+
+    if (!dryRun && nodesArray.length > 0) {
+      await this.recordsValidationBatchPersister.addItem([Record.getUuid(record), Record.getValidation(record)])
+
+      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
+
+      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
+      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+    }
+  }
+
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
-    const { dryRun, entityDefUuid, insertMissingNodes, survey } = context
+    const { entityDefUuid, insertMissingNodes, survey } = context
 
     this.incrementProcessedItems()
 
@@ -142,8 +158,8 @@ export default class DataImportJob extends Job {
       const { record, newRecord } = await DataImportJobRecordProvider.fetchOrCreateRecord({
         valuesByDefUuid,
         currentRecord: this.currentRecord,
-        context: this.context,
-        tx: this.tx,
+        context,
+        tx,
       })
       this.currentRecord = record
 
@@ -156,25 +172,17 @@ export default class DataImportJob extends Job {
 
       this.currentRecord = recordUpdated
 
-      const recordUuid = Record.getUuid(this.currentRecord)
-
-      const nodesArray = Object.values(nodesUpdated)
-
-      if (!dryRun && nodesArray.length > 0) {
-        await this.recordsValidationBatchPersister.addItem([recordUuid, Record.getValidation(this.currentRecord)])
-
-        this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
-
-        await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-        await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
-      }
+      this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
       if (newRecord) {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
-      } else if (nodesArray.length > 0) {
-        this.updatedValues += nodesArray.length
-        this.updatedRecordsUuids.add(recordUuid)
+      } else {
+        const nodesArray = Object.values(nodesUpdated)
+        if (nodesArray.length > 0) {
+          this.updatedValues += nodesArray.length
+          this.updatedRecordsUuids.add(Record.getUuid(this.currentRecord))
+        }
       }
     } catch (e) {
       const { key, params } = e
