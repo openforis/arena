@@ -5,8 +5,6 @@ import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as JobSerialized from '@common/job/jobSerialized'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -22,7 +20,7 @@ import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import { Button, ButtonDownload, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import { DataImportCompleteDialog } from './DataImportSuccessfulDialog'
+import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
@@ -30,6 +28,8 @@ const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
   insertNewRecords: 'insertNewRecords',
 }
+
+const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
 
 const fileMaxSize = 20 // 20MB
 
@@ -54,27 +54,29 @@ export const DataImportCsvView = () => {
     cycle: canSelectCycle ? null : surveyCycle,
     dataImportType: null,
     file: null,
-    importCompleteResult: null,
+    jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
+    selectedEntityDefUuid: null,
+    // options
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
-    selectedEntityDefUuid: null,
   })
 
   const {
     cycle,
     dataImportType,
     file,
-    importCompleteResult,
+    jobCompleted,
     nodeDefLabelType,
+    selectedEntityDefUuid,
+    // options
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
-    selectedEntityDefUuid,
   } = state
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 
-  const setStateProp = (prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value }))
+  const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
   const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
 
@@ -82,7 +84,7 @@ export const DataImportCsvView = () => {
     const nodeDefLabelTypeNext =
       allowedLabelTypes[(allowedLabelTypes.indexOf(nodeDefLabelType) + 1) % allowedLabelTypes.length]
     setStateProp('nodeDefLabelType')(nodeDefLabelTypeNext)
-  }, [nodeDefLabelType])
+  }, [nodeDefLabelType, setStateProp])
 
   const onImportTypeChange = useCallback(
     (value) => {
@@ -108,29 +110,34 @@ export const DataImportCsvView = () => {
     setStateProp('file')(files[0])
   }
 
-  const onStartImport = async () => {
-    const startJob = async () => {
-      const job = await API.startDataImportFromCsvJob({
-        surveyId,
-        file,
-        cycle,
-        entityDefUuid: selectedEntityDefUuid,
-        insertNewRecords: dataImportType === importTypes.insertNewRecords,
-        insertMissingNodes: !preventAddingNewEntityData,
-        updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+  const startImportJob = async ({ dryRun = false } = {}) => {
+    const job = await API.startDataImportFromCsvJob({
+      surveyId,
+      file,
+      cycle,
+      entityDefUuid: selectedEntityDefUuid,
+      dryRun,
+      insertNewRecords: dataImportType === importTypes.insertNewRecords,
+      insertMissingNodes: !preventAddingNewEntityData,
+      updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+    })
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        autoHide: true,
+        errorKeyHeaderName: 'dataImportView.errors.rowNum',
+        onComplete: (jobCompleted) => {
+          setState((statePrev) => ({ ...statePrev, jobCompleted }))
+        },
       })
-      dispatch(
-        JobActions.showJobMonitor({
-          job,
-          autoHide: true,
-          onComplete: async (jobCompleted) => {
-            const importCompleteResult = JobSerialized.getResult(jobCompleted)
-            setState((statePrev) => ({ ...statePrev, importCompleteResult }))
-          },
-        })
-      )
-    }
-    confirm({ key: 'dataImportView.startImportConfirm', onOk: startJob })
+    )
+  }
+  const onValidateFileClick = async () => {
+    await startImportJob({ dryRun: true })
+  }
+
+  const onStartImportClick = () => {
+    confirm({ key: 'dataImportView.startImportConfirm', onOk: startImportJob })
   }
 
   return (
@@ -188,19 +195,16 @@ export const DataImportCsvView = () => {
             {dataImportType === importTypes.updateExistingRecords && (
               <fieldset>
                 <legend>{i18n.t('dataImportView.options.header')}</legend>
-                <Checkbox
-                  checked={preventAddingNewEntityData}
-                  label={i18n.t('dataImportView.options.preventAddingNewEntityData')}
-                  onChange={setStateProp('preventAddingNewEntityData')}
-                />
-                <Checkbox
-                  checked={preventUpdatingRecordsInAnalysis}
-                  label={i18n.t('dataImportView.options.preventUpdatingRecordsInAnalysis')}
-                  onChange={setStateProp('preventUpdatingRecordsInAnalysis')}
-                />
+                {optionsRecordUpdate.map((optionKey) => (
+                  <Checkbox
+                    key={optionKey}
+                    checked={state[optionKey]}
+                    label={i18n.t(`dataImportView.options.${optionKey}`)}
+                    onChange={setStateProp(optionKey)}
+                  />
+                ))}
               </fieldset>
             )}
-
             <Dropzone
               maxSize={fileMaxSize}
               accept={{ 'text/csv': ['.csv'] }}
@@ -208,20 +212,19 @@ export const DataImportCsvView = () => {
               droppedFiles={file ? [file] : []}
             />
 
+            <Button disabled={!file} label={'dataImportView.validateFile'} onClick={onValidateFileClick} />
+
             <Button
               className="btn-primary start-btn"
               disabled={!file}
               label={'dataImportView.startImport'}
-              onClick={onStartImport}
+              onClick={onStartImportClick}
             />
           </div>
         )}
       </div>
-      {importCompleteResult && (
-        <DataImportCompleteDialog
-          importCompleteResult={importCompleteResult}
-          onClose={() => setStateProp('importCompleteResult')(null)}
-        />
+      {jobCompleted && (
+        <DataImportCompleteDialog job={jobCompleted} onClose={() => setStateProp('jobCompleted')(null)} />
       )}
     </div>
   )

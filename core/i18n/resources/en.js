@@ -43,6 +43,7 @@ Do you want to ignore them?`,
     descending: 'Descending',
     description: 'Description',
     description_plural: 'Descriptions',
+    details: 'Details',
     dimension: 'Dimension',
     dimension_plural: 'Dimensions',
     done: 'Done',
@@ -60,6 +61,8 @@ Please check also the Spam/Junk mail folder.`,
     entity: 'Entity',
     error: 'Error',
     error_plural: 'Errors',
+    errorFound: '1 error found',
+    errorFound_other: '{{count}} errors found',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     expand: 'Expand',
@@ -508,14 +511,20 @@ $t(common.cantUndoWarning)`,
     confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadTemplate: 'Download template',
+    errors: {
+      rowNum: 'Row #',
+    },
     forceImportFromAnotherSurvey: 'Force import from another survey',
-    importComplete: `## Import complete:
-
+    importCompleteSummary: `
 - {{rowsProcessed}} rows processed
 - {{updatedValues}} values updated
 - {{insertedRecords}} records created
 - {{updatedRecords}} records updated
-    `,
+`,
+    importCompleteSuccessfully: `## Import complete:
+$t(dataImportView.importCompleteSummary)`,
+    importCompleteWithErrors: `## Import complete (with errors):
+- {{rowsProcessed}} rows processed`,
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',
@@ -527,6 +536,7 @@ $t(common.cantUndoWarning)`,
     },
     options: {
       header: 'Options',
+      abortOnErrors: 'Abort on errors',
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
     },
@@ -543,6 +553,14 @@ Are you sure you want to continue?`,
       selectFile: 'Select File',
       startImport: 'Start import',
     },
+    validateFile: 'Validate file',
+    validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
+- {{rowsProcessed}} rows processed`,
+    validationCompleteSuccessfully: `## Validation complete
+- {{rowsProcessed}} rows processed
+- {{updatedValues}} values would be updated
+- {{insertedRecords}} records would be created
+- {{updatedRecords}} records would be updated`,
   },
 
   dataView: {
@@ -1442,6 +1460,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     CollectSurveyReaderJob: 'Collect Survey Reader',
     CyclesDeletedCheckJob: 'Deleted Cycles Check',
     DataImportJob: 'Data Import',
+    DataImportValidationJob: 'Data Import File Validation',
     FilesImportJob: 'Files Import',
     NodeDefsImportJob: 'Node Definitions Import',
     NodeDefsValidationJob: 'Node Definitions Validation',

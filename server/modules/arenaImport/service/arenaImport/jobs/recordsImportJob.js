@@ -102,7 +102,8 @@ export default class RecordsImportJob extends Job {
       await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
 
       // insert nodes (add them to batch persister)
-      await PromiseUtils.each(Record.getNodesArray(record), async (node) => {
+      const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+      await PromiseUtils.each(nodes, async (node) => {
         // check that the node definition associated to the node has not been deleted from the survey
         if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
           await nodesBatchPersister.addItem(node)

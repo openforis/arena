@@ -1,59 +1,14 @@
-@import "~@webapp/style/vars";
-
-.progress-bar {
-  position: relative;
-  height: 1rem;
-  width: 100%;
-
-  .progress {
-    font-size: .7rem;
-    text-transform: uppercase;
-    position: absolute;
-    left: .2rem;
-    top: 0;
-    font-weight: 600;
-    color: white;
-  }
-
-  .filler {
-    transition: width .2s ease-in;
-    height: 100%;
-  }
-
-  &.running {
-    .filler {
-      //border: 1px solid $blueLightActive;
-      background: rgba($blue, .3);
-    }
-  }
-
-  &.failed {
-    .filler {
-      border: 1px solid rgba($red, .4);
-      background: rgba($red, .8);
-      width: 100% !important;
-    }
-  }
-
-  &.succeeded {
-    .filler {
-      border: 1px solid rgba($green, .4);
-      background: rgba($green, .8);
-    }
-  }
+.progress-bar[role='progressbar'] {
+  height: 0.5rem;
 }
 
-.progress-bar-striped {
-  background-image: linear-gradient(45deg, rgba($black, .15) 25%, transparent 25%, transparent 50%, rgba($black, .15) 50%, rgba($black, .15) 75%, transparent 75%, transparent);
-  background-size: 1rem 1rem;
-  animation: progress-bar-stripes 1s linear infinite;
-}
+.progress-bar-with-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
 
-@keyframes progress-bar-stripes {
-  from {
-    background-position: 1rem 0;
-  }
-  to {
-    background-position: 0 0;
+  .progress-bar {
+    width: 100%;
   }
 }

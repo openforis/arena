@@ -13,13 +13,17 @@
   .main-container {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
   }
 
   .internal-container {
     display: grid;
     grid-template-columns: 0.6fr 0.4fr;
-    gap: 2rem;
+    gap: 1rem;
+
+    .form {
+      grid-row-gap: 1rem;
+    }
 
     .btn-group {
       gap: 1rem;

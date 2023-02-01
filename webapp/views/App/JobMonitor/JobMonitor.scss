@@ -9,73 +9,44 @@
 .app-job-monitor__job-errors {
   justify-self: stretch;
 
-  .header,
-  .row {
-    display: grid;
-    grid-template-columns: 0.35fr 0.65fr;
-    font-size: 0.85rem;
-  }
-
-  .header {
-    font-weight: 600;
-    text-transform: uppercase;
-    border-bottom: 1px solid $greyBorder;
-
-    > * {
-      padding: 0.3rem 0.5rem;
-    }
-  }
-
-  .body {
+  .expansion-panel__content {
+    height: 18rem;
     max-height: calc(35vh - 2px);
-    overflow-y: auto;
-  }
-
-  .row {
-    border-bottom: 1px solid rgba($greyBorder, 0.8);
-
-    > * {
-      padding: 0.3rem 0.5rem;
-      word-break: break-all;
-    }
-
-    .item {
-      border-left: 1px solid rgba($greyBorder, 0.8);
-    }
-
-    .item-error {
-      border-left: 1px solid rgba($greyBorder, 0.8);
-      border-right: 1px solid rgba($greyBorder, 0.8);
-    }
 
     .validation-field_message {
       color: inherit;
     }
   }
+
+  .data-grid {
+    background-color: white;
+  }
 }
 
 .app-job-monitor__inner-jobs {
-  max-height: 45vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-top: 2rem;
-  padding: 2rem 1.5rem 0 1.5rem;
-  background-color: white;
+  .expansion-panel__content {
+    max-height: 45vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem 0.5rem 0 0.5rem;
+    background-color: white;
 
-  .job {
-    display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
-
-    .name {
-      font-size: 0.9rem;
+    .expansion-panel__content {
+      padding: 0;
     }
-  }
 
-  > div {
-    margin-bottom: 2rem;
-  }
+    .job {
+      display: grid;
+      grid-template-columns: 0.5fr 0.5fr;
+      margin-bottom: 1rem;
 
-  .app-job-monitor__job-errors {
-    padding: 0 1rem 2rem 1rem;
+      .name {
+        font-size: 0.9rem;
+      }
+    }
+
+    .app-job-monitor__job-errors {
+      padding: 0 1rem 2rem 1rem;
+    }
   }
 }

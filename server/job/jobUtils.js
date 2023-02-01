@@ -34,11 +34,13 @@ const calculatedElapsedMillis = (job) =>
   job.startTime ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime() : 0
 
 export const jobToJSON = (job) => ({
+  [JobSerialized.keys.uuid]: job.uuid,
   [JobSerialized.keys.type]: job.type,
   [JobSerialized.keys.userUuid]: job.userUuid,
   [JobSerialized.keys.surveyId]: job.surveyId,
 
   [JobSerialized.keys.innerJobs]: job.innerJobs.map(jobToJSON),
+  [JobSerialized.keys.currentInnerJobIndex]: job.currentInnerJobIndex,
 
   // Status
   [JobSerialized.keys.status]: job.status,

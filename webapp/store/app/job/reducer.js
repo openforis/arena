@@ -5,8 +5,8 @@ import * as JobActions from './actions'
 import * as JobState from './state'
 
 const actionHandlers = {
-  [JobActions.JOB_START]: (state, { job, onComplete, autoHide, closeButton }) =>
-    JobState.startJob({ job, onComplete, autoHide, closeButton }),
+  [JobActions.JOB_START]: (_state, { job, onComplete, autoHide, closeButton, errorKeyHeaderName }) =>
+    JobState.startJob({ job, onComplete, autoHide, closeButton, errorKeyHeaderName }),
 
   [JobActions.JOB_UPDATE]: (state, { job }) => JobState.updateJob({ job })(state),
 }

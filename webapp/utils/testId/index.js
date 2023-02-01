@@ -93,9 +93,11 @@ export const TestId = {
   },
   modal: {
     close: 'text="Close"',
-    itemError: '.item-error',
     modal: 'modal',
     ok: 'text="Ok"',
+  },
+  jobMonitor: {
+    errorItem: '.error-item',
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',

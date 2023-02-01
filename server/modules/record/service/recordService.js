@@ -31,6 +31,7 @@ import * as FileManager from '../manager/fileManager'
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
 import { ValidationUtils } from '@core/validation/validationUtils'
+import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -259,20 +260,25 @@ export const startCSVDataImportJob = ({
   filePath,
   cycle,
   entityDefUuid,
+  dryRun = false,
   insertNewRecords = false,
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
+  abortOnErrors = true,
 }) => {
-  const job = new DataImportJob({
+  const jobParams = {
     user,
     surveyId,
     filePath,
     cycle,
     entityDefUuid,
+    dryRun,
     insertNewRecords,
     insertMissingNodes,
     updateRecordsInAnalysis,
-  })
+    abortOnErrors,
+  }
+  const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
   JobManager.executeJobThread(job)
   return job
 }
