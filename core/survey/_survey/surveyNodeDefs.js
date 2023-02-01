@@ -17,18 +17,14 @@ export const getNodeDefs = R.propOr({}, nodeDefsKey)
 
 export const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-export const getNodeDefRoot = R.pipe(getNodeDefsArray, R.find(NodeDef.isRoot))
+export const getNodeDefRoot = (survey) => Surveys.getNodeDefRoot({ survey })
 
 export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 export const getNodeDefsByUuids =
   (uuids = []) =>
-  (survey) => {
-    if (R.isEmpty(uuids)) {
-      return []
-    }
-    return uuids.map((uuid) => getNodeDefByUuid(uuid)(survey))
-  }
+  (survey) =>
+    Surveys.getNodeDefsByUuids({ survey, uuids })
 
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null

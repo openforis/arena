@@ -60,7 +60,11 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
     const recordToInsert = Record.newRecord(user, cycle)
     let record = null
     if (dryRun) {
-      const { record: recordCreated } = RecordUpdater.createRootEntity({ survey, record: recordToInsert })
+      const { record: recordCreated } = RecordUpdater.createRootEntity({
+        survey,
+        record: recordToInsert,
+        sideEffect: true,
+      })
       record = recordCreated
     } else {
       record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, tx)

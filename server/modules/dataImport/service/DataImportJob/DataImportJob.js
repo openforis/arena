@@ -168,6 +168,7 @@ export default class DataImportJob extends Job {
         entityDefUuid,
         valuesByDefUuid,
         insertMissingNodes,
+        sideEffect: true,
       })(this.currentRecord)
 
       this.currentRecord = recordUpdated

@@ -2,6 +2,7 @@ import {
   RecordUpdater as CoreRecordUpdater,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordValidator,
+  RecordUpdateResult,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -13,14 +14,13 @@ import SystemError from '@core/systemError'
 
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
-import RecordUpdateResult from './RecordUpdateResult'
 import { NodeValueFormatter } from '../nodeValueFormatter'
 
 const { createNodeAndDescendants, createRootEntity } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 const _addOrUpdateAttribute =
-  ({ survey, entity, attributeDef, value }) =>
+  ({ survey, entity, attributeDef, value, sideEffect = false }) =>
   (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
@@ -29,7 +29,7 @@ const _addOrUpdateAttribute =
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
       const attributeCreated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
-      updateResult.addNode(attributeCreated)
+      updateResult.addNode(attributeCreated, { sideEffect })
       return updateResult
     }
     if (
@@ -50,7 +50,7 @@ const _addOrUpdateAttribute =
       )(attribute)
 
       const updateResult = new RecordUpdateResult({ record })
-      updateResult.addNode(attributeUpdated)
+      updateResult.addNode(attributeUpdated, { sideEffect })
       return updateResult
     }
     // no updates performed
@@ -58,7 +58,7 @@ const _addOrUpdateAttribute =
   }
 
 const _addEntityAndKeyValues =
-  ({ survey, entityDef, parentNode, keyValuesByDefUuid }) =>
+  ({ survey, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
   (record) => {
     const updateResult = new RecordUpdateResult({ record })
     const updateResultDescendants = CoreRecordNodesUpdater.createNodeAndDescendants({
@@ -66,6 +66,7 @@ const _addEntityAndKeyValues =
       record,
       parentNode,
       nodeDef: entityDef,
+      sideEffect,
     })
     updateResult.merge(updateResultDescendants)
 
@@ -76,12 +77,15 @@ const _addEntityAndKeyValues =
     const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
     keyDefs.forEach((keyDef) => {
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
+
       const keyAttributeUpdateResult = _addOrUpdateAttribute({
         survey,
         entity,
         attributeDef: keyDef,
         value: keyValue,
+        sideEffect,
       })(updateResult.record)
+
       if (keyAttributeUpdateResult) {
         updateResult.merge(keyAttributeUpdateResult)
       }
@@ -90,7 +94,7 @@ const _addEntityAndKeyValues =
   }
 
 const _getOrCreateEntityByKeys =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes }) =>
+  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false }) =>
   (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
       return { entity: RecordReader.getRootNode(record), updateResult: null }
@@ -142,11 +146,12 @@ const _getOrCreateEntityByKeys =
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
+      sideEffect,
     })(record)
     return { entity: entityInserted, updateResult }
   }
 
-const _afterNodesUpdate = async ({ survey, record, nodes }) => {
+const _afterNodesUpdate = async ({ survey, record, nodes, sideEffect = false }) => {
   // output
   const updateResult = new RecordUpdateResult({ record, nodes })
 
@@ -155,6 +160,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes }) => {
     survey,
     record,
     nodes,
+    sideEffect,
   })
 
   updateResult.merge(updateResultDependents)
@@ -176,7 +182,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes }) => {
 }
 
 const updateAttributesWithValues =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false }) =>
+  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -186,6 +192,7 @@ const updateAttributesWithValues =
       entityDefUuid,
       valuesByDefUuid,
       insertMissingNodes,
+      sideEffect,
     })(record)
 
     if (updateResultEntity) {
@@ -214,6 +221,7 @@ const updateAttributesWithValues =
           entity: attributeParentEntity,
           attributeDef,
           value,
+          sideEffect,
         })(currentRecord)
 
         if (attributeUpdateResult) {
@@ -222,7 +230,7 @@ const updateAttributesWithValues =
       }
     })
 
-    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes })
+    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
   }
 
 export const RecordNodesUpdater = {
