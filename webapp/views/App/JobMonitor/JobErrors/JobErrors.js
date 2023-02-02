@@ -31,10 +31,10 @@ const JobErrors = ({ errorKeyHeaderName, job, openPanel }) => {
         allowExportToCsv
         autoPageSize
         columns={[
-          { field: 'errorKey', headerName: i18n.t(errorKeyHeaderName) },
+          { field: 'errorKey', flex: 0.3, headerName: i18n.t(errorKeyHeaderName) },
           {
             field: 'error',
-            flex: 1,
+            flex: 0.7,
             headerName: i18n.t('common.error', { count: errorsCount }),
             renderCell: ({ value }) => (
               <ValidationFieldMessages validation={validationWrapper(value)} showKeys={false} />
