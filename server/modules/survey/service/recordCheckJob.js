@@ -115,7 +115,7 @@ export default class RecordCheckJob extends Job {
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
 
-    this.logDebug(`checking record ${recordUuid}`)
+    // this.logDebug(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId: this.surveyId, recordUuid }, this.tx)
@@ -173,10 +173,10 @@ export default class RecordCheckJob extends Job {
 
     const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
     if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(nodesToValidate)) {
-      this.logDebug(`validating record ${recordUuid}`)
+      // this.logDebug(`validating record ${recordUuid}`)
       await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, nodesToValidate, this.tx)
     }
-    this.logDebug('record check complete')
+    // this.logDebug('record check complete')
   }
 
   // Inserts all the missing single nodes in the specified records having the node def in the specified  ones.

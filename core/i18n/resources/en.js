@@ -554,9 +554,11 @@ Are you sure you want to continue?`,
       startImport: 'Start import',
     },
     validateFile: 'Validate file',
+    validateFileInfo:
+      'The validation process checks that the file contains valid data according to the data type of each attribute.',
     validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
 - {{rowsProcessed}} rows processed`,
-    validationCompleteSuccessfully: `## Validation complete
+    validationCompleteSuccessfully: `## Validation complete without errors
 - {{rowsProcessed}} rows processed
 - {{updatedValues}} values would be updated
 - {{insertedRecords}} records would be created
