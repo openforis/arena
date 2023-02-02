@@ -4,7 +4,7 @@
 .analysis-node-defs__list-header {
   position: relative;
   display: grid;
-  grid-template-columns: 40px 150px 200px 1fr 120px 120px repeat(2, 80px);
+  grid-template-columns: 40px 0.2fr 0.4fr 0.4fr 120px 120px repeat(2, 80px);
   grid-column-gap: 22px;
   align-items: center;
 
