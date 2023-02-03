@@ -515,16 +515,7 @@ $t(common.cantUndoWarning)`,
       rowNum: 'Row #',
     },
     forceImportFromAnotherSurvey: 'Force import from another survey',
-    importCompleteSummary: `
-- {{rowsProcessed}} rows processed
-- {{updatedValues}} values updated
-- {{insertedRecords}} records created
-- {{updatedRecords}} records updated
-`,
-    importCompleteSuccessfully: `## Import complete:
-$t(dataImportView.importCompleteSummary)`,
-    importCompleteWithErrors: `## Import complete (with errors):
-- {{rowsProcessed}} rows processed`,
+
     importFromCollect: 'Import data from Collect / Collect Mobile',
     importFromCsv: 'Import data from CSV',
     importIntoCycle: 'Import into cycle',
@@ -533,6 +524,32 @@ $t(dataImportView.importCompleteSummary)`,
       label: 'Import type',
       insertNewRecords: 'Insert new records',
       updateExistingRecords: 'Update existing records',
+    },
+    jobs: {
+      CollectDataImportJob: {
+        importCompleteSuccessfully: `Collect data import complete:
+        - {{insertedRecords}} records created`,
+      },
+      DataImportJob: {
+        importCompleteSummary: `
+        - {{rowsProcessed}} rows processed
+        - {{updatedValues}} values updated
+        - {{insertedRecords}} records created
+        - {{updatedRecords}} records updated`,
+        importCompleteSuccessfully: `## Import complete:
+$t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
+        importCompleteWithErrors: `## Import complete (with errors):
+        - {{rowsProcessed}} rows processed`,
+      },
+      DataImportValidationJob: {
+        validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
+        - {{rowsProcessed}} rows processed`,
+        validationCompleteSuccessfully: `## Validation complete without errors
+        - {{rowsProcessed}} rows processed
+        - {{updatedValues}} values would be updated
+        - {{insertedRecords}} records would be created
+        - {{updatedRecords}} records would be updated`,
+      },
     },
     options: {
       header: 'Options',
@@ -556,13 +573,6 @@ Are you sure you want to continue?`,
     validateFile: 'Validate file',
     validateFileInfo:
       'The validation process checks that the file contains valid data according to the data type of each attribute.',
-    validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
-- {{rowsProcessed}} rows processed`,
-    validationCompleteSuccessfully: `## Validation complete without errors
-- {{rowsProcessed}} rows processed
-- {{updatedValues}} values would be updated
-- {{insertedRecords}} records would be created
-- {{updatedRecords}} records would be updated`,
   },
 
   dataView: {

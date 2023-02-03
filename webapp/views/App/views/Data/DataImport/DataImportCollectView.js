@@ -50,7 +50,7 @@ export const CollectDataImportView = () => {
           const { insertedRecords } = JobSerialized.getResult(jobCompleted)
           dispatch(
             NotificationActions.notifyInfo({
-              key: 'dataImportView.importComplete',
+              key: 'dataImportView.jobs.CollectDataImportJob.importCompleteSuccessfully',
               params: { insertedRecords },
             })
           )
