@@ -105,7 +105,7 @@
     "@mui/material": "^5.10.15",
     "@mui/x-data-grid": "^5.17.20",
     "@mui/x-date-pickers": "^5.0.14",
-    "@openforis/arena-core": "^0.0.127",
+    "@openforis/arena-core": "^0.0.128",
     "@openforis/arena-server": "^0.1.22",
     "@sendgrid/mail": "^7.7.0",
     "@shopify/draggable": "^1.0.0-beta.8",
