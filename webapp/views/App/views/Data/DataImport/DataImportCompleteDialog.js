@@ -9,10 +9,10 @@ import { useI18n } from '@webapp/store/system'
 import Markdown from '@webapp/components/markdown'
 import JobErrors from '@webapp/views/App/JobMonitor/JobErrors'
 
-const determineContentKey = ({ dryRun, hasErrors }) => {
-  const jobType = dryRun ? 'validation' : 'import'
+const determineContentKey = ({ jobType, dryRun, hasErrors }) => {
+  const action = dryRun ? 'validation' : 'import'
   const status = hasErrors ? 'WithErrors' : 'Successfully'
-  return `dataImportView.${jobType}Complete${status}`
+  return `dataImportView.jobs.${jobType}.${action}Complete${status}`
 }
 
 export const DataImportCompleteDialog = (props) => {
@@ -26,7 +26,7 @@ export const DataImportCompleteDialog = (props) => {
   const hasErrors = errorsCount > 0
   const errorsFoundMessage = i18n.t('common.errorFound', { count: errorsCount })
 
-  const contentKey = determineContentKey({ dryRun, hasErrors })
+  const contentKey = determineContentKey({ jobType: job.type, dryRun, hasErrors })
   const content = i18n.t(contentKey, { ...jobResult, errorsFoundMessage })
 
   return (
