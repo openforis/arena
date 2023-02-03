@@ -53,7 +53,7 @@ ${itemCodes
   * **X**: ${point.x}
   * **Y**: ${point.y}
   * **SRS**: ${point.srs}
-  * **${i18n.t('mapView.elevation')}**: ${elevation}`
+* **${i18n.t('mapView.elevation')}**: ${elevation}`
 
   const flyToPoint = (point) => {
     popupRef.current?.close()

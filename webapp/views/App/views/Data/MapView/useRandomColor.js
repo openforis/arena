@@ -4,7 +4,7 @@ const possibleColors = {
   aqua: '#00ffff',
   azure: '#f0ffff',
   beige: '#f5f5dc',
-  black: '#000000',
+  // black: '#000000',
   blue: '#0000ff',
   brown: '#a52a2a',
   cyan: '#00ffff',
@@ -59,7 +59,8 @@ export const useRandomColor = (dependencies = []) => {
     // update state
     const availableColorsUpdated = [...availableColors]
     availableColorsUpdated.splice(colorIndex, 1)
-    availableColorsRef.current = availableColorsUpdated.length > 0 ? availableColorsUpdated : [...Object.values(colors)]
+    availableColorsRef.current =
+      availableColorsUpdated.length > 0 ? availableColorsUpdated : [...Object.values(possibleColors)]
 
     return color
   }, dependencies)
