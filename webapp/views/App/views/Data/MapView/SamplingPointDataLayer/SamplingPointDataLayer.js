@@ -1,14 +1,10 @@
 import React, { useRef } from 'react'
-import { CircleMarker, LayersControl, LayerGroup } from 'react-leaflet'
+import { LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { ClusterMarker } from '../common'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
-import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
-import { MarkerTooltip } from '../common/MarkerTooltip'
-
-const markerRadius = 10
+import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 
 export const SamplingPointDataLayer = (props) => {
   const { markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props
@@ -25,9 +21,6 @@ export const SamplingPointDataLayer = (props) => {
 
   // Have a Reference to points for opening popups automatically
   const markerRefs = useRef([])
-
-  const options = useMapContextOptions()
-  const { showMarkersLabels } = options
 
   const openPopupOfPoint = (point) => {
     const marker = markerRefs.current[point.uuid]
@@ -53,7 +46,7 @@ export const SamplingPointDataLayer = (props) => {
       <LayerGroup>
         {clusters.map((cluster) => {
           // the point may be either a cluster or a sampling point item
-          const { cluster: isCluster, itemUuid, itemCodes } = cluster.properties
+          const { cluster: isCluster, itemUuid } = cluster.properties
 
           // we have a cluster to render
           if (isCluster) {
@@ -71,30 +64,19 @@ export const SamplingPointDataLayer = (props) => {
               />
             )
           }
-          const [longitude, latitude] = cluster.geometry.coordinates
-
           // we have a single point (sampling point item) to render
           return (
-            <CircleMarker
+            <SamplingPointDataMarker
               key={itemUuid}
-              center={[latitude, longitude]}
-              radius={markerRadius}
-              color={markersColor}
-              ref={(ref) => {
-                if (ref != null) markerRefs.current[itemUuid] = ref
-              }}
-            >
-              {showMarkersLabels && <MarkerTooltip color={markersColor}>{itemCodes.join(' - ')}</MarkerTooltip>}
-
-              <SamplingPointDataItemPopup
-                pointFeature={cluster}
-                getNextPoint={getNextPoint}
-                getPreviousPoint={getPreviousPoint}
-                openPopupOfPoint={openPopupOfPoint}
-                onRecordEditClick={onRecordEditClick}
-                createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
-              />
-            </CircleMarker>
+              createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
+              getNextPoint={getNextPoint}
+              getPreviousPoint={getPreviousPoint}
+              markersColor={markersColor}
+              markerRefs={markerRefs}
+              openPopupOfPoint={openPopupOfPoint}
+              onRecordEditClick={onRecordEditClick}
+              pointFeature={cluster}
+            />
           )
         })}
       </LayerGroup>

@@ -5,14 +5,12 @@ import React, { useCallback, useState } from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 import { ButtonIconGear } from '../buttons'
 import { Checkbox } from '../form'
 import { useMapContext } from './MapContext'
 import { MapOptions } from './mapOptions'
 
 export const MapOptionsEditor = () => {
-  const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
 
   const sampleBasedImageInterpretation = Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)
@@ -44,7 +42,7 @@ export const MapOptionsEditor = () => {
                 <Checkbox
                   key={key}
                   checked={value}
-                  label={i18n.t(`mapView.options.${key}`)}
+                  label={`mapView.options.${key}`}
                   onChange={(valueUpdated) => onOptionUpdate({ option: key, value: valueUpdated })}
                 />
               ))}

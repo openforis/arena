@@ -70,7 +70,7 @@ export const init = (app) => {
     try {
       const { lat, lng } = Request.getParams(req)
       const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
-      const { data } = await axios.get(url, { timeout: 5000 })
+      const { data } = await axios.get(url, { timeout: 10000 })
       const elevation = data?.results?.[0]?.elevation
 
       res.json(elevation)
