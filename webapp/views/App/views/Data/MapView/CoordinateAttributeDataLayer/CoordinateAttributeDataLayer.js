@@ -1,10 +1,11 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { ClusterMarker } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
+import { useFlyToPoint } from '../common/useFlyToPoint'
 
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
@@ -19,55 +20,15 @@ export const CoordinateAttributeDataLayer = (props) => {
     points,
   } = useCoordinateAttributeDataLayer(props)
 
-  const [state, setState] = useState({})
-  const { currentPointShown, currentPointPopupOpen } = state
-
-  // Have a Reference to points for opening popups automatically
-  const markerRefs = useRef([])
-
-  const setMarkerByParentUuid = useCallback(({ parentUuid, marker }) => {
-    markerRefs.current[parentUuid] = marker
-  }, [])
-
-  const openPopupOfPoint = useCallback(
-    async (point) => {
-      const marker = markerRefs.current[point.uuid]
-      if (marker) {
-        marker.openPopup()
-      } else {
-        if (currentPointShown) {
-          // unmount current marker
-          await setState({ currentPointShown: null })
-        }
-        // marker is not visible (it's clustered); add it to the map as CoordinateAttributeMarker
-        setState({ currentPointShown: point, currentPointPopupOpen: true })
-      }
-    },
-    [currentPointShown]
-  )
-
-  const getPointIndex = useCallback((uuid) => points.findIndex((item) => item.properties.parentUuid === uuid), [points])
-
-  const getNextPoint = useCallback(
-    (uuid) => {
-      const index = getPointIndex(uuid)
-      return points[(index + 1) % points.length]
-    },
-    [getPointIndex, points]
-  )
-
-  const getPreviousPoint = useCallback(
-    (uuid) => {
-      const index = getPointIndex(uuid)
-      return points[index > 0 ? index - 1 : points.length - 1]
-    },
-    [getPointIndex, points]
-  )
-
-  const onCurrentPointPopupClose = useCallback(
-    () => setState((statePrev) => ({ ...statePrev, currentPointPopupOpen: false })),
-    []
-  )
+  const {
+    currentPointShown,
+    currentPointPopupOpen,
+    flyToNextPoint,
+    flyToPreviousPoint,
+    onCurrentPointPopupClose,
+    openPopupOfPoint,
+    setMarkerByKey,
+  } = useFlyToPoint({ points })
 
   return (
     <LayersControl.Overlay name={layerName}>
@@ -86,8 +47,8 @@ export const CoordinateAttributeDataLayer = (props) => {
                 clusterExpansionZoomExtractor={clusterExpansionZoomExtractor}
                 clusterIconCreator={clusterIconCreator}
                 getClusterLeaves={getClusterLeaves}
-                onRecordEditClick={onRecordEditClick}
                 openPopupOfPoint={openPopupOfPoint}
+                onRecordEditClick={onRecordEditClick}
                 pointLabelFunction={(point) => point.properties.ancestorsKeys.join(' - ')}
                 totalPoints={totalPoints}
               />
@@ -102,10 +63,9 @@ export const CoordinateAttributeDataLayer = (props) => {
               markersColor={markersColor}
               pointFeature={cluster}
               onRecordEditClick={onRecordEditClick}
-              getNextPoint={getNextPoint}
-              getPreviousPoint={getPreviousPoint}
-              openPopupOfPoint={openPopupOfPoint}
-              setMarkerByParentUuid={setMarkerByParentUuid}
+              flyToNextPoint={flyToNextPoint}
+              flyToPreviousPoint={flyToPreviousPoint}
+              setMarkerByKey={setMarkerByKey}
             />
           )
         })}
@@ -115,9 +75,8 @@ export const CoordinateAttributeDataLayer = (props) => {
             markersColor={markersColor}
             pointFeature={currentPointShown}
             onRecordEditClick={onRecordEditClick}
-            getNextPoint={getNextPoint}
-            getPreviousPoint={getPreviousPoint}
-            openPopupOfPoint={openPopupOfPoint}
+            flyToNextPoint={flyToNextPoint}
+            flyToPreviousPoint={flyToPreviousPoint}
             popupOpen={currentPointPopupOpen}
             onPopupClose={onCurrentPointPopupClose}
           />
