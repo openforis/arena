@@ -2,8 +2,8 @@ import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummaryGenerator from '@server/modules/category/manager/categoryImportSummaryGenerator'
 
-const { newSummary, newColumn } = CategoryImportSummary
-const { code, label, description, extra } = CategoryImportSummary.columnTypes
+const { newSummary, newItem: newColumn } = CategoryImportSummary
+const { code, label, description, extra } = CategoryImportSummary.itemTypes
 const { text } = ExtraPropDef.dataTypes
 
 describe('CategoryImportSummaryGenerator Test', () => {

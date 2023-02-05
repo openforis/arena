@@ -111,9 +111,9 @@ export default class CategoryImportJob extends Job {
     const columns = CategoryImportSummary.getColumns(this.summary)
 
     return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
-      if (CategoryImportSummary.isColumnExtra(column)) {
+      if (CategoryImportSummary.isItemExtra(column)) {
         accExtraDef[columnName] = ExtraPropDef.newItem({
-          dataType: CategoryImportSummary.getColumnDataType(column),
+          dataType: CategoryImportSummary.getItemDataType(column),
         })
       }
 
@@ -336,7 +336,7 @@ export default class CategoryImportJob extends Job {
   _addErrorCodeDuplicate(levelIndex, codes) {
     const code = codes[levelIndex]
     const columnName = CategoryImportSummary.getColumnName(
-      CategoryImportSummary.columnTypes.code,
+      CategoryImportSummary.itemTypes.code,
       levelIndex
     )(this.summary)
     this._addError(Validation.messageKeys.categoryImport.codeDuplicate, {
@@ -347,7 +347,7 @@ export default class CategoryImportJob extends Job {
 
   _addErrorCodeRequired(levelIndex) {
     const columnName = CategoryImportSummary.getColumnName(
-      CategoryImportSummary.columnTypes.code,
+      CategoryImportSummary.itemTypes.code,
       levelIndex
     )(this.summary)
     this._addError(Validation.messageKeys.categoryImport.codeRequired, {

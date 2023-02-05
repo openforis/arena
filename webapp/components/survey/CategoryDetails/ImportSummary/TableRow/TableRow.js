@@ -11,13 +11,13 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { useI18n } from '@webapp/store/system'
 
 const _getColumnSummaryKey = ({ column }) => {
-  if (CategoryImportSummary.isColumnLabel(column)) {
+  if (CategoryImportSummary.isItemLabel(column)) {
     return 'categoryEdit.importSummary.columnTypeLabel'
   }
-  if (CategoryImportSummary.isColumnDescription(column)) {
+  if (CategoryImportSummary.isItemDescription(column)) {
     return 'categoryEdit.importSummary.columnTypeDescription'
   }
-  if (CategoryImportSummary.isColumnExtra(column)) {
+  if (CategoryImportSummary.isItemExtra(column)) {
     return 'categoryEdit.importSummary.columnTypeSummaryExtra'
   }
 
@@ -31,7 +31,7 @@ const TableRow = (props) => {
 
   const columnSummaryKey = _getColumnSummaryKey({ column })
 
-  const dataType = CategoryImportSummary.getColumnDataType(column)
+  const dataType = CategoryImportSummary.getItemDataType(column)
 
   return (
     <div className="table__row">
@@ -39,13 +39,13 @@ const TableRow = (props) => {
       <div>{columnName}</div>
       <div>
         {i18n.t(columnSummaryKey, {
-          type: CategoryImportSummary.getColumnType(column),
-          level: CategoryImportSummary.getColumnLevelIndex(column) + 1,
-          language: Languages.getLanguageLabel(CategoryImportSummary.getColumnLang(column), i18n.language),
+          type: CategoryImportSummary.getItemType(column),
+          level: CategoryImportSummary.getItemLevelIndex(column) + 1,
+          language: Languages.getLanguageLabel(CategoryImportSummary.getItemLang(column), i18n.language),
         })}
       </div>
       <div className="column__extra-def">
-        {CategoryImportSummary.isColumnExtra(column) && (
+        {CategoryImportSummary.isItemExtra(column) && (
           <Dropdown
             className="dropdown__extra-def-type"
             items={Object.keys(ExtraPropDef.dataTypes)}

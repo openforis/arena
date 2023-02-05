@@ -20,18 +20,18 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
       Object.entries(columns).forEach(([columnName, column]) => {
         const columnValue = row[columnName]
 
-        if (CategoryImportSummary.isColumnCode(column)) {
+        if (CategoryImportSummary.isItemCode(column)) {
           codes.push(columnValue)
         } else if (StringUtils.isNotBlank(columnValue)) {
-          if (CategoryImportSummary.isColumnExtra(column)) {
+          if (CategoryImportSummary.isItemExtra(column)) {
             extra[columnName] = columnValue
           } else {
             // Label or description
-            const lang = CategoryImportSummary.getColumnLang(column)
+            const lang = CategoryImportSummary.getItemLang(column)
 
-            if (CategoryImportSummary.isColumnLabel(column)) {
+            if (CategoryImportSummary.isItemLabel(column)) {
               labelsByLang[lang] = columnValue
-            } else if (CategoryImportSummary.isColumnDescription(column)) {
+            } else if (CategoryImportSummary.isItemDescription(column)) {
               descriptionsByLang[lang] = columnValue
             }
           }

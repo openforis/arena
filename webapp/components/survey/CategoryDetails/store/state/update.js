@@ -87,7 +87,7 @@ export const assocImportSummaryColumnDataType =
   ({ columnName, dataType }) =>
   (state) => {
     const summary = getImportSummary(state)
-    const summaryUpdated = CategoryImportSummary.assocColumnDataType(columnName, dataType)(summary)
+    const summaryUpdated = CategoryImportSummary.assocItemDataType(columnName, dataType)(summary)
     return assocImportSummary({ summary: summaryUpdated })(state)
   }
 

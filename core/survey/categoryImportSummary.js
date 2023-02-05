@@ -1,11 +1,12 @@
 import * as R from 'ramda'
 
 export const keys = {
-  columns: 'columns',
+  items: 'items',
   filePath: 'filePath',
 }
 
-export const keysColumn = {
+export const keysItem = {
+  columnNames: 'columnNames',
   dataType: 'dataType',
   lang: 'lang',
   levelIndex: 'levelIndex',
@@ -14,7 +15,7 @@ export const keysColumn = {
   type: 'type',
 }
 
-export const columnTypes = {
+export const itemTypes = {
   code: 'code',
   description: 'description',
   extra: 'extra',
@@ -23,59 +24,58 @@ export const columnTypes = {
 
 // ===== SUMMARY
 
-export const newSummary = ({ columns, filePath = null }) => ({
-  [keys.columns]: columns,
+export const newSummary = ({ items, filePath = null }) => ({
+  [keys.items]: items,
   [keys.filePath]: filePath,
 })
 
-export const getColumns = R.propOr({}, keys.columns)
+export const getItems = R.propOr([], keys.items)
+
+export const getItemColumns = R.propOr({}, keysItem.columns)
 
 export const getFilePath = R.prop(keys.filePath)
 
-// ===== COLUMN
+// ===== ITEM
 
-export const newColumn = ({ type, levelName = null, levelIndex = -1, lang = null, dataType = null }) => ({
-  [keysColumn.type]: type,
-  [keysColumn.levelName]: levelName,
-  [keysColumn.levelIndex]: levelIndex,
-  [keysColumn.lang]: lang,
-  [keysColumn.dataType]: dataType,
+export const newItem = ({ columnNames, type, levelName = null, levelIndex = -1, lang = null, dataType = null }) => ({
+  [keysItem.columnNames]: columnNames,
+  [keysItem.type]: type,
+  [keysItem.levelName]: levelName,
+  [keysItem.levelIndex]: levelIndex,
+  [keysItem.lang]: lang,
+  [keysItem.dataType]: dataType,
 })
 
-export const getColumnType = R.prop(keysColumn.type)
+export const getItemType = R.prop(keysItem.type)
 
-export const getColumnLevelName = R.prop(keysColumn.levelName)
+export const getItemLevelName = R.prop(keysItem.levelName)
 
-export const getColumnLevelIndex = R.prop(keysColumn.levelIndex)
+export const getItemLevelIndex = R.prop(keysItem.levelIndex)
 
-export const getColumnLang = R.prop(keysColumn.lang)
+export const getItemLang = R.prop(keysItem.lang)
 
-export const getColumnDataType = R.prop(keysColumn.dataType)
+export const getItemDataType = R.prop(keysItem.dataType)
 
-const isColumnType = (type) => R.pipe(getColumnType, R.equals(type))
+const isItemType = (type) => R.pipe(getItemType, R.equals(type))
 
-export const isColumnCode = isColumnType(columnTypes.code)
-export const isColumnExtra = isColumnType(columnTypes.extra)
-export const isColumnLabel = isColumnType(columnTypes.label)
-export const isColumnDescription = isColumnType(columnTypes.description)
+export const isItemCode = isItemType(itemTypes.code)
+export const isItemExtra = isItemType(itemTypes.extra)
+export const isItemLabel = isItemType(itemTypes.label)
+export const isItemDescription = isItemType(itemTypes.description)
 
-export const hasColumnLang = (column) => isColumnLabel(column) || isColumnDescription(column)
+export const hasItemLang = (column) => isItemLabel(column) || isItemDescription(column)
 
 // ===== UTILS
 
-export const getLevelNames = R.pipe(getColumns, R.values, R.filter(isColumnCode), R.map(getColumnLevelName))
+export const getLevelNames = R.pipe(getItems, R.filter(isItemCode), R.map(getItemLevelName))
 
 export const getColumnName = (type, levelIndex) =>
   R.pipe(
-    getColumns,
-    Object.entries,
-    R.find(([, column]) => getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex),
-    (entry) => (entry ? entry[0] : null)
+    getItems,
+    R.find((item) => getItemType(item) === type && getItemLevelIndex(item) === levelIndex),
+    (item) => (item ? getItemColumns(item)[0] : null)
   )
 
-export const hasColumn = (type, levelIndex) => R.pipe(getColumnName(type, levelIndex), R.isNil, R.not)
-
 // UPDATE
-export const assocColumns = R.assoc(keys.columns)
-export const assocColumnDataType = (columnName, dataType) =>
-  R.assocPath([keys.columns, columnName, keysColumn.dataType], dataType)
+export const assocItemDataType = (columnName, dataType) =>
+  R.assocPath([keys.columns, columnName, keysItem.dataType], dataType)
