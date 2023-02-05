@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { Popup, useMap } from 'react-leaflet'
+import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -15,21 +15,14 @@ import { useSurvey } from '@webapp/store/survey'
 import { useElevation } from '../common/useElevation'
 
 export const SamplingPointDataItemPopup = (props) => {
-  const {
-    pointFeature,
-    getNextPoint,
-    getPreviousPoint,
-    openPopupOfPoint,
-    onRecordEditClick,
-    createRecordFromSamplingPointDataItem,
-  } = props
+  const { createRecordFromSamplingPointDataItem, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } =
+    props
 
   const { properties: pointProperties } = pointFeature
   const { itemUuid, itemCodes, itemPoint: point, recordUuid } = pointProperties
 
   const popupRef = useRef(null)
   const i18n = useI18n()
-  const map = useMap()
 
   const userCanCreateRecords = useAuthCanCreateRecord()
   const survey = useSurvey()
@@ -55,20 +48,14 @@ ${itemCodes
   * **SRS**: ${point.srs}
 * **${i18n.t('mapView.elevation')}**: ${elevation}`
 
-  const flyToPoint = (point) => {
-    popupRef.current?.close()
-    map.flyTo(point.latLng)
-    map.once('zoomend', () => openPopupOfPoint(point))
-  }
-
   const onClickNext = () => {
-    const nextPoint = getNextPoint(itemUuid)
-    flyToPoint(nextPoint)
+    flyToNextPoint(pointFeature)
+    popupRef.current?.close()
   }
 
   const onClickPrevious = () => {
-    const previousPoint = getPreviousPoint(itemUuid)
-    flyToPoint(previousPoint)
+    flyToPreviousPoint(pointFeature)
+    popupRef.current?.close()
   }
 
   const onRecordCreate = useCallback(
@@ -108,10 +95,9 @@ ${itemCodes
 }
 
 SamplingPointDataItemPopup.propTypes = {
-  pointFeature: PropTypes.any,
-  getNextPoint: PropTypes.func,
-  getPreviousPoint: PropTypes.func,
-  openPopupOfPoint: PropTypes.func,
-  onRecordEditClick: PropTypes.func,
-  createRecordFromSamplingPointDataItem: PropTypes.func,
+  createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
+  flyToNextPoint: PropTypes.func.isRequired,
+  flyToPreviousPoint: PropTypes.func.isRequired,
+  pointFeature: PropTypes.any.isRequired,
+  onRecordEditClick: PropTypes.func.isRequired,
 }

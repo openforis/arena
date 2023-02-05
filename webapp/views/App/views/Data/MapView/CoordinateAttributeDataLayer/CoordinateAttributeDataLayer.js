@@ -2,10 +2,9 @@ import React from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { ClusterMarker } from '../common'
+import { ClusterMarker, useFlyToPoint } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
-import { useFlyToPoint } from '../common/useFlyToPoint'
 
 export const CoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
@@ -60,11 +59,11 @@ export const CoordinateAttributeDataLayer = (props) => {
             <CoordinateAttributeMarker
               key={key}
               attributeDef={attributeDef}
-              markersColor={markersColor}
-              pointFeature={cluster}
-              onRecordEditClick={onRecordEditClick}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
+              markersColor={markersColor}
+              onRecordEditClick={onRecordEditClick}
+              pointFeature={cluster}
               setMarkerByKey={setMarkerByKey}
             />
           )
@@ -72,13 +71,13 @@ export const CoordinateAttributeDataLayer = (props) => {
         {currentPointShown && (
           <CoordinateAttributeMarker
             attributeDef={attributeDef}
-            markersColor={markersColor}
-            pointFeature={currentPointShown}
-            onRecordEditClick={onRecordEditClick}
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
-            popupOpen={currentPointPopupOpen}
+            markersColor={markersColor}
             onPopupClose={onCurrentPointPopupClose}
+            onRecordEditClick={onRecordEditClick}
+            pointFeature={currentPointShown}
+            popupOpen={currentPointPopupOpen}
           />
         )}
       </LayerGroup>

@@ -10,7 +10,7 @@ export const useFlyToPoint = ({ points }) => {
   // Have a Reference to points for opening popups automatically
   const markersByKeyRef = useRef({})
 
-  const getPointKey = (point) => point?.properties?.key
+  const getPointKey = useCallback((point) => point?.properties?.key, [])
 
   const openPopupOfPoint = useCallback(
     async (point) => {
@@ -27,7 +27,7 @@ export const useFlyToPoint = ({ points }) => {
         setState({ currentPointShown: point, currentPointPopupOpen: true })
       }
     },
-    [currentPointShown]
+    [currentPointShown, getPointKey]
   )
 
   const getPointIndex = useCallback((point) => points.findIndex((p) => getPointKey(p) === getPointKey(point)), [points])

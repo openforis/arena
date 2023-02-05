@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
-import { MarkerTooltip } from '../common/MarkerTooltip'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -26,36 +25,16 @@ export const CoordinateAttributeMarker = (props) => {
   const { ancestorsKeys, key } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
-  const circleRef = useRef(null)
-
-  const options = useMapContextOptions()
-  const { showMarkersLabels, showLocationMarkers } = options
-
-  useEffect(() => {
-    const circleMarker = circleRef.current
-    circleMarker.setStyle({
-      fill: showLocationMarkers,
-      stroke: showLocationMarkers,
-    })
-    if (showMarkersLabels && !circleMarker.isTooltipOpen()) {
-      circleMarker.toggleTooltip()
-    }
-    setMarkerByKey?.({ key, marker: circleMarker })
-
-    if (popupOpen) {
-      circleMarker.openPopup()
-    }
-
-    return () => {
-      setMarkerByKey?.({ key, marker: null })
-    }
-  }, [circleRef, key, popupOpen, setMarkerByKey, showLocationMarkers, showMarkersLabels])
+  const { markerRef, showMarkersLabels } = useLayerMarker({ key, popupOpen, setMarkerByKey })
 
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
       <CircleMarker
-        ref={circleRef}
+        ref={(ref) => {
+          markerRef.current = ref
+          setMarkerByKey({ key, marker: ref })
+        }}
         center={[latitude, longitude]}
         radius={markerRadius}
         color={markersColor}
