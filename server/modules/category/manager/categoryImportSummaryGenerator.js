@@ -33,21 +33,27 @@ const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns
 }, {})
 
 // column name ends with x, y or srs and there are other columns with the other prefixes
+const _getGeometryPointTypeItemName = ({ columnName }) => {
+  const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
+  if (locationColSuffix) {
+    return columnName.substring(0, columnName.length - locationColSuffix.length)
+  }
+  return null
+}
+
+const _getGeometryPointTypeColumnNames = ({ itemName }) => locationColumnsSuffixes.map((suffix) => itemName + suffix)
+
 const _isGeometryPointType = ({ columnName, columnNames }) => {
   const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
   if (locationColSuffix) {
-    const itemName = columnName.substring(0, columnName.length - locationColSuffix.length)
-    const otherSuffixes = locationColumnsSuffixes.filter((suffix) => suffix !== locationColSuffix)
-    if (otherSuffixes.every((suffix) => columnNames.includes(itemName + suffix))) {
-      return true
-    }
+    const itemName = _getGeometryPointTypeItemName({ columnName })
+    const locationColumnNames = _getGeometryPointTypeColumnNames({ itemName })
+    return locationColumnNames.every((colName) => columnNames.includes(colName))
   }
   return false
 }
 
-const _extractColumnTypeByName = ({ columnName, columnNames, columnPatterns, ignoreLabelsAndDescriptions = false }) => {
-  if (_isGeometryPointType({ columnName, columnNames })) return CategoryImportSummary.itemTypes.extra
-
+const _extractColumnTypeByName = ({ columnName, columnPatterns, ignoreLabelsAndDescriptions = false }) => {
   // try to find column type by matching one of the column patterns
   const columnType = Object.keys(columnPatterns).find((type) => columnPatterns[type].test(columnName))
 
@@ -71,7 +77,7 @@ const _extractLang = ({ columnPatterns, columnName, columnType }) => {
 
 const _validateSummary = (summary) => {
   const items = CategoryImportSummary.getItems(summary)
-  const atLeastOneCodeColumn = items.some((item) => CategoryImportSummary.isItemCode(column))
+  const atLeastOneCodeColumn = items.some(CategoryImportSummary.isItemCode)
   if (!atLeastOneCodeColumn) {
     throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
@@ -117,7 +123,7 @@ export const createImportSummaryFromColumnNames = ({
     const columnType =
       someExtraWasCreated || isGeometryPointType
         ? CategoryImportSummary.itemTypes.extra
-        : _extractColumnTypeByName({ columnName, columnNames, columnPatterns, ignoreLabelsAndDescriptions })
+        : _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
 
     const extra = columnType === CategoryImportSummary.itemTypes.extra
 
@@ -133,12 +139,22 @@ export const createImportSummaryFromColumnNames = ({
       : null
 
     const lang = extra ? null : _extractLang({ columnPatterns, columnName, columnType })
+    const itemName = isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
+    const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName }) : [columnName]
 
-    const item = CategoryImportSummary.newItem({ type: columnType, levelName, levelIndex, lang, dataType })
+    const item = CategoryImportSummary.newItem({
+      name: itemName,
+      columnNames: itemColumnNames,
+      type: columnType,
+      levelName,
+      levelIndex,
+      lang,
+      dataType,
+    })
 
     acc.push(item)
     return acc
-  }, {})
+  }, [])
 
   const summary = CategoryImportSummary.newSummary({ items })
 

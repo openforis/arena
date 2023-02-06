@@ -2,7 +2,7 @@ import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummaryGenerator from '@server/modules/category/manager/categoryImportSummaryGenerator'
 
-const { newSummary, newItem: newColumn } = CategoryImportSummary
+const { newSummary, newItem } = CategoryImportSummary
 const { code, label, description, extra } = CategoryImportSummary.itemTypes
 const { text } = ExtraPropDef.dataTypes
 
@@ -14,7 +14,7 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['region_code'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
         },
       }),
     },
@@ -28,8 +28,8 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['region_code', 'label_en'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
+          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
         },
       }),
     },
@@ -38,8 +38,8 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['region_code', 'label'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          label: newColumn({ type: label, levelIndex: -1, lang: null }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
+          label: newItem({ type: label, levelIndex: -1, lang: null }),
         },
       }),
     },
@@ -48,9 +48,9 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['region_code', 'label_en', 'description_en'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
-          description_en: newColumn({ type: description, levelIndex: -1, lang: 'en' }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
+          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
+          description_en: newItem({ type: description, levelIndex: -1, lang: 'en' }),
         },
       }),
     },
@@ -59,11 +59,11 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['region_code', 'label_en', 'description_en', 'extra_1', 'extra_2'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
-          description_en: newColumn({ type: description, levelIndex: -1, lang: 'en' }),
-          extra_1: newColumn({ type: extra, dataType: text }),
-          extra_2: newColumn({ type: extra, dataType: text }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
+          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
+          description_en: newItem({ type: description, levelIndex: -1, lang: 'en' }),
+          extra_1: newItem({ type: extra, dataType: text }),
+          extra_2: newItem({ type: extra, dataType: text }),
         },
       }),
     },
@@ -72,9 +72,9 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['region_code', 'province_code', 'district_code'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          province_code: newColumn({ type: code, levelName: 'province', levelIndex: 1 }),
-          district_code: newColumn({ type: code, levelName: 'district', levelIndex: 2 }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
+          province_code: newItem({ type: code, levelName: 'province', levelIndex: 1 }),
+          district_code: newItem({ type: code, levelName: 'district', levelIndex: 2 }),
         },
       }),
     },
@@ -92,13 +92,13 @@ describe('CategoryImportSummaryGenerator Test', () => {
       ],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          region_code: newColumn({ type: code, levelName: 'region', levelIndex: 0 }),
-          province_code: newColumn({ type: code, levelName: 'province', levelIndex: 1 }),
-          district_code: newColumn({ type: code, levelName: 'district', levelIndex: 2 }),
-          label_en: newColumn({ type: label, levelIndex: -1, lang: 'en' }),
-          extra_1: newColumn({ type: extra, dataType: text }),
-          extra_2: newColumn({ type: extra, dataType: text }),
-          extra_3: newColumn({ type: extra, dataType: text }),
+          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
+          province_code: newItem({ type: code, levelName: 'province', levelIndex: 1 }),
+          district_code: newItem({ type: code, levelName: 'district', levelIndex: 2 }),
+          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
+          extra_1: newItem({ type: extra, dataType: text }),
+          extra_2: newItem({ type: extra, dataType: text }),
+          extra_3: newItem({ type: extra, dataType: text }),
         },
       }),
     },
@@ -107,12 +107,12 @@ describe('CategoryImportSummaryGenerator Test', () => {
       columns: ['level1_code', 'level2_code', 'level3_code', 'x', 'y', 'srs_id'],
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          level1_code: newColumn({ type: code, levelName: 'level1', levelIndex: 0 }),
-          level2_code: newColumn({ type: code, levelName: 'level2', levelIndex: 1 }),
-          level3_code: newColumn({ type: code, levelName: 'level3', levelIndex: 2 }),
-          x: newColumn({ type: extra, dataType: text }),
-          y: newColumn({ type: extra, dataType: text }),
-          srs_id: newColumn({ type: extra, dataType: text }),
+          level1_code: newItem({ type: code, levelName: 'level1', levelIndex: 0 }),
+          level2_code: newItem({ type: code, levelName: 'level2', levelIndex: 1 }),
+          level3_code: newItem({ type: code, levelName: 'level3', levelIndex: 2 }),
+          x: newItem({ type: extra, dataType: text }),
+          y: newItem({ type: extra, dataType: text }),
+          srs_id: newItem({ type: extra, dataType: text }),
         },
       }),
     },
@@ -123,14 +123,14 @@ describe('CategoryImportSummaryGenerator Test', () => {
       ignoreLabelsAndDescriptions: true,
       summary: newSummary({
         [CategoryImportSummary.keys.columns]: {
-          level1_code: newColumn({ type: code, levelName: 'level1', levelIndex: 0 }),
-          level2_code: newColumn({ type: code, levelName: 'level2', levelIndex: 1 }),
-          level3_code: newColumn({ type: code, levelName: 'level3', levelIndex: 2 }),
-          x: newColumn({ type: extra, dataType: text }),
-          y: newColumn({ type: extra, dataType: text }),
-          srs_id: newColumn({ type: extra, dataType: text }),
-          region: newColumn({ type: extra, dataType: text }),
-          region_label: newColumn({ type: extra, dataType: text }),
+          level1_code: newItem({ type: code, levelName: 'level1', levelIndex: 0 }),
+          level2_code: newItem({ type: code, levelName: 'level2', levelIndex: 1 }),
+          level3_code: newItem({ type: code, levelName: 'level3', levelIndex: 2 }),
+          x: newItem({ type: extra, dataType: text }),
+          y: newItem({ type: extra, dataType: text }),
+          srs_id: newItem({ type: extra, dataType: text }),
+          region: newItem({ type: extra, dataType: text }),
+          region_label: newItem({ type: extra, dataType: text }),
         },
       }),
     },
