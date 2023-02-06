@@ -13,9 +13,9 @@ describe('CategoryImportSummaryGenerator Test', () => {
       title: 'flat code list',
       columns: ['region_code'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+        ],
       }),
     },
     {
@@ -27,93 +27,147 @@ describe('CategoryImportSummaryGenerator Test', () => {
       title: 'flat code list with label',
       columns: ['region_code', 'label_en'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+          newItem({ key: 'label_en', columns: ['label_en'], type: label, levelIndex: -1, lang: 'en' }),
+        ],
       }),
     },
     {
       title: 'flat code list with label in default language',
       columns: ['region_code', 'label'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-          label: newItem({ type: label, levelIndex: -1, lang: null }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+          newItem({ key: 'label', columns: ['label'], type: label, levelIndex: -1, lang: null }),
+        ],
       }),
     },
     {
       title: 'flat code list with label and description',
       columns: ['region_code', 'label_en', 'description_en'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
-          description_en: newItem({ type: description, levelIndex: -1, lang: 'en' }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+          newItem({ key: 'label_en', columns: ['label_en'], type: label, levelIndex: -1, lang: 'en' }),
+          newItem({
+            key: 'description_en',
+            columns: ['description_en'],
+            type: description,
+            levelIndex: -1,
+            lang: 'en',
+          }),
+        ],
       }),
     },
     {
       title: 'flat code list with label, description and extras',
       columns: ['region_code', 'label_en', 'description_en', 'extra_1', 'extra_2'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
-          description_en: newItem({ type: description, levelIndex: -1, lang: 'en' }),
-          extra_1: newItem({ type: extra, dataType: text }),
-          extra_2: newItem({ type: extra, dataType: text }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+          newItem({ key: 'label_en', columns: ['label_en'], type: label, levelIndex: -1, lang: 'en' }),
+          newItem({
+            key: 'description_en',
+            columns: ['description_en'],
+            type: description,
+            levelIndex: -1,
+            lang: 'en',
+          }),
+          newItem({ key: 'extra_1', columns: ['extra_1'], type: extra, dataType: text }),
+          newItem({ key: 'extra_2', columns: ['extra_2'], type: extra, dataType: text }),
+        ],
       }),
     },
     {
       title: 'hierarchical code list',
       columns: ['region_code', 'province_code', 'district_code'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-          province_code: newItem({ type: code, levelName: 'province', levelIndex: 1 }),
-          district_code: newItem({ type: code, levelName: 'district', levelIndex: 2 }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+          newItem({
+            key: 'province_code',
+            columns: ['province_code'],
+            type: code,
+            levelName: 'province',
+            levelIndex: 1,
+          }),
+          newItem({
+            key: 'district_code',
+            columns: ['district_code'],
+            type: code,
+            levelName: 'district',
+            levelIndex: 2,
+          }),
+        ],
       }),
     },
     {
       title: 'hierarchical code list full',
-      columns: [
-        'region_code',
-        'province_code',
-        'district_code',
-        'label_en',
-        'label_en',
-        'extra_1',
-        'extra_2',
-        'extra_3',
-      ],
+      columns: ['region_code', 'province_code', 'district_code', 'label_en', 'extra_1', 'extra_2', 'extra_3'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          region_code: newItem({ type: code, levelName: 'region', levelIndex: 0 }),
-          province_code: newItem({ type: code, levelName: 'province', levelIndex: 1 }),
-          district_code: newItem({ type: code, levelName: 'district', levelIndex: 2 }),
-          label_en: newItem({ type: label, levelIndex: -1, lang: 'en' }),
-          extra_1: newItem({ type: extra, dataType: text }),
-          extra_2: newItem({ type: extra, dataType: text }),
-          extra_3: newItem({ type: extra, dataType: text }),
-        },
+        items: [
+          newItem({ key: 'region_code', columns: ['region_code'], type: code, levelName: 'region', levelIndex: 0 }),
+          newItem({
+            key: 'province_code',
+            columns: ['province_code'],
+            type: code,
+            levelName: 'province',
+            levelIndex: 1,
+          }),
+          newItem({
+            key: 'district_code',
+            columns: ['district_code'],
+            type: code,
+            levelName: 'district',
+            levelIndex: 2,
+          }),
+          newItem({ key: 'label_en', columns: ['label_en'], type: label, levelIndex: -1, lang: 'en' }),
+          newItem({ key: 'extra_1', columns: ['extra_1'], type: extra, dataType: text }),
+          newItem({ key: 'extra_2', columns: ['extra_2'], type: extra, dataType: text }),
+          newItem({ key: 'extra_3', columns: ['extra_3'], type: extra, dataType: text }),
+        ],
       }),
     },
     {
       title: 'sampling point data',
       columns: ['level1_code', 'level2_code', 'level3_code', 'x', 'y', 'srs_id'],
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          level1_code: newItem({ type: code, levelName: 'level1', levelIndex: 0 }),
-          level2_code: newItem({ type: code, levelName: 'level2', levelIndex: 1 }),
-          level3_code: newItem({ type: code, levelName: 'level3', levelIndex: 2 }),
-          x: newItem({ type: extra, dataType: text }),
-          y: newItem({ type: extra, dataType: text }),
-          srs_id: newItem({ type: extra, dataType: text }),
-        },
+        items: [
+          newItem({ key: 'level1_code', columns: ['level1_code'], type: code, levelName: 'level1', levelIndex: 0 }),
+          newItem({
+            key: 'level2_code',
+            columns: ['level2_code'],
+            type: code,
+            levelName: 'level2',
+            levelIndex: 1,
+          }),
+          newItem({
+            key: 'level3_code',
+            columns: ['level3_code'],
+            type: code,
+            levelName: 'level3',
+            levelIndex: 2,
+          }),
+          newItem({
+            key: 'x',
+            columns: ['x'],
+            type: extra,
+            dataType: text,
+          }),
+          newItem({
+            key: 'y',
+            columns: ['y'],
+            type: extra,
+            dataType: text,
+          }),
+          newItem({
+            key: 'srs_id',
+            columns: ['srs_id'],
+            type: extra,
+            dataType: text,
+          }),
+        ],
       }),
     },
     {
@@ -122,16 +176,41 @@ describe('CategoryImportSummaryGenerator Test', () => {
       codeColumnPattern: /(level\d+)_code/,
       ignoreLabelsAndDescriptions: true,
       summary: newSummary({
-        [CategoryImportSummary.keys.columns]: {
-          level1_code: newItem({ type: code, levelName: 'level1', levelIndex: 0 }),
-          level2_code: newItem({ type: code, levelName: 'level2', levelIndex: 1 }),
-          level3_code: newItem({ type: code, levelName: 'level3', levelIndex: 2 }),
-          x: newItem({ type: extra, dataType: text }),
-          y: newItem({ type: extra, dataType: text }),
-          srs_id: newItem({ type: extra, dataType: text }),
-          region: newItem({ type: extra, dataType: text }),
-          region_label: newItem({ type: extra, dataType: text }),
-        },
+        items: [
+          newItem({ key: 'level1_code', columns: ['level1_code'], type: code, levelName: 'level1', levelIndex: 0 }),
+          newItem({ key: 'level2_code', columns: ['level2_code'], type: code, levelName: 'level2', levelIndex: 1 }),
+          newItem({ key: 'level3_code', columns: ['level3_code'], type: code, levelName: 'level3', levelIndex: 2 }),
+          newItem({
+            key: 'x',
+            columns: ['x'],
+            type: extra,
+            dataType: text,
+          }),
+          newItem({
+            key: 'y',
+            columns: ['y'],
+            type: extra,
+            dataType: text,
+          }),
+          newItem({
+            key: 'srs_id',
+            columns: ['srs_id'],
+            type: extra,
+            dataType: text,
+          }),
+          newItem({
+            key: 'region',
+            columns: ['region'],
+            type: extra,
+            dataType: text,
+          }),
+          newItem({
+            key: 'region_label',
+            columns: ['region_label'],
+            type: extra,
+            dataType: text,
+          }),
+        ],
       }),
     },
   ]

@@ -6,12 +6,12 @@ export const keys = {
 }
 
 export const keysItem = {
-  columnNames: 'columnNames',
+  columns: 'columns',
   dataType: 'dataType',
   lang: 'lang',
   levelIndex: 'levelIndex',
   levelName: 'levelName',
-  name: 'name',
+  key: 'name',
   type: 'type',
 }
 
@@ -37,17 +37,9 @@ export const getFilePath = R.prop(keys.filePath)
 
 // ===== ITEM
 
-export const newItem = ({
-  name,
-  columnNames,
-  type,
-  levelName = null,
-  levelIndex = -1,
-  lang = null,
-  dataType = null,
-}) => ({
-  [keysItem.name]: name,
-  [keysItem.columnNames]: columnNames,
+export const newItem = ({ key, columns, type, levelName = null, levelIndex = -1, lang = null, dataType = null }) => ({
+  [keysItem.key]: key,
+  [keysItem.columns]: columns,
   [keysItem.type]: type,
   [keysItem.levelName]: levelName,
   [keysItem.levelIndex]: levelIndex,
@@ -55,7 +47,7 @@ export const newItem = ({
   [keysItem.dataType]: dataType,
 })
 
-export const getItemName = R.prop(keysItem.name)
+export const getItemKey = R.prop(keysItem.key)
 
 export const getItemType = R.prop(keysItem.type)
 

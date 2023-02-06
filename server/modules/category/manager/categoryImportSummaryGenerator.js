@@ -143,8 +143,8 @@ export const createImportSummaryFromColumnNames = ({
     const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName }) : [columnName]
 
     const item = CategoryImportSummary.newItem({
-      name: itemName,
-      columnNames: itemColumnNames,
+      key: itemName,
+      columns: itemColumnNames,
       type: columnType,
       levelName,
       levelIndex,
