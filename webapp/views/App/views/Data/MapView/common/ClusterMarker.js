@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Marker, Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 
 const ClusteredPointsPopup = (props) => {
   const { clusteredPoints, openPopupOfPoint, pointLabelFunction } = props
@@ -54,6 +55,15 @@ export const ClusterMarker = (props) => {
 
   const markerRef = useRef(null)
   const [clusteredPoints, setClusteredPoints] = useState([])
+
+  const options = useMapContextOptions()
+  const { showLocationMarkers } = options
+
+  // hide cluster marker if showLocationMarkers is false
+  useEffect(() => {
+    const marker = markerRef.current
+    marker.setOpacity(showLocationMarkers ? 1 : 0)
+  }, [markerRef, showLocationMarkers])
 
   const onClick = useCallback(() => {
     const maxZoom = map.getMaxZoom()
