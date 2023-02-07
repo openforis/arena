@@ -78,6 +78,7 @@ export const CoordinateAttributeDataLayer = (props) => {
             onRecordEditClick={onRecordEditClick}
             pointFeature={currentPointShown}
             popupOpen={currentPointPopupOpen}
+            setMarkerByKey={setMarkerByKey}
           />
         )}
       </LayerGroup>
