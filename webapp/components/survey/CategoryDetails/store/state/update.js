@@ -83,11 +83,11 @@ export const dissocItem = ({ levelIndex, itemUuid }) =>
 
 export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
 
-export const assocImportSummaryColumnDataType =
-  ({ columnName, dataType }) =>
+export const assocImportSummaryItemDataType =
+  ({ key, dataType }) =>
   (state) => {
     const summary = getImportSummary(state)
-    const summaryUpdated = CategoryImportSummary.assocItemDataType(columnName, dataType)(summary)
+    const summaryUpdated = CategoryImportSummary.assocItemDataType(key, dataType)(summary)
     return assocImportSummary({ summary: summaryUpdated })(state)
   }
 

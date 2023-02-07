@@ -10,42 +10,44 @@ import Dropdown from '@webapp/components/form/Dropdown'
 
 import { useI18n } from '@webapp/store/system'
 
-const _getColumnSummaryKey = ({ column }) => {
-  if (CategoryImportSummary.isItemLabel(column)) {
+const _getColumnSummaryKey = ({ item }) => {
+  if (CategoryImportSummary.isItemLabel(item)) {
     return 'categoryEdit.importSummary.columnTypeLabel'
   }
-  if (CategoryImportSummary.isItemDescription(column)) {
+  if (CategoryImportSummary.isItemDescription(item)) {
     return 'categoryEdit.importSummary.columnTypeDescription'
   }
-  if (CategoryImportSummary.isItemExtra(column)) {
-    return 'categoryEdit.importSummary.columnTypeSummaryExtra'
+  if (CategoryImportSummary.isItemExtra(item)) {
+    return 'categoryEdit.importSummary.columnTypeExtra'
   }
-
   return 'categoryEdit.importSummary.columnTypeSummary'
 }
 
 const TableRow = (props) => {
-  const { column, columnName, idx, onDataTypeChange } = props
+  const { idx, item, onDataTypeChange } = props
 
   const i18n = useI18n()
 
-  const columnSummaryKey = _getColumnSummaryKey({ column })
+  const columnSummaryKey = _getColumnSummaryKey({ item })
+  const columns = CategoryImportSummary.getItemColumns(item)
 
-  const dataType = CategoryImportSummary.getItemDataType(column)
+  const dataType = CategoryImportSummary.getItemDataType(item)
+  const itemLangCode = CategoryImportSummary.getItemLang(item)
+  const language = Languages.getLanguageLabel(itemLangCode)
 
   return (
     <div className="table__row">
       <div>{idx + 1}</div>
-      <div>{columnName}</div>
+      <div>{columns.join(', ')}</div>
       <div>
         {i18n.t(columnSummaryKey, {
-          type: CategoryImportSummary.getItemType(column),
-          level: CategoryImportSummary.getItemLevelIndex(column) + 1,
-          language: Languages.getLanguageLabel(CategoryImportSummary.getItemLang(column), i18n.language),
+          type: CategoryImportSummary.getItemType(item),
+          level: CategoryImportSummary.getItemLevelIndex(item) + 1,
+          language,
         })}
       </div>
       <div className="column__extra-def">
-        {CategoryImportSummary.isItemExtra(column) && (
+        {CategoryImportSummary.isItemExtra(item) && (
           <Dropdown
             className="dropdown__extra-def-type"
             items={Object.keys(ExtraPropDef.dataTypes)}
@@ -53,7 +55,7 @@ const TableRow = (props) => {
             itemLabel={(item) => i18n.t(`extraProp.dataTypes.${item}`)}
             searchable={false}
             selection={dataType}
-            onChange={(item) => onDataTypeChange(item)}
+            onChange={onDataTypeChange}
           />
         )}
       </div>
@@ -62,9 +64,9 @@ const TableRow = (props) => {
 }
 
 TableRow.propTypes = {
-  column: PropTypes.object.isRequired,
-  columnName: PropTypes.string.isRequired,
   idx: PropTypes.number.isRequired,
+  item: PropTypes.object.isRequired,
+  key: PropTypes.string.isRequired,
   onDataTypeChange: PropTypes.func.isRequired,
 }
 

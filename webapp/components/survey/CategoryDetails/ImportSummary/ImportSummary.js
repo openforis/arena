@@ -5,23 +5,21 @@ import PropTypes from 'prop-types'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
-import { useI18n } from '@webapp/store/system'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
 import TableHeader from './TableHeader'
 import TableRow from './TableRow'
 
 import { State, useActions } from '../store'
+import { Button } from '@webapp/components/buttons'
 
 const ImportSummary = (props) => {
   const { state, setState } = props
 
-  const i18n = useI18n()
-
   const Actions = useActions({ setState })
 
   const importSummary = State.getImportSummary(state)
-  const columns = CategoryImportSummary.getColumns(importSummary)
+  const items = CategoryImportSummary.getItems(importSummary)
 
   return (
     <Modal className="category__import-summary" onClose={Actions.hideImportSummary}>
@@ -30,29 +28,35 @@ const ImportSummary = (props) => {
           <div className="table__content">
             <TableHeader />
             <div className="table__rows">
-              {Object.entries(columns).map(([columnName, column], idx) => (
-                <TableRow
-                  key={columnName}
-                  idx={idx}
-                  columnName={columnName}
-                  column={column}
-                  onDataTypeChange={(dataType) => Actions.setImportSummaryColumnDataType({ columnName, dataType })}
-                />
-              ))}
+              {items.map((item, idx) => {
+                const key = CategoryImportSummary.getItemKey(item)
+                return (
+                  <TableRow
+                    key={key}
+                    idx={idx}
+                    item={item}
+                    onDataTypeChange={(dataType) => Actions.setImportSummaryColumnDataType({ key, dataType })}
+                  />
+                )
+              })}
             </div>
           </div>
         </div>
       </ModalBody>
 
       <ModalFooter>
-        <button type="button" className="btn modal-footer__item" onClick={() => Actions.importCategory({ state })}>
-          <span className="icon icon-upload2 icon-12px icon-left" />
-          {i18n.t('common.import')}
-        </button>
-        <button type="button" className="btn btn-close modal-footer__item" onClick={Actions.hideImportSummary}>
-          <span className="icon icon-cross icon-10px icon-left" />
-          {i18n.t('common.close')}
-        </button>
+        <Button
+          className="modal-footer__item"
+          onClick={() => Actions.importCategory({ state })}
+          iconClassName="icon-upload2 icon-12px"
+          label="common.import"
+        />
+        <Button
+          className="btn-close modal-footer__item"
+          onClick={Actions.hideImportSummary}
+          iconClassName="icon-cross icon-10px"
+          label="common.close"
+        />
       </ModalFooter>
     </Modal>
   )

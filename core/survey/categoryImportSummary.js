@@ -80,5 +80,10 @@ export const getColumnName = (type, levelIndex) =>
   )
 
 // UPDATE
-export const assocItemDataType = (columnName, dataType) =>
-  R.assocPath([keys.columns, columnName, keysItem.dataType], dataType)
+export const assocItemDataType = (key, dataType) => (summary) => {
+  const items = getItems(summary)
+  const itemIdx = items.findIndex((item) => getItemKey(item) === key)
+  const item = items[itemIdx]
+  const itemUpdated = R.assoc(keysItem.dataType, dataType)(item)
+  return R.assocPath([keys.items, itemIdx], itemUpdated)(summary)
+}
