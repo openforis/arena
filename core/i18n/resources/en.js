@@ -1224,7 +1224,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     level: 'Level',
 
     importSummary: {
-      column: 'Column',
+      columns: 'Column',
       columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
       columnTypeExtra: '$t(extraProp.label)',
       columnTypeDescription: 'Description ({{language}})',

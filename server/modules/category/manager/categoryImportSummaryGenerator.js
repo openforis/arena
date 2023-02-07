@@ -138,12 +138,18 @@ export const createImportSummaryFromColumnNames = ({
         : ExtraPropDef.dataTypes.text
       : null
 
+    const key = isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
+
+    if (acc.find((itm) => CategoryImportSummary.getItemKey(itm) === key)) {
+      // item already generated (e.g. geometry point)
+      return acc
+    }
+
+    const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName: key }) : [columnName]
     const lang = extra ? null : _extractLang({ columnPatterns, columnName, columnType })
-    const itemName = isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
-    const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName }) : [columnName]
 
     const item = CategoryImportSummary.newItem({
-      key: itemName,
+      key,
       columns: itemColumnNames,
       type: columnType,
       levelName,
