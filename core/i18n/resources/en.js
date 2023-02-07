@@ -1236,8 +1236,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         extra: '$t(extraProp.label)',
       },
       dataType: 'Data Type',
+      title: 'Category import summary',
     },
-
     reportingData: 'Reporting data',
     templateForDataImport: 'Template for data import',
     templateForDataImportGeneric: 'Template for data import (generic)',
