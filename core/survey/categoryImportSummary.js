@@ -8,10 +8,11 @@ export const keys = {
 export const keysItem = {
   columns: 'columns',
   dataType: 'dataType',
+  dataTypeReadOnly: 'dataTypeReadOnly',
   lang: 'lang',
   levelIndex: 'levelIndex',
   levelName: 'levelName',
-  key: 'name',
+  key: 'key',
   type: 'type',
 }
 
@@ -37,7 +38,16 @@ export const getFilePath = R.prop(keys.filePath)
 
 // ===== ITEM
 
-export const newItem = ({ key, columns, type, levelName = null, levelIndex = -1, lang = null, dataType = null }) => ({
+export const newItem = ({
+  key,
+  columns,
+  type,
+  levelName = null,
+  levelIndex = -1,
+  lang = null,
+  dataType = null,
+  dataTypeReadOnly = false,
+}) => ({
   [keysItem.key]: key,
   [keysItem.columns]: columns,
   [keysItem.type]: type,
@@ -45,6 +55,7 @@ export const newItem = ({ key, columns, type, levelName = null, levelIndex = -1,
   [keysItem.levelIndex]: levelIndex,
   [keysItem.lang]: lang,
   [keysItem.dataType]: dataType,
+  [keysItem.dataTypeReadOnly]: dataTypeReadOnly,
 })
 
 export const getItemKey = R.prop(keysItem.key)
@@ -58,6 +69,8 @@ export const getItemLevelIndex = R.prop(keysItem.levelIndex)
 export const getItemLang = R.prop(keysItem.lang)
 
 export const getItemDataType = R.prop(keysItem.dataType)
+
+export const isItemDataTypeReadOnly = R.propEq(keysItem.dataTypeReadOnly, true)
 
 const isItemType = (type) => R.pipe(getItemType, R.equals(type))
 

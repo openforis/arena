@@ -49,19 +49,12 @@ const ImportSummary = (props) => {
           </div>
         </div>
       </ModalBody>
-
       <ModalFooter>
         <Button
           className="modal-footer__item"
           onClick={() => Actions.importCategory({ state })}
           iconClassName="icon-upload2 icon-12px"
           label="common.import"
-        />
-        <Button
-          className="btn-close modal-footer__item"
-          onClick={Actions.hideImportSummary}
-          iconClassName="icon-cross icon-10px"
-          label="common.close"
         />
       </ModalFooter>
     </Modal>

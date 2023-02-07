@@ -108,15 +108,15 @@ export default class CategoryImportJob extends Job {
   }
 
   extractItemExtraDef() {
-    const columns = CategoryImportSummary.getColumns(this.summary)
+    const items = CategoryImportSummary.getItems(this.summary)
 
-    return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
-      if (CategoryImportSummary.isItemExtra(column)) {
-        accExtraDef[columnName] = ExtraPropDef.newItem({
-          dataType: CategoryImportSummary.getItemDataType(column),
+    return items.reduce((accExtraDef, item) => {
+      if (CategoryImportSummary.isItemExtra(item)) {
+        const itemKey = CategoryImportSummary.getItemKey(item)
+        accExtraDef[itemKey] = ExtraPropDef.newItem({
+          dataType: CategoryImportSummary.getItemDataType(item),
         })
       }
-
       return accExtraDef
     }, {})
   }
@@ -253,14 +253,16 @@ export default class CategoryImportJob extends Job {
   async _readItems() {
     this.logDebug('reading CSV file rows')
 
+    const { surveyId, category, user, tx } = this
+
     // init items updater
     this.itemsUpdater = new CategoryItemsUpdater({
-      surveyId: this.surveyId,
-      category: this.category,
-      user: this.user,
+      surveyId,
+      category,
+      user,
       errorHandler: this._addError.bind(this),
       itemExtraPropsExtrator: this.extractItemExtraProps.bind(this),
-      tx: this.tx,
+      tx,
     })
     await this.itemsUpdater.init()
 

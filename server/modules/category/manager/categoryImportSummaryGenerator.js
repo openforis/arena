@@ -156,6 +156,7 @@ export const createImportSummaryFromColumnNames = ({
       levelIndex,
       lang,
       dataType,
+      dataTypeReadOnly: isGeometryPointType,
     })
 
     acc.push(item)

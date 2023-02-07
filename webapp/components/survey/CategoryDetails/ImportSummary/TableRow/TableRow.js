@@ -50,6 +50,7 @@ const TableRow = (props) => {
         {CategoryImportSummary.isItemExtra(item) && (
           <Dropdown
             className="dropdown__extra-def-type"
+            disabled={CategoryImportSummary.isItemDataTypeReadOnly(item)}
             items={Object.keys(ExtraPropDef.dataTypes)}
             itemValue={A.identity}
             itemLabel={(item) => i18n.t(`extraProp.dataTypes.${item}`)}
