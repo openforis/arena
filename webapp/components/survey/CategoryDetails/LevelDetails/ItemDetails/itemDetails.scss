@@ -1,6 +1,6 @@
 .category__item {
   .extra-props {
-    max-height: 150px;
+    max-height: 180px;
     overflow-y: auto;
     padding: 10px;
 
@@ -14,6 +14,16 @@
         white-space: nowrap;
         overflow: hidden;
         max-width: 120px;
+      }
+    }
+
+    .geometry-point-form-item-content {
+      display: flex;
+      flex-direction: column;
+      row-gap: 0.5rem;
+
+      .form-item {
+        grid-template-columns: 40px 1fr;
       }
     }
   }
