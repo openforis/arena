@@ -100,7 +100,7 @@ $borderColor: $greyBorder;
   grid-template-columns: 80px auto 1fr;
   column-gap: 10px;
   min-height: 35px;
-  grid-row-gap: 1rem;
+  grid-row-gap: 0.2rem;
   font-size: 0.9rem;
 
   &.not-valid {
@@ -125,10 +125,6 @@ $borderColor: $greyBorder;
   &:not(.active):hover {
     background-color: rgba($greenLight, 0.6);
     cursor: pointer;
-  }
-
-  .form-item {
-    grid-template-columns: 0.4 0.6fr;
   }
 
   .labels-editor.with-label {

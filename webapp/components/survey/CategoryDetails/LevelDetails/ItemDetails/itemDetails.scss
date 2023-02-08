@@ -1,12 +1,20 @@
 .category__item {
+  .form-item {
+    grid-template-columns: 7rem auto;
+    width: 100%;
+
+    input {
+      width: 100%;
+    }
+  }
+
   .extra-props {
     max-height: 180px;
     overflow-y: auto;
     padding: 10px;
 
     .form-item {
-      width: 330px;
-      height: 30px;
+      height: auto;
       grid-template-columns: 120px 200px;
 
       .form-label {
@@ -20,7 +28,7 @@
     .geometry-point-form-item-content {
       display: flex;
       flex-direction: column;
-      row-gap: 0.5rem;
+      row-gap: 0.1rem;
 
       .form-item {
         grid-template-columns: 40px 1fr;
