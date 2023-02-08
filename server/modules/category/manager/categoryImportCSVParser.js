@@ -1,17 +1,22 @@
 import * as R from 'ramda'
 
-import { Objects, PointFactory, Points } from '@openforis/arena-core'
+import { Objects, PointFactory, Points, SystemError } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+import * as Srs from '@core/geo/srs'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as CSVReader from '@server/utils/file/csvReader'
 
-const _getItemValue = ({ item, row }) => {
+const _getItemValue = ({ survey, item, row }) => {
+  // single column
   const itemColumns = CategoryImportSummary.getItemColumns(item)
   if (itemColumns.length === 1) return row[itemColumns[0]]
 
+  // multiple columns
   if (
     CategoryImportSummary.isItemExtra(item) &&
     CategoryImportSummary.getItemDataType(item) === ExtraPropDef.dataTypes.geometryPoint
@@ -20,12 +25,19 @@ const _getItemValue = ({ item, row }) => {
     const x = row[itemKey + '_x']
     const y = row[itemKey + '_y']
     const srs = row[itemKey + '_srs']
-    return Points.toString(PointFactory.createInstance({ x, y, srs }))
+    if (!Objects.isEmpty(x) && !Objects.isEmpty(y) && !Objects.isEmpty(srs)) {
+      const surveyInfo = Survey.getSurveyInfo(survey)
+      const surveySrss = Survey.getSRS(surveyInfo)
+      if (!surveySrss.find((surveySrs) => Srs.getCode(surveySrs) === srs)) {
+        throw new SystemError(Validation.messageKeys.categoryImport.srsNotDefined, { srs })
+      }
+      return Points.toString(PointFactory.createInstance({ x, y, srs }))
+    }
   }
   return null
 }
 
-export const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
+export const createRowsReaderFromStream = async ({ stream, survey, summary, onRowItem, onTotalChange }) => {
   const items = CategoryImportSummary.getItems(summary)
 
   return CSVReader.createReaderFromStream(
@@ -38,7 +50,7 @@ export const createRowsReaderFromStream = async (stream, summary, onRowItem, onT
       const descriptionsByLang = {}
 
       items.forEach((item) => {
-        const itemValue = _getItemValue({ item, row })
+        const itemValue = _getItemValue({ survey, item, row })
         const itemKey = CategoryImportSummary.getItemKey(item)
 
         if (CategoryImportSummary.isItemCode(item)) {

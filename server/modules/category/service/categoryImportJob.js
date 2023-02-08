@@ -15,6 +15,8 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
 import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
@@ -24,8 +26,9 @@ export default class CategoryImportJob extends Job {
   constructor(params, type = CategoryImportJob.type) {
     super(type, params)
 
-    this.itemsByCodes = {} // Cache of category items by ancestor codes
+    this.survey = null
     this.summary = null
+    this.itemsByCodes = {} // Cache of category items by ancestor codes
     this.category = null
     this.totalItemsInserted = 0
 
@@ -36,6 +39,8 @@ export default class CategoryImportJob extends Job {
     await super.onStart()
 
     await SRSs.init()
+
+    this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
@@ -266,10 +271,11 @@ export default class CategoryImportJob extends Job {
     })
     await this.itemsUpdater.init()
 
-    const reader = await CategoryImportCSVParser.createRowsReaderFromStream(
-      await this.createReadStream(),
-      this.summary,
-      async (itemRow) => {
+    const reader = await CategoryImportCSVParser.createRowsReaderFromStream({
+      stream: await this.createReadStream(),
+      survey: this.survey,
+      summary: this.summary,
+      onRowItem: async (itemRow) => {
         if (this.isCanceled()) {
           reader.cancel()
           return
@@ -277,10 +283,10 @@ export default class CategoryImportJob extends Job {
 
         await this._onRow(itemRow)
       },
-      (total) => {
+      onTotalChange: (total) => {
         this.total = total + 1 // +1 consider final db inserts
-      }
-    )
+      },
+    })
 
     await reader.start()
 
