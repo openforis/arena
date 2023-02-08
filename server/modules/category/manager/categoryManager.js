@@ -7,25 +7,23 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
+import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
 
 import { db } from '@server/db/db'
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import {
   publishSurveySchemaTableProps,
   markSurveyDraft,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
-import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as CategoryValidator from '../categoryValidator'
+import * as CategoryExportManager from './categoryExportManager'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 import * as CategoryRepository from '../repository/categoryRepository'
-import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
 
 // ====== VALIDATION
 
@@ -161,24 +159,7 @@ export const {
   insertItems: insertItemsInBatch,
 } = CategoryRepository
 
-export const exportCategoryToStream = async ({ surveyId, categoryUuid, draft, outputStream }, client = db) => {
-  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-
-  // get survey languages
-  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft })
-  const languages = Survey.getLanguages(surveyInfo)
-
-  const { stream: categoryStream, headers } = CategoryRepository.generateCategoryExportStreamAndHeaders({
-    surveyId,
-    category,
-    languages,
-  })
-
-  return client.stream(categoryStream, (dbStream) => {
-    const csvTransform = CSVWriter.transformJsonToCsv({ fields: headers })
-    dbStream.pipe(csvTransform).pipe(outputStream)
-  })
-}
+export const { exportCategoryToStream } = CategoryExportManager
 
 // ====== UPDATE
 
