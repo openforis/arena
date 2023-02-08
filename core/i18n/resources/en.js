@@ -1312,6 +1312,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
+      srsNotDefined: 'SRS with code {{srs}} not defined in survey',
     },
 
     dataImport: {
