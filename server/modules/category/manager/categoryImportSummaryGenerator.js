@@ -83,6 +83,12 @@ const _validateSummary = (summary) => {
   }
 }
 
+const _determineDataType = ({ isExtra, isGeometryPointType }) => {
+  if (!isExtra) return null
+
+  return isGeometryPointType ? ExtraPropDef.dataTypes.geometryPoint : ExtraPropDef.dataTypes.text
+}
+
 export const createImportSummaryFromColumnNames = ({
   columnNames,
   codeColumnPattern = null,
@@ -125,18 +131,14 @@ export const createImportSummaryFromColumnNames = ({
         ? CategoryImportSummary.itemTypes.extra
         : _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
 
-    const extra = columnType === CategoryImportSummary.itemTypes.extra
+    const isExtra = columnType === CategoryImportSummary.itemTypes.extra
 
-    if (extra && !someExtraWasCreated) someExtraWasCreated = true
+    if (isExtra && !someExtraWasCreated) someExtraWasCreated = true
 
     const level = getOrCreateLevel({ columnName, columnType })
     const { name: levelName, index: levelIndex } = level
 
-    const dataType = extra
-      ? isGeometryPointType
-        ? ExtraPropDef.dataTypes.geometryPoint
-        : ExtraPropDef.dataTypes.text
-      : null
+    const dataType = _determineDataType({ isExtra, isGeometryPointType })
 
     const key = StringUtils.normalizeName(
       isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
@@ -148,7 +150,7 @@ export const createImportSummaryFromColumnNames = ({
     }
 
     const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName: key }) : [columnName]
-    const lang = extra ? null : _extractLang({ columnPatterns, columnName, columnType })
+    const lang = isExtra ? null : _extractLang({ columnPatterns, columnName, columnType })
 
     const item = CategoryImportSummary.newItem({
       key,
