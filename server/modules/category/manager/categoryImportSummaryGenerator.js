@@ -138,7 +138,9 @@ export const createImportSummaryFromColumnNames = ({
         : ExtraPropDef.dataTypes.text
       : null
 
-    const key = isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
+    const key = StringUtils.normalizeName(
+      isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
+    )
 
     if (acc.find((itm) => CategoryImportSummary.getItemKey(itm) === key)) {
       // item already generated (e.g. geometry point)
