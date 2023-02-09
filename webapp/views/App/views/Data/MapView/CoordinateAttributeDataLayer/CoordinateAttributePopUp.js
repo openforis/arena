@@ -1,8 +1,11 @@
 import './CoordinateAttributePopUp.scss'
 
 import React, { useCallback, useMemo, useRef, useState } from 'react'
-import { Popup, useMap } from 'react-leaflet'
+import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import circleToPolygon from 'circle-to-polygon'
+
+import { PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -18,7 +21,6 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
 import { useElevation } from '../common/useElevation'
 import { useI18n } from '@webapp/store/system'
-const circleToPolygon = require('circle-to-polygon')
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -46,22 +48,15 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 }
 
 export const CoordinateAttributePopUp = (props) => {
-  const {
-    attributeDef,
-    recordUuid,
-    parentUuid,
-    ancestorsKeys,
-    point,
-    pointLatLong,
-    onRecordEditClick,
-    getNextPoint,
-    getPreviousPoint,
-    openPopupOfPoint,
-  } = props
+  const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
+
+  const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
+  const [longitude, latitude] = pointFeature.geometry.coordinates
+
+  const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
 
   const popupRef = useRef(null)
   const i18n = useI18n()
-  const map = useMap()
   const surveyInfo = useSurveyInfo()
 
   const survey = useSurvey()
@@ -71,25 +66,15 @@ export const CoordinateAttributePopUp = (props) => {
 
   const elevation = useElevation({ surveyId: Survey.getIdSurveyInfo(surveyInfo), point: pointLatLong, active: open })
 
-  const flyTo = useCallback(
-    (point) => {
-      popupRef.current?.close()
-      const [longitude, latitude] = point.geometry.coordinates
-      map.flyTo([latitude, longitude], map.getMaxZoom())
-      map.once('zoomend', () => openPopupOfPoint(point))
-    },
-    [map, openPopupOfPoint]
-  )
-
   const onClickNext = useCallback(() => {
-    const nextPoint = getNextPoint(parentUuid)
-    flyTo(nextPoint)
-  }, [flyTo, getNextPoint, parentUuid])
+    flyToNextPoint(pointFeature)
+    popupRef.current?.close()
+  }, [flyToNextPoint, pointFeature])
 
   const onClickPrevious = useCallback(() => {
-    const previousPoint = getPreviousPoint(parentUuid)
-    flyTo(previousPoint)
-  }, [flyTo, getPreviousPoint, parentUuid])
+    flyToPreviousPoint(pointFeature)
+    popupRef.current?.close()
+  }, [flyToPreviousPoint, pointFeature])
 
   const onEarthMapButtonClick = useCallback(() => {
     let geojson
@@ -149,14 +134,9 @@ export const CoordinateAttributePopUp = (props) => {
 }
 
 CoordinateAttributePopUp.propTypes = {
-  attributeDef: PropTypes.any,
-  recordUuid: PropTypes.string,
-  parentUuid: PropTypes.string,
-  ancestorsKeys: PropTypes.any,
-  point: PropTypes.any,
-  pointLatLong: PropTypes.object,
-  onRecordEditClick: PropTypes.func,
-  getNextPoint: PropTypes.func,
-  getPreviousPoint: PropTypes.func,
-  openPopupOfPoint: PropTypes.func,
+  attributeDef: PropTypes.any.isRequired,
+  pointFeature: PropTypes.any.isRequired,
+  onRecordEditClick: PropTypes.func.isRequired,
+  flyToNextPoint: PropTypes.func.isRequired,
+  flyToPreviousPoint: PropTypes.func.isRequired,
 }

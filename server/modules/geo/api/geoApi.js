@@ -1,12 +1,18 @@
 import axios from 'axios'
+import xmljs from 'xml-js'
 
-import { SRSs } from '@openforis/arena-core'
+import { Objects, Promises, SRSs } from '@openforis/arena-core'
 
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { MapUtils } from '@core/map/mapUtils'
 import { PlanetApi } from './planetApi'
-import xmljs from 'xml-js'
+
+// free elevation API urls
+const elevationApiUrls = [
+  ({ lat, lng }) => `https://api.opentopodata.org/v1/aster30m?locations=${lat},${lng}`,
+  ({ lat, lng }) => `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
+]
 
 const getMapTileForwardUrl = (req) => {
   const { provider, period, x, y, z, proc } = Request.getParams(req)
@@ -67,16 +73,19 @@ export const init = (app) => {
   )
 
   app.get('/survey/:surveyId/geo/map/elevation', AuthMiddleware.requireMapUsePermission, async (req, res) => {
-    try {
-      const { lat, lng } = Request.getParams(req)
-      const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`
-      const { data } = await axios.get(url, { timeout: 10000 })
-      const elevation = data?.results?.[0]?.elevation
-
-      res.json(elevation)
-    } catch (error) {
-      res.json(null)
-    }
+    const { lat, lng } = Request.getParams(req)
+    let elevation = null
+    await Promises.each(elevationApiUrls, async (urlPattern) => {
+      if (!Objects.isEmpty(elevation)) return
+      try {
+        const url = urlPattern({ lat, lng })
+        const { data } = await axios.get(url, { timeout: 10000 })
+        elevation = data?.results?.[0]?.elevation
+      } catch (error) {
+        // ignore it
+      }
+    })
+    res.json(elevation)
   })
 
   app.get(

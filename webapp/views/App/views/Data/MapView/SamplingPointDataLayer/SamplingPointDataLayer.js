@@ -1,8 +1,8 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { ClusterMarker } from '../common'
+import { ClusterMarker, useFlyToPoint } from '../common'
 import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
 
@@ -16,30 +16,18 @@ export const SamplingPointDataLayer = (props) => {
     getClusterLeaves,
     overlayName,
     totalPoints,
-    items,
+    points,
   } = useSamplingPointDataLayer(props)
 
-  // Have a Reference to points for opening popups automatically
-  const markerRefs = useRef([])
-
-  const openPopupOfPoint = (point) => {
-    const marker = markerRefs.current[point.uuid]
-    marker?.openPopup()
-  }
-
-  const getPointIndex = (uuid) => {
-    return items.findIndex((item) => item.uuid === uuid)
-  }
-
-  const getNextPoint = (uuid) => {
-    const index = getPointIndex(uuid)
-    return items[(index + 1) % items.length]
-  }
-
-  const getPreviousPoint = (uuid) => {
-    const index = getPointIndex(uuid)
-    return items[index > 0 ? index - 1 : items.length - 1]
-  }
+  const {
+    currentPointShown,
+    currentPointPopupOpen,
+    flyToNextPoint,
+    flyToPreviousPoint,
+    onCurrentPointPopupClose,
+    openPopupOfPoint,
+    setMarkerByKey,
+  } = useFlyToPoint({ points })
 
   return (
     <LayersControl.Overlay name={overlayName}>
@@ -69,16 +57,28 @@ export const SamplingPointDataLayer = (props) => {
             <SamplingPointDataMarker
               key={itemUuid}
               createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
-              getNextPoint={getNextPoint}
-              getPreviousPoint={getPreviousPoint}
+              flyToNextPoint={flyToNextPoint}
+              flyToPreviousPoint={flyToPreviousPoint}
               markersColor={markersColor}
-              markerRefs={markerRefs}
-              openPopupOfPoint={openPopupOfPoint}
               onRecordEditClick={onRecordEditClick}
               pointFeature={cluster}
+              setMarkerByKey={setMarkerByKey}
             />
           )
         })}
+        {currentPointShown && (
+          <SamplingPointDataMarker
+            createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
+            flyToNextPoint={flyToNextPoint}
+            flyToPreviousPoint={flyToPreviousPoint}
+            markersColor={markersColor}
+            onPopupClose={onCurrentPointPopupClose}
+            onRecordEditClick={onRecordEditClick}
+            pointFeature={currentPointShown}
+            popupOpen={currentPointPopupOpen}
+            setMarkerByKey={setMarkerByKey}
+          />
+        )}
       </LayerGroup>
     </LayersControl.Overlay>
   )
