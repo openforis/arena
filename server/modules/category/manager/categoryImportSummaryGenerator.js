@@ -36,7 +36,7 @@ const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns
 const _getGeometryPointTypeItemName = ({ columnName }) => {
   const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
   if (locationColSuffix) {
-    return columnName.substring(0, columnName.length - locationColSuffix.length)
+    return StringUtils.removeSuffix(locationColSuffix)(columnName)
   }
   return null
 }

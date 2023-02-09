@@ -294,9 +294,10 @@ export default class CategoryImportJob extends Job {
   }
 
   async _onRow(itemRow) {
-    const { levelIndex, codes, labelsByLang, descriptionsByLang, extra } = itemRow
-
-    if (this._checkCodesNotEmpty(codes)) {
+    const { error, levelIndex, codes, labelsByLang, descriptionsByLang, extra } = itemRow
+    if (error) {
+      this._addError(error.key, error.params)
+    } else if (this._checkCodesNotEmpty(codes)) {
       const itemCodeKey = String(codes)
       const itemCached = this.itemsUpdater.getItemCachedByCodes(codes)
 
