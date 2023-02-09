@@ -67,7 +67,6 @@ const TableRow = (props) => {
 TableRow.propTypes = {
   idx: PropTypes.number.isRequired,
   item: PropTypes.object.isRequired,
-  key: PropTypes.string.isRequired,
   onDataTypeChange: PropTypes.func.isRequired,
 }
 
