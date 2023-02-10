@@ -145,5 +145,6 @@ export const useSamplingPointDataLayer = (props) => {
     overlayName,
     totalPoints: points.length,
     items,
+    points,
   }
 }

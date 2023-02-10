@@ -1,13 +1,10 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { PointFactory } from '@openforis/arena-core'
-
+import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
-import { MarkerTooltip } from '../common/MarkerTooltip'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -18,45 +15,26 @@ export const CoordinateAttributeMarker = (props) => {
     markersColor,
     onRecordEditClick,
     pointFeature,
-    getNextPoint,
-    getPreviousPoint,
+    flyToNextPoint,
+    flyToPreviousPoint,
     onPopupClose,
-    openPopupOfPoint,
     popupOpen,
-    setMarkerByParentUuid,
+    setMarkerByKey,
   } = props
 
-  const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
+  const { ancestorsKeys, key } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
-  const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
-
-  const circleRef = useRef(null)
-
-  const options = useMapContextOptions()
-  const { showMarkersLabels, showLocationMarkers } = options
-
-  useEffect(() => {
-    const circleMarker = circleRef.current
-    circleMarker.setStyle({
-      fill: showLocationMarkers,
-      stroke: showLocationMarkers,
-    })
-    if (showMarkersLabels && !circleMarker.isTooltipOpen()) {
-      circleMarker.toggleTooltip()
-    }
-    setMarkerByParentUuid?.({ parentUuid, marker: circleMarker })
-
-    if (popupOpen) {
-      circleMarker.openPopup()
-    }
-  }, [circleRef, parentUuid, popupOpen, setMarkerByParentUuid, showLocationMarkers, showMarkersLabels])
+  const { markerRef, showMarkersLabels } = useLayerMarker({ key, popupOpen, setMarkerByKey })
 
   return (
     <div>
       <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
       <CircleMarker
-        ref={circleRef}
+        ref={(ref) => {
+          markerRef.current = ref
+          setMarkerByKey({ key, marker: ref })
+        }}
         center={[latitude, longitude]}
         radius={markerRadius}
         color={markersColor}
@@ -68,15 +46,10 @@ export const CoordinateAttributeMarker = (props) => {
 
         <CoordinateAttributePopUp
           attributeDef={attributeDef}
-          point={point}
-          pointLatLong={pointLatLong}
-          recordUuid={recordUuid}
-          parentUuid={parentUuid}
-          ancestorsKeys={ancestorsKeys}
+          flyToNextPoint={flyToNextPoint}
+          flyToPreviousPoint={flyToPreviousPoint}
           onRecordEditClick={onRecordEditClick}
-          getNextPoint={getNextPoint}
-          getPreviousPoint={getPreviousPoint}
-          openPopupOfPoint={openPopupOfPoint}
+          pointFeature={pointFeature}
         />
       </CircleMarker>
     </div>
@@ -88,10 +61,9 @@ CoordinateAttributeMarker.propTypes = {
   markersColor: PropTypes.any,
   onRecordEditClick: PropTypes.any,
   pointFeature: PropTypes.any,
-  getNextPoint: PropTypes.func,
-  getPreviousPoint: PropTypes.func,
+  flyToNextPoint: PropTypes.func,
+  flyToPreviousPoint: PropTypes.func,
   onPopupClose: PropTypes.func,
-  openPopupOfPoint: PropTypes.func,
   popupOpen: PropTypes.bool,
-  setMarkerByParentUuid: PropTypes.func,
+  setMarkerByKey: PropTypes.func,
 }
