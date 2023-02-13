@@ -10,10 +10,12 @@ import SystemError from '@core/systemError'
 import * as CSVReader from '@server/utils/file/csvReader'
 
 const columnProps = {
-  [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
-  [CategoryImportSummary.columnTypes.label]: { preffix: 'label', lang: true },
-  [CategoryImportSummary.columnTypes.description]: { preffix: 'description', lang: true },
+  [CategoryImportSummary.itemTypes.code]: { suffix: '_code', lang: false },
+  [CategoryImportSummary.itemTypes.label]: { preffix: 'label', lang: true },
+  [CategoryImportSummary.itemTypes.description]: { preffix: 'description', lang: true },
 }
+
+const locationColumnsSuffixes = ['_x', '_y', '_srs']
 
 // TODO remove code from here if needed // categories export
 
@@ -30,14 +32,35 @@ const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns
   }
 }, {})
 
+// column name ends with x, y or srs and there are other columns with the other prefixes
+const _getGeometryPointTypeItemName = ({ columnName }) => {
+  const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
+  if (locationColSuffix) {
+    return StringUtils.removeSuffix(locationColSuffix)(columnName)
+  }
+  return null
+}
+
+const _getGeometryPointTypeColumnNames = ({ itemName }) => locationColumnsSuffixes.map((suffix) => itemName + suffix)
+
+const _isGeometryPointType = ({ columnName, columnNames }) => {
+  const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
+  if (locationColSuffix) {
+    const itemName = _getGeometryPointTypeItemName({ columnName })
+    const locationColumnNames = _getGeometryPointTypeColumnNames({ itemName })
+    return locationColumnNames.every((colName) => columnNames.includes(colName))
+  }
+  return false
+}
+
 const _extractColumnTypeByName = ({ columnName, columnPatterns, ignoreLabelsAndDescriptions = false }) => {
   // try to find column type by matching one of the column patterns
   const columnType = Object.keys(columnPatterns).find((type) => columnPatterns[type].test(columnName))
 
   // columns not matching any of the predefined patterns will be considered of type extra
-  return columnType && (!ignoreLabelsAndDescriptions || columnType === CategoryImportSummary.columnTypes.code)
+  return columnType && (!ignoreLabelsAndDescriptions || columnType === CategoryImportSummary.itemTypes.code)
     ? columnType
-    : CategoryImportSummary.columnTypes.extra
+    : CategoryImportSummary.itemTypes.extra
 }
 
 const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
@@ -53,11 +76,17 @@ const _extractLang = ({ columnPatterns, columnName, columnType }) => {
 }
 
 const _validateSummary = (summary) => {
-  const columns = CategoryImportSummary.getColumns(summary)
-  const atLeastOneCodeColumn = Object.values(columns).some((column) => CategoryImportSummary.isColumnCode(column))
+  const items = CategoryImportSummary.getItems(summary)
+  const atLeastOneCodeColumn = items.some(CategoryImportSummary.isItemCode)
   if (!atLeastOneCodeColumn) {
     throw new SystemError(Validation.messageKeys.categoryImport.codeColumnMissing)
   }
+}
+
+const _determineDataType = ({ isExtra, isGeometryPointType }) => {
+  if (!isExtra) return null
+
+  return isGeometryPointType ? ExtraPropDef.dataTypes.geometryPoint : ExtraPropDef.dataTypes.text
 }
 
 export const createImportSummaryFromColumnNames = ({
@@ -72,14 +101,14 @@ export const createImportSummaryFromColumnNames = ({
   // if a codeColumnPattern is specified, use it to test if a column is of type code
   const columnPatterns = { ...columnPatternsDefault }
   if (codeColumnPattern) {
-    columnPatterns[CategoryImportSummary.columnTypes.code] = codeColumnPattern
+    columnPatterns[CategoryImportSummary.itemTypes.code] = codeColumnPattern
   }
 
   const levelsByName = {}
 
   const getOrCreateLevel = ({ columnName, columnType }) => {
     const columnProp = columnProps[columnType]
-    if (columnProp && columnType === CategoryImportSummary.columnTypes.code) {
+    if (columnProp && columnType === CategoryImportSummary.itemTypes.code) {
       const levelName = _extractLevelName({ columnPatterns, columnName, columnType })
       let level = levelsByName[levelName]
       if (!level) {
@@ -92,26 +121,53 @@ export const createImportSummaryFromColumnNames = ({
     return { name: null, index: -1 }
   }
 
-  let someExtraWasCreated = false
-  const columns = columnNames.reduce((acc, columnName) => {
-    const columnType = someExtraWasCreated
-      ? CategoryImportSummary.columnTypes.extra
-      : _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
-    const extra = columnType === CategoryImportSummary.columnTypes.extra
-    if (extra && !someExtraWasCreated) someExtraWasCreated = true
+  let someExtraWasCreated = false // once an 'extra' info column is found, all other columns will be considered as extra
+
+  const items = columnNames.reduce((acc, columnName) => {
+    const isGeometryPointType = _isGeometryPointType({ columnName, columnNames })
+
+    const columnType =
+      someExtraWasCreated || isGeometryPointType
+        ? CategoryImportSummary.itemTypes.extra
+        : _extractColumnTypeByName({ columnName, columnPatterns, ignoreLabelsAndDescriptions })
+
+    const isExtra = columnType === CategoryImportSummary.itemTypes.extra
+
+    if (isExtra && !someExtraWasCreated) someExtraWasCreated = true
 
     const level = getOrCreateLevel({ columnName, columnType })
     const { name: levelName, index: levelIndex } = level
 
-    const dataType = extra ? ExtraPropDef.dataTypes.text : null
+    const dataType = _determineDataType({ isExtra, isGeometryPointType })
 
-    const lang = extra ? null : _extractLang({ columnPatterns, columnName, columnType })
+    const key = StringUtils.normalizeName(
+      isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
+    )
 
-    const column = CategoryImportSummary.newColumn({ type: columnType, levelName, levelIndex, lang, dataType })
-    return { ...acc, [columnName]: column }
-  }, {})
+    if (acc.find((itm) => CategoryImportSummary.getItemKey(itm) === key)) {
+      // item already generated (e.g. geometry point)
+      return acc
+    }
 
-  const summary = CategoryImportSummary.newSummary({ columns })
+    const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName: key }) : [columnName]
+    const lang = isExtra ? null : _extractLang({ columnPatterns, columnName, columnType })
+
+    const item = CategoryImportSummary.newItem({
+      key,
+      columns: itemColumnNames,
+      type: columnType,
+      levelName,
+      levelIndex,
+      lang,
+      dataType,
+      dataTypeReadOnly: isGeometryPointType,
+    })
+
+    acc.push(item)
+    return acc
+  }, [])
+
+  const summary = CategoryImportSummary.newSummary({ items })
 
   _validateSummary(summary)
 

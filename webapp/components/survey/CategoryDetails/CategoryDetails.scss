@@ -100,7 +100,7 @@ $borderColor: $greyBorder;
   grid-template-columns: 80px auto 1fr;
   column-gap: 10px;
   min-height: 35px;
-  grid-row-gap: 2rem;
+  grid-row-gap: 0.2rem;
   font-size: 0.9rem;
 
   &.not-valid {

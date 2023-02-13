@@ -7,13 +7,12 @@ import * as R from 'ramda'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 import { normalizeName } from '@core/stringUtils'
 
 import { Button, ButtonDelete } from '@webapp/components'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { useI18n } from '@webapp/store/system'
@@ -23,6 +22,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../../store'
 import classNames from 'classnames'
+import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
 
 const ItemDetails = (props) => {
   const { level, index, item, state, setState } = props
@@ -123,23 +123,13 @@ const ItemDetails = (props) => {
           />
 
           {extraPropsEditorVisible && (
-            <fieldset className="extra-props">
-              <legend>{i18n.t('extraProp.label_plural')}</legend>
-              {Object.entries(itemExtraDefs).map(([key, { dataType }]) => (
-                <FormItem label={key} key={key}>
-                  <Input
-                    value={CategoryItem.getExtraProp(key)(item)}
-                    numberFormat={dataType === ExtraPropDef.dataTypes.number ? NumberFormats.decimal() : null}
-                    readOnly={readOnly}
-                    validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
-                    onChange={(value) => {
-                      const extra = R.pipe(CategoryItem.getExtra, R.assoc(key, value))(item)
-                      updateProp({ key: CategoryItem.keysProps.extra, value: extra })
-                    }}
-                  />
-                </FormItem>
-              ))}
-            </fieldset>
+            <ItemExtraPropsEditor
+              item={item}
+              itemExtraDefs={itemExtraDefs}
+              readOnly={readOnly}
+              updateProp={updateProp}
+              validation={validation}
+            />
           )}
 
           {!readOnly && (
