@@ -7,8 +7,9 @@ export const useJob = () => {
   const job = useSelector(JobState.getJob)
   const closeButton = useSelector(JobState.getCloseButton)
   const errorKeyHeaderName = useSelector(JobState.getErrorKeyHeaderName)
+  const errorsExportFileName = useSelector(JobState.getErrorsExportFileName)
 
   if (!hasJob) return {}
 
-  return { job, closeButton, errorKeyHeaderName }
+  return { job, closeButton, errorKeyHeaderName, errorsExportFileName }
 }

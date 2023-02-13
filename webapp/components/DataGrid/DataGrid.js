@@ -3,12 +3,15 @@ import { DataGrid as MuiDataGrid, GridFooter, GridFooterContainer, GridToolbarEx
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-const FooterWithExport = () => (
-  <GridFooterContainer>
-    <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
-    <GridFooter />
-  </GridFooterContainer>
-)
+const FooterWithExport =
+  ({ exportFileName }) =>
+  () =>
+    (
+      <GridFooterContainer>
+        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+        <GridFooter />
+      </GridFooterContainer>
+    )
 
 const DataGrid = (props) => {
   const {
@@ -18,6 +21,7 @@ const DataGrid = (props) => {
     className,
     columns: columnsProp,
     density,
+    exportFileName,
     disableSelectionOnClick,
     getRowClassName,
     getRowId,
@@ -26,7 +30,7 @@ const DataGrid = (props) => {
   } = props
 
   const components = {
-    ...(allowExportToCsv ? { Footer: FooterWithExport } : {}),
+    ...(allowExportToCsv ? { Footer: FooterWithExport({ exportFileName }) } : {}),
   }
 
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
@@ -56,6 +60,7 @@ DataGrid.propTypes = {
   columns: PropTypes.array.isRequired,
   density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
   disableSelectionOnClick: PropTypes.bool,
+  exportFileName: PropTypes.string,
   getRowClassName: PropTypes.func,
   getRowId: PropTypes.func,
   initialState: PropTypes.object,

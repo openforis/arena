@@ -1,5 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -16,7 +17,7 @@ const determineContentKey = ({ jobType, dryRun, hasErrors }) => {
 }
 
 export const DataImportCompleteDialog = (props) => {
-  const { job, onClose } = props
+  const { errorsExportFileName, job, onClose } = props
 
   const i18n = useI18n()
 
@@ -33,11 +34,23 @@ export const DataImportCompleteDialog = (props) => {
     <Modal className={classNames('data-import_complete-dialog', { 'with-errors': hasErrors })} onClose={onClose}>
       <ModalBody>
         <Markdown source={content} />
-        {hasErrors && <JobErrors errorKeyHeaderName="dataImportView.errors.rowNum" job={job} />}
+        {hasErrors && (
+          <JobErrors
+            errorKeyHeaderName="dataImportView.errors.rowNum"
+            exportFileName={errorsExportFileName}
+            job={job}
+          />
+        )}
       </ModalBody>
       <ModalFooter>
         <Button className="btn modal-footer__item" onClick={onClose} label="common.ok" />
       </ModalFooter>
     </Modal>
   )
+}
+
+DataImportCompleteDialog.propTypes = {
+  errorsExportFileName: PropTypes.string,
+  job: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
 }

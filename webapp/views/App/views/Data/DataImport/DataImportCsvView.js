@@ -42,6 +42,7 @@ const allowedLabelTypes = [
 export const DataImportCsvView = () => {
   const i18n = useI18n()
   const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyId = useSurveyId()
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
@@ -73,6 +74,8 @@ export const DataImportCsvView = () => {
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
   } = state
+
+  const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${Number(cycle) + 1})_ImportError`
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 
@@ -126,6 +129,7 @@ export const DataImportCsvView = () => {
         job,
         autoHide: true,
         errorKeyHeaderName: 'dataImportView.errors.rowNum',
+        errorsExportFileName,
         onComplete: (jobCompleted) => {
           setState((statePrev) => ({ ...statePrev, jobCompleted }))
         },
@@ -227,7 +231,11 @@ export const DataImportCsvView = () => {
         )}
       </div>
       {jobCompleted && (
-        <DataImportCompleteDialog job={jobCompleted} onClose={() => setStateProp('jobCompleted')(null)} />
+        <DataImportCompleteDialog
+          job={jobCompleted}
+          onClose={() => setStateProp('jobCompleted')(null)}
+          errorsExportFileName={errorsExportFileName}
+        />
       )}
     </div>
   )

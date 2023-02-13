@@ -12,6 +12,7 @@ export const keys = {
   autoHide: 'autoHide',
   onComplete: 'onComplete',
   errorKeyHeaderName: 'errorKeyHeaderName',
+  errorsExportFileName: 'errorsExportFileName',
 }
 
 // ====== READ
@@ -25,6 +26,8 @@ export const isAutoHide = R.pipe(getJob, R.propOr(false, keys.autoHide))
 
 export const getErrorKeyHeaderName = R.pipe(getJob, R.prop(keys.errorKeyHeaderName))
 
+export const getErrorsExportFileName = R.pipe(getJob, R.prop(keys.errorsExportFileName))
+
 export const hasJob = (state) => Object.keys(getJob(state)).length > 0
 
 // ====== UPDATE
@@ -34,12 +37,14 @@ export const startJob = ({
   closeButton = null,
   autoHide = false,
   errorKeyHeaderName = undefined,
+  errorsExportFileName = null,
 }) => ({
   ...job,
   [keys.autoHide]: autoHide,
   [keys.closeButton]: closeButton,
   [keys.onComplete]: onComplete,
   [keys.errorKeyHeaderName]: errorKeyHeaderName,
+  [keys.errorsExportFileName]: errorsExportFileName,
 })
 
 export const updateJob =
