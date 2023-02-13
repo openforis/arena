@@ -15,6 +15,8 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
 import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
@@ -24,8 +26,9 @@ export default class CategoryImportJob extends Job {
   constructor(params, type = CategoryImportJob.type) {
     super(type, params)
 
-    this.itemsByCodes = {} // Cache of category items by ancestor codes
+    this.survey = null
     this.summary = null
+    this.itemsByCodes = {} // Cache of category items by ancestor codes
     this.category = null
     this.totalItemsInserted = 0
 
@@ -36,6 +39,8 @@ export default class CategoryImportJob extends Job {
     await super.onStart()
 
     await SRSs.init()
+
+    this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
@@ -108,15 +113,15 @@ export default class CategoryImportJob extends Job {
   }
 
   extractItemExtraDef() {
-    const columns = CategoryImportSummary.getColumns(this.summary)
+    const items = CategoryImportSummary.getItems(this.summary)
 
-    return Object.entries(columns).reduce((accExtraDef, [columnName, column]) => {
-      if (CategoryImportSummary.isColumnExtra(column)) {
-        accExtraDef[columnName] = ExtraPropDef.newItem({
-          dataType: CategoryImportSummary.getColumnDataType(column),
+    return items.reduce((accExtraDef, item) => {
+      if (CategoryImportSummary.isItemExtra(item)) {
+        const itemKey = CategoryImportSummary.getItemKey(item)
+        accExtraDef[itemKey] = ExtraPropDef.newItem({
+          dataType: CategoryImportSummary.getItemDataType(item),
         })
       }
-
       return accExtraDef
     }, {})
   }
@@ -253,21 +258,24 @@ export default class CategoryImportJob extends Job {
   async _readItems() {
     this.logDebug('reading CSV file rows')
 
+    const { surveyId, category, user, tx } = this
+
     // init items updater
     this.itemsUpdater = new CategoryItemsUpdater({
-      surveyId: this.surveyId,
-      category: this.category,
-      user: this.user,
+      surveyId,
+      category,
+      user,
       errorHandler: this._addError.bind(this),
       itemExtraPropsExtrator: this.extractItemExtraProps.bind(this),
-      tx: this.tx,
+      tx,
     })
     await this.itemsUpdater.init()
 
-    const reader = await CategoryImportCSVParser.createRowsReaderFromStream(
-      await this.createReadStream(),
-      this.summary,
-      async (itemRow) => {
+    const reader = await CategoryImportCSVParser.createRowsReaderFromStream({
+      stream: await this.createReadStream(),
+      survey: this.survey,
+      summary: this.summary,
+      onRowItem: async (itemRow) => {
         if (this.isCanceled()) {
           reader.cancel()
           return
@@ -275,10 +283,10 @@ export default class CategoryImportJob extends Job {
 
         await this._onRow(itemRow)
       },
-      (total) => {
+      onTotalChange: (total) => {
         this.total = total + 1 // +1 consider final db inserts
-      }
-    )
+      },
+    })
 
     await reader.start()
 
@@ -286,9 +294,10 @@ export default class CategoryImportJob extends Job {
   }
 
   async _onRow(itemRow) {
-    const { levelIndex, codes, labelsByLang, descriptionsByLang, extra } = itemRow
-
-    if (this._checkCodesNotEmpty(codes)) {
+    const { error, levelIndex, codes, labelsByLang, descriptionsByLang, extra } = itemRow
+    if (error) {
+      this._addError(error.key, error.params)
+    } else if (this._checkCodesNotEmpty(codes)) {
       const itemCodeKey = String(codes)
       const itemCached = this.itemsUpdater.getItemCachedByCodes(codes)
 
@@ -336,7 +345,7 @@ export default class CategoryImportJob extends Job {
   _addErrorCodeDuplicate(levelIndex, codes) {
     const code = codes[levelIndex]
     const columnName = CategoryImportSummary.getColumnName(
-      CategoryImportSummary.columnTypes.code,
+      CategoryImportSummary.itemTypes.code,
       levelIndex
     )(this.summary)
     this._addError(Validation.messageKeys.categoryImport.codeDuplicate, {
@@ -347,7 +356,7 @@ export default class CategoryImportJob extends Job {
 
   _addErrorCodeRequired(levelIndex) {
     const columnName = CategoryImportSummary.getColumnName(
-      CategoryImportSummary.columnTypes.code,
+      CategoryImportSummary.itemTypes.code,
       levelIndex
     )(this.summary)
     this._addError(Validation.messageKeys.categoryImport.codeRequired, {

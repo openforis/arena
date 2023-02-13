@@ -1224,9 +1224,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     level: 'Level',
 
     importSummary: {
-      column: 'Column',
+      columns: 'Column',
       columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
-      columnTypeSummaryExtra: '$t(extraProp.label)',
+      columnTypeExtra: '$t(extraProp.label)',
       columnTypeDescription: 'Description ({{language}})',
       columnTypeLabel: 'Label ({{language}})',
       columnType: {
@@ -1236,8 +1236,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         extra: '$t(extraProp.label)',
       },
       dataType: 'Data Type',
+      title: 'Category import summary',
     },
-
     reportingData: 'Reporting data',
     templateForDataImport: 'Template for data import',
     templateForDataImportGeneric: 'Template for data import (generic)',
@@ -1312,6 +1312,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
+      srsNotDefined: 'SRS with code {{srs}} not defined in survey',
     },
 
     dataImport: {

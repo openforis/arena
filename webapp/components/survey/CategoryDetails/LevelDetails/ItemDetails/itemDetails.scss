@@ -1,12 +1,20 @@
 .category__item {
+  .form-item {
+    grid-template-columns: 0.3fr 0.65fr;
+    width: 100%;
+
+    input {
+      width: 100%;
+    }
+  }
+
   .extra-props {
-    max-height: 150px;
+    max-height: 180px;
     overflow-y: auto;
     padding: 10px;
 
     .form-item {
-      width: 330px;
-      height: 30px;
+      height: auto;
       grid-template-columns: 120px 200px;
 
       .form-label {
@@ -14,6 +22,16 @@
         white-space: nowrap;
         overflow: hidden;
         max-width: 120px;
+      }
+    }
+
+    .geometry-point-form-item-content {
+      display: flex;
+      flex-direction: column;
+      row-gap: 0.1rem;
+
+      .form-item {
+        grid-template-columns: 40px 1fr;
       }
     }
   }

@@ -2,6 +2,11 @@
   display: grid;
   grid-template-rows: 1fr 50px;
 
+  .modal-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
   .modal-content {
     margin: 5vh auto;
     height: 90vh;

@@ -11,7 +11,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Srs from '@core/geo/srs'
 
 import { useI18n } from '@webapp/store/system'
 import { RecordState } from '@webapp/store/ui/record'
@@ -19,7 +18,7 @@ import { RecordState } from '@webapp/store/ui/record'
 import { Button, Map, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
-import Dropdown from '@webapp/components/form/Dropdown'
+import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
@@ -122,15 +121,11 @@ const NodeDefCoordinate = (props) => {
   )
 
   const srsDropdown = (
-    <Dropdown
-      testId={TestId.surveyForm.coordinateSRS(NodeDef.getName(nodeDef))}
-      readOnly={entryDisabled}
-      items={surveySrs}
-      itemValue="code"
-      itemLabel={Srs.getNameAndCode}
-      selection={selectedSrs}
+    <SrsDropdown
       onChange={(selection) => handleInputChange(Node.valuePropsCoordinate.srs, selection?.code)}
-      disabled={singleSrs}
+      readOnly={entryDisabled}
+      selectedSrsCode={selectedSrsCode}
+      testId={TestId.surveyForm.coordinateSRS(NodeDef.getName(nodeDef))}
     />
   )
 
