@@ -12,8 +12,9 @@ import * as API from '@webapp/service/api'
 export const startCSVExport = (options) => async (dispatch, getState) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const job = await API.startExportDataToCSVJob({ surveyId, options })
+  const job = await API.startExportDataToCSVJob({ surveyId, cycle, options })
 
   dispatch(
     JobActions.showJobMonitor({
@@ -24,7 +25,7 @@ export const startCSVExport = (options) => async (dispatch, getState) => {
         return (
           <ButtonDownload
             testId={TestId.dataExport.exportCSV}
-            href={API.downloadExportedDataToCSVUrl({ surveyId, exportUuid })}
+            href={API.downloadExportedDataToCSVUrl({ surveyId, cycle, exportUuid })}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
           />
         )

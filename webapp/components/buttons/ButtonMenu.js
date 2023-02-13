@@ -63,7 +63,7 @@ ButtonMenu.propTypes = {
       content: PropTypes.node,
       icon: PropTypes.node,
       iconClassName: PropTypes.string,
-      label: PropTypes.string.isRequired,
+      label: PropTypes.string,
       onClick: PropTypes.func,
     })
   ),

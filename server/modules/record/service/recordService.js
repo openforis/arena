@@ -17,12 +17,15 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as ValidationResult from '@core/validation/validationResult'
 import i18n from '@core/i18n/i18nFactory'
 import * as Validation from '@core/validation/validation'
+import { ValidationUtils } from '@core/validation/validationUtils'
 
 import * as JobManager from '@server/job/jobManager'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
+import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -30,8 +33,6 @@ import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
-import { ValidationUtils } from '@core/validation/validationUtils'
-import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -100,7 +101,9 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
     }
   }
 
-  Response.setContentTypeFile({ res, fileName: 'records.csv', contentType: Response.contentTypes.csv })
+  const survey = await SurveyManager.fetchSurveyById({ surveyId })
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'Records' })
+  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   const fields = [
     ...nodeDefKeys.map(NodeDef.getName),
@@ -192,7 +195,7 @@ export const { fetchValidationReport, countValidationReportItems } = RecordManag
 export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, recordUuid = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const fileName = `${Survey.getName(survey)}_validation_report.csv`
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport' })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   const objectTransformer = (item) => {

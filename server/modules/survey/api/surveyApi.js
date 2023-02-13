@@ -16,12 +16,7 @@ import * as User from '../../../../core/user/user'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
 import * as UserService from '../../user/service/userService'
-
-const generateOutputFileName = async ({ surveyId, fileType, extension }) => {
-  const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-  const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
-  return `${surveyName}_${fileType}_${DateUtils.nowFormatDefault()}.${extension}`
-}
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 export const init = (app) => {
   // ==== CREATE
@@ -172,12 +167,14 @@ export const init = (app) => {
     AuthMiddleware.requireRecordsExportPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, includeCategories, includeCategoryItemsLabels, includeAnalysis } = Request.getParams(req)
+        const { surveyId, cycle, includeCategories, includeCategoryItemsLabels, includeAnalysis } =
+          Request.getParams(req)
 
         const user = Request.getUser(req)
 
         const job = SurveyService.startExportCsvDataJob({
           surveyId,
+          cycle,
           user,
           includeCategories,
           includeCategoryItemsLabels,
@@ -196,7 +193,7 @@ export const init = (app) => {
     AuthMiddleware.requireRecordsExportPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, exportUuid } = Request.getParams(req)
+        const { surveyId, cycle, exportUuid } = Request.getParams(req)
 
         if (!isUuid(exportUuid)) {
           throw new Error('Invalid exportUuid specified')
@@ -204,7 +201,14 @@ export const init = (app) => {
 
         const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.zip`)
 
-        const fileName = await generateOutputFileName({ surveyId, fileType: 'export', extension: 'zip' })
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+        const fileName = ExportFileNameGenerator.generate({
+          survey,
+          cycle,
+          fileType: 'DataExport',
+          extension: 'zip',
+          includeTimestamp: true,
+        })
 
         Response.sendFile({
           res,
@@ -223,7 +227,8 @@ export const init = (app) => {
     try {
       const { surveyId, cycle } = Request.getParams(req)
 
-      const fileName = await generateOutputFileName({ surveyId, fileType: 'schema_summary', extension: 'csv' })
+      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary' })
       Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
       await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res })

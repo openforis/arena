@@ -16,7 +16,7 @@ const validationWrapper = (fields) => ({
   fields,
 })
 
-const JobErrors = ({ errorKeyHeaderName, job, openPanel }) => {
+const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job, openPanel }) => {
   const errors = JobSerialized.getErrors(job)
   const errorsCount = JobSerialized.getErrorsCount(job)
 
@@ -24,6 +24,8 @@ const JobErrors = ({ errorKeyHeaderName, job, openPanel }) => {
   const survey = useSurvey()
 
   if (errorsCount === 0) return null
+
+  const exportFileName = exportFileNameProp ? exportFileNameProp : `arena_${job.type}_errors`
 
   return (
     <ExpansionPanel buttonLabel="common.error_plural" className="app-job-monitor__job-errors" startClosed={!openPanel}>
@@ -48,6 +50,7 @@ const JobErrors = ({ errorKeyHeaderName, job, openPanel }) => {
           },
         ]}
         density="compact"
+        exportFileName={exportFileName}
         initialState={{
           sorting: {
             sortModel: [{ field: 'errorKey', sort: 'asc' }],
@@ -66,6 +69,7 @@ const JobErrors = ({ errorKeyHeaderName, job, openPanel }) => {
 
 JobErrors.propTypes = {
   errorKeyHeaderName: PropTypes.string,
+  exportFileName: PropTypes.string,
   job: PropTypes.object,
   openPanel: PropTypes.bool,
 }

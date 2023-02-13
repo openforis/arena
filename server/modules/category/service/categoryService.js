@@ -10,6 +10,7 @@ import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
@@ -33,8 +34,13 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 }
 
 export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => {
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-  const fileName = `${Category.getName(category) || 'category'}.csv`
+  const fileName = ExportFileNameGenerator.generate({
+    survey,
+    fileType: 'Category',
+    itemName: Category.getName(category),
+  })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   await CategoryManager.exportCategoryToStream({ surveyId, categoryUuid, draft, outputStream: res })
@@ -45,7 +51,7 @@ export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res
   const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
 
   const templateData = CategoryImportTemplateGenerator.generateTemplate({ languages })
-  const fileName = 'category_import_template.csv'
+  const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'CategoryImportGeneric' })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
@@ -57,8 +63,11 @@ export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, dra
   const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
 
   const templateData = CategoryImportTemplateGenerator.generateTemplate({ category, languages })
-  const fileName = `${Category.getName(category) || 'category'}_import_template.csv`
-
+  const fileName = ExportFileNameGenerator.generate({
+    survey,
+    fileType: 'CategoryImport',
+    itemName: Category.getName(category),
+  })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })

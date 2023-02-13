@@ -60,14 +60,16 @@ export const getDataImportFromCsvTemplateUrl = ({ surveyId, entityDefUuid, cycle
 }
 
 // ==== DATA EXPORT
-export const startExportDataToCSVJob = async ({ surveyId, options }) => {
-  const { data } = await axios.post(`/api/survey/${surveyId}/export-csv-data`, options)
+export const startExportDataToCSVJob = async ({ surveyId, cycle, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/export-csv-data`, { cycle, ...options })
   const { job } = data
   return job
 }
 
-export const downloadExportedDataToCSVUrl = ({ surveyId, exportUuid }) =>
-  `/api/survey/${surveyId}/export-csv-data/${exportUuid}`
+export const downloadExportedDataToCSVUrl = ({ surveyId, cycle, exportUuid }) => {
+  const params = new URLSearchParams({ cycle })
+  return `/api/survey/${surveyId}/export-csv-data/${exportUuid}?${params.toString()}`
+}
 
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
@@ -80,11 +82,9 @@ export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
   return tempFileName
 }
 
-export const downloadDataQueryExport = ({ surveyId, entityDefUuid, tempFileName }) => {
-  window.open(
-    `/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?tempFileName=${tempFileName}`,
-    'data-query-export'
-  )
+export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, tempFileName }) => {
+  const params = new URLSearchParams({ cycle, tempFileName }).toString()
+  window.open(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?${params}`, 'data-query-export')
 }
 
 // ==== READ

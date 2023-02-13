@@ -1,15 +1,14 @@
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
-import * as DateUtils from '../../../../core/dateUtils'
 import * as ObjectUtils from '../../../../core/objectUtils'
-import * as Survey from '../../../../core/survey/survey'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
 
 import { jobToJSON } from '../../../job/jobUtils'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -174,8 +173,11 @@ export const init = (app) => {
           SurveyService.fetchSurveyById({ surveyId, draft }),
           TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft),
         ])
-        const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
-        const fileName = `${surveyName}_taxonomy_${Taxonomy.getName(taxonomy)}_${DateUtils.nowFormatDefault()}.csv`
+        const fileName = ExportFileNameGenerator.generate({
+          survey,
+          fileType: 'Taxonomy',
+          itemName: Taxonomy.getName(taxonomy),
+        })
         Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
         await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)

@@ -190,10 +190,10 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
-  { surveyId, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
+  { surveyId, cycle, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
   client
 ) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, includeAnalysis }, client)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, includeAnalysis }, client)
 
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
@@ -219,6 +219,7 @@ export const fetchEntitiesDataToCsvFiles = async (
 
     await fetchViewData({
       survey,
+      cycle,
       recordOwnerUuid,
       streamOutput: stream,
       query,

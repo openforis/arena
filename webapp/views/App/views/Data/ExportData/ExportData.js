@@ -1,12 +1,12 @@
 import './ExportData.scss'
 
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
-import { useDispatch } from 'react-redux'
 import { Button, ExpansionPanel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
