@@ -51,7 +51,7 @@ const JobMonitor = () => {
             currentJobIndex={JobSerialized.getCurrentInnerJobIndex(job)}
             innerJobs={innerJobs}
             panelStartClosed={!jobEnded}
-            openPanel={jobEnded}
+            openPanel={JobSerialized.isFailed(job)}
           />
         )}
       </ModalBody>
