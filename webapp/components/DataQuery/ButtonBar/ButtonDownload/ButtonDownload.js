@@ -17,7 +17,7 @@ const ButtonDownload = (props) => {
 
   const onClick = async () => {
     const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query })
-    API.downloadDataQueryExport({ surveyId, entityDefUuid, tempFileName })
+    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName })
   }
 
   return <ButtonDownloadSimple disabled={disabled} title="common.csvExport" showLabel={false} onClick={onClick} />

@@ -1,13 +1,14 @@
 import * as A from '../../../../core/arena'
-import * as DateUtils from '../../../../core/dateUtils'
 
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 import * as FileUtils from '../../../utils/file/fileUtils'
 
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyRdbService from '../service/surveyRdbService'
 
 import { requireRecordListViewPermission, requireSurveyRdbRefreshPermission } from '../../auth/authApiMiddleware'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 export const init = (app) => {
   app.get('/surveyRdb/recreateRdbs', requireSurveyRdbRefreshPermission, async (req, res, next) => {
@@ -98,12 +99,15 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const { tempFileName } = Request.getParams(req)
+        const { surveyId, cycle, tempFileName } = Request.getParams(req)
+
+        const survey = await SurveyService.fetchSurveyById({ surveyId })
+        const outputFileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ExlorerTable' })
 
         Response.sendFile({
           res,
           path: FileUtils.tempFilePath(tempFileName),
-          name: `data-export-${DateUtils.nowFormatDefault()}.csv`,
+          name: outputFileName,
           contentType: Response.contentTypes.csv,
         })
       } catch (error) {

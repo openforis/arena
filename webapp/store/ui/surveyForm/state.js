@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -29,6 +31,7 @@ export const assocFormActivePage = (nodeDef) => R.assoc(keys.nodeDefUuidPage, No
 export const getFormActivePageNodeDef = (state) => {
   const survey = SurveyState.getSurvey(state)
   const nodeDefUuidPage = getStateProp(keys.nodeDefUuidPage)(state)
+  if (Objects.isEmpty(survey) || Objects.isEmpty(Survey.getNodeDefs(survey))) return null
 
   return nodeDefUuidPage ? Survey.getNodeDefByUuid(nodeDefUuidPage)(survey) : Survey.getNodeDefRoot(survey)
 }

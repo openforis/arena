@@ -82,11 +82,9 @@ export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
   return tempFileName
 }
 
-export const downloadDataQueryExport = ({ surveyId, entityDefUuid, tempFileName }) => {
-  window.open(
-    `/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?tempFileName=${tempFileName}`,
-    'data-query-export'
-  )
+export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, tempFileName }) => {
+  const params = new URLSearchParams({ cycle, tempFileName }).toString()
+  window.open(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?${params}`, 'data-query-export')
 }
 
 // ==== READ
