@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 
 import * as API from '@webapp/service/api'
@@ -10,8 +11,8 @@ const toOption = (surveyInfo) => {
 
   return {
     name: Survey.getName(surveyInfo),
-    label: Survey.getDefaultLabel(surveyInfo),
-    description: Survey.getDefaultDescription(surveyInfo),
+    label: StringUtils.trim(Survey.getDefaultLabel(surveyInfo)),
+    description: StringUtils.trim(Survey.getDefaultDescription(surveyInfo)),
     value: Survey.getIdSurveyInfo(surveyInfo),
   }
 }
