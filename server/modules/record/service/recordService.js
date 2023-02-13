@@ -195,7 +195,7 @@ export const { fetchValidationReport, countValidationReportItems } = RecordManag
 export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, recordUuid = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const fileName = `${Survey.getName(survey)}_validation_report.csv`
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport' })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   const objectTransformer = (item) => {
