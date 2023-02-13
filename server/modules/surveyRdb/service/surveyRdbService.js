@@ -128,6 +128,7 @@ export const exportViewDataToTempFile = async ({
 export const fetchEntitiesDataToCsvFiles = async ({
   user,
   surveyId,
+  cycle,
   outputDir,
   includeCategoryItemsLabels,
   includeAnalysis,
@@ -138,6 +139,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
 
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
     surveyId,
+    cycle,
     outputDir,
     includeCategoryItemsLabels,
     includeAnalysis,
