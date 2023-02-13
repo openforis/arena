@@ -2,13 +2,13 @@ import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
 import * as ObjectUtils from '../../../../core/objectUtils'
-import * as Survey from '../../../../core/survey/survey'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
 
 import { jobToJSON } from '../../../job/jobUtils'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as TaxonomyService from '../service/taxonomyService'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -16,12 +16,6 @@ const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
 
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
-}
-
-const _generateExportFileName = ({ survey, fileType, taxonomy = null, extension = 'csv' }) => {
-  const surveyName = Survey.getName(survey)
-  const taxonomyName = taxonomy ? Taxonomy.getName(taxonomy) || 'taxonomy' : ''
-  return `${surveyName}_${fileType}${taxonomy ? `_${taxonomyName}` : ''}.${extension}`
 }
 
 export const init = (app) => {
@@ -179,7 +173,11 @@ export const init = (app) => {
           SurveyService.fetchSurveyById({ surveyId, draft }),
           TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft),
         ])
-        const fileName = _generateExportFileName({ survey, taxonomy, fileType: 'Taxonomy' })
+        const fileName = ExportFileNameGenerator.generate({
+          survey,
+          fileType: 'Taxonomy',
+          itemName: Taxonomy.getName(taxonomy),
+        })
         Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
         await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
