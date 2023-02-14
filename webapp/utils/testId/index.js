@@ -28,6 +28,7 @@ export const TestId = {
     exportBtn: 'category-export-btn',
     templateForDataImportBtn: 'category-template-data-import-btn',
     templateForDataImportGenericBtn: 'category-template-data-import-generic-btn',
+    templateForSamplingPointDataImportBtn: 'category-template-sampling-point-data-import-btn',
   },
   categorySelector: {
     dropdown: 'category-selector-dropdown',

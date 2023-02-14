@@ -111,6 +111,18 @@ const CategoryDetails = (props) => {
                     />
                   ),
                 },
+                {
+                  key: 'data-import-sampling-point-data-template-download',
+                  content: (
+                    <ButtonDownload
+                      className="btn-transparent"
+                      testId={TestId.categoryDetails.templateForSamplingPointDataImportBtn}
+                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                      requestParams={{ samplingPointData: true }}
+                      label="categoryEdit.templateForSamplingPointDataImport"
+                    />
+                  ),
+                },
               ]}
             />
           )}
