@@ -75,19 +75,20 @@
   color: $black;
   background-color: white;
   border: 1px solid rgba($black, 0.15);
+  font-size: 1rem;
 
   &:focus,
   &:active,
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
-    background-color: lighten($greenLight, 5%);
+    background-color: lighten($greenLight, 10%);
     color: $black;
     -webkit-text-fill-color: $black;
-    box-shadow: 0 0 0px 1000px lighten($greenLight, 5%) inset;
-    -webkit-box-shadow: 0 0 0px 1000px lighten($greenLight, 5%) inset;
+    box-shadow: 0 0 0px 1000px lighten($greenLight, 10%) inset;
+    -webkit-box-shadow: 0 0 0px 1000px lighten($greenLight, 10%) inset;
     font-family: $fontFamily;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 }
 
