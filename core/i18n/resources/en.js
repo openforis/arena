@@ -353,6 +353,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         <br />
         `,
       },
+      activeSurveyNotSelected: `<title>Active survey not selected</title>
+        <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
