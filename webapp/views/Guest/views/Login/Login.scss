@@ -4,6 +4,15 @@
   .form-input {
     padding: 20px 5px;
   }
+  .input-text,
+  .input-text input {
+    background-color: white;
+    border: inherit;
+  }
+
+  label.MuiInputLabel-shrink {
+    font-size: 120%;
+  }
 }
 
 .guest-login__btn-request-access,

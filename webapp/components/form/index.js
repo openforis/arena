@@ -7,3 +7,6 @@ import Radiobox from './radiobox'
 import UploadButton from './uploadButton'
 
 export { ButtonGroup, Checkbox, Dropdown, EmailInput, LanguageDropdown, Radiobox, UploadButton }
+
+export { PasswordInput } from './PasswordInput'
+export { TextInput } from './TextInput'
