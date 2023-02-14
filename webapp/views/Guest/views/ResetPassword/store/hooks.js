@@ -32,7 +32,7 @@ export const useResetPassword = () => {
 
   const navigateToHomePage = () => navigate(appModuleUri(homeModules.dashboard))
 
-  const onChangeUser = (event) => actions.updateUser(event)(dispatch)
+  const onChangeUser = ({ prop, value }) => actions.updateUser({ prop, value })(dispatch)
   const onChangeUserTitle = (userWithTitle) => actions.updateUserTitle(userWithTitle)(dispatch)
 
   const onSubmit = () => {

@@ -5,14 +5,18 @@ import classNames from 'classnames'
 
 export const TextInput = (props) => {
   const {
+    autoComplete,
     className,
     defaultValue,
+    disabled,
+    endAdornment,
     id,
     label,
-    startAdornment,
-    endAdornment,
+    name,
     onChange: onChangeProp,
     placeholder,
+    readOnly,
+    startAdornment,
     textTransformFunction,
     type,
     value,
@@ -29,6 +33,7 @@ export const TextInput = (props) => {
 
   return (
     <MuiTextField
+      autoComplete={autoComplete}
       className={classNames('input-text', className)}
       defaultValue={defaultValue}
       label={label}
@@ -37,8 +42,10 @@ export const TextInput = (props) => {
         startAdornment,
         endAdornment,
       }}
+      name={name}
       onChange={onChange}
       placeholder={placeholder}
+      disabled={disabled || readOnly}
       type={type}
       value={value}
     />
@@ -46,14 +53,18 @@ export const TextInput = (props) => {
 }
 
 TextInput.propTypes = {
+  autoComplete: PropTypes.bool,
   className: PropTypes.string,
   defaultValue: PropTypes.string,
+  disabled: PropTypes.bool,
+  endAdornment: PropTypes.any,
   id: PropTypes.string,
   label: PropTypes.string,
-  startAdornment: PropTypes.any,
-  endAdornment: PropTypes.any,
+  name: PropTypes.string,
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
+  readOnly: PropTypes.bool,
+  startAdornment: PropTypes.any,
   textTransformFunction: PropTypes.func,
   type: PropTypes.string,
   value: PropTypes.string,
