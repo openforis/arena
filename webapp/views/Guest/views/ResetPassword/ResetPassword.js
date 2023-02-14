@@ -11,6 +11,7 @@ import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { useResetPassword } from './store/hooks'
 import { Button } from '@webapp/components'
 import { PasswordInput, TextInput } from '@webapp/components/form'
+import { PasswordStrengthChecker } from './PasswordStrengthChecker'
 
 const ResetPassword = () => {
   const i18n = useI18n()
@@ -38,9 +39,9 @@ const ResetPassword = () => {
         <>
           <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
           <TextInput
-            autoComplete={false}
             defaultValue={user.name}
-            name="fullname"
+            name="name"
+            autoComplete="name"
             label={i18n.t('loginView.yourName')}
             onChange={(value) => onChangeUser({ prop: 'name', value })}
           />
@@ -51,6 +52,8 @@ const ResetPassword = () => {
         label={i18n.t('loginView.yourNewPassword')}
         onChange={(value) => onChangeUser({ prop: 'password', value })}
       />
+
+      <PasswordStrengthChecker password={user.password} />
 
       <PasswordInput
         defaultValue={user.passwordConfirm}

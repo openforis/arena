@@ -53,7 +53,7 @@ export const TextInput = (props) => {
 }
 
 TextInput.propTypes = {
-  autoComplete: PropTypes.bool,
+  autoComplete: PropTypes.string,
   className: PropTypes.string,
   defaultValue: PropTypes.string,
   disabled: PropTypes.bool,
@@ -68,4 +68,8 @@ TextInput.propTypes = {
   textTransformFunction: PropTypes.func,
   type: PropTypes.string,
   value: PropTypes.string,
+}
+
+TextInput.defaultProps = {
+  autoComplete: 'off',
 }

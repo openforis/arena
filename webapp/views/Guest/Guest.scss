@@ -60,6 +60,7 @@
 .guest__form {
   position: fixed;
   width: 30vw;
+  min-width: 20rem;
   height: 60vh;
   top: 20vh;
   left: 35vw;
@@ -74,7 +75,6 @@
   text-align: center;
   color: $black;
   background-color: white;
-  border: 1px solid rgba($black, 0.15);
   font-size: 1rem;
 
   &:focus,
