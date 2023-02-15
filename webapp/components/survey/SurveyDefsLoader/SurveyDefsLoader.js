@@ -9,6 +9,8 @@ import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
+import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
+
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
 
@@ -32,13 +34,19 @@ const SurveyDefsLoader = (props) => {
     }
   })
 
-  if (!ready) return null
+  if (!surveyUuid) {
+    return <ActiveSurveyNotSelected />
+  }
 
-  return !requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) ? (
-    children
-  ) : (
-    <div className="table__empty-rows">{i18n.t('surveyDefsLoader.requireSurveyPublish')}</div>
-  )
+  if (!ready) {
+    return null
+  }
+
+  if (!requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)) {
+    return children
+  }
+
+  return <div className="table__empty-rows">{i18n.t('surveyDefsLoader.requireSurveyPublish')}</div>
 }
 
 SurveyDefsLoader.propTypes = {

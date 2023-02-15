@@ -361,6 +361,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         <br />
         `,
       },
+      activeSurveyNotSelected: `<title>Active survey not selected</title>
+        <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
@@ -1249,6 +1251,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     reportingData: 'Reporting data',
     templateForDataImport: 'Template for data import',
     templateForDataImportGeneric: 'Template for data import (generic)',
+    templateForSamplingPointDataImport: 'Template for Sampling Point Data import',
   },
 
   extraProp: {

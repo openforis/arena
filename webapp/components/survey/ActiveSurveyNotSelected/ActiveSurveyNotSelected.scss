@@ -1,0 +1,15 @@
+.active-survey-not-selected {
+  text-align: center;
+  line-height: 5rem;
+
+  p {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    font-size: 120%;
+  }
+
+  a {
+    font-size: 120%;
+  }
+}
