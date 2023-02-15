@@ -25,7 +25,7 @@ export const PasswordStrengthChecker = (props) => {
 
   return (
     <ExpansionPanel
-      className="password-checks-panel"
+      className="password-strength-checks-panel"
       buttonLabel="resetPasswordView.passwordStrengthChecksTitle"
       open={!passwordIsValid}
     >

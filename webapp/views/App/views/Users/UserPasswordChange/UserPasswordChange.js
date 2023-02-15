@@ -10,9 +10,10 @@ import * as API from '@webapp/service/api'
 
 import { useI18n } from '@webapp/store/system'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
 import { Button } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
+import { PasswordInput, PasswordStrengthChecker } from '@webapp/components/form'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const defaultState = { form: UserPasswordChangeForm.newForm(), validation: {} }
 
@@ -45,14 +46,23 @@ const UserPasswordChange = () => {
   return (
     <div className="user-change-password">
       {Object.values(UserPasswordChangeForm.keys).map((key) => (
-        <FormItem key={key} label={i18n.t(`userPasswordChangeView.${key}`)}>
-          <Input
-            type="password"
-            value={form[key]}
+        <>
+          <ValidationTooltip
             validation={Validation.getFieldValidation(key)(validation)}
-            onChange={setStateProp(key)}
-          />
-        </FormItem>
+            className="form-input-container"
+          >
+            <PasswordInput
+              autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
+              label={i18n.t(`userPasswordChangeView.${key}`)}
+              onChange={setStateProp(key)}
+              value={form[key]}
+            />
+          </ValidationTooltip>
+
+          {key === UserPasswordChangeForm.keys.newPassword && (
+            <PasswordStrengthChecker password={UserPasswordChangeForm.getNewPassword(form)} />
+          )}
+        </>
       ))}
 
       <Button

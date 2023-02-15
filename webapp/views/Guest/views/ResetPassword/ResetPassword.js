@@ -10,8 +10,7 @@ import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
 import { useResetPassword } from './store/hooks'
 import { Button } from '@webapp/components'
-import { PasswordInput, TextInput } from '@webapp/components/form'
-import { PasswordStrengthChecker } from './PasswordStrengthChecker'
+import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/components/form'
 
 const ResetPassword = () => {
   const i18n = useI18n()

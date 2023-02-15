@@ -9,4 +9,5 @@ import UploadButton from './uploadButton'
 export { ButtonGroup, Checkbox, Dropdown, EmailInput, LanguageDropdown, Radiobox, UploadButton }
 
 export { PasswordInput } from './PasswordInput'
+export { PasswordStrengthChecker } from './PasswordStrengthChecker'
 export { TextInput } from './TextInput'
