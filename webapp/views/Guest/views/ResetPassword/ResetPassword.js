@@ -41,13 +41,14 @@ const ResetPassword = () => {
           <TextInput
             defaultValue={user.name}
             name="name"
-            autoComplete="name"
+            autoComplete="new-name"
             label={i18n.t('loginView.yourName')}
             onChange={(value) => onChangeUser({ prop: 'name', value })}
           />
         </>
       )}
       <PasswordInput
+        autoComplete="new-password"
         defaultValue={user.password}
         label={i18n.t('loginView.yourNewPassword')}
         onChange={(value) => onChangeUser({ prop: 'password', value })}
@@ -56,6 +57,7 @@ const ResetPassword = () => {
       <PasswordStrengthChecker password={user.password} />
 
       <PasswordInput
+        autoComplete="new-password"
         defaultValue={user.passwordConfirm}
         label={i18n.t('loginView.repeatYourNewPassword')}
         onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
