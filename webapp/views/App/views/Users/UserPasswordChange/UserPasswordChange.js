@@ -46,7 +46,7 @@ const UserPasswordChange = () => {
   return (
     <div className="user-change-password">
       {Object.values(UserPasswordChangeForm.keys).map((key) => (
-        <>
+        <div key={key}>
           <ValidationTooltip
             validation={Validation.getFieldValidation(key)(validation)}
             className="form-input-container"
@@ -62,7 +62,7 @@ const UserPasswordChange = () => {
           {key === UserPasswordChangeForm.keys.newPassword && (
             <PasswordStrengthChecker password={UserPasswordChangeForm.getNewPassword(form)} />
           )}
-        </>
+        </div>
       ))}
 
       <Button
