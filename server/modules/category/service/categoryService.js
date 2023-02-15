@@ -48,9 +48,7 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
 
 export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
-  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
-
-  const templateData = CategoryImportTemplateGenerator.generateTemplate({ languages })
+  const templateData = CategoryImportTemplateGenerator.generateTemplate({ survey })
   const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'CategoryImportGeneric' })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
@@ -60,14 +58,21 @@ export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res
 export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res }) => {
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
-  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
-
-  const templateData = CategoryImportTemplateGenerator.generateTemplate({ category, languages })
+  const templateData = CategoryImportTemplateGenerator.generateTemplate({ survey, category })
   const fileName = ExportFileNameGenerator.generate({
     survey,
     fileType: 'CategoryImport',
     itemName: Category.getName(category),
   })
+  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+
+  await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
+}
+
+export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, draft, res }) => {
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+  const templateData = CategoryImportTemplateGenerator.generateSamplingPointDataTemplate({ survey })
+  const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'SamplingPointDataImport' })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
