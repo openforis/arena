@@ -10,6 +10,7 @@ import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
 import { useResetPassword } from './store/hooks'
 import { Button } from '@webapp/components'
+import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/components/form'
 
 const ResetPassword = () => {
   const i18n = useI18n()
@@ -31,33 +32,34 @@ const ResetPassword = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      <input value={user.email} readOnly type="text" name="email" />
+      <TextInput label={i18n.t('loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
 
       {!User.hasAccepted(initialUser) && (
         <>
           <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
-          <input
+          <TextInput
             defaultValue={user.name}
-            onChange={onChangeUser}
             name="name"
-            placeholder={i18n.t('loginView.yourName')}
+            autoComplete="new-name"
+            label={i18n.t('loginView.yourName')}
+            onChange={(value) => onChangeUser({ prop: 'name', value })}
           />
         </>
       )}
-      <input
+      <PasswordInput
+        autoComplete="new-password"
         defaultValue={user.password}
-        onChange={onChangeUser}
-        type="password"
-        name="password"
-        placeholder={i18n.t('loginView.yourNewPassword')}
+        label={i18n.t('loginView.yourNewPassword')}
+        onChange={(value) => onChangeUser({ prop: 'password', value })}
       />
 
-      <input
+      <PasswordStrengthChecker password={user.password} />
+
+      <PasswordInput
+        autoComplete="new-password"
         defaultValue={user.passwordConfirm}
-        onChange={onChangeUser}
-        type="password"
-        name="passwordConfirm"
-        placeholder={i18n.t('loginView.repeatYourNewPassword')}
+        label={i18n.t('loginView.repeatYourNewPassword')}
+        onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
       />
 
       <div className="guest__buttons">

@@ -53,7 +53,7 @@ const ForgotPassword = () => {
           setObjectField('email', value)
         }}
         name="username"
-        placeholder={i18n.t('loginView.yourEmail')}
+        label={i18n.t('loginView.yourEmail')}
       />
 
       <div className="guest__buttons">

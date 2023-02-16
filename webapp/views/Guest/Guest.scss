@@ -23,46 +23,69 @@
   animation: not-logged-in__bg-animation 15s infinite;
 }
 
-.guest__openforis {
-  position: fixed;
-  width: 60px;
-  right: 5vw;
-  top: 0;
-  border-left: 2px solid $green;
-  border-bottom: 2px solid $green;
-  border-right: 2px solid $green;
-  padding: 10px;
-  display: grid;
-  grid-row-gap: 10px;
-  z-index: $zIndex10TopOfApp;
+.guest__openforis,
+.guest__of-arena-logo {
+  display: none;
+}
 
-  > div {
-    padding: 10px 0;
-    text-align: center;
-    font-size: 1.25rem;
-    color: white;
-    text-transform: uppercase;
+@media screen and (max-width: 768px) {
+  .guest__of-arena-logo {
+    display: flex;
+    margin: 1rem;
+
+    img {
+      height: 100px;
+    }
   }
+}
 
-  .openforis {
-    background-color: rgba($green, 0.9);
+@media only screen and (min-width: 768px) {
+  .guest__openforis {
+    position: fixed;
+    width: 60px;
+    right: 5vw;
+    top: 0;
+    border-left: 2px solid $green;
+    border-bottom: 2px solid $green;
+    border-right: 2px solid $green;
+    padding: 10px;
+    display: grid;
+    grid-row-gap: 10px;
+    z-index: $zIndex10TopOfApp;
 
-    .separator {
-      font-size: 0.3rem;
+    > div {
+      padding: 10px 0;
+      text-align: center;
+      font-size: 1.25rem;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .openforis {
+      background-color: rgba($green, 0.9);
+
+      .separator {
+        font-size: 0.3rem;
+      }
+    }
+
+    .arena {
+      background-color: rgba($red, 0.8);
     }
   }
 
-  .arena {
-    background-color: rgba($red, 0.8);
+  .guest__form {
+    position: fixed;
+    width: 30vw;
+    min-width: 20rem;
+    height: 60vh;
+    top: 20vh;
+    left: 35vw;
   }
 }
 
 .guest__form {
-  position: fixed;
-  width: 30vw;
-  height: 60vh;
-  top: 20vh;
-  left: 35vw;
+  margin: 1rem 3rem;
   display: grid;
   grid-template-columns: 1fr;
   justify-content: center;
@@ -74,20 +97,20 @@
   text-align: center;
   color: $black;
   background-color: white;
-  border: 1px solid rgba($black, 0.15);
+  font-size: 1rem;
 
   &:focus,
   &:active,
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
-    background-color: lighten($greenLight, 5%);
+    background-color: lighten($greenLight, 10%);
     color: $black;
     -webkit-text-fill-color: $black;
-    box-shadow: 0 0 0px 1000px lighten($greenLight, 5%) inset;
-    -webkit-box-shadow: 0 0 0px 1000px lighten($greenLight, 5%) inset;
+    box-shadow: 0 0 0px 1000px lighten($greenLight, 10%) inset;
+    -webkit-box-shadow: 0 0 0px 1000px lighten($greenLight, 10%) inset;
     font-family: $fontFamily;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 }
 

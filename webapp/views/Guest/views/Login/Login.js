@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
-import { EmailInput } from '@webapp/components/form'
+import { EmailInput, PasswordInput } from '@webapp/components/form'
 
 import Error from '@webapp/views/Guest/Error'
 
@@ -39,21 +39,20 @@ const Login = () => {
     setObjectField('email', value)
   }
 
-  const onChangePassword = (event) => {
+  const onChangePassword = (value) => {
     dispatch(LoginActions.setLoginError(null))
-    setObjectField('password', event.target.value)
+    setObjectField('password', value)
   }
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      <EmailInput onChange={onChangeEmail} name="email" placeholder={i18n.t('loginView.yourEmail')} value={email} />
+      <EmailInput defaultValue={email} label={i18n.t('loginView.yourEmail')} name="email" onChange={onChangeEmail} />
 
-      <input
+      <PasswordInput
         defaultValue={formObject.password}
-        onChange={onChangePassword}
-        type="password"
         name="password"
-        placeholder={i18n.t('loginView.yourPassword')}
+        label={i18n.t('loginView.yourPassword')}
+        onChange={onChangePassword}
       />
 
       <Link

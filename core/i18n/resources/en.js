@@ -327,6 +327,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     setNewPassword: 'Set new password',
     forgotPasswordLinkInvalid: 'The page you have tried to access does not exist or is no longer valid',
     passwordSuccessfullyReset: 'Your password has been successfully reset',
+    passwordStrengthChecksTitle: 'Password strength checks',
+    passwordStrengthChecks: {
+      noWhiteSpaces: 'No white spaces',
+      atLeast8CharactersLong: 'At least 8 characters long',
+      containsLowerCaseLetters: 'Contains lowercase letters',
+      containsUpperCaseLetters: 'Contains uppercase letters',
+      containsNumbers: 'Contains numbers',
+    },
   },
 
   homeView: {

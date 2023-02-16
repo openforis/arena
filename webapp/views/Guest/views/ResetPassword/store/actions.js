@@ -6,11 +6,13 @@ export const initUser = (user) => (dispatch) =>
     payload: user,
   })
 
-export const updateUser = (event) => (dispatch) =>
-  dispatch({
-    type: actionTypes.USER_UPDATE,
-    payload: { [event.target.name]: event.target.value },
-  })
+export const updateUser =
+  ({ prop, value }) =>
+  (dispatch) =>
+    dispatch({
+      type: actionTypes.USER_UPDATE,
+      payload: { [prop]: value },
+    })
 
 export const updateUserTitle = (userWithTitle) => (dispatch) =>
   dispatch({
