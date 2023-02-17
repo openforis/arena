@@ -327,7 +327,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   resetPasswordView: {
     title: {
       completeRegistration: 'Complete your registration to Arena',
-      setYourPassword: 'Set your password',
+      setYourNewPassword: 'Set your new password',
     },
     setNewPassword: 'Set new password',
     forgotPasswordLinkInvalid: 'The page you have tried to access does not exist or is no longer valid',

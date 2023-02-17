@@ -37,7 +37,7 @@ const ResetPassword = () => {
       <div className="title">
         {i18n.t(
           hasAlreadyAccepted
-            ? 'resetPasswordView.title.setYourPassword'
+            ? 'resetPasswordView.title.setYourNewPassword'
             : 'resetPasswordView.title.completeRegistration'
         )}
       </div>
