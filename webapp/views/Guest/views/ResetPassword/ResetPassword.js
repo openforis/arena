@@ -30,11 +30,21 @@ const ResetPassword = () => {
       </form>
     )
 
+  const hasAlreadyAccepted = User.hasAccepted(initialUser)
+
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+      <div className="title">
+        {i18n.t(
+          hasAlreadyAccepted
+            ? 'resetPasswordView.title.setYourNewPassword'
+            : 'resetPasswordView.title.completeRegistration'
+        )}
+      </div>
+
       <TextInput label={i18n.t('loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
 
-      {!User.hasAccepted(initialUser) && (
+      {!hasAlreadyAccepted && (
         <>
           <DropdownUserTitle user={user} onChange={onChangeUserTitle} />
           <TextInput
@@ -49,7 +59,7 @@ const ResetPassword = () => {
       <PasswordInput
         autoComplete="new-password"
         defaultValue={user.password}
-        label={i18n.t('loginView.yourNewPassword')}
+        label={i18n.t(hasAlreadyAccepted ? 'loginView.yourNewPassword' : 'loginView.yourPassword')}
         onChange={(value) => onChangeUser({ prop: 'password', value })}
       />
 
@@ -58,13 +68,13 @@ const ResetPassword = () => {
       <PasswordInput
         autoComplete="new-password"
         defaultValue={user.passwordConfirm}
-        label={i18n.t('loginView.repeatYourNewPassword')}
+        label={i18n.t(hasAlreadyAccepted ? 'loginView.repeatYourNewPassword' : 'loginView.repeatYourPassword')}
         onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
       />
 
       <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onSubmit}>
-          {i18n.t('resetPasswordView.setNewPassword')}
+          {i18n.t(hasAlreadyAccepted ? 'resetPasswordView.setNewPassword' : 'resetPasswordView.completeRegistration')}
         </button>
       </div>
 

@@ -282,6 +282,7 @@ Do you want to proceed?`,
     yourEmail: 'Your email',
     yourPassword: 'Your password',
     yourNewPassword: 'Your new password',
+    repeatYourPassword: 'Repeat your password',
     repeatYourNewPassword: 'Repeat your new password',
     requestAccess: 'New to $t(common.appNameFull)? Request access',
     resetPassword: 'Reset password',
@@ -324,6 +325,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
   },
 
   resetPasswordView: {
+    title: {
+      completeRegistration: 'Complete your registration to Arena',
+      setYourNewPassword: 'Set your new password',
+    },
     setNewPassword: 'Set new password',
     forgotPasswordLinkInvalid: 'The page you have tried to access does not exist or is no longer valid',
     passwordSuccessfullyReset: 'Your password has been successfully reset',
@@ -335,6 +340,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       containsUpperCaseLetters: 'Contains uppercase letters',
       containsNumbers: 'Contains numbers',
     },
+    completeRegistration: 'Complete registration',
   },
 
   homeView: {
