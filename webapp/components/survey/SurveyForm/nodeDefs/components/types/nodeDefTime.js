@@ -21,7 +21,7 @@ const NodeDefTime = (props) => {
   )
 
   return (
-    <div className="survey-form__node-def-date">
+    <div className="survey-form__node-def-time">
       <TimeInput disabled={edit || !canEditRecord || readOnly} onChange={onChange} value={timeStr} />
     </div>
   )
