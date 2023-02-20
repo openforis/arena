@@ -1,0 +1,11 @@
+.records-clone {
+  .modal-body {
+    display: grid;
+    grid-template-columns: 20rem 20rem;
+    align-self: center;
+
+    .form-item {
+      width: 20rem;
+    }
+  }
+}

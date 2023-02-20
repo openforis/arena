@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 $borderRadius: 2px;
 
@@ -28,7 +28,7 @@ $borderRadius: 2px;
   animation-name: animatetop;
   animation-duration: 0.4s;
   margin: 10vh 20vw auto;
-  padding: 5vh 5vw;
+  padding: 1rem;
   box-shadow: $shadow3;
 }
 
@@ -48,7 +48,10 @@ $borderRadius: 2px;
 }
 
 .modal-close {
-  padding: 3px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
 
   &:hover {
     cursor: pointer;
