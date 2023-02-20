@@ -8,7 +8,8 @@ export default class CSVDataExtractionJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, includeCategoryItemsLabels, includeAnalysis, outputDir } = this.context
+    const { surveyId, cycle, includeCategoryItemsLabels, includeAnalysis, includeDataFromAllCycles, outputDir } =
+      this.context
 
     await SurveyRdbService.fetchEntitiesDataToCsvFiles(
       {
@@ -18,6 +19,7 @@ export default class CSVDataExtractionJob extends Job {
         outputDir,
         includeCategoryItemsLabels,
         includeAnalysis,
+        includeDataFromAllCycles,
         callback: ({ total }) => {
           this.total = total
           this.incrementProcessedItems()

@@ -39,6 +39,7 @@ export const startExportCsvDataJob = ({
   includeCategories,
   includeCategoryItemsLabels,
   includeAnalysis,
+  includeDataFromAllCycles,
 }) => {
   const job = new ExportCsvDataJob({
     user,
@@ -47,6 +48,7 @@ export const startExportCsvDataJob = ({
     includeCategories,
     includeCategoryItemsLabels,
     includeAnalysis,
+    includeDataFromAllCycles,
   })
 
   JobManager.executeJobThread(job)

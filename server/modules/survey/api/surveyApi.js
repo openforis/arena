@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
-import { isUuid } from '@core/uuid'
 
 import * as Response from '../../../utils/response'
 import * as Request from '../../../utils/request'
@@ -159,69 +158,6 @@ export const init = (app) => {
       next(error)
     }
   })
-
-  // export-csv-data
-  // generate zip with CSV
-  app.post(
-    '/survey/:surveyId/export-csv-data',
-    AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, includeCategories, includeCategoryItemsLabels, includeAnalysis } =
-          Request.getParams(req)
-
-        const user = Request.getUser(req)
-
-        const job = SurveyService.startExportCsvDataJob({
-          surveyId,
-          cycle,
-          user,
-          includeCategories,
-          includeCategoryItemsLabels,
-          includeAnalysis,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  // get zip with csv
-  app.get(
-    '/survey/:surveyId/export-csv-data/:exportUuid',
-    AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, exportUuid } = Request.getParams(req)
-
-        if (!isUuid(exportUuid)) {
-          throw new Error('Invalid exportUuid specified')
-        }
-
-        const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.zip`)
-
-        const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-        const fileName = ExportFileNameGenerator.generate({
-          survey,
-          cycle,
-          fileType: 'DataExport',
-          extension: 'zip',
-          includeTimestamp: true,
-        })
-
-        Response.sendFile({
-          res,
-          path: tempFilePath,
-          name: fileName,
-          contentType: Response.contentTypes.zip,
-          onEnd: async () => FileUtils.deleteFile(tempFilePath),
-        })
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {

@@ -132,6 +132,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   outputDir,
   includeCategoryItemsLabels,
   includeAnalysis,
+  includeDataFromAllCycles,
   callback,
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId })
@@ -143,6 +144,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
     outputDir,
     includeCategoryItemsLabels,
     includeAnalysis,
+    includeDataFromAllCycles,
     recordOwnerUuid,
     callback,
   })
