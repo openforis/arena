@@ -10,14 +10,21 @@ import { ExportCsvDataActions } from '@webapp/store/ui'
 import { Button, ExpansionPanel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { useSurveyCycleKeys } from '@webapp/store/survey'
 
 const ExportData = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
+  const cycles = useSurveyCycleKeys()
 
   const [state, setState] = useState({
-    options: { includeCategoryItemsLabels: true, includeCategories: false, includeAnalysis: false },
+    options: {
+      includeCategoryItemsLabels: true,
+      includeCategories: false,
+      includeAnalysis: false,
+      includeDataFromAllCycles: false,
+    },
   })
   const { options } = state
 
@@ -45,6 +52,13 @@ const ExportData = () => {
             checked={options.includeAnalysis}
             label={i18n.t('dataExportView.options.includeResultVariables')}
             onChange={onOptionChange('includeAnalysis')}
+          />
+        )}
+        {cycles.length > 1 && (
+          <Checkbox
+            checked={options.includeDataFromAllCycles}
+            label={i18n.t('dataExportView.options.includeDataFromAllCycles')}
+            onChange={onOptionChange('includeDataFromAllCycles')}
           />
         )}
       </ExpansionPanel>
