@@ -61,14 +61,14 @@ export const getDataImportFromCsvTemplateUrl = ({ surveyId, entityDefUuid, cycle
 
 // ==== DATA EXPORT
 export const startExportDataToCSVJob = async ({ surveyId, cycle, options }) => {
-  const { data } = await axios.post(`/api/survey/${surveyId}/export-csv-data`, { cycle, ...options })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-export/csv`, { cycle, ...options })
   const { job } = data
   return job
 }
 
 export const downloadExportedDataToCSVUrl = ({ surveyId, cycle, exportUuid }) => {
   const params = new URLSearchParams({ cycle })
-  return `/api/survey/${surveyId}/export-csv-data/${exportUuid}?${params.toString()}`
+  return `/api/survey/${surveyId}/data-export/csv/${exportUuid}?${params.toString()}`
 }
 
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {

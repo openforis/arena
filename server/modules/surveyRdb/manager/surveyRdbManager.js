@@ -190,9 +190,19 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
-  { surveyId, cycle, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
+  {
+    surveyId,
+    cycle: cycleParam,
+    outputDir,
+    includeCategoryItemsLabels,
+    includeAnalysis,
+    includeDataFromAllCycles,
+    recordOwnerUuid = null,
+    callback,
+  },
   client
 ) => {
+  const cycle = includeDataFromAllCycles ? null : cycleParam
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, includeAnalysis }, client)
 
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
