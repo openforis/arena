@@ -37,6 +37,7 @@ export {
   fetchRecordsCountByStep,
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
+  startRecordsCloneJob,
 } from './data'
 export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
