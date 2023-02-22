@@ -33,7 +33,7 @@ export const newValidationRecordDuplicate = ({
 export const getValidationChildrenCount = (nodeParentUuid, nodeDefChildUuid) =>
   RecordValidations.getValidationChildrenCount({ nodeParentUuid, nodeDefChildUuid })
 
-export const getNodeValidation = RecordValidations.getNodeValidation
+export const getNodeValidation = (node) => RecordValidations.getValidationNode({ nodeUuid: node?.uuid })
 
 // ===== UPDATE
 export const setValidationCount = (nodeParentUuid, nodeDefChildUuid, validationCount) =>

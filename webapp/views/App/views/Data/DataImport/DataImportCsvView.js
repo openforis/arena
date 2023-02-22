@@ -7,6 +7,7 @@ import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import { RecordCycle } from '@core/record/recordCycle'
 
 import * as API from '@webapp/service/api'
 
@@ -75,7 +76,7 @@ export const DataImportCsvView = () => {
     preventUpdatingRecordsInAnalysis,
   } = state
 
-  const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${Number(cycle) + 1})_ImportError`
+  const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${RecordCycle.getLabel(cycle)})_ImportError`
 
   const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
 

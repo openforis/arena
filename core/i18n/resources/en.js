@@ -630,8 +630,14 @@ Are you sure you want to continue?`,
       title: 'Records clone',
       fromCycle: 'From cycle',
       toCycle: 'To cycle',
-      confirmCloning: 'Clone records from cycle {{cycleFrom}} to cycle {{cycleTo}}?',
+      confirmClone: `Clone records from cycle {{cycleFrom}} to cycle {{cycleTo}}?\n
+(Only records not already in cycle {{cycleTo}} will be cloned)`,
       startCloning: 'Start cloning',
+      cloneComplete: 'Clone complete. {{recordsCloned}} records cloned from {{cycleFrom}} to {{cycleTo}}',
+      error: {
+        cycleFromOrCycleToMissing: 'Please select "Cycle from" and "Cycle to"',
+        cycleToMustBeDifferentFromCycleFrom: '"Cycle to" must be different from "Cycle from"',
+      },
     },
     recordDeleted_one: `Record deleted successfully!`,
     recordDeleted_other: `{{count}} records deleted successfully!`,
@@ -1406,6 +1412,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       valueRequired: 'Required value',
     },
 
+    recordClone: {
+      differentKeyAttributes: 'Key attributes are different in Cycle {{cycleFrom}} and Cycle {{cycleTo}}',
+    },
+
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
@@ -1505,6 +1515,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     NodeDefsValidationJob: 'Node Definitions Validation',
     chainsCyclesCheckJob: `Chains Cycles Check`,
     RecordCheckJob: 'Record Check',
+    RecordsCloneJob: 'Records Clone',
     RecordsImportJob: 'Records Import',
     RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
     SamplingPointDataImportJob: 'Sampling Point Data Import',

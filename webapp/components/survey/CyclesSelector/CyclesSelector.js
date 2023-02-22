@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { RecordCycle } from '@core/record/recordCycle'
+
 import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
 
@@ -26,7 +28,7 @@ const CyclesSelector = (props) => {
         onChange={(cycles) => onChange(cycles.sort((a, b) => Number(a) - Number(b)))}
         items={cyclesKeysSurvey.map((cycle) => ({
           key: cycle,
-          label: Number(cycle) + 1,
+          label: RecordCycle.getLabel(cycle),
           disabled:
             (cyclesKeysSelected.length === 1 && cycle === cyclesKeysSelected[0]) || // Disabled if current cycle is the only one selected in nodeDef
             cycle === cycleKeyCurrent || // Cannot remove nodeDef from current cycle
