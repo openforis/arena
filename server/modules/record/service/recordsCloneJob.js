@@ -25,13 +25,28 @@ export default class RecordsCloneJob extends Job {
   async onStart() {
     await super.onStart()
     await SRSs.init()
+
+    const { context, user, tx } = this
+    const { surveyId } = context
+    this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
   }
 
   async execute() {
-    const { context, user, tx } = this
-    const { surveyId, cycleFrom, cycleTo } = context
+    const recordsToClone = await this.findRecordsToClone()
 
-    this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
+    this.total = recordsToClone.length
+
+    await Promises.each(recordsToClone, async (recordSummary) => this.cloneRecord({ recordSummary }))
+  }
+
+  async beforeSuccess() {
+    await super.beforeSuccess()
+    await this.nodesInsertBatchPersister.flush()
+  }
+
+  async findRecordsToClone() {
+    const { context } = this
+    const { surveyId, cycleFrom, cycleTo } = context
 
     const { nodeDefKeys: nodeDefKeysCycleFrom, list: recordsCycleFrom } =
       await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, cycle: cycleFrom })
@@ -52,17 +67,12 @@ export default class RecordsCloneJob extends Job {
         Objects.isEqual(keyValuesRecordCycleFrom, getKeyValues(recordCycleTo))
       )
     })
-
-    this.total = recordsToClone.length
-
-    await Promises.each(recordsToClone, async (recordSummary) => this.cloneRecord({ recordSummary }))
-
-    await this.nodesInsertBatchPersister.flush()
+    return recordsToClone
   }
 
   async cloneRecord({ recordSummary }) {
-    const { context, surveyId, tx, user } = this
-    const { cycleTo } = context
+    const { context, tx, user } = this
+    const { surveyId, cycleTo } = context
 
     const record = await RecordManager.fetchRecordAndNodesByUuid({
       surveyId,
@@ -106,7 +116,7 @@ export default class RecordsCloneJob extends Job {
       let newFieldKey
       if (oldFieldKey.startsWith(RecordValidation.prefixValidationFieldChildrenCount)) {
         const oldParentUuid = oldFieldKey.substring(
-          RecordValidation.prefixValidationFieldChildrenCount,
+          RecordValidation.prefixValidationFieldChildrenCount.length,
           oldFieldKey.lastIndexOf('_')
         )
         const newParentUuid = newUuidsByOldUuid[oldParentUuid]
@@ -114,7 +124,9 @@ export default class RecordsCloneJob extends Job {
       } else {
         newFieldKey = newUuidsByOldUuid[oldFieldKey]
       }
-      record.validation.fields[newFieldKey] = validationField
+      if (newFieldKey) {
+        record.validation.fields[newFieldKey] = validationField
+      }
       delete record.validation.fields[oldFieldKey]
     })
   }
