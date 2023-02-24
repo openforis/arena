@@ -153,7 +153,7 @@ export const DataImportCsvView = () => {
         <div className="form">
           {canSelectCycle && (
             <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
-              <CycleSelector surveyCycleKey={cycle} onChange={setStateProp('cycle')} />
+              <CycleSelector selectedCycle={cycle} onChange={setStateProp('cycle')} />
             </FormItem>
           )}
 

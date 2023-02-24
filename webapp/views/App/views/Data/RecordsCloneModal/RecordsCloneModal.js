@@ -11,7 +11,7 @@ import { Modal, ModalBody, ModalClose, ModalFooter, ModalHeader } from '@webapp/
 import { Button } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
@@ -23,18 +23,17 @@ export const RecordsCloneModal = (props) => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const surveyId = useSurveyId()
+  const cycleFrom = useSurveyCycleKey()
 
   const [state, setState] = useState({
-    cycleFrom: null,
     cycleTo: null,
   })
 
-  const { cycleFrom, cycleTo } = state
+  const { cycleTo } = state
 
   const cycleFromLabel = RecordCycle.getLabel(cycleFrom)
   const cycleToLabel = RecordCycle.getLabel(cycleTo)
 
-  const onCycleFromChange = (value) => setState((statePrev) => ({ ...statePrev, cycleFrom: value }))
   const onCycleToChange = (value) => setState((statePrev) => ({ ...statePrev, cycleTo: value }))
 
   const checkCanClone = () => {
@@ -96,11 +95,13 @@ export const RecordsCloneModal = (props) => {
         <ModalClose onClose={onClose} />
       </ModalHeader>
       <ModalBody>
-        <FormItem label={i18n.t('dataView.recordsClone.fromCycle')}>
-          <CycleSelector surveyCycleKey={cycleFrom} onChange={onCycleFromChange} />
-        </FormItem>
+        <FormItem label={i18n.t('dataView.recordsClone.fromCycle')}>{cycleFromLabel}</FormItem>
         <FormItem label={i18n.t('dataView.recordsClone.toCycle')}>
-          <CycleSelector surveyCycleKey={cycleTo} onChange={onCycleToChange} />
+          <CycleSelector
+            selectedCycle={cycleTo}
+            onChange={onCycleToChange}
+            filterFunction={(cycle) => cycle > cycleFrom}
+          />
         </FormItem>
       </ModalBody>
       <ModalFooter>

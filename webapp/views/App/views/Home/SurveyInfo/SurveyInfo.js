@@ -107,7 +107,7 @@ const SurveyInfo = () => {
 
         {Object.values(cycles).length > 1 && (
           <FormItem label={i18n.t('homeView.surveyInfo.cycleForArenaMobile')}>
-            <CycleSelector surveyCycleKey={defaultCycleKey} onChange={setDefaultCycleKey} />
+            <CycleSelector selectedCycle={defaultCycleKey} onChange={setDefaultCycleKey} />
           </FormItem>
         )}
 

@@ -69,7 +69,7 @@ const Header = () => {
                 <div className="header__survey-title">{Survey.getLabel(surveyInfo, lang)}</div>
               </Link>
               <CycleSelector
-                surveyCycleKey={surveyCycleKey}
+                selectedCycle={surveyCycleKey}
                 onChange={(cycle) => {
                   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
                   const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)

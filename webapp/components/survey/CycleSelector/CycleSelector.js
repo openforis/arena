@@ -1,13 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
+
 import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const CycleSelector = (props) => {
-  const { surveyCycleKey, onChange } = props
+  const { selectedCycle, filterFunction, onChange } = props
 
   const i18n = useI18n()
   const cycleKeys = useSurveyCycleKeys()
@@ -16,11 +18,11 @@ const CycleSelector = (props) => {
     return null
   }
 
-  const cycleItems = cycleKeys.map((cycleKey) => ({
+  const cycleItems = cycleKeys.filter(filterFunction).map((cycleKey) => ({
     value: cycleKey,
     label: `${i18n.t('common.cycle')} ${Number(cycleKey) + 1}`,
   }))
-  const cycleSelection = cycleItems.find((cycleItem) => cycleItem.value === surveyCycleKey)
+  const cycleSelection = cycleItems.find((cycleItem) => cycleItem.value === selectedCycle)
 
   return (
     <Dropdown
@@ -35,13 +37,15 @@ const CycleSelector = (props) => {
 }
 
 CycleSelector.propTypes = {
-  surveyCycleKey: PropTypes.string,
+  filterFunction: PropTypes.func,
+  selectedCycle: PropTypes.string,
   onChange: PropTypes.func,
 }
 
 CycleSelector.defaultProps = {
-  surveyCycleKey: null,
+  selectedCycle: null,
   onChange: () => ({}),
+  filterFunction: A.identity,
 }
 
 export default CycleSelector
