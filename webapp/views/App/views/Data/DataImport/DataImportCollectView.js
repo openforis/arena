@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
+import { RecordCycle } from '@core/record/recordCycle'
+
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
@@ -75,7 +77,7 @@ export const CollectDataImportView = () => {
             surveyCycleKeys.length > 1
               ? 'dataImportView.confirmDeleteAllRecordsInCycle'
               : 'dataImportView.confirmDeleteAllRecords',
-          params: { cycle: Number(cycle) + 1 },
+          params: { cycle: RecordCycle.getLabel(cycle) },
           onOk: async () => startImportJob(),
         })
       )

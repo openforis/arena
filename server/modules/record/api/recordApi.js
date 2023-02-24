@@ -126,6 +126,19 @@ export const init = (app) => {
     }
   })
 
+  app.post('/survey/:surveyId/records/clone', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, cycleFrom, cycleTo } = Request.getParams(req)
+
+      const job = RecordService.startRecordsCloneJob({ user, surveyId, cycleFrom, cycleTo })
+      const jobSerialized = JobUtils.jobToJSON(job)
+      res.json({ job: jobSerialized })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== READ
 
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {

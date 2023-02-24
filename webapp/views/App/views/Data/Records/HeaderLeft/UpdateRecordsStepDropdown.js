@@ -32,7 +32,7 @@ const toStepByKey = {
   [updateTypes.demoteAllRecordsFromCleansing]: RecordStep.stepNames.entry,
 }
 
-export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }) => {
+export const UpdateRecordsStepDropdown = ({ onRecordsUpdate }) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
@@ -67,12 +67,12 @@ export const UpdateRecordsStepDropdown = ({ keys, placeholder, onRecordsUpdate }
 
   return (
     <Dropdown
-      items={keys.map((key) => ({
+      items={Object.values(updateTypes).map((key) => ({
         value: key,
         label: i18n.t(`dataView.records.${key}`),
       }))}
       onChange={(item) => onMoveAllRecords(item.value)}
-      placeholder={i18n.t(placeholder)}
+      placeholder={i18n.t('dataView.records.updateRecordsStep')}
       searchable={false}
     />
   )

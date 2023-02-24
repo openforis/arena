@@ -33,6 +33,7 @@ import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
+import RecordsCloneJob from './recordsCloneJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -282,6 +283,13 @@ export const startCSVDataImportJob = ({
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
+  JobManager.executeJobThread(job)
+  return job
+}
+
+// RECORDS CLONE
+export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo }) => {
+  const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo })
   JobManager.executeJobThread(job)
   return job
 }

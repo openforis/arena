@@ -7,6 +7,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Validation from '@core/validation/validation'
 
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -17,9 +18,13 @@ import * as NodeCreationManager from './nodeCreationManager'
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
-    const recordDb = await RecordRepository.insertRecord(surveyId, record, t)
+    let recordSummaryToStore = Record.dissocNodes(record)
+    if (Validation.isObjValid(recordSummaryToStore)) {
+      recordSummaryToStore = Validation.dissocValidation(recordSummaryToStore)
+    }
+    const recordDb = await RecordRepository.insertRecord(surveyId, recordSummaryToStore, t)
     if (!Record.isPreview(record)) {
-      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, record, system, t)
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordCreate, recordSummaryToStore, system, t)
     }
     return recordDb
   })

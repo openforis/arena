@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as Node from './node'
+import { RecordValidations } from '@openforis/arena-core'
 
 export const keys = {
   recordKeys: 'recordKeys',
@@ -13,7 +13,7 @@ export const prefixValidationFieldChildrenCount = 'childrenCount_'
 
 // ===== UTILS
 export const getValidationChildrenCountKey = (nodeParentUuid, nodeDefChildUuid) =>
-  `${prefixValidationFieldChildrenCount}${nodeParentUuid}_${nodeDefChildUuid}`
+  RecordValidations.getValidationChildrenCountKey({ nodeParentUuid, nodeDefChildUuid })
 export const isValidationFieldKeyChildrenCount = R.startsWith(prefixValidationFieldChildrenCount)
 export const isValidationResultErrorCount = (validationResult) =>
   ValidationResult.getKey(validationResult).startsWith('record.nodes.count.')
@@ -31,9 +31,9 @@ export const newValidationRecordDuplicate = ({
 // ===== READ
 
 export const getValidationChildrenCount = (nodeParentUuid, nodeDefChildUuid) =>
-  Validation.getFieldValidation(getValidationChildrenCountKey(nodeParentUuid, nodeDefChildUuid))
+  RecordValidations.getValidationChildrenCount({ nodeParentUuid, nodeDefChildUuid })
 
-export const getNodeValidation = (node) => Validation.getFieldValidation(Node.getUuid(node))
+export const getNodeValidation = (node) => RecordValidations.getValidationNode({ nodeUuid: node?.uuid })
 
 // ===== UPDATE
 export const setValidationCount = (nodeParentUuid, nodeDefChildUuid, validationCount) =>

@@ -1,12 +1,12 @@
 import './HeaderLeft.scss'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as StringUtils from '@core/stringUtils'
 
-import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
 import { RecordActions } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
@@ -20,7 +20,8 @@ import {
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
 
-import { UpdateRecordsStepDropdown, updateTypes } from './UpdateRecordsStepDropdown'
+import { RecordsCloneModal as RecordsCloneModal } from '../../RecordsCloneModal'
+import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems, navigateToRecord }) => {
   const dispatch = useDispatch()
@@ -28,6 +29,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const cycle = useSurveyCycleKey()
+  const cycles = useSurveyCycleKeys()
 
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
@@ -35,12 +37,22 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
   const canExportRecordsSummary = useAuthCanExportRecordsList()
+  const canCloneRecords = cycles.length > 1
+
+  const [state, setState] = useState({ recordsCloneModalOpen: false })
+  const { recordsCloneModalOpen } = state
 
   const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
+
+  const toggleRecordsCloneModalOpen = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, recordsCloneModalOpen: !recordsCloneModalOpen }))
+  }, [recordsCloneModalOpen])
+
   const onDeleteConfirm = useCallback(
     () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
     [dispatch, onRecordsUpdate, selectedItems]
   )
+
   const onDeleteButtonClick = useCallback(
     () =>
       dispatch(
@@ -64,7 +76,6 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
           label="common.new"
         />
       )}
-
       {(totalCount > 0 || StringUtils.isNotBlank(search)) && (
         <input
           className="records__header-left__input-search"
@@ -73,19 +84,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
           onChange={(e) => handleSearch(e.target.value)}
         />
       )}
-
-      {published && canUpdateRecordsStep && (
-        <UpdateRecordsStepDropdown
-          keys={[
-            updateTypes.promoteAllRecordsToCleansing,
-            updateTypes.promoteAllRecordsToAnalysis,
-            updateTypes.demoteAllRecordsFromAnalysis,
-            updateTypes.demoteAllRecordsFromCleansing,
-          ]}
-          placeholder="dataView.records.updateRecordsStep"
-          onRecordsUpdate={onRecordsUpdate}
-        />
-      )}
+      {published && canUpdateRecordsStep && <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} />}
       {
         // Edit selected record
         selectedItems.length === 1 && (
@@ -96,6 +95,10 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
         // Delete selected records
         canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
       }
+      {canCloneRecords && (
+        <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
+      )}
+      {recordsCloneModalOpen && <RecordsCloneModal onClose={toggleRecordsCloneModalOpen} />}
       {canExportRecordsSummary && (
         <ButtonDownload
           testId={TestId.records.exportBtn}
