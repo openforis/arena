@@ -46,7 +46,7 @@ export default class RecordsCloneJob extends Job {
 
   async findRecordsToClone() {
     const { context } = this
-    const { surveyId, cycleFrom, cycleTo } = context
+    const { surveyId, cycleFrom, cycleTo, recordsUuids } = context
 
     const { nodeDefKeys: nodeDefKeysCycleFrom, list: recordsCycleFrom } =
       await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, cycle: cycleFrom })
@@ -62,6 +62,9 @@ export default class RecordsCloneJob extends Job {
     const getKeyValues = (recordSummary) => keys.map((key) => recordSummary[key])
 
     const recordsToClone = recordsCycleFrom.filter((recordCycleFrom) => {
+      if (!Objects.isEmpty(recordsUuids) && !recordsUuids.includes(Record.getUuid(recordCycleFrom))) {
+        return false
+      }
       const keyValuesRecordCycleFrom = getKeyValues(recordCycleFrom)
       return !recordsCycleTo.some((recordCycleTo) =>
         Objects.isEqual(keyValuesRecordCycleFrom, getKeyValues(recordCycleTo))

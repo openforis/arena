@@ -1,18 +1,27 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { FormControlLabel, Radio, RadioGroup } from '@mui/material'
 import { useI18n } from '@webapp/store/system'
 
 export const RadioButtonGroup = (props) => {
-  const { items, onChange, value } = props
+  const { items, onChange: onChangeProp, value } = props
 
   const i18n = useI18n()
+
+  const onChange = useCallback((e) => onChangeProp(e.target.value), [onChangeProp])
 
   return (
     <RadioGroup value={value} onChange={onChange}>
       {items.map((item) => {
-        const { label, value } = item
-        return <FormControlLabel key={value} value={value} control={<Radio />} label={i18n.t(label)} />
+        const { key, disabled: itemDisabled, label, labelParams } = item
+        return (
+          <FormControlLabel
+            key={key}
+            value={key}
+            control={<Radio disabled={itemDisabled} />}
+            label={i18n.t(label, labelParams)}
+          />
+        )
       })}
     </RadioGroup>
   )

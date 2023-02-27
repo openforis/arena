@@ -20,7 +20,7 @@ import {
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
 
-import { RecordsCloneModal as RecordsCloneModal } from '../../RecordsCloneModal'
+import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems, navigateToRecord }) => {
@@ -98,7 +98,12 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
       {canCloneRecords && (
         <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
       )}
-      {recordsCloneModalOpen && <RecordsCloneModal onClose={toggleRecordsCloneModalOpen} />}
+      {recordsCloneModalOpen && (
+        <RecordsCloneModal
+          onClose={toggleRecordsCloneModalOpen}
+          selectedRecordsUuids={selectedItems.map((selectedItem) => selectedItem.uuid)}
+        />
+      )}
       {canExportRecordsSummary && (
         <ButtonDownload
           testId={TestId.records.exportBtn}

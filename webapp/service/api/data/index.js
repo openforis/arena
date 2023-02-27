@@ -102,9 +102,9 @@ export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) =
 }
 
 // ==== RECORDS CLONE
-export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo }) => {
+export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recordsUuids }) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/records/clone`, { surveyId, cycleFrom, cycleTo })
+  } = await axios.post(`/api/survey/${surveyId}/records/clone`, { surveyId, cycleFrom, cycleTo, recordsUuids })
   return job
 }
