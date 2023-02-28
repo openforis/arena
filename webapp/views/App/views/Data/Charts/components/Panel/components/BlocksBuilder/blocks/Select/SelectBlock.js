@@ -91,6 +91,7 @@ const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, 
           className="basic-multi-select"
           itemIcon={(item) => (showIcons ? icons[item.type] : null)}
           items={options}
+          menuPosition="absolute"
           multiple={isMulti}
           name={id}
           onChange={handleChange}
