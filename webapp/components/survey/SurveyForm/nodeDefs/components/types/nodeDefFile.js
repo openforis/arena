@@ -104,11 +104,12 @@ const FileInput = (props) => {
 
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
 
-  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="ellipsis" />
+  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="btn-s ellipsis" />
 
   return (
     <div className="survey-form__node-def-file">
       <UploadButton
+        className="btn-s"
         disabled={edit || !canEditRecord || readOnly}
         showLabel={false}
         onChange={(files) => handleFileChange(files[0])}

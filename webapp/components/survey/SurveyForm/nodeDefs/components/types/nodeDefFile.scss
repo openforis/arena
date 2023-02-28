@@ -1,6 +1,6 @@
 .survey-form__node-def-file {
   display: grid;
-  grid-template-columns: 30px 1fr 30px;
+  grid-template-columns: auto 1fr auto;
   grid-column-gap: 0.5rem;
 
   .survey-form__node-def-file__tooltip-preview {
