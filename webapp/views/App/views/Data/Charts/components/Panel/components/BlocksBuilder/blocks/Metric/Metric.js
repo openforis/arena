@@ -80,11 +80,20 @@ const CustomPopover = (props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const { metric, values, config, configItemsByPath, configActions, blockPath, children, block, dimensions } = props
 
+  const elementIsDropdownOption = (el) =>
+    el?.classList?.contains('dropdown__option') || el?.classList?.contains('dropdown-option__label')
+
+  const onClickOutside = (e) => {
+    if (!elementIsDropdownOption(e.target)) {
+      setIsPopoverOpen(false)
+    }
+  }
+
   return (
     <Popover
       padding={8}
       isOpen={isPopoverOpen}
-      onClickOutside={() => setIsPopoverOpen(false)}
+      onClickOutside={onClickOutside}
       positions={['right', 'top', 'left', 'bottom']}
       align={'center'}
       content={
