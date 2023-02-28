@@ -46,6 +46,7 @@ const Dropdown = (props) => {
     itemValue,
     items: itemsProp,
     menuPlacement,
+    menuPosition,
     multiple,
     onBeforeChange,
     onChange: onChangeProp,
@@ -109,7 +110,7 @@ const Dropdown = (props) => {
         onChange={onChange}
         openMenuOnClick={openMenuOnClick}
         menuPlacement={menuPlacement}
-        menuPosition="fixed"
+        menuPosition={menuPosition}
         menuIsOpen={menuIsOpen}
         onInputChange={onInputChange}
         options={options}
@@ -135,6 +136,7 @@ Dropdown.propTypes = {
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
+  menuPosition: PropTypes.oneOf(['absolute', 'fixed']),
   multiple: PropTypes.bool,
   onBeforeChange: PropTypes.func, // Executed before onChange: if false is returned, onChange is not executed (item cannot be selected)
   onChange: PropTypes.func.isRequired,
@@ -161,6 +163,7 @@ Dropdown.defaultProps = {
   itemLabel: 'label',
   itemValue: 'value',
   menuPlacement: 'auto',
+  menuPosition: 'fixed',
   multiple: false,
   onBeforeChange: null,
   placeholder: undefined,
