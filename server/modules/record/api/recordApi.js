@@ -246,8 +246,8 @@ export const init = (app) => {
 
         const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
         const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
-
-        sendFileContent(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
+        const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
+        sendFileContent(res, fileName, RecordFile.getContent(file), RecordFile.getSize(file))
       } catch (error) {
         next(error)
       }

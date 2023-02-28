@@ -53,6 +53,7 @@ export const {
   getNodeChildrenByDefUuid,
   getNodeChildrenByDefUuidUnsorted,
   getNodeChildByDefUuid,
+  getNodeChildIndex,
   visitAncestorsAndSelf,
   visitDescendantsAndSelf,
 } = RecordReader
