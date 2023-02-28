@@ -78,6 +78,12 @@ export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
   R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
 
+export const getNodeChildIndex = (node) => (record) => {
+  const parentNode = getParentNode(node)(record)
+  const siblings = getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
+  return siblings.findIndex((sibling) => Node.isEqual(sibling)(node))
+}
+
 export const visitDescendantsAndSelf =
   (node, visitor, stopIfFn = null) =>
   (record) => {

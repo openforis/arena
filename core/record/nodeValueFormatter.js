@@ -30,12 +30,12 @@ const formatters = {
   },
 }
 
-const format = ({ survey, nodeDef, value, i18n = null }) => {
+const format = ({ survey, nodeDef, value }) => {
   if (A.isNull(value)) {
     return ''
   }
   const formatter = formatters[NodeDef.getType(nodeDef)]
-  const formatValue = (v) => (formatter ? formatter({ survey, nodeDef, value: v, i18n }) : value)
+  const formatValue = (v) => (formatter ? formatter({ survey, nodeDef, value: v }) : value)
 
   return NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value.map(formatValue).join(', ') : formatValue(value)
 }

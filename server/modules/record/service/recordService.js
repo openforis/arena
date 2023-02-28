@@ -34,6 +34,8 @@ import * as FileManager from '../manager/fileManager'
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -339,3 +341,42 @@ export const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) =>
     nodeUuid,
     user,
   })
+
+// generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
+export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId })
+  const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+
+  const node = await fetchNodeByUuid(surveyId, nodeUuid)
+  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: Node.getRecordUuid(node) })
+  const fileNameParts = []
+  Record.visitAncestorsAndSelf({
+    node,
+    visitor: (ancestorNode) => {
+      const ancestorDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestorNode))(survey)
+      if (ancestorNode === node) {
+        fileNameParts.push(NodeDef.getName(ancestorDef))
+        if (NodeDef.isMultiple(ancestorDef)) {
+          // add node position to the end
+          const index = Record.getNodeChildIndex(ancestorNode)(record)
+          const position = String(index + 1)
+          fileNameParts.push(position)
+        }
+      } else {
+        const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
+        const ancestorKeyValues = Record.getEntityKeyValues(survey, ancestorNode)(record)
+        const keyValuesFormatted = ancestorKeyDefs.map((keyDef, index) => {
+          const keyValue = ancestorKeyValues[index]
+          const keyValueFormatted = NodeValueFormatter.format({ survey, nodeDef: keyDef, value: keyValue })
+          return keyValueFormatted
+        })
+        fileNameParts.unshift(keyValuesFormatted.join('_'))
+      }
+    },
+  })(record)
+
+  const fileName = RecordFile.getName(file)
+  const extension = FileUtils.getExtension(fileName)
+
+  return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
+}
