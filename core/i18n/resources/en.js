@@ -635,8 +635,8 @@ Are you sure you want to continue?`,
       startCloning: 'Start cloning',
       cloneComplete: 'Clone complete. {{recordsCloned}} records cloned from {{cycleFrom}} to {{cycleTo}}',
       error: {
-        cycleToMissing: 'Please select "Cycle to"',
-        cycleToMustBeDifferentFromCycleFrom: '"Cycle to" must be different from "Cycle from"',
+        cycleToMissing: 'Please select "To cycle"',
+        cycleToMustBeDifferentFromCycleFrom: '"To cycle" must be different from "From cycle"',
       },
       source: {
         label: 'Source',

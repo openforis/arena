@@ -16,6 +16,7 @@ import {
   useAuthCanDeleteRecords,
   useAuthCanExportRecordsList,
   useAuthCanUpdateRecordsStep,
+  useAuthCanUseAnalysis,
 } from '@webapp/store/user/hooks'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
@@ -35,9 +36,11 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const published = Survey.isPublished(surveyInfo)
 
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
+  const canAnalyzeRecords = useAuthCanUseAnalysis()
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
   const canExportRecordsSummary = useAuthCanExportRecordsList()
-  const canCloneRecords = cycles.length > 1 && cycle !== cycles[cycles.length - 1]
+  const lastCycle = cycles[cycles.length - 1]
+  const canCloneRecords = canAnalyzeRecords && cycles.length > 1 && cycle !== lastCycle
 
   const [state, setState] = useState({ recordsCloneModalOpen: false })
   const { recordsCloneModalOpen } = state
