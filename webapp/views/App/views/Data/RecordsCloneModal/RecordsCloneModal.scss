@@ -1,11 +1,23 @@
 .records-clone {
   .modal-body {
-    display: grid;
-    grid-template-columns: 20rem 20rem;
+    display: flex;
+    flex-direction: column;
     align-self: center;
+    gap: 3rem;
 
     .form-item {
-      width: 20rem;
+      width: 40rem;
+    }
+
+    .source-form-item {
+      .form-label {
+        align-self: self-start;
+        padding-top: 8px;
+      }
+    }
+
+    .cycle-selector {
+      width: 15rem;
     }
   }
 }

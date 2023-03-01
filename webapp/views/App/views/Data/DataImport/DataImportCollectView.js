@@ -101,7 +101,7 @@ export const CollectDataImportView = () => {
 
           {surveyCycleKeys.length > 1 && (
             <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
-              <CycleSelector surveyCycleKey={cycle} onChange={setCycle} />
+              <CycleSelector selectedCycle={cycle} onChange={setCycle} />
             </FormItem>
           )}
 

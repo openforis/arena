@@ -31,5 +31,6 @@ import Table from './Table'
 export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper, Table }
 
 export { Map } from './Map'
+export { RadioButtonGroup } from './RadioButtonGroup'
 export { Slider } from './Slider'
 export { Split } from './Split'

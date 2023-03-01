@@ -290,8 +290,8 @@ export const startCSVDataImportJob = ({
 }
 
 // RECORDS CLONE
-export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo }) => {
-  const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo })
+export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
+  const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
   JobManager.executeJobThread(job)
   return job
 }
