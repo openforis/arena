@@ -130,7 +130,7 @@ export const {
   getPropsDraft,
 } = SurveyInfo
 
-export const { getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin, assocAuthGroups } = SurveyInfo
+export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin, assocAuthGroups } = SurveyInfo
 
 // UPDATE
 export const { markDraft } = SurveyInfo
