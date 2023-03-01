@@ -149,6 +149,11 @@ export const isValid = (surveyInfo) => surveyInfo && surveyInfo.id
 
 export const { getAuthGroups } = ObjectUtils
 
+export const getAuthGroupByName = (groupName) => (surveyInfo) => {
+  const authGroups = getAuthGroups(surveyInfo)
+  return authGroups.find((authGroup) => AuthGroup.getName(authGroup) === groupName)
+}
+
 const _getAuthGroupByName = (name) => R.pipe(getAuthGroups, R.find(R.propEq(AuthGroup.keys.name, name)))
 
 export const getAuthGroupAdmin = _getAuthGroupByName(AuthGroup.groupNames.surveyAdmin)
