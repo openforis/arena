@@ -12,12 +12,13 @@ import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
 import {
-  requireRecordListViewPermission,
-  requireRecordEditPermission,
+  requireRecordAnalysisPermission,
   requireRecordCreatePermission,
+  requireRecordEditPermission,
+  requireRecordListExportPermission,
+  requireRecordListViewPermission,
   requireRecordViewPermission,
   requireRecordsEditPermission,
-  requireRecordListExportPermission,
 } from '../../auth/authApiMiddleware'
 import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
@@ -126,7 +127,7 @@ export const init = (app) => {
     }
   })
 
-  app.post('/survey/:surveyId/records/clone', requireRecordCreatePermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/records/clone', requireRecordAnalysisPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { surveyId, cycleFrom, cycleTo, recordsUuids } = Request.getParams(req)
