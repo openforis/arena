@@ -344,7 +344,7 @@ export const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) =>
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
@@ -364,13 +364,16 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
         }
       } else {
         const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
-        const ancestorKeyValues = Record.getEntityKeyValues(survey, ancestorNode)(record)
-        const keyValuesFormatted = ancestorKeyDefs.map((keyDef, index) => {
-          const keyValue = ancestorKeyValues[index]
-          const keyValueFormatted = NodeValueFormatter.format({ survey, nodeDef: keyDef, value: keyValue })
-          return keyValueFormatted
-        })
-        fileNameParts.unshift(keyValuesFormatted.join('_'))
+
+        if (ancestorKeyDefs.length > 0) {
+          const ancestorKeyValues = Record.getEntityKeyValues(survey, ancestorNode)(record)
+          const keyValuesFormatted = ancestorKeyDefs.map((keyDef, index) => {
+            const keyValue = ancestorKeyValues[index]
+            const keyValueFormatted = NodeValueFormatter.format({ survey, nodeDef: keyDef, value: keyValue })
+            return keyValueFormatted
+          })
+          fileNameParts.unshift(keyValuesFormatted.join('_'))
+        }
       }
     },
   })(record)
