@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -18,15 +18,25 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ExtraPropDefsEditor } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
+import { useNotifyWarning } from '@webapp/components/hooks'
 
 const Header = (props) => {
   const { state, Actions } = props
   const i18n = useI18n()
+  const notifyWarn = useNotifyWarning()
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
   const taxonomy = State.getTaxonomy(state)
   const validation = Validation.getValidation(taxonomy)
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
+
+  const onExtraPropsClick = useCallback(() => {
+    if (Taxonomy.getExtraPropKeys(taxonomy).length === 0) {
+      notifyWarn({ key: 'taxonomy.edit.extraPropsNotDefined' })
+    } else {
+      Actions.toggleEditExtraPropertiesPanel()
+    }
+  }, [Actions, notifyWarn, taxonomy])
 
   return (
     <div className="taxonomy__header">
@@ -78,7 +88,7 @@ const Header = (props) => {
               {
                 key: 'extra-props-edit',
                 label: 'extraProp.editor.title',
-                onClick: Actions.toggleEditExtraPropertiesPanel,
+                onClick: onExtraPropsClick,
               },
             ]}
           />
