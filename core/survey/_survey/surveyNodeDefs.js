@@ -257,8 +257,9 @@ export const getHierarchy =
       ]
 
       length += childDefs.length
-      const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }
-      return R.append(item, array)
+      const item = { ...nodeDef, children: childDefs.reduce(h, []) }
+      array.push(item)
+      return array
     }
 
     return {
