@@ -32,16 +32,20 @@ const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple })
   const validationsUpdated = multiple
     ? NodeDefValidations.dissocRequired(validations)
     : NodeDefValidations.dissocCount(validations)
-  const nodeDefUpdated = NodeDef.assocValidations(validationsUpdated)(nodeDef)
+  let nodeDefUpdated = NodeDef.assocValidations(validationsUpdated)(nodeDef)
 
-  if (NodeDef.isEntity(nodeDefUpdated) && !multiple && NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
-    const nodeDefsUpdated = Survey.updateLayoutProp({
-      surveyCycleKey,
-      nodeDef: nodeDefUpdated,
-      key: NodeDefLayout.keys.renderType,
-      value: NodeDefLayout.renderType.form,
-    })(survey)
-    return nodeDefsUpdated[nodeDef.uuid]
+  if (NodeDef.isEntity(nodeDefUpdated) && !multiple) {
+    nodeDefUpdated = NodeDef.dissocEnumerate(nodeDefUpdated)
+
+    if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
+      const nodeDefsUpdated = Survey.updateLayoutProp({
+        surveyCycleKey,
+        nodeDef: nodeDefUpdated,
+        key: NodeDefLayout.keys.renderType,
+        value: NodeDefLayout.renderType.form,
+      })(survey)
+      nodeDefUpdated = nodeDefsUpdated[nodeDef.uuid]
+    }
   }
   return nodeDefUpdated
 }
