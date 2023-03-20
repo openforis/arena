@@ -93,14 +93,25 @@ const BasicProps = (props) => {
       )}
 
       {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
-          <Checkbox
-            id={TestId.nodeDefDetails.nodeDefMultiple}
-            checked={NodeDef.isMultiple(nodeDef)}
-            disabled={multipleEditDisabled}
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
-          />
-        </FormItem>
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
+            <Checkbox
+              id={TestId.nodeDefDetails.nodeDefMultiple}
+              checked={NodeDef.isMultiple(nodeDef)}
+              disabled={multipleEditDisabled}
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
+            />
+          </FormItem>
+          {NodeDef.isMultipleEntity(nodeDef) && (
+            <FormItem label={i18n.t('nodeDefEdit.basicProps.enumerate')}>
+              <Checkbox
+                id={TestId.nodeDefDetails.nodeDefEnumerate}
+                checked={NodeDef.isEnumerate(nodeDef)}
+                onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+              />
+            </FormItem>
+          )}
+        </>
       )}
 
       {NodeDef.isFile(nodeDef) && <FileProps state={state} Actions={Actions} />}

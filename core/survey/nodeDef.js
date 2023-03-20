@@ -56,6 +56,7 @@ export const NodeDefLabelTypes = {
 export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
+  enumerate: 'enumerate', // only for multiple entities
   key: 'key',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
@@ -191,6 +192,9 @@ export const getLayout = getProp(propKeys.layout, {})
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 
 export const getDescriptions = getProp(propKeys.descriptions, {})
+
+export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
+
 // code
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 // taxon
