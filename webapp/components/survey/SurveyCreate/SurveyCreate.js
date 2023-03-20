@@ -20,6 +20,7 @@ import { Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
+import { Checkbox } from '@webapp/components/form'
 import { ProgressBar } from '@webapp/components'
 
 import { createTypes, useCreateSurvey } from './store'
@@ -32,8 +33,8 @@ const SurveyCreate = (props) => {
   const i18n = useI18n()
   const navigate = useNavigate()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate } = useCreateSurvey({ template })
-  const { createType, name, label, lang, validation, cloneFrom, uploadProgressPercent } = newSurvey
+  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onOptionUpdate } = useCreateSurvey({ template })
+  const { createType, name, label, lang, validation, cloneFrom, options, uploadProgressPercent } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -129,6 +130,18 @@ const SurveyCreate = (props) => {
             </div>
           ) : (
             <>
+              <div className="row">
+                <fieldset className="options-fieldset">
+                  <legend>{i18n.t('common.options')}</legend>
+                  <div>
+                    <Checkbox
+                      checked={options['includeData']}
+                      label={`homeView.surveyCreate.options.includeData`}
+                      onChange={(value) => onOptionUpdate({ key: 'includeData', value })}
+                    />
+                  </div>
+                </fieldset>
+              </div>
               <div className="row">
                 <UploadButton
                   inputFieldId={TestId.surveyCreate.importFromArena}

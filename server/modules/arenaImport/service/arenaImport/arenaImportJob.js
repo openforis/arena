@@ -18,7 +18,9 @@ import ChainsImportJob from './jobs/chainsImportJob'
 import CreateRdbJob from './jobs/createRdb'
 
 const createInnerJobs = (params) => {
-  const { backup = true, mobile = false } = params
+  const { backup = true, mobile = false, options } = params
+  const { includeData } = options
+
   return [
     new ArenaSurveyReaderJob(),
 
@@ -34,8 +36,8 @@ const createInnerJobs = (params) => {
           ...(backup ? [new ActivityLogImportJob()] : []),
         ]
       : []),
-    ...(backup ? [new RecordsImportJob()] : []),
-    ...(backup ? [new FilesImportJob()] : []),
+    ...(backup && includeData ? [new RecordsImportJob()] : []),
+    ...(backup && includeData ? [new FilesImportJob()] : []),
     // Needed when the survey is published
     new CreateRdbJob(),
   ]
@@ -56,8 +58,8 @@ export default class ArenaImportJob extends Job {
    * @returns {ArenaImportJob} - The import job.
    */
   constructor(params) {
-    const { backup = true, mobile = false, ...paramsRest } = params
-    super(ArenaImportJob.type, { ...paramsRest, backup, mobile }, createInnerJobs(params))
+    const { backup = true, mobile = false, options = { includeData: true }, ...paramsRest } = params
+    super(ArenaImportJob.type, { ...paramsRest, backup, mobile, options }, createInnerJobs(params))
   }
 
   async onStart() {

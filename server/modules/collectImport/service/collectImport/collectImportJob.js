@@ -15,6 +15,9 @@ import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
 export default class CollectImportJob extends Job {
   constructor(params) {
+    const { options = {} } = params
+    const { includeData = true } = options
+
     super(CollectImportJob.type, params, [
       new CollectSurveyReaderJob(),
       new SurveyCreatorJob(),
@@ -23,8 +26,7 @@ export default class CollectImportJob extends Job {
       new SamplingPointDataImportJob(),
       new NodeDefsImportJob(),
       new SurveyDependencyGraphsGenerationJob(),
-      new RecordsImportJob(),
-      new RecordCheckJob(),
+      ...(includeData ? [new RecordsImportJob(), new RecordCheckJob()] : []),
       new SurveyRdbCreationJob(),
     ])
   }

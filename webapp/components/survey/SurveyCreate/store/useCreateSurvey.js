@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { Objects } from '@openforis/arena-core'
+
 import { useActions } from './actions'
 
 export const createTypes = {
@@ -15,6 +17,7 @@ const initialState = {
   lang: 'en',
   cloneFrom: '',
   template: false,
+  options: { includeData: false },
   validation: {},
   uploadProgressPercent: -1,
 }
@@ -41,11 +44,17 @@ export const useCreateSurvey = ({ template = false } = {}) => {
     setNewSurvey(newSurveyUpdated)
   }
 
+  const onOptionUpdate = ({ key, value }) => {
+    const newSurveyUpdated = Objects.assocPath({ obj: newSurvey, path: ['options', key], value })
+    setNewSurvey(newSurveyUpdated)
+  }
+
   return {
     newSurvey,
     onUpdate,
     onCreate,
     onImport,
     onCreateTypeUpdate,
+    onOptionUpdate,
   }
 }
