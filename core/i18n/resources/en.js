@@ -1601,6 +1601,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   },
 
   record: {
+    ancestorNotFound: 'Ancestor node not found in record',
     keyDuplicate: 'Duplicate record key',
     oneOrMoreInvalidValues: 'One or more values are invalid',
     uniqueAttributeDuplicate: 'Duplicate value',
