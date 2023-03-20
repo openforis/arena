@@ -129,7 +129,7 @@ const _getOrCreateEntityByKeys =
     }
 
     // insert missing entity node (with keys)
-    const entityParentDef = Survey.getNodeDefAncestorMultipleEntity(entityDef)(survey)
+    const entityParentDef = Survey.getNodeDefParent(entityDef)(survey)
     const entityParent = RecordReader.findDescendantByKeyValues({
       survey,
       descendantDefUuid: NodeDef.getUuid(entityParentDef),
