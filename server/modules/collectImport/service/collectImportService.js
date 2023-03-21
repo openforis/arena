@@ -10,8 +10,8 @@ import * as CollectImportReportManager from '../manager/collectImportReportManag
 import CollectImportJob from './collectImport/collectImportJob'
 
 // COLLECT SURVEY IMPORT
-export const startCollectImportJob = ({ user, filePath, newSurvey }) => {
-  const job = new CollectImportJob({ user, filePath, newSurvey })
+export const startCollectImportJob = ({ user, filePath, newSurvey, options }) => {
+  const job = new CollectImportJob({ user, filePath, newSurvey, options })
 
   JobManager.executeJobThread(job)
 

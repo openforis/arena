@@ -20,11 +20,19 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const file = Request.getFile(req)
-      const newSurvey = Request.getJsonParam(req, 'survey')
+      const newSurveyParam = Request.getJsonParam(req, 'survey')
+
+      const { options, ...newSurvey } = newSurveyParam
+
       const validation = await SurveyService.validateSurveyClone({ newSurvey })
 
       if (Validation.isValid(validation)) {
-        const job = CollectImportService.startCollectImportJob({ user, filePath: file.tempFilePath, newSurvey })
+        const job = CollectImportService.startCollectImportJob({
+          user,
+          filePath: file.tempFilePath,
+          newSurvey,
+          options,
+        })
         res.json({ job: JobUtils.jobToJSON(job) })
       } else {
         res.json({ validation })

@@ -4,14 +4,14 @@ import { FormControlLabel, Radio, RadioGroup } from '@mui/material'
 import { useI18n } from '@webapp/store/system'
 
 export const RadioButtonGroup = (props) => {
-  const { items, onChange: onChangeProp, value } = props
+  const { items, onChange: onChangeProp, row, value } = props
 
   const i18n = useI18n()
 
   const onChange = useCallback((e) => onChangeProp(e.target.value), [onChangeProp])
 
   return (
-    <RadioGroup value={value} onChange={onChange}>
+    <RadioGroup onChange={onChange} row={row} value={value}>
       {items.map((item) => {
         const { key, disabled: itemDisabled, label, labelParams } = item
         return (
@@ -30,5 +30,10 @@ export const RadioButtonGroup = (props) => {
 RadioButtonGroup.propTypes = {
   items: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
+  row: PropTypes.bool,
   value: PropTypes.string,
+}
+
+RadioButtonGroup.defaultProps = {
+  row: false,
 }

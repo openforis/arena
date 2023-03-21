@@ -2,13 +2,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  row-gap: 2rem;
+
+  .form-item {
+    height: 2rem;
+    width: 55rem;
+  }
 
   .row {
     display: flex;
     justify-content: space-around;
-    width: 30rem;
-    height: 2rem;
-    margin: 2rem;
+  }
+
+  .dropzone {
+    width: 50rem;
+    min-height: 10rem;
+  }
+
+  .MuiFormGroup-row {
+    gap: 2rem;
   }
 
   .home-survey-create__collect-import {
@@ -16,5 +28,9 @@
     align-self: normal;
     text-align: center;
     padding-top: 2rem;
+  }
+
+  .options-fieldset {
+    height: fit-content;
   }
 }
