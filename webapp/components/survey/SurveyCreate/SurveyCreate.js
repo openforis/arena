@@ -173,6 +173,7 @@ const SurveyCreate = (props) => {
                   disabled={!file}
                   label={'homeView.surveyCreate.startImport'}
                   onClick={onImport}
+                  testId={TestId.surveyCreate.startImportBtn}
                 />
               </div>
             </>

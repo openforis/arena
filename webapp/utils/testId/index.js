@@ -148,6 +148,7 @@ export const TestId = {
   },
   surveyCreate: {
     createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,
+    startImportBtn: 'survey-create-start-import-btn',
     submitBtn: 'survey-create-submit-btn',
     surveyCloneFrom: 'survey-clone-from',
     surveyName: 'survey-name',
