@@ -18,8 +18,8 @@ import ChainsImportJob from './jobs/chainsImportJob'
 import CreateRdbJob from './jobs/createRdb'
 
 const createInnerJobs = (params) => {
-  const { backup = true, mobile = false, options } = params
-  const { includeData } = options
+  const { backup = true, mobile = false, options = {} } = params
+  const { includeData = true } = options
 
   return [
     new ArenaSurveyReaderJob(),
