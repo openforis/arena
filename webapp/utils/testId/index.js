@@ -148,8 +148,6 @@ export const TestId = {
   },
   surveyCreate: {
     createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,
-    importFromArena: 'import-from-arena',
-    importFromCollect: 'import-from-collect',
     submitBtn: 'survey-create-submit-btn',
     surveyCloneFrom: 'survey-clone-from',
     surveyName: 'survey-name',

@@ -22,7 +22,7 @@ export default () =>
 
     test(`Import survey `, async () => {
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' })))
-      const input = await page.$(getSelector(TestId.surveyCreate.importFromArena), 'input')
+      const input = page.locator('.home-survey-create .dropzone input')
       await Promise.all([
         page.waitForResponse('**/survey/**'), // job status response
         input.setInputFiles(getSurveyZipPath(survey)),
