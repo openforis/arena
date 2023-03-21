@@ -16,14 +16,13 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import { Input } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
-import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox } from '@webapp/components/form'
-import { ProgressBar } from '@webapp/components'
+import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
 
-import { createTypes, useCreateSurvey } from './store'
+import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 
 const SurveyCreate = (props) => {
@@ -33,8 +32,12 @@ const SurveyCreate = (props) => {
   const i18n = useI18n()
   const navigate = useNavigate()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onOptionUpdate } = useCreateSurvey({ template })
-  const { createType, name, label, lang, validation, cloneFrom, options, uploadProgressPercent } = newSurvey
+  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
+    useCreateSurvey({
+      template,
+    })
+  const { createType, name, label, lang, source, validation, cloneFrom, options, file, uploadProgressPercent } =
+    newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -70,34 +73,32 @@ const SurveyCreate = (props) => {
           ]}
         />
       </div>
-      <div className="row">
+      <FormItem label={i18n.t('common.name')}>
         <Input
           id={TestId.surveyCreate.surveyName}
-          placeholder={i18n.t('common.name')}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
           onChange={(value) => onUpdate({ name: 'name', value: StringUtils.normalizeName(value) })}
         />
-      </div>
+      </FormItem>
       {createType === createTypes.fromScratch && (
         <>
-          <div className="row">
+          <FormItem label={i18n.t('common.label')}>
             <Input
               id={TestId.surveyCreate.surveyLabel}
-              placeholder={i18n.t('common.label')}
               value={label}
               validation={Validation.getFieldValidation('label')(validation)}
               onChange={(value) => onUpdate({ name: 'label', value })}
             />
-          </div>
-          <div className="row">
+          </FormItem>
+          <FormItem label={i18n.t('common.language')}>
             <LanguageDropdown
               selection={lang}
               validation={Validation.getFieldValidation('lang')(validation)}
               onChange={(value) => onUpdate({ name: 'lang', value })}
               disabled={!A.isEmpty(cloneFrom)}
             />
-          </div>
+          </FormItem>
         </>
       )}
 
@@ -137,27 +138,31 @@ const SurveyCreate = (props) => {
                     <Checkbox
                       checked={options['includeData']}
                       label={`homeView.surveyCreate.options.includeData`}
-                      onChange={(value) => onOptionUpdate({ key: 'includeData', value })}
+                      onChange={(value) => onOptionChange({ key: 'includeData', value })}
                     />
                   </div>
                 </fieldset>
               </div>
-              <div className="row">
-                <UploadButton
-                  inputFieldId={TestId.surveyCreate.importFromArena}
-                  label={i18n.t('homeView.surveyCreate.importFromArena')}
-                  accept=".zip"
-                  maxSize={1000}
-                  onChange={(files) => onImport.Arena({ file: files[0] })}
+              <FormItem label={i18n.t('homeView.surveyCreate.source.label')}>
+                <RadioButtonGroup
+                  items={Object.values(importSources).map((key) => ({
+                    key,
+                    label: `homeView.surveyCreate.source.${key}`,
+                  }))}
+                  onChange={onSourceChange}
+                  row
+                  value={source}
                 />
+              </FormItem>
+              <div className="row">
+                <Dropzone maxSize={1000} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
               </div>
               <div className="row">
-                <UploadButton
-                  inputFieldId={TestId.surveyCreate.importFromCollect}
-                  label={i18n.t('homeView.surveyCreate.importFromCollect')}
-                  accept=".collect,.collect-backup"
-                  maxSize={1000}
-                  onChange={(files) => onImport.Collect({ file: files[0] })}
+                <Button
+                  className="btn-primary"
+                  disabled={!file}
+                  label={'homeView.surveyCreate.startImport'}
+                  onClick={onImport}
                 />
               </div>
             </>
