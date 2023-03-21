@@ -14,6 +14,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
+import { contentTypes } from '@webapp/service/api'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -155,7 +156,16 @@ const SurveyCreate = (props) => {
                 />
               </FormItem>
               <div className="row">
-                <Dropzone maxSize={1000} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+                <Dropzone
+                  accept={
+                    source === importSources.arena
+                      ? { [contentTypes.zip]: ['.zip'] }
+                      : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
+                  }
+                  maxSize={1000}
+                  onDrop={onFilesDrop}
+                  droppedFiles={file ? [file] : []}
+                />
               </div>
               <div className="row">
                 <Button

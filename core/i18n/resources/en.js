@@ -190,8 +190,14 @@ Do you want to proceed?`,
   },
 
   dropzone: {
-    message: 'Drag and drop a file here, or click to select it',
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
+    error: {
+      fileTooBig: 'Selected file is too big',
+      invalidFileExtension: 'Invalid file extension: {{extension}}',
+    },
+    message: 'Drag and drop a file here, or click to select it',
+    selectedFile: 'Selected file',
+    selectedFile_other: 'Selected files',
   },
 
   error: {

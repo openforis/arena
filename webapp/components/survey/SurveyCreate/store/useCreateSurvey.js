@@ -52,7 +52,7 @@ export const useCreateSurvey = ({ template = false } = {}) => {
   }
 
   const onSourceChange = (value) => {
-    const newSurveyUpdated = { ...newSurvey, source: value }
+    const newSurveyUpdated = { ...newSurvey, source: value, file: null }
     setNewSurvey(newSurveyUpdated)
   }
 

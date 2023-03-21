@@ -12,7 +12,11 @@
   .row {
     display: flex;
     justify-content: space-around;
-    width: 30rem;
+  }
+
+  .dropzone {
+    width: 50rem;
+    min-height: 10rem;
   }
 
   .MuiFormGroup-row {

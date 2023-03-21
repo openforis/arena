@@ -57,4 +57,4 @@ export { getCurrentInstance, createInstance, terminateInstance } from './rStudio
 
 export { createAccessRequest, acceptAccessRequest, fetchUserSurveys, changeUserPassword } from './user'
 
-export { objectToFormData } from './utils/apiUtils'
+export { contentTypes, objectToFormData } from './utils/apiUtils'
