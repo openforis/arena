@@ -137,6 +137,7 @@ const SurveyCreate = (props) => {
                   <legend>{i18n.t('common.options')}</legend>
                   <div>
                     <Checkbox
+                      id={TestId.surveyCreate.optionIncludeDataCheckbox}
                       checked={options['includeData']}
                       label={`homeView.surveyCreate.options.includeData`}
                       onChange={(value) => onOptionChange({ key: 'includeData', value })}

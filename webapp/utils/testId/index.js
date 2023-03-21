@@ -148,6 +148,7 @@ export const TestId = {
   },
   surveyCreate: {
     createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,
+    optionIncludeDataCheckbox: 'survey-create-option-include-data',
     startImportBtn: 'survey-create-start-import-btn',
     submitBtn: 'survey-create-submit-btn',
     surveyCloneFrom: 'survey-clone-from',
