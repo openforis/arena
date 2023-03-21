@@ -104,9 +104,9 @@ const SurveyCreate = (props) => {
       )}
 
       {createType === createTypes.clone && (
-        <div className="row">
+        <FormItem label={i18n.t('common.cloneFrom')}>
           <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
-        </div>
+        </FormItem>
       )}
 
       {createType !== createTypes.import && (
