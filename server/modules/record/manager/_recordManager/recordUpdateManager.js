@@ -47,15 +47,15 @@ export const initNewRecord = async (
     createMultipleEntities,
   })
 
-  nodesUpdateListener(nodes)
-  nodesValidationListener(Record.getValidation(recordUpdated))
+  nodesUpdateListener?.(nodes)
+  nodesValidationListener?.(Record.getValidation(recordUpdated))
 
-  if (Record.isPreview(recordUpdated)) {
-    return recordUpdated
-  }
   const nodesArray = Record.getNodesArray(recordUpdated)
   await NodeCreationManager.insertNodesInBatch({ user, surveyId, nodes: nodesArray, systemActivity: true }, client)
-  return persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, client)
+
+  return Record.isPreview(recordUpdated)
+    ? recordUpdated
+    : persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, client)
 }
 
 // ==== UPDATE
