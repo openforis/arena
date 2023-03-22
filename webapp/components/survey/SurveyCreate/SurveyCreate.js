@@ -14,15 +14,16 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
+import { contentTypes } from '@webapp/service/api'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
-import { Input } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
-import UploadButton from '@webapp/components/form/uploadButton'
 import { useOnUpdate } from '@webapp/components/hooks'
-import { ProgressBar } from '@webapp/components'
+import { Checkbox } from '@webapp/components/form'
+import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
 
-import { createTypes, useCreateSurvey } from './store'
+import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 
 const SurveyCreate = (props) => {
@@ -32,8 +33,12 @@ const SurveyCreate = (props) => {
   const i18n = useI18n()
   const navigate = useNavigate()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate } = useCreateSurvey({ template })
-  const { createType, name, label, lang, validation, cloneFrom, uploadProgressPercent } = newSurvey
+  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
+    useCreateSurvey({
+      template,
+    })
+  const { createType, name, label, lang, source, validation, cloneFrom, options, file, uploadProgressPercent } =
+    newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -69,41 +74,39 @@ const SurveyCreate = (props) => {
           ]}
         />
       </div>
-      <div className="row">
+      <FormItem label={i18n.t('common.name')}>
         <Input
           id={TestId.surveyCreate.surveyName}
-          placeholder={i18n.t('common.name')}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
           onChange={(value) => onUpdate({ name: 'name', value: StringUtils.normalizeName(value) })}
         />
-      </div>
+      </FormItem>
       {createType === createTypes.fromScratch && (
         <>
-          <div className="row">
+          <FormItem label={i18n.t('common.label')}>
             <Input
               id={TestId.surveyCreate.surveyLabel}
-              placeholder={i18n.t('common.label')}
               value={label}
               validation={Validation.getFieldValidation('label')(validation)}
               onChange={(value) => onUpdate({ name: 'label', value })}
             />
-          </div>
-          <div className="row">
+          </FormItem>
+          <FormItem label={i18n.t('common.language')}>
             <LanguageDropdown
               selection={lang}
               validation={Validation.getFieldValidation('lang')(validation)}
               onChange={(value) => onUpdate({ name: 'lang', value })}
               disabled={!A.isEmpty(cloneFrom)}
             />
-          </div>
+          </FormItem>
         </>
       )}
 
       {createType === createTypes.clone && (
-        <div className="row">
+        <FormItem label={i18n.t('common.cloneFrom')}>
           <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
-        </div>
+        </FormItem>
       )}
 
       {createType !== createTypes.import && (
@@ -130,21 +133,48 @@ const SurveyCreate = (props) => {
           ) : (
             <>
               <div className="row">
-                <UploadButton
-                  inputFieldId={TestId.surveyCreate.importFromArena}
-                  label={i18n.t('homeView.surveyCreate.importFromArena')}
-                  accept=".zip"
+                <fieldset className="options-fieldset">
+                  <legend>{i18n.t('common.options')}</legend>
+                  <div>
+                    <Checkbox
+                      id={TestId.surveyCreate.optionIncludeDataCheckbox}
+                      checked={options['includeData']}
+                      label={`homeView.surveyCreate.options.includeData`}
+                      onChange={(value) => onOptionChange({ key: 'includeData', value })}
+                    />
+                  </div>
+                </fieldset>
+              </div>
+              <FormItem label={i18n.t('homeView.surveyCreate.source.label')}>
+                <RadioButtonGroup
+                  items={Object.values(importSources).map((key) => ({
+                    key,
+                    label: `homeView.surveyCreate.source.${key}`,
+                  }))}
+                  onChange={onSourceChange}
+                  row
+                  value={source}
+                />
+              </FormItem>
+              <div className="row">
+                <Dropzone
+                  accept={
+                    source === importSources.arena
+                      ? { [contentTypes.zip]: ['.zip'] }
+                      : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
+                  }
                   maxSize={1000}
-                  onChange={(files) => onImport.Arena({ file: files[0] })}
+                  onDrop={onFilesDrop}
+                  droppedFiles={file ? [file] : []}
                 />
               </div>
               <div className="row">
-                <UploadButton
-                  inputFieldId={TestId.surveyCreate.importFromCollect}
-                  label={i18n.t('homeView.surveyCreate.importFromCollect')}
-                  accept=".collect,.collect-backup"
-                  maxSize={1000}
-                  onChange={(files) => onImport.Collect({ file: files[0] })}
+                <Button
+                  className="btn-primary"
+                  disabled={!file}
+                  label={'homeView.surveyCreate.startImport'}
+                  onClick={onImport}
+                  testId={TestId.surveyCreate.startImportBtn}
                 />
               </div>
             </>

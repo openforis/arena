@@ -13,20 +13,26 @@ import SamplingPointDataImportJob from './metaImportJobs/samplingPointDataImport
 import NodeDefsImportJob from './metaImportJobs/nodeDefsImportJob/nodeDefsImportJob'
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
+const createInnerJob = (params) => {
+  const { options = {} } = params
+  const { includeData = true } = options
+
+  return [
+    new CollectSurveyReaderJob(),
+    new SurveyCreatorJob(),
+    new CategoriesImportJob(),
+    new TaxonomiesImportJob(),
+    new SamplingPointDataImportJob(),
+    new NodeDefsImportJob(),
+    new SurveyDependencyGraphsGenerationJob(),
+    ...(includeData ? [new RecordsImportJob(), new RecordCheckJob()] : []),
+    new SurveyRdbCreationJob(),
+  ]
+}
+
 export default class CollectImportJob extends Job {
   constructor(params) {
-    super(CollectImportJob.type, params, [
-      new CollectSurveyReaderJob(),
-      new SurveyCreatorJob(),
-      new CategoriesImportJob(),
-      new TaxonomiesImportJob(),
-      new SamplingPointDataImportJob(),
-      new NodeDefsImportJob(),
-      new SurveyDependencyGraphsGenerationJob(),
-      new RecordsImportJob(),
-      new RecordCheckJob(),
-      new SurveyRdbCreationJob(),
-    ])
+    super(CollectImportJob.type, params, createInnerJob(params))
   }
 
   async beforeSuccess() {

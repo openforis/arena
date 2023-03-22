@@ -15,9 +15,11 @@ export const init = (app) => {
       const filePath = Request.getFilePath(req)
       const newSurveyParams = Request.getJsonParam(req, 'survey')
 
-      const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name: newSurveyParams.name })
+      const { name, options } = newSurveyParams
 
-      const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget })
+      const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
+
+      const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget, options })
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
