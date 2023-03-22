@@ -23,7 +23,9 @@ import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
 
 import * as RecordValidationManager from './recordValidationManager'
+import * as NodeCreationManager from './nodeCreationManager'
 import * as NodeUpdateManager from './nodeUpdateManager'
+import { RecordUpdater } from '@openforis/arena-core'
 
 /**
  * =======.
@@ -37,23 +39,23 @@ export const initNewRecord = async (
   { user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, createMultipleEntities = true },
   client = db
 ) => {
-  const rootNodeDef = Survey.getNodeDefRoot(survey)
+  const surveyId = Survey.getId(survey)
 
-  const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(record))
+  const { record: recordUpdated, nodes } = await RecordUpdater.createRootEntity({
+    survey,
+    record,
+    createMultipleEntities,
+  })
 
-  return persistNode(
-    {
-      user,
-      survey,
-      record,
-      node: rootNode,
-      nodesUpdateListener,
-      nodesValidationListener,
-      system: true,
-      createMultipleEntities,
-    },
-    client
-  )
+  nodesUpdateListener(nodes)
+  nodesValidationListener(Record.getValidation(recordUpdated))
+
+  if (Record.isPreview(recordUpdated)) {
+    return recordUpdated
+  }
+  const nodesArray = Record.getNodesArray(recordUpdated)
+  await NodeCreationManager.insertNodesInBatch({ user, surveyId, nodes: nodesArray, systemActivity: true }, client)
+  return persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, client)
 }
 
 // ==== UPDATE
@@ -362,7 +364,6 @@ const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValida
 
   let recordUpdated = Record.mergeNodeValidations(validations)(record)
 
-  // 4. update survey rdb
   if (!Record.isPreview(recordUpdated)) {
     recordUpdated = await persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, t)
   }

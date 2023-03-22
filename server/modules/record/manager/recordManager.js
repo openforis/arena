@@ -124,6 +124,7 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
       const logContent = R.pick([
         Node.keys.uuid,
         Node.keys.recordUuid,
+        Node.keys.parentUuid,
         Node.keys.nodeDefUuid,
         Node.keys.meta,
         Node.keys.value,
@@ -148,6 +149,7 @@ export {
 // ==== VALIDATION
 export {
   persistValidation,
+  mergeAndPersistValidation,
   updateRecordValidationsFromValues,
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
