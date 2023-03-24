@@ -1052,7 +1052,14 @@ $t(common.appNameFull)
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
-      enumerate: 'Enumerate',
+      enumerate: {
+        label: 'Enumerate',
+        info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
+      },
+      enumerator: {
+        label: 'Enumerator',
+        info: 'The items in the category will be used to generate the rows of the parent entity',
+      },
       form: 'Form',
       formula: 'Formula',
       key: 'Key',

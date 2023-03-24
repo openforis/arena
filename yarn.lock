@@ -1726,10 +1726,10 @@
     proj4 "^2.8.0"
     uuid "^9.0.0"
 
-"@openforis/arena-core@^0.0.131":
-  version "0.0.131"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.131/3a772869e6f63b6fc36b48e2168c449cfb5aeeb3#3a772869e6f63b6fc36b48e2168c449cfb5aeeb3"
-  integrity sha512-PW1jJwpkir6OZ6V0n7GDaEauMqKG08riWlk+Y5uOyMeCv97+aBULlKDXMN9+Axx9BTYrAXiO5hZYZjIyTNAd8w==
+"@openforis/arena-core@^0.0.132":
+  version "0.0.132"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.132/d26e1cdd408316118e663133c5da9c96c449de11#d26e1cdd408316118e663133c5da9c96c449de11"
+  integrity sha512-dznF0mp4BNt5tTFW1k6isPdljGnXEHsb0mrQY5PmxtC2liv4drCXrb7fqhpkvC6ILOwf2MyF0YONtgWtx6pkVg==
   dependencies:
     "@esri/proj-codes" "^3.0.0"
     "@jsep-plugin/regex" "^1.0.3"
