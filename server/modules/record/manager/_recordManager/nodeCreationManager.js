@@ -9,7 +9,6 @@ import * as Node from '@core/record/node'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeRepository from '../../repository/nodeRepository'
-import { NodeRdbManager } from './nodeRDBManager'
 
 const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && Objects.isEmpty(nodes)) {
@@ -94,11 +93,6 @@ export const insertNode = async (
   if (persistNodes) {
     await insertNodesInBatch({ user, surveyId, nodes: nodesArray, systemActivity: system }, t)
   }
-
-  recordUpdated =
-    Record.isPreview(recordUpdated) || !persistNodes
-      ? recordUpdated
-      : NodeRdbManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, t)
 
   return _createUpdateResult(recordUpdated, node, nodesCreated)
 }
