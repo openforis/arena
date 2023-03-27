@@ -10,6 +10,8 @@ export { default as RFilePersistResults } from './rFilePersistResults'
 
 export { default as RFileReadData } from './rFileReadData'
 
+export { default as RFileStatisticalAnalysis } from './rFileStatisticalAnalysis'
+
 export { default as ListCategories } from './listCategories'
 
 export { default as ListTaxonomies } from './listTaxonomies'
