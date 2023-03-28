@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import { Surveys } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -20,7 +22,17 @@ import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
 
 const NodeDefCode = (props) => {
-  const { canEditRecord, edit, entryDataQuery, nodeDef, nodes, parentNode, readOnly, removeNode, updateNode } = props
+  const {
+    canEditRecord,
+    edit,
+    entryDataQuery,
+    nodeDef,
+    nodes,
+    parentNode,
+    readOnly: readOnlyProp,
+    removeNode,
+    updateNode,
+  } = props
 
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
@@ -37,6 +49,8 @@ const NodeDefCode = (props) => {
   const codeUuidsHierarchy = nodeParentCode
     ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
     : []
+  const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
+  const readOnly = readOnlyProp || enumerator
 
   const items = useItems({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId })
   const itemsArray = useMemo(() => Object.values(items), [items])
@@ -78,7 +92,7 @@ const NodeDefCode = (props) => {
       NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)
         ? CategoryItem.getLabelWithCode(lang)(item)
         : CategoryItem.getLabel(lang)(item),
-    [lang]
+    [lang, nodeDef, surveyCycleKey]
   )
 
   return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (

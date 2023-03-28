@@ -13,8 +13,8 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as RecordRepository from '../../repository/recordRepository'
-import * as RecordUpdateManager from './recordUpdateManager'
 import * as NodeCreationManager from './nodeCreationManager'
+import { NodeRdbManager } from './nodeRDBManager'
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
@@ -106,7 +106,7 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
     nodesArray.forEach((node) => {
       node[Node.keys.created] = true
     })
-    await RecordUpdateManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
+    await NodeRdbManager.persistNodesToRDB({ survey, record: recordUpdated, nodesArray }, tx)
 
     return recordUuid
   })

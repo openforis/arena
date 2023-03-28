@@ -22,7 +22,7 @@ const NodeDefEntityTable = (props) => {
             <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
           </div>
 
-          {entry && canEditRecord && (
+          {entry && canEditRecord && !NodeDef.isEnumerate(nodeDef) && (
             <button
               aria-disabled={!canAddNode}
               className="btn btn-xs btn-add"

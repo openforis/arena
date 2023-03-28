@@ -32,7 +32,7 @@ const AdvancedProps = (props) => {
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
-            <div className="readonly_row">
+            <div className="form-item_row">
               <Checkbox
                 checked={NodeDef.isReadOnly(nodeDef)}
                 disabled={readOnly || NodeDef.isMultiple(nodeDef)}

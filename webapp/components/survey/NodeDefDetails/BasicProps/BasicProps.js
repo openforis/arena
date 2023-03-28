@@ -27,6 +27,7 @@ import DecimalProps from '../DecimalProps'
 import BooleanProps from '../BooleanProps'
 import FileProps from '../FileProps'
 import AnalysisProps from '../AnalysisProps'
+import { ButtonIconInfo } from '@webapp/components/buttons'
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
@@ -48,6 +49,7 @@ const BasicProps = (props) => {
     displayIn,
     cyclesNodeDef,
     nodeDefParentLabel,
+    enumerator,
   } = useBasicProps(props)
 
   return (
@@ -83,24 +85,56 @@ const BasicProps = (props) => {
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
-          <Checkbox
-            id={TestId.nodeDefDetails.nodeDefKey}
-            checked={NodeDef.isKey(nodeDef)}
-            disabled={keyEditDisabled}
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
-          />
+          <div className="form-item_row">
+            <Checkbox
+              id={TestId.nodeDefDetails.nodeDefKey}
+              checked={NodeDef.isKey(nodeDef)}
+              disabled={keyEditDisabled}
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
+            />
+            {enumerator && (
+              <>
+                <span>
+                  {i18n.t('nodeDefEdit.basicProps.enumerator.label')}
+                  <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
+                </span>
+              </>
+            )}
+          </div>
         </FormItem>
       )}
 
       {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
-          <Checkbox
-            id={TestId.nodeDefDetails.nodeDefMultiple}
-            checked={NodeDef.isMultiple(nodeDef)}
-            disabled={multipleEditDisabled}
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
-          />
-        </FormItem>
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
+            <div className="form-item_row">
+              <Checkbox
+                id={TestId.nodeDefDetails.nodeDefMultiple}
+                checked={NodeDef.isMultiple(nodeDef)}
+                disabled={multipleEditDisabled}
+                onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
+              />
+              {NodeDef.isMultipleEntity(nodeDef) && (
+                <FormItem
+                  label={
+                    <>
+                      <span>{i18n.t('nodeDefEdit.basicProps.enumerate.label')}</span>
+                      <ButtonIconInfo title="nodeDefEdit.basicProps.enumerate.info" />
+                    </>
+                  }
+                >
+                  <div>
+                    <Checkbox
+                      id={TestId.nodeDefDetails.nodeDefEnumerate}
+                      checked={NodeDef.isEnumerate(nodeDef)}
+                      onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+                    />
+                  </div>
+                </FormItem>
+              )}
+            </div>
+          </FormItem>
+        </>
       )}
 
       {NodeDef.isFile(nodeDef) && <FileProps state={state} Actions={Actions} />}
