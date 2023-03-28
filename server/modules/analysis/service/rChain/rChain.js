@@ -334,7 +334,8 @@ class RChain {
 
   async _initFilesClosing() {
     this._fileCalculateResults = await new RFileCalculateResults(this).init()
-    this._filePersistResults = await new RFilePersistResults(this).init()
+    const resultsBackFromRStudio = Chain.isResultsBackFromRStudio(this.chain)
+    this._filePersistResults = await new RFilePersistResults(this).init(!resultsBackFromRStudio)
     this._fileStatisticalAnalysis = await new RFileStatisticalAnalysis(this).init()
     this._fileOptionalReporting = await new RFileOptionalReporting(this).init()
     this._fileClose = await new RFileClose(this).init() // Check if we should remove this

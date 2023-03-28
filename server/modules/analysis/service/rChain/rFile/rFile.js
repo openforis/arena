@@ -42,13 +42,16 @@ export default class RFile {
     return this.appendContent(arenaInfo(this._fileName, content))
   }
 
-  async init() {
+  async init(commentedOut = false) {
     await FileUtils.appendFile(this.path)
 
-    const fileArenaContent =
-      this.path.includes('system/init') || this.path.includes('system/close')
-        ? source(this.pathRelative)
-        : sourceWithTryCatch(this.pathRelative)
+    const shouldCatchErrors = this.path.includes('system/init') || this.path.includes('system/close')
+
+    let fileArenaContent = shouldCatchErrors ? source(this.pathRelative) : sourceWithTryCatch(this.pathRelative)
+
+    if (commentedOut) {
+      fileArenaContent = `# ${fileArenaContent}`
+    }
 
     await FileUtils.appendFile(this._rChain.fileArena, fileArenaContent + _contentSeparator)
 

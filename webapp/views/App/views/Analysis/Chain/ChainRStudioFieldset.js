@@ -37,6 +37,13 @@ export const ChainRStudioFieldset = (props) => {
             onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
           />
         </FormItem>
+        <FormItem label={i18n.t('chainView.resultsBackFromRStudio')}>
+          <Checkbox
+            checked={Chain.isResultsBackFromRStudio(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.resultsBackFromRStudio)(validation)}
+            onChange={(value) => updateChain(Chain.assocResultsBackFromRStudio(value)(chain))}
+          />
+        </FormItem>
         <ButtonRStudio onClick={openRStudio} />
         <ButtonRStudio isLocal onClick={openRStudioLocal} />
       </div>

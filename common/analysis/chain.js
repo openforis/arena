@@ -25,6 +25,7 @@ export const keysProps = {
   analysisNodeDefs: 'analysisNodeDefs',
   submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
   statisticalAnalysis: 'statisticalAnalysis',
+  resultsBackFromRStudio: 'resultsBackFromRStudio',
 }
 
 export const statusExec = {
@@ -55,12 +56,15 @@ export const hasSamplingDesign = ObjectUtils.isPropTrue(keysProps.hasSamplingDes
 export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
 export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})
 export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
+export const isResultsBackFromRStudio = ObjectUtils.getProp(keysProps.resultsBackFromRStudio, true)
 
 // ====== UPDATE
 export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.hasSamplingDesign, value)
 
 export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
   ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
+
+export const assocResultsBackFromRStudio = (value) => ObjectUtils.setProp(keysProps.resultsBackFromRStudio, value)
 
 const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
 

@@ -69,8 +69,8 @@ export default class RFilePersistResults extends RFileSystem {
     })
   }
 
-  async init() {
-    await super.init()
+  async init(commentedOut = false) {
+    await super.init(commentedOut)
     const { dirResults } = this.rChain
 
     // create results dir
