@@ -16,7 +16,6 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
-import ButtonRStudio from '@webapp/components/ButtonRStudio'
 import TabBar from '@webapp/components/tabBar'
 
 import ButtonBar from './ButtonBar'
@@ -36,14 +35,6 @@ const ChainComponent = () => {
   const canHaveRecords = Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const validation = Chain.getValidation(chain)
-
-  const _openRStudio = useCallback(() => {
-    dispatch(ChainActions.openRStudio())
-  }, [dispatch])
-
-  const _openRStudioLocal = useCallback(() => {
-    dispatch(ChainActions.openRStudio({ isLocal: true }))
-  }, [dispatch])
 
   const updateChain = useCallback(
     (chainUpdate) => dispatch(ChainActions.updateChain({ chain: chainUpdate })),
@@ -78,11 +69,6 @@ const ChainComponent = () => {
 
   return (
     <div className="chain">
-      <div className="btn-rstudio-container">
-        <ButtonRStudio onClick={_openRStudio} />
-        <ButtonRStudio isLocal onClick={_openRStudioLocal} />
-      </div>
-
       <TabBar
         tabs={[
           {

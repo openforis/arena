@@ -11,7 +11,8 @@
       grid-template-columns: 0.2fr 0.75fr;
     }
 
-    .dropdown {
+    .dropdown,
+    .dropdown-wrapper {
       width: 30rem;
     }
 
@@ -24,13 +25,15 @@
       }
     }
 
-    .btn-rstudio-container {
-      position: absolute;
-      right: 16px;
-      display: flex;
-      flex-direction: column;
-      .btn-rstudio-container-message {
-        max-width: 120px;
+    .rstudio-fieldset {
+      margin: auto;
+
+      .content {
+        .form-item {
+          display: flex;
+        }
+        display: flex;
+        gap: 3rem;
       }
     }
 
