@@ -8,6 +8,7 @@ import * as JobSerialized from '@common/job/jobSerialized'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useUser } from '@webapp/store/user'
 import * as API from '@webapp/service/api'
+import { useCallback } from 'react'
 
 const sendSurveyCreateRequest = async ({ dispatch, newSurvey, user }) => {
   try {
@@ -31,33 +32,34 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
   const dispatch = useDispatch()
   const user = useUser()
 
-  return () => {
-    ;(async () => {
-      dispatch(LoaderActions.showLoader())
-      const data = await sendSurveyCreateRequest({ dispatch, newSurvey, user })
-      dispatch(LoaderActions.hideLoader())
-      if (!data) {
-        return
-      }
-      const { job, survey, validation } = data
-      if (job) {
-        dispatch(
-          JobActions.showJobMonitor({
-            job,
-            onComplete: async (_job) => {
-              const { surveyId } = JobSerialized.getResult(_job)
-              dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
-            },
-          })
-        )
-      } else if (survey) {
-        dispatch(SurveyActions.createSurvey({ survey }))
-      } else {
-        setNewSurvey({
-          ...newSurvey,
-          validation,
+  const create = useCallback(async () => {
+    dispatch(LoaderActions.showLoader())
+    const data = await sendSurveyCreateRequest({ dispatch, newSurvey, user })
+    dispatch(LoaderActions.hideLoader())
+    if (!data) {
+      return
+    }
+    const { job, survey, validation } = data
+    if (job) {
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          onComplete: async (_job) => {
+            const { surveyId } = JobSerialized.getResult(_job)
+            dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
+          },
         })
-      }
-    })()
-  }
+      )
+    } else if (survey) {
+      dispatch(SurveyActions.createSurvey({ survey }))
+    } else {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
+
+      setNewSurvey({
+        ...newSurvey,
+        validation,
+      })
+    }
+  }, [dispatch, newSurvey, setNewSurvey, user])
+  return create
 }

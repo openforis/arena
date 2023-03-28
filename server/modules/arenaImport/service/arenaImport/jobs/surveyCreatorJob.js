@@ -26,7 +26,13 @@ export default class SurveyCreatorJob extends Job {
     surveyInfoArenaSurvey.props = { ...surveyInfoArenaSurvey.props, ...surveyInfoArenaSurvey.propsDraft }
 
     // skip collect report
-    const { collectUri, collectNodeDefsInfoByPath, collectReport, ...propsToImport } = surveyInfoArenaSurvey.props
+    const {
+      collectUri,
+      collectNodeDefsInfoByPath,
+      // eslint-disable-next-line no-unused-vars
+      collectReport, // always ignore Collect import report when survey is imported or cloned
+      ...propsToImport
+    } = surveyInfoArenaSurvey.props
 
     const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
     const surveyTargetName = Survey.getName(surveyInfoTarget)
@@ -37,7 +43,7 @@ export default class SurveyCreatorJob extends Job {
 
     const defaultLanguage = Survey.getDefaultLanguage(surveyInfoArenaSurvey)
 
-    // import survey as published only if it has records
+    // import survey as published only if it has records and if the survey being imported is published already
     const published =
       (await ArenaSurveyFileZip.hasRecords(arenaSurveyFileZip)) && Survey.isPublished(surveyInfoArenaSurvey)
     const draft = !published
@@ -46,7 +52,7 @@ export default class SurveyCreatorJob extends Job {
 
     const newSurveyInfo = Survey.newSurvey({
       ...propsToImport,
-      ...collectProps,
+      ...(backup ? collectProps : {}), // ignore Collect survey properties when cloning a survey
       [Survey.infoKeys.ownerUuid]: User.getUuid(this.user),
       [Survey.infoKeys.name]: name,
       [Survey.infoKeys.published]: published,
