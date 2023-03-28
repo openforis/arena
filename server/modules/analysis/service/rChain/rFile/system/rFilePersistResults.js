@@ -30,6 +30,14 @@ const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   return scripts
 }
 
+const getHeaderScript = () => {
+  return `if(checkGlobalErrors("persist-results.R cannot be executed.")) {`
+}
+
+const getFooterScript = () => {
+  return `}`
+}
+
 export default class RFilePersistResults extends RFileSystem {
   constructor(rChain) {
     super(rChain, 'persist-results')
@@ -73,6 +81,8 @@ export default class RFilePersistResults extends RFileSystem {
     await super.init(commentedOut)
     const { dirResults } = this.rChain
 
+    // check errors script
+    await this.appendContent(getHeaderScript())
     // create results dir
     await this.appendContent(dirCreate(dirResults))
     // persist chainEntitiesResults
@@ -83,6 +93,8 @@ export default class RFilePersistResults extends RFileSystem {
     await this.initPersistUserScripts()
     // remove results dir
     await this.appendContent(unlink(dirResults))
+
+    await this.appendContent(getFooterScript())
 
     return this
   }
