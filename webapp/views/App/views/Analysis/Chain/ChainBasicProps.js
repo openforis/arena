@@ -16,6 +16,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { ChainRStudioFieldset } from './ChainRStudioFieldset'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -86,13 +87,8 @@ export const ChainBasicProps = (props) => {
           ))}
         </div>
       </FormItem>
-      <FormItem label={i18n.t('chainView.submitOnlyAnalysisStepDataIntoR')}>
-        <Checkbox
-          checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
-          validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
-          onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
-        />
-      </FormItem>
+
+      <ChainRStudioFieldset updateChain={updateChain} />
     </>
   )
 }
