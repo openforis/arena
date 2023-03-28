@@ -113,6 +113,7 @@ export const TestId = {
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
     nodeDefCodeParent: 'node-def-code-parent',
+    nodeDefEnumerate: 'node-def-enumerate',
     nodeDefName: 'node-def-name',
     nodeDefKey: 'node-def-key',
     nodeDefMultiple: 'node-def-multiple',

@@ -121,25 +121,28 @@ export const insertNode = async (surveyId, node, draft, client = db) => {
 export const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
   client.none(DbUtils.insertAllQuery(getSurveyDBSchema(surveyId), 'node', tableColumnsInsert, nodeValues))
 
-export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) =>
-  nodes.length > 0 &&
-  client.none(
-    DbUtils.insertAllQueryBatch(
-      getSurveyDBSchema(surveyId),
-      'node',
-      tableColumnsInsert,
-      nodes.map((node) => ({
-        ...node,
-        date_created: Node.getDateCreated(node),
-        date_modified: Node.getDateModified(node),
-        record_uuid: Node.getRecordUuid(node),
-        parent_uuid: Node.getParentUuid(node),
-        node_def_uuid: Node.getNodeDefUuid(node),
-        value: _toValueQueryParam(Node.getValue(node)),
-        meta: Node.getMeta(node),
-      }))
-    )
+export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) => {
+  if (nodes.length === 0) return []
+
+  const query = DbUtils.insertAllQueryBatch(
+    getSurveyDBSchema(surveyId),
+    'node',
+    tableColumnsInsert,
+    nodes.map((node) => ({
+      ...node,
+      date_created: Node.getDateCreated(node),
+      date_modified: Node.getDateModified(node),
+      record_uuid: Node.getRecordUuid(node),
+      parent_uuid: Node.getParentUuid(node),
+      node_def_uuid: Node.getNodeDefUuid(node),
+      value: _toValueQueryParam(Node.getValue(node)),
+      meta: Node.getMeta(node),
+    }))
   )
+  // assign generated ids to nodes (side effect)
+  await client.map(query + ' RETURNING id', [], (row, index) => (nodes[index].id = row.id))
+  return nodes
+}
 
 // ============== READ
 

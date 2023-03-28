@@ -14,16 +14,19 @@ import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
-export const persistValidation = async (survey, record, nodesValidation, tx) => {
-  const surveyId = Survey.getId(survey)
+export const persistValidation = async ({ survey, record }, tx) =>
+  RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
+export const mergeAndPersistValidation = async (survey, record, nodesValidation, tx) => {
   const recordValidationUpdated = R.pipe(
     Record.getValidation,
     Validation.mergeValidation(nodesValidation),
     Validation.updateCounts
   )(record)
 
-  await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)
+  const recordUpdated = Validation.assocValidation(recordValidationUpdated)(record)
+
+  await persistValidation({ survey, record: recordUpdated }, tx)
 }
 
 const isRootUniqueNodesUpdated = ({ survey, nodes }) =>
@@ -54,7 +57,7 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
   const validation = Validation.recalculateValidity(Validation.newInstance(true, validationFields))
 
   // 4. persist validation
-  await persistValidation(survey, record, validation, tx)
+  await mergeAndPersistValidation(survey, record, validation, tx)
 
   return validation
 }
@@ -78,7 +81,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
   await Promise.all(
     Object.entries(validationByRecord).map(async ([recordUuid, nodesValidation]) => {
       const recordToUpdate = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
-      await persistValidation(survey, recordToUpdate, nodesValidation, t)
+      await mergeAndPersistValidation(survey, recordToUpdate, nodesValidation, t)
     })
   )
 }

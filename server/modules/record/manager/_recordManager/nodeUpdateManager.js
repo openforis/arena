@@ -4,11 +4,9 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
@@ -17,12 +15,6 @@ import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
 
 const logger = Log.getLogger('NodeUpdateManager')
-
-const _getNodesToInsert = (nodeDef) => {
-  if (NodeDef.isSingle(nodeDef)) return 1
-  const validations = NodeDef.getValidations(nodeDef)
-  return Number(NodeDefValidations.getMinCount(validations)) || 0
-}
 
 const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
@@ -82,83 +74,6 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
   return _createUpdateResult(record, node, updatedNodes)
 }
 
-// ==== CREATE
-
-const _insertNodeRecursively = async (
-  { user, survey, nodeDef, record, nodeToInsert, system, persistNodes = true, createMultipleEntities = true },
-  t
-) => {
-  const surveyId = Survey.getId(survey)
-
-  if (!Record.isPreview(record) && persistNodes) {
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, system, t)
-  }
-
-  // Insert node
-  const node = persistNodes
-    ? await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
-    : nodeToInsert
-
-  const recordUpdated = Record.assocNode(node)(record)
-
-  // Add children if entity
-  const childDefs = NodeDef.isEntity(nodeDef) ? Survey.getNodeDefChildren(nodeDef)(survey) : []
-
-  // Insert only child single nodes (it allows to apply default values)
-  const descendantNodes = {}
-  await PromiseUtils.each(childDefs, async (childDef) => {
-    const nodesToInsert = _getNodesToInsert(childDef)
-    if (nodesToInsert > 0 && (createMultipleEntities || !NodeDef.isMultipleEntity(childDef))) {
-      await PromiseUtils.each([...Array(Number(nodesToInsert)).keys()], async () => {
-        const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-        const descendantNodesInserted = await _insertNodeRecursively(
-          {
-            user,
-            survey,
-            nodeDef: childDef,
-            record: recordUpdated,
-            nodeToInsert: childNode,
-            system: true,
-            persistNodes,
-            createMultipleEntities,
-          },
-          t
-        )
-        Object.assign(descendantNodes, descendantNodesInserted)
-      })
-    }
-  })
-
-  return {
-    ...descendantNodes,
-    [Node.getUuid(node)]: node,
-  }
-}
-
-export const insertNode = async (
-  { user, survey, record, node, system, persistNodes = true, createMultipleEntities = true },
-  t
-) => {
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-
-  // If it's a code, don't insert if it has been inserted already (by another user)
-  if (NodeDef.isCode(nodeDef)) {
-    const nodeParent = Record.getParentNode(node)(record)
-    const siblings = Record.getNodeChildrenByDefUuid(nodeParent, Node.getNodeDefUuid(node))(record)
-    if (R.any((sibling) => R.equals(Node.getValue(sibling), Node.getValue(node)))(siblings)) {
-      return _createUpdateResult(record)
-    }
-  }
-
-  const nodesToReturn = await _insertNodeRecursively(
-    { user, survey, nodeDef, record, nodeToInsert: node, system, persistNodes, createMultipleEntities },
-    t
-  )
-
-  return _createUpdateResult(record, node, nodesToReturn)
-}
-
 // ==== UPDATE
 
 export const updateNode = async ({ user, survey, record, node, system = false, updateDependents = true }, t) => {
@@ -206,22 +121,6 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   } else {
     return _createUpdateResult(record, node)
   }
-}
-
-export const persistNode = async (
-  { user, survey, record, node, system = false, createMultipleEntities = true },
-  client
-) => {
-  const nodeUuid = Node.getUuid(node)
-
-  const existingNode = Record.getNodeByUuid(nodeUuid)(record)
-
-  if (existingNode) {
-    // Updating existing node
-    return updateNode({ user, survey, record, node, system }, client)
-  }
-  // Inserting new node
-  return insertNode({ user, survey, record, node, system, createMultipleEntities }, client)
 }
 
 const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
