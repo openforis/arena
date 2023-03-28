@@ -8,7 +8,7 @@ import DfResults from './dfResults'
 
 import { dirCreate, writeCsv, arenaPutFile, zipr, unlink } from '../../rFunctions'
 
-const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
+const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
   const { name: dfResultName, dfSourceName } = dfResults
   const scripts = []
@@ -64,8 +64,7 @@ export default class RFilePersistResults extends RFileSystem {
       const dfResults = new DfResults(this.rChain, entity)
 
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
-      await this.appendContent(...dfResults.scripts)
-      await this.appendContent(...getPutResultsScripts({ rChain: this.rChain, entity, dfResults }))
+      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults }))
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
     })
   }

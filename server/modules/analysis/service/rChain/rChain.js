@@ -21,6 +21,7 @@ import RFile, { padStart } from './rFile'
 import {
   ListCategories,
   ListTaxonomies,
+  RFileCalculateResults,
   RFileClose,
   RFileInit,
   RFileLogin,
@@ -57,6 +58,7 @@ class RChain {
     this._fileInit = null
     this._fileLogin = null
     this._fileReadData = null
+    this._fileCalculateResults = null
     this._filePersistResults = null
     this._fileStatisticalAnalysis = null
     this.__fileOptionalReporting = null
@@ -331,6 +333,7 @@ class RChain {
   }
 
   async _initFilesClosing() {
+    this._fileCalculateResults = await new RFileCalculateResults(this).init()
     this._filePersistResults = await new RFilePersistResults(this).init()
     this._fileStatisticalAnalysis = await new RFileStatisticalAnalysis(this).init()
     this._fileOptionalReporting = await new RFileOptionalReporting(this).init()
