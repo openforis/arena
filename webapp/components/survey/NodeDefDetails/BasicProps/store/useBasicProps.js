@@ -10,6 +10,7 @@ import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
 import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
 
 import { State } from '../../store'
+import { Surveys } from '@openforis/arena-core'
 
 export const useBasicProps = (props) => {
   const { state } = props
@@ -27,6 +28,7 @@ export const useBasicProps = (props) => {
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
+  const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -59,5 +61,6 @@ export const useBasicProps = (props) => {
     displayIn,
     cyclesNodeDef,
     nodeDefParentLabel,
+    enumerator,
   }
 }

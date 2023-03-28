@@ -187,6 +187,7 @@ const mapStateToProps = (state, props) => {
       canEditRecord &&
       parentNode &&
       NodeDef.isMultiple(nodeDef) &&
+      !NodeDef.isEnumerate(nodeDef) &&
       !_maxCountReached({ nodeDef, nodes }) &&
       !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 

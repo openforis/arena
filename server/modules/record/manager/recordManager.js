@@ -16,13 +16,15 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import * as RecordRepository from '../repository/recordRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
+import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 
 // ==== CREATE
 
 export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordManager/recordCreationManager'
 export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
 
-export const { insertNode, persistNodesToRDB } = RecordUpdateManager
+export const { insertNode } = RecordUpdateManager
+export const { persistNodesToRDB } = NodeRdbManager
 
 // ==== READ
 
@@ -124,6 +126,7 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
       const logContent = R.pick([
         Node.keys.uuid,
         Node.keys.recordUuid,
+        Node.keys.parentUuid,
         Node.keys.nodeDefUuid,
         Node.keys.meta,
         Node.keys.value,
@@ -148,6 +151,7 @@ export {
 // ==== VALIDATION
 export {
   persistValidation,
+  mergeAndPersistValidation,
   updateRecordValidationsFromValues,
   validateNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'

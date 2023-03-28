@@ -56,6 +56,7 @@ export const NodeDefLabelTypes = {
 export const propKeys = {
   cycles: 'cycles',
   descriptions: ObjectUtils.keysProps.descriptions,
+  enumerate: 'enumerate', // only for multiple entities
   key: 'key',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
@@ -191,6 +192,8 @@ export const getLayout = getProp(propKeys.layout, {})
 export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 
 export const getDescriptions = getProp(propKeys.descriptions, {})
+
+export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
 // code
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
 // taxon
@@ -364,6 +367,8 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
+export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
+
 // layout
 export const assocLayout = (layout) => ObjectUtils.setProp(propKeys.layout, layout)
 
