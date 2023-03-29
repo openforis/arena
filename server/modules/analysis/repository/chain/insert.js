@@ -6,14 +6,21 @@ export const insertMany = async ({ surveyId, chains = [] }, client = DB) =>
   client.tx(async (tx) => {
     const tableChain = new TableChain(surveyId)
 
+    const insertColumns = [
+      TableChain.columnSet.uuid,
+      TableChain.columnSet.props,
+      TableChain.columnSet.validation,
+      TableChain.columnSet.scriptCommon,
+      TableChain.columnSet.scriptEnd,
+    ]
     await tx.batch([
-      chains.map(({ uuid, props, validation, script_common: scriptCommon }) =>
+      chains.map(({ uuid, props, validation, script_common: scriptCommon, script_end: scriptEnd }) =>
         tx.none(
           `
     INSERT INTO ${tableChain.nameQualified} 
-        (${TableChain.columnSet.uuid}, ${TableChain.columnSet.props}, ${TableChain.columnSet.validation}, ${TableChain.columnSet.scriptCommon})
-    VALUES ($1, $2::jsonb, $3::jsonb, $4)`,
-          [uuid, props, validation, scriptCommon]
+        (${insertColumns.join(', ')})
+    VALUES ($1, $2::jsonb, $3::jsonb, $4, $5)`,
+          [uuid, props, validation, scriptCommon, scriptEnd]
         )
       ),
     ])
