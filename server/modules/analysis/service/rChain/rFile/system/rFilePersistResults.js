@@ -1,12 +1,11 @@
 import * as PromiseUtils from '@core/promiseUtils'
 import * as ApiRoutes from '@common/apiRoutes'
-import * as FileUtils from '@server/utils/file/fileUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import RFileSystem from './rFileSystem'
 import DfResults from './dfResults'
 
-import { dirCreate, writeCsv, arenaPutFile, zipr, unlink } from '../../rFunctions'
+import { writeCsv, arenaPutFile, zipr } from '../../rFunctions'
+import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
 
 const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
@@ -26,46 +25,23 @@ const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
       fileZip
     )
   )
-
   return scripts
 }
 
-const getHeaderScript = () => {
-  return `if(checkGlobalErrors("persist-results.R cannot be executed.")) {`
-}
-
-const getFooterScript = () => {
-  return `}`
-}
-
-export default class RFilePersistResults extends RFileSystem {
+export default class RFilePersistResults extends RFilePersistScriptsGeneric {
   constructor(rChain) {
     super(rChain, 'persist-results')
   }
 
-  async initPersistScripts({ dirName, zipName }) {
-    const { surveyId, chainUuid, dirResults } = this.rChain
-    const zipFile = FileUtils.join(dirResults, zipName)
-
-    await this.logInfo(`'Persisting ${zipName} started'`)
-    await this.appendContent(
-      zipr(zipFile, dirName),
-      arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile)
-    )
-    await this.logInfo(`'Persisting ${zipName} completed'`)
+  getHeaderScript() {
+    return `if(checkGlobalErrors("persist-results.R cannot be executed.")) {`
   }
 
-  async initPersistUserScripts() {
-    const { dirNames } = this.rChain
-    await this.initPersistScripts({ dirName: dirNames.user, zipName: 'userScripts.zip' })
+  getFooterScript() {
+    return `}`
   }
 
-  async initPersistSamplingScripts() {
-    const { dirNames } = this.rChain
-    await this.initPersistScripts({ dirName: dirNames.sampling, zipName: 'samplingScripts.zip' })
-  }
-
-  async initPersistChainEntitiesResults() {
+  async appendPersistScripts() {
     const { entitiesWithActiveQuantitativeVariables } = this.rChain
 
     await PromiseUtils.each(entitiesWithActiveQuantitativeVariables, async (entity) => {
@@ -75,27 +51,5 @@ export default class RFilePersistResults extends RFileSystem {
       await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults }))
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
     })
-  }
-
-  async init(commentedOut = false) {
-    await super.init(commentedOut)
-    const { dirResults } = this.rChain
-
-    // check errors script
-    await this.appendContent(getHeaderScript())
-    // create results dir
-    await this.appendContent(dirCreate(dirResults))
-    // persist chainEntitiesResults
-    await this.initPersistChainEntitiesResults()
-    // persist base unit scripts
-    await this.initPersistSamplingScripts()
-    // persist user scripts
-    await this.initPersistUserScripts()
-    // remove results dir
-    await this.appendContent(unlink(dirResults))
-
-    await this.appendContent(getFooterScript())
-
-    return this
   }
 }
