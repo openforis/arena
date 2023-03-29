@@ -118,7 +118,7 @@ export const getAttributes = R.propOr({}, keys.attributes)
 export const getAttribute = (name, defaultValue = null) => R.pipe(getAttributes, R.propOr(defaultValue, name))
 
 /**
- * Returns the attribute called 'name' of a node def element
+ * Returns the attribute called 'name' of a node def element.
  */
 const getNodeDefName = getAttribute('name')
 
@@ -126,16 +126,24 @@ export const getAttributeName = getNodeDefName
 
 export const getAttributeBoolean = (name) => R.pipe(getAttribute(name), R.equals('true'))
 
+const _transformValue = (value) =>
+  value === 'true' || value === 'false'
+    ? value === 'true' // cast value into boolean
+    : value
+
 export const getUiAttribute =
   (name, defaultValue = null) =>
   (collectXmlElement) => {
     const value =
       getAttribute(`n1:${name}`)(collectXmlElement) || getAttribute(`ui:${name}`, defaultValue)(collectXmlElement)
-    if (value === 'true' || value === 'false') {
-      // cast the value into Boolean
-      return value === 'true'
-    }
-    return value
+    return _transformValue(value)
+  }
+
+export const getCollectAttribute =
+  (name, defaultValue = null) =>
+  (collectXmlElement) => {
+    const value = getAttribute(`collect:${name}`, defaultValue)(collectXmlElement)
+    return _transformValue(value)
   }
 
 export const getNodeDefRoot = R.pipe(getElementsByPath(['schema', 'entity']), R.head)
