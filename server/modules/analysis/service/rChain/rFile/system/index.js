@@ -1,5 +1,7 @@
 export { default } from './rFileSystem'
 
+export { default as RFileCalculateResults } from './rFileCalculateResults'
+
 export { default as RFileClose } from './rFileClose'
 
 export { default as RFileInit } from './rFileInit'

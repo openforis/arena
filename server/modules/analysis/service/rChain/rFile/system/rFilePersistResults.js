@@ -8,7 +8,7 @@ import DfResults from './dfResults'
 
 import { dirCreate, writeCsv, arenaPutFile, zipr, unlink } from '../../rFunctions'
 
-const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
+const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
   const { name: dfResultName, dfSourceName } = dfResults
   const scripts = []
@@ -28,6 +28,14 @@ const getPutResultsScripts = ({ rChain, entity, dfResults }) => {
   )
 
   return scripts
+}
+
+const getHeaderScript = () => {
+  return `if(checkGlobalErrors("persist-results.R cannot be executed.")) {`
+}
+
+const getFooterScript = () => {
+  return `}`
 }
 
 export default class RFilePersistResults extends RFileSystem {
@@ -64,16 +72,17 @@ export default class RFilePersistResults extends RFileSystem {
       const dfResults = new DfResults(this.rChain, entity)
 
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
-      await this.appendContent(...dfResults.scripts)
-      await this.appendContent(...getPutResultsScripts({ rChain: this.rChain, entity, dfResults }))
+      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults }))
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
     })
   }
 
-  async init() {
-    await super.init()
+  async init(commentedOut = false) {
+    await super.init(commentedOut)
     const { dirResults } = this.rChain
 
+    // check errors script
+    await this.appendContent(getHeaderScript())
     // create results dir
     await this.appendContent(dirCreate(dirResults))
     // persist chainEntitiesResults
@@ -84,6 +93,8 @@ export default class RFilePersistResults extends RFileSystem {
     await this.initPersistUserScripts()
     // remove results dir
     await this.appendContent(unlink(dirResults))
+
+    await this.appendContent(getFooterScript())
 
     return this
   }
