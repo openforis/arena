@@ -371,6 +371,10 @@ export default class NodeDefsImportJob extends Job {
           [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(Survey.cycleOneKey, renderType),
         }
       }
+      case NodeDef.nodeDefType.entity: {
+        const enumerate = CollectSurvey.getCollectAttribute('enumerate')(collectNodeDef)
+        return enumerate ? { [NodeDef.propKeys.enumerate]: enumerate } : {}
+      }
       case NodeDef.nodeDefType.file: {
         const collectMaxSize = CollectSurvey.getAttribute('maxSize')(collectNodeDef)
         // in Collect max size is in bytes; convert it into MB
