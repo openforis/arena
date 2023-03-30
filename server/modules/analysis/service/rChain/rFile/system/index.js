@@ -10,6 +10,8 @@ export { default as RFileLogin } from './rFileLogin'
 
 export { default as RFilePersistResults } from './rFilePersistResults'
 
+export { default as RFilePersistUserScripts } from './rFilePersistUserScripts'
+
 export { default as RFileReadData } from './rFileReadData'
 
 export { default as RFileStatisticalAnalysis } from './rFileStatisticalAnalysis'

@@ -11,6 +11,7 @@ const columnSet = {
   validation: 'validation',
   statusExec: 'status_exec',
   scriptCommon: 'script_common',
+  scriptEnd: 'script_end',
 }
 
 const tableName = 'chain'

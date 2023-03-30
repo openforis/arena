@@ -26,10 +26,11 @@ import {
   RFileInit,
   RFileLogin,
   RFilePersistResults,
+  RFilePersistUserScripts,
   RFileReadData,
   RFileStatisticalAnalysis,
 } from './rFile/system'
-import { RFileCommon, RFileOptionalReporting } from './rFile/user'
+import { RFileCommon, RFileCommonEnd } from './rFile/user'
 import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
 
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -60,8 +61,9 @@ class RChain {
     this._fileReadData = null
     this._fileCalculateResults = null
     this._filePersistResults = null
+    this._filePersistUserScripts = null
     this._fileStatisticalAnalysis = null
-    this.__fileOptionalReporting = null
+    this._fileCommonEnd = null
     this._fileClose = null
     // User files
     this._fileCommon = null
@@ -334,10 +336,11 @@ class RChain {
 
   async _initFilesClosing() {
     this._fileCalculateResults = await new RFileCalculateResults(this).init()
+    this._filePersistUserScripts = await new RFilePersistUserScripts(this).init()
     const resultsBackFromRStudio = Chain.isResultsBackFromRStudio(this.chain)
     this._filePersistResults = await new RFilePersistResults(this).init(!resultsBackFromRStudio)
     this._fileStatisticalAnalysis = await new RFileStatisticalAnalysis(this).init()
-    this._fileOptionalReporting = await new RFileOptionalReporting(this).init()
+    this._fileCommonEnd = await new RFileCommonEnd(this).init()
     this._fileClose = await new RFileClose(this).init() // Check if we should remove this
   }
 

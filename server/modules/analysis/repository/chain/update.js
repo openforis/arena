@@ -9,7 +9,7 @@ import { TableChain } from '../../../../../common/model/db'
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
- * @param {object<string, any>} [params.fields={}] - A <key, value> object containing the fields to update.
+ * @param {Object<string, any>} [params.fields={}] - A <key, value> object containing the fields to update.
  * @param {boolean} [params.dateExecuted=false] - Whether to update date executed to current time.
  * @param {boolean} [params.dateModified=false] - Whether to update date modified to current time.
  * @param {pgPromise.IDatabase} [client=db] - The database client.

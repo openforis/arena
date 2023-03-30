@@ -1743,10 +1743,10 @@
     proj4 "^2.8.0"
     uuid "^9.0.0"
 
-"@openforis/arena-server@^0.1.22":
-  version "0.1.22"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.22/039c88f1eeb55378058a7f0b99d9bf811848eb7e#039c88f1eeb55378058a7f0b99d9bf811848eb7e"
-  integrity sha512-/SA8J5L8qRvQ9nX2Fag6RD+iSCgZjcFuVNjnP2CRHyCwZe0lIcncbj6u8oxKqHQT7UJPdkQeR2o87yUnHEWApg==
+"@openforis/arena-server@^0.1.23":
+  version "0.1.23"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.23/68154ee28be2734c0d52771d3899d64c84a24db6#68154ee28be2734c0d52771d3899d64c84a24db6"
+  integrity sha512-nptH7SVye9LZM8+XmCsuTKeO4YIA5WIdo/L+RtQhGVCjlJT9TJOGb/l2LoDihDXC5jFsFlEQrd380w3d+VZN0A==
   dependencies:
     "@godaddy/terminus" "^4.11.2"
     "@openforis/arena-core" "^0.0.121"
