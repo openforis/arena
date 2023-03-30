@@ -26,13 +26,11 @@ export default class RFilePersistScriptsGeneric extends RFileSystem {
   }
 
   getHeaderScript() {
-    // to be extended by subclasses
-    return ''
+    return `if(checkGlobalErrors("${this.fileName} cannot be executed.")) {`
   }
 
   getFooterScript() {
-    // to be extended by subclasses
-    return ''
+    return `}`
   }
 
   async init(commentedOut = false) {
