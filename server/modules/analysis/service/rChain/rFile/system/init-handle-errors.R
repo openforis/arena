@@ -22,7 +22,7 @@ checkGlobalErrors = function(message) {
         }
         
         if (interactive()) {
-            aReply=askYesNo(paste0(" Errors in the chain, see the console!\n\n ", message, "\n\n Clear chain's error list and try to fix the issues?", default = FALSE))
+            aReply=askYesNo(paste0(" Errors in the chain, see the console!\n\n ", message, "\n\n Clear chain's error list and try to fix the issues?"), default = FALSE)
             if (aReply==TRUE) {
                 global_arena_errors <- list()
             }
