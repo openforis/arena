@@ -14,6 +14,7 @@ export const keys = {
   temporary: ObjectUtils.keys.temporary,
   validation: Validation.keys.validation,
   scriptCommon: 'script_common',
+  scriptEnd: 'script_end',
 }
 
 export const keysProps = {
@@ -52,6 +53,7 @@ export const {
 export const getDateExecuted = ObjectUtils.getDate(keys.dateExecuted)
 export const getStatusExec = R.propOr(null, keys.statusExec)
 export const getScriptCommon = R.propOr(null, keys.scriptCommon)
+export const getScriptEnd = R.propOr(null, keys.scriptEnd)
 export const hasSamplingDesign = ObjectUtils.isPropTrue(keysProps.hasSamplingDesign)
 export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
 export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})

@@ -24,6 +24,10 @@ export default class RFile {
     return this._dir
   }
 
+  get fileName() {
+    return this._fileName
+  }
+
   get path() {
     return this._path
   }

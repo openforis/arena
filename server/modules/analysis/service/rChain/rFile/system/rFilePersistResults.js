@@ -33,14 +33,6 @@ export default class RFilePersistResults extends RFilePersistScriptsGeneric {
     super(rChain, 'persist-results')
   }
 
-  getHeaderScript() {
-    return `if(checkGlobalErrors("persist-results.R cannot be executed.")) {`
-  }
-
-  getFooterScript() {
-    return `}`
-  }
-
   async appendPersistScripts() {
     const { entitiesWithActiveQuantitativeVariables } = this.rChain
 
