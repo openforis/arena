@@ -61,22 +61,27 @@ arena.delete = function(url, body) {
   return(arena.parseResponse(resp))
 }
 
+
 arena.login = function(tentative) {
   if (missing(tentative)) {
     tentative <- 1
   }
-  if (tentative==1) 
-      user <- getPass::getPass("Enter your username (email): ")
-    else 
-    {
-      sText <- "Invalid email or password specified, try again! \n\nEnter your username (email): "
-      user <- getPass::getPass( sText )
-    }
-  user <- trimws(user)
+  if (tentative > 1) {
+    enterEmailMessage <- "Invalid email or password specified, try again!\r\nUsername (email):"
+  } else {
+    enterEmailMessage <- "Username (email):"
+  }
+  user <- rstudioapi::showPrompt(title = "Enter your username (email)", message = enterEmailMessage)
   
-  password <- getPass::getPass("Enter your password: ")
+  if (is.null(user)) return(FALSE)
+  
+  user <- trimws(tolower(user))
+
+  password <- rstudioapi::askForPassword(prompt = "Enter your password:")
+  if (is.null(password)) return(FALSE)
+
   password <- trimws(password)
-  
+
   resp <- httr::POST(
     paste0(arena.host, 'auth/login'),
     body = list(email = user, password = password)
@@ -84,16 +89,16 @@ arena.login = function(tentative) {
   respParsed <- arena.parseResponse(resp)
   
   if ("message" %in% names(respParsed) && (
-    (respParsed$message == 'validationErrors.user.userNotFound') | 
-    (respParsed$message == 'validationErrors.user.emailInvalid') | 
+    (respParsed$message == 'validationErrors.user.userNotFound') || 
+    (respParsed$message == 'validationErrors.user.emailInvalid') || 
     (respParsed$message == 'Missing credentials')
     )) 
   {
     if (tentative < 3) {
       print('*** Invalid email or password specified, try again')
-      arena.login(tentative + 1)
+      return(arena.login(tentative + 1))
     } else if (tentative >= 3) {
-      print(paste("*** Login failed:",respParsed$message, sep = ' '))
+      print(paste("*** Login failed:", respParsed$message, sep = ' '))
       return(FALSE)
     }
   } else {
