@@ -30,6 +30,10 @@
 
     .form-item {
       display: flex;
+
+      .form-label {
+        width: 10rem;
+      }
     }
   }
 }

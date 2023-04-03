@@ -110,7 +110,7 @@ export const ChainStatisticalAnalysisProps = () => {
 
   return (
     <div className="statistical-analysis">
-      <FormItem label={i18n.t('common.entity')}>
+      <FormItem label={i18n.t('chainView.statisticalAnalysis.entityToReport')}>
         <div className="entity-selector-wrapper">
           <EntitySelector
             hierarchy={Survey.getHierarchy()(survey)}
