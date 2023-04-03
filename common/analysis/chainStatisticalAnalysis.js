@@ -76,9 +76,9 @@ const assocReportingDataCategoryUuid = (reportingDataCategoryUuid) =>
   )
 const assocReportingDataAttributeDefUuid =
   ({ categoryLevelUuid, nodeDefUuid }) =>
-  (samplingDesign) =>
+  (statisticalAnalysis) =>
     Objects.assocPath({
-      obj: samplingDesign,
+      obj: statisticalAnalysis,
       path: [keys.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid],
       value: nodeDefUuid,
     })

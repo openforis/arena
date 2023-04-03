@@ -77,8 +77,17 @@ export const updateSamplingDesign = (updateFn) => (chain) => {
   const samplingDesign = getSamplingDesign(chain)
   const samplingDesignUpdated = updateFn(samplingDesign)
   let chainUpdated = assocSamplingDesign(samplingDesignUpdated)(chain)
-  if (!ChainSamplingDesign.getSamplingStrategy(samplingDesignUpdated)) {
+  if (
+    !ChainSamplingDesign.getSamplingStrategy(samplingDesignUpdated) &&
+    ChainStatisticalAnalysis.getPValue(getStatisticalAnalysis(chainUpdated))
+  ) {
     chainUpdated = updateStatisticalAnalysis(ChainStatisticalAnalysis.resetPValue)(chainUpdated)
+  }
+  if (
+    !ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) &&
+    ChainStatisticalAnalysis.isClusteringOnlyVariances(getStatisticalAnalysis(chainUpdated))
+  ) {
+    chainUpdated = updateStatisticalAnalysis(ChainStatisticalAnalysis.assocClusteringOnlyVariances(false))(chainUpdated)
   }
   return chainUpdated
 }
