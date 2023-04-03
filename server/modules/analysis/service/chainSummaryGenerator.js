@@ -15,6 +15,12 @@ import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnaly
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
+const generateSurveySummary = ({ survey, lang }) => ({
+  surveyName: Survey.getName(survey),
+  surveyLabel: Survey.getLabel(survey, lang),
+  surveyDescription: Survey.getDescription(lang, '')(survey),
+})
+
 const generateReportingDataCategoryAttributesSummary = ({ survey, category, chain }) => {
   const levels = Category.getLevelsArray(category)
   const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
@@ -151,13 +157,15 @@ const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
 
 const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
-  const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-  const lang = langParam || defaultLang
 
   const chain = await ChainManager.fetchChain({ surveyId, chainUuid })
   if (!chain) {
     throw new SystemError('chainNotFound', { chainUuid })
   }
+
+  const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+  const lang = langParam || defaultLang
+  const surveySummary = generateSurveySummary({ survey, lang })
 
   const getNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(survey)
 
@@ -185,6 +193,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
 
   return {
+    ...surveySummary,
     label: Chain.getLabel(lang, defaultLang)(chain),
     selectedCycle: getCycleLabel(cycle),
     cycles: Chain.getCycles(chain).map(getCycleLabel),
