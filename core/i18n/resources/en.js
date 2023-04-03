@@ -969,6 +969,7 @@ $t(common.cantUndoWarning)`,
     },
     reportingDataCategory: 'Reporting data category',
     reportingDataAttribute: 'Reporting data attribute for {{level}}',
+    reportingDataTableAndJoinsWithAttributes: 'Reporting data table and joins with attributes',
     samplingNodeDefs: 'Sampling NodeDefs',
   },
 

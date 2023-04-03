@@ -4,6 +4,9 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
 import * as Validation from '@core/validation/validation'
 
+import { ChainSamplingDesign } from './chainSamplingDesign'
+import { ChainStatisticalAnalysis } from './chainStatisticalAnalysis'
+
 export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateExecuted: 'dateExecuted',
@@ -73,7 +76,11 @@ const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDes
 export const updateSamplingDesign = (updateFn) => (chain) => {
   const samplingDesign = getSamplingDesign(chain)
   const samplingDesignUpdated = updateFn(samplingDesign)
-  return assocSamplingDesign(samplingDesignUpdated)(chain)
+  let chainUpdated = assocSamplingDesign(samplingDesignUpdated)(chain)
+  if (!ChainSamplingDesign.getSamplingStrategy(samplingDesignUpdated)) {
+    chainUpdated = updateStatisticalAnalysis(ChainStatisticalAnalysis.resetPValue)(chainUpdated)
+  }
+  return chainUpdated
 }
 
 const assocStatisticalAnalysis = (value) => ObjectUtils.setProp(keysProps.statisticalAnalysis, value)

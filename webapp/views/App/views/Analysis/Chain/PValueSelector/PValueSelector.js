@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
-import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -15,14 +15,14 @@ export const PValueSelector = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const chain = useChain()
-  const samplingDesign = Chain.getSamplingDesign(chain)
+  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
 
-  const items = ChainSamplingDesign.pValues.map(pValueToItem)
+  const items = ChainStatisticalAnalysis.pValues.map(pValueToItem)
 
-  const selectedItem = pValueToItem(ChainSamplingDesign.getPValue(samplingDesign))
+  const selectedItem = pValueToItem(ChainStatisticalAnalysis.getPValue(statisticalAnalysis))
 
   const onChange = (item) => {
-    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocPValue(item?.value))(chain)
+    const chainUpdated = Chain.updateStatisticalAnalysis(ChainStatisticalAnalysis.assocPValue(item?.value))(chain)
     dispatch(ChainActions.updateChain({ chain: chainUpdated }))
   }
 
