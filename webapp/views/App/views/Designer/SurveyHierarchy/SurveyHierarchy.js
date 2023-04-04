@@ -59,15 +59,16 @@ const SurveyHierarchy = () => {
 
         <div className="survey-hierarchy__attributes">
           <NodeDefsSelector
+            canSelectAttributes={false}
             hierarchy={hierarchy}
+            nodeDefLabelType={nodeDefLabelType}
             nodeDefUuidEntity={selectedNodeDefUuid}
             onChangeEntity={(nodeDefUuidEntity) => {
               tree.expandToNode(nodeDefUuidEntity)
               setSelectedNodeDefUuid(nodeDefUuidEntity)
             }}
-            canSelectAttributes={false}
             showAncestors={false}
-            nodeDefLabelType={nodeDefLabelType}
+            showSingleEntities
           />
         </div>
       </div>
