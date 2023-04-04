@@ -4,12 +4,6 @@
   .table__header {
     header {
       column-gap: 2rem;
-
-      .form-item.exclude-resolved {
-        text-transform: none;
-        width: 20rem;
-        grid-template-columns: 0.8fr 0.2fr;
-      }
     }
   }
   .table__rows {
