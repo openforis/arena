@@ -18,14 +18,14 @@ const Row = (props) => {
   return (
     <>
       <div>{rowNo}</div>
-      <div>{nodeDefPath}</div>
+      <div className="full-width">{nodeDefPath}</div>
       <div>
         {typeIcon}
         {typeLabel}
       </div>
-      <div>{CollectImportReportItem.getExpression(row)}</div>
-      <div>{CollectImportReportItem.getApplyIf(row)}</div>
-      <div>
+      <div className="full-width">{CollectImportReportItem.getExpression(row)}</div>
+      <div className="full-width">{CollectImportReportItem.getApplyIf(row)}</div>
+      <div className="full-width">
         <LabelsEditor
           labels={CollectImportReportItem.getMessages(row)}
           readOnly
@@ -40,7 +40,7 @@ const Row = (props) => {
           onChange={(checked) => onUpdate({ resolved: checked })}
         />
       </div>
-      <div>
+      <div className="cell icon">
         <Link
           className="btn btn-transparent"
           to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}

@@ -24,7 +24,7 @@ const CollectImportReport = () => {
         module="collect-import-report"
         moduleApiUri={`/api/survey/${surveyId}/collect-import/report`}
         restParams={{ excludeResolved }}
-        gridTemplateColumns="60px repeat(5, 0.2fr) 0.1fr 30px"
+        gridTemplateColumns="3rem 0.3fr 12rem 0.3fr 0.2fr 0.2fr 7rem 3rem"
         headerLeftComponent={() => (
           <HeaderLeft excludeResolved={excludeResolved} setExcludeResolved={setExcludeResolved} />
         )}

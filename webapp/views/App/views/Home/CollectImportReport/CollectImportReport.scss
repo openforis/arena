@@ -12,14 +12,8 @@
       }
     }
   }
-  .table__row-header,
-  .table__row {
-    grid-template-columns: 60px repeat(5, 0.2fr) 0.1fr 30px;
-  }
-
   .table__rows {
-    height: calc(100% - 15px);
-    padding-bottom: 50px;
+    height: calc(100% - 45px);
   }
 
   .table__row {
@@ -41,6 +35,16 @@
 
     .icon-warning.warning {
       color: $orange;
+    }
+
+    .cell.icon {
+      a {
+        display: block;
+      }
+    }
+
+    .full-width {
+      width: 100%;
     }
   }
 }
