@@ -2,6 +2,8 @@ import './CollectImportReport.scss'
 
 import React, { useState } from 'react'
 
+import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
+
 import Table from '@webapp/components/Table'
 
 import { useSurveyId } from '@webapp/store/survey'
@@ -21,6 +23,7 @@ const CollectImportReport = () => {
     <SurveyDefsLoader draft validate>
       <Table
         className="collect-import-report"
+        keyExtractor={({ item }) => CollectImportReportItem.getId(item)}
         module="collect-import-report"
         moduleApiUri={`/api/survey/${surveyId}/collect-import/report`}
         restParams={{ excludeResolved }}
