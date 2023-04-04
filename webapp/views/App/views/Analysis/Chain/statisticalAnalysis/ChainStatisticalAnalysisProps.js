@@ -5,8 +5,10 @@ import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Validation from '@core/validation/validation'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 import { useI18n } from '@webapp/store/system'
@@ -14,11 +16,13 @@ import { useSurvey } from '@webapp/store/survey'
 import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
-import { ButtonGroup } from '@webapp/components/form'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import WarningBadge from '@webapp/components/warningBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { DimensionsSelector } from './DimensionsSelector'
+import { PValueSelector } from '../PValueSelector'
+import { ReportingDataAttributeDefs } from '../ReportingDataAttributeDefs'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()
@@ -28,7 +32,10 @@ export const ChainStatisticalAnalysisProps = () => {
   const chain = useChain()
   const chainUuid = Chain.getUuid(chain)
   const [chainUpdated, setChainUpdated] = useState(chain)
+
+  const samplingDesign = Chain.getSamplingDesign(chain)
   const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chainUpdated)
+  const validation = Chain.getValidation(chain)
   const dimensionUuids = ChainStatisticalAnalysis.getDimensionUuids(chainStatisticalAnalysis)
   const entityDefUuid = ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)
   const entityDef = entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : null
@@ -90,9 +97,20 @@ export const ChainStatisticalAnalysisProps = () => {
     [updateStatisticalAnalysis]
   )
 
+  const onClusteringOnlyVariancesChange = useCallback(
+    (clusteringOnlyVariances) =>
+      updateStatisticalAnalysis(ChainStatisticalAnalysis.assocClusteringOnlyVariances(clusteringOnlyVariances)),
+    [updateStatisticalAnalysis]
+  )
+
+  const onNonResponseBiasCorrectionChange = useCallback(
+    (value) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocNonResponseBiasCorrection(value)),
+    [updateStatisticalAnalysis]
+  )
+
   return (
     <div className="statistical-analysis">
-      <FormItem label={i18n.t('common.entity')}>
+      <FormItem label={i18n.t('chainView.statisticalAnalysis.entityToReport')}>
         <div className="entity-selector-wrapper">
           <EntitySelector
             hierarchy={Survey.getHierarchy()(survey)}
@@ -139,6 +157,35 @@ export const ChainStatisticalAnalysisProps = () => {
           items={reportingMethodItems}
         />
       </FormItem>
+
+      {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
+        <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
+          <Checkbox
+            checked={ChainStatisticalAnalysis.isClusteringOnlyVariances(chainStatisticalAnalysis)}
+            validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.clusteringOnlyVariances)(
+              validation
+            )}
+            onChange={onClusteringOnlyVariancesChange}
+          />
+        </FormItem>
+      )}
+
+      <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
+        <div className="nonResponseBiasCorrectionContainer">
+          <Checkbox
+            checked={ChainStatisticalAnalysis.isNonResponseBiasCorrection(chainStatisticalAnalysis)}
+            validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.nonResponseBiasCorrection)(
+              validation
+            )}
+            onChange={onNonResponseBiasCorrectionChange}
+          />
+          <label className="nonResponseBiasCorrectionTip">{i18n.t('chainView.nonResponseBiasCorrectionTip')}</label>
+        </div>
+      </FormItem>
+
+      {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && <PValueSelector />}
+
+      <ReportingDataAttributeDefs chain={chain} updateStatisticalAnalysis={updateStatisticalAnalysis} />
     </div>
   )
 }

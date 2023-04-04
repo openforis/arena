@@ -144,7 +144,7 @@ Dropdown.propTypes = {
   readOnly: PropTypes.bool,
   renderOptionLabel: PropTypes.func,
   searchable: PropTypes.bool,
-  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string]),
+  selection: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.string, PropTypes.array]),
   testId: PropTypes.string,
   title: PropTypes.string,
   validation: PropTypes.object,
