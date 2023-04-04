@@ -40,7 +40,6 @@ const CollectImportReport = () => {
         )}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
-        rowProps={{ onItemClick }}
         onRowClick={onItemClick}
       />
     </SurveyDefsLoader>
