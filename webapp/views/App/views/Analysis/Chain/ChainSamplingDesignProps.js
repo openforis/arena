@@ -14,6 +14,7 @@ import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
+import { ReportingDataAttributeDefs } from './ReportingDataAttributeDefs'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -37,6 +38,8 @@ export const ChainSamplingDesignProps = (props) => {
           {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />}
 
           <ClusteringEntitySelector />
+
+          <ReportingDataAttributeDefs />
         </>
       )}
     </>

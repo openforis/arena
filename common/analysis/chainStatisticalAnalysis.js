@@ -1,5 +1,3 @@
-import { Objects } from '@openforis/arena-core'
-
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 
@@ -10,8 +8,6 @@ const keys = {
   filter: 'filter',
   nonResponseBiasCorrection: 'nonResponseBiasCorrection',
   pValue: 'pValue',
-  reportingDataCategoryUuid: 'reportingDataCategoryUuid',
-  reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
   reportingMethod: 'reportingMethod',
 }
 
@@ -37,9 +33,6 @@ const getPValue = A.propOr(pValueDefault, keys.pValue)
 
 const isNonResponseBiasCorrection = isPropTrue(keys.nonResponseBiasCorrection)
 
-const getReportingDataCategoryUuid = A.prop(keys.reportingDataCategoryUuid)
-const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
-  Objects.path([keys.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid])
 const getReportingMethod = A.prop(keys.reportingMethod)
 
 const isEmpty = (statisticalAnalysis) =>
@@ -68,20 +61,6 @@ const assocNonResponseBiasCorrection = (nonResponseBiasCorrection) =>
 const assocPValue = (pValue) => A.assoc(keys.pValue, pValue)
 const resetPValue = assocPValue(null)
 
-const dissocReportingDataAttributeDefsByLevelUuid = A.dissoc(keys.reportingDataAttributeDefsByLevelUuid)
-const assocReportingDataCategoryUuid = (reportingDataCategoryUuid) =>
-  A.pipe(
-    dissocReportingDataAttributeDefsByLevelUuid,
-    A.assoc(keys.reportingDataCategoryUuid, reportingDataCategoryUuid)
-  )
-const assocReportingDataAttributeDefUuid =
-  ({ categoryLevelUuid, nodeDefUuid }) =>
-  (statisticalAnalysis) =>
-    Objects.assocPath({
-      obj: statisticalAnalysis,
-      path: [keys.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid],
-      value: nodeDefUuid,
-    })
 const assocReportingMethod = (reportingMethod) => A.assoc(keys.reportingMethod, reportingMethod)
 
 export const ChainStatisticalAnalysis = {
@@ -94,8 +73,6 @@ export const ChainStatisticalAnalysis = {
   getEntityDefUuid,
   getFilter,
   getPValue,
-  getReportingDataAttributeDefUuid,
-  getReportingDataCategoryUuid,
   getReportingMethod,
   isNonResponseBiasCorrection,
   isEmpty,
@@ -107,8 +84,5 @@ export const ChainStatisticalAnalysis = {
   assocNonResponseBiasCorrection,
   assocPValue,
   resetPValue,
-  dissocReportingDataAttributeDefsByLevelUuid,
-  assocReportingDataAttributeDefUuid,
-  assocReportingDataCategoryUuid,
   assocReportingMethod,
 }

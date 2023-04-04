@@ -1,3 +1,5 @@
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 const keysProps = {
@@ -5,6 +7,8 @@ const keysProps = {
   baseUnitNodeDefUuid: 'baseUnitNodeDefUuid',
   clusteringNodeDefUuid: 'clusteringNodeDefUuid',
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
+  reportingDataCategoryUuid: 'reportingDataCategoryUuid',
+  reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
   samplingStrategy: 'samplingStrategy',
   stratumNodeDefUuid: 'stratumNodeDefUuid',
 }
@@ -23,6 +27,9 @@ const isAreaWeightingMethod = isPropTrue(keysProps.areaWeightingMethod)
 const getBaseUnitNodeDefUuid = A.prop(keysProps.baseUnitNodeDefUuid)
 const getClusteringNodeDefUuid = A.prop(keysProps.clusteringNodeDefUuid)
 const getPostStratificationAttributeDefUuid = A.prop(keysProps.postStratificationAttributeDefUuid)
+const getReportingDataCategoryUuid = A.prop(keysProps.reportingDataCategoryUuid)
+const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
+  Objects.path([keysProps.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid])
 const getSamplingStrategy = A.prop(keysProps.samplingStrategy)
 const getStratumNodeDefUuid = A.prop(keysProps.stratumNodeDefUuid)
 
@@ -54,12 +61,12 @@ const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
 const assocPostStratificationAttributeDefUuid = (postStratificationAttributeDefUuid) =>
   A.assoc(keysProps.postStratificationAttributeDefUuid, postStratificationAttributeDefUuid)
 
-const resetPostStratificationAttributeDefUuid = assocPostStratificationAttributeDefUuid(null)
+const resetPostStratificationAttributeDefUuid = A.dissoc(keysProps.postStratificationAttributeDefUuid)
 
 const assocStratumNodeDefUuid = (stratumNodeDefUuid) => (samplingDesign) => {
   let samplingDesignUpdated = A.assoc(keysProps.stratumNodeDefUuid, stratumNodeDefUuid)(samplingDesign)
   if (getPostStratificationAttributeDefUuid(samplingDesignUpdated) === stratumNodeDefUuid) {
-    samplingDesignUpdated = assocPostStratificationAttributeDefUuid(null)(samplingDesignUpdated)
+    samplingDesignUpdated = resetPostStratificationAttributeDefUuid(samplingDesignUpdated)
   }
   return samplingDesignUpdated
 }
@@ -79,6 +86,23 @@ const assocSamplingStrategy = (samplingStrategy) => (samplingDesign) => {
   return samplingDesignUpdated
 }
 
+const dissocReportingDataAttributeDefsByLevelUuid = A.dissoc(keysProps.reportingDataAttributeDefsByLevelUuid)
+
+const assocReportingDataCategoryUuid = (reportingDataCategoryUuid) =>
+  A.pipe(
+    dissocReportingDataAttributeDefsByLevelUuid,
+    A.assoc(keysProps.reportingDataCategoryUuid, reportingDataCategoryUuid)
+  )
+
+const assocReportingDataAttributeDefUuid =
+  ({ categoryLevelUuid, nodeDefUuid }) =>
+  (samplingDesign) =>
+    Objects.assocPath({
+      obj: samplingDesign,
+      path: [keysProps.reportingDataAttributeDefsByLevelUuid, categoryLevelUuid],
+      value: nodeDefUuid,
+    })
+
 export const ChainSamplingDesign = {
   keysProps,
   samplingStrategies,
@@ -88,6 +112,8 @@ export const ChainSamplingDesign = {
   isAreaWeightingMethod,
   getClusteringNodeDefUuid,
   isPostStratificationEnabled,
+  getReportingDataAttributeDefUuid,
+  getReportingDataCategoryUuid,
   isStratificationEnabled,
   isStratificationNotSpecifiedAllowed,
   getPostStratificationAttributeDefUuid,
@@ -99,6 +125,8 @@ export const ChainSamplingDesign = {
   assocBaseUnitNodeDefUuid,
   assocClusteringNodeDefUuid,
   assocPostStratificationAttributeDefUuid,
+  assocReportingDataCategoryUuid,
+  assocReportingDataAttributeDefUuid,
   assocSamplingStrategy,
   assocStratumNodeDefUuid,
 }
