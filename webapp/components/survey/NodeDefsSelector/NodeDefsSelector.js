@@ -27,6 +27,7 @@ const NodeDefsSelector = (props) => {
     showAnalysisAttributes,
     showAncestors,
     showMultipleAttributes,
+    showSingleEntities,
     onChangeAttributes,
     onChangeEntity,
     nodeDefLabelType,
@@ -55,7 +56,7 @@ const NodeDefsSelector = (props) => {
         nodeDefUuidEntity={nodeDefUuidEntity}
         onChange={onChangeEntity}
         nodeDefLabelType={nodeDefLabelType}
-        showSingleEntities={false}
+        showSingleEntities={showSingleEntities}
       />
 
       <ButtonIconFilter
@@ -121,6 +122,7 @@ NodeDefsSelector.propTypes = {
   showAnalysisAttributes: PropTypes.bool,
   showAncestors: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
+  showSingleEntities: PropTypes.bool,
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
@@ -134,6 +136,7 @@ NodeDefsSelector.defaultProps = {
   showAnalysisAttributes: false,
   showAncestors: true,
   showMultipleAttributes: true,
+  showSingleEntities: false,
   onChangeEntity: () => {},
   onChangeAttributes: () => {},
   nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
