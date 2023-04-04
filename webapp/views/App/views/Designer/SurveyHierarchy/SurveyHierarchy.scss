@@ -14,7 +14,7 @@
 
   .survey-hierarchy__center {
     display: grid;
-    grid-template-columns: 1fr 240px;
+    grid-template-columns: 1fr auto;
     height: 100%;
 
     .survey-hierarchy__tree {
@@ -73,7 +73,10 @@
 
     .survey-hierarchy__attributes {
       height: 100%;
-      width: 100%;
+
+      .node-defs-selector {
+        width: 20rem;
+      }
     }
   }
 }
