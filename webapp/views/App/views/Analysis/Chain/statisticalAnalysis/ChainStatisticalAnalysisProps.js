@@ -22,7 +22,6 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { DimensionsSelector } from './DimensionsSelector'
 import { PValueSelector } from '../PValueSelector'
-import { ReportingDataAttributeDefs } from '../ReportingDataAttributeDefs'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()
@@ -184,8 +183,6 @@ export const ChainStatisticalAnalysisProps = () => {
       </FormItem>
 
       {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && <PValueSelector />}
-
-      <ReportingDataAttributeDefs chain={chain} updateStatisticalAnalysis={updateStatisticalAnalysis} />
     </div>
   )
 }

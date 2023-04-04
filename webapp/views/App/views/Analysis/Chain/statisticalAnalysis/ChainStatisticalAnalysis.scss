@@ -20,20 +20,4 @@
   .filter {
     width: 60rem;
   }
-
-  .reporting-data-table-and-joins {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    margin: auto;
-    gap: 1rem;
-
-    .form-item {
-      display: flex;
-
-      .form-label {
-        width: 10rem;
-      }
-    }
-  }
 }
