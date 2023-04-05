@@ -31,6 +31,12 @@ const OptionComponent =
     )
   }
 
+const SingleValueComponent = (reactSelectProps) => {
+  const { children: childrenProp, ...otherProps } = reactSelectProps
+  const children = childrenProp && typeof childrenProp === 'string' ? childrenProp.trim() : childrenProp
+  return <components.SingleValue {...otherProps}>{children}</components.SingleValue>
+}
+
 const Dropdown = (props) => {
   const {
     minCharactersToAutocomplete,
@@ -98,7 +104,7 @@ const Dropdown = (props) => {
       <ReactSelect
         className={classNames('dropdown', className)}
         classNamePrefix="dropdown"
-        components={{ Option: OptionComponent({ renderOptionLabel }) }}
+        components={{ Option: OptionComponent({ renderOptionLabel }), SingleValue: SingleValueComponent }}
         defaultValue={defaultValue}
         filterOption={createFilter({ stringify: (option) => option.label })}
         inputId={inputId}
