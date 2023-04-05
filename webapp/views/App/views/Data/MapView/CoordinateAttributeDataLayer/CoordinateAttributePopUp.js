@@ -14,7 +14,7 @@ import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 import L from 'leaflet'
 
-import { ButtonIconEdit, ButtonIconGear } from '@webapp/components'
+import { Button, ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
@@ -125,7 +125,10 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <ButtonIconGear label="mapView.openInEarthMap" showLabel size="small" onClick={onEarthMapButtonClick} />
+            <Button className="earth-map-btn" size="small" onClick={onEarthMapButtonClick}>
+              <img src="/img/of_earth_map_icon_small.png" alt="Earth Map" />
+              {i18n.t('mapView.openInEarthMap')}
+            </Button>
           </div>
         </div>
       </div>
