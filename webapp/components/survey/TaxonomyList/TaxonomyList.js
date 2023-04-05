@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import Table from '@webapp/components/Table/Table'
 
 import HeaderLeft from './HeaderLeft'
@@ -10,12 +11,27 @@ import Row from './Row'
 const TaxonomyList = (props) => {
   const { canSelect, selectedItemUuid, onSelect: onTaxonomySelect, onTaxonomyOpen, onTaxonomyCreated } = props
 
+  const canEdit = useAuthCanEditSurvey()
+
+  let gridTemplateColumns = 'repeat(2, 1fr) 8rem repeat(2, 6rem)'
+  if (canSelect) {
+    // select button
+    gridTemplateColumns += ' 6rem'
+  }
+  // view/edit button
+  gridTemplateColumns += ' 6rem'
+
+  if (canEdit) {
+    // delete button
+    gridTemplateColumns += ' 6rem'
+  }
+
   return (
     <Table
       module="taxonomies"
       className="taxonomies-list"
       restParams={{ draft: true, validate: true }}
-      gridTemplateColumns="repeat(2, 1fr) repeat(6, 7rem)"
+      gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={HeaderLeft}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}

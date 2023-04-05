@@ -31,6 +31,7 @@ const Row = (props) => {
     <>
       <div>{Taxonomy.getName(taxonomy)}</div>
       <div>{Taxonomy.getDescription(lang)(taxonomy)}</div>
+      <div>{Taxonomy.getExtraPropsDefsArray(taxonomy).length > 0 && <span className="icon icon-checkmark" />}</div>
       <div className="taxonomy-row__badge-container">
         <ErrorBadge validation={taxonomy.validation} />
       </div>
