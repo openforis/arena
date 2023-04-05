@@ -27,6 +27,8 @@ export const reportingDataItemExtraDefKeys = {
   area: 'area',
 }
 
+const samplingUnitsPlanCategoryName = 'sampling_units_plan'
+
 // ========
 // LEVELS
 // ========
@@ -132,3 +134,4 @@ export const newCategory = (props = {}, levels = null) => {
 // UTILS
 export const isLevelDeleteAllowed = (level) => (category) =>
   !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1
+export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
