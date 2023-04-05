@@ -1,7 +1,7 @@
 .access-request {
   z-index: 2;
-  width: 60rem;
-  height: calc(100% - 4rem);
+  height: 100%;
+  max-width: 60rem;
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
@@ -13,12 +13,16 @@
   }
 
   .content {
-    height: 100%;
+    height: calc(100% - 14rem);
     overflow: auto;
 
     .introduction,
     .request-sent-message {
       white-space: pre-line;
+    }
+
+    .introduction {
+      padding: 1rem;
     }
 
     form {
@@ -31,10 +35,24 @@
         .loading-bar {
           position: relative;
         }
+
+        .MuiTextField-root {
+          width: 100%;
+
+          input {
+            padding: 0.4rem 0.6rem;
+          }
+        }
+
+        .tooltip-error {
+          .MuiTextField-root {
+            border: 1px solid red;
+          }
+        }
       }
 
-      input {
-        text-align: left;
+      .required-field-label {
+        width: 95%;
       }
 
       .recaptcha-wrapper {
@@ -55,6 +73,20 @@
       text-align: center;
       line-height: 3rem;
       font-size: 1.2rem;
+    }
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .access-request {
+    .content {
+      height: calc(100% - 7rem);
+    }
+
+    form {
+      .form-item {
+        width: 90%;
+      }
     }
   }
 }
