@@ -127,6 +127,10 @@ $tableHeaderHeight: 30px;
     &:hover {
       background-color: inherit;
     }
+
+    &:disabled {
+      opacity: 0.2;
+    }
   }
 
   .counts {
