@@ -11,18 +11,19 @@ $borderColor: $greyBorder;
 .category__header {
   display: flex;
   gap: 1rem;
+  align-items: center;
 
   .form-item {
     width: 100%;
-
-    &.check {
-      display: flex;
-    }
   }
 
   .btn {
     display: flex;
     align-items: center;
+  }
+
+  .reporting-data-checkbox {
+    width: 17rem;
   }
 
   .import-btn,
