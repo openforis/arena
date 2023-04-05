@@ -46,6 +46,11 @@ export const getSamplingPointDataNodeDefs = (survey) => {
   })(survey)
 }
 
+export const isCategoryUnused = (category) => (survey) =>
+  !Category.isReportingData(category) &&
+  !Category.isSamplingUnitsPlanCategory(category) &&
+  Objects.isEmpty(SurveyNodeDefs.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
+
 // ====== UPDATE
 export const assocCategories = (newCategories) => R.assoc(categories, newCategories)
 
