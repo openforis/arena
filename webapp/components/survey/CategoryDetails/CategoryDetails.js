@@ -128,9 +128,13 @@ const CategoryDetails = (props) => {
           )}
 
           {Category.isReportingData(category) && (
-            <FormItem label={i18n.t('categoryEdit.reportingData')} className="check">
-              <Checkbox checked disabled={readOnly} onChange={Actions.convertToSimpleCategory} />
-            </FormItem>
+            <Checkbox
+              checked
+              className="reporting-data-checkbox"
+              disabled={readOnly}
+              label="categoryEdit.reportingData"
+              onChange={Actions.convertToSimpleCategory}
+            />
           )}
           {!readOnly && !Category.isReportingData(category) && (
             <ButtonMenu
