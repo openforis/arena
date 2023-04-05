@@ -23,13 +23,11 @@ const generateSurveySummary = ({ survey, lang }) => ({
 
 const generateReportingDataCategoryAttributesSummary = ({ survey, category, chain }) => {
   const levels = Category.getLevelsArray(category)
-  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  const samplingDesign = Chain.getSamplingDesign(chain)
 
   return levels.reduce((acc, level, levelIndex) => {
     const categoryLevelUuid = CategoryLevel.getUuid(level)
-    const attributeDefUuid = ChainStatisticalAnalysis.getReportingDataAttributeDefUuid({ categoryLevelUuid })(
-      statisticalAnalysis
-    )
+    const attributeDefUuid = ChainSamplingDesign.getReportingDataAttributeDefUuid({ categoryLevelUuid })(samplingDesign)
     if (!attributeDefUuid) {
       return acc
     }
@@ -97,10 +95,10 @@ const generateReportingDataCategoryItemsSummary = async ({ survey, category, lan
 }
 
 const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => {
-  const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  const samplingDesign = Chain.getSamplingDesign(chain)
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
     surveyId: Survey.getId(survey),
-    categoryUuid: ChainStatisticalAnalysis.getReportingDataCategoryUuid(statisticalAnalysis),
+    categoryUuid: ChainSamplingDesign.getReportingDataCategoryUuid(samplingDesign),
     draft: true,
   })
   if (!category) {
