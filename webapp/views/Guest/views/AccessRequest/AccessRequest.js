@@ -47,7 +47,7 @@ const AccessRequest = () => {
               validation={validation}
             />
           ))}
-          <div className="form-label">* = {i18n.t('common.requiredField')}</div>
+          <div className="form-label required-field-label">{`* = ${i18n.t('common.requiredField')}`}</div>
           <div className="recaptcha-wrapper">
             <ReCaptcha ref={reCaptchaRef} />
           </div>
