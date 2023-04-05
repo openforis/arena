@@ -63,6 +63,14 @@ const CategoryList = (props) => {
       },
       width: '10rem',
     },
+    // Extra props
+    {
+      key: 'extraProps',
+      header: 'extraProp.label_plural',
+      renderItem: ({ item: category }) =>
+        Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
+      width: '8rem',
+    },
   ]
 
   if (canEdit) {
