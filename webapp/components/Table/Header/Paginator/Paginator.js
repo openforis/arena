@@ -42,7 +42,7 @@ const Paginator = (props) => {
       <button
         type="button"
         className="btn btn-transparent"
-        aria-disabled={count < limit || isFirstPage}
+        disabled={count < limit || isFirstPage}
         onClick={() => setOffset(0)}
         title={i18n.t('common.paginator.firstPage')}
       >
@@ -51,7 +51,7 @@ const Paginator = (props) => {
       <button
         type="button"
         className="btn btn-transparent"
-        aria-disabled={isFirstPage}
+        disabled={isFirstPage}
         onClick={() => setOffset(offset - limit)}
         style={{ transform: 'scaleX(-1)' }}
         title={i18n.t('common.paginator.previousPage')}
@@ -66,7 +66,7 @@ const Paginator = (props) => {
       <button
         type="button"
         className="btn btn-transparent"
-        aria-disabled={isLastPage}
+        disabled={isLastPage}
         onClick={() => setOffset(offset + limit)}
         title={i18n.t('common.paginator.nextPage')}
       >
@@ -75,7 +75,7 @@ const Paginator = (props) => {
       <button
         type="button"
         className="btn btn-transparent"
-        aria-disabled={isLastPage}
+        disabled={isLastPage}
         onClick={() => setOffset((totalNoPages - 1) * limit)}
         title={i18n.t('common.paginator.lastPage')}
       >
