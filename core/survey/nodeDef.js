@@ -435,3 +435,6 @@ export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.differenc
 const isEntityAndNotRoot = (nodeDef) => isEntity(nodeDef) && !isRoot(nodeDef)
 export const isDisplayAsEnabled = isEntityAndNotRoot
 export const isDisplayInEnabled = isEntityAndNotRoot
+
+export const canMultipleAttributeBeAggregated = (nodeDef) =>
+  [nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
