@@ -10,6 +10,7 @@ import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { useSurvey } from '@webapp/store/survey'
 import { ExpansionPanel } from '@webapp/components'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 const validationWrapper = (fields) => ({
   valid: false,
@@ -33,10 +34,15 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
         allowExportToCsv
         autoPageSize
         columns={[
-          { field: 'errorKey', flex: 0.3, headerName: i18n.t(errorKeyHeaderName) },
+          {
+            field: 'errorKey',
+            flex: 0.4,
+            headerName: i18n.t(errorKeyHeaderName),
+            renderCell: ({ value }) => <LabelWithTooltip label={value} />,
+          },
           {
             field: 'error',
-            flex: 0.7,
+            flex: 0.6,
             headerName: i18n.t('common.error', { count: errorsCount }),
             renderCell: ({ value }) => (
               <ValidationFieldMessages validation={validationWrapper(value)} showKeys={false} />

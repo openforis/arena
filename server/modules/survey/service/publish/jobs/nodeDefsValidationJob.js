@@ -7,6 +7,20 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '../../../manager/surveyManager'
+import { Promises } from '@openforis/arena-core'
+
+const getNodeDefPath = ({ survey, nodeDef }) => {
+  if (NodeDef.isRoot(nodeDef)) {
+    return NodeDef.getName(nodeDef)
+  }
+  const pathParts = []
+  Survey.visitAncestorsAndSelf(nodeDef, (ancestor) => {
+    if (!NodeDef.isRoot(ancestor)) {
+      pathParts.unshift(NodeDef.getName(ancestor))
+    }
+  })(survey)
+  return pathParts.join('/')
+}
 
 export default class NodeDefsValidationJob extends Job {
   constructor(params) {
@@ -14,31 +28,33 @@ export default class NodeDefsValidationJob extends Job {
   }
 
   async execute() {
-    const survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
-    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
-    for (const cycle of cycleKeys) {
-      const surveyAndNodeDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    const { errors, surveyId, tx } = this
+    const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
+    const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
+
+    await Promises.each(cycleKeys, async (cycle) => {
+      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         {
-          surveyId: this.surveyId,
+          surveyId,
           cycle,
           draft: true,
           advanced: true,
           validate: true,
         },
-        this.tx
+        tx
       )
 
       R.pipe(
         Survey.getNodeDefsValidation,
         Validation.getFieldValidations,
         R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
-          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(surveyAndNodeDefs)
-          this.errors[NodeDef.getName(nodeDef)] = Validation.getFieldValidations(nodeDefValidation)
+          const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+          errors[getNodeDefPath({ survey, nodeDef })] = Validation.getFieldValidations(nodeDefValidation)
         })
-      )(surveyAndNodeDefs)
-    }
+      )(survey)
+    })
 
-    if (!R.isEmpty(this.errors)) {
+    if (!R.isEmpty(errors)) {
       await this.setStatusFailed()
     }
   }
