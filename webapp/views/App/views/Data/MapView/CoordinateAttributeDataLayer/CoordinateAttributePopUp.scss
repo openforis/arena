@@ -7,6 +7,7 @@
     flex-direction: column;
     height: auto;
     gap: 0.5rem;
+    margin-top: 12px;
 
     div[role='row'] {
       display: flex;
@@ -18,6 +19,11 @@
       padding: 0.6rem 0.6rem;
       white-space: nowrap;
     }
-    margin-top: 12px;
+
+    .earth-map-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
   }
 }
