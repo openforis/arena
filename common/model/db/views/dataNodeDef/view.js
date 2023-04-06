@@ -80,7 +80,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
         this.nodeDef,
         true
       )(this.survey)
-        .filter(NodeDef.isMultipleAttribute)
+        .filter((nodeDef) => NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef))
         .map((multAttrDef) => new ColumnNodeDef(this.tableData, multAttrDef))
     )
     // parent view columns
