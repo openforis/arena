@@ -6,9 +6,6 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as SQL from '../../../../../common/model/db/sql'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
 
-const _canMultipleNodeDefBeAggregated = (nodeDef) =>
-  NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef) || NodeDef.isText(nodeDef)
-
 const _getMultipleAttributeInnerSelect = ({ viewDataNodeDef, columnNodeDef }) => {
   const { survey, tableData } = viewDataNodeDef
 
@@ -29,7 +26,7 @@ const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
         return [`${tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
     } else if (NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
-      if (_canMultipleNodeDefBeAggregated(columnNodeDef.nodeDef)) {
+      if (NodeDef.canMultipleAttributeBeAggregated(columnNodeDef.nodeDef)) {
         return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
       } else {
         // skip multiple attributes that cannot be aggregated into a single column yet
