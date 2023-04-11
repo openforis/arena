@@ -7,24 +7,14 @@ import * as StringUtils from '@core/stringUtils'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
+import { nodeDefType } from './nodeDefType'
 import * as NodeDefLayout from './nodeDefLayout'
 import * as NodeDefValidations from './nodeDefValidations'
+import { valuePropsTaxon } from './nodeValueProps'
 
 // ======== NODE DEF PROPERTIES
 
-export const nodeDefType = {
-  integer: 'integer',
-  decimal: 'decimal',
-  text: 'text',
-  date: 'date',
-  time: 'time',
-  boolean: 'boolean',
-  code: 'code',
-  coordinate: 'coordinate',
-  taxon: 'taxon',
-  file: 'file',
-  entity: 'entity',
-}
+export { nodeDefType }
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -81,6 +71,7 @@ export const propKeys = {
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
   vernacularNameLabels: 'vernacularNameLabels',
+  visibleFields: 'visibleFields',
 
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
@@ -132,6 +123,12 @@ const metaKeys = {
 
 export const maxKeyAttributes = 3
 const MAX_FILE_SIZE_DEFAULT = 10
+
+const taxonVisibleFieldsDefault = JSON.stringify([
+  valuePropsTaxon.code,
+  valuePropsTaxon.scientificName,
+  valuePropsTaxon.vernacularName,
+])
 
 // ==== READ
 
@@ -200,6 +197,7 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
 export const getVernacularNameLabel = (lang) => (nodeDef) => getVernacularNameLabels(nodeDef)[lang]
+export const getVisibleFields = getProp(propKeys.visibleFields, taxonVisibleFieldsDefault)
 // text
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
@@ -438,3 +436,5 @@ export const isDisplayInEnabled = isEntityAndNotRoot
 
 export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
+
+export { taxonVisibleFieldsDefault }

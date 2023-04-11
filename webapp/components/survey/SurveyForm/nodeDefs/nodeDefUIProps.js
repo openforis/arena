@@ -91,11 +91,11 @@ const propsUI = {
       { field: 'code', labelKey: 'common.code' },
       {
         field: 'scientific_name',
-        labelKey: 'surveyForm.nodeDefTaxon.scientificName',
+        labelKey: 'surveyForm.nodeDefTaxon.field.scientificName',
       },
       {
         field: 'vernacular_name',
-        labelKey: 'surveyForm.nodeDefTaxon.vernacularName',
+        labelKey: 'surveyForm.nodeDefTaxon.field.vernacularName',
       },
     ],
   },

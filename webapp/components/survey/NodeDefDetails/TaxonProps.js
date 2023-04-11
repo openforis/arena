@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
@@ -22,6 +23,17 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { State } from './store'
 
+const valueProps = Node.valuePropsTaxon
+
+const visibleFieldsCombinations = [
+  NodeDef.taxonVisibleFieldsDefault,
+  [valueProps.code, valueProps.scientificName],
+  [valueProps.scientificName],
+  [valueProps.scientificName, valueProps.vernacularName],
+]
+
+const visibleFieldsDropdownItems = visibleFieldsCombinations.map(JSON.stringify)
+
 const TaxonProps = (props) => {
   const { state, Actions } = props
 
@@ -37,8 +49,11 @@ const TaxonProps = (props) => {
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
-  const onTaxonomySelect = (taxonomySelected) =>
-    Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) })
+  const onTaxonomySelect = useCallback(
+    (taxonomySelected) =>
+      Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) }),
+    [Actions, state]
+  )
 
   const itemsLookupFunction = async (value) => API.fetchTaxonomies({ surveyId, search: value })
 
@@ -51,7 +66,7 @@ const TaxonProps = (props) => {
         setTaxonomy(null)
       }
     })()
-  }, [taxonomyUuid, showTaxonomiesPanel])
+  }, [taxonomyUuid, showTaxonomiesPanel, surveyId])
 
   const onTaxonomyEditPanelClose = useCallback(async () => {
     const taxonomyEditedUuid = taxonomyToEdit.uuid
@@ -67,11 +82,16 @@ const TaxonProps = (props) => {
       onTaxonomySelect(taxonomyToEdit)
     }
     setTaxonomyToEdit(null)
-  }, [taxonomyToEdit])
+  }, [onTaxonomySelect, surveyId, taxonomyToEdit, taxonomyUuid])
+
+  const visibleFieldsLabelFunction = (fields) =>
+    JSON.parse(fields)
+      .map((field) => i18n.t(`surveyForm.nodeDefTaxon.field.${field}`))
+      .join(', ')
 
   return (
     <>
-      <FormItem label="Taxonomy">
+      <FormItem label={i18n.t('taxonomy.header')}>
         <div className="taxonomy-selector">
           <Dropdown
             items={itemsLookupFunction}
@@ -94,9 +114,18 @@ const TaxonProps = (props) => {
         </div>
       </FormItem>
 
+      <FormItem label={i18n.t('surveyForm.nodeDefTaxon.visibleFields')}>
+        <Dropdown
+          items={visibleFieldsDropdownItems}
+          itemLabel={visibleFieldsLabelFunction}
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.visibleFields, value })}
+          selection={NodeDef.getVisibleFields(nodeDef)}
+        />
+      </FormItem>
+
       <LabelsEditor
         formLabelKey="taxonomy.vernacularNameLabel"
-        placeholder="surveyForm.nodeDefTaxon.vernacularName"
+        placeholder="surveyForm.nodeDefTaxon.field.vernacularName"
         labels={NodeDef.getVernacularNameLabels(nodeDef)}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
       />
