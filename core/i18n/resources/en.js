@@ -997,6 +997,8 @@ $t(common.cantUndoWarning)`,
   expression: {
     invalid: 'Invalid expression: {{details}}',
     undefinedFunction: 'Undefined function: {{name}}',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
   },
 
   // ====== Help views
