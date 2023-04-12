@@ -79,7 +79,11 @@ describe('Applicable Test', () => {
       global.applicableRecord = Record.mergeNodes(nodesUpdated)(record)
 
       // Update dependent nodes
-      const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+      const { record: recordUpdate } = await RecordManager.updateNodesDependents({
+        survey,
+        record,
+        nodes: nodesUpdated,
+      })
       global.applicableRecord = recordUpdate
 
       const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)

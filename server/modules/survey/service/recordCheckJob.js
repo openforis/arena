@@ -21,7 +21,8 @@ export default class RecordCheckJob extends Job {
     super(RecordCheckJob.type, params)
 
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
-    this.nodesBatchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
+    this.nodesBatchInserter = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
+    this.nodesBatchUpdater = new BatchPersister(this.nodesBatchUpdateHandler.bind(this), 2500)
   }
 
   async onStart() {
@@ -132,33 +133,46 @@ export default class RecordCheckJob extends Job {
       record = recordDeletedNodes || record
     }
 
-    const nodesToValidate = {}
-    let missingNodes = {}
+    const nodesInsertedByUuid = {}
+    const allUpdatedNodesByUuid = {}
 
     // 3. insert missing nodes
     if (!R.isEmpty(nodeDefAddedUuids)) {
-      const { record: recordUpdateInsert, nodes: missingNodesInserted = {} } = await this._insertMissingSingleNodes({
+      const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
         survey,
         nodeDefAddedUuids,
         record,
       })
       record = recordUpdateInsert || record
-      missingNodes = missingNodesInserted
-      Object.assign(nodesToValidate, missingNodesInserted)
+      Object.assign(nodesInsertedByUuid, nodesUpdatedMissing)
+      Object.assign(allUpdatedNodesByUuid, nodesUpdatedMissing)
     }
 
     // 4. apply default values and recalculate applicability
-    if (!R.isEmpty(nodeDefUpdatedUuids) || !R.isEmpty(missingNodes)) {
+    const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
+
+    if (!R.isEmpty(nodeDefUpdatedUuids) || !R.isEmpty(nodesInsertedByUuid)) {
       const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(
         survey,
-        nodeDefUpdatedUuids,
+        nodeDefAddedOrUpdatedUuids,
         record,
-        missingNodes,
+        nodesInsertedByUuid,
         this.tx
       )
       record = recordUpdate || record
-      Object.assign(nodesToValidate, nodesUpdatedDefaultValues)
+      Object.assign(allUpdatedNodesByUuid, nodesUpdatedDefaultValues)
     }
+
+    // 4a. Persist nodes
+    const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
+    const nodesCreatedArray = allUpdatedNodesArray.filter(Node.isCreated)
+    await PromiseUtils.each(nodesCreatedArray, async (node) => {
+      this.nodesBatchInserter.addItem(node, this.tx)
+    })
+    const nodesUpdatedArray = allUpdatedNodesArray.filter((node) => Node.isUpdated(node) && !Node.isCreated(node))
+    await PromiseUtils.each(nodesUpdatedArray, async (node) => {
+      this.nodesBatchUpdater.addItem(node, this.tx)
+    })
 
     // 5. clear record keys validation (record keys validation performed after RDB generation)
     record = _clearRecordKeysValidation(record)
@@ -169,12 +183,11 @@ export default class RecordCheckJob extends Job {
       return { ...nodesByUuid, ...ObjectUtils.toUuidIndexedObj(nodes) }
     }, {})
 
-    Object.assign(nodesToValidate, newNodes)
+    Object.assign(allUpdatedNodesByUuid, newNodes)
 
-    const nodeDefAddedOrUpdatedUuids = R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids)
-    if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(nodesToValidate)) {
+    if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(allUpdatedNodesByUuid)) {
       // this.logDebug(`validating record ${recordUuid}`)
-      await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, nodesToValidate, this.tx)
+      await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, allUpdatedNodesByUuid, this.tx)
     }
     // this.logDebug('record check complete')
   }
@@ -200,21 +213,23 @@ export default class RecordCheckJob extends Job {
         recordUpdated = recordUpdatedNodeInsert || recordUpdated
       })
     })
-    const nodesAddedArray = Object.values(nodesUpdated).filter(Node.isCreated)
-    await PromiseUtils.each(nodesAddedArray, async (node) => {
-      this.nodesBatchPersister.addItem(node, this.tx)
-    })
-
     return { record: recordUpdated, nodes: nodesUpdated }
   }
 
   async nodesBatchInsertHandler(nodesArray, tx) {
-    await RecordManager.insertNodesInBulk({ user: this.user, surveyId: this.surveyId, nodesArray }, tx)
+    const { user, surveyId } = this
+    await RecordManager.insertNodesInBulk({ user, surveyId, nodesArray }, tx)
+  }
+
+  async nodesBatchUpdateHandler(nodesArray, tx) {
+    const { user, surveyId } = this
+    await RecordManager.updateNodes({ user, surveyId, nodes: nodesArray }, tx)
   }
 
   async beforeSuccess() {
     super.beforeSuccess()
-    await this.nodesBatchPersister.flush(this.tx)
+    await this.nodesBatchInserter.flush(this.tx)
+    await this.nodesBatchUpdater.flush(this.tx)
   }
 }
 
@@ -248,7 +263,7 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
     })
   })
 
-  return RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
+  return RecordManager.updateNodesDependents({ survey, record, nodes: nodesToUpdate, perstistNodes: false }, tx)
 }
 
 const _clearRecordKeysValidation = (record) => {
