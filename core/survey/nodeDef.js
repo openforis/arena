@@ -124,11 +124,7 @@ const metaKeys = {
 export const maxKeyAttributes = 3
 const MAX_FILE_SIZE_DEFAULT = 10
 
-const taxonVisibleFieldsDefault = JSON.stringify([
-  valuePropsTaxon.code,
-  valuePropsTaxon.scientificName,
-  valuePropsTaxon.vernacularName,
-])
+const taxonVisibleFieldsDefault = [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName]
 
 // ==== READ
 

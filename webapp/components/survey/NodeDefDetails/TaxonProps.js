@@ -25,14 +25,12 @@ import { State } from './store'
 
 const valueProps = Node.valuePropsTaxon
 
-const visibleFieldsCombinations = [
+const visibleFieldsDropdownItems = [
   NodeDef.taxonVisibleFieldsDefault,
   [valueProps.code, valueProps.scientificName],
   [valueProps.scientificName],
   [valueProps.scientificName, valueProps.vernacularName],
 ]
-
-const visibleFieldsDropdownItems = visibleFieldsCombinations.map(JSON.stringify)
 
 const TaxonProps = (props) => {
   const { state, Actions } = props
@@ -85,9 +83,7 @@ const TaxonProps = (props) => {
   }, [onTaxonomySelect, surveyId, taxonomyToEdit, taxonomyUuid])
 
   const visibleFieldsLabelFunction = (fields) =>
-    JSON.parse(fields)
-      .map((field) => i18n.t(`surveyForm.nodeDefTaxon.field.${field}`))
-      .join(', ')
+    fields.map((field) => i18n.t(`surveyForm.nodeDefTaxon.field.${field}`)).join(', ')
 
   return (
     <>
@@ -118,6 +114,7 @@ const TaxonProps = (props) => {
         <Dropdown
           items={visibleFieldsDropdownItems}
           itemLabel={visibleFieldsLabelFunction}
+          itemValue={JSON.stringify}
           onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.visibleFields, value })}
           selection={NodeDef.getVisibleFields(nodeDef)}
         />
