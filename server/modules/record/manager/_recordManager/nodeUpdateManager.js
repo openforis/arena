@@ -141,7 +141,7 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
-export const updateNodesDependents = async (survey, record, nodes, tx) => {
+export const updateNodesDependents = async ({ survey, record, nodes, persistNodes = true }, tx) => {
   const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
@@ -152,7 +152,7 @@ export const updateNodesDependents = async (survey, record, nodes, tx) => {
   let recordUpdated = recordUpdatedDependents
 
   // persist updates in batch
-  if (!R.isEmpty(nodesUpdated)) {
+  if (persistNodes && !R.isEmpty(nodesUpdated)) {
     const nodesArray = Object.values(nodesUpdated)
     const surveyId = Survey.getId(survey)
     await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
