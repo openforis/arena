@@ -33,6 +33,7 @@ import {
 import { RFileCommon, RFileCommonEnd } from './rFile/user'
 import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
 
+const FILE_R_PROFILE = FileUtils.join(__dirname, 'rFile', '.Rprofile')
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
 class RChain {
@@ -216,6 +217,7 @@ class RChain {
   async _initFiles() {
     // Init root files
     this._fileArena = FileUtils.join(this._dir, 'arena.R')
+    this._fileRProfile = FileUtils.join(this._dir, '.Rprofile')
     this._fileRStudioProject = FileUtils.join(this._dir, 'r_studio_project.Rproj')
     this._fileChainSummaryJsonPath = await FileChainSummaryJson.initFile({
       dir: this.dir,
@@ -226,6 +228,7 @@ class RChain {
 
     await Promise.all([
       FileUtils.appendFile(this._fileArena),
+      FileUtils.copyFile(FILE_R_PROFILE, this._fileRProfile),
       FileUtils.copyFile(FILE_R_STUDIO_PROJECT, this._fileRStudioProject),
     ])
 
