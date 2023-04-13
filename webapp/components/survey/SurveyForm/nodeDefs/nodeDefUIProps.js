@@ -3,6 +3,7 @@ import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { valuePropsTaxon } from '@core/survey/nodeValueProps'
 
 import { NumberFormats } from '@webapp/components/form/Input'
 
@@ -88,14 +89,16 @@ const propsUI = {
       vernacularNameUuid: null,
     },
     formFields: [
-      { field: 'code', labelKey: 'common.code' },
+      { field: valuePropsTaxon.code, labelKey: 'common.code', tableColumnFlex: 2 },
       {
-        field: 'scientific_name',
-        labelKey: 'surveyForm.nodeDefTaxon.field.scientificName',
+        field: valuePropsTaxon.scientificName,
+        labelKey: 'surveyForm.nodeDefTaxon.scientificName',
+        tableColumnFlex: 5,
       },
       {
-        field: 'vernacular_name',
-        labelKey: 'surveyForm.nodeDefTaxon.field.vernacularName',
+        field: valuePropsTaxon.vernacularName,
+        labelKey: 'surveyForm.nodeDefTaxon.vernacularName',
+        tableColumnFlex: 3,
       },
     ],
   },
@@ -135,6 +138,12 @@ export const getComponent = getProp('component', NodeDefText)
 export const getFormFields = getProp('formFields', ['field'])
 
 export const getFormFieldsLength = (nodeDef) => getFormFields(nodeDef).length
+
+export const getTableColumnFlex = (field) => (nodeDef) => {
+  const formFields = getFormFields(nodeDef)
+  const formField = formFields.find((formField) => formField.field === field)
+  return formField?.tableColumnFlex || 1
+}
 
 export const getDefaultValue = getProp('defaultValue')
 

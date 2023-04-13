@@ -124,7 +124,9 @@ const metaKeys = {
 export const maxKeyAttributes = 3
 const MAX_FILE_SIZE_DEFAULT = 10
 
-const taxonVisibleFieldsDefault = [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName]
+export const visibleFieldsDefaultByType = {
+  [nodeDefType.taxon]: [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName],
+}
 
 // ==== READ
 
@@ -193,7 +195,10 @@ export const getCategoryUuid = getProp(propKeys.categoryUuid)
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
 export const getVernacularNameLabel = (lang) => (nodeDef) => getVernacularNameLabels(nodeDef)[lang]
-export const getVisibleFields = getProp(propKeys.visibleFields, taxonVisibleFieldsDefault)
+export const getVisibleFields = (nodeDef) => {
+  const visibleFieldsDefault = visibleFieldsDefaultByType[getType(nodeDef)]
+  return getProp(propKeys.visibleFields, visibleFieldsDefault)(nodeDef)
+}
 // text
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
@@ -432,5 +437,3 @@ export const isDisplayInEnabled = isEntityAndNotRoot
 
 export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
-
-export { taxonVisibleFieldsDefault }

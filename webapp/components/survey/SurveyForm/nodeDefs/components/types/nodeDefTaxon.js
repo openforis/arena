@@ -14,9 +14,10 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as StringUtils from '@core/stringUtils'
 
-import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
-import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 import { TestId } from '@webapp/utils/testId'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon
 
@@ -35,6 +36,7 @@ const NodeDefTaxon = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const taxonRefData = edit ? null : NodeRefData.getTaxon(node)
+  const visibleFields = NodeDef.getVisibleFields(nodeDef)
 
   const updateSelectionFromNode = () => {
     const unlisted = taxonRefData && Taxon.isUnlistedTaxon(taxonRefData)
@@ -52,24 +54,28 @@ const NodeDefTaxon = (props) => {
   const updateNodeValue = (nodeValue, taxon = null) =>
     updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
 
-  const onChangeTaxon = (taxon) => {
-    if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
+  const onChangeTaxon = (selectedTaxon) => {
+    if (
+      selectedTaxon &&
+      (!Taxon.isEqual(selectedTaxon)(taxonRefData) ||
+        Taxon.getVernacularNameUuid(selectedTaxon) !== Taxon.getVernacularNameUuid(taxonRefData))
+    ) {
       const nodeValue = {
-        [taxonUuid]: Taxon.getUuid(taxon),
+        [taxonUuid]: Taxon.getUuid(selectedTaxon),
       }
-      if (Taxon.isUnlistedTaxon(taxon)) {
+      if (Taxon.isUnlistedTaxon(selectedTaxon)) {
         if (selection[scientificName]) {
           nodeValue[scientificName] = selection[scientificName]
         }
         if (selection[vernacularName]) {
           nodeValue[vernacularName] = selection[vernacularName]
         }
-        if (Taxon.getVernacularNameUuid(taxon)) {
-          nodeValue[vernacularNameUuid] = Taxon.getVernacularNameUuid(taxon)
-        }
+      }
+      if (Taxon.getVernacularNameUuid(selectedTaxon)) {
+        nodeValue[vernacularNameUuid] = Taxon.getVernacularNameUuid(selectedTaxon)
       }
 
-      updateNodeValue(nodeValue, taxon)
+      updateNodeValue(nodeValue, selectedTaxon)
     } else {
       // Reset to last node value
       updateSelectionFromNode()
@@ -98,6 +104,7 @@ const NodeDefTaxon = (props) => {
   if (!edit) {
     useEffect(updateSelectionFromNode, [
       Taxon.getUuid(taxonRefData),
+      Taxon.getVernacularNameUuid(taxonRefData),
       Node.getScientificName(node),
       Node.getVernacularName(node),
     ])
@@ -110,7 +117,7 @@ const NodeDefTaxon = (props) => {
 
   return (
     <div className={className} ref={elementRef}>
-      {R.keys(selectionDefault).map((field) => {
+      {visibleFields.map((field) => {
         const inputField = (
           <NodeDefTaxonInputField
             id={TestId.surveyForm.taxonField(NodeDef.getName(nodeDef), field)}
@@ -130,7 +137,11 @@ const NodeDefTaxon = (props) => {
         )
 
         if (isTableBody) {
-          return inputField
+          return (
+            <div key={field} style={{ flex: NodeDefUIProps.getTableColumnFlex(field)(nodeDef) }}>
+              {inputField}
+            </div>
+          )
         }
         const fieldLabelKey =
           (field === vernacularName ? NodeDef.getVernacularNameLabel(lang)(nodeDef) : null) ||

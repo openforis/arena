@@ -26,7 +26,7 @@ import { State } from './store'
 const valueProps = Node.valuePropsTaxon
 
 const visibleFieldsDropdownItems = [
-  NodeDef.taxonVisibleFieldsDefault,
+  NodeDef.visibleFieldsDefaultByType[NodeDef.nodeDefType.taxon],
   [valueProps.code, valueProps.scientificName],
   [valueProps.scientificName],
   [valueProps.scientificName, valueProps.vernacularName],
@@ -83,7 +83,7 @@ const TaxonProps = (props) => {
   }, [onTaxonomySelect, surveyId, taxonomyToEdit, taxonomyUuid])
 
   const visibleFieldsLabelFunction = (fields) =>
-    fields.map((field) => i18n.t(`surveyForm.nodeDefTaxon.field.${field}`)).join(', ')
+    fields.map((field) => i18n.t(`surveyForm.nodeDefTaxon.${field}`)).join(', ')
 
   return (
     <>
@@ -122,7 +122,7 @@ const TaxonProps = (props) => {
 
       <LabelsEditor
         formLabelKey="taxonomy.vernacularNameLabel"
-        placeholder="surveyForm.nodeDefTaxon.field.vernacularName"
+        placeholder="surveyForm.nodeDefTaxon.vernacularName"
         labels={NodeDef.getVernacularNameLabels(nodeDef)}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
       />

@@ -99,7 +99,7 @@ const NodeDefEntityTableCell = (props) => {
   const onResizeStop = (_e, { size }) => {
     const { width } = size
 
-    const fieldWidth = Math.ceil(width / NodeDefUiProps.getFormFieldsLength(nodeDef))
+    const fieldWidth = Math.ceil(width / fieldsLength)
     if (!fieldWidth || fieldWidth < NodeDefLayout.columnWidthMinPx) return
 
     dispatch(
