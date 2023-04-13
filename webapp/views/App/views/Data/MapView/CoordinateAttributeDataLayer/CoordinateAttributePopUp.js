@@ -77,13 +77,20 @@ export const CoordinateAttributePopUp = (props) => {
   }, [flyToPreviousPoint, pointFeature])
 
   const onEarthMapButtonClick = useCallback(() => {
+    const { y: latitude, x: longitude } = pointLatLong
     let geojson
-    const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
-    if (isCircle) {
-      const radius = SamplingPolygon.getRadius(surveyInfo)
-      geojson = circleToPolygon([pointLatLong.x, pointLatLong.y], radius)
+    if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
+      const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
+      if (isCircle) {
+        const radius = SamplingPolygon.getRadius(surveyInfo)
+        geojson = circleToPolygon([longitude, latitude], radius)
+      } else {
+        const bounds = SamplingPolygon.getBounds(surveyInfo, latitude, longitude)
+        geojson = L.rectangle(bounds).toGeoJSON()
+      }
     } else {
-      const bounds = SamplingPolygon.getBounds(surveyInfo, pointLatLong.y, pointLatLong.x)
+      // default 100mx100m square
+      const bounds = SamplingPolygon.generateBounds({ latitude, longitude })
       geojson = L.rectangle(bounds).toGeoJSON()
     }
     const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
