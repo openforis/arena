@@ -2,6 +2,7 @@ import { Objects, RecordNodesUpdater } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -50,9 +51,10 @@ export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActi
 }
 
 export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity = false }, tx) => {
-  await NodeRepository.insertNodesInBatch({ surveyId, nodes }, tx)
+  const nodesInserted = await NodeRepository.insertNodesInBatch({ surveyId, nodes }, tx)
   const activities = nodes.map((node) => ActivityLog.newActivity(ActivityLog.type.nodeCreate, node, systemActivity))
   await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+  return nodesInserted
 }
 
 export const insertNode = async (
@@ -89,10 +91,11 @@ export const insertNode = async (
     recordUpdated = descendantsCreateResult.record
   }
 
-  const nodesArray = Object.values(nodesCreated)
-  if (persistNodes) {
-    await insertNodesInBatch({ user, surveyId, nodes: nodesArray, systemActivity: system }, t)
-  }
+  const nodesInserted = persistNodes
+    ? ObjectUtils.toUuidIndexedObj(
+        await insertNodesInBatch({ user, surveyId, nodes: Object.values(nodesCreated), systemActivity: system }, t)
+      )
+    : nodesCreated
 
-  return _createUpdateResult(recordUpdated, node, nodesCreated)
+  return _createUpdateResult(recordUpdated, node, nodesInserted)
 }

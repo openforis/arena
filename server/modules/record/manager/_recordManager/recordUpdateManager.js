@@ -277,7 +277,7 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
-    await NodeUpdateManager.updateNodesDependents(survey, record, nodesUpdated, t)
+    await NodeUpdateManager.updateNodesDependents({ survey, record, nodes: nodesUpdated }, t)
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }
