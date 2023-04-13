@@ -2,9 +2,13 @@ import React from 'react'
 import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import * as Survey from '@core/survey/survey'
+
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -25,11 +29,14 @@ export const CoordinateAttributeMarker = (props) => {
   const { ancestorsKeys, key } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
+  const surveyInfo = useSurveyInfo()
   const { markerRef, showMarkersLabels } = useLayerMarker({ key, popupOpen, setMarkerByKey })
 
   return (
     <div>
-      <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
+      {Survey.isSampleBasedImageInterpretationEnabled(surveyInfo) && (
+        <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
+      )}
       <CircleMarker
         ref={(ref) => {
           markerRef.current = ref
