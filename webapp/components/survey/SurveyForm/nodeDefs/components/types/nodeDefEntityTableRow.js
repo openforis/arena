@@ -131,24 +131,22 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     <div ref={rowRef} className={className} data-testid={id} id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
       {nodeDefColumns
         .filter((nodeDefChild) => !isChildHidden(nodeDefChild))
-        .map((nodeDefChild) => {
-          return (
-            <NodeDefEntityTableCell
-              key={nodeDefChild.uuid}
-              {...props}
-              nodeDef={nodeDefChild}
-              parentNode={node}
-              draggable={draggable}
-              renderType={renderType}
-              resizable={resizable}
-              onDragStart={dragStart}
-              onDragOver={dragOver}
-              onDragEnd={dragEnd}
-              onResizeStart={onChildResizeStart}
-              onResizeStop={onChildResizeStop}
-            />
-          )
-        })}
+        .map((nodeDefChild) => (
+          <NodeDefEntityTableCell
+            key={nodeDefChild.uuid}
+            {...props}
+            nodeDef={nodeDefChild}
+            parentNode={node}
+            draggable={draggable}
+            renderType={renderType}
+            resizable={resizable}
+            onDragStart={dragStart}
+            onDragOver={dragOver}
+            onDragEnd={dragEnd}
+            onResizeStart={onChildResizeStart}
+            onResizeStop={onChildResizeStop}
+          />
+        ))}
 
       {
         // placeholder used for drag&drop (during survey editing)

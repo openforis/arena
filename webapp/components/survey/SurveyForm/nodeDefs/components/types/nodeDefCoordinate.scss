@@ -18,15 +18,3 @@
     }
   }
 }
-
-.survey-form__node-def-table-cell-coordinate {
-  .subfields-labels-wrapper,
-  &.survey-form__node-def-table-cell-composite {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-
-    &.with-map {
-      grid-template-columns: repeat(3, auto) 30px;
-    }
-  }
-}

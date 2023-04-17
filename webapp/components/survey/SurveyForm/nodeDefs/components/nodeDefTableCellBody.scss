@@ -25,6 +25,7 @@
 }
 
 .survey-form__node-def-table-cell-composite {
+  display: flex;
   height: 100%;
 
   > div:not(:last-child) > :first-child {

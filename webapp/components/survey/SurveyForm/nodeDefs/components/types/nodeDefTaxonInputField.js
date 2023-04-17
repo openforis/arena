@@ -38,7 +38,7 @@ const NodeDefTaxonInputField = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <Input
         id={id}
         ref={inputRef}
@@ -61,7 +61,7 @@ const NodeDefTaxonInputField = (props) => {
           autocompleteSourceElement={autocompleteSourceElement}
         />
       )}
-    </React.Fragment>
+    </>
   )
 }
 
