@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { valuePropsTaxon } from '@core/survey/nodeValueProps'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
@@ -17,12 +18,15 @@ const NodeDefTableCellHeader = (props) => {
 
   const i18n = useI18n()
 
-  const fields = NodeDefUiProps.getFormFields(nodeDef)
+  const visibleFields = NodeDef.getVisibleFields(nodeDef)
+  const fields = NodeDefUiProps.getFormFields(nodeDef).filter(
+    (field) => !visibleFields || visibleFields.includes(field.field)
+  )
 
   const getFieldLabelKey = ({ field }) => {
     let labelKey = null
     // use custom field label
-    if (NodeDef.isTaxon(nodeDef) && field.field === 'vernacular_name') {
+    if (NodeDef.isTaxon(nodeDef) && field.field === valuePropsTaxon.vernacularName) {
       labelKey = NodeDef.getVernacularNameLabel(lang)(nodeDef)
     }
     return labelKey || field.labelKey
@@ -42,7 +46,11 @@ const NodeDefTableCellHeader = (props) => {
       {fields.length > 1 && (
         <div className="subfields-labels-wrapper">
           {fields.map((field) => (
-            <div key={field.field} className="label">
+            <div
+              key={field.field}
+              className={`label ${field.field}`}
+              style={{ flex: NodeDefUiProps.getTableColumnFlex(field.field)(nodeDef) }}
+            >
               {i18n.t(getFieldLabelKey({ field }))}
             </div>
           ))}

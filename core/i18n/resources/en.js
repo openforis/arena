@@ -1222,6 +1222,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       code: '$t(common.code)',
       scientificName: 'Scientific name',
       vernacularName: 'Vernacular name',
+      visibleFields: 'Visible fields',
     },
     nodeDefFile: {
       errorLoadingPreview: 'Error loading preview',
