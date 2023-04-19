@@ -938,29 +938,22 @@ $t(common.cantUndoWarning)`,
     deleteComplete: 'Processing chain deleted',
     cannotSelectNodeDefNotBelongingToCycles: `The node definition "{{label}}" cannot be selected because it doesn't belong to all cycles of the processing chain`,
     cannotSelectCycle: 'This cycle cannot be selected because some node definitions do not belong to this cycle',
-    copyRStudioCode: `#### You are about to open an RStudio Server ####
-    
-    \n
+    copyRStudioCode: `#### You are about to open an RStudio Server ####  
 
-###### Click then OK button a RStudio Server is opened and these commands are copied to your clipboard. ######  
+##### Click the OK button and these commands will be copied to your clipboard. #####  
 
-###### Once the RStudio console is active, paste and run these lines to import the chain code. ###### 
-
-\n
+###### RStudio Server will be opened; once the RStudio console is active, paste and run the following lines to import the chain code: ######  
 
 {{rStudioCode}}
-
 `,
-    copyRStudioCodeLocal: `#### You are about to open an RStudio Server ####
+    copyRStudioCodeLocal: `#### Processing chain to RStudio ####  
 
-\n
+###### Click the OK button and these commands will be copied to your clipboard. ######  
 
-###### Click then OK button and these commands are copied to your clipboard. ###### 
+###### Start RStudio in your machine (you should have package 'rstudioapi' installed). ######  
 
-###### Start RStudio in your machine. You should have package 'rstudioapi' installed. ###### 
+###### Once the RStudio console is active, paste and run the following lines to import the chain code: ######  
 
-###### Once the RStudio console is active, paste and run these lines to import the chain code. ###### 
-\n
 
 {{rStudioCode}}
 
