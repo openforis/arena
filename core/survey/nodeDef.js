@@ -76,6 +76,9 @@ export const propKeys = {
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
   fileType: 'fileType',
+
+  // Coordinate
+  allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
 }
 
 export const textTransformValues = {
@@ -213,9 +216,13 @@ export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 
+// Boolean
 export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
 export const isBooleanLabelYesNo = (nodeDef) =>
   isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
+
+// Coordiante
+export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
