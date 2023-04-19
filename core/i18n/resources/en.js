@@ -1116,6 +1116,9 @@ $t(common.appNameFull)
       },
       parentCode: 'Parent Code',
     },
+    coordinateProps: {
+      allowOnlyDeviceCoordinate: 'Allow only device coordinate',
+    },
     expressionsProp: {
       expression: 'Expression',
       applyIf: 'Apply If',

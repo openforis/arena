@@ -20,14 +20,26 @@ import { NodeDefExpressionsProp } from '../ExpressionsProp'
 
 import { useBasicProps } from './store'
 
-import TextProps from '../TextProps'
-import CodeProps from '../CodeProps'
-import TaxonProps from '../TaxonProps'
-import DecimalProps from '../DecimalProps'
-import BooleanProps from '../BooleanProps'
-import FileProps from '../FileProps'
-import AnalysisProps from '../AnalysisProps'
 import { ButtonIconInfo } from '@webapp/components/buttons'
+
+import BooleanProps from '../BooleanProps'
+import CodeProps from '../CodeProps'
+import CoordinateProps from '../CoordinateProps'
+import DecimalProps from '../DecimalProps'
+import FileProps from '../FileProps'
+import TaxonProps from '../TaxonProps'
+import TextProps from '../TextProps'
+import AnalysisProps from '../AnalysisProps'
+
+const basicPropsComponentByType = {
+  [NodeDef.nodeDefType.boolean]: BooleanProps,
+  [NodeDef.nodeDefType.code]: CodeProps,
+  [NodeDef.nodeDefType.coordinate]: CoordinateProps,
+  [NodeDef.nodeDefType.decimal]: DecimalProps,
+  [NodeDef.nodeDefType.file]: FileProps,
+  [NodeDef.nodeDefType.taxon]: TaxonProps,
+  [NodeDef.nodeDefType.text]: TextProps,
+}
 
 const BasicProps = (props) => {
   const { state, Actions, editingFromDesigner } = props
@@ -72,16 +84,6 @@ const BasicProps = (props) => {
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
       />
-
-      {NodeDef.isText(nodeDef) && <TextProps state={state} Actions={Actions} />}
-
-      {NodeDef.isCode(nodeDef) && <CodeProps state={state} Actions={Actions} />}
-
-      {NodeDef.isTaxon(nodeDef) && <TaxonProps state={state} Actions={Actions} />}
-
-      {NodeDef.isDecimal(nodeDef) && <DecimalProps state={state} Actions={Actions} />}
-
-      {NodeDef.isBoolean(nodeDef) && <BooleanProps state={state} Actions={Actions} />}
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
@@ -137,7 +139,8 @@ const BasicProps = (props) => {
         </>
       )}
 
-      {NodeDef.isFile(nodeDef) && <FileProps state={state} Actions={Actions} />}
+      {NodeDef.getType(nodeDef) in basicPropsComponentByType &&
+        React.createElement(basicPropsComponentByType[NodeDef.getType(nodeDef)], { Actions, state })}
 
       {displayAsEnabled && editingFromDesigner && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
