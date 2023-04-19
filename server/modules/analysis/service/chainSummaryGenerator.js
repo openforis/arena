@@ -190,6 +190,15 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   const reportingCategorySummary = await generateReportingDataCategorySummary({ survey, chain, lang })
   const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
 
+  const getCodeAttributeSummary = async (key, codeAttrDef) => ({
+    [key]: NodeDef.getName(codeAttrDef),
+    [`${key}Category`]: await fetchCategoryNameByUuid({
+      survey,
+      categoryUuid: NodeDef.getCategoryUuid(codeAttrDef),
+    }),
+    [`${key}CategoryLevel`]: codeAttrDef ? Survey.getNodeDefCategoryLevelIndex(codeAttrDef)(survey) + 1 : '',
+  })
+
   return {
     ...surveySummary,
     label: Chain.getLabel(lang, defaultLang)(chain),
@@ -200,18 +209,10 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
-      ? {
-          stratumAttribute: NodeDef.getName(stratumAttributeDef),
-        }
+      ? await getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
-      ? {
-          postStratificationAttribute: NodeDef.getName(postStratificationAttributeDef),
-          postStratificationCategory: await fetchCategoryNameByUuid({
-            survey,
-            categoryUuid: NodeDef.getCategoryUuid(postStratificationAttributeDef),
-          }),
-        }
+      ? await getCodeAttributeSummary('postStratificationAttribute', postStratificationAttributeDef)
       : {}),
     areaWeightingMethod: ChainSamplingDesign.isAreaWeightingMethod(chainSamplingDesign),
     clusteringEntity: NodeDef.getName(clusteringEntityDef),
