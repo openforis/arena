@@ -16,7 +16,16 @@ const exportUsersIntoStream = async ({ outputStream }) => {
 
   const transformTitle = (title) => (title ? i18n.t(`user.titleValues.${title}`) : '')
 
-  const headers = ['email', 'name', 'title', 'status', 'surveys', 'invited_date', 'last_login_time']
+  const headers = [
+    'email',
+    'name',
+    'title',
+    'status',
+    'system_administrator',
+    'surveys',
+    'invited_date',
+    'last_login_time',
+  ]
 
   const objectTransformer = (obj) => ({
     ...obj,

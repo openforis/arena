@@ -118,7 +118,13 @@ GROUP BY gu.user_uuid`
       ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
       : ''
   }
-      ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
+      ${DbUtils.selectDate('us.last_login_time', 'last_login_time')},
+      EXISTS (
+        SELECT * 
+          FROM auth_group_user 
+          JOIN auth_group ON auth_group.uuid = auth_group_user.group_uuid 
+        WHERE auth_group.name = '${AuthGroup.groupNames.systemAdmin}' 
+          AND auth_group_user.user_uuid = u.uuid) AS system_administrator
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
