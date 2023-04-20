@@ -78,7 +78,7 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     (row) => Number(row.count)
   )
 
-const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC' }) => {
+const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC', includeSurveys = false }) => {
   // check sort by parameters
   const orderByFieldBySortBy = {
     email: 'email',
@@ -89,6 +89,20 @@ const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC' }
   const orderBy = orderByFieldBySortBy[sortBy] || 'email'
   const orderByDirection = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
 
+  const surveysSelect = `SELECT 
+  gu.user_uuid AS user_uuid,
+  STRING_AGG(
+      (s.props || s.props_draft) ->> 'name' || ' (' || g.name || ')', 
+      ', '
+      ORDER BY s.props ->> 'name'
+  ) AS surveys,
+  MIN (ui.invited_date) AS invited_date
+FROM survey s
+  JOIN auth_group g ON g.survey_uuid = s.uuid
+  JOIN auth_group_user gu ON g.uuid = gu.group_uuid
+  LEFT JOIN user_invitation ui ON ui.survey_uuid = s.uuid AND ui.user_uuid = gu.user_uuid
+GROUP BY gu.user_uuid`
+
   return `
     WITH us AS (
       SELECT DISTINCT ON (us.sess #>> '{passport,user}')
@@ -98,9 +112,15 @@ const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC' }
       WHERE us.sess #>> '{passport,user}' IS NOT NULL
       ORDER BY us.sess #>> '{passport,user}', expire DESC
     )
-    SELECT ${selectFields.join(', ')},
+    ${includeSurveys ? `, user_surveys AS (${surveysSelect})` : ''}
+    SELECT ${selectFields.join(', ')}, ${
+    includeSurveys
+      ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
+      : ''
+  }
       ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
     FROM "user" u
+    ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
     ORDER BY ${orderBy} ${orderByDirection}`
@@ -116,7 +136,10 @@ export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', s
   )
 
 export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
-  const select = _usersSelectQuery({ selectFields: ['u.email', 'u.name', 'u.status'] })
+  const select = _usersSelectQuery({
+    selectFields: ['u.email', 'u.name', `u.props ->> 'title' AS title`, 'u.status'],
+    includeSurveys: true,
+  })
   const stream = new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
   await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
