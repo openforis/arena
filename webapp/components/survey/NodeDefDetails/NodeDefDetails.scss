@@ -16,6 +16,10 @@
     .form-item {
       display: flex;
     }
+
+    &.checkbox-with-info {
+      gap: 0rem;
+    }
   }
 }
 
