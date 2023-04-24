@@ -43,6 +43,19 @@
       gap: 2rem;
     }
 
+    .chain-sampling-design {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 50rem;
+      justify-self: center;
+
+      .form-item {
+        width: 50rem;
+        grid-template-columns: 0.3fr 0.7fr;
+      }
+    }
+
     .p-value-dropdown {
       width: 7rem;
     }
@@ -54,22 +67,6 @@
 
       .nonResponseBiasCorrectionTip {
         color: red;
-      }
-    }
-
-    .reporting-data-table-and-joins {
-      display: flex;
-      flex-direction: column;
-      width: fit-content;
-      margin: auto;
-      gap: 1rem;
-
-      .form-item {
-        display: flex;
-
-        .form-label {
-          width: 10rem;
-        }
       }
     }
   }

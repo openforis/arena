@@ -1,17 +1,16 @@
 import * as Chain from '@common/analysis/chain'
+import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as PromiseUtils from '@core/promiseUtils'
-import * as StringUtils from '@core/stringUtils'
 import SystemError from '@core/systemError'
+
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+
 import * as ChainManager from '../manager'
-import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -21,21 +20,6 @@ const generateSurveySummary = ({ survey, lang }) => ({
   surveyDescription: Survey.getDescription(lang, '')(survey),
 })
 
-const generateReportingDataCategoryAttributesSummary = ({ survey, category, chain }) => {
-  const levels = Category.getLevelsArray(category)
-  const samplingDesign = Chain.getSamplingDesign(chain)
-
-  return levels.reduce((acc, level, levelIndex) => {
-    const categoryLevelUuid = CategoryLevel.getUuid(level)
-    const attributeDefUuid = ChainSamplingDesign.getReportingDataAttributeDefUuid({ categoryLevelUuid })(samplingDesign)
-    if (!attributeDefUuid) {
-      return acc
-    }
-    const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
-    return { ...acc, [`attributeLevel${levelIndex + 1}`]: NodeDef.getName(attributeDef) }
-  }, {})
-}
-
 const fetchCategoryNameByUuid = async ({ survey, categoryUuid }) => {
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
     surveyId: Survey.getId(survey),
@@ -43,76 +27,6 @@ const fetchCategoryNameByUuid = async ({ survey, categoryUuid }) => {
     draft: true,
   })
   return Category.getName(category)
-}
-
-const getExtraPropArea = (item) => {
-  const area = CategoryItem.getExtraProp(Category.reportingDataItemExtraDefKeys.area)(item)
-  return StringUtils.isBlank(area) ? '' : Number(area)
-}
-
-const generateReportingDataCategoryItemsSummary = async ({ survey, category, lang }) => {
-  const levels = Category.getLevelsArray(category)
-
-  const reportingCategoryItems = []
-  await PromiseUtils.each(levels, async (_level, levelIndex) => {
-    const items = await CategoryManager.fetchItemsByLevelIndex({
-      surveyId: Survey.getId(survey),
-      categoryUuid: Category.getUuid(category),
-      levelIndex,
-      draft: true,
-    })
-    reportingCategoryItems.push(...items)
-  })
-
-  return reportingCategoryItems.map((item) => ({
-    // level codes
-    ...levels.reduce((acc, level, levelIndex) => {
-      const levelCode =
-        CategoryItem.getLevelUuid(item) === CategoryLevel.getUuid(level)
-          ? CategoryItem.getCode(item) // item is in current level
-          : item[`level${levelIndex}Code`] // level code prop is 0 based when it's fetched from DB
-
-      if (StringUtils.isBlank(levelCode)) {
-        return acc
-      }
-      // level code prop is 1 based in the summary
-      return { ...acc, [`level${levelIndex + 1}Code`]: levelCode }
-    }, {}),
-
-    // label
-    label: CategoryItem.getLabel(lang)(item),
-
-    // level index (1 based)
-    levelIndex: Category.getItemLevelIndex(item)(category) + 1,
-
-    // area (only for last level items)
-    ...(Category.isItemLeaf(item)(category)
-      ? {
-          area: getExtraPropArea(item),
-        }
-      : {}),
-  }))
-}
-
-const generateReportingDataCategorySummary = async ({ survey, chain, lang }) => {
-  const samplingDesign = Chain.getSamplingDesign(chain)
-  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
-    surveyId: Survey.getId(survey),
-    categoryUuid: ChainSamplingDesign.getReportingDataCategoryUuid(samplingDesign),
-    draft: true,
-  })
-  if (!category) {
-    return null
-  }
-  const attributes = generateReportingDataCategoryAttributesSummary({ survey, category, chain })
-
-  const items = await generateReportingDataCategoryItemsSummary({ survey, category, lang })
-
-  return {
-    name: Category.getName(category),
-    attributes,
-    items,
-  }
 }
 
 const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) => {
@@ -187,7 +101,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     showInactiveResultVariables: true,
   })(survey)
 
-  const reportingCategorySummary = await generateReportingDataCategorySummary({ survey, chain, lang })
   const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
 
   const getCodeAttributeSummary = async (key, codeAttrDef) => ({
@@ -222,11 +135,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     resultVariables: await Promise.all(
       analysisNodeDefs.map((analysisNodeDef) => generateResultVariableSummary({ survey, analysisNodeDef, lang }))
     ),
-    ...(reportingCategorySummary
-      ? {
-          reportingCategory: reportingCategorySummary,
-        }
-      : {}),
     ...(statisticalAnalysisSummary
       ? {
           analysis: statisticalAnalysisSummary,
