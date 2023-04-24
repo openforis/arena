@@ -443,4 +443,4 @@ export const isDisplayAsEnabled = isEntityAndNotRoot
 export const isDisplayInEnabled = isEntityAndNotRoot
 
 export const canMultipleAttributeBeAggregated = (nodeDef) =>
-  [nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
+  [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
