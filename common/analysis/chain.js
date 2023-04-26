@@ -105,6 +105,18 @@ export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true)
   DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
 
+export const checkChangeRequiresSurveyPublish = ({ chainPrev, chainNext }) => {
+  const samplingDesignPrev = getSamplingDesign(chainPrev)
+  const samplingDesignNext = getSamplingDesign(chainNext)
+  if (
+    ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesignPrev) !==
+    ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesignNext)
+  ) {
+    return true
+  }
+  return false
+}
+
 // ====== VALIDATION
 // The validation object contains the validation of chain index by uuids
 export const { getValidation, hasValidation, assocValidation, dissocValidation } = Validation
