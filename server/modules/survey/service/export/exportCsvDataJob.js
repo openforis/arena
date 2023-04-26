@@ -1,15 +1,13 @@
 import Job from '@server/job/job'
 
-import * as FileUtils from '@server/utils/file/fileUtils'
+import { ZipArchiver } from '@server/utils/file/ZipArchiver'
 
 import CSVDataExtractionJob from './jobs/CSVDataExtractionJob'
 import CategoriesExportJob from './jobs/CategoriesExportJob'
-import ZipCreationJob from './jobs/ZipCreationJob'
 
 const createInternalJobs = ({ includeCategories }) => [
   new CSVDataExtractionJob(),
   ...(includeCategories ? [new CategoriesExportJob()] : []),
-  new ZipCreationJob(),
 ]
 
 export default class ExportCsvDataJob extends Job {
@@ -21,24 +19,23 @@ export default class ExportCsvDataJob extends Job {
     await super.onStart()
 
     // exportUuid will be used when dowloading the generated output file
-    // the generated zip file will be named `${exportUuid}.zip`
     const exportUuid = this.uuid
-    // use job uuid as temp folder name
-    const outputDir = FileUtils.tempFilePath(exportUuid)
 
-    // delete output dir if already existing (it shouldn't be possible...)
-    await FileUtils.rmdir(outputDir)
+    // the generated zip file will be named `${exportUuid}.zip`
+    const outputFileName = `${exportUuid}.zip`
 
-    await FileUtils.mkdir(outputDir)
+    const archiver = new ZipArchiver(outputFileName)
 
     this.setContext({
       exportUuid,
-      outputDir,
+      archiver,
     })
   }
 
   async beforeSuccess() {
-    const { exportUuid } = this.context
+    const { archiver, exportUuid } = this.context
+
+    await archiver.finalize()
 
     this.setResult({
       exportUuid,

@@ -193,7 +193,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   {
     surveyId,
     cycle: cycleParam,
-    outputDir,
+    archiver,
     includeCategoryItemsLabels,
     includeAnalysis,
     includeDataFromAllCycles,
@@ -213,8 +213,8 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const stream = FileUtils.createWriteStream(FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`))
-
+    const tempFilePath = FileUtils.newTempFilePath()
+    const tempFileOutputStream = FileUtils.createWriteStream(tempFilePath)
     const childDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
       : [nodeDefContext] // Multiple attribute
@@ -231,11 +231,13 @@ export const fetchEntitiesDataToCsvFiles = async (
       survey,
       cycle,
       recordOwnerUuid,
-      streamOutput: stream,
+      streamOutput: tempFileOutputStream,
       query,
       addCycle: true,
       includeCategoryItemsLabels,
     })
+
+    archiver.file({ path: tempFilePath, entryName: `${NodeDef.getName(nodeDefContext)}.csv` })
   })
 }
 /**

@@ -129,7 +129,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   user,
   surveyId,
   cycle,
-  outputDir,
+  archiver,
   includeCategoryItemsLabels,
   includeAnalysis,
   includeDataFromAllCycles,
@@ -141,7 +141,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
     surveyId,
     cycle,
-    outputDir,
+    archiver,
     includeCategoryItemsLabels,
     includeAnalysis,
     includeDataFromAllCycles,
