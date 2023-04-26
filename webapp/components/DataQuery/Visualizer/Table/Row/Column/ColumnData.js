@@ -5,10 +5,13 @@ import { useI18n } from '@webapp/store/system'
 import { ValueFormatter } from '../../../../valueFormatter'
 
 import { useColumn } from './store'
+import { Objects } from '@openforis/arena-core'
 
 const getColValue = ({ nodeDef, col, row, i18n }) => {
   const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
-  return ValueFormatter.format({ i18n, nodeDef, value })
+  if (Objects.isEmpty(value)) return ''
+  const values = Array.isArray(value) ? value : [value]
+  return values.map((val) => ValueFormatter.format({ i18n, nodeDef, value: val })).join(', ')
 }
 
 const ColumnData = (props) => {

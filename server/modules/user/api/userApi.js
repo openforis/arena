@@ -13,6 +13,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { UserExportService } from '../service/userExportService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -151,7 +152,7 @@ export const init = (app) => {
       const fileName = `users_${DateUtils.nowFormatDefault()}.csv`
       Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-      await UserService.exportUsersIntoStream({ outputStream: res })
+      await UserExportService.exportUsersIntoStream({ outputStream: res })
     } catch (error) {
       next(error)
     }

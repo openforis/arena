@@ -2,6 +2,8 @@ import * as fs from 'fs'
 
 import { db } from '@server/db/db'
 
+import * as ProcessUtils from '@core/processUtils'
+import { Countries } from '@core/Countries'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserGroupInvitation from '@core/user/userGroupInvitation'
@@ -12,8 +14,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-import { Countries } from '@core/Countries'
-import * as ProcessUtils from '@core/processUtils'
 
 import SystemError from '@core/systemError'
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -245,7 +245,6 @@ export const countUsersBySurveyId = async (user, surveyId) => {
 
 export const {
   countUsers,
-  exportUsersIntoStream,
   exportUserAccessRequestsIntoStream,
   fetchUsers,
   fetchUserByUuid,

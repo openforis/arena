@@ -28,6 +28,7 @@ export const {
   countSystemAdministrators,
   fetchUserProfilePicture,
   fetchSystemAdministratorsEmail,
+  fetchUsersIntoStream,
   updateNamePasswordAndStatus,
   updatePassword,
   resetUsersPrefsSurveyCycle,
@@ -186,13 +187,6 @@ export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = 
     )
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
-
-export const exportUsersIntoStream = async ({ outputStream }) => {
-  const headers = ['email', 'name', 'status', 'last_login_time']
-  const transformer = CSVWriter.transformJsonToCsv({ fields: headers })
-  transformer.pipe(outputStream)
-  await UserRepository.fetchUsersIntoStream({ transformer })
-}
 
 export const fetchUsersBySurveyId = async (
   { surveyId, offset = 0, limit = null, isSystemAdmin = false },
