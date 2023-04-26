@@ -11,7 +11,7 @@ export class ZipArchiver {
   }
 
   file({ path, entryName }) {
-    this._archiver.file(path, { entryName })
+    this._archiver.file(path, { name: entryName })
   }
 
   directory({ path }) {
