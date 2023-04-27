@@ -5,13 +5,12 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
 
-import { ColumnNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
+import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
 import { Query } from '../../../../common/model/query'
 import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
@@ -79,9 +78,10 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
  *
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewData = async (params) => {
+export const fetchViewData = async (params, client = db) => {
   const {
     survey,
     cycle,
@@ -98,18 +98,21 @@ export const fetchViewData = async (params) => {
   } = params
 
   // Fetch data
-  const result = await DataViewRepository.fetchViewData({
-    survey,
-    cycle,
-    query,
-    columnNodeDefs,
-    includeFileAttributeDefs,
-    recordSteps,
-    recordOwnerUuid,
-    offset,
-    limit,
-    stream: Boolean(streamOutput),
-  })
+  const result = await DataViewRepository.fetchViewData(
+    {
+      survey,
+      cycle,
+      query,
+      columnNodeDefs,
+      includeFileAttributeDefs,
+      recordSteps,
+      recordOwnerUuid,
+      offset,
+      limit,
+      stream: Boolean(streamOutput),
+    },
+    client
+  )
 
   if (streamOutput) {
     const fields = columnNodeDefs
@@ -190,21 +193,9 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
-  {
-    surveyId,
-    cycle: cycleParam,
-    archiver,
-    includeCategoryItemsLabels,
-    includeAnalysis,
-    includeDataFromAllCycles,
-    recordOwnerUuid = null,
-    callback,
-  },
-  client
+  { survey, cycle, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
+  client = db
 ) => {
-  const cycle = includeDataFromAllCycles ? null : cycleParam
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, includeAnalysis }, client)
-
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
@@ -213,8 +204,9 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const tempFilePath = FileUtils.newTempFilePath()
-    const tempFileOutputStream = FileUtils.createWriteStream(tempFilePath)
+    const outputFilePath = FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`)
+    const outputStream = FileUtils.createWriteStream(outputFilePath)
+
     const childDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
       : [nodeDefContext] // Multiple attribute
@@ -227,19 +219,66 @@ export const fetchEntitiesDataToCsvFiles = async (
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
-    await fetchViewData({
-      survey,
-      cycle,
-      recordOwnerUuid,
-      streamOutput: tempFileOutputStream,
-      query,
-      addCycle: true,
-      includeCategoryItemsLabels,
-    })
-
-    archiver.file({ path: tempFilePath, entryName: `${NodeDef.getName(nodeDefContext)}.csv` })
+    await fetchViewData(
+      {
+        survey,
+        cycle,
+        recordOwnerUuid,
+        streamOutput: outputStream,
+        query,
+        addCycle: true,
+        includeCategoryItemsLabels,
+      },
+      client
+    )
   })
 }
+
+export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwnerUuid = null }, client = db) => {
+  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
+    (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
+  )
+
+  const fileUuidsByCycle = {}
+  let total = 0
+
+  await PromiseUtils.each(nodeDefs, async (nodeDefContext) => {
+    const childrenFileDefs = (
+      NodeDef.isEntity(nodeDefContext)
+        ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
+        : [nodeDefContext]
+    ).filter(NodeDef.isFile)
+
+    if (childrenFileDefs.length === 0) {
+      return
+    }
+
+    const entityDefUuid = NodeDef.getUuid(nodeDefContext)
+    let query = Query.create({ entityDefUuid })
+    const queryAttributeDefsUuids = childrenFileDefs.map(NodeDef.getUuid)
+    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+
+    const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
+    const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)
+
+    entityData.forEach((entityRow) => {
+      childrenFileDefs.forEach((nodeDefFile) => {
+        const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefFile)
+        const fileUuidColumnName = columnNodeDef.name
+        const fileUuid = entityRow[fileUuidColumnName]
+        if (fileUuid) {
+          const rowCycle = entityRow[TableDataNodeDef.columnSet.recordCycle]
+          const fileUuids = fileUuidsByCycle[rowCycle] || []
+          fileUuids.push(fileUuid)
+          fileUuidsByCycle[rowCycle] = fileUuids
+          total++
+        }
+      })
+    })
+  })
+  return { fileUuidsByCycle, total }
+}
+
 /**
  * Counts the number of rows in the data view related to the specified query object.
  *

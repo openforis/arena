@@ -12,6 +12,13 @@ import { Checkbox } from '@webapp/components/form'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 
+const exportOptions = {
+  includeCategoryItemsLabels: 'includeCategoryItemsLabels',
+  includeCategories: 'includeCategories',
+  includeAnalysis: 'includeAnalysis',
+  includeDataFromAllCycles: 'includeDataFromAllCycles',
+  includeFiles: 'includeFiles',
+}
 const ExportData = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
@@ -20,10 +27,11 @@ const ExportData = () => {
 
   const [state, setState] = useState({
     options: {
-      includeCategoryItemsLabels: true,
-      includeCategories: false,
-      includeAnalysis: false,
-      includeDataFromAllCycles: false,
+      [exportOptions.includeCategoryItemsLabels]: true,
+      [exportOptions.includeCategories]: false,
+      [exportOptions.includeAnalysis]: false,
+      [exportOptions.includeDataFromAllCycles]: false,
+      [exportOptions.includeFiles]: false,
     },
   })
   const { options } = state
@@ -37,30 +45,20 @@ const ExportData = () => {
   return (
     <div className="export">
       <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
-        <Checkbox
-          checked={options.includeCategoryItemsLabels}
-          label={i18n.t('dataExportView.options.includeCategoryItemsLabels')}
-          onChange={onOptionChange('includeCategoryItemsLabels')}
-        />
-        <Checkbox
-          checked={options.includeCategories}
-          label={i18n.t('dataExportView.options.includeCategories')}
-          onChange={onOptionChange('includeCategories')}
-        />
-        {canAnalyzeRecords && (
+        {[
+          exportOptions.includeCategoryItemsLabels,
+          exportOptions.includeCategories,
+          ...(canAnalyzeRecords ? [exportOptions.includeAnalysis] : []),
+          ...(cycles.length > 1 ? [exportOptions.includeDataFromAllCycles] : []),
+          exportOptions.includeFiles,
+        ].map((optionKey) => (
           <Checkbox
-            checked={options.includeAnalysis}
-            label={i18n.t('dataExportView.options.includeResultVariables')}
-            onChange={onOptionChange('includeAnalysis')}
+            key={optionKey}
+            checked={options[optionKey]}
+            label={i18n.t(`dataExportView.options.${optionKey}`)}
+            onChange={onOptionChange(optionKey)}
           />
-        )}
-        {cycles.length > 1 && (
-          <Checkbox
-            checked={options.includeDataFromAllCycles}
-            label={i18n.t('dataExportView.options.includeDataFromAllCycles')}
-            onChange={onOptionChange('includeDataFromAllCycles')}
-          />
-        )}
+        ))}
       </ExpansionPanel>
 
       <Button

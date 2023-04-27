@@ -127,24 +127,43 @@ export const exportViewDataToTempFile = async ({
 
 export const fetchEntitiesDataToCsvFiles = async ({
   user,
-  surveyId,
-  cycle,
-  archiver,
+  survey,
+  cycle: cycleParam,
+  outputDir,
   includeCategoryItemsLabels,
   includeAnalysis,
   includeDataFromAllCycles,
   callback,
 }) => {
-  const survey = await SurveyManager.fetchSurveyById({ surveyId })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
+  const cycle = includeDataFromAllCycles ? null : cycleParam
+
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
-    surveyId,
+    survey,
     cycle,
-    archiver,
+    outputDir,
     includeCategoryItemsLabels,
     includeAnalysis,
-    includeDataFromAllCycles,
+    recordOwnerUuid,
+    callback,
+  })
+}
+
+export const fetchEntitiesFileUuidsByCycle = async ({
+  user,
+  survey,
+  cycle: cycleParam,
+  includeDataFromAllCycles,
+  callback,
+}) => {
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+
+  const cycle = includeDataFromAllCycles ? null : cycleParam
+
+  return SurveyRdbManager.fetchEntitiesFileUuidsByCycle({
+    survey,
+    cycle,
     recordOwnerUuid,
     callback,
   })
