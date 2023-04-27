@@ -1,5 +1,6 @@
 import i18n from '@core/i18n/i18nFactory'
 import * as AuthGroup from '@core/auth/authGroup'
+import { Countries } from '@core/Countries'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
@@ -16,10 +17,13 @@ const exportUsersIntoStream = async ({ outputStream }) => {
 
   const transformTitle = (title) => (title ? i18n.t(`user.titleValues.${title}`) : '')
 
+  const transformCountry = (countryCode) => (countryCode ? Countries.getCountryName({ code: countryCode }) : '')
+
   const headers = [
     'email',
     'name',
     'title',
+    'country',
     'status',
     'system_administrator',
     'surveys',
@@ -31,6 +35,7 @@ const exportUsersIntoStream = async ({ outputStream }) => {
     ...obj,
     surveys: transformSurveyNames(obj.surveys),
     title: transformTitle(obj.title),
+    country: transformCountry(obj.country),
   })
 
   const transformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
