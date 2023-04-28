@@ -3,7 +3,6 @@ import './DateInput.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { TextField } from '@mui/material'
 
 import * as DateUtils from '@core/dateUtils'
 import { useDateTimeInput } from './useDateTimeInput'
@@ -19,11 +18,16 @@ const DateInput = (props) => {
     <DatePicker
       className="date-picker"
       disabled={disabled}
-      inputFormat={format}
+      format={format}
       onChange={onInputChange}
-      renderInput={(params) => (
-        <TextField {...params} className="date-picker__text-field" autoComplete="off" error={errorRef.current} />
-      )}
+      slotProps={{
+        textField: {
+          autoComplete: 'off',
+          variant: 'outlined',
+          className: 'date-picker__text-field',
+          error: errorRef.current,
+        },
+      }}
       value={dateValue}
     />
   )

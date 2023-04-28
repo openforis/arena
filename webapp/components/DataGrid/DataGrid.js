@@ -43,7 +43,7 @@ const DataGrid = (props) => {
       columns={columns}
       components={components}
       density={density}
-      disableSelectionOnClick={disableSelectionOnClick}
+      disableRowSelectionOnClick={disableSelectionOnClick}
       getRowClassName={getRowClassName}
       getRowId={getRowId}
       initialState={initialState}

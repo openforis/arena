@@ -16,14 +16,11 @@ export const useDateTimeInput = ({ format, onChange: onChangeProp, value }) => {
   )
 
   const onInputChange = useCallback(
-    (date, keyboardInputValue) => {
-      const selectedFromCalendar = !keyboardInputValue
+    (date, changeContext) => {
+      const { validationError } = changeContext
       if (date === null) {
         applyChange(null)
-      } else if (
-        selectedFromCalendar ||
-        (keyboardInputValue.length === format.length && DateUtils.isValidDateObject(date))
-      ) {
+      } else if (!validationError && DateUtils.isValidDateObject(date)) {
         applyChange(DateUtils.format(date, format))
       } else {
         errorRef.current = true
