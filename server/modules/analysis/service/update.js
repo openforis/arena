@@ -30,8 +30,10 @@ export const update = async ({ user, surveyId, chain }) => {
     const params = { surveyId, chainUuid, dateModified: true, fields }
     updates.push(ChainRepository.updateChain(params, t))
 
-    // mark survey draft
-    updates.push(markSurveyDraft(surveyId, t))
+    if (Chain.checkChangeRequiresSurveyPublish({ chainPrev: chainDb, chainNext: chain })) {
+      // mark survey draft
+      updates.push(markSurveyDraft(surveyId, t))
+    }
 
     return t.batch(updates)
   })
