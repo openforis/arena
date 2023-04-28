@@ -9,9 +9,9 @@ const zipDirIntoFile = async ({ dirPath, outputFilePath }) => {
   await zip.finalize()
 }
 
-const zipDirIntoTempFile = ({ dirPath }) => {
+const zipDirIntoTempFile = async ({ dirPath }) => {
   const outputFilePath = FileUtils.newTempFilePath()
-  zipDirIntoFile({ dirPath, outputFilePath })
+  await zipDirIntoFile({ dirPath, outputFilePath })
   return outputFilePath
 }
 

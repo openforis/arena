@@ -24,6 +24,7 @@ export const init = (app) => {
           includeCategoryItemsLabels,
           includeAnalysis,
           includeDataFromAllCycles,
+          includeFiles,
         } = Request.getParams(req)
 
         const user = Request.getUser(req)
@@ -36,6 +37,7 @@ export const init = (app) => {
           includeCategoryItemsLabels,
           includeAnalysis,
           includeDataFromAllCycles,
+          includeFiles,
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
