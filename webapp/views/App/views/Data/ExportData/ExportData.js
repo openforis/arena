@@ -3,7 +3,6 @@ import './ExportData.scss'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
@@ -19,27 +18,27 @@ const exportOptions = {
   includeDataFromAllCycles: 'includeDataFromAllCycles',
   includeFiles: 'includeFiles',
 }
+
+const defaultOptionsSelection = {
+  [exportOptions.includeCategoryItemsLabels]: true,
+  [exportOptions.includeCategories]: false,
+  [exportOptions.includeAnalysis]: false,
+  [exportOptions.includeDataFromAllCycles]: false,
+  [exportOptions.includeFiles]: false,
+}
+
 const ExportData = () => {
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const cycles = useSurveyCycleKeys()
 
-  const [state, setState] = useState({
-    options: {
-      [exportOptions.includeCategoryItemsLabels]: true,
-      [exportOptions.includeCategories]: false,
-      [exportOptions.includeAnalysis]: false,
-      [exportOptions.includeDataFromAllCycles]: false,
-      [exportOptions.includeFiles]: false,
-    },
-  })
-  const { options } = state
+  const [state, setState] = useState({ selectedOptions: defaultOptionsSelection })
+  const { selectedOptions } = state
 
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
-      const optionsUpdated = { ...statePrev.options, [option]: value }
-      return { ...statePrev, options: optionsUpdated }
+      const optionsUpdated = { ...statePrev.selectedOptions, [option]: value }
+      return { ...statePrev, selectedOptions: optionsUpdated }
     })
 
   return (
@@ -54,8 +53,8 @@ const ExportData = () => {
         ].map((optionKey) => (
           <Checkbox
             key={optionKey}
-            checked={options[optionKey]}
-            label={i18n.t(`dataExportView.options.${optionKey}`)}
+            checked={selectedOptions[optionKey]}
+            label={`dataExportView.options.${optionKey}`}
             onChange={onOptionChange(optionKey)}
           />
         ))}
@@ -63,7 +62,7 @@ const ExportData = () => {
 
       <Button
         testId={TestId.dataExport.prepareExport}
-        onClick={() => dispatch(ExportCsvDataActions.startCSVExport(options))}
+        onClick={() => dispatch(ExportCsvDataActions.startCSVExport(selectedOptions))}
         label="dataExportView.startCsvExport"
       />
     </div>
