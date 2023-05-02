@@ -3,7 +3,7 @@ const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
 
 const getEntry = (type) =>
-  glob.sync(path.resolve(__dirname, type, 'tests', '*.js')).sort((fileA, fileB) => {
+  glob.globSync(path.resolve(__dirname, type, 'tests', '*.js')).sort((fileA, fileB) => {
     const idxA = fileA.substr(0, 3)
     const idxB = fileB.substr(0, 3)
     return idxA < idxB
