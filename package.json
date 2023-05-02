@@ -122,7 +122,6 @@
     "classnames": "^2.3.1",
     "cluster": "^0.7.7",
     "codemirror": "^5.65.5",
-    "connect-pg-simple": "^7.0.0",
     "csv": "^6.2.11",
     "d3": "^7.8.4",
     "d3-interpolate-path": "^2.2.3",
