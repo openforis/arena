@@ -184,7 +184,7 @@
     "supercluster": "^7.1.5",
     "to-snake-case": "^1.0.0",
     "use-supercluster": "^0.4.0",
-    "uuid": "^8.3.2",
+    "uuid": "^9.0.0",
     "vega": "^5.25.0",
     "vega-lite": "^5.7.1",
     "xml-js": "^1.6.11"
