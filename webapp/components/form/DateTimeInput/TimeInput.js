@@ -3,6 +3,7 @@ import './TimeInput.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { TimePicker } from '@mui/x-date-pickers/TimePicker'
+import { TextField } from '@mui/material'
 
 import * as DateUtils from '@core/dateUtils'
 import { useDateTimeInput } from './useDateTimeInput'
@@ -19,7 +20,7 @@ const TimeInput = (props) => {
       ampm={false}
       disabled={disabled}
       onChange={onInputChange}
-      slotProps={{ textField: { variant: 'outlined', className: 'time-picker__text-field', error: errorRef.current } }}
+      renderInput={(params) => <TextField {...params} className="time-picker__text-field" error={errorRef.current} />}
       value={dateValue}
     />
   )
