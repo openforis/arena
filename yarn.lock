@@ -3209,13 +3209,14 @@ axios@^0.26.0:
   dependencies:
     follow-redirects "^1.14.8"
 
-axios@^0.27.2:
-  version "0.27.2"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.27.2.tgz#207658cc8621606e586c85db4b41a750e756d972"
-  integrity sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==
+axios@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.4.0.tgz#38a7bf1224cd308de271146038b551d725f0be1f"
+  integrity sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==
   dependencies:
-    follow-redirects "^1.14.9"
+    follow-redirects "^1.15.0"
     form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
 
 axobject-query@^3.1.1:
   version "3.1.1"
@@ -4461,10 +4462,10 @@ csstype@^3.1.2:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.2.tgz#1d4bf9d572f11c14031f0436e1c10bc1f571f50b"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
 
-csv-generate@^4.2.4:
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-4.2.4.tgz#42cbe6b4e32fe59531fc1b57f07b5ab509e101d3"
-  integrity sha512-PvEwuRksnW30I1DlZnVuCVMOiff7ZoUXOCMQJ1c0DPKXQkIC87hWvqJ4ztO70ceQMQER1hp/Lajo8KIy7at1PA==
+csv-generate@^4.2.5:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-4.2.5.tgz#8d7eeb8ee61fc1e81bf820628b0d35b1817e8a33"
+  integrity sha512-CS4JQizdciP9dMGYz/wRm70+hbVGIYP+Hcx/kNR8eicAPZ3MUeq9G6AE8KqMZcZdcFv53m7gLpOaw2eg7nPP/w==
 
 csv-load-sync@^2.3.1:
   version "2.3.1"
@@ -4473,25 +4474,25 @@ csv-load-sync@^2.3.1:
   dependencies:
     check-more-types "^2.10.0"
 
-csv-parse@^5.3.8:
-  version "5.3.8"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.3.8.tgz#c9919fbc5670fddec09a4b40e25365a2d11956d1"
-  integrity sha512-ird8lzMv9I64oqIVIHdaTbT7Yr55n2C/Nv6m1LxO7nddLEeI67468VQ9Ik+r6lwYbK9kTE1oSqAVcVKc/Uqx6g==
+csv-parse@^5.3.9:
+  version "5.3.9"
+  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.3.9.tgz#7af0daa161b0213080bb2cdffacd9b699cf48963"
+  integrity sha512-Nuh09OE1+wG6x5Lu2T+woxlupPAnWJ6Wj9XVYK74gP646e5gDrUsrCws1zz5NbckpQ+jygnxb8xDLj3gfBxi3w==
 
-csv-stringify@^6.3.2:
-  version "6.3.2"
-  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.3.2.tgz#0d5105dcf6f5a6605262d1a008883120684db164"
-  integrity sha512-dD9gfbxNKa5v90NHiE2Qd6F9I52GtJjGTfowwzqiNDZD/+NPW3h19d2Nvv311a8QUW11rYRobco27nvVAnCrLw==
+csv-stringify@^6.3.3:
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.3.3.tgz#f13688210fc24a6598625b2b6040c4f55f939374"
+  integrity sha512-bL926F/b6oJieWPt0njp3vfu8jySbPsDxCL4VUd9xHsJt3H/YJXLdzqOkh8y5l+1cBYOCEYbHNZ7ipVCfWzYSw==
 
-csv@^6.2.10:
-  version "6.2.10"
-  resolved "https://registry.yarnpkg.com/csv/-/csv-6.2.10.tgz#5e94bac81c23d1a8eb30ab63cabbb68d2b1f34b7"
-  integrity sha512-aO1dkeMlzWHvtKOdiTeqt7G4SwF/JtJ2fYNOMtlrGiKERD+ASq+QZelGqpFCzHGvZSIhzDtwqRVEgPMkme2BQg==
+csv@^6.2.11:
+  version "6.2.11"
+  resolved "https://registry.yarnpkg.com/csv/-/csv-6.2.11.tgz#34f6a770113df784572399aeac955126dea19c0f"
+  integrity sha512-MZR5oNS0UvNne7nWsI+VaEI21RuZVrjfmhfihCalIz1n2jcst5h+mUCEgDWSR3sy5lVJhETp5g0s9SXWBLFH8w==
   dependencies:
-    csv-generate "^4.2.4"
-    csv-parse "^5.3.8"
-    csv-stringify "^6.3.2"
-    stream-transform "^3.2.4"
+    csv-generate "^4.2.5"
+    csv-parse "^5.3.9"
+    csv-stringify "^6.3.3"
+    stream-transform "^3.2.5"
 
 cwd@^0.10.0:
   version "0.10.0"
@@ -6292,7 +6293,7 @@ flush-write-stream@^1.0.0:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
 
-follow-redirects@^1.0.0, follow-redirects@^1.14.0, follow-redirects@^1.14.8, follow-redirects@^1.14.9:
+follow-redirects@^1.0.0, follow-redirects@^1.14.0, follow-redirects@^1.14.8, follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
@@ -10548,6 +10549,11 @@ proxy-addr@~2.0.7:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
 
+proxy-from-env@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/proxy-from-env/-/proxy-from-env-1.1.0.tgz#e102f16ca355424865755d2c9e8ea4f24d58c3e2"
+  integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
+
 prr@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/prr/-/prr-1.0.1.tgz#d3fc114ba06995a45ec6893f484ceb1d78f5f476"
@@ -12015,10 +12021,10 @@ stream-shift@^1.0.0:
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.1.tgz#d7088281559ab2778424279b0877da3c392d5a3d"
   integrity sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==
 
-stream-transform@^3.2.4:
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/stream-transform/-/stream-transform-3.2.4.tgz#cc37b7950a43f97a89b6472745ec9ef9850c4948"
-  integrity sha512-YoZm/eoh6f/MH7uHkq+NK3fx3JkyXbck7FcTpJavwEUg0aMINqMPkDj5uNW0CoRy7c/2NSJm0HvoyFv6dVauPA==
+stream-transform@^3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/stream-transform/-/stream-transform-3.2.5.tgz#681b9f2c28c4fb92b34d4f25d9ef3d87fefc0c49"
+  integrity sha512-B0p1gG7P0pFgVo4/xGACKC4IqcK+9DNCpkt+Jy/d9wVnbRxxJX1zQbJelBCsJ6H1mcfBt598T+JFP0DuA7NiHg==
 
 streamroller@^3.1.5:
   version "3.1.5"
