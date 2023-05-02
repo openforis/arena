@@ -3,6 +3,7 @@ import { db } from '@server/db/db'
 import * as camelize from 'camelize'
 
 import * as User from '@core/user/user'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
@@ -124,7 +125,13 @@ GROUP BY gu.user_uuid`
           FROM auth_group_user 
           JOIN auth_group ON auth_group.uuid = auth_group_user.group_uuid 
         WHERE auth_group.name = '${AuthGroup.groupNames.systemAdmin}' 
-          AND auth_group_user.user_uuid = u.uuid) AS system_administrator
+          AND auth_group_user.user_uuid = u.uuid) 
+      AS system_administrator,
+      (
+        SELECT uar.props ->> '${UserAccessRequest.keysProps.country}'
+        FROM user_access_request uar
+        WHERE uar.email = u.email
+      ) AS country
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
@@ -143,7 +150,7 @@ export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', s
 
 export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
   const select = _usersSelectQuery({
-    selectFields: ['u.email', 'u.name', `u.props ->> 'title' AS title`, 'u.status'],
+    selectFields: ['u.email', 'u.name', `u.props ->> '${User.keysProps.title}' AS title`, 'u.status'],
     includeSurveys: true,
   })
   const stream = new DbUtils.QueryStream(DbUtils.formatQuery(select, []))

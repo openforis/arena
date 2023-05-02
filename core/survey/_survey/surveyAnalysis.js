@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Chain from '@common/analysis/chain'
@@ -84,16 +85,18 @@ export const getAnalysisEntities =
   (survey) => {
     const { root } = getHierarchy()(survey)
 
+    const clusteringNodeDefUuid = A.pipe(Chain.getSamplingDesign, ChainSamplingDesign.getClusteringNodeDefUuid)(chain)
+
     const entities = []
     traverseHierarchyItemSync(root, (nodeDef) => {
       if (
         (NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)) &&
-        getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0
+        ((clusteringNodeDefUuid && NodeDef.getUuid(nodeDef) === clusteringNodeDefUuid) ||
+          getAnalysisNodeDefs({ entity: nodeDef, chain })(survey).length > 0)
       ) {
         entities.push(nodeDef)
       }
     })
-
     return entities
   }
 

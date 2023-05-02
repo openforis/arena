@@ -3,7 +3,6 @@ import './ExportData.scss'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
@@ -12,60 +11,58 @@ import { Checkbox } from '@webapp/components/form'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 
+const exportOptions = {
+  includeCategoryItemsLabels: 'includeCategoryItemsLabels',
+  includeCategories: 'includeCategories',
+  includeAnalysis: 'includeAnalysis',
+  includeDataFromAllCycles: 'includeDataFromAllCycles',
+  includeFiles: 'includeFiles',
+}
+
+const defaultOptionsSelection = {
+  [exportOptions.includeCategoryItemsLabels]: true,
+  [exportOptions.includeCategories]: false,
+  [exportOptions.includeAnalysis]: false,
+  [exportOptions.includeDataFromAllCycles]: false,
+  [exportOptions.includeFiles]: false,
+}
+
 const ExportData = () => {
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const cycles = useSurveyCycleKeys()
 
-  const [state, setState] = useState({
-    options: {
-      includeCategoryItemsLabels: true,
-      includeCategories: false,
-      includeAnalysis: false,
-      includeDataFromAllCycles: false,
-    },
-  })
-  const { options } = state
+  const [state, setState] = useState({ selectedOptions: defaultOptionsSelection })
+  const { selectedOptions } = state
 
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
-      const optionsUpdated = { ...statePrev.options, [option]: value }
-      return { ...statePrev, options: optionsUpdated }
+      const optionsUpdated = { ...statePrev.selectedOptions, [option]: value }
+      return { ...statePrev, selectedOptions: optionsUpdated }
     })
 
   return (
     <div className="export">
       <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
-        <Checkbox
-          checked={options.includeCategoryItemsLabels}
-          label={i18n.t('dataExportView.options.includeCategoryItemsLabels')}
-          onChange={onOptionChange('includeCategoryItemsLabels')}
-        />
-        <Checkbox
-          checked={options.includeCategories}
-          label={i18n.t('dataExportView.options.includeCategories')}
-          onChange={onOptionChange('includeCategories')}
-        />
-        {canAnalyzeRecords && (
+        {[
+          exportOptions.includeCategoryItemsLabels,
+          exportOptions.includeCategories,
+          ...(canAnalyzeRecords ? [exportOptions.includeAnalysis] : []),
+          ...(cycles.length > 1 ? [exportOptions.includeDataFromAllCycles] : []),
+          exportOptions.includeFiles,
+        ].map((optionKey) => (
           <Checkbox
-            checked={options.includeAnalysis}
-            label={i18n.t('dataExportView.options.includeResultVariables')}
-            onChange={onOptionChange('includeAnalysis')}
+            key={optionKey}
+            checked={selectedOptions[optionKey]}
+            label={`dataExportView.options.${optionKey}`}
+            onChange={onOptionChange(optionKey)}
           />
-        )}
-        {cycles.length > 1 && (
-          <Checkbox
-            checked={options.includeDataFromAllCycles}
-            label={i18n.t('dataExportView.options.includeDataFromAllCycles')}
-            onChange={onOptionChange('includeDataFromAllCycles')}
-          />
-        )}
+        ))}
       </ExpansionPanel>
 
       <Button
         testId={TestId.dataExport.prepareExport}
-        onClick={() => dispatch(ExportCsvDataActions.startCSVExport(options))}
+        onClick={() => dispatch(ExportCsvDataActions.startCSVExport(selectedOptions))}
         label="dataExportView.startCsvExport"
       />
     </div>
