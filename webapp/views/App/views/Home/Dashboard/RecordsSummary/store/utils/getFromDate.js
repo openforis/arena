@@ -19,6 +19,9 @@ export const getFromDate = (date, timeRange) => {
     case timeRanges._1Year:
       return DateUtils.subYears(date, 1)
 
+    case timeRanges._5Years:
+      return DateUtils.subYears(date, 5)
+
     default:
       throw new Error(`Unknown timeRange: ${timeRange}`)
   }

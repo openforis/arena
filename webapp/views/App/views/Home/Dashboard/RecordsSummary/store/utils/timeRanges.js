@@ -4,4 +4,5 @@ export const timeRanges = {
   _3Months: '3Months',
   _6Months: '6Months',
   _1Year: '1Year',
+  _5Years: '5Years',
 }
