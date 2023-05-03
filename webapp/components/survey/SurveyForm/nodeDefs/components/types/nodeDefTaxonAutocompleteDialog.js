@@ -41,12 +41,14 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
     draft,
   }
 
-  const {
-    data: { list = [] } = { list: [] },
-    dispatch,
-  } = useAsyncGetRequest(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, { params })
+  const { data: { list = [] } = { list: [] }, dispatch: fetchTaxa } = useAsyncGetRequest(
+    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
+    { params }
+  )
 
-  useEffect(dispatch, [fieldValue])
+  useEffect(() => {
+    fetchTaxa()
+  }, [fetchTaxa, fieldValue])
 
   return ReactDOM.createPortal(
     <AutocompleteDialog
