@@ -7,6 +7,7 @@ import {
   formatTime,
   getBooleanSelector,
   getCoordinateSelector,
+  getDateTimeCalendarBtnSelector,
   getDateTimeInputSelector,
   getNodeDefSelector,
   getTaxonSelector,
@@ -71,8 +72,17 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
 
-const enterTime = async (nodeDef, value, parentSelector) =>
-  page.fill(getDateTimeInputSelector(nodeDef, parentSelector), formatTime(value))
+const enterTime = async (nodeDef, value, parentSelector) => {
+  const timeFormatted = formatTime(value)
+  const [hours, minutes] = timeFormatted.split(':')
+  // open hours/minutes selector
+  await page.click(getDateTimeCalendarBtnSelector(nodeDef, parentSelector))
+  // select time
+  await page.getByRole('option', { name: `${hours} hours` }).click()
+  await page.getByRole('option', { name: `${minutes} minutes` }).click()
+  // click ok button
+  await page.getByRole('button', { name: 'OK' }).click()
+}
 
 const enterFns = {
   boolean: enterBoolean,
