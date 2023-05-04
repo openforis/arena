@@ -4,7 +4,6 @@ import * as DateUtils from '../../../../core/dateUtils'
 import { TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import {
-  formatTime,
   getBooleanSelector,
   getCoordinateSelector,
   getDateTimeCalendarBtnSelector,
@@ -73,11 +72,12 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
 
 const enterTime = async (nodeDef, value, parentSelector) => {
-  const timeFormatted = formatTime(value)
-  const [hours, minutes] = timeFormatted.split(':')
+  const hours = value.getHours()
+  const minutes = value.getMinutes()
   // open hours/minutes selector
   await page.click(getDateTimeCalendarBtnSelector(nodeDef, parentSelector))
   // select time
+  await page.waitForSelector('.MuiMultiSectionDigitalClock-root', { timeout: 2000 })
   await page.getByRole('option', { name: `${hours} hours` }).click()
   await page.getByRole('option', { name: `${minutes} minutes` }).click()
   // click ok button
