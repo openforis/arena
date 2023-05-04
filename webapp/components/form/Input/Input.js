@@ -2,7 +2,7 @@ import '../form.scss'
 
 import React, { useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
-import NumberFormat from 'react-number-format'
+import { NumericFormat } from 'react-number-format'
 import classNames from 'classnames'
 
 import { useOnUpdate } from '../../hooks'
@@ -70,7 +70,7 @@ export const Input = React.forwardRef((props, ref) => {
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
-        <NumberFormat
+        <NumericFormat
           autoComplete="off"
           disabled={disabled}
           className={className}

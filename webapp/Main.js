@@ -2,7 +2,7 @@ import './utils/polyfill/polyfill'
 import './style/main.scss'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { BrowserRouter } from 'react-router-dom'
@@ -18,7 +18,9 @@ import i18n from '@core/i18n/i18nFactory'
 document.getElementById('preloader-wrapper').remove()
 
 // render React app
-ReactDOM.render(
+const container = document.getElementById('main')
+const root = createRoot(container)
+root.render(
   <Provider store={store}>
     <I18nextProvider i18n={i18n}>
       <BrowserRouter>
@@ -27,6 +29,5 @@ ReactDOM.render(
         </LocalizationProvider>
       </BrowserRouter>
     </I18nextProvider>
-  </Provider>,
-  document.getElementById('main')
+  </Provider>
 )
