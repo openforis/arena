@@ -79,19 +79,24 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
   )
 
   const getCodeAttributeAncestorNames = (nodeDef) => {
-    const ancestorCodeAttributeNames = []
+    const codeAttributeAncestorNames = []
 
     let currentParentCode = Survey.getNodeDefParentCode(nodeDef)(survey)
     while (currentParentCode) {
-      ancestorCodeAttributeNames.unshift(NodeDef.getName(currentParentCode))
+      codeAttributeAncestorNames.unshift(NodeDef.getName(currentParentCode))
       currentParentCode = Survey.getNodeDefParentCode(currentParentCode)(survey)
     }
-    return ancestorCodeAttributeNames
+    return codeAttributeAncestorNames
   }
 
   return {
     categoryAttributeAncestors: codeAttributes2ndLevel.map((nodeDef) => ({
       attribute: NodeDef.getName(nodeDef),
+      categoryName: getCategoryNameByUuid({
+        survey,
+        categoryUuid: NodeDef.getCategoryUuid(nodeDef),
+      }),
+      categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
       ancestors: getCodeAttributeAncestorNames(nodeDef),
     })),
   }
