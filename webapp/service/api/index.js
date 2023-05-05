@@ -55,6 +55,6 @@ export {
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
 
-export { createAccessRequest, acceptAccessRequest, fetchUserSurveys, changeUserPassword } from './user'
+export { createAccessRequest, acceptAccessRequest, fetchUser, fetchUserSurveys, changeUserPassword } from './user'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
