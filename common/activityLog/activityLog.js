@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -127,29 +127,29 @@ export const newActivity = (activityType, content, system = false) => ({
 // ====== READ
 
 export const { getId } = ObjectUtils
-export const getUserUuid = R.prop(keys.userUuid)
-export const getType = R.prop(keys.type)
-export const getContent = R.prop(keys.content)
-export const isSystem = R.propEq(keys.system, true)
+export const getUserUuid = A.prop(keys.userUuid)
+export const getType = A.prop(keys.type)
+export const getContent = A.prop(keys.content)
+export const isSystem = ObjectUtils.isKeyTrue(keys.system)
 export const { getDateCreated } = ObjectUtils
 // taxonomy
-export const getTaxonomy = R.prop(keysContent.taxonomy)
+export const getTaxonomy = A.prop(keysContent.taxonomy)
 // cateogry
-export const getCategory = R.prop(keysContent.category)
+export const getCategory = A.prop(keysContent.category)
 
 // Props associated from fetch
-export const getUserName = R.prop(keys.userName)
-export const getRecordUuid = R.prop(keys.recordUuid)
-export const getKeysHierarchy = R.propOr([], keys.keysHierarchy)
-export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
-export const getTargetUserName = R.prop(keys.targetUserName)
-export const getTargetUserUuid = R.prop(keys.targetUserUuid)
-export const getTargetUserEmail = R.prop(keys.targetUserEmail)
-export const getChainUuid = R.prop(keys.chainUuid)
-export const getChainLabels = R.prop(keys.chainLabels)
+export const getUserName = A.prop(keys.userName)
+export const getRecordUuid = A.prop(keys.recordUuid)
+export const getKeysHierarchy = A.propOr([], keys.keysHierarchy)
+export const getNodeDefUuid = A.prop(keys.nodeDefUuid)
+export const getTargetUserName = A.prop(keys.targetUserName)
+export const getTargetUserUuid = A.prop(keys.targetUserUuid)
+export const getTargetUserEmail = A.prop(keys.targetUserEmail)
+export const getChainUuid = A.prop(keys.chainUuid)
+export const getChainLabels = A.prop(keys.chainLabels)
 
 // Content props
-const _getContentProp = (prop) => R.path([keys.content, prop])
+const _getContentProp = (prop) => A.pipe(getContent, A.prop(prop))
 export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)
