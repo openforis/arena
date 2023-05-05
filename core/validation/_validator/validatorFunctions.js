@@ -5,7 +5,7 @@ import { ValidatorErrorKeys } from './validatorErrorKeys'
 import * as ValidatorNameKeywords from './validatorNameKeywords'
 
 /**
- * Internal names must contain only lowercase letters, numbers and underscores starting with a letter
+ * Internal names must contain only lowercase letters, numbers and underscores starting with a letter.
  */
 const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 
@@ -69,3 +69,11 @@ export const validateEmail =
   }
 
 export const { isKeyword } = ValidatorNameKeywords
+
+export const validateMinLength =
+  ({ errorKey = ValidatorErrorKeys.minLengthNotRespected, minLength }) =>
+  (propName, item) => {
+    const value = getProp(propName, '')(item)
+    const length = value.length
+    return length < minLength ? { key: errorKey, params: { minLength, length } } : null
+  }
