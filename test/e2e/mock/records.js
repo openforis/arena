@@ -43,7 +43,7 @@ const _createRecord = (idx) => {
   const clusterProvince = `${clusterRegion}${getRandomInRange(0, 2)}`
   const clusterTime = new Date()
   clusterTime.setHours(getRandomInRange(0, 23))
-  clusterTime.setMinutes(getRandomInRange(0, 59))
+  clusterTime.setMinutes(Math.floor(getRandomInRange(0, 59) * 6)) //random minutes multiples of 5 (time picker shows minutes in this way)
 
   return {
     // cluster
