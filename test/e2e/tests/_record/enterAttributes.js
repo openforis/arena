@@ -80,8 +80,6 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   await page.waitForSelector('.MuiMultiSectionDigitalClock-root', { timeout: 2000 })
   await page.getByRole('option', { name: `${hours} hours` }).click()
   await page.getByRole('option', { name: `${minutes} minutes` }).click()
-  // click ok button
-  await page.getByRole('button', { name: 'OK' }).click()
 }
 
 const enterFns = {
