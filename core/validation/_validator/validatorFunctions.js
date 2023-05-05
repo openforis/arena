@@ -75,5 +75,8 @@ export const validateMinLength =
   (propName, item) => {
     const value = getProp(propName, '')(item)
     const length = value.length
-    return length < minLength ? { key: errorKey, params: { minLength, length } } : null
+    if (length >= minLength) {
+      return null
+    }
+    return { key: errorKey, params: { minLength, length } }
   }
