@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { plot } from '../mock/nodeDefs'
@@ -10,7 +12,7 @@ import { gotoRecord } from './_records'
 const { plot_id } = plot.children
 
 export default () =>
-  describe('Record verify', () => {
+  test.describe('Record verify', () => {
     describe.each(Array.from(Array(records.length).keys()))(`Verify record %s`, (idx) => {
       const record = records[idx]
 

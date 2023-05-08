@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import * as PromiseUtils from '../../../core/promiseUtils'
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { survey, survey2, surveyFromTemplate, surveyImport } from '../mock/survey'
@@ -23,7 +25,7 @@ const deleteSurvey = async (surveyToDelete) => {
 }
 
 export default () =>
-  describe('Survey Delete', () => {
+  test.describe('Survey Delete', () => {
     gotoSurveyList()
 
     test('Delete surveys', async () => {

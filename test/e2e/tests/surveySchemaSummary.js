@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import fs from 'fs'
 import path from 'path'
 
@@ -38,7 +40,7 @@ const getTestNodeDefsOrderedByPath = () => {
 }
 
 export default () =>
-  describe('Survey Schema Summary', () => {
+  test.describe('Survey Schema Summary', () => {
     gotoFormDesigner()
 
     const filePath = path.join(downloadsPath, 'schemaSummary.csv')

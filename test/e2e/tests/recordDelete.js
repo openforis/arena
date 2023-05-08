@@ -1,10 +1,12 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { records } from '../mock/records'
 import { gotoHome, gotoRecords } from './_navigation'
 import { expectNoItems } from './_tables'
 
 export default () =>
-  describe('Record delete', () => {
+  test.describe('Record delete', () => {
     gotoRecords()
 
     describe.each(Array.from(Array(records.length).keys()).reverse())(`Delete record at index %s`, (idx) => {

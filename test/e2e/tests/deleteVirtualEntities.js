@@ -1,10 +1,12 @@
+import { test } from '@playwright/test'
+
 import { gotoEntities, gotoHome } from './_navigation'
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { virtualEntities } from '../mock/nodeDefs'
 
 export default () =>
-  describe('Delete virtual entities', () => {
+  test.describe('Delete virtual entities', () => {
     gotoEntities()
 
     test(`Delete entity`, async () => {

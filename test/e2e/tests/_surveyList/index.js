@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
 export const clickSurvey = async (survey) => {

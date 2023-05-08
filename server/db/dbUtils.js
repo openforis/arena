@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import * as pgPromise from 'pg-promise'
+import pgPromise from 'pg-promise'
 import * as _QueryStream from 'pg-query-stream'
 
 import { db } from '@server/db/db'
@@ -38,11 +38,11 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  *
  * @param schema
  * @param table
- * @param idCol Name of the identifier column (used to build the WHERE condition) or pgromise helpers.ColumnConfig object
- * @param updateCols Array of column names or pgromise helpers.ColumnConfig objects that describe the columns to update
- * @param itemsValues List of array of values to use in the update.
- *        The first value in every array of values must be the value of the identifier column
- * @returns Generated query string
+ * @param idCol - Name of the identifier column (used to build the WHERE condition) or pgromise helpers.ColumnConfig object.
+ * @param updateCols - Array of column names or pgromise helpers.ColumnConfig objects that describe the columns to update.
+ * @param itemsValues - List of array of values to use in the update.
+ *        The first value in every array of values must be the value of the identifier column.
+ * @returns Generated query string.
  */
 export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
   const getColumnName = (col) => R.propOr(col, 'name', col)
@@ -74,7 +74,10 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
 }
 
 /**
- * Combines draft and published props
+ * Combines draft and published props.
+ * @param draft
+ * @param columnPrefix
+ * @param alias
  */
 export const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
   draft
@@ -82,14 +85,22 @@ export const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
     : `${columnPrefix}props${alias ? ` AS ${alias}` : ''}`
 
 /**
- * Combines a draft and a published column prop, if needed
+ * Combines a draft and a published column prop, if needed.
+ * @param propName
+ * @param draft
+ * @param columnPrefix
+ * @param asText
+ * @param alias
  */
 export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) =>
   `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${alias ? ` AS ${alias}` : ''}`
 
 /**
  * Generates a filter condition (LIKE) with a named parameter.
- * E.g. "lower(col) LIKE $/searchValue/ where "col" is a json prop column
+ * E.g. "lower(col) LIKE $/searchValue/ where "col" is a json prop column.
+ * @param propName
+ * @param draft
+ * @param columnPrefix
  */
 export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
   `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`

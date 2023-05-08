@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { categories } from '../mock/categories'
@@ -13,7 +15,7 @@ const { cluster_country, cluster_region, cluster_province } = cluster.children
 const category = categories[cluster_country.category]
 
 export default () =>
-  describe('NodeDefCode and category edit', () => {
+  test.describe('NodeDefCode and category edit', () => {
     gotoFormDesigner()
 
     addNodeDef(cluster, cluster_country, false)

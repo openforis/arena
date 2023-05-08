@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { dragAndDrop, dragAndDropOver } from './utils/dragDrop'
@@ -61,7 +63,7 @@ const verityEntityOrder = (nodeDef, expectedOrder) =>
   })
 
 export default () =>
-  describe('NodeDef reorder', () => {
+  test.describe('NodeDef reorder', () => {
     gotoFormDesigner()
 
     verityEntityOrder(

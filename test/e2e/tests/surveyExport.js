@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { survey } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
 import {
@@ -13,7 +15,7 @@ import {
 import { selectSurvey } from './_surveyList'
 
 export default () =>
-  describe('Survey export', () => {
+  test.describe('Survey export', () => {
     gotoSurveyList()
 
     selectSurvey(survey)

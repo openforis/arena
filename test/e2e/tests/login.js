@@ -1,7 +1,9 @@
+import { expect, test } from '@playwright/test'
+
 import { user } from '../mock/user'
 
 export default () =>
-  describe('Login', () => {
+  test.describe('Login', () => {
     test('Login Unsuccessful', async () => {
       // Fill input[name="email"]
       await page.fill('input[name="email"]', user.email)

@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { BASE_URL } from '../../config'
 
@@ -32,7 +34,7 @@ export const gotoTemplateList = () =>
 
 // ==== Dashboard
 export const gotoSurveyInfo = () =>
-  test('Goto survey create', async () => {
+  test('Goto survey info', async () => {
     await page.goto(`${BASE_URL}/app/home/dashboard/`)
     await page.click(getSelector(TestId.dashboard.surveyInfoBtn, 'a'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyInfo/`)

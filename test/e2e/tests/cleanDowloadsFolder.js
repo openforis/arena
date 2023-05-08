@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import fs from 'fs'
 import path from 'path'
 
@@ -14,6 +16,6 @@ export const cleanDowloadsFolder = () => {
         fs.rmSync(filePath)
       }
     })
-    await expect(fs.readdirSync(downloadsPath).length).toBe(0)
+    expect(fs.readdirSync(downloadsPath).length).toBe(0)
   })
 }

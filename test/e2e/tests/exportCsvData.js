@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
@@ -36,7 +38,7 @@ const getCodeAndLabel = (value) => {
   return { code, label }
 }
 export default () =>
-  describe('Export data in csv', () => {
+  test.describe('Export data in csv', () => {
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {

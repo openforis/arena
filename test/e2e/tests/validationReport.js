@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { cluster, plot, tree } from '../mock/nodeDefs'
@@ -75,11 +77,11 @@ const gotoRecordAndEnterValue = (record, attribute, value) => {
 }
 
 export default () =>
-  describe('Validation report', () => {
+  test.describe('Validation report', () => {
     gotoValidationReport()
     expectMessages([])
 
-    describe(`Duplicate root entity key`, () => {
+    test.describe(`Duplicate root entity key`, () => {
       gotoRecordAndEnterValue(record2, cluster_id, '6')
       gotoRecordAndEnterValue(record3, cluster_id, '6')
       gotoValidationReport()
@@ -89,14 +91,14 @@ export default () =>
       ])
     })
 
-    describe(`Restore root entity keys`, () => {
+    test.describe(`Restore root entity keys`, () => {
       gotoRecordAndEnterValue(record3, cluster_id, '3')
       gotoRecordAndEnterValue(record2, cluster_id, '2')
       gotoValidationReport()
       expectMessages([])
     })
 
-    describe(`Duplicate root entity unique attribute`, () => {
+    test.describe(`Duplicate root entity unique attribute`, () => {
       const record1CoordinateValuePrev = record1[cluster_coordinate.name]
       const record2CoordinateValuePrev = record2[cluster_coordinate.name]
       const clusterCoordinateDuplicate = { x: '10', y: '20', srs: '4326' }
@@ -118,7 +120,7 @@ export default () =>
       expectMessages([])
     })
 
-    describe(`Invalidate record ${cluster_id.name} ${record1[cluster_id.name]}`, () => {
+    test.describe(`Invalidate record ${cluster_id.name} ${record1[cluster_id.name]}`, () => {
       gotoRecords()
       gotoRecord(record1)
       enterAttribute(cluster_id, '')
@@ -136,7 +138,7 @@ export default () =>
       expectMessages([['Cluster[] / Cluster id', 'Required value']])
     })
 
-    describe(`Verify non relevant nodes becoming relevant and getting validated`, () => {
+    test.describe(`Verify non relevant nodes becoming relevant and getting validated`, () => {
       gotoNode('Cluster[] / Cluster id')
       enterAttribute(cluster_id, record1[cluster_id.name])
       waitThread()
@@ -151,7 +153,7 @@ export default () =>
       ])
     })
 
-    describe(`Edit node in page`, () => {
+    test.describe(`Edit node in page`, () => {
       const clusterIdValue = record1[cluster_id.name]
       const plotIdValue = record1[plot_id.name]
 
@@ -173,7 +175,7 @@ export default () =>
       ])
     })
 
-    describe(`Verify non relevant nodes validation is cleared`, () => {
+    test.describe(`Verify non relevant nodes validation is cleared`, () => {
       gotoRecords()
       gotoRecord(record1)
       enterAttribute(cluster_id, '')

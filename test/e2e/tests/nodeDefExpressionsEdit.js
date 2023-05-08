@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { nodeDefExpressions } from '../mock/nodeDefExpressions'
 import { editNodeDef, gotoFormPage } from './_formDesigner'
@@ -16,7 +18,7 @@ const editExpression = (nodeDef) => {
 }
 
 export default () =>
-  describe('NodeDef expressions edit', () => {
+  test.describe('NodeDef expressions edit', () => {
     gotoFormDesigner()
 
     editExpression(cluster_date)

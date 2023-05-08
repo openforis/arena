@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { survey, surveyFromTemplate } from '../mock/survey'
 import { gotoSurveyList } from './_navigation'
 import {
@@ -13,7 +15,7 @@ import { selectSurvey } from './_surveyList'
 import { createSurvey } from './_surveyCreate'
 
 export default () =>
-  describe('Survey create from template', () => {
+  test.describe('Survey create from template', () => {
     createSurvey(surveyFromTemplate)
 
     exportSurvey(surveyFromTemplate)

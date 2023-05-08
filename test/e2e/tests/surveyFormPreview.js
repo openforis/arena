@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { gotoFormPage } from './_formDesigner'
@@ -29,7 +31,7 @@ const {
 const { tree_id, tree_dec_1, tree_dec_2 } = tree.children
 
 export default () =>
-  describe('SurveyForm preview', () => {
+  test.describe('SurveyForm preview', () => {
     let startTime = null
 
     gotoFormDesigner()
@@ -124,7 +126,7 @@ export default () =>
         const treeDec1Tree2BadgeEl = await page.$(
           `${tree2Selector} ${getSelector(TestId.surveyForm.nodeDefErrorBadge(tree_dec_1.name))}`
         )
-        await expect(treeDec1Tree2BadgeEl).toBeNull()
+        expect(treeDec1Tree2BadgeEl).toBeNull()
       })
 
       test(`Verify ${tree_dec_2.name} validation`, async () => {

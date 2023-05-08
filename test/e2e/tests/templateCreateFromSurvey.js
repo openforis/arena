@@ -1,9 +1,11 @@
+import { expect, test } from '@playwright/test'
+
 import { templateFromSurvey } from '../mock/survey'
 import { createTemplate } from './_templateCreate'
 import { exportSurvey, verifyCategories, verifyNodeDefs, verifySurvey, verifyTaxonomies } from './_surveyExport'
 
 export default () =>
-  describe('Template Create from Survey', () => {
+  test.describe('Template Create from Survey', () => {
     createTemplate(templateFromSurvey)
 
     exportSurvey(templateFromSurvey)

@@ -1,3 +1,5 @@
+import { test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { getSurveyZipPath } from '../paths'
 import { survey, surveyImport } from '../mock/survey'
@@ -15,7 +17,7 @@ import {
 import { selectSurvey } from './_surveyList'
 
 export default () =>
-  describe('Survey import', () => {
+  test.describe('Survey import', () => {
     exportSurvey(survey)
 
     gotoSurveyCreate()

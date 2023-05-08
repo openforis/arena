@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { editNodeDef, addNodeDef, addNodeDefAtomicChildren, addNodeDefSubPage } from './_formDesigner'
@@ -5,7 +7,7 @@ import { gotoFormDesigner } from './_navigation'
 import { publishWithErrors, publishWithoutErrors } from './_publish'
 
 export default () =>
-  describe('NodeDef atomic edit', () => {
+  test.describe('NodeDef atomic edit', () => {
     gotoFormDesigner()
 
     test('Verify root entity error', async () => {

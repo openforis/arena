@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { user, user2 } from '../mock/user'
 import { FormUtils } from './utils/formUtils'
@@ -35,7 +37,7 @@ const inviteUser = (userToInvite) =>
   })
 
 export default () =>
-  describe('User invite', () => {
+  test.describe('User invite', () => {
     gotoUserList()
     expectUsers([[user.email, user.authGroup.key]])
 

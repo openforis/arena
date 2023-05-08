@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { BASE_URL } from '../config'
 import { templates } from '../mock/survey'
@@ -6,7 +8,7 @@ import { clickSurvey } from './_surveyList'
 import { expectNoItems } from './_tables'
 
 export default () =>
-  describe('Template Delete', () => {
+  test.describe('Template Delete', () => {
     gotoTemplateList()
 
     describe.each(Array.from(Array(templates.length).keys()))(`Delete template %s`, (idx) => {

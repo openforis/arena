@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { gotoHome, gotoSurveyInfo } from './_navigation'
 
@@ -8,7 +10,7 @@ const surveyLanguage = getSelector(TestId.surveyInfo.surveyLanguage, 'input')
 const saveBtn = getSelector(TestId.surveyInfo.saveBtn, 'button')
 
 export default () =>
-  describe('Survey info edit', () => {
+  test.describe('Survey info edit', () => {
     gotoSurveyInfo()
 
     test('Verify name required', async () => {

@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { plot, tree } from '../mock/nodeDefs'
 import { taxonomies } from '../mock/taxonomies'
@@ -12,7 +14,7 @@ const { tree_species } = tree.children
 const taxonomy = taxonomies[tree_species.taxonomy]
 
 export default () =>
-  describe('NodeDefTaxon and taxonomy edit', () => {
+  test.describe('NodeDefTaxon and taxonomy edit', () => {
     gotoFormDesigner()
     gotoFormPage(plot)
 

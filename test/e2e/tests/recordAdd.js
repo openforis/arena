@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { plot } from '../mock/nodeDefs'
@@ -7,7 +9,7 @@ import { gotoHome, gotoRecords } from './_navigation'
 import { enterCluster, enterPlot, enterTrees } from './_record'
 
 export default () =>
-  describe('Record add', () => {
+  test.describe('Record add', () => {
     describe.each(Array.from(Array(records.length).keys()))(`Add record %s`, (idx) => {
       const record = records[idx]
 
@@ -20,7 +22,7 @@ export default () =>
           page.click(getSelector(TestId.records.addBtn, 'button')),
         ])
         const invalidRecordBtn = await page.waitForSelector(getSelector(TestId.record.invalidBtn))
-        await expect(invalidRecordBtn).not.toBeNull()
+        expect(invalidRecordBtn).not.toBeNull()
       })
 
       enterCluster(record)

@@ -1,3 +1,5 @@
+import { test } from '@playwright/test'
+
 import { BASE_URL } from '../config'
 
 import login from '../tests/login'
@@ -37,12 +39,12 @@ import { cleanDowloadsFolder } from '../tests/cleanDowloadsFolder'
 // import createVirtualEntities from '../tests/createVirtualEntities'
 // import deleteVirtualEntities from '../tests/deleteVirtualEntities'
 
-beforeAll(async () => {
+test.beforeAll(async () => {
   await insertTestUser()
   await page.goto(BASE_URL)
 })
 
-describe('E2E Tests', () => {
+test.describe('E2E Tests', () => {
   login()
   /**
    * Survey create and info edit.

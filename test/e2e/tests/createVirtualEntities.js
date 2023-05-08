@@ -1,10 +1,12 @@
+import { test } from '@playwright/test'
+
 import { gotoHome, gotoEntities } from './_navigation'
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { virtualEntities } from '../mock/nodeDefs'
 import { FormUtils } from './utils/formUtils'
 
 export default () =>
-  describe('Create virtual entities', () => {
+  test.describe('Create virtual entities', () => {
     gotoEntities()
 
     describe.each(Array.from(Array(virtualEntities.length).keys()))(`Add virtual entity %s`, (idx) => {

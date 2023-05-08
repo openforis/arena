@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { categories } from '../../mock/categories'
 import { BASE_URL } from '../../config'
