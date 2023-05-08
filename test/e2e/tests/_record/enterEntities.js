@@ -1,3 +1,5 @@
+import { expect, test } from '@playwright/test'
+
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
 import { cluster, plot, tree } from '../../mock/nodeDefs'
@@ -19,7 +21,7 @@ const { plot_id, plot_text } = plot.children
 const { tree_id, tree_dec_1, tree_dec_2, tree_species } = tree.children
 
 export const enterCluster = (record) =>
-  describe(`Enter ${cluster.name} values`, () => {
+  test.describe(`Enter ${cluster.name} values`, () => {
     enterAttribute(cluster_id, record[cluster_id.name])
     enterAttribute(cluster_boolean, record[cluster_boolean.name])
     enterAttribute(cluster_decimal, record[cluster_decimal.name])
@@ -30,7 +32,7 @@ export const enterCluster = (record) =>
   })
 
 export const enterPlot = (record) =>
-  describe(`Enter ${plot.name} values`, () => {
+  test.describe(`Enter ${plot.name} values`, () => {
     test('Add new plot', async () => {
       await page.click(getSelector(TestId.entities.form.addNewNode, 'button'))
       await expect(page).toHaveSelector(getSelector(TestId.entities.form.nodeSelect), 'select')
