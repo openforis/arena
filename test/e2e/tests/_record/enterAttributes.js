@@ -78,13 +78,14 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   const listboxSelector = '.MuiMultiSectionDigitalClock-root'
   await page.waitForSelector(listboxSelector, { timeout: 2000 })
   let listboxEl = await page.$(listboxSelector)
-  await expect(listboxEl).toBeVisible()
+  await expect(listboxEl).not.toBeNull()
   await expect(page.getByRole('listbox')).toBeVisible()
   const hours = value.getHours()
   await page.getByRole('option', { name: `${hours} hours` }).click()
   const minutes = value.getMinutes()
   await page.getByRole('option', { name: `${minutes} minutes` }).click()
-  await expect(listboxEl).not.toBeVisible()
+  listboxEl = await page.$(listboxSelector)
+  await expect(listboxEl).toBeNull()
 }
 
 const enterFns = {
