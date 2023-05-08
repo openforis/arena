@@ -20,6 +20,7 @@ import { TestId } from '@webapp/utils/testId'
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import { useInviteUser } from './store'
+import { Checkbox } from '@webapp/components/form'
 
 const UserInviteComponent = () => {
   const { userInvite, onUpdate, onInvite } = useInviteUser()
@@ -30,9 +31,12 @@ const UserInviteComponent = () => {
 
   const validation = UserInvite.getValidation(userInvite)
   const selectedGroupUuid = UserInvite.getGroupUuid(userInvite)
+  const inviteAsSurveyManager = UserInvite.isInviteAsSurveyManager(userInvite)
   const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo })
   const selectedGroup = groups.find((group) => group.uuid === selectedGroupUuid)
   const selectedGroupName = AuthGroup.getName(selectedGroup)
+  const groupIsSurveyGroup = AuthGroup.isSurveyGroup(selectedGroup)
+  const canInviteAsSurveyManager = groupIsSurveyGroup && groups.some(AuthGroup.isSurveyManagerGroup)
 
   return (
     <div className="user-invite form">
@@ -53,6 +57,15 @@ const UserInviteComponent = () => {
           onChange={(group) => onUpdate({ name: UserInvite.keys.groupUuid, value: AuthGroup.getUuid(group) })}
         />
       </FormItem>
+
+      {canInviteAsSurveyManager && (
+        <FormItem label={i18n.t('authGroups.surveyManager.label')}>
+          <Checkbox
+            checked={inviteAsSurveyManager}
+            onChange={(value) => onUpdate({ name: UserInvite.keys.inviteAsSurveyManager, value })}
+          />
+        </FormItem>
+      )}
 
       {!Survey.isPublished(surveyInfo) && (
         <Markdown

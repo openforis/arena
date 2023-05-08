@@ -133,7 +133,7 @@ export const isSystemAdminGroup = (group) => getName(group) === groupNames.syste
 
 export const isSurveyManagerGroup = (group) => getName(group) === groupNames.surveyManager
 
-export const isSurveyGroup = (group) => !isSystemAdminGroup(group) && !isSurveyManagerGroup(group)
+export const isSurveyGroup = (group) => group && !isSystemAdminGroup(group) && !isSurveyManagerGroup(group)
 
 export const { isEqual } = ObjectUtils
 
