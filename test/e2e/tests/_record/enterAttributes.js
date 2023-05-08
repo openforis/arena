@@ -78,10 +78,15 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   const timePickerSelector = '.MuiPickersPopper-root'
   const timePickerLocator = page.locator(timePickerSelector)
   await expect(await timePickerLocator.isVisible()).toBeTruthy()
+
   const hours = value.getHours()
-  await page.getByRole('option', { label: `${hours} hours` }).click()
+  const hoursOptionLocator = page.locator(`${timePickerSelector} li aria-label["${hours} hours"]`)
+  await hoursOptionLocator.click()
+
   const minutes = value.getMinutes()
-  await page.getByRole('option', { label: `${minutes} minutes` }).click()
+  const minutesOptionLocator = page.locator(`${timePickerSelector} li aria-label["${minutes} minutes"]`)
+  await minutesOptionLocator.click()
+
   if (await timePickerLocator.isVisible()) {
     await page.click('.MuiDialogActions-root button[text="OK"]')
   }
