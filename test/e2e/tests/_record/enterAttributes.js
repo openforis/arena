@@ -76,15 +76,13 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   await page.click(getDateTimeCalendarBtnSelector(nodeDef, parentSelector))
   // select time
   const listboxSelector = '.MuiMultiSectionDigitalClock-root'
-  const listboxLocator = page.locator(listboxSelector)
-  let listboxEl = page.$(listboxLocator)
-  await expect(listboxEl).not.toBeNull()
+  let listboxLocator = page.locator(listboxSelector)
+  await expect(await listboxLocator.isVisible()).toBeTruthy()
   const hours = value.getHours()
   await page.getByRole('option', { name: `${hours} hours` }).click()
   const minutes = value.getMinutes()
   await page.getByRole('option', { name: `${minutes} minutes` }).click()
-  listboxEl = await page.$(listboxSelector)
-  await expect(listboxEl).toBeNull()
+  await expect(await listboxLocator.isHidden()).toBeTruthy()
 }
 
 const enterFns = {
