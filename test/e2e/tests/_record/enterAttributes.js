@@ -82,7 +82,12 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   await page.getByRole('option', { name: `${hours} hours` }).click()
   const minutes = value.getMinutes()
   await page.getByRole('option', { name: `${minutes} minutes` }).click()
-  await expect(await timePickerLocator.isHidden()).toBeTruthy()
+  let timePickerVisible = await timePickerLocator.isVisible()
+  if (timePickerVisible) {
+    await page.click('.MuiDialogActions-root button[text="OK"]')
+  }
+  timePickerVisible = await timePickerLocator.isVisible()
+  await expect(timePickerVisible).toBeTruthy()
 }
 
 const enterFns = {
