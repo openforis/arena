@@ -80,11 +80,11 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   await expect(await timePickerLocator.isVisible()).toBeTruthy()
 
   const hours = value.getHours()
-  const hoursOptionLocator = page.locator(`${timePickerSelector} li aria-label["${hours} hours"]`)
+  const hoursOptionLocator = page.locator(`${timePickerSelector} li[aria-label="${hours} hours"]`)
   await hoursOptionLocator.click()
 
   const minutes = value.getMinutes()
-  const minutesOptionLocator = page.locator(`${timePickerSelector} li aria-label["${minutes} minutes"]`)
+  const minutesOptionLocator = page.locator(`${timePickerSelector} li[aria-label="${minutes} minutes"]`)
   await minutesOptionLocator.click()
 
   if (await timePickerLocator.isVisible()) {
