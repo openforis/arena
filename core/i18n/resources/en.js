@@ -1336,6 +1336,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
     invalidDate: 'Invalid date',
+    minLengthNotRespected: 'Minimum length of {{minLength}} characters not respected',
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
     nameRequired: 'Name is required',

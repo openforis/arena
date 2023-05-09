@@ -44,6 +44,7 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
 export const {
   validateRequired,
   validateItemPropUniqueness,
+  validateMinLength,
   validateNotKeyword,
   validateName,
   validateNumber,
