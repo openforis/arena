@@ -73,18 +73,26 @@ const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSel
 
 const enterTime = async (nodeDef, value, parentSelector) => {
   // open hours/minutes selector
-  await page.click(getDateTimeCalendarBtnSelector(nodeDef, parentSelector))
-  // select time
+  const dateTimeCalendarBtnSelector = getDateTimeCalendarBtnSelector(nodeDef, parentSelector)
+  const dateTimeCalendarBtnLocator = page.locator(dateTimeCalendarBtnSelector)
+  expect(await dateTimeCalendarBtnLocator.isVisible()).toBeTruthy()
+  await dateTimeCalendarBtnLocator.click()
+
+  // select time using time picker
   const timePickerSelector = '.MuiPickersPopper-root'
   const timePickerLocator = page.locator(timePickerSelector)
   await expect(await timePickerLocator.isVisible()).toBeTruthy()
 
   const hours = value.getHours()
   const hoursOptionLocator = page.locator(`${timePickerSelector} li[aria-label="${hours} hours"]`)
+  await hoursOptionLocator.scrollIntoViewIfNeeded()
+  await expect(await hoursOptionLocator.isVisible()).toBeTruthy()
   await hoursOptionLocator.click()
 
   const minutes = value.getMinutes()
   const minutesOptionLocator = page.locator(`${timePickerSelector} li[aria-label="${minutes} minutes"]`)
+  await minutesOptionLocator.scrollIntoViewIfNeeded()
+  await expect(await minutesOptionLocator.isVisible()).toBeTruthy()
   await minutesOptionLocator.click()
 
   if (await timePickerLocator.isVisible()) {
