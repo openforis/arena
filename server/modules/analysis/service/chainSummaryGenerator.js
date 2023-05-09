@@ -8,7 +8,6 @@ import * as Category from '@core/survey/category'
 import SystemError from '@core/systemError'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 import * as ChainManager from '../manager'
 
@@ -20,18 +19,14 @@ const generateSurveySummary = ({ survey, lang }) => ({
   surveyDescription: Survey.getDescription(lang, '')(survey),
 })
 
-const fetchCategoryNameByUuid = async ({ survey, categoryUuid }) => {
-  const category = await CategoryManager.fetchCategoryAndLevelsByUuid({
-    surveyId: Survey.getId(survey),
-    categoryUuid,
-    draft: true,
-  })
+const getCategoryNameByUuid = ({ survey, categoryUuid }) => {
+  const category = Survey.getCategoryByUuid(categoryUuid)(survey)
   return Category.getName(category)
 }
 
-const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) => {
+const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
   const categoryName = NodeDef.isCode(analysisNodeDef)
-    ? await fetchCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(analysisNodeDef) })
+    ? getCategoryNameByUuid({ survey, categoryUuid: NodeDef.getCategoryUuid(analysisNodeDef) })
     : ''
   const entity = Survey.getNodeDefParent(analysisNodeDef)(survey)
 
@@ -49,7 +44,7 @@ const generateResultVariableSummary = async ({ survey, analysisNodeDef, lang }) 
 
 const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
   const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
-  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return null
+  if (ChainStatisticalAnalysis.isEmpty(statisticalAnalysis)) return {}
 
   const entity = Survey.getNodeDefByUuid(ChainStatisticalAnalysis.getEntityDefUuid(statisticalAnalysis))(survey)
   const dimensions = Survey.getNodeDefsByUuids(ChainStatisticalAnalysis.getDimensionUuids(statisticalAnalysis))(survey)
@@ -57,23 +52,68 @@ const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
   const samplingStrategySpecified = !!ChainSamplingDesign.getSamplingStrategy(chainSamplingDesign)
 
   return {
-    entity: NodeDef.getName(entity),
-    dimensions: dimensions.map(NodeDef.getName),
-    filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
-    reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
-    clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
-    nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
-    ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+    analysis: {
+      entity: NodeDef.getName(entity),
+      dimensions: dimensions.map(NodeDef.getName),
+      filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
+      reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
+      clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
+      nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
+      ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+    },
+  }
+}
+
+const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
+  const hierarchicalCategories = Survey.getCategoriesArray(survey).filter(Category.isHierarchical)
+  if (hierarchicalCategories.length === 0) {
+    return {}
+  }
+  const hierarchicalCategoriesUuids = hierarchicalCategories.map(Category.getUuid)
+
+  const codeAttributes2ndLevel = Survey.getNodeDefsArray(survey).filter(
+    (nodeDef) =>
+      NodeDef.isCode(nodeDef) &&
+      hierarchicalCategoriesUuids.includes(NodeDef.getCategoryUuid(nodeDef)) &&
+      !!NodeDef.getParentCodeDefUuid(nodeDef)
+  )
+
+  const getCodeAttributeAncestorNames = (nodeDef) => {
+    const codeAttributeAncestorNames = []
+
+    let currentParentCode = Survey.getNodeDefParentCode(nodeDef)(survey)
+    while (currentParentCode) {
+      codeAttributeAncestorNames.unshift(NodeDef.getName(currentParentCode))
+      currentParentCode = Survey.getNodeDefParentCode(currentParentCode)(survey)
+    }
+    return codeAttributeAncestorNames
+  }
+
+  return {
+    categoryAttributeAncestors: codeAttributes2ndLevel.map((nodeDef) => ({
+      attribute: NodeDef.getName(nodeDef),
+      categoryName: getCategoryNameByUuid({
+        survey,
+        categoryUuid: NodeDef.getCategoryUuid(nodeDef),
+      }),
+      categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
+      ancestors: getCodeAttributeAncestorNames(nodeDef),
+    })),
   }
 }
 
 const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langParam = null }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: true, advanced: true })
-
   const chain = await ChainManager.fetchChain({ surveyId, chainUuid })
   if (!chain) {
     throw new SystemError('chainNotFound', { chainUuid })
   }
+
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft: true,
+    advanced: true,
+  })
 
   const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
   const lang = langParam || defaultLang
@@ -101,11 +141,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     showInactiveResultVariables: true,
   })(survey)
 
-  const statisticalAnalysisSummary = generateStatisticalAnalysisSummary({ survey, chain })
-
-  const getCodeAttributeSummary = async (key, codeAttrDef) => ({
+  const getCodeAttributeSummary = (key, codeAttrDef) => ({
     [key]: NodeDef.getName(codeAttrDef),
-    [`${key}Category`]: await fetchCategoryNameByUuid({
+    [`${key}Category`]: getCategoryNameByUuid({
       survey,
       categoryUuid: NodeDef.getCategoryUuid(codeAttrDef),
     }),
@@ -122,24 +160,21 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
-      ? await getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
+      ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
-      ? await getCodeAttributeSummary('postStratificationAttribute', postStratificationAttributeDef)
+      ? getCodeAttributeSummary('postStratificationAttribute', postStratificationAttributeDef)
       : {}),
     areaWeightingMethod: ChainSamplingDesign.isAreaWeightingMethod(chainSamplingDesign),
     clusteringEntity: NodeDef.getName(clusteringEntityDef),
     clusteringEntityKeys: clusteringEntityDef
       ? Survey.getNodeDefAncestorsKeyAttributes(clusteringEntityDef, true)(survey).map(NodeDef.getName)
       : null,
-    resultVariables: await Promise.all(
-      analysisNodeDefs.map((analysisNodeDef) => generateResultVariableSummary({ survey, analysisNodeDef, lang }))
+    ...generateCategoryAttributeAncestorsSummary({ survey }),
+    resultVariables: analysisNodeDefs.map((analysisNodeDef) =>
+      generateResultVariableSummary({ survey, analysisNodeDef, lang })
     ),
-    ...(statisticalAnalysisSummary
-      ? {
-          analysis: statisticalAnalysisSummary,
-        }
-      : {}),
+    ...generateStatisticalAnalysisSummary({ survey, chain }),
   }
 }
 

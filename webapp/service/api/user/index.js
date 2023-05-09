@@ -18,6 +18,12 @@ export const acceptAccessRequest = async ({ accessRequestAccept }) => {
 }
 
 // ==== READ
+export const fetchUser = async ({ userUuid, surveyId = null }) => {
+  const params = surveyId ? { surveyId } : undefined
+  const { data: user } = await axios.get(`/api/user/${userUuid}`, { params })
+  return user
+}
+
 export const fetchUserSurveys = async ({ userUuid }) => {
   const {
     data: { surveys },

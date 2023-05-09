@@ -2,6 +2,7 @@ export const ValidatorErrorKeys = {
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
   invalidDate: 'validationErrors.invalidDate',
+  minLengthNotRespected: 'validationErrors.minLengthNotRespected',
   nameDuplicate: 'validationErrors.nameDuplicate',
   nameCannotBeKeyword: 'validationErrors.nameCannotBeKeyword',
   nameRequired: 'validationErrors.nameRequired',

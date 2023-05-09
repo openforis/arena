@@ -11,31 +11,27 @@ const validateSurveyNameUniqueness = (surveyInfos) => (propName, survey) =>
     ? { key: Validation.messageKeys.nameDuplicate }
     : null
 
+const getSurveyNameValidations = ({ surveyInfos, required = true }) => [
+  ...(required ? [Validator.validateRequired(Validation.messageKeys.nameRequired)] : []),
+  Validator.validateMinLength({ minLength: 6 }),
+  Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+  validateSurveyNameUniqueness(surveyInfos),
+]
+
 export const validateNewSurvey = async ({ newSurvey, surveyInfos }) =>
   Validator.validate(newSurvey, {
-    name: [
-      Validator.validateRequired(Validation.messageKeys.nameRequired),
-      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
-      validateSurveyNameUniqueness(surveyInfos),
-    ],
+    name: getSurveyNameValidations({ surveyInfos }),
     lang: [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
   })
 
 export const validateSurveyClone = async ({ newSurvey, surveyInfos }) =>
   Validator.validate(newSurvey, {
-    name: [
-      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
-      validateSurveyNameUniqueness(surveyInfos),
-    ],
+    name: getSurveyNameValidations({ surveyInfos, required: false }),
   })
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
   const validation = await Validator.validate(surveyInfo, {
-    'props.name': [
-      Validator.validateRequired(Validation.messageKeys.nameRequired),
-      Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
-      validateSurveyNameUniqueness(surveyInfos),
-    ],
+    'props.name': getSurveyNameValidations({ surveyInfos }),
     'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
     'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
   })
