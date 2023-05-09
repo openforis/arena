@@ -52,6 +52,8 @@ const _addOrUpdateAttribute =
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
 
+    const value = _adaptValue({ survey, record, parentNode: entity, attributeDef, value: valueParam })
+
     if (!attribute) {
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
@@ -59,7 +61,6 @@ const _addOrUpdateAttribute =
       updateResult.addNode(attributeCreated, { sideEffect })
       return updateResult
     }
-    const value = _adaptValue({ survey, record, parentNode: entity, attributeDef, value: valueParam })
     if (
       !NodeValues.isValueEqual({
         survey,
