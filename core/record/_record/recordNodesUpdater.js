@@ -20,7 +20,7 @@ const { createNodeAndDescendants, createRootEntity } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 const _valueAdapterByType = {
-  [NodeDef.nodeDefType.code]: ({ survey, record, attributeDef, value }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, record, parentNode, attributeDef, value }) => {
     if (value[Node.valuePropsCode.itemUuid]) {
       return value
     }
@@ -28,7 +28,12 @@ const _valueAdapterByType = {
     if (!code) {
       return null
     }
-    const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef: attributeDef, code, record })(survey)
+    const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({
+      nodeDef: attributeDef,
+      code,
+      record,
+      parentNode,
+    })(survey)
     if (!itemUuid) {
       throw new SystemError('validationErrors.dataImport.invalidCode', { code })
     }
@@ -36,9 +41,9 @@ const _valueAdapterByType = {
   },
 }
 
-const _adaptValue = ({ survey, record, attributeDef, value }) => {
+const _adaptValue = ({ survey, record, parentNode, attributeDef, value }) => {
   const valueAdapter = _valueAdapterByType[NodeDef.getType(attributeDef)]
-  return valueAdapter ? valueAdapter({ survey, record, attributeDef, value }) : value
+  return valueAdapter ? valueAdapter({ survey, record, parentNode, attributeDef, value }) : value
 }
 
 const _addOrUpdateAttribute =
@@ -54,7 +59,7 @@ const _addOrUpdateAttribute =
       updateResult.addNode(attributeCreated, { sideEffect })
       return updateResult
     }
-    const value = _adaptValue({ survey, record, attributeDef, value: valueParam })
+    const value = _adaptValue({ survey, record, parentNode: entity, attributeDef, value: valueParam })
     if (
       !NodeValues.isValueEqual({
         survey,
