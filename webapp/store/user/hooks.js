@@ -79,7 +79,9 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
     responseType: 'blob',
   })
 
-  useEffect(dispatch, [userUuid, forceUpdateKey])
+  useEffect(() => {
+    dispatch()
+  }, [userUuid, forceUpdateKey])
 
   useEffect(() => {
     if (data && data.size > 0) {

@@ -102,7 +102,9 @@ const NodeDefTaxon = (props) => {
   }
 
   if (!edit) {
-    useEffect(updateSelectionFromNode, [
+    useEffect(() => {
+      updateSelectionFromNode()
+    }, [
       Taxon.getUuid(taxonRefData),
       Taxon.getVernacularNameUuid(taxonRefData),
       Node.getScientificName(node),
