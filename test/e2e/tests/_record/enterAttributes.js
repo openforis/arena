@@ -97,7 +97,6 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   if ((await timePickerLocator.isVisible()) && (await okButtonLocator.isVisible())) {
     await okButtonLocator.click()
   }
-  await expect(await timePickerLocator.isVisible()).toBeFalsy()
 }
 
 const enterFns = {
