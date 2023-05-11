@@ -83,22 +83,21 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   const timePickerLocator = page.locator(timePickerSelector)
   await expect(await timePickerLocator.isVisible()).toBeTruthy()
 
-  const hours = value.getHours()
-  const hoursOptionLocator = page.locator(`${timePickerSelector} li[aria-label="${hours} hours"]`)
-  await hoursOptionLocator.scrollIntoViewIfNeeded()
-  await expect(await hoursOptionLocator.isVisible()).toBeTruthy()
-  await hoursOptionLocator.click()
-
-  const minutes = value.getMinutes()
-  const minutesOptionLocator = page.locator(`${timePickerSelector} li[aria-label="${minutes} minutes"]`)
-  await minutesOptionLocator.scrollIntoViewIfNeeded()
-  await expect(await minutesOptionLocator.isVisible()).toBeTruthy()
-  await minutesOptionLocator.click()
-
-  if (await timePickerLocator.isVisible()) {
-    await page.click('.MuiDialogActions-root button[text="OK"]')
+  const selectTimePart = async ({ key, value }) => {
+    const optionLocator = page.locator(`${timePickerSelector} li[aria-label="${value} ${key}"]`)
+    await optionLocator.scrollIntoViewIfNeeded()
+    await expect(await optionLocator.isVisible()).toBeTruthy()
+    await optionLocator.click()
   }
-  await expect(await timePickerLocator.isVisible()).toBeTruthy()
+
+  await selectTimePart({ key: 'hours', value: value.getHours() })
+  await selectTimePart({ key: 'minutes', value: value.getMinutes() })
+
+  const okButtonLocator = page.locator('.MuiDialogActions-root button[text="OK"]')
+  if ((await timePickerLocator.isVisible()) && (await okButtonLocator.isVisible())) {
+    await okButtonLocator.click()
+  }
+  await expect(await timePickerLocator.isVisible()).toBeFalsy()
 }
 
 const enterFns = {
