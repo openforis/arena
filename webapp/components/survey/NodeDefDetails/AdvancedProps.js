@@ -92,12 +92,22 @@ const AdvancedProps = (props) => {
       />
 
       <FormItem label={i18n.t('nodeDefEdit.advancedProps.hiddenWhenNotRelevant')}>
-        <Checkbox
-          checked={NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)}
-          disabled={readOnly}
-          validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
-          onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
-        />
+        <div className="form-item_row">
+          <Checkbox
+            checked={NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)}
+            disabled={readOnly}
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenWhenNotRelevant)(validation)}
+            onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
+          />
+          <FormItem label={i18n.t('nodeDefEdit.advancedProps.hiddenInMobile')}>
+            <Checkbox
+              checked={NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)}
+              disabled={readOnly}
+              validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenInMobile)(validation)}
+              onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenInMobile, value })}
+            />
+          </FormItem>
+        </div>
       </FormItem>
     </div>
   )

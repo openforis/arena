@@ -1071,6 +1071,7 @@ $t(common.appNameFull)
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       hidden: 'Hide in entry form',
+      hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
