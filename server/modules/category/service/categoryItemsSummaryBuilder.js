@@ -27,7 +27,7 @@ const getAncestorItemCode = ({ category, item, levelIndex }) => {
   if (itemLevelIndex > levelIndex) {
     return CategoryItem.getCode(getAncestorItem({ category, item, levelIndex }))
   }
-  return null
+  return ''
 }
 
 const assocCumulativeArea = ({ category, items }) => {
@@ -83,6 +83,7 @@ const toItemSummary = ({ category, language, item }) => {
     ...extractExtraDefsSummary({ category, item }),
     ...(Category.isReportingData(category)
       ? {
+          area: CategoryItem.getExtraProp(Category.reportingDataItemExtraDefKeys.area)(item) || '',
           area_cumulative: item.areaCumulative,
         }
       : {}),
