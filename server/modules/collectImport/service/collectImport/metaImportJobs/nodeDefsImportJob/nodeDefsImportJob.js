@@ -201,7 +201,14 @@ export default class NodeDefsImportJob extends Job {
 
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
+    } else if (type === NodeDef.nodeDefType.coordinate) {
+      // 3e. allowOnlyDeviceCoordinate
+      const allowOnlyDeviceCoordinate = CollectSurvey.getUiAttribute('allowOnlyDeviceCoordinate', false)(collectNodeDef)
+      if (allowOnlyDeviceCoordinate) {
+        propsUpdated[NodeDef.propKeys.allowOnlyDeviceCoordinate] = true
+      }
     }
+
     // 4a. update hidden when not relevant layout prop
     const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
     if (hiddenWhenNotRelevant) {
