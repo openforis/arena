@@ -9,11 +9,10 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import { PanelRight } from '@webapp/components'
+import { ResizableModal } from '@webapp/components'
 import RecordEditor from '@webapp/components/survey/Record'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
@@ -23,8 +22,6 @@ import { useRandomColors } from './useRandomColor'
 const MapWrapper = () => {
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
-
-  const i18n = useI18n()
 
   const [state, setState] = useState({
     samplingPointDataLevels: [],
@@ -100,14 +97,15 @@ const MapWrapper = () => {
         ]}
       />
       {editingRecordUuid && (
-        <PanelRight
-          className="record-panel"
-          header={i18n.t('mapView.editRecord')}
-          width="70vw"
+        <ResizableModal
+          className="record-modal"
+          header="mapView.editRecord"
+          initWidth={1000}
+          initHeight={600}
           onClose={closeRecordEditor}
         >
           <RecordEditor recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} insideMap />
-        </PanelRight>
+        </ResizableModal>
       )}
     </>
   )
