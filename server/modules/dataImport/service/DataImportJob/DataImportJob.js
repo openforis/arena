@@ -173,7 +173,7 @@ export default class DataImportJob extends Job {
 
       this.currentRecord = recordUpdated
 
-      this.persistUpdatedNodes({ nodesUpdated })
+      await this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
       if (newRecord) {
