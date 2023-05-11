@@ -1,6 +1,8 @@
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 
+const CODE_JOINT_CODE_SEPARATOR = '*'
+
 const assocParentAndChildren = ({ category, items }) => {
   if (Category.getLevelsArray(category).length > 1) {
     items.forEach((item) => {
@@ -53,15 +55,22 @@ const extractAncestoLevelCodes = ({ category, item }) => {
 
   if (!hierarchical) return {}
 
+  const itemLevelIndex = Category.getItemLevelIndex(item)(category)
+
+  const ancestorItemCodes = levels.reduce((acc, _level, levelIndex) => {
+    if (levelIndex <= itemLevelIndex) {
+      acc.push(getAncestorItemCode({ category, item, levelIndex }))
+    }
+    return acc
+  }, [])
+
   return {
-    level: Category.getItemLevelIndex(item)(category) + 1,
-    ...levels.reduce(
-      (acc, _level, levelIndex) => ({
-        ...acc,
-        [`level_${levelIndex + 1}_code`]: getAncestorItemCode({ category, item, levelIndex }),
-      }),
-      {}
-    ),
+    level: itemLevelIndex + 1,
+    code_joint: ancestorItemCodes.join(CODE_JOINT_CODE_SEPARATOR),
+    ...levels.reduce((acc, _level, levelIndex) => {
+      acc[`level_${levelIndex + 1}_code`] = ancestorItemCodes[levelIndex]
+      return acc
+    }, {}),
   }
 }
 
