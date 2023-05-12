@@ -18,7 +18,7 @@ const CoordinateProps = (props) => {
 
   return (
     <FormItem label={i18n.t('nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinate')}>
-      <div className="form-item_row checkbox-with-info">
+      <div className="form-item_body checkbox-with-info">
         <ButtonIconInfo title="nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinateInfo" />
         <Checkbox
           checked={NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)}
