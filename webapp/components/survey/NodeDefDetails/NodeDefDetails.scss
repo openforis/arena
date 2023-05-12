@@ -9,16 +9,24 @@
   z-index: $zIndex10TopOfApp;
   background-color: white;
 
-  .form-item_row {
+  .form_row,
+  .form-item_body {
     display: flex;
     gap: 3rem;
+
+    &.checkbox-with-info {
+      gap: 0rem;
+      align-items: center;
+    }
 
     .form-item {
       display: flex;
     }
+  }
 
-    &.checkbox-with-info {
-      gap: 0rem;
+  .form_row {
+    &.without-label {
+      margin-left: 20%;
     }
   }
 }
@@ -31,7 +39,7 @@
   grid-row-gap: 1.5rem;
 
   .form {
-    grid-row-gap: 1rem;
+    grid-row-gap: 0.5rem;
   }
 
   .form-item,
