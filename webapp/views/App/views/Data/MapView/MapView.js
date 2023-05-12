@@ -18,6 +18,8 @@ import RecordEditor from '@webapp/components/survey/Record'
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
 import { useRandomColors } from './useRandomColor'
+import { appModuleUri, noHeaderModules } from '@webapp/app/appModules'
+import { WindowUtils } from '@webapp/utils/windowUtils'
 
 const MapWrapper = () => {
   const survey = useSurvey()
@@ -57,6 +59,12 @@ const MapWrapper = () => {
   const closeRecordEditor = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
   }, [])
+
+  const detachRecordEditor = useCallback(() => {
+    const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${editingRecordUuid}`
+    WindowUtils.openPopup(recordEditUrl)
+    closeRecordEditor()
+  }, [closeRecordEditor, editingRecordUuid])
 
   const createRecordFromSamplingPointDataItem = useCallback(
     async ({ itemUuid, callback }) => {
@@ -103,6 +111,7 @@ const MapWrapper = () => {
           initWidth={1000}
           initHeight={600}
           onClose={closeRecordEditor}
+          onDetach={detachRecordEditor}
         >
           <RecordEditor recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} noHeader />
         </ResizableModal>

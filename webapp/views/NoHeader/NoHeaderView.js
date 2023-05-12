@@ -11,7 +11,7 @@ export const NoHeaderView = () => {
       modules={[
         {
           component: RecordNoHeader,
-          path: noHeaderModules.record.path,
+          path: `${noHeaderModules.record.path}/:recordUuid`,
         },
       ]}
     />

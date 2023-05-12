@@ -3,12 +3,12 @@ import './ResizableModal.scss'
 import { useI18n } from '@webapp/store/system'
 import React from 'react'
 import ReactModal from 'react-modal-resizable-draggable'
-import { ButtonIconClose } from '../buttons'
+import { Button, ButtonIconClose } from '../buttons'
 
 export const ResizableModal = (props) => {
-  const { children, className, initHeight, initWidth, isOpen, onClose, header: headerProp } = props
+  const { children, className, header: headerProp, initHeight, initWidth, isOpen, onClose, onDetach } = props
+
   const i18n = useI18n()
-  const header = i18n.t(headerProp)
 
   return (
     <ReactModal
@@ -19,8 +19,16 @@ export const ResizableModal = (props) => {
       isOpen={isOpen}
     >
       <div className="resizable-modal__header">
-        <h3>{header}</h3>
-        <ButtonIconClose onClick={onClose} />
+        <h3>{i18n.t(headerProp)}</h3>
+        {onDetach && (
+          <Button
+            className="btn-s detach-btn"
+            iconClassName="icon-display icon-10px"
+            onClick={onDetach}
+            title="common.openInNewWindow"
+          />
+        )}
+        {onClose && <ButtonIconClose onClick={onClose} />}
       </div>
       <div className="resizable-modal__body">{children}</div>
     </ReactModal>

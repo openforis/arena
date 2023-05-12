@@ -28,7 +28,7 @@ export const noHeader = 'noHeader'
 export const noHeaderModules = {
   record: {
     key: 'record',
-    path: 'record/:recordUuid/',
+    path: 'record',
   },
 }
 
@@ -252,6 +252,7 @@ export const app = 'app'
 const _getModuleParentPathParts = (module) => {
   if (Object.values(appModules).includes(module)) return [app]
   if (Object.values(guestModules).includes(module)) return [guest]
+  if (Object.values(noHeaderModules).includes(module)) return [noHeader]
 
   if (Object.values(homeModules).includes(module)) return _getModulePathParts(appModules.home)
   if (Object.values(designerModules).includes(module)) return _getModulePathParts(appModules.designer)
