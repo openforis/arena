@@ -68,6 +68,19 @@ const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.time]: singlePropValueEqualComparator,
 }
 
+/**
+ * Compares 2 attribute values according to their properties (depending on the attribute definition).
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!object} [params.survey] - The survey object.
+ * @param {!object} [params.value] - The 1st value to compare.
+ * @param {!object} [params.valueSearch] - The 2nd value to compare.
+ * @param {object} [params.record] - The record object (mandatory when comparing values of hierarchical code attriutes).
+ * @param {object} [params.parentNode] - The parent node object (mandatory when comparing values of hierarchical code attriutes).
+ * @param {boolean} [params.strict] - When true, the comparison is done considering the value internal identifiers (e.g. Category item UUID),
+ * otherwise values will be converted into values using internal identifiers (e.g. Category item codes into category item UUIDs).
+ * @returns {boolean} - True if the values are equal.
+ */
 const isValueEqual = ({ survey, nodeDef, value, valueSearch, record = null, parentNode = null, strict = false }) => {
   const valueComparator = valueComparatorByNodeDefType[NodeDef.getType(nodeDef)]
   return valueComparator && valueComparator({ survey, nodeDef, record, parentNode, value, valueSearch, strict })
