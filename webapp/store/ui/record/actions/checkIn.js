@@ -13,7 +13,7 @@ import * as ActionTypes from './actionTypes'
 import * as RecordState from '../state'
 
 export const checkInRecord =
-  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }) =>
+  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
 
@@ -65,10 +65,10 @@ export const checkInRecord =
         record,
         nodeDefActivePage,
         formPageNodeUuidByNodeDefUuid,
-        insideMap,
+        noHeader,
       })
     } else {
-      dispatch({ type: ActionTypes.recordLoad, record, insideMap })
+      dispatch({ type: ActionTypes.recordLoad, record, noHeader })
     }
 
     // Hide app loader on record edit

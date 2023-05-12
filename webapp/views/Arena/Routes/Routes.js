@@ -2,11 +2,12 @@ import React from 'react'
 import { Route, Routes as RouterRoutes } from 'react-router-dom'
 
 import * as User from '@core/user/user'
-import { app, guest } from '@webapp/app/appModules'
+import { app, guest, noHeader } from '@webapp/app/appModules'
 
 import { useUser } from '@webapp/store/user'
 
 import Guest from '@webapp/views/Guest'
+import { NoHeaderView } from '@webapp/views/NoHeader'
 const AppView = React.lazy(() => import('../../App'))
 
 import { useWebSocket } from './useWebSocket'
@@ -22,6 +23,7 @@ const Routes = () => {
     <>
       <RouterRoutes>
         <Route path={`/${guest}/*`} element={<Guest />} />
+        <Route path={`/${noHeader}/*`} element={<NoHeaderView />} />
         {user && User.hasAccepted(user) ? (
           <Route
             path={`/${app}/*`}

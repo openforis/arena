@@ -104,7 +104,7 @@ const MapWrapper = () => {
           initHeight={600}
           onClose={closeRecordEditor}
         >
-          <RecordEditor recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} insideMap />
+          <RecordEditor recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} noHeader />
         </ResizableModal>
       )}
     </>

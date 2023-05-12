@@ -22,6 +22,16 @@ export const guestModules = {
 
 // ==== Logged in modules
 
+// ==== No header (full screen) modules
+export const noHeader = 'noHeader'
+
+export const noHeaderModules = {
+  record: {
+    key: 'record',
+    path: 'record/:recordUuid/',
+  },
+}
+
 // ==== App Root modules
 export const appModules = {
   home: {

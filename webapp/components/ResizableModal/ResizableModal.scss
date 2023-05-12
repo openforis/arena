@@ -25,7 +25,7 @@
   }
 
   .flexible-modal-drag-area {
-    background: white;
+    background: transparent;
     height: 35px;
     position: absolute;
     right: 0;
@@ -34,7 +34,18 @@
     text-align: center;
   }
 
-  .body {
+  .resizable-modal__header {
+    text-align: center;
+
+    .close-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1;
+    }
+  }
+
+  .resizable-modal__body {
     height: calc(100% - 35px);
     width: 100%;
   }
