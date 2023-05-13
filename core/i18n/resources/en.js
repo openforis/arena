@@ -675,6 +675,7 @@ Are you sure you want to continue?`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
+    recordEditModalTitle: 'Record: {{keyValues}}',
     elevation: 'Elevation (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
