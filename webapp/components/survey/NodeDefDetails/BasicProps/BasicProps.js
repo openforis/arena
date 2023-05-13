@@ -87,7 +87,7 @@ const BasicProps = (props) => {
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
         <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
-          <div className="form-item_row">
+          <div className="form-item_body">
             <Checkbox
               id={TestId.nodeDefDetails.nodeDefKey}
               checked={NodeDef.isKey(nodeDef)}
@@ -95,12 +95,10 @@ const BasicProps = (props) => {
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.key, value })}
             />
             {enumerator && (
-              <>
-                <span>
-                  {i18n.t('nodeDefEdit.basicProps.enumerator.label')}
-                  <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
-                </span>
-              </>
+              <span>
+                {i18n.t('nodeDefEdit.basicProps.enumerator.label')}
+                <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
+              </span>
             )}
           </div>
         </FormItem>
@@ -109,7 +107,7 @@ const BasicProps = (props) => {
       {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
         <>
           <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
-            <div className="form-item_row">
+            <div className="form-item_body">
               <Checkbox
                 id={TestId.nodeDefDetails.nodeDefMultiple}
                 checked={NodeDef.isMultiple(nodeDef)}
@@ -119,10 +117,10 @@ const BasicProps = (props) => {
               {NodeDef.isMultipleEntity(nodeDef) && (
                 <FormItem
                   label={
-                    <>
-                      <span>{i18n.t('nodeDefEdit.basicProps.enumerate.label')}</span>
+                    <span>
+                      {i18n.t('nodeDefEdit.basicProps.enumerate.label')}
                       <ButtonIconInfo title="nodeDefEdit.basicProps.enumerate.info" />
-                    </>
+                    </span>
                   }
                 >
                   <div>
