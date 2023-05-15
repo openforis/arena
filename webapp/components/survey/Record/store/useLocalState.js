@@ -17,14 +17,18 @@ export const useLocalState = (props) => {
     recordUuid: recordUuidProp,
     pageNodeUuid: pageNodeUuidProp,
     pageNodeDefUuid: pageNodeDefUuidProp,
-    insideMap = false,
+    noHeader: noHeaderProp = false,
   } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const { recordUuid: recordUuidUrlParam } = useParams()
 
-  const { pageNodeUuid: pageNodeUuidUrlParam, pageNodeDefUuid: pageNodeDefUuidUrlParam } = useQuery()
+  const {
+    pageNodeUuid: pageNodeUuidUrlParam,
+    pageNodeDefUuid: pageNodeDefUuidUrlParam,
+    noHeader: noHeaderUrlParam,
+  } = useQuery()
 
   const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
   const preview = Boolean(recordUuidPreview)
@@ -32,6 +36,7 @@ export const useLocalState = (props) => {
   const recordUuid = recordUuidProp || recordUuidUrlParam || recordUuidPreview
   const pageNodeUuid = pageNodeUuidProp || pageNodeUuidUrlParam
   const pageNodeDefUuid = pageNodeDefUuidProp || pageNodeDefUuidUrlParam
+  const noHeader = noHeaderProp || noHeaderUrlParam
 
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
@@ -78,7 +83,7 @@ export const useLocalState = (props) => {
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
     const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }))
+    dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }))
 
     // Add beforeunload event listener
     window.addEventListener('beforeunload', onComponentUnload)

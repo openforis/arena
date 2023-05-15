@@ -165,6 +165,7 @@
     "react-i18next": "^12.2.2",
     "react-leaflet": "^4.2.1",
     "react-leaflet-markercluster": "^3.0.0-rc1",
+    "react-modal-resizable-draggable": "^0.1.6",
     "react-number-format": "^5.1.4",
     "react-redux": "^8.0.2",
     "react-router": "^6.11.0",

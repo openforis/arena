@@ -8,7 +8,7 @@ const baseLayerProviders = {
 }
 
 const baseLayerAttribution = {
-  planet: 'Planet Labs PBC',
+  planet: 'Planet Labs PBC, NICFI Satellite Data Program',
 }
 
 export const periodTypes = {
