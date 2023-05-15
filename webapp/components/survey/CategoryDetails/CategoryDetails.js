@@ -161,8 +161,9 @@ const CategoryDetails = (props) => {
 
         {editingItemExtraDefs && (
           <ExtraPropDefsEditor
-            category={category}
             toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
+            extraPropDefs={Category.getItemExtraDefsArray(category)}
+            isExtraPropDefReadOnly={(extraPropDef) => Category.isExtraPropDefReadOnly(extraPropDef)(category)}
             onExtraPropDefDelete={({ propName }) =>
               Actions.updateCategoryItemExtraPropItem({
                 categoryUuid,

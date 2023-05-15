@@ -3,18 +3,23 @@ import './ExtraPropDefsEditor.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Category from '@core/survey/category'
-
 import { ButtonAdd, PanelRight } from '@webapp/components'
 
 import { ExtraPropDefEditor } from './ExtraPropDefEditor'
 import { useExtraPropDefsEditor } from './useExtraPropDefsEditor'
 
 export const ExtraPropDefsEditor = (props) => {
-  const { category, onExtraPropDefDelete, onExtraPropDefUpdate, toggleEditExtraPropsPanel, canAdd = true } = props
+  const {
+    extraPropDefs: extraPropDefsProp,
+    isExtraPropDefReadOnly,
+    onExtraPropDefDelete,
+    onExtraPropDefUpdate,
+    toggleEditExtraPropsPanel,
+    canAdd = true,
+  } = props
 
   const { i18n, extraPropDefs, readOnly, onItemAdd, onItemDelete, onItemUpdate } = useExtraPropDefsEditor({
-    category,
+    extraPropDefs: extraPropDefsProp,
     onExtraPropDefDelete,
     onExtraPropDefUpdate,
   })
@@ -33,7 +38,7 @@ export const ExtraPropDefsEditor = (props) => {
             extraPropDef={extraPropDef}
             extraPropDefs={extraPropDefs}
             index={index}
-            readOnly={readOnly || Category.isExtraPropDefReadOnly(extraPropDef)(category)}
+            readOnly={readOnly || isExtraPropDefReadOnly?.(extraPropDef)}
             onItemDelete={onItemDelete}
             onItemUpdate={onItemUpdate}
           />
@@ -52,7 +57,8 @@ export const ExtraPropDefsEditor = (props) => {
 
 ExtraPropDefsEditor.propTypes = {
   canAdd: PropTypes.bool,
-  category: PropTypes.object.isRequired,
+  extraPropDefs: PropTypes.array.isRequired,
+  isExtraPropDefReadOnly: PropTypes.funct,
   onExtraPropDefDelete: PropTypes.func.isRequired,
   onExtraPropDefUpdate: PropTypes.func.isRequired,
   toggleEditExtraPropsPanel: PropTypes.func.isRequired,

@@ -2,22 +2,19 @@ import { useCallback, useState } from 'react'
 
 import { ArrayUtils } from '@core/arrayUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as Category from '@core/survey/category'
 
 import { useConfirm } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 export const useExtraPropDefsEditor = (props) => {
-  const { category, onExtraPropDefDelete, onExtraPropDefUpdate } = props
+  const { extraPropDefs: extraPropDefsProp, onExtraPropDefDelete, onExtraPropDefUpdate } = props
 
   const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
   const confirm = useConfirm()
 
-  const extraDefsInitial = Category.getItemExtraDefsArray(category)
-
-  const [state, setState] = useState({ extraPropDefs: extraDefsInitial })
+  const [state, setState] = useState({ extraPropDefs: extraPropDefsProp })
 
   const { extraPropDefs } = state
 
