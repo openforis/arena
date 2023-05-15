@@ -1,3 +1,4 @@
+import { Strings } from '@openforis/arena-core'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 
@@ -68,7 +69,8 @@ const extractAncestoLevelCodes = ({ category, item }) => {
     level: itemLevelIndex + 1,
     code_joint: ancestorItemCodes.join(CODE_JOINT_CODE_SEPARATOR),
     ...levels.reduce((acc, _level, levelIndex) => {
-      acc[`level_${levelIndex + 1}_code`] = ancestorItemCodes[levelIndex]
+      const ancestorItemCode = ancestorItemCodes[levelIndex]
+      acc[`level_${levelIndex + 1}_code`] = Strings.defaultIfEmpty('')(ancestorItemCode)
       return acc
     }, {}),
   }
