@@ -29,13 +29,13 @@ export const RecordEditModal = (props) => {
 
   const onDetach = useCallback(() => {
     const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}`
-    WindowUtils.openPopup(recordEditUrl)
+    WindowUtils.openPopup(recordEditUrl, 'arena-map-record-editor')
     onClose()
   }, [onClose, recordUuid])
 
   return (
     <ResizableModal
-      className="record-modal"
+      className="map-record-edit-modal"
       header={<RecordEditModalTitle />}
       initWidth={1000}
       initHeight={600}
