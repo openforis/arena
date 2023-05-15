@@ -1,6 +1,6 @@
 import './MapView.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,30 +23,21 @@ const MapWrapper = () => {
   const surveyId = Survey.getId(survey)
 
   const [state, setState] = useState({
-    samplingPointDataLevels: [],
-    coordinateAttributeDefs: [],
+    editingRecordUuid: null,
+    editingParentNodeUuid: null,
   })
-  const { samplingPointDataLevels, coordinateAttributeDefs, editingRecordUuid, editingParentNodeUuid } = state
+  const { editingRecordUuid, editingParentNodeUuid } = state
+
+  // get sampling point data levels
+  const categories = Survey.getCategoriesArray(survey)
+  const samplingPointDataCategory = categories.find(
+    (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
+  )
+  // get coordinate attributes
+  const coordinateAttributeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isCoordinate)
+  const samplingPointDataLevels = Category.getLevelsArray(samplingPointDataCategory)
 
   const layerColors = useRandomColors(samplingPointDataLevels.length + coordinateAttributeDefs.length)
-
-  useEffect(() => {
-    ;(async () => {
-      // get sampling point data levels
-      const categories = await API.fetchCategories({ surveyId, draft: true })
-      const samplingPointDataCategory = categories.find(
-        (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
-      )
-      // get coordinate attributes
-      const coordinateAttributeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isCoordinate)
-
-      setState((statePrev) => ({
-        ...statePrev,
-        samplingPointDataLevels: Category.getLevelsArray(samplingPointDataCategory),
-        coordinateAttributeDefs,
-      }))
-    })()
-  }, [])
 
   const onRecordEditClick = useCallback((params) => {
     const { recordUuid, parentUuid } = params || {}
