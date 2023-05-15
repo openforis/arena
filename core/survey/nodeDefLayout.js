@@ -12,6 +12,7 @@ export const keys = {
   columnWidth: 'columnWidth', // Width of the column when rendering inside a table (defaults to '160px')
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
   hiddenWhenNotRelevant: 'hiddenWhenNotRelevant', // Boolean: true if the node must be hidden when is not relevant
+  hiddenInMobile: 'hiddenInMobile', // Boolean: true if the node must be always hidden in Arena Mobile
   // Node Def Code
   codeShown: 'codeShown', // Boolean: true if the code of the category item should be shown, false otherwise
 }
@@ -104,6 +105,8 @@ export const getLayoutChildrenCompressed =
   }
 
 export const isHiddenWhenNotRelevant = (cycle) => _getPropLayout(cycle, keys.hiddenWhenNotRelevant, false)
+
+export const isHiddenInMobile = (cycle) => _getPropLayout(cycle, keys.hiddenInMobile, false)
 
 /**
  * Returns the uuids of the layout children items.

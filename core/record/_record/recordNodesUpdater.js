@@ -69,6 +69,7 @@ const _addOrUpdateAttribute =
         valueSearch: value,
         record,
         parentNode: entity,
+        strict: true,
       })
     ) {
       // update existing attribute (if value changed)

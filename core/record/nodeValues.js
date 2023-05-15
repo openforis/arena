@@ -11,10 +11,16 @@ const singlePropValueEqualComparator = ({ value, valueSearch }) =>
   value === valueSearch || String(value) === String(valueSearch)
 
 const getValueCode = (value) => (StringUtils.isString(value) ? value : value[Node.valuePropsCode.code])
-const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode, value }) => {
-  const { itemUuid } = value
+const getValueItemUuid = (value) => value[Node.valuePropsCode.itemUuid]
+
+const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode, value, strict }) => {
+  const itemUuid = getValueItemUuid(value)
   if (itemUuid) {
     return itemUuid
+  }
+  if (strict) {
+    // strict comparison: if itemUuid is not defined, do not convert value "code" into itemUuid
+    return null
   }
 
   // find itemUuid by code
@@ -33,12 +39,19 @@ const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode,
 
 const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueEqualComparator,
-  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, record, parentNode, value, valueSearch }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, record, parentNode, value, valueSearch, strict }) => {
     if (value === valueSearch) return true
     if (Objects.isEmpty(value) || Objects.isEmpty(valueSearch)) return false
 
-    const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value })
-    const itemUuidSearch = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value: valueSearch })
+    const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value, strict })
+    const itemUuidSearch = extractCategoryItemUuidFromValue({
+      survey,
+      nodeDef,
+      record,
+      parentNode,
+      value: valueSearch,
+      strict,
+    })
     return itemUuidSearch === itemUuid
   },
   [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
@@ -55,9 +68,22 @@ const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.time]: singlePropValueEqualComparator,
 }
 
-const isValueEqual = ({ survey, nodeDef, value, valueSearch, record = null, parentNode = null }) => {
+/**
+ * Compares 2 attribute values according to their properties (depending on the attribute definition).
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!object} [params.survey] - The survey object.
+ * @param {!object} [params.value] - The 1st value to compare.
+ * @param {!object} [params.valueSearch] - The 2nd value to compare.
+ * @param {object} [params.record] - The record object (mandatory when comparing values of hierarchical code attriutes).
+ * @param {object} [params.parentNode] - The parent node object (mandatory when comparing values of hierarchical code attriutes).
+ * @param {boolean} [params.strict] - When true, the comparison is done considering the value internal identifiers (e.g. Category item UUID),
+ * otherwise values will be converted into values using internal identifiers (e.g. Category item codes into category item UUIDs).
+ * @returns {boolean} - True if the values are equal.
+ */
+const isValueEqual = ({ survey, nodeDef, value, valueSearch, record = null, parentNode = null, strict = false }) => {
   const valueComparator = valueComparatorByNodeDefType[NodeDef.getType(nodeDef)]
-  return valueComparator && valueComparator({ survey, nodeDef, record, parentNode, value, valueSearch })
+  return valueComparator && valueComparator({ survey, nodeDef, record, parentNode, value, valueSearch, strict })
 }
 
 export const NodeValues = {
