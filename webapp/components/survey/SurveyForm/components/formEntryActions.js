@@ -16,12 +16,14 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 import { Button } from '@webapp/components/buttons'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const record = useRecord()
+  const noHeader = useIsRecordViewWithoutHeader()
 
   const stepId = Record.getStep(record)
   const step = RecordStep.getStep(stepId)
@@ -29,8 +31,8 @@ const RecordEntryButtons = () => {
   const stepPrev = RecordStep.getPreviousStep(stepId)
   const valid = Validation.isObjValid(record)
 
-  const canPromote = useAuthCanPromoteRecord(record)
-  const canDemote = useAuthCanDemoteRecord(record)
+  const canPromote = useAuthCanPromoteRecord(record) && !noHeader
+  const canDemote = useAuthCanDemoteRecord(record) && !noHeader
 
   const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 

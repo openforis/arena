@@ -34,8 +34,8 @@ const NodeDefCoordinate = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const canUseMap = useAuthCanUseMap()
-  const insideMap = useSelector(RecordState.isInsideMap)
-  const canShowMap = canUseMap && !insideMap
+  const noHeader = useSelector(RecordState.hasNoHeader)
+  const canShowMap = canUseMap && !noHeader
 
   const [showMap, setShowMap] = useState(false)
 

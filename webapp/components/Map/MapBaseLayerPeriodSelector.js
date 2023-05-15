@@ -103,7 +103,7 @@ export const MapBaseLayerPeriodSelector = () => {
   const updateSideBySide = useCallback(() => {
     const layerLeft = getLayer(true)
     const layerRight = getLayer(false)
-    if (layerLeft && layerRight && selectedPeriodValueLeft && selectedPeriodValueRight) {
+    if (periodSelectorAvailable && layerLeft && layerRight && selectedPeriodValueLeft && selectedPeriodValueRight) {
       if (sideBySideObject) {
         sideBySideObject.setLeftLayers(layerLeft)
         sideBySideObject.setRightLayers(layerRight)
@@ -114,12 +114,13 @@ export const MapBaseLayerPeriodSelector = () => {
       sideBySideObject.remove()
       sideBySideObject = null
     }
-  }, [getLayer, map, selectedPeriodValueLeft, selectedPeriodValueRight])
+  }, [getLayer, map, periodSelectorAvailable, selectedPeriodValueLeft, selectedPeriodValueRight])
 
   // update side by side on selections change
   useEffect(() => {
     updateSideBySide()
   }, [
+    periodSelectorAvailable,
     updateSideBySide,
     falseColorLeftChecked,
     falseColorRightChecked,

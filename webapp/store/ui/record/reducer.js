@@ -21,8 +21,8 @@ const actionHandlers = {
 
   // Record updates
   [RecordActions.recordCreate]: (state, { record }) => RecordState.assocRecord(record)(state),
-  [RecordActions.recordLoad]: (state, { record, insideMap }) =>
-    A.pipe(RecordState.assocRecord(record), RecordState.assocInsideMap(insideMap))(state),
+  [RecordActions.recordLoad]: (state, { record, noHeader }) =>
+    A.pipe(RecordState.assocRecord(record), RecordState.assocNoHeader(noHeader))(state),
   [RecordActions.recordLoadError]: (state, { error }) => RecordState.assocRecordLoadError(error)(state),
   [RecordActions.recordDelete]: (state) => RecordState.assocRecord(null)(state),
   [RecordActions.recordCheckedOut]: RecordState.reset,
