@@ -7,6 +7,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
+import { ExtraPropDef } from './extraPropDef'
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -135,3 +136,5 @@ export const newCategory = (props = {}, levels = null) => {
 export const isLevelDeleteAllowed = (level) => (category) =>
   !CategoryLevel.isPublished(level) && CategoryLevel.getIndex(level) === getLevelsArray(category).length - 1
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
+export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
+  isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area

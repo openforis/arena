@@ -52,7 +52,7 @@ export const ExtraPropDefEditor = (props) => {
         }
         validation={Validation.getFieldValidation(ExtraPropDef.keys.dataType)(validation)}
       />
-      {!editing && (
+      {!editing && !readOnly && (
         <>
           <ButtonIconEdit disabled={readOnly} showLabel={false} onClick={onEditClick} />
           <ButtonDelete disabled={readOnly} showLabel={false} onClick={() => onItemDelete({ index })} />

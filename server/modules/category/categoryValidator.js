@@ -90,8 +90,8 @@ const _validateItemExtraProps = (extraDefs, validation) => (item) => {
     if (StringUtils.isBlank(extra[key])) {
       return null
     }
-
-    const extraDefType = R.path([key, ExtraPropDef.keys.dataType], extraDefs)
+    const extraDef = extraDefs[key]
+    const extraDefType = extraDef[ExtraPropDef.keys.dataType]
     return _extraPropValidators[extraDefType](key, extra)
   }
 

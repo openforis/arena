@@ -11,6 +11,7 @@ import { useExtraPropDefsEditor } from './useExtraPropDefsEditor'
 export const ExtraPropDefsEditor = (props) => {
   const {
     extraPropDefs: extraPropDefsProp,
+    isExtraPropDefReadOnly,
     onExtraPropDefDelete,
     onExtraPropDefUpdate,
     toggleEditExtraPropsPanel,
@@ -37,7 +38,7 @@ export const ExtraPropDefsEditor = (props) => {
             extraPropDef={extraPropDef}
             extraPropDefs={extraPropDefs}
             index={index}
-            readOnly={readOnly}
+            readOnly={readOnly || isExtraPropDefReadOnly?.(extraPropDef)}
             onItemDelete={onItemDelete}
             onItemUpdate={onItemUpdate}
           />
@@ -57,6 +58,7 @@ export const ExtraPropDefsEditor = (props) => {
 ExtraPropDefsEditor.propTypes = {
   canAdd: PropTypes.bool,
   extraPropDefs: PropTypes.array.isRequired,
+  isExtraPropDefReadOnly: PropTypes.funct,
   onExtraPropDefDelete: PropTypes.func.isRequired,
   onExtraPropDefUpdate: PropTypes.func.isRequired,
   toggleEditExtraPropsPanel: PropTypes.func.isRequired,
