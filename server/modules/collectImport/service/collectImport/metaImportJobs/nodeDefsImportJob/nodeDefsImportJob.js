@@ -219,7 +219,7 @@ export default class NodeDefsImportJob extends Job {
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
     const hiddenInMobile =
       StringUtils.isNotBlank(relevantExpr) &&
-      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/, ''))
+      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
     if (hiddenInMobile) {
       _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
     }
