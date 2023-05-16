@@ -74,8 +74,8 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
 
     const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
 
-    const applicable = NodeDef.getApplicable(nodeDef)
-    const applyIf = applicable.length > 0 ? NodeDefExpression.getExpression(applicable[0]) : ''
+    const relevantExpressions = NodeDef.getApplicable(nodeDef)
+    const relevantIf = relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
 
     return {
       uuid,
@@ -91,8 +91,9 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
       taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
-      applyIf,
-      hiddenWhenNotApplicable: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
+      hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+      relevantIf,
+      hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
       defaultValue: getDefaultValuesSummary({ nodeDef }),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
