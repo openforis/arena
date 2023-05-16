@@ -71,6 +71,8 @@ export const { isEqual } = ObjectUtils
 export const assocVernacularNames = (lang, vernacularNames) =>
   R.assocPath([keys.vernacularNames, lang], vernacularNames)
 
+export const assocVernacularNamesByLang = (vernacularNames) => R.assoc(keys.vernacularNames, vernacularNames)
+
 export const appendVernacularName = (vernacularName) => (taxon) =>
   R.pipe(
     getVernacularNamesByLang(TaxonVernacularName.getLang(vernacularName)),
