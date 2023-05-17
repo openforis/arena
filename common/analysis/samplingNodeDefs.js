@@ -157,7 +157,6 @@ const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }
 }
 
 export const SamplingNodeDefs = {
-  SAMPLING_NODE_DEF_BASE_UNIT_NAME: SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME,
   getEntityAreaNodeDefName,
   isEntityAreaNodeDef,
   isBaseUnitEntityAreaNodeDef,
