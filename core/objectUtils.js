@@ -8,6 +8,7 @@ export const keys = {
   cycle: 'cycle',
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
+  draft: 'draft',
   id: 'id',
   index: 'index',
   name: 'name',
