@@ -5,7 +5,7 @@ import * as DateUtils from '@core/dateUtils'
 export const useDateTimeInput = ({ format, onChange: onChangeProp, value }) => {
   const errorRef = useRef(false)
 
-  const dateValue = DateUtils.parse(value, format)
+  const dateValue = value ? DateUtils.parse(value, format) : null
 
   const applyChange = useCallback(
     (dateFormatted) => {
@@ -16,17 +16,14 @@ export const useDateTimeInput = ({ format, onChange: onChangeProp, value }) => {
   )
 
   const onInputChange = useCallback(
-    (date, keyboardInputValue) => {
-      const selectedFromCalendar = !keyboardInputValue
+    (date, context) => {
+      const { validationError } = context
       if (date === null) {
         applyChange(null)
-      } else if (
-        selectedFromCalendar ||
-        (keyboardInputValue.length === format.length && DateUtils.isValidDateObject(date))
-      ) {
-        applyChange(DateUtils.format(date, format))
-      } else {
+      } else if (validationError) {
         errorRef.current = true
+      } else {
+        applyChange(DateUtils.format(date, format))
       }
     },
     [applyChange, format]

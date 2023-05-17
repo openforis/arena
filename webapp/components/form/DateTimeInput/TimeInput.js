@@ -27,7 +27,7 @@ const TimeInput = (props) => {
 
 TimeInput.propTypes = {
   disabled: PropTypes.bool,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 }
 
