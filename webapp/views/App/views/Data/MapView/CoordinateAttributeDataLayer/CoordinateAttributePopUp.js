@@ -66,6 +66,11 @@ export const CoordinateAttributePopUp = (props) => {
 
   const elevation = useElevation({ surveyId: Survey.getIdSurveyInfo(surveyInfo), point: pointLatLong, active: open })
 
+  const onRemove = useCallback(() => {
+    setOpen(false)
+    onRecordEditClick(null)
+  }, [])
+
   const onClickNext = useCallback(() => {
     flyToNextPoint(pointFeature)
     popupRef.current?.close()
@@ -112,7 +117,7 @@ export const CoordinateAttributePopUp = (props) => {
     <Popup
       eventHandlers={{
         add: () => setOpen(true),
-        remove: () => setOpen(false),
+        remove: onRemove,
       }}
       ref={popupRef}
     >
