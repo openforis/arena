@@ -48,14 +48,31 @@ export const RecordEditModal = (props) => {
     onClose()
   }, [onClose, recordUuid])
 
+  const onModalClose = useCallback(
+    ({ modalState }) => {
+      onClose()
+    },
+    [onClose]
+  )
+
+  const modalProps = {
+    height: 600,
+    left: undefined,
+    top: undefined,
+    width: 1000,
+  }
+
   return (
     <ResizableModal
       className="map-record-edit-modal"
       header={<RecordEditModalTitle />}
-      initWidth={1000}
-      initHeight={600}
-      onClose={onClose}
+      initWidth={modalProps.width}
+      initHeight={modalProps.height}
+      left={modalProps.left}
+      onClose={onModalClose}
+      onRequestClose={onClose}
       onDetach={onDetach}
+      top={modalProps.top}
     >
       <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
     </ResizableModal>
