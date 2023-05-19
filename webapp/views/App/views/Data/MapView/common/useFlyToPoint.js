@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-export const useFlyToPoint = ({ points }) => {
+export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
   const map = useMap()
 
   const [state, setState] = useState({})
@@ -50,12 +50,14 @@ export const useFlyToPoint = ({ points }) => {
 
   const flyTo = useCallback(
     (point) => {
-      //   popupRef.current?.close()
+      // close record edit popup
+      onRecordEditClick?.(null)
+
       const [longitude, latitude] = point.geometry.coordinates
       map.flyTo([latitude, longitude], map.getMaxZoom())
       map.once('zoomend', () => openPopupOfPoint(point))
     },
-    [map, openPopupOfPoint]
+    [map, onRecordEditClick, openPopupOfPoint]
   )
 
   const flyToNextPoint = useCallback(
