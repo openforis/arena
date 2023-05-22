@@ -1095,6 +1095,11 @@ $t(common.appNameFull)
       },
     },
     textProps: {
+      textInputType: 'Text input type',
+      textInputTypes: {
+        singleLine: 'Single line',
+        multiLine: 'Multi line',
+      },
       textTransform: 'Text transform',
       textTransformTypes: {
         none: 'none',

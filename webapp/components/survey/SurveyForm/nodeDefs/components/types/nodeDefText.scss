@@ -15,6 +15,10 @@
   }
 }
 
+.survey-form__node-def-text.multiline {
+  height: 100%;
+}
+
 .survey-form__node-def-text-multiple-container {
   display: grid;
   grid-template-columns: 1fr auto;
