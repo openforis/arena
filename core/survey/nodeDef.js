@@ -57,6 +57,7 @@ export const propKeys = {
   hidden: 'hidden',
 
   // Text
+  textInputType: 'textInputType',
   textTransform: 'textTransform',
 
   // Decimal
@@ -79,6 +80,11 @@ export const propKeys = {
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
+}
+
+export const textInputTypes = {
+  singleLine: 'singleLine',
+  multiLine: 'multiLine',
 }
 
 export const textTransformValues = {
@@ -203,6 +209,7 @@ export const getVisibleFields = (nodeDef) => {
   return getProp(propKeys.visibleFields, visibleFieldsDefault)(nodeDef)
 }
 // text
+export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.singleLine)
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
