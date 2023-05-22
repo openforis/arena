@@ -905,7 +905,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       surveyNotPublished: '$t(chainView.cannotStartRStudio.common): publish the survey first',
     },
     nonResponseBiasCorrection: 'Non-response bias correction',
-    nonResponseBiasCorrectionTip: `To implement this method, add a category named 'sampling_units_plan'`,
+    nonResponseBiasCorrectionTip: `To implement this method, add 'design_psu' and 'design_ssu' into the stratum category as extra properties.`,
     pValue: 'P-value',
     resultsBackFromRStudio: 'Results read back from RStudio',
     samplingDesign: 'Sampling Design',
@@ -1095,6 +1095,11 @@ $t(common.appNameFull)
       },
     },
     textProps: {
+      textInputType: 'Text input type',
+      textInputTypes: {
+        singleLine: 'Single line',
+        multiLine: 'Multi line',
+      },
       textTransform: 'Text transform',
       textTransformTypes: {
         none: 'none',

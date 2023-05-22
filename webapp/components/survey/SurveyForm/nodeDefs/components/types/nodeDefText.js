@@ -1,6 +1,7 @@
 import './nodeDefText.scss'
 
 import React from 'react'
+import classNames from 'classnames'
 
 import { Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
@@ -11,17 +12,21 @@ import * as Node from '@core/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
-  <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
-    <Input
-      disabled={edit || !canEditRecord || readOnly}
-      numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
-      textTransformFunction={NodeDef.getTextTransformFunction(nodeDef)}
-      value={Node.getValue(node, '')}
-      onChange={(value) => updateNode(nodeDef, node, value)}
-    />
-  </div>
-)
+const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => {
+  const multiline = NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine
+  return (
+    <div className={classNames(`survey-form__node-def-${NodeDef.getType(nodeDef)}`, { multiline })}>
+      <Input
+        disabled={edit || !canEditRecord || readOnly}
+        numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
+        inputType={multiline ? 'textarea' : 'input'}
+        textTransformFunction={NodeDef.getTextTransformFunction(nodeDef)}
+        value={Node.getValue(node, '')}
+        onChange={(value) => updateNode(nodeDef, node, value)}
+      />
+    </div>
+  )
+}
 
 const MultipleTextInput = (props) => {
   const { nodeDef, parentNode, nodes, canEditRecord } = props
@@ -42,7 +47,7 @@ const MultipleTextInput = (props) => {
               <TextInput {...props} node={n} />
 
               {!n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord && (
-                <NodeDeleteButton nodeDef={nodeDef} node={n} showConfirm={true}  />
+                <NodeDeleteButton nodeDef={nodeDef} node={n} showConfirm={true} />
               )}
             </div>
           )

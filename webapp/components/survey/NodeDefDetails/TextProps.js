@@ -11,6 +11,12 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 import { State } from './store'
 
+const textInputTypes = ({ i18n }) =>
+  Object.keys(NodeDef.textInputTypes).map((key) => ({
+    key,
+    label: i18n.t(`nodeDefEdit.textProps.textInputTypes.${key}`),
+  }))
+
 const textTransformTypes = ({ i18n }) =>
   Object.keys(NodeDef.textTransformValues).map((labelKey) => ({
     key: labelKey,
@@ -38,13 +44,24 @@ const TextProps = (props) => {
   }, [])
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.textProps.textTransform')}>
-      <ButtonGroup
-        selectedItemKey={NodeDef.getTextTransform(nodeDef)}
-        onChange={selectLabelValue}
-        items={textTransformTypes({ i18n })}
-      />
-    </FormItem>
+    <>
+      <FormItem label={i18n.t('nodeDefEdit.textProps.textTransform')}>
+        <ButtonGroup
+          selectedItemKey={NodeDef.getTextTransform(nodeDef)}
+          onChange={selectLabelValue}
+          items={textTransformTypes({ i18n })}
+        />
+      </FormItem>
+      <FormItem label={i18n.t('nodeDefEdit.textProps.textInputType')}>
+        <ButtonGroup
+          selectedItemKey={NodeDef.getTextInputType(nodeDef)}
+          onChange={(value) => {
+            Actions.setProp({ state, key: NodeDef.propKeys.textInputType, value })
+          }}
+          items={textInputTypes({ i18n })}
+        />
+      </FormItem>
+    </>
   )
 }
 
