@@ -85,5 +85,5 @@ export const useListenOnNodeUpdates = ({ data, query, setData }) => {
         AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted, onNodesUpdateCompleted)
       }
     }
-  }, [listeningToWebSocket, onNodesUpdate, onNodeValidationsUpdate, onNodesUpdateCompleted])
+  }, [listeningToWebSocket, onNodesUpdate, onNodeValidationsUpdate, onNodesUpdateCompleted, data])
 }
