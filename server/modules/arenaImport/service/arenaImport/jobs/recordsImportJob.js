@@ -88,6 +88,13 @@ export default class RecordsImportJob extends Job {
       ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
       : null
 
+    if (existingRecordSummary) {
+      // skip record
+      // TODO update record
+      this.logDebug(`skipping record ${recordUuid}; it already exists`)
+      return
+    }
+
     if (
       !existingRecordSummary ||
       DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
