@@ -8,7 +8,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
-/* eslint-disable import/no-cycle */
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
@@ -17,7 +16,7 @@ const NodeDefTableCellBody = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes, parentNode, surveyCycleKey } = props
 
   const surveyLanguage = useSurveyPreferredLang()
-  const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
+  const readOnly = NodeDef.isKey(nodeDef) || NodeDef.isReadOnlyOrAnalysis(nodeDef)
 
   const propsNodeDefComponent = {
     ...props,
