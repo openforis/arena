@@ -18,7 +18,7 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import WarningBadge from '@webapp/components/warningBadge'
-import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { DimensionsSelector } from './DimensionsSelector'
 import { PValueSelector } from '../PValueSelector'
@@ -107,6 +107,21 @@ export const ChainStatisticalAnalysisProps = () => {
     [updateStatisticalAnalysis]
   )
 
+  const onReportingAreaChange = useCallback(
+    (value) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingArea(value)),
+    [updateStatisticalAnalysis]
+  )
+
+  const reportingAreaFormItem = (
+    <FormItem className="reporting-area" label={i18n.t('chainView.statisticalAnalysis.reportingArea')}>
+      <Input
+        numberFormat={NumberFormats.decimal}
+        onChange={onReportingAreaChange}
+        value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
+      />
+    </FormItem>
+  )
+
   return (
     <div className="statistical-analysis">
       <FormItem label={i18n.t('chainView.statisticalAnalysis.entityToReport')}>
@@ -182,7 +197,14 @@ export const ChainStatisticalAnalysisProps = () => {
         </div>
       </FormItem>
 
-      {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && <PValueSelector />}
+      {ChainSamplingDesign.getSamplingStrategy(samplingDesign) && (
+        <div className="form_row p-value">
+          <PValueSelector />
+          {reportingAreaFormItem}
+        </div>
+      )}
+
+      {!ChainSamplingDesign.getSamplingStrategy(samplingDesign) && reportingAreaFormItem}
     </div>
   )
 }
