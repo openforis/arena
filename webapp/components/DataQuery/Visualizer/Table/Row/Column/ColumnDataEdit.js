@@ -11,7 +11,7 @@ import * as RecordValidation from '@core/record/recordValidation'
 
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
-import { RecordActions } from '@webapp/store/ui/record'
+import { RecordActions, useRecordNode } from '@webapp/store/ui/record'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellBody'
@@ -29,7 +29,9 @@ const ColumnDataEdit = (props) => {
   const canEditRecord = useAuthCanEditRecord(record)
   const { widthOuter } = useColumn({ nodeDef, query, colWidth })
 
-  const node = cell && cell.node
+  const cellNode = cell && cell.node
+  const nodeUpdated = useRecordNode({ nodeUuid: cellNode?.uuid })
+  const node = nodeUpdated || cellNode
   const recordValidation = Record.getValidation(record)
   const validation = RecordValidation.getNodeValidation(node)(recordValidation)
 

@@ -67,7 +67,7 @@ const Table = (props) => {
 
 Table.propTypes = {
   query: PropTypes.object.isRequired,
-  data: PropTypes.array.isRequired,
+  data: PropTypes.array,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool,
   dataLoadingError: PropTypes.bool,

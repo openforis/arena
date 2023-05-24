@@ -22,8 +22,8 @@ export const useDataQuery = ({ query, limitData = true }) => {
   const hasSelection = Query.hasSelection(query)
   const mode = Query.getMode(query)
   const dataEmpty = data ? A.isEmpty(data.data) : true
-  const dataLoaded = (data?.loaded && hasSelection) || false
-  const dataLoading = data?.loading || false
+  const dataLoaded = (data && (data.loaded === undefined || data.loaded) && hasSelection) || false
+  const dataLoading = !!data?.loading
   const dataLoadingError = data?.error || false
 
   const entityDefUuid = Query.getEntityDefUuid(query)
