@@ -16,7 +16,7 @@ const NodeDefTableCellBody = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes, parentNode, surveyCycleKey } = props
 
   const surveyLanguage = useSurveyPreferredLang()
-  const readOnly = NodeDef.isKey(nodeDef) || NodeDef.isReadOnlyOrAnalysis(nodeDef)
+  const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef) || (entryDataQuery && NodeDef.isKey(nodeDef))
 
   const propsNodeDefComponent = {
     ...props,
