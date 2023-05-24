@@ -180,12 +180,14 @@ export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
 }
 
 export const checkOut = async (socketId, user, surveyId, recordUuid) => {
-  const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
-
-  if (Record.isPreview(record)) {
+  const recordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid })
+  if (Record.isPreview(recordSummary)) {
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
-  } else if (Record.isEmpty(record)) {
-    await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
+  } else {
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
+    if (Record.isEmpty(record)) {
+      await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
+    }
   }
   RecordServiceThreads.dissocSocket(socketId)
 }
