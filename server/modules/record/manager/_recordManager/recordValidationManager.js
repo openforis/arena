@@ -120,13 +120,13 @@ export const validateRecordUniqueNodesUniquenessAndPersistValidation = async (
   if (nodesUnique.length === 0) {
     return null // empty record, consider its uniqueness as valid
   }
-  const nodeDefsUnique = Survey.getNodeDefRootKeys(survey)
+  const nodeDefUnique = Survey.getNodeDefByUuid(nodeDefUniqueUuid)(survey)
 
   return validateRecordsUniquenessAndPersistValidation(
     {
       survey,
       cycle: Record.getCycle(record),
-      nodeDefsUnique,
+      nodeDefsUnique: [nodeDefUnique],
       nodesUnique,
       recordUuidsExcluded: [Record.getUuid(record)],
       excludeRecordsFromCount: excludeRecordFromCount,
