@@ -111,7 +111,7 @@ const _prepareSelectFields = ({
 const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode }) => {
   queryBuilder.from(viewDataNodeDef.nameAliased)
   if (editMode) {
-    const { surveyId } = viewDataNodeDef
+    const { survey, surveyId } = viewDataNodeDef
     const tableRecord = new TableRecord(surveyId)
     queryBuilder.from(
       // Node table; one join per column def
@@ -121,7 +121,7 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
           nodeDefCol
         )
         const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
-        const tableNode = new TableNode(surveyId)
+        const tableNode = new TableNode(survey)
         tableNode.alias = `n${idx + 1}`
 
         return `LEFT JOIN LATERAL ( 
