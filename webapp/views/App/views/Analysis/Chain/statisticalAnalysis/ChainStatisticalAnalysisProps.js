@@ -115,7 +115,7 @@ export const ChainStatisticalAnalysisProps = () => {
   const reportingAreaFormItem = (
     <FormItem className="reporting-area" label={i18n.t('chainView.statisticalAnalysis.reportingArea')}>
       <Input
-        numberFormat={NumberFormats.decimal}
+        numberFormat={NumberFormats.decimal()}
         onChange={onReportingAreaChange}
         value={ChainStatisticalAnalysis.getReportingArea(chainStatisticalAnalysis)}
       />
