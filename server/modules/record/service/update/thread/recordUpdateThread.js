@@ -1,6 +1,4 @@
-import * as R from 'ramda'
-
-import { SRSs, SystemError } from '@openforis/arena-core'
+import { Objects, SRSs, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -36,7 +34,7 @@ class RecordUpdateThread extends Thread {
   }
 
   async handleNodesUpdated(updatedNodes) {
-    if (!R.isEmpty(updatedNodes)) {
+    if (!Objects.isEmpty(updatedNodes)) {
       this.postMessage({
         type: WebSocketEvent.nodesUpdate,
         content: updatedNodes,
@@ -166,7 +164,7 @@ class RecordUpdateThread extends Thread {
         Logger.debug(`Skipping unknown message type: ${msg.type}`)
     }
 
-    if (R.includes(msg.type, [messageTypes.nodePersist, messageTypes.nodeDelete])) {
+    if ([messageTypes.nodePersist, messageTypes.nodeDelete].includes(msg.type)) {
       this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted })
     }
   }
