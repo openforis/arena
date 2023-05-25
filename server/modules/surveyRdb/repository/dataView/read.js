@@ -22,10 +22,10 @@ import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilde
 import * as DataCol from '../../schemaRdb/dataCol'
 import * as DataTable from '../../schemaRdb/dataTable'
 
-const _getParentNodeUuidColumnName = (viewDataNodeDef, nodeDef) => {
+const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   const { survey } = viewDataNodeDef
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  return ColumnNodeDef.getColumnName(nodeDefParent)
+  const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
 }
 
 const columnTransformByNodeDefType = {
@@ -116,13 +116,19 @@ const _prepareFromClause = ({ queryBuilder, viewDataNodeDef, nodeDefCols, editMo
     queryBuilder.from(
       // Node table; one join per column def
       ...nodeDefCols.map((nodeDefCol, idx) => {
-        const nodeDefParentUuidColumnName = _getParentNodeUuidColumnName(viewDataNodeDef, nodeDefCol)
+        const ancestorMultipleEntityUuidColumnName = _getAncestorMultipleEntityUuidColumnName(
+          viewDataNodeDef,
+          nodeDefCol
+        )
         const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
         const tableNode = new TableNode(surveyId)
         tableNode.alias = `n${idx + 1}`
 
         return `LEFT JOIN LATERAL ( 
-          ${tableNode.getSelect({ parentUuid: `${viewDataNodeDef.alias}.${nodeDefParentUuidColumnName}`, nodeDefUuid })}
+          ${tableNode.getSelect({
+            parentUuid: `${viewDataNodeDef.alias}.${ancestorMultipleEntityUuidColumnName}`,
+            nodeDefUuid,
+          })}
         ) AS ${tableNode.alias} ON TRUE`
       }),
       // Record table
@@ -145,7 +151,7 @@ const _dbTransformCallbackSelect =
     nodeDefCols.forEach((nodeDefCol) => {
       const nodeDefColUuid = NodeDef.getUuid(nodeDefCol)
       const nodeJson = rowUpdated[nodeDefColUuid]
-      const nodeDefParentColumnUuid = _getParentNodeUuidColumnName(viewDataNodeDef, nodeDefCol)
+      const nodeDefParentColumnUuid = _getAncestorMultipleEntityUuidColumnName(viewDataNodeDef, nodeDefCol)
       const parentUuid = rowUpdated[nodeDefParentColumnUuid]
       rowUpdated.cols[nodeDefColUuid] = {
         node: TableNode.dbTransformCallback(nodeJson),
@@ -156,7 +162,7 @@ const _dbTransformCallbackSelect =
     // Record column
     rowUpdated.record = TableRecord.transformCallback(viewDataNodeDef.surveyId)(rowUpdated.record)
     // Parent node uuid column
-    const nodeDefParentColumnUuid = _getParentNodeUuidColumnName(viewDataNodeDef, viewDataNodeDef.nodeDef)
+    const nodeDefParentColumnUuid = _getAncestorMultipleEntityUuidColumnName(viewDataNodeDef, viewDataNodeDef.nodeDef)
     rowUpdated.parentUuid = rowUpdated[nodeDefParentColumnUuid]
 
     return rowUpdated

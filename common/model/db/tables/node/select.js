@@ -32,6 +32,7 @@ export function getSelect(params) {
   const propsCategoryItem = _getPropsCombined(tableCategoryItem)
 
   const whereConditions = []
+
   const _addUuidEqualCondition = (column, value) => {
     if (value) {
       whereConditions.push(`${column} = ${isUuid(value) ? `'${value}'` : value}`)
@@ -40,7 +41,8 @@ export function getSelect(params) {
 
   _addUuidEqualCondition(this.columnUuid, uuid)
   _addUuidEqualCondition(this.columnRecordUuid, recordUuid)
-  _addUuidEqualCondition(this.columnParentUuid, parentUuid)
+  // _addUuidEqualCondition(this.columnParentUuid, parentUuid)
+  whereConditions.push(`${parentUuid}::text IN (SELECT jsonb_array_elements_text(${this.columnMeta} -> 'h'))`)
   _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
 
   const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
@@ -101,7 +103,11 @@ export function getSelect(params) {
     LEFT OUTER JOIN
         ${tableTaxonVernacularName.nameAliased}
     ON
-        (${columnTaxonVernacularNameUuid})::uuid = ${tableTaxonVernacularName.columnUuid}`
+        (${columnTaxonVernacularNameUuid})::uuid = ${tableTaxonVernacularName.columnUuid}
+  `
 
-  return `${query}${whereConditions.length > 0 ? ` WHERE ${whereConditions.join(' AND ')}` : ''}`
+  if (whereConditions.length > 0) {
+    return `${query} WHERE ${whereConditions.join(' AND ')}`
+  }
+  return query
 }
