@@ -1,1 +1,1 @@
-export { fetchSrssByCodes } from '../repository/srsRepository'
+export { fetchSRSsByCodes, findSRSByCodeOrName } from '../repository/srsRepository'

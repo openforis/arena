@@ -82,7 +82,7 @@ export default class SurveyCreatorJob extends Job {
       const srsId = CollectSurvey.getAttribute('srid')(srsEl)
       return srsId.startsWith(SRS_ID_PREFIX) ? srsId.substring(SRS_ID_PREFIX.length) : srsId
     })
-    const srss = await SrsManager.fetchSrssByCodes({ srsCodes }, this.tx)
+    const srss = await SrsManager.fetchSRSsByCodes({ srsCodes }, this.tx)
     return srss.map(R.omit([Srs.keys.wkt]))
   }
 }
