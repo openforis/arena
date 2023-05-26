@@ -9,6 +9,9 @@ import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { ValueFormatter } from '@webapp/components/DataQuery'
 
 export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey, i18n }) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const srsIndex = Survey.getSRSIndex(surveyInfo)
+
   const dataTable = new TableDataNodeDef(survey, nodeDefParent)
   const attributeColumn = new ColumnNodeDef(dataTable, attributeDef)
   const parentEntityColumn = new ColumnNodeDef(dataTable, nodeDefParent)
@@ -29,7 +32,7 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey,
       // workaraound: prepend SRID= to location if not specified
       const locationStr = location.startsWith('SRID=') ? location : `SRID=${location}`
       const point = Points.parse(locationStr)
-      const pointLatLong = point ? Points.toLatLong(point) : null
+      const pointLatLong = point ? Points.toLatLong(point, srsIndex) : null
       if (!pointLatLong) {
         // location is not valid, cannot convert it to lat-lon
         acc.pointIndexByDataIndex[index] = null

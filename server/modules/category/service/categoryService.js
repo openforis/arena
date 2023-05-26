@@ -118,11 +118,15 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
 
   const recordFinder = await createSamplingPointDataRecordFinder({ surveyId, draft })
 
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const srsIndex = Survey.getSRSIndex(surveyInfo)
+
   const samplingPointData = items.map((item) => {
     const location = CategoryItem.getExtraProp('location')(item)
     const codes = CategoryItem.getCodesHierarchy(item)
     const point = Points.parse(location)
-    const pointLatLong = Points.toLatLong(point)
+    const pointLatLong = Points.toLatLong(point, srsIndex)
 
     const record = recordFinder?.(item)
 

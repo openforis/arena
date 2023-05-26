@@ -244,6 +244,7 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex(surveyId, draft, client)
   const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client)
+
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 

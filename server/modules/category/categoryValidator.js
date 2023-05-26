@@ -223,7 +223,8 @@ const validateCategoryProps = async (categories, category) =>
   Validator.validate(category, categoryValidators(categories))
 
 export const validateCategory = async ({ survey, categories, category, items }) => {
-  const srsIndex = Survey.getSRSIndex(survey)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const srsIndex = Survey.getSRSIndex(surveyInfo)
   const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid)(items)
 
   const categoryValidation = await validateCategoryProps(categories, category)
