@@ -136,7 +136,7 @@ export const importSurvey = async (params, client = db) => {
 
   return client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(
+    let surveyInfo = await SurveyRepository.insertSurvey(
       {
         survey: surveyInfoParam,
         props: backup ? Survey.getProps(surveyInfoParam) : {},
@@ -150,7 +150,14 @@ export const importSurvey = async (params, client = db) => {
     await DBMigrator.migrateSurveySchema(surveyId)
 
     // Create default groups for this survey
-    surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+    surveyInfo = Survey.assocAuthGroups(await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t))(
+      surveyInfo
+    )
+
+    // fetch SRS from DB
+    const srsCodes = Survey.getSRSCodes(surveyInfo)
+    const srss = await SrsRepository.fetchSrssByCodes({ srsCodes }, t)
+    surveyInfo = Survey.assocSrs(srss)(surveyInfo)
 
     await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 

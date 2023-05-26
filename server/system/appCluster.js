@@ -1,7 +1,6 @@
 import * as express from 'express'
 import morgan from 'morgan'
 
-import { SRSs } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -56,7 +55,4 @@ export const run = async () => {
   await UserResetPasswordCleanup.init()
   await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
-
-  // ====== Spatial Reference Systems (SRSs)
-  await SRSs.init()
 }

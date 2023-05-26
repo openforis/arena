@@ -2,12 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
-import { useSRSs } from '@webapp/components/hooks'
+import * as Survey from '@core/survey/survey'
+
+import { useSurvey } from '@webapp/store/survey'
 
 export const useMap = (props) => {
   const { centerPoint, markerPoint, onMarkerPointChange } = props
 
-  const { srssInitialized } = useSRSs()
+  const survey = useSurvey()
+  const srsIndex = Survey.getSRSIndex(survey)
 
   const [state, setState] = useState({
     centerPositionLatLon: null,
@@ -17,7 +20,7 @@ export const useMap = (props) => {
   const { centerPositionLatLon, markerPointUpdated } = state
 
   const fromPointToLatLon = (point) => {
-    if (srssInitialized && Points.isValid(point)) {
+    if (Points.isValid(point, srsIndex)) {
       const pointLatLong = Points.toLatLong(point)
       const { x, y } = pointLatLong
       return [y, x]
@@ -27,20 +30,18 @@ export const useMap = (props) => {
 
   // on markerPoint update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
-    if (srssInitialized) {
-      const actualCenterPoint =
-        markerPoint && Points.isValid(markerPoint)
-          ? markerPoint
-          : centerPoint && Points.isValid(centerPoint)
-          ? centerPoint
-          : PointFactory.createInstance({ x: 0, y: 0, srs: '4326' })
+    const actualCenterPoint =
+      markerPoint && Points.isValid(markerPoint)
+        ? markerPoint
+        : centerPoint && Points.isValid(centerPoint)
+        ? centerPoint
+        : PointFactory.createInstance({ x: 0, y: 0, srs: '4326' })
 
-      setState((statePrev) => ({
-        ...statePrev,
-        centerPositionLatLon: actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null,
-      }))
-    }
-  }, [srssInitialized, centerPoint, markerPoint])
+    setState((statePrev) => ({
+      ...statePrev,
+      centerPositionLatLon: actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null,
+    }))
+  }, [centerPoint, markerPoint])
 
   const mapEventHandlers = useMemo(
     () => ({

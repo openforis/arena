@@ -3,12 +3,14 @@ import { useMapEvents } from 'react-leaflet'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
-import { useSRSs } from '@webapp/components/hooks'
+import * as Survey from '@core/survey/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 export const useMapMarker = (props) => {
   const { editable, onPointUpdated: onPointUpdatedProp, point } = props
 
-  const { srssInitialized } = useSRSs()
+  const survey = useSurvey()
+  const srsIndex = Survey.getSRSIndex(survey)
 
   const markerRef = useRef(null)
 
@@ -19,8 +21,8 @@ export const useMapMarker = (props) => {
   const { pointLatLon } = state
 
   const fromPointToLatLon = (point) => {
-    if (srssInitialized && Points.isValid(point)) {
-      const pointLatLong = Points.toLatLong(point)
+    if (Points.isValid(point, srsIndex)) {
+      const pointLatLong = Points.toLatLong(point, srsIndex)
       const { x, y } = pointLatLong
       return [y, x]
     }
@@ -28,13 +30,13 @@ export const useMapMarker = (props) => {
   }
   // on point update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
-    if (srssInitialized && point) {
+    if (point) {
       setState((statePrev) => ({
         ...statePrev,
         pointLatLon: fromPointToLatLon(point),
       }))
     }
-  }, [srssInitialized, point])
+  }, [point])
 
   const onPointUpdated = useCallback(
     ({ lat, lng }) => {
@@ -47,11 +49,11 @@ export const useMapMarker = (props) => {
 
       // transform updated location into a location with the same SRS as the marker position parameter
       if (point?.srs && point.srs !== pointUpdated.srs) {
-        pointUpdated = Points.transform(pointUpdated, point.srs)
+        pointUpdated = Points.transform(pointUpdated, point.srs, srsIndex)
       }
       onPointUpdatedProp(pointUpdated)
     },
-    [point]
+    [onPointUpdatedProp, point.srs, srsIndex]
   )
 
   const markerEventHandlers = useMemo(

@@ -1,8 +1,6 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
-import { SRSs } from '@openforis/arena-core'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import Job from '@server/job/job'
@@ -37,8 +35,6 @@ export default class CategoryImportJob extends Job {
 
   async onStart() {
     await super.onStart()
-
-    await SRSs.init()
 
     this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
 
