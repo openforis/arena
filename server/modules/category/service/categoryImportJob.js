@@ -95,7 +95,10 @@ export default class CategoryImportJob extends Job {
 
     // Validate category
     this.logDebug('category validation start')
-    this.category = await CategoryManager.validateCategory(this.surveyId, Category.getUuid(this.category), this.tx)
+    this.category = await CategoryManager.validateCategory(
+      { survey: this.survey, categoryUuid: Category.getUuid(this.category) },
+      this.tx
+    )
     this.logDebug('category validation end')
 
     this.setResult({

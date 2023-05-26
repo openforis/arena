@@ -1,4 +1,4 @@
-import { Objects, SRSs, SystemError } from '@openforis/arena-core'
+import { Objects, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -90,9 +90,6 @@ class RecordUpdateThread extends Thread {
   }
 
   async init() {
-    // Init SRSs
-    await SRSs.init()
-
     // Init record
     this.record = await RecordManager.fetchRecordAndNodesByUuid({
       surveyId: this.surveyId,

@@ -25,6 +25,7 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
@@ -172,9 +173,17 @@ export const fetchSurveyById = async ({ surveyId, draft = false, validate = fals
     SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
-  const validation = validate ? await validateSurveyInfo(surveyInfo) : null
 
-  return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
+  const srsCodes = Survey.getSRSCodes(surveyInfo)
+  const srss = await SrsRepository.fetchSrssByCodes({ srsCodes }, client)
+  const surveyInfoUpdated = R.pipe(Survey.assocSrs(srss), Survey.assocAuthGroups(authGroups))(surveyInfo)
+
+  const validation = validate ? await validateSurveyInfo(surveyInfoUpdated) : null
+
+  return assocSurveyInfo({
+    ...surveyInfoUpdated,
+    validation,
+  })
 }
 
 export const fetchSurveyAndNodeDefsBySurveyId = async (
@@ -228,7 +237,6 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex(surveyId, draft, client)
   const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client)
-
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 

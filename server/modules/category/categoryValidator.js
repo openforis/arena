@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import { Points } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -73,11 +74,11 @@ const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
 })
 
 const _extraPropValidators = {
-  [ExtraPropDef.dataTypes.number]: (key, extra) =>
+  [ExtraPropDef.dataTypes.number]: ({ key, extra }) =>
     Validator.validateNumber(Validation.messageKeys.categoryEdit.itemExtraPropInvalidNumber, { key })(key, extra),
-  [ExtraPropDef.dataTypes.geometryPoint]: (key, extra) => {
+  [ExtraPropDef.dataTypes.geometryPoint]: ({ key, extra, srsIndex }) => {
     const point = Points.parse(extra[key])
-    if (point && Points.isValid(point)) {
+    if (point && Points.isValid(point, srsIndex)) {
       return null
     }
     return ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemExtraPropInvalidGeometryPoint, { key })
@@ -85,35 +86,37 @@ const _extraPropValidators = {
   [ExtraPropDef.dataTypes.text]: () => null,
 }
 
-const _validateItemExtraProps = (extraDefs, validation) => (item) => {
-  const _validateItemExtraProp = (key, extra) => {
-    if (StringUtils.isBlank(extra[key])) {
-      return null
+const _validateItemExtraProps =
+  ({ extraDefs, validation, srsIndex }) =>
+  (item) => {
+    const _validateItemExtraProp = ({ key, extra }) => {
+      if (StringUtils.isBlank(extra[key])) {
+        return null
+      }
+      const extraDef = extraDefs[key]
+      const extraDefType = extraDef[ExtraPropDef.keys.dataType]
+      return _extraPropValidators[extraDefType]({ key, extra, srsIndex })
     }
-    const extraDef = extraDefs[key]
-    const extraDefType = extraDef[ExtraPropDef.keys.dataType]
-    return _extraPropValidators[extraDefType](key, extra)
+
+    const extra = CategoryItem.getExtra(item)
+    return extra
+      ? R.pipe(
+          R.keys,
+          R.reduce((accValidation, key) => {
+            const validationResult = _validateItemExtraProp({ key, extra })
+            return R.unless(
+              R.always(R.isNil(validationResult)),
+              Validation.assocFieldValidation(
+                `${CategoryItem.keysProps.extra}_${key}`,
+                Validation.newInstance(false, {}, [validationResult])
+              )
+            )(accValidation)
+          }, validation)
+        )(extra)
+      : validation
   }
 
-  const extra = CategoryItem.getExtra(item)
-  return extra
-    ? R.pipe(
-        R.keys,
-        R.reduce((accValidation, key) => {
-          const validationResult = _validateItemExtraProp(key, extra)
-          return R.unless(
-            R.always(R.isNil(validationResult)),
-            Validation.assocFieldValidation(
-              `${CategoryItem.keysProps.extra}_${key}`,
-              Validation.newInstance(false, {}, [validationResult])
-            )
-          )(accValidation)
-        }, validation)
-      )(extra)
-    : validation
-}
-
-const validateItems = async (category, itemsByParentUuid) => {
+const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
   const itemsValidationsByUuid = {}
   let errorFound = false
 
@@ -158,7 +161,7 @@ const validateItems = async (category, itemsByParentUuid) => {
       validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
     }
 
-    validation = _validateItemExtraProps(Category.getItemExtraDef(category), validation)(item)
+    validation = _validateItemExtraProps({ extraDefs: Category.getItemExtraDef(category), validation, srsIndex })(item)
 
     if (isLeaf || R.isEmpty(itemChildren)) {
       stack.pop() // It won't be visited again, remove it from stack
@@ -219,12 +222,13 @@ const categoryValidators = (categories) => ({
 const validateCategoryProps = async (categories, category) =>
   Validator.validate(category, categoryValidators(categories))
 
-export const validateCategory = async (categories, category, items) => {
+export const validateCategory = async ({ survey, categories, category, items }) => {
+  const srsIndex = Survey.getSRSIndex(survey)
   const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid)(items)
 
   const categoryValidation = await validateCategoryProps(categories, category)
   const levelsValidation = await validateLevels(category, itemsByParentUuid)
-  const itemsValidation = await validateItems(category, itemsByParentUuid)
+  const itemsValidation = await validateItems({ category, itemsByParentUuid, srsIndex })
 
   return R.pipe(
     Validation.setValid(R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),

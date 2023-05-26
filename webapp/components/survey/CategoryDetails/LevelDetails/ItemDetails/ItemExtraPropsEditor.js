@@ -16,11 +16,11 @@ const GeometryPointExtraPropEditor = (props) => {
 
   const value = CategoryItem.getExtraProp(extraPropKey)(item)
 
-  const point = Points.parse(value)
+  const point = Points.parse(value) || {}
   const { x, y, srs } = point
 
   const onFieldChange = (field) => (value) => {
-    const pointUpdated = { ...point, [field]: value }
+    const pointUpdated = { ...point, [field]: ['x', 'y'].includes(field) ? Number(value) : value }
     const extra = A.pipe(CategoryItem.getExtra, A.assoc(extraPropKey, pointUpdated))(item)
     updateProp({ key: CategoryItem.keysProps.extra, value: extra })
   }

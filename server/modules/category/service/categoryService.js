@@ -43,7 +43,7 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
   })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  await CategoryManager.exportCategoryToStream({ surveyId, categoryUuid, draft, outputStream: res })
+  await CategoryManager.exportCategoryToStream({ survey, categoryUuid, draft, outputStream: res })
 }
 
 export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {

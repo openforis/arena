@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
@@ -48,6 +46,7 @@ const keys = {
   categoryItemIndex: 'categoryItemIndex', // items by item uuid
   taxonUuidIndex: 'taxonUuidIndex',
   taxonIndex: 'taxonIndex',
+  srsIndex: 'srsIndex',
 }
 
 const categoryItemNullParentUuid = 'null'
@@ -74,7 +73,7 @@ export const getCategoryItemUuidAndCodeHierarchy =
     if (levelIndex > 0) {
       const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
       parentItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
-      hierarchyCode = R.append(parentItemUuid, Node.getHierarchyCode(parentCodeAttribute))
+      hierarchyCode = [...Node.getHierarchyCode(parentCodeAttribute), parentItemUuid]
     }
 
     const itemUuid = getCategoryItemUuid({ categoryUuid, parentItemUuid, code })(survey)
@@ -136,6 +135,7 @@ export const assocRefData =
       taxonIndex[uuid] = item
       Objects.setInPath({ obj: taxonUuidIndex, path: [Taxon.getTaxonomyUuid(item), Taxon.getCode(item)], value: uuid })
     })
+
     const refData = SurveyRefDataFactory.createInstance({ itemsByCategoryUuid, taxonIndex, taxonUuidIndex })
 
     return {
