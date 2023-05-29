@@ -96,13 +96,13 @@ const Dropdown = (props) => {
 
   return (
     <ValidationTooltip
-      className="dropdown-wrapper dropdown-validation-tooltip"
+      className={classNames('dropdown-wrapper dropdown-validation-tooltip', className)}
       id={id}
       testId={testId}
       validation={validation}
     >
       <ReactSelect
-        className={classNames('dropdown', className)}
+        className="dropdown"
         classNamePrefix="dropdown"
         components={{ Option: OptionComponent({ renderOptionLabel }), SingleValue: SingleValueComponent }}
         defaultValue={defaultValue}
