@@ -10,7 +10,6 @@ import * as dbUtils from '../../../../db/dbUtils'
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as Record from '../../../../../core/record/record'
-import * as Node from '../../../../../core/record/node'
 import * as Expression from '../../../../../core/expressionParser/expression'
 
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
@@ -346,15 +345,10 @@ export const isRecordUniqueByUniqueNodes = async ({ survey, record }, client = d
 }
 
 export const fetchRecordsCountByRootNodesValue = async (
-  survey,
-  cycle,
-  nodes,
-  recordUuidsExcluded = [],
-  excludeRecordsFromCount = false,
+  { survey, cycle, nodeDefs, nodes, recordUuidsExcluded = [], excludeRecordsFromCount = false },
   client = db
 ) => {
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
-  const nodeDefs = nodes.map((node) => Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
   const surveyId = Survey.getId(survey)
   const schemaRdb = Schemata.getSchemaSurveyRdb(surveyId)
   const schema = Schemata.getSchemaSurvey(surveyId)
