@@ -60,6 +60,7 @@ const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
       clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
       nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
       ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
     },
   }
 }

@@ -25,8 +25,9 @@ const MapWrapper = () => {
   const [state, setState] = useState({
     editingRecordUuid: null,
     editingParentNodeUuid: null,
+    lastRecordEditModalState: null,
   })
-  const { editingRecordUuid, editingParentNodeUuid } = state
+  const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
 
   // get sampling point data levels
   const categories = Survey.getCategoriesArray(survey)
@@ -46,6 +47,10 @@ const MapWrapper = () => {
 
   const closeRecordEditor = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
+  }, [])
+
+  const onRecordEditorClose = useCallback(({ modalState: lastRecordEditModalState }) => {
+    setState(({ statePrev }) => ({ ...statePrev, lastRecordEditModalState }))
   }, [])
 
   const createRecordFromSamplingPointDataItem = useCallback(
@@ -88,7 +93,9 @@ const MapWrapper = () => {
       />
       {editingRecordUuid && (
         <RecordEditModal
-          onClose={closeRecordEditor}
+          initialState={lastRecordEditModalState}
+          onClose={onRecordEditorClose}
+          onRequestClose={closeRecordEditor}
           recordUuid={editingRecordUuid}
           parentNodeUuid={editingParentNodeUuid}
         />
