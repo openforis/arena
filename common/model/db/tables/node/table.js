@@ -1,6 +1,7 @@
 import camelize from 'camelize'
 import * as R from 'ramda'
 
+import * as Survey from '../../../../../core/survey/survey'
 import * as Node from '../../../../../core/record/node'
 
 import Table from '../table'
@@ -23,9 +24,14 @@ const columnSet = {
  * @typedef {module:arena.TableSurvey} module:arena.TableNode
  */
 export default class TableNode extends TableSurvey {
-  constructor(surveyId) {
-    super(surveyId, 'node', columnSet)
+  constructor(survey) {
+    super(Survey.getId(survey), 'node', columnSet)
+    this._survey = survey
     this.getSelect = getSelect.bind(this)
+  }
+
+  get survey() {
+    return this._survey
   }
 
   get columnRecordUuid() {
