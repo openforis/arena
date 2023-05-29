@@ -28,7 +28,7 @@ const extractValueFromRowResult = ({ rowResult, nodeDef, columnName }) => {
 }
 
 export default class MassiveUpdateNodes extends MassiveUpdate {
-  constructor({ surveyId, analysisNodeDefs }, tx) {
+  constructor({ survey, analysisNodeDefs }, tx) {
     const nodeDefsByColumnName = NodeDefTable.getNodeDefsByColumnNames({
       nodeDefs: analysisNodeDefs,
       includeExtendedCols: true,
@@ -43,7 +43,7 @@ export default class MassiveUpdateNodes extends MassiveUpdate {
       new Column({ name: TableNode.columnSet.value, cast: 'jsonb' }),
     ]
 
-    const tableNode = new TableNode(surveyId)
+    const tableNode = new TableNode(survey)
 
     super(
       {
