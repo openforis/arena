@@ -1,10 +1,18 @@
 import { isUuid } from '../../../../../core/uuid'
+import * as Survey from '../../../../../core/survey/survey'
+import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as Node from '../../../../../core/record/node'
 
 import TableCategoryItem from '../categoryItem'
 import TableTaxon from '../taxon'
 import TableTaxonVernacularName from '../taxonVernacularName'
 import { jsonBuildObject } from '../../sql'
+
+const _isInsideSingleEntity = ({ survey, nodeDefUuid }) => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  return NodeDef.isSingle(nodeDefParent)
+}
 
 /**
  * Generates the select query for the node table by the given parameters.
@@ -32,16 +40,30 @@ export function getSelect(params) {
   const propsCategoryItem = _getPropsCombined(tableCategoryItem)
 
   const whereConditions = []
+
   const _addUuidEqualCondition = (column, value) => {
     if (value) {
       whereConditions.push(`${column} = ${isUuid(value) ? `'${value}'` : value}`)
     }
   }
 
+  const _addParentNodeCondition = () => {
+    if (nodeDefUuid && _isInsideSingleEntity({ survey: this.survey, nodeDefUuid })) {
+      // node def is inside a single entity
+      // parentUuid is the uuid of the first ancestor multiple entity
+      // use node hierarchy in the where condition
+      whereConditions.push(
+        `${parentUuid}::text IN (SELECT jsonb_array_elements_text(${this.columnMeta} -> '${Node.metaKeys.hierarchy}'))`
+      )
+    } else {
+      _addUuidEqualCondition(this.columnParentUuid, parentUuid)
+    }
+  }
+
   _addUuidEqualCondition(this.columnUuid, uuid)
   _addUuidEqualCondition(this.columnRecordUuid, recordUuid)
-  _addUuidEqualCondition(this.columnParentUuid, parentUuid)
   _addUuidEqualCondition(this.columnNodeDefUuid, nodeDefUuid)
+  _addParentNodeCondition()
 
   const _getColumnValueProp = (keyProp) => `${this.columnValue}->>'${keyProp}'`
   const columnTaxonUuid = _getColumnValueProp(Node.valuePropsTaxon.taxonUuid)
@@ -101,7 +123,11 @@ export function getSelect(params) {
     LEFT OUTER JOIN
         ${tableTaxonVernacularName.nameAliased}
     ON
-        (${columnTaxonVernacularNameUuid})::uuid = ${tableTaxonVernacularName.columnUuid}`
+        (${columnTaxonVernacularNameUuid})::uuid = ${tableTaxonVernacularName.columnUuid}
+  `
 
-  return `${query}${whereConditions.length > 0 ? ` WHERE ${whereConditions.join(' AND ')}` : ''}`
+  if (whereConditions.length > 0) {
+    return `${query} WHERE ${whereConditions.join(' AND ')}`
+  }
+  return query
 }
