@@ -7,8 +7,10 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 
 const DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE = {
-  [NodeDef.nodeDefType.coordinate]: 2,
-  [NodeDef.nodeDefType.taxon]: 2,
+  [NodeDef.nodeDefType.coordinate]: () => 2,
+  [NodeDef.nodeDefType.taxon]: () => 2,
+  [NodeDef.nodeDefType.text]: ({ nodeDef }) =>
+    NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine ? 2 : 1,
 }
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
@@ -201,7 +203,7 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
-  const h = DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)] || 1
+  const h = DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) || 1
 
   const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h })
   layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
