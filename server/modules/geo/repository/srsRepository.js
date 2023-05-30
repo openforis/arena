@@ -20,7 +20,7 @@ const extractName = (row) => {
 const rowToSrs = (row) => {
   const { srid: code, srtext: wkt } = row
   const name = extractName(row)
-  return SRSFactory.createInstance({ code, name, wkt })
+  return SRSFactory.createInstance({ code: String(code), name, wkt })
 }
 
 export const fetchSRSsByCodes = async ({ srsCodes }, client = db) =>
