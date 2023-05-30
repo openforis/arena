@@ -24,6 +24,7 @@ const DataGrid = (props) => {
     exportFileName,
     disableSelectionOnClick,
     getRowClassName,
+    getRowHeight,
     getRowId,
     initialState,
     rows,
@@ -45,6 +46,7 @@ const DataGrid = (props) => {
       density={density}
       disableSelectionOnClick={disableSelectionOnClick}
       getRowClassName={getRowClassName}
+      getRowHeight={getRowHeight}
       getRowId={getRowId}
       initialState={initialState}
       rows={rows}
@@ -62,6 +64,7 @@ DataGrid.propTypes = {
   disableSelectionOnClick: PropTypes.bool,
   exportFileName: PropTypes.string,
   getRowClassName: PropTypes.func,
+  getRowHeight: PropTypes.func,
   getRowId: PropTypes.func,
   initialState: PropTypes.object,
   rows: PropTypes.array.isRequired,
