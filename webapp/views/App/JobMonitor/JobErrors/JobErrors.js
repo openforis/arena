@@ -33,6 +33,7 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
       <DataGrid
         allowExportToCsv
         autoPageSize
+        autoRowHeight
         columns={[
           {
             field: 'errorKey',
@@ -57,7 +58,6 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
         ]}
         density="compact"
         exportFileName={exportFileName}
-        getRowHeight={() => 'auto'}
         initialState={{
           sorting: {
             sortModel: [{ field: 'errorKey', sort: 'asc' }],

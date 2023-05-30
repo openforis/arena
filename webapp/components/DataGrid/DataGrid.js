@@ -17,6 +17,7 @@ const DataGrid = (props) => {
   const {
     allowExportToCsv,
     autoPageSize,
+    autoRowHeight,
     checkboxSelection,
     className,
     columns: columnsProp,
@@ -24,7 +25,6 @@ const DataGrid = (props) => {
     exportFileName,
     disableSelectionOnClick,
     getRowClassName,
-    getRowHeight,
     getRowId,
     initialState,
     rows,
@@ -35,6 +35,8 @@ const DataGrid = (props) => {
   }
 
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
+
+  const getRowHeight = useMemo(() => (autoRowHeight ? () => 'auto' : undefined), [autoRowHeight])
 
   return (
     <MuiDataGrid
@@ -57,6 +59,7 @@ const DataGrid = (props) => {
 DataGrid.propTypes = {
   allowExportToCsv: PropTypes.bool,
   autoPageSize: PropTypes.bool,
+  autoRowHeight: PropTypes.bool,
   checkboxSelection: PropTypes.bool,
   className: PropTypes.string,
   columns: PropTypes.array.isRequired,
@@ -64,7 +67,6 @@ DataGrid.propTypes = {
   disableSelectionOnClick: PropTypes.bool,
   exportFileName: PropTypes.string,
   getRowClassName: PropTypes.func,
-  getRowHeight: PropTypes.func,
   getRowId: PropTypes.func,
   initialState: PropTypes.object,
   rows: PropTypes.array.isRequired,
@@ -73,6 +75,7 @@ DataGrid.propTypes = {
 DataGrid.defaultProps = {
   allowExportToCsv: false,
   autoPageSize: false,
+  autoRowHeight: false,
   checkboxSelection: false,
   density: 'standard',
   disableSelectionOnClick: true,
