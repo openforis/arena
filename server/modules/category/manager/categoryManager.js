@@ -62,7 +62,8 @@ const _validateCategory = async ({ surveyId, categoryUuid }, client = db) => {
   return validateCategory({ survey, categoryUuid }, client)
 }
 
-export const validateCategories = async (surveyId, client = db) => {
+export const validateCategories = async (survey, client = db) => {
+  const surveyId = Survey.getId(survey)
   const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(
     { surveyId, draft: true, includeValidation: true },
     client
@@ -70,7 +71,7 @@ export const validateCategories = async (surveyId, client = db) => {
 
   const categoriesValidated = await Promise.all(
     Object.keys(categories).map((categoryUuid) =>
-      _validateCategoryFromCategories({ surveyId, categories, categoryUuid }, client)
+      _validateCategoryFromCategories({ survey, categories, categoryUuid }, client)
     )
   )
   return ObjectUtils.toUuidIndexedObj(categoriesValidated)
