@@ -70,7 +70,7 @@ export const validateCategories = async (surveyId, client = db) => {
 
   const categoriesValidated = await Promise.all(
     Object.keys(categories).map((categoryUuid) =>
-      _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
+      _validateCategoryFromCategories({ surveyId, categories, categoryUuid }, client)
     )
   )
   return ObjectUtils.toUuidIndexedObj(categoriesValidated)
