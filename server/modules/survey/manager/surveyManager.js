@@ -37,11 +37,10 @@ const assocSurveyInfo = (survey) => survey
 
 const _fetchAndAssocSrss = async ({ surveyInfo }, client) => {
   const srsCodes = Survey.getSRSCodes(surveyInfo)
-  if (srsCodes.length > 0) {
-    const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
-    return Survey.assocSrs(srss)(surveyInfo)
-  }
-  return surveyInfo
+  if (srsCodes.length === 0) return surveyInfo
+
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
+  return Survey.assocSrs(srss)(surveyInfo)
 }
 
 // ====== VALIDATION
