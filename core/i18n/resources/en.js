@@ -1650,6 +1650,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
     entity: {
       keyDuplicate: 'Duplicate entity key',
+      keyValueNotSpecified: 'Key value for attribute {{keyDefName}} not specified',
     },
     nodes: {
       count: {
