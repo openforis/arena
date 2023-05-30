@@ -95,7 +95,7 @@ const checkAllHeadersAreValid =
     const dataExportModelHeaders = csvDataExportModel.columns.map((col) => col.header)
     const invalidHeaders = headers.filter((header) => !dataExportModelHeaders.includes(header))
     if (invalidHeaders.length > 0) {
-      throw new SystemError('validationErrors.dataImport.invalidHeaders', { invalidHeaders })
+      throw new SystemError('validationErrors.dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
     }
   }
 
