@@ -35,6 +35,15 @@ import SystemError from '@core/systemError'
 
 const assocSurveyInfo = (survey) => survey
 
+const _fetchAndAssocSrss = async ({ surveyInfo }, client) => {
+  const srsCodes = Survey.getSRSCodes(surveyInfo)
+  if (srsCodes.length > 0) {
+    const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
+    return Survey.assocSrs(srss)(surveyInfo)
+  }
+  return surveyInfo
+}
+
 // ====== VALIDATION
 
 export const validateNewSurvey = async ({ newSurvey }) => {
@@ -154,10 +163,7 @@ export const importSurvey = async (params, client = db) => {
       surveyInfo
     )
 
-    // fetch SRS from DB
-    const srsCodes = Survey.getSRSCodes(surveyInfo)
-    const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, t)
-    surveyInfo = Survey.assocSrs(srss)(surveyInfo)
+    surveyInfo = await _fetchAndAssocSrss({ surveyInfo }, t)
 
     await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 
@@ -181,9 +187,8 @@ export const fetchSurveyById = async ({ surveyId, draft = false, validate = fals
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
 
-  const srsCodes = Survey.getSRSCodes(surveyInfo)
-  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
-  const surveyInfoUpdated = R.pipe(Survey.assocSrs(srss), Survey.assocAuthGroups(authGroups))(surveyInfo)
+  let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
+  surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo: surveyInfoUpdated }, client)
 
   const validation = validate ? await validateSurveyInfo(surveyInfoUpdated) : null
 
