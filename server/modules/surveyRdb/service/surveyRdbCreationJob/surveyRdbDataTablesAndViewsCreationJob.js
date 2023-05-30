@@ -31,6 +31,9 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     this.total = descendantMultipleDefs.length + 3
 
     // Visit entities and multiple attributes to create and populate tables
+    // (break loop if job is canceled)
+    const stopIfFunction = () => this.isCanceled()
+
     await PromiseUtils.each(
       descendantMultipleDefs,
       async (nodeDef) => {
@@ -43,12 +46,12 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
 
         // ===== insert into table
         this.logDebug(`insert into table ${nodeDefName} - start`)
-        await SurveyRdbManager.populateTable(survey, nodeDef, tx)
+        await SurveyRdbManager.populateTable({ survey, nodeDef, stopIfFunction }, tx)
         this.logDebug(`insert into table ${nodeDefName} - end`)
 
         this.incrementProcessedItems()
       },
-      () => this.isCanceled()
+      stopIfFunction
     )
     // create views
     await PromiseUtils.each(descendantMultipleDefs, async (nodeDef) => {
