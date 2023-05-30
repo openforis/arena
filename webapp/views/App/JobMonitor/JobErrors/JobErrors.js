@@ -33,6 +33,7 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
       <DataGrid
         allowExportToCsv
         autoPageSize
+        autoRowHeight
         columns={[
           {
             field: 'errorKey',

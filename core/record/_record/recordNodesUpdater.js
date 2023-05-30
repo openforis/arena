@@ -3,6 +3,7 @@ import {
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordValidator,
   RecordUpdateResult,
+  Objects,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -108,6 +109,12 @@ const _addEntityAndKeyValues =
     keyDefs.forEach((keyDef) => {
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
 
+      if (Objects.isEmpty(keyValue)) {
+        throw new SystemError('record.entity.keyValueNotSpecified', {
+          keyDefName: NodeDef.getName(keyDef),
+        })
+      }
+
       const keyAttributeUpdateResult = _addOrUpdateAttribute({
         survey,
         entity,
@@ -165,6 +172,7 @@ const _getOrCreateEntityByKeys =
       descendantDefUuid: NodeDef.getUuid(entityParentDef),
       keyValuesByDefUuid: valuesByDefUuid,
     })(record)
+
     if (!entityParent) {
       throw new SystemError('record.cannotFindAncestorForEntity', {
         entityName: NodeDef.getName(entityDef),
@@ -178,6 +186,7 @@ const _getOrCreateEntityByKeys =
       keyValuesByDefUuid: valuesByDefUuid,
       sideEffect,
     })(record)
+
     return { entity: entityInserted, updateResult }
   }
 
