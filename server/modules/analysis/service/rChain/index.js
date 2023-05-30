@@ -81,7 +81,7 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
 
     // Insert node results
     const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entityDef, analysisNodeDefs }, tx)
-    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes({ surveyId, analysisNodeDefs }, tx)
+    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes({ survey, analysisNodeDefs }, tx)
 
     await CSVReader.createReaderFromStream(stream, null, async (row) => {
       await massiveUpdateData.push(row)

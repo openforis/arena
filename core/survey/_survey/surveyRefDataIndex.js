@@ -46,7 +46,6 @@ const keys = {
   categoryItemIndex: 'categoryItemIndex', // items by item uuid
   taxonUuidIndex: 'taxonUuidIndex',
   taxonIndex: 'taxonIndex',
-  srsIndex: 'srsIndex',
 }
 
 const categoryItemNullParentUuid = 'null'

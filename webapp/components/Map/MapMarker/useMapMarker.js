@@ -3,14 +3,12 @@ import { useMapEvents } from 'react-leaflet'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurveySrsIndex } from '@webapp/store/survey'
 
 export const useMapMarker = (props) => {
   const { editable, onPointUpdated: onPointUpdatedProp, point } = props
 
-  const survey = useSurvey()
-  const srsIndex = Survey.getSRSIndex(survey)
+  const srsIndex = useSurveySrsIndex()
 
   const markerRef = useRef(null)
 
@@ -19,15 +17,20 @@ export const useMapMarker = (props) => {
   })
 
   const { pointLatLon } = state
+  const pointSrs = point?.srs
 
-  const fromPointToLatLon = (point) => {
-    if (Points.isValid(point, srsIndex)) {
-      const pointLatLong = Points.toLatLong(point, srsIndex)
-      const { x, y } = pointLatLong
-      return [y, x]
-    }
-    return null
-  }
+  const fromPointToLatLon = useCallback(
+    (point) => {
+      if (Points.isValid(point, srsIndex)) {
+        const pointLatLong = Points.toLatLong(point, srsIndex)
+        const { x, y } = pointLatLong
+        return [y, x]
+      }
+      return null
+    },
+    [srsIndex]
+  )
+
   // on point update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
     if (point) {
@@ -36,7 +39,7 @@ export const useMapMarker = (props) => {
         pointLatLon: fromPointToLatLon(point),
       }))
     }
-  }, [point])
+  }, [fromPointToLatLon, point])
 
   const onPointUpdated = useCallback(
     ({ lat, lng }) => {
@@ -45,15 +48,15 @@ export const useMapMarker = (props) => {
         pointLatLon: [lat, lng],
       }))
 
-      let pointUpdated = PointFactory.createInstance({ x: lng, y: lat, srs: '4326' })
+      let pointUpdated = PointFactory.createInstance({ x: lng, y: lat })
 
       // transform updated location into a location with the same SRS as the marker position parameter
-      if (point?.srs && point.srs !== pointUpdated.srs) {
-        pointUpdated = Points.transform(pointUpdated, point.srs, srsIndex)
+      if (pointSrs && pointSrs !== pointUpdated.srs) {
+        pointUpdated = Points.transform(pointUpdated, pointSrs, srsIndex)
       }
       onPointUpdatedProp(pointUpdated)
     },
-    [onPointUpdatedProp, point.srs, srsIndex]
+    [onPointUpdatedProp, pointSrs, srsIndex]
   )
 
   const markerEventHandlers = useMemo(
@@ -66,7 +69,7 @@ export const useMapMarker = (props) => {
         }
       },
     }),
-    []
+    [onPointUpdated]
   )
 
   if (editable) {

@@ -156,7 +156,7 @@ export const importSurvey = async (params, client = db) => {
 
     // fetch SRS from DB
     const srsCodes = Survey.getSRSCodes(surveyInfo)
-    const srss = await SrsRepository.fetchSrssByCodes({ srsCodes }, t)
+    const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, t)
     surveyInfo = Survey.assocSrs(srss)(surveyInfo)
 
     await _addUserToSurveyAdmins({ user, surveyInfo }, t)
@@ -182,7 +182,7 @@ export const fetchSurveyById = async ({ surveyId, draft = false, validate = fals
   ])
 
   const srsCodes = Survey.getSRSCodes(surveyInfo)
-  const srss = await SrsRepository.fetchSrssByCodes({ srsCodes }, client)
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
   const surveyInfoUpdated = R.pipe(Survey.assocSrs(srss), Survey.assocAuthGroups(authGroups))(surveyInfo)
 
   const validation = validate ? await validateSurveyInfo(surveyInfoUpdated) : null
@@ -244,6 +244,7 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex(surveyId, draft, client)
   const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client)
+
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 

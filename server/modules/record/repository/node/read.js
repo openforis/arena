@@ -7,7 +7,7 @@ import { db } from '../../../../db/db'
  * Fetches nodes by the given survey id and the optional parameters.
  *
  * @param {!object} params - The query parameters.
- * @param {!string} params.surveyId - The survey id.
+ * @param {!object} params.survey - The survey object.
  * @param {string} [params.uuid=null] - The node uuid to filter by.
  * @param {string} [params.recordUuid=null] - The record uuid to filter by.
  * @param {string} [params.parentUuid=null] - The parent node uuid to filter by.
@@ -18,8 +18,8 @@ import { db } from '../../../../db/db'
  * @returns {Promise<Node[]>} - The result promise.
  */
 export const fetchNodes = async (params, client = db) => {
-  const { surveyId, uuid, recordUuid, parentUuid, nodeDefUuid, draft } = params
-  const table = new TableNode(surveyId)
+  const { survey, uuid, recordUuid, parentUuid, nodeDefUuid, draft } = params
+  const table = new TableNode(survey)
   return client.map(
     table.getSelect({ uuid, recordUuid, parentUuid, nodeDefUuid, draft }),
     [],

@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -13,6 +15,11 @@ export const useSurveyDefsFetched = (draft) => useSelector(SurveyStatusState.are
 export const useSurvey = () => useSelector(SurveyState.getSurvey)
 export const useSurveyId = () => useSelector(SurveyState.getSurveyId)
 export const useSurveyInfo = () => useSelector(SurveyState.getSurveyInfo)
+export const useSurveySrsIndex = () =>
+  useSelector((state) => {
+    const surveyInfo = SurveyState.getSurveyInfo(state)
+    return Survey.getSRSIndex(surveyInfo)
+  }, Objects.isEqual)
 export const useSurveyCycleKey = () => useSelector(SurveyState.getSurveyCycleKey)
 export const useSurveyCycleKeys = () => useSelector(SurveyState.getSurveyCyclesKeys)
 export const useSurveyPreferredLang = () => useSelector(SurveyState.getSurveyPreferredLang)

@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react'
 
-import * as API from '@webapp/service/api'
 import { Points } from '@openforis/arena-core'
 
-export const useElevation = ({ surveyId, point, active = true }) => {
-  const pointLatLng = Points.toLatLong(point)
+import * as Survey from '@core/survey/survey'
+
+import * as API from '@webapp/service/api'
+
+export const useElevation = ({ survey, point, active = true }) => {
+  const surveyId = Survey.getId(survey)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const srsIndex = Survey.getSRSIndex(surveyInfo)
+
+  const pointLatLng = Points.toLatLong(point, srsIndex)
   const { y: lat, x: lng } = pointLatLng
 
   const [elevation, setElevation] = useState('...')

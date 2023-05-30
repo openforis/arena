@@ -56,7 +56,7 @@ export const validateCategory = async ({ survey, categoryUuid }, client = db) =>
 const _validateCategory = async ({ surveyId, categoryUuid }, client = db) => {
   let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const srsCodes = Survey.getSRSCodes(survey)
-  const srss = await SrsRepository.fetchSrssByCodes({ srsCodes }, client)
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
   survey = Survey.assocSrs(srss)(survey)
 
   return validateCategory({ survey, categoryUuid }, client)

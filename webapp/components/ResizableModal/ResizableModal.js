@@ -1,6 +1,6 @@
 import './ResizableModal.scss'
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactModal from 'react-modal-resizable-draggable'
 import classNames from 'classnames'
 
@@ -8,14 +8,37 @@ import { useI18n } from '@webapp/store/system'
 import { Button, ButtonIconClose } from '../buttons'
 
 export const ResizableModal = (props) => {
-  const { children, className, header: headerProp, initHeight, initWidth, isOpen, onClose, onDetach } = props
+  const {
+    children,
+    className,
+    header: headerProp,
+    initHeight,
+    initWidth,
+    isOpen,
+    left,
+    onClose,
+    onDetach,
+    onRequestClose,
+    top,
+  } = props
 
+  const modalRef = useRef(null)
   const i18n = useI18n()
   const header = typeof headerProp === 'string' ? i18n.t(headerProp) : headerProp
 
+  useEffect(() => {
+    if (!onClose) return
+
+    const modal = modalRef.current
+
+    return () => {
+      onClose({ modalState: modal?.state })
+    }
+  }, [modalRef, onClose])
+
   return (
     <div className={classNames('resizable-modal', className)}>
-      <ReactModal initWidth={initWidth} initHeight={initHeight} onRequestClose={onClose} isOpen={isOpen}>
+      <ReactModal initHeight={initHeight} initWidth={initWidth} isOpen={isOpen} left={left} ref={modalRef} top={top}>
         <div className="resizable-modal__header">
           <h3>{header}</h3>
           {onDetach && (
@@ -26,7 +49,7 @@ export const ResizableModal = (props) => {
               title="common.openInNewWindow"
             />
           )}
-          {onClose && <ButtonIconClose onClick={onClose} />}
+          {onRequestClose && <ButtonIconClose onClick={onRequestClose} />}
         </div>
         <div className="resizable-modal__body">{children}</div>
       </ReactModal>
