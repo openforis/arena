@@ -28,14 +28,14 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const { surveyId } = Request.getParams(req)
-      const record = Request.getBody(req)
+      const recordToCreate = Request.getBody(req)
       const socketId = Request.getSocketId(req)
 
-      if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
+      if (Record.getOwnerUuid(recordToCreate) !== User.getUuid(user)) {
         throw new Error('Error record create. User is different')
       }
 
-      await RecordService.createRecord(socketId, user, surveyId, record)
+      await RecordService.createRecord({ socketId, user, surveyId, recordToCreate })
 
       sendOk(res)
     } catch (error) {
@@ -59,12 +59,12 @@ export const init = (app) => {
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, cycle, draft } = Request.getParams(req)
       const node = Request.getJsonParam(req, 'node')
       const file = Request.getFile(req)
       const socketId = Request.getSocketId(req)
 
-      await RecordService.persistNode(socketId, user, surveyId, node, file)
+      await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file })
 
       sendOk(res)
     } catch (error) {
@@ -394,11 +394,11 @@ export const init = (app) => {
   })
 
   app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
-    const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
+    const { surveyId, cycle, draft, recordUuid, nodeUuid } = Request.getParams(req)
     const user = Request.getUser(req)
     const socketId = Request.getSocketId(req)
 
-    RecordService.deleteNode(socketId, user, surveyId, recordUuid, nodeUuid)
+    RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid })
     sendOk(res)
   })
 }
