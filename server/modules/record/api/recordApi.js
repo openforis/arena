@@ -329,7 +329,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const socketId = Request.getSocketId(req)
 
-      const record = await RecordService.checkIn(socketId, user, surveyId, recordUuid, draft)
+      const record = await RecordService.checkIn({ socketId, user, surveyId, recordUuid, draft })
 
       res.json({ record })
     } catch (error) {

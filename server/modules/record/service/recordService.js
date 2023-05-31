@@ -139,13 +139,13 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   await RecordManager.deleteRecord(user, survey, record)
 
   // Notify other users viewing or editing the record it has been deleted
-  const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
+  const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
   socketIds.forEach((socketIdCurrent) => {
     if (socketIdCurrent !== socketId || notifySameUser) {
       WebSocketServer.notifySocket(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
     }
   })
-  RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
+  RecordSocketsMap.dissocSocketsByRecordUuid(recordUuid)
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
@@ -170,7 +170,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
-export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
+export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
@@ -309,14 +309,14 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 const _sendNodeUpdateMessage = ({ socketId, user, surveyId, cycle, recordUuid, draft, msg }) => {
   RecordSocketsMap.assocSocket(recordUuid, socketId)
 
-  const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
+  // const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
 
   const thread = SurveyRecordsThreadService.getOrCreatedThread({ socketId, surveyId, cycle, draft })
   thread.postMessage(msg, user)
 
-  if (singleMessage) {
-    RecordServiceThreads.killRecordThread(recordUuid)
-  }
+  // if (singleMessage) {
+  //   SurveyRecordsThreadService.killRecordThread(recordUuid)
+  // }
 }
 
 export const { fetchNodeByUuid } = RecordManager

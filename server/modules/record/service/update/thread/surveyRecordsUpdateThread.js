@@ -7,6 +7,7 @@ import Thread from '@server/threads/thread'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 import Queue from '@core/queue'
 
@@ -24,9 +25,6 @@ class SurveyRecordsUpdateThread extends Thread {
     this.survey = null
     this.record = null
     this.processing = false
-
-    this.handleNodesUpdated = this.handleNodesUpdated.bind(this)
-    this.handleNodesValidationUpdated = this.handleNodesValidationUpdated.bind(this)
   }
 
   sendThreadInitMsg() {
@@ -85,12 +83,11 @@ class SurveyRecordsUpdateThread extends Thread {
           })
           return // Stop processing
         }
-
         // Unexpected error: Crash and burn
         throw error
+      } finally {
+        this.processing = false
       }
-
-      this.processing = false
       await this.processNext()
     }
   }
@@ -118,51 +115,6 @@ class SurveyRecordsUpdateThread extends Thread {
     this.recordsByUuid = {}
   }
 
-  async processRecordInitMsg(msg) {
-    const { survey, surveyId } = this
-    const { recordUuid, user } = msg
-    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
-    record = await RecordManager.initNewRecord({
-      user,
-      survey,
-      record,
-      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
-    })
-    this.recordsByUuid[recordUuid] = record
-  }
-
-  async processRecordNodePersistMsg(msg) {
-    const { survey } = this
-    const { node, recordUuid, user } = msg
-    let record = this.recordsByUuid[recordUuid]
-    record = await RecordManager.persistNode({
-      user,
-      survey,
-      record,
-      node,
-      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
-    })
-    this.recordsByUuid[recordUuid] = record
-  }
-
-  async processRecordNodeDeleteMsg(msg) {
-    const { survey } = this
-    const { nodeUuid, recordUuid, user } = msg
-
-    let record = this.recordsByUuid[recordUuid]
-    record = await RecordManager.deleteNode(
-      user,
-      survey,
-      record,
-      nodeUuid,
-      (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
-      (validations) => this.handleNodesValidationUpdated({ record, validations })
-    )
-    this.recordsByUuid[recordUuid] = record
-  }
-
   async processMessage(msg) {
     Logger.debug('process message', msg)
     const { type } = msg
@@ -188,8 +140,65 @@ class SurveyRecordsUpdateThread extends Thread {
     }
 
     if ([messageTypes.nodePersist, messageTypes.nodeDelete].includes(type)) {
-      this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted })
+      const recordUuid = msg.recordUuid || msg.node?.recordUuid
+      this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted, content: { recordUuid } })
     }
+  }
+
+  async processRecordInitMsg(msg) {
+    const { survey, surveyId } = this
+    const { recordUuid, user } = msg
+    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+    record = await RecordManager.initNewRecord({
+      user,
+      survey,
+      record,
+      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
+      nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
+    })
+    this.recordsByUuid[recordUuid] = record
+  }
+
+  async processRecordNodePersistMsg(msg) {
+    const { survey } = this
+    const { node, user } = msg
+    const recordUuid = Node.getRecordUuid(node)
+    let record = await this.getOrFetchRecord({ recordUuid })
+    record = await RecordManager.persistNode({
+      user,
+      survey,
+      record,
+      node,
+      nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+      nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
+    })
+    this.recordsByUuid[recordUuid] = record
+  }
+
+  async processRecordNodeDeleteMsg(msg) {
+    const { survey } = this
+    const { nodeUuid, recordUuid, user } = msg
+
+    let record = await this.getOrFetchRecord({ recordUuid })
+    record = await RecordManager.deleteNode(
+      user,
+      survey,
+      record,
+      nodeUuid,
+      (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
+      (validations) => this.handleNodesValidationUpdated({ record, validations })
+    )
+    this.recordsByUuid[recordUuid] = record
+  }
+
+  async getOrFetchRecord({ recordUuid }) {
+    const { surveyId, recordsByUuid } = this
+    let record = recordsByUuid[recordUuid]
+    if (!record) {
+      record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+      recordsByUuid[recordUuid] = record
+    }
+    return record
   }
 }
 

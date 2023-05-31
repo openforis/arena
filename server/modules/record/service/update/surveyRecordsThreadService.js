@@ -7,7 +7,7 @@ import { messageTypes as RecordThreadMessageTypes } from './thread/recordThreadM
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
 import * as RecordSocketsMap from './recordSocketsMap'
 
-const INACTIVITY_PERIOD = 60 * 60 * 1000 // 1 hour
+const INACTIVITY_PERIOD = 10 * 60 * 1000 // 10 mins
 const threadTimeouts = {}
 
 // ======
@@ -43,7 +43,7 @@ const _createThread = ({ surveyId, cycle, draft }) => {
     }
   }
 
-  const exitHandler = () => {
+  const exitHandler = (args) => {
     // RecordSocketsMap.dissocSockets(recordUuid)
     SurveyRecordsThreadMap.remove(threadKey)
   }
