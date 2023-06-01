@@ -7,7 +7,6 @@ import * as Log from '@server/log/log'
 import * as A from '@core/arena'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as DateUtils from '@core/dateUtils'
-import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -43,16 +42,17 @@ import * as RecordSocketsMap from './update/recordSocketsMap'
 const Logger = Log.getLogger('RecordService')
 
 // RECORD
-export const createRecord = async ({ socketId, user, surveyId, recordToCreate }) => {
+export const createRecord = async ({ user, surveyId, recordToCreate }) => {
   Logger.debug('create record: ', recordToCreate)
 
   const recordUuid = Record.getUuid(recordToCreate)
   const cycle = Record.getCycle(recordToCreate)
 
   const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
+  const preview = Record.isPreview(recordToCreate)
 
   // Create record thread and initialize record
-  const thread = SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle })
+  const thread = SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
   thread.postMessage({ type: RecordThreadMessageTypes.recordInit, user, surveyId, recordUuid })
 
   return record
@@ -145,7 +145,7 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
       WebSocketServer.notifySocket(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
     }
   })
-  RecordSocketsMap.dissocSocketsByRecordUuid(recordUuid)
+  RecordSocketsMap.dissocSockets(recordUuid)
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
@@ -178,7 +178,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
   const cycle = Record.getCycle(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    SurveyRecordsThreadService.getOrCreatedThread({ socketId, surveyId, cycle, draft })
+    SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft })
   }
 
   RecordSocketsMap.assocSocket(recordUuid, socketId)
@@ -190,6 +190,7 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
   const recordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid })
   if (Record.isPreview(recordSummary)) {
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
+    SurveyRecordsThreadService.killThread({ surveyId, cycle: Record.getCycle(recordSummary), draft: true })
   } else {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
     if (Record.isEmpty(record)) {
@@ -311,7 +312,7 @@ const _sendNodeUpdateMessage = ({ socketId, user, surveyId, cycle, recordUuid, d
 
   // const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
 
-  const thread = SurveyRecordsThreadService.getOrCreatedThread({ socketId, surveyId, cycle, draft })
+  const thread = SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft })
   thread.postMessage(msg, user)
 
   // if (singleMessage) {

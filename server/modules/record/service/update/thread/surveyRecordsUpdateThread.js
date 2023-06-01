@@ -96,7 +96,7 @@ class SurveyRecordsUpdateThread extends Thread {
     // Init SRSs
     await SRSs.init()
 
-    const { surveyId, cycle, draft } = this
+    const { surveyId, cycle, draft } = this.params
 
     const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
       surveyId,
@@ -108,7 +108,7 @@ class SurveyRecordsUpdateThread extends Thread {
     // If in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
     const dependencyGraph = draft
       ? Survey.buildDependencyGraph(surveyDb)
-      : await SurveyManager.fetchDependencies(this.surveyId)
+      : await SurveyManager.fetchDependencies(surveyId)
 
     this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
 
@@ -116,8 +116,8 @@ class SurveyRecordsUpdateThread extends Thread {
   }
 
   async processMessage(msg) {
-    Logger.debug('process message', msg)
     const { type } = msg
+    Logger.debug('processing message', type)
 
     switch (type) {
       case messageTypes.threadInit:

@@ -4,7 +4,7 @@ const threads = new ThreadsCache()
 const threadZombies = new Set() // Set of threads marked to be killed
 
 // thread cache
-const getThreadKey = ({ surveyId, cycle, draft }) => `${surveyId}_${cycle}_${draft}`
+const getKey = ({ surveyId, cycle, draft }) => `${surveyId}_${cycle}_${draft}`
 const get = (threadKey) => threads.getThread(threadKey)
 const put = (threadKey, thread) => threads.putThread(threadKey, thread)
 
@@ -21,7 +21,7 @@ const reviveZombie = (threadKey) => threadZombies.delete(threadKey)
 const isZombie = (threadKey) => threadZombies.has(threadKey)
 
 export const SurveyRecordsThreadMap = {
-  getThreadKey,
+  getKey,
   get,
   put,
   remove,

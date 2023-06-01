@@ -24,6 +24,7 @@ const _updateNodeDebounced = (node, file, delay) => {
 
     const state = getState()
     const record = RecordState.getRecord(state)
+    const recordUuid = Record.getUuid(record)
 
     const formData = objectToFormData({
       cycle: Record.getCycle(record),
@@ -33,7 +34,7 @@ const _updateNodeDebounced = (node, file, delay) => {
     })
 
     const surveyId = SurveyState.getSurveyId(state)
-    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData)
+    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData)
   }
 
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
