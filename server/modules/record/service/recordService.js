@@ -24,6 +24,7 @@ import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -33,7 +34,6 @@ import * as FileManager from '../manager/fileManager'
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
-import { FileUtils } from '@webapp/utils/fileUtils'
 import { SurveyRecordsThreadService } from './update/surveyRecordsThreadService'
 import * as RecordSocketsMap from './update/recordSocketsMap'
 
@@ -396,7 +396,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
   })(record)
 
   const fileName = RecordFile.getName(file)
-  const extension = FileUtils.getExtension(fileName)
+  const extension = FileUtils.getFileExtension(fileName)
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
