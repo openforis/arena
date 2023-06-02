@@ -1,7 +1,5 @@
 import * as fs from 'fs'
 
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
-
 import * as Log from '@server/log/log'
 
 import * as A from '@core/arena'
@@ -11,6 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
@@ -34,7 +33,6 @@ import * as FileManager from '../manager/fileManager'
 import * as RecordServiceThreads from './update/recordServiceThreads'
 import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
-import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { SurveyRecordsThreadService } from './update/surveyRecordsThreadService'
 import * as RecordSocketsMap from './update/recordSocketsMap'
@@ -138,14 +136,7 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
   await RecordManager.deleteRecord(user, survey, record)
 
-  // Notify other users viewing or editing the record it has been deleted
-  const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
-  socketIds.forEach((socketIdCurrent) => {
-    if (socketIdCurrent !== socketId || notifySameUser) {
-      WebSocketServer.notifySocket(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
-    }
-  })
-  RecordSocketsMap.dissocSockets(recordUuid)
+  SurveyRecordsThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
@@ -189,15 +180,15 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
 export const checkOut = async (socketId, user, surveyId, recordUuid) => {
   const recordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid })
   if (Record.isPreview(recordSummary)) {
-    await RecordManager.deleteRecordPreview(surveyId, recordUuid)
     SurveyRecordsThreadService.killThread({ surveyId, cycle: Record.getCycle(recordSummary), draft: true })
+    await RecordManager.deleteRecordPreview(surveyId, recordUuid)
   } else {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
     if (Record.isEmpty(record)) {
       await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
     }
   }
-  RecordSocketsMap.dissocSocket(socketId)
+  RecordSocketsMap.dissocSocket(recordUuid, socketId)
 }
 
 export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket

@@ -26,7 +26,7 @@ const _createThread = ({ surveyId, cycle, draft }) => {
   const threadKey = getThreadKey({ surveyId, cycle, draft })
 
   const handleMessageFromThread = (msg) => {
-    const { content, type } = msg
+    const { type, content } = msg
     if (type === RecordThreadMessageTypes.threadKill) {
       if (SurveyRecordsThreadMap.isZombie(threadKey)) {
         clearTimeout(threadTimeouts[threadKey])
@@ -36,16 +36,11 @@ const _createThread = ({ surveyId, cycle, draft }) => {
         thread.terminate()
       }
     } else {
-      // Notify all sockets that have checked in the record
-      const { recordUuid } = content
-      const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
-      socketIds.forEach((socketIdCurrent) => {
-        WebSocketServer.notifySocket(socketIdCurrent, type, content)
-      })
+      notifyRecordUpdateToSockets({ eventType: type, content })
     }
   }
 
-  const exitHandler = (args) => {
+  const exitHandler = () => {
     // RecordSocketsMap.dissocSockets(recordUuid)
     SurveyRecordsThreadMap.remove(threadKey)
   }
@@ -56,11 +51,6 @@ const _createThread = ({ surveyId, cycle, draft }) => {
 }
 
 // ====== DELETE
-const killThread = ({ surveyId, cycle, draft }) => {
-  const threadKey = getThreadKey({ surveyId, cycle, draft })
-  _killThread(threadKey)
-}
-
 const _killThread = (threadKey) => {
   clearTimeout(threadTimeouts[threadKey])
   const thread = getThread(threadKey)
@@ -69,6 +59,16 @@ const _killThread = (threadKey) => {
     SurveyRecordsThreadMap.markZombie(threadKey)
     thread.postMessage({ type: RecordThreadMessageTypes.threadKill })
   }
+}
+
+const killThread = ({ surveyId, cycle, draft }) => {
+  const threadKey = getThreadKey({ surveyId, cycle, draft })
+  _killThread(threadKey)
+}
+
+const killSurveyThreads = ({ surveyId }) => {
+  const threadKeys = SurveyRecordsThreadMap.getThreadsKeysBySurveyId({ surveyId })
+  threadKeys.forEach(_killThread)
 }
 
 // ====== READ
@@ -91,7 +91,30 @@ const getOrCreatedThread = ({ surveyId, cycle, draft = false }) => {
   return thread
 }
 
+// ====== WebSocket notification
+
+const notifyRecordUpdateToSockets = ({ eventType, content }) => {
+  const { recordUuid } = content
+  const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
+  socketIds.forEach((socketId) => {
+    WebSocketServer.notifySocket(socketId, eventType, content)
+  })
+}
+
+const notifyRecordDeleteToSockets = ({ socketIdUser, recordUuid, notifySameUser = true }) => {
+  // Notify other users viewing or editing the record it has been deleted
+  const socketIds = RecordSocketsMap.getSocketIds(recordUuid)
+  socketIds.forEach((socketId) => {
+    if (socketId !== socketIdUser || notifySameUser) {
+      WebSocketServer.notifySocket(socketId, WebSocketEvent.recordDelete, recordUuid)
+    }
+  })
+  RecordSocketsMap.dissocSockets(recordUuid)
+}
+
 export const SurveyRecordsThreadService = {
   getOrCreatedThread,
   killThread,
+  killSurveyThreads,
+  notifyRecordDeleteToSockets,
 }
