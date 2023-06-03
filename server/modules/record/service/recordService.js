@@ -178,7 +178,12 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
 }
 
 export const checkOut = async (socketId, user, surveyId, recordUuid) => {
-  const recordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid })
+  const recordSummary = await RecordManager.fetchRecordSummary({
+    surveyId,
+    recordUuid,
+    includeRootKeyValues: false,
+    includePreview: true,
+  })
   if (Record.isPreview(recordSummary)) {
     SurveyRecordsThreadService.killThread({ surveyId, cycle: Record.getCycle(recordSummary), draft: true })
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)

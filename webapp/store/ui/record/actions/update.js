@@ -23,15 +23,19 @@ const _updateNodeDebounced = (node, file, delay) => {
     dispatch(AppSavingActions.showAppSaving())
 
     const state = getState()
+    const cycle = SurveyState.getSurveyCycleKey(state)
+
     const record = RecordState.getRecord(state)
-    const recordUuid = Record.getUuid(record)
+    const draft = record && Record.isPreview(record)
 
     const formData = objectToFormData({
-      cycle: Record.getCycle(record),
-      draft: Record.isPreview(record),
+      cycle,
+      draft,
       node: JSON.stringify(node),
       ...(file ? { file } : {}),
     })
+
+    const recordUuid = Node.getRecordUuid(node)
 
     const surveyId = SurveyState.getSurveyId(state)
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData)

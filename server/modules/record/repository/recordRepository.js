@@ -130,8 +130,8 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
-    nodeDefRoot,
-    nodeDefKeys,
+    nodeDefRoot = null,
+    nodeDefKeys = null,
     cycle = null,
     step = null,
     offset = 0,
@@ -140,25 +140,26 @@ export const fetchRecordsSummaryBySurveyId = async (
     sortOrder = 'DESC',
     search = false,
     recordUuid = null,
+    includePreview = false,
   },
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColumnName = NodeDefTable.getColumnName
   const getNodeDefKeyColAlias = NodeDef.getName
-  const nodeDefKeysColumnNamesByAlias = nodeDefKeys.reduce(
+  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce(
     (acc, key) => ({ ...acc, [getNodeDefKeyColAlias(key)]: getNodeDefKeyColumnName(key) }),
     {}
   )
   const nodeDefKeysSelect = nodeDefKeys
-    .map(
+    ?.map(
       (nodeDefKey) =>
         `${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
     )
     .join(', ')
 
   const nodeDefKeysSelectSearch = nodeDefKeys
-    .map(
+    ?.map(
       (nodeDefKey) =>
         ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$/search:value/%'`
     )
@@ -172,11 +173,18 @@ export const fetchRecordsSummaryBySurveyId = async (
     FROM ${schema}.node
     GROUP BY record_uuid
   `
+  const recordsSelectWhereConditions = []
+  if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
+  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
+  if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
+  if (!A.isNull(recordUuid)) recordsSelectWhereConditions.push('r.uuid = $/recordUuid/')
+
   const recordsSelect = `
     SELECT 
         r.uuid, 
         r.owner_uuid, 
         r.step, 
+        r.preview, 
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 
         r.validation,
         node_last_modified.date_modified
@@ -185,11 +193,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       LEFT OUTER JOIN 
         node_last_modified
         ON r.uuid = node_last_modified.record_uuid
-    WHERE 
-      r.preview = FALSE 
-      ${A.isNull(cycle) ? '' : 'AND r.cycle = $/cycle/'}
-      ${A.isNull(step) ? '' : 'AND r.step = $/step/'}
-      ${A.isNull(recordUuid) ? '' : 'AND r.uuid = $/recordUuid/'}
+    ${recordsSelectWhereConditions.length > 0 ? `WHERE ${recordsSelectWhereConditions.join(' AND ')}` : ''}
     ORDER BY r.date_created DESC
   `
 
@@ -214,15 +218,19 @@ export const fetchRecordsSummaryBySurveyId = async (
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_uuid = u.uuid
-    -- join with root entity table to get node key values 
-    LEFT OUTER JOIN
-      ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
-    ON r.uuid = ${rootEntityTableAlias}.record_uuid
+      ${
+        nodeDefRoot && nodeDefKeys?.length > 0
+          ? `-- join with root entity table to get node key values 
+      LEFT OUTER JOIN
+        ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+      ON r.uuid = ${rootEntityTableAlias}.record_uuid`
+          : ''
+      }
 
     ${whereCondition}
 
     ORDER BY ${
-      Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
+      nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
         ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
         : `r.${toSnakeCase(sortBy)}`
     } ${sortOrder}
