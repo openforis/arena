@@ -12,7 +12,7 @@ const keys = {
   recordEdit: 'recordEdit',
   recordLoadError: 'recordLoadError',
   recordPreviewUuid: 'recordPreviewUuid',
-  insideMap: 'insideMap',
+  noHeader: 'noHeader',
 }
 
 // ====== READ
@@ -23,7 +23,7 @@ export const getRecordLoadError = R.pipe(getState, R.prop(keys.recordLoadError))
 
 export const getRecordUuidPreview = R.pipe(getState, R.prop(keys.recordPreviewUuid))
 
-export const isInsideMap = R.pipe(getState, R.prop(keys.insideMap))
+export const hasNoHeader = R.pipe(getState, R.prop(keys.noHeader))
 
 export const getRecordUuid = R.pipe(getRecord, Record.getUuid)
 
@@ -37,7 +37,7 @@ export const assocRecordLoadError = R.assoc(keys.recordLoadError)
 
 export const assocRecordUuidPreview = R.assoc(keys.recordPreviewUuid)
 
-export const assocInsideMap = R.assoc(keys.insideMap)
+export const assocNoHeader = R.assoc(keys.noHeader)
 
 const _updateRecord = (fn) => (recordState) =>
   R.pipe(R.prop(keys.recordEdit), fn, (record) => R.assoc(keys.recordEdit, record)(recordState))(recordState)

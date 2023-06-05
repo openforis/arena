@@ -1,6 +1,6 @@
 import './MapView.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,48 +9,36 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import { PanelRight } from '@webapp/components'
-import RecordEditor from '@webapp/components/survey/Record'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
 import { useRandomColors } from './useRandomColor'
+import { RecordEditModal } from './RecordEditModal'
 
 const MapWrapper = () => {
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
 
-  const i18n = useI18n()
-
   const [state, setState] = useState({
-    samplingPointDataLevels: [],
-    coordinateAttributeDefs: [],
+    editingRecordUuid: null,
+    editingParentNodeUuid: null,
+    lastRecordEditModalState: null,
   })
-  const { samplingPointDataLevels, coordinateAttributeDefs, editingRecordUuid, editingParentNodeUuid } = state
+  const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
+
+  // get sampling point data levels
+  const categories = Survey.getCategoriesArray(survey)
+  const samplingPointDataCategory = categories.find(
+    (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
+  )
+  // get coordinate attributes
+  const coordinateAttributeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isCoordinate)
+  const samplingPointDataLevels = Category.getLevelsArray(samplingPointDataCategory)
 
   const layerColors = useRandomColors(samplingPointDataLevels.length + coordinateAttributeDefs.length)
-
-  useEffect(() => {
-    ;(async () => {
-      // get sampling point data levels
-      const categories = await API.fetchCategories({ surveyId, draft: true })
-      const samplingPointDataCategory = categories.find(
-        (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
-      )
-      // get coordinate attributes
-      const coordinateAttributeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isCoordinate)
-
-      setState((statePrev) => ({
-        ...statePrev,
-        samplingPointDataLevels: Category.getLevelsArray(samplingPointDataCategory),
-        coordinateAttributeDefs,
-      }))
-    })()
-  }, [])
 
   const onRecordEditClick = useCallback((params) => {
     const { recordUuid, parentUuid } = params || {}
@@ -59,6 +47,10 @@ const MapWrapper = () => {
 
   const closeRecordEditor = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, editingRecordUuid: null, editingParentNodeUuid: null }))
+  }, [])
+
+  const onRecordEditorClose = useCallback(({ modalState: lastRecordEditModalState }) => {
+    setState(({ statePrev }) => ({ ...statePrev, lastRecordEditModalState }))
   }, [])
 
   const createRecordFromSamplingPointDataItem = useCallback(
@@ -100,14 +92,13 @@ const MapWrapper = () => {
         ]}
       />
       {editingRecordUuid && (
-        <PanelRight
-          className="record-panel"
-          header={i18n.t('mapView.editRecord')}
-          width="70vw"
-          onClose={closeRecordEditor}
-        >
-          <RecordEditor recordUuid={editingRecordUuid} pageNodeUuid={editingParentNodeUuid} insideMap />
-        </PanelRight>
+        <RecordEditModal
+          initialState={lastRecordEditModalState}
+          onClose={onRecordEditorClose}
+          onRequestClose={closeRecordEditor}
+          recordUuid={editingRecordUuid}
+          parentNodeUuid={editingParentNodeUuid}
+        />
       )}
     </>
   )

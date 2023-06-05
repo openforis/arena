@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import { Objects } from '@openforis/arena-core'
-
 import BatchPersister from '@server/db/batchPersister'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -10,6 +8,7 @@ import * as Taxon from '@core/survey/taxon'
 import * as Validation from '@core/validation/validation'
 
 import * as TaxonomyManager from './taxonomyManager'
+import { TaxonComparator } from './taxonComparator'
 
 const createPredefinedTaxa = (taxonomy) => [
   Taxon.newTaxon({
@@ -59,6 +58,7 @@ export default class TaxonomyImportManager {
         },
         this.tx
       )
+
       this.existingTaxaByCode = ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
       this.existingTaxaByScientificName = ObjectUtils.toIndexedObj(
         taxa,
@@ -74,7 +74,7 @@ export default class TaxonomyImportManager {
     }
     // Update existing item
     const taxonUpdated = Taxon.mergeProps(taxon)(taxonExisting)
-    if (!Objects.isEqual(taxonUpdated, taxonExisting)) {
+    if (!TaxonComparator.isTaxonEqual(taxonExisting)(taxonUpdated)) {
       await this.batchPersisterUpdate.addItem(R.omit([Validation.keys.validation], taxonUpdated))
     }
     return true

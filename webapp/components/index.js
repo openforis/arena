@@ -33,5 +33,6 @@ export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, Panel
 export { Alert } from './Alert'
 export { Map } from './Map'
 export { RadioButtonGroup } from './RadioButtonGroup'
+export { ResizableModal } from './ResizableModal'
 export { Slider } from './Slider'
 export { Split } from './Split'

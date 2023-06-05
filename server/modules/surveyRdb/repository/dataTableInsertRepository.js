@@ -85,7 +85,7 @@ const getSelectQuery = ({
         c.ancestor_uuid = n.uuid`
 }
 
-export const populateTable = async (survey, nodeDef, client) => {
+export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, client) => {
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
 
@@ -111,7 +111,7 @@ export const populateTable = async (survey, nodeDef, client) => {
 
   const limit = 5000
   const noIter = Math.ceil(count / limit)
-  for (let i = 0; i < noIter; i++) {
+  for (let i = 0; i < noIter && !stopIfFunction?.(); i++) {
     const offset = i * limit
 
     // 2. fetch nodes
@@ -122,6 +122,9 @@ export const populateTable = async (survey, nodeDef, client) => {
       LIMIT ${limit}`
     )
 
+    if (stopIfFunction?.()) {
+      break
+    }
     // 3. convert nodes into values
     const nodesRowValues = nodes.map((nodeRow) => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns))
 

@@ -136,15 +136,19 @@ const CategoryDetails = (props) => {
               onChange={Actions.convertToSimpleCategory}
             />
           )}
-          {!readOnly && !Category.isReportingData(category) && (
+          {!readOnly && (
             <ButtonMenu
               iconClassName="icon-cog icon-14px"
               items={[
-                {
-                  key: 'convert-to-report-data-category',
-                  label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
-                  onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
-                },
+                ...(!Category.isReportingData(category)
+                  ? [
+                      {
+                        key: 'convert-to-report-data-category',
+                        label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
+                        onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
+                      },
+                    ]
+                  : []),
                 {
                   key: 'extra-props-editor',
                   label: 'extraProp.editor.title',
@@ -159,6 +163,7 @@ const CategoryDetails = (props) => {
           <ExtraPropDefsEditor
             toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
             extraPropDefs={Category.getItemExtraDefsArray(category)}
+            isExtraPropDefReadOnly={(extraPropDef) => Category.isExtraPropDefReadOnly(extraPropDef)(category)}
             onExtraPropDefDelete={({ propName }) =>
               Actions.updateCategoryItemExtraPropItem({
                 categoryUuid,

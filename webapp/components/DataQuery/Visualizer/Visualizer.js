@@ -42,7 +42,7 @@ const Visualizer = (props) => {
 }
 
 Visualizer.propTypes = {
-  data: PropTypes.array.isRequired,
+  data: PropTypes.array,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
   dataLoadingError: PropTypes.bool,

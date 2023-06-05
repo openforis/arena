@@ -20,7 +20,7 @@ export const useExtraPropDefsEditor = (props) => {
 
   const updateExtraPropDefsState = useCallback(
     (extraPropDefsUpdated) => setState((statePrev) => ({ ...statePrev, extraPropDefs: extraPropDefsUpdated })),
-    [setState]
+    []
   )
 
   const onItemAdd = useCallback(async () => {
@@ -30,7 +30,7 @@ export const useExtraPropDefsEditor = (props) => {
       newItem: true,
     }
     updateExtraPropDefsState([...extraPropDefs, extraPropDef])
-  }, [extraPropDefs])
+  }, [extraPropDefs, updateExtraPropDefsState])
 
   const onItemDelete = useCallback(
     ({ index }) => {

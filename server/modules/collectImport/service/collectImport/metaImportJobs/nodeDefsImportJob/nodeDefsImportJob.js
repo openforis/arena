@@ -207,6 +207,12 @@ export default class NodeDefsImportJob extends Job {
       if (allowOnlyDeviceCoordinate) {
         propsUpdated[NodeDef.propKeys.allowOnlyDeviceCoordinate] = true
       }
+    } else if (type === NodeDef.nodeDefType.text) {
+      // 3f. text input type (short/memo => singleLine/multiLine)
+      const collectTextInputType = CollectSurvey.getAttribute('type', 'short')(collectNodeDef)
+      if (collectTextInputType === 'memo') {
+        propsUpdated[NodeDef.propKeys.textInputType] = NodeDef.textInputTypes.multiLine
+      }
     }
 
     // 4a. update hidden when not relevant layout prop
@@ -219,7 +225,7 @@ export default class NodeDefsImportJob extends Job {
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
     const hiddenInMobile =
       StringUtils.isNotBlank(relevantExpr) &&
-      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/, ''))
+      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
     if (hiddenInMobile) {
       _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
     }
