@@ -1049,7 +1049,7 @@
     core-js-pure "^3.30.2"
     regenerator-runtime "^0.13.11"
 
-"@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.20.6", "@babel/runtime@^7.20.7", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.18.3", "@babel/runtime@^7.20.6", "@babel/runtime@^7.20.7", "@babel/runtime@^7.21.0", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.22.3"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.3.tgz#0a7fce51d43adbf0f7b517a71f4c3aaca92ebcbb"
   integrity sha512-XsDuspWKLUsxwCp6r7EhsExHtYfbe5oAGQ19kqngTdCPUoPQzOPdUbD/pB9PJiwb2ptYKQDjSJT3R6dC+EPqfQ==
@@ -1652,7 +1652,7 @@
   resolved "https://registry.yarnpkg.com/@mui/types/-/types-7.2.4.tgz#b6fade19323b754c5c6de679a38f068fd50b9328"
   integrity sha512-LBcwa8rN84bKF+f5sDyku42w1NTxaPgPyYKODsh01U1fVstTClbUoSA96oyRBnSNyEiAVjKm6Gwx9vjR+xyqHA==
 
-"@mui/utils@^5.10.3", "@mui/utils@^5.13.1":
+"@mui/utils@^5.13.1":
   version "5.13.1"
   resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-5.13.1.tgz#86199e46014215f95da046a5ec803f4a39c96eee"
   integrity sha512-6lXdWwmlUbEU2jUI8blw38Kt+3ly7xkmV9ljzY4Q20WhsJMWiNry9CX8M+TaP/HbtuyR8XKsdMgQW7h7MM3n3A==
@@ -1663,16 +1663,16 @@
     prop-types "^15.8.1"
     react-is "^18.2.0"
 
-"@mui/x-data-grid@^5.17.20":
-  version "5.17.26"
-  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-5.17.26.tgz#1f7fa73dd3986cf052e2fd2cb56eb4678a7bd913"
-  integrity sha512-eGJq9J0g9cDGLFfMmugOadZx0mJeOd/yQpHwEa5gUXyONS6qF0OhXSWyDOhDdA3l2TOoQzotMN5dY/T4Wl1KYA==
+"@mui/x-data-grid@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-6.6.0.tgz#3912c5db97d674b8d1d596d4fffba826c00a7617"
+  integrity sha512-RCAdQM4D0RWLnFCtuv6pJEFqUtH3WmlTU2Av+p3Ir2Utw03FQzc81oOpOZNv/6SXv+rMa+i42pb6fW0U5Xz0AQ==
   dependencies:
-    "@babel/runtime" "^7.18.9"
-    "@mui/utils" "^5.10.3"
+    "@babel/runtime" "^7.21.0"
+    "@mui/utils" "^5.13.1"
     clsx "^1.2.1"
     prop-types "^15.8.1"
-    reselect "^4.1.6"
+    reselect "^4.1.8"
 
 "@mui/x-date-pickers@^6.3.0":
   version "6.6.0"
@@ -1768,10 +1768,10 @@
     proj4 "^2.8.0"
     uuid "^9.0.0"
 
-"@openforis/arena-core@^0.0.140":
-  version "0.0.140"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.140/e9df502bd5337c6b6d85020a59d56ea7d80b4531#e9df502bd5337c6b6d85020a59d56ea7d80b4531"
-  integrity sha512-RMi70SKDmbVvdCVdv+wx0LV3p3img5XvqjKdqhjHAfJKLjwtt5Vvwij6ETqGI1Dlu2tD4eualwcJzoz6WCfYCw==
+"@openforis/arena-core@^0.0.141":
+  version "0.0.141"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.141/ebaa31665b297dd96315be4baba9c783bb1ffc3f#ebaa31665b297dd96315be4baba9c783bb1ffc3f"
+  integrity sha512-kDw7lLD5baChnxX06gQldD+P2JHN0beD79OzV9ePhGehArGzHbJxjNfxfm1igHb0URWwct+CbJPQvli2weTEsQ==
   dependencies:
     "@esri/proj-codes" "^3.1.0"
     "@jsep-plugin/regex" "^1.0.3"
@@ -10826,7 +10826,7 @@ requires-port@^1.0.0:
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==
 
-reselect@^4.1.6:
+reselect@^4.1.8:
   version "4.1.8"
   resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.8.tgz#3f5dc671ea168dccdeb3e141236f69f02eaec524"
   integrity sha512-ab9EmR80F/zQTMNeneUr4cv+jSwPJgIlvEmVwLerwrWVbpLlBuls9XHzIeTFy4cegU2NHBp3va0LKOzU5qFEYQ==
@@ -13361,11 +13361,6 @@ y18n@^5.0.5:
   resolved "https://registry.yarnpkg.com/y18n/-/y18n-5.0.8.tgz#7f4934d0f7ca8c56f95314939ddcd2dd91ce1d55"
   integrity sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==
 
-yallist@*, yallist@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
-  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
-
 yallist@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-2.1.2.tgz#1c11f9218f076089a47dd512f93c6699a6a81d52"
@@ -13375,6 +13370,11 @@ yallist@^3.0.2:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.1.1.tgz#dbb7daf9bfd8bac9ab45ebf602b8cbad0d5d08fd"
   integrity sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==
+
+yallist@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
+  integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
 yaml@^1.10.0, yaml@^1.10.2:
   version "1.10.2"
