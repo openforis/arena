@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+const TOLERANCE = 2 // pixels of tolerance when considering text as ellipsed
+
 export const LabelWithTooltip = (props) => {
   const { className, label, style, children } = props
 
@@ -14,7 +16,9 @@ export const LabelWithTooltip = (props) => {
   useEffect(() => {
     const labelEl = labelRef?.current
     if (labelEl) {
-      setEllipsed(labelEl.offsetHeight < labelEl.scrollHeight || labelEl.offsetWidth < labelEl.scrollWidth)
+      const ellipsedNext =
+        labelEl.offsetHeight < labelEl.scrollHeight - TOLERANCE || labelEl.offsetWidth < labelEl.scrollWidth - TOLERANCE
+      setEllipsed(ellipsedNext)
     }
   }, [label])
 
