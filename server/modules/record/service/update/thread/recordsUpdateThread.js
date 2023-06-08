@@ -15,9 +15,9 @@ import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
-const Logger = Log.getLogger('SurveyRecordsUpdateThread')
+const Logger = Log.getLogger('RecordsUpdateThread')
 
-class SurveyRecordsUpdateThread extends Thread {
+class RecordsUpdateThread extends Thread {
   constructor(paramsObj) {
     super(paramsObj)
 
@@ -145,7 +145,9 @@ class SurveyRecordsUpdateThread extends Thread {
   async processRecordInitMsg(msg) {
     const { survey, surveyId } = this
     const { recordUuid, user } = msg
+
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+
     record = await RecordManager.initNewRecord({
       user,
       survey,
@@ -199,5 +201,5 @@ class SurveyRecordsUpdateThread extends Thread {
   }
 }
 
-const thread = new SurveyRecordsUpdateThread()
+const thread = new RecordsUpdateThread()
 thread.sendThreadInitMsg()

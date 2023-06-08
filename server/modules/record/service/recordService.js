@@ -38,7 +38,7 @@ import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 const Logger = Log.getLogger('RecordService')
 
 // RECORD
-export const createRecord = async ({ user, surveyId, recordToCreate }) => {
+export const createRecord = async ({ socketId, user, surveyId, recordToCreate }) => {
   Logger.debug('create record: ', recordToCreate)
 
   const recordUuid = Record.getUuid(recordToCreate)
@@ -50,6 +50,8 @@ export const createRecord = async ({ user, surveyId, recordToCreate }) => {
   // Create record thread and initialize record
   const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
   thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
+
+  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
   return record
 }

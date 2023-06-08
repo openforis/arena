@@ -9,7 +9,8 @@ import * as RecordSocketsMap from './recordSocketsMap'
 
 const { get: getThread, getKey: getThreadKey } = SurveyRecordsThreadMap
 
-const INACTIVITY_PERIOD = 10 * 60 * 1000 // 10 mins
+const recordsUpdateThreadFileName = 'recordsUpdateThread.js'
+const inactivityPeriod = 10 * 60 * 1000 // 10 mins
 const threadTimeouts = {}
 
 // ======
@@ -44,13 +45,13 @@ const _createThread = ({ surveyId, cycle, draft }) => {
     SurveyRecordsThreadMap.remove(threadKey)
   }
 
-  const thread = new ThreadManager('surveyRecordsUpdateThread.js', threadData, handleMessageFromThread, exitHandler)
+  const thread = new ThreadManager(recordsUpdateThreadFileName, threadData, handleMessageFromThread, exitHandler)
 
   return SurveyRecordsThreadMap.put(threadKey, thread)
 }
 
 // ====== DELETE
-const _killThread = (threadKey) => {
+const _killThreadByKey = (threadKey) => {
   clearTimeout(threadTimeouts[threadKey])
   const thread = getThread(threadKey)
 
@@ -62,12 +63,12 @@ const _killThread = (threadKey) => {
 
 const killThread = ({ surveyId, cycle, draft }) => {
   const threadKey = getThreadKey({ surveyId, cycle, draft })
-  _killThread(threadKey)
+  _killThreadByKey(threadKey)
 }
 
 const killSurveyThreads = ({ surveyId }) => {
   const threadKeys = SurveyRecordsThreadMap.getThreadsKeysBySurveyId({ surveyId })
-  threadKeys.forEach(_killThread)
+  threadKeys.forEach(_killThreadByKey)
 }
 
 // ====== READ
@@ -76,7 +77,7 @@ const _resetThreadInactivityTimeout = (threadKey) => {
   clearTimeout(threadTimeouts[threadKey])
 
   // After one hour of inactivity, thread gets killed and user is notified
-  threadTimeouts[threadKey] = setTimeout(_killThread.bind(null, threadKey), INACTIVITY_PERIOD)
+  threadTimeouts[threadKey] = setTimeout(_killThreadByKey.bind(null, threadKey), inactivityPeriod)
 }
 
 const getOrCreatedThread = ({ surveyId, cycle, draft = false }) => {
