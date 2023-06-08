@@ -7,11 +7,11 @@ import SurveyCloneJob from './clone/surveyCloneJob'
 import ExportCsvDataJob from './export/exportCsvDataJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import { SchemaSummary } from './schemaSummary'
-import { SurveyRecordsThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
-  SurveyRecordsThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
 
   const job = new SurveyPublishJob({ user, surveyId })
 
@@ -65,7 +65,7 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>
   SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream })
 
 export const deleteSurvey = async (surveyId) => {
-  SurveyRecordsThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
 
   await SurveyManager.deleteSurvey(surveyId)
 }

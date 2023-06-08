@@ -31,11 +31,9 @@ import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as FileManager from '../manager/fileManager'
 
-import * as RecordServiceThreads from './update/recordServiceThreads'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
-import { SurveyRecordsThreadService } from './update/surveyRecordsThreadService'
-import * as RecordSocketsMap from './update/recordSocketsMap'
+import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -50,7 +48,7 @@ export const createRecord = async ({ user, surveyId, recordToCreate }) => {
   const preview = Record.isPreview(recordToCreate)
 
   // Create record thread and initialize record
-  const thread = SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
+  const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
   thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
 
   return record
@@ -136,7 +134,7 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
   await RecordManager.deleteRecord(user, survey, record)
 
-  SurveyRecordsThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
+  RecordsUpdateThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
@@ -169,10 +167,10 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
   const cycle = Record.getCycle(record)
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft })
+    RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft })
   }
 
-  RecordSocketsMap.assocSocket(recordUuid, socketId)
+  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
   return record
 }
@@ -185,7 +183,7 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
     includePreview: true,
   })
   if (Record.isPreview(recordSummary)) {
-    SurveyRecordsThreadService.killThread({ surveyId, cycle: Record.getCycle(recordSummary), draft: true })
+    RecordsUpdateThreadService.killThread({ surveyId, cycle: Record.getCycle(recordSummary), draft: true })
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
   } else {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
@@ -193,10 +191,10 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
       await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
     }
   }
-  RecordSocketsMap.dissocSocket(recordUuid, socketId)
+  RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
 }
 
-export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
+export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
 export const { fetchValidationReport, countValidationReportItems } = RecordManager
@@ -304,16 +302,10 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 
 // NODE
 const _sendNodeUpdateMessage = ({ socketId, user, surveyId, cycle, recordUuid, draft, msg }) => {
-  RecordSocketsMap.assocSocket(recordUuid, socketId)
+  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
-  // const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
-
-  const thread = SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft })
+  const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft })
   thread.postMessage(msg, user)
-
-  // if (singleMessage) {
-  //   SurveyRecordsThreadService.killRecordThread(recordUuid)
-  // }
 }
 
 export const { fetchNodeByUuid } = RecordManager
