@@ -1,4 +1,4 @@
-import { Objects, SRSs, SystemError } from '@openforis/arena-core'
+import { Objects, SystemError } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -13,7 +13,7 @@ import Queue from '@core/queue'
 
 import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
-import { messageTypes } from './recordThreadMessageTypes'
+import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 
 const Logger = Log.getLogger('SurveyRecordsUpdateThread')
 
@@ -29,7 +29,7 @@ class SurveyRecordsUpdateThread extends Thread {
 
   sendThreadInitMsg() {
     ;(async () => {
-      await this.messageHandler({ type: messageTypes.threadInit })
+      await this.messageHandler({ type: RecordsUpdateThreadMessageTypes.threadInit })
     })()
   }
 
@@ -93,9 +93,6 @@ class SurveyRecordsUpdateThread extends Thread {
   }
 
   async init() {
-    // Init SRSs
-    await SRSs.init()
-
     const { surveyId, cycle, draft } = this.params
 
     const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -120,26 +117,26 @@ class SurveyRecordsUpdateThread extends Thread {
     Logger.debug('processing message', type)
 
     switch (type) {
-      case messageTypes.threadInit:
+      case RecordsUpdateThreadMessageTypes.threadInit:
         await this.init()
         break
-      case messageTypes.recordInit:
+      case RecordsUpdateThreadMessageTypes.recordInit:
         await this.processRecordInitMsg(msg)
         break
-      case messageTypes.nodePersist:
+      case RecordsUpdateThreadMessageTypes.nodePersist:
         await this.processRecordNodePersistMsg(msg)
         break
-      case messageTypes.nodeDelete:
+      case RecordsUpdateThreadMessageTypes.nodeDelete:
         await this.processRecordNodeDeleteMsg(msg)
         break
-      case messageTypes.threadKill:
+      case RecordsUpdateThreadMessageTypes.threadKill:
         this.postMessage(msg)
         break
       default:
         Logger.debug(`Skipping unknown message type: ${type}`)
     }
 
-    if ([messageTypes.nodePersist, messageTypes.nodeDelete].includes(type)) {
+    if ([RecordsUpdateThreadMessageTypes.nodePersist, RecordsUpdateThreadMessageTypes.nodeDelete].includes(type)) {
       const recordUuid = msg.recordUuid || msg.node?.recordUuid
       this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted, content: { recordUuid } })
     }

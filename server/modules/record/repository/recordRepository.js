@@ -183,6 +183,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     SELECT 
         r.uuid, 
         r.owner_uuid, 
+        r.cycle,
         r.step, 
         r.preview, 
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 

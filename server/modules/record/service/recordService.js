@@ -32,7 +32,7 @@ import * as RecordManager from '../manager/recordManager'
 import * as FileManager from '../manager/fileManager'
 
 import * as RecordServiceThreads from './update/recordServiceThreads'
-import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
+import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
 import { SurveyRecordsThreadService } from './update/surveyRecordsThreadService'
 import * as RecordSocketsMap from './update/recordSocketsMap'
@@ -51,7 +51,7 @@ export const createRecord = async ({ user, surveyId, recordToCreate }) => {
 
   // Create record thread and initialize record
   const thread = SurveyRecordsThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
-  thread.postMessage({ type: RecordThreadMessageTypes.recordInit, user, surveyId, recordUuid })
+  thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
 
   return record
 }
@@ -342,7 +342,7 @@ export const persistNode = async ({ socketId, user, surveyId, draft, cycle, node
     draft,
     recordUuid,
     msg: {
-      type: RecordThreadMessageTypes.nodePersist,
+      type: RecordsUpdateThreadMessageTypes.nodePersist,
       node,
       user,
     },
@@ -358,7 +358,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
     draft,
     recordUuid,
     msg: {
-      type: RecordThreadMessageTypes.nodeDelete,
+      type: RecordsUpdateThreadMessageTypes.nodeDelete,
       nodeUuid,
       user,
     },

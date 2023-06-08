@@ -7,8 +7,8 @@ import * as ThreadParams from '@server/threads/threadParams'
 
 import * as RecordThreadsMap from './recordThreadsMap'
 import * as RecordSocketsMap from './recordSocketsMap'
-import * as RecordUpdateThreadParams from './thread/recordUpdateThreadParams'
-import { messageTypes as RecordThreadMessageTypes } from './thread/recordThreadMessageTypes'
+import * as RecordsUpdateThreadParams from './thread/recordsUpdateThreadParams'
+import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 
 const recordThreadTimeouts = {}
 
@@ -22,11 +22,11 @@ const _createRecordThread = (socketId, user, surveyId, recordUuid) => {
     [ThreadParams.keys.socketId]: socketId,
     [ThreadParams.keys.user]: user,
     [ThreadParams.keys.surveyId]: surveyId,
-    [RecordUpdateThreadParams.keys.recordUuid]: recordUuid,
+    [RecordsUpdateThreadParams.keys.recordUuid]: recordUuid,
   }
 
   const messageHandler = (msg) => {
-    if (msg.type === RecordThreadMessageTypes.threadKill) {
+    if (msg.type === RecordsUpdateThreadMessageTypes.threadKill) {
       if (RecordThreadsMap.isZombie(recordUuid)) {
         clearTimeout(recordThreadTimeouts[recordUuid])
         delete recordThreadTimeouts[recordUuid]
@@ -86,7 +86,7 @@ export const killRecordThread = (recordUuid) => {
   const thread = getRecordThread(recordUuid)
 
   RecordThreadsMap.markZombie(recordUuid)
-  thread.postMessage({ type: RecordThreadMessageTypes.threadKill })
+  thread.postMessage({ type: RecordsUpdateThreadMessageTypes.threadKill })
 }
 
 // ======

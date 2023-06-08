@@ -3,7 +3,7 @@ import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 import ThreadManager from '@server/threads/threadManager'
 import * as ThreadParams from '@server/threads/threadParams'
 
-import { messageTypes as RecordThreadMessageTypes } from './thread/recordThreadMessageTypes'
+import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
 import * as RecordSocketsMap from './recordSocketsMap'
 
@@ -27,7 +27,7 @@ const _createThread = ({ surveyId, cycle, draft }) => {
 
   const handleMessageFromThread = (msg) => {
     const { type, content } = msg
-    if (type === RecordThreadMessageTypes.threadKill) {
+    if (type === RecordsUpdateThreadMessageTypes.threadKill) {
       if (SurveyRecordsThreadMap.isZombie(threadKey)) {
         clearTimeout(threadTimeouts[threadKey])
         delete threadTimeouts[threadKey]
@@ -57,7 +57,7 @@ const _killThread = (threadKey) => {
 
   if (thread) {
     SurveyRecordsThreadMap.markZombie(threadKey)
-    thread.postMessage({ type: RecordThreadMessageTypes.threadKill })
+    thread.postMessage({ type: RecordsUpdateThreadMessageTypes.threadKill })
   }
 }
 
