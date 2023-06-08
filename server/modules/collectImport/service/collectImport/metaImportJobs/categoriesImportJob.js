@@ -62,11 +62,12 @@ export default class CategoriesImportJob extends Job {
     await this.itemBatchPersister.flush(tx)
 
     // Validate categories (after all items have been persisted)
-    await CategoryManager.validateCategories(this.surveyId, this.tx)
+    const surveyUpdated = Survey.assocCategories(ObjectUtils.toUuidIndexedObj(categories))(survey)
+    await CategoryManager.validateCategories(surveyUpdated, tx)
 
     this.setContext({
       qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel,
-      survey: Survey.assocCategories(ObjectUtils.toUuidIndexedObj(categories))(survey),
+      survey: surveyUpdated,
     })
   }
 

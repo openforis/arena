@@ -13,7 +13,6 @@ import BaseUnitSelector from './BaseUnitSelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
-import { PostStratificationAttributeSelector } from './PostStratificationAttributeSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props
@@ -34,7 +33,7 @@ export const ChainSamplingDesignProps = (props) => {
           <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
 
           {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
-          {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />}
+          {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
 
           <ClusteringEntitySelector />
         </>

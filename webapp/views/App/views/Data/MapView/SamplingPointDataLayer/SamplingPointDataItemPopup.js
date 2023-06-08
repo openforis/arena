@@ -36,7 +36,7 @@ export const SamplingPointDataItemPopup = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const elevation = useElevation({ surveyId: Survey.getId(survey), point, active: open })
+  const elevation = useElevation({ survey, point, active: open })
 
   const content = `**${i18n.t('mapView.samplingPointItemPopup.title')}**
 ${itemCodes

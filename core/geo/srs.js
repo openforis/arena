@@ -38,4 +38,3 @@ export const latLonSrs = newSrs(
 
 export const latLongSrsCode = getCode(latLonSrs)
 export const isLatLong = (code) => latLongSrsCode === code
-export const getNameAndCode = (srs) => `${getName(srs)} (EPSG:${getCode(srs)})`
