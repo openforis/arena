@@ -38,22 +38,10 @@ import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 const Logger = Log.getLogger('RecordService')
 
 // RECORD
-export const createRecord = async ({ socketId, user, surveyId, recordToCreate }) => {
-  Logger.debug('create record: ', recordToCreate)
+export const createRecord = async ({ user, surveyId, recordToCreate }) => {
+  Logger.debug('creating record: ', recordToCreate)
 
-  const recordUuid = Record.getUuid(recordToCreate)
-  const cycle = Record.getCycle(recordToCreate)
-
-  const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
-  const preview = Record.isPreview(recordToCreate)
-
-  // Create record thread and initialize record
-  const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
-  thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
-
-  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
-
-  return record
+  return RecordManager.insertRecord(user, surveyId, recordToCreate)
 }
 
 export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cycle, itemUuid }) => {
@@ -168,12 +156,16 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
   const preview = Record.isPreview(record)
   const cycle = Record.getCycle(record)
 
-  if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft })
-  }
-
   RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
+  if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
+    // Create record thread
+    const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
+    // initialize record if empty
+    if (Record.getNodesArray(record).length === 0) {
+      thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
+    }
+  }
   return record
 }
 
