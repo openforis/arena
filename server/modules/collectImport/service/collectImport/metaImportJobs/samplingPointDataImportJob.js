@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { PointFactory, Points, SRSs } from '@openforis/arena-core'
+import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -33,12 +33,6 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
       },
       'SamplingPointDataImportJob'
     )
-  }
-
-  async onStart() {
-    await super.onStart()
-    // initialize SRSs list since it's used by category extra props (with coordinates) validator
-    await SRSs.init()
   }
 
   async logCategoryImportActivity() {

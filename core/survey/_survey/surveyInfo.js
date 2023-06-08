@@ -1,10 +1,11 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as AuthGroup from '@core/auth/authGroup'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
-import { Objects } from '@openforis/arena-core'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -96,6 +97,13 @@ export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 
+export const getSRSCodes = (survey) => getSRS(survey).map((srs) => srs.code)
+
+export const getSRSIndex = (survey) => {
+  const srss = getSRS(survey)
+  return ObjectUtils.toIndexedObj(srss, 'code')
+}
+
 export const getDefaultSRS = R.pipe(getSRS, R.head)
 
 export const getStatus = (surveyInfo) => {
@@ -140,6 +148,8 @@ export const isTemplate = R.propEq(keys.template, true)
 
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)
+
+export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
 
 // ====== UTILS
 

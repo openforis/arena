@@ -13,7 +13,7 @@ const valuesByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: () => true,
   [NodeDef.nodeDefType.code]: () => 'CATEGORY_CODE',
   [NodeDef.nodeDefType.coordinate]: ({ valueProp }) => {
-    const coordinate = PointFactory.createInstance({ srs: 'EPSG:4326', x: 41.8830209, y: 12.4879562 })
+    const coordinate = PointFactory.createInstance({ x: 41.8830209, y: 12.4879562 })
     return coordinate[valueProp]
   },
   [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(new Date()),

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Objects, SRSs } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,11 +23,6 @@ export default class RecordCheckJob extends Job {
     this.surveyAndNodeDefsByCycle = {} // Cache of surveys and updated node defs by cycle
     this.nodesBatchInserter = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
     this.nodesBatchUpdater = new BatchPersister(this.nodesBatchUpdateHandler.bind(this), 2500)
-  }
-
-  async onStart() {
-    super.onStart()
-    await SRSs.init()
   }
 
   async execute() {

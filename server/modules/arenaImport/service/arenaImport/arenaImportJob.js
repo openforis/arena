@@ -1,5 +1,3 @@
-import { SRSs } from '@openforis/arena-core'
-
 import Job from '@server/job/job'
 
 import { SurveyCreatorJobHelper } from '@server/modules/survey/service/surveyCreatorJobHelper'
@@ -60,11 +58,6 @@ export default class ArenaImportJob extends Job {
   constructor(params) {
     const { backup = true, mobile = false, options = { includeData: true }, ...paramsRest } = params
     super(ArenaImportJob.type, { ...paramsRest, backup, mobile, options }, createInnerJobs(params))
-  }
-
-  async onStart() {
-    await super.onStart()
-    await SRSs.init()
   }
 
   async beforeSuccess() {
