@@ -20,7 +20,7 @@ const SrsDropdown = (props) => {
       disabled={disabled || singleSrs}
       items={surveySrs}
       itemValue="code"
-      itemLabel={Srs.getNameAndCode}
+      itemLabel={Srs.getName}
       onChange={onChange}
       readOnly={readOnly}
       selection={selectedSrs}

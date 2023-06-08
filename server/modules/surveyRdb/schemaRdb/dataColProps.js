@@ -102,19 +102,23 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]: () => (node, columnName) => {
-      const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
+    [colValueProcessor]:
+      ({ survey }) =>
+      (node, columnName) => {
+        const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
 
-      if (columnName.endsWith('_x')) return x
-      if (columnName.endsWith('_y')) return y
-      if (columnName.endsWith('_srs')) return srs
+        if (columnName.endsWith('_x')) return x
+        if (columnName.endsWith('_y')) return y
+        if (columnName.endsWith('_srs')) return srs
 
-      const point = PointFactory.createInstance({ srs, x, y })
-      if (point && Points.isValid(point)) {
-        return Points.toString(point)
-      }
-      return null
-    },
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const srsIndex = Survey.getSRSIndex(surveyInfo)
+        const point = PointFactory.createInstance({ srs, x, y })
+        if (point && Points.isValid(point, srsIndex)) {
+          return Points.toString(point)
+        }
+        return null
+      },
   },
 
   [nodeDefType.file]: {

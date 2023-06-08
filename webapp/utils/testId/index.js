@@ -23,7 +23,7 @@ export const TestId = {
     itemCode: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-code`,
     itemLabelPrefix: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-label`,
     itemLabel: (levelIdx, itemIdx) => _withLang(TestId.categoryDetails.itemLabelPrefix(levelIdx, itemIdx)),
-    itemDescriptionPrefix: (levelIdx, itemIdx) => _withLang(`item-${levelIdx}-${itemIdx}-description`),
+    itemDescriptionPrefix: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-description`,
     itemDescription: (levelIdx, itemIdx) => _withLang(TestId.categoryDetails.itemDescriptionPrefix(levelIdx, itemIdx)),
     exportBtn: 'category-export-btn',
     templateForDataImportBtn: 'category-template-data-import-btn',
