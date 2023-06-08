@@ -77,7 +77,7 @@ export const canHaveData = (survey) => {
 /**
  * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
  *
- * @param {!Survey} survey - The survey object.
+ * @param {!object} survey - The survey object.
  * @returns {boolean} - True if all key attributes are using the sampling point data category.
  */
 export const canRecordBeIdentifiedBySamplingPointDataItem = (survey) => {
@@ -108,6 +108,8 @@ export const {
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
   getSRS,
+  getSRSCodes,
+  getSRSIndex,
   getDefaultSRS,
   getStatus,
   getCycles,
@@ -130,10 +132,10 @@ export const {
   getPropsDraft,
 } = SurveyInfo
 
-export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin, assocAuthGroups } = SurveyInfo
+export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { markDraft } = SurveyInfo
+export const { assocAuthGroups, assocSrs, markDraft } = SurveyInfo
 
 // ====== READ nodeDefs
 export const {

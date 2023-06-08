@@ -1,4 +1,4 @@
-import { Objects, Promises, SRSs, SystemError } from '@openforis/arena-core'
+import { Objects, Promises, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { uuidv4 } from '@core/uuid'
@@ -24,7 +24,6 @@ export default class RecordsCloneJob extends Job {
 
   async onStart() {
     await super.onStart()
-    await SRSs.init()
 
     const { context, user, tx } = this
     const { surveyId } = context

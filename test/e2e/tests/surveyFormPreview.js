@@ -54,7 +54,7 @@ export default () =>
       verifyAttribute(cluster_country, '(0) country 0')
       verifyAttribute(cluster_region, '')
       verifyAttribute(cluster_province, '')
-      verifyAttribute(cluster_coordinate, { x: '', y: '', srs: '4326', srsLabel: 'GCS WGS 1984 (EPSG:4326)' })
+      verifyAttribute(cluster_coordinate, { x: '', y: '', srs: '4326', srsLabel: 'WGS 1984 (EPSG:4326)' })
       verifyAttribute(cluster_time, () => {
         // it is possible the default value was set one minute after the startTime was initialized in the test
         const date = new Date(startTime)

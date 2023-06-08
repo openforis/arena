@@ -7,6 +7,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -20,6 +21,8 @@ import {
   publishSurveySchemaTableProps,
   markSurveyDraft,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as CategoryValidator from '../categoryValidator'
 import * as CategoryExportManager from './categoryExportManager'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
@@ -27,23 +30,40 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 // ====== VALIDATION
 
-const _validateCategoryFromCategories = async (surveyId, categories, categoryUuid, client = db) => {
+const _validateCategoryFromCategories = async ({ survey, categories, categoryUuid }, client = db) => {
+  const surveyId = Survey.getId(survey)
   const category = R.prop(categoryUuid, categories)
   const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
-  const validation = await CategoryValidator.validateCategory(R.values(categories), category, items)
+  const validation = await CategoryValidator.validateCategory({
+    survey,
+    categories: R.values(categories),
+    category,
+    items,
+  })
   await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
   return Validation.assocValidation(validation)(category)
 }
 
-export const validateCategory = async (surveyId, categoryUuid, client = db) => {
+export const validateCategory = async ({ survey, categoryUuid }, client = db) => {
+  const surveyId = Survey.getId(survey)
   const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(
     { surveyId, draft: true, includeValidation: true },
     client
   )
-  return _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
+  return _validateCategoryFromCategories({ survey, categories, categoryUuid }, client)
 }
 
-export const validateCategories = async (surveyId, client = db) => {
+const _validateCategory = async ({ surveyId, categoryUuid }, client = db) => {
+  let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const srsCodes = Survey.getSRSCodes(survey)
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
+  survey = Survey.assocSrs(srss)(survey)
+
+  return validateCategory({ survey, categoryUuid }, client)
+}
+
+export const validateCategories = async (survey, client = db) => {
+  const surveyId = Survey.getId(survey)
   const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(
     { surveyId, draft: true, includeValidation: true },
     client
@@ -51,7 +71,7 @@ export const validateCategories = async (surveyId, client = db) => {
 
   const categoriesValidated = await Promise.all(
     Object.keys(categories).map((categoryUuid) =>
-      _validateCategoryFromCategories(surveyId, categories, categoryUuid, client)
+      _validateCategoryFromCategories({ survey, categories, categoryUuid }, client)
     )
   )
   return ObjectUtils.toUuidIndexedObj(categoriesValidated)
@@ -78,7 +98,9 @@ const _insertLevelInTransaction = async ({
   ])
   return {
     level,
-    category: validate ? await validateCategory(surveyId, CategoryLevel.getCategoryUuid(level), t) : null,
+    category: validate
+      ? await _validateCategory({ surveyId, categoryUuid: CategoryLevel.getCategoryUuid(level) }, t)
+      : null,
   }
 }
 
@@ -103,7 +125,7 @@ export const insertCategory = async (
         : []),
     ])
 
-    return validate ? validateCategory(surveyId, Category.getUuid(categoryDb), t) : categoryDb
+    return validate ? _validateCategory({ surveyId, categoryUuid: Category.getUuid(categoryDb) }, t) : categoryDb
   })
 
 export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
@@ -118,7 +140,7 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemInsert, logContent, false, t),
     ])
     return {
-      category: await validateCategory(surveyId, categoryUuid, t),
+      category: await _validateCategory({ surveyId, categoryUuid }, t),
       item,
     }
   })
@@ -192,7 +214,7 @@ export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, va
         t
       ),
     ])
-    return validateCategory(surveyId, categoryUuid, t)
+    return _validateCategory({ surveyId, categoryUuid }, t)
   })
 
 const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t) => {
@@ -291,7 +313,7 @@ export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, k
 
     return {
       level,
-      category: await validateCategory(surveyId, categoryUuid, t),
+      category: await _validateCategory({ surveyId, categoryUuid }, t),
     }
   })
 
@@ -324,7 +346,7 @@ export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key
 
     return {
       item,
-      category: await validateCategory(surveyId, categoryUuid, t),
+      category: await _validateCategory({ surveyId, categoryUuid }, t),
     }
   })
 
@@ -468,7 +490,7 @@ export const deleteLevel = async (user, surveyId, categoryUuid, levelUuid, clien
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelDelete, logContent, false, t),
     ])
 
-    return validateCategory(surveyId, categoryUuid, t)
+    return _validateCategory({ surveyId, categoryUuid }, t)
   })
 
 /**
@@ -544,7 +566,7 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemDelete, logContent, false, t),
     ])
 
-    return validateCategory(surveyId, categoryUuid, t)
+    return _validateCategory({ surveyId, categoryUuid }, t)
   })
 
 export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = db) => {
