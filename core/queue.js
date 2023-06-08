@@ -9,9 +9,7 @@ export default class Queue {
   }
 
   enqueueItems(items) {
-    for (const item of items) {
-      this.enqueue(item)
-    }
+    items.forEach((item) => this.enqueue(item))
   }
 
   dequeue() {

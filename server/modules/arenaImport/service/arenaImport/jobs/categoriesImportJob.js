@@ -17,7 +17,7 @@ export default class CategoriesImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurveyFileZip, surveyId } = this.context
+    const { arenaSurveyFileZip, survey } = this.context
 
     const categories = await ArenaSurveyFileZip.getCategories(arenaSurveyFileZip)
 
@@ -31,7 +31,7 @@ export default class CategoriesImportJob extends Job {
           this.incrementProcessedItems()
         }
       })
-      await CategoryManager.validateCategories(surveyId, this.tx)
+      await CategoryManager.validateCategories(survey, this.tx)
     }
     this.setContext({ categories })
   }

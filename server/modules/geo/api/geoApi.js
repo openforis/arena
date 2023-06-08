@@ -1,11 +1,13 @@
 import axios from 'axios'
 import xmljs from 'xml-js'
 
-import { Objects, Promises, SRSs } from '@openforis/arena-core'
+import { Objects, Promises } from '@openforis/arena-core'
+
+import { MapUtils } from '@core/map/mapUtils'
 
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import { MapUtils } from '@core/map/mapUtils'
+import * as SrsManager from '@server/modules/geo/manager/srsManager'
 import { PlanetApi } from './planetApi'
 
 // free elevation API urls
@@ -27,7 +29,7 @@ export const init = (app) => {
     try {
       const { codeOrName } = Request.getParams(req)
 
-      const srss = SRSs.findSRSByCodeOrName(codeOrName)
+      const srss = await SrsManager.findSRSByCodeOrName(codeOrName)
 
       res.json({ srss })
     } catch (error) {

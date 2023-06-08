@@ -32,7 +32,7 @@ const SrsEditor = (props) => {
       className="srs_editor__input_chips"
       items={srsLookupFunction}
       itemKey={Srs.keys.code}
-      itemLabel={Srs.getNameAndCode}
+      itemLabel={Srs.getName}
       selection={srs}
       minCharactersToAutocomplete={3}
       requiredItems={1}

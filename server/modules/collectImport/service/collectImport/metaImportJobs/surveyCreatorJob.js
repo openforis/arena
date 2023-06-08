@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import { SRSs } from '@openforis/arena-core'
-
 import * as Survey from '../../../../../../core/survey/survey'
 import * as Srs from '../../../../../../core/geo/srs'
 import * as User from '../../../../../../core/user/user'
@@ -12,10 +10,11 @@ import Job from '../../../../../job/job'
 
 import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
 
+import * as SurveyUniqueNameGenerator from '../../../../survey/service/surveyUniqueNameGenerator'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
+import * as SrsManager from '../../../../geo/manager/srsManager'
 
 import * as CollectSurvey from '../model/collectSurvey'
-import * as SurveyUniqueNameGenerator from '../../../../survey/service/surveyUniqueNameGenerator'
 
 const SRS_ID_PREFIX = 'EPSG:'
 
@@ -76,19 +75,14 @@ export default class SurveyCreatorJob extends Job {
   async extractSrss() {
     const { collectSurvey } = this.context
 
-    await SRSs.init()
-
     const srsElements = CollectSurvey.getElementsByPath(['spatialReferenceSystems', 'spatialReferenceSystem'])(
       collectSurvey
     )
-    return srsElements.reduce((srsAcc, srsEl) => {
+    const srsCodes = srsElements.map((srsEl) => {
       const srsId = CollectSurvey.getAttribute('srid')(srsEl)
-      let srs = SRSs.getSRSByCode(srsId)
-      if (!srs && srsId.startsWith(SRS_ID_PREFIX)) {
-        srs = SRSs.getSRSByCode(srsId.substring(SRS_ID_PREFIX.length))
-      }
-      if (!srs) return srsAcc
-      return [...srsAcc, R.omit([Srs.keys.wkt], srs)]
-    }, [])
+      return srsId.startsWith(SRS_ID_PREFIX) ? srsId.substring(SRS_ID_PREFIX.length) : srsId
+    })
+    const srss = await SrsManager.fetchSRSsByCodes({ srsCodes }, this.tx)
+    return srss.map(R.omit([Srs.keys.wkt]))
   }
 }
