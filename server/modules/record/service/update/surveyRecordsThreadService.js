@@ -99,7 +99,12 @@ const notifyRecordUpdateToSockets = ({ eventType, content }) => {
   const { recordUuid } = content
   const socketIds = RecordSocketsMap.getSocketIdsByRecordUuid(recordUuid)
   socketIds.forEach((socketId) => {
-    WebSocketServer.notifySocket(socketId, eventType, content)
+    if (WebSocketServer.isSocketConnected(socketId)) {
+      WebSocketServer.notifySocket(socketId, eventType, content)
+    } else {
+      // socket has been disconnected without checking out the record
+      RecordSocketsMap.dissocSocket({ recordUuid, socketId })
+    }
   })
 }
 
