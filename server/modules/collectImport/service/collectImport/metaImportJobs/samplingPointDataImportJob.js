@@ -63,9 +63,13 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
 
   async getOrCreateSummary() {
     const stream = await this.createReadStream()
+    const { survey } = this
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const defaultLang = Survey.getDefaultLanguage(surveyInfo)
     return stream
       ? CategoryManager.createImportSummaryFromStream({
           stream,
+          defaultLang,
           codeColumnPattern: /(level\d+)_code/,
           ignoreLabelsAndDescriptions: true,
         })
