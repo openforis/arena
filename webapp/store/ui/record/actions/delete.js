@@ -14,8 +14,16 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch(AppSavingActions.showAppSaving())
   dispatch({ type: ActionTypes.nodeDelete, node })
 
-  const surveyId = SurveyState.getSurveyId(getState())
-  await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
+  const state = getState()
+  const record = RecordState.getRecord(state)
+  const surveyId = SurveyState.getSurveyId(state)
+  const recordUuid = Record.getUuid(record)
+  const cycle = Record.getCycle(record)
+  const nodeUuid = Node.getUuid(node)
+
+  await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
+    data: { cycle },
+  })
 }
 
 export const recordDeleted =

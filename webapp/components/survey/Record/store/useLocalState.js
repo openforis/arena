@@ -48,7 +48,7 @@ export const useLocalState = (props) => {
   // Add websocket event listeners
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
-    eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content)), []),
+    eventHandler: useCallback((content) => dispatch(RecordActions.recordNodesUpdate(content.updatedNodes)), []),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodeValidationsUpdate,
