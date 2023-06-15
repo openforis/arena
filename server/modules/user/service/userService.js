@@ -40,22 +40,22 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
   client.tx(async (t) => {
     Logger.debug('checking if admin users exist...')
     const aminsCount = await UserManager.countSystemAdministrators(t)
-    Logger.info(`${aminsCount} admin users found; skipping admin user insert`)
     if (aminsCount > 0) {
+      Logger.info(`${aminsCount} admin users found; skipping admin user insert`)
       return null
     }
-
+    const throwError = (details) => {
+      throw new SystemError(`Cannot create system admin user: ${details}`)
+    }
     const email = ProcessUtils.ENV.adminEmail
     const password = ProcessUtils.ENV.adminPassword
-    if (!email && !password)
-      throw new SystemError('Cannot create system admin user: email or password not specified in environment variables')
+    if (!email && !password) throwError(`email or password not specified in environment variables`)
 
     const validation = await SystemAdminUserValidator.validate({ email, password })
-    if (Validation.isNotValid(validation))
-      throw new SystemError('Cannot create admin user: email or password are not valid')
+    if (Validation.isNotValid(validation)) throwError(`email or password are not valid or password is unsafe`)
 
     const existingUser = await UserManager.fetchUserByEmail(email, t)
-    if (existingUser) throw new SystemError(`Cannot crate system admin user: user with email ${email} already exists`)
+    if (existingUser) throwError(`user with email ${email} already exists`)
 
     Logger.debug(`inserting system admin user with email: ${email}`)
     const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
