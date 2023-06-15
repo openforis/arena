@@ -55,7 +55,7 @@ const _createRecord = (idx) => {
       x: getRandomInRange(-90, 90, 4),
       y: getRandomInRange(-90, 90, 4),
       srs: '4326',
-      srsLabel: 'GCS WGS 1984 (EPSG:4326)',
+      srsLabel: 'WGS 1984 (EPSG:4326)',
     },
     [cluster_country.name]: '(0) country 0',
     [cluster_region.name]: `(${clusterRegion}) region ${clusterRegion}`,

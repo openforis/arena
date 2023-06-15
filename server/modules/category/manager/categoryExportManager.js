@@ -3,7 +3,6 @@ import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import { db } from '@server/db/db'
-import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
 import { Objects, Points } from '@openforis/arena-core'
@@ -29,12 +28,12 @@ const categoryItemExportTransformer =
     return obj
   }
 
-export const exportCategoryToStream = async ({ surveyId, categoryUuid, draft, outputStream }, client = db) => {
+export const exportCategoryToStream = async ({ survey, categoryUuid, draft, outputStream }, client = db) => {
+  const surveyId = Survey.getId(survey)
   const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
 
   // get survey languages
-  const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft })
-  const languages = Survey.getLanguages(surveyInfo)
+  const languages = Survey.getLanguages(survey)
 
   const { stream: categoryStream, headers } = CategoryRepository.generateCategoryExportStreamAndHeaders({
     surveyId,

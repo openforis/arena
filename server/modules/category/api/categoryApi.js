@@ -31,9 +31,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
+        const { surveyId } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        const summary = await CategoryService.createImportSummary(filePath)
+        const summary = await CategoryService.createImportSummary({ surveyId, filePath })
 
         res.json(summary)
       } catch (error) {

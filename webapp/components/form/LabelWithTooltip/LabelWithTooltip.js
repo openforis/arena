@@ -2,19 +2,24 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+const TOLERANCE = 2 // pixels of tolerance when considering text as ellipsed
+
 export const LabelWithTooltip = (props) => {
   const { className, label, style, children } = props
 
   const labelRef = useRef(null)
 
   // detect when ellipsis is active and show a tooltip in that case
-  const [ellipsed, setEllipsed] = useState(false)
-  const tooltip = ellipsed ? label : null
+  const [tooltip, setTooltip] = useState(null)
 
   useEffect(() => {
     const labelEl = labelRef?.current
     if (labelEl) {
-      setEllipsed(labelEl.offsetHeight < labelEl.scrollHeight || labelEl.offsetWidth < labelEl.scrollWidth)
+      const ellipsedNext =
+        labelEl.offsetHeight < labelEl.scrollHeight - TOLERANCE || labelEl.offsetWidth < labelEl.scrollWidth - TOLERANCE
+      if (ellipsedNext) {
+        setTooltip(label)
+      }
     }
   }, [label])
 
