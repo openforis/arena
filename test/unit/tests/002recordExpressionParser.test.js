@@ -26,8 +26,8 @@ describe('RecordExpressionParser Test', () => {
     { q: 'cluster_id != 1', r: true },
     // !12 == null under strict logical negation semantics
     { q: '!cluster_id', r: null },
-    // Number + String is invalid -> null
-    { q: 'cluster_id + "1"', r: null },
+    // Number + String
+    { q: 'cluster_id + "1"', r: '121' },
     { q: '!(cluster_id == 1)', r: true },
     // 18 + 1
     { q: 'cluster_distance + 1', r: 19 },
