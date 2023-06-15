@@ -39,6 +39,12 @@ export const getFileSize = (path) => {
   return size
 }
 
+export const getFileExtension = (file) => {
+  const fileName = typeof file === 'string' ? file : file.name
+  const extension = fileName.split('.').pop()
+  return extension
+}
+
 export const deleteFile = (path) => fs.unlinkSync(path)
 
 // ======= Temp Files

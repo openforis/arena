@@ -109,11 +109,11 @@ export const useCoordinateAttributeDataLayer = (props) => {
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdate,
     eventHandler: useCallback(
-      (nodesUpdated) => {
+      ({ updatedNodes }) => {
         if (editingRecordUuid) {
           const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
           const rootKeyDefsUuids = rootKeyDefs.map(NodeDef.getUuid)
-          const shouldFetchRecordData = Object.values(nodesUpdated).some(
+          const shouldFetchRecordData = Object.values(updatedNodes).some(
             (nodeUpdated) =>
               Node.getRecordUuid(nodeUpdated) === editingRecordUuid &&
               (Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef) ||

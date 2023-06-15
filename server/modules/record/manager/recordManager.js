@@ -29,22 +29,51 @@ export const { persistNodesToRDB } = NodeRdbManager
 // ==== READ
 
 export const fetchRecordsSummaryBySurveyId = async (
-  { surveyId, cycle, offset, limit, sortBy, sortOrder, search, step = null, recordUuid = null },
+  {
+    surveyId,
+    cycle,
+    offset,
+    limit,
+    sortBy,
+    sortOrder,
+    search,
+    step = null,
+    recordUuid = null,
+    includeRootKeyValues = true,
+    includePreview = false,
+  },
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
-  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-    surveyId,
-    NodeDef.getUuid(nodeDefRoot),
-    nodeDefsDraft,
-    client
-  )
+  const nodeDefRoot = includeRootKeyValues
+    ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
+    : null
+  const nodeDefKeys = includeRootKeyValues
+    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
+        surveyId,
+        NodeDef.getUuid(nodeDefRoot),
+        nodeDefsDraft,
+        client
+      )
+    : null
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
-    { surveyId, cycle, nodeDefRoot, nodeDefKeys, offset, limit, sortBy, sortOrder, search, step, recordUuid },
+    {
+      surveyId,
+      cycle,
+      nodeDefRoot,
+      nodeDefKeys,
+      offset,
+      limit,
+      sortBy,
+      sortOrder,
+      search,
+      step,
+      recordUuid,
+      includePreview,
+    },
     client
   )
 
@@ -54,8 +83,14 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
 }
 
-export const fetchRecordSummary = async ({ surveyId, recordUuid }, client = db) => {
-  const { list } = await fetchRecordsSummaryBySurveyId({ surveyId, recordUuid }, client)
+export const fetchRecordSummary = async (
+  { surveyId, recordUuid, includeRootKeyValues = true, includePreview = false },
+  client = db
+) => {
+  const { list } = await fetchRecordsSummaryBySurveyId(
+    { surveyId, recordUuid, includeRootKeyValues, includePreview },
+    client
+  )
   return list[0]
 }
 

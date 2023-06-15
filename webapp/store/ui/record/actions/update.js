@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import * as A from '@core/arena'
+import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
@@ -21,10 +22,23 @@ const _updateNodeDebounced = (node, file, delay) => {
   const action = async (dispatch, getState) => {
     dispatch(AppSavingActions.showAppSaving())
 
-    const formData = objectToFormData({ node: JSON.stringify(node), ...(file ? { file } : {}) })
+    const state = getState()
+    const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const surveyId = SurveyState.getSurveyId(getState())
-    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData)
+    const record = RecordState.getRecord(state)
+    const draft = record && Record.isPreview(record)
+
+    const formData = objectToFormData({
+      cycle,
+      draft,
+      node: JSON.stringify(node),
+      ...(file ? { file } : {}),
+    })
+
+    const recordUuid = Node.getRecordUuid(node)
+
+    const surveyId = SurveyState.getSurveyId(state)
+    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData)
   }
 
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)

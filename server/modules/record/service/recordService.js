@@ -1,7 +1,5 @@
 import * as fs from 'fs'
 
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
-
 import * as Log from '@server/log/log'
 
 import * as A from '@core/arena'
@@ -11,6 +9,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as RecordFile from '@core/record/recordFile'
 import * as Authorizer from '@core/auth/authorizer'
@@ -25,31 +24,24 @@ import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as FileManager from '../manager/fileManager'
 
-import * as RecordServiceThreads from './update/recordServiceThreads'
-import { messageTypes as RecordThreadMessageTypes } from './update/thread/recordThreadMessageTypes'
+import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
-import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
-import { FileUtils } from '@webapp/utils/fileUtils'
+import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 
 const Logger = Log.getLogger('RecordService')
 
 // RECORD
-export const createRecord = async (socketId, user, surveyId, recordToCreate) => {
-  Logger.debug('create record: ', recordToCreate)
+export const createRecord = async ({ user, surveyId, recordToCreate }) => {
+  Logger.debug('creating record: ', recordToCreate)
 
-  const record = await RecordManager.insertRecord(user, surveyId, recordToCreate)
-
-  // Create record thread and initialize record
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, Record.getUuid(recordToCreate))
-  thread.postMessage({ type: RecordThreadMessageTypes.recordInit })
-
-  return record
+  return RecordManager.insertRecord(user, surveyId, recordToCreate)
 }
 
 export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cycle, itemUuid }) => {
@@ -132,14 +124,7 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
   await RecordManager.deleteRecord(user, survey, record)
 
-  // Notify other users viewing or editing the record it has been deleted
-  const socketIds = RecordServiceThreads.getSocketIds(recordUuid)
-  socketIds.forEach((socketIdCurrent) => {
-    if (socketIdCurrent !== socketId || notifySameUser) {
-      WebSocketServer.notifySocket(socketIdCurrent, WebSocketEvent.recordDelete, recordUuid)
-    }
-  })
-  RecordServiceThreads.dissocSocketsByRecordUuid(recordUuid)
+  RecordsUpdateThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
 }
 
 export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
@@ -164,24 +149,35 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
-export const checkIn = async (socketId, user, surveyId, recordUuid, draft) => {
+export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
   const preview = Record.isPreview(record)
+  const cycle = Record.getCycle(record)
+
+  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
   if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
-    RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, recordUuid)
+    // Create record thread
+    const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
+    // initialize record if empty
+    if (Record.getNodesArray(record).length === 0) {
+      thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
+    }
   }
-
-  RecordServiceThreads.assocSocket(recordUuid, socketId)
-
   return record
 }
 
 export const checkOut = async (socketId, user, surveyId, recordUuid) => {
-  const recordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid })
+  const recordSummary = await RecordManager.fetchRecordSummary({
+    surveyId,
+    recordUuid,
+    includeRootKeyValues: false,
+    includePreview: true,
+  })
   if (Record.isPreview(recordSummary)) {
+    RecordsUpdateThreadService.killThread({ surveyId, cycle: Record.getCycle(recordSummary), draft: true })
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
   } else {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
@@ -189,10 +185,10 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
       await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
     }
   }
-  RecordServiceThreads.dissocSocket(socketId)
+  RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
 }
 
-export const dissocSocketFromRecordThread = RecordServiceThreads.dissocSocket
+export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
 export const { fetchValidationReport, countValidationReportItems } = RecordManager
@@ -299,22 +295,16 @@ export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recor
 }
 
 // NODE
-const _sendNodeUpdateMessage = (socketId, user, surveyId, recordUuid, msg) => {
-  RecordServiceThreads.assocSocket(recordUuid, socketId)
+const _sendNodeUpdateMessage = ({ socketId, user, surveyId, cycle, recordUuid, draft, msg }) => {
+  RecordsUpdateThreadService.assocSocket({ recordUuid, socketId })
 
-  const singleMessage = !RecordServiceThreads.getRecordThread(recordUuid)
-
-  const thread = RecordServiceThreads.getOrCreatedRecordThread(socketId, user, surveyId, recordUuid)
+  const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft })
   thread.postMessage(msg, user)
-
-  if (singleMessage) {
-    RecordServiceThreads.killRecordThread(recordUuid)
-  }
 }
 
 export const { fetchNodeByUuid } = RecordManager
 
-export const persistNode = async (socketId, user, surveyId, node, file) => {
+export const persistNode = async ({ socketId, user, surveyId, draft, cycle, node, file = null }) => {
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
@@ -330,18 +320,34 @@ export const persistNode = async (socketId, user, surveyId, node, file) => {
     await FileManager.insertFile(surveyId, fileObj)
   }
 
-  _sendNodeUpdateMessage(socketId, user, surveyId, recordUuid, {
-    type: RecordThreadMessageTypes.nodePersist,
-    node,
+  _sendNodeUpdateMessage({
+    socketId,
     user,
+    surveyId,
+    cycle,
+    draft,
+    recordUuid,
+    msg: {
+      type: RecordsUpdateThreadMessageTypes.nodePersist,
+      node,
+      user,
+    },
   })
 }
 
-export const deleteNode = (socketId, user, surveyId, recordUuid, nodeUuid) =>
-  _sendNodeUpdateMessage(socketId, user, surveyId, recordUuid, {
-    type: RecordThreadMessageTypes.nodeDelete,
-    nodeUuid,
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid }) =>
+  _sendNodeUpdateMessage({
+    socketId,
     user,
+    surveyId,
+    cycle,
+    draft,
+    recordUuid,
+    msg: {
+      type: RecordsUpdateThreadMessageTypes.nodeDelete,
+      nodeUuid,
+      user,
+    },
   })
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
@@ -381,7 +387,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
   })(record)
 
   const fileName = RecordFile.getName(file)
-  const extension = FileUtils.getExtension(fileName)
+  const extension = FileUtils.getFileExtension(fileName)
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
