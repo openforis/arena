@@ -1,10 +1,9 @@
-import * as R from 'ramda'
 import * as camelize from 'camelize'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as NumberUtils from '@core/numberUtils'
-import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -22,7 +21,7 @@ const getValueFromItem = (nodeDefCol, columnName, item = {}, isInProps = false) 
   // Remove nodeDefName from col name
   const prop = camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
 
-  return isInProps ? NodeDef.getProp(prop)(item) : R.propOr(null, prop, item)
+  return isInProps ? NodeDef.getProp(prop)(item) : A.propOr(null, prop, item)
 }
 
 const nodeValuePropProcessor =
@@ -75,13 +74,17 @@ const props = {
   [nodeDefType.code]: {
     [colValueProcessor]: ({ survey, nodeCol }) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
+      const defaultLang = Survey.getDefaultLanguage(surveyInfo)
+
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
+      const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
 
       return (_node, columnName) => {
-        return R.endsWith('label', columnName)
-          ? ObjectUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item) // 'label'
-          : CategoryItem.getCode(item)
+        if (!item) return null
+
+        return columnName.endsWith('_label')
+          ? CategoryItem.getLabel(defaultLang)(item) // label
+          : CategoryItem.getCode(item) // code
       }
     },
   },
@@ -91,13 +94,19 @@ const props = {
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
-      return (node, columnName) =>
-        // eslint-disable-next-line no-nested-ternary
-        R.equals(NodeDef.getName(nodeDefCol), columnName)
-          ? Taxon.getCode(taxon)
-          : Taxon.isUnlistedTaxon(taxon) // Scientific_name
-          ? Node.getScientificName(node) // From node value
-          : Taxon.getScientificName(taxon) // From taxon item
+      return (node, columnName) => {
+        if (NodeDef.getName(nodeDefCol) === columnName) {
+          // Code
+          return Taxon.getCode(taxon)
+        }
+        // Scientific_name
+        if (Taxon.isUnlistedTaxon(taxon)) {
+          // Scientific name from node value
+          return Node.getScientificName(node)
+        }
+        // Scientific name from taxon item
+        return Taxon.getScientificName(taxon)
+      }
     },
   },
 
@@ -127,7 +136,7 @@ const props = {
 }
 
 export const getColValueProcessor = (nodeDef) =>
-  R.propOr(
+  A.propOr(
     () => (node) => {
       return Node.isValueBlank(node) ? null : Node.getValue(node)
     },

@@ -1,6 +1,4 @@
 import * as R from 'ramda'
-import camelize from 'camelize'
-import * as toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import { Query } from '../../../query'
@@ -46,11 +44,14 @@ const getColumnNames = (nodeDef, tableNodeDef = null) => {
 }
 
 const extractColumnName = ({ nodeDef, columnName }) => {
-  // this is because when there is not subfix whe should return
-  if (NodeDef.isCode(nodeDef) && !new RegExp(`${toSnakeCase(NodeDef.getName(nodeDef))}_`).test(columnName)) {
+  // const nodeDefName = toSnakeCase(NodeDef.getName(nodeDef))
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const prefix = `${nodeDefName}_`
+  // this is because when there is not subfix we should return
+  if (NodeDef.isCode(nodeDef) && !new RegExp(prefix).test(columnName)) {
     return 'code'
   }
-  return camelize(columnName.replace(`${toSnakeCase(NodeDef.getName(nodeDef))}_`, ''))
+  return columnName.replace(prefix, '')
 }
 
 /**
