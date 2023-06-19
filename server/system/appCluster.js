@@ -1,7 +1,6 @@
 import * as express from 'express'
 import morgan from 'morgan'
 
-import { SRSs } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -41,6 +40,7 @@ export const run = async () => {
   app.use('/guest/*', express.static(dist))
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/img/', express.static(imgDir))
+  app.use('/noHeader/*', express.static(dist))
 
   // ====== APIs
   authApi.init(app)
@@ -56,7 +56,4 @@ export const run = async () => {
   await UserResetPasswordCleanup.init()
   await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
-
-  // ====== Spatial Reference Systems (SRSs)
-  await SRSs.init()
 }

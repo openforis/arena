@@ -69,10 +69,11 @@ const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
   return match[1]
 }
 
-const _extractLang = ({ columnPatterns, columnName, columnType }) => {
+const _extractLang = ({ columnPatterns, columnName, columnType, defaultLang }) => {
   const pattern = columnPatterns[columnType]
   const match = columnName.match(pattern)
-  return match[2]
+  const lang = match[2]
+  return lang || defaultLang
 }
 
 const _validateSummary = (summary) => {
@@ -91,6 +92,7 @@ const _determineDataType = ({ isExtra, isGeometryPointType }) => {
 
 export const createImportSummaryFromColumnNames = ({
   columnNames,
+  defaultLang,
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
@@ -150,7 +152,7 @@ export const createImportSummaryFromColumnNames = ({
     }
 
     const itemColumnNames = isGeometryPointType ? _getGeometryPointTypeColumnNames({ itemName: key }) : [columnName]
-    const lang = isExtra ? null : _extractLang({ columnPatterns, columnName, columnType })
+    const lang = isExtra ? null : _extractLang({ columnPatterns, columnName, columnType, defaultLang })
 
     const item = CategoryImportSummary.newItem({
       key,
@@ -176,14 +178,23 @@ export const createImportSummaryFromColumnNames = ({
 
 export const createImportSummaryFromStream = async ({
   stream,
+  defaultLang,
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
   const columnNames = await CSVReader.readHeadersFromStream(stream)
-  return createImportSummaryFromColumnNames({ columnNames, codeColumnPattern, ignoreLabelsAndDescriptions })
+  return createImportSummaryFromColumnNames({
+    columnNames,
+    defaultLang,
+    codeColumnPattern,
+    ignoreLabelsAndDescriptions,
+  })
 }
 
-export const createImportSummary = async (filePath) => ({
-  ...(await createImportSummaryFromStream({ stream: fs.createReadStream(filePath) })),
-  [CategoryImportSummary.keys.filePath]: filePath,
-})
+export const createImportSummary = async ({ filePath, defaultLang }) => {
+  const summary = await createImportSummaryFromStream({ stream: fs.createReadStream(filePath), defaultLang })
+  return {
+    ...summary,
+    [CategoryImportSummary.keys.filePath]: filePath,
+  }
+}

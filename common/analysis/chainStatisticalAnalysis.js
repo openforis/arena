@@ -9,6 +9,7 @@ const keys = {
   nonResponseBiasCorrection: 'nonResponseBiasCorrection',
   pValue: 'pValue',
   reportingMethod: 'reportingMethod',
+  reportingArea: 'reportingArea',
 }
 
 const reportingMethods = {
@@ -34,6 +35,8 @@ const getPValue = A.propOr(pValueDefault, keys.pValue)
 const isNonResponseBiasCorrection = isPropTrue(keys.nonResponseBiasCorrection)
 
 const getReportingMethod = A.prop(keys.reportingMethod)
+
+const getReportingArea = A.prop(keys.reportingArea)
 
 const isEmpty = (statisticalAnalysis) =>
   !getEntityDefUuid(statisticalAnalysis) &&
@@ -63,6 +66,8 @@ const resetPValue = assocPValue(null)
 
 const assocReportingMethod = (reportingMethod) => A.assoc(keys.reportingMethod, reportingMethod)
 
+const assocReportingArea = (reportingArea) => A.assoc(keys.reportingArea, reportingArea)
+
 export const ChainStatisticalAnalysis = {
   keys,
   pValues,
@@ -74,6 +79,7 @@ export const ChainStatisticalAnalysis = {
   getFilter,
   getPValue,
   getReportingMethod,
+  getReportingArea,
   isNonResponseBiasCorrection,
   isEmpty,
 
@@ -85,4 +91,5 @@ export const ChainStatisticalAnalysis = {
   assocPValue,
   resetPValue,
   assocReportingMethod,
+  assocReportingArea,
 }

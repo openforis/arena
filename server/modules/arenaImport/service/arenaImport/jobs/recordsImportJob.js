@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
-import * as DateUtils from '@core/dateUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
@@ -88,29 +87,36 @@ export default class RecordsImportJob extends Job {
       ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
       : null
 
-    if (
-      !existingRecordSummary ||
-      DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
-    ) {
-      if (existingRecordSummary) {
-        // delete existing record before import (if the record to import has more recent changes)
-        this.logDebug(`deleting existing record ${recordUuid}`)
-        await RecordManager.deleteRecord(this.user, survey, existingRecordSummary, this.tx)
-      }
-      // insert record
-      await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
-
-      // insert nodes (add them to batch persister)
-      const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-      await PromiseUtils.each(nodes, async (node) => {
-        // check that the node definition associated to the node has not been deleted from the survey
-        if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
-          await nodesBatchPersister.addItem(node)
-        }
-      })
-    } else {
-      this.logDebug(`skipping record ${recordUuid}; it doesn't have any recent updates`)
+    if (existingRecordSummary) {
+      // skip record
+      // TODO update record
+      this.logDebug(`skipping record ${recordUuid}; it already exists`)
+      return
     }
+
+    // if (
+    //   !existingRecordSummary ||
+    //   DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
+    // ) {
+    // if (existingRecordSummary) {
+    //   // delete existing record before import (if the record to import has more recent changes)
+    //   this.logDebug(`deleting existing record ${recordUuid}`)
+    //   await RecordManager.deleteRecord(this.user, survey, existingRecordSummary, this.tx)
+    // }
+    // insert record
+    await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
+
+    // insert nodes (add them to batch persister)
+    const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+    await PromiseUtils.each(nodes, async (node) => {
+      // check that the node definition associated to the node has not been deleted from the survey
+      if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
+        await nodesBatchPersister.addItem(node)
+      }
+    })
+    // } else {
+    //   this.logDebug(`skipping record ${recordUuid}; it doesn't have any recent updates`)
+    // }
   }
 
   /**

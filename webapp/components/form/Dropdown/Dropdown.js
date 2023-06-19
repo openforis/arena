@@ -34,7 +34,11 @@ const OptionComponent =
 const SingleValueComponent = (reactSelectProps) => {
   const { children: childrenProp, ...otherProps } = reactSelectProps
   const children = childrenProp && typeof childrenProp === 'string' ? childrenProp.trim() : childrenProp
-  return <components.SingleValue {...otherProps}>{children}</components.SingleValue>
+  return (
+    <components.SingleValue {...otherProps}>
+      <LabelWithTooltip label={children} />
+    </components.SingleValue>
+  )
 }
 
 const Dropdown = (props) => {
@@ -96,13 +100,13 @@ const Dropdown = (props) => {
 
   return (
     <ValidationTooltip
-      className="dropdown-wrapper dropdown-validation-tooltip"
+      className={classNames('dropdown-wrapper dropdown-validation-tooltip', className)}
       id={id}
       testId={testId}
       validation={validation}
     >
       <ReactSelect
-        className={classNames('dropdown', className)}
+        className="dropdown"
         classNamePrefix="dropdown"
         components={{ Option: OptionComponent({ renderOptionLabel }), SingleValue: SingleValueComponent }}
         defaultValue={defaultValue}

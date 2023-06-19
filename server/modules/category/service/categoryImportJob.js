@@ -1,8 +1,6 @@
 import * as fs from 'fs'
 import * as R from 'ramda'
 
-import { SRSs } from '@openforis/arena-core'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import Job from '@server/job/job'
@@ -37,8 +35,6 @@ export default class CategoryImportJob extends Job {
 
   async onStart() {
     await super.onStart()
-
-    await SRSs.init()
 
     this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
 
@@ -95,7 +91,10 @@ export default class CategoryImportJob extends Job {
 
     // Validate category
     this.logDebug('category validation start')
-    this.category = await CategoryManager.validateCategory(this.surveyId, Category.getUuid(this.category), this.tx)
+    this.category = await CategoryManager.validateCategory(
+      { survey: this.survey, categoryUuid: Category.getUuid(this.category) },
+      this.tx
+    )
     this.logDebug('category validation end')
 
     this.setResult({

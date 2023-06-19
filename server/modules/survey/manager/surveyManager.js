@@ -25,6 +25,7 @@ import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
+import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
@@ -33,6 +34,14 @@ import * as SurveyRepository from '../repository/surveyRepository'
 import SystemError from '@core/systemError'
 
 const assocSurveyInfo = (survey) => survey
+
+const _fetchAndAssocSrss = async ({ surveyInfo }, client) => {
+  const srsCodes = Survey.getSRSCodes(surveyInfo)
+  if (srsCodes.length === 0) return surveyInfo
+
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
+  return Survey.assocSrs(srss)(surveyInfo)
+}
 
 // ====== VALIDATION
 
@@ -135,7 +144,7 @@ export const importSurvey = async (params, client = db) => {
 
   return client.tx(async (t) => {
     // Insert survey into db
-    const surveyInfo = await SurveyRepository.insertSurvey(
+    let surveyInfo = await SurveyRepository.insertSurvey(
       {
         survey: surveyInfoParam,
         props: backup ? Survey.getProps(surveyInfoParam) : {},
@@ -149,7 +158,11 @@ export const importSurvey = async (params, client = db) => {
     await DBMigrator.migrateSurveySchema(surveyId)
 
     // Create default groups for this survey
-    surveyInfo.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+    surveyInfo = Survey.assocAuthGroups(await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t))(
+      surveyInfo
+    )
+
+    surveyInfo = await _fetchAndAssocSrss({ surveyInfo }, t)
 
     await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 
@@ -172,9 +185,16 @@ export const fetchSurveyById = async ({ surveyId, draft = false, validate = fals
     SurveyRepository.fetchSurveyById({ surveyId, draft, backup }, client),
     AuthGroupRepository.fetchSurveyGroups(surveyId, client),
   ])
-  const validation = validate ? await validateSurveyInfo(surveyInfo) : null
 
-  return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
+  let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
+  surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo: surveyInfoUpdated }, client)
+
+  const validation = validate ? await validateSurveyInfo(surveyInfoUpdated) : null
+
+  return assocSurveyInfo({
+    ...surveyInfoUpdated,
+    validation,
+  })
 }
 
 export const fetchSurveyAndNodeDefsBySurveyId = async (

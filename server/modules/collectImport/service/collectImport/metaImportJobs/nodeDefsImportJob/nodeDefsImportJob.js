@@ -201,11 +201,33 @@ export default class NodeDefsImportJob extends Job {
 
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
+    } else if (type === NodeDef.nodeDefType.coordinate) {
+      // 3e. allowOnlyDeviceCoordinate
+      const allowOnlyDeviceCoordinate = CollectSurvey.getUiAttribute('allowOnlyDeviceCoordinate', false)(collectNodeDef)
+      if (allowOnlyDeviceCoordinate) {
+        propsUpdated[NodeDef.propKeys.allowOnlyDeviceCoordinate] = true
+      }
+    } else if (type === NodeDef.nodeDefType.text) {
+      // 3f. text input type (short/memo => singleLine/multiLine)
+      const collectTextInputType = CollectSurvey.getAttribute('type', 'short')(collectNodeDef)
+      if (collectTextInputType === 'memo') {
+        propsUpdated[NodeDef.propKeys.textInputType] = NodeDef.textInputTypes.multiLine
+      }
     }
-    // 4. update hidden when not relevant layout prop
+
+    // 4a. update hidden when not relevant layout prop
     const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
     if (hiddenWhenNotRelevant) {
       _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
+    }
+
+    // 4b. update hiddenInMobile layout prop
+    const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
+    const hiddenInMobile =
+      StringUtils.isNotBlank(relevantExpr) &&
+      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
+    if (hiddenInMobile) {
+      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
     }
 
     Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
@@ -230,7 +252,7 @@ export default class NodeDefsImportJob extends Job {
     )
     nodeDef = nodeDefsUpdated[nodeDefUuid]
 
-    // 5. store nodeDef in cache
+    // 6. store nodeDef in cache
     let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
     if (!nodeDefsInfo) {
       nodeDefsInfo = []

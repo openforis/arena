@@ -22,6 +22,16 @@ export const guestModules = {
 
 // ==== Logged in modules
 
+// ==== No header (full screen) modules
+export const noHeader = 'noHeader'
+
+export const noHeaderModules = {
+  record: {
+    key: 'record',
+    path: 'record',
+  },
+}
+
 // ==== App Root modules
 export const appModules = {
   home: {
@@ -242,6 +252,7 @@ export const app = 'app'
 const _getModuleParentPathParts = (module) => {
   if (Object.values(appModules).includes(module)) return [app]
   if (Object.values(guestModules).includes(module)) return [guest]
+  if (Object.values(noHeaderModules).includes(module)) return [noHeader]
 
   if (Object.values(homeModules).includes(module)) return _getModulePathParts(appModules.home)
   if (Object.values(designerModules).includes(module)) return _getModulePathParts(appModules.designer)

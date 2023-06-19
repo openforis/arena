@@ -12,8 +12,9 @@ const validateSurveyNameUniqueness = (surveyInfos) => (propName, survey) =>
     : null
 
 const getSurveyNameValidations = ({ surveyInfos, required = true }) => [
-  ...(required ? [Validator.validateRequired(Validation.messageKeys.nameRequired)] : []),
-  Validator.validateMinLength({ minLength: 6 }),
+  ...(required
+    ? [Validator.validateRequired(Validation.messageKeys.nameRequired), Validator.validateMinLength({ minLength: 6 })]
+    : []),
   Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
   validateSurveyNameUniqueness(surveyInfos),
 ]

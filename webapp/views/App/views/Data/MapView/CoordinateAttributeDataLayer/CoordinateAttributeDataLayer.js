@@ -27,7 +27,7 @@ export const CoordinateAttributeDataLayer = (props) => {
     onCurrentPointPopupClose,
     openPopupOfPoint,
     setMarkerByKey,
-  } = useFlyToPoint({ points })
+  } = useFlyToPoint({ points, onRecordEditClick })
 
   return (
     <LayersControl.Overlay name={layerName}>

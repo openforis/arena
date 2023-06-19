@@ -26,7 +26,6 @@ export { useOnPageUnload } from './useOnPageUnload'
 export { useBrowserLanguageCode } from './useBrowserLanguageCode'
 export { useRequest } from './useRequest'
 export { useShouldShowFirstTimeHelp } from './useShouldShowFirstTimeHelp'
-export { useSRSs } from './useSRSs'
 export { useQuery } from './useQuery'
 export { useOnWebSocketEvent } from './useOnWebSocketEvent'
 // confirm dialog

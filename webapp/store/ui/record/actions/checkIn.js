@@ -10,10 +10,9 @@ import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'
 
 import * as ActionTypes from './actionTypes'
-import * as RecordState from '../state'
 
 export const checkInRecord =
-  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, insideMap }) =>
+  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
 
@@ -65,10 +64,10 @@ export const checkInRecord =
         record,
         nodeDefActivePage,
         formPageNodeUuidByNodeDefUuid,
-        insideMap,
+        noHeader,
       })
     } else {
-      dispatch({ type: ActionTypes.recordLoad, record, insideMap })
+      dispatch({ type: ActionTypes.recordLoad, record, noHeader })
     }
 
     // Hide app loader on record edit
@@ -78,10 +77,9 @@ export const checkInRecord =
   }
 
 export const checkOutRecord = (recordUuid) => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
-  const record = RecordState.getRecord(getState())
   // Checkout can be called after logout, therefore checking if survey still exists in state
-  if (surveyId && record) {
+  const surveyId = SurveyState.getSurveyId(getState())
+  if (surveyId && recordUuid) {
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
   }
   dispatch({ type: ActionTypes.recordCheckedOut, recordUuid })

@@ -53,8 +53,6 @@ export const CoordinateAttributePopUp = (props) => {
   const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
-  const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude, srs: '4326' })
-
   const popupRef = useRef(null)
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
@@ -64,7 +62,13 @@ export const CoordinateAttributePopUp = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const elevation = useElevation({ surveyId: Survey.getIdSurveyInfo(surveyInfo), point: pointLatLong, active: open })
+  const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
+  const elevation = useElevation({ survey, point: pointLatLong, active: open })
+
+  const onRemove = useCallback(() => {
+    setOpen(false)
+    onRecordEditClick(null)
+  }, [onRecordEditClick])
 
   const onClickNext = useCallback(() => {
     flyToNextPoint(pointFeature)
@@ -77,7 +81,6 @@ export const CoordinateAttributePopUp = (props) => {
   }, [flyToPreviousPoint, pointFeature])
 
   const onEarthMapButtonClick = useCallback(() => {
-    const { y: latitude, x: longitude } = pointLatLong
     let geojson
     if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
       const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
@@ -95,7 +98,7 @@ export const CoordinateAttributePopUp = (props) => {
     }
     const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
     window.open(earthMapUrl, 'EarthMap')
-  }, [pointLatLong.x, pointLatLong.y, surveyInfo])
+  }, [latitude, longitude, surveyInfo])
 
   const path = useMemo(
     () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
@@ -112,7 +115,7 @@ export const CoordinateAttributePopUp = (props) => {
     <Popup
       eventHandlers={{
         add: () => setOpen(true),
-        remove: () => setOpen(false),
+        remove: onRemove,
       }}
       ref={popupRef}
     >

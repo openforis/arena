@@ -1,4 +1,4 @@
-export const messageTypes = {
+export const RecordsUpdateThreadMessageTypes = {
   threadKill: 'threadKill',
   threadInit: 'threadInit',
 

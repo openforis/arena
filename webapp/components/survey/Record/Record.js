@@ -6,8 +6,8 @@ import { useLocalState } from './store'
 import { useI18n } from '@webapp/store/system'
 
 const Record = (props) => {
-  const { recordUuid, pageNodeUuid, insideMap = false } = props
-  const { editable, preview, record, recordLoadError } = useLocalState({ recordUuid, pageNodeUuid, insideMap })
+  const { recordUuid, pageNodeUuid, noHeader = false } = props
+  const { editable, preview, record, recordLoadError } = useLocalState({ recordUuid, pageNodeUuid, noHeader })
 
   const i18n = useI18n()
 

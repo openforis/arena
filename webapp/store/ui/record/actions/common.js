@@ -13,5 +13,5 @@ export const recordNodesUpdate = (nodes) => (dispatch, getState) => {
     dispatch(LoaderActions.hideLoader())
   }
 
-  dispatch({ type: ActionTypes.nodesUpdate, nodes })
+  dispatch({ type: ActionTypes.nodesUpdate, nodes: nodes })
 }

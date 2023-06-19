@@ -23,7 +23,7 @@ const _convertItemsToPoints = (items) => {
   const points = items.map((item) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
     const [lat, long] = latLng
-    const itemPoint = PointFactory.createInstance({ x: long, y: lat, srs: '4326' })
+    const itemPoint = PointFactory.createInstance({ x: long, y: lat })
 
     bounds.extend([lat, long])
 

@@ -60,6 +60,7 @@ const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
       clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
       nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
       ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
+      reportingArea: ChainStatisticalAnalysis.getReportingArea(statisticalAnalysis),
     },
   }
 }
@@ -131,9 +132,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   )
   const samplingStrategySpecified = samplingStrategyIndex >= 0
   const stratumAttributeDef = getNodeDefByUuid(ChainSamplingDesign.getStratumNodeDefUuid(chainSamplingDesign))
-  const postStratificationAttributeDef = getNodeDefByUuid(
-    ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
-  )
+  // const postStratificationAttributeDef = getNodeDefByUuid(
+  //   ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
+  // )
   const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
@@ -163,8 +164,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
       ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
-      ? getCodeAttributeSummary('postStratificationAttribute', postStratificationAttributeDef)
-      : {}),
+      ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank
+      : //  getCodeAttributeSummary('postStratificationAttribute', postStratificationAttributeDef)
+        {}),
     areaWeightingMethod: ChainSamplingDesign.isAreaWeightingMethod(chainSamplingDesign),
     clusteringEntity: NodeDef.getName(clusteringEntityDef),
     clusteringEntityKeys: clusteringEntityDef

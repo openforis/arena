@@ -51,7 +51,7 @@ export const init = (app) => {
     try {
       // Before logout checkOut record if there's an opened thread
       const socketId = Request.getSocketId(req)
-      RecordService.dissocSocketFromRecordThread(socketId)
+      RecordService.dissocSocketFromUpdateThread(socketId)
 
       req.logout((err) => {
         if (err) {
