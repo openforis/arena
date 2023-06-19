@@ -1,18 +1,21 @@
-import { Objects } from '@openforis/arena-core'
+import { Objects, Promises } from '@openforis/arena-core'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as RecordFile from '@core/record/recordFile'
 import { db } from '@server/db/db'
+import * as Log from '@server/log/log'
 
 import * as FileRepository from '../repository/fileRepository'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
 
-const fileContentStorageTypes = {
+const logger = Log.getLogger('FileManager')
+
+export const fileContentStorageTypes = {
   db: 'db',
   fileSystem: 'fileSystem',
 }
 
-const determineFileContentStorageType = () => {
+export const getFileContentStorageType = () => {
   if (!Objects.isEmpty(ProcessUtils.ENV.storageFilePath)) {
     return fileContentStorageTypes.fileSystem
   }
@@ -20,7 +23,7 @@ const determineFileContentStorageType = () => {
 }
 
 const fetchFileContent = async ({ surveyId, file }) => {
-  const fileContentStorageType = determineFileContentStorageType()
+  const fileContentStorageType = getFileContentStorageType()
   if (fileContentStorageType === fileContentStorageTypes.fileSystem) {
     return FileRepositoryFileSystem.readFileContent({ surveyId, file })
   }
@@ -28,9 +31,13 @@ const fetchFileContent = async ({ surveyId, file }) => {
 }
 
 export const insertFile = async (surveyId, file, client = db) => {
-  const fileContentStorageType = determineFileContentStorageType()
+  const fileContentStorageType = getFileContentStorageType()
   if (fileContentStorageType === fileContentStorageTypes.fileSystem) {
-    await FileRepositoryFileSystem.writeFileContent({ surveyId, file })
+    await FileRepositoryFileSystem.writeFileContent({
+      surveyId,
+      fileUuid: RecordFile.getUuid(file),
+      content: RecordFile.getContent(file),
+    })
     file.content = null
   }
   return FileRepository.insertFile(surveyId, file, client)
@@ -49,7 +56,7 @@ export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) => {
 }
 
 export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
-  const fileContentStorageType = determineFileContentStorageType()
+  const fileContentStorageType = getFileContentStorageType()
   if (fileContentStorageType === fileContentStorageTypes.fileSystem) {
     const fileUuids = await FileRepository.fetchFileUuidsByRecordUuids({ surveyId, recordUuids }, client)
     await FileRepositoryFileSystem.deleteFiles({ surveyId, fileUuids })
@@ -58,9 +65,34 @@ export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = d
   }
 }
 
+export const moveFilesContentToNewStorageIfNeeded = async ({ surveyId }, client = db) => {
+  const storageType = getFileContentStorageType()
+  if (storageType === fileContentStorageTypes.db) return false
+
+  const fileUuids = await FileRepository.fetchFileUuidsOfFilesWithContent({ surveyId }, client)
+  if (fileUuids.length === 0) return false
+
+  logger.debug(`Survey ${surveyId}: started moving ${fileUuids.length} files from DB to new storage (${storageType})`)
+
+  if (storageType === fileContentStorageTypes.fileSystem) {
+    await client.tx(async (tx) => {
+      await Promises.each(fileUuids, async (fileUuid) => {
+        const file = await FileRepository.fetchFileByUuid(surveyId, fileUuid, tx)
+
+        await FileRepositoryFileSystem.writeFileContent({
+          surveyId,
+          fileUuid: RecordFile.getUuid(file),
+          content: RecordFile.getContent(file),
+        })
+      })
+      logger.debug(`Files moved from DB; clearing 'content' column`)
+      await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
+    })
+  }
+}
+
 export const {
   // READ
-  fetchFileUuidsBySurveyId,
   fetchFileSummariesBySurveyId,
   fetchFileSummaryByUuid,
   // UPDATE

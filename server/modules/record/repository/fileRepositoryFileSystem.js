@@ -7,11 +7,11 @@ const determineFilePath = ({ surveyId, fileUuid }) => {
   return FileUtils.join(fileDir, fileUuid)
 }
 
-export const writeFileContent = async ({ surveyId, file }) => {
+export const writeFileContent = async ({ surveyId, fileUuid, fileContent }) => {
   const fileDir = FileUtils.join(ProcessUtils.ENV.storageFilePath, surveyId)
   await FileUtils.mkdir(fileDir)
-  const filePath = determineFilePath({ surveyId, fileUuid: RecordFile.getUuid(file) })
-  await FileUtils.writeFile(filePath, RecordFile.getContent(file))
+  const filePath = determineFilePath({ surveyId, fileUuid })
+  await FileUtils.writeFile(filePath, fileContent)
 }
 
 export const readFileContent = async ({ surveyId, file }) => {

@@ -24,16 +24,6 @@ export const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-export const fetchFileUuidsBySurveyId = async (surveyId, client = db) =>
-  client.manyOrNone(
-    `
-    SELECT uuid
-    FROM ${getSurveyDBSchema(surveyId)}.file
-    WHERE ${NOT_DELETED_CONDITION}`,
-    [],
-    (row) => row.uuid
-  )
-
 export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
   client.manyOrNone(
     `
@@ -49,6 +39,16 @@ export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, cli
     FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
     [recordUuids],
+    (row) => row.uuid
+  )
+
+export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE content IS NOT NULL`,
+    [],
     (row) => row.uuid
   )
 
@@ -107,6 +107,15 @@ export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
     WHERE uuid = $1
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [fileUuid, props]
+  )
+
+export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
+  client.none(
+    `
+      UPDATE ${getSurveyDBSchema(surveyId)}.file
+      SET content = NULL
+      WHERE content IS NOT NULL
+      `
   )
 
 // ============== DELETE

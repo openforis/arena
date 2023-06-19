@@ -2,12 +2,15 @@ import 'dotenv/config'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import * as FileService from '@server/modules/record/service/fileService'
 
 import * as appCluster from './system/appCluster'
 
 const initialize = async () => {
   // recursively create temp folder
   await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
+
+  await FileService.moveFilesContentToNewStorageIfNeeded()
 
   await appCluster.run()
 }
