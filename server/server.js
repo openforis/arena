@@ -10,7 +10,7 @@ const initialize = async () => {
   // recursively create temp folder
   await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
 
-  await FileService.moveFilesContentToNewStorageIfNeeded()
+  await FileService.checkFilesStorage()
 
   await appCluster.run()
 }

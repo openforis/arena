@@ -17,6 +17,15 @@ export const rmdir = async (path) => {
 
 export const existsDir = (path) => fs.existsSync(path)
 
+export const canReadWritePath = (path) => {
+  try {
+    fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 export const copyDir = ({ source, destination }) => ncp(source, destination)
 
 export { join, sep }

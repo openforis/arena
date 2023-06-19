@@ -65,7 +65,19 @@ export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = d
   }
 }
 
-export const moveFilesContentToNewStorageIfNeeded = async ({ surveyId }, client = db) => {
+export const checkCanAccessFilesStorage = async () => {
+  const storageType = getFileContentStorageType()
+  if (storageType === fileContentStorageTypes.db) return true
+
+  if (storageType === fileContentStorageTypes.fileSystem) {
+    if (!(await FileRepositoryFileSystem.checkCanAccessStorageFolder())) {
+      throw new Error('Cannot access files storage path: ' + FileRepositoryFileSystem.getStorageFolderPath())
+    }
+  }
+  return true
+}
+
+export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db) => {
   const storageType = getFileContentStorageType()
   if (storageType === fileContentStorageTypes.db) return false
 
@@ -75,7 +87,7 @@ export const moveFilesContentToNewStorageIfNeeded = async ({ surveyId }, client 
   logger.debug(`Survey ${surveyId}: started moving ${fileUuids.length} files from DB to new storage (${storageType})`)
 
   if (storageType === fileContentStorageTypes.fileSystem) {
-    await client.tx(async (tx) => {
+    return client.tx(async (tx) => {
       await Promises.each(fileUuids, async (fileUuid) => {
         const file = await FileRepository.fetchFileByUuid(surveyId, fileUuid, tx)
 
@@ -87,8 +99,16 @@ export const moveFilesContentToNewStorageIfNeeded = async ({ surveyId }, client 
       })
       logger.debug(`Files moved from DB; clearing 'content' column`)
       await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
+
+      return true
     })
   }
+
+  logger.debug(
+    `Survey ${surveyId}: ${fileUuids.length} survey files moved successfully to new storage (${storageType})`
+  )
+
+  return false
 }
 
 export const {
