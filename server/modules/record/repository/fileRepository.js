@@ -25,7 +25,7 @@ export const insertFile = async (surveyId, file, client = db) => {
 // ============== READ
 
 export const fetchFileUuidsBySurveyId = async (surveyId, client = db) =>
-  client.map(
+  client.manyOrNone(
     `
     SELECT uuid
     FROM ${getSurveyDBSchema(surveyId)}.file
@@ -40,6 +40,16 @@ export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
     FROM ${getSurveyDBSchema(surveyId)}.file
     WHERE ${NOT_DELETED_CONDITION}`
+  )
+
+export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, client = db) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
+    [recordUuids],
+    (row) => row.uuid
   )
 
 export const fetchFileByUuid = async (surveyId, uuid, client = db) =>

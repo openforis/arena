@@ -25,6 +25,8 @@ export { join, sep }
 
 export const readFile = async (path) => promises.readFile(path, { encoding: 'utf8' })
 
+export const readBinaryFile = async (path) => promises.readFile(path)
+
 export const writeFile = async (path, data = '') => promises.writeFile(path, data)
 
 export const appendFile = async (path, data = '') => promises.appendFile(path, data)
@@ -46,6 +48,7 @@ export const getFileExtension = (file) => {
 }
 
 export const deleteFile = (path) => fs.unlinkSync(path)
+export const deleteFileAsync = (path) => promises.unlink(path)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`

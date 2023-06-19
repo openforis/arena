@@ -17,6 +17,7 @@ const ENV = {
   nodeEnv: process.env.NODE_ENV || environments.development,
   debug: Boolean(process.env.DEBUG),
   tempFolder: process.env.TEMP_FOLDER || '/tmp/arena_upload',
+  storageFilePath: process.env.STORAGE_FILE_PATH,
   buildReport: process.env.BUILD_REPORT === 'true',
   // APP VERSION
   applicationVersion: process.env.APPLICATION_VERSION,
