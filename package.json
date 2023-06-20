@@ -112,6 +112,7 @@
     "ace-builds": "^1.19.0",
     "adm-zip": "^0.5.10",
     "archiver": "^5.3.1",
+    "aws-sdk": "^2.1400.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "bignumber.js": "^9.1.1",

@@ -36,11 +36,10 @@ export const readFileContent = async ({ surveyId, file }) => {
   return content
 }
 
-export const deleteFiles = async ({ surveyId, fileUuids }) => {
-  await Promise.all(
+export const deleteFiles = async ({ surveyId, fileUuids }) =>
+  Promise.all(
     fileUuids.map(async (fileUuid) => {
       const filePath = getFilePath({ surveyId, fileUuid })
       await FileUtils.deleteFileAsync(filePath)
     })
   )
-}

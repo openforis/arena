@@ -17,7 +17,6 @@ const ENV = {
   nodeEnv: process.env.NODE_ENV || environments.development,
   debug: Boolean(process.env.DEBUG),
   tempFolder: process.env.TEMP_FOLDER || '/tmp/arena_upload',
-  storageFilePath: process.env.STORAGE_FILE_PATH,
   buildReport: process.env.BUILD_REPORT === 'true',
   // APP VERSION
   applicationVersion: process.env.APPLICATION_VERSION,
@@ -54,6 +53,12 @@ const ENV = {
   adminEmail: process.env.ADMIN_EMAIL,
   // - admin user password
   adminPassword: process.env.ADMIN_PASSWORD,
+  // FILE STORAGE
+  fileStoragePath: process.env.FILE_STORAGE_PATH,
+  fileStorageAwsAccessKey: process.env.FILE_STORAGE_AWS_ACCESS_KEY,
+  fileStorageAwsSecretAccessKey: process.env.FILE_STORAGE_AWS_SECRET_ACCESS_KEY,
+  fileStorageAwsS3BucketName: process.env.FILE_STORAGE_AWS_S3_BUCKET_NAME,
+  fileStorageAwsS3BucketRegion: process.env.FILE_STORAGE_AWS_S3_BUCKET_REGION,
 }
 
 module.exports = {
