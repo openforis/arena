@@ -18,7 +18,7 @@ import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const field =
-    NodeDef.isTaxon(nodeDef) && columnName === NodeDef.getName(nodeDef)
+    (NodeDef.isTaxon(nodeDef) || NodeDef.isCode(nodeDef)) && columnName === NodeDef.getName(nodeDef)
       ? 'code'
       : ColumnNodeDef.extractColumnName({ nodeDef, columnName })
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
