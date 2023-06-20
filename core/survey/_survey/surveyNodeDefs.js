@@ -7,6 +7,7 @@ import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
+import * as SurveyInfo from './surveyInfo'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
 import Queue from '@core/queue'
 
@@ -383,4 +384,5 @@ export const getNodeDefCodeCandidateParents =
   }
 
 export const canUpdateCategory = (nodeDef) => (survey) =>
-  !(NodeDef.isPublished(nodeDef) || isNodeDefParentCode(nodeDef)(survey))
+  (!NodeDef.isPublished(nodeDef) || SurveyInfo.isTemplate(SurveyInfo.getInfo(survey))) &&
+  !isNodeDefParentCode(nodeDef)(survey)

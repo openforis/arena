@@ -3,13 +3,14 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import * as Node from '@core/record/node'
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
@@ -37,10 +38,11 @@ const TaxonProps = (props) => {
 
   const i18n = useI18n()
   const surveyId = useSurveyId()
+  const surveyInfo = useSurveyInfo()
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
-  const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef)
+  const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef) || Survey.isTemplate(surveyInfo)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
 
   const [taxonomy, setTaxonomy] = useState({})
