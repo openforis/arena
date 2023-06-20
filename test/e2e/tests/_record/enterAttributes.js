@@ -4,9 +4,9 @@ import * as DateUtils from '../../../../core/dateUtils'
 import { TestId } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import {
-  formatTime,
   getBooleanSelector,
   getCoordinateSelector,
+  getDateTimeCalendarBtnSelector,
   getDateTimeInputSelector,
   getNodeDefSelector,
   getTaxonSelector,
@@ -71,8 +71,33 @@ const enterTaxon = async (nodeDef, value, parentSelector) => {
 
 const enterText = async (nodeDef, value, parentSelector) => page.fill(getTextSelector(nodeDef, parentSelector), value)
 
-const enterTime = async (nodeDef, value, parentSelector) =>
-  page.fill(getDateTimeInputSelector(nodeDef, parentSelector), formatTime(value))
+const enterTime = async (nodeDef, value, parentSelector) => {
+  // open hours/minutes selector
+  const dateTimeCalendarBtnSelector = getDateTimeCalendarBtnSelector(nodeDef, parentSelector)
+  const dateTimeCalendarBtnLocator = page.locator(dateTimeCalendarBtnSelector)
+  expect(await dateTimeCalendarBtnLocator.isVisible()).toBeTruthy()
+  await dateTimeCalendarBtnLocator.click()
+
+  // select time using time picker
+  const timePickerSelector = '.MuiPickersPopper-root'
+  const timePickerLocator = page.locator(timePickerSelector)
+  await expect(await timePickerLocator.isVisible()).toBeTruthy()
+
+  const selectTimePart = async ({ key, value }) => {
+    const optionLocator = page.locator(`${timePickerSelector} li[aria-label="${value} ${key}"]`)
+    await optionLocator.scrollIntoViewIfNeeded()
+    await expect(await optionLocator.isVisible()).toBeTruthy()
+    await optionLocator.click()
+  }
+
+  await selectTimePart({ key: 'hours', value: value.getHours() })
+  await selectTimePart({ key: 'minutes', value: value.getMinutes() })
+
+  const okButtonLocator = page.locator('.MuiDialogActions-root button[text="OK"]')
+  if ((await timePickerLocator.isVisible()) && (await okButtonLocator.isVisible())) {
+    await okButtonLocator.click()
+  }
+}
 
 const enterFns = {
   boolean: enterBoolean,
