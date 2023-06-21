@@ -27,6 +27,8 @@ export const getFileContentStorageType = () => {
   return fileContentStorageTypes.db
 }
 
+export const isFileContentStoredInDB = () => getFileContentStorageType() === fileContentStorageTypes.db
+
 const contentFetchFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuid }) =>
     FileRepositoryFileSystem.readFileContent({ surveyId, fileUuid }),
@@ -86,16 +88,6 @@ export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) => {
   return file
 }
 
-export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
-  const storageType = getFileContentStorageType()
-  const deleteFn = contentDeleteFunctionByStorageType[storageType]
-  if (deleteFn) {
-    const fileUuids = await FileRepository.fetchFileUuidsByRecordUuids({ surveyId, recordUuids }, client)
-    await deleteFn({ surveyId, fileUuids })
-  }
-  await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, client)
-}
-
 export const checkCanAccessFilesStorage = async () => {
   const storageType = getFileContentStorageType()
   switch (storageType) {
@@ -142,13 +134,30 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
   return true
 }
 
+export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
+  const storageType = getFileContentStorageType()
+  const deleteFn = contentDeleteFunctionByStorageType[storageType]
+  if (deleteFn) {
+    const fileUuids = await FileRepository.fetchFileUuidsByRecordUuids({ surveyId, recordUuids }, client)
+    await deleteFn({ surveyId, fileUuids })
+  }
+  await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, client)
+}
+
+export const deleteSurveyFilesContentByUuids = async ({ surveyId, fileUuids }) => {
+  const storageType = getFileContentStorageType()
+  const deleteFn = contentDeleteFunctionByStorageType[storageType]
+  if (deleteFn) {
+    await deleteFn({ surveyId, fileUuids })
+  }
+}
+
 export const {
   // READ
   fetchFileSummariesBySurveyId,
   fetchFileSummaryByUuid,
+  fetchFileUuidsBySurveyId,
   // UPDATE
   markRecordFilesAsDeleted,
   updateFileProps,
-  // DELETE
-  deleteFileByUuid,
 } = FileRepository

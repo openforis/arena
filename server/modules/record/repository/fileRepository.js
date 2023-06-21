@@ -42,6 +42,15 @@ export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, cli
     (row) => row.uuid
   )
 
+export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSurveyDBSchema(surveyId)}.file`,
+    [],
+    (row) => row.uuid
+  )
+
 export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db) =>
   client.map(
     `
