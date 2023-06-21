@@ -1,43 +1,67 @@
 import { Objects, Promises } from '@openforis/arena-core'
 
-import * as ProcessUtils from '@core/processUtils'
+import { ENV } from '@core/processUtils'
 import * as RecordFile from '@core/record/recordFile'
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
 import * as FileRepository from '../repository/fileRepository'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
+import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
 
 const logger = Log.getLogger('FileManager')
 
 export const fileContentStorageTypes = {
   db: 'db',
   fileSystem: 'fileSystem',
+  s3Bucket: 's3Bucket',
 }
 
 export const getFileContentStorageType = () => {
-  if (!Objects.isEmpty(ProcessUtils.ENV.storageFilePath)) {
+  if (!Objects.isEmpty(ENV.fileStoragePath)) {
     return fileContentStorageTypes.fileSystem
+  }
+  if (!Objects.isEmpty(ENV.fileStorageAwsS3BucketName)) {
+    return fileContentStorageTypes.s3Bucket
   }
   return fileContentStorageTypes.db
 }
 
+const contentFetchFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuid }) =>
+    FileRepositoryFileSystem.readFileContent({ surveyId, fileUuid }),
+  [fileContentStorageTypes.s3Bucket]: async ({ surveyId, fileUuid }) =>
+    FileRepositoryS3Bucket.readFileContent({ surveyId, fileUuid }),
+}
+
+const contentStoreFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuid, content }) =>
+    FileRepositoryFileSystem.writeFileContent({
+      surveyId,
+      fileUuid,
+      content,
+    }),
+  [fileContentStorageTypes.s3Bucket]: async ({ surveyId, fileUuid, content }) =>
+    FileRepositoryS3Bucket.uploadFileContent({ surveyId, fileUuid, content }),
+}
+
 const fetchFileContent = async ({ surveyId, file }) => {
   const fileContentStorageType = getFileContentStorageType()
-  if (fileContentStorageType === fileContentStorageTypes.fileSystem) {
-    return FileRepositoryFileSystem.readFileContent({ surveyId, file })
+  const fetchFn = contentFetchFunctionByStorageType[fileContentStorageType]
+  if (fetchFn) {
+    return fetchFn({ surveyId, fileUuid: RecordFile.getUuid(file) })
   }
   return RecordFile.getContent(file)
 }
 
 export const insertFile = async (surveyId, file, client = db) => {
-  const fileContentStorageType = getFileContentStorageType()
-  if (fileContentStorageType === fileContentStorageTypes.fileSystem) {
-    await FileRepositoryFileSystem.writeFileContent({
-      surveyId,
-      fileUuid: RecordFile.getUuid(file),
-      content: RecordFile.getContent(file),
-    })
+  const storageType = getFileContentStorageType()
+  const fileUuid = RecordFile.getUuid(file)
+  const content = RecordFile.getContent(file)
+  const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
+  if (contentStoreFunction) {
+    await contentStoreFunction({ surveyId, fileUuid, content })
+    // clear content in file object so it won't be stored into DB
     file.content = null
   }
   return FileRepository.insertFile(surveyId, file, client)
@@ -67,14 +91,16 @@ export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = d
 
 export const checkCanAccessFilesStorage = async () => {
   const storageType = getFileContentStorageType()
-  if (storageType === fileContentStorageTypes.db) return true
-
-  if (storageType === fileContentStorageTypes.fileSystem) {
-    if (!(await FileRepositoryFileSystem.checkCanAccessStorageFolder())) {
-      throw new Error('Cannot access files storage path: ' + FileRepositoryFileSystem.getStorageFolderPath())
-    }
+  switch (storageType) {
+    case fileContentStorageTypes.fileSystem:
+      await FileRepositoryFileSystem.checkCanAccessStorageFolder()
+      return true
+    case fileContentStorageTypes.s3Bucket:
+      await FileRepositoryS3Bucket.checkCanAccessS3Bucket()
+      return true
+    default:
+      return true
   }
-  return true
 }
 
 export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db) => {

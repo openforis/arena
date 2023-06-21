@@ -8,20 +8,26 @@ const logger = Log.getLogger('FileService')
 // UPDATE
 
 export const checkFilesStorage = async () => {
+  const storageType = FileManager.getFileContentStorageType()
+
+  logger.debug(`Checking if files storage ${storageType} is accessible`)
+
   if (!(await FileManager.checkCanAccessFilesStorage())) return false
 
-  const storageType = FileManager.getFileContentStorageType()
-  if (storageType !== FileManager.fileContentStorageTypes.db) {
-    logger.debug(`Moving survey files to new storage (${storageType}) if necessary`)
-    const surveyIds = await SurveyManager.fetchAllSurveyIds()
-    const surveyFilesMoveResult = await Promise.all(
-      surveyIds.map((surveyId) => FileManager.moveFilesToNewStorageIfNecessary({ surveyId }))
-    )
-    if (surveyFilesMoveResult.some((result) => result)) {
-      logger.debug(`Survey files moved successfully`)
-    } else {
-      logger.debug('Survey files move not necessary')
-    }
+  logger.debug(`Files storage ${storageType} is accessible!`)
+
+  if (storageType === FileManager.fileContentStorageTypes.db) {
+    return
+  }
+  logger.debug(`Moving survey files to new storage (${storageType}) if necessary`)
+  const surveyIds = await SurveyManager.fetchAllSurveyIds()
+  const surveyFilesMoveResult = await Promise.all(
+    surveyIds.map((surveyId) => FileManager.moveFilesToNewStorageIfNecessary({ surveyId }))
+  )
+  if (surveyFilesMoveResult.some((result) => result)) {
+    logger.debug(`Survey files moved successfully`)
+  } else {
+    logger.debug('Survey files move not necessary')
   }
 }
 

@@ -1,11 +1,10 @@
 import * as ProcessUtils from '@core/processUtils'
-import * as RecordFile from '@core/record/recordFile'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export const getStorageFolderPath = () => ProcessUtils.ENV.storageFilePath
+export const getStorageFolderPath = () => ProcessUtils.ENV.fileStoragePath
 
 export const getSurveyFilesStorageFolderPath = ({ surveyId }) =>
-  FileUtils.join(ProcessUtils.ENV.storageFilePath, surveyId)
+  FileUtils.join(ProcessUtils.ENV.fileStoragePath, surveyId)
 
 const getFilePath = ({ surveyId, fileUuid }) => {
   const storageFolderPath = getSurveyFilesStorageFolderPath({ surveyId })
@@ -20,7 +19,7 @@ export const checkCanAccessStorageFolder = async () => {
   if (FileUtils.canReadWritePath(storageFolderPath)) {
     return true
   }
-  return false
+  throw new Error('Cannot access files storage path: ' + getStorageFolderPath())
 }
 
 export const writeFileContent = async ({ surveyId, fileUuid, content }) => {
@@ -30,8 +29,8 @@ export const writeFileContent = async ({ surveyId, fileUuid, content }) => {
   await FileUtils.writeFile(filePath, content)
 }
 
-export const readFileContent = async ({ surveyId, file }) => {
-  const filePath = getFilePath({ surveyId, fileUuid: RecordFile.getUuid(file) })
+export const readFileContent = async ({ surveyId, fileUuid }) => {
+  const filePath = getFilePath({ surveyId, fileUuid })
   const content = await FileUtils.readBinaryFile(filePath)
   return content
 }

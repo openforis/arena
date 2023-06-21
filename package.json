@@ -99,6 +99,7 @@
     "yarn-audit-fix": "^9.3.10"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.354.0",
     "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.10.8",
     "@emotion/styled": "^11.10.8",
@@ -112,7 +113,6 @@
     "ace-builds": "^1.19.0",
     "adm-zip": "^0.5.10",
     "archiver": "^5.3.1",
-    "aws-sdk": "^2.1400.0",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "bignumber.js": "^9.1.1",
