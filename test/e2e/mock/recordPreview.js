@@ -21,7 +21,7 @@ export const recordPreview = {
   [cluster_time.name]: () => {
     const date = new Date()
     date.setHours(12)
-    date.setMinutes(23)
+    date.setMinutes(25)
     return date
   },
   [cluster_boolean.name]: 'false',

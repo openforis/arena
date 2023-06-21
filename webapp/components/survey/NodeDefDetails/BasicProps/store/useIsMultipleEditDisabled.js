@@ -6,11 +6,12 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 export const useIsMultipleEditDisabled = ({ nodeDef }) => {
   const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyCycleKey = useSurveyCycleKey()
 
   return (
     !nodeDef ||
-    NodeDef.isPublished(nodeDef) ||
+    (NodeDef.isPublished(nodeDef) && !Survey.isTemplate(surveyInfo)) ||
     NodeDef.isKey(nodeDef) ||
     NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef) ||
     Survey.isNodeDefParentCode(nodeDef)(survey) ||

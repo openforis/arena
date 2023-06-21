@@ -24,6 +24,9 @@ export const getCoordinateSelector = (nodeDef, parentSelector) => {
 export const getDateTimeInputSelector = (nodeDef, parentSelector) =>
   `${getNodeDefSelector(nodeDef, parentSelector)} input`
 
+export const getDateTimeCalendarBtnSelector = (nodeDef, parentSelector) =>
+  `${getNodeDefSelector(nodeDef, parentSelector)} button.MuiIconButton-edgeEnd`
+
 export const getTaxonSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const _selector = (field) =>
