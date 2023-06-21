@@ -19,12 +19,12 @@ export const checkFilesStorage = async () => {
   if (storageType === FileManager.fileContentStorageTypes.db) {
     return
   }
-  logger.debug(`Moving survey files to new storage (${storageType}) if necessary`)
+  logger.debug(`Moving survey files to new storage (if necessary)`)
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const surveyFilesMoveResult = await Promise.all(
+  const allSurveysFilesMoveResult = await Promise.all(
     surveyIds.map((surveyId) => FileManager.moveFilesToNewStorageIfNecessary({ surveyId }))
   )
-  if (surveyFilesMoveResult.some((result) => result)) {
+  if (allSurveysFilesMoveResult.some((surveyFilesMoved) => surveyFilesMoved)) {
     logger.debug(`Survey files moved successfully`)
   } else {
     logger.debug('Survey files move not necessary')

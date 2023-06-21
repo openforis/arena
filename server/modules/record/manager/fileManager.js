@@ -45,9 +45,16 @@ const contentStoreFunctionByStorageType = {
     FileRepositoryS3Bucket.uploadFileContent({ surveyId, fileUuid, content }),
 }
 
+const contentDeleteFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuids }) =>
+    FileRepositoryFileSystem.deleteFiles({ surveyId, fileUuids }),
+  [fileContentStorageTypes.s3Bucket]: async ({ surveyId, fileUuids }) =>
+    FileRepositoryS3Bucket.deleteFiles({ surveyId, fileUuids }),
+}
+
 const fetchFileContent = async ({ surveyId, file }) => {
-  const fileContentStorageType = getFileContentStorageType()
-  const fetchFn = contentFetchFunctionByStorageType[fileContentStorageType]
+  const storageType = getFileContentStorageType()
+  const fetchFn = contentFetchFunctionByStorageType[storageType]
   if (fetchFn) {
     return fetchFn({ surveyId, fileUuid: RecordFile.getUuid(file) })
   }
@@ -56,10 +63,10 @@ const fetchFileContent = async ({ surveyId, file }) => {
 
 export const insertFile = async (surveyId, file, client = db) => {
   const storageType = getFileContentStorageType()
-  const fileUuid = RecordFile.getUuid(file)
-  const content = RecordFile.getContent(file)
   const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
   if (contentStoreFunction) {
+    const fileUuid = RecordFile.getUuid(file)
+    const content = RecordFile.getContent(file)
     await contentStoreFunction({ surveyId, fileUuid, content })
     // clear content in file object so it won't be stored into DB
     file.content = null
@@ -80,13 +87,13 @@ export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) => {
 }
 
 export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
-  const fileContentStorageType = getFileContentStorageType()
-  if (fileContentStorageType === fileContentStorageTypes.fileSystem) {
+  const storageType = getFileContentStorageType()
+  const deleteFn = contentDeleteFunctionByStorageType[storageType]
+  if (deleteFn) {
     const fileUuids = await FileRepository.fetchFileUuidsByRecordUuids({ surveyId, recordUuids }, client)
-    await FileRepositoryFileSystem.deleteFiles({ surveyId, fileUuids })
-  } else {
-    await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, client)
+    await deleteFn({ surveyId, fileUuids })
   }
+  await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, client)
 }
 
 export const checkCanAccessFilesStorage = async () => {
@@ -105,36 +112,34 @@ export const checkCanAccessFilesStorage = async () => {
 
 export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db) => {
   const storageType = getFileContentStorageType()
-  if (storageType === fileContentStorageTypes.db) return false
+  if (storageType === fileContentStorageTypes.db) {
+    return false
+  }
 
   const fileUuids = await FileRepository.fetchFileUuidsOfFilesWithContent({ surveyId }, client)
-  if (fileUuids.length === 0) return false
+  if (fileUuids.length === 0) {
+    return false
+  }
 
   logger.debug(`Survey ${surveyId}: started moving ${fileUuids.length} files from DB to new storage (${storageType})`)
 
-  if (storageType === fileContentStorageTypes.fileSystem) {
-    return client.tx(async (tx) => {
-      await Promises.each(fileUuids, async (fileUuid) => {
-        const file = await FileRepository.fetchFileByUuid(surveyId, fileUuid, tx)
+  await client.tx(async (tx) => {
+    await Promises.each(fileUuids, async (fileUuid) => {
+      const file = await FileRepository.fetchFileByUuid(surveyId, fileUuid, tx)
 
-        await FileRepositoryFileSystem.writeFileContent({
-          surveyId,
-          fileUuid: RecordFile.getUuid(file),
-          content: RecordFile.getContent(file),
-        })
-      })
-      logger.debug(`Files moved from DB; clearing 'content' column`)
-      await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
-
-      return true
+      const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
+      const content = RecordFile.getContent(file)
+      await contentStoreFunction({ surveyId, fileUuid, content })
     })
-  }
+    logger.debug(`Files moved from DB; clearing 'content' column in DB 'file' table`)
+    await FileRepository.clearAllSurveyFilesContent({ surveyId }, tx)
+  })
 
   logger.debug(
     `Survey ${surveyId}: ${fileUuids.length} survey files moved successfully to new storage (${storageType})`
   )
 
-  return false
+  return true
 }
 
 export const {

@@ -1,4 +1,10 @@
-import { GetObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadBucketCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -35,8 +41,7 @@ export const uploadFileContent = async ({ surveyId, fileUuid, content }) => {
     ...createCommandParams({ surveyId, fileUuid }),
     Body: content,
   })
-  const response = await s3Client.send(command)
-  return response
+  return s3Client.send(command)
 }
 
 export const readFileContent = async ({ surveyId, fileUuid }) => {
@@ -45,3 +50,11 @@ export const readFileContent = async ({ surveyId, fileUuid }) => {
   const content = await response.Body.transformToByteArray()
   return content
 }
+
+export const deleteFiles = async ({ surveyId, fileUuids }) =>
+  Promise.all(
+    fileUuids.map(async (fileUuid) => {
+      const command = new DeleteObjectCommand(createCommandParams({ surveyId, fileUuid }))
+      return s3Client.send(command)
+    })
+  )
