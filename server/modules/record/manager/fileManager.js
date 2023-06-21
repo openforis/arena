@@ -30,28 +30,18 @@ export const getFileContentStorageType = () => {
 export const isFileContentStoredInDB = () => getFileContentStorageType() === fileContentStorageTypes.db
 
 const contentFetchFunctionByStorageType = {
-  [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuid }) =>
-    FileRepositoryFileSystem.readFileContent({ surveyId, fileUuid }),
-  [fileContentStorageTypes.s3Bucket]: async ({ surveyId, fileUuid }) =>
-    FileRepositoryS3Bucket.readFileContent({ surveyId, fileUuid }),
+  [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.readFileContent,
+  [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.readFileContent,
 }
 
 const contentStoreFunctionByStorageType = {
-  [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuid, content }) =>
-    FileRepositoryFileSystem.writeFileContent({
-      surveyId,
-      fileUuid,
-      content,
-    }),
-  [fileContentStorageTypes.s3Bucket]: async ({ surveyId, fileUuid, content }) =>
-    FileRepositoryS3Bucket.uploadFileContent({ surveyId, fileUuid, content }),
+  [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.writeFileContent,
+  [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.uploadFileContent,
 }
 
 const contentDeleteFunctionByStorageType = {
-  [fileContentStorageTypes.fileSystem]: async ({ surveyId, fileUuids }) =>
-    FileRepositoryFileSystem.deleteFiles({ surveyId, fileUuids }),
-  [fileContentStorageTypes.s3Bucket]: async ({ surveyId, fileUuids }) =>
-    FileRepositoryS3Bucket.deleteFiles({ surveyId, fileUuids }),
+  [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.deleteFiles,
+  [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.deleteFiles,
 }
 
 const fetchFileContent = async ({ surveyId, file }) => {
