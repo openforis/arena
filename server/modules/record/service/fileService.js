@@ -12,7 +12,7 @@ export const checkFilesStorage = async () => {
 
   logger.debug(`Checking if files storage ${storageType} is accessible`)
 
-  if (!(await FileManager.checkCanAccessFilesStorage())) return false
+  await FileManager.checkCanAccessFilesStorage()
 
   logger.debug(`Files storage ${storageType} is accessible!`)
 
