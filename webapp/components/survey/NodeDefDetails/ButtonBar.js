@@ -28,10 +28,8 @@ const ButtonBar = (props) => {
 
   const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
-  const canNavigateNodeDefs =
-    !NodeDef.isRoot(nodeDef) &&
-    !NodeDef.isAnalysis(nodeDef) &&
-    !(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef))
+  const canNavigateNodeDefs = !NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef)
+  !NodeDef.isAnalysis(nodeDef) && !(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef))
 
   return (
     <div className="button-bar">
