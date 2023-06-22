@@ -29,9 +29,10 @@ export const getFileContentStorageType = () => {
 
 export const isFileContentStoredInDB = () => getFileContentStorageType() === fileContentStorageTypes.db
 
-const contentFetchFunctionByStorageType = {
-  [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.readFileContent,
-  [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.readFileContent,
+const contentAsStreamFetchFunctionByStorageType = {
+  [fileContentStorageTypes.db]: FileRepository.fetchFileContentAsStream,
+  [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.getFileContentAsStream,
+  [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.getFileContentAsStream,
 }
 
 const contentStoreFunctionByStorageType = {
@@ -44,13 +45,13 @@ const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.deleteFiles,
 }
 
-const fetchFileContent = async ({ surveyId, file }) => {
+export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = db) => {
   const storageType = getFileContentStorageType()
-  const fetchFn = contentFetchFunctionByStorageType[storageType]
+  const fetchFn = contentAsStreamFetchFunctionByStorageType[storageType]
   if (fetchFn) {
-    return fetchFn({ surveyId, fileUuid: RecordFile.getUuid(file) })
+    return fetchFn({ surveyId, fileUuid }, client)
   }
-  return RecordFile.getContent(file)
+  return null
 }
 
 export const insertFile = async (surveyId, file, client = db) => {
@@ -64,18 +65,6 @@ export const insertFile = async (surveyId, file, client = db) => {
     file.content = null
   }
   return FileRepository.insertFile(surveyId, file, client)
-}
-
-export const fetchFileByUuid = async (surveyId, fileUuid, client = db) => {
-  const file = await FileRepository.fetchFileByUuid(surveyId, fileUuid, client)
-  file.content = await fetchFileContent({ surveyId, file })
-  return file
-}
-
-export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) => {
-  const file = await FileRepository.fetchFileByNodeUuid(surveyId, nodeUuid, client)
-  file.content = await fetchFileContent({ surveyId, file })
-  return file
 }
 
 export const checkCanAccessFilesStorage = async () => {
@@ -107,7 +96,7 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
 
   await client.tx(async (tx) => {
     await Promises.each(fileUuids, async (fileUuid) => {
-      const file = await FileRepository.fetchFileByUuid(surveyId, fileUuid, tx)
+      const file = await FileRepository.fetchFileAndContentByUuid(surveyId, fileUuid, tx)
 
       const contentStoreFunction = contentStoreFunctionByStorageType[storageType]
       const content = RecordFile.getContent(file)

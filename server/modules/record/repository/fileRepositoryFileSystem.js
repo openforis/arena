@@ -13,7 +13,7 @@ const getFilePath = ({ surveyId, fileUuid }) => {
 
 export const checkCanAccessStorageFolder = async () => {
   const storageFolderPath = getStorageFolderPath()
-  if (!FileUtils.existsDir(storageFolderPath)) {
+  if (!FileUtils.exists(storageFolderPath)) {
     await FileUtils.mkdir(storageFolderPath)
   }
   if (FileUtils.canReadWritePath(storageFolderPath)) {
@@ -29,10 +29,12 @@ export const writeFileContent = async ({ surveyId, fileUuid, content }) => {
   await FileUtils.writeFile(filePath, content)
 }
 
-export const readFileContent = async ({ surveyId, fileUuid }) => {
+export const getFileContentAsStream = ({ surveyId, fileUuid }) => {
   const filePath = getFilePath({ surveyId, fileUuid })
-  const content = await FileUtils.readBinaryFile(filePath)
-  return content
+  if (!FileUtils.exists(filePath)) {
+    throw new Error(`File not found: ${filePath}`)
+  }
+  return FileUtils.createReadStream(filePath)
 }
 
 export const deleteFiles = async ({ surveyId, fileUuids }) =>

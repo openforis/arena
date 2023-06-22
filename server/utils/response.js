@@ -68,7 +68,7 @@ export const sendFile = ({ res, path: filePath, name = null, contentType = null,
 }
 
 export const sendDirAsZip = ({ res, dir, name, deleteDirOnFinish = false }) => {
-  if (!FileUtils.existsDir(dir)) {
+  if (!FileUtils.exists(dir)) {
     sendErr(res, 'Directory not found')
   }
   // zip dir into a new temporary file to get the final size

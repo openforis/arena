@@ -1,3 +1,5 @@
+import { Readable } from 'stream'
+
 import { db } from '@server/db/db'
 import * as RecordFile from '@core/record/recordFile'
 
@@ -61,7 +63,7 @@ export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db
     (row) => row.uuid
   )
 
-export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
+export const fetchFileAndContentByUuid = async (surveyId, uuid, client = db) =>
   client.one(
     `
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
@@ -78,14 +80,17 @@ export const fetchFileSummaryByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
-  client.one(
+export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = db) => {
+  const row = await client.oneOrNone(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
-    WHERE props ->> '${RecordFile.propKeys.nodeUuid}' = $1 
-      AND ${NOT_DELETED_CONDITION}`,
-    [nodeUuid]
+    SELECT content
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE uuid = $1`,
+    [fileUuid]
   )
+  const contentBuffer = row?.content
+  return contentBuffer ? Readable.from(contentBuffer) : null
+}
 
 // ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>

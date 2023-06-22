@@ -44,11 +44,10 @@ export const uploadFileContent = async ({ surveyId, fileUuid, content }) => {
   return s3Client.send(command)
 }
 
-export const readFileContent = async ({ surveyId, fileUuid }) => {
+export const getFileContentAsStream = async ({ surveyId, fileUuid }) => {
   const command = new GetObjectCommand(createCommandParams({ surveyId, fileUuid }))
   const response = await s3Client.send(command)
-  const content = await response.Body.transformToByteArray()
-  return content
+  return response.Body
 }
 
 export const deleteFiles = async ({ surveyId, fileUuids }) =>

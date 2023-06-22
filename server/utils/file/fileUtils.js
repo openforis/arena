@@ -10,12 +10,12 @@ import { uuidv4 } from '../../../core/uuid'
 export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
 
 export const rmdir = async (path) => {
-  if (existsDir(path)) {
+  if (exists(path)) {
     await promises.rmdir(path, { recursive: true })
   }
 }
 
-export const existsDir = (path) => fs.existsSync(path)
+export const exists = (path) => fs.existsSync(path)
 
 export const canReadWritePath = (path) => {
   try {

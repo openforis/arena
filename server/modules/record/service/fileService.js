@@ -35,7 +35,7 @@ export const {
   // CREATE
   insertFile,
   // READ
-  fetchFileByUuid,
-  fetchFileByNodeUuid,
+  fetchFileContentAsStream,
+  fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
 } = FileManager
