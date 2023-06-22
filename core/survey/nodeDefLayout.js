@@ -80,6 +80,9 @@ export const getLayoutChildrenCompressed =
         .reduce((layoutChildrenAcc, item) => {
           const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
           const hidden = Boolean(hiddenDefsByUuid[childDefUuid])
+          if (hidden) {
+            return layoutChildrenAcc
+          }
           const h = hidden ? 0 : hOriginal
           const w = hidden ? 0 : wOriginal
 
@@ -99,7 +102,8 @@ export const getLayoutChildrenCompressed =
 
           itemPrev = { x, y, h, w, xOriginal, yOriginal, hOriginal, wOriginal }
 
-          return hidden ? layoutChildrenAcc : [...layoutChildrenAcc, { ...item, h, w, x, y }]
+          layoutChildrenAcc.push({ ...item, h, w, x, y })
+          return layoutChildrenAcc
         }, [])
     )
   }
