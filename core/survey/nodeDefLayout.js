@@ -78,13 +78,11 @@ export const getLayoutChildrenCompressed =
       layoutChildren
         // compact layout items
         .reduce((layoutChildrenAcc, item) => {
-          const { i: childDefUuid, h: hOriginal, w: wOriginal, x: xOriginal, y: yOriginal } = item
-          const hidden = Boolean(hiddenDefsByUuid[childDefUuid])
-          if (hidden) {
+          const { i: childDefUuid, h, w, x: xOriginal, y: yOriginal } = item
+
+          if (hiddenDefsByUuid[childDefUuid]) {
             return layoutChildrenAcc
           }
-          const h = hidden ? 0 : hOriginal
-          const w = hidden ? 0 : wOriginal
 
           const sameRowOfPreviousItem = xOriginal > itemPrev.xOriginal
 
@@ -100,7 +98,7 @@ export const getLayoutChildrenCompressed =
             : // item in another row, move it yPrev + hPrev
               Math.min(itemPrev.y + itemPrev.h, yOriginal)
 
-          itemPrev = { x, y, h, w, xOriginal, yOriginal, hOriginal, wOriginal }
+          itemPrev = { x, y, h, w, xOriginal, yOriginal }
 
           layoutChildrenAcc.push({ ...item, h, w, x, y })
           return layoutChildrenAcc
