@@ -3,6 +3,7 @@ import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as JobUtils from '@server/job/jobUtils'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
+import { ArenaMobileDataImport } from '../service/arenaMobileDataImport'
 
 export const init = (app) => {
   // ====== READ - all survey day
@@ -27,13 +28,21 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
+      const {
+        surveyId,
+        conflictResolutionStrategy = ArenaMobileDataImport.conflictResolutionStrategies.skipDuplicates,
+      } = Request.getParams(req)
 
       const filePath = Request.getFilePath(req)
 
       const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
 
-      const job = ArenaMobileImportService.startArenaMobileImportJob({ user, filePath, survey })
+      const job = ArenaMobileImportService.startArenaMobileImportJob({
+        user,
+        filePath,
+        survey,
+        conflictResolutionStrategy,
+      })
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (e) {

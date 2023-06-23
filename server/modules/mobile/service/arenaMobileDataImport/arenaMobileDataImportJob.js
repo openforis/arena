@@ -1,6 +1,6 @@
 import Job from '@server/job/job'
 import RecordsImportJob from './jobs/recordsImportJob'
-import FilesImportJob from '../arenaImport/jobs/filesImportJob'
+import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
 
 export default class ArenaMobileDataImportJob extends Job {
   /**

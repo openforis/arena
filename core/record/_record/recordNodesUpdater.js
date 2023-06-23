@@ -272,9 +272,22 @@ const updateAttributesWithValues =
     return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
   }
 
+const mergeEntities = ({ survey, entitySource, entityTarget }) => {}
+
+const mergeRecords = ({ survey, recordSource, recordTarget }) => {
+  const rootTarget = RecordReader.getRootNode(recordTarget)
+  const rootSource = RecordReader.getRootNode(recordSource)
+  if (Node.getUuid(rootTarget) !== Node.getUuid(rootSource)) {
+    // it should never happen...
+    throw new Error('error merging records: root entities have different uuids')
+  }
+  return mergeEntities({ survey, entitySource: rootSource, entityTarget: rootTarget })
+}
+
 export const RecordNodesUpdater = {
   createNodeAndDescendants,
   createRootEntity,
   updateNodesDependents,
   updateAttributesWithValues,
+  mergeRecords,
 }

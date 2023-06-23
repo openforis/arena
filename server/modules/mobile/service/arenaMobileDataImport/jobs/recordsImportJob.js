@@ -1,28 +1,23 @@
-import * as ActivityLog from '@common/activityLog/activityLog'
-
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as DateUtils from '@core/dateUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
-import Job from '@server/job/job'
-import BatchPersister from '@server/db/batchPersister'
-import * as RecordManager from '@server/modules/record/manager/recordManager'
-import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
-
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
+import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+
 import FileZip from '@server/utils/file/fileZip'
+import { ArenaMobileDataImport } from '../../arenaMobileDataImport'
 
-const NODES_INSERT_BATCH_SIZE = 10000
-
-export default class RecordsImportJob extends Job {
+export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
     super(RecordsImportJob.type, params)
   }
 
   async execute() {
-    const { filePath, survey } = this.context
-    const surveyId = Survey.getId(survey)
+    const { filePath } = this.context
 
     const arenaSurveyFileZip = new FileZip(filePath)
     await arenaSurveyFileZip.init()
@@ -32,40 +27,20 @@ export default class RecordsImportJob extends Job {
 
     if (this.total == 0) return
 
-    // use a batch persister to persist nodes in batch
-    const nodesBatchPersister = new BatchPersister(
-      async (nodes) =>
-        RecordManager.insertNodesInBatch({ user: this.user, surveyId, nodes, systemActivity: true }, this.tx),
-      NODES_INSERT_BATCH_SIZE
-    )
-
     // import records sequentially
     await PromiseUtils.each(recordSummaries, async (recordSummary) => {
       const recordUuid = Record.getUuid(recordSummary)
 
-      // insert activity log
-      await ActivityLogManager.insert(
-        this.user,
-        surveyId,
-        ActivityLog.type.recordImport,
-        { recordUuid },
-        false,
-        this.tx
-      )
-
-      // insert record
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
 
-      await this.insertOrSkipRecord({ record, nodesBatchPersister })
+      await this.insertOrSkipRecord({ record })
 
       this.incrementProcessedItems()
     })
-
-    await nodesBatchPersister.flush()
   }
 
-  async insertOrSkipRecord({ record, nodesBatchPersister }) {
-    const { survey } = this.context
+  async insertOrSkipRecord({ record }) {
+    const { survey, conflictResolutionStrategy } = this.context
 
     const surveyId = Survey.getId(survey)
 
@@ -76,9 +51,15 @@ export default class RecordsImportJob extends Job {
     const existingRecordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
 
     if (existingRecordSummary) {
-      // skip record
-      // TODO update record
-      this.logDebug(`skipping record ${recordUuid}; it already exists`)
+      if (conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.skipDuplicates) {
+        // skip record
+        this.logDebug(`skipping record ${recordUuid}; it already exists`)
+      } else if (
+        conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.overwriteIfUpdated &&
+        DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
+      ) {
+        
+      }
       return
     }
 
@@ -96,12 +77,12 @@ export default class RecordsImportJob extends Job {
 
     // insert nodes (add them to batch persister)
     const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-    await PromiseUtils.each(nodes, async (node) => {
-      // check that the node definition associated to the node has not been deleted from the survey
-      if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
-        await nodesBatchPersister.addItem(node)
-      }
-    })
+
+    // check that the node definition associated to the node has not been deleted from the survey
+    const validNodes = nodes.filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
+
+    await this.persistUpdatedNodes({ nodesUpdated: validNodes })
+
     // } else {
     //   this.logDebug(`skipping record ${recordUuid}; it doesn't have any recent updates`)
     // }
@@ -114,7 +95,8 @@ export default class RecordsImportJob extends Job {
    * @returns {object} - The modified record.
    */
   prepareRecordSummaryToStore(record) {
-    const maxNodeModifiedDate = new Date(Math.max.apply(null, Record.getNodesArray(record).map(Record.getDateModified)))
+    const nodes = Record.getNodesArray(record)
+    const maxNodeModifiedDate = new Date(Math.max.apply(null, nodes.map(Node.getDateModified)))
     return Record.assocDateModified(maxNodeModifiedDate)(record)
   }
 }
