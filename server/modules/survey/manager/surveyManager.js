@@ -24,6 +24,7 @@ import * as CategoryRepository from '@server/modules/category/repository/categor
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
+import * as FileManager from '@server/modules/record/manager/fileManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
 import * as SrsRepository from '@server/modules/geo/repository/srsRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
@@ -361,8 +362,13 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
 // ====== DELETE
-export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) =>
-  client.tx(async (t) => {
+export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, client = db) => {
+  // fetch file uuids to delete before survey schema is dropped
+  const filesToDeleteUuids = !FileManager.isFileContentStoredInDB()
+    ? await FileManager.fetchFileUuidsBySurveyId({ surveyId }, client)
+    : []
+
+  await client.tx(async (t) => {
     if (deleteUserPrefs) {
       await UserRepository.deleteUsersPrefsSurvey(surveyId, t)
     }
@@ -370,6 +376,10 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
     await SurveyRepository.dropSurveySchema(surveyId, t)
     await SchemaRdbRepository.dropSchema(surveyId, t)
   })
+  if (filesToDeleteUuids.length > 0) {
+    await FileManager.deleteSurveyFilesContentByUuids({ surveyId, fileUuids: filesToDeleteUuids })
+  }
+}
 
 export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
   client.tx(async (t) => {

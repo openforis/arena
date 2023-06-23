@@ -26,8 +26,8 @@ export default class FilesExportJob extends Job {
       // write each file content into a separate binary file
       await PromiseUtils.each(filesSummaries, async (fileSummary) => {
         const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileData = await FileService.fetchFileByUuid(surveyId, fileUuid, this.tx)
-        archive.append(RecordFile.getContent(fileData), { name: ExportFile.file({ fileUuid }) })
+        const fileContentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
+        archive.append(fileContentStream, { name: ExportFile.file({ fileUuid }) })
         this.incrementProcessedItems()
       })
     }

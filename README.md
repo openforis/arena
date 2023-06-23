@@ -57,6 +57,19 @@ PGPASSWORD=arena
 # temporary uploaded files folder
 TEMP_FOLDER=/home/your_user/openforis/arena/upload
 
+# FILES STORAGE
+## (if both FILE_STORAGE_PATH and FILE_STORAGE_AWS_S3_BUCKET_NAME are not specified, files will be stored in DB)
+
+## FILES STORAGE (file system)
+### path of a folder in the file system used to store files
+FILE_STORAGE_PATH=
+
+## FILES STORAGE (AWS S3 Bucket)
+FILE_STORAGE_AWS_S3_BUCKET_NAME=
+FILE_STORAGE_AWS_S3_BUCKET_REGION=
+FILE_STORAGE_AWS_ACCESS_KEY=
+FILE_STORAGE_AWS_SECRET_ACCESS_KEY=
+
 # Email service (Arena uses Sendgrid to send emails)
 SENDGRID_API_KEY= # get it from https://sendgrid.com/
 

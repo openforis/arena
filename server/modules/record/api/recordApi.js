@@ -1,6 +1,6 @@
 import * as Request from '@server/utils/request'
 
-import { sendOk, sendFileContent, setContentTypeFile, contentTypes } from '@server/utils/response'
+import { sendOk, setContentTypeFile, contentTypes } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as User from '@core/user/user'
@@ -246,9 +246,12 @@ export const init = (app) => {
         const { surveyId, nodeUuid } = Request.getParams(req)
 
         const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-        const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
+        const fileUuid = Node.getFileUuid(node)
+        const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
         const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-        sendFileContent(res, fileName, RecordFile.getContent(file), RecordFile.getSize(file))
+        const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+        setContentTypeFile({ res, fileName, fileSize: RecordFile.getSize(file) })
+        contentStream.pipe(res)
       } catch (error) {
         next(error)
       }
