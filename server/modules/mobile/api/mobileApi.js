@@ -5,12 +5,12 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 export const init = (app) => {
-  // ====== READ - all survey data
+  // ====== READ - all survey day
   app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, cycle } = Request.getParams(req)
 
-      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
+      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle })
 
       res.json({ survey })
     } catch (e) {
