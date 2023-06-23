@@ -29,6 +29,12 @@ export const getFileContentStorageType = () => {
 
 export const isFileContentStoredInDB = () => getFileContentStorageType() === fileContentStorageTypes.db
 
+const checkCanAccessStoreFunctionByStorageType = {
+  [fileContentStorageTypes.db]: () => true, // DB always accessible
+  [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.checkCanAccessStorageFolder,
+  [fileContentStorageTypes.s3Bucket]: FileRepositoryS3Bucket.checkCanAccessS3Bucket,
+}
+
 const contentAsStreamFetchFunctionByStorageType = {
   [fileContentStorageTypes.db]: FileRepository.fetchFileContentAsStream,
   [fileContentStorageTypes.fileSystem]: FileRepositoryFileSystem.getFileContentAsStream,
@@ -69,16 +75,8 @@ export const insertFile = async (surveyId, file, client = db) => {
 
 export const checkCanAccessFilesStorage = async () => {
   const storageType = getFileContentStorageType()
-  switch (storageType) {
-    case fileContentStorageTypes.fileSystem:
-      await FileRepositoryFileSystem.checkCanAccessStorageFolder()
-      return true
-    case fileContentStorageTypes.s3Bucket:
-      await FileRepositoryS3Bucket.checkCanAccessS3Bucket()
-      return true
-    default:
-      return true
-  }
+  const checkStoreFunction = checkCanAccessStoreFunctionByStorageType[storageType]
+  await checkStoreFunction?.()
 }
 
 export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db) => {
