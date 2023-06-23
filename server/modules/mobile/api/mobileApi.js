@@ -27,13 +27,13 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
 
       const filePath = Request.getFilePath(req)
 
-      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle })
+      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
 
-      const job = ArenaMobileImportService.startArenaMobileImportJob({ user, filePath, survey, surveyId })
+      const job = ArenaMobileImportService.startArenaMobileImportJob({ user, filePath, survey })
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (e) {

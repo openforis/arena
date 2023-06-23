@@ -1,10 +1,10 @@
 import * as JobManager from '@server/job/jobManager'
 
-import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
+import ArenaMobileDataImportJob from '@server/modules/arenaImport/service/mobileDataImport/arenaMobileDataImportJob'
 
 // ARENA SURVEY IMPORT
-export const startArenaMobileImportJob = ({ user, filePath, survey, surveyId }) => {
-  const job = new ArenaImportJob({ user, filePath, survey, surveyId, mobile: true })
+export const startArenaMobileImportJob = ({ user, filePath, survey }) => {
+  const job = new ArenaMobileDataImportJob({ user, filePath, survey })
 
   JobManager.executeJobThread(job)
 
