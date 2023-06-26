@@ -15,7 +15,7 @@ const actionHandlersByType = {
   [ACTION_TYPES.error]: (error) => ({ error, loading: false, loaded: false }),
 }
 
-export default ({ method, url, data, ...rest }) => {
+export default ({ method, url, data, params, ...rest }) => {
   const [state, _dispatch] = useReducer((_state, { type, payload }) => actionHandlersByType[type](payload), {
     loading: false,
     loaded: false,
@@ -33,7 +33,7 @@ export default ({ method, url, data, ...rest }) => {
     _dispatch({ type: ACTION_TYPES.loading, payload: { ...state, source } })
 
     try {
-      const result = await axios({ ...rest, method, url, data, cancelToken: source.token })
+      const result = await axios({ ...rest, method, url, data, params, cancelToken: source.token })
       if (isMountedRef.current) {
         _dispatch({ type: ACTION_TYPES.loaded, payload: result })
       }
@@ -42,7 +42,7 @@ export default ({ method, url, data, ...rest }) => {
         _dispatch({ type: ACTION_TYPES.error, payload: error })
       }
     }
-  }, [state, method, url, data, rest])
+  }, [method, url, JSON.stringify(data), JSON.stringify(params)])
 
   const setState = (stateUpdate) => {
     _dispatch({ type: ACTION_TYPES.loading, payload: stateUpdate })
