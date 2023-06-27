@@ -48,7 +48,7 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
 
   useEffect(() => {
     fetchTaxa()
-  }, [fetchTaxa, fieldValue])
+  }, [fieldValue])
 
   return ReactDOM.createPortal(
     <AutocompleteDialog

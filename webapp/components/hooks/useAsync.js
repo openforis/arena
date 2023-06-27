@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react'
+import { useReducer } from 'react'
 import axios from 'axios'
 
 import useIsMountedRef from './useIsMountedRef'
@@ -23,7 +23,7 @@ export default ({ method, url, data, params, ...rest }) => {
   })
   const isMountedRef = useIsMountedRef()
 
-  const dispatch = useCallback(async () => {
+  const dispatch = () => {
     const { source: sourcePrev } = state
     if (sourcePrev) {
       sourcePrev.cancel()
@@ -32,17 +32,18 @@ export default ({ method, url, data, params, ...rest }) => {
 
     _dispatch({ type: ACTION_TYPES.loading, payload: { ...state, source } })
 
-    try {
-      const result = await axios({ ...rest, method, url, data, params, cancelToken: source.token })
-      if (isMountedRef.current) {
-        _dispatch({ type: ACTION_TYPES.loaded, payload: result })
-      }
-    } catch (error) {
-      if (!axios.isCancel(error)) {
-        _dispatch({ type: ACTION_TYPES.error, payload: error })
-      }
-    }
-  }, [method, url, JSON.stringify(data), JSON.stringify(params)])
+    axios({ ...rest, method, url, data, params, cancelToken: source.token })
+      .then((result) => {
+        if (isMountedRef.current) {
+          _dispatch({ type: ACTION_TYPES.loaded, payload: result })
+        }
+      })
+      .catch((error) => {
+        if (!axios.isCancel(error)) {
+          _dispatch({ type: ACTION_TYPES.error, payload: error })
+        }
+      })
+  }
 
   const setState = (stateUpdate) => {
     _dispatch({ type: ACTION_TYPES.loading, payload: stateUpdate })
