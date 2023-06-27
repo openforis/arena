@@ -1,11 +1,10 @@
-import * as FileManager from '../manager/fileManager'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { Promises } from '@openforis/arena-core'
 
 import * as Log from '@server/log/log'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as FileManager from '../manager/fileManager'
 
 const logger = Log.getLogger('FileService')
-
-// UPDATE
 
 export const checkFilesStorage = async () => {
   const storageType = FileManager.getFileContentStorageType()
@@ -21,10 +20,11 @@ export const checkFilesStorage = async () => {
   }
   logger.debug(`Moving survey files to new storage (if necessary)`)
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  const allSurveysFilesMoveResult = await Promise.all(
-    surveyIds.map((surveyId) => FileManager.moveFilesToNewStorageIfNecessary({ surveyId }))
-  )
-  if (allSurveysFilesMoveResult.some((surveyFilesMoved) => surveyFilesMoved)) {
+  let surveysFilesMoved = false
+  await Promises.each(surveyIds, async (surveyId) => {
+    surveysFilesMoved = surveysFilesMoved || (await FileManager.moveFilesToNewStorageIfNecessary({ surveyId }))
+  })
+  if (surveysFilesMoved) {
     logger.debug(`Survey files moved successfully`)
   } else {
     logger.debug('Survey files move not necessary')

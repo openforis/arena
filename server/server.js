@@ -10,9 +10,10 @@ const initialize = async () => {
   // recursively create temp folder
   await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
 
-  await FileService.checkFilesStorage()
-
   await appCluster.run()
+
+  // run files storage check after DB migrations
+  await FileService.checkFilesStorage()
 }
 
 initialize()
