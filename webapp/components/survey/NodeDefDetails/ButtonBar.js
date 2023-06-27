@@ -30,6 +30,7 @@ const ButtonBar = (props) => {
 
   const canNavigateNodeDefs =
     !NodeDef.isRoot(nodeDef) &&
+    !NodeDef.isTemporary(nodeDef) &&
     !NodeDef.isAnalysis(nodeDef) &&
     !(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef))
 

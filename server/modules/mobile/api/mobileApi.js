@@ -11,12 +11,7 @@ export const init = (app) => {
     try {
       const { surveyId, cycle } = Request.getParams(req)
 
-      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-        surveyId,
-        cycle,
-        draft: false,
-        backup: true,
-      })
+      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle })
 
       res.json({ survey })
     } catch (e) {

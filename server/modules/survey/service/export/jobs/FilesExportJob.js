@@ -1,5 +1,4 @@
 import * as PromiseUtils from '@core/promiseUtils'
-import * as RecordFile from '@core/record/recordFile'
 import * as Survey from '@core/survey/survey'
 
 import Job from '@server/job/job'
@@ -16,6 +15,8 @@ export default class FilesExportJob extends Job {
   async execute() {
     const { survey, cycle, includeDataFromAllCycles, outputDir } = this.context
 
+    const surveyId = Survey.getId(survey)
+
     const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle(
       {
         user: this.user,
@@ -30,13 +31,13 @@ export default class FilesExportJob extends Job {
     // write the files in subfolders by cycle
     await PromiseUtils.each(Object.entries(fileUuidsByCycle), async ([cycle, fileUuids]) => {
       await PromiseUtils.each(fileUuids, async (fileUuid) => {
-        const recordFile = await FileService.fetchFileByUuid(Survey.getId(survey), fileUuid, this.tx)
+        const recordFileContent = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
         const cycleFilesPath = FileUtils.join(outputDir, 'files', cycle)
-        if (!FileUtils.existsDir(cycleFilesPath)) {
+        if (!FileUtils.exists(cycleFilesPath)) {
           await FileUtils.mkdir(cycleFilesPath)
         }
         const tempFilePath = FileUtils.join(cycleFilesPath, fileUuid)
-        await FileUtils.writeFile(tempFilePath, RecordFile.getContent(recordFile))
+        await FileUtils.writeFile(tempFilePath, recordFileContent)
         this.incrementProcessedItems()
       })
     })

@@ -16,7 +16,7 @@ import SystemError from '@core/systemError'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as FileRepository from '@server/modules/record/repository/fileRepository'
+import * as FileManager from '@server/modules/record/manager/fileManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
@@ -128,7 +128,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     const surveyId = Survey.getId(survey)
     await Promise.all([
       RecordRepository.deleteRecord(surveyId, uuid, t),
-      FileRepository.markRecordFilesAsDeleted(surveyId, uuid, t),
+      FileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
@@ -136,14 +136,14 @@ export const deleteRecord = async (user, survey, record, client = db) =>
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
-    await FileRepository.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
+    await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
-      await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, t)
+      await FileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
   })
