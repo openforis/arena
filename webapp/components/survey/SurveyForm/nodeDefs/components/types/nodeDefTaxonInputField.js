@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 
 import { Input } from '@webapp/components/form/Input'
 
@@ -27,15 +27,21 @@ const NodeDefTaxonInputField = (props) => {
   const inputRef = useRef(null)
   const [autocompleteOpened, setAutocompleteOpened] = useState(false)
 
-  const onChangeInput = (value) => {
-    onChangeSelectionField(field, value)
-    setAutocompleteOpened(!StringUtils.isBlank(value))
-  }
+  const onChangeInput = useCallback(
+    (value) => {
+      onChangeSelectionField(field, value)
+      setAutocompleteOpened(!StringUtils.isBlank(value))
+    },
+    [field, onChangeSelectionField]
+  )
 
-  const onItemSelectAutocomplete = (taxon) => {
-    setAutocompleteOpened(false)
-    onChangeTaxon(taxon)
-  }
+  const onItemSelectAutocomplete = useCallback(
+    (taxon) => {
+      setAutocompleteOpened(false)
+      onChangeTaxon(taxon)
+    },
+    [onChangeTaxon]
+  )
 
   return (
     <>
