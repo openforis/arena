@@ -293,6 +293,7 @@ export const fetchUserSurveysInfo = async (
             ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx)
             : 0,
           chainsCount: await ChainRepository.countChains({ surveyId }, tx),
+          filesSize: await FileManager.fetchTotalFilesSize({ surveyId }, tx),
         }
       })
     )

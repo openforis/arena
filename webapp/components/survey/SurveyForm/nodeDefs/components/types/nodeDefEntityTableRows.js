@@ -61,8 +61,11 @@ const NodeDefEntityTableRows = (props) => {
   })
 
   const onScrollTableDataRows = () => {
+    const headerEl = tableRowsHeaderRef.current
+    const rowsEl = tableDataRowsRef.current
+
     const onScroll = () => {
-      const { scrollLeft, scrollTop } = tableDataRowsRef.current
+      const { scrollLeft, scrollTop } = rowsEl
       if (scrollLeft !== gridSize.left || scrollTop !== gridSize.top) {
         setGridSize((gridSizePrev) => ({
           ...gridSizePrev,
@@ -74,8 +77,10 @@ const NodeDefEntityTableRows = (props) => {
 
     debounce(onScroll, 'scroll-table-data-rows', 100)()
 
+    if (!headerEl || !rowsEl) return
+
     // adjust header row position
-    tableRowsHeaderRef.current.style.left = `${-tableDataRowsRef.current.scrollLeft}px`
+    headerEl.style.left = `${-rowsEl.scrollLeft}px`
   }
 
   // NodeDef update effect entry mode
