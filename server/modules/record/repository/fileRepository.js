@@ -92,6 +92,18 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
   return contentBuffer ? Readable.from(contentBuffer) : null
 }
 
+export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
+  const total = await client.oneOrNone(
+    `SELECT SUM((props ->> '${RecordFile.propKeys.size}')::INTEGER)
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE props -> '${RecordFile.propKeys.deleted}' IS NULL 
+      OR NOT (props -> '${RecordFile.propKeys.deleted}')::BOOLEAN`,
+    null,
+    (row) => row.sum
+  )
+  return total || 0
+}
+
 // ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
   client.one(

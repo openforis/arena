@@ -732,6 +732,7 @@ Are you sure you want to continue?`,
     nodes: 'Nodes',
     chains: 'Chains',
     records: 'Records',
+    files: 'Files',
   },
 
   usersView: {
