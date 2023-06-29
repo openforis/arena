@@ -173,7 +173,7 @@ export const {
   traverseHierarchyItem,
   traverseHierarchyItemSync,
   getDescendantsAndSelf,
-  visitDescendants,
+  visitDescendantsAndSelf,
   findDescendants,
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,

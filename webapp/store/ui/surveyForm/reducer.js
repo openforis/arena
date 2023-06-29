@@ -32,8 +32,8 @@ const actionHandlers = {
       SurveyFormState.assocNodeDefAddChildTo(showAddChildTo ? nodeDef : null)
     )(state),
 
-  [SurveyFormActions.formPageNodeUpdate]: (state, { nodeDef, node }) =>
-    SurveyFormState.assocFormPageNode(NodeDef.getUuid(nodeDef), node)(state),
+  [SurveyFormActions.formPageNodesUpdate]: (state, { formPageNodeUuidByNodeDefUuid }) =>
+    SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid)(state),
 
   [SurveyFormActions.formShowPageNavigationUpdate]: (state, { showPageNavigation }) =>
     SurveyFormState.setShowPageNavigation(showPageNavigation)(state),

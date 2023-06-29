@@ -34,9 +34,25 @@ export const setFormActivePage =
     dispatch({ type: formActivePageNodeDefUpdate, nodeDef, showAddChildTo })
 
 // Current node of active form page
-export const formPageNodeUpdate = 'survey/form/pageNode/update'
+export const formPageNodesUpdate = 'survey/form/pageNodes/update'
 
-export const setFormPageNode = (nodeDef, node) => (dispatch) => dispatch({ type: formPageNodeUpdate, nodeDef, node })
+// Sets the node (entity) for a page (identified by the entity def)
+// and reset the node set for the descendant entity defs.
+export const setFormPageNode = (nodeDef, nodeUuid) => (dispatch, getState) => {
+  const state = getState()
+  const survey = SurveyState.getSurvey(state)
+  const formPageNodeUuidByNodeDefUuid = {}
+
+  Survey.visitDescendantsAndSelf({
+    nodeDef,
+    visitorFn: (descendantNodeDef) => {
+      const formPageNodeUuid = NodeDef.isEqual(descendantNodeDef)(nodeDef) ? nodeUuid : null
+      formPageNodeUuidByNodeDefUuid[NodeDef.getUuid(descendantNodeDef)] = formPageNodeUuid
+    },
+  })(survey)
+
+  dispatch({ type: formPageNodesUpdate, formPageNodeUuidByNodeDefUuid })
+}
 
 // Toggle form page navigation
 export const formShowPageNavigationUpdate = 'survey/form/showPageNavigation/update'
