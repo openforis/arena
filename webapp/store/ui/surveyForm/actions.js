@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
@@ -40,14 +41,17 @@ export const formPageNodesUpdate = 'survey/form/pageNodes/update'
 // and reset the node set for the descendant entity defs.
 export const setFormPageNode = (nodeDef, nodeUuid) => (dispatch, getState) => {
   const state = getState()
+  const cycle = SurveyState.getSurveyCycleKey(state)
   const survey = SurveyState.getSurvey(state)
   const formPageNodeUuidByNodeDefUuid = {}
 
   Survey.visitDescendantsAndSelf({
     nodeDef,
     visitorFn: (descendantNodeDef) => {
-      const formPageNodeUuid = NodeDef.isEqual(descendantNodeDef)(nodeDef) ? nodeUuid : null
-      formPageNodeUuidByNodeDefUuid[NodeDef.getUuid(descendantNodeDef)] = formPageNodeUuid
+      if (NodeDef.isEntity(descendantNodeDef) && NodeDefLayout.hasPage(cycle)(descendantNodeDef)) {
+        const formPageNodeUuid = NodeDef.isEqual(descendantNodeDef)(nodeDef) ? nodeUuid : null
+        formPageNodeUuidByNodeDefUuid[NodeDef.getUuid(descendantNodeDef)] = formPageNodeUuid
+      }
     },
   })(survey)
 
