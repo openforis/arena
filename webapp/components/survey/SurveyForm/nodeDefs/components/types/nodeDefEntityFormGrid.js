@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -21,6 +21,8 @@ const NodeDefEntityFormGrid = (props) => {
 
   const dispatch = useDispatch()
 
+  const gridRef = useRef(null)
+
   const survey = useSelector(SurveyState.getSurvey)
   const cycle = useSelector(SurveyState.getSurveyCycleKey)
 
@@ -29,6 +31,15 @@ const NodeDefEntityFormGrid = (props) => {
   const mountedRef = useIsMountedRef({ delay: 200 })
 
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const nodeUuid = Node.getUuid(node)
+
+  // on node change, scroll inner container to top
+  useEffect(() => {
+    const innerContainer = gridRef.current?.elementRef?.current
+    if (innerContainer) {
+      innerContainer.scrollTop = 0
+    }
+  }, [nodeUuid])
 
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
@@ -70,6 +81,7 @@ const NodeDefEntityFormGrid = (props) => {
       className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
+      ref={gridRef}
       useCSSTransforms={false}
     >
       {visibleNodeDefsInnerPage.map((childDef) => (
