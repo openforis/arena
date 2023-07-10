@@ -285,7 +285,7 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
   })
 }
 
-export const visitDescendants =
+export const visitDescendantsAndSelf =
   ({ nodeDef = null, visitorFn }) =>
   (survey) => {
     const queue = new Queue()
@@ -308,7 +308,7 @@ export const findDescendants =
   ({ nodeDef = null, filterFn }) =>
   (survey) => {
     const descendants = []
-    visitDescendants({
+    visitDescendantsAndSelf({
       nodeDef,
       visitorFn: (nodeDefCurrent) => {
         if (filterFn(nodeDefCurrent)) {

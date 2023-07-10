@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
@@ -34,9 +35,28 @@ export const setFormActivePage =
     dispatch({ type: formActivePageNodeDefUpdate, nodeDef, showAddChildTo })
 
 // Current node of active form page
-export const formPageNodeUpdate = 'survey/form/pageNode/update'
+export const formPageNodesUpdate = 'survey/form/pageNodes/update'
 
-export const setFormPageNode = (nodeDef, node) => (dispatch) => dispatch({ type: formPageNodeUpdate, nodeDef, node })
+// Sets the node (entity) for a page (identified by the entity def)
+// and reset the node set for the descendant entity defs.
+export const setFormPageNode = (nodeDef, nodeUuid) => (dispatch, getState) => {
+  const state = getState()
+  const cycle = SurveyState.getSurveyCycleKey(state)
+  const survey = SurveyState.getSurvey(state)
+  const formPageNodeUuidByNodeDefUuid = {}
+
+  Survey.visitDescendantsAndSelf({
+    nodeDef,
+    visitorFn: (descendantNodeDef) => {
+      if (NodeDef.isEntity(descendantNodeDef) && NodeDefLayout.hasPage(cycle)(descendantNodeDef)) {
+        const formPageNodeUuid = NodeDef.isEqual(descendantNodeDef)(nodeDef) ? nodeUuid : null
+        formPageNodeUuidByNodeDefUuid[NodeDef.getUuid(descendantNodeDef)] = formPageNodeUuid
+      }
+    },
+  })(survey)
+
+  dispatch({ type: formPageNodesUpdate, formPageNodeUuidByNodeDefUuid })
+}
 
 // Toggle form page navigation
 export const formShowPageNavigationUpdate = 'survey/form/showPageNavigation/update'
