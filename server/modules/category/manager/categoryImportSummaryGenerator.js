@@ -8,11 +8,14 @@ import * as StringUtils from '@core/stringUtils'
 import SystemError from '@core/systemError'
 
 import * as CSVReader from '@server/utils/file/csvReader'
+import { Strings } from '@openforis/arena-core'
+
+const defaultLevelName = 'level_1'
 
 const columnProps = {
-  [CategoryImportSummary.itemTypes.code]: { suffix: '_code', lang: false },
-  [CategoryImportSummary.itemTypes.label]: { preffix: 'label', lang: true },
-  [CategoryImportSummary.itemTypes.description]: { preffix: 'description', lang: true },
+  [CategoryImportSummary.itemTypes.code]: { pattern: '(?:code|(.*)_code)', lang: false },
+  [CategoryImportSummary.itemTypes.label]: { prefix: 'label', lang: true },
+  [CategoryImportSummary.itemTypes.description]: { prefix: 'description', lang: true },
 }
 
 const locationColumnsSuffixes = ['_x', '_y', '_srs']
@@ -20,12 +23,12 @@ const locationColumnsSuffixes = ['_x', '_y', '_srs']
 // TODO remove code from here if needed // categories export
 
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
-  // columns will be like level_name_code, level_name_label, level_name_label_en, level_name_description, level_name_description_en
+  // columns will be like code (or level_name_code in case of hierarchical categories), label, label_en, description, description_en
   // the language suffix is optional
   const langSuffixPattern = columnProp.lang ? `(_([a-z]{2}))?` : ''
-  const pattern = new RegExp(
-    `${columnProp.preffix ? columnProp.preffix : `^(.*)${columnProp.suffix}`}${langSuffixPattern}$`
-  )
+  const prefix = Strings.defaultIfEmpty('')(columnProp.prefix)
+  const internalPattern = Strings.defaultIfEmpty('')(columnProp.pattern)
+  const pattern = new RegExp(`^${prefix}${internalPattern}${langSuffixPattern}$`)
   return {
     ...columnPatterns,
     [columnType]: pattern,
@@ -66,7 +69,7 @@ const _extractColumnTypeByName = ({ columnName, columnPatterns, ignoreLabelsAndD
 const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
   const pattern = columnPatterns[columnType]
   const match = columnName.match(pattern)
-  return match[1]
+  return match[1] || defaultLevelName
 }
 
 const _extractLang = ({ columnPatterns, columnName, columnType, defaultLang }) => {
