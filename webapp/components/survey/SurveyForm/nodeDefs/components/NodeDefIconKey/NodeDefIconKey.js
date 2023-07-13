@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 const NodeDefIconKey = (props) => {
   const { nodeDef } = props
 
-  return NodeDef.isKey(nodeDef) && <span className="icon icon-key2 icon-10px icon-left node-def__icon-key" />
+  return NodeDef.isKey(nodeDef) && <span className="icon icon-key2 icon-10px node-def__icon-key" />
 }
 
 NodeDefIconKey.propTypes = {
