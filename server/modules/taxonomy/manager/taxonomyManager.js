@@ -179,10 +179,14 @@ export const findTaxaByVernacularName = async (
   draft = false,
   includeUnlUnk = false,
   client = db
-) => {
-  const taxaDb = await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
-  return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
-}
+) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
 
 export const { fetchTaxonByUuid, fetchTaxonByCode, fetchTaxonVernacularNameByUuid, fetchTaxaWithVernacularNames } =
   TaxonomyRepository
