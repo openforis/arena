@@ -28,6 +28,6 @@ export const createTemplate = (template) => {
     }
 
     const surveyTitleSelector = getSelector(TestId.header.surveyTitle)
-    await expect(await page.innerText(surveyTitleSelector)).toBe(`${label}`)
+    await expect(await page.innerText(surveyTitleSelector)).toBe(`${label} [${name}]`)
   })
 }
