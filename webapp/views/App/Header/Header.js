@@ -20,6 +20,7 @@ import { usePrevious } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
 import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 
@@ -45,6 +46,10 @@ const Header = () => {
 
   pictureUpdateKeyRef.current += prevUser !== user
 
+  const surveyLabel = Survey.getLabel(surveyInfo, lang, false)
+  const surveyName = Survey.getName(surveyInfo)
+  const surveyTitle = surveyLabel ? `${surveyLabel} [${surveyName}]` : surveyName
+
   return (
     <div className={classNames('header', { 'sidebar-open': isSideBarOpen })}>
       <div className="header__logo">
@@ -66,7 +71,7 @@ const Header = () => {
                 to={appModuleUri(homeModules.surveyInfo)}
                 className="btn-s btn-transparent"
               >
-                <div className="header__survey-title">{Survey.getLabel(surveyInfo, lang)}</div>
+                <LabelWithTooltip className="header__survey-title" label={surveyTitle} />
               </Link>
               <CycleSelector
                 selectedCycle={surveyCycleKey}

@@ -96,6 +96,7 @@ const generateTemplate = ({ survey, category: categoryProp = null }) => {
   const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
   const category = categoryProp || generateCategoryTemplate()
   const levels = Category.getLevelsArray(category)
+  const flat = levels.length === 1
   const extraDefs = generateExtraDefsForTemplate(category)
   const items = generateItems({ levels })
 
@@ -104,7 +105,7 @@ const generateTemplate = ({ survey, category: categoryProp = null }) => {
     ...levels.reduce(
       (acc, level, levelIndex) => ({
         ...acc,
-        [CategoryExportFile.getLevelCodeHeader({ level })]: item.levelCodes[levelIndex] || '',
+        [CategoryExportFile.getLevelCodeHeader({ level, flat })]: item.levelCodes[levelIndex] || '',
       }),
       {}
     ),
