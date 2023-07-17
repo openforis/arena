@@ -409,12 +409,14 @@ export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterVal
 
   return client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
-     FROM ${getSurveyDBSchema(surveyId)}.taxon t
-       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+     FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+       JOIN ${getSurveyDBSchema(surveyId)}.taxon t
        ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $/taxonomyUuid/ 
       AND ${filterCondition}
-     ORDER BY ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} ASC
+     ORDER BY 
+      ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} ASC,
+      ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft, 't.')} ASC
      LIMIT 20`,
     { taxonomyUuid, searchValue },
     (record) => dbTransformCallback(record, draft, true)
