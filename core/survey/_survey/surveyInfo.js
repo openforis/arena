@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Objects } from '@openforis/arena-core'
+import { DEFAULT_SRS, Objects } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
 
@@ -101,7 +101,12 @@ export const getSRSCodes = (survey) => getSRS(survey).map((srs) => srs.code)
 
 export const getSRSIndex = (survey) => {
   const srss = getSRS(survey)
-  return ObjectUtils.toIndexedObj(srss, 'code')
+  const srssIndex = ObjectUtils.toIndexedObj(srss, 'code')
+  if (!srssIndex[DEFAULT_SRS.code]) {
+    // always include default SRS (lat-long, EPSG:4326)
+    srssIndex[DEFAULT_SRS.code] = DEFAULT_SRS
+  }
+  return srssIndex
 }
 
 export const getDefaultSRS = R.pipe(getSRS, R.head)
