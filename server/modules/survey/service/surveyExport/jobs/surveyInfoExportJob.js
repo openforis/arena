@@ -9,8 +9,8 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { ExportFile } from '../exportFile'
 
 const keepOnlyOneCycle = ({ survey, cycle }) => {
-  // keep only first cycle in survey cycles
-  survey[Survey.infoKeys.cycles] = {
+  // create new cycle and set it in survey cycles
+  survey[Survey.infoKeys.props][Survey.infoKeys.cycles] = {
     [Survey.cycleOneKey]: SurveyCycle.newCycle(),
   }
   // move layout in spefified cycle into first cycle
@@ -36,7 +36,7 @@ export default class SurveyInfoExportJob extends Job {
       { surveyId, advanced: true, backup, draft: true, cycle },
       this.tx
     )
-    if (!Objects.isEmpty(cycle)) {
+    if (!backup && !Objects.isNil(cycle)) {
       surveyFull = keepOnlyOneCycle({ survey: surveyFull, cycle })
     }
     archive.append(JSON.stringify(surveyFull, null, 2), { name: ExportFile.survey })

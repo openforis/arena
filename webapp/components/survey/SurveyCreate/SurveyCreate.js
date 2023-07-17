@@ -37,8 +37,19 @@ const SurveyCreate = (props) => {
     useCreateSurvey({
       template,
     })
-  const { createType, name, label, lang, source, validation, cloneFrom, options, file, uploadProgressPercent } =
-    newSurvey
+  const {
+    createType,
+    name,
+    label,
+    lang,
+    source,
+    validation,
+    cloneFrom,
+    cloneFromCycle,
+    options,
+    file,
+    uploadProgressPercent,
+  } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -106,13 +117,23 @@ const SurveyCreate = (props) => {
       {createType === createTypes.clone && (
         <>
           <FormItem label={i18n.t('common.cloneFrom')}>
-            <SurveyDropdown selection={cloneFrom?.value} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
+            <SurveyDropdown
+              selection={cloneFrom?.value}
+              onChange={(value) => {
+                const cycles = value?.cycles || []
+                const lastCycleKey = cycles[cycles.length - 1]
+                onUpdate({ name: 'cloneFrom', value }, { name: 'cloneFromCycle', value: lastCycleKey })
+              }}
+            />
           </FormItem>
           {cloneFrom?.cycles?.length > 1 && (
             <FormItem label={i18n.t('common.cycle')}>
               <Dropdown
-                items={cloneFrom?.cycles?.map((cycleKey) => ({ value: cycleKey, label: String(Number(cycleKey) + 1) }))}
-                onChange={(item) => onUpdate({ name: 'cloneFromCycle', value: item?.value })}
+                items={cloneFrom.cycles}
+                itemValue={(cycleKey) => cycleKey}
+                itemLabel={(cycleKey) => String(Number(cycleKey) + 1)}
+                onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
+                selection={cloneFromCycle}
               />
             </FormItem>
           )}
