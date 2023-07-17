@@ -104,6 +104,7 @@ export const ValidatorErrorKeys = {
   surveyInfoEdit: {
     langRequired: 'validationErrors.surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors.surveyInfoEdit.srsRequired',
+    cycleRequired: 'validationErrors.surveyInfoEdit.cycleRequired',
     cyclesRequired: 'validationErrors.surveyInfoEdit.cyclesRequired',
     cyclesExceedingMax: 'validationErrors.surveyInfoEdit.cyclesExceedingMax',
     cycleDateStartMandatory: 'validationErrors.surveyInfoEdit.cycleDateStartMandatory',

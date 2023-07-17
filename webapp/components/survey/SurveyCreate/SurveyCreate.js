@@ -20,7 +20,7 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
-import { Checkbox } from '@webapp/components/form'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
@@ -104,9 +104,19 @@ const SurveyCreate = (props) => {
       )}
 
       {createType === createTypes.clone && (
-        <FormItem label={i18n.t('common.cloneFrom')}>
-          <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
-        </FormItem>
+        <>
+          <FormItem label={i18n.t('common.cloneFrom')}>
+            <SurveyDropdown selection={cloneFrom?.value} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
+          </FormItem>
+          {cloneFrom?.cycles?.length > 1 && (
+            <FormItem label={i18n.t('common.cycle')}>
+              <Dropdown
+                items={cloneFrom?.cycles?.map((cycleKey) => ({ value: cycleKey, label: String(Number(cycleKey) + 1) }))}
+                onChange={(item) => onUpdate({ name: 'cloneFromCycle', value: item?.value })}
+              />
+            </FormItem>
+          )}
+        </>
       )}
 
       {createType !== createTypes.import && (

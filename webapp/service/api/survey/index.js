@@ -4,8 +4,8 @@ import * as Survey from '@core/survey/survey'
 
 // ==== CREATE
 export const insertSurvey = async ({ newSurvey }) => {
-  const { name, label, lang, cloneFrom = false, template = false } = newSurvey
-  const { data } = await axios.post('/api/survey', { name, label, lang, cloneFrom, template })
+  const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = newSurvey
+  const { data } = await axios.post('/api/survey', { name, label, lang, cloneFrom, cloneFromCycle, template })
   return data
 }
 

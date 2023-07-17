@@ -23,11 +23,13 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const surveyReq = Request.getBody(req)
-      const validation = await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
+      const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
+
+      const validation = cloneFrom
+        ? await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
+        : await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
 
       if (Validation.isValid(validation)) {
-        const { name, label, lang, cloneFrom = null, template = false } = surveyReq
-
         const surveyInfoTarget = Survey.newSurvey({
           ownerUuid: User.getUuid(user),
           name,
@@ -37,7 +39,13 @@ export const init = (app) => {
         })
 
         if (cloneFrom) {
-          const job = SurveyService.cloneSurvey({ surveyId: cloneFrom, surveyInfoTarget, user, res })
+          const job = SurveyService.cloneSurvey({
+            surveyId: cloneFrom,
+            cycle: cloneFromCycle,
+            surveyInfoTarget,
+            user,
+            res,
+          })
           res.json({ job })
           return
         }
