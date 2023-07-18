@@ -93,8 +93,9 @@ const DEFAULT_OPTIONS = {
 const RECORD_CYCLE_HEADER = 'record_cycle'
 
 export class CsvDataExportModel {
-  constructor({ survey, nodeDefContext, options = DEFAULT_OPTIONS }) {
+  constructor({ survey, cycle, nodeDefContext, options = DEFAULT_OPTIONS }) {
     this.survey = survey
+    this.cycle = cycle
     this.nodeDefContext = nodeDefContext
     this.options = { ...DEFAULT_OPTIONS, ...options }
     this.columns = []
@@ -162,10 +163,16 @@ export class CsvDataExportModel {
   }
 
   _extractAttributeDefsColumns(nodeDefContext) {
-    const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = this.options
+    const { cycle, options } = this
+    const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = options
 
     let descendantDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(this.survey)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities({
+          nodeDef: nodeDefContext,
+          includeAnalysis,
+          sorted: true,
+          cycle,
+        })(this.survey)
       : [nodeDefContext] // Multiple attribute
 
     descendantDefs = descendantDefs.filter(

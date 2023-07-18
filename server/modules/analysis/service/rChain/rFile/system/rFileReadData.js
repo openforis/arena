@@ -77,10 +77,11 @@ export default class RFileReadData extends RFileSystem {
   }
 
   async appendContentToConvertDataTypes({ entityDef }) {
-    const { survey } = this.rChain
+    const { survey, cycle } = this.rChain
 
     const csvDataExportModel = new CsvDataExportModel({
       survey,
+      cycle,
       nodeDefContext: entityDef,
       options: { includeAncestorAttributes: true, includeFiles: false },
     })

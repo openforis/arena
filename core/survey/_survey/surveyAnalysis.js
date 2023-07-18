@@ -137,10 +137,10 @@ export const getAvailableReportingDataNodeDefs =
     const availableReportingDataNodeDefs = []
     if (baseUnitNodeDef) {
       SurveyNodeDefs.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDefAncestor) => {
-        SurveyNodeDefs.getNodeDefDescendantAttributesInSingleEntities(
-          nodeDefAncestor,
-          true
-        )(survey).forEach((nodeDef) => {
+        SurveyNodeDefs.getNodeDefDescendantAttributesInSingleEntities({
+          nodeDef: nodeDefAncestor,
+          includeAnalysis: true,
+        })(survey).forEach((nodeDef) => {
           if (NodeDef.isSingleAttribute(nodeDef) && NodeDef.isCode(nodeDef)) {
             availableReportingDataNodeDefs.push(nodeDef)
           }

@@ -38,10 +38,10 @@ export const DimensionsSelector = (props) => {
 
   if (entityDef) {
     Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
-      const dimensionsInAncestor = Survey.getNodeDefDescendantAttributesInSingleEntities(
-        ancestorDef,
-        showAnalysisAttributes
-      )(survey).filter(isDimensionIncluded)
+      const dimensionsInAncestor = Survey.getNodeDefDescendantAttributesInSingleEntities({
+        nodeDef: ancestorDef,
+        includeAnalysis: showAnalysisAttributes,
+      })(survey).filter(isDimensionIncluded)
 
       const nestedOptions = dimensionsInAncestor.map((dimension) => ({
         value: NodeDef.getUuid(dimension),
