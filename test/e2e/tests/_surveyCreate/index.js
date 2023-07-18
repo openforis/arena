@@ -15,7 +15,7 @@ export const createSurvey = (surveyToAdd) => {
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'clone' })))
 
       // set survey 'Clone from' field
-      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: name })
+      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: `${name} - ${label}` })
 
       // press "Create survey" and wait for the job to complete
       await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))

@@ -12,7 +12,11 @@ const toOption = (surveyInfo) => {
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const surveyName = Survey.getName(surveyInfo)
   const surveyLabel = StringUtils.trim(Survey.getDefaultLabel(surveyInfo))
-  const label = `${surveyName}${surveyLabel ? ` - ${surveyLabel}` : ''}`
+  const labelParts = [surveyName]
+  if (surveyLabel) {
+    labelParts.push(surveyLabel)
+  }
+  const label = labelParts.join(' - ')
 
   return {
     value: surveyId,
