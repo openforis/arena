@@ -26,8 +26,8 @@ export const init = (app) => {
       const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
 
       const validation = cloneFrom
-        ? await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
-        : await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
+        ? await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
+        : await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
 
       if (Validation.isValid(validation)) {
         const surveyInfoTarget = Survey.newSurvey({
