@@ -20,11 +20,20 @@ export const checkFilesStorage = async () => {
   }
   logger.debug(`Moving survey files to new storage (if necessary)`)
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
-  let surveysFilesMoved = false
+  let allSurveysFilesMoved = false
+  let errorsFound = false
   await Promises.each(surveyIds, async (surveyId) => {
-    surveysFilesMoved = surveysFilesMoved || (await FileManager.moveFilesToNewStorageIfNecessary({ surveyId }))
+    try {
+      const surveyFilesMoved = await FileManager.moveFilesToNewStorageIfNecessary({ surveyId })
+      allSurveysFilesMoved = allSurveysFilesMoved || surveyFilesMoved
+    } catch (error) {
+      errorsFound = true
+      logger.error(`Error moving files for survey ${surveyId}`, error)
+    }
   })
-  if (surveysFilesMoved) {
+  if (errorsFound) {
+    logger.error(`There were errors moving survey files to the new storage`)
+  } else if (allSurveysFilesMoved) {
     logger.debug(`Survey files moved successfully`)
   } else {
     logger.debug('Survey files move not necessary')
