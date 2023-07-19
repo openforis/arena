@@ -937,6 +937,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
+    deleteChain: 'Delete chain',
     deleteConfirm: `Delete this processing chain?
     
 $t(common.cantUndoWarning)`,
