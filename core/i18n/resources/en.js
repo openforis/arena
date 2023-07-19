@@ -1463,6 +1463,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
+      cycleRequired: 'Cycle is required',
       cyclesRequired: 'At least one cycle must be defined',
       cyclesExceedingMax: 'A survey can have at most 10 cycles',
       cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',

@@ -13,6 +13,9 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   const inputSelector = `${dropdownSelector} .dropdown__input`
 
   if (await page.isEditable(inputSelector)) {
+    // wait for dropdown items to be ready
+    await page.waitForTimeout(200)
+
     // open dropdown menu
     const toggleBtnSelector = `${dropdownSelector} .dropdown__indicator`
     await page.locator(toggleBtnSelector).last().click()
@@ -36,6 +39,9 @@ const expectDropdownToBeDisabled = async ({ testId = null, parentSelector = '' }
 }
 
 const expectDropdownValue = async ({ testId = null, parentSelector = '', value }) => {
+  // wait for dropdown value to be set
+  await page.waitForTimeout(500)
+
   const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
   if (Objects.isEmpty(value)) {
     await expect(dropdownValueEl).toBeNull()

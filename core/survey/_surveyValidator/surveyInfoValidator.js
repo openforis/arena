@@ -28,6 +28,7 @@ export const validateNewSurvey = async ({ newSurvey, surveyInfos }) =>
 export const validateSurveyClone = async ({ newSurvey, surveyInfos }) =>
   Validator.validate(newSurvey, {
     name: getSurveyNameValidations({ surveyInfos, required: false }),
+    cloneFromCycle: [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cyclesRequired)],
   })
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
