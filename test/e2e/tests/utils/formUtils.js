@@ -13,6 +13,9 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   const inputSelector = `${dropdownSelector} .dropdown__input`
 
   if (await page.isEditable(inputSelector)) {
+    // wait for dropdown items to be ready
+    await page.waitForTimeout(200)
+
     // open dropdown menu
     const toggleBtnSelector = `${dropdownSelector} .dropdown__indicator`
     await page.locator(toggleBtnSelector).last().click()
