@@ -26,7 +26,7 @@ const ButtonBar = () => {
         href={API.getChainSummaryExportUrl({ surveyId, chainUuid: Chain.getUuid(chain) })}
         requestParams={{ cycle }}
       />
-      <ButtonDelete onClick={deleteChain} />
+      <ButtonDelete label="chainView.deleteChain" onClick={deleteChain} />
     </div>
   )
 }
