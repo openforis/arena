@@ -1,6 +1,6 @@
 import * as camelize from 'camelize'
 
-import { PointFactory, Points } from '@openforis/arena-core'
+import { Objects, PointFactory, Points } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as NumberUtils from '@core/numberUtils'
@@ -114,14 +114,20 @@ const props = {
     [colValueProcessor]:
       ({ survey }) =>
       (node, columnName) => {
-        const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
-
-        if (columnName.endsWith('_x')) return x
-        if (columnName.endsWith('_y')) return y
-        if (columnName.endsWith('_srs')) return srs
+        const valueProp = Object.values(Node.valuePropsCoordinate).find((valueProp) =>
+          columnName.endsWith(`_${valueProp}`)
+        )
+        if (valueProp) {
+          const nodeValue = Node.getValue(node)
+          const fieldValue = nodeValue[valueProp]
+          if (Objects.isEmpty(fieldValue)) return null
+          if (valueProp === Node.valuePropsCode.srs) return fieldValue
+          return Number(valueProp)
+        }
 
         const surveyInfo = Survey.getSurveyInfo(survey)
         const srsIndex = Survey.getSRSIndex(surveyInfo)
+        const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
         const point = PointFactory.createInstance({ srs, x, y })
         if (point && Points.isValid(point, srsIndex)) {
           return Points.toString(point)
