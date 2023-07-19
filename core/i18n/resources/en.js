@@ -1217,6 +1217,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       },
     },
     nodeDefCoordinate: {
+      coordinate: 'Coordinate',
       srs: 'SRS',
       x: 'X',
       y: 'Y',
