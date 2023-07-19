@@ -80,6 +80,9 @@ export const propKeys = {
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
+  includeAccuracy: 'includeAccuracy',
+  includeElevation: 'includeElevation',
+  includeElevationAccuracy: 'includeElevationAccuracy',
 }
 
 export const textInputTypes = {
@@ -97,6 +100,12 @@ export const textTransformValues = {
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
+}
+
+export const coordinateAdditionalFields = {
+  accuracy: 'accuracy',
+  elevation: 'elevation',
+  elevationAccuracy: 'elevationAccuracy',
 }
 
 export const fileTypeValues = {
@@ -230,6 +239,16 @@ export const isBooleanLabelYesNo = (nodeDef) =>
 
 // Coordiante
 export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
+export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
+export const isElevationIncluded = ObjectUtils.isPropTrue(propKeys.includeElevation)
+export const isElevationAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeElevationAccuracy)
+export const getCoordinateAdditionalFields = (nodeDef) => {
+  const fields = []
+  if (isAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.accuracy)
+  if (isElevationIncluded(nodeDef)) fields.push(coordinateAdditionalFields.elevation)
+  if (isElevationAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.elevationAccuracy)
+  return fields
+}
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)

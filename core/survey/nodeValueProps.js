@@ -10,6 +10,9 @@ export const valuePropsCoordinate = {
   x: 'x',
   y: 'y',
   srs: 'srs',
+  accuracy: 'accuracy',
+  elevation: 'elevation',
+  elevationAccuracy: 'elevationAccuracy',
 }
 
 export const valuePropsDate = {

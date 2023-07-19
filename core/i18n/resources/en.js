@@ -1022,6 +1022,7 @@ $t(common.appNameFull)
   // ====== Survey views
 
   nodeDefEdit: {
+    additionalFields: 'Additional fields',
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
@@ -1220,6 +1221,9 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       x: 'X',
       y: 'Y',
       showOnMap: 'Show on map',
+      accuracy: 'Accuracy',
+      elevation: 'Elevation',
+      elevationAccuracy: 'Elevation accuracy',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
