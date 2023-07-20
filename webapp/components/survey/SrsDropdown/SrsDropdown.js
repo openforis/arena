@@ -17,6 +17,7 @@ const SrsDropdown = (props) => {
 
   return (
     <Dropdown
+      className="form-input-container"
       disabled={disabled || singleSrs}
       items={surveySrs}
       itemValue="code"
