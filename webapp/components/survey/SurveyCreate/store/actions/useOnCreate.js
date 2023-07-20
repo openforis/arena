@@ -12,7 +12,9 @@ import { useCallback } from 'react'
 
 const sendSurveyCreateRequest = async ({ dispatch, newSurvey, user }) => {
   try {
-    return await API.insertSurvey({ newSurvey })
+    const { surveyId: cloneFromSurveyId } = newSurvey.cloneFrom || {}
+
+    return await API.insertSurvey({ newSurvey: { ...newSurvey, cloneFrom: cloneFromSurveyId } })
   } catch (e) {
     const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
     const errorKey = Number.isNaN(maxSurveysCount)

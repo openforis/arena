@@ -1,4 +1,9 @@
 export const useOnUpdate =
   ({ newSurvey, setNewSurvey }) =>
-  ({ name, value }) =>
-    setNewSurvey({ ...newSurvey, [name]: value })
+  (...nameValuePairs) => {
+    const newSurveyNext = { ...newSurvey }
+    nameValuePairs.forEach(({ name, value }) => {
+      newSurveyNext[name] = value
+    })
+    setNewSurvey(newSurveyNext)
+  }

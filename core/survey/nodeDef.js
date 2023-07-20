@@ -1,7 +1,9 @@
 import * as R from 'ramda'
+
+import { Objects } from '@openforis/arena-core'
+
 import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
@@ -420,6 +422,30 @@ export const copyLayout =
         .reduce((layoutAcc, cycleKey) => NodeDefLayout.assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), layout)
       return layoutUpdated
     })(nodeDef)
+
+/**
+ * It keeps only cycleToKeep information and moves it to cycleTarget.
+ * (it does side effect on the specified nodeDef).
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!string} params.cycleToKeep - Id of source cycle to keep.
+ * @param {!string} params.cycleTarget - Id of target cycle.
+ * @returns {object} - Returns the nodeDef specified in parameters (it does side effect).
+ */
+export const keepOnlyOneCycle =
+  ({ cycleToKeep, cycleTarget }) =>
+  (nodeDef) => {
+    nodeDef.props[propKeys.cycles] = [cycleTarget]
+    const nodeDefProps = nodeDef[keys.props]
+    const layoutForCycle = nodeDefProps[propKeys.layout]?.[cycleToKeep]
+
+    if (Objects.isEmpty(layoutForCycle)) {
+      delete nodeDefProps[propKeys.layout]
+    } else {
+      nodeDefProps[propKeys.layout] = { [cycleTarget]: layoutForCycle }
+    }
+    return nodeDef
+  }
 
 // ==== UTILS
 export const canNodeDefBeMultiple = (nodeDef) =>
