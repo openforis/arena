@@ -122,7 +122,7 @@ const props = {
           const fieldValue = nodeValue[valueProp]
           if (Objects.isEmpty(fieldValue)) return null
           if (valueProp === Node.valuePropsCode.srs) return fieldValue
-          return Number(valueProp)
+          return Number(fieldValue)
         }
 
         const surveyInfo = Survey.getSurveyInfo(survey)
