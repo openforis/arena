@@ -3,6 +3,7 @@ import * as camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
 import * as A from '@core/arena'
+import * as DateUtils from '@core/dateUtils'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -67,7 +68,7 @@ export const insertRecord = async (surveyId, record, client = db) =>
       Record.getCycle(record),
       Record.isPreview(record),
       Validation.isObjValid(record) ? {} : Record.getValidation(record),
-      Record.getDateCreated(record) || new Date(),
+      DateUtils.formatDateTimeISO(Record.getDateCreated(record) || new Date()),
       surveyId,
     ],
     dbTransformCallback(surveyId)

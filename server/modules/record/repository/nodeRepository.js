@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import * as A from '@core/arena'
+import * as DateUtils from '@core/dateUtils'
 
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -130,8 +131,8 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
     tableColumnsInsert,
     nodes.map((node) => ({
       ...node,
-      date_created: Node.getDateCreated(node),
-      date_modified: Node.getDateModified(node),
+      date_created: DateUtils.formatDateTimeISO(Node.getDateCreated(node)),
+      date_modified: DateUtils.formatDateTimeISO(Node.getDateModified(node)),
       record_uuid: Node.getRecordUuid(node),
       parent_uuid: Node.getParentUuid(node),
       node_def_uuid: Node.getNodeDefUuid(node),
@@ -225,7 +226,7 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
     Node.getId(node),
     _toValueQueryParam(Node.getValue(node)),
     Node.getMeta(node),
-    Node.getDateModified(node),
+    DateUtils.formatDateTimeISO(Node.getDateModified(node)),
   ])
   await client.none(
     DbUtils.updateAllQuery(

@@ -113,16 +113,15 @@ export const isValidDateInFormat = (dateStr, format) => {
   return isValidDateObject(parsed)
 }
 
-const addOrSubtractTimezoneOffset = (date, add = true) => {
-  const offset = date.getTimezoneOffset() * 60000 * (add ? 1 : -1)
-  return new Date(date.getTime() + offset)
-}
-
 export const formatDateISO = (date) => format(date, formats.dateISO)
 
 export const formatDateTimeDefault = (date) => format(date, formats.datetimeDefault)
 
-export const formatDateTimeISO = (date) => format(addOrSubtractTimezoneOffset(date), formats.datetimeISO)
+export const formatDateTimeISO = (date) => {
+  if (!date) return date
+
+  return new Date(date).toISOString()
+}
 
 export const formatDateTimeDisplay = (date) => format(date, formats.datetimeDisplay)
 
@@ -132,7 +131,7 @@ export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:
 
 export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
 export const parseDateISO = (dateStr) => parse(dateStr, formats.dateISO)
-export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, adjustTimezoneDifference = false }) => {
+export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo }) => {
   if (R.isNil(dateStr) || R.isEmpty(dateStr)) {
     return null
   }
@@ -140,8 +139,7 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo, a
   if (!isValidDateObject(dateParsed)) {
     return null
   }
-  const dateAdjusted = adjustTimezoneDifference ? addOrSubtractTimezoneOffset(dateParsed, false) : dateParsed
-  return format(dateAdjusted, formatTo)
+  return format(dateParsed, formatTo)
 }
 
 export const convertDateTimeFromISOToDisplay = (dateStr) =>
