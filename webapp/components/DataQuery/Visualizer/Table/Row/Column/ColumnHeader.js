@@ -16,11 +16,20 @@ import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDef
 import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
+const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
+  if (columnName === NodeDef.getName(nodeDef)) {
+    if (NodeDef.isTaxon(nodeDef) || NodeDef.isCode(nodeDef)) {
+      return 'code'
+    }
+    if (NodeDef.isCoordinate(nodeDef)) {
+      return 'coordinate'
+    }
+  }
+  return ColumnNodeDef.extractColumnName({ nodeDef, columnName })
+}
+
 const getColLabelKey = ({ columnName, nodeDef }) => {
-  const field =
-    (NodeDef.isTaxon(nodeDef) || NodeDef.isCode(nodeDef)) && columnName === NodeDef.getName(nodeDef)
-      ? 'code'
-      : ColumnNodeDef.extractColumnName({ nodeDef, columnName })
+  const field = getFieldByViewColumnName({ columnName, nodeDef })
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
   return `surveyForm.${nodeDefTypePrefix}.${field}`
 }
