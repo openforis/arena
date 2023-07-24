@@ -117,12 +117,6 @@ export const formatDateISO = (date) => format(date, formats.dateISO)
 
 export const formatDateTimeDefault = (date) => format(date, formats.datetimeDefault)
 
-export const formatDateTimeISO = (date) => {
-  if (!date) return date
-
-  return new Date(date).toISOString()
-}
-
 export const formatDateTimeDisplay = (date) => format(date, formats.datetimeDisplay)
 
 export const formatDateTimeExport = (date) => format(date, formats.datetimeExport)
@@ -147,7 +141,6 @@ export const convertDateTimeFromISOToDisplay = (dateStr) =>
     dateStr,
     formatFrom: formats.datetimeISO,
     formatTo: formats.datetimeDisplay,
-    adjustTimezoneDifference: true,
   })
 
 export const nowFormatDefault = () => format(Date.now(), formats.datetimeDefault)
