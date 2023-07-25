@@ -303,13 +303,13 @@ export const fetchItemsByLevelIndex = async (
 
   // join category_item table to get ancestors codes
   const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
-  const codesSelectFields = ancestorLevelIndexes.map((ancstorLevelIdx) =>
+  const codesSelectFields = ancestorLevelIndexes.map((ancestorLevelIdx) =>
     DbUtils.getPropColCombined(
       CategoryItem.keysProps.code,
       draft,
-      `i${ancstorLevelIdx}.`,
+      `i${ancestorLevelIdx}.`,
       true,
-      `level_${ancstorLevelIdx}_code`
+      `level_${ancestorLevelIdx}_code`
     )
   )
   const ancestorLevelIndexesReverse = [...ancestorLevelIndexes].reverse()
