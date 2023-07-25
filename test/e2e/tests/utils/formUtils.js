@@ -15,17 +15,10 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   // wait for dropdown items to be ready
   await page.waitForTimeout(1000)
 
-  const inputEl = await page.$(inputSelector)
-
-  await inputEl.scrollIntoViewIfNeeded()
-
   if (await page.isEditable(inputSelector)) {
     // open dropdown menu
     const toggleBtnSelector = `${dropdownSelector} .dropdown__indicator`
-    const toggleBtnElLocator = page.locator(toggleBtnSelector).last()
-
-    await toggleBtnElLocator.scrollIntoViewIfNeeded()
-    await toggleBtnElLocator.click()
+    await page.locator(toggleBtnSelector).last().click()
     if (value) {
       // select dropdown option by test id
       await page.click(getSelector(TestId.dropdown.dropDownItem(value)))
