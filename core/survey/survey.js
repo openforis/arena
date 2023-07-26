@@ -130,6 +130,7 @@ export const {
   isTemplate,
   getProps,
   getPropsDraft,
+  getFilesStatistics,
 } = SurveyInfo
 
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo

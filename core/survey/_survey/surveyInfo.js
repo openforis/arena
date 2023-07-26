@@ -65,6 +65,8 @@ export const getOwnerName = R.propOr('', keys.ownerName)
 
 export const isDraft = R.propEq(keys.draft, true)
 
+export const getFilesStatistics = R.propOr({}, keys.filesStatistics)
+
 export const getLanguages = ObjectUtils.getProp(keys.languages, [])
 
 export const getDefaultLanguage = R.pipe(getLanguages, R.head)

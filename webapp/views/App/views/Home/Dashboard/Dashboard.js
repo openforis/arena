@@ -11,6 +11,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyInfo from './SurveyInfo'
 import ActivityLog from './ActivityLog'
 import RecordsSummary from './RecordsSummary'
+import { StorageSummary } from './StorageSummary'
 import Helper, { helperTypes } from './Helper'
 
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
@@ -19,19 +20,24 @@ import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
 
-  const canEditDef = useAuthCanEditSurvey()
+  const canEditSurvey = useAuthCanEditSurvey()
   const surveyInfo = useSurveyInfo()
 
   return (
-    <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
-      {showFirstTimeHelp && canEditDef ? (
+    <SurveyDefsLoader draft={canEditSurvey} validate={canEditSurvey}>
+      {showFirstTimeHelp && canEditSurvey ? (
         <Helper firstTimeHelp={showFirstTimeHelp} />
       ) : (
         <>
           <div className="home-dashboard">
             <SurveyInfo />
 
-            {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
+            {!Survey.isTemplate(surveyInfo) && (
+              <div>
+                <RecordsSummary />
+                {canEditSurvey && <StorageSummary />}
+              </div>
+            )}
           </div>
           <ActivityLog />
         </>
