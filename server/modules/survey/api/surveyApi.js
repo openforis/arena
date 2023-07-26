@@ -14,8 +14,10 @@ import * as User from '../../../../core/user/user'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
+import * as FileService from '../../record/service/fileService'
 import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { Authorizer } from '@openforis/arena-core'
 
 export const init = (app) => {
   // ==== CREATE
@@ -134,7 +136,13 @@ export const init = (app) => {
         UserService.updateUserPrefs(user),
       ])
 
-      res.json({ survey })
+      let surveyUpdated = survey
+
+      if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
+        surveyUpdated = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+      }
+
+      res.json({ survey: surveyUpdated })
     } catch (error) {
       next(error)
     }

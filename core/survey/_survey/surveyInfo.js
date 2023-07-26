@@ -24,6 +24,7 @@ export const keys = {
   cycles: 'cycles',
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
+  filesStatistics: 'filesStatistics',
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
@@ -153,6 +154,8 @@ export const isTemplate = R.propEq(keys.template, true)
 
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)
+
+export const assocFilesStatistics = R.assoc(keys.filesStatistics)
 
 export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
 
