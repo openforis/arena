@@ -1,4 +1,4 @@
-import { Objects, Promises, SystemError } from '@openforis/arena-core'
+import { Dates, Objects, Promises, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { uuidv4 } from '@core/uuid'
@@ -8,7 +8,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
-import * as DateUtils from '@core/dateUtils'
 
 import Job from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
@@ -82,7 +81,7 @@ export default class RecordsCloneJob extends Job {
       fetchForUpdate: false,
     })
     record.uuid = uuidv4()
-    record.dateCreated = DateUtils.formatDateTimeISO(new Date())
+    record.dateCreated = Dates.nowFormattedForStorage()
     record.cycle = cycleTo
     delete record.id
 
@@ -142,7 +141,7 @@ export default class RecordsCloneJob extends Job {
 
     nodesArray.forEach((node) => {
       node.recordUuid = record.uuid
-      node.dateCreated = node.dateModified = DateUtils.formatDateTimeISO(new Date())
+      node.dateCreated = node.dateModified = Dates.nowFormattedForStorage()
 
       const oldUuid = Node.getUuid(node)
       const newUuid = uuidv4()

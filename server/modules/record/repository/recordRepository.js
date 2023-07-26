@@ -2,6 +2,8 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
@@ -67,7 +69,7 @@ export const insertRecord = async (surveyId, record, client = db) =>
       Record.getCycle(record),
       Record.isPreview(record),
       Validation.isObjValid(record) ? {} : Record.getValidation(record),
-      Record.getDateCreated(record) || new Date(),
+      Dates.formatForStorage(Record.getDateCreated(record) || new Date()),
       surveyId,
     ],
     dbTransformCallback(surveyId)
