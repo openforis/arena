@@ -14,7 +14,7 @@ export default class FilesImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurveyFileZip, surveyId } = this.context
+    const { arenaSurveyFileZip } = this.context
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
     if (filesSummaries && filesSummaries.length > 0) {
@@ -29,16 +29,6 @@ export default class FilesImportJob extends Job {
 
         await this.persistFile(file)
 
-        this.incrementProcessedItems()
-      })
-    } else {
-      // old format
-      const fileUuids = await ArenaSurveyFileZip.getFileUuidsOld(arenaSurveyFileZip)
-      this.total = fileUuids.length
-
-      await PromiseUtils.each(fileUuids, async (fileUuid) => {
-        const file = await ArenaSurveyFileZip.getFileOld(arenaSurveyFileZip, fileUuid)
-        await FileService.insertFile(surveyId, file, this.tx)
         this.incrementProcessedItems()
       })
     }
