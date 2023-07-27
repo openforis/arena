@@ -5,6 +5,7 @@ export {
   fetchCategory,
   createCategory,
   fetchCategoryItems,
+  fetchCategoryItemsInLevel,
   countSamplingPointData,
   fetchSamplingPointData,
   deleteCategory,

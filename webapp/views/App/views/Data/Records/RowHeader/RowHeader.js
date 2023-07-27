@@ -30,7 +30,6 @@ const RowHeader = (props) => {
         {i18n.t('common.dateCreated')}
       </div>
       <div>
-        {' '}
         <SortToggle sort={sort} handleSortBy={handleSortBy} field={Record.keys.dateModified} />
         {i18n.t('common.dateLastModified')}
       </div>
