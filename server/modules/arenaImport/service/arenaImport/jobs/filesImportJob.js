@@ -1,9 +1,10 @@
+import SystemError from '@core/systemError'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
 
-import * as FileManager from '@server/modules/record/manager/fileManager'
+import * as FileService from '@server/modules/record/service/fileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
@@ -17,6 +18,8 @@ export default class FilesImportJob extends Job {
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
     if (filesSummaries && filesSummaries.length > 0) {
+      await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
+
       this.total = filesSummaries.length
       await PromiseUtils.each(filesSummaries, async (fileSummary) => {
         let file = { ...fileSummary }
@@ -35,7 +38,7 @@ export default class FilesImportJob extends Job {
 
       await PromiseUtils.each(fileUuids, async (fileUuid) => {
         const file = await ArenaSurveyFileZip.getFileOld(arenaSurveyFileZip, fileUuid)
-        await FileManager.insertFile(surveyId, file, this.tx)
+        await FileService.insertFile(surveyId, file, this.tx)
         this.incrementProcessedItems()
       })
     }
@@ -43,11 +46,20 @@ export default class FilesImportJob extends Job {
 
   async persistFile(file) {
     const { surveyId } = this.context
-    const existingFileSummary = await FileManager.fetchFileSummaryByUuid(surveyId, file.uuid, this.tx)
+    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, file.uuid, this.tx)
     if (existingFileSummary) {
-      await FileManager.updateFileProps(surveyId, RecordFile.getUuid(file), RecordFile.getProps(file), this.tx)
+      await FileService.updateFileProps(surveyId, RecordFile.getUuid(file), RecordFile.getProps(file), this.tx)
     } else {
-      await FileManager.insertFile(surveyId, file, this.tx)
+      await FileService.insertFile(surveyId, file, this.tx)
+    }
+  }
+
+  async checkFilesNotExceedingAvailableQuota(filesSummaries) {
+    const { surveyId } = this.context
+    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + RecordFile.getSize(fileSummary), 0)
+    if (totalSize > filesStatistics.availableSpace) {
+      throw new SystemError('cannotImportFilesExceedingQuota')
     }
   }
 }

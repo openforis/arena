@@ -1636,6 +1636,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
     },
+    cannotInsertFileExceedingQuota: 'Cannot insert file: files storage quota would be exceeded',
+    cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
