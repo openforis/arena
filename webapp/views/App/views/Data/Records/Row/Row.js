@@ -6,10 +6,12 @@ import * as R from 'ramda'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
 import * as DateUtils from '@core/dateUtils'
-import { useNodeDefRootKeys } from '@webapp/store/survey'
+import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -19,6 +21,18 @@ import { useAuthCanDeleteRecord, useAuthCanEditRecord } from '@webapp/store/user
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 const valueFormattersByType = {
+  [NodeDef.nodeDefType.code]: ({ cycle, nodeDef, value: code, categoryItemsByCodeDefUuid, lang }) => {
+    const item = categoryItemsByCodeDefUuid[NodeDef.getUuid(nodeDef)]?.find(
+      (item) => CategoryItem.getCode(item) === code
+    )
+    if (item) {
+      const result = NodeDefLayout.isCodeShown(cycle)(nodeDef)
+        ? CategoryItem.getLabelWithCode(lang)(item)
+        : CategoryItem.getLabel(lang)(item)
+      return result ?? CategoryItem.getCode(item)
+    }
+    return code
+  },
   [NodeDef.nodeDefType.date]: ({ value }) =>
     DateUtils.convertDate({
       dateStr: value,
@@ -28,19 +42,21 @@ const valueFormattersByType = {
 }
 
 const Row = (props) => {
-  const { idx, row: record, rowNo, selected, navigateToRecord, onRecordsUpdate } = props
+  const { idx, row: record, rowNo, selected, navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid } = props
   const nodeDefKeys = useNodeDefRootKeys()
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const canEdit = useAuthCanEditRecord(record)
   const canDelete = useAuthCanDeleteRecord(record)
+  const lang = useSurveyPreferredLang()
 
   const keyValues = nodeDefKeys.map((nodeDef) => {
     const name = NodeDef.getName(nodeDef)
     const value = record[A.camelize(name)]
+    const cycle = Record.getCycle(record)
     const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
-    return value && formatter ? formatter({ value }) : value
+    return value && formatter ? formatter({ cycle, nodeDef, value, categoryItemsByCodeDefUuid, lang }) : value
   })
 
   const onEditButtonClick = useCallback(
@@ -125,8 +141,17 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
+  idx: PropTypes.number.isRequired,
   row: PropTypes.object.isRequired,
   rowNo: PropTypes.number.isRequired,
+  selected: PropTypes.bool,
+  navigateToRecord: PropTypes.func.isRequired,
+  onRecordsUpdate: PropTypes.func.isRequired,
+  categoryItemsByCodeDefUuid: PropTypes.object.isRequired,
+}
+
+Row.defaultProps = {
+  selected: false,
 }
 
 export default Row
