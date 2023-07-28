@@ -1355,6 +1355,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     minLengthNotRespected: 'Minimum length of {{minLength}} characters not respected',
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
+    nameInvalid:
+      'Name is invalid: it must contain only lowercase letters and numbers, starting with a letter, and only "-" and "_" symbols',
     nameRequired: 'Name is required',
     requiredField: '{{field}} is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
