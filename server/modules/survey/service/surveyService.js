@@ -88,4 +88,5 @@ export const {
   // UTILS
   validateNewSurvey,
   validateSurveyClone,
+  validateSurveyImportFromCollect,
 } = SurveyManager
