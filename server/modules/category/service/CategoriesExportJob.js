@@ -6,6 +6,7 @@ import * as Category from '@core/survey/category'
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '../manager/categoryManager'
 
 export default class CategoriesExportJob extends Job {
@@ -50,7 +51,8 @@ export default class CategoriesExportJob extends Job {
 
     // export category into temp file
     const outputStream = FileUtils.createWriteStream(categoryTempFilePath)
-    await CategoryManager.exportCategoryToStream({ surveyId, categoryUuid: category.uuid, draft, outputStream })
+    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
+    await CategoryManager.exportCategoryToStream({ survey, categoryUuid: category.uuid, draft, outputStream })
 
     // write to archive
     const zipEntryName = `${Category.getName(category) || `category_${index}`}.csv`
