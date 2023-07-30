@@ -40,7 +40,7 @@ export {
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
 } from './data'
-export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
 export {
   fetchNodeDef,

@@ -83,8 +83,8 @@ export const propKeys = {
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
   includeAccuracy: 'includeAccuracy',
-  includeElevation: 'includeElevation',
-  includeElevationAccuracy: 'includeElevationAccuracy',
+  includeAltitude: 'includeAltitude',
+  includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 }
 
 export const textInputTypes = {
@@ -106,8 +106,8 @@ export const booleanLabelValues = {
 
 export const coordinateAdditionalFields = {
   accuracy: 'accuracy',
-  elevation: 'elevation',
-  elevationAccuracy: 'elevationAccuracy',
+  altitude: 'altitude',
+  altitudeAccuracy: 'altitudeAccuracy',
 }
 
 export const fileTypeValues = {
@@ -242,13 +242,13 @@ export const isBooleanLabelYesNo = (nodeDef) =>
 // Coordiante
 export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
 export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
-export const isElevationIncluded = ObjectUtils.isPropTrue(propKeys.includeElevation)
-export const isElevationAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeElevationAccuracy)
+export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
+export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
 export const getCoordinateAdditionalFields = (nodeDef) => {
   const fields = []
   if (isAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.accuracy)
-  if (isElevationIncluded(nodeDef)) fields.push(coordinateAdditionalFields.elevation)
-  if (isElevationAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.elevationAccuracy)
+  if (isAltitudeIncluded(nodeDef)) fields.push(coordinateAdditionalFields.altitude)
+  if (isAltitudeAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.altitudeAccuracy)
   return fields
 }
 
