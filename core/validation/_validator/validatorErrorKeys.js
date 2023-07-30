@@ -5,6 +5,7 @@ export const ValidatorErrorKeys = {
   minLengthNotRespected: 'validationErrors.minLengthNotRespected',
   nameDuplicate: 'validationErrors.nameDuplicate',
   nameCannotBeKeyword: 'validationErrors.nameCannotBeKeyword',
+  nameInvalid: 'validationErrors.nameInvalid',
   nameRequired: 'validationErrors.nameRequired',
 
   aggregateFunction: {

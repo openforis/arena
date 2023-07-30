@@ -71,7 +71,7 @@ export const init = (app) => {
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex({
           surveyId,
           categoryUuid,
-          levelIndex: categoryLevelIndex,
+          levelIndex: Number(categoryLevelIndex),
           draft: true,
         })
 

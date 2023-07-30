@@ -12,9 +12,9 @@ const validateSurveyNameUniqueness = (surveyInfos) => (propName, survey) =>
     : null
 
 const getSurveyNameValidations = ({ surveyInfos, required = true }) => [
-  ...(required
-    ? [Validator.validateRequired(Validation.messageKeys.nameRequired), Validator.validateMinLength({ minLength: 6 })]
-    : []),
+  ...(required ? [Validator.validateRequired(Validation.messageKeys.nameRequired)] : []),
+  Validator.validateMinLength({ minLength: 6 }),
+  Validator.validateName(Validation.messageKeys.nameInvalid),
   Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
   validateSurveyNameUniqueness(surveyInfos),
 ]
@@ -29,6 +29,11 @@ export const validateSurveyClone = async ({ newSurvey, surveyInfos }) =>
   Validator.validate(newSurvey, {
     name: getSurveyNameValidations({ surveyInfos, required: false }),
     cloneFromCycle: [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.cyclesRequired)],
+  })
+
+export const validateSurveyImportFromCollect = async ({ newSurvey, surveyInfos }) =>
+  Validator.validate(newSurvey, {
+    name: getSurveyNameValidations({ surveyInfos, required: false }),
   })
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
