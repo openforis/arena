@@ -180,7 +180,7 @@ export const updateNodeDefProps = async (
 
     const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
       Object.assign(nodeDefsUpdated, nodeDefs)
-      surveyUpdated = Survey.mergeNodeDefs({ nodeDefs })(surveyUpdated)
+      surveyUpdated = Survey.mergeNodeDefs(nodeDefs)(surveyUpdated)
     }
 
     const _addNodeDefUpdatedToSurvey = (nodeDef) => {
@@ -230,7 +230,11 @@ export const updateNodeDefProps = async (
     }
 
     if (_propsUpdateRequiresParentLayoutUpdate({ nodeDef, props })) {
-      const nodeDefParentUpdated = NodeDefLayoutUpdater.adjustParentLayoutChildrenHeights({ survey, nodeDef })
+      const nodeDefParent = Survey.getNodeDefParent(nodeDef)(surveyUpdated)
+      const nodeDefParentUpdated = NodeDefLayoutUpdater.adjustLayoutChildrenHeights({
+        survey: surveyUpdated,
+        nodeDef: nodeDefParent,
+      })
       _addNodeDefUpdatedToSurvey(nodeDefParentUpdated)
     }
 

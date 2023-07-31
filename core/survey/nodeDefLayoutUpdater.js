@@ -20,8 +20,15 @@ const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE = {
     NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine ? 2 : 1,
 }
 
+const GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE = {
+  [NodeDef.nodeDefType.coordinate]: GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.nodeDefType.coordinate],
+}
+
 const _getMinGridItemHeight = ({ nodeDef }) =>
   GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) ?? 1
+
+const _getMaxGridItemHeight = ({ nodeDef }) =>
+  GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef })
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
   const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
@@ -356,14 +363,22 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cycles
   return nodeDefsUpdated
 }
 
-export const adjustParentLayoutChildrenHeights = ({ survey, nodeDef }) => {
-  const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
-  const layoutParent = NodeDefLayout.getLayout(nodeDefParent)
-  const cyclesKeys = Object.keys(layoutParent)
-  const layoutParentUpdated = cyclesKeys.reduce(
+/**
+ * Avoids that items in form layout overlap each other by setting their height to the minimum
+ * and moving the items below or above if necessary.
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!object} [params.survey] - The survey.
+ * @param {!object} [params.nodeDef] - The node defintion.
+ * @returns {object} - The updated node defintion.
+ */
+export const adjustLayoutChildrenHeights = ({ survey, nodeDef }) => {
+  const layout = NodeDefLayout.getLayout(nodeDef)
+  const cyclesKeys = Object.keys(layout)
+  const layoutUpdated = cyclesKeys.reduce(
     (acc, cycle) => {
-      const layoutCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
-      const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDefParent)
+      const layoutCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDef)
+      const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDef)
 
       let prevItem = { x: 0, y: 0, w: 0, h: 0, yOriginal: 0 }
       let prevRowHeight = 0
@@ -374,10 +389,7 @@ export const adjustParentLayoutChildrenHeights = ({ survey, nodeDef }) => {
 
       const layoutChildrenAdjusted = layoutChildren.reduce((layoutChildrenAcc, item) => {
         const { i: itemNodeDefUuid, h: hOriginal, w, x, y: yOriginal } = item
-        const itemNodeDef =
-          itemNodeDefUuid === NodeDef.getUuid(nodeDef)
-            ? nodeDef
-            : SurveyNodeDefs.getNodeDefByUuid(itemNodeDefUuid)(survey)
+        const itemNodeDef = SurveyNodeDefs.getNodeDefByUuid(itemNodeDefUuid)(survey)
 
         const sameRowOfPreviousItem = x > prevItem.x
 
@@ -389,7 +401,10 @@ export const adjustParentLayoutChildrenHeights = ({ survey, nodeDef }) => {
         }
 
         const hMin = _getMinGridItemHeight({ nodeDef: itemNodeDef })
-        const h = hMin > hOriginal ? hMin : hOriginal
+        const hMax = _getMaxGridItemHeight({ nodeDef: itemNodeDef })
+        let h = hOriginal
+        if (h < hMin) h = hMin
+        if (hMax && h > hMax) h = hMax
 
         const y = sameRowOfPreviousItem
           ? // item can have the same y of the previous one
@@ -397,12 +412,11 @@ export const adjustParentLayoutChildrenHeights = ({ survey, nodeDef }) => {
           : // item in another row
             Math.max(yOriginal, prevRowMinY + prevRowHeight)
 
-        prevItem = { x, y, h, w, yOriginal }
-
         currentRowHeight = Math.max(currentRowHeight, h)
         currentRowMinY = Math.min(currentRowMinY, y)
 
         const itemUpdated = { ...item, h, w, x, y }
+        prevItem = itemUpdated
 
         layoutChildrenAcc.push(itemUpdated)
         return layoutChildrenAcc
@@ -410,7 +424,7 @@ export const adjustParentLayoutChildrenHeights = ({ survey, nodeDef }) => {
       acc[cycle] = { ...layoutCycle, [NodeDefLayout.keys.layoutChildren]: layoutChildrenAdjusted }
       return acc
     },
-    { ...layoutParent }
+    { ...layout }
   )
-  return NodeDef.assocLayout(layoutParentUpdated)(nodeDefParent)
+  return NodeDef.assocLayout(layoutUpdated)(nodeDef)
 }
