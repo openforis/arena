@@ -6,12 +6,22 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 
-const DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE = {
-  [NodeDef.nodeDefType.coordinate]: () => 2,
+const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE = {
+  [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
+    const minHeight = 2
+    const additionalFieldsNum = NodeDef.getCoordinateAdditionalFields(nodeDef).length
+    if (additionalFieldsNum === 0) return minHeight
+    // 1 additional field => height += 1
+    // 2 or 3 additional fields => height += 2
+    return minHeight + (additionalFieldsNum === 1 ? 1 : 2)
+  },
   [NodeDef.nodeDefType.taxon]: () => 2,
   [NodeDef.nodeDefType.text]: ({ nodeDef }) =>
     NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine ? 2 : 1,
 }
+
+const _getMinGridItemHeight = ({ nodeDef }) =>
+  GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) ?? 1
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
   const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
@@ -203,7 +213,7 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
-  const h = DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) || 1
+  const h = _getMinGridItemHeight({ nodeDef })
 
   const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h })
   layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
@@ -344,4 +354,63 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cycles
   }
 
   return nodeDefsUpdated
+}
+
+export const adjustParentLayoutChildrenHeights = ({ survey, nodeDef }) => {
+  const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
+  const layoutParent = NodeDefLayout.getLayout(nodeDefParent)
+  const cyclesKeys = Object.keys(layoutParent)
+  const layoutParentUpdated = cyclesKeys.reduce(
+    (acc, cycle) => {
+      const layoutCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
+      const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDefParent)
+
+      let prevItem = { x: 0, y: 0, w: 0, h: 0, yOriginal: 0 }
+      let prevRowHeight = 0
+      let prevRowMinY = 0
+
+      let currentRowHeight = 0
+      let currentRowMinY = 0
+
+      const layoutChildrenAdjusted = layoutChildren.reduce((layoutChildrenAcc, item) => {
+        const { i: itemNodeDefUuid, h: hOriginal, w, x, y: yOriginal } = item
+        const itemNodeDef =
+          itemNodeDefUuid === NodeDef.getUuid(nodeDef)
+            ? nodeDef
+            : SurveyNodeDefs.getNodeDefByUuid(itemNodeDefUuid)(survey)
+
+        const sameRowOfPreviousItem = x > prevItem.x
+
+        if (!sameRowOfPreviousItem) {
+          prevRowHeight = currentRowHeight
+          prevRowMinY = currentRowMinY
+          currentRowHeight = 0
+          currentRowMinY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
+        }
+
+        const hMin = _getMinGridItemHeight({ nodeDef: itemNodeDef })
+        const h = hMin > hOriginal ? hMin : hOriginal
+
+        const y = sameRowOfPreviousItem
+          ? // item can have the same y of the previous one
+            Math.max(yOriginal, prevItem.y)
+          : // item in another row
+            Math.max(yOriginal, prevRowMinY + prevRowHeight)
+
+        prevItem = { x, y, h, w, yOriginal }
+
+        currentRowHeight = Math.max(currentRowHeight, h)
+        currentRowMinY = Math.min(currentRowMinY, y)
+
+        const itemUpdated = { ...item, h, w, x, y }
+
+        layoutChildrenAcc.push(itemUpdated)
+        return layoutChildrenAcc
+      }, [])
+      acc[cycle] = { ...layoutCycle, [NodeDefLayout.keys.layoutChildren]: layoutChildrenAdjusted }
+      return acc
+    },
+    { ...layoutParent }
+  )
+  return NodeDef.assocLayout(layoutParentUpdated)(nodeDefParent)
 }
