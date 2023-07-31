@@ -900,6 +900,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     records: 'Records',
     recordsInStepCount: '{{recordsCount}} in {{step}} step',
     submitOnlyAnalysisStepDataIntoR: 'Submit only analysis step data to RStudio',
+    includeEmptyEntities: 'Include empty entities',
     cannotStartRStudio: {
       common: 'Cannot start RStudio',
       noRecords: '$t(chainView.cannotStartRStudio.common): there are no records to submit',

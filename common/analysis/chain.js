@@ -30,6 +30,7 @@ export const keysProps = {
   submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
   statisticalAnalysis: 'statisticalAnalysis',
   resultsBackFromRStudio: 'resultsBackFromRStudio',
+  includeEmptyEntities: 'includeEmptyEntities',
 }
 
 export const statusExec = {
@@ -62,6 +63,7 @@ export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProp
 export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})
 export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
 export const isResultsBackFromRStudio = ObjectUtils.getProp(keysProps.resultsBackFromRStudio, true)
+export const isIncludeEmptyEntities = ObjectUtils.getProp(keysProps.includeEmptyEntities, true)
 
 // ====== UPDATE
 export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.hasSamplingDesign, value)
@@ -70,6 +72,8 @@ export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
   ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
 
 export const assocResultsBackFromRStudio = (value) => ObjectUtils.setProp(keysProps.resultsBackFromRStudio, value)
+
+export const assocIncludeEmptyEntities = (value) => ObjectUtils.setProp(keysProps.includeEmptyEntities, value)
 
 const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
 
