@@ -47,7 +47,7 @@ export const ChainBasicProps = (props) => {
     existsAnotherChainWithSamplingDesign || (Chain.hasSamplingDesign(chain) && Boolean(baseUnitNodeDef))
 
   return (
-    <>
+    <div className="chain-basic-props">
       <LabelsEditor
         labels={chain.props?.labels}
         formLabelKey="chainView.formLabel"
@@ -89,6 +89,6 @@ export const ChainBasicProps = (props) => {
       </FormItem>
 
       <ChainRStudioFieldset updateChain={updateChain} />
-    </>
+    </div>
   )
 }
