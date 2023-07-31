@@ -157,17 +157,12 @@ class RChain {
   }
 
   async _initEntities() {
-    const entityDefs = Survey.getAnalysisEntities({ chain: this.chain })(this.survey).filter(
-      NodeDef.isInCycle(this.cycle)
-    )
+    const { chain, cycle, survey } = this
+    const entityDefs = Survey.getAnalysisEntities({ chain })(survey).filter(NodeDef.isInCycle(cycle))
 
-    const entitiesWithData = await SurveyRdbManager.filterEntitiesWithData({
-      survey: this.survey,
-      cycle: this.cycle,
-      entityDefs,
-    })
-
-    this._entities = entitiesWithData
+    this._entities = Chain.isIncludeEntitiesWithoutData(chain)
+      ? entityDefs
+      : await SurveyRdbManager.filterEntitiesWithData({ survey, cycle, entityDefs })
   }
 
   async _initSurveyAndChain() {

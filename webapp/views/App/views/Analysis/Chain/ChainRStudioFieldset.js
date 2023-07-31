@@ -29,10 +29,10 @@ export const ChainRStudioFieldset = (props) => {
       <div className="content">
         <div>
           <Checkbox
-            label="chainView.includeEmptyEntities"
-            checked={Chain.isIncludeEmptyEntities(chain)}
-            validation={Validation.getFieldValidation(Chain.keysProps.includeEmptyEntities)(validation)}
-            onChange={(value) => updateChain(Chain.assocIncludeEmptyEntities(value)(chain))}
+            label="chainView.includeEntitiesWithoutData"
+            checked={Chain.isIncludeEntitiesWithoutData(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.includeEntitiesWithoutData)(validation)}
+            onChange={(value) => updateChain(Chain.assocIncludeEntitiesWithoutData(value)(chain))}
           />
           <Checkbox
             label="chainView.submitOnlyAnalysisStepDataIntoR"
