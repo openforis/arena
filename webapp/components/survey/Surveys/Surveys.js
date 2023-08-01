@@ -16,6 +16,7 @@ import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import HeaderLeft from './HeaderLeft'
 
@@ -74,7 +75,7 @@ const Surveys = (props) => {
         {
           key: Survey.sortableKeys.name,
           header: 'common.name',
-          renderItem: ({ item }) => Survey.getName(Survey.getSurveyInfo(item)),
+          renderItem: ({ item }) => <LabelWithTooltip label={Survey.getName(Survey.getSurveyInfo(item))} />,
           width: 'minmax(8rem, 1fr)',
           sortable: true,
         },
@@ -83,7 +84,8 @@ const Surveys = (props) => {
           header: 'common.label',
           renderItem: ({ item }) => {
             const surveyInfo = Survey.getSurveyInfo(item)
-            return Survey.getLabel(surveyInfo, lang, false) || Survey.getDefaultLabel(surveyInfo)
+            const label = Survey.getLabel(surveyInfo, lang, false) || Survey.getDefaultLabel(surveyInfo)
+            return <LabelWithTooltip label={label} />
           },
           width: 'minmax(8rem, 1fr)',
           sortable: true,
