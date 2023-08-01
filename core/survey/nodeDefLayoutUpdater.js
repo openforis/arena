@@ -384,8 +384,10 @@ export const adjustLayoutChildrenHeights = ({ survey, nodeDef }) => {
       let prevRowHeight = 0
       let prevRowMinY = 0
 
+      let currentRowHeightOriginal = 0
       let currentRowHeight = 0
-      let currentRowMinY = 0
+      let currentRowStartingY = 0
+      let currentRowYOffset = 0
 
       const layoutChildrenAdjusted = layoutChildren.reduce((layoutChildrenAcc, item) => {
         const { i: itemNodeDefUuid, h: hOriginal, w, x, y: yOriginal } = item
@@ -395,9 +397,16 @@ export const adjustLayoutChildrenHeights = ({ survey, nodeDef }) => {
 
         if (!sameRowOfPreviousItem) {
           prevRowHeight = currentRowHeight
-          prevRowMinY = currentRowMinY
+          prevRowMinY = currentRowStartingY
+
+          const rowHeightDiff = currentRowHeightOriginal - currentRowHeight
+          if (rowHeightDiff > 0) {
+            // prev row has been shrinked
+            currentRowYOffset = currentRowYOffset + rowHeightDiff
+          }
+          currentRowHeightOriginal = 0
           currentRowHeight = 0
-          currentRowMinY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
+          currentRowStartingY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
         }
 
         const hMin = _getMinGridItemHeight({ nodeDef: itemNodeDef })
@@ -406,14 +415,16 @@ export const adjustLayoutChildrenHeights = ({ survey, nodeDef }) => {
         if (h < hMin) h = hMin
         if (hMax && h > hMax) h = hMax
 
-        const y = sameRowOfPreviousItem
-          ? // item can have the same y of the previous one
-            Math.max(yOriginal, prevItem.y)
-          : // item in another row
-            Math.max(yOriginal, prevRowMinY + prevRowHeight)
+        const y =
+          (sameRowOfPreviousItem
+            ? // item can have the same y of the previous one
+              Math.max(yOriginal, prevItem.y)
+            : // item in another row
+              Math.max(yOriginal, prevRowMinY + prevRowHeight)) - currentRowYOffset
 
-        currentRowHeight = Math.max(currentRowHeight, h)
-        currentRowMinY = Math.min(currentRowMinY, y)
+        currentRowHeightOriginal = Math.max(currentRowHeightOriginal, y + hOriginal - currentRowStartingY)
+        currentRowHeight = Math.max(currentRowHeight, y + h - currentRowStartingY)
+        currentRowStartingY = Math.min(currentRowStartingY, y)
 
         const itemUpdated = { ...item, h, w, x, y }
         prevItem = itemUpdated
