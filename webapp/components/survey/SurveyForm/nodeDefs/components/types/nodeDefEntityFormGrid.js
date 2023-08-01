@@ -7,13 +7,13 @@ import classNames from 'classnames'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
 import * as Node from '@core/record/node'
 
 import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
 import { useIsMountedRef } from '@webapp/components/hooks'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
