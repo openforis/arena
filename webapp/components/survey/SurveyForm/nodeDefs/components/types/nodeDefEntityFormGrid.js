@@ -13,6 +13,7 @@ import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDef
 import { useIsMountedRef } from '@webapp/components/hooks'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -61,7 +62,19 @@ const NodeDefEntityFormGrid = (props) => {
     : nodeDefsInnerPage
 
   const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
-  const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal
+  const rdgLayout = (entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal).map(
+    (gridItem) => {
+      const { i: gridItemNodeDefUuid } = gridItem
+
+      const gridItemNodeDef = gridItemNodeDefUuid ? Survey.getNodeDefByUuid(gridItemNodeDefUuid)(survey) : null
+      if (!gridItemNodeDef) return gridItem
+
+      // calculate min and max height at runtime in case we change them in the future
+      const minH = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef: gridItemNodeDef })
+      const maxH = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: gridItemNodeDef })
+      return { ...gridItem, minH, maxH }
+    }
+  )
 
   if (nodeDefsInnerPage.length === 0) return null
 

@@ -5,30 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
-
-const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE = {
-  [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
-    const minHeight = 2
-    const additionalFieldsNum = NodeDef.getCoordinateAdditionalFields(nodeDef).length
-    if (additionalFieldsNum === 0) return minHeight
-    // 1 additional field => height += 1
-    // 2 or 3 additional fields => height += 2
-    return minHeight + (additionalFieldsNum === 1 ? 1 : 2)
-  },
-  [NodeDef.nodeDefType.taxon]: () => 2,
-  [NodeDef.nodeDefType.text]: ({ nodeDef }) =>
-    NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine ? 2 : 1,
-}
-
-const GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE = {
-  [NodeDef.nodeDefType.coordinate]: GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.nodeDefType.coordinate],
-}
-
-const _getMinGridItemHeight = ({ nodeDef }) =>
-  GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) ?? 1
-
-const _getMaxGridItemHeight = ({ nodeDef }) =>
-  GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef })
+import { NodeDefLayoutSizes } from './nodeDefLayoutSizes'
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
   const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
@@ -220,9 +197,10 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
-  const h = _getMinGridItemHeight({ nodeDef })
+  const minH = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef })
+  const maxH = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef })
 
-  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h })
+  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h: minH, minH, maxH })
   layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
   return layoutForCycleUpdated
 }
@@ -409,8 +387,8 @@ export const adjustLayoutChildrenHeights = ({ survey, nodeDef }) => {
           currentRowStartingY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
         }
 
-        const hMin = _getMinGridItemHeight({ nodeDef: itemNodeDef })
-        const hMax = _getMaxGridItemHeight({ nodeDef: itemNodeDef })
+        const hMin = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef: itemNodeDef })
+        const hMax = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: itemNodeDef })
         let h = hOriginal
         if (h < hMin) h = hMin
         if (hMax && h > hMax) h = hMax
