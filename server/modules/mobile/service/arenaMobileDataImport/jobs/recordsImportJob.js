@@ -10,6 +10,7 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import FileZip from '@server/utils/file/fileZip'
 import { ArenaMobileDataImport } from '../../arenaMobileDataImport'
+import { RecordNodesUpdater } from '@core/record/_record/recordNodesUpdater'
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -58,34 +59,29 @@ export default class RecordsImportJob extends DataImportBaseJob {
         conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.overwriteIfUpdated &&
         DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
       ) {
-        
+        this.logDebug(`updating record ${recordUuid}`)
+
+        const recordTarget = await RecordManager.fetchRecordAndNodesByUuid({
+          surveyId,
+          recordUuid,
+          draft: false,
+          fetchForUpdate: true,
+        })
+        RecordNodesUpdater.mergeRecords({ survey, recordSource: record, recordTarget })
       }
       return
+    } else {
+      // insert record
+      await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
+
+      // insert nodes (add them to batch persister)
+      const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+
+      // check that the node definition associated to the node has not been deleted from the survey
+      const validNodes = nodes.filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
+
+      await this.persistUpdatedNodes({ nodesUpdated: validNodes })
     }
-
-    // if (
-    //   !existingRecordSummary ||
-    //   DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
-    // ) {
-    // if (existingRecordSummary) {
-    //   // delete existing record before import (if the record to import has more recent changes)
-    //   this.logDebug(`deleting existing record ${recordUuid}`)
-    //   await RecordManager.deleteRecord(this.user, survey, existingRecordSummary, this.tx)
-    // }
-    // insert record
-    await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
-
-    // insert nodes (add them to batch persister)
-    const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-
-    // check that the node definition associated to the node has not been deleted from the survey
-    const validNodes = nodes.filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
-
-    await this.persistUpdatedNodes({ nodesUpdated: validNodes })
-
-    // } else {
-    //   this.logDebug(`skipping record ${recordUuid}; it doesn't have any recent updates`)
-    // }
   }
 
   /**

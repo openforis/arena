@@ -181,6 +181,7 @@ export {
   deleteRecordsByCycles,
   deleteNode,
   deleteNodesByNodeDefUuids,
+  deleteNodesByUuids,
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION

@@ -7,6 +7,7 @@ import {
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -47,6 +48,34 @@ const _adaptValue = ({ survey, record, parentNode, attributeDef, value }) => {
   return valueAdapter ? valueAdapter({ survey, record, parentNode, attributeDef, value }) : value
 }
 
+const _updateAttributeValue = ({ survey, record, entity, attributeDef, attribute, value, sideEffect = false }) => {
+  if (
+    !NodeValues.isValueEqual({
+      survey,
+      nodeDef: attributeDef,
+      value: Node.getValue(attribute),
+      valueSearch: value,
+      record,
+      parentNode: entity,
+      strict: true,
+    })
+  ) {
+    // update existing attribute (if value changed)
+    const attributeUpdated = A.pipe(
+      Node.assocValue(value),
+      // reset default value applied flag
+      Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false }),
+      Node.assocUpdated(true)
+    )(attribute)
+
+    const updateResult = new RecordUpdateResult({ record })
+    updateResult.addNode(attributeUpdated, { sideEffect })
+    return updateResult
+  }
+  // no updates performed
+  return null
+}
+
 const _addOrUpdateAttribute =
   ({ survey, entity, attributeDef, value: valueParam, sideEffect = false }) =>
   (record) => {
@@ -62,30 +91,7 @@ const _addOrUpdateAttribute =
       updateResult.addNode(attributeCreated, { sideEffect })
       return updateResult
     }
-    if (
-      !NodeValues.isValueEqual({
-        survey,
-        nodeDef: attributeDef,
-        value: Node.getValue(attribute),
-        valueSearch: value,
-        record,
-        parentNode: entity,
-        strict: true,
-      })
-    ) {
-      // update existing attribute (if value changed)
-      const attributeUpdated = A.pipe(
-        Node.assocValue(value),
-        // reset default value applied flag
-        Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false })
-      )(attribute)
-
-      const updateResult = new RecordUpdateResult({ record })
-      updateResult.addNode(attributeUpdated, { sideEffect })
-      return updateResult
-    }
-    // no updates performed
-    return null
+    return _updateAttributeValue({ survey, record, entity, attributeDef, attribute, value, sideEffect })
   }
 
 const _addEntityAndKeyValues =
@@ -272,7 +278,83 @@ const updateAttributesWithValues =
     return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
   }
 
-const mergeEntities = ({ survey, entitySource, entityTarget }) => {}
+const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, entityTarget }) => {
+  const updateResult = new RecordUpdateResult({ record: recordTarget })
+
+  const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
+
+  Survey.getNodeDefChildren(entityDef, false).forEach((childDef) => {
+    const childDefUuid = NodeDef.getUuid(childDef)
+
+    const childrenSource = RecordReader.getNodeChildrenByDefUuidUnsorted(entitySource, childDefUuid)(recordSource)
+    const childrenTarget = RecordReader.getNodeChildrenByDefUuidUnsorted(
+      entitySource,
+      childDefUuid
+    )(updateResult.record)
+
+    // delete nodes that are not in source record
+
+    const childrenTargetToDelete = childrenTarget
+      .filter(
+        (childTarget) => !childrenSource.find((childSource) => Node.getUuid(childSource) === Node.getUuid(childTarget))
+      )
+      .map(Node.assocDeleted)
+
+    if (childrenTargetToDelete.length > 0) {
+      const nodesDeleteUpdateResult = CoreRecordNodesUpdater.removeNodes({
+        nodes: ObjectUtils.toUuidIndexedObj(childrenTargetToDelete),
+      })(updateResult.record)
+      updateResult.merge(nodesDeleteUpdateResult)
+    }
+
+    // add new nodes to updateResult (and record)
+
+    const childrenSourceToAdd = childrenSource.filter(
+      (childSource) => !childrenTarget.find((childTarget) => Node.getUuid(childTarget) === Node.getUuid(childSource))
+    )
+    childrenSourceToAdd.forEach((childSourceToAdd) => {
+      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedNode) => {
+        updateResult.addNode(Node.assocCreated(visitedNode))
+      })(updateResult.record)
+    })
+
+    // update existing nodes
+
+    const childrenTargetToUpdate = childrenTarget.filter((childTarget) =>
+      childrenSource.find((childSource) => Node.getUuid(childSource) === Node.getUuid(childTarget))
+    )
+    childrenTargetToUpdate.forEach((childTargetToUpdate) => {
+      const childSource = childrenSource.find(
+        (childSource) => Node.getUuid(childSource) === Node.getUuid(childTargetToUpdate)
+      )
+      if (NodeDef.isAttribute(childDef)) {
+        const attributeUpdateResult = _updateAttributeValue({
+          survey,
+          record: updateResult.record,
+          entity: entityTarget,
+          attribute: childTargetToUpdate,
+          value: Node.getValue(childSource),
+          sideEffect: true,
+        })
+        if (attributeUpdateResult) {
+          updateResult.merge(attributeUpdateResult)
+        }
+      } else {
+        const childEntityUpdateResult = _mergeEntities({
+          survey,
+          recordSource,
+          recordTarget: updateResult.record,
+          entitySource: childSource,
+          entityTarget: childTargetToUpdate,
+        })
+        if (childEntityUpdateResult) {
+          updateResult.merge(childEntityUpdateResult)
+        }
+      }
+    })
+  })
+  return updateResult
+}
 
 const mergeRecords = ({ survey, recordSource, recordTarget }) => {
   const rootTarget = RecordReader.getRootNode(recordTarget)
@@ -281,7 +363,7 @@ const mergeRecords = ({ survey, recordSource, recordTarget }) => {
     // it should never happen...
     throw new Error('error merging records: root entities have different uuids')
   }
-  return mergeEntities({ survey, entitySource: rootSource, entityTarget: rootTarget })
+  return _mergeEntities({ survey, recordSource, recordTarget, entitySource: rootSource, entityTarget: rootTarget })
 }
 
 export const RecordNodesUpdater = {

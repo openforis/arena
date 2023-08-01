@@ -28,6 +28,7 @@ export default class DataImportBaseJob extends Job {
 
     this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
+    this.nodesDeleteBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
     this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
   }
 
