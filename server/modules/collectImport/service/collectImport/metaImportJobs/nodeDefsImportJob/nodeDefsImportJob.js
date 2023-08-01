@@ -207,6 +207,16 @@ export default class NodeDefsImportJob extends Job {
       if (allowOnlyDeviceCoordinate) {
         propsUpdated[NodeDef.propKeys.allowOnlyDeviceCoordinate] = true
       }
+      // 3f. accuracy
+      const includeAccuracy = CollectSurvey.getUiAttribute('includeAccuracy', false)(collectNodeDef)
+      if (includeAccuracy) {
+        propsUpdated[NodeDef.propKeys.includeAccuracy] = true
+      }
+      // 3g. altitude
+      const includeAltitude = CollectSurvey.getUiAttribute('includeAltitude', false)(collectNodeDef)
+      if (includeAltitude) {
+        propsUpdated[NodeDef.propKeys.includeAltitude] = true
+      }
     } else if (type === NodeDef.nodeDefType.text) {
       // 3f. text input type (short/memo => singleLine/multiLine)
       const collectTextInputType = CollectSurvey.getAttribute('type', 'short')(collectNodeDef)

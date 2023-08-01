@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import * as API from '@webapp/service/api'
 
-export const useElevation = ({ survey, point, active = true }) => {
+export const useAltitude = ({ survey, point, active = true }) => {
   const surveyId = Survey.getId(survey)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
@@ -14,17 +14,17 @@ export const useElevation = ({ survey, point, active = true }) => {
   const pointLatLng = Points.toLatLong(point, srsIndex)
   const { y: lat, x: lng } = pointLatLng
 
-  const [elevation, setElevation] = useState('...')
+  const [altitude, setAltitude] = useState('...')
 
   useEffect(() => {
-    const fetchElevation = async () => {
-      const elev = await API.fetchElevation({ surveyId, lat, lng })
-      setElevation(elev === null ? 'error' : elev)
+    const fetchAltitude = async () => {
+      const _altitude = await API.fetchAltitude({ surveyId, lat, lng })
+      setAltitude(_altitude === null ? 'error' : _altitude)
     }
     if (active) {
-      fetchElevation()
+      fetchAltitude()
     }
   }, [active, lat, lng, surveyId])
 
-  return elevation
+  return altitude
 }

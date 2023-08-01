@@ -9,11 +9,23 @@ import { useI18n } from '@webapp/store/system'
 const toOption = (surveyInfo) => {
   if (!surveyInfo) return null
 
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+  const surveyName = Survey.getName(surveyInfo)
+  const surveyLabel = StringUtils.trim(Survey.getDefaultLabel(surveyInfo))
+  const labelParts = [surveyName]
+  if (surveyLabel) {
+    labelParts.push(surveyLabel)
+  }
+  const label = labelParts.join(' - ')
+
   return {
-    name: Survey.getName(surveyInfo),
-    label: StringUtils.trim(Survey.getDefaultLabel(surveyInfo)),
+    value: surveyId,
+    label,
+    surveyId,
+    surveyName,
+    surveyLabel,
     description: StringUtils.trim(Survey.getDefaultDescription(surveyInfo)),
-    value: Survey.getIdSurveyInfo(surveyInfo),
+    cycles: Survey.getCycleKeys(surveyInfo),
   }
 }
 

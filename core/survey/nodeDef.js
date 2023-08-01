@@ -1,7 +1,9 @@
 import * as R from 'ramda'
+
+import { Objects } from '@openforis/arena-core'
+
 import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
@@ -80,6 +82,9 @@ export const propKeys = {
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
+  includeAccuracy: 'includeAccuracy',
+  includeAltitude: 'includeAltitude',
+  includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 }
 
 export const textInputTypes = {
@@ -97,6 +102,12 @@ export const textTransformValues = {
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
+}
+
+export const coordinateAdditionalFields = {
+  accuracy: 'accuracy',
+  altitude: 'altitude',
+  altitudeAccuracy: 'altitudeAccuracy',
 }
 
 export const fileTypeValues = {
@@ -230,6 +241,16 @@ export const isBooleanLabelYesNo = (nodeDef) =>
 
 // Coordiante
 export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
+export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
+export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
+export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
+export const getCoordinateAdditionalFields = (nodeDef) => {
+  const fields = []
+  if (isAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.accuracy)
+  if (isAltitudeIncluded(nodeDef)) fields.push(coordinateAdditionalFields.altitude)
+  if (isAltitudeAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.altitudeAccuracy)
+  return fields
+}
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -401,6 +422,30 @@ export const copyLayout =
         .reduce((layoutAcc, cycleKey) => NodeDefLayout.assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), layout)
       return layoutUpdated
     })(nodeDef)
+
+/**
+ * It keeps only cycleToKeep information and moves it to cycleTarget.
+ * (it does side effect on the specified nodeDef).
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!string} params.cycleToKeep - Id of source cycle to keep.
+ * @param {!string} params.cycleTarget - Id of target cycle.
+ * @returns {object} - Returns the nodeDef specified in parameters (it does side effect).
+ */
+export const keepOnlyOneCycle =
+  ({ cycleToKeep, cycleTarget }) =>
+  (nodeDef) => {
+    nodeDef.props[propKeys.cycles] = [cycleTarget]
+    const nodeDefProps = nodeDef[keys.props]
+    const layoutForCycle = nodeDefProps[propKeys.layout]?.[cycleToKeep]
+
+    if (Objects.isEmpty(layoutForCycle)) {
+      delete nodeDefProps[propKeys.layout]
+    } else {
+      nodeDefProps[propKeys.layout] = { [cycleTarget]: layoutForCycle }
+    }
+    return nodeDef
+  }
 
 // ==== UTILS
 export const canNodeDefBeMultiple = (nodeDef) =>

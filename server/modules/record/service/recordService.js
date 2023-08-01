@@ -345,6 +345,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
     recordUuid,
     msg: {
       type: RecordsUpdateThreadMessageTypes.nodeDelete,
+      recordUuid,
       nodeUuid,
       user,
     },

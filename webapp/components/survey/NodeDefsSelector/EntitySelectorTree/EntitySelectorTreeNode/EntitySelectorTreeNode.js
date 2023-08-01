@@ -72,7 +72,9 @@ const EntitySelectorTreeNode = (props) => {
     ? childrenPageDefs.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
     : childrenPageDefs
 
-  const hasVisibleChildren = visibleChildren.length > 0
+  const availableChildren = visibleChildren.filter((childDef) => !isDisabled(childDef))
+
+  const hasChildren = availableChildren.length > 0
 
   return (
     <div className={classNames('entity-selector-tree-node-wrapper', { 'is-root': root, hidden })}>
@@ -81,7 +83,7 @@ const EntitySelectorTreeNode = (props) => {
           'with-children': showChildren,
         })}
       >
-        {hasVisibleChildren && (
+        {hasChildren && (
           <button type="button" className="btn-xs btn-toggle" onClick={toggleShowChildren}>
             <span className="icon icon-play3 icon-14px" />
           </button>
@@ -94,7 +96,6 @@ const EntitySelectorTreeNode = (props) => {
           })}
           data-testid={TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef))}
           onClick={() => onSelect(nodeDef)}
-          aria-disabled={isDisabled(nodeDef)}
         >
           {label}
           {getLabelSuffix(nodeDef)}
@@ -102,7 +103,7 @@ const EntitySelectorTreeNode = (props) => {
       </div>
 
       {showChildren &&
-        childrenPageDefs.map((nodeDefChild) => (
+        availableChildren.map((nodeDefChild) => (
           <EntitySelectorTreeNode
             key={NodeDef.getUuid(nodeDefChild)}
             expanded={expanded}

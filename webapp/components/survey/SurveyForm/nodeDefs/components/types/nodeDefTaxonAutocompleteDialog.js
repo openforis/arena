@@ -48,14 +48,14 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
 
   useEffect(() => {
     fetchTaxa()
-  }, [fetchTaxa, fieldValue])
+  }, [fieldValue])
 
   return ReactDOM.createPortal(
     <AutocompleteDialog
       className="survey-form__node-def-taxon-autocomplete-list"
       items={list}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
-      itemKey={(taxon) => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
+      itemKey={(taxon) => `${Taxon.getUuid(taxon)}_${Taxon.getVernacularNameUuid(taxon)}`}
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}

@@ -178,7 +178,7 @@ export const init = (app) => {
     }
   })
 
-  // Fetch item by uuid
+  // Fetch category by uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid',
     AuthMiddleware.requireSurveyViewPermission,
@@ -251,6 +251,23 @@ export const init = (app) => {
         const items = ObjectUtils.toUuidIndexedObj(
           await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
         )
+
+        res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // Fetch items by level uuid
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/levels/:levelIndex/items',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, levelIndex, draft } = Request.getParams(req)
+
+        const items = await CategoryService.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft })
 
         res.json({ items })
       } catch (error) {

@@ -5,13 +5,16 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 import { ArenaMobileDataImport } from '../service/arenaMobileDataImport'
 
+const fetchSurvey = async ({ surveyId, cycle }) =>
+  SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle, advanced: true })
+
 export const init = (app) => {
-  // ====== READ - all survey day
+  // ====== READ - all survey data
   app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle } = Request.getParams(req)
 
-      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle })
+      const survey = await fetchSurvey({ surveyId, cycle })
 
       res.json({ survey })
     } catch (e) {
@@ -25,12 +28,13 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const {
         surveyId,
+        cycle,
         conflictResolutionStrategy = ArenaMobileDataImport.conflictResolutionStrategies.skipDuplicates,
       } = Request.getParams(req)
 
       const filePath = Request.getFilePath(req)
 
-      const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
+      const survey = await fetchSurvey({ surveyId, cycle })
 
       const job = ArenaMobileImportService.startArenaMobileImportJob({
         user,

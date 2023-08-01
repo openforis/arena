@@ -1,6 +1,7 @@
 import Job from '@server/job/job'
 
 import * as PromiseUtils from '@core/promiseUtils'
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -14,9 +15,9 @@ export default class CategoriesExportJob extends Job {
   }
 
   async execute() {
-    const { surveyId, outputDir } = this.context
+    const { survey, outputDir } = this.context
 
-    const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId })
+    const categories = Survey.getCategoriesArray(survey)
     this.total = categories.length
 
     const categoriesDir = FileUtils.join(outputDir, categoriesOutputFolderName)
@@ -27,7 +28,7 @@ export default class CategoriesExportJob extends Job {
       const categoryOutputStream = FileUtils.createWriteStream(categoryTempFilePath)
       await CategoryManager.exportCategoryToStream(
         {
-          surveyId,
+          survey,
           categoryUuid: category.uuid,
           outputStream: categoryOutputStream,
         },

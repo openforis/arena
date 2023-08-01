@@ -1,4 +1,12 @@
 export const useOnUpdate =
   ({ newSurvey, setNewSurvey }) =>
-  ({ name, value }) =>
-    setNewSurvey({ ...newSurvey, [name]: value })
+  (...nameValuePairs) => {
+    const newSurveyNext = {
+      ...newSurvey,
+      validation: null, // reset validation (validation performed server side)
+    }
+    nameValuePairs.forEach(({ name, value }) => {
+      newSurveyNext[name] = value
+    })
+    setNewSurvey(newSurveyNext)
+  }

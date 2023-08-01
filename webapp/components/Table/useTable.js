@@ -49,10 +49,10 @@ export const useTable = ({
     },
   })
 
-  const initData = useCallback(() => {
+  const initData = () => {
     fetchData()
     fetchCount()
-  }, [fetchData, fetchCount])
+  }
 
   // init data on mount and on restParams and search update
   useEffect(initData, [JSON.stringify(restParams), search])

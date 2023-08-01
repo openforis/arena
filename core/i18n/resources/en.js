@@ -676,7 +676,7 @@ Are you sure you want to continue?`,
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     recordEditModalTitle: 'Record: {{keyValues}}',
-    elevation: 'Elevation (m)',
+    altitude: 'Altitude (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     openInEarthMap: 'Open in Earth Map',
@@ -732,6 +732,7 @@ Are you sure you want to continue?`,
     nodes: 'Nodes',
     chains: 'Chains',
     records: 'Records',
+    files: 'Files',
   },
 
   usersView: {
@@ -899,6 +900,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     records: 'Records',
     recordsInStepCount: '{{recordsCount}} in {{step}} step',
     submitOnlyAnalysisStepDataIntoR: 'Submit only analysis step data to RStudio',
+    includeEntitiesWithoutData: 'Include entities without data',
     cannotStartRStudio: {
       common: 'Cannot start RStudio',
       noRecords: '$t(chainView.cannotStartRStudio.common): there are no records to submit',
@@ -936,6 +938,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
+    deleteChain: 'Delete chain',
     deleteConfirm: `Delete this processing chain?
     
 $t(common.cantUndoWarning)`,
@@ -1020,6 +1023,7 @@ $t(common.appNameFull)
   // ====== Survey views
 
   nodeDefEdit: {
+    additionalFields: 'Additional fields',
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
@@ -1214,10 +1218,14 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       },
     },
     nodeDefCoordinate: {
+      coordinate: 'Coordinate',
       srs: 'SRS',
       x: 'X',
       y: 'Y',
       showOnMap: 'Show on map',
+      accuracy: 'Accuracy',
+      altitude: 'Altitude',
+      altitudeAccuracy: 'Altitude accuracy',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
@@ -1348,6 +1356,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     minLengthNotRespected: 'Minimum length of {{minLength}} characters not respected',
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
+    nameInvalid:
+      'Name is invalid: it must contain only lowercase letters and numbers, starting with a letter, and only "-" and "_" symbols',
     nameRequired: 'Name is required',
     requiredField: '{{field}} is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
@@ -1461,6 +1471,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
+      cycleRequired: 'Cycle is required',
       cyclesRequired: 'At least one cycle must be defined',
       cyclesExceedingMax: 'A survey can have at most 10 cycles',
       cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',

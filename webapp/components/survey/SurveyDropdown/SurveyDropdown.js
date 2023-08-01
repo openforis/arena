@@ -22,17 +22,17 @@ const SurveyDropdown = (props) => {
     <Dropdown
       className="survey-dropdown"
       items={options}
-      onChange={(item) => onChange(item?.value)}
+      onChange={(item) => onChange(item)}
       placeholder={i18n.t('common.select')}
       renderOptionLabel={({ data }) => {
-        const { name, label } = data
+        const { surveyName, surveyLabel } = data
         return (
           <div className="dropdown-option__label">
-            <span className="survey-name">{name}</span>
-            {label && (
+            <span className="survey-name">{surveyName}</span>
+            {surveyLabel && (
               <>
                 <span> - </span>
-                <span className="survey-label">{label}</span>
+                <span className="survey-label">{surveyLabel}</span>
               </>
             )}
           </div>

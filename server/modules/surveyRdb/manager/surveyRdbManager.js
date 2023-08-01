@@ -208,7 +208,12 @@ export const fetchEntitiesDataToCsvFiles = async (
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext, includeAnalysis)(survey)
+      ? Survey.getNodeDefDescendantAttributesInSingleEntities({
+          nodeDef: nodeDefContext,
+          includeAnalysis,
+          sorted: true,
+          cycle,
+        })(survey)
       : [nodeDefContext] // Multiple attribute
 
     const ancestorKeys = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
@@ -245,7 +250,7 @@ export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwner
   await PromiseUtils.each(nodeDefs, async (nodeDefContext) => {
     const childrenFileDefs = (
       NodeDef.isEntity(nodeDefContext)
-        ? Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDefContext)(survey)
+        ? Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef: nodeDefContext })(survey)
         : [nodeDefContext]
     ).filter(NodeDef.isFile)
 

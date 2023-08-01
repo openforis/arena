@@ -74,7 +74,10 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     if (NodeDef.isAttribute(this.nodeDef)) {
       nodeDefs = [this.nodeDef] // Multiple attr table
     } else {
-      const descendants = Survey.getNodeDefDescendantAttributesInSingleEntities(this.nodeDef, true)(this.survey)
+      const descendants = Survey.getNodeDefDescendantAttributesInSingleEntities({
+        nodeDef: this.nodeDef,
+        includeAnalysis: true,
+      })(this.survey)
       nodeDefs = R.sortBy(R.ascend(R.prop('id')))(descendants)
     }
     return nodeDefs.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))

@@ -5,6 +5,7 @@ export const ValidatorErrorKeys = {
   minLengthNotRespected: 'validationErrors.minLengthNotRespected',
   nameDuplicate: 'validationErrors.nameDuplicate',
   nameCannotBeKeyword: 'validationErrors.nameCannotBeKeyword',
+  nameInvalid: 'validationErrors.nameInvalid',
   nameRequired: 'validationErrors.nameRequired',
 
   aggregateFunction: {
@@ -104,6 +105,7 @@ export const ValidatorErrorKeys = {
   surveyInfoEdit: {
     langRequired: 'validationErrors.surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors.surveyInfoEdit.srsRequired',
+    cycleRequired: 'validationErrors.surveyInfoEdit.cycleRequired',
     cyclesRequired: 'validationErrors.surveyInfoEdit.cyclesRequired',
     cyclesExceedingMax: 'validationErrors.surveyInfoEdit.cyclesExceedingMax',
     cycleDateStartMandatory: 'validationErrors.surveyInfoEdit.cycleDateStartMandatory',

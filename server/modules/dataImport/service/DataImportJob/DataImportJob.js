@@ -86,12 +86,13 @@ export default class DataImportJob extends DataImportBaseJob {
   }
 
   async startCsvReader() {
-    const { entityDefUuid, filePath, survey } = this.context
+    const { cycle, entityDefUuid, filePath, survey } = this.context
 
     try {
       const reader = await DataImportFileReader.createReader({
         filePath,
         survey,
+        cycle,
         entityDefUuid,
         onRowItem: (item) => this.onRowItem(item),
         onTotalChange: (total) => (this.total = total),

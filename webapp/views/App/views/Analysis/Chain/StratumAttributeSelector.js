@@ -31,7 +31,9 @@ export const StratumAttributeSelector = () => {
   if (baseUnitNodeDef) {
     Survey.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDef) => {
       // search inside single entities
-      const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDef, true)(survey)
+      const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef, includeAnalysis: true })(
+        survey
+      )
       selectableDefs.push(
         ...descendantDefs.filter(
           (descendantDef) =>
