@@ -76,15 +76,17 @@ export default class RecordsImportJob extends DataImportBaseJob {
         })
         this.currentRecord = recordTargetUpdated
         await this.persistUpdatedNodes({ nodesUpdated })
-
+        this.updatedRecordsUuids.add(recordUuid)
         this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
       }
     } else {
       // insert record
+      this.logDebug(`inserting new record ${recordUuid}`)
+
       await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
 
       // insert nodes (add them to batch persister)
-      const nodes = Record.getNodesArray(record)
+      const nodesArray = Record.getNodesArray(record)
         // check that the node definition associated to the node has not been deleted from the survey
         .filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
         .sort((nodeA, nodeB) => nodeA.id - nodeB.id)
@@ -92,9 +94,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
           node[Node.keys.created] = true // do side effect to avoid creating new objects
           return node
         })
-      const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodes)
+      const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
 
       await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid })
+
+      this.insertedRecordsUuids.add(recordUuid)
+
+      this.logDebug(`record insert complete (${nodesArray.length} nodes inserted)`)
     }
   }
 }
