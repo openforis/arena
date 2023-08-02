@@ -147,6 +147,8 @@ export const assocCreated = R.assoc(keys.created)
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
 
+export const assocDateModified = R.assoc(keys.dateModified)
+
 //
 // ======
 // UTILS

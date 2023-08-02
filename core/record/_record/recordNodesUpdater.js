@@ -48,7 +48,16 @@ const _adaptValue = ({ survey, record, parentNode, attributeDef, value }) => {
   return valueAdapter ? valueAdapter({ survey, record, parentNode, attributeDef, value }) : value
 }
 
-const _updateAttributeValue = ({ survey, record, entity, attributeDef, attribute, value, sideEffect = false }) => {
+const _updateAttributeValue = ({
+  survey,
+  record,
+  entity,
+  attributeDef,
+  attribute,
+  value,
+  dateModified = new Date(),
+  sideEffect = false,
+}) => {
   if (
     !NodeValues.isValueEqual({
       survey,
@@ -65,7 +74,8 @@ const _updateAttributeValue = ({ survey, record, entity, attributeDef, attribute
       Node.assocValue(value),
       // reset default value applied flag
       Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false }),
-      Node.assocUpdated(true)
+      Node.assocUpdated(true),
+      (nodeUpdated) => (dateModified ? Node.assocDateModified(dateModified)(nodeUpdated) : nodeUpdated)
     )(attribute)
 
     const updateResult = new RecordUpdateResult({ record })
@@ -305,30 +315,25 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
 
     // delete nodes that are not in source record
     const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted)
-
     if (childrenTargetToDelete.length > 0) {
-      const nodesDeleteUpdateResult = CoreRecordNodesUpdater.removeNodes({
-        nodes: ObjectUtils.toUuidIndexedObj(childrenTargetToDelete),
-      })(updateResult.record)
+      const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(childrenTargetToDelete)
+      const nodesDeleteUpdateResult = CoreRecordNodesUpdater.removeNodes({ nodes: nodesIndexedByUuid })(
+        updateResult.record
+      )
       updateResult.merge(nodesDeleteUpdateResult)
     }
 
-    // add new nodes to updateResult (and record)
-
-    const childrenSourceToAdd = _getNodesArrayDifference(childrenSource, childrenTarget)
-
-    childrenSourceToAdd.forEach((childSourceToAdd) => {
+    // add new nodes (in source record but not in target record) to updateResult (and record)
+    _getNodesArrayDifference(childrenSource, childrenTarget).forEach((childSourceToAdd) => {
       RecordReader.visitDescendantsAndSelf(childSourceToAdd, (node) => {
         const nodeUpdated = Node.assocCreated(node) // new node for the server
         updateResult.addNode(nodeUpdated)
       })(updateResult.record)
     })
 
-    // update existing nodes
+    // update existing nodes (nodes in both source and target records)
 
-    const childrenTargetToUpdate = _getNodesArrayIntersection(childrenSource, childrenTarget)
-
-    childrenTargetToUpdate.forEach((childTargetToUpdate) => {
+    _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childTargetToUpdate) => {
       const childSource = childrenSource.find(
         (childSource) => Node.getUuid(childSource) === Node.getUuid(childTargetToUpdate)
       )
@@ -339,6 +344,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
           entity: entityTarget,
           attribute: childTargetToUpdate,
           value: Node.getValue(childSource),
+          dateModified: Node.getDateModified(childSource),
           sideEffect: true,
         })
         if (attributeUpdateResult) {
