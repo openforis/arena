@@ -6,6 +6,7 @@ import Job from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
+import { NodesDeleteBatchPersister } from '@server/modules/record/manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
 
@@ -18,17 +19,18 @@ export default class DataImportBaseJob extends Job {
     this.updatedValues = 0
 
     this.currentRecord = null
-    this.nodesUpdateBatchPersister = null
+    this.nodesDeleteBatchPersister = null
     this.nodesInsertBatchPersister = null
+    this.nodesUpdateBatchPersister = null
     this.recordsValidationBatchPersister = null
   }
 
   async execute() {
     const { user, surveyId, tx } = this
 
-    this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
+    this.nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
-    this.nodesDeleteBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
+    this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
     this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
   }
 
@@ -43,12 +45,14 @@ export default class DataImportBaseJob extends Job {
 
       this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
 
+      await this.nodesDeleteBatchPersister.addItems(nodesArray.filter(Node.isDeleted))
       await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
+      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter(Node.isUpdated))
     }
   }
 
   async beforeSuccess() {
+    await this.nodesDeleteBatchPersister.flush()
     await this.nodesInsertBatchPersister.flush()
     await this.nodesUpdateBatchPersister.flush()
     await this.recordsValidationBatchPersister.flush()

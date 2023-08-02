@@ -278,12 +278,23 @@ const updateAttributesWithValues =
     return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
   }
 
+const _findNodeWithSameUuid = (nodeSearch, nodesArray) =>
+  nodesArray.filter((node) => Node.getUuid(node) === Node.getUuid(nodeSearch))
+
+const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !_findNodeWithSameUuid(node, otherNodes))
+
+const _getNodesArrayIntersection = (nodes, otherNodes) =>
+  nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
+
 const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, entityTarget }) => {
   const updateResult = new RecordUpdateResult({ record: recordTarget })
 
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
 
-  Survey.getNodeDefChildren(entityDef, false).forEach((childDef) => {
+  Survey.getNodeDefChildren(
+    entityDef,
+    false
+  )(survey).forEach((childDef) => {
     const childDefUuid = NodeDef.getUuid(childDef)
 
     const childrenSource = RecordReader.getNodeChildrenByDefUuidUnsorted(entitySource, childDefUuid)(recordSource)
@@ -293,12 +304,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
     )(updateResult.record)
 
     // delete nodes that are not in source record
-
-    const childrenTargetToDelete = childrenTarget
-      .filter(
-        (childTarget) => !childrenSource.find((childSource) => Node.getUuid(childSource) === Node.getUuid(childTarget))
-      )
-      .map(Node.assocDeleted)
+    const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted)
 
     if (childrenTargetToDelete.length > 0) {
       const nodesDeleteUpdateResult = CoreRecordNodesUpdater.removeNodes({
@@ -309,20 +315,19 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
 
     // add new nodes to updateResult (and record)
 
-    const childrenSourceToAdd = childrenSource.filter(
-      (childSource) => !childrenTarget.find((childTarget) => Node.getUuid(childTarget) === Node.getUuid(childSource))
-    )
+    const childrenSourceToAdd = _getNodesArrayDifference(childrenSource, childrenTarget)
+
     childrenSourceToAdd.forEach((childSourceToAdd) => {
-      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedNode) => {
-        updateResult.addNode(Node.assocCreated(visitedNode))
+      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (node) => {
+        const nodeUpdated = Node.assocCreated(node) // new node for the server
+        updateResult.addNode(nodeUpdated)
       })(updateResult.record)
     })
 
     // update existing nodes
 
-    const childrenTargetToUpdate = childrenTarget.filter((childTarget) =>
-      childrenSource.find((childSource) => Node.getUuid(childSource) === Node.getUuid(childTarget))
-    )
+    const childrenTargetToUpdate = _getNodesArrayIntersection(childrenSource, childrenTarget)
+
     childrenTargetToUpdate.forEach((childTargetToUpdate) => {
       const childSource = childrenSource.find(
         (childSource) => Node.getUuid(childSource) === Node.getUuid(childTargetToUpdate)

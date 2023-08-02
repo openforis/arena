@@ -67,9 +67,16 @@ export default class RecordsImportJob extends DataImportBaseJob {
           draft: false,
           fetchForUpdate: true,
         })
-        RecordNodesUpdater.mergeRecords({ survey, recordSource: record, recordTarget })
+        const { record: recordTargetUpdated, nodes: nodesUpdated } = RecordNodesUpdater.mergeRecords({
+          survey,
+          recordSource: record,
+          recordTarget,
+        })
+        this.currentRecord = recordTargetUpdated
+        await this.persistUpdatedNodes({ nodesUpdated })
+
+        this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
       }
-      return
     } else {
       // insert record
       await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
