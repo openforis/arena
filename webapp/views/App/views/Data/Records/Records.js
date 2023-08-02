@@ -7,7 +7,7 @@ import * as Record from '@core/record/record'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import { useSurveyCycleKey, useNodeDefRootKeys, useSurvey } from '@webapp/store/survey'
+import { useSurveyCycleKey, useNodeDefRootKeys } from '@webapp/store/survey'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
@@ -21,11 +21,10 @@ import { useNodeDefKeysCategoryItemsInLevel } from './useNodeDefKeysCategoryItem
 
 const Records = () => {
   const navigate = useNavigate()
-  const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const nodeDefKeys = useNodeDefRootKeys()
 
-  const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel({ survey })
+  const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel()
 
   const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
 
