@@ -28,18 +28,15 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const {
         surveyId,
-        cycle,
         conflictResolutionStrategy = ArenaMobileDataImport.conflictResolutionStrategies.skipDuplicates,
       } = Request.getParams(req)
 
       const filePath = Request.getFilePath(req)
 
-      const survey = await fetchSurvey({ surveyId, cycle })
-
       const job = ArenaMobileImportService.startArenaMobileImportJob({
         user,
         filePath,
-        survey,
+        surveyId,
         conflictResolutionStrategy,
       })
 

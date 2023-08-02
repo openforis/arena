@@ -1,4 +1,6 @@
 import Job from '@server/job/job'
+import FileZip from '@server/utils/file/fileZip'
+
 import RecordsImportJob from './jobs/recordsImportJob'
 import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
 
@@ -13,6 +15,17 @@ export default class ArenaMobileDataImportJob extends Job {
    */
   constructor(params) {
     super(ArenaMobileDataImportJob.type, params, [new RecordsImportJob(), new FilesImportJob()])
+  }
+
+  async onStart() {
+    await super.onStart()
+
+    const { filePath } = this.context
+
+    const arenaSurveyFileZip = new FileZip(filePath)
+    await arenaSurveyFileZip.init()
+
+    this.setContext({ arenaSurveyFileZip })
   }
 }
 

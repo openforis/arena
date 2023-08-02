@@ -2,13 +2,14 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 
-import FileZip from '@server/utils/file/fileZip'
 import { ArenaMobileDataImport } from '../../arenaMobileDataImport'
 import { RecordNodesUpdater } from '@core/record/_record/recordNodesUpdater'
 
@@ -18,21 +19,24 @@ export default class RecordsImportJob extends DataImportBaseJob {
   }
 
   async execute() {
-    const { filePath } = this.context
+    super.execute()
 
-    const arenaSurveyFileZip = new FileZip(filePath)
-    await arenaSurveyFileZip.init()
+    const { arenaSurveyFileZip, surveyId } = this.context
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
 
     if (this.total == 0) return
 
+    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true })
+    this.setContext({ survey })
+
     // import records sequentially
     await PromiseUtils.each(recordSummaries, async (recordSummary) => {
       const recordUuid = Record.getUuid(recordSummary)
 
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      this.currentRecord = record
 
       await this.insertOrSkipRecord({ record })
 
@@ -41,9 +45,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   }
 
   async insertOrSkipRecord({ record }) {
-    const { survey, conflictResolutionStrategy } = this.context
-
-    const surveyId = Survey.getId(survey)
+    const { survey, surveyId, conflictResolutionStrategy } = this.context
 
     const recordUuid = Record.getUuid(record)
 
@@ -82,25 +84,18 @@ export default class RecordsImportJob extends DataImportBaseJob {
       await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
 
       // insert nodes (add them to batch persister)
-      const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+      const nodes = Record.getNodesArray(record)
+        // check that the node definition associated to the node has not been deleted from the survey
+        .filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
+        .sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+        .map((node) => {
+          node[Node.keys.created] = true // do side effect to avoid creating new objects
+          return node
+        })
+      const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodes)
 
-      // check that the node definition associated to the node has not been deleted from the survey
-      const validNodes = nodes.filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
-
-      await this.persistUpdatedNodes({ nodesUpdated: validNodes })
+      await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid })
     }
-  }
-
-  /**
-   * Updates the record modified date using the max modified date of the nodes.
-   *
-   * @param {!object} record - The record object.
-   * @returns {object} - The modified record.
-   */
-  prepareRecordSummaryToStore(record) {
-    const nodes = Record.getNodesArray(record)
-    const maxNodeModifiedDate = new Date(Math.max.apply(null, nodes.map(Node.getDateModified)))
-    return Record.assocDateModified(maxNodeModifiedDate)(record)
   }
 }
 

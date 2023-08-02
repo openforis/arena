@@ -9,6 +9,7 @@ import { RecordsValidationBatchPersister } from '@server/modules/record/manager/
 import { NodesDeleteBatchPersister } from '@server/modules/record/manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
+import { Dates } from '@openforis/arena-core'
 
 export default class DataImportBaseJob extends Job {
   constructor(type, params) {
@@ -43,11 +44,11 @@ export default class DataImportBaseJob extends Job {
     if (!dryRun && nodesArray.length > 0) {
       await this.recordsValidationBatchPersister.addItem([Record.getUuid(record), Record.getValidation(record)])
 
-      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
-
       await this.nodesDeleteBatchPersister.addItems(nodesArray.filter(Node.isDeleted))
       await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
       await this.nodesUpdateBatchPersister.addItems(nodesArray.filter(Node.isUpdated))
+
+      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
     }
   }
 
@@ -82,5 +83,25 @@ export default class DataImportBaseJob extends Job {
     this.addError({
       error: Validation.newInstance(false, {}, [{ key, params }]),
     })
+  }
+
+  /**
+   * Updates the record modified date using the max modified date of the nodes.
+   *
+   * @param {!object} record - The record object.
+   * @returns {object} - The modified record.
+   */
+  prepareRecordSummaryToStore(record) {
+    const nodes = Record.getNodesArray(record)
+    const maxNodeModifiedDate = new Date(
+      Math.max.apply(
+        null,
+        nodes.map((node) => {
+          const dateModified = Node.getDateModified(node)
+          return dateModified instanceof Date ? dateModified : Dates.parseISO(dateModified)
+        })
+      )
+    )
+    return Record.assocDateModified(maxNodeModifiedDate)(record)
   }
 }

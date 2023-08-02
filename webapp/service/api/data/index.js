@@ -51,6 +51,13 @@ export const startDataImportFromCsvJob = async ({
   return job
 }
 
+export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, dryRun = false }) => {
+  const formData = objectToFormData({ file, cycle, dryRun })
+  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
+  const { job } = data
+  return job
+}
+
 export const getDataImportFromCsvTemplateUrl = ({ surveyId, entityDefUuid, cycle }) => {
   const params = new URLSearchParams({
     entityDefUuid,
