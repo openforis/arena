@@ -62,17 +62,11 @@ export default class DataImportBaseJob extends Job {
   }
 
   generateResult() {
-    const {
-      errors,
-      insertedRecordsUuids,
-      updatedRecordsUuids: updatedRecordsByUuid,
-      processed: rowsProcessed,
-      updatedValues,
-    } = this
+    const { errors, insertedRecordsUuids, updatedRecordsUuids, processed: rowsProcessed, updatedValues } = this
 
     return {
       insertedRecords: insertedRecordsUuids.size,
-      updatedRecords: updatedRecordsByUuid.size,
+      updatedRecords: updatedRecordsUuids.size,
       rowsProcessed,
       updatedValues,
       errorsCount: Object.keys(errors).length,

@@ -138,13 +138,15 @@ export default class DataImportJob extends DataImportBaseJob {
       await this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
+      const recordUuid = Record.getUuid(this.currentRecord)
       if (newRecord) {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
+        this.insertedRecordsUuids.add(recordUuid)
       } else {
         const nodesArray = Object.values(nodesUpdated)
         if (nodesArray.length > 0) {
           this.updatedValues += nodesArray.length
-          this.updatedRecordsUuids.add(Record.getUuid(this.currentRecord))
+          this.updatedRecordsUuids.add(recordUuid)
         }
       }
     } catch (e) {
