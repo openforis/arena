@@ -296,14 +296,7 @@ const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
   nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
 
-const _mergeEntities = async ({
-  survey,
-  recordSource,
-  recordTarget,
-  entitySource,
-  entityTarget,
-  sideEffect = false,
-}) => {
+const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, entityTarget }) => {
   const updateResult = new RecordUpdateResult({ record: recordTarget })
 
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
@@ -335,10 +328,11 @@ const _mergeEntities = async ({
 
     // add new nodes (in source record but not in target record) to updateResult (and record)
     _getNodesArrayDifference(childrenSource, childrenTarget).forEach((childSourceToAdd) => {
-      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (node) => {
-        const nodeUpdated = Node.assocCreated(node) // new node for the server
-        updateResult.addNode(nodeUpdated)
-      })(updateResult.record)
+      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
+        const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
+        newNodeToAdd[Node.keys.id] = null // clear internal id
+        updateResult.addNode(newNodeToAdd)
+      })(recordSource)
     })
 
     // update existing nodes (nodes in both source and target records)
@@ -372,7 +366,7 @@ const _mergeEntities = async ({
       }
     })
   })
-  return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
+  return updateResult
 }
 
 const mergeRecords = async ({ survey, recordSource, recordTarget, sideEffect = false }) => {
@@ -382,14 +376,14 @@ const mergeRecords = async ({ survey, recordSource, recordTarget, sideEffect = f
     // it should never happen...
     throw new Error('error merging records: root entities have different uuids')
   }
-  return _mergeEntities({
+  const updateResult = _mergeEntities({
     survey,
     recordSource,
     recordTarget,
     entitySource: rootSource,
     entityTarget: rootTarget,
-    sideEffect,
   })
+  return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
 }
 
 export const RecordNodesUpdater = {
