@@ -21,7 +21,8 @@ export default class CreateRdbJob extends Job {
   async shouldExecute() {
     const { survey, mobile } = this.context
     if (mobile) return true
+
     const surveyInfo = Survey.getSurveyInfo(survey)
-    return Survey.isPublished(surveyInfo)
+    return Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)
   }
 }
