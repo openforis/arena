@@ -301,7 +301,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
 
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
 
-  const entityTargetUpdated = Node.assocMeta(Node.getMeta(entitySource))(entityTarget)
+  const entityTargetUpdated = A.pipe(Node.assocMeta(Node.getMeta(entitySource)), Node.assocUpdated(true))(entityTarget)
   updateResult.addNode(entityTargetUpdated)
 
   Survey.getNodeDefChildren(

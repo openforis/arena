@@ -19,7 +19,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   }
 
   async execute() {
-    super.execute()
+    await super.execute()
 
     const { context, tx } = this
     const { arenaSurveyFileZip, surveyId } = context
