@@ -21,14 +21,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
   async execute() {
     super.execute()
 
-    const { arenaSurveyFileZip, surveyId } = this.context
+    const { context, tx } = this
+    const { arenaSurveyFileZip, surveyId } = context
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
 
     if (this.total == 0) return
 
-    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true })
+    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
     this.setContext({ survey })
 
     // import records sequentially
@@ -55,35 +56,46 @@ export default class RecordsImportJob extends DataImportBaseJob {
     if (existingRecordSummary) {
       if (conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.skipExisting) {
         // skip record
-        this.logDebug(`skipping record ${recordUuid}; it already exists`)
+        this.skippedRecordsUuids.add(recordUuid)
+        this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (
         conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.overwriteIfUpdated &&
         DateUtils.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
       ) {
-        this.logDebug(`updating record ${recordUuid}`)
-
-        const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
-          {
-            surveyId,
-            recordUuid,
-            draft: false,
-            fetchForUpdate: true,
-          },
-          tx
-        )
-        const { record: recordTargetUpdated, nodes: nodesUpdated } = RecordNodesUpdater.mergeRecords({
-          survey,
-          recordSource: record,
-          recordTarget,
-        })
-        this.currentRecord = recordTargetUpdated
-        await this.persistUpdatedNodes({ nodesUpdated })
-        this.updatedRecordsUuids.add(recordUuid)
-        this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
+        await this.updateExistingRecord()
       }
     } else {
       await this.insertNewRecord(recordUuid, user, surveyId, record, tx, survey)
     }
+  }
+
+  async updateExistingRecord() {
+    const { context, currentRecord: record, tx } = this
+    const { survey, surveyId } = context
+
+    const recordUuid = Record.getUuid(record)
+
+    this.logDebug(`updating record ${recordUuid}`)
+
+    const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
+      {
+        surveyId,
+        recordUuid,
+        draft: false,
+        fetchForUpdate: true,
+      },
+      tx
+    )
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = RecordNodesUpdater.mergeRecords({
+      survey,
+      recordSource: record,
+      recordTarget,
+    })
+    this.currentRecord = recordTargetUpdated
+    await this.persistUpdatedNodes({ nodesUpdated })
+
+    this.updatedRecordsUuids.add(recordUuid)
+    this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
   }
 
   async insertNewRecord() {
@@ -111,6 +123,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.insertedRecordsUuids.add(recordUuid)
 
     this.logDebug(`record insert complete (${nodesArray.length} nodes inserted)`)
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    result.updatedRecordsUuids = Array.from(this.updatedRecordsUuids) // it will be used to refresh records in update threads
+    return result
   }
 }
 

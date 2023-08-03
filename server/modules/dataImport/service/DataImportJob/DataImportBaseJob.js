@@ -16,6 +16,7 @@ export default class DataImportBaseJob extends Job {
     super(type, params)
 
     this.insertedRecordsUuids = new Set()
+    this.skippedRecordsUuids = new Set()
     this.updatedRecordsUuids = new Set()
     this.updatedValues = 0
 
@@ -62,13 +63,13 @@ export default class DataImportBaseJob extends Job {
   }
 
   generateResult() {
-    const { errors, insertedRecordsUuids, updatedRecordsUuids, processed: rowsProcessed, updatedValues } = this
+    const { errors, insertedRecordsUuids, updatedRecordsUuids, skippedRecordsUuids, processed } = this
 
     return {
       insertedRecords: insertedRecordsUuids.size,
       updatedRecords: updatedRecordsUuids.size,
-      rowsProcessed,
-      updatedValues,
+      skippedRecords: skippedRecordsUuids.size,
+      processed,
       errorsCount: Object.keys(errors).length,
     }
   }

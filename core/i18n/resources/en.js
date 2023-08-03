@@ -549,8 +549,9 @@ $t(common.cantUndoWarning)`,
     },
     forceImportFromAnotherSurvey: 'Force import from another survey',
 
-    importFromCollect: 'Import data from Collect / Collect Mobile',
-    importFromCsv: 'Import data from CSV',
+    importFromArena: 'Arena/Arena Mobile',
+    importFromCollect: 'Collect / Collect Mobile',
+    importFromCsv: 'CSV',
     importIntoCycle: 'Import into cycle',
     importIntoEntity: 'Import into entity',
     importType: {
@@ -559,6 +560,13 @@ $t(common.cantUndoWarning)`,
       updateExistingRecords: 'Update existing records',
     },
     jobs: {
+      ArenaDataImportJob: {
+        importCompleteSuccessfully: `Arena Mobile data import complete:
+        - {{processed}} records processed
+        - {{insertedRecords}} records created
+        - {{updatedRecords}} records updated
+        - {{skippedRecords}} records skipped`,
+      },
       CollectDataImportJob: {
         importCompleteSuccessfully: `Collect data import complete:
         - {{insertedRecords}} records created`,
@@ -1551,6 +1559,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   // ====== Jobs
   jobs: {
     ActivityLogImportJob: 'Activity Log Import',
+    ArenaMobileDataImportJob: 'Arena Mobile Data Import',
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',

@@ -7,7 +7,7 @@ import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTy
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
 import * as RecordSocketsMap from './recordSocketsMap'
 
-const { get: getThread, getKey: getThreadKey } = SurveyRecordsThreadMap
+const { get: getThreadByKey, getKey: getThreadKey } = SurveyRecordsThreadMap
 
 const recordsUpdateThreadFileName = 'recordsUpdateThread.js'
 const inactivityPeriod = 10 * 60 * 1000 // 10 mins
@@ -33,7 +33,7 @@ const _createThread = ({ surveyId, cycle, draft }) => {
         clearTimeout(threadTimeouts[threadKey])
         delete threadTimeouts[threadKey]
 
-        const thread = getThread(threadKey)
+        const thread = getThreadByKey(threadKey)
         thread.terminate()
       }
     } else {
@@ -53,7 +53,7 @@ const _createThread = ({ surveyId, cycle, draft }) => {
 // ====== DELETE
 const _killThreadByKey = (threadKey) => {
   clearTimeout(threadTimeouts[threadKey])
-  const thread = getThread(threadKey)
+  const thread = getThreadByKey(threadKey)
 
   if (thread) {
     SurveyRecordsThreadMap.markZombie(threadKey)
@@ -80,14 +80,25 @@ const _resetThreadInactivityTimeout = (threadKey) => {
   threadTimeouts[threadKey] = setTimeout(_killThreadByKey.bind(null, threadKey), inactivityPeriod)
 }
 
-const getOrCreatedThread = ({ surveyId, cycle, draft = false }) => {
+const getThread = ({ surveyId, cycle, draft = false }) => {
   const threadKey = getThreadKey({ surveyId, cycle, draft })
   if (SurveyRecordsThreadMap.isZombie(threadKey)) {
     SurveyRecordsThreadMap.reviveZombie(threadKey)
   }
+  const thread = getThreadByKey(threadKey)
+  if (thread) {
+    _resetThreadInactivityTimeout(threadKey)
+  }
+  return thread
+}
 
-  const thread = getThread(threadKey) || _createThread({ surveyId, cycle, draft })
-  _resetThreadInactivityTimeout(threadKey)
+const getOrCreatedThread = ({ surveyId, cycle, draft = false }) => {
+  let thread = getThread({ surveyId, cycle, draft })
+  if (!thread) {
+    thread = _createThread({ surveyId, cycle, draft })
+    const threadKey = getThreadKey({ surveyId, cycle, draft })
+    _resetThreadInactivityTimeout(threadKey)
+  }
   return thread
 }
 
@@ -121,6 +132,7 @@ const notifyRecordDeleteToSockets = ({ socketIdUser, recordUuid, notifySameUser 
 
 export const RecordsUpdateThreadService = {
   getOrCreatedThread,
+  getThread,
   killThread,
   killSurveyThreads,
   // sockets
