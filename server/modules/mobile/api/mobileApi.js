@@ -26,10 +26,8 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const {
-        surveyId,
-        conflictResolutionStrategy = ArenaMobileDataImport.conflictResolutionStrategies.skipDuplicates,
-      } = Request.getParams(req)
+      const { surveyId, conflictResolutionStrategy = ArenaMobileDataImport.conflictResolutionStrategies.skipExisting } =
+        Request.getParams(req)
 
       const filePath = Request.getFilePath(req)
 
