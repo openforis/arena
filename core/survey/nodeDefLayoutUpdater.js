@@ -5,13 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
-
-const DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE = {
-  [NodeDef.nodeDefType.coordinate]: () => 2,
-  [NodeDef.nodeDefType.taxon]: () => 2,
-  [NodeDef.nodeDefType.text]: ({ nodeDef }) =>
-    NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine ? 2 : 1,
-}
+import { NodeDefLayoutSizes } from './nodeDefLayoutSizes'
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
   const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
@@ -203,9 +197,10 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   const y = layoutChildrenPrev.reduce((accY, layoutChild) => R.max(accY, layoutChild.y + layoutChild.h), 0)
 
   // New node def height depends on its type
-  const h = DEFAULT_GRID_LAYOUT_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) || 1
+  const minH = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef })
+  const maxH = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef })
 
-  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h })
+  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h: minH, minH, maxH })
   layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
   return layoutForCycleUpdated
 }
@@ -344,4 +339,81 @@ export const updateLayoutOnCyclesUpdate = ({ survey, nodeDefUuid, cycles, cycles
   }
 
   return nodeDefsUpdated
+}
+
+/**
+ * Avoids that items in form layout overlap each other by setting their height to the minimum
+ * and moving the items below or above if necessary.
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!object} [params.survey] - The survey.
+ * @param {!object} [params.nodeDef] - The node defintion.
+ * @returns {object} - The updated node defintion.
+ */
+export const adjustLayoutChildrenHeights = ({ survey, nodeDef }) => {
+  const layout = NodeDefLayout.getLayout(nodeDef)
+  const cyclesKeys = Object.keys(layout)
+  const layoutUpdated = cyclesKeys.reduce(
+    (acc, cycle) => {
+      const layoutCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDef)
+      const layoutChildren = NodeDefLayout.getLayoutChildrenSorted(cycle)(nodeDef)
+
+      let prevItem = { x: 0, y: 0, w: 0, h: 0, yOriginal: 0 }
+      let prevRowHeight = 0
+      let prevRowMinY = 0
+
+      let currentRowHeightOriginal = 0
+      let currentRowHeight = 0
+      let currentRowStartingY = 0
+      let currentRowYOffset = 0
+
+      const layoutChildrenAdjusted = layoutChildren.reduce((layoutChildrenAcc, item) => {
+        const { i: itemNodeDefUuid, h: hOriginal, w, x, y: yOriginal } = item
+        const itemNodeDef = SurveyNodeDefs.getNodeDefByUuid(itemNodeDefUuid)(survey)
+
+        const sameRowOfPreviousItem = x > prevItem.x
+
+        if (!sameRowOfPreviousItem) {
+          prevRowHeight = currentRowHeight
+          prevRowMinY = currentRowStartingY
+
+          const rowHeightDiff = currentRowHeightOriginal - currentRowHeight
+          if (rowHeightDiff > 0) {
+            // prev row has been shrinked
+            currentRowYOffset = currentRowYOffset + rowHeightDiff
+          }
+          currentRowHeightOriginal = 0
+          currentRowHeight = 0
+          currentRowStartingY = Math.max(yOriginal, prevRowMinY + prevRowHeight)
+        }
+
+        const hMin = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef: itemNodeDef })
+        const hMax = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: itemNodeDef })
+        let h = hOriginal
+        if (h < hMin) h = hMin
+        if (hMax && h > hMax) h = hMax
+
+        const y =
+          (sameRowOfPreviousItem
+            ? // item can have the same y of the previous one
+              Math.max(yOriginal, prevItem.y)
+            : // item in another row
+              Math.max(yOriginal, prevRowMinY + prevRowHeight)) - currentRowYOffset
+
+        currentRowHeightOriginal = Math.max(currentRowHeightOriginal, y + hOriginal - currentRowStartingY)
+        currentRowHeight = Math.max(currentRowHeight, y + h - currentRowStartingY)
+        currentRowStartingY = Math.min(currentRowStartingY, y)
+
+        const itemUpdated = { ...item, h, w, x, y }
+        prevItem = itemUpdated
+
+        layoutChildrenAcc.push(itemUpdated)
+        return layoutChildrenAcc
+      }, [])
+      acc[cycle] = { ...layoutCycle, [NodeDefLayout.keys.layoutChildren]: layoutChildrenAdjusted }
+      return acc
+    },
+    { ...layout }
+  )
+  return NodeDef.assocLayout(layoutUpdated)(nodeDef)
 }

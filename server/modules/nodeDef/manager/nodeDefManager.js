@@ -158,6 +158,14 @@ const _updateNodeDefAreaBasedEstimate = async (
   return nodeDefAreaBasedEstimateUpdated
 }
 
+const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
+  NodeDef.isCoordinate(nodeDef) &&
+  R.intersection(Object.keys(props))([
+    NodeDef.propKeys.includeAccuracy,
+    NodeDef.propKeys.includeAltitude,
+    NodeDef.propKeys.includeAltitudeAccuracy,
+  ]).length > 0
+
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
@@ -168,6 +176,16 @@ export const updateNodeDefProps = async (
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
     const nodeDefsUpdated = {}
+    let surveyUpdated = survey
+
+    const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
+      Object.assign(nodeDefsUpdated, nodeDefs)
+      surveyUpdated = Survey.mergeNodeDefs(nodeDefs)(surveyUpdated)
+    }
+
+    const _addNodeDefUpdatedToSurvey = (nodeDef) => {
+      _addNodeDefsUpdatedToSurvey({ [NodeDef.getUuid(nodeDef)]: nodeDef })
+    }
 
     // update node def into db
     const nodeDef = await NodeDefRepository.updateNodeDefProps(
@@ -178,9 +196,7 @@ export const updateNodeDefProps = async (
       propsAdvanced,
       t
     )
-    nodeDefsUpdated[nodeDefUuid] = nodeDef
-
-    let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
+    _addNodeDefUpdatedToSurvey(nodeDef)
 
     const updatingCycles = NodeDef.propKeys.cycles in props
 
@@ -199,26 +215,40 @@ export const updateNodeDefProps = async (
           },
           t
         )
-        Object.assign(nodeDefsUpdated, nodeDefsCyclesUpdated)
-        surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsCyclesUpdated })(surveyUpdated)
+        _addNodeDefsUpdatedToSurvey(nodeDefsCyclesUpdated)
       }
 
       // update layout
-      Object.assign(
-        nodeDefsUpdated,
-        NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({ survey: surveyUpdated, nodeDefUuid, cycles, cyclesPrev })
+      _addNodeDefsUpdatedToSurvey(
+        NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({
+          survey: surveyUpdated,
+          nodeDefUuid,
+          cycles,
+          cyclesPrev,
+        })
       )
-      surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(surveyUpdated)
+    }
+
+    if (_propsUpdateRequiresParentLayoutUpdate({ nodeDef, props })) {
+      const nodeDefParent = Survey.getNodeDefParent(nodeDef)(surveyUpdated)
+      const nodeDefParentUpdated = NodeDefLayoutUpdater.adjustLayoutChildrenHeights({
+        survey: surveyUpdated,
+        nodeDef: nodeDefParent,
+      })
+      _addNodeDefUpdatedToSurvey(nodeDefParentUpdated)
     }
 
     const updatingLayout = NodeDefLayout.keys.layout in props
 
     if (updatingLayout) {
       const layout = props[NodeDefLayout.keys.layout]
-      Object.assign(
-        nodeDefsUpdated,
-        NodeDefLayoutUpdater.updateLayout({ survey: surveyUpdated, nodeDefUuid, layout, nodeDefPrev })
-      )
+      const nodeDefsLayoutUpdated = NodeDefLayoutUpdater.updateLayout({
+        survey: surveyUpdated,
+        nodeDefUuid,
+        layout,
+        nodeDefPrev,
+      })
+      _addNodeDefsUpdatedToSurvey(nodeDefsLayoutUpdated)
     }
 
     const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
@@ -229,7 +259,7 @@ export const updateNodeDefProps = async (
           { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef: nodeDef },
           t
         )
-        nodeDefsUpdated[nodeDefUuid] = nodeDefAreaBasedEstimateUpdated
+        _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
       }
     }
     const logContent = {
