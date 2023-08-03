@@ -172,6 +172,8 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
     await NodeRepository.updateNodes({ surveyId, nodes }, t)
   })
 
+export { updateRecordDateModified } from '../repository/recordRepository'
+
 // ==== DELETE
 
 export {
