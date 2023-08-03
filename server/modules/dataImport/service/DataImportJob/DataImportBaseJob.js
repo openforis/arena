@@ -27,7 +27,9 @@ export default class DataImportBaseJob extends Job {
     this.recordsValidationBatchPersister = null
   }
 
-  async execute() {
+  async onStart() {
+    await super.onStart()
+
     const { user, surveyId, tx } = this
 
     this.nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
@@ -54,6 +56,8 @@ export default class DataImportBaseJob extends Job {
   }
 
   async beforeSuccess() {
+    await super.beforeSuccess()
+
     await this.nodesDeleteBatchPersister.flush()
     await this.nodesInsertBatchPersister.flush()
     await this.nodesUpdateBatchPersister.flush()

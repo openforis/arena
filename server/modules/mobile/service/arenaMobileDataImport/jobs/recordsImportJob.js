@@ -86,10 +86,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
       },
       tx
     )
-    const { record: recordTargetUpdated, nodes: nodesUpdated } = RecordNodesUpdater.mergeRecords({
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = await RecordNodesUpdater.mergeRecords({
       survey,
       recordSource: record,
       recordTarget,
+      sideEffect: true,
     })
     this.currentRecord = recordTargetUpdated
     await this.persistUpdatedNodes({ nodesUpdated })
@@ -127,7 +128,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   generateResult() {
     const result = super.generateResult()
-    result.updatedRecordsUuids = Array.from(this.updatedRecordsUuids) // it will be used to refresh records in update threads
+    result['updatedRecordsUuids'] = Array.from(this.updatedRecordsUuids) // it will be used to refresh records in update threads
     return result
   }
 }

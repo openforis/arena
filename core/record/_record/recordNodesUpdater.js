@@ -289,14 +289,21 @@ const updateAttributesWithValues =
   }
 
 const _findNodeWithSameUuid = (nodeSearch, nodesArray) =>
-  nodesArray.filter((node) => Node.getUuid(node) === Node.getUuid(nodeSearch))
+  nodesArray.find((node) => Node.getUuid(node) === Node.getUuid(nodeSearch))
 
 const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !_findNodeWithSameUuid(node, otherNodes))
 
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
   nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
 
-const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, entityTarget }) => {
+const _mergeEntities = async ({
+  survey,
+  recordSource,
+  recordTarget,
+  entitySource,
+  entityTarget,
+  sideEffect = false,
+}) => {
   const updateResult = new RecordUpdateResult({ record: recordTarget })
 
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
@@ -312,7 +319,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
 
     const childrenSource = RecordReader.getNodeChildrenByDefUuidUnsorted(entitySource, childDefUuid)(recordSource)
     const childrenTarget = RecordReader.getNodeChildrenByDefUuidUnsorted(
-      entitySource,
+      entityTarget,
       childDefUuid
     )(updateResult.record)
 
@@ -336,10 +343,8 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
 
     // update existing nodes (nodes in both source and target records)
 
-    _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childTargetToUpdate) => {
-      const childSource = childrenSource.find(
-        (childSource) => Node.getUuid(childSource) === Node.getUuid(childTargetToUpdate)
-      )
+    _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
+      const childTargetToUpdate = _findNodeWithSameUuid(childSource, childrenTarget)
       if (NodeDef.isAttribute(childDef)) {
         const attributeUpdateResult = _updateAttributeValue({
           survey,
@@ -367,17 +372,24 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
       }
     })
   })
-  return updateResult
+  return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
 }
 
-const mergeRecords = ({ survey, recordSource, recordTarget }) => {
-  const rootTarget = RecordReader.getRootNode(recordTarget)
+const mergeRecords = async ({ survey, recordSource, recordTarget, sideEffect = false }) => {
   const rootSource = RecordReader.getRootNode(recordSource)
+  const rootTarget = RecordReader.getRootNode(recordTarget)
   if (Node.getUuid(rootTarget) !== Node.getUuid(rootSource)) {
     // it should never happen...
     throw new Error('error merging records: root entities have different uuids')
   }
-  return _mergeEntities({ survey, recordSource, recordTarget, entitySource: rootSource, entityTarget: rootTarget })
+  return _mergeEntities({
+    survey,
+    recordSource,
+    recordTarget,
+    entitySource: rootSource,
+    entityTarget: rootTarget,
+    sideEffect,
+  })
 }
 
 export const RecordNodesUpdater = {
