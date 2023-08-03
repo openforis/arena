@@ -179,11 +179,11 @@ export const fetchRecordsSummaryBySurveyId = async (
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
   if (!A.isNull(recordUuid)) recordsSelectWhereConditions.push('r.uuid = $/recordUuid/')
+  if (!A.isEmpty(search))
+    recordsSelectWhereConditions.push(`${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%'`)
 
-  const whereCondition = search
-    ? `WHERE ${nodeDefKeysSelectSearch} 
-                 OR u.name ilike '%$/search:value/%'`
-    : ''
+  const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
+  const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
 
   return client.map(
     `
