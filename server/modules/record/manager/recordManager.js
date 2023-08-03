@@ -36,7 +36,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit,
     sortBy,
     sortOrder,
-    search,
+    search = null,
     step = null,
     recordUuid = null,
     includeRootKeyValues = true,

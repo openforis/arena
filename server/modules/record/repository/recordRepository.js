@@ -147,7 +147,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit = null,
     sortBy = 'date_created',
     sortOrder = 'DESC',
-    search = false,
+    search = null,
     recordUuid = null,
     includePreview = false,
   },
