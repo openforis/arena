@@ -11,7 +11,6 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import { ArenaMobileDataImport } from '../../arenaMobileDataImport'
-import { RecordNodesUpdater } from '@core/record/_record/recordNodesUpdater'
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -86,12 +85,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
       },
       tx
     )
-    const { record: recordTargetUpdated, nodes: nodesUpdated } = await RecordNodesUpdater.mergeRecords({
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.replaceUpdatedNodes({
       survey,
       recordSource: record,
-      recordTarget,
       sideEffect: true,
-    })
+    })(recordTarget)
     this.currentRecord = recordTargetUpdated
     await this.persistUpdatedNodes({ nodesUpdated })
 

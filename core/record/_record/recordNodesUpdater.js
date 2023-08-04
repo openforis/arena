@@ -183,11 +183,13 @@ const _getOrCreateEntityByKeys =
 
     // insert missing entity node (with keys)
     const entityParentDef = Survey.getNodeDefParent(entityDef)(survey)
-    const entityParent = RecordReader.findDescendantByKeyValues({
-      survey,
-      descendantDefUuid: NodeDef.getUuid(entityParentDef),
-      keyValuesByDefUuid: valuesByDefUuid,
-    })(record)
+    const entityParent = NodeDef.isRoot(entityParentDef)
+      ? RecordReader.getRootNode(record)
+      : RecordReader.findDescendantByKeyValues({
+          survey,
+          descendantDefUuid: NodeDef.getUuid(entityParentDef),
+          keyValuesByDefUuid: valuesByDefUuid,
+        })(record)
 
     if (!entityParent) {
       throw new SystemError('record.cannotFindAncestorForEntity', {
@@ -369,27 +371,29 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
   return updateResult
 }
 
-const mergeRecords = async ({ survey, recordSource, recordTarget, sideEffect = false }) => {
-  const rootSource = RecordReader.getRootNode(recordSource)
-  const rootTarget = RecordReader.getRootNode(recordTarget)
-  if (Node.getUuid(rootTarget) !== Node.getUuid(rootSource)) {
-    // it should never happen...
-    throw new Error('error merging records: root entities have different uuids')
+const replaceUpdatedNodes =
+  ({ survey, recordSource, sideEffect = false }) =>
+  async (recordTarget) => {
+    const rootSource = RecordReader.getRootNode(recordSource)
+    const rootTarget = RecordReader.getRootNode(recordTarget)
+    if (Node.getUuid(rootTarget) !== Node.getUuid(rootSource)) {
+      // it should never happen...
+      throw new Error('error merging records: root entities have different uuids')
+    }
+    const updateResult = _mergeEntities({
+      survey,
+      recordSource,
+      recordTarget,
+      entitySource: rootSource,
+      entityTarget: rootTarget,
+    })
+    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
   }
-  const updateResult = _mergeEntities({
-    survey,
-    recordSource,
-    recordTarget,
-    entitySource: rootSource,
-    entityTarget: rootTarget,
-  })
-  return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
-}
 
 export const RecordNodesUpdater = {
   createNodeAndDescendants,
   createRootEntity,
   updateNodesDependents,
   updateAttributesWithValues,
-  mergeRecords,
+  replaceUpdatedNodes,
 }

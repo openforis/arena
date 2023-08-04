@@ -72,8 +72,13 @@ export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = Reco
 
 // ====== UPDATE
 export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
-export const { createNodeAndDescendants, createRootEntity, updateNodesDependents, updateAttributesWithValues } =
-  RecordNodesUpdater
+export const {
+  createNodeAndDescendants,
+  createRootEntity,
+  updateNodesDependents,
+  updateAttributesWithValues,
+  replaceUpdatedNodes,
+} = RecordNodesUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
 // ====== DELETE
