@@ -36,7 +36,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit,
     sortBy,
     sortOrder,
-    search = null,
+    search,
     step = null,
     recordUuid = null,
     includeRootKeyValues = true,
@@ -171,8 +171,6 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
     await NodeRepository.updateNodes({ surveyId, nodes }, t)
   })
-
-export { updateRecordDateModified } from '../repository/recordRepository'
 
 // ==== DELETE
 

@@ -319,9 +319,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
-      const colValue = DataCol.getValue(survey, nodeDefUnique, nodeUnique)
-      const colValueString = R.isNil(colValue) ? null : String(colValue)
-      const value = Expression.newLiteral(colValueString)
+      const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
 
       const condition = Expression.newBinary({
         left: identifier,

@@ -24,14 +24,11 @@ const tableColumns = [
   Record.keys.preview,
   'owner_uuid',
   'date_created',
-  'date_modified',
   'validation',
 ]
 const tableName = 'record'
 
-const selectFieldDateCreated = DbUtils.selectDate('date_created')
-const selectFieldDateModified = DbUtils.selectDate('date_modified')
-const recordSelectFields = `uuid, owner_uuid, step, cycle, ${selectFieldDateCreated}, ${selectFieldDateModified}, preview, validation`
+const recordSelectFields = `uuid, owner_uuid, step, cycle, ${DbUtils.selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -57,14 +54,13 @@ const dbTransformCallback =
 
 // ============== CREATE
 
-export const insertRecord = async (surveyId, record, client = db) => {
-  const now = new Date()
-  return client.one(
+export const insertRecord = async (surveyId, record, client = db) =>
+  client.one(
     `
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
-    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $9)
+    (owner_uuid, uuid, step, cycle, preview, validation, date_created)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $8)
     `,
     [
       Record.getOwnerUuid(record),
@@ -73,13 +69,11 @@ export const insertRecord = async (surveyId, record, client = db) => {
       Record.getCycle(record),
       Record.isPreview(record),
       Validation.isObjValid(record) ? {} : Record.getValidation(record),
-      Dates.formatForStorage(Record.getDateCreated(record) || now),
-      Dates.formatForStorage(Record.getDateModified(record) || now),
+      Dates.formatForStorage(Record.getDateCreated(record) || new Date()),
       surveyId,
     ],
     dbTransformCallback(surveyId)
   )
-}
 
 export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, client = db) =>
   client.none(
@@ -91,7 +85,6 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         ...record,
         owner_uuid: userUuid || Record.getOwnerUuid(record),
         date_created: Record.getDateCreated(record),
-        date_modified: Record.getDateModified(record),
         validation: JSON.stringify(Validation.isObjValid(record) ? {} : Record.getValidation(record)),
       }))
     )
@@ -147,7 +140,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit = null,
     sortBy = 'date_created',
     sortOrder = 'DESC',
-    search = null,
+    search = false,
     recordUuid = null,
     includePreview = false,
   },
@@ -174,32 +167,54 @@ export const fetchRecordsSummaryBySurveyId = async (
     )
     .join(' OR ')
 
+  const schema = getSurveyDBSchema(surveyId)
+
+  const nodeLastModifiedDateSelect = `
+    SELECT
+      record_uuid, to_char(MAX(date_modified),'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS date_modified
+    FROM ${schema}.node
+    GROUP BY record_uuid
+  `
   const recordsSelectWhereConditions = []
   if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
   if (!A.isNull(recordUuid)) recordsSelectWhereConditions.push('r.uuid = $/recordUuid/')
-  if (!A.isEmpty(search))
-    recordsSelectWhereConditions.push(`${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%'`)
 
-  const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
-  const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
+  const recordsSelect = `
+    SELECT 
+        r.uuid, 
+        r.owner_uuid, 
+        r.cycle,
+        r.step, 
+        r.preview, 
+        ${DbUtils.selectDate('r.date_created', 'date_created')}, 
+        r.validation,
+        node_last_modified.date_modified
+    FROM ${schema}.record r
+      -- GET LAST MODIFIED NODE DATE
+      LEFT OUTER JOIN 
+        node_last_modified
+        ON r.uuid = node_last_modified.record_uuid
+    ${recordsSelectWhereConditions.length > 0 ? `WHERE ${recordsSelectWhereConditions.join(' AND ')}` : ''}
+    ORDER BY r.date_created DESC
+  `
+
+  const whereCondition = search
+    ? `WHERE ${nodeDefKeysSelectSearch} 
+                 OR u.name ilike '%$/search:value/%'`
+    : ''
 
   return client.map(
-    `
+    `WITH 
+      node_last_modified AS (${nodeLastModifiedDateSelect}),
+      r AS (${recordsSelect})
     SELECT 
-      r.uuid, 
-      r.owner_uuid, 
-      r.cycle,
-      r.step, 
-      r.preview, 
-      ${DbUtils.selectDate('r.date_created', 'date_created')}, 
-      ${DbUtils.selectDate('r.date_modified', 'date_modified')},
-      r.validation,
+      r.*,
       s.uuid AS survey_uuid,
       u.name as owner_name
       ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
-    FROM ${getSurveyDBSchema(surveyId)}.record r
+    FROM  r
     -- GET SURVEY UUID
     JOIN survey s
       ON s.id = $/surveyId/
@@ -282,15 +297,6 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
   )
 
 // ============== UPDATE
-
-export const updateRecordDateModified = async ({ surveyId, recordUuid }, client = db) =>
-  client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.record 
-     SET date_modified = ${DbUtils.now}
-     WHERE uuid = $1
-    RETURNING ${recordSelectFields}`,
-    [recordUuid]
-  )
 
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   client.one(
