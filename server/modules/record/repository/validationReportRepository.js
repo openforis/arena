@@ -50,7 +50,6 @@ const query = ({ surveyId, recordUuid }) => {
       r.step AS record_step,
       r.uuid AS record_uuid,
       r.date_created as record_date_created,
-      r.date_modified as record_date_modified,
       u.name as record_owner_name,
       n.id AS node_id,
       n.uuid AS node_uuid,
@@ -66,7 +65,13 @@ const query = ({ surveyId, recordUuid }) => {
       (SELECT h.keys_hierarchy 
         FROM ${SchemaRdb.getName(surveyId)}._node_keys_hierarchy h
         WHERE h.node_uuid = n.uuid
-      )
+      ),
+      -- GET LAST MODIFIED NODE DATE
+      (
+        SELECT MAX(n.date_modified)
+        FROM ${getSurveyDBSchema(surveyId)}.node n
+        WHERE n.record_uuid = r.uuid
+      ) AS record_date_modified
     FROM
       ${surveySchema}.record r
       JOIN "user" u

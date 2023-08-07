@@ -307,39 +307,36 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 }
 
 const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
-  if (Record.isPreview(record)) return
-
-  const nodeDefsModified = Object.values(nodes).map((node) =>
-    Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  )
-
-  // Check if root keys have been modified
-  if (nodeDefsModified.some((nodeDef) => Survey.isNodeDefRootKey(nodeDef)(survey))) {
-    // Validate record uniqueness of records with same record keys
-    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
-      { survey, record, excludeRecordFromCount: false },
-      t
+  if (!Record.isPreview(record)) {
+    const nodeDefsModified = Object.values(nodes).map((node) =>
+      Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     )
-  }
 
-  // Check if root unique nodes have been modified
-
-  const rootUniqueNodeDefsModified = nodeDefsModified.filter((nodeDef) => {
-    const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-    return NodeDef.isRoot(nodeDefParent) && NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
-  })
-  if (rootUniqueNodeDefsModified.length > 0) {
-    // for each modified node def, validate record uniqueness of records with same record unique nodes
-    await PromiseUtils.each(rootUniqueNodeDefsModified, async (nodeDefUnique) =>
-      RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
-        { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
+    // Check if root keys have been modified
+    if (nodeDefsModified.some((nodeDef) => Survey.isNodeDefRootKey(nodeDef)(survey))) {
+      // Validate record uniqueness of records with same record keys
+      await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+        { survey, record, excludeRecordFromCount: false },
         t
       )
-    )
+    }
+
+    // Check if root unique nodes have been modified
+
+    const rootUniqueNodeDefsModified = nodeDefsModified.filter((nodeDef) => {
+      const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+      return NodeDef.isRoot(nodeDefParent) && NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+    })
+    if (rootUniqueNodeDefsModified.length > 0) {
+      // for each modified node def, validate record uniqueness of records with same record unique nodes
+      await PromiseUtils.each(rootUniqueNodeDefsModified, async (nodeDefUnique) =>
+        RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+          { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
+          t
+        )
+      )
+    }
   }
-  const surveyId = Survey.getId(survey)
-  const recordUuid = Record.getUuid(record)
-  await RecordRepository.updateRecordDateModified({ surveyId, recordUuid }, t)
 }
 
 const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {
