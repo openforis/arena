@@ -1,3 +1,5 @@
+import { ConflictResolutionStrategy } from '@common/dataImport'
+
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
@@ -9,8 +11,6 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-
-import { ArenaMobileDataImport } from '../../arenaMobileDataImport'
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -53,12 +53,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const existingRecordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, tx)
 
     if (existingRecordSummary) {
-      if (conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.skipExisting) {
+      if (conflictResolutionStrategy === ConflictResolutionStrategy.skipExisting) {
         // skip record
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (
-        conflictResolutionStrategy === ArenaMobileDataImport.conflictResolutionStrategies.overwriteIfUpdated &&
+        conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
         DateUtils.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
       ) {
         await this.updateExistingRecord()

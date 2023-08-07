@@ -1,9 +1,10 @@
+import { ConflictResolutionStrategy } from '@common/dataImport'
+
 import * as Request from '../../../utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as JobUtils from '@server/job/jobUtils'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
-import { ArenaMobileDataImport } from '../service/arenaMobileDataImport'
 
 const fetchSurvey = async ({ surveyId, cycle }) =>
   SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle, advanced: true })
@@ -26,8 +27,7 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, conflictResolutionStrategy = ArenaMobileDataImport.conflictResolutionStrategies.skipExisting } =
-        Request.getParams(req)
+      const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
 
       const filePath = Request.getFilePath(req)
 
