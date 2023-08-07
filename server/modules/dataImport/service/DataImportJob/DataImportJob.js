@@ -133,6 +133,10 @@ export default class DataImportJob extends Job {
 
       this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
 
+      const surveyId = Survey.getId(survey)
+      const recordUuid = Record.getUuid(record)
+      await RecordManager.updateRecordDateModified({ surveyId, recordUuid }, tx)
+
       await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
       await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
     }
