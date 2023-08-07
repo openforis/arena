@@ -40,7 +40,7 @@ export default class DataImportBaseJob extends Job {
 
   async persistUpdatedNodes({ nodesUpdated }) {
     const { context, currentRecord: record, tx } = this
-    const { dryRun, survey } = context
+    const { dryRun, survey, surveyId } = context
 
     const nodesArray = Object.values(nodesUpdated)
 
@@ -52,18 +52,19 @@ export default class DataImportBaseJob extends Job {
       await this.nodesUpdateBatchPersister.addItems(nodesArray.filter(Node.isUpdated))
 
       this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
+      const recordUuid = Record.getUuid(record)
+      const recordUpdatedDb = await RecordManager.updateRecordDateModified({ surveyId, recordUuid }, tx)
+      record.dateModified = recordUpdatedDb.dateModified
     }
   }
 
   async beforeSuccess() {
-    await super.beforeSuccess()
-
     await this.nodesDeleteBatchPersister.flush()
     await this.nodesInsertBatchPersister.flush()
     await this.nodesUpdateBatchPersister.flush()
     await this.recordsValidationBatchPersister.flush()
 
-    this.setResult(this.generateResult())
+    await super.beforeSuccess()
   }
 
   generateResult() {

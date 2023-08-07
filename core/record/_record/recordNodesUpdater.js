@@ -4,10 +4,11 @@ import {
   RecordValidator,
   RecordUpdateResult,
   Objects,
+  Records,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as ObjectUtils from '@core/objectUtils'
+import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -67,7 +68,8 @@ const _updateAttributeValue = ({
       record,
       parentNode: entity,
       strict: true,
-    })
+    }) ||
+    dateModified // always update attribute when dateModified changes
   ) {
     // update existing attribute (if value changed)
     const attributeUpdated = A.pipe(
@@ -298,13 +300,17 @@ const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
   nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
 
-const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, entityTarget }) => {
+const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, entityTarget, sideEffect = false }) => {
   const updateResult = new RecordUpdateResult({ record: recordTarget })
 
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
 
-  const entityTargetUpdated = A.pipe(Node.assocMeta(Node.getMeta(entitySource)), Node.assocUpdated(true))(entityTarget)
-  updateResult.addNode(entityTargetUpdated)
+  const metaSource = Node.getMeta(entitySource)
+  const metaTarget = Node.getMeta(entityTarget)
+  if (!Objects.isEqual(metaSource, metaTarget)) {
+    const entityTargetUpdated = A.pipe(Node.assocMeta(metaSource), Node.assocUpdated(true))(entityTarget)
+    updateResult.addNode(entityTargetUpdated)
+  }
 
   Survey.getNodeDefChildren(
     entityDef,
@@ -319,10 +325,10 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
     )(updateResult.record)
 
     // delete nodes that are not in source record
-    const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted)
+    const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
     if (childrenTargetToDelete.length > 0) {
-      const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(childrenTargetToDelete)
-      const nodesDeleteUpdateResult = CoreRecordNodesUpdater.removeNodes({ nodes: nodesIndexedByUuid })(
+      const childrenTargetToDeleteUuids = childrenTargetToDelete.map(Node.getUuid)
+      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
         updateResult.record
       )
       updateResult.merge(nodesDeleteUpdateResult)
@@ -342,17 +348,22 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
     _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
       const childTargetToUpdate = _findNodeWithSameUuid(childSource, childrenTarget)
       if (NodeDef.isAttribute(childDef)) {
-        const attributeUpdateResult = _updateAttributeValue({
-          survey,
-          record: updateResult.record,
-          entity: entityTarget,
-          attribute: childTargetToUpdate,
-          value: Node.getValue(childSource),
-          dateModified: Node.getDateModified(childSource),
-          sideEffect: true,
-        })
-        if (attributeUpdateResult) {
-          updateResult.merge(attributeUpdateResult)
+        const sourceDateModified = Node.getDateModified(childSource)
+        const targetDateModified = Node.getDateModified(childTargetToUpdate)
+        if (DateUtils.isAfter(sourceDateModified, targetDateModified)) {
+          const attributeUpdateResult = _updateAttributeValue({
+            survey,
+            record: updateResult.record,
+            entity: entityTarget,
+            attributeDef: childDef,
+            attribute: childTargetToUpdate,
+            value: Node.getValue(childSource),
+            dateModified: sourceDateModified,
+            sideEffect,
+          })
+          if (attributeUpdateResult) {
+            updateResult.merge(attributeUpdateResult)
+          }
         }
       } else {
         const childEntityUpdateResult = _mergeEntities({
@@ -386,6 +397,7 @@ const replaceUpdatedNodes =
       recordTarget,
       entitySource: rootSource,
       entityTarget: rootTarget,
+      sideEffect,
     })
     return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
   }

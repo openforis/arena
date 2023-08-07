@@ -40,11 +40,11 @@ export const DataImportArenaView = () => {
         job,
         autoHide: true,
         onComplete: async (jobCompleted) => {
-          const { insertedRecords } = JobSerialized.getResult(jobCompleted)
+          const { processed, insertedRecords, skippedRecords, updatedRecords } = JobSerialized.getResult(jobCompleted)
           dispatch(
             NotificationActions.notifyInfo({
               key: 'dataImportView.jobs.ArenaDataImportJob.importCompleteSuccessfully',
-              params: { insertedRecords },
+              params: { processed, insertedRecords, skippedRecords, updatedRecords },
             })
           )
         },

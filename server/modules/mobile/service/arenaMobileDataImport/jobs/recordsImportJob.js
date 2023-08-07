@@ -91,6 +91,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       sideEffect: true,
     })(recordTarget)
     this.currentRecord = recordTargetUpdated
+
     await this.persistUpdatedNodes({ nodesUpdated })
 
     this.updatedRecordsUuids.add(recordUuid)
