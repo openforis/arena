@@ -2709,10 +2709,10 @@
     proj4 "^2.8.0"
     uuid "^9.0.0"
 
-"@openforis/arena-core@^0.0.151":
-  version "0.0.151"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.151/be4ec91bda4646a035fee263081f0974cdd43111#be4ec91bda4646a035fee263081f0974cdd43111"
-  integrity sha512-2i4fxsoZ5k4iRI/rdNFVF8exOVx61h6vO0IWRzP9/CMz0uxmnnuiLgpzw+REFj9/q+s7S8/lbBK9u061FLN93w==
+"@openforis/arena-core@^0.0.153":
+  version "0.0.153"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.153/2acb25e91d03f8cc59135174111034b6945d9e76#2acb25e91d03f8cc59135174111034b6945d9e76"
+  integrity sha512-xCRTDH7pWZzuLFcfBY8pL14/n8/toczx9G9ZmOF5dm6BWymONmxxdDOhUnLjT52+nYvXQt7HsuCCDtz//KlXwA==
   dependencies:
     "@esri/proj-codes" "^3.1.0"
     "@jsep-plugin/regex" "^1.0.3"
@@ -2726,10 +2726,10 @@
     proj4 "^2.9.0"
     uuid "^9.0.0"
 
-"@openforis/arena-server@^0.1.26":
-  version "0.1.26"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.26/1abe44701a841332d08c35b78fb7e5f6e9aad043#1abe44701a841332d08c35b78fb7e5f6e9aad043"
-  integrity sha512-8yEPIxUL9QB8Tc1K/NLh7asXlfvsZw5tMedRs4NRyN3668TTeqNcUQa1m1U1kbjh1Oh22pmS9g653u2itkJYew==
+"@openforis/arena-server@^0.1.27":
+  version "0.1.27"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.27/9697614e4a0ea4848d9b689a8ee6cda0681f07e3#9697614e4a0ea4848d9b689a8ee6cda0681f07e3"
+  integrity sha512-4RMd1ojLrgoAqBAU2HPvsA9447DRA9eIKcMm3b35BtjaHVuMqw0cGB//QXcLhMX4jnKHLjx4ZdYDluOr3aebLA==
   dependencies:
     "@godaddy/terminus" "^4.12.0"
     "@openforis/arena-core" "^0.0.136"

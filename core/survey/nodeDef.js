@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Objects } from '@openforis/arena-core'
+import { NodeDefs, Objects } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
@@ -209,8 +209,28 @@ export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 export const getDescriptions = getProp(propKeys.descriptions, {})
 
 export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
+
+// boolean
+export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
+export const isBooleanLabelYesNo = (nodeDef) =>
+  isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
 // code
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
+// coordinate
+export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
+export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
+export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
+export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
+export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFields
+// decimal
+export const getMaxNumberDecimalDigits = (nodeDef) => {
+  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
+  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
+}
+// file
+export const isNumberOfFilesEnabled = isMultiple
+export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
+export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
@@ -224,33 +244,6 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
-// decimal
-export const getMaxNumberDecimalDigits = (nodeDef) => {
-  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
-  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
-}
-// File
-export const isNumberOfFilesEnabled = isMultiple
-export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
-export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
-
-// Boolean
-export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
-export const isBooleanLabelYesNo = (nodeDef) =>
-  isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
-
-// Coordiante
-export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
-export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
-export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
-export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
-export const getCoordinateAdditionalFields = (nodeDef) => {
-  const fields = []
-  if (isAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.accuracy)
-  if (isAltitudeIncluded(nodeDef)) fields.push(coordinateAdditionalFields.altitude)
-  if (isAltitudeAccuracyIncluded(nodeDef)) fields.push(coordinateAdditionalFields.altitudeAccuracy)
-  return fields
-}
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
