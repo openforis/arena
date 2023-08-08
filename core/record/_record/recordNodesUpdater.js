@@ -1,14 +1,14 @@
 import {
+  Dates,
+  Objects,
+  Records,
   RecordUpdater as CoreRecordUpdater,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordValidator,
   RecordUpdateResult,
-  Objects,
-  Records,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -350,7 +350,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
       if (NodeDef.isAttribute(childDef)) {
         const sourceDateModified = Node.getDateModified(childSource)
         const targetDateModified = Node.getDateModified(childTargetToUpdate)
-        if (DateUtils.isAfter(sourceDateModified, targetDateModified)) {
+        if (Dates.isAfter(sourceDateModified, targetDateModified)) {
           const attributeUpdateResult = _updateAttributeValue({
             survey,
             record: updateResult.record,

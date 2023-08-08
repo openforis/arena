@@ -1,7 +1,8 @@
 import * as R from 'ramda'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
-import * as DateUtils from '@core/dateUtils'
 import * as Validation from '@core/validation/validation'
 
 import { ChainSamplingDesign } from './chainSamplingDesign'
@@ -107,7 +108,7 @@ export const updateStatisticalAnalysis = (updateFn) => (chain) => {
 
 // ====== CHECK
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
-  DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
+  Dates.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
 
 export const checkChangeRequiresSurveyPublish = ({ chainPrev, chainNext }) => {

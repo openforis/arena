@@ -1,9 +1,10 @@
+import { Dates } from '@openforis/arena-core'
+
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import * as DateUtils from '@core/dateUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
@@ -59,7 +60,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (
         conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
-        DateUtils.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
+        Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
       ) {
         await this.updateExistingRecord()
       }
