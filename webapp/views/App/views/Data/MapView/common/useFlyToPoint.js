@@ -48,7 +48,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
     [getPointIndex, points]
   )
 
-  const flyTo = useCallback(
+  const flyToPoint = useCallback(
     (point) => {
       // close record edit popup
       onRecordEditClick?.(null)
@@ -63,17 +63,17 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
   const flyToNextPoint = useCallback(
     (point) => {
       const nextPoint = getNextPoint(point)
-      flyTo(nextPoint)
+      flyToPoint(nextPoint)
     },
-    [flyTo, getNextPoint]
+    [flyToPoint, getNextPoint]
   )
 
   const flyToPreviousPoint = useCallback(
     (point) => {
       const previousPoint = getPreviousPoint(point)
-      flyTo(previousPoint)
+      flyToPoint(previousPoint)
     },
-    [flyTo, getPreviousPoint]
+    [flyToPoint, getPreviousPoint]
   )
 
   const setMarkerByKey = useCallback(({ key, marker }) => {
@@ -92,6 +92,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
   return {
     currentPointShown,
     currentPointPopupOpen,
+    flyToPoint,
     flyToNextPoint,
     flyToPreviousPoint,
     onCurrentPointPopupClose,
