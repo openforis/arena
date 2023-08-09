@@ -93,7 +93,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     })(recordTarget)
     this.currentRecord = recordTargetUpdated
 
-    await this.persistUpdatedNodes({ nodesUpdated })
+    await this.persistUpdatedNodes({ nodesUpdated, dateModified: Record.getDateModified(record) })
 
     this.updatedRecordsUuids.add(recordUuid)
     this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
@@ -119,7 +119,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       })
     const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
 
-    await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid })
+    await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid, dateModified: Record.getDateModified(record) })
 
     this.insertedRecordsUuids.add(recordUuid)
 

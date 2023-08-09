@@ -38,24 +38,27 @@ export default class DataImportBaseJob extends Job {
     this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
   }
 
-  async persistUpdatedNodes({ nodesUpdated }) {
+  async persistUpdatedNodes({ nodesUpdated, dateModified = new Date() }) {
     const { context, currentRecord: record, tx } = this
     const { dryRun, survey, surveyId } = context
 
     const nodesArray = Object.values(nodesUpdated)
 
-    if (!dryRun && nodesArray.length > 0) {
-      await this.recordsValidationBatchPersister.addItem([Record.getUuid(record), Record.getValidation(record)])
+    record.dateModified = dateModified
 
-      await this.nodesDeleteBatchPersister.addItems(nodesArray.filter(Node.isDeleted))
-      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter(Node.isUpdated))
+    if (dryRun) return
 
-      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
-      const recordUuid = Record.getUuid(record)
-      const recordUpdatedDb = await RecordManager.updateRecordDateModified({ surveyId, recordUuid }, tx)
-      record.dateModified = recordUpdatedDb.dateModified
-    }
+    await this.recordsValidationBatchPersister.addItem([Record.getUuid(record), Record.getValidation(record)])
+    const recordUuid = Record.getUuid(record)
+    await RecordManager.updateRecordDateModified({ surveyId, recordUuid, dateModified }, tx)
+
+    if (nodesArray.length === 0) return
+
+    await this.nodesDeleteBatchPersister.addItems(nodesArray.filter(Node.isDeleted))
+    await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
+    await this.nodesUpdateBatchPersister.addItems(nodesArray.filter(Node.isUpdated))
+
+    this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
   }
 
   async beforeSuccess() {
