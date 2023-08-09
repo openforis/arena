@@ -22,6 +22,7 @@ export const SamplingPointDataLayer = (props) => {
   const {
     currentPointShown,
     currentPointPopupOpen,
+    flyToPoint,
     flyToNextPoint,
     flyToPreviousPoint,
     onCurrentPointPopupClose,
@@ -57,6 +58,7 @@ export const SamplingPointDataLayer = (props) => {
             <SamplingPointDataMarker
               key={itemUuid}
               createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
+              flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
               markersColor={markersColor}
@@ -69,6 +71,7 @@ export const SamplingPointDataLayer = (props) => {
         {currentPointShown && (
           <SamplingPointDataMarker
             createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
+            flyToPoint={flyToPoint}
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
             markersColor={markersColor}
