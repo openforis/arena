@@ -373,9 +373,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
           entitySource: childSource,
           entityTarget: childTargetToUpdate,
         })
-        if (childEntityUpdateResult) {
-          updateResult.merge(childEntityUpdateResult)
-        }
+        updateResult.merge(childEntityUpdateResult)
       }
     })
   })
