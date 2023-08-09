@@ -8,12 +8,10 @@ import {
   differenceInHours,
   differenceInMinutes,
   format as dateFnsFormat,
-  isAfter as dateFnsIsAfter,
-  isBefore as dateFnsIsBefore,
   isValid as fnsIsValid,
 } from 'date-fns'
 
-import { isBlank, isString } from './stringUtils'
+import { isBlank } from './stringUtils'
 
 export { parseISO, subDays, addDays, differenceInDays, differenceInHours, subMonths, subYears } from 'date-fns'
 
@@ -136,13 +134,3 @@ export const convertDateTimeFromISOToDisplay = (dateStr) =>
   })
 
 export const nowFormatDefault = () => format(Date.now(), formats.datetimeDefault)
-
-const toDate = (date) => {
-  if (!R.isNil(date) && isString(date) && !isBlank(date)) {
-    // datetime in ISO format
-    return new Date(date)
-  }
-  return date
-}
-export const isAfter = (date, dateToCompare) => dateFnsIsAfter(toDate(date), toDate(dateToCompare))
-export const isBefore = (date, dateToCompare) => dateFnsIsBefore(toDate(date), toDate(dateToCompare))
