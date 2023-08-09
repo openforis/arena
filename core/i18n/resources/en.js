@@ -536,7 +536,7 @@ $t(common.cantUndoWarning)`,
       includeDataFromAllCycles: 'Include data from all cycles',
       includeFiles: 'Include files',
     },
-    startCsvExport: 'Start CSV export',
+    startExport: 'Start export',
   },
 
   dataImportView: {
