@@ -294,7 +294,7 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 
   // 3. update node validations
   // exclude deleted nodes
-  const nodePointersToValidate = Object.values(updatedNodesAndDependents).reduce((acc, node) => {
+  const dependentNodePointersToValidate = Object.values(updatedNodesAndDependents).reduce((acc, node) => {
     const dependentValidationPointers = Records.getDependentNodePointers({
       survey,
       record,
@@ -305,13 +305,18 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
     acc.push(...dependentValidationPointers)
     return acc
   }, [])
-  const nodesToValidate = NodePointers.getNodesFromNodePointers({ record, nodePointers: nodePointersToValidate })
+  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
+    record,
+    nodePointers: dependentNodePointersToValidate,
+  })
+
+  const nodesToValidate = { ...updatedNodesAndDependents, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
 
   const recordUpdated = await validateNodesAndPersistToRDB(
     {
       survey,
       record,
-      nodes: ObjectUtils.toUuidIndexedObj(nodesToValidate),
+      nodes: nodesToValidate,
       nodesValidationListener,
     },
     t
