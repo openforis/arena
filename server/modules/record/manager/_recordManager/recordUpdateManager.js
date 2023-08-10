@@ -272,6 +272,25 @@ const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
   }
 }
 
+const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
+  const dependentNodePointersToValidate = Object.values(nodes).reduce((acc, node) => {
+    const dependentValidationPointers = Records.getDependentNodePointers({
+      survey,
+      record,
+      node,
+      dependencyType: SurveyDependencyType.validations,
+      includeSelf: true,
+    })
+    acc.push(...dependentValidationPointers)
+    return acc
+  }, [])
+  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
+    record,
+    nodePointers: dependentNodePointersToValidate,
+  })
+  return { ...nodes, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
+}
+
 const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListener, nodesValidationListener }, t) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
@@ -293,24 +312,7 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
   }
 
   // 3. update node validations
-  // exclude deleted nodes
-  const dependentNodePointersToValidate = Object.values(updatedNodesAndDependents).reduce((acc, node) => {
-    const dependentValidationPointers = Records.getDependentNodePointers({
-      survey,
-      record,
-      node,
-      dependencyType: SurveyDependencyType.validations,
-      includeSelf: true,
-    })
-    acc.push(...dependentValidationPointers)
-    return acc
-  }, [])
-  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
-    record,
-    nodePointers: dependentNodePointersToValidate,
-  })
-
-  const nodesToValidate = { ...updatedNodesAndDependents, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
+  const nodesToValidate = _getDependentNodesToValidate({ survey, record, nodes: updatedNodesAndDependents })
 
   const recordUpdated = await validateNodesAndPersistToRDB(
     {
