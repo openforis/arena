@@ -17,6 +17,7 @@ import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManag
 export {
   addNodeDefsCycles,
   deleteNodeDefsCycles,
+  deleteOrphaneNodeDefs,
   permanentlyDeleteNodeDefs,
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
@@ -97,7 +98,7 @@ export const insertNodeDef = async (
     }
 
     const areaEstimatedNodeDef = NodeDef.hasAreaBasedEstimated(nodeDef)
-      ? await NodeDefAreaBasedEstimateManager.createNodeDefAreaBasedEstimate(
+      ? await NodeDefAreaBasedEstimateManager.insertNodeDefAreaBasedEstimate(
           { survey, chainUuid: NodeDef.getChainUuid(nodeDef), estimatedOfNodeDef: nodeDef },
           t
         )
