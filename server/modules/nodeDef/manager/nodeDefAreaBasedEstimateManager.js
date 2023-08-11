@@ -17,10 +17,11 @@ const insertNodeDefAreaBasedEstimate = async ({ survey, chainUuid, estimatedOfNo
   return NodeDefRepository.insertNodeDef(surveyId, nodeDef, client)
 }
 
-const updateNodeDefAreaBasedEstimate = async (
-  { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef },
-  client = db
-) => {
+const updateNodeDefAreaBasedEstimate = async ({ survey, nodeDef }, client = db) => {
+  const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
+  if (!nodeDefAreaBasedEstimate) {
+    return null
+  }
   const surveyId = Survey.getId(survey)
   const chainUuid = NodeDef.getChainUuid(nodeDefAreaBasedEstimate)
   const chain = await ChainRepository.fetchChain({ surveyId, chainUuid }, client)
@@ -29,7 +30,7 @@ const updateNodeDefAreaBasedEstimate = async (
     survey,
     chain,
     nodeDefAreaBasedEstimate,
-    areaBasedEstimatedOfNodeDef,
+    areaBasedEstimatedOfNodeDef: nodeDef,
   })
   nodeDefAreaBasedEstimateUpdated = await NodeDefRepository.updateNodeDefProps(
     surveyId,
@@ -42,7 +43,25 @@ const updateNodeDefAreaBasedEstimate = async (
   return nodeDefAreaBasedEstimateUpdated
 }
 
+const insertOrDeleteNodeDefAreaBasedEstimate = async ({ survey, nodeDef }, client = db) => {
+  const chainUuid = NodeDef.getChainUuid(nodeDef)
+  if (NodeDef.hasAreaBasedEstimated(nodeDef)) {
+    // insert new area based estimate node def
+    return insertNodeDefAreaBasedEstimate({ survey, chainUuid, estimatedOfNodeDef: nodeDef }, client)
+  } else {
+    // delete existing area based estimate node def
+    const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
+    if (!nodeDefAreaBasedEstimate) {
+      return null
+    }
+    const surveyId = Survey.getId(survey)
+    await NodeDefRepository.markNodeDefDeleted(surveyId, NodeDef.getUuid(nodeDefAreaBasedEstimate), client)
+    return NodeDef.assocDeleted(true)(nodeDefAreaBasedEstimate)
+  }
+}
+
 export const NodeDefAreaBasedEstimateManager = {
   insertNodeDefAreaBasedEstimate,
   updateNodeDefAreaBasedEstimate,
+  insertOrDeleteNodeDefAreaBasedEstimate,
 }

@@ -167,7 +167,9 @@ export const updateNodeDefProps = async (
     }
 
     const _addNodeDefUpdatedToSurvey = (nodeDef) => {
-      _addNodeDefsUpdatedToSurvey({ [NodeDef.getUuid(nodeDef)]: nodeDef })
+      if (nodeDef) {
+        _addNodeDefsUpdatedToSurvey({ [NodeDef.getUuid(nodeDef)]: nodeDef })
+      }
     }
 
     // update node def into db
@@ -240,35 +242,18 @@ export const updateNodeDefProps = async (
         NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
 
       if (hasAreaBasedEstimateChanged) {
-        const chainUuid = NodeDef.getChainUuid(nodeDef)
-        if (NodeDef.hasAreaBasedEstimated(nodeDef)) {
-          // insert new area based estimate node def
-          const nodeDefAreaBasedEstimate = await NodeDefAreaBasedEstimateManager.insertNodeDefAreaBasedEstimate(
-            { survey, chainUuid, estimatedOfNodeDef: nodeDef },
-            t
-          )
-          _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimate)
-        } else {
-          // delete existing area based estimate node def
-          const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDefPrev)(survey)
-          if (nodeDefAreaBasedEstimate) {
-            await NodeDefRepository.markNodeDefDeleted(surveyId, NodeDef.getUuid(nodeDefAreaBasedEstimate), t)
-          }
-          _addNodeDefUpdatedToSurvey(NodeDef.assocDeleted(true)(nodeDefAreaBasedEstimate))
-        }
+        const nodeDefAreaBasedEstimateUpdated =
+          await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
+        _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
       } else {
         // node def name changed => update node def area based estimate generated name
         const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
         if (nameUpdated) {
-          const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDefPrev)(survey)
-          if (nodeDefAreaBasedEstimate) {
-            const nodeDefAreaBasedEstimateUpdated =
-              await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
-                { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef: nodeDef },
-                t
-              )
-            _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
-          }
+          const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
+            { survey, nodeDef },
+            t
+          )
+          _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
         }
       }
     }
