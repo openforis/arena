@@ -381,6 +381,8 @@ export const newNodeDef = (
 
 // ==== UPDATE
 
+export const assocDeleted = R.assoc(keys.deleted)
+
 export const assocParentUuid = R.assoc(keys.parentUuid)
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 export const { mergeProps } = ObjectUtils

@@ -1148,7 +1148,6 @@ $t(common.appNameFull)
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
     cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
-    cannotSetPropSaveChangesFirst: 'Cannot set "{{prop}}": save changes first',
   },
 
   languagesEditor: {
