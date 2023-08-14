@@ -1,9 +1,12 @@
 import * as R from 'ramda'
 
+import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as PromiseUtils from '@core/promiseUtils'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -269,6 +272,25 @@ const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
   }
 }
 
+const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
+  const dependentNodePointersToValidate = Object.values(nodes).reduce((acc, node) => {
+    const dependentValidationPointers = Records.getDependentNodePointers({
+      survey,
+      record,
+      node,
+      dependencyType: SurveyDependencyType.validations,
+      includeSelf: true,
+    })
+    acc.push(...dependentValidationPointers)
+    return acc
+  }, [])
+  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
+    record,
+    nodePointers: dependentNodePointersToValidate,
+  })
+  return { ...nodes, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
+}
+
 const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListener, nodesValidationListener }, t) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
@@ -290,12 +312,13 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
   }
 
   // 3. update node validations
-  // exclude deleted nodes
-  let recordUpdated = await validateNodesAndPersistToRDB(
+  const nodesToValidate = _getDependentNodesToValidate({ survey, record, nodes: updatedNodesAndDependents })
+
+  const recordUpdated = await validateNodesAndPersistToRDB(
     {
       survey,
       record,
-      nodes: updatedNodesAndDependents,
+      nodes: nodesToValidate,
       nodesValidationListener,
     },
     t
