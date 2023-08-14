@@ -57,6 +57,7 @@ const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
       dimensions: dimensions.map(NodeDef.getName),
       filter: ChainStatisticalAnalysis.getFilter(statisticalAnalysis),
       reportingMethod: ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis),
+      stratumAggregation: ChainStatisticalAnalysis.isStratumAggregation(statisticalAnalysis),
       clusteringVariances: ChainStatisticalAnalysis.isClusteringOnlyVariances(statisticalAnalysis),
       nonResponseBiasCorrection: ChainStatisticalAnalysis.isNonResponseBiasCorrection(statisticalAnalysis),
       ...(samplingStrategySpecified ? { pValue: ChainStatisticalAnalysis.getPValue(statisticalAnalysis) } : {}),
