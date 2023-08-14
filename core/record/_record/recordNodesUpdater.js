@@ -71,13 +71,10 @@ const _updateAttributeValue = ({
     }) ||
     dateModified // always update attribute when dateModified changes
   ) {
-    // update existing attribute (if value changed)
-    const attributeUpdated = A.pipe(
-      Node.assocValue(value),
-      // reset default value applied flag
-      Node.assocMeta({ ...Node.getMeta(attribute), [Node.metaKeys.defaultValue]: false }),
-      Node.assocUpdated(true),
-      (nodeUpdated) => (dateModified ? Node.assocDateModified(dateModified)(nodeUpdated) : nodeUpdated)
+    // update existing attribute (if value changed);
+    // do not update meta defaultValue applied flag (value could have been a default value already)
+    const attributeUpdated = A.pipe(Node.assocValue(value), Node.assocUpdated(true), (nodeUpdated) =>
+      dateModified ? Node.assocDateModified(dateModified)(nodeUpdated) : nodeUpdated
     )(attribute)
 
     const updateResult = new RecordUpdateResult({ record })
@@ -265,7 +262,8 @@ const updateAttributesWithValues =
       if (
         NodeDef.isDescendantOf(entityDef)(attributeDef) &&
         (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
-        !NodeDef.isReadOnly(attributeDef)
+        // update also read-only values with value evaluated only one time with data coming from CSV
+        (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
       ) {
         const { record: currentRecord } = updateResult
 

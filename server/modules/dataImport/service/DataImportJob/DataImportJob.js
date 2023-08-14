@@ -157,7 +157,7 @@ export default class DataImportJob extends DataImportBaseJob {
   }
 
   generateResult() {
-    const result = this.generateResult()
+    const result = super.generateResult()
     const { dryRun } = this.context
     return { ...result, dryRun }
   }

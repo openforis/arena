@@ -573,20 +573,20 @@ $t(common.cantUndoWarning)`,
       },
       DataImportJob: {
         importCompleteSummary: `
-        - {{rowsProcessed}} rows processed
+        - {{processed}} rows processed
         - {{updatedValues}} values updated
         - {{insertedRecords}} records created
         - {{updatedRecords}} records updated`,
         importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         importCompleteWithErrors: `## Import complete (with errors):
-        - {{rowsProcessed}} rows processed`,
+        - {{processed}} rows processed`,
       },
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
-        - {{rowsProcessed}} rows processed`,
+        - {{processed}} rows processed`,
         validationCompleteSuccessfully: `## Validation complete without errors
-        - {{rowsProcessed}} rows processed
+        - {{processed}} rows processed
         - {{updatedValues}} values would be updated
         - {{insertedRecords}} records would be created
         - {{updatedRecords}} records would be updated`,
