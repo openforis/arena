@@ -359,6 +359,23 @@ export const permanentlyDeleteNodeDefs = async (surveyId, client = DB) =>
           deleted = true
     `)
 
+export const deleteOrphaneNodeDefs = async (surveyId, client = DB) =>
+  client.query(`
+        DELETE
+        FROM
+          ${getSurveyDBSchema(surveyId)}.node_def
+        WHERE
+          analysis = true AND (
+            parent_uuid IS NULL 
+            OR 
+            ((props_advanced || props_advanced_draft) ->> '${
+              NodeDef.keysPropsAdvanced.areaBasedEstimatedOf
+            }')::uuid NOT IN (
+              SELECT uuid FROM ${getSurveyDBSchema(surveyId)}.node_def
+            )
+          )
+      `)
+
 export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
   client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def
