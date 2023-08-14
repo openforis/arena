@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Promises } from '@openforis/arena-core'
+
 import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
@@ -7,7 +9,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '../../../manager/surveyManager'
-import { Promises } from '@openforis/arena-core'
+import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   if (NodeDef.isRoot(nodeDef)) {
@@ -29,6 +31,9 @@ export default class NodeDefsValidationJob extends Job {
 
   async execute() {
     const { errors, surveyId, tx } = this
+
+    await NodeDefManager.deleteOrphaneNodeDefs(surveyId, tx)
+
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
 
