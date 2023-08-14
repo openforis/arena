@@ -34,7 +34,7 @@ const getPValue = A.propOr(pValueDefault, keys.pValue)
 
 const isNonResponseBiasCorrection = isPropTrue(keys.nonResponseBiasCorrection)
 
-const getReportingMethod = A.prop(keys.reportingMethod)
+const getReportingMethod = A.propOr(reportingMethods[2], keys.reportingMethod)
 
 const getReportingArea = A.prop(keys.reportingArea)
 
