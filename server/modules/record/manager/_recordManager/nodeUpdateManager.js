@@ -253,3 +253,12 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
     return Record.mergeNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
   })
+
+export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {
+  const nodesDeleted = await NodeRepository.deleteNodesByUuids(surveyId, nodeUuids, tx)
+  const activities = nodeUuids.map((uuid) =>
+    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid }, systemActivity)
+  )
+  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+  return nodesDeleted
+}

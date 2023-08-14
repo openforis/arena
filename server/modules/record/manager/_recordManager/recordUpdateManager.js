@@ -219,7 +219,7 @@ export const deleteNode = async (
     t
   )
 
-export const deleteNodesByNodeDefUuids = NodeUpdateManager.deleteNodesByNodeDefUuids
+export const { deleteNodesByNodeDefUuids, deleteNodesByUuids } = NodeUpdateManager
 
 const _updateNodeAndValidateRecordUniqueness = async (
   user,

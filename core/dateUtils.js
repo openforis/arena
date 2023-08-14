@@ -13,17 +13,7 @@ import {
 
 import { isBlank } from './stringUtils'
 
-export {
-  isBefore,
-  isAfter,
-  parseISO,
-  subDays,
-  addDays,
-  differenceInDays,
-  differenceInHours,
-  subMonths,
-  subYears,
-} from 'date-fns'
+export { parseISO, subDays, addDays, differenceInDays, differenceInHours, subMonths, subYears } from 'date-fns'
 
 export const formats = {
   dateDefault: 'dd/MM/yyyy',

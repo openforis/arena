@@ -1,41 +1,25 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
-import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
-import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
-import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
-import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
-
 import { DataImportFileReader } from './dataImportFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
+import DataImportBaseJob from './DataImportBaseJob'
 
-export default class DataImportJob extends Job {
+export default class DataImportJob extends DataImportBaseJob {
   constructor(params, type = DataImportJob.type) {
     super(type, params)
-
-    this.insertedRecordsUuids = new Set()
-    this.updatedRecordsUuids = new Set()
-    this.updatedValues = 0
-
-    this.currentRecord = null
-    this.nodesUpdateBatchPersister = null
-    this.nodesInsertBatchPersister = null
-    this.recordsValidationBatchPersister = null
   }
 
   async execute() {
-    const { context, user, surveyId, tx } = this
-    const { abortOnErrors, dryRun } = context
+    super.execute()
 
-    this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
-    this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
-    this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
+    const { context } = this
+    const { abortOnErrors, dryRun } = context
 
     await this.fetchSurvey()
 
@@ -122,26 +106,6 @@ export default class DataImportJob extends Job {
     }
   }
 
-  async persistUpdatedNodes({ nodesUpdated }) {
-    const { context, currentRecord: record, tx } = this
-    const { dryRun, survey } = context
-
-    const nodesArray = Object.values(nodesUpdated)
-
-    if (!dryRun && nodesArray.length > 0) {
-      await this.recordsValidationBatchPersister.addItem([Record.getUuid(record), Record.getValidation(record)])
-
-      this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
-
-      const surveyId = Survey.getId(survey)
-      const recordUuid = Record.getUuid(record)
-      await RecordManager.updateRecordDateModified({ surveyId, recordUuid }, tx)
-
-      await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-      await this.nodesUpdateBatchPersister.addItems(nodesArray.filter((node) => !Node.isCreated(node)))
-    }
-  }
-
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
     const { entityDefUuid, insertMissingNodes, survey } = context
@@ -174,13 +138,15 @@ export default class DataImportJob extends Job {
       await this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
+      const recordUuid = Record.getUuid(this.currentRecord)
       if (newRecord) {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
+        this.insertedRecordsUuids.add(recordUuid)
       } else {
         const nodesArray = Object.values(nodesUpdated)
         if (nodesArray.length > 0) {
           this.updatedValues += nodesArray.length
-          this.updatedRecordsUuids.add(Record.getUuid(this.currentRecord))
+          this.updatedRecordsUuids.add(recordUuid)
         }
       }
     } catch (e) {
@@ -190,30 +156,10 @@ export default class DataImportJob extends Job {
     }
   }
 
-  async beforeSuccess() {
-    await this.nodesInsertBatchPersister.flush()
-    await this.nodesUpdateBatchPersister.flush()
-    await this.recordsValidationBatchPersister.flush()
-
-    const {
-      context,
-      errors,
-      insertedRecordsUuids,
-      updatedRecordsUuids: updatedRecordsByUuid,
-      processed: rowsProcessed,
-      updatedValues,
-    } = this
-
-    const { dryRun } = context
-
-    this.setResult({
-      insertedRecords: insertedRecordsUuids.size,
-      updatedRecords: updatedRecordsByUuid.size,
-      rowsProcessed,
-      updatedValues,
-      dryRun,
-      errorsCount: Object.keys(errors).length,
-    })
+  generateResult() {
+    const result = this.generateResult()
+    const { dryRun } = this.context
+    return { ...result, dryRun }
   }
 
   _addError(key, params = {}) {

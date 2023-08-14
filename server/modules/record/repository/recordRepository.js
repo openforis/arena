@@ -283,13 +283,13 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
 
 // ============== UPDATE
 
-export const updateRecordDateModified = async ({ surveyId, recordUuid }, client = db) =>
+export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModified = new Date() }, client = db) =>
   client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.record 
-     SET date_modified = ${DbUtils.now}
+     SET date_modified = $2
      WHERE uuid = $1
     RETURNING ${recordSelectFields}`,
-    [recordUuid]
+    [recordUuid, Dates.formatForStorage(dateModified)]
   )
 
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>

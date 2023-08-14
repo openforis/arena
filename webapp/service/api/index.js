@@ -30,6 +30,7 @@ export { fetchActivityLogs } from './activityLog'
 export {
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
+  startDataImportFromArenaJob,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   updateRecordsStep,

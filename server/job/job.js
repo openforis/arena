@@ -231,7 +231,11 @@ export default class Job {
    * (it runs INSIDE the current db transaction)
    */
   async beforeSuccess() {
-    // To be extended by subclasses
+    this.setResult(this.generateResult())
+  }
+
+  generateResult() {
+    return {}
   }
 
   /**
