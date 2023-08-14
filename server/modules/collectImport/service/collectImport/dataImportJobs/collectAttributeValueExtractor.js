@@ -81,13 +81,14 @@ const extractDateValueAndMeta = (collectNode) => {
 }
 
 const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNodeDef, tx) => async (collectNode) => {
-  const { file_name: fileName, file_size: fileSize } = CollectRecord.getTextValues(collectNode)
+  const { file_name: fileName } = CollectRecord.getTextValues(collectNode)
 
   const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
   const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${fileName}`)
 
   if (content) {
     const fileUuid = uuidv4()
+    const fileSize = Buffer.byteLength(content)
     const file = RecordFile.createFile(
       fileUuid,
       fileName,

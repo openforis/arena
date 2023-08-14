@@ -355,9 +355,10 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: Node.getRecordUuid(node) })
+  const surveySummary = await SurveyManager.fetchSurveyById({ surveyId })
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
-    draft: Record.isPreview(record),
+    draft: !Survey.isPublished(surveySummary),
   })
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 
