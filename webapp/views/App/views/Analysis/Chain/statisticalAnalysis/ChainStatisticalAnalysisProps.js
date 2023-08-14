@@ -53,8 +53,8 @@ export const ChainStatisticalAnalysisProps = () => {
     [chainUuid, survey]
   )
 
-  const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([key, name]) => ({
-    key,
+  const reportingMethodItems = Object.entries(ChainStatisticalAnalysis.reportingMethods).map(([name, code]) => ({
+    key: code,
     label: i18n.t(`chainView.statisticalAnalysis.reportingMethods.${name}`),
   }))
 
@@ -109,6 +109,11 @@ export const ChainStatisticalAnalysisProps = () => {
 
   const onReportingAreaChange = useCallback(
     (value) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocReportingArea(value)),
+    [updateStatisticalAnalysis]
+  )
+
+  const onStratumAggregationChange = useCallback(
+    (value) => updateStatisticalAnalysis(ChainStatisticalAnalysis.assocStratumAggregation(value)),
     [updateStatisticalAnalysis]
   )
 
@@ -171,6 +176,16 @@ export const ChainStatisticalAnalysisProps = () => {
           items={reportingMethodItems}
         />
       </FormItem>
+
+      {Chain.isStratumAggregationAvailable(chain) && (
+        <FormItem label={i18n.t('chainView.statisticalAnalysis.stratumAggregation')}>
+          <Checkbox
+            checked={ChainStatisticalAnalysis.isStratumAggregation(chainStatisticalAnalysis)}
+            validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.stratumAggregation)(validation)}
+            onChange={onStratumAggregationChange}
+          />
+        </FormItem>
+      )}
 
       {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
         <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>

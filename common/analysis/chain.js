@@ -78,32 +78,56 @@ export const assocIncludeEntitiesWithoutData = (value) =>
 
 const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
 
-export const updateSamplingDesign = (updateFn) => (chain) => {
+const _updateSamplingDesign = (updateFn) => (chain) => {
   const samplingDesign = getSamplingDesign(chain)
   const samplingDesignUpdated = updateFn(samplingDesign)
-  let chainUpdated = assocSamplingDesign(samplingDesignUpdated)(chain)
-  if (
-    !ChainSamplingDesign.getSamplingStrategy(samplingDesignUpdated) &&
-    ChainStatisticalAnalysis.getPValue(getStatisticalAnalysis(chainUpdated))
-  ) {
-    chainUpdated = updateStatisticalAnalysis(ChainStatisticalAnalysis.resetPValue)(chainUpdated)
-  }
-  if (
-    !ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) &&
-    ChainStatisticalAnalysis.isClusteringOnlyVariances(getStatisticalAnalysis(chainUpdated))
-  ) {
-    chainUpdated = updateStatisticalAnalysis(ChainStatisticalAnalysis.assocClusteringOnlyVariances(false))(chainUpdated)
-  }
-  return chainUpdated
+  return assocSamplingDesign(samplingDesignUpdated)(chain)
 }
 
 const assocStatisticalAnalysis = (value) => ObjectUtils.setProp(keysProps.statisticalAnalysis, value)
 
-export const updateStatisticalAnalysis = (updateFn) => (chain) => {
+const _updateStatisticalAnalysis = (updateFn) => (chain) => {
   const statisticalAnalysis = getStatisticalAnalysis(chain)
-  const getStatisticalAnalysisUpdated = updateFn(statisticalAnalysis)
-  return assocStatisticalAnalysis(getStatisticalAnalysisUpdated)(chain)
+  const statisticalAnalysisUpdated = updateFn(statisticalAnalysis)
+  return assocStatisticalAnalysis(statisticalAnalysisUpdated)(chain)
 }
+
+const _cleanupChain = (chain) => {
+  let chainUpdated = chain
+  // reset invalid pValue
+  if (
+    !ChainSamplingDesign.getSamplingStrategy(getSamplingDesign(chainUpdated)) &&
+    ChainStatisticalAnalysis.getPValue(getStatisticalAnalysis(chainUpdated))
+  ) {
+    chainUpdated = _updateStatisticalAnalysis(ChainStatisticalAnalysis.resetPValue)(chainUpdated)
+  }
+  // reset invalid clustering only variance
+  if (
+    !ChainSamplingDesign.getClusteringNodeDefUuid(getSamplingDesign(chainUpdated)) &&
+    ChainStatisticalAnalysis.isClusteringOnlyVariances(getStatisticalAnalysis(chainUpdated))
+  ) {
+    chainUpdated = _updateStatisticalAnalysis(ChainStatisticalAnalysis.assocClusteringOnlyVariances(false))(
+      chainUpdated
+    )
+  }
+  // reset invalid stratum aggregation
+  if (
+    !isStratumAggregationAvailable(chainUpdated) &&
+    ChainStatisticalAnalysis.isStratumAggregation(getStatisticalAnalysis(chainUpdated))
+  ) {
+    chainUpdated = _updateStatisticalAnalysis(ChainStatisticalAnalysis.assocStratumAggregation(false))(chainUpdated)
+  }
+  return chainUpdated
+}
+
+const _updateChain = (updateFn) => (chain) => {
+  const chainUpdated = updateFn(chain)
+  return _cleanupChain(chainUpdated)
+}
+
+export const updateSamplingDesign = (updateFn) => _updateChain(_updateSamplingDesign(updateFn))
+
+export const updateStatisticalAnalysis = (updateFn) => _updateChain(_updateStatisticalAnalysis(updateFn))
 
 // ====== CHECK
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
@@ -120,6 +144,20 @@ export const checkChangeRequiresSurveyPublish = ({ chainPrev, chainNext }) => {
     return true
   }
   return false
+}
+
+// utils
+export const isStratumAggregationAvailable = (chain) => {
+  const statisticalAnalysis = getStatisticalAnalysis(chain)
+  const samplingDesign = getSamplingDesign(chain)
+  const reportingMethod = ChainStatisticalAnalysis.getReportingMethod(statisticalAnalysis)
+  return (
+    reportingMethod === ChainStatisticalAnalysis.reportingMethods.dimensionsSeparate &&
+    [
+      ChainSamplingDesign.samplingStrategies.stratifiedRandom,
+      ChainSamplingDesign.samplingStrategies.stratifiedSystematic,
+    ].includes(ChainSamplingDesign.getSamplingStrategy(samplingDesign))
+  )
 }
 
 // ====== VALIDATION

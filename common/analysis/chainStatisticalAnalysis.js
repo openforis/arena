@@ -10,11 +10,12 @@ const keys = {
   pValue: 'pValue',
   reportingMethod: 'reportingMethod',
   reportingArea: 'reportingArea',
+  stratumAggregation: 'stratumAggregation',
 }
 
 const reportingMethods = {
-  1: 'dimensionsCombined',
-  2: 'dimensionsSeparate',
+  dimensionsCombined: 1,
+  dimensionsSeparate: 2,
 }
 
 const pValues = [0.99, 0.98, 0.95, 0.9, 0.8]
@@ -34,9 +35,11 @@ const getPValue = A.propOr(pValueDefault, keys.pValue)
 
 const isNonResponseBiasCorrection = isPropTrue(keys.nonResponseBiasCorrection)
 
-const getReportingMethod = A.propOr(reportingMethods[2], keys.reportingMethod)
+const getReportingMethod = A.propOr(reportingMethods.dimensionsSeparate, keys.reportingMethod)
 
 const getReportingArea = A.prop(keys.reportingArea)
+
+const isStratumAggregation = isPropTrue(keys.stratumAggregation)
 
 const isEmpty = (statisticalAnalysis) =>
   !getEntityDefUuid(statisticalAnalysis) &&
@@ -68,6 +71,8 @@ const assocReportingMethod = (reportingMethod) => A.assoc(keys.reportingMethod, 
 
 const assocReportingArea = (reportingArea) => A.assoc(keys.reportingArea, reportingArea)
 
+const assocStratumAggregation = (stratumAggregation) => A.assoc(keys.stratumAggregation, stratumAggregation)
+
 export const ChainStatisticalAnalysis = {
   keys,
   pValues,
@@ -81,6 +86,7 @@ export const ChainStatisticalAnalysis = {
   getReportingMethod,
   getReportingArea,
   isNonResponseBiasCorrection,
+  isStratumAggregation,
   isEmpty,
 
   assocClusteringOnlyVariances,
@@ -92,4 +98,5 @@ export const ChainStatisticalAnalysis = {
   resetPValue,
   assocReportingMethod,
   assocReportingArea,
+  assocStratumAggregation,
 }
