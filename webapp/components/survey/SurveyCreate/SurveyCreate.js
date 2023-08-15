@@ -9,6 +9,8 @@ import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { RecordCycle } from '@core/record/recordCycle'
+
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
@@ -131,7 +133,7 @@ const SurveyCreate = (props) => {
               <Dropdown
                 items={cloneFrom.cycles}
                 itemValue={(cycleKey) => cycleKey}
-                itemLabel={(cycleKey) => String(Number(cycleKey) + 1)}
+                itemLabel={RecordCycle.getLabel}
                 onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
                 selection={cloneFromCycle}
               />

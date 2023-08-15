@@ -85,6 +85,8 @@ export default () =>
           'relevantIf',
           'hiddenWhenNotRelevant',
           'defaultValue',
+          'defaultValueApplyIf',
+          'defaultValueEvaluateOnce',
           'required',
           'unique',
           'validations',
