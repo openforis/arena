@@ -12,12 +12,13 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import { Button, Dropzone } from '@webapp/components'
+import { NotificationActions } from '@webapp/store/ui'
+import { Dropzone } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
+import { UploadStartButton } from './UploadStartButton'
 
 const fileMaxSize = 1000 // 1 GB
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
@@ -36,14 +37,7 @@ export const CollectDataImportView = () => {
   const [forceImport, setForceImport] = useState(false)
   const [file, setFile] = useState(null)
 
-  const startImportJob = async () => {
-    const job = await API.startCollectRecordsImportJob({
-      surveyId,
-      file,
-      deleteAllRecords: canDeleteAllRecords && deleteAllRecords,
-      cycle,
-      forceImport,
-    })
+  const onJobStart = (job) => {
     dispatch(
       JobActions.showJobMonitor({
         job,
@@ -67,23 +61,6 @@ export const CollectDataImportView = () => {
       return acceptedFileExtensions.includes(extension)
     })[0]
     setFile(_file)
-  }
-
-  const onStartImportClick = async () => {
-    if (deleteAllRecords) {
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key:
-            surveyCycleKeys.length > 1
-              ? 'dataImportView.confirmDeleteAllRecordsInCycle'
-              : 'dataImportView.confirmDeleteAllRecords',
-          params: { cycle: RecordCycle.getLabel(cycle) },
-          onOk: async () => startImportJob(),
-        })
-      )
-    } else {
-      await startImportJob()
-    }
   }
 
   return (
@@ -114,11 +91,24 @@ export const CollectDataImportView = () => {
 
         <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
-        <Button
-          className="btn-primary"
+        <UploadStartButton
           disabled={!file}
-          label="dataImportView.startImport"
-          onClick={onStartImportClick}
+          confirmMessageKey={
+            surveyCycleKeys.length > 1
+              ? 'dataImportView.confirmDeleteAllRecordsInCycle'
+              : 'dataImportView.confirmDeleteAllRecords'
+          }
+          confirmMessageParams={{ cycle: RecordCycle.getLabel(cycle) }}
+          showConfirm={deleteAllRecords}
+          startFunction={API.startCollectRecordsImportJob}
+          startFunctionParams={{
+            surveyId,
+            file,
+            deleteAllRecords: canDeleteAllRecords && deleteAllRecords,
+            cycle,
+            forceImport,
+          }}
+          onUploadComplete={onJobStart}
         />
       </div>
     </div>

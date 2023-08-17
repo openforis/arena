@@ -17,11 +17,12 @@ export const startCollectRecordsImportJob = async ({
   file,
   deleteAllRecords,
   cycle,
+  onUploadProgress,
   forceImport = false,
 } = {}) => {
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData)
+  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
