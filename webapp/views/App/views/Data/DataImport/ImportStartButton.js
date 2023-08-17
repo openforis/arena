@@ -5,11 +5,13 @@ import PropTypes from 'prop-types'
 import { Button, ProgressBar } from '@webapp/components'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-export const UploadStartButton = (props) => {
+export const ImportStartButton = (props) => {
   const {
+    className,
     confirmMessageKey,
     confirmMessageParams,
     disabled,
+    label,
     showConfirm,
     startFunction,
     startFunctionParams,
@@ -48,27 +50,31 @@ export const UploadStartButton = (props) => {
     <>
       {uploadProgressPercent >= 0 && <ProgressBar indeterminate={false} progress={uploadProgressPercent} />}
       <Button
-        className="btn-primary"
+        className={className}
         disabled={disabled || uploadProgressPercent >= 0}
-        label="dataImportView.startImport"
+        label={label}
         onClick={onStartClick}
       />
     </>
   )
 }
 
-UploadStartButton.propTypes = {
+ImportStartButton.propTypes = {
+  className: PropTypes.string,
   confirmMessageKey: PropTypes.string,
   confirmMessageParams: PropTypes.object,
   disabled: PropTypes.bool,
+  label: PropTypes.string,
   showConfirm: PropTypes.bool,
   startFunction: PropTypes.func.isRequired,
   startFunctionParams: PropTypes.object,
   onUploadComplete: PropTypes.func.isRequired,
 }
 
-UploadStartButton.defaultProps = {
+ImportStartButton.defaultProps = {
+  className: 'btn-primary start-btn',
   disabled: false,
+  label: 'dataImportView.startImport',
   showConfirm: false,
   startFunctionParams: {},
 }

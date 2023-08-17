@@ -18,7 +18,7 @@ import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import { UploadStartButton } from './UploadStartButton'
+import { ImportStartButton } from './ImportStartButton'
 
 const fileMaxSize = 1000 // 1 GB
 const acceptedFileExtensions = ['collect-backup', 'collect-data']
@@ -91,7 +91,7 @@ export const CollectDataImportView = () => {
 
         <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
-        <UploadStartButton
+        <ImportStartButton
           disabled={!file}
           confirmMessageKey={
             surveyCycleKeys.length > 1
