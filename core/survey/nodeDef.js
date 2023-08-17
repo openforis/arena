@@ -85,6 +85,9 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
+
+  // code and taxon
+  itemsFilter: 'itemsFilter',
 }
 
 export const textInputTypes = {
@@ -244,6 +247,9 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
+
+// code and taxon
+export const getItemsFilter = getProp(propKeys.itemsFilter, '')
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)

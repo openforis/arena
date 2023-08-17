@@ -1,6 +1,6 @@
 import './NodeDefCode.scss'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -40,20 +40,15 @@ const NodeDefCode = (props) => {
   const record = useRecord()
 
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyId = Survey.getId(survey)
   const draft = Survey.isDraft(surveyInfo)
-  const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  const parentCategoryItemUuid = Node.getCategoryItemUuid(nodeParentCode)
   const codeUuidsHierarchy = nodeParentCode
     ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
     : []
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
 
-  const items = useItems({ categoryUuid, categoryLevelIndex, draft, edit, parentCategoryItemUuid, surveyId })
-  const itemsArray = useMemo(() => Object.values(items), [items])
+  const itemsArray = useItems({ survey, record, nodeDef, parentNode, draft, edit })
   const [selectedItems, setSelectedItems] = useState([])
 
   // On items or nodes change, update selectedItems

@@ -18,6 +18,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 import { State } from './store'
+import { ScriptEditor } from '@webapp/components/ScriptEditor'
 
 const displayAsItems = ({ i18n }) => [
   {
@@ -62,6 +63,15 @@ const CodeProps = (props) => {
         />
       </FormItem>
 
+      <FormItem label={i18n.t('nodeDefEdit.codeProps.itemsFilter')}>
+        <ScriptEditor
+          height="inherit"
+          mode="javascript"
+          script={NodeDef.getItemsFilter(nodeDef)}
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.itemsFilter, value })}
+        />
+      </FormItem>
+
       {!NodeDef.isAnalysis(nodeDef) && (
         <>
           {Category.isHierarchical(category) && (
@@ -86,6 +96,7 @@ const CodeProps = (props) => {
               </div>
             </FormItem>
           )}
+
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
