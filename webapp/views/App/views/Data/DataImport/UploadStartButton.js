@@ -58,7 +58,7 @@ export const UploadStartButton = (props) => {
 }
 
 UploadStartButton.propTypes = {
-  confirmMessageKey: PropTypes.bool,
+  confirmMessageKey: PropTypes.string,
   confirmMessageParams: PropTypes.object,
   disabled: PropTypes.bool,
   showConfirm: PropTypes.bool,
