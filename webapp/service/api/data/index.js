@@ -54,14 +54,14 @@ export const startDataImportFromCsvJob = async ({
   return job
 }
 
-export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, dryRun = false }) => {
+export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, onUploadProgress, dryRun = false }) => {
   const formData = objectToFormData({
     file,
     cycle,
     dryRun,
     conflictResolutionStrategy: ConflictResolutionStrategy.overwriteIfUpdated,
   })
-  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
+  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
