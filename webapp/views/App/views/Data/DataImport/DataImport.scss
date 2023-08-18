@@ -8,6 +8,10 @@
   align-items: center;
   overflow-y: hidden;
 
+  .progress-bar {
+    width: 100%;
+  }
+
   .form {
     width: 40rem;
     justify-items: center;

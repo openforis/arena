@@ -21,7 +21,7 @@ export const useSurveySrsIndex = () =>
     return Survey.getSRSIndex(surveyInfo)
   }, Objects.isEqual)
 export const useSurveyCycleKey = () => useSelector(SurveyState.getSurveyCycleKey)
-export const useSurveyCycleKeys = () => useSelector(SurveyState.getSurveyCyclesKeys)
+export const useSurveyCycleKeys = () => useSelector(SurveyState.getSurveyCyclesKeys, Objects.isEqual)
 export const useSurveyPreferredLang = () => useSelector(SurveyState.getSurveyPreferredLang)
 
 export const useSurveyLangs = () => Survey.getLanguages(useSurveyInfo())
