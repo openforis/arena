@@ -85,9 +85,6 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
-
-  // code and taxon
-  itemsFilter: 'itemsFilter',
 }
 
 export const textInputTypes = {
@@ -138,6 +135,9 @@ export const keysPropsAdvanced = {
   isSampling: 'isSampling',
   hasAreaBasedEstimated: 'hasAreaBasedEstimated',
   areaBasedEstimatedOf: 'areaBasedEstimatedOf', // uuid of area based estimated node def
+
+  // code and taxon
+  itemsFilter: 'itemsFilter',
 }
 
 const metaKeys = {
@@ -248,9 +248,6 @@ export const getTextTransform = getProp(propKeys.textTransform, textTransformVal
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
 
-// code and taxon
-export const getItemsFilter = getProp(propKeys.itemsFilter, '')
-
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
@@ -328,6 +325,9 @@ export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
+
+// code and taxon
+export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])

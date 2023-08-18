@@ -1136,6 +1136,7 @@ $t(common.appNameFull)
         checkbox: 'Checkbox',
         dropdown: 'Dropdown',
       },
+      itemsFilter: 'Items filter',
       parentCode: 'Parent Code',
     },
     coordinateProps: {

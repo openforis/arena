@@ -14,11 +14,10 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 import { State } from './store'
-import { ScriptEditor } from '@webapp/components/ScriptEditor'
 
 const displayAsItems = ({ i18n }) => [
   {
@@ -64,11 +63,10 @@ const CodeProps = (props) => {
       </FormItem>
 
       <FormItem label={i18n.t('nodeDefEdit.codeProps.itemsFilter')}>
-        <ScriptEditor
-          height="inherit"
-          mode="javascript"
-          script={NodeDef.getItemsFilter(nodeDef)}
-          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.itemsFilter, value })}
+        <Input
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
+          validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
+          value={NodeDef.getItemsFilter(nodeDef)}
         />
       </FormItem>
 
