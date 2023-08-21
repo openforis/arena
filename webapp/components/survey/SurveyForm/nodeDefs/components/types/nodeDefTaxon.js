@@ -28,7 +28,18 @@ const selectionDefault = {
 }
 
 const NodeDefTaxon = (props) => {
-  const { surveyId, nodeDef, taxonomyUuid, node, edit, draft, renderType, canEditRecord, readOnly, updateNode } = props
+  const {
+    surveyId,
+    nodeDef,
+    node,
+    parentNode,
+    edit,
+    draft,
+    renderType,
+    canEditRecord,
+    readOnly,
+    updateNode,
+  } = props
 
   const [selection, setSelection] = useState(selectionDefault)
   const elementRef = useRef(null)
@@ -133,7 +144,8 @@ const NodeDefTaxon = (props) => {
             id={TestId.surveyForm.taxonField(NodeDef.getName(nodeDef), field)}
             key={field}
             surveyId={surveyId}
-            taxonomyUuid={taxonomyUuid}
+            nodeDef={nodeDef}
+            parentNode={parentNode}
             edit={edit}
             draft={draft}
             canEditRecord={canEditRecord}

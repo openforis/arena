@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 
 import AutocompleteDialog from '@webapp/components/form/AutocompleteDialog'
-import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import * as Taxon from '@core/survey/taxon'
+import { useTaxa } from './useTaxa'
 
 const NodeDefTaxonAutocompleteItemRenderer = (props) => {
   const { item: taxon, ...otherProps } = props
@@ -23,8 +23,9 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
 
 const NodeDefTaxonAutocompleteDialog = (props) => {
   const {
-    surveyId,
     taxonomyUuid,
+    nodeDef,
+    parentNode,
     draft,
     inputRef,
     field,
@@ -34,26 +35,12 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
     onClose,
   } = props
 
-  const params = {
-    filterProp: field,
-    filterValue: fieldValue,
-    includeUnlUnk: true,
-    draft,
-  }
-
-  const { data: { list = [] } = { list: [] }, dispatch: fetchTaxa } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
-    { params }
-  )
-
-  useEffect(() => {
-    fetchTaxa()
-  }, [fieldValue])
+  const taxa = useTaxa({ nodeDef, parentNode, draft, field, fieldValue })
 
   return ReactDOM.createPortal(
     <AutocompleteDialog
       className="survey-form__node-def-taxon-autocomplete-list"
-      items={list}
+      items={taxa}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
       itemKey={(taxon) => `${Taxon.getUuid(taxon)}_${Taxon.getVernacularNameUuid(taxon)}`}
       inputField={inputRef.current}

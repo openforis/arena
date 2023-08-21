@@ -14,7 +14,7 @@ import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
-import { FormItem } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
 import TaxonomyList from '@webapp/components/survey/TaxonomyList'
@@ -128,6 +128,14 @@ const TaxonProps = (props) => {
         labels={NodeDef.getVernacularNameLabels(nodeDef)}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
       />
+
+      <FormItem label={i18n.t('nodeDefEdit.codeProps.itemsFilter')}>
+        <Input
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
+          validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
+          value={NodeDef.getItemsFilter(nodeDef)}
+        />
+      </FormItem>
 
       <div className="taxon-props__panel-right">
         {showTaxonomiesPanel && !taxonomyToEdit && (

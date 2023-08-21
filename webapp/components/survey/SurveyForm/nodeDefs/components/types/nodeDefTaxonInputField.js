@@ -10,7 +10,8 @@ const NodeDefTaxonInputField = (props) => {
   const {
     id,
     surveyId,
-    taxonomyUuid,
+    nodeDef,
+    parentNode,
     edit,
     draft,
     canEditRecord,
@@ -57,7 +58,8 @@ const NodeDefTaxonInputField = (props) => {
       {autocompleteOpened && (
         <NodeDefTaxonAutocompleteDialog
           surveyId={surveyId}
-          taxonomyUuid={taxonomyUuid}
+          nodeDef={nodeDef}
+          parentNode={parentNode}
           draft={draft}
           inputRef={inputRef}
           field={field}
@@ -74,7 +76,6 @@ const NodeDefTaxonInputField = (props) => {
 NodeDefTaxonInputField.defaultProps = {
   id: null,
   surveyId: null,
-  taxonomyUuid: null,
   edit: false,
   draft: false,
   canEditRecord: false,
