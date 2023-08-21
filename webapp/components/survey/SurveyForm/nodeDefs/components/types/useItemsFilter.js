@@ -11,23 +11,21 @@ export const useItemsFilter = ({ survey, nodeDef, record, parentNode, items, alw
     const itemsArray = Object.values(items || {})
     if (itemsArray.length === 0 || Objects.isEmpty(itemsFilter)) return itemsArray
 
-    const itemsFiltered = itemsArray.filter((item) => {
-      if (alwaysIncludeItemFunction && alwaysIncludeItemFunction(item)) return true
+    return itemsArray.filter((item) => {
+      if (alwaysIncludeItemFunction?.(item)) return true
 
       try {
-        const result = new RecordExpressionEvaluator().evalExpression({
+        return new RecordExpressionEvaluator().evalExpression({
           survey,
           record,
           node: parentNode,
           query: itemsFilter,
           item,
         })
-        return result
       } catch (error) {
         // TODO throw error?
         return false
       }
     })
-    return itemsFiltered
   }, [items, itemsFilter, alwaysIncludeItemFunction, parentNode, record, survey])
 }

@@ -39,6 +39,7 @@ const NodeDefTaxon = (props) => {
     canEditRecord,
     readOnly,
     updateNode,
+    entryDataQuery,
   } = props
 
   const [selection, setSelection] = useState(selectionDefault)
@@ -147,6 +148,7 @@ const NodeDefTaxon = (props) => {
             nodeDef={nodeDef}
             parentNode={parentNode}
             edit={edit}
+            entryDataQuery={entryDataQuery}
             draft={draft}
             canEditRecord={canEditRecord}
             readOnly={readOnly}

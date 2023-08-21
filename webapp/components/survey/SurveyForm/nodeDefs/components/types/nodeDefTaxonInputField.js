@@ -13,6 +13,7 @@ const NodeDefTaxonInputField = (props) => {
     nodeDef,
     parentNode,
     edit,
+    entryDataQuery,
     draft,
     canEditRecord,
     readOnly,
@@ -61,6 +62,7 @@ const NodeDefTaxonInputField = (props) => {
           nodeDef={nodeDef}
           parentNode={parentNode}
           draft={draft}
+          entryDataQuery={entryDataQuery}
           inputRef={inputRef}
           field={field}
           fieldValue={inputRef.current.value}

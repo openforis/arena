@@ -1,3 +1,5 @@
+import { useCallback } from 'react'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -8,7 +10,7 @@ import * as API from '@webapp/service/api'
 import { useRequest } from '@webapp/components/hooks'
 import { useItemsFilter } from '../../../useItemsFilter'
 
-export const useItems = ({ survey, record, nodeDef, parentNode, draft, edit }) => {
+export const useItems = ({ survey, record, nodeDef, parentNode, draft, edit, entryDataQuery }) => {
   const surveyId = Survey.getId(survey)
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
@@ -23,5 +25,10 @@ export const useItems = ({ survey, record, nodeDef, parentNode, draft, edit }) =
     requestArguments: [{ surveyId, categoryUuid, draft, parentUuid: parentCategoryItemUuid }],
   })
 
-  return useItemsFilter({ survey, nodeDef, record, parentNode, items })
+  const alwaysIncludeItemFunction = useCallback(
+    () => entryDataQuery, // do not filter items when editing records from Data Explorer (entryDataQuery=true; record object is incomplete)
+    [entryDataQuery]
+  )
+
+  return useItemsFilter({ survey, nodeDef, record, parentNode, items, alwaysIncludeItemFunction })
 }

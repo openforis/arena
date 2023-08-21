@@ -23,10 +23,10 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
 
 const NodeDefTaxonAutocompleteDialog = (props) => {
   const {
-    taxonomyUuid,
     nodeDef,
     parentNode,
     draft,
+    entryDataQuery,
     inputRef,
     field,
     fieldValue,
@@ -35,7 +35,7 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
     onClose,
   } = props
 
-  const taxa = useTaxa({ nodeDef, parentNode, draft, field, fieldValue })
+  const taxa = useTaxa({ nodeDef, parentNode, draft, entryDataQuery, field, fieldValue })
 
   return ReactDOM.createPortal(
     <AutocompleteDialog

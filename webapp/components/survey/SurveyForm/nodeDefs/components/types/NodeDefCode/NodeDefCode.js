@@ -48,7 +48,7 @@ const NodeDefCode = (props) => {
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
 
-  const itemsArray = useItems({ survey, record, nodeDef, parentNode, draft, edit })
+  const itemsArray = useItems({ survey, record, nodeDef, parentNode, draft, edit, entryDataQuery })
   const [selectedItems, setSelectedItems] = useState([])
 
   // On items or nodes change, update selectedItems
