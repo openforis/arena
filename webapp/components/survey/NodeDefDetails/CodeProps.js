@@ -14,7 +14,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
-import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItem } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 import { State } from './store'
@@ -59,14 +59,6 @@ const CodeProps = (props) => {
           editingNodeDef
           onChange={setCategoryProp}
           onCategoryLoad={setCategory}
-        />
-      </FormItem>
-
-      <FormItem label={i18n.t('nodeDefEdit.codeProps.itemsFilter')}>
-        <Input
-          onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
-          validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
-          value={NodeDef.getItemsFilter(nodeDef)}
         />
       </FormItem>
 

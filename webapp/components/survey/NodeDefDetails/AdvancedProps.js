@@ -10,7 +10,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { FormItem } from '@webapp/components/form/Input'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'
@@ -107,6 +107,16 @@ const AdvancedProps = (props) => {
           onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenWhenNotRelevant, value })}
         />
       </div>
+
+      {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
+        <FormItem label={i18n.t('nodeDefEdit.advancedProps.itemsFilter')}>
+          <Input
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
+            validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
+            value={NodeDef.getItemsFilter(nodeDef)}
+          />
+        </FormItem>
+      )}
     </div>
   )
 }

@@ -1083,15 +1083,16 @@ $t(common.appNameFull)
       table: 'Table',
     },
     advancedProps: {
+      areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
+      itemsFilter: 'Items filter',
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
-      areaBasedEstimate: 'Area-based estimate',
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
@@ -1136,7 +1137,6 @@ $t(common.appNameFull)
         checkbox: 'Checkbox',
         dropdown: 'Dropdown',
       },
-      itemsFilter: 'Items filter',
       parentCode: 'Parent Code',
     },
     coordinateProps: {
