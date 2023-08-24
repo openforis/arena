@@ -1090,6 +1090,10 @@ $t(common.appNameFull)
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
       itemsFilter: 'Items filter',
+      itemsFilterInfo: `Expression used to filter selectable items.
+In the expression, the word "this" will refer to the item itself. 
+E.g. this.region = region_attribute_name 
+(where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
