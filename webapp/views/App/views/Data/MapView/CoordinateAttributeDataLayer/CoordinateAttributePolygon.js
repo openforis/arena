@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import { Rectangle, Circle } from 'react-leaflet'
 import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
+
+import * as SamplingPolygon from '@core/survey/SamplingPolygon'
+
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 import { useSurveyInfo } from '@webapp/store/survey'
-import * as SamplingPolygon from '@core/survey/SamplingPolygon'
-import _ from 'lodash'
-import PropTypes from 'prop-types'
 
 export const CoordinateAttributePolygon = (props) => {
   const surveyInfo = useSurveyInfo()
@@ -34,7 +35,6 @@ export const CoordinateAttributePolygon = (props) => {
     longitude + SamplingPolygon.MetersToDegreesLongitude(controlPointOffsetEast, latitude)
   )
 
-
   const bounds = SamplingPolygon.getBounds(surveyInfo, latitude, longitude)
 
   const pointSize = 10
@@ -49,13 +49,13 @@ export const CoordinateAttributePolygon = (props) => {
 
   const onClickControlPoint = (j, i) => {
     const newArray = [...colors]
-    newArray[j][i] = (newArray[j][i] + 1) % _.size(PointColor)
+    newArray[j][i] = (newArray[j][i] + 1) % Object.keys(PointColor).length
     setColors(newArray)
   }
 
   const onClickCircleControlPoint = (i) => {
     const newArray = [...circleColors]
-    newArray[i] = (newArray[i] + 1) % _.size(PointColor)
+    newArray[i] = (newArray[i] + 1) % Object.keys(PointColor).length
     setCircleColors(newArray)
   }
 
@@ -152,8 +152,12 @@ export const CoordinateAttributePolygon = (props) => {
     for (let eastIndex = 0; eastIndex < numberOfPointsEast; eastIndex++) {
       for (let northIndex = 0; northIndex < numberOfPointsNorth; northIndex++) {
         const pointDistanceLng =
-        SamplingPolygon.MetersToDegreesLongitude(len_lng_meters, startLat + northIndex * pointDistanceLat) / numberOfPointsEast
-        const pointSizeLng = SamplingPolygon.MetersToDegreesLongitude(pointSize, startLat + northIndex * pointDistanceLat)
+          SamplingPolygon.MetersToDegreesLongitude(len_lng_meters, startLat + northIndex * pointDistanceLat) /
+          numberOfPointsEast
+        const pointSizeLng = SamplingPolygon.MetersToDegreesLongitude(
+          pointSize,
+          startLat + northIndex * pointDistanceLat
+        )
         const startLon = bounds.getSouthWest().lng + len_lng / numberOfPointsNorth / 2 - pointSizeLat / 2
         points.push(
           <Rectangle

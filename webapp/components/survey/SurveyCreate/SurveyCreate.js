@@ -161,7 +161,7 @@ const SurveyCreate = (props) => {
         <>
           {uploadProgressPercent >= 0 ? (
             <div className="row">
-              <ProgressBar progress={uploadProgressPercent} />
+              <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
             </div>
           ) : (
             <>

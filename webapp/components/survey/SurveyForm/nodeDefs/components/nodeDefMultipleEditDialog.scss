@@ -1,8 +1,9 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .survey-form__node-def-multiple-edit-dialog {
   .modal-body {
     height: 40vh;
+    overflow-y: auto;
   }
 
   .dropdown {
@@ -15,5 +16,5 @@
 }
 
 .node-def__icon-key {
-  opacity: .8;
+  opacity: 0.8;
 }

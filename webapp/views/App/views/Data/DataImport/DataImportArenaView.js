@@ -10,10 +10,11 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
 import { NotificationActions } from '@webapp/store/ui'
-import { Button, Dropzone } from '@webapp/components'
+import { Dropzone } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
+import { ImportStartButton } from './ImportStartButton'
 
 const fileMaxSize = 1000 // 1 GB
 const acceptedFileExtensions = ['zip']
@@ -29,28 +30,26 @@ export const DataImportArenaView = () => {
   const [cycle, setCycle] = useState(surveyCycle)
   const [file, setFile] = useState(null)
 
-  const startImportJob = useCallback(async () => {
-    const job = await API.startDataImportFromArenaJob({
-      surveyId,
-      cycle,
-      file,
-    })
-    dispatch(
-      JobActions.showJobMonitor({
-        job,
-        autoHide: true,
-        onComplete: async (jobCompleted) => {
-          const { processed, insertedRecords, skippedRecords, updatedRecords } = JobSerialized.getResult(jobCompleted)
-          dispatch(
-            NotificationActions.notifyInfo({
-              key: 'dataImportView.jobs.ArenaDataImportJob.importCompleteSuccessfully',
-              params: { processed, insertedRecords, skippedRecords, updatedRecords },
-            })
-          )
-        },
-      })
-    )
-  }, [cycle, file, surveyId])
+  const onImportJobStart = useCallback(
+    (job) => {
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          autoHide: true,
+          onComplete: async (jobCompleted) => {
+            const { processed, insertedRecords, skippedRecords, updatedRecords } = JobSerialized.getResult(jobCompleted)
+            dispatch(
+              NotificationActions.notifyInfo({
+                key: 'dataImportView.jobs.ArenaDataImportJob.importCompleteSuccessfully',
+                params: { processed, insertedRecords, skippedRecords, updatedRecords },
+              })
+            )
+          },
+        })
+      )
+    },
+    [dispatch]
+  )
 
   const onFilesDrop = async (files) => {
     const _file = files.filter((file) => {
@@ -77,7 +76,14 @@ export const DataImportArenaView = () => {
 
         <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
-        <Button className="btn-primary" disabled={!file} label="dataImportView.startImport" onClick={startImportJob} />
+        <ImportStartButton
+          confirmMessageKey="dataImportView.startImportConfirm"
+          disabled={!file}
+          showConfirm
+          startFunction={API.startDataImportFromArenaJob}
+          startFunctionParams={{ surveyId, cycle, file }}
+          onUploadComplete={onImportJobStart}
+        />
       </div>
     </div>
   )
