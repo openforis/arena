@@ -1,6 +1,8 @@
 @import 'webapp/style/vars';
 
 .dialog-confirm {
+  z-index: $zIndex20AppModalConfirm;
+
   .modal-content {
     text-align: center;
 

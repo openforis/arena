@@ -141,7 +141,6 @@
     "leaflet-geometryutil": "^0.10.2",
     "leaflet-side-by-side": "^2.2.0",
     "leaflet.markercluster": "^1.5.3",
-    "lodash": "^4.17.21",
     "log4js": "^6.9.1",
     "marked": "^5.0.0",
     "morgan": "^1.10.0",
