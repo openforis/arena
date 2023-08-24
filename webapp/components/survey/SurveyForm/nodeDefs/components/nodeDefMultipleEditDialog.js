@@ -7,7 +7,7 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/m
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 
-const NodeDefMultipleEditDialog = props => {
+const NodeDefMultipleEditDialog = (props) => {
   const { nodeDef, label, onClose } = props
 
   const i18n = useI18n()
@@ -16,11 +16,7 @@ const NodeDefMultipleEditDialog = props => {
     <Modal isOpen={true} className="survey-form__node-def-multiple-edit-dialog" closeOnEsc={true} onClose={onClose}>
       <ModalHeader>{label}</ModalHeader>
 
-      <ModalBody>
-        {React.createElement(NodeDefUiProps.getComponent(nodeDef), {
-          ...props,
-        })}
-      </ModalBody>
+      <ModalBody>{React.createElement(NodeDefUiProps.getComponent(nodeDef), props)}</ModalBody>
 
       <ModalFooter>
         <div>
