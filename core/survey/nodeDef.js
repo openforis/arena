@@ -135,6 +135,9 @@ export const keysPropsAdvanced = {
   isSampling: 'isSampling',
   hasAreaBasedEstimated: 'hasAreaBasedEstimated',
   areaBasedEstimatedOf: 'areaBasedEstimatedOf', // uuid of area based estimated node def
+
+  // code and taxon
+  itemsFilter: 'itemsFilter',
 }
 
 const metaKeys = {
@@ -322,6 +325,9 @@ export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
+
+// code and taxon
+export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
