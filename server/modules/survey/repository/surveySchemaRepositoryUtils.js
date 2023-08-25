@@ -43,7 +43,7 @@ export const unpublishSurveySchemaTableProps = async (surveyId, tableName, clien
     UPDATE
       ${getSurveyDBSchema(surveyId)}.${tableName}
     SET
-      props_draft = props_draft || props,
+      props_draft = props || props_draft,
       props = '{}'::jsonb
   `)
 

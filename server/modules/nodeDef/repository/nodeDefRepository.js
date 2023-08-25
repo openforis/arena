@@ -326,9 +326,9 @@ export const unpublishNodeDefsProps = async (surveyId, client = DB) =>
   UPDATE
     ${getSurveyDBSchema(surveyId)}.node_def
   SET
-    props_draft = props_draft || props,
+    props_draft = props || props_draft,
     props = '{}'::jsonb,
-    props_advanced_draft = props_advanced_draft || props_advanced,
+    props_advanced_draft = props_advanced || props_advanced_draft,
     props_advanced = '{}'::jsonb
   `)
 

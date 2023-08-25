@@ -390,7 +390,7 @@ If there are records associated to this cycle, they will be deleted.`,
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
       srsPlaceholder: 'Type code or label',
-      unpublish: 'Unpublish',
+      unpublish: 'Unpublish and delete data',
       unpublishSurveyDialog: {
         confirmUnpublish: 'Are you sure you want to unpublish this survey?',
         unpublishWarning: `Unpublishing the **{{surveyName}}** survey will delete all of its data.\n\n

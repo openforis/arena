@@ -294,7 +294,7 @@ export const unpublishSurveyProps = async (surveyId, client = db) =>
   UPDATE
       survey
   SET
-      props_draft = props_draft || props,
+      props_draft = props || props_draft,
       props = '{}'::jsonb,
       draft = true,
       published = false
