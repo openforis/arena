@@ -86,6 +86,7 @@ const CodeProps = (props) => {
               </div>
             </FormItem>
           )}
+
           <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
