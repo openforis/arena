@@ -8,7 +8,7 @@ import ExportCsvDataJob from './export/exportCsvDataJob'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
-import SurveyUnpublishJob from './publish/surveyUnpublishJob'
+import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { SchemaSummary } from './schemaSummary'
 
 // JOBS

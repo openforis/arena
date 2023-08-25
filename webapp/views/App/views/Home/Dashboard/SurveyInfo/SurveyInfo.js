@@ -13,7 +13,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
-import { useConfirmDelete } from '@webapp/components/hooks'
+import { useConfirm } from '@webapp/components/hooks'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonMenu } from '@webapp/components'
@@ -30,10 +30,10 @@ const SurveyInfo = () => {
 
   const surveyName = Survey.getName(surveyInfo)
 
-  const confirmDelete = useConfirmDelete()
+  const confirm = useConfirm()
 
   const onDeleteClick = useCallback(() => {
-    confirmDelete({
+    confirm({
       key: 'homeView.deleteSurveyDialog.deleteWarning',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteSurvey(navigate)),
@@ -42,7 +42,19 @@ const SurveyInfo = () => {
       strongConfirmInputLabel: 'homeView.deleteSurveyDialog.confirmName',
       strongConfirmRequiredText: surveyName,
     })
-  }, [dispatch, navigate, confirmDelete, surveyName])
+  }, [dispatch, navigate, confirm, surveyName])
+
+  const onUnpublishClick = useCallback(() => {
+    confirm({
+      key: 'homeView.surveyInfo.unpublishSurveyDialog.unpublishWarning',
+      params: { surveyName },
+      onOk: () => dispatch(SurveyActions.unpublishSurvey()),
+      headerText: 'homeView.surveyInfo.unpublishSurveyDialog.confirmUnpublish',
+      strongConfirm: true,
+      strongConfirmInputLabel: 'homeView.surveyInfo.unpublishSurveyDialog.confirmName',
+      strongConfirmRequiredText: surveyName,
+    })
+  }, [confirm, dispatch, surveyName])
 
   return (
     <>
@@ -77,8 +89,8 @@ const SurveyInfo = () => {
             <ButtonMenu
               className="btn-s btn-transparent btn-menu-export"
               iconClassName="icon-download2 icon-14px"
+              label="common.export"
               testId={TestId.dashboard.surveyExportBtn}
-              title="common.export"
               items={[
                 {
                   key: 'survey-export',
@@ -110,12 +122,50 @@ const SurveyInfo = () => {
             />
           )}
           {canEditSurvey && (
-            <Button
-              className="btn-s btn-transparent"
-              testId={TestId.dashboard.surveyDeleteBtn}
-              onClick={onDeleteClick}
-              iconClassName="icon-bin icon-12px icon-left"
-              label="common.delete"
+            <ButtonMenu
+              className="btn-s btn-transparent btn-menu-advanced"
+              iconClassName="icon-cog icon-14px"
+              label="homeView.surveyInfo.advancedFunctions"
+              items={[
+                ...(Survey.isDraft(surveyInfo)
+                  ? [
+                      {
+                        key: 'survey-info-publish',
+                        content: (
+                          <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
+                        ),
+                      },
+                    ]
+                  : []),
+                ...(Survey.isPublished(surveyInfo)
+                  ? [
+                      {
+                        key: 'survey-info-unpublish',
+                        content: (
+                          <Button
+                            className="btn-s btn-transparent"
+                            testId={TestId.dashboard.surveyUnpublishBtn}
+                            onClick={onUnpublishClick}
+                            iconClassName="icon-eye-blocked icon-12px icon-left"
+                            label="homeView.surveyInfo.unpublish"
+                          />
+                        ),
+                      },
+                    ]
+                  : []),
+                {
+                  key: 'survey-info-delete',
+                  content: (
+                    <Button
+                      className="btn-s btn-transparent"
+                      testId={TestId.dashboard.surveyDeleteBtn}
+                      onClick={onDeleteClick}
+                      iconClassName="icon-bin icon-12px icon-left"
+                      label="common.delete"
+                    />
+                  ),
+                },
+              ]}
             />
           )}
           {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (

@@ -380,6 +380,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      advancedFunctions: 'Advanced functions',
       confirmDeleteCycleHeader: 'Delete this cycle?',
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
@@ -389,6 +390,14 @@ If there are records associated to this cycle, they will be deleted.`,
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
       srsPlaceholder: 'Type code or label',
+      unpublish: 'Unpublish',
+      unpublishSurveyDialog: {
+        confirmUnpublish: 'Are you sure you want to unpublish this survey?',
+        unpublishWarning: `Unpublishing the **{{surveyName}}** survey will delete all of its data.\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Enter this survey’s name to confirm:',
+      },
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
@@ -1590,6 +1599,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     SurveyPublishJob: 'Survey Publish',
     SurveyPublishPerformJob: 'Survey Publish Perform',
     SurveyRdbCreationJob: 'Survey RDB Creation',
+    SurveyUnpublishJob: 'Survey Unpublish',
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
