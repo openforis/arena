@@ -10,6 +10,7 @@ import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ChainManager from '../manager'
+import { Objects } from '@openforis/arena-core'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -30,7 +31,7 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
     : ''
   const entity = Survey.getNodeDefParent(analysisNodeDef)(survey)
 
-  return {
+  const result = {
     name: NodeDef.getName(analysisNodeDef),
     entity: NodeDef.getName(entity),
     entityPath: Survey.getNodeDefPath({ nodeDef: entity, separator: '/' })(survey),
@@ -40,6 +41,11 @@ const generateResultVariableSummary = ({ survey, analysisNodeDef, lang }) => {
     categoryName,
     active: NodeDef.isActive(analysisNodeDef),
   }
+  if (NodeDef.isDecimal(analysisNodeDef)) {
+    const decimalDigits = NodeDef.getMaxNumberDecimalDigits(analysisNodeDef)
+    result['decimalDigits'] = Objects.isEmpty(decimalDigits) ? '' : String(decimalDigits)
+  }
+  return result
 }
 
 const generateStatisticalAnalysisSummary = ({ survey, chain }) => {
