@@ -365,6 +365,9 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
     }
   })
 
+export const unpublishSurveyProps = async (surveyId, client = db) =>
+  SurveyRepository.unpublishSurveyProps(surveyId, client)
+
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
 // ====== DELETE

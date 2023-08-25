@@ -175,7 +175,7 @@ export default class RecordCheckJob extends Job {
     // 6. validate nodes
     const newNodes = nodeDefAddedUuids.reduce((nodesByUuid, nodeDefUuid) => {
       const nodes = Record.getNodesByDefUuid(nodeDefUuid)(record)
-      return { ...nodesByUuid, ...ObjectUtils.toUuidIndexedObj(nodes) }
+      return Object.assign(nodesByUuid, ObjectUtils.toUuidIndexedObj(nodes))
     }, {})
 
     Object.assign(allUpdatedNodesByUuid, newNodes)
@@ -246,9 +246,7 @@ const _insertMissingSingleNode = async (survey, childDef, record, parentNode, us
 }
 
 const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {
-  const nodesToUpdate = {
-    ...newNodes,
-  }
+  const nodesToUpdate = Object.assign({}, newNodes)
 
   // Include nodes associated to updated node defs
   nodeDefUpdatedUuids.forEach((nodeDefUpdatedUuid) => {
@@ -258,7 +256,10 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
     })
   })
 
-  return RecordManager.updateNodesDependents({ survey, record, nodes: nodesToUpdate, perstistNodes: false }, tx)
+  return RecordManager.updateNodesDependents(
+    { survey, record, nodes: nodesToUpdate, perstistNodes: false, sideEffect: true },
+    tx
+  )
 }
 
 const _clearRecordKeysValidation = (record) => {

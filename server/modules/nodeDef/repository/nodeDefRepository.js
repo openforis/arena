@@ -320,6 +320,18 @@ export const publishNodeDefsProps = async (surveyId, client = DB) =>
       props_advanced_draft = '{}'::jsonb
     `)
 
+// UNPUBLISH
+export const unpublishNodeDefsProps = async (surveyId, client = DB) =>
+  client.query(`
+  UPDATE
+    ${getSurveyDBSchema(surveyId)}.node_def
+  SET
+    props_draft = props_draft || props,
+    props = '{}'::jsonb,
+    props_advanced_draft = props_advanced_draft || props_advanced,
+    props_advanced = '{}'::jsonb
+  `)
+
 // ============== DELETE
 
 export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => {

@@ -38,6 +38,15 @@ export const publishSurveySchemaTableProps = async (surveyId, tableName, client 
       props_draft = '{}'::jsonb
   `)
 
+export const unpublishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
+  client.query(`
+    UPDATE
+      ${getSurveyDBSchema(surveyId)}.${tableName}
+    SET
+      props_draft = props_draft || props,
+      props = '{}'::jsonb
+  `)
+
 export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
   client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
