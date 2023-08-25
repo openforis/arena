@@ -10,6 +10,9 @@ const deleteSurvey = async (surveyToDelete) => {
 
   await clickSurvey(surveyToDelete)
 
+  const advancedFunctionsButtonMenuSelector = getSelector(TestId.dashboard.surveyExportBtn, 'button')
+  await page.click(advancedFunctionsButtonMenuSelector)
+
   await page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button'))
   await page.fill(getSelector(TestId.dialogConfirm.strongConfirmInput), name)
 

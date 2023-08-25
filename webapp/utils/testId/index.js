@@ -35,6 +35,7 @@ export const TestId = {
     addCategoryBtn: 'category-selector-add-btn',
   },
   dashboard: {
+    advancedFunctionsBtn: 'survey-advanced-functions',
     collectReportBtn: 'collect-report-btn',
     surveyDeleteBtn: 'survey-delete-btn',
     surveyExportBtn: 'survey-export-btn',

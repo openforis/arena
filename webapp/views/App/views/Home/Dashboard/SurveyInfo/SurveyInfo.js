@@ -126,6 +126,7 @@ const SurveyInfo = () => {
               className="btn-s btn-transparent btn-menu-advanced"
               iconClassName="icon-cog icon-14px"
               label="homeView.surveyInfo.advancedFunctions"
+              testId={TestId.dashboard.advancedFunctionsBtn}
               items={[
                 ...(Survey.isDraft(surveyInfo)
                   ? [
