@@ -128,16 +128,6 @@ const SurveyInfo = () => {
               label="homeView.surveyInfo.advancedFunctions"
               testId={TestId.dashboard.advancedFunctionsBtn}
               items={[
-                ...(Survey.isDraft(surveyInfo)
-                  ? [
-                      {
-                        key: 'survey-info-publish',
-                        content: (
-                          <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
-                        ),
-                      },
-                    ]
-                  : []),
                 ...(Survey.isPublished(surveyInfo)
                   ? [
                       {
