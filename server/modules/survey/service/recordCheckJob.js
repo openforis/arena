@@ -246,7 +246,9 @@ const _insertMissingSingleNode = async (survey, childDef, record, parentNode, us
 }
 
 const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, record, newNodes, tx) => {
-  const nodesToUpdate = Object.assign({}, newNodes)
+  const nodesToUpdate = {
+    ...newNodes,
+  }
 
   // Include nodes associated to updated node defs
   nodeDefUpdatedUuids.forEach((nodeDefUpdatedUuid) => {
