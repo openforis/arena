@@ -13,7 +13,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
-import { useConfirm } from '@webapp/components/hooks'
+import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonMenu } from '@webapp/components'
@@ -31,9 +31,10 @@ const SurveyInfo = () => {
   const surveyName = Survey.getName(surveyInfo)
 
   const confirm = useConfirm()
+  const confirmDelete = useConfirmDelete()
 
   const onDeleteClick = useCallback(() => {
-    confirm({
+    confirmDelete({
       key: 'homeView.deleteSurveyDialog.deleteWarning',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteSurvey(navigate)),
@@ -42,7 +43,7 @@ const SurveyInfo = () => {
       strongConfirmInputLabel: 'homeView.deleteSurveyDialog.confirmName',
       strongConfirmRequiredText: surveyName,
     })
-  }, [dispatch, navigate, confirm, surveyName])
+  }, [dispatch, navigate, confirmDelete, surveyName])
 
   const onUnpublishClick = useCallback(() => {
     confirm({
