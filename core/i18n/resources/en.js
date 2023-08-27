@@ -1092,15 +1092,20 @@ $t(common.appNameFull)
       table: 'Table',
     },
     advancedProps: {
+      areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
+      itemsFilter: 'Items filter',
+      itemsFilterInfo: `Expression used to filter selectable items.
+In the expression, the word "this" will refer to the item itself. 
+E.g. this.region = region_attribute_name 
+(where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
-      areaBasedEstimate: 'Area-based estimate',
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
