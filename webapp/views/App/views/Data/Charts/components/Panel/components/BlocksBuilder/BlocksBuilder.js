@@ -5,6 +5,7 @@ import { chartsConfig } from '../../../../state/config'
 import ContainerBlock from './blocks/Container'
 import SelectBlock from './blocks/Select'
 import MetricBlock from './blocks/Metric'
+import SingleMetricBlock from './blocks/SingleMetric'
 import InputBlock from './blocks/Input'
 import SliderBlock from './blocks/Slider'
 import CheckboxBlock from './blocks/Checkbox'
@@ -14,6 +15,7 @@ const RenderByType = {
   container: ContainerBlock,
   select: SelectBlock,
   metric: MetricBlock,
+  singleMetric: SingleMetricBlock,
   input: InputBlock,
   slider: SliderBlock,
   checkbox: CheckboxBlock,

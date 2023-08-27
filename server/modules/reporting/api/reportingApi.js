@@ -1,27 +1,29 @@
 import * as A from '@core/arena'
-
 import * as Request from '@server/utils/request'
-
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
-
 import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
 
 const vega = require('vega')
 const vegaLite = require('vega-lite')
 
-const generateSvgChart = async ({ chartSpec, data }) => {
-  const spec = {
-    ...chartSpec,
-    data: {
-      name: 'table',
-      values: data,
-    },
-  }
+const generateChart = async ({ chartSpec, data }) => {
+  if (chartSpec.chartType === 'scatterPlot' || chartSpec.chartType === 'barChart') {
+    // return raw data if scatterPlot is requested
+    return data
+  } else {
+    const spec = {
+      ...chartSpec,
+      data: {
+        name: 'table',
+        values: data,
+      },
+    }
 
-  let vegaspec = vegaLite.compile(spec).spec
-  const view = new vega.View(vega.parse(vegaspec), { renderer: 'none' })
-  const svg = await view.toSVG()
-  return svg
+    let vegaspec = vegaLite.compile(spec).spec
+    const view = new vega.View(vega.parse(vegaspec), { renderer: 'none' })
+    const svg = await view.toSVG()
+    return svg
+  }
 }
 
 export const init = (app) => {
@@ -34,9 +36,9 @@ export const init = (app) => {
       const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query })
 
       const chartSpec = A.parse(chart)
-      const svg = await generateSvgChart({ chartSpec, data })
+      const chartResult = await generateChart({ chartSpec, data })
 
-      res.json({ svg })
+      res.json({ chartResult })
     } catch (error) {
       next(error)
     }

@@ -1,5 +1,5 @@
 import './Charts.scss'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Query } from '@common/model/query'
 import { Button } from '@webapp/components/buttons'
 import Chart from './components/Chart'
@@ -22,6 +22,13 @@ const Charts = () => {
     entityDefUuid,
     setEntityDefUuid
   )
+
+  useEffect(() => {
+    // if spec.chartType is 'scatterPlot' and data is not already fetched, fetch data
+    if ((spec.chartType === 'scatterPlot' || spec.chartType === 'barChart') && !chartData) {
+      renderChart()
+    }
+  }, [spec, chartData]) // this effect runs whenever spec or chartData changes
 
   return (
     <div className={classNames('charts', { 'full-screen': fullScreen })}>
@@ -50,7 +57,7 @@ const Charts = () => {
           dimensions={dimensions}
         />
 
-        <Chart draft={draft} renderChart={renderChart} data={chartData} fullScreen={fullScreen} />
+        <Chart specs={spec} draft={draft} renderChart={renderChart} data={chartData} fullScreen={fullScreen} />
       </Split>
     </div>
   )

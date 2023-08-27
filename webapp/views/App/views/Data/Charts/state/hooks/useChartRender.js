@@ -17,15 +17,20 @@ const useChartRender = (spec, query) => {
     try {
       if (!query) return
       setChartData(null)
-      const { data } = await axios.post(getUrl({ surveyId, query }), {
+
+      const apiUrl = getUrl({ surveyId, query })
+
+
+      const { data } = await axios.post(apiUrl, {
         cycle,
         query: A.stringify(query),
         chart: A.stringify(spec),
       })
 
+      console.log('Received data:', data)
       setChartData(data)
     } catch (err) {
-      console.log(err)
+      console.error('Error occurred:', err.response ? err.response.data : err.message)
     }
   }, [spec, surveyId, cycle])
 

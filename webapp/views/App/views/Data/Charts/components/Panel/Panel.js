@@ -22,14 +22,14 @@ const Panel = ({ config, configItemsByPath, configActions, dimensions, spec, onU
 
   return (
     <div className="charts_panel__container">
-      <ModeSelector modes={panelModes} currentMode={currentMode} onSelectMode={onSelectMode} />
+      {/* <ModeSelector modes={panelModes} currentMode={currentMode} onSelectMode={onSelectMode} />
 
       <RawChartBuilder
         visible={currentMode === panelModes.RAW}
         dimensions={dimensions}
         spec={spec}
         onUpdateSpec={onUpdateSpec}
-      />
+      /> */}
 
       <BlocksBuilder
         visible={currentMode === panelModes.BUILDER}

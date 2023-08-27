@@ -1,13 +1,17 @@
-import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { TitleBlock, ShowLegendBlock, MaxHeightBlock, SingleMetricBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
 
-const bar = {
+const scatter = {
   selector: {
-    title: 'Bar',
+    title: 'Scatter',
   },
   baseSpec: {
-    chartType: 'barChart',
+    chartType: 'scatterPlot',
     chart: {
+      dotSize: '8',
+      titleSize: '33',
+      axisSize: '16',
+      ticksSize: '12',
       showLegend: false,
     },
     query: {},
@@ -16,14 +20,69 @@ const bar = {
     blocks: {
       query: {
         title: 'Query',
-        subtitle: 'Config of the query for the bar chart',
+        subtitle: 'Query for the Scatter plot',
         type: 'container',
         blocks: {
-          groupBy: GroupByBlock({
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const transform = valuesToCalculations(value)
+          metricX: SingleMetricBlock({
+            id: 'metricX',
+            title: 'Metric X axis',
+            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const transform = valuesToCalculations(columnValues)
 
-              const groupBy = {
+              const xMetric = {
+                field: transform.as,
+                type: 'quantitative',
+              }
+
+              const newSpec = {
+                ...spec,
+                query: {
+                  ...spec.query,
+                  xMetric,
+                },
+              }
+              return newSpec
+            },
+          }),
+          metricY: SingleMetricBlock({
+            id: 'metricY',
+            title: 'Metric Y axis',
+            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const transform = valuesToCalculations(columnValues)
+
+              const yMetric = {
+                field: transform.as,
+                type: 'quantitative',
+              }
+
+              const newSpec = {
+                ...spec,
+                query: {
+                  ...spec.query,
+                  yMetric,
+                },
+              }
+              return newSpec
+            },
+          }),
+          category: SingleMetricBlock({
+            id: 'category',
+            title: 'Category',
+            blocks: {
+              column: {
+                id: 'column',
+                title: 'Column',
+                type: 'select',
+                optionsParams: { filter: ['nominal'] },
+              },
+            },
+            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const transform = valuesToCalculations(columnValues)
+
+              const category = {
                 field: transform.as,
                 type: 'nominal',
               }
@@ -32,69 +91,20 @@ const bar = {
                 ...spec,
                 query: {
                   ...spec.query,
-                  groupBy,
-                },
-              }
-              return newSpec
-            },
-          }),
-          metric: MetricBlock({
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              const transform = valuesToCalculations(columnValues, '-')
-              const aggTransform = valuesToCalculations(aggregationValues, '-')
-
-              const aggValues = configItemsByPath['query.groupBy']?.value
-              const aggs = aggValues?.map((val) => val.value)
-
-              // Logs in the console for reference
-              console.log('aggTransform', aggTransform)
-              console.log('transform', transform)
-              console.log('column', columnValues)
-              console.log('aggregationValues', aggregationValues)
-              console.log('aggs', aggs)
-
-              const metric = {
-                field: transform.as,
-                aggregate: aggTransform.as,
-                type: 'quantitative',
-              }
-
-              const newSpec = {
-                ...spec,
-                query: {
-                  ...spec.query,
-                  metric,
+                  category,
                 },
               }
               return newSpec
             },
           }),
         },
-        order: ['groupBy', 'metric'],
+        order: ['metricX', 'metricY', 'category'],
       },
       other: {
         title: 'Custom Chart',
         subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
-          'show-title': ShowLegendBlock({
-            id: 'show-legend',
-            title: 'Show Title',
-            label: 'Show title',
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  showTitle: value,
-                },
-              }
-              return newSpec
-            },
-            defaultValue: false,
-          }),
           title: TitleBlock({
             valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
               const newSpec = {
@@ -102,6 +112,36 @@ const bar = {
                 chart: {
                   ...spec.chart,
                   title: value,
+                },
+              }
+              return newSpec
+            },
+          }),
+          xAxis: TitleBlock({
+            id: 'xAxis',
+            title: 'Name of the X axis',
+            subtitle: 'Write here the name of the X axis',
+            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  xAxisTitle: value,
+                },
+              }
+              return newSpec
+            },
+          }),
+          yAxis: TitleBlock({
+            id: 'yAxis',
+            title: 'Name of the Y axis',
+            subtitle: 'Write here the name of the Y axis',
+            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  yAxisTitle: value,
                 },
               }
               return newSpec
@@ -120,6 +160,23 @@ const bar = {
             },
             defaultValue: false,
           }),
+          'dot-size': {
+            id: 'dot-size',
+            title: 'Dot Size',
+            subtitle: '',
+            type: 'slider',
+            params: { min: 0, max: 30, step: 1, default: 12, unit: 'px' },
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  dotSize: value,
+                },
+              }
+              return newSpec
+            },
+          },
           'title-size': {
             id: 'title-size',
             title: 'Title Font Size',
@@ -171,103 +228,80 @@ const bar = {
               return newSpec
             },
           },
-          xTitle: TitleBlock({
-            id: 'xAxis',
-            title: 'Name of the X axis',
-            subtitle: 'Write here the name of the X axis',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  xAxisTitle: value,
-                },
-              }
-              return newSpec
-            },
-          }),
-          yTitle: TitleBlock({
-            id: 'yAxis',
-            title: 'Name of the Y axis',
-            subtitle: 'Write here the name of the Y axis',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  yAxisTitle: value,
-                },
-              }
-              return newSpec
-            },
-          }),
-          maxHeight: MaxHeightBlock({
+          maxX: MaxHeightBlock({
+            id: 'maxX',
+            title: 'X Max',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
                   ...spec.chart,
-                  barMaxHeight: value,
+                  xMax: value,
                 },
               }
               return newSpec
             },
           }),
-          stack: {
-            id: 'stack',
-            title: 'Stack and normalize bars',
-            subtitle: '',
-            label: 'stack bars',
-            type: 'checkbox',
-            defaultValue: false,
+          minX: MaxHeightBlock({
+            id: 'minX',
+            title: 'X Min',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
                   ...spec.chart,
-                  stackedBars: value,
+                  xMin: value,
                 },
               }
               return newSpec
             },
-          },
-          switchHorizontal: {
-            id: 'horizontal',
-            title: 'Make chart Horizontal',
-            subtitle: 'Make Horizontal',
-            label: 'Make horizontal',
-            type: 'checkbox',
-            defaultValue: false,
+          }),
+          maxY: MaxHeightBlock({
+            id: 'maxY',
+            title: 'Y Max',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
                   ...spec.chart,
-                  isHorizontal: value,
+                  yMax: value,
                 },
               }
               return newSpec
             },
-          },
+          }),
+          minY: MaxHeightBlock({
+            id: 'minY',
+            title: 'Y Min',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  yMin: value,
+                },
+              }
+              return newSpec
+            },
+          }),
         },
-
         order: [
-          'show-title',
           'title',
+          'xAxis',
+          'yAxis',
           'show-legend',
+          'dot-size',
           'title-size',
           'axis-size',
           'ticks-size',
-          'xTitle',
-          'yTitle',
-          'maxHeight',
-          'stack',
-          'switchHorizontal',
+          'maxX',
+          'minX',
+          'maxY',
+          'minY',
         ],
       },
     },
     order: ['query', 'other'],
   },
 }
-
-export default bar
+export default scatter

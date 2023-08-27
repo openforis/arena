@@ -6,10 +6,10 @@ export const blockTypes = {
   metric: 'metric',
 }
 
-export const valuesToCalculations = (values = []) => {
+export const valuesToCalculations = (values = [], join = '_') => {
   const datumValues = values.map((val) => `datum.${val.value}`)
   return {
     calculate: `${datumValues.join("+','+")}`,
-    as: `${values.map((val) => val.name).join('_')}`,
+    as: `${values.map((val) => val.name).join(join)}`,
   }
 }
