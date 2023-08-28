@@ -11,11 +11,13 @@ export const useItemsFilter = ({ survey, nodeDef, record, parentNode, items, alw
     const itemsArray = Object.values(items || {})
     if (itemsArray.length === 0 || Objects.isEmpty(itemsFilter)) return itemsArray
 
+    const expressionEvaluator = new RecordExpressionEvaluator()
+
     return itemsArray.filter((item) => {
       if (alwaysIncludeItemFunction?.(item)) return true
 
       try {
-        return new RecordExpressionEvaluator().evalExpression({
+        return expressionEvaluator.evalExpression({
           survey,
           record,
           node: parentNode,
