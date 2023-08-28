@@ -2263,10 +2263,10 @@
     proj4 "^2.8.0"
     uuid "^9.0.0"
 
-"@openforis/arena-core@^0.0.162":
-  version "0.0.162"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.162/163c55f3869146c349925afe253429a8fe46441f#163c55f3869146c349925afe253429a8fe46441f"
-  integrity sha512-4aZ5aVBmI2vyIF4eAFOfpbiqRxROZ3WoXIRw1LreRShgRWxNsoQtgNS5XcCHO+WAqOZ8ed0l3z7b+ea/ZX5KMA==
+"@openforis/arena-core@^0.0.163":
+  version "0.0.163"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.163/9c34809c0a7dcba31d81329de418f366317fb235#9c34809c0a7dcba31d81329de418f366317fb235"
+  integrity sha512-6QBIJACNKxjnVyjuO/VGGRDjEpDMRsona0psxyas3msoLlh7opUihKwAIAscPc4rZl/YTS8vjSQlZD6fQRy4NA==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.1"
