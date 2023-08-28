@@ -40,4 +40,4 @@ const BarChart = ({ specs, originalData }) => {
   return <div ref={chartRef}></div>
 }
 
-export default BarChart
+export default React.memo(BarChart)

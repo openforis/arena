@@ -34,6 +34,8 @@ export const init = (app) => {
 
       const query = A.parse(queryParam)
       const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query })
+      const limit = chartSpec.chartType === 'scatterPlot' ? 10000 : null
+      const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, limit })
 
       const chartSpec = A.parse(chart)
       const chartResult = await generateChart({ chartSpec, data })

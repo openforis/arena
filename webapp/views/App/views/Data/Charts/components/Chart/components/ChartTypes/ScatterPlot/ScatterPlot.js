@@ -1,68 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
-
-// Function to process the original data
-const processData = (originalData, specs) => {
-  let xField, yField, categoryField
-
-  if (specs && specs.query && specs.query.xMetric && specs.query.yMetric) {
-    xField = specs.query.xMetric.field
-    yField = specs.query.yMetric.field
-    categoryField = specs.query.category ? specs.query.category.field : null
-  } else {
-    xField = yField = categoryField = null
-  }
-
-  let data = []
-  if (originalData && originalData.chartResult) {
-    data = originalData.chartResult.map((item) => {
-      let newItem = {}
-      newItem[xField] = item[xField] !== undefined ? parseFloat(item[xField]) : null
-      newItem[yField] = item[yField] !== undefined ? parseFloat(item[yField]) : null
-      newItem.category = categoryField && item[categoryField] !== undefined ? item[categoryField] : 'No Category'
-      return newItem
-    })
-    // Filter out data points with NaN x or y values
-    data = data.filter((item) => !isNaN(item[xField]) && !isNaN(item[yField]))
-  }
-
-  return { data, xField, yField, categoryField }
-}
-
-// Function to create the legend
-const createLegend = (svg, width, colorScale, data) => {
-  if (!data || !Array.isArray(data)) {
-    return
-  }
-  const categories = Array.from(new Set(data.map((d) => d.category)))
-  categories.sort()
-
-  const legendSize = 10
-  const legendSpacing = 5
-  const legendOffset = -80 // Offset from right
-  const legend = svg
-    .selectAll('.legend')
-    .data(categories)
-    .enter()
-    .append('g')
-    .attr('class', 'legend')
-    .attr('transform', (d, i) => `translate(0,${i * (legendSize + legendSpacing)})`)
-
-  legend
-    .append('rect')
-    .attr('x', width - legendSize - legendOffset)
-    .attr('width', legendSize)
-    .attr('height', legendSize)
-    .style('fill', (d) => colorScale(d))
-
-  legend
-    .append('text')
-    .attr('x', width - legendSize - legendSpacing - legendOffset)
-    .attr('y', legendSize / 2)
-    .attr('dy', '.35em')
-    .style('text-anchor', 'end')
-    .text((d) => d)
-}
+import { processData } from './utils/processData'
+import { createLegend } from './utils/legend'
 
 const ScatterPlot = ({ specs, originalData }) => {
   console.log('originalData', originalData)
