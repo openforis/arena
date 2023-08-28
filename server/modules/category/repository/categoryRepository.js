@@ -391,6 +391,12 @@ export const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =
       SET published = true
   `)
 
+export const markCategoriesUnpublishedBySurveyId = async (surveyId, client = db) =>
+  client.any(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.category
+      SET published = false
+  `)
+
 export const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
   updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 

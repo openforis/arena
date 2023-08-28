@@ -23,6 +23,7 @@ export {
   updateNodeDefAnalysisCycles,
   insertNodeDefsBatch,
   updateNodeDefPropsInBatch,
+  unpublishNodeDefsProps,
 } from '../repository/nodeDefRepository'
 
 const _persistNodeDefLayout = async ({ surveyId, nodeDef }, client = db) => {

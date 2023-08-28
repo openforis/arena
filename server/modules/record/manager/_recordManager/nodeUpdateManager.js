@@ -141,12 +141,13 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
-export const updateNodesDependents = async ({ survey, record, nodes, persistNodes = true }, tx) => {
+export const updateNodesDependents = async ({ survey, record, nodes, persistNodes = true, sideEffect = false }, tx) => {
   const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
     nodes,
     logger,
+    sideEffect,
   })
 
   let recordUpdated = recordUpdatedDependents
