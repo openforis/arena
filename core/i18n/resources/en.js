@@ -83,6 +83,7 @@ Please check also the Spam/Junk mail folder.`,
     hide: 'Hide',
     id: 'id',
     import: 'Import',
+    info: 'Info',
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
@@ -552,6 +553,15 @@ $t(common.cantUndoWarning)`,
     importFromArena: 'Arena/Arena Mobile',
     importFromCollect: 'Collect / Collect Mobile',
     importFromCsv: 'CSV',
+    importFromCsvStepsInfo: `### Importing steps
+1. Select the target entity
+2. Download a template
+3. Fill in the template and save it (CSV) [UTF-9]
+4. Check options
+5. Upload the CSV file
+6. Validate the file
+7. Start import
+`,
     importIntoCycle: 'Import into cycle',
     importIntoEntity: 'Import into entity',
     importType: {
