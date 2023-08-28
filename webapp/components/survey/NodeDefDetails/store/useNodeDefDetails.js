@@ -32,17 +32,15 @@ export const useNodeDefDetails = () => {
 
   useOnPageUnload({ active: State.isDirty(state) })
 
+  // create initial state on mount
   useEffect(() => {
-    const loadNodeDef = async () => {
-      // Editing a nodeDef
-      if (nodeDefUuid) {
-        const nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-        const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
-        setState(State.create({ nodeDef: nodeDefSurvey, validation }))
-      }
+    // Editing a nodeDef
+    if (nodeDefUuid) {
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const validation = Survey.getNodeDefValidation(nodeDef)(survey)
+      setState(State.create({ nodeDef, validation }))
     }
-    loadNodeDef()
-  }, [nodeDefUuid, survey])
+  }, [])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
