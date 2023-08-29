@@ -101,14 +101,16 @@ const NodeDefEditButtons = (props) => {
         <span className="icon icon-pencil2 icon-12px" />
       </Link>
 
-      <Button
-        className="btn-s btn-transparent"
-        onClick={openCloneDialog}
-        onMouseDown={(e) => e.stopPropagation()}
-        iconClassName="icon-copy"
-        title="surveyForm.cloneNode"
-        titleParams={{ nodeDefLabel }}
-      />
+      {!NodeDef.isRoot(nodeDef) && (
+        <Button
+          className="btn-s btn-transparent"
+          onClick={openCloneDialog}
+          onMouseDown={(e) => e.stopPropagation()}
+          iconClassName="icon-copy"
+          title="surveyForm.cloneNode"
+          titleParams={{ nodeDefLabel }}
+        />
+      )}
 
       {NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && (
         <Button
@@ -137,9 +139,7 @@ const NodeDefEditButtons = (props) => {
         <Button
           className="btn-s btn-transparent"
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
-          onMouseDown={(e) => {
-            e.stopPropagation()
-          }}
+          onMouseDown={(e) => e.stopPropagation()}
           iconClassName="icon-bin2 icon-12px"
           title="surveyForm.delete"
           titleParams={{ nodeDefLabel }}
