@@ -403,6 +403,17 @@ export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
+export const cloneIntoEntityDef =
+  ({ nodeDefParent }) =>
+  (nodeDef) =>
+    newNodeDef(
+      nodeDefParent,
+      getType(nodeDef),
+      [...getCycles(nodeDef)],
+      ObjectUtils.clone(getProps(nodeDef)),
+      ObjectUtils.clone(getPropsAdvanced(nodeDef)),
+      isAnalysis(nodeDef)
+    )
 
 // layout
 export const assocLayout = (layout) => ObjectUtils.setProp(propKeys.layout, layout)

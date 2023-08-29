@@ -70,6 +70,22 @@ export const createNodeDefs =
     )
   }
 
+export const cloneNodeDefIntoEntityDef =
+  ({ nodeDef, nodeDefParentUuid, navigate }) =>
+  (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+
+    const nodeDefParent = Survey.getNodeDefByUuid(nodeDefParentUuid)(survey)
+    const nodeDefCloned = NodeDef.cloneIntoEntityDef({ nodeDefParent })(nodeDef)
+
+    dispatch({ type: nodeDefCreate, nodeDef: nodeDefCloned })
+
+    navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDefCloned)}/`)
+
+    return nodeDefCloned
+  }
+
 // ==== Internal update nodeDefs actions
 const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
