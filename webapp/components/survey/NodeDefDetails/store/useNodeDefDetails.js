@@ -40,7 +40,7 @@ export const useNodeDefDetails = () => {
       const validation = Survey.getNodeDefValidation(nodeDef)(survey)
       setState(State.create({ nodeDef, validation }))
     }
-  }, [])
+  }, [nodeDefUuid])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
