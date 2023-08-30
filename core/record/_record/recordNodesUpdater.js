@@ -6,6 +6,7 @@ import {
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordValidator,
   RecordUpdateResult,
+  Promises,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -38,7 +39,8 @@ const _valueAdapterByType = {
       parentNode,
     })(survey)
     if (!itemUuid) {
-      throw new SystemError('validationErrors.dataImport.invalidCode', { code })
+      const attributeName = NodeDef.getName(attributeDef)
+      throw new SystemError('validationErrors.dataImport.invalidCode', { attributeName, code })
     }
     return Node.newNodeValueCode({ itemUuid })
   },
@@ -257,7 +259,7 @@ const updateAttributesWithValues =
 
     // 2. update attribute values
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    Object.entries(valuesByDefUuid).forEach(([attributeDefUuid, value]) => {
+    await Promises.each(Object.entries(valuesByDefUuid), async ([attributeDefUuid, value]) => {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
       if (
         NodeDef.isDescendantOf(entityDef)(attributeDef) &&
@@ -283,11 +285,18 @@ const updateAttributesWithValues =
 
         if (attributeUpdateResult) {
           updateResult.merge(attributeUpdateResult)
+
+          const dependentsUpdateResult = await _afterNodesUpdate({
+            survey,
+            record: attributeUpdateResult.record,
+            nodes: attributeUpdateResult.nodes,
+            sideEffect,
+          })
+          updateResult.merge(dependentsUpdateResult)
         }
       }
     })
-
-    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
+    return updateResult
   }
 
 const _findNodeWithSameUuid = (nodeSearch, nodesArray) =>
