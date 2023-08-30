@@ -1207,6 +1207,7 @@ E.g. this.region = region_attribute_name
       text: 'Text',
       time: 'Time',
     },
+    clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,

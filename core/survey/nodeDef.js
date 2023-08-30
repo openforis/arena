@@ -404,13 +404,13 @@ export const assocProp = ({ key, value }) =>
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
 export const cloneIntoEntityDef =
-  ({ nodeDefParent }) =>
+  ({ nodeDefParent, clonedNodeDefName }) =>
   (nodeDef) =>
     newNodeDef(
       nodeDefParent,
       getType(nodeDef),
       [...getCycles(nodeDef)],
-      ObjectUtils.clone(getProps(nodeDef)),
+      { ...ObjectUtils.clone(getProps(nodeDef)), [propKeys.name]: clonedNodeDefName },
       ObjectUtils.clone(getPropsAdvanced(nodeDef)),
       isAnalysis(nodeDef)
     )

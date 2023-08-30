@@ -1,9 +1,9 @@
 import './nodeDefEditButtons.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -16,17 +16,15 @@ import { NodeDefsActions } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button } from '@webapp/components'
-import { NodeDefEntitySelectorDialog } from './entitySelectorDialog'
+import { NodeDefEditButtonsMenu } from './nodeDefEditButtonsMenu'
 
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef } = props
 
   const dispatch = useDispatch()
-  const navigate = useNavigate()
 
   const elementRef = useRef(null)
   const [style, setStyle] = useState({})
-  const [cloneDialogOpen, setCloneDialogOpen] = useState(false)
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -43,22 +41,6 @@ const NodeDefEditButtons = (props) => {
       setStyle({ position: 'fixed', top: `${top}px`, right: `${right}px` })
     }
   }, [hasNodeDefAddChildTo])
-
-  const openCloneDialog = useCallback(() => {
-    setCloneDialogOpen(true)
-  }, [])
-
-  const closeCloneDialog = useCallback(() => {
-    setCloneDialogOpen(false)
-  }, [])
-
-  const onCloneIntoEntityDefSelected = useCallback(
-    (nodeDefParentUuid) => {
-      closeCloneDialog()
-      dispatch(NodeDefsActions.cloneNodeDefIntoEntityDef({ nodeDef, nodeDefParentUuid, navigate }))
-    },
-    [closeCloneDialog, dispatch, navigate, nodeDef]
-  )
 
   return (
     <div
@@ -98,26 +80,17 @@ const NodeDefEditButtons = (props) => {
         to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         title={i18n.t('surveyForm.edit', { nodeDefLabel })}
       >
-        <span className="icon icon-pencil2 icon-12px" />
+        <span className="icon icon-pencil2 icon-16px" />
       </Link>
 
-      {!NodeDef.isRoot(nodeDef) && (
-        <Button
-          className="btn-s btn-transparent"
-          onClick={openCloneDialog}
-          onMouseDown={(e) => e.stopPropagation()}
-          iconClassName="icon-copy"
-          title="surveyForm.cloneNode"
-          titleParams={{ nodeDefLabel }}
-        />
-      )}
+      <NodeDefEditButtonsMenu nodeDef={nodeDef} />
 
       {NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && (
         <Button
           className="btn-s btn-transparent"
           onClick={() => dispatch(NodeDefsActions.compressFormItems(nodeDef))}
           onMouseDown={(e) => e.stopPropagation()}
-          iconClassName="icon-paragraph-justify"
+          iconClassName="icon-stack"
           title="surveyForm.compressFormItems"
           titleParams={{ nodeDefLabel }}
         />
@@ -132,25 +105,6 @@ const NodeDefEditButtons = (props) => {
           iconClassName="icon-plus icon-12px"
           title="surveyForm.addChildToTitle"
           titleParams={{ nodeDefLabel }}
-        />
-      )}
-
-      {!NodeDef.isRoot(nodeDef) && (
-        <Button
-          className="btn-s btn-transparent"
-          onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
-          onMouseDown={(e) => e.stopPropagation()}
-          iconClassName="icon-bin2 icon-12px"
-          title="surveyForm.delete"
-          titleParams={{ nodeDefLabel }}
-        />
-      )}
-
-      {cloneDialogOpen && (
-        <NodeDefEntitySelectorDialog
-          nodeDef={nodeDef}
-          onChange={onCloneIntoEntityDefSelected}
-          onClose={closeCloneDialog}
         />
       )}
     </div>
