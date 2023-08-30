@@ -1,15 +1,13 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { NodeDefsActions } from '@webapp/store/survey'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button, ButtonMenu } from '@webapp/components'
 import { NodeDefEntitySelectorDialog } from './entitySelectorDialog'
-import { useNavigate } from 'react-router'
-import { useState } from 'react'
 
 export const NodeDefEditButtonsMenu = (props) => {
   const { nodeDef } = props
