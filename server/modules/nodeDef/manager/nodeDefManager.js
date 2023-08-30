@@ -283,10 +283,34 @@ export const updateNodeDefProps = async (
 
 export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
   client.tx(async (t) => {
+    const result = {}
+
+    const addOrRemoveInParentLayout = async ({ nodeDef, add = true }) => {
+      const cyclesAdded = add ? NodeDef.getCycles(nodeDef) : []
+      const cyclesRemoved = add ? [] : NodeDef.getCycles(nodeDef)
+
+      const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
+        survey,
+        nodeDef,
+        cyclesAdded,
+        cyclesRemoved,
+      })
+      if (parentUpdated) {
+        await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
+        result[NodeDef.getUuid(parentUpdated)] = parentUpdated
+      }
+    }
+
     const surveyId = Survey.getId(survey)
 
     const nodeDefSource = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    // remove source node def from parent layout
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefSource, add: false })
+
     const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
+
+    // update source node def parent uuid and meta
     let nodeDefUpdated = {
       ...nodeDefSource,
       [NodeDef.keys.parentUuid]: targetParentNodeDefUuid,
@@ -308,23 +332,16 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
       t
     )
 
-    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({
-      survey,
-      nodeDef: nodeDefUpdated,
-      cyclesAdded: NodeDef.getCycles(nodeDefUpdated),
-    })
-    if (nodeDefParentUpdated) {
-      await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)
-    }
+    result[nodeDefUuid] = nodeDefUpdated
+
+    // add node def to target parent layout
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true })
 
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, nodeDefUpdate, false, t)
 
     await markSurveyDraft(surveyId, t)
 
-    return {
-      [nodeDefUuid]: nodeDefUpdated,
-      ...(nodeDefParentUpdated ? { [NodeDef.getUuid(nodeDefParentUpdated)]: nodeDefParentUpdated } : {}),
-    }
+    return result
   })
 
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
