@@ -149,6 +149,18 @@ export const updateNodeDefProps = async (
 export const updateNodeDefsProps = async ({ surveyId, nodeDefs }, client = db) =>
   NodeDefManager.updateNodeDefPropsInBatch({ surveyId, nodeDefs }, client)
 
+export const moveNodeDef = async ({ user, surveyId, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId }, t)
+
+    const nodeDefsUpdated = await NodeDefManager.moveNodeDef({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, t)
+    const nodeDefsDependent = Survey.getNodeDefDependencies(nodeDefUuid)(survey)
+    // remove dependent node defs from dependency graph (add them back later)
+    const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
+
+    return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsDependent, nodeDefsUpdated }, t)
+  })
+
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
   const survey = await fetchSurvey({ surveyId, cycle }, client)
 
