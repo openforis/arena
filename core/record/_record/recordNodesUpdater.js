@@ -6,6 +6,7 @@ import {
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordValidator,
   RecordUpdateResult,
+  Promises,
 } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -38,7 +39,8 @@ const _valueAdapterByType = {
       parentNode,
     })(survey)
     if (!itemUuid) {
-      throw new SystemError('validationErrors.dataImport.invalidCode', { code })
+      const attributeName = NodeDef.getName(attributeDef)
+      throw new SystemError('validationErrors.dataImport.invalidCode', { attributeName, code })
     }
     return Node.newNodeValueCode({ itemUuid })
   },
@@ -242,6 +244,20 @@ const updateAttributesWithValues =
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
+    const updateDependentNodes = async (nodeUpdateResult) => {
+      if (!nodeUpdateResult) return
+
+      updateResult.merge(nodeUpdateResult)
+
+      const dependentsUpdateResult = await _afterNodesUpdate({
+        survey,
+        record: nodeUpdateResult.record,
+        nodes: nodeUpdateResult.nodes,
+        sideEffect,
+      })
+      updateResult.merge(dependentsUpdateResult)
+    }
+
     // 1. get or create context entity
     const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
       survey,
@@ -251,43 +267,47 @@ const updateAttributesWithValues =
       sideEffect,
     })(record)
 
-    if (updateResultEntity) {
-      updateResult.merge(updateResultEntity)
-    }
+    await updateDependentNodes(updateResultEntity)
 
-    // 2. update attribute values
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    Object.entries(valuesByDefUuid).forEach(([attributeDefUuid, value]) => {
-      const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
-      if (
-        NodeDef.isDescendantOf(entityDef)(attributeDef) &&
-        (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
-        // update also read-only values with value evaluated only one time with data coming from CSV
-        (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
-      ) {
-        const { record: currentRecord } = updateResult
 
-        const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
-          survey,
-          parentNode: entity,
-          nodeDefUuid: attributeDefUuid,
-        })(currentRecord)
+    // 2. consider only attributes descendants of the specified entity
 
-        const attributeUpdateResult = _addOrUpdateAttribute({
-          survey,
-          entity: attributeParentEntity,
-          attributeDef,
-          value,
-          sideEffect,
-        })(currentRecord)
-
-        if (attributeUpdateResult) {
-          updateResult.merge(attributeUpdateResult)
-        }
+    const valuesByDefUuidEntriesInDescendantAttributes = Object.entries(valuesByDefUuid).filter(
+      ([attributeDefUuid]) => {
+        const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
+        return (
+          NodeDef.isDescendantOf(entityDef)(attributeDef) &&
+          (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
+          // update also read-only values with value evaluated only one time with external data (e.g. from CSV)
+          (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
+        )
       }
-    })
+    )
 
-    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
+    // 3. update attribute values
+    await Promises.each(valuesByDefUuidEntriesInDescendantAttributes, async ([attributeDefUuid, value]) => {
+      const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
+
+      const { record: currentRecord } = updateResult
+
+      const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
+        survey,
+        parentNode: entity,
+        nodeDefUuid: attributeDefUuid,
+      })(currentRecord)
+
+      const attributeUpdateResult = _addOrUpdateAttribute({
+        survey,
+        entity: attributeParentEntity,
+        attributeDef,
+        value,
+        sideEffect,
+      })(currentRecord)
+
+      await updateDependentNodes(attributeUpdateResult)
+    })
+    return updateResult
   }
 
 const _findNodeWithSameUuid = (nodeSearch, nodesArray) =>
