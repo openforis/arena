@@ -1180,6 +1180,10 @@ E.g. this.region = region_attribute_name
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
     cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
+    cloneDialog: {
+      title: 'Cloning node definition "{{nodeDefName}}"',
+      entityToCloneInto: 'Entity to clone into:',
+    },
   },
 
   languagesEditor: {
@@ -1203,6 +1207,7 @@ E.g. this.region = region_attribute_name
       text: 'Text',
       time: 'Time',
     },
+    clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
