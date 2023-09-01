@@ -34,6 +34,16 @@ export const useOnSurveyCycleUpdate = (effect) => {
 export const useNodeDefRootKeys = () => Survey.getNodeDefRootKeys(useSurvey())
 
 // ==== Node defs
-export const useNodeDefByUuid = (uuid) => Survey.getNodeDefByUuid(uuid)(useSurvey())
+export const useNodeDefByUuid = (uuid) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getNodeDefByUuid(uuid)(survey)
+  })
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
+export const useNodeDefValidationByUuid = (uuid) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
+    return Survey.getNodeDefValidation(nodeDef)(survey)
+  })
