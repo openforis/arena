@@ -13,7 +13,6 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
-import { nodeDefUpdate } from '@webapp/store/survey/nodeDefs/actions'
 
 export {
   addNodeDefsCycles,
@@ -286,14 +285,11 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     const result = {}
 
     const addOrRemoveInParentLayout = async ({ nodeDef, add = true }) => {
-      const cyclesAdded = add ? NodeDef.getCycles(nodeDef) : []
-      const cyclesRemoved = add ? [] : NodeDef.getCycles(nodeDef)
-
       const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
         survey,
         nodeDef,
-        cyclesAdded,
-        cyclesRemoved,
+        cyclesAdded: add ? NodeDef.getCycles(nodeDef) : [],
+        cyclesDeleted: add ? [] : NodeDef.getCycles(nodeDef),
       })
       if (parentUpdated) {
         await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
@@ -311,22 +307,13 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
 
     // update source node def parent uuid and meta
-    let nodeDefUpdated = {
-      ...nodeDefSource,
-      [NodeDef.keys.parentUuid]: targetParentNodeDefUuid,
-      [NodeDef.keys.meta]: {
-        ...NodeDef.getMeta(nodeDefSource),
-        [NodeDef.metaKeys.h]: [...NodeDef.getMetaHierarchy(targetParentNodeDef), targetParentNodeDefUuid],
-      },
-    }
+    let nodeDefUpdated = NodeDef.changeParentEntity({ targetParentNodeDef })(nodeDefSource)
 
     nodeDefUpdated = await NodeDefRepository.updateNodeDefProps(
       {
         surveyId,
         nodeDefUuid,
         parentUuid: targetParentNodeDefUuid,
-        props: NodeDef.getProps(nodeDefUpdated),
-        propsAdvanced: NodeDef.getPropsAdvanced(nodeDefUpdated),
         meta: NodeDef.getMeta(nodeDefUpdated),
       },
       t
@@ -337,7 +324,7 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     // add node def to target parent layout
     await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true })
 
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, nodeDefUpdate, false, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, nodeDefUpdated, false, t)
 
     await markSurveyDraft(surveyId, t)
 

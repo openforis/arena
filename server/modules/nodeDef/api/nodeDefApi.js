@@ -178,8 +178,6 @@ export const init = (app) => {
           targetParentNodeDefUuid,
         })
 
-        // do not send updated node def back to client (node def already updated client side)
-        delete nodeDefsUpdated[nodeDefUuid]
         res.json({ nodeDefsUpdated, nodeDefsValidation })
       } catch (error) {
         next(error)

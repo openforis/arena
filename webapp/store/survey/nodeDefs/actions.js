@@ -59,19 +59,6 @@ export const createNodeDef = (parent, type, props, navigate) => async (dispatch,
   return nodeDef
 }
 
-export const createNodeDefs =
-  ({ surveyId, surveyCycleKey, nodeDefs }) =>
-  async (dispatch) => {
-    const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDefs({ surveyId, surveyCycleKey, nodeDefs })
-
-    dispatch(
-      _onNodeDefsUpdate(
-        nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
-        nodeDefsValidation
-      )
-    )
-  }
-
 export const cloneNodeDefIntoEntityDef =
   ({ nodeDef, nodeDefParentUuid, navigate }) =>
   (dispatch, getState) => {
@@ -91,6 +78,21 @@ export const cloneNodeDefIntoEntityDef =
     navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDefCloned)}/`)
 
     return nodeDefCloned
+  }
+
+export const moveNodeDef =
+  ({ nodeDefUuid, targetParentNodeDefUuid }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const surveyId = SurveyState.getSurveyId(state)
+
+    const { nodeDefsValidation, nodeDefsUpdated } = await API.moveNodeDef({
+      surveyId,
+      nodeDefUuid,
+      targetParentNodeDefUuid,
+    })
+
+    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
   }
 
 // ==== Internal update nodeDefs actions

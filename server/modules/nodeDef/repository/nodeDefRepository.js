@@ -204,7 +204,7 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
 // ============== UPDATE
 
 export const updateNodeDefProps = async (
-  { surveyId, nodeDefUuid, parentUuid, props, propsAdvanced = {}, meta = {} },
+  { surveyId, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, meta = {} },
   client = DB
 ) =>
   client.one(
