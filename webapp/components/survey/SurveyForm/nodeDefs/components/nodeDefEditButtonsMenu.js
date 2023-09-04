@@ -42,9 +42,7 @@ export const NodeDefEditButtonsMenu = (props) => {
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   const openEntitySelectDialog = useCallback(
-    (action) => () => {
-      setState((statePrev) => ({ ...statePrev, entitySelectDialogOpen: true, action }))
-    },
+    (action) => () => setState((statePrev) => ({ ...statePrev, entitySelectDialogOpen: true, action })),
     []
   )
 

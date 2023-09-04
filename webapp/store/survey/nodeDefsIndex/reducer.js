@@ -19,6 +19,9 @@ const actionHandlers = {
 
   // NodeDefs load
   [SurveyActions.surveyDefsLoad]: (_state, { nodeDefs }) => Survey.initNodeDefsIndex({ nodeDefs }),
+  [SurveyActions.surveyDefsIndexUpdate]: (state) => {
+    console.log(state)
+  },
 
   [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => Survey.addNodeDefToIndex({ nodeDefsIndex: state, nodeDef }),
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef }),

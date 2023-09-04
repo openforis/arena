@@ -15,6 +15,7 @@ import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { NotificationActions } from '@webapp/store/ui/notification'
 
 import * as SurveyState from '../state'
+import { surveyDefsIndexUpdate } from '../actions/actionTypes'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -84,6 +85,7 @@ export const moveNodeDef =
   ({ nodeDefUuid, targetParentNodeDefUuid }) =>
   async (dispatch, getState) => {
     const state = getState()
+    const survey = SurveyState.getSurvey(state)
     const surveyId = SurveyState.getSurveyId(state)
 
     const { nodeDefsValidation, nodeDefsUpdated } = await API.moveNodeDef({
@@ -93,6 +95,9 @@ export const moveNodeDef =
     })
 
     dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    // let surveyUpdated = Survey.assocNodeDefs({ ...Survey.getNodeDefs(survey), ...nodeDefsUpdated })(survey)
+    // surveyUpdated = Survey.initAndAssocNodeDefsIndex(surveyUpdated)
+    // dispatch({ type: surveyDefsIndexUpdate, index:  })
   }
 
 // ==== Internal update nodeDefs actions
