@@ -1180,6 +1180,10 @@ E.g. this.region = region_attribute_name
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
     cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
+    cloneDialog: {
+      title: 'Cloning node definition "{{nodeDefName}}"',
+      entityToCloneInto: 'Entity to clone into:',
+    },
   },
 
   languagesEditor: {
@@ -1203,6 +1207,7 @@ E.g. this.region = region_attribute_name
       text: 'Text',
       time: 'Time',
     },
+    clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
@@ -1435,7 +1440,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyFile: 'The file you are trying to import is empty',
       invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
       invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
-      invalidCode: 'Invalid code in column {{headers}}: {{code}}',
+      invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
       invalidDate:
         'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as yyyy-MM-dd or dd/MM/yyyy. E.g. 2023-01-15 or 15/01/2023',

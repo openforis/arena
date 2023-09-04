@@ -1,28 +1,35 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .survey-form__node-def-edit-buttons {
   position: absolute;
   top: 0;
   right: 0;
-  background-color: rgba($grey, .9);
-  padding: 0 .3rem;
+  background-color: rgba($grey, 0.9);
+  padding: 0.3rem;
   z-index: $zIndex6Tooltip;
 
   display: flex;
-  font-size: .8rem;
+  font-size: 0.8rem;
   align-items: center;
+
+  .survey-form__node-def-edit-button {
+    padding-right: 1.4rem;
+  }
+
+  .button-menu__button {
+    padding: 0;
+  }
 }
 
 .survey-form__node-def-edit-page-props {
-  margin: 0 .5rem;
-  padding: .2rem;
+  margin: 0 0.5rem;
+  padding: 0.2rem;
 
   input {
-    padding: .2rem .2rem;
+    padding: 0.2rem 0.2rem;
     width: 30px;
     border-bottom: 1px dashed $greyBorder;
     font-size: 1em;
     text-align: center;
   }
 }
-

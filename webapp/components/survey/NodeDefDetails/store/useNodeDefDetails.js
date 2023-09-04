@@ -3,20 +3,20 @@ import { useNavigate, useParams } from 'react-router'
 
 import { useIsDesignerNodeDefRoute, useOnUpdate, useOnBrowserBack, useOnPageUnload } from '@webapp/components/hooks'
 
-import * as Survey from '@core/survey/survey'
-
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useActions } from './actions'
 import { State } from './state'
+import { useNodeDefValidationByUuid } from '@webapp/store/survey/hooks'
 
 export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
 
   const navigate = useNavigate()
 
-  const survey = useSurvey()
+  const nodeDef = useNodeDefByUuid(nodeDefUuid)
+  const validation = useNodeDefValidationByUuid(nodeDefUuid)
   const surveyCycleKey = useSurveyCycleKey()
 
   const [state, setState] = useState({})
@@ -36,11 +36,9 @@ export const useNodeDefDetails = () => {
   useEffect(() => {
     // Editing a nodeDef
     if (nodeDefUuid) {
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const validation = Survey.getNodeDefValidation(nodeDef)(survey)
       setState(State.create({ nodeDef, validation }))
     }
-  }, [])
+  }, [nodeDefUuid])
 
   useOnUpdate(() => {
     if (editingFromDesigner) {
