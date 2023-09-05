@@ -4,6 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
+import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
 
@@ -81,8 +82,41 @@ export const cloneNodeDefIntoEntityDef =
     return nodeDefCloned
   }
 
+const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDefUuid, nodeDefsValidation }) => {
+  if (Validation.isValid(nodeDefsValidation)) return
+
+  // navigate to node def details page if moved node def has errors
+  if (Validation.isNotValid(Validation.getFieldValidation(nodeDefUuid)(nodeDefsValidation))) {
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    dispatch(
+      NotificationActions.notifyWarning({
+        key: 'nodeDefEdit.movedNodeDefinitionHasErrors',
+        params: { nodeDefName: NodeDef.getName(nodeDef) },
+      })
+    )
+    navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
+  } else {
+    // show warning if errors are found in other node definitions
+    const fieldValidations = Validation.getFieldValidations(nodeDefsValidation)
+    const invalidNodeDefsNames = Object.entries(fieldValidations).reduce((names, [field, fieldValidation]) => {
+      if (Validation.isNotValid(fieldValidation)) {
+        const invalidNodeDef = Survey.getNodeDefByUuid(field)(survey)
+        names.push(NodeDef.getName(invalidNodeDef))
+      }
+      return names
+    }, [])
+
+    dispatch(
+      NotificationActions.notifyWarning({
+        key: 'nodeDefEdit.nodeDefintionsHaveErrors',
+        params: { nodeDefNames: invalidNodeDefsNames },
+      })
+    )
+  }
+}
+
 export const moveNodeDef =
-  ({ nodeDefUuid, targetParentNodeDefUuid }) =>
+  ({ nodeDefUuid, targetParentNodeDefUuid, navigate }) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -100,6 +134,8 @@ export const moveNodeDef =
     // update survey index: parent entity has changed
     const allNodeDefs = { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated }
     dispatch({ type: surveyDefsIndexUpdate, nodeDefs: allNodeDefs })
+
+    _handleNodeDefMoveValidationErrors({ dispatch, navigate, survey, nodeDefUuid, nodeDefsValidation })
   }
 
 // ==== Internal update nodeDefs actions

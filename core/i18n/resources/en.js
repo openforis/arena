@@ -1191,7 +1191,7 @@ E.g. this.region = region_attribute_name
       entitySelectLabel: 'Entity to move into:',
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
-    nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefsNames}}',
+    nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
   },
 
   languagesEditor: {
