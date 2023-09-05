@@ -22,7 +22,12 @@ const iconByAction = {
 
 const isEntitySelectableByAction = {
   [actions.clone]: () => true,
-  [actions.move]: ({ entityDefUuid, currentNodeDef }) => entityDefUuid !== NodeDef.getParentUuid(currentNodeDef),
+  [actions.move]: ({ entityDefUuid, nodeDef }) => entityDefUuid !== NodeDef.getParentUuid(nodeDef),
+}
+
+const availabilityByAction = {
+  [actions.clone]: () => true,
+  [actions.move]: ({ nodeDef }) => !NodeDef.isPublished(nodeDef),
 }
 
 export const NodeDefEditButtonsMenu = (props) => {
@@ -79,19 +84,21 @@ export const NodeDefEditButtonsMenu = (props) => {
     // items with entity selection (clone or move actions)
     if (NodeDef.isAttribute(nodeDef)) {
       _menuItems.push(
-        ...Object.keys(actions).map((action) => ({
-          key: `node-${action}`,
-          content: (
-            <Button
-              className="btn-s btn-transparent"
-              iconClassName={iconByAction[action]}
-              label={`surveyForm.${action}`}
-              labelParams={{ nodeDefLabel }}
-              onClick={openEntitySelectDialog(action)}
-              onMouseDown={(e) => e.stopPropagation()}
-            />
-          ),
-        }))
+        ...Object.keys(actions)
+          .filter((action) => availabilityByAction[action]({ nodeDef }))
+          .map((action) => ({
+            key: `node-${action}`,
+            content: (
+              <Button
+                className="btn-s btn-transparent"
+                iconClassName={iconByAction[action]}
+                label={`surveyForm.${action}`}
+                labelParams={{ nodeDefLabel }}
+                onClick={openEntitySelectDialog(action)}
+                onMouseDown={(e) => e.stopPropagation()}
+              />
+            ),
+          }))
       )
     }
     // delete action
@@ -120,9 +127,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       <ButtonMenu className="btn-transparent" iconClassName="icon-menu icon-16px" items={menuItems} />
       {entitySelectDialogOpen && (
         <NodeDefEntitySelectorDialog
-          isEntitySelectable={(entityDefUuid) =>
-            isEntitySelectableByAction[action]({ entityDefUuid, currentNodeDef: nodeDef })
-          }
+          isEntitySelectable={(entityDefUuid) => isEntitySelectableByAction[action]({ entityDefUuid, nodeDef })}
           confirmButtonLabel={`nodeDefEdit.${action}Dialog.confirmButtonLabel`}
           currentNodeDef={nodeDef}
           entitySelectLabel={`nodeDefEdit.${action}Dialog.entitySelectLabel`}
