@@ -86,7 +86,8 @@ export const moveNodeDef =
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
-    const surveyId = SurveyState.getSurveyId(state)
+
+    const surveyId = Survey.getId(survey)
 
     const { nodeDefsValidation, nodeDefsUpdated } = await API.moveNodeDef({
       surveyId,
@@ -95,9 +96,10 @@ export const moveNodeDef =
     })
 
     dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
-    // let surveyUpdated = Survey.assocNodeDefs({ ...Survey.getNodeDefs(survey), ...nodeDefsUpdated })(survey)
-    // surveyUpdated = Survey.initAndAssocNodeDefsIndex(surveyUpdated)
-    // dispatch({ type: surveyDefsIndexUpdate, index:  })
+
+    // update survey index: parent entity has changed
+    const allNodeDefs = { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated }
+    dispatch({ type: surveyDefsIndexUpdate, nodeDefs: allNodeDefs })
   }
 
 // ==== Internal update nodeDefs actions
