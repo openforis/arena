@@ -196,6 +196,8 @@ export const fetchEntitiesDataToCsvFiles = async (
   { survey, cycle, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
   client = db
 ) => {
+  const addCycle = Survey.getCycleKeys(survey).length > 1
+
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
@@ -231,7 +233,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         recordOwnerUuid,
         streamOutput: outputStream,
         query,
-        addCycle: true,
+        addCycle,
         includeCategoryItemsLabels,
       },
       client

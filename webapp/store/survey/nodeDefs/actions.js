@@ -3,6 +3,8 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
+
 import * as API from '@webapp/service/api'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
@@ -68,6 +70,27 @@ export const createNodeDefs =
         nodeDefsValidation
       )
     )
+  }
+
+export const cloneNodeDefIntoEntityDef =
+  ({ nodeDef, nodeDefParentUuid, navigate }) =>
+  (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+
+    const nodeDefParent = Survey.getNodeDefByUuid(nodeDefParentUuid)(survey)
+
+    const existingNodeDefNames = Survey.getNodeDefsArray(survey).map(NodeDef.getName)
+    const clonedNodeDefName = UniqueNameGenerator.generateUniqueName({
+      startingName: NodeDef.getName(nodeDef),
+      existingNames: existingNodeDefNames,
+    })
+    const nodeDefCloned = NodeDef.cloneIntoEntityDef({ nodeDefParent, clonedNodeDefName })(nodeDef)
+    dispatch({ type: nodeDefCreate, nodeDef: nodeDefCloned })
+
+    navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDefCloned)}/`)
+
+    return nodeDefCloned
   }
 
 // ==== Internal update nodeDefs actions

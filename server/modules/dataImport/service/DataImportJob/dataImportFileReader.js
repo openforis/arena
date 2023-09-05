@@ -42,14 +42,15 @@ const valueConverterByNodeDefType = {
     }
     return String(['true', '1'].includes(String(val).toLocaleLowerCase()))
   },
-  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value, headers }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
     const category = Survey.getCategoryItemByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
       const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
       if (!itemUuid) {
-        throw new SystemError('validationErrors.dataImport.invalidCode', { code, headers })
+        const attributeName = NodeDef.getName(nodeDef)
+        throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
       }
       return Node.newNodeValueCode({ itemUuid })
     }
