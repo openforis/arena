@@ -418,7 +418,7 @@ export const cloneIntoEntityDef =
 export const changeParentEntity =
   ({ targetParentNodeDef }) =>
   (nodeDef) => {
-    const targetParentNodeDefUuid = getUuid(nodeDef)
+    const targetParentNodeDefUuid = getUuid(targetParentNodeDef)
     return {
       ...nodeDef,
       [keys.parentUuid]: targetParentNodeDefUuid,

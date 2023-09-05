@@ -39,9 +39,17 @@ const afterNodeDefUpdate = async (
   let surveyUpdated = Survey.mergeNodeDefs(allUpdatedNodeDefs)(survey)
 
   // add dependent node defs to dependency graph
+  // nodeDefsDependent can contain nodeDefs that have been updated and are in nodeDefsUpdated too: replace them with the updated ones
+  const nodeDefsDependentByUuid = nodeDefsDependent.reduce((acc, nodeDefDependent) => {
+    const dependentUuid = NodeDef.getUuid(nodeDefDependent)
+    const nodeDefDepedentUpdated = nodeDefsUpdated[dependentUuid] ?? nodeDefDependent
+    acc[dependentUuid] = nodeDefDepedentUpdated
+    return acc
+  }, {})
+
   surveyUpdated = Survey.addNodeDefsDependencies({
     ...updatedNodeDefsNotDeleted,
-    ...ObjectUtils.toUuidIndexedObj(nodeDefsDependent),
+    ...nodeDefsDependentByUuid,
   })(surveyUpdated)
 
   await SurveyManager.updateSurveyDependencyGraphs(
@@ -52,11 +60,17 @@ const afterNodeDefUpdate = async (
 
   const nodeDefParent = !nodeDef || NodeDef.isRoot(nodeDef) ? null : Survey.getNodeDefParent(nodeDef)(surveyUpdated)
 
-  const nodeDefsToValidate = [
-    ...(nodeDefParent ? [nodeDefParent] : []), // always re-validate parent entity (keys may have been changed)
-    ...Object.values(allUpdatedNodeDefs),
-    ...nodeDefsDependent,
-  ].filter(Boolean) // exclude null node defs (deleted or invalid reference in dependency graph)
+  const nodeDefsToValidateByUuid = {}
+
+  // always re-validate parent entity (keys may have been changed)
+  if (nodeDefParent) {
+    nodeDefsToValidateByUuid[NodeDef.getUuid(nodeDefParent)] = nodeDefParent
+  }
+  Object.assign(nodeDefsToValidateByUuid, allUpdatedNodeDefs)
+  Object.values(nodeDefsDependentByUuid).forEach((nodeDefDependent) => {
+    nodeDefsToValidateByUuid[NodeDef.getUuid(nodeDefDependent)] = nodeDefDependent
+  })
+  const nodeDefsToValidate = Object.values(nodeDefsToValidateByUuid)
 
   const nodeDefsValidationArray = await Promise.all(
     nodeDefsToValidate.map((nodeDefToValidate) => SurveyValidator.validateNodeDef(surveyUpdated, nodeDefToValidate))
@@ -153,8 +167,10 @@ export const moveNodeDef = async ({ user, surveyId, nodeDefUuid, targetParentNod
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId }, t)
 
-    const nodeDefsUpdated = await NodeDefManager.moveNodeDef({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, t)
     const nodeDefsDependent = Survey.getNodeDefDependencies(nodeDefUuid)(survey)
+
+    const nodeDefsUpdated = await NodeDefManager.moveNodeDef({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, t)
+
     // remove dependent node defs from dependency graph (add them back later)
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
 
