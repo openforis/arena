@@ -18,9 +18,9 @@ const Panel = ({ config, configItemsByPath, configActions, dimensions }) => {
 }
 
 Panel.propTypes = {
-  config: PropTypes.arrayOf(PropTypes.any),
-  configItemsByPath: PropTypes.arrayOf(PropTypes.any),
-  configActions: PropTypes.arrayOf(PropTypes.any),
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
   dimensions: PropTypes.arrayOf(PropTypes.any),
 }
 
