@@ -1,6 +1,8 @@
 import path from 'path'
 import Archiver from 'archiver'
 
+import { SystemError as CoreSystemError } from '@openforis/arena-core'
+
 import * as FileUtils from '@server/utils/file/fileUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from './unauthorizedError'
@@ -26,7 +28,7 @@ const _getErr = ({ key, params }) => ({
 export const sendErr = (res, err) => {
   if (err instanceof UnauthorizedError) {
     res.status(StatusCodes.FORBIDDEN).json(_getErr(err))
-  } else if (err instanceof SystemError) {
+  } else if (err instanceof SystemError || err instanceof CoreSystemError) {
     res.status(err.statusCode).json(_getErr(err))
   } else {
     res.status(err.statusCode).json(
