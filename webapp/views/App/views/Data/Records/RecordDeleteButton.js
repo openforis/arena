@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'
 
-import { TestId } from '@webapp/utils/testId'
-
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions } from '@webapp/store/ui/record'
