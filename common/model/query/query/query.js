@@ -57,6 +57,7 @@ export const assocMeasures = A.assoc(keys.measures)
 export const assocFilter = A.assoc(keys.filter)
 export const assocFilterRecordUuid = A.assoc(keys.filterRecordUuid)
 export const assocSort = A.assoc(keys.sort)
+export const assocMode = A.assoc(keys.mode)
 
 // mode
 export const toggleModeAggregate = (query) => ({
