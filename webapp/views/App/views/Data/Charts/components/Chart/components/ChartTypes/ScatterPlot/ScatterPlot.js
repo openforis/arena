@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import { processData } from './utils/processData'
 import { createLegend } from './utils/legend'
 
 const ScatterPlot = ({ specs, originalData }) => {
-  console.log('originalData', originalData)
-
-  const { data, xField, yField, categoryField } = processData(originalData, specs)
+  const { data, xField, yField } = processData(originalData, specs)
   const chartRef = useRef()
 
   // Shape symbols
@@ -49,7 +48,6 @@ const ScatterPlot = ({ specs, originalData }) => {
     // Map specs
     const xMetric = specs.query?.xMetric?.field || 'x'
     const yMetric = specs.query?.yMetric?.field || 'y'
-    const categoryMetric = specs.query?.category?.field || 'category'
     const xAxisTitle = specs.chart.xAxisTitle || xField
     const yAxisTitle = specs.chart.yAxisTitle || yField
     const title = specs.chart.title || ''
@@ -57,7 +55,7 @@ const ScatterPlot = ({ specs, originalData }) => {
     const titleSize = specs.chart.titleSize || '20'
     const axisSize = specs.chart.axisSize || '16'
     const ticksSize = specs.chart.ticksSize || '12'
-    const showLegend = specs.chart?.showLegend ?? true
+    const showLegend = specs.chart.showLegend ?? true
     const xMax = parseFloat(specs.chart.xMax) || d3.max(data, (d) => d[xMetric])
     const xMin = parseFloat(specs.chart.xMin) || d3.min(data, (d) => d[xMetric])
     const yMax = parseFloat(specs.chart.yMax) || d3.max(data, (d) => d[yMetric])
@@ -166,6 +164,34 @@ const ScatterPlot = ({ specs, originalData }) => {
       ></div>
     </div>
   )
+}
+
+ScatterPlot.propTypes = {
+  specs: PropTypes.shape({
+    query: PropTypes.shape({
+      xMetric: PropTypes.shape({
+        field: PropTypes.string.isRequired,
+      }).isRequired,
+      yMetric: PropTypes.shape({
+        field: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+    chart: PropTypes.shape({
+      xAxisTitle: PropTypes.string,
+      yAxisTitle: PropTypes.string,
+      title: PropTypes.string,
+      dotSize: PropTypes.number,
+      titleSize: PropTypes.string,
+      axisSize: PropTypes.string,
+      ticksSize: PropTypes.string,
+      showLegend: PropTypes.bool,
+      xMax: PropTypes.string,
+      xMin: PropTypes.string,
+      yMax: PropTypes.string,
+      yMin: PropTypes.string,
+    }).isRequired,
+  }).isRequired,
+  originalData: PropTypes.array.isRequired,
 }
 
 export default React.memo(ScatterPlot)
