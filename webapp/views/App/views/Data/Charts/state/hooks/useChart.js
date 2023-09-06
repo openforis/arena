@@ -5,6 +5,7 @@ import useChartConfig from './useChartConfig'
 import useChartRender from './useChartRender'
 
 const useChart = (query, table, setTable) => {
+  console.log('useChart query', query)
   const [draft, setDraft] = useState(null)
 
   const { config, configItemsByPath, configActions } = useChartConfig({ table, setTable })
@@ -19,6 +20,13 @@ const useChart = (query, table, setTable) => {
   useEffect(() => {
     setDraft(true)
   }, [spec])
+
+  // Call renderChart whenever spec.query changes
+  useEffect(() => {
+    if (spec.query) {
+      renderChart()
+    }
+  }, [spec.query, renderChart])
 
   return { config, configItemsByPath, configActions, spec, updateSpec, draft, chartData, renderChart }
 }

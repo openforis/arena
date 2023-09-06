@@ -170,6 +170,8 @@ const _getExportFieldsAgg = ({ survey, query }) => {
 export const fetchViewDataAgg = async (params) => {
   const { survey, cycle, query, recordOwnerUuid = null, limit, offset, streamOutput = null } = params
 
+  console.log('fetchViewDataAgg params:', params) // Log the input params
+
   // Fetch data
   const result = await DataViewRepository.fetchViewDataAgg({
     survey,
@@ -180,6 +182,8 @@ export const fetchViewDataAgg = async (params) => {
     offset,
     stream: Boolean(streamOutput),
   })
+
+  console.log('fetchViewDataAgg result:', result) // Log the result
 
   if (streamOutput) {
     await db.stream(result, (dbStream) => {

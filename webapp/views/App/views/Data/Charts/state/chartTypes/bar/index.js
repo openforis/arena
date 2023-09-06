@@ -24,6 +24,7 @@ const bar = {
               const transform = valuesToCalculations(value)
 
               const groupBy = {
+                field_uuid: transform.key,
                 field: transform.as,
                 type: 'nominal',
               }
@@ -48,15 +49,9 @@ const bar = {
               const aggValues = configItemsByPath['query.groupBy']?.value
               const aggs = aggValues?.map((val) => val.value)
 
-              // Logs in the console for reference
-              console.log('aggTransform', aggTransform)
-              console.log('transform', transform)
-              console.log('column', columnValues)
-              console.log('aggregationValues', aggregationValues)
-              console.log('aggs', aggs)
-
               const metric = {
                 field: transform.as,
+                field_uuid: transform.key,
                 aggregate: aggTransform.as,
                 type: 'quantitative',
               }

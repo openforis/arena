@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import { Query } from '../../../../common/model/query'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -51,12 +52,17 @@ export const fetchViewData = async (params) => {
     addCycle = false,
   } = params
 
+  const parsedQuery = A.parse(query)
+  console.log('fetchViewData params:', params) // Log the input params
+  console.log('isModeAggregate:', Query.isModeAggregate(parsedQuery))
+
   const survey = await _fetchSurvey(surveyId, cycle)
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
-  return Query.isModeAggregate(query)
-    ? SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, recordOwnerUuid, offset, limit, streamOutput })
-    : SurveyRdbManager.fetchViewData({
+  console.log('Calling SurveyRdbManager.fetchViewData/Agg')
+  const data = Query.isModeAggregate(parsedQuery)
+    ? await SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, recordOwnerUuid, offset, limit, streamOutput })
+    : await SurveyRdbManager.fetchViewData({
         survey,
         cycle,
         query,
@@ -67,6 +73,10 @@ export const fetchViewData = async (params) => {
         streamOutput,
         addCycle,
       })
+
+  console.log('fetchViewData data:', data) // Log the data
+
+  return data
 }
 
 /**
