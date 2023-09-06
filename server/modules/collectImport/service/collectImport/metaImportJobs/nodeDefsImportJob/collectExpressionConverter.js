@@ -22,7 +22,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
     // predefined variables
     { pattern: '\\$this', replace: Expression.thisVariable },
-    { pattern: '\\$context', replace: 'parent(this)' },
+    { pattern: '\\$context', replace: Expression.contextVariable },
     // not function
     { pattern: /not\(/, replace: '!(' },
     // parent function

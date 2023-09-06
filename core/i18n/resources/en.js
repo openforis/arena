@@ -1666,6 +1666,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyHeaders: 'Empty headers found',
     },
     entryDataNotFound: 'Entry data not found: {{entryName}}',
+    expression: {
+      undefinedFunction: '$t(expression.undefinedFunction)',
+    },
     generic: 'Unexpected error: {{text}}',
     importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
     invalidType: 'Invalid type {{type}}',
