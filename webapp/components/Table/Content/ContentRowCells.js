@@ -14,6 +14,7 @@ export const ContentRowCells = (props) => {
     isRowExpandable,
     item,
     itemPosition,
+    itemSelected,
     onRowExpandToggle,
     rowExpanded,
   } = props
@@ -29,6 +30,7 @@ export const ContentRowCells = (props) => {
           initData={initData}
           item={item}
           itemPosition={itemPosition}
+          itemSelected={itemSelected}
         />
       ))}
       {expandableRows && (

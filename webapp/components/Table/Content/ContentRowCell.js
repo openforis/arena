@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const ContentRowCell = (props) => {
-  const { active, cellTestIdExtractor, column, item, itemPosition, initData } = props
+  const { active, cellTestIdExtractor, column, item, itemPosition, itemSelected, initData } = props
 
   const { key, renderItem } = column
 
@@ -9,7 +9,7 @@ export const ContentRowCell = (props) => {
 
   return (
     <div key={key} data-testid={testId}>
-      {renderItem({ active, item, itemPosition, initData })}
+      {renderItem({ active, item, itemPosition, itemSelected, initData })}
     </div>
   )
 }

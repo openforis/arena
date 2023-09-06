@@ -69,7 +69,9 @@ const Content = (props) => {
   }
 
   const hasColumns = columns?.length > 0
-  const rowComponent = hasColumns ? (_props) => <ContentRowCells {..._props} columns={columns} /> : rowComponentParam
+  const rowComponent = hasColumns
+    ? (_props) => <ContentRowCells {..._props} columns={columns} itemSelected={_props.selected} />
+    : rowComponentParam
 
   const rowHeaderComponent = hasColumns
     ? (_props) => <ContentHeaders {..._props} columns={columns} />
