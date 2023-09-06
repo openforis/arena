@@ -46,6 +46,7 @@ export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './sur
 export {
   fetchNodeDef,
   fetchNodeDefs,
+  moveNodeDef,
   putNodeDefProps,
   putNodeDefsProps,
   postNodeDef,

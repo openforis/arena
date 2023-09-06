@@ -415,6 +415,20 @@ export const cloneIntoEntityDef =
       isAnalysis(nodeDef)
     )
 
+export const changeParentEntity =
+  ({ targetParentNodeDef }) =>
+  (nodeDef) => {
+    const targetParentNodeDefUuid = getUuid(targetParentNodeDef)
+    return {
+      ...nodeDef,
+      [keys.parentUuid]: targetParentNodeDefUuid,
+      [keys.meta]: {
+        ...getMeta(nodeDef),
+        [metaKeys.h]: [...getMetaHierarchy(targetParentNodeDef), targetParentNodeDefUuid],
+      },
+    }
+  }
+
 // layout
 export const assocLayout = (layout) => ObjectUtils.setProp(propKeys.layout, layout)
 

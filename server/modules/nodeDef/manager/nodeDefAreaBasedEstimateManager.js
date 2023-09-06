@@ -33,11 +33,13 @@ const updateNodeDefAreaBasedEstimate = async ({ survey, nodeDef }, client = db) 
     areaBasedEstimatedOfNodeDef: nodeDef,
   })
   nodeDefAreaBasedEstimateUpdated = await NodeDefRepository.updateNodeDefProps(
-    surveyId,
-    NodeDef.getUuid(nodeDefAreaBasedEstimate),
-    NodeDef.getParentUuid(nodeDefAreaBasedEstimate),
-    NodeDef.getProps(nodeDefAreaBasedEstimateUpdated),
-    NodeDef.getPropsAdvanced(nodeDefAreaBasedEstimateUpdated),
+    {
+      surveyId,
+      nodeDefUuid: NodeDef.getUuid(nodeDefAreaBasedEstimate),
+      parentUuid: NodeDef.getParentUuid(nodeDefAreaBasedEstimate),
+      props: NodeDef.getProps(nodeDefAreaBasedEstimateUpdated),
+      propsAdvanced: NodeDef.getPropsAdvanced(nodeDefAreaBasedEstimateUpdated),
+    },
     client
   )
   return nodeDefAreaBasedEstimateUpdated
