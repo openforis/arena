@@ -1,12 +1,11 @@
 @import 'webapp/style/vars';
 
-.validation-report {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  
+.app-module > :first-child.validation-report {
+  overflow-y: hidden;
+
   .footer {
-    display: grid;
-    grid-template-columns: 8rem 1fr 8rem;
+    position: absolute;
+    bottom: 0;
   }
 
   .btn-csv-export {
