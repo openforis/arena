@@ -45,6 +45,7 @@ export const VisibleColumnsMenu = (props) => {
           ),
         }
       })}
+      label="common.table.visibleColumns"
       menuClassName="visible-columns-menu"
     />
   )
