@@ -1,5 +1,6 @@
 import './HeaderLeft.scss'
 import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
@@ -23,18 +24,8 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
-import { VisibleColumnsMenu } from './VisibleColumnsMenu'
 
-const HeaderLeft = ({
-  columns,
-  handleSearch,
-  search,
-  totalCount,
-  onRecordsUpdate,
-  selectedItems,
-  navigateToRecord,
-  onVisibleColumnsChange,
-}) => {
+const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
@@ -127,9 +118,17 @@ const HeaderLeft = ({
           label="common.export"
         />
       )}
-      <VisibleColumnsMenu columns={columns} onSelectionChange={onVisibleColumnsChange} />
     </div>
   )
+}
+
+HeaderLeft.propTypes = {
+  handleSearch: PropTypes.func.isRequired,
+  navigateToRecord: PropTypes.func.isRequired,
+  onRecordsUpdate: PropTypes.func.isRequired,
+  search: PropTypes.string,
+  selectedItems: PropTypes.array.isRequired,
+  totalCount: PropTypes.number.isRequired,
 }
 
 export default HeaderLeft

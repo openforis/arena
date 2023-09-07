@@ -36,8 +36,6 @@ const Records = () => {
 
   const columns = useColumns({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate })
 
-  const [visibleColumns, setVisibleColumns] = useState(columns)
-
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `30px 70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 80px`
 
@@ -46,26 +44,20 @@ const Records = () => {
     eventHandler: onRecordsUpdate,
   })
 
-  const onVisibleColumnsChange = useCallback(
-    (visibleColumnKeys) => {
-      setVisibleColumns(columns.filter((column) => visibleColumnKeys.includes(column.key)))
-    },
-    [columns]
-  )
-
   return (
     <Table
+      visibleColumnsSelectionEnabled
+      columns={columns}
       module="records/summary"
       restParams={{ cycle, recordsRequestedAt }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={HeaderLeft}
-      headerProps={{ columns, navigateToRecord, onRecordsUpdate, onVisibleColumnsChange }}
-      rowProps={{ onRecordsUpdate, navigateToRecord, categoryItemsByCodeDefUuid }}
+      headerProps={{ navigateToRecord, onRecordsUpdate }}
+      rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
       noItemsLabelKey="dataView.records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
       onRowDoubleClick={navigateToRecord}
-      columns={visibleColumns}
     />
   )
 }
