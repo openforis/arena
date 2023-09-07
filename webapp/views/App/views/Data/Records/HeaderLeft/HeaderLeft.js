@@ -23,8 +23,18 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
+import { VisibleColumnsMenu } from './VisibleColumnsMenu'
 
-const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selectedItems, navigateToRecord }) => {
+const HeaderLeft = ({
+  columns,
+  handleSearch,
+  search,
+  totalCount,
+  onRecordsUpdate,
+  selectedItems,
+  navigateToRecord,
+  onVisibleColumnsChange,
+}) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const i18n = useI18n()
@@ -41,6 +51,8 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
   const canExportRecordsSummary = useAuthCanExportRecordsList()
   const lastCycle = cycles[cycles.length - 1]
   const canCloneRecords = canAnalyzeRecords && cycles.length > 1 && cycle !== lastCycle
+
+  const selectedItemsCount = selectedItems.length
 
   const [state, setState] = useState({ recordsCloneModalOpen: false })
   const { recordsCloneModalOpen } = state
@@ -61,11 +73,11 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'dataView.records.confirmDeleteSelectedRecord',
-          params: { count: selectedItems.length },
+          params: { count: selectedItemsCount },
           onOk: onDeleteConfirm,
         })
       ),
-    [dispatch, selectedItems.length, onDeleteConfirm]
+    [dispatch, selectedItemsCount, onDeleteConfirm]
   )
 
   return (
@@ -90,7 +102,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
       {published && canUpdateRecordsStep && <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} />}
       {
         // Edit selected record
-        selectedItems.length === 1 && (
+        selectedItemsCount === 1 && (
           <ButtonIconEdit onClick={onSelectedRecordClick} title="dataView.editSelectedRecord" />
         )
       }
@@ -115,6 +127,7 @@ const HeaderLeft = ({ handleSearch, search, totalCount, onRecordsUpdate, selecte
           label="common.export"
         />
       )}
+      <VisibleColumnsMenu columns={columns} onSelectionChange={onVisibleColumnsChange} />
     </div>
   )
 }

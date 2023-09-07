@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { Button } from './Button'
 
 export const ButtonMenu = (props) => {
-  const { className, items, ...otherProps } = props
+  const { className, closeMenuOnItemClick, menuClassName, items, ...otherProps } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -17,13 +17,15 @@ export const ButtonMenu = (props) => {
     setAnchorEl(event.currentTarget)
   }
 
-  const onClose = () => {
+  const closeMenu = () => {
     setAnchorEl(null)
   }
 
   const onItemClick = (item) => () => {
     item.onClick?.()
-    onClose()
+    if (closeMenuOnItemClick) {
+      closeMenu()
+    }
   }
 
   const open = Boolean(anchorEl)
@@ -35,7 +37,7 @@ export const ButtonMenu = (props) => {
         <span className="icon icon-ctrl button-menu__button-icon" />
       </Button>
 
-      <Menu anchorEl={anchorEl} open={open} onClose={onClose}>
+      <Menu anchorEl={anchorEl} className={menuClassName} open={open} onClose={closeMenu}>
         {items.map((item) => (
           <MenuItem key={item.key} onClick={onItemClick(item)}>
             {item.content ? (
@@ -57,6 +59,7 @@ export const ButtonMenu = (props) => {
 
 ButtonMenu.propTypes = {
   ...Button.propTypes,
+  closeMenuOnItemClick: PropTypes.bool,
   items: PropTypes.arrayOf(
     PropTypes.shape({
       key: PropTypes.string.isRequired,
@@ -67,8 +70,10 @@ ButtonMenu.propTypes = {
       onClick: PropTypes.func,
     })
   ),
+  menuClassName: PropTypes.string,
 }
 
 ButtonMenu.defaultProps = {
   ...Button.defaultProps,
+  closeMenuOnItemClick: true,
 }
