@@ -2,6 +2,7 @@ export {
   surveyCreate,
   surveyDefsLoad,
   surveyDefsReset,
+  surveyDefsIndexUpdate,
   surveyDelete,
   surveyUpdate,
   surveyChainSave,

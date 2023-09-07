@@ -1,3 +1,5 @@
+import { SystemError as CoreSystemError } from '@openforis/arena-core'
+
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
@@ -81,8 +83,9 @@ export default class Job {
       if (!this.isFailed() && (this.isRunning() || this.isSucceeded())) {
         // Error found, change status only if not changed already
         this.logError(`${error.stack || error}`)
-        const errorKey = `appErrors.${error instanceof SystemError ? error.key : 'generic'}`
-        const errorParams = error instanceof SystemError ? error.params : { text: error.toString() }
+        const isSystemError = error instanceof SystemError || error instanceof CoreSystemError
+        const errorKey = `appErrors.${isSystemError ? error.key : 'generic'}`
+        const errorParams = isSystemError ? error.params : { text: error.toString() }
         this.addError({
           error: {
             valid: false,

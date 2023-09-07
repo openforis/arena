@@ -53,12 +53,12 @@ export const updateNodeDefTest = async () => {
 
   const newName = 'node_def_1_new'
   const nodeDef1Uuid = NodeDef.getUuid(nodeDef1)
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps({
     surveyId,
-    nodeDef1Uuid,
-    NodeDef.getParentUuid(nodeDef1),
-    { name: newName }
-  )
+    nodeDefUuid: nodeDef1Uuid,
+    parentUuid: NodeDef.getParentUuid(nodeDef1),
+    props: { name: newName },
+  })
   expect(NodeDef.getName(updatedNodeDef)).toBe(newName)
 
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, cycle: Survey.cycleOneKey, draft: true })

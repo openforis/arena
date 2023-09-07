@@ -1181,9 +1181,17 @@ E.g. this.region = region_attribute_name
       'This node cannot be converted to multiple because it has default values.',
     cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
     cloneDialog: {
+      confirmButtonLabel: 'Clone',
       title: 'Cloning node definition "{{nodeDefName}}"',
-      entityToCloneInto: 'Entity to clone into:',
+      entitySelectLabel: 'Entity to clone into:',
     },
+    moveDialog: {
+      confirmButtonLabel: 'Move',
+      title: 'Moving node definition "{{nodeDefName}}"',
+      entitySelectLabel: 'Entity to move into:',
+    },
+    movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
+    nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
   },
 
   languagesEditor: {
@@ -1215,6 +1223,7 @@ E.g. this.region = region_attribute_name
     schemaSummaryTitle: 'Export schema summary to CSV',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
+    move: `Move '{{nodeDefLabel}}'`,
     movePageUp: 'Move page up',
     movePageDown: 'Move page down',
     formEditActions: {
@@ -1657,6 +1666,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyHeaders: 'Empty headers found',
     },
     entryDataNotFound: 'Entry data not found: {{entryName}}',
+    expression: {
+      undefinedFunction: '$t(expression.undefinedFunction)',
+    },
     generic: 'Unexpected error: {{text}}',
     importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
     invalidType: 'Invalid type {{type}}',
