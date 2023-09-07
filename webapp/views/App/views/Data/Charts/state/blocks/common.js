@@ -11,6 +11,6 @@ export const valuesToCalculations = (values = [], join = '_') => {
   return {
     calculate: `${datumValues.join("+','+")}`,
     as: `${values.map((val) => val.name).join(join)}`,
-    key: `${values.map((val) => val.key).join(join)}`,
+    key: `${values.map((val) => val.source_uuid).join(join)}`,
   }
 }

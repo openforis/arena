@@ -12,8 +12,8 @@ import {
 export const renderBarChart = (data, specs, metricAggregationNames, groupByField, chartRef) => {
   d3.select(chartRef.current).select('svg').remove()
   const margin = { top: 80, right: 60, bottom: 50, left: 100 }
-  const width = 960 - margin.left - margin.right
-  const height = 500 - margin.top - margin.bottom
+  const width = chartRef.current.clientWidth - margin.left - margin.right
+  const height = chartRef.current.clientHeight - margin.top - margin.bottom
 
   const isMultiMetric = metricAggregationNames.length > 1
   const barMaxHeight = specs.chart.barMaxHeight ? parseInt(specs.chart.barMaxHeight, 10) : null

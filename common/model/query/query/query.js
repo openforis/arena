@@ -1,9 +1,7 @@
 import * as A from '@core/arena'
-
 import { ArrayUtils } from '@core/arrayUtils'
-
-import { keys, modes, displayTypes } from './keys'
 import { defaults } from './defaults'
+import { keys, modes, displayTypes } from './keys'
 
 export const DEFAULT_AGGREGATE_FUNCTIONS = {
   avg: 'avg',

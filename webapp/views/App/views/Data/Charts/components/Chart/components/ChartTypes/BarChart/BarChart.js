@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
-import { groupBy, map } from 'lodash'
-import { calculateAggregatedValues, getMetricAggregationPairs } from './utils/aggregation'
+import PropTypes from 'prop-types'
 import { renderBarChart } from './utils/render'
+import './BarChart.css'
 
 const BarChart = ({ specs, originalData }) => {
   const chartRef = useRef()
@@ -9,35 +9,53 @@ const BarChart = ({ specs, originalData }) => {
   useEffect(() => {
     if (!(specs && specs.query && specs.query.metric && specs.query.groupBy)) return
 
-    const metricAggregationPairs = getMetricAggregationPairs(specs.query.metric)
     const groupByField = specs.query.groupBy.field
 
-    if (!groupByField) {
-      console.error('groupByField cannot be null or undefined')
-      return
+    if (groupByField) {
+      let data
+      if (originalData && originalData.chartResult) {
+        data = originalData.chartResult.map((item) => ({
+          groupBy: item[groupByField],
+          [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]: parseFloat(
+            item[`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]
+          ),
+        }))
+      } else {
+        data = []
+      }
+
+      renderBarChart(
+        data,
+        specs,
+        [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`],
+        groupByField,
+        chartRef
+      )
     }
-
-    let data
-    if (originalData && originalData.chartResult) {
-      const groupedData = groupBy(originalData.chartResult, groupByField)
-
-      data = map(groupedData, (group, key) => {
-        const aggregatedValues = calculateAggregatedValues(group, metricAggregationPairs)
-
-        return {
-          groupBy: key,
-          ...aggregatedValues,
-        }
-      })
-    } else {
-      data = []
-    }
-
-    const metricAggregationNames = metricAggregationPairs.map((pair) => `${pair.field}_${pair.aggregation}`)
-    renderBarChart(data, specs, metricAggregationNames, groupByField, chartRef)
   }, [specs, originalData])
 
-  return <div ref={chartRef}></div>
+  return <div className="chart-container" ref={chartRef}></div>
+}
+
+BarChart.propTypes = {
+  specs: PropTypes.shape({
+    query: PropTypes.shape({
+      metric: PropTypes.shape({
+        field: PropTypes.string.isRequired,
+        aggregate: PropTypes.string,
+      }).isRequired,
+      groupBy: PropTypes.shape({
+        field: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
+  originalData: PropTypes.shape({
+    chartResult: PropTypes.arrayOf(
+      PropTypes.shape({
+        [PropTypes.string]: PropTypes.number,
+      })
+    ),
+  }),
 }
 
 export default React.memo(BarChart)

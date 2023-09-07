@@ -58,7 +58,6 @@ export const init = (app) => {
         query = Query.assocMeasures(measures)(query)
 
         query = Query.assocMode(mode)(query)
-        query = A.stringify(query)
       }
 
       const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, limit })
