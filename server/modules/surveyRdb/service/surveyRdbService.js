@@ -52,14 +52,13 @@ export const fetchViewData = async (params) => {
     addCycle = false,
   } = params
 
-  const parsedQuery = A.parse(query)
-  console.log('fetchViewData params:', params) // Log the input params
-  console.log('isModeAggregate:', Query.isModeAggregate(parsedQuery))
-
+  let parsedQuery = query
+  if (typeof query === 'string') {
+    parsedQuery = A.parse(query)
+  }
   const survey = await _fetchSurvey(surveyId, cycle)
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
-  console.log('Calling SurveyRdbManager.fetchViewData/Agg')
   const data = Query.isModeAggregate(parsedQuery)
     ? await SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, recordOwnerUuid, offset, limit, streamOutput })
     : await SurveyRdbManager.fetchViewData({
@@ -73,8 +72,6 @@ export const fetchViewData = async (params) => {
         streamOutput,
         addCycle,
       })
-
-  console.log('fetchViewData data:', data) // Log the data
 
   return data
 }

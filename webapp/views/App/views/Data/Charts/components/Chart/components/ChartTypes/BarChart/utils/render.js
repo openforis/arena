@@ -46,7 +46,7 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
   }
 
   const maxMetricValue = d3.max(data, (d) => d3.max(metricAggregationNames, (metric) => d[metric]))
-  if (barMaxHeight && !isNaN(barMaxHeight)) {
+  if (barMaxHeight) {
     yScale.domain([0, Math.min(maxMetricValue, barMaxHeight)])
   } else {
     yScale.domain([0, maxMetricValue])
@@ -81,11 +81,11 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
     renderSingleMetricBars(svg, data, metricAggregationNames, xScale, yScale, colorScale, height, tooltip, isHorizontal)
   }
 
-  if (specs.chart?.showTitle) {
+  if (specs.chart.showTitle) {
     renderTitle(svg, width, specs.chart.title, specs.chart.titleSize || 16)
   }
 
-  if (isMultiMetric && specs.chart?.showLegend) {
+  if (isMultiMetric && specs.chart.showLegend) {
     renderLegend(svg, metricAggregationNames, colorScale, width)
   }
 }

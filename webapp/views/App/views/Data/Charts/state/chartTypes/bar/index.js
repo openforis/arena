@@ -40,14 +40,11 @@ const bar = {
             },
           }),
           metric: MetricBlock({
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+            valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
               const transform = valuesToCalculations(columnValues, '-')
               const aggTransform = valuesToCalculations(aggregationValues, '-')
-
-              const aggValues = configItemsByPath['query.groupBy']?.value
-              const aggs = aggValues?.map((val) => val.value)
 
               const metric = {
                 field: transform.as,
@@ -91,7 +88,7 @@ const bar = {
             defaultValue: false,
           }),
           title: TitleBlock({
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+            valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
@@ -170,7 +167,7 @@ const bar = {
             id: 'xAxis',
             title: 'Name of the X axis',
             subtitle: 'Write here the name of the X axis',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+            valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
@@ -185,7 +182,7 @@ const bar = {
             id: 'yAxis',
             title: 'Name of the Y axis',
             subtitle: 'Write here the name of the Y axis',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+            valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {

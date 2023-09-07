@@ -36,7 +36,6 @@ export const init = (app) => {
       const chartSpec = A.parse(chart)
 
       let query = A.parse(queryParam)
-      console.log('Initial query:', query) // Log initial query
 
       const limit = chartSpec.chartType === 'scatterPlot' ? 10000 : null
 
@@ -55,25 +54,18 @@ export const init = (app) => {
             [metricFieldUuid]: [aggregateFunction],
           })
         )
-        console.log('measures:', measures) // Log measures as a Map object
-        console.log('aggregateFunction:', aggregateFunction)
-        console.log('metricFieldUuid:', metricFieldUuid)
+
         query = Query.assocMeasures(measures)(query)
 
         query = Query.assocMode(mode)(query)
         query = A.stringify(query)
-        console.log('string query', query)
       }
 
-      console.log('Modified query:', query) // Log modified query
-
       const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, limit })
-      console.log('Data stats: Number of items =', data.length, ', Number of columns =', Object.keys(data[0]).length) // Log stats of the data
 
       const chartResult = await generateChart({ chartSpec, data })
       res.json({ chartResult })
     } catch (error) {
-      console.error('Error:', error)
       next(error)
     }
   })

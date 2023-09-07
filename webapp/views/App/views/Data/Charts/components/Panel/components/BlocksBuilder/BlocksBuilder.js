@@ -22,7 +22,7 @@ const RenderByType = {
 }
 
 const BaseBlock = () => <div></div>
-const BlocksBuilder = ({ config, configItemsByPath, configActions, visible, dimensions, blockPath = '' }) => {
+const BlocksBuilder = ({ config, configItemsByPath, configActions, dimensions, visible = true, blockPath = '' }) => {
   const builderBlocks = chartsConfig?.[config.type]?.builderBlocks
   return (
     <div className={`blocks-builder ${visible ? 'visible' : ''}`}>
@@ -54,9 +54,16 @@ const BlocksBuilder = ({ config, configItemsByPath, configActions, visible, dime
 }
 
 BlocksBuilder.propTypes = {
-  visible: PropTypes.bool.isRequired,
-
+  visible: PropTypes.bool,
   dimensions: PropTypes.arrayOf(PropTypes.any),
+  config: PropTypes.shape({
+    type: PropTypes.string,
+  }).isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.shape({
+    changeType: PropTypes.func,
+  }).isRequired,
+  blockPath: PropTypes.string,
 }
 
 export default BlocksBuilder

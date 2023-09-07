@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 import * as d3 from 'd3'
-import { processData } from './utils/processData'
+import PropTypes from 'prop-types'
+import React, { useEffect, useRef } from 'react'
+import './ScatterPlot.css'
 import { createLegend } from './utils/legend'
+import { processData } from './utils/processData'
 
 const ScatterPlot = ({ specs, originalData }) => {
   const { data, xField, yField } = processData(originalData, specs)
@@ -29,8 +30,8 @@ const ScatterPlot = ({ specs, originalData }) => {
 
     // Margins and sizes from the specs
     const margin = { top: 50, right: 100, bottom: 50, left: 60 }
-    const width = 960 - margin.left - margin.right
-    const height = 500 - margin.top - margin.bottom
+    const width = chartRef.current.clientWidth - margin.left - margin.right
+    const height = chartRef.current.clientHeight - margin.top - margin.bottom
 
     const svg = d3
       .select(chartRef.current)
@@ -149,19 +150,8 @@ const ScatterPlot = ({ specs, originalData }) => {
   }
 
   return (
-    <div>
-      <div ref={chartRef} />
-      <div
-        id="tooltip"
-        style={{
-          position: 'absolute',
-          visibility: 'hidden',
-          backgroundColor: 'white',
-          padding: '10px',
-          border: '1px solid black',
-          borderRadius: '5px',
-        }}
-      ></div>
+    <div className="chart-container" ref={chartRef}>
+      <div id="tooltip"></div>
     </div>
   )
 }
