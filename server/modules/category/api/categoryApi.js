@@ -267,7 +267,12 @@ export const init = (app) => {
       try {
         const { surveyId, categoryUuid, levelIndex, draft } = Request.getParams(req)
 
-        const items = await CategoryService.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft })
+        const items = await CategoryService.fetchItemsByLevelIndex({
+          surveyId,
+          categoryUuid,
+          levelIndex: Number(levelIndex),
+          draft,
+        })
 
         res.json({ items })
       } catch (error) {

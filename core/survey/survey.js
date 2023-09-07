@@ -188,6 +188,7 @@ export const {
   addNodeDefsDependencies,
   getDependencyGraph,
   getNodeDefDependencies,
+  getNodeDefDependentsUuids,
   hasDependencyGraph,
   isNodeDefDependentOn,
   removeNodeDefDependencies,

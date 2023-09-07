@@ -163,6 +163,28 @@ export const init = (app) => {
     }
   })
 
+  app.put(
+    '/survey/:surveyId/nodeDef/:nodeDefUuid/move',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, nodeDefUuid, targetParentNodeDefUuid } = Request.getParams(req)
+
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.moveNodeDef({
+          user,
+          surveyId,
+          nodeDefUuid,
+          targetParentNodeDefUuid,
+        })
+
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // ==== DELETE
 
   app.delete('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
