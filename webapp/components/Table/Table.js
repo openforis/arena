@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
 
+import LoadingBar from '../LoadingBar'
+
 import Header from './Header'
 import Content from './Content'
+import { Footer } from './Footer'
 import { useTable } from './useTable'
-import LoadingBar from '../LoadingBar'
 
 const Table = (props) => {
   const {
@@ -105,6 +107,7 @@ const Table = (props) => {
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
       />
+      <Footer offset={offset} list={list} limit={limit} count={count} />
     </div>
   )
 }
