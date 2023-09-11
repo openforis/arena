@@ -5,7 +5,6 @@ import useChartConfig from './useChartConfig'
 import useChartRender from './useChartRender'
 
 const useChart = (query, table, setTable) => {
-  console.log('useChart query', query)
   const [draft, setDraft] = useState(null)
 
   const { config, configItemsByPath, configActions } = useChartConfig({ table, setTable })

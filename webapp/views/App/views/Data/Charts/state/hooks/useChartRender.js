@@ -10,7 +10,6 @@ const getUrl = ({ surveyId, query }) => `/api/reporting/${surveyId}/${Query.getE
 const useChartRender = (spec, query) => {
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  console.log('query', query)
 
   const [chartData, setChartData] = useState(null)
 
@@ -20,18 +19,12 @@ const useChartRender = (spec, query) => {
       setChartData(null)
 
       const apiUrl = getUrl({ surveyId, query })
-      console.log('API Endpoint:', apiUrl) // Log constructed API endpoint
-
-      console.log('Sending request with spec:', spec)
-      console.log('Sending request with query :', query)
-
       const { data } = await axios.post(apiUrl, {
         cycle,
         query: A.stringify(query),
         chart: A.stringify(spec),
       })
 
-      console.log('Received data:', data)
       setChartData(data)
     } catch (err) {
       console.error('Error occurred:', err.response ? err.response.data : err.message)

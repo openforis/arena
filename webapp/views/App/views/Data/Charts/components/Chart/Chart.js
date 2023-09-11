@@ -14,12 +14,7 @@ const Chart = ({ data, specs, draft, renderChart, fullScreen }) => {
   const ChartComponent = chartType === 'scatterPlot' ? ScatterPlot : BarChart
 
   if (!hasData) {
-    console.warn('Chart Component - No data provided.')
     return null
-  }
-
-  if (draft) {
-    console.log('Chart Component - Rendering in draft state.')
   }
 
   return (
