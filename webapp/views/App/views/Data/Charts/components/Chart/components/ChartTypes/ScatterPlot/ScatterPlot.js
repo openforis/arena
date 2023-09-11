@@ -73,7 +73,7 @@ const ScatterPlot = ({ specs, originalData }) => {
       .domain(categories)
       .range(categories.map((value, i) => shapeSymbols[i % shapeSymbols.length]))
     // Draw points on the graph
-    drawPoints(svg, data, xScale, yScale, symbolGenerator, dotSize, colorScale, shapeScale, xField, yField)
+    drawPoints(svg, data, { xScale, yScale, symbolGenerator, dotSize, colorScale, shapeScale, xField, yField })
 
     // Append x axis title
     appendAxisTitle(svg, width, height, margin, axisSize, xAxisTitle, yAxisTitle)
@@ -146,7 +146,8 @@ const ScatterPlot = ({ specs, originalData }) => {
       .style('font-size', ticksSize + 'px')
   }
 
-  const drawPoints = (svg, data, xScale, yScale, symbolGenerator, dotSize, colorScale, shapeScale, xField, yField) => {
+  const drawPoints = (svg, data, charSpecs) => {
+    const { xScale, yScale, symbolGenerator, dotSize, colorScale, shapeScale, xField, yField } = charSpecs
     svg
       .selectAll('.dot')
       .data(data)

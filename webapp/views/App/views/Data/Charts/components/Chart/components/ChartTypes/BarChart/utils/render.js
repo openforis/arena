@@ -49,19 +49,21 @@ const setupChart = (data, specs, metricAggregationNames, chartRef) => {
   return { width, height, svg, tooltip, xScale, yScale, colorScale, isHorizontal, isMultiMetric }
 }
 
-const renderBars = (
-  isMultiMetric,
-  specs,
-  svg,
-  data,
-  metricAggregationNames,
-  xScale,
-  yScale,
-  colorScale,
-  height,
-  tooltip,
-  isHorizontal
-) => {
+const renderBars = (params) => {
+  const {
+    isMultiMetric,
+    specs,
+    svg,
+    data,
+    metricAggregationNames,
+    xScale,
+    yScale,
+    colorScale,
+    height,
+    tooltip,
+    isHorizontal,
+  } = params
+
   if (isMultiMetric) {
     if (specs.chart.stackedBars) {
       renderStackedBars(svg, data, metricAggregationNames, { xScale, yScale }, colorScale, tooltip, isHorizontal)
@@ -119,7 +121,7 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
     isHorizontal
   )
 
-  renderBars(
+  renderBars({
     isMultiMetric,
     specs,
     svg,
@@ -130,8 +132,8 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
     colorScale,
     height,
     tooltip,
-    isHorizontal
-  )
+    isHorizontal,
+  })
 
   if (specs.chart.showTitle) {
     renderTitle(svg, width, specs.chart.title, specs.chart.titleSize || 16)
