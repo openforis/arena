@@ -1,6 +1,6 @@
 import './nodeDefTaxon.scss'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -28,7 +28,19 @@ const selectionDefault = {
 }
 
 const NodeDefTaxon = (props) => {
-  const { surveyId, nodeDef, taxonomyUuid, node, edit, draft, renderType, canEditRecord, readOnly, updateNode } = props
+  const {
+    surveyId,
+    nodeDef,
+    node,
+    parentNode,
+    edit,
+    draft,
+    renderType,
+    canEditRecord,
+    readOnly,
+    updateNode,
+    entryDataQuery,
+  } = props
 
   const [selection, setSelection] = useState(selectionDefault)
   const elementRef = useRef(null)
@@ -36,9 +48,9 @@ const NodeDefTaxon = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const taxonRefData = edit ? null : NodeRefData.getTaxon(node)
-  const visibleFields = NodeDef.getVisibleFields(nodeDef)
+  const visibleFields = useMemo(() => NodeDef.getVisibleFields(nodeDef), [nodeDef])
 
-  const updateSelectionFromNode = () => {
+  const updateSelectionFromNode = useCallback(() => {
     const unlisted = taxonRefData && Taxon.isUnlistedTaxon(taxonRefData)
     const selectionUpdate = taxonRefData
       ? {
@@ -49,57 +61,65 @@ const NodeDefTaxon = (props) => {
       : selectionDefault
 
     setSelection(selectionUpdate)
-  }
+  }, [node, taxonRefData])
 
-  const updateNodeValue = (nodeValue, taxon = null) =>
-    updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
+  const updateNodeValue = useCallback(
+    (nodeValue, taxon = null) => updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon }),
+    [node, nodeDef, updateNode]
+  )
 
-  const onChangeTaxon = (selectedTaxon) => {
-    if (
-      selectedTaxon &&
-      (!Taxon.isEqual(selectedTaxon)(taxonRefData) ||
-        Taxon.getVernacularNameUuid(selectedTaxon) !== Taxon.getVernacularNameUuid(taxonRefData))
-    ) {
-      const nodeValue = {
-        [taxonUuid]: Taxon.getUuid(selectedTaxon),
-      }
-      if (Taxon.isUnlistedTaxon(selectedTaxon)) {
-        if (selection[scientificName]) {
-          nodeValue[scientificName] = selection[scientificName]
+  const onChangeTaxon = useCallback(
+    (selectedTaxon) => {
+      if (
+        selectedTaxon &&
+        (!Taxon.isEqual(selectedTaxon)(taxonRefData) ||
+          Taxon.getVernacularNameUuid(selectedTaxon) !== Taxon.getVernacularNameUuid(taxonRefData))
+      ) {
+        const nodeValue = {
+          [taxonUuid]: Taxon.getUuid(selectedTaxon),
         }
-        if (selection[vernacularName]) {
-          nodeValue[vernacularName] = selection[vernacularName]
+        if (Taxon.isUnlistedTaxon(selectedTaxon)) {
+          if (selection[scientificName]) {
+            nodeValue[scientificName] = selection[scientificName]
+          }
+          if (selection[vernacularName]) {
+            nodeValue[vernacularName] = selection[vernacularName]
+          }
         }
-      }
-      if (Taxon.getVernacularNameUuid(selectedTaxon)) {
-        nodeValue[vernacularNameUuid] = Taxon.getVernacularNameUuid(selectedTaxon)
-      }
+        if (Taxon.getVernacularNameUuid(selectedTaxon)) {
+          nodeValue[vernacularNameUuid] = Taxon.getVernacularNameUuid(selectedTaxon)
+        }
 
-      updateNodeValue(nodeValue, selectedTaxon)
-    } else {
-      // Reset to last node value
-      updateSelectionFromNode()
-    }
-  }
+        updateNodeValue(nodeValue, selectedTaxon)
+      } else {
+        // Reset to last node value
+        updateSelectionFromNode()
+      }
+    },
+    [selection, taxonRefData, updateNodeValue, updateSelectionFromNode]
+  )
 
-  const onChangeSelectionField = (field, value) => {
-    if (StringUtils.isBlank(value)) {
-      if (Node.isValueBlank(node)) {
-        setSelection(selectionDefault)
-      } else if (field === vernacularName && selection[code] === Taxon.unlistedCode) {
-        // If current code is UNL and vernacular name is reset, do not clear node value
+  const onChangeSelectionField = useCallback(
+    (field, value) => {
+      if (StringUtils.isBlank(value)) {
+        if (Node.isValueBlank(node)) {
+          setSelection(selectionDefault)
+        } else if (field === vernacularName && selection[code] === Taxon.unlistedCode) {
+          // If current code is UNL and vernacular name is reset, do not clear node value
+          updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
+        } else {
+          // Clear node value
+          updateNodeValue({})
+        }
+      } else if (field !== code && selection[code] === Taxon.unlistedCode) {
+        // If input field is not code and current code is UNL, update node value field
         updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
       } else {
-        // Clear node value
-        updateNodeValue({})
+        setSelection({ ...selectionDefault, [field]: value })
       }
-    } else if (field !== code && selection[code] === Taxon.unlistedCode) {
-      // If input field is not code and current code is UNL, update node value field
-      updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
-    } else {
-      setSelection({ ...selectionDefault, [field]: value })
-    }
-  }
+    },
+    [node, selection, taxonRefData, updateNodeValue]
+  )
 
   if (!edit) {
     useEffect(() => {
@@ -125,8 +145,10 @@ const NodeDefTaxon = (props) => {
             id={TestId.surveyForm.taxonField(NodeDef.getName(nodeDef), field)}
             key={field}
             surveyId={surveyId}
-            taxonomyUuid={taxonomyUuid}
+            nodeDef={nodeDef}
+            parentNode={parentNode}
             edit={edit}
+            entryDataQuery={entryDataQuery}
             draft={draft}
             canEditRecord={canEditRecord}
             readOnly={readOnly}

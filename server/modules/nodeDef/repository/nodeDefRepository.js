@@ -203,18 +203,22 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
 
 // ============== UPDATE
 
-export const updateNodeDefProps = async (surveyId, nodeDefUuid, parentUuid, props, propsAdvanced = {}, client = DB) =>
+export const updateNodeDefProps = async (
+  { surveyId, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, meta = {} },
+  client = DB
+) =>
   client.one(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
         props_advanced_draft = props_advanced_draft || $2::jsonb,
         parent_uuid = $3,
+        meta = meta || $4::jsonb,
         date_modified = ${DbUtils.now}
-    WHERE uuid = $4
+    WHERE uuid = $5
     RETURNING ${nodeDefSelectFields}
   `,
-    [props, propsAdvanced, parentUuid, nodeDefUuid],
+    [props, propsAdvanced, parentUuid, meta, nodeDefUuid],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
 
@@ -320,6 +324,18 @@ export const publishNodeDefsProps = async (surveyId, client = DB) =>
       props_advanced_draft = '{}'::jsonb
     `)
 
+// UNPUBLISH
+export const unpublishNodeDefsProps = async (surveyId, client = DB) =>
+  client.query(`
+  UPDATE
+    ${getSurveyDBSchema(surveyId)}.node_def
+  SET
+    props_draft = props || props_draft,
+    props = '{}'::jsonb,
+    props_advanced_draft = props_advanced || props_advanced_draft,
+    props_advanced = '{}'::jsonb
+  `)
+
 // ============== DELETE
 
 export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => {
@@ -358,6 +374,23 @@ export const permanentlyDeleteNodeDefs = async (surveyId, client = DB) =>
         WHERE
           deleted = true
     `)
+
+export const deleteOrphaneNodeDefs = async (surveyId, client = DB) =>
+  client.query(`
+        DELETE
+        FROM
+          ${getSurveyDBSchema(surveyId)}.node_def
+        WHERE
+          analysis = true AND (
+            parent_uuid IS NULL 
+            OR 
+            ((props_advanced || props_advanced_draft) ->> '${
+              NodeDef.keysPropsAdvanced.areaBasedEstimatedOf
+            }')::uuid NOT IN (
+              SELECT uuid FROM ${getSurveyDBSchema(surveyId)}.node_def
+            )
+          )
+      `)
 
 export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
   client.query(`

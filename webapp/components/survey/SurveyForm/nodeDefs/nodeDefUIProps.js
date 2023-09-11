@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import { valuePropsTaxon } from '@core/survey/nodeValueProps'
+import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
 
 import { NumberFormats } from '@webapp/components/form/Input'
 
@@ -74,10 +74,14 @@ const propsUI = {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left" />,
     defaultValue: { x: '', y: '', srs: '' },
-    formFields: [
-      { field: 'x', labelKey: 'surveyForm.nodeDefCoordinate.x' },
-      { field: 'y', labelKey: 'surveyForm.nodeDefCoordinate.y' },
-      { field: 'srs', labelKey: 'common.srs' },
+    formFieldsFn: (nodeDef) => [
+      { field: valuePropsCoordinate.x, labelKey: 'surveyForm.nodeDefCoordinate.x' },
+      { field: valuePropsCoordinate.y, labelKey: 'surveyForm.nodeDefCoordinate.y' },
+      { field: valuePropsCoordinate.srs, labelKey: 'common.srs' },
+      ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
+        field,
+        labelKey: `surveyForm.nodeDefCoordinate.${field}`,
+      })),
     ],
   },
 
@@ -88,7 +92,7 @@ const propsUI = {
       taxonUuid: null,
       vernacularNameUuid: null,
     },
-    formFields: [
+    formFieldsFn: () => [
       { field: valuePropsTaxon.code, labelKey: 'common.code', tableColumnFlex: 2 },
       {
         field: valuePropsTaxon.scientificName,
@@ -135,7 +139,10 @@ export const getNumberFormat = (nodeDef) =>
 
 export const getComponent = getProp('component', NodeDefText)
 
-export const getFormFields = getProp('formFields', ['field'])
+export const getFormFields = (nodeDef) => {
+  const getFieldsFn = getProp('formFieldsFn')(nodeDef)
+  return getFieldsFn ? getFieldsFn(nodeDef) : ['field']
+}
 
 export const getFormFieldsLength = (nodeDef) => getFormFields(nodeDef).length
 

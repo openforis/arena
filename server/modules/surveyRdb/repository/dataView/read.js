@@ -36,18 +36,20 @@ const columnTransformByNodeDefType = {
     // transform not applied
     return namesFull
   },
-  [NodeDef.nodeDefType.coordinate]: ({ nameFull, alias, streamMode }) => {
-    const srsIdValue = `ST_SRID(${nameFull})`
-    const xValue = `ST_X(${nameFull})`
-    const yValue = `ST_Y(${nameFull})`
-    return [
-      ...(streamMode
-        ? []
-        : [`'SRID=EPSG:' || ${srsIdValue} || ';POINT(' || ${xValue} || ' ' || ${yValue} || ')' AS ${alias}`]),
-      `${xValue} AS ${alias}_x`,
-      `${yValue} AS ${alias}_y`,
-      `${srsIdValue} AS ${alias}_srs`,
-    ]
+  [NodeDef.nodeDefType.coordinate]: ({ viewAlias, names, nameFull, alias, streamMode }) => {
+    const result = names
+      .filter((colName) => colName !== alias || !streamMode) // include default column only when not in reading stream mode (e.g. in data explorer)
+      .map((colName) => {
+        if (colName === alias) {
+          // not in stream mode: read default column as a geometry point string
+          const srsIdValue = `ST_SRID(${nameFull})`
+          const xValue = `ST_X(${nameFull})`
+          const yValue = `ST_Y(${nameFull})`
+          return `'SRID=EPSG:' || ${srsIdValue} || ';POINT(' || ${xValue} || ' ' || ${yValue} || ')' AS ${alias}`
+        }
+        return `${viewAlias}.${colName} AS ${colName}`
+      })
+    return result
   },
   [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${alias}`],
   [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
@@ -57,11 +59,11 @@ const _selectsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const { name: alias, nameFull, namesFull } = columnNodeDef
+    const { name: alias, names, nameFull, namesFull } = columnNodeDef
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
-      return columnTransform({ streamMode, nameFull, namesFull, alias })
+      return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
     }
     return namesFull
   }
@@ -317,7 +319,9 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
-      const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
+      const colValue = DataCol.getValue(survey, nodeDefUnique, nodeUnique)
+      const colValueString = R.isNil(colValue) ? null : String(colValue)
+      const value = Expression.newLiteral(colValueString)
 
       const condition = Expression.newBinary({
         left: identifier,

@@ -17,15 +17,36 @@ const CoordinateProps = (props) => {
   const nodeDef = State.getNodeDef(state)
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinate')}>
-      <div className="form-item_body checkbox-with-info">
-        <ButtonIconInfo title="nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinateInfo" />
-        <Checkbox
-          checked={NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)}
-          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.allowOnlyDeviceCoordinate, value })}
-        />
-      </div>
-    </FormItem>
+    <>
+      <FormItem label={i18n.t('nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinate')}>
+        <div className="form-item_body checkbox-with-info">
+          <ButtonIconInfo title="nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinateInfo" />
+          <Checkbox
+            checked={NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)}
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.allowOnlyDeviceCoordinate, value })}
+          />
+        </div>
+      </FormItem>
+      <FormItem label={i18n.t('nodeDefEdit.additionalFields')}>
+        <div className="display-flex">
+          <Checkbox
+            checked={NodeDef.isAccuracyIncluded(nodeDef)}
+            label="surveyForm.nodeDefCoordinate.accuracy"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAccuracy, value })}
+          />
+          <Checkbox
+            checked={NodeDef.isAltitudeIncluded(nodeDef)}
+            label="surveyForm.nodeDefCoordinate.altitude"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitude, value })}
+          />
+          <Checkbox
+            checked={NodeDef.isAltitudeAccuracyIncluded(nodeDef)}
+            label="surveyForm.nodeDefCoordinate.altitudeAccuracy"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitudeAccuracy, value })}
+          />
+        </div>
+      </FormItem>
+    </>
   )
 }
 

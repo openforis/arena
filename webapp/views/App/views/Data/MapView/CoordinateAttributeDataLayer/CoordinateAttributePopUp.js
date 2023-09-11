@@ -19,7 +19,7 @@ import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
-import { useElevation } from '../common/useElevation'
+import { useAltitude } from '../common/useAltitude'
 import { useI18n } from '@webapp/store/system'
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -63,7 +63,7 @@ export const CoordinateAttributePopUp = (props) => {
   const [open, setOpen] = useState(false)
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
-  const elevation = useElevation({ survey, point: pointLatLong, active: open })
+  const altitude = useAltitude({ survey, point: pointLatLong, active: open })
 
   const onRemove = useCallback(() => {
     setOpen(false)
@@ -109,7 +109,7 @@ export const CoordinateAttributePopUp = (props) => {
 * **X**: ${point.x}
 * **Y**: ${point.y}
 * **SRS**: ${point.srs}
-* **${i18n.t('mapView.elevation')}**: ${elevation}`
+* **${i18n.t('mapView.altitude')}**: ${altitude}`
 
   return (
     <Popup

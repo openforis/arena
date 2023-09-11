@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -7,6 +7,7 @@ import classNames from 'classnames'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
 import * as Node from '@core/record/node'
 
 import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
@@ -21,6 +22,8 @@ const NodeDefEntityFormGrid = (props) => {
 
   const dispatch = useDispatch()
 
+  const gridRef = useRef(null)
+
   const survey = useSelector(SurveyState.getSurvey)
   const cycle = useSelector(SurveyState.getSurveyCycleKey)
 
@@ -29,6 +32,15 @@ const NodeDefEntityFormGrid = (props) => {
   const mountedRef = useIsMountedRef({ delay: 200 })
 
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const nodeUuid = Node.getUuid(node)
+
+  // on node change, scroll inner container to top
+  useEffect(() => {
+    const innerContainer = gridRef.current?.elementRef?.current
+    if (innerContainer) {
+      innerContainer.scrollTop = 0
+    }
+  }, [nodeUuid])
 
   const onChangeLayout = (layout) => {
     if (window.innerWidth >= 480 && layout.length > 0) {
@@ -50,7 +62,19 @@ const NodeDefEntityFormGrid = (props) => {
     : nodeDefsInnerPage
 
   const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
-  const rdgLayout = entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal
+  const rdgLayout = (entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal).map(
+    (gridItem) => {
+      const { i: gridItemNodeDefUuid } = gridItem
+
+      const gridItemNodeDef = gridItemNodeDefUuid ? Survey.getNodeDefByUuid(gridItemNodeDefUuid)(survey) : null
+      if (!gridItemNodeDef) return gridItem
+
+      // calculate min and max height at runtime in case we change them in the future
+      const minH = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef: gridItemNodeDef })
+      const maxH = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: gridItemNodeDef })
+      return { ...gridItem, minH, maxH }
+    }
+  )
 
   if (nodeDefsInnerPage.length === 0) return null
 
@@ -70,6 +94,7 @@ const NodeDefEntityFormGrid = (props) => {
       className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
       onDragStop={onChangeLayout}
       onResizeStop={onChangeLayout}
+      ref={gridRef}
       useCSSTransforms={false}
     >
       {visibleNodeDefsInnerPage.map((childDef) => (

@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
@@ -147,6 +149,8 @@ export const assocCreated = R.assoc(keys.created)
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
 
+export const assocDateModified = R.assoc(keys.dateModified)
+
 //
 // ======
 // UTILS
@@ -187,11 +191,24 @@ export const getCoordinateY = (node) => _getValuePropNumber({ node, prop: valueP
 export const getCoordinateSrs = (node, defaultValue = null) =>
   _getValuePropRaw(valuePropsCoordinate.srs, defaultValue)(node)
 
-export const newNodeValueCoordinate = ({ x, y, srsId }) => ({
-  [valuePropsCoordinate.x]: x,
-  [valuePropsCoordinate.y]: y,
-  [valuePropsCoordinate.srs]: srsId,
-})
+export const newNodeValueCoordinate = ({
+  x,
+  y,
+  srsId,
+  accuracy = undefined,
+  altitude = undefined,
+  altitudeAccuracy = undefined,
+}) => {
+  const result = {
+    [valuePropsCoordinate.x]: x,
+    [valuePropsCoordinate.y]: y,
+    [valuePropsCoordinate.srs]: srsId,
+  }
+  if (!Objects.isEmpty(accuracy)) result[valuePropsCoordinate.accuracy] = accuracy
+  if (!Objects.isEmpty(altitude)) result[valuePropsCoordinate.altitude] = altitude
+  if (!Objects.isEmpty(altitudeAccuracy)) result[valuePropsCoordinate.altitudeAccuracy] = altitudeAccuracy
+  return result
+}
 
 // Date
 const _getDatePart = (index) =>

@@ -33,6 +33,8 @@ describe('CollectExpressionConverter Test', () => {
     { q: '$this', r: 'this' },
     { q: '$this < 10 and $this > 0', r: 'this < 10 && this > 0' },
     { q: '$this >= 1 and $this < 20', r: 'this >= 1 && this < 20' },
+    { q: '$context', r: '$context' },
+    { q: '$context/cluster_id', r: '$context.cluster_id' },
     // not function
     { q: 'not(cluster_accessible)', r: '!(cluster_accessible)' },
     { q: 'not($this)', r: '!(this)', n: 'cluster_accessible' },

@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as SurveyCycle from '../surveyCycle'
 import * as Validator from '../../validation/validator'
 import * as Validation from '../../validation/validation'
@@ -9,7 +11,7 @@ import * as DateUtils from '../../dateUtils'
 
 const MAX_CYCLES = 10
 
-const _validateDate = errorMessageKey => (propName, obj) => {
+const _validateDate = (errorMessageKey) => (propName, obj) => {
   const value = obj[propName]
   return value && !DateUtils.isValidDateInFormat(value, SurveyCycle.dateFormat)
     ? ValidationResult.newInstance(errorMessageKey)
@@ -24,21 +26,21 @@ const _validateDateIsBefore = (dateStr, dateToCompareStr, errorMessageKey) => {
   const date = DateUtils.parse(dateStr, SurveyCycle.dateFormat)
   const dateToCompare = DateUtils.parse(dateToCompareStr, SurveyCycle.dateFormat)
 
-  return DateUtils.isBefore(date, dateToCompare) ? null : ValidationResult.newInstance(errorMessageKey)
+  return Dates.isBefore(date, dateToCompare) ? null : ValidationResult.newInstance(errorMessageKey)
 }
 
 const _validateCycleStartDateBeforeEndDate = (propName, item) =>
   _validateDateIsBefore(
     SurveyCycle.getDateStart(item),
     SurveyCycle.getDateEnd(item),
-    Validation.messageKeys.surveyInfoEdit.cycleDateStartBeforeDateEnd,
+    Validation.messageKeys.surveyInfoEdit.cycleDateStartBeforeDateEnd
   )
 
-const _validateDateStartAfterPrevDateEnd = cyclePrev => (propName, item) =>
+const _validateDateStartAfterPrevDateEnd = (cyclePrev) => (propName, item) =>
   _validateDateIsBefore(
     SurveyCycle.getDateEnd(cyclePrev),
     SurveyCycle.getDateStart(item),
-    Validation.messageKeys.surveyInfoEdit.cycleDateStartAfterPrevDateEnd,
+    Validation.messageKeys.surveyInfoEdit.cycleDateStartAfterPrevDateEnd
   )
 
 const _cycleValidators = (cyclePrev, isLast) => ({
@@ -57,7 +59,7 @@ const _cycleValidators = (cyclePrev, isLast) => ({
   ],
 })
 
-export const validateCycles = async cycles => {
+export const validateCycles = async (cycles) => {
   const cyclesArray = R.values(cycles)
   const cyclesSize = cyclesArray.length
 

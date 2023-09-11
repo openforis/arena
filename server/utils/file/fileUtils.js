@@ -10,12 +10,21 @@ import { uuidv4 } from '../../../core/uuid'
 export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
 
 export const rmdir = async (path) => {
-  if (existsDir(path)) {
-    await promises.rmdir(path, { recursive: true })
+  if (exists(path)) {
+    await promises.rm(path, { recursive: true })
   }
 }
 
-export const existsDir = (path) => fs.existsSync(path)
+export const exists = (path) => fs.existsSync(path)
+
+export const canReadWritePath = (path) => {
+  try {
+    fs.accessSync(path, fs.constants.R_OK | fs.constants.W_OK)
+    return true
+  } catch (e) {
+    return false
+  }
+}
 
 export const copyDir = ({ source, destination }) => ncp(source, destination)
 
@@ -24,6 +33,8 @@ export { join, sep }
 // ====== FILE
 
 export const readFile = async (path) => promises.readFile(path, { encoding: 'utf8' })
+
+export const readBinaryFile = async (path) => promises.readFile(path)
 
 export const writeFile = async (path, data = '') => promises.writeFile(path, data)
 
@@ -46,6 +57,7 @@ export const getFileExtension = (file) => {
 }
 
 export const deleteFile = (path) => fs.unlinkSync(path)
+export const deleteFileAsync = (path) => promises.unlink(path)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`

@@ -123,6 +123,9 @@ class RecordsUpdateThread extends Thread {
       case RecordsUpdateThreadMessageTypes.recordInit:
         await this.processRecordInitMsg(msg)
         break
+      case RecordsUpdateThreadMessageTypes.recordReload:
+        await this.processRecordReloadMsg(msg)
+        break
       case RecordsUpdateThreadMessageTypes.nodePersist:
         await this.processRecordNodePersistMsg(msg)
         break
@@ -156,6 +159,16 @@ class RecordsUpdateThread extends Thread {
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
     })
     this.recordsByUuid[recordUuid] = record
+  }
+
+  async processRecordReloadMsg(msg) {
+    const { surveyId } = this
+    const { recordUuid } = msg
+
+    if (this.recordsByUuid[recordUuid]) {
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+      this.recordsByUuid[recordUuid] = record
+    }
   }
 
   async processRecordNodePersistMsg(msg) {

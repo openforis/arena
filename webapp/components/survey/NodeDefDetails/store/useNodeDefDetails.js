@@ -1,27 +1,22 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { useDispatch } from 'react-redux'
 
-import * as API from '@webapp/service/api'
 import { useIsDesignerNodeDefRoute, useOnUpdate, useOnBrowserBack, useOnPageUnload } from '@webapp/components/hooks'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
-import { useSurvey, useSurveyId, useSurveyCycleKey, NodeDefsActions } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { useActions } from './actions'
 import { State } from './state'
+import { useNodeDefValidationByUuid } from '@webapp/store/survey/hooks'
 
 export const useNodeDefDetails = () => {
   const { nodeDefUuid } = useParams()
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
-  const survey = useSurvey()
-  const surveyId = useSurveyId()
+  const nodeDef = useNodeDefByUuid(nodeDefUuid)
+  const validation = useNodeDefValidationByUuid(nodeDefUuid)
   const surveyCycleKey = useSurveyCycleKey()
 
   const [state, setState] = useState({})
@@ -37,25 +32,12 @@ export const useNodeDefDetails = () => {
 
   useOnPageUnload({ active: State.isDirty(state) })
 
+  // create initial state on mount
   useEffect(() => {
-    const loadNodeDef = async () => {
-      // Editing a nodeDef
-      if (nodeDefUuid) {
-        let nodeDefSurvey = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-
-        if (NodeDef.isAnalysis(nodeDefSurvey) && !NodeDef.isTemporary(nodeDefSurvey)) {
-          try {
-            nodeDefSurvey = await API.fetchNodeDef({ surveyId, nodeDefUuid })
-            dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefSurvey }))
-          } catch (err) {
-            navigate(-1)
-          }
-        }
-        const validation = Survey.getNodeDefValidation(nodeDefSurvey)(survey)
-        setState(State.create({ nodeDef: nodeDefSurvey, validation }))
-      }
+    // Editing a nodeDef
+    if (nodeDefUuid) {
+      setState(State.create({ nodeDef, validation }))
     }
-    loadNodeDef()
   }, [nodeDefUuid])
 
   useOnUpdate(() => {

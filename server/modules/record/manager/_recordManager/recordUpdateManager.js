@@ -1,9 +1,12 @@
 import * as R from 'ramda'
 
+import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as PromiseUtils from '@core/promiseUtils'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -16,7 +19,7 @@ import SystemError from '@core/systemError'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-import * as FileRepository from '@server/modules/record/repository/fileRepository'
+import * as FileManager from '@server/modules/record/manager/fileManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 import * as DataTableReadRepository from '@server/modules/surveyRdb/repository/dataTableReadRepository'
@@ -128,7 +131,7 @@ export const deleteRecord = async (user, survey, record, client = db) =>
     const surveyId = Survey.getId(survey)
     await Promise.all([
       RecordRepository.deleteRecord(surveyId, uuid, t),
-      FileRepository.markRecordFilesAsDeleted(surveyId, uuid, t),
+      FileManager.markRecordFilesAsDeleted(surveyId, uuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordDelete, logContent, false, t),
     ])
   })
@@ -136,14 +139,14 @@ export const deleteRecord = async (user, survey, record, client = db) =>
 export const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async (t) => {
     await RecordRepository.deleteRecord(surveyId, recordUuid, t)
-    await FileRepository.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
+    await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
   })
 
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours) =>
   db.tx(async (t) => {
     const recordUuids = await RecordRepository.deleteRecordsPreview(surveyId, olderThan24Hours, t)
     if (!R.isEmpty(recordUuids)) {
-      await FileRepository.deleteFilesByRecordUuids(surveyId, recordUuids, t)
+      await FileManager.deleteFilesByRecordUuids(surveyId, recordUuids, t)
     }
     return recordUuids.length
   })
@@ -216,7 +219,7 @@ export const deleteNode = async (
     t
   )
 
-export const deleteNodesByNodeDefUuids = NodeUpdateManager.deleteNodesByNodeDefUuids
+export const { deleteNodesByNodeDefUuids, deleteNodesByUuids } = NodeUpdateManager
 
 const _updateNodeAndValidateRecordUniqueness = async (
   user,
@@ -269,6 +272,25 @@ const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
   }
 }
 
+const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
+  const dependentNodePointersToValidate = Object.values(nodes).reduce((acc, node) => {
+    const dependentValidationPointers = Records.getDependentNodePointers({
+      survey,
+      record,
+      node,
+      dependencyType: SurveyDependencyType.validations,
+      includeSelf: true,
+    })
+    acc.push(...dependentValidationPointers)
+    return acc
+  }, [])
+  const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({
+    record,
+    nodePointers: dependentNodePointersToValidate,
+  })
+  return { ...nodes, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
+}
+
 const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListener, nodesValidationListener }, t) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
@@ -290,12 +312,13 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
   }
 
   // 3. update node validations
-  // exclude deleted nodes
-  let recordUpdated = await validateNodesAndPersistToRDB(
+  const nodesToValidate = _getDependentNodesToValidate({ survey, record, nodes: updatedNodesAndDependents })
+
+  const recordUpdated = await validateNodesAndPersistToRDB(
     {
       survey,
       record,
-      nodes: updatedNodesAndDependents,
+      nodes: nodesToValidate,
       nodesValidationListener,
     },
     t
@@ -307,36 +330,39 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 }
 
 const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
-  if (!Record.isPreview(record)) {
-    const nodeDefsModified = Object.values(nodes).map((node) =>
-      Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-    )
+  if (Record.isPreview(record)) return
 
-    // Check if root keys have been modified
-    if (nodeDefsModified.some((nodeDef) => Survey.isNodeDefRootKey(nodeDef)(survey))) {
-      // Validate record uniqueness of records with same record keys
-      await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
-        { survey, record, excludeRecordFromCount: false },
+  const nodeDefsModified = Object.values(nodes).map((node) =>
+    Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  )
+
+  // Check if root keys have been modified
+  if (nodeDefsModified.some((nodeDef) => Survey.isNodeDefRootKey(nodeDef)(survey))) {
+    // Validate record uniqueness of records with same record keys
+    await RecordValidationManager.validateRecordKeysUniquenessAndPersistValidation(
+      { survey, record, excludeRecordFromCount: false },
+      t
+    )
+  }
+
+  // Check if root unique nodes have been modified
+
+  const rootUniqueNodeDefsModified = nodeDefsModified.filter((nodeDef) => {
+    const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+    return NodeDef.isRoot(nodeDefParent) && NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+  })
+  if (rootUniqueNodeDefsModified.length > 0) {
+    // for each modified node def, validate record uniqueness of records with same record unique nodes
+    await PromiseUtils.each(rootUniqueNodeDefsModified, async (nodeDefUnique) =>
+      RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+        { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
         t
       )
-    }
-
-    // Check if root unique nodes have been modified
-
-    const rootUniqueNodeDefsModified = nodeDefsModified.filter((nodeDef) => {
-      const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-      return NodeDef.isRoot(nodeDefParent) && NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
-    })
-    if (rootUniqueNodeDefsModified.length > 0) {
-      // for each modified node def, validate record uniqueness of records with same record unique nodes
-      await PromiseUtils.each(rootUniqueNodeDefsModified, async (nodeDefUnique) =>
-        RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
-          { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
-          t
-        )
-      )
-    }
+    )
   }
+  const surveyId = Survey.getId(survey)
+  const recordUuid = Record.getUuid(record)
+  await RecordRepository.updateRecordDateModified({ surveyId, recordUuid }, t)
 }
 
 const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {

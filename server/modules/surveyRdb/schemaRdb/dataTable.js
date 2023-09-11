@@ -38,12 +38,12 @@ export const columnNameRecordOwnerUuid = 'record_owner_uuid'
 
 // eslint-disable-next-line
 /**
- * @deprecated - Use TableDataNodeDef
+ * @deprecated - Use TableDataNodeDef.
  */
 export const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
     ? R.pipe(
-        Survey.getNodeDefDescendantAttributesInSingleEntities(nodeDef),
+        Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef }),
         R.filter(NodeDef.isSingleAttribute),
         R.sortBy(R.ascend(R.prop('id')))
       )(survey)
@@ -51,13 +51,13 @@ export const getNodeDefColumns = (survey, nodeDef) =>
 
 // eslint-disable-next-line
 /**
- * @deprecated - Use TableDataNodeDef
+ * @deprecated - Use TableDataNodeDef.
  */
 export const getName = NodeDefTable.getTableName
 
 // eslint-disable-next-line
 /**
- * @deprecated - Use TableDataNodeDef
+ * @deprecated - Use TableDataNodeDef.
  */
 export const getColumnNames = (survey, nodeDef) => [
   columnNameUuuid,

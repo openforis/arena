@@ -1,7 +1,8 @@
 import * as R from 'ramda'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
-import * as DateUtils from '@core/dateUtils'
 import * as Validation from '@core/validation/validation'
 
 import { ChainSamplingDesign } from './chainSamplingDesign'
@@ -30,6 +31,7 @@ export const keysProps = {
   submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
   statisticalAnalysis: 'statisticalAnalysis',
   resultsBackFromRStudio: 'resultsBackFromRStudio',
+  includeEntitiesWithoutData: 'includeEntitiesWithoutData',
 }
 
 export const statusExec = {
@@ -62,6 +64,7 @@ export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProp
 export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})
 export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
 export const isResultsBackFromRStudio = ObjectUtils.getProp(keysProps.resultsBackFromRStudio, true)
+export const isIncludeEntitiesWithoutData = ObjectUtils.getProp(keysProps.includeEntitiesWithoutData, false)
 
 // ====== UPDATE
 export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.hasSamplingDesign, value)
@@ -70,6 +73,9 @@ export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
   ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
 
 export const assocResultsBackFromRStudio = (value) => ObjectUtils.setProp(keysProps.resultsBackFromRStudio, value)
+
+export const assocIncludeEntitiesWithoutData = (value) =>
+  ObjectUtils.setProp(keysProps.includeEntitiesWithoutData, value)
 
 const assocSamplingDesign = (value) => ObjectUtils.setProp(keysProps.samplingDesign, value)
 
@@ -102,7 +108,7 @@ export const updateStatisticalAnalysis = (updateFn) => (chain) => {
 
 // ====== CHECK
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>
-  DateUtils.isAfter(getDateModified(chain), getDateExecuted(chain))
+  Dates.isAfter(getDateModified(chain), getDateExecuted(chain))
 )
 
 export const checkChangeRequiresSurveyPublish = ({ chainPrev, chainNext }) => {

@@ -19,7 +19,13 @@ export default () =>
       test(`Delete template ${template.name}`, async () => {
         const { name } = template
 
-        await page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button'))
+        await page.click(getSelector(TestId.dashboard.advancedFunctionsBtn, 'button'))
+
+        await Promise.all([
+          page.waitForSelector(getSelector(TestId.modal.modal)),
+          page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button')),
+        ])
+
         await page.fill(getSelector(TestId.dialogConfirm.strongConfirmInput), name)
 
         // Click div[role="dialog"] >> text="Delete"

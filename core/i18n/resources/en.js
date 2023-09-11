@@ -83,6 +83,7 @@ Please check also the Spam/Junk mail folder.`,
     hide: 'Hide',
     id: 'id',
     import: 'Import',
+    info: 'Info',
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
@@ -380,6 +381,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      advancedFunctions: 'Advanced functions',
       confirmDeleteCycleHeader: 'Delete this cycle?',
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
@@ -389,6 +391,14 @@ If there are records associated to this cycle, they will be deleted.`,
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
       srsPlaceholder: 'Type code or label',
+      unpublish: 'Unpublish and delete data',
+      unpublishSurveyDialog: {
+        confirmUnpublish: 'Are you sure you want to unpublish this survey?',
+        unpublishWarning: `Unpublishing the **{{surveyName}}** survey will delete all of its data.\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Enter this survey’s name to confirm:',
+      },
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
@@ -536,7 +546,7 @@ $t(common.cantUndoWarning)`,
       includeDataFromAllCycles: 'Include data from all cycles',
       includeFiles: 'Include files',
     },
-    startCsvExport: 'Start CSV export',
+    startExport: 'Start export',
   },
 
   dataImportView: {
@@ -549,8 +559,18 @@ $t(common.cantUndoWarning)`,
     },
     forceImportFromAnotherSurvey: 'Force import from another survey',
 
-    importFromCollect: 'Import data from Collect / Collect Mobile',
-    importFromCsv: 'Import data from CSV',
+    importFromArena: 'Arena/Arena Mobile',
+    importFromCollect: 'Collect / Collect Mobile',
+    importFromCsv: 'CSV',
+    importFromCsvStepsInfo: `### Importing steps
+1. Select the target entity
+2. Download a template
+3. Fill in the template and save it (CSV) [UTF-9]
+4. Check options
+5. Upload the CSV file
+6. Validate the file
+7. Start import
+`,
     importIntoCycle: 'Import into cycle',
     importIntoEntity: 'Import into entity',
     importType: {
@@ -559,26 +579,33 @@ $t(common.cantUndoWarning)`,
       updateExistingRecords: 'Update existing records',
     },
     jobs: {
+      ArenaDataImportJob: {
+        importCompleteSuccessfully: `Arena Mobile data import complete:
+        - {{processed}} records processed
+        - {{insertedRecords}} records created
+        - {{updatedRecords}} records updated
+        - {{skippedRecords}} records skipped`,
+      },
       CollectDataImportJob: {
         importCompleteSuccessfully: `Collect data import complete:
         - {{insertedRecords}} records created`,
       },
       DataImportJob: {
         importCompleteSummary: `
-        - {{rowsProcessed}} rows processed
+        - {{processed}} rows processed
         - {{updatedValues}} values updated
         - {{insertedRecords}} records created
         - {{updatedRecords}} records updated`,
         importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         importCompleteWithErrors: `## Import complete (with errors):
-        - {{rowsProcessed}} rows processed`,
+        - {{processed}} rows processed`,
       },
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
-        - {{rowsProcessed}} rows processed`,
+        - {{processed}} rows processed`,
         validationCompleteSuccessfully: `## Validation complete without errors
-        - {{rowsProcessed}} rows processed
+        - {{processed}} rows processed
         - {{updatedValues}} values would be updated
         - {{insertedRecords}} records would be created
         - {{updatedRecords}} records would be updated`,
@@ -676,7 +703,7 @@ Are you sure you want to continue?`,
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     recordEditModalTitle: 'Record: {{keyValues}}',
-    elevation: 'Elevation (m)',
+    altitude: 'Altitude (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     openInEarthMap: 'Open in Earth Map',
@@ -732,6 +759,7 @@ Are you sure you want to continue?`,
     nodes: 'Nodes',
     chains: 'Chains',
     records: 'Records',
+    files: 'Files',
   },
 
   usersView: {
@@ -899,6 +927,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     records: 'Records',
     recordsInStepCount: '{{recordsCount}} in {{step}} step',
     submitOnlyAnalysisStepDataIntoR: 'Submit only analysis step data to RStudio',
+    includeEntitiesWithoutData: 'Include entities without data',
     cannotStartRStudio: {
       common: 'Cannot start RStudio',
       noRecords: '$t(chainView.cannotStartRStudio.common): there are no records to submit',
@@ -936,6 +965,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
+    deleteChain: 'Delete chain',
     deleteConfirm: `Delete this processing chain?
     
 $t(common.cantUndoWarning)`,
@@ -1020,6 +1050,7 @@ $t(common.appNameFull)
   // ====== Survey views
 
   nodeDefEdit: {
+    additionalFields: 'Additional fields',
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
@@ -1071,15 +1102,20 @@ $t(common.appNameFull)
       table: 'Table',
     },
     advancedProps: {
+      areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
+      itemsFilter: 'Items filter',
+      itemsFilterInfo: `Expression used to filter selectable items.
+In the expression, the word "this" will refer to the item itself. 
+E.g. this.region = region_attribute_name 
+(where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
-      areaBasedEstimate: 'Area-based estimate',
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
@@ -1144,6 +1180,18 @@ $t(common.appNameFull)
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
     cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
+    cloneDialog: {
+      confirmButtonLabel: 'Clone',
+      title: 'Cloning node definition "{{nodeDefName}}"',
+      entitySelectLabel: 'Entity to clone into:',
+    },
+    moveDialog: {
+      confirmButtonLabel: 'Move',
+      title: 'Moving node definition "{{nodeDefName}}"',
+      entitySelectLabel: 'Entity to move into:',
+    },
+    movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
+    nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
   },
 
   languagesEditor: {
@@ -1167,6 +1215,7 @@ $t(common.appNameFull)
       text: 'Text',
       time: 'Time',
     },
+    clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
@@ -1174,6 +1223,7 @@ $t(common.appNameFull)
     schemaSummaryTitle: 'Export schema summary to CSV',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
+    move: `Move '{{nodeDefLabel}}'`,
     movePageUp: 'Move page up',
     movePageDown: 'Move page down',
     formEditActions: {
@@ -1214,10 +1264,14 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       },
     },
     nodeDefCoordinate: {
+      coordinate: 'Coordinate',
       srs: 'SRS',
       x: 'X',
       y: 'Y',
       showOnMap: 'Show on map',
+      accuracy: 'Accuracy',
+      altitude: 'Altitude',
+      altitudeAccuracy: 'Altitude accuracy',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
@@ -1348,6 +1402,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     minLengthNotRespected: 'Minimum length of {{minLength}} characters not respected',
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
+    nameInvalid:
+      'Name is invalid: it must contain only lowercase letters and numbers, starting with a letter, and only "-" and "_" symbols',
     nameRequired: 'Name is required',
     requiredField: '{{field}} is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
@@ -1393,7 +1449,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyFile: 'The file you are trying to import is empty',
       invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
       invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
-      invalidCode: 'Invalid code in column {{headers}}: {{code}}',
+      invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
       invalidDate:
         'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as yyyy-MM-dd or dd/MM/yyyy. E.g. 2023-01-15 or 15/01/2023',
@@ -1461,6 +1517,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     surveyInfoEdit: {
       langRequired: 'Language is required',
       srsRequired: 'Spatial Reference System is required',
+      cycleRequired: 'Cycle is required',
       cyclesRequired: 'At least one cycle must be defined',
       cyclesExceedingMax: 'A survey can have at most 10 cycles',
       cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
@@ -1540,6 +1597,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   // ====== Jobs
   jobs: {
     ActivityLogImportJob: 'Activity Log Import',
+    ArenaMobileDataImportJob: 'Arena Mobile Data Import',
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
     CategoryImportJob: 'Category Import',
@@ -1570,6 +1628,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     SurveyPublishJob: 'Survey Publish',
     SurveyPublishPerformJob: 'Survey Publish Perform',
     SurveyRdbCreationJob: 'Survey RDB Creation',
+    SurveyUnpublishJob: 'Survey Unpublish',
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
@@ -1607,6 +1666,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       emptyHeaders: 'Empty headers found',
     },
     entryDataNotFound: 'Entry data not found: {{entryName}}',
+    expression: {
+      undefinedFunction: '$t(expression.undefinedFunction)',
+    },
     generic: 'Unexpected error: {{text}}',
     importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
     invalidType: 'Invalid type {{type}}',

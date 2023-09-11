@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { NodeDefExpressionValidator } from '@openforis/arena-core'
+
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -19,6 +21,8 @@ const keysValidationFields = {
 }
 
 const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using file attribute
+
+const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
@@ -99,6 +103,23 @@ const validateVirtualEntityFormula = (survey, nodeDef) =>
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
+const validateItemsFilterExpression = (survey, nodeDef) => {
+  if (R.isEmpty(NodeDef.getItemsFilter(nodeDef))) return null
+
+  const { validationResult } = nodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    expression: NodeDef.getItemsFilter(nodeDef),
+    isContextParent: true,
+    selfReferenceAllowed: true,
+    itemsFilter: true,
+  })
+  if (validationResult && !validationResult.valid) {
+    return Validation.newInstance(false, {}, [validationResult])
+  }
+  return null
+}
+
 const validateColumnWidth =
   ({ survey }) =>
   (_propName, nodeDef) => {
@@ -161,18 +182,24 @@ const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
   // File
   [`${keys.props}.${propKeys.maxFileSize}`]: [validateMaxFileSize],
-  // Taxonomy
+  // Taxon
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
 })
 
 const validateAdvancedProps = async (survey, nodeDef) => {
-  const [validationDefaultValues, validationApplicable, validationValidations, validationVirtualEntityFormula] =
-    await Promise.all([
-      NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
-      NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
-      NodeDefValidationsValidator.validate(survey, nodeDef),
-      validateVirtualEntityFormula(survey, nodeDef),
-    ])
+  const [
+    validationDefaultValues,
+    validationApplicable,
+    validationValidations,
+    validationVirtualEntityFormula,
+    validationItemsFilter,
+  ] = await Promise.all([
+    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
+    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
+    NodeDefValidationsValidator.validate(survey, nodeDef),
+    validateVirtualEntityFormula(survey, nodeDef),
+    validateItemsFilterExpression(survey, nodeDef),
+  ])
 
   return Validation.newInstance(
     R.all(Validation.isValid, [
@@ -180,12 +207,14 @@ const validateAdvancedProps = async (survey, nodeDef) => {
       validationApplicable,
       validationValidations,
       validationVirtualEntityFormula,
+      validationItemsFilter,
     ]),
     R.reject(Validation.isValid, {
       [NodeDef.keysPropsAdvanced.defaultValues]: validationDefaultValues,
       [NodeDef.keysPropsAdvanced.applicable]: validationApplicable,
       [NodeDef.keysPropsAdvanced.validations]: validationValidations,
       [NodeDef.keysPropsAdvanced.formula]: validationVirtualEntityFormula,
+      [NodeDef.keysPropsAdvanced.itemsFilter]: validationItemsFilter,
     })
   )
 }

@@ -12,6 +12,7 @@ import { db } from '@server/db/db'
 
 import {
   publishSurveySchemaTableProps,
+  unpublishSurveySchemaTableProps,
   markSurveyDraft,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -179,10 +180,14 @@ export const findTaxaByVernacularName = async (
   draft = false,
   includeUnlUnk = false,
   client = db
-) => {
-  const taxaDb = await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
-  return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
-}
+) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
 
 export const { fetchTaxonByUuid, fetchTaxonByCode, fetchTaxonVernacularNameByUuid, fetchTaxaWithVernacularNames } =
   TaxonomyRepository
@@ -205,11 +210,17 @@ export const fetchTaxaWithVernacularNamesStream = async (surveyId, taxonomyUuid,
 
 // ====== UPDATE
 
-export const publishTaxonomiesProps = async (surveyId, client = db) => {
-  await publishSurveySchemaTableProps(surveyId, 'taxonomy', client)
-  await publishSurveySchemaTableProps(surveyId, 'taxon', client)
-  await publishSurveySchemaTableProps(surveyId, 'taxon_vernacular_name', client)
-}
+const allTaxonomyRelatedTables = ['taxonomy', 'taxon', 'taxon_vernacular_name']
+
+export const publishTaxonomiesProps = async (surveyId, client = db) =>
+  client.tx(async (t) =>
+    Promise.all(allTaxonomyRelatedTables.map((table) => publishSurveySchemaTableProps(surveyId, table, t)))
+  )
+
+export const unpublishTaxonomiesProps = async (surveyId, client = db) =>
+  client.tx(async (t) =>
+    Promise.all(allTaxonomyRelatedTables.map((table) => unpublishSurveySchemaTableProps(surveyId, table, t)))
+  )
 
 export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) =>
   client.tx(

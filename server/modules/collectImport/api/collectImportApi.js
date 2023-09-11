@@ -24,7 +24,7 @@ export const init = (app) => {
 
       const { options, ...newSurvey } = newSurveyParam
 
-      const validation = await SurveyService.validateSurveyClone({ newSurvey })
+      const validation = await SurveyService.validateSurveyImportFromCollect({ newSurvey })
 
       if (Validation.isValid(validation)) {
         const job = CollectImportService.startCollectImportJob({

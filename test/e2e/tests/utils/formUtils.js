@@ -12,10 +12,20 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   const dropdownSelector = getDropdownSelector({ testId, parentSelector })
   const inputSelector = `${dropdownSelector} .dropdown__input`
 
+  // wait for dropdown items to be ready
+  await page.waitForTimeout(5000)
+
+  const inputEl = await page.$(inputSelector)
+
+  await inputEl.scrollIntoViewIfNeeded()
+
   if (await page.isEditable(inputSelector)) {
     // open dropdown menu
     const toggleBtnSelector = `${dropdownSelector} .dropdown__indicator`
-    await page.locator(toggleBtnSelector).last().click()
+    const toggleBtnElLocator = page.locator(toggleBtnSelector).last()
+
+    await toggleBtnElLocator.scrollIntoViewIfNeeded()
+    await toggleBtnElLocator.click()
     if (value) {
       // select dropdown option by test id
       await page.click(getSelector(TestId.dropdown.dropDownItem(value)))
@@ -36,6 +46,9 @@ const expectDropdownToBeDisabled = async ({ testId = null, parentSelector = '' }
 }
 
 const expectDropdownValue = async ({ testId = null, parentSelector = '', value }) => {
+  // wait for dropdown value to be set
+  await page.waitForTimeout(5000)
+
   const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
   if (Objects.isEmpty(value)) {
     await expect(dropdownValueEl).toBeNull()

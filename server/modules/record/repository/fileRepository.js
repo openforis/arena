@@ -1,3 +1,5 @@
+import { Readable } from 'stream'
+
 import { db } from '@server/db/db'
 import * as RecordFile from '@core/record/recordFile'
 
@@ -24,16 +26,6 @@ export const insertFile = async (surveyId, file, client = db) => {
 
 // ============== READ
 
-export const fetchFileUuidsBySurveyId = async (surveyId, client = db) =>
-  client.map(
-    `
-    SELECT uuid
-    FROM ${getSurveyDBSchema(surveyId)}.file
-    WHERE ${NOT_DELETED_CONDITION}`,
-    [],
-    (row) => row.uuid
-  )
-
 export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
   client.manyOrNone(
     `
@@ -42,7 +34,36 @@ export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
     WHERE ${NOT_DELETED_CONDITION}`
   )
 
-export const fetchFileByUuid = async (surveyId, uuid, client = db) =>
+export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, client = db) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
+    [recordUuids],
+    (row) => row.uuid
+  )
+
+export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSurveyDBSchema(surveyId)}.file`,
+    [],
+    (row) => row.uuid
+  )
+
+export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE content IS NOT NULL`,
+    [],
+    (row) => row.uuid
+  )
+
+export const fetchFileAndContentByUuid = async (surveyId, uuid, client = db) =>
   client.one(
     `
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
@@ -59,14 +80,29 @@ export const fetchFileSummaryByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-export const fetchFileByNodeUuid = async (surveyId, nodeUuid, client = db) =>
-  client.one(
+export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = db) => {
+  const row = await client.oneOrNone(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
-    WHERE props ->> '${RecordFile.propKeys.nodeUuid}' = $1 
-      AND ${NOT_DELETED_CONDITION}`,
-    [nodeUuid]
+    SELECT content
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE uuid = $1`,
+    [fileUuid]
   )
+  const contentBuffer = row?.content
+  return contentBuffer ? Readable.from(contentBuffer) : null
+}
+
+export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
+  const total = await client.oneOrNone(
+    `SELECT SUM((props ->> '${RecordFile.propKeys.size}')::INTEGER)
+    FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE props -> '${RecordFile.propKeys.deleted}' IS NULL 
+      OR NOT (props -> '${RecordFile.propKeys.deleted}')::BOOLEAN`,
+    null,
+    (row) => row.sum
+  )
+  return total || 0
+}
 
 // ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
@@ -97,6 +133,15 @@ export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
     WHERE uuid = $1
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [fileUuid, props]
+  )
+
+export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
+  client.none(
+    `
+      UPDATE ${getSurveyDBSchema(surveyId)}.file
+      SET content = NULL
+      WHERE content IS NOT NULL
+      `
   )
 
 // ============== DELETE

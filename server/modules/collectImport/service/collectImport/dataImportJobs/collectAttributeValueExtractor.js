@@ -15,6 +15,7 @@ import * as RecordFile from '@core/record/recordFile'
 import * as FileManager from '../../../../record/manager/fileManager'
 import * as CollectSurvey from '../model/collectSurvey'
 import * as CollectRecord from '../model/collectRecord'
+import { Objects } from '@openforis/arena-core'
 
 const { nodeDefType } = NodeDef
 
@@ -48,17 +49,24 @@ const extractCodeValueAndMeta = (survey, nodeDef, record, node) => (collectNode)
   return null
 }
 
-const extractCoordinateValueAndMeta = (collectNode) => {
-  const { x, y, srs } = CollectRecord.getTextValues(collectNode)
+const extractCoordinateValueAndMeta = ({ nodeDef, collectNode }) => {
+  const { x, y, srs, accuracy, altitude } = CollectRecord.getTextValues(collectNode)
 
-  if (x && y && srs) {
+  if (!Objects.isEmpty(x) && !Objects.isEmpty(y) && !Objects.isEmpty(srs)) {
     const srsId = R.ifElse(R.isEmpty, R.identity, R.pipe(R.split(':'), R.last))(srs)
-
-    return {
-      value: Node.newNodeValueCoordinate({ x: Number(x), y: Number(y), srsId }),
+    const value = {
+      [Node.valuePropsCoordinate.x]: Number(x),
+      [Node.valuePropsCoordinate.y]: Number(y),
+      [Node.valuePropsCoordinate.srs]: srsId,
     }
-  }
+    if (NodeDef.isAccuracyIncluded(nodeDef) && !Objects.isEmpty(accuracy))
+      value[Node.valuePropsCoordinate.accuracy] = Number(accuracy)
+    if (NodeDef.isAltitudeIncluded(nodeDef) && !Objects.isEmpty(altitude))
+      value[Node.valuePropsCoordinate.altitude] = Number(altitude)
 
+    return { value }
+  }
+  // invalid or empty value
   return null
 }
 
@@ -73,13 +81,14 @@ const extractDateValueAndMeta = (collectNode) => {
 }
 
 const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNodeDef, tx) => async (collectNode) => {
-  const { file_name: fileName, file_size: fileSize } = CollectRecord.getTextValues(collectNode)
+  const { file_name: fileName } = CollectRecord.getTextValues(collectNode)
 
   const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
   const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${fileName}`)
 
   if (content) {
     const fileUuid = uuidv4()
+    const fileSize = Buffer.byteLength(content)
     const file = RecordFile.createFile(
       fileUuid,
       fileName,
@@ -149,7 +158,7 @@ const valueAndMetaExtractorByType = {
   [nodeDefType.boolean]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.code]: ({ collectNode, survey, nodeDef, record, node }) =>
     extractCodeValueAndMeta(survey, nodeDef, record, node)(collectNode),
-  [nodeDefType.coordinate]: ({ collectNode }) => extractCoordinateValueAndMeta(collectNode),
+  [nodeDefType.coordinate]: ({ collectNode, nodeDef }) => extractCoordinateValueAndMeta({ nodeDef, collectNode }),
   [nodeDefType.date]: ({ collectNode }) => extractDateValueAndMeta(collectNode),
   [nodeDefType.decimal]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.file]: ({ collectNode, survey, node, collectSurveyFileZip, collectNodeDef, tx }) =>

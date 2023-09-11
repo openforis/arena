@@ -35,6 +35,7 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const exportModel = new CsvDataExportModel({
     survey,
+    cycle,
     nodeDefContext: entityDef,
     options: {
       includeAnalysis: false,

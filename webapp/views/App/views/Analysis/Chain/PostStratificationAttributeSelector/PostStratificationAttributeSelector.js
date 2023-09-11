@@ -26,7 +26,10 @@ export const PostStratificationAttributeSelector = () => {
   const selectableDefs = []
   Survey.visitAncestorsAndSelf(baseUnitNodeDef, (entityDef) => {
     // search inside single entities
-    const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities(entityDef, true)(survey)
+    const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities({
+      nodeDef: entityDef,
+      includeAnalysis: true,
+    })(survey)
 
     selectableDefs.push(
       ...descendantDefs.filter(

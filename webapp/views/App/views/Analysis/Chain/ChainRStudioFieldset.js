@@ -27,18 +27,26 @@ export const ChainRStudioFieldset = (props) => {
     <fieldset className="rstudio-fieldset">
       <legend>RStudio</legend>
       <div className="content">
-        <Checkbox
-          label="chainView.submitOnlyAnalysisStepDataIntoR"
-          checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
-          validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
-          onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
-        />
-        <Checkbox
-          label="chainView.resultsBackFromRStudio"
-          checked={Chain.isResultsBackFromRStudio(chain)}
-          validation={Validation.getFieldValidation(Chain.keysProps.resultsBackFromRStudio)(validation)}
-          onChange={(value) => updateChain(Chain.assocResultsBackFromRStudio(value)(chain))}
-        />
+        <div>
+          <Checkbox
+            label="chainView.includeEntitiesWithoutData"
+            checked={Chain.isIncludeEntitiesWithoutData(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.includeEntitiesWithoutData)(validation)}
+            onChange={(value) => updateChain(Chain.assocIncludeEntitiesWithoutData(value)(chain))}
+          />
+          <Checkbox
+            label="chainView.submitOnlyAnalysisStepDataIntoR"
+            checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
+            onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
+          />
+          <Checkbox
+            label="chainView.resultsBackFromRStudio"
+            checked={Chain.isResultsBackFromRStudio(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.resultsBackFromRStudio)(validation)}
+            onChange={(value) => updateChain(Chain.assocResultsBackFromRStudio(value)(chain))}
+          />
+        </div>
         <ButtonRStudio onClick={openRStudio} />
         <ButtonRStudio isLocal onClick={openRStudioLocal} />
       </div>

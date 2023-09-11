@@ -5,22 +5,26 @@ import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+
 import { useSurveyCycleKey, useNodeDefRootKeys } from '@webapp/store/survey'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import Table from '@webapp/components/Table'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import HeaderLeft from './HeaderLeft'
 import RowHeader from './RowHeader'
 import Row from './Row'
+import { useNodeDefKeysCategoryItemsInLevel } from './useNodeDefKeysCategoryItemsInLevel'
 
 const Records = () => {
   const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
   const nodeDefKeys = useNodeDefRootKeys()
+
+  const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel()
 
   const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
 
@@ -52,7 +56,7 @@ const Records = () => {
       headerProps={{ onRecordsUpdate, navigateToRecord }}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
-      rowProps={{ onRecordsUpdate, navigateToRecord }}
+      rowProps={{ onRecordsUpdate, navigateToRecord, categoryItemsByCodeDefUuid }}
       noItemsLabelKey="dataView.records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
       onRowDoubleClick={navigateToRecord}

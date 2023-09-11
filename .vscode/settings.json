@@ -1,8 +1,9 @@
 {
-    "eslint.run": "onSave",
-    "eslint.format.enable": true,
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
+  "eslint.run": "onSave",
+  "eslint.format.enable": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "git-blame.gitWebUrl": ""
 }

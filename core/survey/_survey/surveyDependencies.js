@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import { Surveys } from '@openforis/arena-core'
 
 export { dependencyTypes } from './surveyDependencyTypes'
@@ -20,6 +21,11 @@ export const getNodeDefDependencies =
   (nodeDefUuid, dependencyType = null) =>
   (survey) =>
     Surveys.getNodeDefDependents({ survey, nodeDefUuid, dependencyType })
+
+export const getNodeDefDependentsUuids =
+  (nodeDefUuid, dependencyType = null) =>
+  (survey) =>
+    Surveys.getNodeDefDependents({ survey, nodeDefUuid, dependencyType }).map(NodeDef.getUuid)
 
 /**
  * Determines if the specified nodeDefUuid is among the dependencies of the specified nodeDefSourceUuid.

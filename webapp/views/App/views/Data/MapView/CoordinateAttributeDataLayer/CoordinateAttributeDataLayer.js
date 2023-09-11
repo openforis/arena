@@ -22,6 +22,7 @@ export const CoordinateAttributeDataLayer = (props) => {
   const {
     currentPointShown,
     currentPointPopupOpen,
+    flyToPoint,
     flyToNextPoint,
     flyToPreviousPoint,
     onCurrentPointPopupClose,
@@ -59,6 +60,7 @@ export const CoordinateAttributeDataLayer = (props) => {
             <CoordinateAttributeMarker
               key={key}
               attributeDef={attributeDef}
+              flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
               markersColor={markersColor}

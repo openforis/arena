@@ -2,6 +2,7 @@ import * as R from 'ramda'
 import * as toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import { ColumnNodeDef } from '@common/model/db'
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'
@@ -19,22 +20,11 @@ export const getTableName = (nodeDef, nodeDefParent) => {
 
 export const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
-const colsByType = {
-  [NodeDef.nodeDefType.code]: ['', '_label'],
-  [NodeDef.nodeDefType.coordinate]: ['', '_x', '_y', '_srs'],
-  [NodeDef.nodeDefType.taxon]: ['', '_scientific_name'], // ?, 'vernacular_names?'],
-  [NodeDef.nodeDefType.file]: ['_file_uuid', '_file_name'],
-}
-
-const getCols = (nodeDef) => R.propOr([], NodeDef.getType(nodeDef), colsByType)
-
 const getDefaultColumnName = (nodeDef) =>
   NodeDef.isEntity(nodeDef) ? `${NodeDef.getName(nodeDef)}_uuid` : `${NodeDef.getName(nodeDef)}`
 
-export const getColumnNames = (nodeDef, includeExtendedCols = true) => {
-  const cols = includeExtendedCols ? getCols(nodeDef) : []
-  return R.isEmpty(cols) ? [getDefaultColumnName(nodeDef)] : cols.map((col) => `${NodeDef.getName(nodeDef)}${col}`)
-}
+export const getColumnNames = (nodeDef, includeExtendedCols = true) =>
+  includeExtendedCols ? ColumnNodeDef.getColumnNames(nodeDef) : [getDefaultColumnName(nodeDef)]
 
 export const getColumnName = R.pipe(getColumnNames, R.head)
 

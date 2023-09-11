@@ -1,41 +1,45 @@
-import * as R from 'ramda'
+import * as ObjectUtils from '@core/objectUtils'
 
+import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
+import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportJob'
 import CategoriesExportJob from '@server/modules/category/service/CategoriesExportJob'
 import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
-import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
-import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import ExportCsvDataJob from '@server/modules/survey/service/export/exportCsvDataJob'
+import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
-import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
-import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
+import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
+import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
+import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
 
 const jobClasses = [
+  ArenaImportJob,
+  ArenaMobileDataImportJob,
   CategoriesExportJob,
   CategoryImportJob,
   CollectImportJob,
   CollectDataImportJob,
   DataImportJob,
   DataImportValidationJob,
-  RecordsCloneJob,
-  SurveyPublishJob,
   ExportCsvDataJob,
-  TaxonomyImportJob,
-  ArenaImportJob,
+  RecordsCloneJob,
   SurveyCloneJob,
   SurveyExportJob,
+  SurveyPublishJob,
   SurveysRdbRefreshJob,
+  SurveyUnpublishJob,
+  TaxonomyImportJob,
 ]
 
-const getJobClass = (jobType) => R.find(R.propEq('type', jobType), jobClasses)
+const jobClassesByType = ObjectUtils.toIndexedObj(jobClasses, 'type')
 
 export const createJob = (jobType, params) => {
-  const JobClass = getJobClass(jobType)
+  const JobClass = jobClassesByType[jobType]
 
   return new JobClass(params)
 }

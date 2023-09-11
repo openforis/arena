@@ -21,16 +21,7 @@ export default class RecordsImportJob extends Job {
   }
 
   async execute() {
-    const {
-      surveyId: _surveyId,
-      survey,
-      arenaSurveyFileZip,
-      includingUsers,
-      newUserUuidByOldUuid,
-      mobile,
-    } = this.context
-    const surveyId = mobile ? Survey.getId(survey) : _surveyId
-
+    const { surveyId, arenaSurveyFileZip, includingUsers, newUserUuidByOldUuid } = this.context
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
 
@@ -59,14 +50,13 @@ export default class RecordsImportJob extends Job {
 
       // insert record
       let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
-      if (!mobile) {
-        const ownerUuid = includingUsers
-          ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
-            newUserUuidByOldUuid[Record.getOwnerUuid(record)]
-          : // ignore owner in imported file; consider current user as owner
-            User.getUuid(this.user)
-        record = Record.assocOwnerUuid(ownerUuid)(record)
-      }
+
+      const ownerUuid = includingUsers
+        ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
+          newUserUuidByOldUuid[Record.getOwnerUuid(record)]
+        : // ignore owner in imported file; consider current user as owner
+          User.getUuid(this.user)
+      record = Record.assocOwnerUuid(ownerUuid)(record)
 
       await this.insertOrSkipRecord({ record, nodesBatchPersister })
 
@@ -77,32 +67,10 @@ export default class RecordsImportJob extends Job {
   }
 
   async insertOrSkipRecord({ record, nodesBatchPersister }) {
-    const { mobile, survey, surveyId } = this.context
-
-    const recordUuid = Record.getUuid(record)
+    const { survey, surveyId } = this.context
 
     const recordSummary = this.prepareRecordSummaryToStore(record)
 
-    const existingRecordSummary = mobile
-      ? await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, this.tx)
-      : null
-
-    if (existingRecordSummary) {
-      // skip record
-      // TODO update record
-      this.logDebug(`skipping record ${recordUuid}; it already exists`)
-      return
-    }
-
-    // if (
-    //   !existingRecordSummary ||
-    //   DateUtils.isAfter(Record.getDateModified(recordSummary), Record.getDateModified(existingRecordSummary))
-    // ) {
-    // if (existingRecordSummary) {
-    //   // delete existing record before import (if the record to import has more recent changes)
-    //   this.logDebug(`deleting existing record ${recordUuid}`)
-    //   await RecordManager.deleteRecord(this.user, survey, existingRecordSummary, this.tx)
-    // }
     // insert record
     await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
 
@@ -114,9 +82,6 @@ export default class RecordsImportJob extends Job {
         await nodesBatchPersister.addItem(node)
       }
     })
-    // } else {
-    //   this.logDebug(`skipping record ${recordUuid}; it doesn't have any recent updates`)
-    // }
   }
 
   /**

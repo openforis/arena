@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -19,6 +19,7 @@ export const CoordinateAttributeMarker = (props) => {
     markersColor,
     onRecordEditClick,
     pointFeature,
+    flyToPoint,
     flyToNextPoint,
     flyToPreviousPoint,
     onPopupClose,
@@ -31,6 +32,10 @@ export const CoordinateAttributeMarker = (props) => {
 
   const surveyInfo = useSurveyInfo()
   const { markerRef, showMarkersLabels } = useLayerMarker({ key, popupOpen, setMarkerByKey })
+
+  const onDoubleClick = useCallback(() => {
+    flyToPoint(pointFeature)
+  }, [flyToPoint, pointFeature])
 
   return (
     <div>
@@ -47,7 +52,7 @@ export const CoordinateAttributeMarker = (props) => {
         color={markersColor}
         fillColor={markersColor}
         fillOpacity={fillOpacity}
-        eventHandlers={{ popupclose: onPopupClose }}
+        eventHandlers={{ dblclick: onDoubleClick, popupclose: onPopupClose }}
       >
         {showMarkersLabels && <MarkerTooltip color={markersColor}>{ancestorsKeys.join(' - ')}</MarkerTooltip>}
 
@@ -68,6 +73,7 @@ CoordinateAttributeMarker.propTypes = {
   markersColor: PropTypes.any,
   onRecordEditClick: PropTypes.any,
   pointFeature: PropTypes.any,
+  flyToPoint: PropTypes.func,
   flyToNextPoint: PropTypes.func,
   flyToPreviousPoint: PropTypes.func,
   onPopupClose: PropTypes.func,

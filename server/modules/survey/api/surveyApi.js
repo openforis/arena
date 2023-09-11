@@ -23,11 +23,13 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const surveyReq = Request.getBody(req)
-      const validation = await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
+      const { name, label, lang, cloneFrom = null, cloneFromCycle = null, template = false } = surveyReq
+
+      const validation = cloneFrom
+        ? await SurveyService.validateSurveyClone({ newSurvey: surveyReq })
+        : await SurveyService.validateNewSurvey({ newSurvey: surveyReq })
 
       if (Validation.isValid(validation)) {
-        const { name, label, lang, cloneFrom = null, template = false } = surveyReq
-
         const surveyInfoTarget = Survey.newSurvey({
           ownerUuid: User.getUuid(user),
           name,
@@ -37,7 +39,13 @@ export const init = (app) => {
         })
 
         if (cloneFrom) {
-          const job = SurveyService.cloneSurvey({ surveyId: cloneFrom, surveyInfoTarget, user, res })
+          const job = SurveyService.cloneSurvey({
+            surveyId: cloneFrom,
+            cycle: cloneFromCycle,
+            surveyInfoTarget,
+            user,
+            res,
+          })
           res.json({ job })
           return
         }
@@ -90,9 +98,9 @@ export const init = (app) => {
   app.get('/surveys/count', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { template = false, search = null, lang = null } = Request.getParams(req)
+      const { draft = true, template = false, search = null, lang = null } = Request.getParams(req)
 
-      const count = await SurveyService.countUserSurveys({ user, template, search, lang })
+      const count = await SurveyService.countUserSurveys({ user, draft, template, search, lang })
 
       res.json({ count })
     } catch (error) {
@@ -195,6 +203,15 @@ export const init = (app) => {
     const user = Request.getUser(req)
 
     const job = SurveyService.startPublishJob(user, surveyId)
+
+    res.json({ job: JobUtils.jobToJSON(job) })
+  })
+
+  app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+
+    const job = SurveyService.startUnpublishJob(user, surveyId)
 
     res.json({ job: JobUtils.jobToJSON(job) })
   })

@@ -44,9 +44,9 @@ export const fetchAvailableMapPeriods = async ({ provider, periodType }) => {
   return null
 }
 
-export const fetchElevation = async ({ surveyId, lat, lng }) => {
+export const fetchAltitude = async ({ surveyId, lat, lng }) => {
   try {
-    const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/elevation`, { params: { lat, lng } })
+    const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/altitude`, { params: { lat, lng } })
     return data
   } catch {
     return null

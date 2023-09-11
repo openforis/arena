@@ -113,3 +113,5 @@ export const toIndexedObj = (array, propName) =>
   }, {})
 
 export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
+
+export const clone = (obj) => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
