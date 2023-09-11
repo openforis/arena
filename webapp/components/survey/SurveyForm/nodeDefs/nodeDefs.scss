@@ -74,7 +74,7 @@
   > :nth-child(1).form-label {
     align-self: end;
     justify-self: auto;
-    padding: 0.5rem 1rem;
+    margin: 0.5rem 0.5rem;
     font-weight: 600;
     text-align: left;
     font-size: 0.8rem;
@@ -120,8 +120,8 @@
     display: flex;
     align-items: center;
 
-    > *:not(:first-child) {
-      margin-left: 10px;
+    > .icon:not(:first-child) {
+      margin-left: 6px;
     }
   }
 }

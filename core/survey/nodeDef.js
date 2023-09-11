@@ -1,7 +1,9 @@
 import * as R from 'ramda'
+
+import { NodeDefs, Objects } from '@openforis/arena-core'
+
 import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
-
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
@@ -80,6 +82,9 @@ export const propKeys = {
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
+  includeAccuracy: 'includeAccuracy',
+  includeAltitude: 'includeAltitude',
+  includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 }
 
 export const textInputTypes = {
@@ -97,6 +102,12 @@ export const textTransformValues = {
 export const booleanLabelValues = {
   trueFalse: 'trueFalse',
   yesNo: 'yesNo',
+}
+
+export const coordinateAdditionalFields = {
+  accuracy: 'accuracy',
+  altitude: 'altitude',
+  altitudeAccuracy: 'altitudeAccuracy',
 }
 
 export const fileTypeValues = {
@@ -124,6 +135,9 @@ export const keysPropsAdvanced = {
   isSampling: 'isSampling',
   hasAreaBasedEstimated: 'hasAreaBasedEstimated',
   areaBasedEstimatedOf: 'areaBasedEstimatedOf', // uuid of area based estimated node def
+
+  // code and taxon
+  itemsFilter: 'itemsFilter',
 }
 
 const metaKeys = {
@@ -198,8 +212,28 @@ export const isDeleted = ObjectUtils.isKeyTrue(keys.deleted)
 export const getDescriptions = getProp(propKeys.descriptions, {})
 
 export const isEnumerate = ObjectUtils.isPropTrue(propKeys.enumerate)
+
+// boolean
+export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
+export const isBooleanLabelYesNo = (nodeDef) =>
+  isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
 // code
 export const getCategoryUuid = getProp(propKeys.categoryUuid)
+// coordinate
+export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
+export const isAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAccuracy)
+export const isAltitudeIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitude)
+export const isAltitudeAccuracyIncluded = ObjectUtils.isPropTrue(propKeys.includeAltitudeAccuracy)
+export const getCoordinateAdditionalFields = NodeDefs.getCoordinateAdditionalFields
+// decimal
+export const getMaxNumberDecimalDigits = (nodeDef) => {
+  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
+  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
+}
+// file
+export const isNumberOfFilesEnabled = isMultiple
+export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
+export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
@@ -213,23 +247,6 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
-// decimal
-export const getMaxNumberDecimalDigits = (nodeDef) => {
-  const decimalDigits = getProp(propKeys.maxNumberDecimalDigits, NaN)(nodeDef)
-  return A.isEmpty(decimalDigits) ? NaN : Number(decimalDigits)
-}
-// File
-export const isNumberOfFilesEnabled = isMultiple
-export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
-export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
-
-// Boolean
-export const getLabelValue = getProp(propKeys.labelValue, booleanLabelValues.trueFalse)
-export const isBooleanLabelYesNo = (nodeDef) =>
-  isBoolean(nodeDef) && getProp(propKeys.labelValue, booleanLabelValues.trueFalse)(nodeDef) === booleanLabelValues.yesNo
-
-// Coordiante
-export const isAllowOnlyDeviceCoordinate = ObjectUtils.isPropTrue(propKeys.allowOnlyDeviceCoordinate)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -309,6 +326,9 @@ export const getValidationExpressions = R.pipe(getValidations, NodeDefValidation
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
 
+// code and taxon
+export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
+
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
 
@@ -367,6 +387,8 @@ export const newNodeDef = (
 
 // ==== UPDATE
 
+export const assocDeleted = R.assoc(keys.deleted)
+
 export const assocParentUuid = R.assoc(keys.parentUuid)
 export const assocMetaHierarchy = R.assocPath([keys.meta, metaKeys.h])
 export const { mergeProps } = ObjectUtils
@@ -381,6 +403,31 @@ export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
+export const cloneIntoEntityDef =
+  ({ nodeDefParent, clonedNodeDefName }) =>
+  (nodeDef) =>
+    newNodeDef(
+      nodeDefParent,
+      getType(nodeDef),
+      [...getCycles(nodeDef)],
+      { ...ObjectUtils.clone(getProps(nodeDef)), [propKeys.name]: clonedNodeDefName },
+      ObjectUtils.clone(getPropsAdvanced(nodeDef)),
+      isAnalysis(nodeDef)
+    )
+
+export const changeParentEntity =
+  ({ targetParentNodeDef }) =>
+  (nodeDef) => {
+    const targetParentNodeDefUuid = getUuid(targetParentNodeDef)
+    return {
+      ...nodeDef,
+      [keys.parentUuid]: targetParentNodeDefUuid,
+      [keys.meta]: {
+        ...getMeta(nodeDef),
+        [metaKeys.h]: [...getMetaHierarchy(targetParentNodeDef), targetParentNodeDefUuid],
+      },
+    }
+  }
 
 // layout
 export const assocLayout = (layout) => ObjectUtils.setProp(propKeys.layout, layout)
@@ -401,6 +448,30 @@ export const copyLayout =
         .reduce((layoutAcc, cycleKey) => NodeDefLayout.assocLayoutCycle(cycleKey, layoutCycle)(layoutAcc), layout)
       return layoutUpdated
     })(nodeDef)
+
+/**
+ * It keeps only cycleToKeep information and moves it to cycleTarget.
+ * (it does side effect on the specified nodeDef).
+ *
+ * @param {!object} params - The function parameters.
+ * @param {!string} params.cycleToKeep - Id of source cycle to keep.
+ * @param {!string} params.cycleTarget - Id of target cycle.
+ * @returns {object} - Returns the nodeDef specified in parameters (it does side effect).
+ */
+export const keepOnlyOneCycle =
+  ({ cycleToKeep, cycleTarget }) =>
+  (nodeDef) => {
+    nodeDef.props[propKeys.cycles] = [cycleTarget]
+    const nodeDefProps = nodeDef[keys.props]
+    const layoutForCycle = nodeDefProps[propKeys.layout]?.[cycleToKeep]
+
+    if (Objects.isEmpty(layoutForCycle)) {
+      delete nodeDefProps[propKeys.layout]
+    } else {
+      nodeDefProps[propKeys.layout] = { [cycleTarget]: layoutForCycle }
+    }
+    return nodeDef
+  }
 
 // ==== UTILS
 export const canNodeDefBeMultiple = (nodeDef) =>

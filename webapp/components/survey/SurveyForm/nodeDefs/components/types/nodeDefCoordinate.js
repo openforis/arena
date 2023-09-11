@@ -50,6 +50,7 @@ const NodeDefCoordinate = (props) => {
   const selectedSrsCode = selectedSrs?.code
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
+  const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef)
 
   const adjustValue = useCallback(
     (newValue) => {
@@ -129,6 +130,16 @@ const NodeDefCoordinate = (props) => {
     />
   )
 
+  const additionalInputFields = additionalFields.map((additionalField) => (
+    <Input
+      key={additionalField}
+      numberFormat={numberFormat}
+      readOnly={entryDisabled}
+      value={StringUtils.nullToEmpty(value[additionalField])}
+      onChange={(value) => handleInputChange(additionalField, value)}
+    />
+  ))
+
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
       <Map
@@ -163,6 +174,7 @@ const NodeDefCoordinate = (props) => {
         {xInput}
         {yInput}
         {srsDropdown}
+        {additionalInputFields}
         {mapTriggerButton}
         {mapPanelRight}
       </div>
@@ -175,6 +187,11 @@ const NodeDefCoordinate = (props) => {
         <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
         <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
         <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
+        {additionalFields.map((additionalField, index) => (
+          <FormItem key={additionalField} label={i18n.t(`surveyForm.nodeDefCoordinate.${additionalField}`)}>
+            {additionalInputFields[index]}
+          </FormItem>
+        ))}
       </div>
       {mapTriggerButton}
       {mapPanelRight}

@@ -19,6 +19,7 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import {
   publishSurveySchemaTableProps,
+  unpublishSurveySchemaTableProps,
   markSurveyDraft,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
@@ -191,14 +192,22 @@ export const { exportCategoryToStream } = CategoryExportManager
 
 // ====== UPDATE
 
+const allCategoryRelatedTables = ['category', 'category_level', 'category_item']
+
 export const publishProps = async (surveyId, langsDeleted, client = db) =>
   client.tx(async (t) =>
     Promise.all([
-      publishSurveySchemaTableProps(surveyId, 'category', t),
-      publishSurveySchemaTableProps(surveyId, 'category_level', t),
-      publishSurveySchemaTableProps(surveyId, 'category_item', t),
+      ...allCategoryRelatedTables.map((table) => publishSurveySchemaTableProps(surveyId, table, t)),
       CategoryRepository.markCategoriesPublishedBySurveyId(surveyId, t),
       ...langsDeleted.map((langDeleted) => CategoryRepository.deleteItemLabels(surveyId, langDeleted, t)),
+    ])
+  )
+
+export const unpublishProps = async (surveyId, client = db) =>
+  client.tx(async (t) =>
+    Promise.all([
+      ...allCategoryRelatedTables.map((table) => unpublishSurveySchemaTableProps(surveyId, table, t)),
+      CategoryRepository.markCategoriesUnpublishedBySurveyId(surveyId, t),
     ])
   )
 

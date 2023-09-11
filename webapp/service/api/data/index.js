@@ -2,7 +2,8 @@ import axios from 'axios'
 
 import * as A from '@core/arena'
 import { Query } from '@common/model/query'
-import { objectToFormData } from '..'
+import { ConflictResolutionStrategy } from '@common/dataImport'
+import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD
 export const createRecordFromSamplingPointDataItem = async ({ surveyId, itemUuid }) => {
@@ -16,11 +17,12 @@ export const startCollectRecordsImportJob = async ({
   file,
   deleteAllRecords,
   cycle,
+  onUploadProgress,
   forceImport = false,
 } = {}) => {
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData)
+  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -35,6 +37,7 @@ export const startDataImportFromCsvJob = async ({
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
   abortOnErrors = true,
+  onUploadProgress,
 }) => {
   const formData = objectToFormData({
     cycle,
@@ -46,7 +49,19 @@ export const startDataImportFromCsvJob = async ({
     updateRecordsInAnalysis,
     abortOnErrors,
   })
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcsv`, formData)
+  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcsv`, formData, { onUploadProgress })
+  const { job } = data
+  return job
+}
+
+export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, onUploadProgress, dryRun = false }) => {
+  const formData = objectToFormData({
+    file,
+    cycle,
+    dryRun,
+    conflictResolutionStrategy: ConflictResolutionStrategy.overwriteIfUpdated,
+  })
+  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
   const { job } = data
   return job
 }

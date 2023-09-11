@@ -42,14 +42,15 @@ const valueConverterByNodeDefType = {
     }
     return String(['true', '1'].includes(String(val).toLocaleLowerCase()))
   },
-  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value, headers }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
     const category = Survey.getCategoryItemByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
       const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
       if (!itemUuid) {
-        throw new SystemError('validationErrors.dataImport.invalidCode', { code, headers })
+        const attributeName = NodeDef.getName(nodeDef)
+        throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
       }
       return Node.newNodeValueCode({ itemUuid })
     }
@@ -122,16 +123,18 @@ const validateHeaders =
  * @param {!object} params - The parameters object.
  * @param {!string} [params.filePath] - File path to be read.
  * @param {!object} [params.survey] - The survey object.
+ * @param {!string} [params.cycle] - The survey cycle.
  * @param {!string} [params.entityDefUuid] - The UUID of the entity definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
  * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
  * @returns {Promise} - Result promise. It resolves when the file is fully read.
  */
-const createReader = async ({ filePath, survey, entityDefUuid, onRowItem, onTotalChange }) => {
+const createReader = async ({ filePath, survey, cycle, entityDefUuid, onRowItem, onTotalChange }) => {
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
   const csvDataExportModel = new CsvDataExportModel({
     survey,
+    cycle,
     nodeDefContext: entityDef,
     options: {
       includeCategoryItemsLabels: false,

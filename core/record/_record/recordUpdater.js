@@ -1,13 +1,13 @@
 import * as R from 'ramda'
 
+import { Records, RecordNodesUpdater, Dates } from '@openforis/arena-core'
+
 import * as Validation from '@core/validation/validation'
 import * as Node from '@core/record/node'
 import * as RecordValidation from '@core/record/recordValidation'
-import * as DateUtils from '@core/dateUtils'
 
 import { keys } from './recordKeys'
 import * as RecordReader from './recordReader'
-import { Records, RecordNodesUpdater } from '@openforis/arena-core'
 
 // ====== UPDATE
 
@@ -86,7 +86,7 @@ export const mergeNodeValidations = (nodeValidations) => (record) =>
 export const dissocNodes = R.dissoc(keys.nodes)
 
 export const assocDateModified = (dateModified) => (record) => {
-  const dateModifiedString = DateUtils.formatDateTimeISO(dateModified)
+  const dateModifiedString = Dates.formatForStorage(dateModified)
   return R.assoc(keys.dateModified, dateModifiedString)(record)
 }
 

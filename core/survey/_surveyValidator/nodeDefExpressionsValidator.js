@@ -17,6 +17,7 @@ const expressionsByDependencyTypeFns = {
     NodeDefValidations.getExpressions
   ),
   [SurveyDependencyTypes.dependencyTypes.formula]: NodeDef.getFormula,
+  [SurveyDependencyTypes.dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
 }
 
 const applyIfUniquenessByDependencyType = {

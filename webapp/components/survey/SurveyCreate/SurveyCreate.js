@@ -9,6 +9,8 @@ import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { RecordCycle } from '@core/record/recordCycle'
+
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
@@ -20,7 +22,7 @@ import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
-import { Checkbox } from '@webapp/components/form'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
@@ -37,8 +39,19 @@ const SurveyCreate = (props) => {
     useCreateSurvey({
       template,
     })
-  const { createType, name, label, lang, source, validation, cloneFrom, options, file, uploadProgressPercent } =
-    newSurvey
+  const {
+    createType,
+    name,
+    label,
+    lang,
+    source,
+    validation,
+    cloneFrom,
+    cloneFromCycle,
+    options,
+    file,
+    uploadProgressPercent,
+  } = newSurvey
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -104,9 +117,29 @@ const SurveyCreate = (props) => {
       )}
 
       {createType === createTypes.clone && (
-        <FormItem label={i18n.t('common.cloneFrom')}>
-          <SurveyDropdown selection={cloneFrom} onChange={(value) => onUpdate({ name: 'cloneFrom', value })} />
-        </FormItem>
+        <>
+          <FormItem label={i18n.t('common.cloneFrom')}>
+            <SurveyDropdown
+              selection={cloneFrom?.value}
+              onChange={(value) => {
+                const cycles = value?.cycles || []
+                const lastCycleKey = cycles[cycles.length - 1]
+                onUpdate({ name: 'cloneFrom', value }, { name: 'cloneFromCycle', value: lastCycleKey })
+              }}
+            />
+          </FormItem>
+          {cloneFrom?.cycles?.length > 1 && (
+            <FormItem label={i18n.t('common.cycle')}>
+              <Dropdown
+                items={cloneFrom.cycles}
+                itemValue={(cycleKey) => cycleKey}
+                itemLabel={RecordCycle.getLabel}
+                onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
+                selection={cloneFromCycle}
+              />
+            </FormItem>
+          )}
+        </>
       )}
 
       {createType !== createTypes.import && (
@@ -128,7 +161,7 @@ const SurveyCreate = (props) => {
         <>
           {uploadProgressPercent >= 0 ? (
             <div className="row">
-              <ProgressBar progress={uploadProgressPercent} />
+              <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
             </div>
           ) : (
             <>

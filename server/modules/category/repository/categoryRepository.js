@@ -303,13 +303,13 @@ export const fetchItemsByLevelIndex = async (
 
   // join category_item table to get ancestors codes
   const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
-  const codesSelectFields = ancestorLevelIndexes.map((ancstorLevelIdx) =>
+  const codesSelectFields = ancestorLevelIndexes.map((ancestorLevelIdx) =>
     DbUtils.getPropColCombined(
       CategoryItem.keysProps.code,
       draft,
-      `i${ancstorLevelIdx}.`,
+      `i${ancestorLevelIdx}.`,
       true,
-      `level_${ancstorLevelIdx}_code`
+      `level_${ancestorLevelIdx}_code`
     )
   )
   const ancestorLevelIndexesReverse = [...ancestorLevelIndexes].reverse()
@@ -389,6 +389,12 @@ export const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =
   client.any(`
       UPDATE ${getSurveyDBSchema(surveyId)}.category
       SET published = true
+  `)
+
+export const markCategoriesUnpublishedBySurveyId = async (surveyId, client = db) =>
+  client.any(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.category
+      SET published = false
   `)
 
 export const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>

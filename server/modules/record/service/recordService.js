@@ -345,6 +345,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
     recordUuid,
     msg: {
       type: RecordsUpdateThreadMessageTypes.nodeDelete,
+      recordUuid,
       nodeUuid,
       user,
     },
@@ -352,11 +353,15 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
 
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId })
-  const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
-
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: Node.getRecordUuid(node) })
+  const surveySummary = await SurveyManager.fetchSurveyById({ surveyId })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    draft: !Survey.isPublished(surveySummary),
+  })
+  const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
+
   const fileNameParts = []
   Record.visitAncestorsAndSelf({
     node,

@@ -9,8 +9,8 @@ import * as ExpressionUtils from './helpers/utils'
 
 import { types } from './helpers/types'
 
-const { modes, thisVariable } = ExpressionConstants
-export { modes, thisVariable }
+const { modes, thisVariable, contextVariable } = ExpressionConstants
+export { modes, thisVariable, contextVariable }
 
 export { types } from './helpers/types'
 export { operators } from './helpers/operators'

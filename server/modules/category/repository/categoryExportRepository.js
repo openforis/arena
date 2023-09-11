@@ -170,9 +170,10 @@ const generateCategoryExportQuery = ({ surveyId, category, selectFields, languag
 
 const _getSelectFieldsExcludingExtra = ({ category, languages = [] }) => {
   const levels = Category.getLevelsArray(category)
+  const flat = levels.length === 1
   return levels
     .sort((la, lb) => la.index - lb.index)
-    .reduce((headers, level) => [...headers, CategoryExportFile.getLevelCodeHeader({ level })], [])
+    .reduce((headers, level) => [...headers, CategoryExportFile.getLevelCodeHeader({ level, flat })], [])
     .concat(languages.map((language) => CategoryExportFile.getLabelHeader({ language })))
     .concat(languages.map((language) => CategoryExportFile.getDescriptionHeader({ language })))
 }

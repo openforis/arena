@@ -5,14 +5,17 @@ import { gotoTemplateCreate } from '../_navigation'
 export const createTemplate = (template) => {
   gotoTemplateCreate()
 
-  const { cloneFromLabel, label, name } = template
+  const { cloneFrom, cloneFromLabel, label, name } = template
 
   test(`Create Template ${name}`, async () => {
     await page.fill(getSelector(TestId.surveyCreate.surveyName, 'input'), name)
 
-    if (cloneFromLabel) {
+    if (cloneFrom) {
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' })))
-      await FormUtils.selectDropdownItem({ testId: TestId.surveyCreate.surveyCloneFrom, label: cloneFromLabel })
+      await FormUtils.selectDropdownItem({
+        testId: TestId.surveyCreate.surveyCloneFrom,
+        label: `${cloneFrom} - ${cloneFromLabel}`,
+      })
       await page.click(getSelector(TestId.surveyCreate.submitBtn, 'button'))
       await Promise.all([
         page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),
@@ -28,6 +31,6 @@ export const createTemplate = (template) => {
     }
 
     const surveyTitleSelector = getSelector(TestId.header.surveyTitle)
-    await expect(await page.innerText(surveyTitleSelector)).toBe(`${label}`)
+    await expect(await page.innerText(surveyTitleSelector)).toBe(`${label} [${name}]`)
   })
 }

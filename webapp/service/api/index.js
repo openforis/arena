@@ -5,6 +5,7 @@ export {
   fetchCategory,
   createCategory,
   fetchCategoryItems,
+  fetchCategoryItemsInLevelRequest,
   countSamplingPointData,
   fetchSamplingPointData,
   deleteCategory,
@@ -29,6 +30,7 @@ export { fetchActivityLogs } from './activityLog'
 export {
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
+  startDataImportFromArenaJob,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
   updateRecordsStep,
@@ -39,11 +41,12 @@ export {
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
 } from './data'
-export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
 export {
   fetchNodeDef,
   fetchNodeDefs,
+  moveNodeDef,
   putNodeDefProps,
   putNodeDefsProps,
   postNodeDef,

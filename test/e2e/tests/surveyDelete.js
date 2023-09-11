@@ -10,7 +10,13 @@ const deleteSurvey = async (surveyToDelete) => {
 
   await clickSurvey(surveyToDelete)
 
-  await page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button'))
+  await page.click(getSelector(TestId.dashboard.advancedFunctionsBtn, 'button'))
+
+  await Promise.all([
+    page.waitForSelector(getSelector(TestId.modal.modal)),
+    page.click(getSelector(TestId.dashboard.surveyDeleteBtn, 'button')),
+  ])
+
   await page.fill(getSelector(TestId.dialogConfirm.strongConfirmInput), name)
 
   // Click div[role="dialog"] >> text="Delete"

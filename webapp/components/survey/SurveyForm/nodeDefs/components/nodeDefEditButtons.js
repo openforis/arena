@@ -17,6 +17,8 @@ import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button } from '@webapp/components'
 
+import { NodeDefEditButtonsMenu } from './nodeDefEditButtonsMenu'
+
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef } = props
 
@@ -79,17 +81,17 @@ const NodeDefEditButtons = (props) => {
         to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
         title={i18n.t('surveyForm.edit', { nodeDefLabel })}
       >
-        <span className="icon icon-pencil2 icon-12px" />
+        <span className="icon icon-pencil2 icon-16px" />
       </Link>
+
+      <NodeDefEditButtonsMenu nodeDef={nodeDef} />
 
       {NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && (
         <Button
           className="btn-s btn-transparent"
           onClick={() => dispatch(NodeDefsActions.compressFormItems(nodeDef))}
-          onMouseDown={(e) => {
-            e.stopPropagation()
-          }}
-          iconClassName="icon-paragraph-justify"
+          onMouseDown={(e) => e.stopPropagation()}
+          iconClassName="icon-stack"
           title="surveyForm.compressFormItems"
           titleParams={{ nodeDefLabel }}
         />
@@ -100,24 +102,9 @@ const NodeDefEditButtons = (props) => {
           testId={TestId.surveyForm.nodeDefAddChildToBtn(nodeDefName)}
           className="btn-s btn-transparent"
           onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
-          onMouseDown={(e) => {
-            e.stopPropagation()
-          }}
+          onMouseDown={(e) => e.stopPropagation()}
           iconClassName="icon-plus icon-12px"
           title="surveyForm.addChildToTitle"
-          titleParams={{ nodeDefLabel }}
-        />
-      )}
-
-      {!NodeDef.isRoot(nodeDef) && (
-        <Button
-          className="btn-s btn-transparent"
-          onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
-          onMouseDown={(e) => {
-            e.stopPropagation()
-          }}
-          iconClassName="icon-bin2 icon-12px"
-          title="surveyForm.delete"
           titleParams={{ nodeDefLabel }}
         />
       )}

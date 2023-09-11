@@ -12,7 +12,8 @@ export default () =>
         await page.click(getSelector(TestId.records.tableRowDeleteButton(idx)))
         await page.waitForSelector(getSelector(TestId.modal.modal))
         await page.click(TestId.modal.ok)
-        await page.waitForNavigation()
+        // wait for records list to refresh
+        await page.waitForTimeout(1000)
       })
 
       test(`Verify record at index ${idx} deleted`, async () => {

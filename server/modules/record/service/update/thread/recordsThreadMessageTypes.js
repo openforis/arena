@@ -3,6 +3,7 @@ export const RecordsUpdateThreadMessageTypes = {
   threadInit: 'threadInit',
 
   recordInit: 'recordInit',
+  recordReload: 'recordReload',
   nodePersist: 'nodePersist',
   nodeDelete: 'nodeDelete',
 }

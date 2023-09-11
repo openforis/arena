@@ -12,23 +12,24 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
-import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
-import * as ChainRepository from '@server/modules/analysis/repository/chain'
+import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
 
 export {
   addNodeDefsCycles,
   deleteNodeDefsCycles,
+  deleteOrphaneNodeDefs,
   permanentlyDeleteNodeDefs,
   markNodeDefsWithoutCyclesDeleted,
   updateNodeDefAnalysisCycles,
   insertNodeDefsBatch,
   updateNodeDefPropsInBatch,
+  unpublishNodeDefsProps,
 } from '../repository/nodeDefRepository'
 
 const _persistNodeDefLayout = async ({ surveyId, nodeDef }, client = db) => {
   const { uuid: nodeDefUuid, parentUuid, props } = nodeDef
   const { layout } = props
-  return NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, parentUuid, { layout }, {}, client)
+  return NodeDefRepository.updateNodeDefProps({ surveyId, nodeDefUuid, parentUuid, props: { layout } }, client)
 }
 
 const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cyclesPrev }, client = db) => {
@@ -60,11 +61,12 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
       // add db update to batch
       batchUpdates.push(
         NodeDefRepository.updateNodeDefProps(
-          surveyId,
-          descendantUuid,
-          parentUuid,
-          { [NodeDef.propKeys.cycles]: cyclesUpdated },
-          {},
+          {
+            surveyId,
+            nodeDefUuid: descendantUuid,
+            parentUuid,
+            props: { [NodeDef.propKeys.cycles]: cyclesUpdated },
+          },
           client
         )
       )
@@ -96,6 +98,14 @@ export const insertNodeDef = async (
     if (nodeDefParentUpdated) {
       await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)
     }
+
+    const areaEstimatedNodeDef = NodeDef.hasAreaBasedEstimated(nodeDef)
+      ? await NodeDefAreaBasedEstimateManager.insertNodeDefAreaBasedEstimate(
+          { survey, chainUuid: NodeDef.getChainUuid(nodeDef), estimatedOfNodeDef: nodeDef },
+          t
+        )
+      : null
+
     if (addLogs) {
       await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, system, t)
     }
@@ -105,6 +115,7 @@ export const insertNodeDef = async (
     return {
       [NodeDef.getUuid(nodeDef)]: nodeDef,
       ...(nodeDefParentUpdated ? { [NodeDef.getUuid(nodeDefParentUpdated)]: nodeDefParentUpdated } : {}),
+      ...(areaEstimatedNodeDef ? { [NodeDef.getUuid(areaEstimatedNodeDef)]: areaEstimatedNodeDef } : {}),
     }
   })
 
@@ -133,30 +144,13 @@ export const fetchNodeDefsBySurveyId = async (
 
 // ======= UPDATE
 
-const _updateNodeDefAreaBasedEstimate = async (
-  { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef },
-  client = db
-) => {
-  const surveyId = Survey.getId(survey)
-  const chainUuid = NodeDef.getChainUuid(nodeDefAreaBasedEstimate)
-  const chain = await ChainRepository.fetchChain({ surveyId, chainUuid }, client)
-
-  let nodeDefAreaBasedEstimateUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({
-    survey,
-    chain,
-    nodeDefAreaBasedEstimate,
-    areaBasedEstimatedOfNodeDef,
-  })
-  nodeDefAreaBasedEstimateUpdated = await NodeDefRepository.updateNodeDefProps(
-    surveyId,
-    NodeDef.getUuid(nodeDefAreaBasedEstimate),
-    NodeDef.getParentUuid(nodeDefAreaBasedEstimate),
-    NodeDef.getProps(nodeDefAreaBasedEstimateUpdated),
-    NodeDef.getPropsAdvanced(nodeDefAreaBasedEstimateUpdated),
-    client
-  )
-  return nodeDefAreaBasedEstimateUpdated
-}
+const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
+  NodeDef.isCoordinate(nodeDef) &&
+  R.intersection(Object.keys(props))([
+    NodeDef.propKeys.includeAccuracy,
+    NodeDef.propKeys.includeAltitude,
+    NodeDef.propKeys.includeAltitudeAccuracy,
+  ]).length > 0
 
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
@@ -168,19 +162,31 @@ export const updateNodeDefProps = async (
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
     const nodeDefsUpdated = {}
+    let surveyUpdated = survey
+
+    const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
+      Object.assign(nodeDefsUpdated, nodeDefs)
+      surveyUpdated = Survey.mergeNodeDefs(nodeDefs)(surveyUpdated)
+    }
+
+    const _addNodeDefUpdatedToSurvey = (nodeDef) => {
+      if (nodeDef) {
+        _addNodeDefsUpdatedToSurvey({ [NodeDef.getUuid(nodeDef)]: nodeDef })
+      }
+    }
 
     // update node def into db
     const nodeDef = await NodeDefRepository.updateNodeDefProps(
-      surveyId,
-      nodeDefUuid,
-      parentUuid,
-      props,
-      propsAdvanced,
+      {
+        surveyId,
+        nodeDefUuid,
+        parentUuid,
+        props,
+        propsAdvanced,
+      },
       t
     )
-    nodeDefsUpdated[nodeDefUuid] = nodeDef
-
-    let surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(survey)
+    _addNodeDefUpdatedToSurvey(nodeDef)
 
     const updatingCycles = NodeDef.propKeys.cycles in props
 
@@ -199,37 +205,61 @@ export const updateNodeDefProps = async (
           },
           t
         )
-        Object.assign(nodeDefsUpdated, nodeDefsCyclesUpdated)
-        surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsCyclesUpdated })(surveyUpdated)
+        _addNodeDefsUpdatedToSurvey(nodeDefsCyclesUpdated)
       }
 
       // update layout
-      Object.assign(
-        nodeDefsUpdated,
-        NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({ survey: surveyUpdated, nodeDefUuid, cycles, cyclesPrev })
+      _addNodeDefsUpdatedToSurvey(
+        NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({
+          survey: surveyUpdated,
+          nodeDefUuid,
+          cycles,
+          cyclesPrev,
+        })
       )
-      surveyUpdated = Survey.mergeNodeDefs({ nodeDefs: nodeDefsUpdated })(surveyUpdated)
+    }
+
+    if (_propsUpdateRequiresParentLayoutUpdate({ nodeDef, props })) {
+      const nodeDefParent = Survey.getNodeDefParent(nodeDef)(surveyUpdated)
+      const nodeDefParentUpdated = NodeDefLayoutUpdater.adjustLayoutChildrenHeights({
+        survey: surveyUpdated,
+        nodeDef: nodeDefParent,
+      })
+      _addNodeDefUpdatedToSurvey(nodeDefParentUpdated)
     }
 
     const updatingLayout = NodeDefLayout.keys.layout in props
 
     if (updatingLayout) {
       const layout = props[NodeDefLayout.keys.layout]
-      Object.assign(
-        nodeDefsUpdated,
-        NodeDefLayoutUpdater.updateLayout({ survey: surveyUpdated, nodeDefUuid, layout, nodeDefPrev })
-      )
+      const nodeDefsLayoutUpdated = NodeDefLayoutUpdater.updateLayout({
+        survey: surveyUpdated,
+        nodeDefUuid,
+        layout,
+        nodeDefPrev,
+      })
+      _addNodeDefsUpdatedToSurvey(nodeDefsLayoutUpdated)
     }
 
-    const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
-    if (nameUpdated) {
-      const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDefPrev)(survey)
-      if (nodeDefAreaBasedEstimate) {
-        const nodeDefAreaBasedEstimateUpdated = await _updateNodeDefAreaBasedEstimate(
-          { survey, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef: nodeDef },
-          t
-        )
-        nodeDefsUpdated[nodeDefUuid] = nodeDefAreaBasedEstimateUpdated
+    if (NodeDef.isAnalysis(nodeDef)) {
+      const hasAreaBasedEstimateChanged =
+        NodeDef.keysPropsAdvanced.hasAreaBasedEstimated in propsAdvanced &&
+        NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
+
+      if (hasAreaBasedEstimateChanged) {
+        const nodeDefAreaBasedEstimateUpdated =
+          await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
+        _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
+      } else {
+        // node def name changed => update node def area based estimate generated name
+        const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
+        if (nameUpdated) {
+          const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
+            { survey, nodeDef },
+            t
+          )
+          _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
+        }
       }
     }
     const logContent = {
@@ -248,6 +278,57 @@ export const updateNodeDefProps = async (
     ])
 
     return nodeDefsUpdated
+  })
+
+export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
+  client.tx(async (t) => {
+    const result = {}
+
+    const addOrRemoveInParentLayout = async ({ nodeDef, add = true }) => {
+      const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
+        survey,
+        nodeDef,
+        cyclesAdded: add ? NodeDef.getCycles(nodeDef) : [],
+        cyclesDeleted: add ? [] : NodeDef.getCycles(nodeDef),
+      })
+      if (parentUpdated) {
+        await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
+        result[NodeDef.getUuid(parentUpdated)] = parentUpdated
+      }
+    }
+
+    const surveyId = Survey.getId(survey)
+
+    const nodeDefSource = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    // remove source node def from parent layout
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefSource, add: false })
+
+    const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
+
+    // update source node def parent uuid and meta
+    let nodeDefUpdated = NodeDef.changeParentEntity({ targetParentNodeDef })(nodeDefSource)
+
+    nodeDefUpdated = await NodeDefRepository.updateNodeDefProps(
+      {
+        surveyId,
+        nodeDefUuid,
+        parentUuid: targetParentNodeDefUuid,
+        meta: NodeDef.getMeta(nodeDefUpdated),
+      },
+      t
+    )
+
+    result[nodeDefUuid] = nodeDefUpdated
+
+    // add node def to target parent layout
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true })
+
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, nodeDefUpdated, false, t)
+
+    await markSurveyDraft(surveyId, t)
+
+    return result
   })
 
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {

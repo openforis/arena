@@ -1,6 +1,6 @@
 export const survey = {
   name: 'survey',
-  label: 'Survey',
+  label: 'My Survey',
   labels: {
     en: 'My Survey',
   },
