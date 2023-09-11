@@ -1,5 +1,5 @@
 import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock, MetricBlock } from '../../blocks'
-import { valuesToCalculations } from '../../blocks/common'
+import { valuesToCalculations, valuesToSpec, sliderBlock } from '../../blocks/common'
 
 const bar = {
   selector: {
@@ -75,94 +75,19 @@ const bar = {
             id: 'show-legend',
             title: 'Show Title',
             label: 'Show title',
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  showTitle: value,
-                },
-              }
-              return newSpec
-            },
+            valuesToSpec: valuesToSpec('showTitle'),
             defaultValue: false,
           }),
           title: TitleBlock({
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  title: value,
-                },
-              }
-              return newSpec
-            },
+            valuesToSpec: valuesToSpec('title'),
           }),
           'show-legend': ShowLegendBlock({
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  showLegend: value,
-                },
-              }
-              return newSpec
-            },
+            valuesToSpec: valuesToSpec('showLegend'),
             defaultValue: false,
           }),
-          'title-size': {
-            id: 'title-size',
-            title: 'Title Font Size',
-            subtitle: '',
-            type: 'slider',
-            params: { min: 0, max: 80, step: 1, default: 40, unit: 'px' },
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  titleSize: value,
-                },
-              }
-              return newSpec
-            },
-          },
-          'axis-size': {
-            id: 'axis-size',
-            title: 'Axis Font Size',
-            subtitle: '',
-            type: 'slider',
-            params: { min: 0, max: 80, step: 1, default: 25, unit: 'px' },
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  axisSize: value,
-                },
-              }
-              return newSpec
-            },
-          },
-          'ticks-size': {
-            id: 'ticks-size',
-            title: 'Ticks Size',
-            subtitle: '',
-            type: 'slider',
-            params: { min: 0, max: 80, step: 1, default: 15, unit: 'px' },
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  ticksSize: value,
-                },
-              }
-              return newSpec
-            },
-          },
+          'title-size': sliderBlock('title-size', 'Title Font Size', 40),
+          'axis-size': sliderBlock('axis-size', 'Axis Font Size', 25),
+          'ticks-size': sliderBlock('ticks-size', 'Ticks Size', 15),
           xTitle: TitleBlock({
             id: 'xAxis',
             title: 'Name of the X axis',

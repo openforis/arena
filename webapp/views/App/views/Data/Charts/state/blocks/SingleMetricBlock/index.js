@@ -1,5 +1,20 @@
 import { blockTypes } from '../common'
-import { _valuesToSpec, _singleLabelBuilder, _singleBlocks } from '../metricHelpers'
+import { _valuesToSpec } from '../metricHelpers'
+
+const _labelBuilder = (values) => {
+  const column = values.column.map(({ label }) => label)
+
+  return `${column}`
+}
+
+const _blocks = {
+  column: {
+    id: 'column',
+    title: 'Column',
+    type: 'select',
+    optionsParams: { filter: ['quantitative'] },
+  },
+}
 
 const SingleMetricBlock = ({
   id = 'metric',
@@ -7,9 +22,9 @@ const SingleMetricBlock = ({
   subtitle = '',
   type = blockTypes.metric,
   isMulti = false,
-  labelBuilder = _singleLabelBuilder,
+  labelBuilder = _labelBuilder,
   valuesToSpec = _valuesToSpec,
-  blocks = _singleBlocks,
+  blocks = _blocks,
   order = ['column'],
 } = {}) => ({
   id,
