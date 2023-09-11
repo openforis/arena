@@ -17,7 +17,7 @@ const _delete =
     const categoryUuid = Category.getUuid(category)
     await API.deleteCategory({ surveyId, categoryUuid })
 
-    dispatch(SurveyActions.surveyCategoryDeleted(category))
+    dispatch(SurveyActions.surveyCategoryDeleted(categoryUuid))
 
     if (callback) {
       callback()
