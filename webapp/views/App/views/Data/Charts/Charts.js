@@ -6,6 +6,7 @@ import Chart from './components/Chart'
 import Panel from './components/Panel'
 import DataSelector from './components/DataSelector'
 import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import { D3_CHART_TYPES } from './constants/chartTypes'
 
 import Split from 'react-split'
 
@@ -24,8 +25,7 @@ const Charts = () => {
   )
 
   useEffect(() => {
-    // if spec.chartType is 'scatterPlot' and data is not already fetched, fetch data
-    if ((spec.chartType === 'scatterPlot' || spec.chartType === 'barChart') && !chartData) {
+    if (D3_CHART_TYPES.includes(spec.chartType) && !chartData) {
       renderChart()
     }
   }, [spec, chartData]) // this effect runs whenever spec or chartData changes
