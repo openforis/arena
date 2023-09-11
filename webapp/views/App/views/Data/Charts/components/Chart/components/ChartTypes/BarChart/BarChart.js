@@ -7,13 +7,13 @@ const BarChart = ({ specs, originalData }) => {
   const chartRef = useRef()
 
   useEffect(() => {
-    if (!(specs && specs.query && specs.query.metric && specs.query.groupBy)) return
+    if (!specs?.query?.metric || !specs?.query?.groupBy) return
 
     const groupByField = specs.query.groupBy.field
 
     if (groupByField) {
       let data
-      if (originalData && originalData.chartResult) {
+      if (originalData?.chartResult) {
         data = originalData.chartResult.map((item) => ({
           groupBy: item[groupByField],
           [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]: parseFloat(

@@ -33,13 +33,7 @@ const ScatterPlot = ({ specs, originalData }) => {
     const width = chartRef.current.clientWidth - margin.left - margin.right
     const height = chartRef.current.clientHeight - margin.top - margin.bottom
 
-    const svg = d3
-      .select(chartRef.current)
-      .append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`)
+    const svg = createSvg(chartRef, width, height, margin)
 
     // Scales and color scale
     const xScale = d3.scaleLinear().range([0, width])
@@ -47,6 +41,63 @@ const ScatterPlot = ({ specs, originalData }) => {
     const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
 
     // Map specs
+    const {
+      xAxisTitle,
+      yAxisTitle,
+      title,
+      dotSize,
+      titleSize,
+      axisSize,
+      ticksSize,
+      showLegend,
+      xMax,
+      xMin,
+      yMax,
+      yMin,
+    } = mapSpecs(specs, data, xField, yField)
+
+    // Domain for scales
+    xScale.domain([xMin, xMax]).nice()
+    yScale.domain([yMin, yMax]).nice()
+
+    // Create and append axes
+    createAxes(svg, height, xScale, yScale, ticksSize)
+
+    // Create a symbol generator
+    let symbolGenerator = d3.symbol()
+
+    // Add a shape scale
+    const categories = Array.from(new Set(data.map((d) => d.category)))
+    const shapeScale = d3
+      .scaleOrdinal()
+      .domain(categories)
+      .range(categories.map((value, i) => shapeSymbols[i % shapeSymbols.length]))
+    // Draw points on the graph
+    drawPoints(svg, data, xScale, yScale, symbolGenerator, dotSize, colorScale, shapeScale, xField, yField)
+
+    // Append x axis title
+    appendAxisTitle(svg, width, height, margin, axisSize, xAxisTitle, yAxisTitle)
+
+    // Append chart title
+    appendChartTitle(svg, width, margin, titleSize, title)
+
+    // Create legend
+    if (showLegend && data.length > 0) {
+      createLegend(svg, width, colorScale, data)
+    }
+  }
+
+  const createSvg = (chartRef, width, height, margin) => {
+    return d3
+      .select(chartRef.current)
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`)
+  }
+
+  const mapSpecs = (specs, data, xField, yField) => {
     const xMetric = specs.query?.xMetric?.field || 'x'
     const yMetric = specs.query?.yMetric?.field || 'y'
     const xAxisTitle = specs.chart.xAxisTitle || xField
@@ -62,11 +113,25 @@ const ScatterPlot = ({ specs, originalData }) => {
     const yMax = parseFloat(specs.chart.yMax) || d3.max(data, (d) => d[yMetric])
     const yMin = parseFloat(specs.chart.yMin) || d3.min(data, (d) => d[yMetric])
 
-    // Domain for scales
-    xScale.domain([xMin, xMax]).nice()
-    yScale.domain([yMin, yMax]).nice()
+    return {
+      xMetric,
+      yMetric,
+      xAxisTitle,
+      yAxisTitle,
+      title,
+      dotSize,
+      titleSize,
+      axisSize,
+      ticksSize,
+      showLegend,
+      xMax,
+      xMin,
+      yMax,
+      yMin,
+    }
+  }
 
-    // Create and append axes
+  const createAxes = (svg, height, xScale, yScale, ticksSize) => {
     svg
       .append('g')
       .attr('transform', 'translate(0,' + height + ')')
@@ -79,17 +144,9 @@ const ScatterPlot = ({ specs, originalData }) => {
       .call(d3.axisLeft(yScale).ticks().tickSizeOuter(0))
       .selectAll('text')
       .style('font-size', ticksSize + 'px')
+  }
 
-    // Create a symbol generator
-    let symbolGenerator = d3.symbol()
-
-    // Add a shape scale
-    const categories = Array.from(new Set(data.map((d) => d.category)))
-    const shapeScale = d3
-      .scaleOrdinal()
-      .domain(categories)
-      .range(categories.map((value, i) => shapeSymbols[i % shapeSymbols.length]))
-    // Draw points on the graph
+  const drawPoints = (svg, data, xScale, yScale, symbolGenerator, dotSize, colorScale, shapeScale, xField, yField) => {
     svg
       .selectAll('.dot')
       .data(data)
@@ -112,8 +169,9 @@ const ScatterPlot = ({ specs, originalData }) => {
         d3.select('#tooltip').style('visibility', 'hidden')
       })
       .attr('d', (d) => symbolGenerator.type(shapeScale(d.category))()) // Here we set the symbol type
+  }
 
-    // Append x axis title
+  const appendAxisTitle = (svg, width, height, margin, axisSize, xAxisTitle, yAxisTitle) => {
     svg
       .append('text')
       .attr('transform', 'translate(' + width / 2 + ' ,' + (height + margin.bottom - 10) + ')')
@@ -122,7 +180,6 @@ const ScatterPlot = ({ specs, originalData }) => {
       .style('text-decoration', 'none') // Add this line
       .text(xAxisTitle)
 
-    // Append y axis title
     svg
       .append('text')
       .attr('transform', 'rotate(-90)')
@@ -132,8 +189,9 @@ const ScatterPlot = ({ specs, originalData }) => {
       .style('text-anchor', 'middle')
       .style('font-size', axisSize + 'px')
       .text(yAxisTitle)
+  }
 
-    // Append chart title
+  const appendChartTitle = (svg, width, margin, titleSize, title) => {
     svg
       .append('text')
       .attr('x', width / 2)
@@ -142,11 +200,6 @@ const ScatterPlot = ({ specs, originalData }) => {
       .style('font-size', titleSize + 'px')
       .style('text-decoration', 'none')
       .text(title)
-
-    // Create legend
-    if (showLegend && data.length > 0) {
-      createLegend(svg, width, colorScale, data)
-    }
   }
 
   return (

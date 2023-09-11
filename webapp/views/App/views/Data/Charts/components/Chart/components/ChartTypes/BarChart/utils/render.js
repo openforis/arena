@@ -9,16 +9,13 @@ import {
   renderGroupedBars,
 } from './renderHelpers'
 
-export const renderBarChart = (data, specs, metricAggregationNames, groupByField, chartRef) => {
+const setupChart = (data, specs, metricAggregationNames, chartRef) => {
   d3.select(chartRef.current).select('svg').remove()
   const margin = { top: 80, right: 60, bottom: 50, left: 100 }
   const width = chartRef.current.clientWidth - margin.left - margin.right
   const height = chartRef.current.clientHeight - margin.top - margin.bottom
 
   const isMultiMetric = metricAggregationNames.length > 1
-  const barMaxHeight = specs.chart.barMaxHeight ? parseInt(specs.chart.barMaxHeight, 10) : null
-  const yScale = d3.scaleLinear().rangeRound([height, 0])
-  const colorScale = d3.scaleOrdinal().domain(metricAggregationNames).range(d3.schemeCategory10)
   const isHorizontal = specs.chart.isHorizontal
 
   const svg = d3
@@ -37,6 +34,10 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
     .padding(0.1)
     .domain(data.map((d) => d.groupBy))
 
+  const yScale = d3.scaleLinear().rangeRound([height, 0])
+
+  const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+
   if (isHorizontal) {
     xScale.rangeRound([0, height])
     yScale.rangeRound([width, 0])
@@ -45,7 +46,58 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
     yScale.rangeRound([height, 0])
   }
 
+  return { width, height, svg, tooltip, xScale, yScale, colorScale, isHorizontal, isMultiMetric }
+}
+
+const renderBars = (
+  isMultiMetric,
+  specs,
+  svg,
+  data,
+  metricAggregationNames,
+  xScale,
+  yScale,
+  colorScale,
+  height,
+  tooltip,
+  isHorizontal
+) => {
+  if (isMultiMetric) {
+    if (specs.chart.stackedBars) {
+      renderStackedBars(svg, data, metricAggregationNames, { xScale, yScale }, colorScale, tooltip, isHorizontal)
+    } else {
+      renderGroupedBars(svg, data, {
+        metricAggregationNames,
+        xScale,
+        yScale,
+        colorScale,
+        height,
+        tooltip,
+        isHorizontal,
+      })
+    }
+  } else {
+    renderSingleMetricBars(svg, data, metricAggregationNames, {
+      xScale,
+      yScale,
+      colorScale,
+      height,
+      tooltip,
+      isHorizontal,
+    })
+  }
+}
+
+export const renderBarChart = (data, specs, metricAggregationNames, groupByField, chartRef) => {
+  const { width, height, svg, tooltip, xScale, yScale, colorScale, isHorizontal, isMultiMetric } = setupChart(
+    data,
+    specs,
+    metricAggregationNames,
+    chartRef
+  )
+
   const maxMetricValue = d3.max(data, (d) => d3.max(metricAggregationNames, (metric) => d[metric]))
+  const barMaxHeight = specs.chart.barMaxHeight ? parseInt(specs.chart.barMaxHeight, 10) : null
   if (barMaxHeight) {
     yScale.domain([0, Math.min(maxMetricValue, barMaxHeight)])
   } else {
@@ -60,26 +112,26 @@ export const renderBarChart = (data, specs, metricAggregationNames, groupByField
 
   renderAxes(
     svg,
-    xScale,
-    yScale,
-    width,
-    height,
-    xAxisTitle,
-    yAxisTitle,
-    specs.chart.axisSize || 14,
-    specs.chart.ticksSize || 12,
+    { xScale, yScale },
+    { width, height },
+    { xAxisTitle, yAxisTitle },
+    { axisSize: specs.chart.axisSize || 14, ticksSize: specs.chart.ticksSize || 12 },
     isHorizontal
   )
 
-  if (isMultiMetric) {
-    if (specs.chart.stackedBars) {
-      renderStackedBars(svg, data, metricAggregationNames, xScale, yScale, colorScale, height, tooltip, isHorizontal)
-    } else {
-      renderGroupedBars(svg, data, metricAggregationNames, xScale, yScale, colorScale, height, tooltip, isHorizontal)
-    }
-  } else {
-    renderSingleMetricBars(svg, data, metricAggregationNames, xScale, yScale, colorScale, height, tooltip, isHorizontal)
-  }
+  renderBars(
+    isMultiMetric,
+    specs,
+    svg,
+    data,
+    metricAggregationNames,
+    xScale,
+    yScale,
+    colorScale,
+    height,
+    tooltip,
+    isHorizontal
+  )
 
   if (specs.chart.showTitle) {
     renderTitle(svg, width, specs.chart.title, specs.chart.titleSize || 16)

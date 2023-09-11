@@ -45,18 +45,12 @@ export const renderLegend = (svg, metrics, colorScale, width) => {
     .text((d) => d) // use the metric name directly for the text
 }
 
-export const renderAxes = (
-  svg,
-  xScale,
-  yScale,
-  width,
-  height,
-  xAxisTitle,
-  yAxisTitle,
-  axisSize,
-  ticksSize,
-  isHorizontal
-) => {
+export const renderAxes = (svg, scales, dimensions, titles, sizes, isHorizontal) => {
+  const { xScale, yScale } = scales
+  const { width, height } = dimensions
+  let { xAxisTitle, yAxisTitle } = titles
+  const { axisSize, ticksSize } = sizes
+
   const bottomAxis = isHorizontal ? d3.axisLeft(xScale) : d3.axisBottom(xScale)
   const leftAxis = isHorizontal ? d3.axisBottom(yScale) : d3.axisLeft(yScale)
   if (isHorizontal) {
@@ -107,17 +101,8 @@ export const renderAxes = (
   svg.selectAll('.tick text').style('font-size', `${ticksSize}px`)
 }
 
-export const renderStackedBars = (
-  svg,
-  data,
-  metricAggregationNames,
-  xScale,
-  yScale,
-  colorScale,
-  height,
-  tooltip,
-  isHorizontal
-) => {
+export const renderStackedBars = (svg, data, metricAggregationNames, scales, colorScale, tooltip, isHorizontal) => {
+  const { xScale, yScale } = scales
   // Use D3's stack function to compute position of each metric
   const stack = d3.stack().keys(metricAggregationNames)
   const stackedData = stack(data)
@@ -128,7 +113,7 @@ export const renderStackedBars = (
     .data(stackedData)
     .enter()
     .append('g')
-    .attr('fill', (d, i) => colorScale(d.key))
+    .attr('fill', (d) => colorScale(d.key))
     .attr('class', 'metric')
 
   // Create the bars within each group
@@ -167,17 +152,8 @@ export const renderStackedBars = (
     })
 }
 
-export const renderSingleMetricBars = (
-  svg,
-  data,
-  metricAggregationNames,
-  xScale,
-  yScale,
-  colorScale,
-  height,
-  tooltip,
-  isHorizontal
-) => {
+export const renderSingleMetricBars = (svg, data, metricAggregationNames, chartProperties) => {
+  const { xScale, yScale, colorScale, height, tooltip, isHorizontal } = chartProperties
   svg
     .selectAll('rect')
     .data(data)
@@ -200,17 +176,8 @@ export const renderSingleMetricBars = (
     })
 }
 
-export const renderGroupedBars = (
-  svg,
-  data,
-  metricAggregationNames,
-  xScale,
-  yScale,
-  colorScale,
-  height,
-  tooltip,
-  isHorizontal
-) => {
+export const renderGroupedBars = (svg, data, chartProperties) => {
+  const { metricAggregationNames, xScale, yScale, colorScale, height, tooltip, isHorizontal } = chartProperties
   const xSubgroupScale = d3.scaleBand().domain(metricAggregationNames).range([0, xScale.bandwidth()]).padding(0.05)
   const metricGroups = svg
     .selectAll('.metricGroups')
