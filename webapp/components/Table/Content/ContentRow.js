@@ -31,17 +31,16 @@ export const ContentRow = (props) => {
 
   const itemPosition = index + offset + 1
 
-  const onClick = useCallback(async () => {
-    if (onRowClick) {
-      await onRowClick(item)
-    }
-  }, [item, onRowClick])
-
-  const onDoubleClick = useCallback(async () => {
-    if (onRowDoubleClick) {
-      await onRowDoubleClick(item)
-    }
-  }, [item, onRowDoubleClick])
+  const onClick = useCallback(
+    async (event) => {
+      if (event.detail === 1) {
+        await onRowClick?.(item)
+      } else {
+        await onRowDoubleClick?.(item)
+      }
+    },
+    [item, onRowClick, onRowDoubleClick]
+  )
 
   return (
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
@@ -49,7 +48,6 @@ export const ContentRow = (props) => {
       data-testid={`${module}_${index}`}
       role="button"
       onClick={onClick}
-      onDoubleClick={onDoubleClick}
       className={className}
       style={{ gridTemplateColumns, height }}
     >

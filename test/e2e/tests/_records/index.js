@@ -11,13 +11,12 @@ export const gotoRecord = (record) => {
   const clusterId = record[clusterIdName]
 
   test(`Goto record ${clusterIdName} ${clusterId}`, async () => {
-    const cellSelector = `${getSelector(TestId.records.cellNodeDef(clusterIdName))}[data-value="${clusterId}"]`
-    const cellLocator = page.locator(cellSelector)
+    const recordKeyCellSelector = `${getSelector(TestId.records.cellNodeDef(clusterIdName))}[data-value="${clusterId}"]`
 
     await Promise.all([
       page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
       page.waitForNavigation(),
-      cellLocator.dblclick(),
+      page.dblclick(recordKeyCellSelector),
     ])
   })
 }
