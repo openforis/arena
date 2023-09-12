@@ -88,7 +88,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
 }
 
 export const validateRecordKeysUniquenessAndPersistValidation = async (
-  { survey, record, excludeRecordsFromCount },
+  { survey, record, excludeRecordFromCount },
   t
 ) => {
   const nodesUnique = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
@@ -104,7 +104,7 @@ export const validateRecordKeysUniquenessAndPersistValidation = async (
       nodeDefsUnique,
       nodesUnique,
       recordUuidsExcluded: [Record.getUuid(record)],
-      excludeRecordsFromCount,
+      excludeRecordsFromCount: excludeRecordFromCount,
       errorKey: Validation.messageKeys.record.keyDuplicate,
     },
     t

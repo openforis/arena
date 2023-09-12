@@ -376,13 +376,18 @@ export const fetchRecordsCountByRootNodesValue = async (
   const filterCondition = nodeDefs
     .map((nodeDef, idx) => {
       const value = nodeValues[idx]
-      return `${rootTableAlias}.${NodeDefTable.getColumnName(nodeDef)}::text ${
-        Objects.isNil(value) ? ' IS NULL' : ` = $/attr_${idx}/`
-      }`
+      const fullColumnName = `${rootTableAlias}.${NodeDefTable.getColumnName(nodeDef)}`
+      if (Objects.isNil(value)) {
+        return `${fullColumnName} IS NULL`
+      }
+      if (NodeDef.isCoordinate(nodeDef)) {
+        return `${fullColumnName} = ST_GeomFromEWKT($/attr_${idx}/)`
+      }
+      return `${fullColumnName}::text = $/attr_${idx}/`
     })
     .join(' AND ')
 
-  const filterQueryParams = nodeDefs.reduce((acc, nodeDef, idx) => {
+  const filterQueryParams = nodeDefs.reduce((acc, _nodeDef, idx) => {
     acc[`attr_${idx}`] = nodeValues[idx]
     return acc
   }, {})
