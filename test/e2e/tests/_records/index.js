@@ -12,6 +12,8 @@ export const gotoRecord = (record) => {
 
   test(`Goto record ${clusterIdName} ${clusterId}`, async () => {
     const cellSelector = `${getSelector(TestId.records.cellNodeDef(clusterIdName))}[data-value="${clusterId}"]`
+    await page.waitForSelector(cellSelector, { timeout: 5000 })
+
     await Promise.all([
       page.waitForSelector(getSelector(TestId.surveyForm.surveyForm)),
       page.waitForNavigation(),
