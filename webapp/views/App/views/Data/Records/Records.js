@@ -15,48 +15,46 @@ import Table from '@webapp/components/Table'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import HeaderLeft from './HeaderLeft'
-import RowHeader from './RowHeader'
-import Row from './Row'
 import { useNodeDefKeysCategoryItemsInLevel } from './useNodeDefKeysCategoryItemsInLevel'
+import { useColumns } from './useColumns'
 
 const Records = () => {
   const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
   const nodeDefKeys = useNodeDefRootKeys()
-
   const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel()
-
-  const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
-
-  const noCols = 3 + nodeDefKeys.length
-  const gridTemplateColumns = `30px 70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 80px`
 
   const navigateToRecord = useCallback(
     (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`),
     [navigate]
   )
-  const refreshData = useCallback(() => {
+  const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
+
+  const onRecordsUpdate = useCallback(() => {
     setRecordsRequestedAt(Date.now())
   }, [setRecordsRequestedAt])
 
-  const onRecordsUpdate = refreshData
+  const columns = useColumns({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate })
+
+  const noCols = 3 + nodeDefKeys.length
+  const gridTemplateColumns = `30px 70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 80px`
 
   useOnWebSocketEvent({
     eventName: WebSocketEvents.recordDelete,
-    eventHandler: refreshData,
+    eventHandler: onRecordsUpdate,
   })
 
   return (
     <Table
+      visibleColumnsSelectionEnabled
+      columns={columns}
       module="records/summary"
       restParams={{ cycle, recordsRequestedAt }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={HeaderLeft}
-      headerProps={{ onRecordsUpdate, navigateToRecord }}
-      rowHeaderComponent={RowHeader}
-      rowComponent={Row}
-      rowProps={{ onRecordsUpdate, navigateToRecord, categoryItemsByCodeDefUuid }}
+      headerProps={{ navigateToRecord, onRecordsUpdate }}
+      rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
       noItemsLabelKey="dataView.records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
       onRowDoubleClick={navigateToRecord}

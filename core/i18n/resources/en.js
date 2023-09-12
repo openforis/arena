@@ -185,6 +185,9 @@ Do you want to proceed?`,
       nextPage: 'Next page',
       previousPage: 'Previous page',
     },
+    table: {
+      visibleColumns: 'Visible columns',
+    },
   },
 
   confirm: {
