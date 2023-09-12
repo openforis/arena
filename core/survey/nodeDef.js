@@ -144,7 +144,7 @@ const metaKeys = {
   h: 'h',
 }
 
-export const maxKeyAttributes = 3
+export const maxKeyAttributes = 5
 const MAX_FILE_SIZE_DEFAULT = 10
 
 export const visibleFieldsDefaultByType = {

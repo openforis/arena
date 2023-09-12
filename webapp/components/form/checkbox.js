@@ -4,9 +4,12 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import ValidationTooltip from '../validationTooltip'
-import { useI18n } from '@webapp/store/system'
 import { Objects } from '@openforis/arena-core'
+
+import { useI18n } from '@webapp/store/system'
+
+import ValidationTooltip from '../validationTooltip'
+import { LabelWithTooltip } from './LabelWithTooltip'
 
 const Checkbox = (props) => {
   const { className, id, validation, checked, label, onChange: onChangeProp, disabled, radio } = props
@@ -36,7 +39,7 @@ const Checkbox = (props) => {
           aria-disabled={disabled}
         >
           <span className={classNameIconContainer} />
-          {i18n.t(label)}
+          <LabelWithTooltip label={i18n.t(label)} />
         </button>
       </ValidationTooltip>
     </div>

@@ -6,17 +6,17 @@ import { useNavigate, useParams } from 'react-router'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import Table from '@webapp/components/Table'
-import { ButtonBack, ButtonDownload } from '@webapp/components/buttons'
+import { ButtonBack } from '@webapp/components/buttons'
 
 import RowHeader from './RowHeader'
 import Row from './Row'
+import { HeaderLeft } from './HeaderLeft'
 
 const ValidationReport = () => {
   const navigate = useNavigate()
-  const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
   const { recordUuid } = useParams()
@@ -38,6 +38,8 @@ const ValidationReport = () => {
     <div className="validation-report">
       <Table
         className="validation-report__table"
+        headerLeftComponent={HeaderLeft}
+        headerProps={{ restParams }}
         module="validationReport"
         restParams={restParams}
         gridTemplateColumns="70px 1fr 2fr 50px"
@@ -45,16 +47,11 @@ const ValidationReport = () => {
         rowComponent={Row}
         onRowClick={onRowClick}
       />
-      <div className="footer">
-        <div>{recordUuid && <ButtonBack />}</div>
-        <ButtonDownload
-          className="btn-csv-export"
-          href={`/api/survey/${surveyId}/validationReport/csv`}
-          requestParams={restParams}
-          label="common.csvExport"
-        />
-        <div />
-      </div>
+      {recordUuid && (
+        <div className="footer">
+          <ButtonBack />
+        </div>
+      )}
     </div>
   )
 }
