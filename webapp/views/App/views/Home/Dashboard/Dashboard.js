@@ -17,6 +17,12 @@ import Helper, { helperTypes } from './Helper'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 
+// Import mockup charts
+import MockupChart0 from './MockupChart0'
+import MockupChart1 from './MockupChart1'
+import MockupChart2 from './MockupChart2'
+import MockupChart3 from './MockupChart3'
+
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
 
@@ -35,7 +41,13 @@ const Dashboard = () => {
             {!Survey.isTemplate(surveyInfo) && (
               <div>
                 <RecordsSummary />
-                {canEditSurvey && <StorageSummary />}
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
+                  {/* {canEditSurvey && <StorageSummary />} */}
+                  <MockupChart0 />
+                  <MockupChart1 />
+                  <MockupChart2 />
+                </div>
+                <MockupChart3 />
               </div>
             )}
           </div>
