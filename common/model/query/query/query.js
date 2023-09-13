@@ -1,9 +1,7 @@
 import * as A from '@core/arena'
-
 import { ArrayUtils } from '@core/arrayUtils'
-
-import { keys, modes, displayTypes } from './keys'
 import { defaults } from './defaults'
+import { keys, modes, displayTypes } from './keys'
 
 export const DEFAULT_AGGREGATE_FUNCTIONS = {
   avg: 'avg',
@@ -57,6 +55,7 @@ export const assocMeasures = A.assoc(keys.measures)
 export const assocFilter = A.assoc(keys.filter)
 export const assocFilterRecordUuid = A.assoc(keys.filterRecordUuid)
 export const assocSort = A.assoc(keys.sort)
+export const assocMode = A.assoc(keys.mode)
 
 // mode
 export const toggleModeAggregate = (query) => ({

@@ -1,11 +1,12 @@
 import './Charts.scss'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Query } from '@common/model/query'
 import { Button } from '@webapp/components/buttons'
 import Chart from './components/Chart'
 import Panel from './components/Panel'
 import DataSelector from './components/DataSelector'
 import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import { D3_CHART_TYPES } from './constants/chartTypes'
 
 import Split from 'react-split'
 
@@ -22,6 +23,12 @@ const Charts = () => {
     entityDefUuid,
     setEntityDefUuid
   )
+
+  useEffect(() => {
+    if (D3_CHART_TYPES.includes(spec.chartType) && !chartData) {
+      renderChart()
+    }
+  }, [spec, chartData]) // this effect runs whenever spec or chartData changes
 
   return (
     <div className={classNames('charts', { 'full-screen': fullScreen })}>
@@ -50,7 +57,7 @@ const Charts = () => {
           dimensions={dimensions}
         />
 
-        <Chart draft={draft} renderChart={renderChart} data={chartData} fullScreen={fullScreen} />
+        <Chart specs={spec} draft={draft} renderChart={renderChart} data={chartData} fullScreen={fullScreen} />
       </Split>
     </div>
   )

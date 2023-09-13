@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import axios from 'axios'
 import * as A from '@core/arena'
 
@@ -17,7 +17,9 @@ const useChartRender = (spec, query) => {
     try {
       if (!query) return
       setChartData(null)
-      const { data } = await axios.post(getUrl({ surveyId, query }), {
+
+      const apiUrl = getUrl({ surveyId, query })
+      const { data } = await axios.post(apiUrl, {
         cycle,
         query: A.stringify(query),
         chart: A.stringify(spec),
@@ -25,9 +27,16 @@ const useChartRender = (spec, query) => {
 
       setChartData(data)
     } catch (err) {
-      console.log(err)
+      console.error('Error occurred:', err.response ? err.response.data : err.message)
     }
   }, [spec, surveyId, cycle])
+
+  // Call renderChart only when necessary data is available
+  useEffect(() => {
+    if (spec.chartType === 'barChart' ? spec.metric && spec.query && spec.query.groupBy : spec.metric) {
+      renderChart()
+    }
+  }, [spec, renderChart])
 
   return {
     chartData,

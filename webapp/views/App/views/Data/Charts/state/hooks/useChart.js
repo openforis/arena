@@ -20,6 +20,13 @@ const useChart = (query, table, setTable) => {
     setDraft(true)
   }, [spec])
 
+  // Call renderChart whenever spec.query changes
+  useEffect(() => {
+    if (spec.query) {
+      renderChart()
+    }
+  }, [spec.query, renderChart])
+
   return { config, configItemsByPath, configActions, spec, updateSpec, draft, chartData, renderChart }
 }
 

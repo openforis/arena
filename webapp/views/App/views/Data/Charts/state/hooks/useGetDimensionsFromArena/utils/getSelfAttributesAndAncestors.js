@@ -24,6 +24,7 @@ const dimensionTypeByNodeDefType = {
 }
 
 const baseDimension = ({ nodeDef, language, nodeDefLabelType }) => ({
+  source_uuid: NodeDef.getUuid(nodeDef),
   name: NodeDef.getName(nodeDef),
   value: NodeDef.getName(nodeDef),
   label: NodeDef.getLabel(nodeDef, language, nodeDefLabelType),
