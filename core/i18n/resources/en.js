@@ -1025,6 +1025,7 @@ $t(common.cantUndoWarning)`,
   },
 
   expression: {
+    identifierNotFound: 'Attribute or entity "{{name}}" not found',
     invalid: 'Invalid expression: {{details}}',
     undefinedFunction: 'Undefined function: {{name}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
