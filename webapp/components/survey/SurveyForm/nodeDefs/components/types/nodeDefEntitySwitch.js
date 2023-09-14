@@ -2,8 +2,6 @@ import './nodeDefEntitySwitch.scss'
 
 import React from 'react'
 
-import * as A from '@core/arena'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -34,7 +32,7 @@ const NodeDefEntitySwitch = (props) => {
 
   const nodeDefName = NodeDef.getName(nodeDef)
   const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
-  const childNames = childUuids.map((childUuid) => A.pipe(Survey.getNodeDefByUuid(childUuid), NodeDef.getName))
+  const childNames = Survey.getNodeDefsByUuids(childUuids)(survey).map(NodeDef.getName)
 
   return (
     <div
