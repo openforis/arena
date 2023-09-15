@@ -14,9 +14,10 @@ export const useMapMarker = (props) => {
 
   const [state, setState] = useState({
     pointLatLon: null, // array with latitude and longitude values
+    pointUpdated: null,
   })
 
-  const { pointLatLon } = state
+  const { pointLatLon, pointUpdated } = state
   const pointSrs = point?.srs
 
   const fromPointToLatLon = useCallback(
@@ -43,17 +44,18 @@ export const useMapMarker = (props) => {
 
   const onPointUpdated = useCallback(
     ({ lat, lng }) => {
-      setState((statePrev) => ({
-        ...statePrev,
-        pointLatLon: [lat, lng],
-      }))
-
       let pointUpdated = PointFactory.createInstance({ x: lng, y: lat })
 
       // transform updated location into a location with the same SRS as the marker position parameter
       if (pointSrs && pointSrs !== pointUpdated.srs) {
         pointUpdated = Points.transform(pointUpdated, pointSrs, srsIndex)
       }
+      setState((statePrev) => ({
+        ...statePrev,
+        pointLatLon: [lat, lng],
+        pointUpdated,
+      }))
+
       onPointUpdatedProp(pointUpdated)
     },
     [onPointUpdatedProp, pointSrs, srsIndex]
@@ -72,14 +74,14 @@ export const useMapMarker = (props) => {
     [onPointUpdated]
   )
 
-  if (editable) {
-    useMapEvents({
-      dblclick(event) {
+  useMapEvents({
+    dblclick(event) {
+      if (editable) {
         const { lat, lng } = event.latlng
         onPointUpdated({ lat, lng })
-      },
-    })
-  }
+      }
+    },
+  })
 
-  return { markerEventHandlers, markerRef, pointLatLon }
+  return { markerEventHandlers, markerRef, pointLatLon, pointUpdated }
 }
