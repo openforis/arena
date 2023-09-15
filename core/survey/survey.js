@@ -121,6 +121,7 @@ export const {
   isDraft,
   isValid,
   isFromCollect,
+  isRdbInitialized,
   getCollectUri,
   getCollectReport,
   getCollectNodeDefsInfoByPath,
@@ -135,7 +136,7 @@ export const {
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
 
 // ====== READ nodeDefs
 export const {
