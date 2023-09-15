@@ -4,8 +4,6 @@ import React from 'react'
 import { MapContainer, ScaleControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { Points } from '@openforis/arena-core'
-
 import { ButtonSave } from '@webapp/components'
 
 import i18n from '@core/i18n/i18nFactory'
@@ -35,7 +33,7 @@ const INITIAL_ZOOM_LEVEL = 3
 
 export const Map = (props) => {
   const { editable, layers, markerPoint, markerTitle, showOptions } = props
-  const { centerPositionLatLon, mapEventHandlers, markerPointUpdated, onMarkerPointUpdated, onSaveClick } =
+  const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
     useMap(props)
 
   if (!centerPositionLatLon) {
@@ -47,12 +45,7 @@ export const Map = (props) => {
       {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
 
       <MapContextProvider>
-        <MapContainer
-          center={centerPositionLatLon}
-          doubleClickZoom={false}
-          zoom={INITIAL_ZOOM_LEVEL}
-          eventHandlers={mapEventHandlers}
-        >
+        <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={INITIAL_ZOOM_LEVEL}>
           <ScaleControl position="topleft" />
           <MapLayersControl layers={layers} />
           <MapMarker
@@ -61,9 +54,13 @@ export const Map = (props) => {
             onPointUpdated={onMarkerPointUpdated}
             title={markerTitle}
           />
-          {showOptions && <MapOptionsEditor />}
-          <KmlUploader />
-          <MapBaseLayerPeriodSelector />
+          {showOptions && (
+            <>
+              <MapOptionsEditor />
+              <KmlUploader />
+              <MapBaseLayerPeriodSelector />
+            </>
+          )}
           <ShowZoomLevel />
           {/* <WmtsComponent /> */}
         </MapContainer>
@@ -74,7 +71,7 @@ export const Map = (props) => {
           {markerPointUpdated && (
             <div className="location-updated-label">
               <label>
-                {i18n.t('mapView.locationUpdated')}:<span>{Points.toString(markerPointUpdated)}</span>
+                {i18n.t('mapView.locationUpdated')}:<span> {markerPointUpdatedToString}</span>
               </label>
             </div>
           )}
