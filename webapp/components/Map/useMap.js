@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
@@ -43,19 +43,6 @@ export const useMap = (props) => {
     }))
   }, [centerPoint, fromPointToLatLon, markerPoint, srsIndex])
 
-  const mapEventHandlers = useMemo(
-    () => ({
-      dblclick(event) {
-        const [latitude, longitute] = event.latlng
-        setState((statePrev) => ({
-          ...statePrev,
-          markerPositionLatLon: PointFactory.createInstance({ x: longitute, y: latitude }),
-        }))
-      },
-    }),
-    []
-  )
-
   const onMarkerPointUpdated = useCallback((markerPointUpdated) => {
     setState((statePrev) => ({ ...statePrev, markerPointUpdated }))
   }, [])
@@ -64,10 +51,14 @@ export const useMap = (props) => {
     onMarkerPointChange(markerPointUpdated)
   }, [markerPointUpdated, onMarkerPointChange])
 
+  const markerPointUpdatedToString = markerPointUpdated
+    ? `${markerPointUpdated.y.toFixed(5)}, ${markerPointUpdated.x.toFixed(5)}`
+    : ''
+
   return {
     centerPositionLatLon,
-    mapEventHandlers,
     markerPointUpdated,
+    markerPointUpdatedToString,
     onMarkerPointUpdated,
     onSaveClick,
   }
