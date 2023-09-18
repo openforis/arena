@@ -166,7 +166,7 @@ export const deleteUserGroupBySurveyAndUser = async (surveyId, userUuid, client 
         JOIN
           survey s
         ON
-          s.id = $2
+          s.uuid = g.survey_uuid AND s.id = $2
         WHERE
           gu.user_uuid = $1
     )               
