@@ -28,6 +28,7 @@ export const VisibleColumnsMenu = (props) => {
 
   return (
     <ButtonMenu
+      className="btn-s"
       closeMenuOnItemClick={false}
       iconClassName="icon-cog"
       items={availableColumns.map((column) => {
