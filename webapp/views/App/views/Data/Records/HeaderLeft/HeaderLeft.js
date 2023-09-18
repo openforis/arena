@@ -77,7 +77,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
         <Button
           testId={TestId.records.addBtn}
           onClick={() => dispatch(RecordActions.createRecord(navigate))}
-          className="btn-s"
           iconClassName="icon-plus icon-12px icon-left"
           label="common.new"
         />

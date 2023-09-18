@@ -32,8 +32,9 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
     [navigateToRecord]
   )
 
-  return useMemo(
-    () => [
+  return useMemo(() => {
+    if (categoryItemsByCodeDefUuid === null) return null
+    return [
       {
         key: 'selected',
         renderItem: ({ itemSelected }) => (
@@ -56,6 +57,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
             {itemPosition}
           </div>
         ),
+        width: '3rem',
       },
       ...nodeDefKeys.map((nodeDef) => ({
         key: NodeDef.getUuid(nodeDef),
@@ -83,12 +85,14 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         header: 'common.dateCreated',
         sortable: true,
         renderItem: ({ item: record }) => DateUtils.formatDateTimeDisplay(Record.getDateCreated(record)),
+        width: '11rem',
       },
       {
         key: Record.keys.dateModified,
         header: 'common.dateLastModified',
         sortable: true,
         renderItem: ({ item: record }) => DateUtils.formatDateTimeDisplay(Record.getDateModified(record)),
+        width: '11rem',
       },
       {
         key: Record.keys.ownerName,
@@ -100,16 +104,19 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         header: 'dataView.records.step',
         sortable: true,
         renderItem: ({ item: record }) => Record.getStep(record),
+        width: '5rem',
       },
       {
         key: 'errors',
         header: 'common.error_plural',
         renderItem: ({ item: record }) => A.pipe(Validation.getValidation, Validation.getErrorsCount)(record),
+        width: '6rem',
       },
       {
         key: 'warnings',
         header: 'common.warning_plural',
         renderItem: ({ item: record }) => A.pipe(Validation.getValidation, Validation.getWarningsCount)(record),
+        width: '6rem',
       },
       {
         key: 'action-buttons',
@@ -134,8 +141,8 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
             </>
           )
         },
+        width: '80px',
       },
-    ],
-    [categoryItemsByCodeDefUuid, lang, nodeDefKeys, onRecordEditButtonClick, onRecordsUpdate, user]
-  )
+    ]
+  }, [categoryItemsByCodeDefUuid, lang, nodeDefKeys, onRecordEditButtonClick, onRecordsUpdate, user])
 }
