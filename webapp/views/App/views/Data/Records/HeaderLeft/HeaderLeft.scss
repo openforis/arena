@@ -1,16 +1,22 @@
 @import 'webapp/style/vars';
 
-$tableHeaderHeight: 40px;
+$tableHeaderHeight: 30px;
 
 .records__header-left {
   display: flex;
+  align-items: center;
   height: $tableHeaderHeight;
   column-gap: 1rem;
-}
 
-.records__header-left__input-search {
-  padding: 0px 5px;
-  border: 1px solid $greyBorder;
-  background: white;
-  width: 15rem;
+  button,
+  .btn {
+    padding: 0.5rem 0.8rem;
+  }
+
+  .records__header-left__input-search {
+    padding: 5px 5px;
+    border: 1px solid $greyBorder;
+    background: white;
+    width: 15rem;
+  }
 }

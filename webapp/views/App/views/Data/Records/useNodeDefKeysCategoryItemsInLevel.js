@@ -8,7 +8,7 @@ import { useSurvey } from '@webapp/store/survey'
 
 export const useNodeDefKeysCategoryItemsInLevel = () => {
   const survey = useSurvey()
-  const [result, setResult] = useState({})
+  const [result, setResult] = useState(null)
 
   useEffect(() => {
     const categoryItemsByCodeDefUuid = {}
@@ -18,9 +18,13 @@ export const useNodeDefKeysCategoryItemsInLevel = () => {
     const surveyId = Survey.getId(survey)
 
     const nodeDefCodeKeys = nodeDefKeys.filter(NodeDef.isCode)
+    if (nodeDefCodeKeys.length === 0) {
+      setResult({})
+      return
+    }
     nodeDefCodeKeys.forEach((nodeDefKey) => {
       const categoryUuid = NodeDef.getCategoryUuid(nodeDefKey)
-      if (!categoryUuid) return null // category not specified (e.g. error importing survey from Collect)
+      if (!categoryUuid) return // category not specified (e.g. error importing survey from Collect)
 
       const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDefKey)(survey)
       const { request, cancel } = API.fetchCategoryItemsInLevelRequest({
@@ -29,10 +33,12 @@ export const useNodeDefKeysCategoryItemsInLevel = () => {
         levelIndex,
         draft: false,
       })
-      requestCancelByNodeDefUuid[NodeDef.getUuid] = cancel
+      const nodeDefKeyUuid = NodeDef.getUuid(nodeDefKey)
+      requestCancelByNodeDefUuid[nodeDefKeyUuid] = cancel
       request.then(({ data }) => {
+        delete requestCancelByNodeDefUuid[nodeDefKeyUuid]
         const { items } = data
-        categoryItemsByCodeDefUuid[NodeDef.getUuid(nodeDefKey)] = items
+        categoryItemsByCodeDefUuid[nodeDefKeyUuid] = items
         if (Object.values(categoryItemsByCodeDefUuid).length === nodeDefCodeKeys.length) {
           setResult(categoryItemsByCodeDefUuid)
         }

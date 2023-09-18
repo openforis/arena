@@ -71,13 +71,12 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
 
-export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) =>
-  client.tx(async (tx) => {
-    const schema = getSurveyDBSchema(surveyId)
-    await tx.batch([
-      nodeDefs.map((nodeDef) =>
-        tx.none(
-          `
+export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.batch([
+    nodeDefs.map((nodeDef) =>
+      client.none(
+        `
     INSERT INTO ${schema}.node_def (
         parent_uuid,
         uuid,
@@ -93,22 +92,22 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }
     $4::jsonb, $5::jsonb,
     $6::jsonb, $7::jsonb, 
     $8,$9,$10)`,
-          [
-            NodeDef.getParentUuid(nodeDef),
-            nodeDef.uuid,
-            NodeDef.getType(nodeDef),
-            backup ? NodeDef.getProps(nodeDef) : {},
-            backup ? NodeDef.getPropsDraft(nodeDef) : NodeDef.getProps(nodeDef),
-            backup ? NodeDef.getPropsAdvanced(nodeDef) : {},
-            backup ? NodeDef.getPropsAdvancedDraft(nodeDef) : NodeDef.getPropsAdvanced(nodeDef),
-            NodeDef.getMeta(nodeDef),
-            NodeDef.isAnalysis(nodeDef),
-            NodeDef.isVirtual(nodeDef),
-          ]
-        )
-      ),
-    ])
-  })
+        [
+          NodeDef.getParentUuid(nodeDef),
+          nodeDef.uuid,
+          NodeDef.getType(nodeDef),
+          backup ? NodeDef.getProps(nodeDef) : {},
+          backup ? NodeDef.getPropsDraft(nodeDef) : NodeDef.getProps(nodeDef),
+          backup ? NodeDef.getPropsAdvanced(nodeDef) : {},
+          backup ? NodeDef.getPropsAdvancedDraft(nodeDef) : NodeDef.getPropsAdvanced(nodeDef),
+          NodeDef.getMeta(nodeDef),
+          NodeDef.isAnalysis(nodeDef),
+          NodeDef.isVirtual(nodeDef),
+        ]
+      )
+    ),
+  ])
+}
 
 // ============== READ
 
