@@ -1,6 +1,6 @@
 @import 'webapp/style/vars';
 
-$tableHeaderHeight: 30px;
+$tableHeaderHeight: 40px;
 $tableFooterHeight: 30px;
 
 .table {
@@ -10,7 +10,6 @@ $tableFooterHeight: 30px;
 }
 
 .table__header {
-  height: $tableHeaderHeight;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,7 +24,6 @@ $tableFooterHeight: 30px;
 }
 
 .table__footer {
-  height: $tableFooterHeight;
   display: flex;
   justify-content: flex-end;
 }

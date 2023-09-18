@@ -17,6 +17,7 @@ export const keys = {
   published: ObjectUtils.keys.published,
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
+  rdbInitialized: 'rdbInitialized',
   // Props
   collectUri: 'collectUri',
   collectReport: 'collectReport',
@@ -51,6 +52,8 @@ export const status = {
 }
 
 export const getInfo = (survey) => (survey.info ? survey.info : survey) // backwards compatibility: survey info were associated to 'info' prop
+
+export const isRdbInitialized = R.propOr(false, keys.rdbInitialized)
 
 // ====== READ surveyInfo
 export const { getId, getUuid, getProps, getPropsDraft, isPublished, getDescription, getDescriptions, getLabels } =
@@ -155,6 +158,8 @@ export const isTemplate = R.propEq(keys.template, true)
 export const markDraft = R.assoc(keys.draft, true)
 
 export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
+
+export const assocRDBInitilized = R.assoc(keys.rdbInitialized)
 
 // ====== UTILS
 

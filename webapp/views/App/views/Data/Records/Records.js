@@ -12,6 +12,7 @@ import { useSurveyCycleKey, useNodeDefRootKeys } from '@webapp/store/survey'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import Table from '@webapp/components/Table'
+import { LoadingBar } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import HeaderLeft from './HeaderLeft'
@@ -43,6 +44,10 @@ const Records = () => {
     eventName: WebSocketEvents.recordDelete,
     eventHandler: onRecordsUpdate,
   })
+
+  if (columns === null) {
+    return <LoadingBar />
+  }
 
   return (
     <Table

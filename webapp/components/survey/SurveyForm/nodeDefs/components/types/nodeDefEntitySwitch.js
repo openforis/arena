@@ -2,7 +2,6 @@ import './nodeDefEntitySwitch.scss'
 
 import React from 'react'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -20,20 +19,20 @@ const componentsByRenderType = {
 const NodeDefEntitySwitch = (props) => {
   const { surveyCycleKey, nodeDef } = props
 
+  const survey = useSurvey()
+
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
   if (!renderType) {
     // node def not in current cycle
     return null
   }
 
-  const survey = useSurvey()
-
   const includeAnalysis = false
-  const childDefs = Survey.getNodeDefChildren(props.nodeDef, includeAnalysis)(survey)
+  const childDefs = Survey.getNodeDefChildrenSorted({ nodeDef, includeAnalysis, cycle: surveyCycleKey })(survey)
 
   const nodeDefName = NodeDef.getName(nodeDef)
   const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
-  const childNames = childUuids.map((childUuid) => A.pipe(Survey.getNodeDefByUuid(childUuid), NodeDef.getName)(survey))
+  const childNames = Survey.getNodeDefsByUuids(childUuids)(survey).map(NodeDef.getName)
 
   return (
     <div
