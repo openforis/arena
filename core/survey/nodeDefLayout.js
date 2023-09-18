@@ -92,9 +92,11 @@ export const getLayoutChildrenCompressed =
             : // item in another row, can have the same x of the previous one
               Math.min(itemPrev.x, xOriginal)
 
+          const prevYDiff = itemPrev.yOriginal - itemPrev.y
+
           const y = sameRowOfPreviousItem
             ? // item can have the same y of the previous one
-              Math.min(itemPrev.y, yOriginal)
+              yOriginal - prevYDiff
             : // item in another row, move it yPrev + hPrev
               Math.min(itemPrev.y + itemPrev.h, yOriginal)
 
