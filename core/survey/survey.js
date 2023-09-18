@@ -149,6 +149,7 @@ export const {
   getNodeDefChildren,
   getNodeDefChildrenInOwnPage,
   hasNodeDefChildrenEntities,
+  getNodeDefChildrenSorted,
   getNodeDefChildByName,
   getNodeDefSiblingByName,
   getNodeDefByName,
