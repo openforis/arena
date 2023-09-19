@@ -1757,11 +1757,6 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.46.0.tgz#3f7802972e8b6fe3f88ed1aabc74ec596c456db6"
   integrity sha512-a8TLtmPi8xzPkCbp/OGFUo5yhRkHM2Ko9kOWP4znJr0WAhWyThaw3PnwX4vOTWOAMsV2uRt32PPDcEz63esSaA==
 
-"@esri/proj-codes@^3.0.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-3.1.0.tgz#c9602ad72a3ba2c0435f8fa547c0d2f00fbb5c4f"
-  integrity sha512-XySw4hYBq5It+zlXlESl3/Hr0xFGkbwaif5o8SJTiGfcWapU4LRh6JLey9Sg2BZGqS8IxpJENMEUl9J87t7adA==
-
 "@floating-ui/core@^1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.4.1.tgz#0d633f4b76052668afb932492ac452f7ebe97f17"
@@ -1787,7 +1782,7 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
-"@godaddy/terminus@^4.12.0":
+"@godaddy/terminus@^4.12.1":
   version "4.12.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.12.1.tgz#c4fdc280a4ac9655d4734250e22299a4ad46c54c"
   integrity sha512-Tm+wVu1/V37uZXcT7xOhzdpFoovQReErff8x3y82k6YyWa1gzxWBjTyrx4G2enjEqoXPnUUmJ3MOmwH+TiP6Sw==
@@ -2246,27 +2241,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.136":
-  version "0.0.136"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.136/07c348e36173b4d2c6c2fc7e2d520568c480e191#07c348e36173b4d2c6c2fc7e2d520568c480e191"
-  integrity sha512-Nx6JGYxQS1z+gfk1T97epANYw3g71K33DMUYs0S/aHlclzdH0zP9RpF2U3PVKVLoTakudV03QAllhiNe15lnjA==
-  dependencies:
-    "@esri/proj-codes" "^3.0.0"
-    "@jsep-plugin/regex" "^1.0.3"
-    bignumber.js "^9.1.1"
-    date-fns "^2.29.3"
-    jsep "^1.3.7"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    proj4 "^2.8.0"
-    uuid "^9.0.0"
-
-"@openforis/arena-core@^0.0.163":
-  version "0.0.163"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.163/9c34809c0a7dcba31d81329de418f366317fb235#9c34809c0a7dcba31d81329de418f366317fb235"
-  integrity sha512-6QBIJACNKxjnVyjuO/VGGRDjEpDMRsona0psxyas3msoLlh7opUihKwAIAscPc4rZl/YTS8vjSQlZD6fQRy4NA==
+"@openforis/arena-core@^0.0.164":
+  version "0.0.164"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.164/7b8f863f75216eaa8185b89c2fbce4bc4a434cd3#7b8f863f75216eaa8185b89c2fbce4bc4a434cd3"
+  integrity sha512-q2GNymzZDPLYQdMQHqqiXVip+TUK2GezJg9fc3nUpd9P0XFgJA0ue6boBCeKm9LRZoTb2TMbuTQXk/OSNjq24g==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.1"
@@ -2279,19 +2257,35 @@
     proj4 "^2.9.0"
     uuid "^9.0.0"
 
-"@openforis/arena-server@^0.1.28":
-  version "0.1.28"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.28/ecc705eb876d6ec2dfcdad8448b01611146416a0#ecc705eb876d6ec2dfcdad8448b01611146416a0"
-  integrity sha512-HFIeKLeeTm0OcKx+cT4eX7tZQkrvhCNcgxHNHKTTdqSKLGTvvVHjIMwVDtWb552FRGDuyb9iy2UJm4JjSwErow==
+"@openforis/arena-core@^0.0.166":
+  version "0.0.166"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.166/6aaecc0092f34f4074e5b77a8dbee08ce2f987c9#6aaecc0092f34f4074e5b77a8dbee08ce2f987c9"
+  integrity sha512-Z1Lqbc16uwy1lpCxGwGn/jcC6hlljLG/bE3prwzPq9wNryHSz+vYOpmNXecqEr11EhoO34zxwoMcdAX9n0K1+Q==
   dependencies:
-    "@godaddy/terminus" "^4.12.0"
-    "@openforis/arena-core" "^0.0.136"
+    "@jsep-plugin/regex" "^1.0.3"
+    bignumber.js "^9.1.2"
+    date-fns "^2.30.0"
+    jsep "^1.3.8"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    proj4 "^2.9.0"
+    uuid "^9.0.1"
+
+"@openforis/arena-server@^0.1.29":
+  version "0.1.29"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.29/c4c803947d561a5ac0691cf24ab5a106ff8d5704#c4c803947d561a5ac0691cf24ab5a106ff8d5704"
+  integrity sha512-bp4G6nSJzvjQp7qpzOTzNrPgnkY5gruLTPrfY3bRhiBIhSjJRTyA6VMKhZ9MautMcwKaGD/4uXKq9jdIPMr0aQ==
+  dependencies:
+    "@godaddy/terminus" "^4.12.1"
+    "@openforis/arena-core" "^0.0.164"
     bcryptjs "^2.4.3"
     body-parser "^1.20.2"
     compression "^1.7.4"
-    connect-pg-simple "^8.0.0"
-    db-migrate "^0.11.13"
-    db-migrate-pg "^1.2.2"
+    connect-pg-simple "^9.0.0"
+    db-migrate "^0.11.14"
+    db-migrate-pg "^1.5.2"
     express "^4.18.2"
     express-fileupload "^1.4.0"
     express-session "^1.17.2"
@@ -2299,8 +2293,8 @@
     log4js "^6.9.1"
     passport "^0.6.0"
     passport-local "^1.0.0"
-    pg-promise "^11.4.3"
-    socket.io "^4.6.1"
+    pg-promise "^11.5.4"
+    socket.io "^4.7.2"
 
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
@@ -3102,7 +3096,7 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/pg@^8.6.5":
+"@types/pg@^8.10.2":
   version "8.10.2"
   resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.10.2.tgz#7814d1ca02c8071f4d0864c1b17c589b061dba43"
   integrity sha512-MKFs9P6nJ+LAeHLU3V0cODEOgyThJ3OAnmOlsZsxux6sfQs3HRXR5bBn7xG5DjckEFhTAxsXi7k7cd0pCMxpJw==
@@ -4134,6 +4128,11 @@ bignumber.js@^9.1.1:
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.1.tgz#c4df7dc496bd849d4c9464344c1aa74228b4dac6"
   integrity sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==
 
+bignumber.js@^9.1.2:
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.2.tgz#b7c4242259c008903b13707983b5f4bbd31eda0c"
+  integrity sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==
+
 binary-extensions@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
@@ -4856,12 +4855,12 @@ connect-history-api-fallback@^2.0.0:
   resolved "https://registry.yarnpkg.com/connect-history-api-fallback/-/connect-history-api-fallback-2.0.0.tgz#647264845251a0daf25b97ce87834cace0f5f1c8"
   integrity sha512-U73+6lQFmfiNPrYbXqr6kZ1i1wiRqXnp2nhMsINseWXO8lDau0LGEffJ8kQi4EjLZympVgRdvqjAgiZ1tgzDDA==
 
-connect-pg-simple@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/connect-pg-simple/-/connect-pg-simple-8.0.0.tgz#f005051ef693b1e8fb8c3d5eb5e16e10ab3972b2"
-  integrity sha512-pBDa23RA1LCkwvRrPOh5xevB+Nknh1UDuhFOKsUrkUDodYqfiQT18P2qXc4lk/TqCMB6hI06B8KNncHh91bZMQ==
+connect-pg-simple@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/connect-pg-simple/-/connect-pg-simple-9.0.0.tgz#b09389c905deca5a7ef6220ab8cd4820cc08b6fb"
+  integrity sha512-tPHR01VQU/qnOl8bMsORD1WyrNkbVkyNmnXfXqaH4NZfxWb3zQkCTPbVHjkhjFpKCQpHA+Ry9Y7medndwyvq6A==
   dependencies:
-    "@types/pg" "^8.6.5"
+    "@types/pg" "^8.10.2"
     pg "^8.8.0"
 
 console-control-strings@^1.1.0:
@@ -5534,7 +5533,7 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@^2.29.3, date-fns@^2.30.0:
+date-fns@^2.30.0:
   version "2.30.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.30.0.tgz#f367e644839ff57894ec6ac480de40cae4b0f4d0"
   integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
@@ -5558,25 +5557,25 @@ db-migrate-base@^2.3.0:
   dependencies:
     bluebird "^3.1.1"
 
-db-migrate-pg@^1.2.2:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/db-migrate-pg/-/db-migrate-pg-1.3.0.tgz#b2e81fbf727e62e7b17dc1aa27a4c7d411468786"
-  integrity sha512-WBf1CTpQUkkoqb+c2dOe3mvuCM8OMpUtC6zFqRqdvccdqqCsDyqOTMT4islRiCuzn1G1BQdrfVnB8OuVsddWRQ==
+db-migrate-pg@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/db-migrate-pg/-/db-migrate-pg-1.5.2.tgz#43f0fe8ccf6aaf777959d84ed43897ae4695b011"
+  integrity sha512-agbT9biJi43E7wld9JgnpMKadYgIobMlRXdtRO8JLRWHI1Jc7mObl9pM7iv4AQ4UTLDgjtkqUqtXlfeWtRuRbA==
   dependencies:
     bluebird "^3.1.1"
     db-migrate-base "^2.3.0"
-    pg "^8.0.3"
-    semver "^5.0.3"
+    pg "^8.11.2"
+    semver "^7.5.4"
 
 db-migrate-shared@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/db-migrate-shared/-/db-migrate-shared-1.2.0.tgz#6125be1b3a5e661229fc75d50c85f6c3ffadbede"
   integrity sha512-65k86bVeHaMxb2L0Gw3y5V+CgZSRwhVQMwDMydmw5MvIpHHwD6SmBciqIwHsZfzJ9yzV/yYhdRefRM6FV5/siw==
 
-db-migrate@^0.11.13:
-  version "0.11.13"
-  resolved "https://registry.yarnpkg.com/db-migrate/-/db-migrate-0.11.13.tgz#b9e5b242c62e82ef8ed2b29e118698813e953d67"
-  integrity sha512-OE/bbDo/mQvLmZrui/2jNAiAECJROSURCOU5xs6qKr3FvtUE2O6b0xBUI6WyAAKdili3LJQHFlpqugiYCGTSBA==
+db-migrate@^0.11.14:
+  version "0.11.14"
+  resolved "https://registry.yarnpkg.com/db-migrate/-/db-migrate-0.11.14.tgz#a9fb80e70adc281355f5be3cf6eec141ffd1be5a"
+  integrity sha512-8e+/YsIlM3d69hj+cb6qG6WyubR8nwXfDf9gGLWl4AxHpI6mTomcqhRLNfPrs7Le7AZv2eEsgK8hkXDSQqfIvg==
   dependencies:
     balanced-match "^1.0.0"
     bluebird "^3.1.1"
@@ -8669,7 +8668,7 @@ jsdom@^16.6.0:
     ws "^7.4.6"
     xml-name-validator "^3.0.0"
 
-jsep@^1.3.7, jsep@^1.3.8:
+jsep@^1.3.8:
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/jsep/-/jsep-1.3.8.tgz#facb6eb908d085d71d950bd2b24b757c7b8a46d7"
   integrity sha512-qofGylTGgYj9gZFsHuyWAN4jr35eJ66qJCK4eKDnldohuUoQFbU3iZn2zjvEbd9wOAhP9Wx5DsAAduTyE1PSWQ==
@@ -10489,6 +10488,16 @@ pg-promise@^11.4.3:
     pg-minify "1.6.3"
     spex "3.3.0"
 
+pg-promise@^11.5.4:
+  version "11.5.4"
+  resolved "https://registry.yarnpkg.com/pg-promise/-/pg-promise-11.5.4.tgz#2436aa4697a56511ec7b017f7db9a06a990f8f6a"
+  integrity sha512-esYSkDt2h6NQOkfotGAm1Ld5OjoITJLpB88Z1PIlcAU/RQ0XQE2PxW0bLJEOMHPGV5iaRnj1Y7ARznXbgN4FNw==
+  dependencies:
+    assert-options "0.8.1"
+    pg "8.11.3"
+    pg-minify "1.6.3"
+    spex "3.3.0"
+
 pg-protocol@*, pg-protocol@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/pg-protocol/-/pg-protocol-1.6.0.tgz#4c91613c0315349363af2084608db843502f8833"
@@ -10525,10 +10534,25 @@ pg-types@^4.0.1:
     postgres-interval "^3.0.0"
     postgres-range "^1.1.1"
 
-pg@8.11.2, pg@^8.0.3, pg@^8.10.0, pg@^8.8.0:
+pg@8.11.2, pg@^8.10.0, pg@^8.8.0:
   version "8.11.2"
   resolved "https://registry.yarnpkg.com/pg/-/pg-8.11.2.tgz#1a23f6de7bfb65ba56e4dd15df96668d319900c4"
   integrity sha512-l4rmVeV8qTIrrPrIR3kZQqBgSN93331s9i6wiUiLOSk0Q7PmUxZD/m1rQI622l3NfqBby9Ar5PABfS/SulfieQ==
+  dependencies:
+    buffer-writer "2.0.0"
+    packet-reader "1.0.0"
+    pg-connection-string "^2.6.2"
+    pg-pool "^3.6.1"
+    pg-protocol "^1.6.0"
+    pg-types "^2.1.0"
+    pgpass "1.x"
+  optionalDependencies:
+    pg-cloudflare "^1.1.1"
+
+pg@8.11.3, pg@^8.11.2:
+  version "8.11.3"
+  resolved "https://registry.yarnpkg.com/pg/-/pg-8.11.3.tgz#d7db6e3fe268fcedd65b8e4599cda0b8b4bf76cb"
+  integrity sha512-+9iuvG8QfaaUrrph+kpF24cXkH1YOOUeArRNYIxq1viYHZagBxrTno7cecY1Fa44tJeZvaoG+Djpkc3JwehN5g==
   dependencies:
     buffer-writer "2.0.0"
     packet-reader "1.0.0"
@@ -11011,7 +11035,7 @@ process@^0.11.1:
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
   integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
-proj4@^2.1.4, proj4@^2.8.0, proj4@^2.9.0:
+proj4@^2.1.4, proj4@^2.9.0:
   version "2.9.0"
   resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.9.0.tgz#1b61db8c998313f80e2514609b339fb2d28cbb82"
   integrity sha512-BoDXEzCVnRJVZoOKA0QHTFtYoE8lUxtX1jST38DJ8U+v1ixY70Kpwi0Llu6YqSWEH2xqu4XMEBNGcgeRIEywoA==
@@ -12006,7 +12030,7 @@ selfsigned@^2.1.1:
   dependencies:
     node-forge "^1"
 
-"semver@2 || 3 || 4 || 5", semver@^5.0.3, semver@^5.3.0, semver@^5.5.0, semver@^5.6.0, semver@^5.7.1, semver@^5.7.2:
+"semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.5.0, semver@^5.6.0, semver@^5.7.1, semver@^5.7.2:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.2.tgz#48d55db737c3287cd4835e17fa13feace1c41ef8"
   integrity sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==
@@ -12272,7 +12296,7 @@ socket.io-parser@~4.2.4:
     "@socket.io/component-emitter" "~3.1.0"
     debug "~4.3.1"
 
-socket.io@^4.6.1:
+socket.io@^4.7.2:
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-4.7.2.tgz#22557d76c3f3ca48f82e73d68b7add36a22df002"
   integrity sha512-bvKVS29/I5fl2FGLNHuXlQaUH/BlzX1IN6S+NKLNZpBsPZIDH+90eQmCs2Railn4YUiww4SzUedJ6+uzwFnKLw==
@@ -13439,6 +13463,11 @@ uuid@^9.0.0:
   version "9.0.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.0.tgz#592f550650024a38ceb0c562f2f6aa435761efb5"
   integrity sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==
+
+uuid@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
 v8-to-istanbul@^8.1.0:
   version "8.1.1"
