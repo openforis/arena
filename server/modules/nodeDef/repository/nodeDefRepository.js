@@ -73,40 +73,36 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
   const schema = getSurveyDBSchema(surveyId)
-  return client.batch([
-    nodeDefs.map((nodeDef) =>
-      client.none(
-        `
-    INSERT INTO ${schema}.node_def (
-        parent_uuid,
-        uuid,
-        type,
-        props,
-        props_draft,
-        props_advanced,
-        props_advanced_draft,
-        meta,
-        analysis,
-        virtual)
-    VALUES ($1, $2, $3, 
-    $4::jsonb, $5::jsonb,
-    $6::jsonb, $7::jsonb, 
-    $8,$9,$10)`,
-        [
-          NodeDef.getParentUuid(nodeDef),
-          nodeDef.uuid,
-          NodeDef.getType(nodeDef),
-          backup ? NodeDef.getProps(nodeDef) : {},
-          backup ? NodeDef.getPropsDraft(nodeDef) : NodeDef.getProps(nodeDef),
-          backup ? NodeDef.getPropsAdvanced(nodeDef) : {},
-          backup ? NodeDef.getPropsAdvancedDraft(nodeDef) : NodeDef.getPropsAdvanced(nodeDef),
-          NodeDef.getMeta(nodeDef),
-          NodeDef.isAnalysis(nodeDef),
-          NodeDef.isVirtual(nodeDef),
-        ]
-      )
-    ),
-  ])
+  return client.none(
+    DbUtils.insertAllQuery(
+      schema,
+      'node_def',
+      [
+        'parent_uuid',
+        'uuid',
+        'type',
+        'props',
+        'props_draft',
+        'props_advanced',
+        'props_advanced_draft',
+        'meta',
+        'analysis',
+        'virtual',
+      ],
+      nodeDefs.map((nodeDef) => [
+        NodeDef.getParentUuid(nodeDef),
+        nodeDef.uuid,
+        NodeDef.getType(nodeDef),
+        backup ? NodeDef.getProps(nodeDef) : {},
+        backup ? NodeDef.getPropsDraft(nodeDef) : NodeDef.getProps(nodeDef),
+        backup ? NodeDef.getPropsAdvanced(nodeDef) : {},
+        backup ? NodeDef.getPropsAdvancedDraft(nodeDef) : NodeDef.getPropsAdvanced(nodeDef),
+        NodeDef.getMeta(nodeDef),
+        NodeDef.isAnalysis(nodeDef),
+        NodeDef.isVirtual(nodeDef),
+      ])
+    )
+  )
 }
 
 // ============== READ
