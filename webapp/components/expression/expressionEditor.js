@@ -5,14 +5,13 @@ import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
 
 import ExpressionEditorPopup from './expressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNodeDefByUuid } from '@webapp/store/survey'
 import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
@@ -33,8 +32,7 @@ const ExpressionEditor = (props) => {
   } = props
 
   const i18n = useI18n()
-  const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
+  const nodeDefCurrent = useNodeDefByUuid(nodeDefUuidCurrent)
 
   const [edit, setEdit] = useState(false)
 
@@ -54,11 +52,10 @@ const ExpressionEditor = (props) => {
   const idPrefix = `expression-editor-${placeholder ? 'placeholder' : index}-${qualifier}`
 
   const qualifierLabel = i18n.t(`expressionEditor.qualifier.${qualifier}`)
-  const nodeDefCurrent = Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey)
   const popupHeader = nodeDefCurrent
     ? i18n.t('expressionEditor.header.editingExpressionForNodeDefinition', {
         qualifier: qualifierLabel,
-        nodeDef: NodeDef.getLabel(nodeDefCurrent, lang),
+        nodeDef: NodeDef.getName(nodeDefCurrent),
       })
     : null
 
