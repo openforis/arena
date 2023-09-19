@@ -32,7 +32,6 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
     <ExpansionPanel buttonLabel="common.error_plural" className="app-job-monitor__job-errors" startClosed={!openPanel}>
       <DataGrid
         allowExportToCsv
-        autoPageSize
         autoRowHeight
         columns={[
           {
