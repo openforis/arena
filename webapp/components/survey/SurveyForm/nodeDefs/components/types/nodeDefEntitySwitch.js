@@ -32,7 +32,7 @@ const NodeDefEntitySwitch = (props) => {
 
   const nodeDefName = NodeDef.getName(nodeDef)
   const childUuids = NodeDefLayout.getLayoutChildrenUuids(surveyCycleKey)(nodeDef)
-  const childNames = Survey.getNodeDefsByUuids(childUuids)(survey).map(NodeDef.getName)
+  const childNames = childUuids.map((uuid) => NodeDef.getName(Survey.getNodeDefByUuid(uuid)(survey)))
 
   return (
     <div
