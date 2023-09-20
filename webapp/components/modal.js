@@ -1,8 +1,9 @@
 import './modal.scss'
-import React from 'react'
-import * as R from 'ramda'
 
-import { KeyboardMap } from '@webapp/utils/keyboardMap'
+import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
+import MuiModal from '@mui/material/Modal'
+
 import { TestId } from '@webapp/utils/testId'
 
 export const ModalClose = ({ _children, onClose }) => (
@@ -17,43 +18,37 @@ export const ModalBody = ({ children }) => <div className="modal-body">{children
 
 export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
 
-export class Modal extends React.Component {
-  constructor(props) {
-    super(props)
+export const Modal = (props) => {
+  const { children, className, closeOnEsc, onClose: onCloseProp } = props
 
-    this.state = { closed: false }
-  }
+  const onClose = useCallback(
+    (event) => {
+      onCloseProp?.(event)
+    },
+    [onCloseProp]
+  )
 
-  componentDidMount() {
-    window.addEventListener('keydown', this)
-    this.setState({ closed: false })
-  }
+  return (
+    <MuiModal
+      className={`modal ${className}`}
+      data-testid={TestId.modal.modal}
+      onClose={onClose}
+      disableEscapeKeyDown={!closeOnEsc}
+      open
+    >
+      <div className="modal-content">{children}</div>
+    </MuiModal>
+  )
+}
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this)
-  }
+Modal.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  closeOnEsc: PropTypes.bool,
+  onClose: PropTypes.func,
+}
 
-  handleEvent(e) {
-    const { onClose, closeOnEsc = true } = this.props
-
-    if (e.type === 'keydown' && e.keyCode === KeyboardMap.Esc) {
-      if (closeOnEsc && onClose) onClose()
-    }
-  }
-
-  render() {
-    const { children, isOpen = true, className = '' } = this.props
-
-    return R.propEq('closed', true)(this.state) ? null : (
-      <div
-        className={`modal ${className}`}
-        data-testid={TestId.modal.modal}
-        tabIndex="-1"
-        role="dialog"
-        style={{ display: isOpen ? 'block' : 'none' }}
-      >
-        <div className="modal-content">{children}</div>
-      </div>
-    )
-  }
+Modal.defaultProps = {
+  className: '',
+  closeOnEsc: false,
 }

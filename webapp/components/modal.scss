@@ -2,17 +2,17 @@
 
 $borderRadius: 2px;
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: $zIndex19AppModal;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: auto;
-  background-color: rgba($black, 0.7);
-}
+// .modal {
+//   display: none;
+//   position: fixed;
+//   z-index: $zIndex19AppModal;
+//   left: 0;
+//   top: 0;
+//   width: 100vw;
+//   height: 100vh;
+//   overflow: auto;
+//   background-color: rgba($black, 0.7);
+// }
 
 .modal-content {
   position: relative;
