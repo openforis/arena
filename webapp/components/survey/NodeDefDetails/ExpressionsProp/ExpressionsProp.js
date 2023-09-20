@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
+import classNames from 'classnames'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
@@ -12,7 +13,6 @@ import * as Expression from '@core/expressionParser/expression'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { FormItem } from '@webapp/components/form/Input'
-import ValidationTooltip from '@webapp/components/validationTooltip'
 import ExpressionProp from './ExpressionProp'
 
 const ExpressionsProp = (props) => {
@@ -48,41 +48,35 @@ const ExpressionsProp = (props) => {
   }
 
   return (
-    <FormItem label={label}>
-      <ValidationTooltip
-        validation={validation}
-        showKeys={false}
-        className={`node-def-edit__expressions-${qualifier}-tooltip`}
-      >
-        <div className="node-def-edit__expressions">
-          {values.map((value, i) => (
-            <ExpressionProp
-              key={i}
-              {...props}
-              excludeCurrentNodeDef={excludeCurrentNodeDef}
-              qualifier={qualifier}
-              index={i}
-              expression={value}
-              validation={Validation.getFieldValidation(i)(validation)}
-              onDelete={onDelete}
-              onUpdate={onUpdate}
-            />
-          ))}
+    <FormItem label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
+      <div className="node-def-edit__expressions">
+        {values.map((value, i) => (
+          <ExpressionProp
+            key={i}
+            {...props}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
+            qualifier={qualifier}
+            index={i}
+            expression={value}
+            validation={Validation.getFieldValidation(i)(validation)}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
+        ))}
 
-          {(multiple || R.isEmpty(values)) && (
-            <ExpressionProp
-              {...props}
-              excludeCurrentNodeDef={excludeCurrentNodeDef}
-              qualifier={qualifier}
-              index={values.length}
-              expression={NodeDefExpression.createExpressionPlaceholder()}
-              validation={{}}
-              onDelete={onDelete}
-              onUpdate={onUpdate}
-            />
-          )}
-        </div>
-      </ValidationTooltip>
+        {(multiple || R.isEmpty(values)) && (
+          <ExpressionProp
+            {...props}
+            excludeCurrentNodeDef={excludeCurrentNodeDef}
+            qualifier={qualifier}
+            index={values.length}
+            expression={NodeDefExpression.createExpressionPlaceholder()}
+            validation={{}}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
+        )}
+      </div>
     </FormItem>
   )
 }
