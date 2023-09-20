@@ -24,16 +24,16 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) => {
   return useCallback(async () => {
     const { file, source, ...surveyObj } = newSurvey
 
+    // reset upload progress (hide progress bar)
+    setNewSurvey({ ...newSurvey, uploadProgressPercent: -1, uploading: true })
+
     const formData = objectToFormData({ file, survey: JSON.stringify(surveyObj) })
 
     const onUploadProgress = (progressEvent) => {
       const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-      setNewSurvey({ ...newSurvey, uploadProgressPercent })
+      setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
     }
     const { data } = await axios.post(urlBasedOnSource[source], formData, { onUploadProgress })
-
-    // reset upload progress (hide progress bar)
-    setNewSurvey({ ...newSurvey, uploadProgressPercent: -1 })
 
     const { job, validation } = data
 
@@ -53,6 +53,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) => {
       setNewSurvey({
         ...newSurvey,
         validation,
+        uploading: false,
       })
     }
   }, [dispatch, newSurvey, setNewSurvey])

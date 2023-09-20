@@ -50,6 +50,7 @@ const SurveyCreate = (props) => {
     cloneFromCycle,
     options,
     file,
+    uploading,
     uploadProgressPercent,
   } = newSurvey
 
@@ -62,6 +63,7 @@ const SurveyCreate = (props) => {
     <div className="home-survey-create">
       <div className="row">
         <ButtonGroup
+          disabled={uploading}
           groupName={template ? 'templateCreateType' : 'surveyCreateType'}
           selectedItemKey={createType}
           onChange={onCreateTypeUpdate}
@@ -89,6 +91,7 @@ const SurveyCreate = (props) => {
       </div>
       <FormItem label={i18n.t('common.name')}>
         <Input
+          disabled={uploading}
           id={TestId.surveyCreate.surveyName}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
@@ -159,7 +162,7 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.import && showImport && (
         <>
-          {uploadProgressPercent >= 0 ? (
+          {uploading && uploadProgressPercent >= 0 ? (
             <div className="row">
               <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
             </div>
@@ -204,7 +207,7 @@ const SurveyCreate = (props) => {
               <div className="row">
                 <Button
                   className="btn-primary"
-                  disabled={!file}
+                  disabled={!file || uploading}
                   label={'homeView.surveyCreate.startImport'}
                   onClick={onImport}
                   testId={TestId.surveyCreate.startImportBtn}
