@@ -8,6 +8,8 @@ const initialState = {
   from: '',
   to: '',
   counts: [],
+  userCounts: [],
+  userDateCounts: [],
   timeRange: timeRanges._2Weeks,
 }
 

@@ -1,18 +1,30 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useContext, useState } from 'react'
 import * as d3 from 'd3'
+
+import { RecordsSummaryContext } from './RecordsSummaryContext'
 
 const MockupChart1 = () => {
   const ref = useRef()
+  const { userCounts } = useContext(RecordsSummaryContext)
+  const [totalCount, setTotalCount] = useState(0) // Add this line
 
   useEffect(() => {
-    const data = [150, 132, 110, 93, 88]
-    const users = ['User1', 'User2', 'User3', 'User4', 'User5']
+    const data = userCounts.map((userCount) => parseInt(userCount.count))
+    const users = userCounts.map((userCount) => (userCount.owner_name ? userCount.owner_name : userCount.owner_email))
+    const newTotalCount = data.reduce((a, b) => a + b, 0)
+    setTotalCount(newTotalCount)
 
-    const svg = d3.select(ref.current).append('svg').attr('width', 500).attr('height', 350)
+    // Select the SVG if it exists, otherwise create a new one
+    let svg = d3.select(ref.current).select('svg')
+    if (svg.empty()) {
+      svg = d3.select(ref.current).append('svg').attr('width', 500).attr('height', 350)
+    }
+    // Clear the SVG
+    svg.selectAll('*').remove()
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data) + 20])
+      .domain([0, Math.max(20, parseInt(d3.max(data)) + parseInt(d3.max(data)) * 0.1)])
       .range([0, 500])
     const yScale = d3.scaleBand().domain(users).range([0, 300]).padding(0.1)
 
@@ -54,13 +66,13 @@ const MockupChart1 = () => {
       .attr('class', 'userLabel')
       .text((d) => d)
       .attr('x', 0)
-      .attr('y', (d, i) => yScale(d) + yScale.bandwidth() / 2)
+      .attr('y', (d) => yScale(d) + yScale.bandwidth() / 2)
       .attr('fill', 'black')
-  }, [])
+  }, [userCounts])
 
   return (
     <div ref={ref} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-      <h4 style={{ textAlign: 'center' }}>Records added per user</h4>
+      <h4 style={{ textAlign: 'center' }}>Records added per user (Total of {totalCount})</h4>
     </div>
   )
 }

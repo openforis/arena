@@ -5,7 +5,7 @@ import * as Survey from '@core/survey/survey'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
-import { PieChart } from './PieChart'
+import GaugeChart from './GaugeChart'
 import { useI18n } from '@webapp/store/system'
 
 const colorsByKey = {
@@ -27,5 +27,5 @@ export const StorageSummary = () => {
     color: colorsByKey[key],
   }))
 
-  return <PieChart data={data} width={400} height={400} />
+  return <GaugeChart data={data} />
 }

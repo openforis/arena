@@ -227,6 +227,24 @@ export const init = (app) => {
     }
   })
 
+  app.get(
+    '/survey/:surveyId/records/dashboard/count/by-user',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, from, to, addDate = false } = Request.getParams(req)
+
+        const counts = addDate
+          ? await RecordService.fetchRecordCreatedCountsByDatesAndUser(surveyId, cycle, from, to)
+          : await RecordService.fetchRecordCreatedCountsByUser(surveyId, cycle, from, to)
+
+        res.json(counts)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, search } = Request.getParams(req)
