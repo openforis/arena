@@ -99,7 +99,7 @@ export const TestId = {
     ok: 'text="Ok"',
   },
   jobMonitor: {
-    errorItem: '.error-item',
+    errorsContainer: '.app-job-monitor__job-errors',
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',

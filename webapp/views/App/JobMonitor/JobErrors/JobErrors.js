@@ -66,7 +66,6 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
           errorKey,
           error,
         }))}
-        getRowClassName={() => 'error-item'}
         getRowId={(row) => row.errorKey}
       />
     </ExpansionPanel>
