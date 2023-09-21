@@ -32,8 +32,8 @@ export const Modal = (props) => {
     <MuiModal
       className={`modal ${className}`}
       data-testid={TestId.modal.modal}
-      onClose={onClose}
       disableEscapeKeyDown={!closeOnEsc}
+      onClose={onClose}
       open
     >
       <div className="modal-content">{children}</div>
@@ -50,5 +50,5 @@ Modal.propTypes = {
 
 Modal.defaultProps = {
   className: '',
-  closeOnEsc: false,
+  closeOnEsc: true,
 }

@@ -45,7 +45,7 @@ export const NodeDefEntitySelectorDialog = (props) => {
     !selectedEntityDefUuid || (isEntitySelectable && !isEntitySelectable?.(selectedEntityDefUuid))
 
   return (
-    <Modal isOpen={true} className="survey-form__node-def-entity-selector-dialog" closeOnEsc={true} onClose={onClose}>
+    <Modal className="survey-form__node-def-entity-selector-dialog" onClose={onClose}>
       <ModalHeader>{i18n.t(title, { nodeDefName: NodeDef.getName(currentNodeDef) })}</ModalHeader>
 
       <ModalBody>
