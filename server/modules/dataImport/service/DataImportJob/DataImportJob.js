@@ -151,7 +151,7 @@ export default class DataImportJob extends DataImportBaseJob {
       }
     } catch (e) {
       const { key, params } = e
-      const errorKey = key || Validation.messageKeys.dataImport.errorUpdatingValues
+      const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
       this._addError(errorKey, params)
     }
   }

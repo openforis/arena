@@ -349,7 +349,10 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
 
   const rootUniqueNodeDefsModified = nodeDefsModified.filter((nodeDef) => {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-    return NodeDef.isRoot(nodeDefParent) && NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
+    return (
+      NodeDef.isRoot(nodeDefParent) &&
+      NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef) && NodeDef.isSingle(nodeDef))
+    )
   })
   if (rootUniqueNodeDefsModified.length > 0) {
     // for each modified node def, validate record uniqueness of records with same record unique nodes
