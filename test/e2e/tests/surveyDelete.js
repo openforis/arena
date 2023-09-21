@@ -21,7 +21,6 @@ const deleteSurvey = async (surveyToDelete) => {
 
   await page.fill(getSelector(TestId.dialogConfirm.strongConfirmInput), name)
 
-  // Click div[role="dialog"] >> text="Delete"
   await Promise.all([
     page.waitForNavigation(/* { url: `{BASE_URL}/app/home/surveys/` } */),
     page.click(`${modalSelector} >> text="Delete"`),
