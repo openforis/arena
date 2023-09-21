@@ -8,20 +8,21 @@ import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
-    [Expression.functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
     [Expression.functionNames
       .categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
-    [Expression.functionNames.index]: `index(node_name)`,
+    [Expression.functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
+    [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
+    [Expression.functionNames.index]: `index(node_name), index(this), index($context), index(parent(this))`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
-    [Expression.functionNames.min]: 'min(3,1) = 1',
-    [Expression.functionNames.max]: 'max(3,1,2) = 3',
-    [Expression.functionNames.parent]: `parent(node_name)`,
-    [Expression.functionNames.pow]: 'pow(2,3) = 2³ = 8',
     [Expression.functionNames.ln]: 'ln(10) = 2.302…',
     [Expression.functionNames.log10]: 'log10(100) = 2',
-    [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
+    [Expression.functionNames.max]: 'max(3,1,2) = 3',
+    [Expression.functionNames.min]: 'min(3,1) = 1',
     [Expression.functionNames.now]: 'now()',
+    [Expression.functionNames.parent]: `parent(this), parent($context), parent(node_name)`,
+    [Expression.functionNames.pow]: 'pow(2,3) = 2³ = 8',
     [Expression.functionNames.taxonProp]: `taxonProp('taxonomy_name', 'extra_prop', 'taxon_code')`,
+    [Expression.functionNames.uuid]: 'uuid()',
   },
   [Expression.modes.sql]: {
     [Expression.functionNames.avg]: 'avg(variable_name)',
