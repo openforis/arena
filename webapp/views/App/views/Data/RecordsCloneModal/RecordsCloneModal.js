@@ -100,7 +100,7 @@ export const RecordsCloneModal = (props) => {
   }
 
   return (
-    <Modal className="records-clone">
+    <Modal className="records-clone" onClose={onClose}>
       <ModalHeader>
         <span>{i18n.t('dataView.recordsClone.title')}</span>
         <ModalClose onClose={onClose} />
