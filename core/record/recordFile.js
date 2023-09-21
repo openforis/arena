@@ -28,11 +28,11 @@ export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUu
   [keys.content]: content,
 })
 
-const getExtension = (fileName) => R.pipe(R.split('.'), R.tail)(fileName)
+const getExtensionFromFileName = (fileName) => R.pipe(R.split('.'), R.tail)(fileName)
 
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
-    const extension = getExtension(fileName)
+    const extension = getExtensionFromFileName(fileName)
 
     return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
@@ -46,6 +46,7 @@ export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted,
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getContent = R.prop(keys.content)
+export const getExtension = R.pipe(getName, getExtensionFromFileName)
 
 // UPDATE
 export const assocContent = R.assoc(keys.content)
