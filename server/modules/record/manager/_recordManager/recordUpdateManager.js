@@ -351,7 +351,8 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
     return (
       NodeDef.isRoot(nodeDefParent) &&
-      NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef) && NodeDef.isSingle(nodeDef))
+      NodeDef.isSingle(nodeDef) &&
+      NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
     )
   })
   if (rootUniqueNodeDefsModified.length > 0) {
