@@ -7,7 +7,13 @@ const Markdown = (props) => {
   const [output, setOutput] = useState('')
 
   useEffect(() => {
-    setOutput(marked.parse(source))
+    setOutput(
+      marked.parse(source, {
+        // disable deprecated options
+        headerIds: false,
+        mangle: false,
+      })
+    )
   }, [source])
 
   return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />

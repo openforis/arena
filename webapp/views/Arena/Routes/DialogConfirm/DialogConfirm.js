@@ -29,7 +29,7 @@ const DialogConfirm = () => {
   } = useDialogConfirm()
 
   return key ? (
-    <Modal className="dialog-confirm">
+    <Modal className="dialog-confirm" onClose={() => dispatch(DialogConfirmActions.onDialogConfirmCancel())}>
       {headerText && (
         <ModalHeader>
           <h5 className="dialog-confirm__header">{i18n.t(headerText)}</h5>
