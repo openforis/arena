@@ -15,6 +15,7 @@ export const functionNames = {
   pow: 'pow',
   sum: 'sum',
   taxonProp: 'taxonProp',
+  uuid: 'uuid',
 }
 
 /**

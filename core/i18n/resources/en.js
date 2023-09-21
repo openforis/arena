@@ -1069,7 +1069,7 @@ $t(common.appNameFull)
         'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
       distance: 'Returns the distance (in meters) between the specified coordinates',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
-      index: 'Returns the index of the context node among its siblings',
+      index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
@@ -1078,11 +1078,12 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Raise a number X to the power P',
+      taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+      uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
-      taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
     },
     basicProps: {
       analysis: 'Analysis',
