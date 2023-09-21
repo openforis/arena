@@ -13,8 +13,6 @@ $borderRadius: 2px;
   border: none;
   border-radius: $borderRadius;
   outline: 0;
-  animation-name: animatetop;
-  animation-duration: 0.4s;
   margin: 10vh 20vw auto;
   padding: 1rem 2rem;
   box-shadow: $shadow3;
@@ -65,13 +63,3 @@ $borderRadius: 2px;
   margin-right: 5px;
 }
 
-@keyframes animatetop {
-  from {
-    transform: translateY(-100px);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}

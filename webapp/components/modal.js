@@ -3,6 +3,7 @@ import './modal.scss'
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import MuiModal from '@mui/material/Modal'
+import Fade from '@mui/material/Fade'
 
 import { TestId } from '@webapp/utils/testId'
 
@@ -36,7 +37,9 @@ export const Modal = (props) => {
       onClose={onClose}
       open
     >
-      <div className="modal-content">{children}</div>
+      <Fade in timeout={500}>
+        <div className="modal-content">{children}</div>
+      </Fade>
     </MuiModal>
   )
 }
