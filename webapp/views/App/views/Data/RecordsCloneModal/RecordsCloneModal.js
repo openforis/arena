@@ -7,7 +7,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { Modal, ModalBody, ModalClose, ModalFooter, ModalHeader } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
@@ -100,11 +100,7 @@ export const RecordsCloneModal = (props) => {
   }
 
   return (
-    <Modal className="records-clone" onClose={onClose}>
-      <ModalHeader>
-        <span>{i18n.t('dataView.recordsClone.title')}</span>
-        <ModalClose onClose={onClose} />
-      </ModalHeader>
+    <Modal className="records-clone" onClose={onClose} showCloseButton title="dataView.recordsClone.title">
       <ModalBody>
         <FormItem label={i18n.t('dataView.recordsClone.fromCycle')}>{cycleFromLabel}</FormItem>
         <FormItem label={i18n.t('dataView.recordsClone.toCycle')}>

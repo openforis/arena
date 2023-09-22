@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
-import { Modal, ModalBody, ModalClose, ModalFooter, ModalHeader } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 
@@ -24,11 +24,12 @@ const ImportSummary = (props) => {
   const items = CategoryImportSummary.getItems(importSummary)
 
   return (
-    <Modal className="category__import-summary" onClose={Actions.hideImportSummary}>
-      <ModalHeader>
-        <span>{i18n.t('categoryEdit.importSummary.title')}</span>
-        <ModalClose onClose={Actions.hideImportSummary} />
-      </ModalHeader>
+    <Modal
+      className="category__import-summary"
+      onClose={Actions.hideImportSummary}
+      showCloseButton
+      title="categoryEdit.importSummary.title"
+    >
       <ModalBody>
         <div className="table">
           <div className="table__content">

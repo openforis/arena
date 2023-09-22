@@ -6,6 +6,7 @@ import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
 
 import { TestId } from '@webapp/utils/testId'
+import { useI18n } from '@webapp/store/system'
 
 export const ModalClose = ({ _children, onClose }) => (
   <div className="modal-close" onClick={() => onClose()}>
@@ -20,7 +21,9 @@ export const ModalBody = ({ children }) => <div className="modal-body">{children
 export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
 
 export const Modal = (props) => {
-  const { children, className, closeOnEsc, onClose: onCloseProp } = props
+  const { children, className, closeOnEsc, onClose: onCloseProp, showCloseButton, title, titleParams } = props
+
+  const i18n = useI18n()
 
   const onClose = useCallback(
     (event) => {
@@ -38,7 +41,15 @@ export const Modal = (props) => {
       open
     >
       <Fade in timeout={500}>
-        <div className="modal-content">{children}</div>
+        <div className="modal-content">
+          {(title || showCloseButton) && (
+            <ModalHeader>
+              {title && <span>{i18n.t(title, titleParams)}</span>}
+              {showCloseButton && <ModalClose onClose={onClose} />}
+            </ModalHeader>
+          )}
+          {children}
+        </div>
       </Fade>
     </MuiModal>
   )
@@ -49,9 +60,13 @@ Modal.propTypes = {
   className: PropTypes.string,
   closeOnEsc: PropTypes.bool,
   onClose: PropTypes.func,
+  title: PropTypes.string,
+  titleParams: PropTypes.object,
+  showCloseButton: PropTypes.bool,
 }
 
 Modal.defaultProps = {
   className: '',
   closeOnEsc: true,
+  showCloseButton: false,
 }

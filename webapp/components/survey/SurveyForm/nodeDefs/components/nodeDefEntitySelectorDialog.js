@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { Button } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { FormItem } from '@webapp/components/form/Input'
 
@@ -45,9 +45,12 @@ export const NodeDefEntitySelectorDialog = (props) => {
     !selectedEntityDefUuid || (isEntitySelectable && !isEntitySelectable?.(selectedEntityDefUuid))
 
   return (
-    <Modal className="survey-form__node-def-entity-selector-dialog" onClose={onClose}>
-      <ModalHeader>{i18n.t(title, { nodeDefName: NodeDef.getName(currentNodeDef) })}</ModalHeader>
-
+    <Modal
+      className="survey-form__node-def-entity-selector-dialog"
+      onClose={onClose}
+      title={title}
+      titleParams={{ nodeDefName: NodeDef.getName(currentNodeDef) }}
+    >
       <ModalBody>
         <FormItem label={i18n.t(entitySelectLabel)}>
           <EntitySelector
