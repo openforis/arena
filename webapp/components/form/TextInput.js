@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { TextField as MuiTextField } from '@mui/material'
 import classNames from 'classnames'
 
+import { useI18n } from '@webapp/store/system'
+
 export const TextInput = (props) => {
   const {
     autoComplete,
@@ -11,16 +13,18 @@ export const TextInput = (props) => {
     disabled,
     endAdornment,
     id,
-    label,
+    label: labelProp,
     name,
     onChange: onChangeProp,
-    placeholder,
+    placeholder: placeholderProp,
     readOnly,
     startAdornment,
     textTransformFunction,
     type,
     value,
   } = props
+
+  const i18n = useI18n()
 
   const onChange = useCallback(
     (e) => {
@@ -30,6 +34,9 @@ export const TextInput = (props) => {
     },
     [onChangeProp, textTransformFunction]
   )
+
+  const label = labelProp ? i18n.t(labelProp) : labelProp
+  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
 
   return (
     <MuiTextField
