@@ -7,7 +7,6 @@ import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button } from '@webapp/components/buttons'
-import { useI18n } from '@webapp/store/system'
 
 import TableHeader from './TableHeader'
 import TableRow from './TableRow'
@@ -17,7 +16,6 @@ import { State, useActions } from '../store'
 const ImportSummary = (props) => {
   const { state, setState } = props
 
-  const i18n = useI18n()
   const Actions = useActions({ setState })
 
   const importSummary = State.getImportSummary(state)
