@@ -6,7 +6,7 @@ import classNames from 'classnames'
 
 import { DialogConfirmActions, useDialogConfirm } from '@webapp/store/ui'
 
-import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
 import Markdown from '@webapp/components/markdown'
 import { TestId } from '@webapp/utils/testId'
@@ -29,12 +29,11 @@ const DialogConfirm = () => {
   } = useDialogConfirm()
 
   return key ? (
-    <Modal className="dialog-confirm" onClose={() => dispatch(DialogConfirmActions.onDialogConfirmCancel())}>
-      {headerText && (
-        <ModalHeader>
-          <h5 className="dialog-confirm__header">{i18n.t(headerText)}</h5>
-        </ModalHeader>
-      )}
+    <Modal
+      className="dialog-confirm"
+      onClose={() => dispatch(DialogConfirmActions.onDialogConfirmCancel())}
+      title={headerText}
+    >
       <ModalBody>
         <Markdown className={headerText ? 'highlight' : undefined} source={i18n.t(key, params)} />
 

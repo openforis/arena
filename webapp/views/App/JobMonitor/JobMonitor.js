@@ -5,11 +5,10 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import { useI18n } from '@webapp/store/system'
 import { useJob, JobActions } from '@webapp/store/app'
 
 import { Button } from '@webapp/components/buttons'
-import { Modal, ModalBody, ModalFooter, ModalHeader } from '@webapp/components/modal'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
 import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
@@ -24,7 +23,6 @@ const getCustomCloseButtonComponent = ({ closeButton, job }) => {
 
 const JobMonitor = () => {
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const { job, closeButton, errorKeyHeaderName, errorsExportFileName } = useJob()
 
   if (!job || JobSerialized.isCanceled(job)) return null
@@ -34,9 +32,7 @@ const JobMonitor = () => {
   const jobEnded = JobSerialized.isEnded(job)
 
   return (
-    <Modal className="app-job-monitor" closeOnEsc={false}>
-      <ModalHeader>{i18n.t(`jobs.${JobSerialized.getType(job)}`)}</ModalHeader>
-
+    <Modal className="app-job-monitor" closeOnEsc={false} title={`jobs.${JobSerialized.getType(job)}`}>
       <ModalBody>
         <JobProgress job={job} />
         <JobErrors
