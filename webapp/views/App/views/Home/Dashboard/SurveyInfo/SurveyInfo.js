@@ -127,7 +127,7 @@ const SurveyInfo = (props) => {
               ]}
             />
           )}
-          {!firstTime && canEditSurvey && (
+          {canEditSurvey && (
             <ButtonMenu
               className="btn-s btn-transparent btn-menu-advanced"
               iconClassName="icon-cog icon-14px"
