@@ -38,7 +38,15 @@ import { NodeRdbManager } from './nodeRDBManager'
 // ==== CREATE
 
 export const initNewRecord = async (
-  { user, survey, record, nodesUpdateListener = null, nodesValidationListener = null, createMultipleEntities = true },
+  {
+    user,
+    survey,
+    record,
+    timezoneOffset,
+    nodesUpdateListener = null,
+    nodesValidationListener = null,
+    createMultipleEntities = true,
+  },
   client = db
 ) => {
   const rootNodeDef = Survey.getNodeDefRoot(survey)
@@ -51,6 +59,7 @@ export const initNewRecord = async (
       survey,
       record,
       node: rootNode,
+      timezoneOffset,
       nodesUpdateListener,
       nodesValidationListener,
       system: true,
@@ -170,6 +179,7 @@ export const persistNode = async (
     survey,
     record,
     node,
+    timezoneOffset,
     nodesUpdateListener = null,
     nodesValidationListener = null,
     system = false,
@@ -182,6 +192,7 @@ export const persistNode = async (
     survey,
     record,
     node,
+    timezoneOffset,
     async (user, survey, record, node, t) => {
       const nodeUuid = Node.getUuid(node)
 
@@ -226,6 +237,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
   survey,
   record,
   node,
+  timezoneOffset,
   nodesUpdateFn,
   nodesUpdateListener = null,
   nodesValidationListener = null,
@@ -238,7 +250,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
     let recordUpdated = recordUpdated1
 
     const { record: recordUpdated2, nodes: updatedNodesAndDependents } = await _onNodesUpdate(
-      { survey, record: recordUpdated, nodesUpdated, nodesUpdateListener, nodesValidationListener },
+      { survey, record: recordUpdated, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
       t
     )
     recordUpdated = recordUpdated2
@@ -291,7 +303,10 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
   return { ...nodes, ...ObjectUtils.toUuidIndexedObj(dependentNodesToValidate) }
 }
 
-const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListener, nodesValidationListener }, t) => {
+const _onNodesUpdate = async (
+  { survey, record, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  t
+) => {
   // 1. update record and notify
   if (nodesUpdateListener) {
     nodesUpdateListener(nodesUpdated)
@@ -299,7 +314,7 @@ const _onNodesUpdate = async ({ survey, record, nodesUpdated, nodesUpdateListene
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
-    await NodeUpdateManager.updateNodesDependents({ survey, record, nodes: nodesUpdated }, t)
+    await NodeUpdateManager.updateNodesDependents({ survey, record, nodes: nodesUpdated, timezoneOffset }, t)
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }

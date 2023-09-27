@@ -328,11 +328,11 @@ export const init = (app) => {
   // RECORD Check in / out
   app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, recordUuid, draft } = Request.getParams(req)
+      const { surveyId, recordUuid, draft, timezoneOffset } = Request.getParams(req)
       const user = Request.getUser(req)
       const socketId = Request.getSocketId(req)
 
-      const record = await RecordService.checkIn({ socketId, user, surveyId, recordUuid, draft })
+      const record = await RecordService.checkIn({ socketId, user, surveyId, recordUuid, draft, timezoneOffset })
 
       res.json({ record })
     } catch (error) {

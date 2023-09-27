@@ -149,7 +149,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
-export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) => {
+export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
@@ -163,7 +163,13 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
     const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
     // initialize record if empty
     if (Record.getNodesArray(record).length === 0) {
-      thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
+      thread.postMessage({
+        type: RecordsUpdateThreadMessageTypes.recordInit,
+        user,
+        surveyId,
+        recordUuid,
+        timezoneOffset,
+      })
     }
   }
   return record
