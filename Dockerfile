@@ -4,23 +4,19 @@ ARG node_version=18.12.1
 
 FROM node:${node_version} AS arena
 
-ARG NPM_TOKEN
-
 COPY . /app/
 
 # Build Arena
 
 WORKDIR /app
 
-RUN echo -e "scripts-prepend-node-path=true\n\
-    @openforis:registry=https://npm.pkg.github.com\n\
-    always-auth=true\n\
-    //npm.pkg.github.com/:_authToken=$NPM_TOKEN\n" > /app/.npmrc
-
-RUN yarn install --frozen-lockfile \
+RUN --mount=type=secret,id=NPM_TOKEN <<EOT
+  set -e
+  npm config set //registry.npmjs.org/:_authToken $(cat /run/secrets/NPM_TOKEN)
+  yarn install --frozen-lockfile \
     && yarn build \
-    && npm rebuild node-sass \
-    && rm -r /app/.npmrc
+    && npm rebuild node-sass
+EOT
 
 RUN npm install pm2 -g
 
