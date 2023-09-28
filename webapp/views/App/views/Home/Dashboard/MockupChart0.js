@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 
-const MockupChart0 = () => {
+const MockupChart0 = (data) => {
   const ref = useRef()
 
   const usedSpace = 2 // GB

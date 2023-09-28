@@ -5,7 +5,8 @@ import { RecordsSummaryContext } from './RecordsSummaryContext'
 
 const MockupChart1 = () => {
   const ref = useRef()
-  const { userCounts } = useContext(RecordsSummaryContext)
+  const { userCounts, userDateCounts } = useContext(RecordsSummaryContext)
+
   const [totalCount, setTotalCount] = useState(0) // Add this line
 
   useEffect(() => {
