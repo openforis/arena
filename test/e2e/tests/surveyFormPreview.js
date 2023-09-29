@@ -57,9 +57,14 @@ export default () =>
       verifyAttribute(cluster_coordinate, { x: '', y: '', srs: '4326', srsLabel: 'WGS 1984 (EPSG:4326)' })
       verifyAttribute(cluster_time, () => {
         // it is possible the default value was set one minute after the startTime was initialized in the test
-        const date = new Date(startTime)
-        date.setMinutes(date.getMinutes() + 1)
-        return `(${formatTime(startTime)})|(${formatTime(date)})`
+        const startTimePlus1Minute = new Date(startTime)
+        startTimePlus1Minute.setMinutes(startTimePlus1Minute.getMinutes() + 1)
+        const possibleDateValues = [new Date(startTime), startTimePlus1Minute]
+        const expectedPossibleValues = possibleDateValues.map((possibleDateValue) => {
+          possibleDateValue.setMinutes(possibleDateValue.getMinutes() - possibleDateValue.getTimezoneOffset())
+          return formatTime(possibleDateValue)
+        })
+        return `(${expectedPossibleValues.join('|')})`
       })
       verifyAttribute(cluster_date, () => startTime)
 
