@@ -1,6 +1,7 @@
 import './SurveyInfo.scss'
 
 import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -18,7 +19,9 @@ import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonMenu } from '@webapp/components'
 
-const SurveyInfo = () => {
+const SurveyInfo = (props) => {
+  const { firstTime } = props
+
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -84,9 +87,11 @@ const SurveyInfo = () => {
             {i18n.t(canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
-          {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
+          {!firstTime && canEditSurvey && (
+            <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
+          )}
 
-          {canExportSurvey && (
+          {!firstTime && canExportSurvey && (
             <ButtonMenu
               className="btn-s btn-transparent btn-menu-export"
               iconClassName="icon-download2 icon-14px"
@@ -174,6 +179,14 @@ const SurveyInfo = () => {
       </div>
     </>
   )
+}
+
+SurveyInfo.propTypes = {
+  firstTime: PropTypes.bool,
+}
+
+SurveyInfo.defaultProps = {
+  firstTime: false,
 }
 
 export default SurveyInfo
