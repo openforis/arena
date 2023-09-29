@@ -16,9 +16,9 @@ import { TestId } from '@webapp/utils/testId'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
+import { Spinner } from '@webapp/components'
 import { usePrevious } from '@webapp/components/hooks'
 import ProfilePicture from '@webapp/components/profilePicture'
-import ProgressBar from '@webapp/components/progressBar'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
@@ -61,30 +61,28 @@ const Header = () => {
       <Breadcrumbs />
 
       <div className="header__survey">
-        {Survey.isValid(surveyInfo) &&
-          (appSaving ? (
-            <ProgressBar className="progress-bar-striped" progress={100} showText={false} />
-          ) : (
-            <>
-              <Link
-                data-testid={TestId.header.surveyTitle}
-                to={appModuleUri(homeModules.surveyInfo)}
-                className="btn-s btn-transparent"
-              >
-                <LabelWithTooltip className="header__survey-title" label={surveyTitle} />
-              </Link>
-              <CycleSelector
-                selectedCycle={surveyCycleKey}
-                onChange={(cycle) => {
-                  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-                  const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
-                  dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
-                }}
-              />
-              <SurveyPreferredLanguageSelector />
-              {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
-            </>
-          ))}
+        {Survey.isValid(surveyInfo) && (
+          <>
+            <Link
+              data-testid={TestId.header.surveyTitle}
+              to={appModuleUri(homeModules.surveyInfo)}
+              className="btn-s btn-transparent"
+            >
+              <LabelWithTooltip className="header__survey-title" label={surveyTitle} />
+            </Link>
+            <CycleSelector
+              selectedCycle={surveyCycleKey}
+              onChange={(cycle) => {
+                const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+                const userUpdated = User.assocPrefSurveyCycle(surveyId, cycle)(user)
+                dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
+              }}
+            />
+            <SurveyPreferredLanguageSelector />
+            {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
+            <div className="header__loader-wrapper">{appSaving && <Spinner size={25} />}</div>
+          </>
+        )}
       </div>
 
       {/* Placeholder to make the header symmetric */}
