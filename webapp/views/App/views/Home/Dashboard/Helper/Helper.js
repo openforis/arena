@@ -21,19 +21,13 @@ const HelperFirstTimeSurvey = () => {
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
             title: <h2 />,
-            linkWithIcon: (
-              <LinkWithIcon
-                to={appModuleUri(homeModules.surveyInfo)}
-                className="btn-s btn-transparent"
-                iconLeft={<span className="icon icon-pencil icon-14px" />}
-              />
-            ),
+            linkWithIcon: <LinkWithIcon to={appModuleUri(homeModules.surveyInfo)} iconLeft="icon-pencil" />,
             basicLink: <Link to={appModuleUri(homeModules.surveyInfo)} className="btn-s btn-transparent" />,
           }}
-        ></Trans>
+        />
 
         <div className="helper__first_time_help-survey-info">
-          <SurveyInfo />
+          <SurveyInfo firstTime />
         </div>
       </div>
 
@@ -42,15 +36,9 @@ const HelperFirstTimeSurvey = () => {
           i18nKey="homeView.dashboard.surveyPropUpdate.secondary"
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
-            linkWithIcon: (
-              <LinkWithIcon
-                to={appModuleUri(designerModules.formDesigner)}
-                className="btn-s btn-transparent"
-                iconLeft={<span className="icon icon-quill icon-14px" />}
-              />
-            ),
+            linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} iconLeft="icon-quill" />,
           }}
-        ></Trans>
+        />
       </div>
     </div>
   )
@@ -71,15 +59,9 @@ const HelperWithoutAttributes = () => {
             values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
             components={{
               title: <h2 />,
-              linkWithIcon: (
-                <LinkWithIcon
-                  to={appModuleUri(designerModules.formDesigner)}
-                  className="btn-s btn-transparent"
-                  iconLeft={<span className="icon icon-pencil icon-14px" />}
-                />
-              ),
+              linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} iconLeft="icon-pencil" />,
             }}
-          ></Trans>
+          />
         </div>
       </div>
     </>
@@ -98,9 +80,9 @@ const HelpersByType = {
 
 const LinkWithIcon = ({ to, iconLeft, iconRight, children }) => (
   <Link to={to} className="btn-s btn-transparent">
-    {iconLeft}
+    {iconLeft && <span className={`icon ${iconLeft} icon-14px`} />}
     {children}
-    {iconRight}
+    {iconRight && <span className={`icon ${iconRight} icon-14px`} />}
   </Link>
 )
 
