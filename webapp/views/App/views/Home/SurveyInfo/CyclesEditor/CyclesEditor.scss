@@ -27,7 +27,10 @@
       }
 
       .date-container {
-        margin-left: 10px;
+        margin-left: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
       .date-label {
@@ -35,14 +38,6 @@
         text-transform: uppercase;
         color: lighten($black, 15%);
         font-weight: 600;
-      }
-
-      .date {
-        margin-left: 5px;
-
-        input {
-          padding: 0.25rem 0.1rem;
-        }
       }
 
       .btn-delete {
