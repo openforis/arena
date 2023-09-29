@@ -13,6 +13,8 @@ import DataImportBaseJob from './DataImportBaseJob'
 export default class DataImportJob extends DataImportBaseJob {
   constructor(params, type = DataImportJob.type) {
     super(type, params)
+
+    this.csvReader = null
   }
 
   async execute() {
@@ -89,16 +91,16 @@ export default class DataImportJob extends DataImportBaseJob {
     const { cycle, entityDefUuid, filePath, survey } = this.context
 
     try {
-      const reader = await DataImportFileReader.createReader({
+      this.csvReader = await DataImportFileReader.createReader({
         filePath,
         survey,
         cycle,
         entityDefUuid,
-        onRowItem: (item) => this.onRowItem(item),
+        onRowItem: async (item) => this.onRowItem(item),
         onTotalChange: (total) => (this.total = total),
       })
 
-      await reader.start()
+      await this.csvReader.start()
     } catch (e) {
       const errorKey = e.key || e.toString()
       const errorParams = e.params
@@ -106,9 +108,19 @@ export default class DataImportJob extends DataImportBaseJob {
     }
   }
 
+  async cancel() {
+    await super.cancel()
+
+    this.csvReader?.cancel()
+  }
+
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
     const { entityDefUuid, insertMissingNodes, survey } = context
+
+    if (this.isCanceled()) {
+      return
+    }
 
     this.incrementProcessedItems()
 
