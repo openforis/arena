@@ -310,7 +310,16 @@ const _sendNodeUpdateMessage = ({ socketId, user, surveyId, cycle, recordUuid, d
 
 export const { fetchNodeByUuid } = RecordManager
 
-export const persistNode = async ({ socketId, user, surveyId, draft, cycle, node, file = null }) => {
+export const persistNode = async ({
+  socketId,
+  user,
+  surveyId,
+  draft,
+  cycle,
+  node,
+  file = null,
+  timezoneOffset = null,
+}) => {
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
@@ -337,11 +346,12 @@ export const persistNode = async ({ socketId, user, surveyId, draft, cycle, node
       type: RecordsUpdateThreadMessageTypes.nodePersist,
       node,
       user,
+      timezoneOffset,
     },
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid }) =>
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset }) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -354,6 +364,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       recordUuid,
       nodeUuid,
       user,
+      timezoneOffset,
     },
   })
 

@@ -201,7 +201,10 @@ export const persistNode = async (
       if (existingNode) {
         return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
       }
-      return NodeCreationManager.insertNode({ user, survey, record, node, system, createMultipleEntities }, t)
+      return NodeCreationManager.insertNode(
+        { user, survey, record, node, system, createMultipleEntities, timezoneOffset },
+        t
+      )
     },
     nodesUpdateListener,
     nodesValidationListener,

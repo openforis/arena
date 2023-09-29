@@ -59,12 +59,12 @@ export const init = (app) => {
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, cycle, draft } = Request.getParams(req)
+      const { surveyId, cycle, draft, timezoneOffset } = Request.getParams(req)
       const node = Request.getJsonParam(req, 'node')
       const file = Request.getFile(req)
       const socketId = Request.getSocketId(req)
 
-      await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file })
+      await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset })
 
       sendOk(res)
     } catch (error) {
@@ -397,11 +397,11 @@ export const init = (app) => {
   })
 
   app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
-    const { surveyId, cycle, draft, recordUuid, nodeUuid } = Request.getParams(req)
+    const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
     const user = Request.getUser(req)
     const socketId = Request.getSocketId(req)
 
-    RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid })
+    RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
     sendOk(res)
   })
 }
