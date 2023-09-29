@@ -2513,20 +2513,6 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@../arena-core":
-  version "0.0.166"
-  dependencies:
-    "@jsep-plugin/regex" "^1.0.3"
-    bignumber.js "^9.1.2"
-    date-fns "^2.30.0"
-    jsep "^1.3.8"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    proj4 "^2.9.0"
-    uuid "^9.0.1"
-
 "@openforis/arena-core@^0.0.164":
   version "0.0.164"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.164/7b8f863f75216eaa8185b89c2fbce4bc4a434cd3#7b8f863f75216eaa8185b89c2fbce4bc4a434cd3"
@@ -2542,6 +2528,22 @@
     lodash.topairs "^4.3.0"
     proj4 "^2.9.0"
     uuid "^9.0.0"
+
+"@openforis/arena-core@^0.0.167":
+  version "0.0.167"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.167/d8ccf7aff8efd03c8d8778cdfc7db01cb112cbdd#d8ccf7aff8efd03c8d8778cdfc7db01cb112cbdd"
+  integrity sha512-ggPPFufKqX9fKcNo8k2c+XyV9a/ubK1SOYFfi4S+DzfdL3/XQpdSAXm4u0x/BSgcVx0MGU5t7hRQhwqRwWT9OQ==
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.3"
+    bignumber.js "^9.1.2"
+    date-fns "^2.30.0"
+    jsep "^1.3.8"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    proj4 "^2.9.0"
+    uuid "^9.0.1"
 
 "@openforis/arena-server@^0.1.29":
   version "0.1.29"
