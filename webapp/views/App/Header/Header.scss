@@ -56,6 +56,13 @@
   line-height: normal;
 }
 
+.header__loader-wrapper {
+  display: flex;
+  align-items: center;
+  width: 3rem;
+  margin-left: 10px;
+}
+
 .header__btn-user {
   max-height: $headerHeight - 1px;
   margin-right: 20px;
