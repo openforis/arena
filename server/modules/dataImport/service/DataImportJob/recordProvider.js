@@ -11,6 +11,14 @@ import * as Validation from '@core/validation/validation'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
+const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
+  const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
+  if (emptyRootKeyValueIndex >= 0) {
+    const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
+    throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissing, { keyName })
+  }
+}
+
 const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx }) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
 
@@ -25,10 +33,7 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
     })
   )
 
-  // check root keys are not empty
-  if (rootKeyValuesFormatted.some(Objects.isEmpty)) {
-    throw new SystemError(Validation.messageKeys.dataImport.recordKeysMissing)
-  }
+  checkRootKeysSpecified({ rootKeyDefs, rootKeyValuesFormatted })
 
   const recordSummary = recordsSummary.find((record) =>
     rootKeyDefs.every((rootKeyDef) => {

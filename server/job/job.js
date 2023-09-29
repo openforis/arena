@@ -213,7 +213,7 @@ export default class Job {
     this.processed += incrementBy
 
     throttle(
-      async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
+      async () => this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
       1000
     )()
