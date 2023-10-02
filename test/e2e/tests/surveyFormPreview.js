@@ -1,3 +1,4 @@
+import * as DateUtils from '../../../core/dateUtils'
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { gotoFormPage } from './_formDesigner'
@@ -57,12 +58,13 @@ export default () =>
       verifyAttribute(cluster_coordinate, { x: '', y: '', srs: '4326', srsLabel: 'WGS 1984 (EPSG:4326)' })
       verifyAttribute(cluster_time, () => {
         // it is possible the default value was set one minute after the startTime was initialized in the test
-        const startTimePlus1Minute = new Date(startTime)
-        startTimePlus1Minute.setMinutes(startTime.getMinutes() + 1)
+        const startTimeDate = new Date(startTime)
+        const startTimePlus1Minute = DateUtils.addMinutes(startTimeDate, 1)
         const possibleDateValues = [new Date(startTime), startTimePlus1Minute]
         const expectedPossibleValues = possibleDateValues.map((possibleDateValue) => {
-          possibleDateValue.setMinutes(possibleDateValue.getMinutes() + possibleDateValue.getTimezoneOffset())
-          return formatTime(possibleDateValue)
+          // const dateWithTimezoneOffset = DateUtils.addMinutes(possibleDateValue, possibleDateValue.getTimezoneOffset())
+          const dateWithTimezoneOffset = possibleDateValue
+          return formatTime(dateWithTimezoneOffset)
         })
         return `(${expectedPossibleValues.join('|')})`
       })
