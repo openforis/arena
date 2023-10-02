@@ -112,7 +112,7 @@ class RecordsUpdateThread extends Thread {
   async getOrFetchSurveyData(msg) {
     const { surveyId, cycle, draft } = msg
 
-    const key = this.getSurveyDataKey({ surveyId, cycle, draft })
+    const key = this.getSurveyDataKey(msg)
 
     let data = this.surveyDataByKey[key]
     if (data) {
@@ -209,10 +209,9 @@ class RecordsUpdateThread extends Thread {
   async processRecordNodeDeleteMsg(msg) {
     const { nodeUuid, recordUuid, user } = msg
 
-    const surveyKey = this.getSurveyDataKey(msg)
     const { survey, recordsByUuid } = await this.getOrFetchSurveyData(msg)
 
-    let record = await this.getOrFetchRecord({ surveyKey, recordUuid })
+    let record = await this.getOrFetchRecord({ msg, recordUuid })
     record = await RecordManager.deleteNode(
       user,
       survey,
