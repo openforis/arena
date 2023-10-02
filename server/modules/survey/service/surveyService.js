@@ -13,7 +13,7 @@ import { SchemaSummary } from './schemaSummary'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
-  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyPublishJob({ user, surveyId })
 
@@ -23,7 +23,7 @@ export const startPublishJob = (user, surveyId) => {
 }
 
 export const startUnpublishJob = (user, surveyId) => {
-  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyUnpublishJob({ user, surveyId })
 
@@ -77,7 +77,7 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>
   SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream })
 
 export const deleteSurvey = async (surveyId) => {
-  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   await SurveyManager.deleteSurvey(surveyId)
 }

@@ -22,9 +22,19 @@ class RecordsUpdateThread extends Thread {
     super(paramsObj)
 
     this.queue = new Queue()
-    this.survey = null
-    this.record = null
+    this.surveyDataByKey = {}
     this.processing = false
+
+    this.messageProcessorByType = {
+      [RecordsUpdateThreadMessageTypes.threadInit]: this.init.bind(this),
+      [RecordsUpdateThreadMessageTypes.recordInit]: this.processRecordInitMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.recordReload]: this.processRecordReloadMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.nodePersist]: this.processRecordNodePersistMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.nodeDelete]: this.processRecordNodeDeleteMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.recordClear]: this.processRecordClearMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.surveyClear]: this.processSurveyClearMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.threadKill]: this.postMessage.bind(this),
+    }
   }
 
   sendThreadInitMsg() {
@@ -92,8 +102,22 @@ class RecordsUpdateThread extends Thread {
     }
   }
 
-  async init() {
-    const { surveyId, cycle, draft } = this.params
+  getSurveyDataKey(msg) {
+    const { surveyId, cycle, draft } = msg
+    return `${surveyId}_${cycle}_${draft}`
+  }
+
+  async init() {}
+
+  async getOrFetchSurveyData(msg) {
+    const { surveyId, cycle, draft } = msg
+
+    const key = this.getSurveyDataKey({ surveyId, cycle, draft })
+
+    let data = this.surveyDataByKey[key]
+    if (data) {
+      return data
+    }
 
     const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
       surveyId,
@@ -107,36 +131,26 @@ class RecordsUpdateThread extends Thread {
       ? Survey.buildDependencyGraph(surveyDb)
       : await SurveyManager.fetchDependencies(surveyId)
 
-    this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
+    const survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
 
-    this.recordsByUuid = {}
+    data = {
+      survey,
+      recordsByUuid: {},
+    }
+    this.surveyDataByKey[key] = data
+
+    return data
   }
 
   async processMessage(msg) {
     const { type } = msg
     Logger.debug('processing message', type)
 
-    switch (type) {
-      case RecordsUpdateThreadMessageTypes.threadInit:
-        await this.init()
-        break
-      case RecordsUpdateThreadMessageTypes.recordInit:
-        await this.processRecordInitMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.recordReload:
-        await this.processRecordReloadMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.nodePersist:
-        await this.processRecordNodePersistMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.nodeDelete:
-        await this.processRecordNodeDeleteMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.threadKill:
-        this.postMessage(msg)
-        break
-      default:
-        Logger.debug(`Skipping unknown message type: ${type}`)
+    const messageProcessor = this.messageProcessorByType[type]
+    if (messageProcessor) {
+      messageProcessor(msg)
+    } else {
+      Logger.debug(`Skipping unknown message type: ${type}`)
     }
 
     if ([RecordsUpdateThreadMessageTypes.nodePersist, RecordsUpdateThreadMessageTypes.nodeDelete].includes(type)) {
@@ -146,8 +160,9 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordInitMsg(msg) {
-    const { survey, surveyId } = this
-    const { recordUuid, user } = msg
+    const { surveyId, recordUuid, user } = msg
+
+    const { survey, recordsByUuid } = await this.getOrFetchSurveyData(msg)
 
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
@@ -158,24 +173,28 @@ class RecordsUpdateThread extends Thread {
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
     })
-    this.recordsByUuid[recordUuid] = record
+    recordsByUuid[recordUuid] = record
   }
 
   async processRecordReloadMsg(msg) {
-    const { surveyId } = this
-    const { recordUuid } = msg
+    const { surveyId, recordUuid } = msg
 
-    if (this.recordsByUuid[recordUuid]) {
+    const { recordsByUuid } = await this.getOrFetchSurveyData(msg)
+
+    if (recordsByUuid[recordUuid]) {
       const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
-      this.recordsByUuid[recordUuid] = record
+      recordsByUuid[recordUuid] = record
     }
   }
 
   async processRecordNodePersistMsg(msg) {
-    const { survey } = this
     const { node, user } = msg
+
+    const { survey, recordsByUuid } = await this.getOrFetchSurveyData(msg)
+
     const recordUuid = Node.getRecordUuid(node)
-    let record = await this.getOrFetchRecord({ recordUuid })
+    let record = await this.getOrFetchRecord({ msg, recordUuid })
+
     record = await RecordManager.persistNode({
       user,
       survey,
@@ -184,14 +203,16 @@ class RecordsUpdateThread extends Thread {
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
     })
-    this.recordsByUuid[recordUuid] = record
+    recordsByUuid[recordUuid] = record
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { survey } = this
     const { nodeUuid, recordUuid, user } = msg
 
-    let record = await this.getOrFetchRecord({ recordUuid })
+    const surveyKey = this.getSurveyDataKey(msg)
+    const { survey, recordsByUuid } = await this.getOrFetchSurveyData(msg)
+
+    let record = await this.getOrFetchRecord({ surveyKey, recordUuid })
     record = await RecordManager.deleteNode(
       user,
       survey,
@@ -200,11 +221,41 @@ class RecordsUpdateThread extends Thread {
       (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       (validations) => this.handleNodesValidationUpdated({ record, validations })
     )
-    this.recordsByUuid[recordUuid] = record
+    recordsByUuid[recordUuid] = record
   }
 
-  async getOrFetchRecord({ recordUuid }) {
-    const { surveyId, recordsByUuid } = this
+  async processRecordClearMsg(msg) {
+    const { recordUuid } = msg
+
+    const { recordsByUuid } = await this.getOrFetchSurveyData(msg)
+    delete recordsByUuid[recordUuid]
+
+    if (Object.keys(recordsByUuid).length === 0) {
+      await this.processSurveyClearMsg(msg)
+    }
+  }
+
+  async processSurveyClearMsg(msg) {
+    const { surveyId, cycle, draft } = msg
+
+    let keysToDelete = []
+
+    if (!Objects.isNil(cycle) && !Objects.isNil(draft)) {
+      const key = this.getSurveyDataKey(msg)
+      keysToDelete.push(key)
+    } else {
+      keysToDelete.push(...Object.keys(this.surveyDataByKey).filter((key) => key.startsWith(`${surveyId}_`)))
+    }
+    keysToDelete.forEach((key) => {
+      delete this.surveyDataByKey[key]
+    })
+  }
+
+  async getOrFetchRecord({ msg, recordUuid }) {
+    const { surveyId } = msg
+
+    const { recordsByUuid } = await this.getOrFetchSurveyData(msg)
+
     let record = recordsByUuid[recordUuid]
     if (!record) {
       record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
