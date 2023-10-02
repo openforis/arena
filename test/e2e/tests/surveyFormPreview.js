@@ -62,8 +62,8 @@ export default () =>
         const startTimePlus1Minute = DateUtils.addMinutes(startTimeDate, 1)
         const possibleDateValues = [new Date(startTime), startTimePlus1Minute]
         const expectedPossibleValues = possibleDateValues.map((possibleDateValue) => {
-          // const dateWithTimezoneOffset = DateUtils.addMinutes(possibleDateValue, possibleDateValue.getTimezoneOffset())
-          const dateWithTimezoneOffset = possibleDateValue
+          const timezoneOffsetDiff = startTimeDate.getTimezoneOffset() - -120 // browser timezone=Europe/Rome
+          const dateWithTimezoneOffset = DateUtils.addMinutes(possibleDateValue, timezoneOffsetDiff)
           return formatTime(dateWithTimezoneOffset)
         })
         return `(${expectedPossibleValues.join('|')})`
