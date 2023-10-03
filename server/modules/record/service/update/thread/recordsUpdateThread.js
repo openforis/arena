@@ -27,7 +27,6 @@ class RecordsUpdateThread extends Thread {
     this.processing = false
 
     this.messageProcessorByType = {
-      [RecordsUpdateThreadMessageTypes.threadInit]: this.init.bind(this),
       [RecordsUpdateThreadMessageTypes.recordInit]: this.processRecordInitMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.recordReload]: this.processRecordReloadMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.nodePersist]: this.processRecordNodePersistMsg.bind(this),
@@ -36,12 +35,6 @@ class RecordsUpdateThread extends Thread {
       [RecordsUpdateThreadMessageTypes.surveyClear]: this.processSurveyClearMsg.bind(this),
       [RecordsUpdateThreadMessageTypes.threadKill]: this.postMessage.bind(this),
     }
-  }
-
-  sendThreadInitMsg() {
-    ;(async () => {
-      await this.messageHandler({ type: RecordsUpdateThreadMessageTypes.threadInit })
-    })()
   }
 
   async handleNodesUpdated({ record, updatedNodes }) {
@@ -107,8 +100,6 @@ class RecordsUpdateThread extends Thread {
     const { surveyId, cycle, draft } = msg
     return `${surveyId}_${cycle}_${draft}`
   }
-
-  async init() {}
 
   async getOrFetchSurveyData(msg) {
     const { surveyId, cycle, draft } = msg
@@ -266,5 +257,4 @@ class RecordsUpdateThread extends Thread {
   }
 }
 
-const thread = new RecordsUpdateThread()
-thread.sendThreadInitMsg()
+new RecordsUpdateThread()
