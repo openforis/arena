@@ -37,6 +37,10 @@ class RecordsUpdateThread extends Thread {
     }
   }
 
+  init() {
+    // do nothing
+  }
+
   async handleNodesUpdated({ record, updatedNodes }) {
     if (!Objects.isEmpty(updatedNodes)) {
       const recordUuid = Record.getUuid(record)
@@ -257,4 +261,5 @@ class RecordsUpdateThread extends Thread {
   }
 }
 
-new RecordsUpdateThread()
+const thread = new RecordsUpdateThread()
+thread.init()
