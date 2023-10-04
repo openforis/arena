@@ -33,7 +33,7 @@ export default () =>
 
       test('Wait thread to complete', async () => {
         // TODO thread issue: https://github.com/openforis/arena/issues/1412
-        await page.waitForTimeout(3000)
+        await page.waitForTimeout(5000)
       })
     })
 
