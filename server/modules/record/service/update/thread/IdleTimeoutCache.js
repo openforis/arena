@@ -13,7 +13,7 @@ export default class IdleTimeoutCache {
 
     this.itemIdleTimeoutSeconds = itemIdleTimeoutSeconds
     this.itemsByKey = {}
-    this._itemTimeoutByKey = {}
+    this._itemTimeoutIdByKey = {}
   }
 
   get(key) {
@@ -49,22 +49,22 @@ export default class IdleTimeoutCache {
 
   delete(key) {
     this._clearItemIdleTimeout(key)
-
     delete this.itemsByKey[key]
+    return this
   }
 
   _clearItemIdleTimeout(key) {
-    const oldTimeout = this._itemTimeoutByKey[key]
-    if (oldTimeout) {
-      clearTimeout(oldTimeout)
+    const timeoutId = this._itemTimeoutIdByKey[key]
+    if (timeoutId) {
+      clearTimeout(timeoutId)
     }
-    delete this._itemTimeoutByKey[key]
+    delete this._itemTimeoutIdByKey[key]
   }
 
   _resetItemIdleTimeout(key) {
     this._clearItemIdleTimeout(key)
 
-    this._itemTimeoutByKey[key] = setTimeout(() => {
+    this._itemTimeoutIdByKey[key] = setTimeout(() => {
       this.delete(key)
     }, this.itemIdleTimeoutSeconds * 1000)
   }

@@ -140,14 +140,15 @@ class RecordsUpdateThread extends Thread {
 
   async processMessage(msg) {
     const { type } = msg
-    Logger.debug('processing message', type)
+    // Logger.debug('processing message', type)
+    Logger.debug('processing message', JSON.stringify(msg))
 
     const messageProcessor = this.messageProcessorByType[type]
     if (messageProcessor) {
       messageProcessor(msg)
 
       if ([RecordsUpdateThreadMessageTypes.nodePersist, RecordsUpdateThreadMessageTypes.nodeDelete].includes(type)) {
-        const recordUuid = msg.recordUuid || msg.node?.recordUuid
+        const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
         this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted, content: { recordUuid } })
       }
     } else {
@@ -242,7 +243,8 @@ class RecordsUpdateThread extends Thread {
       const key = this.getSurveyDataKey(msg)
       keysToDelete.push(key)
     } else {
-      keysToDelete.push(...this.surveysDataCache.findKeys((key) => key.startsWith(`${surveyId}_`)))
+      const keyPrefix = `${surveyId}_`
+      keysToDelete.push(...this.surveysDataCache.findKeys((key) => key.startsWith(keyPrefix)))
     }
     keysToDelete.forEach((key) => {
       this.surveysDataCache.delete(key)
