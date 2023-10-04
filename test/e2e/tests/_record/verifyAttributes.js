@@ -83,7 +83,10 @@ const verifyFns = {
   time: verifyTime,
 }
 
+export const verifyAttributeInternal = async ({ nodeDef, value, parentSelector = '' }) =>
+  verifyFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+
 export const verifyAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Verify ${nodeDef.name} value`, async () => {
-    await verifyFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
+    await verifyAttributeInternal({ nodeDef, value, parentSelector })
   })

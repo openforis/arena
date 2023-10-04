@@ -13,6 +13,7 @@ import {
   getTextSelector,
   parseValue,
 } from './utils'
+import { verifyAttributeInternal } from './verifyAttributes'
 
 const enterBoolean = async (nodeDef, value, parentSelector) => {
   // If the boolean is already checked, due to a default value with the same value we dont need to click
@@ -115,4 +116,5 @@ export const enterAttribute = (nodeDef, value, parentSelector = '') =>
   test(`Enter ${nodeDef.name} value`, async () => {
     await enterFns[nodeDef.type](nodeDef, parseValue(value), parentSelector)
     await FormUtils.waitForHeaderLoaderToDisappear()
+    await verifyAttributeInternal({ nodeDef, value, parentSelector })
   }, 30000)
