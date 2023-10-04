@@ -147,7 +147,7 @@ class RecordsUpdateThread extends Thread {
 
   async processRecordInitMsg(msg) {
     const { survey, surveyId } = this
-    const { recordUuid, user } = msg
+    const { recordUuid, user, timezoneOffset } = msg
 
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
@@ -155,6 +155,7 @@ class RecordsUpdateThread extends Thread {
       user,
       survey,
       record,
+      timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
     })
@@ -173,7 +174,7 @@ class RecordsUpdateThread extends Thread {
 
   async processRecordNodePersistMsg(msg) {
     const { survey } = this
-    const { node, user } = msg
+    const { node, user, timezoneOffset } = msg
     const recordUuid = Node.getRecordUuid(node)
     let record = await this.getOrFetchRecord({ recordUuid })
     record = await RecordManager.persistNode({
@@ -181,6 +182,7 @@ class RecordsUpdateThread extends Thread {
       survey,
       record,
       node,
+      timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
     })

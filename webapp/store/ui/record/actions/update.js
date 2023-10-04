@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
@@ -32,6 +34,7 @@ const _updateNodeDebounced = (node, file, delay) => {
       cycle,
       draft,
       node: JSON.stringify(node),
+      timezoneOffset: Dates.getTimezoneOffset(),
       ...(file ? { file } : {}),
     })
 

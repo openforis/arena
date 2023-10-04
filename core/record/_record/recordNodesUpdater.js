@@ -209,7 +209,7 @@ const _getOrCreateEntityByKeys =
     return { entity: entityInserted, updateResult }
   }
 
-const _afterNodesUpdate = async ({ survey, record, nodes, sideEffect = false }) => {
+const _afterNodesUpdate = async ({ survey, record, nodes, timezoneOffset, sideEffect = false }) => {
   // output
   const updateResult = new RecordUpdateResult({ record, nodes })
 
@@ -218,6 +218,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, sideEffect = false }) 
     survey,
     record,
     nodes,
+    timezoneOffset,
     sideEffect,
   })
 
@@ -240,7 +241,7 @@ const _afterNodesUpdate = async ({ survey, record, nodes, sideEffect = false }) 
 }
 
 const updateAttributesWithValues =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes = false, sideEffect = false }) =>
+  ({ survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -253,6 +254,7 @@ const updateAttributesWithValues =
         survey,
         record: nodeUpdateResult.record,
         nodes: nodeUpdateResult.nodes,
+        timezoneOffset,
         sideEffect,
       })
       updateResult.merge(dependentsUpdateResult)
@@ -399,7 +401,7 @@ const _mergeEntities = ({ survey, recordSource, recordTarget, entitySource, enti
 }
 
 const replaceUpdatedNodes =
-  ({ survey, recordSource, sideEffect = false }) =>
+  ({ survey, recordSource, timezoneOffset, sideEffect = false }) =>
   async (recordTarget) => {
     const rootSource = RecordReader.getRootNode(recordSource)
     const rootTarget = RecordReader.getRootNode(recordTarget)
@@ -415,7 +417,13 @@ const replaceUpdatedNodes =
       entityTarget: rootTarget,
       sideEffect,
     })
-    return _afterNodesUpdate({ survey, record: updateResult.record, nodes: updateResult.nodes, sideEffect })
+    return _afterNodesUpdate({
+      survey,
+      record: updateResult.record,
+      nodes: updateResult.nodes,
+      timezoneOffset,
+      sideEffect,
+    })
   }
 
 export const RecordNodesUpdater = {
