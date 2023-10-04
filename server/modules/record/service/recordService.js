@@ -166,6 +166,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
       thread.postMessage({
         type: RecordsUpdateThreadMessageTypes.recordInit,
         user,
+        surveyId,
         cycle,
         draft,
         recordUuid,
