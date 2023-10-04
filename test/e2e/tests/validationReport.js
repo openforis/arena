@@ -53,7 +53,8 @@ const expectMessages = (messages) => {
     )
   } else {
     test('Verify validation report empty', async () => {
-      await expectNoItems()
+      // await expectNoItems()
+      await expect(page).toHaveText('No items')
     })
   }
 
