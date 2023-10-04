@@ -188,26 +188,28 @@ export const persistNode = async (
   client = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(
-    user,
-    survey,
-    record,
-    node,
-    timezoneOffset,
-    async (user, survey, record, node, t) => {
-      const nodeUuid = Node.getUuid(node)
+    {
+      user,
+      survey,
+      record,
+      node,
+      timezoneOffset,
+      nodesUpdateFn: async (user, survey, record, node, t) => {
+        const nodeUuid = Node.getUuid(node)
 
-      const existingNode = Record.getNodeByUuid(nodeUuid)(record)
+        const existingNode = Record.getNodeByUuid(nodeUuid)(record)
 
-      if (existingNode) {
-        return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
-      }
-      return NodeCreationManager.insertNode(
-        { user, survey, record, node, system, createMultipleEntities, timezoneOffset },
-        t
-      )
+        if (existingNode) {
+          return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
+        }
+        return NodeCreationManager.insertNode(
+          { user, survey, record, node, system, createMultipleEntities, timezoneOffset },
+          t
+        )
+      },
+      nodesUpdateListener,
+      nodesValidationListener,
     },
-    nodesUpdateListener,
-    nodesValidationListener,
     client
   )
 
@@ -224,28 +226,33 @@ export const deleteNode = async (
   t = db
 ) =>
   _updateNodeAndValidateRecordUniqueness(
-    user,
-    survey,
-    record,
-    Record.getNodeByUuid(nodeUuid)(record),
-    timezoneOffset,
-    (user, survey, record, node, t) => NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
-    nodesUpdateListener,
-    nodesValidationListener,
+    {
+      user,
+      survey,
+      record,
+      node: Record.getNodeByUuid(nodeUuid)(record),
+      timezoneOffset,
+      nodesUpdateFn: (user, survey, record, node, t) =>
+        NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
+      nodesUpdateListener,
+      nodesValidationListener,
+    },
     t
   )
 
 export const { deleteNodesByNodeDefUuids, deleteNodesByUuids } = NodeUpdateManager
 
 const _updateNodeAndValidateRecordUniqueness = async (
-  user,
-  survey,
-  record,
-  node,
-  timezoneOffset,
-  nodesUpdateFn,
-  nodesUpdateListener = null,
-  nodesValidationListener = null,
+  {
+    user,
+    survey,
+    record,
+    node,
+    timezoneOffset,
+    nodesUpdateFn,
+    nodesUpdateListener = null,
+    nodesValidationListener = null,
+  },
   client = db
 ) =>
   client.tx(async (t) => {
