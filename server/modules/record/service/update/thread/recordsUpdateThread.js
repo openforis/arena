@@ -156,7 +156,7 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordInitMsg(msg) {
-    const { surveyId, recordUuid, user } = msg
+    const { surveyId, recordUuid, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -166,6 +166,7 @@ class RecordsUpdateThread extends Thread {
       user,
       survey,
       record,
+      timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
     })
@@ -184,7 +185,7 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodePersistMsg(msg) {
-    const { node, user } = msg
+    const { node, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -196,6 +197,7 @@ class RecordsUpdateThread extends Thread {
       survey,
       record,
       node,
+      timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
     })
@@ -203,7 +205,7 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { nodeUuid, recordUuid, user } = msg
+    const { nodeUuid, recordUuid, user, timezoneOffset } = msg
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
@@ -213,6 +215,7 @@ class RecordsUpdateThread extends Thread {
       survey,
       record,
       nodeUuid,
+      timezoneOffset,
       (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       (validations) => this.handleNodesValidationUpdated({ record, validations })
     )

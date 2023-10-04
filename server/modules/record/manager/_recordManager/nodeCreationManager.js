@@ -58,7 +58,7 @@ export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity
 }
 
 export const insertNode = async (
-  { user, survey, record, node, system, persistNodes = true, createMultipleEntities = true },
+  { user, survey, record, node, system, timezoneOffset, persistNodes = true, createMultipleEntities = true },
   t
 ) => {
   const surveyId = Survey.getId(survey)
@@ -85,6 +85,7 @@ export const insertNode = async (
       record,
       parentNode: node,
       nodeDef,
+      timezoneOffset,
       createMultipleEntities,
     })
     Object.assign(nodesCreated, descendantsCreateResult.nodes)
