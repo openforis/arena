@@ -18,10 +18,10 @@ export default () =>
 
       gotoRecord(record)
 
-      // test(`Verify record valid`, async () => {
-      //   const invalidRecordBtn = await page.$(getSelector(TestId.record.invalidBtn))
-      //   await expect(invalidRecordBtn).toBeNull()
-      // })
+      test(`Verify record valid`, async () => {
+        const invalidRecordBtn = await page.$(getSelector(TestId.record.invalidBtn))
+        await expect(invalidRecordBtn).toBeNull()
+      })
 
       verifyCluster(record)
 
