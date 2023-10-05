@@ -28,9 +28,7 @@ const Arena = () => {
           </span>
           <span className="error-message__second-line">{i18n.t('systemErrors.sessionExpiredRefreshPage')}</span>
           <ExpansionPanel className="error-details-panel" buttonLabel="common.details" startClosed>
-            <textarea className="error-details-textarea" rows={10}>
-              {systemError}
-            </textarea>
+            <textarea className="error-details-textarea" rows={10} value={systemError} />
           </ExpansionPanel>
         </div>
       </div>
