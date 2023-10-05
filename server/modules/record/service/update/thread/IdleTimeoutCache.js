@@ -12,13 +12,13 @@ export default class IdleTimeoutCache {
     const { itemIdleTimeoutSeconds } = { ...defaultOptions, ...options }
 
     this.itemIdleTimeoutSeconds = itemIdleTimeoutSeconds
-    this.itemsByKey = {}
+    this._itemsByKey = {}
     this._itemTimeoutIdByKey = {}
   }
 
   get(key) {
     this._resetItemIdleTimeout(key)
-    return this.itemsByKey[key]
+    return this._itemsByKey[key]
   }
 
   has(key) {
@@ -26,7 +26,7 @@ export default class IdleTimeoutCache {
   }
 
   get keys() {
-    return Object.keys(this.itemsByKey)
+    return Object.keys(this._itemsByKey)
   }
 
   get size() {
@@ -42,14 +42,14 @@ export default class IdleTimeoutCache {
   }
 
   set(key, item) {
-    this.itemsByKey[key] = item
+    this._itemsByKey[key] = item
     this._resetItemIdleTimeout(key)
     return this
   }
 
   delete(key) {
     this._clearItemIdleTimeout(key)
-    delete this.itemsByKey[key]
+    delete this._itemsByKey[key]
     return this
   }
 

@@ -145,7 +145,7 @@ class RecordsUpdateThread extends Thread {
 
     const messageProcessor = this.messageProcessorByType[type]
     if (messageProcessor) {
-      messageProcessor(msg)
+      await messageProcessor(msg)
 
       if ([RecordsUpdateThreadMessageTypes.nodePersist, RecordsUpdateThreadMessageTypes.nodeDelete].includes(type)) {
         const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
