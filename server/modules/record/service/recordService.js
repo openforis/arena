@@ -66,6 +66,7 @@ export const {
   fetchRecordCreatedCountsByDates,
   fetchRecordCreatedCountsByDatesAndUser,
   fetchRecordCreatedCountsByUser,
+  fetchRecordCountsByStep,
   updateRecordsStep,
 } = RecordManager
 

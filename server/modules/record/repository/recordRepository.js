@@ -247,6 +247,22 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 }
 
+export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
+  client.any(
+    `
+    SELECT
+      step,
+      COUNT(*) as count
+    FROM
+      ${getSurveyDBSchema(surveyId)}.record
+    WHERE
+      cycle = $1
+    GROUP BY
+      step
+    `,
+    [String(cycle)]
+  )
+
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   client.oneOrNone(
     `SELECT 

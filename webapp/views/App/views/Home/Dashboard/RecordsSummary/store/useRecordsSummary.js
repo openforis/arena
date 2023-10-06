@@ -10,6 +10,8 @@ const initialState = {
   counts: [],
   userCounts: [],
   userDateCounts: [],
+  dataEntry: 0,
+  dataCleansing: 0,
   timeRange: timeRanges._2Weeks,
 }
 

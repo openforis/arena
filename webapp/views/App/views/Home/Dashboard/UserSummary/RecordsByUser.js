@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useContext, useState } from 'react'
 import * as d3 from 'd3'
 
-import { RecordsSummaryContext } from './RecordsSummaryContext'
+import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
-const MockupChart1 = () => {
+const RecordsByUser = () => {
   const ref = useRef()
-  const { userCounts, userDateCounts } = useContext(RecordsSummaryContext)
+  const { userCounts } = useContext(RecordsSummaryContext)
 
   const [totalCount, setTotalCount] = useState(0) // Add this line
 
@@ -78,4 +78,4 @@ const MockupChart1 = () => {
   )
 }
 
-export default MockupChart1
+export default RecordsByUser

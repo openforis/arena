@@ -5,17 +5,18 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import TabSelector from './TabSelector'
 import Helper, { helperTypes } from './Helper'
-import MockupChart1 from './MockupChart1'
-import MockupChart2 from './MockupChart2'
-import MockupChart3 from './MockupChart3'
+import SamplingDataChart from './SamplingPointDataSummary/SamplingDataChart'
 import RecordsSummary from './RecordsSummary'
 import { StorageSummary } from './StorageSummary'
 import SurveyInfo from './SurveyInfo'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
 import { useRecordsSummary } from './RecordsSummary/store'
+import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 import { RecordsSummaryContext } from './RecordsSummaryContext'
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 import './Dashboard.scss'
+import RecordsByUser from './UserSummary/RecordsByUser'
+import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
@@ -25,6 +26,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Dashboard')
 
   const recordsSummaryState = useRecordsSummary()
+  const hasSamplingPointData = useHasSamplingPointData()
 
   const tabs = {
     Dashboard: 'Dashboard',
@@ -48,10 +50,10 @@ const Dashboard = () => {
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
                     {canEditSurvey && <StorageSummary />}
-                    {canEditSurvey && <MockupChart1 />}
-                    {canEditSurvey && <MockupChart2 />}
+                    {canEditSurvey && <RecordsByUser />}
+                    {canEditSurvey && hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
                   </div>
-                  {canEditSurvey && <MockupChart3 />}
+                  {canEditSurvey && <DailyRecordsByUser />}
                 </>
               )}
               {activeTab === 'Record History' && <StorageSummary />}

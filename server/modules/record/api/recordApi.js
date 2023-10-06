@@ -245,6 +245,22 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/records/dashboard/count/by-step',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle } = Request.getParams(req)
+
+        const counts = await RecordService.fetchRecordCountsByStep(surveyId, cycle)
+
+        res.json(counts)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, search } = Request.getParams(req)

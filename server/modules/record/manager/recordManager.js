@@ -117,6 +117,7 @@ export {
   fetchRecordCreatedCountsByDates,
   fetchRecordCreatedCountsByDatesAndUser,
   fetchRecordCreatedCountsByUser,
+  fetchRecordCountsByStep,
   insertRecordsInBatch,
 } from '../repository/recordRepository'
 

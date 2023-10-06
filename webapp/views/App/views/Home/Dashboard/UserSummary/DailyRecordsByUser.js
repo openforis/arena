@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useContext } from 'react'
 import * as d3 from 'd3'
 import { timeDay } from 'd3-time'
 import { timeFormat } from 'd3-time-format'
-import { RecordsSummaryContext } from './RecordsSummaryContext'
+import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
-const MockupChart3 = () => {
+const DailyRecordsByUser = () => {
   const ref = useRef()
   const { userDateCounts } = useContext(RecordsSummaryContext)
 
@@ -139,7 +139,7 @@ const MockupChart3 = () => {
       .attr('cx', (d, i) => x(timeDay.offset(lastDate, -i)))
       .attr('cy', (d) => y(d.record))
       .style('fill', (d) => color(d.user))
-      .on('mouseover', function (event, d, i) {
+      .on('mouseover', function (event, d) {
         d3.select(this).transition().duration(100).attr('r', 6)
         tooltip.transition().duration(100).style('opacity', 0.9)
         tooltip
@@ -147,7 +147,7 @@ const MockupChart3 = () => {
           .style('left', event.pageX + 'px')
           .style('top', event.pageY - 28 + 'px')
       })
-      .on('mouseout', function (d) {
+      .on('mouseout', function () {
         d3.select(this).transition().duration(20).attr('r', 3)
         tooltip
           .transition()
@@ -208,4 +208,4 @@ const MockupChart3 = () => {
   )
 }
 
-export default MockupChart3
+export default DailyRecordsByUser
