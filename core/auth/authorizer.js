@@ -172,6 +172,8 @@ export const canRemoveUser = (user, surveyInfo, userToRemove) =>
   !User.isSystemAdmin(userToRemove) &&
   _hasUserEditAccess(user, surveyInfo, userToRemove)
 
+export const canEditUserMaxSurveys = (user) => User.isSystemAdmin(user)
+
 // USER ACCESS REQUESTS
 export const canViewUsersAccessRequests = (user) => User.isSystemAdmin(user)
 export const canEditUsersAccessRequests = (user) => User.isSystemAdmin(user)

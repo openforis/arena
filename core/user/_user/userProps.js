@@ -22,10 +22,14 @@ const restrictedProps = [keysProps.maxSurveys]
 export const titleKeys = ['mr', 'ms', 'preferNotToSay']
 
 // ====== CREATE
-export const newProps = ({ title = null, mapApiKeyByProvider = null }) => ({
-  ...(!A.isEmpty(title) ? { title } : {}),
-  ...(!A.isEmpty(mapApiKeyByProvider) ? { mapApiKeyByProvider } : {}),
-})
+export const newProps = (propsParam) =>
+  Object.keys(keysProps).reduce((acc, propKey) => {
+    const propValue = propsParam[propKey]
+    if (!A.isEmpty(propValue)) {
+      acc[propKey] = propValue
+    }
+    return acc
+  }, {})
 
 // ====== READ
 export const getProps = R.prop(userKeys.props)
@@ -45,6 +49,7 @@ export const assocMapApiKey =
     const mapApiKeyByProviderUpdated = { ...mapApiKeyByProvider, [provider]: apiKey }
     return assocProp(keysProps.mapApiKeyByProvider)(mapApiKeyByProviderUpdated)(user)
   }
+export const assocMaxSurveys = assocProp(keysProps.maxSurveys)
 
 const dissocListOfProps = (propsArray) => (user) =>
   propsArray.reduce((acc, propKey) => R.dissocPath([userKeys.props, propKey])(acc), user)

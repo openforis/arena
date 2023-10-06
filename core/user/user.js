@@ -110,6 +110,7 @@ export const {
   getMaxSurveys,
   assocTitle,
   assocMapApiKey,
+  assocMaxSurveys,
   titleKeys,
   newProps,
   dissocPrivateProps,

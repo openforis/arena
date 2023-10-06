@@ -11,7 +11,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
-import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
@@ -40,6 +40,7 @@ const UserEdit = () => {
     canRemove,
     canSave,
     canViewEmail,
+    canEditMaxSurveys,
     canEditSystemAdmin,
     canEditSurveyManager,
     hideSurveyGroup,
@@ -131,6 +132,17 @@ const UserEdit = () => {
       {canEditSurveyManager && !systemAdmin && (
         <FormItem label={i18n.t('authGroups.surveyManager.label')}>
           <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
+        </FormItem>
+      )}
+      {canEditMaxSurveys && !systemAdmin && (
+        <FormItem label={i18n.t('userView.maxSurveysUserCanCreate')}>
+          <Input
+            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
+            type="number"
+            value={User.getMaxSurveys(userToUpdate)}
+            validation={Validation.getFieldValidation(User.keysProps.maxSurveys)(validation)}
+            onChange={(value) => onUpdate(User.assocMaxSurveys(value)(userToUpdate))}
+          />
         </FormItem>
       )}
       {!hideSurveyGroup && !systemAdmin && (
