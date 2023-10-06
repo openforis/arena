@@ -5,8 +5,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 const { permissions, keys } = AuthGroup
 
-const MAX_SURVEYS_CREATED_BY_USER = 5
-
 // ======
 // ====== Survey
 // ======
@@ -42,7 +40,7 @@ export const canCreateSurvey = _hasPermissionInSomeGroup(permissions.surveyCreat
 export const canCreateTemplate = (user) => User.isSystemAdmin(user)
 export const getMaxSurveysUserCanCreate = (user) => {
   if (User.isSystemAdmin(user)) return NaN
-  if (canCreateSurvey(user)) return MAX_SURVEYS_CREATED_BY_USER
+  if (canCreateSurvey(user)) return User.getMaxSurveys(user)
   return 0
 }
 

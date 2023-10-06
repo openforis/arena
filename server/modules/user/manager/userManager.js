@@ -317,9 +317,13 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     }
 
     // update user props and picture
-    const name = User.getName(userToUpdate)
-    const email = User.getEmail(userToUpdate)
-    const props = User.getProps(userToUpdate)
+    const userToUpdateModified = User.isSystemAdmin(user)
+      ? userToUpdate
+      : // restricted props can be updated only by system admins
+        User.dissocRestrictedProps(userToUpdate)
+    const name = User.getName(userToUpdateModified)
+    const email = User.getEmail(userToUpdateModified)
+    const props = User.getProps(userToUpdateModified)
 
     return UserRepository.updateUser(
       {
