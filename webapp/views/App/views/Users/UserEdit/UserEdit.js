@@ -134,7 +134,7 @@ const UserEdit = () => {
           <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
         </FormItem>
       )}
-      {canEditMaxSurveys && !systemAdmin && (
+      {canEditMaxSurveys && !systemAdmin && surveyManager && (
         <FormItem label={i18n.t('userView.maxSurveysUserCanCreate')}>
           <Input
             numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
