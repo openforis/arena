@@ -3,9 +3,11 @@
 $borderColor: $greyBorder;
 
 .category {
-  display: grid;
-  grid-template-rows: 5rem 1fr 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   align-items: center;
+  width: 100%;
 }
 
 .category__header {
@@ -14,7 +16,7 @@ $borderColor: $greyBorder;
   align-items: center;
 
   .form-item {
-    width: 100%;
+    flex: 1;
   }
 
   .btn {
@@ -22,8 +24,12 @@ $borderColor: $greyBorder;
     align-items: center;
   }
 
+  .date-import-template-menu-btn {
+    width: 12rem;
+  }
+
   .reporting-data-checkbox {
-    width: 17rem;
+    width: 8rem;
   }
 
   .import-btn,
@@ -33,6 +39,7 @@ $borderColor: $greyBorder;
 }
 
 .category__levels {
+  flex: 1;
   display: flex;
   justify-content: center;
   overflow-x: auto;
@@ -41,12 +48,16 @@ $borderColor: $greyBorder;
     align-self: start;
     margin-left: 1rem;
   }
+
+  .form-item {
+    height: auto;
+  }
 }
 
 .category__level {
   width: 420px;
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   padding: 0.5rem 1rem;
   border-right: 1px dashed $borderColor;
   border-top: 1px dashed $borderColor;
@@ -64,7 +75,7 @@ $borderColor: $greyBorder;
   .category__level-items-header {
     display: flex;
     justify-content: center;
-    margin-top: 3rem;
+    margin-top: 1rem;
     align-items: center;
 
     .btn-add-item {
@@ -73,7 +84,7 @@ $borderColor: $greyBorder;
   }
 
   .category__level-items {
-    height: calc(100vh - 25rem);
+    height: 100%;
     overflow-y: auto;
 
     .item-placeholder {
@@ -86,9 +97,6 @@ $borderColor: $greyBorder;
 
     .category__level-items-header {
       margin-top: 0;
-    }
-    .category__level-items {
-      height: calc(100vh - 20rem);
     }
   }
 }

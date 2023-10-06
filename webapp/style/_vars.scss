@@ -1,6 +1,8 @@
 $fontFamily: 'Noto Sans', sans-serif;
 
 $headerHeight: 45px;
+$footerHeight: 45px;
+
 // colors
 
 $red: #ed5b46;
@@ -44,7 +46,9 @@ $zIndex190AppLoader: 190;
 
 $shadow1: 0 0 4px rgba($black, 0.2);
 $shadow2: 0 0 8px rgba($black, 0.2);
-$shadow3: 0 0 8px 1px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.1);
+$shadow3:
+  0 0 8px 1px rgba($black, 0.2),
+  0 0 0 1px rgba($black, 0.1);
 
 // table
 $tableRowHeight: 35px;
