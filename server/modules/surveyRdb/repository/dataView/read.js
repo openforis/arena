@@ -319,7 +319,9 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
-      const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefUnique, nodeUnique))
+      const colValue = DataCol.getValue(survey, nodeDefUnique, nodeUnique)
+      const colValueString = R.isNil(colValue) ? null : String(colValue)
+      const value = Expression.newLiteral(colValueString)
 
       const condition = Expression.newBinary({
         left: identifier,
@@ -363,15 +365,32 @@ export const fetchRecordsCountByRootNodesValue = async (
   const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
   const rootTableAlias = 'r'
 
+  const nodeValues = nodeDefs.map((nodeDef, idx) => {
+    const value = DataCol.getValue(survey, nodeDef, nodes[idx])
+    return Objects.isNil(value) ? null : String(value)
+  })
+
   const filterColumns = nodeDefs.map(NodeDefTable.getColumnName)
   const filterColumnsString = filterColumns.join(', ')
+
   const filterCondition = nodeDefs
     .map((nodeDef, idx) => {
-      const node = nodes[idx]
-      const value = DataCol.getValue(survey, nodeDef, node)
-      return `${rootTableAlias}.${NodeDefTable.getColumnName(nodeDef)} ${value === null ? ' IS NULL' : `= '${value}'`}`
+      const value = nodeValues[idx]
+      const fullColumnName = `${rootTableAlias}.${NodeDefTable.getColumnName(nodeDef)}`
+      if (Objects.isNil(value)) {
+        return `${fullColumnName} IS NULL`
+      }
+      if (NodeDef.isCoordinate(nodeDef)) {
+        return `${fullColumnName} = ST_GeomFromEWKT($/attr_${idx}/)`
+      }
+      return `${fullColumnName}::text = $/attr_${idx}/`
     })
     .join(' AND ')
+
+  const filterQueryParams = nodeDefs.reduce((acc, _nodeDef, idx) => {
+    acc[`attr_${idx}`] = nodeValues[idx]
+    return acc
+  }, {})
 
   return client.map(
     `
@@ -381,8 +400,8 @@ export const fetchRecordsCountByRootNodesValue = async (
       FROM
         ${rootTable}
       WHERE 
-        ${DataTable.columnNameRecordCycle} = $2
-        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuid} NOT IN ($1:csv)` : ''} 
+        ${DataTable.columnNameRecordCycle} = $/cycle/
+        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuid} NOT IN ($/recordUuidsExcluded:csv/)` : ''}
       GROUP BY 
         ${filterColumnsString}
     )
@@ -396,12 +415,16 @@ export const fetchRecordsCountByRootNodesValue = async (
       ON n.record_uuid = r.record_uuid
       AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
     WHERE
-      ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $2
+      ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $/cycle/
       AND ${filterCondition}
-      AND ${rootTableAlias}.${DataTable.columnNameRecordUuid} NOT IN ($1:csv)
+      AND ${rootTableAlias}.${DataTable.columnNameRecordUuid} NOT IN ($/recordUuidsExcluded:csv/)
     GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuid}, cr.count
   `,
-    [recordUuidsExcluded, cycle],
+    {
+      recordUuidsExcluded,
+      cycle,
+      ...filterQueryParams,
+    },
     camelize
   )
 }

@@ -63,7 +63,7 @@ const ExportData = () => {
       <Button
         testId={TestId.dataExport.prepareExport}
         onClick={() => dispatch(ExportCsvDataActions.startCSVExport(selectedOptions))}
-        label="dataExportView.startCsvExport"
+        label="dataExportView.startExport"
       />
     </div>
   )

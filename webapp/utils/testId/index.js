@@ -35,6 +35,7 @@ export const TestId = {
     addCategoryBtn: 'category-selector-add-btn',
   },
   dashboard: {
+    advancedFunctionsBtn: 'survey-advanced-functions',
     collectReportBtn: 'collect-report-btn',
     surveyDeleteBtn: 'survey-delete-btn',
     surveyExportBtn: 'survey-export-btn',
@@ -98,7 +99,7 @@ export const TestId = {
     ok: 'text="Ok"',
   },
   jobMonitor: {
-    errorItem: '.error-item',
+    errorsContainer: '.app-job-monitor__job-errors',
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',

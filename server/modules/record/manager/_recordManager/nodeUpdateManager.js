@@ -141,12 +141,17 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
-export const updateNodesDependents = async ({ survey, record, nodes, persistNodes = true }, tx) => {
+export const updateNodesDependents = async (
+  { survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
+  tx
+) => {
   const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
     nodes,
+    timezoneOffset,
     logger,
+    sideEffect,
   })
 
   let recordUpdated = recordUpdatedDependents
@@ -253,3 +258,12 @@ export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, re
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
     return Record.mergeNodes(ObjectUtils.toUuidIndexedObj(nodesDeleted))(record)
   })
+
+export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {
+  const nodesDeleted = await NodeRepository.deleteNodesByUuids(surveyId, nodeUuids, tx)
+  const activities = nodeUuids.map((uuid) =>
+    ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid }, systemActivity)
+  )
+  await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+  return nodesDeleted
+}

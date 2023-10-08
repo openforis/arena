@@ -7,6 +7,7 @@ import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/co
 import { ArrayUtils } from '@core/arrayUtils'
 
 export const useTable = ({
+  columns,
   keyExtractor,
   moduleApiUri,
   module,
@@ -15,6 +16,8 @@ export const useTable = ({
   selectable,
 }) => {
   const [totalCount, setTotalCount] = useState(0)
+  const [visibleColumns, setVisibleColumns] = useState(columns)
+
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
@@ -113,6 +116,13 @@ export const useTable = ({
     [keyExtractor, onRowClickProp, selectable]
   )
 
+  const onVisibleColumnsChange = useCallback(
+    (visibleColumnKeys) => {
+      setVisibleColumns(columns.filter((column) => visibleColumnKeys.includes(column.key)))
+    },
+    [columns]
+  )
+
   return {
     loadingData,
     loadingCount,
@@ -127,6 +137,8 @@ export const useTable = ({
     totalCount: Number(totalCount),
     initData,
     onRowClick,
+    onVisibleColumnsChange,
     selectedItems,
+    visibleColumns,
   }
 }

@@ -4,3 +4,5 @@ export const modes = {
 }
 
 export const thisVariable = 'this'
+
+export const contextVariable = '$context'

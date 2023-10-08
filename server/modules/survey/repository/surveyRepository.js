@@ -288,6 +288,22 @@ export const publishSurveyProps = async (surveyId, client = db) =>
     [surveyId]
   )
 
+export const unpublishSurveyProps = async (surveyId, client = db) =>
+  client.none(
+    `
+  UPDATE
+      survey
+  SET
+      props_draft = props || props_draft,
+      props = '{}'::jsonb,
+      draft = true,
+      published = false
+  WHERE
+      id = $1
+  `,
+    [surveyId]
+  )
+
 export const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
   const meta = {
     dependencyGraphs,

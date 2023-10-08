@@ -3,6 +3,7 @@ export const dependencyTypes = {
   applicable: 'applicable',
   validations: 'validations',
   formula: 'formula',
+  itemsFilter: 'itemsFilter',
 }
 
 export const isContextParentByDependencyType = {
@@ -10,6 +11,7 @@ export const isContextParentByDependencyType = {
   [dependencyTypes.applicable]: true,
   [dependencyTypes.validations]: false,
   [dependencyTypes.formula]: false,
+  [dependencyTypes.itemsFilter]: true,
 }
 
 export const selfReferenceAllowedByDependencyType = {
@@ -17,4 +19,5 @@ export const selfReferenceAllowedByDependencyType = {
   [dependencyTypes.applicable]: false,
   [dependencyTypes.validations]: true,
   [dependencyTypes.formula]: false,
+  [dependencyTypes.itemsFilter]: false,
 }

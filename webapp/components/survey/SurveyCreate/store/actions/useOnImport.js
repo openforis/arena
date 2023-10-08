@@ -2,12 +2,14 @@ import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
+import * as JobSerialized from '@common/job/jobSerialized'
+
 import * as Validation from '@core/validation/validation'
 
 import { objectToFormData } from '@webapp/service/api'
 import { SurveyActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
-import * as JobSerialized from '@common/job/jobSerialized'
+import { NotificationActions } from '@webapp/store/ui'
 
 import { importSources } from '../importSources'
 
@@ -22,16 +24,16 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) => {
   return useCallback(async () => {
     const { file, source, ...surveyObj } = newSurvey
 
+    // reset upload progress (hide progress bar)
+    setNewSurvey({ ...newSurvey, uploadProgressPercent: -1, uploading: true })
+
     const formData = objectToFormData({ file, survey: JSON.stringify(surveyObj) })
 
     const onUploadProgress = (progressEvent) => {
       const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-      setNewSurvey({ ...newSurvey, uploadProgressPercent })
+      setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
     }
     const { data } = await axios.post(urlBasedOnSource[source], formData, { onUploadProgress })
-
-    // reset upload progress (hide progress bar)
-    setNewSurvey({ ...newSurvey, uploadProgressPercent: -1 })
 
     const { job, validation } = data
 
@@ -46,9 +48,12 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) => {
         })
       )
     } else if (validation && !Validation.isValid(validation)) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
+
       setNewSurvey({
         ...newSurvey,
         validation,
+        uploading: false,
       })
     }
   }, [dispatch, newSurvey, setNewSurvey])

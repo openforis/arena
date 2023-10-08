@@ -8,7 +8,8 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-/* eslint-disable import/no-cycle */
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 
 const getNodeValues = (nodeDef, nodes, lang) => {
@@ -54,7 +55,9 @@ const NodeDefMultipleTableCell = (props) => {
     )
   ) : (
     <div className="survey-form__node-def-table-cell-body-multiple">
-      <span className="values-summary">{nodeValues}</span>
+      <span className="values-summary">
+        <LabelWithTooltip label={nodeValues} />
+      </span>
       <button type="button" className="btn-s" onClick={() => setShowEditDialog(true)}>
         <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`} />
       </button>

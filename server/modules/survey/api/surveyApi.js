@@ -100,9 +100,9 @@ export const init = (app) => {
   app.get('/surveys/count', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { template = false, search = null, lang = null } = Request.getParams(req)
+      const { draft = true, template = false, search = null, lang = null } = Request.getParams(req)
 
-      const count = await SurveyService.countUserSurveys({ user, template, search, lang })
+      const count = await SurveyService.countUserSurveys({ user, draft, template, search, lang })
 
       res.json({ count })
     } catch (error) {
@@ -211,6 +211,15 @@ export const init = (app) => {
     const user = Request.getUser(req)
 
     const job = SurveyService.startPublishJob(user, surveyId)
+
+    res.json({ job: JobUtils.jobToJSON(job) })
+  })
+
+  app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+
+    const job = SurveyService.startUnpublishJob(user, surveyId)
 
     res.json({ job: JobUtils.jobToJSON(job) })
   })

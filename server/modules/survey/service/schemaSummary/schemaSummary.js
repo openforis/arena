@@ -5,6 +5,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
+import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
@@ -20,6 +21,13 @@ const getDefaultValuesSummary = ({ nodeDef }) => {
   const defaultValues = NodeDef.getDefaultValues(nodeDef)
   return defaultValues.length > 0
     ? defaultValues.map((defaultValue) => NodeDefExpression.getExpression(defaultValue)).join('; ')
+    : ''
+}
+
+const getDefaultValueApplyIf = ({ nodeDef }) => {
+  const defaultValues = NodeDef.getDefaultValues(nodeDef)
+  return defaultValues.length > 0
+    ? defaultValues.map((defaultValue) => NodeDefExpression.getApplyIf(defaultValue)).join('; ')
     : ''
 }
 
@@ -95,10 +103,12 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
       relevantIf,
       hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
       defaultValue: getDefaultValuesSummary({ nodeDef }),
+      defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
+      defaultValueEvaluateOnce: NodeDef.isDefaultValueEvaluatedOneTime(nodeDef),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
-      cycle: String(NodeDef.getCycles(nodeDef).map((val) => String(Number(val) + 1))), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
+      cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }
   })
 

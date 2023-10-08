@@ -46,7 +46,12 @@ export const useExpressionEditorPopupState = (props) => {
   // OnMount initialize state
   useEffect(() => {
     // Either expr or query are passed by the parent component
-    const exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
+    let exprDraft
+    try {
+      exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
+    } catch (error) {
+      exprDraft = ExpressionParser.parseQuery('', mode, canBeConstant)
+    }
     const queryDraft = Expression.toString(exprDraft, mode)
 
     setState({

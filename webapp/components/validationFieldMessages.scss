@@ -1,22 +1,27 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
-.validation-field_message {
-  color: white;
+.validation-field_messages {
+  display: flex;
+  flex-direction: column;
 
-  .icon {
-    padding-right: 0.2em;
-    font-weight: 600;
+  .validation-field_message {
+    color: white;
+
+    .icon {
+      padding-right: 0.2em;
+      font-weight: 600;
+    }
+
+    &.warning .icon {
+      color: $orange;
+    }
+
+    &.error .icon {
+      color: $red;
+    }
   }
 
-  &.warning .icon {
-    color: $orange;
+  .validation-field-message__text {
+    display: inline-block;
   }
-
-  &.error .icon {
-    color: $red;
-  }
-}
-
-.validation-field-message__text {
-  display: inline-block;
 }

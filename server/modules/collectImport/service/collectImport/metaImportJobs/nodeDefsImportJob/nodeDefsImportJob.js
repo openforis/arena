@@ -212,10 +212,10 @@ export default class NodeDefsImportJob extends Job {
       if (includeAccuracy) {
         propsUpdated[NodeDef.propKeys.includeAccuracy] = true
       }
-      // 3g. elevation (altitude in Collect)
+      // 3g. altitude
       const includeAltitude = CollectSurvey.getUiAttribute('includeAltitude', false)(collectNodeDef)
       if (includeAltitude) {
-        propsUpdated[NodeDef.propKeys.includeElevation] = true
+        propsUpdated[NodeDef.propKeys.includeAltitude] = true
       }
     } else if (type === NodeDef.nodeDefType.text) {
       // 3f. text input type (short/memo => singleLine/multiLine)

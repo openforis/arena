@@ -1,9 +1,10 @@
 .table.surveys {
-  header {
+  .table__header {
     column-gap: 5rem;
 
     input {
-      width: 20rem;
+      width: 25rem;
+      padding: 0.5rem;
     }
   }
 }

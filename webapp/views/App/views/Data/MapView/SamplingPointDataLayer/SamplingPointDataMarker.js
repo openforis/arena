@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -10,6 +10,7 @@ const markerRadius = 10
 export const SamplingPointDataMarker = (props) => {
   const {
     createRecordFromSamplingPointDataItem,
+    flyToPoint,
     flyToNextPoint,
     flyToPreviousPoint,
     markersColor,
@@ -25,6 +26,10 @@ export const SamplingPointDataMarker = (props) => {
 
   const { markerRef, showMarkersLabels } = useLayerMarker({ key, popupOpen, setMarkerByKey })
 
+  const onDoubleClick = useCallback(() => {
+    flyToPoint(pointFeature)
+  }, [flyToPoint, pointFeature])
+
   return (
     <CircleMarker
       center={[latitude, longitude]}
@@ -34,7 +39,7 @@ export const SamplingPointDataMarker = (props) => {
         markerRef.current = ref
         setMarkerByKey({ key, marker: ref })
       }}
-      eventHandlers={{ popupclose: onPopupClose }}
+      eventHandlers={{ dblclick: onDoubleClick, popupclose: onPopupClose }}
     >
       {showMarkersLabels && <MarkerTooltip color={markersColor}>{itemCodes.join(' - ')}</MarkerTooltip>}
 
@@ -51,6 +56,7 @@ export const SamplingPointDataMarker = (props) => {
 
 SamplingPointDataMarker.propTypes = {
   createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
+  flyToPoint: PropTypes.func.isRequired,
   flyToNextPoint: PropTypes.func.isRequired,
   flyToPreviousPoint: PropTypes.func.isRequired,
   markersColor: PropTypes.string,

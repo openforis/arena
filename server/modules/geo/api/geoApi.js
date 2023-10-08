@@ -10,8 +10,8 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SrsManager from '@server/modules/geo/manager/srsManager'
 import { PlanetApi } from './planetApi'
 
-// free elevation API urls
-const elevationApiUrls = [
+// free altitude API urls
+const altitudeApiUrls = [
   ({ lat, lng }) => `https://api.opentopodata.org/v1/aster30m?locations=${lat},${lng}`,
   ({ lat, lng }) => `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
 ]
@@ -74,20 +74,20 @@ export const init = (app) => {
     }
   )
 
-  app.get('/survey/:surveyId/geo/map/elevation', AuthMiddleware.requireMapUsePermission, async (req, res) => {
+  app.get('/survey/:surveyId/geo/map/altitude', AuthMiddleware.requireMapUsePermission, async (req, res) => {
     const { lat, lng } = Request.getParams(req)
-    let elevation = null
-    await Promises.each(elevationApiUrls, async (urlPattern) => {
-      if (!Objects.isEmpty(elevation)) return
+    let altitude = null
+    await Promises.each(altitudeApiUrls, async (urlPattern) => {
+      if (!Objects.isEmpty(altitude)) return
       try {
         const url = urlPattern({ lat, lng })
         const { data } = await axios.get(url, { timeout: 10000 })
-        elevation = data?.results?.[0]?.elevation
+        altitude = data?.results?.[0]?.elevation
       } catch (error) {
         // ignore it
       }
     })
-    res.json(elevation)
+    res.json(altitude)
   })
 
   app.get(

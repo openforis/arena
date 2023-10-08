@@ -59,7 +59,7 @@ const _getRStudioCode = ({
   `
 }
 
-const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
+const _copyRStudioCode = async ({ rStudioCode }) => copyToClipboard(rStudioCode)
 
 const isInstanceRunning = async () => {
   const currentInstance = await API.getCurrentInstance()
@@ -68,13 +68,14 @@ const isInstanceRunning = async () => {
 
 const checkCanOpenRStudio = ({ dispatch, state }) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
+  const chain = ChainState.getChain(state)
 
   if (Survey.isDraft(surveyInfo)) {
     dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudio.surveyNotPublished' }))
     return false
   }
 
-  if (!ChainState.hasRecordsToProcess(state)) {
+  if (!Chain.isIncludeEntitiesWithoutData(chain) && !ChainState.hasRecordsToProcess(state)) {
     dispatch(NotificationActions.notifyWarning({ key: 'chainView.cannotStartRStudio.noRecords' }))
     return false
   }
@@ -116,8 +117,8 @@ export const openRStudio =
       DialogConfirmActions.showDialogConfirm({
         key: isLocal ? 'chainView.copyRStudioCodeLocal' : 'chainView.copyRStudioCode',
         params: { rStudioCode },
-        onOk: () => {
-          _copyRStudioCode({ rStudioCode })
+        onOk: async () => {
+          await _copyRStudioCode({ rStudioCode })
           if (!isLocal) {
             window.open(rStudioUrl, 'rstudio')
           }

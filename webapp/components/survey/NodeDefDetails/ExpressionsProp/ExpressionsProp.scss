@@ -1,14 +1,13 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .node-def-edit__expressions {
   overflow-y: auto;
 
   //custom tooltip error
   .tooltip-error {
-
     .node-def-edit__expression {
-      border: 1px solid rgba($red, .6);
-      background-color: rgba($red, .1);
+      border: 1px solid rgba($red, 0.6);
+      background-color: rgba($red, 0.1);
     }
 
     .tooltip-text {
@@ -21,13 +20,12 @@
       }
     }
   }
-
 }
 
-.tooltip-error {
+.error {
   .node-def-edit__expressions {
-    border: 1px solid rgba($red, .6);
-    background-color: rgba($red, .1);
+    border: 1px solid rgba($red, 0.6);
+    background-color: rgba($red, 0.1);
   }
 }
 
@@ -35,19 +33,20 @@
   display: grid;
   grid-template-columns: 120px 1fr;
 
-  .labels-editor-label, .label {
+  .labels-editor-label,
+  .label {
     text-align: center;
     align-self: center;
     font-weight: 600;
-    font-size: .65rem;
+    font-size: 0.65rem;
     background-color: rgba($blueLight, 0.3);
-    padding: .15rem .3rem;
+    padding: 0.15rem 0.3rem;
 
     .form-label {
       text-align: center;
       align-self: center;
       font-weight: 600;
-      font-size: .65rem;
+      font-size: 0.65rem;
     }
   }
 }
@@ -69,7 +68,7 @@
 
     .expression-editor__query-container {
       .btn-edit {
-        padding: .3rem;
+        padding: 0.3rem;
         margin-left: 1rem;
 
         .icon {
@@ -80,7 +79,6 @@
   }
 
   .expression-item.severity {
-
     div:nth-child(2) {
       display: flex;
       align-items: center;
@@ -88,16 +86,16 @@
 
     button {
       margin-left: 1rem;
-      font-size: .7rem;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
 
       &:nth-child(1).active {
-        background-color: rgba($red, .7);
+        background-color: rgba($red, 0.7);
       }
 
       &:nth-child(2).active {
-        background-color: rgba($orange, .7);
+        background-color: rgba($orange, 0.7);
       }
     }
   }

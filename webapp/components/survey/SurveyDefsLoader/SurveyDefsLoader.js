@@ -42,7 +42,11 @@ const SurveyDefsLoader = (props) => {
     return null
   }
 
-  if (!requirePublish || Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)) {
+  if (
+    !requirePublish ||
+    Survey.isPublished(surveyInfo) ||
+    (Survey.isFromCollect(surveyInfo) && Survey.isRdbInitialized(surveyInfo))
+  ) {
     return children
   }
 

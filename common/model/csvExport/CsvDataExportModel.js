@@ -39,6 +39,12 @@ const columnsByNodeDefType = {
       },
       { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
       { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
+      ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
+        header: `${nodeDefName}_${field}`,
+        nodeDef,
+        dataType: columnDataType.numeric,
+        valueProp: field,
+      })),
     ]
   },
   [NodeDef.nodeDefType.date]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.text })],

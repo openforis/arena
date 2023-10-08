@@ -1,9 +1,12 @@
 import './modal.scss'
-import React from 'react'
-import * as R from 'ramda'
 
-import { KeyboardMap } from '@webapp/utils/keyboardMap'
+import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
+import MuiModal from '@mui/material/Modal'
+import Fade from '@mui/material/Fade'
+
 import { TestId } from '@webapp/utils/testId'
+import { useI18n } from '@webapp/store/system'
 
 export const ModalClose = ({ _children, onClose }) => (
   <div className="modal-close" onClick={() => onClose()}>
@@ -17,43 +20,53 @@ export const ModalBody = ({ children }) => <div className="modal-body">{children
 
 export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
 
-export class Modal extends React.Component {
-  constructor(props) {
-    super(props)
+export const Modal = (props) => {
+  const { children, className, closeOnEsc, onClose: onCloseProp, showCloseButton, title, titleParams } = props
 
-    this.state = { closed: false }
-  }
+  const i18n = useI18n()
 
-  componentDidMount() {
-    window.addEventListener('keydown', this)
-    this.setState({ closed: false })
-  }
+  const onClose = useCallback(
+    (event) => {
+      onCloseProp?.(event)
+    },
+    [onCloseProp]
+  )
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this)
-  }
+  return (
+    <MuiModal
+      className={`modal ${className}`}
+      data-testid={TestId.modal.modal}
+      disableEscapeKeyDown={!closeOnEsc}
+      onClose={onClose}
+      open
+    >
+      <Fade in timeout={500}>
+        <div className="modal-content">
+          {(title || showCloseButton) && (
+            <ModalHeader>
+              {title && <span>{i18n.t(title, titleParams)}</span>}
+              {showCloseButton && <ModalClose onClose={onClose} />}
+            </ModalHeader>
+          )}
+          {children}
+        </div>
+      </Fade>
+    </MuiModal>
+  )
+}
 
-  handleEvent(e) {
-    const { onClose, closeOnEsc = true } = this.props
+Modal.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  closeOnEsc: PropTypes.bool,
+  onClose: PropTypes.func,
+  title: PropTypes.string,
+  titleParams: PropTypes.object,
+  showCloseButton: PropTypes.bool,
+}
 
-    if (e.type === 'keydown' && e.keyCode === KeyboardMap.Esc) {
-      if (closeOnEsc && onClose) onClose()
-    }
-  }
-
-  render() {
-    const { children, isOpen = true, className = '' } = this.props
-
-    return R.propEq('closed', true)(this.state) ? null : (
-      <div
-        className={`modal ${className}`}
-        data-testid={TestId.modal.modal}
-        tabIndex="-1"
-        role="dialog"
-        style={{ display: isOpen ? 'block' : 'none' }}
-      >
-        <div className="modal-content">{children}</div>
-      </div>
-    )
-  }
+Modal.defaultProps = {
+  className: '',
+  closeOnEsc: true,
+  showCloseButton: false,
 }

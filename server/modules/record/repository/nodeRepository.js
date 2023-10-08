@@ -266,3 +266,12 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     [nodeDefUuids],
     dbTransformCallback
   )
+
+export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
+  client.manyOrNone(
+    `DELETE FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE uuid IN ($1:csv)
+    RETURNING *, true as ${Node.keys.deleted}`,
+    [nodeUuids],
+    dbTransformCallback
+  )

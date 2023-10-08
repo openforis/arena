@@ -121,6 +121,7 @@ export const {
   isDraft,
   isValid,
   isFromCollect,
+  isRdbInitialized,
   getCollectUri,
   getCollectReport,
   getCollectNodeDefsInfoByPath,
@@ -136,7 +137,7 @@ export const {
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocFilesStatistics, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocFilesStatistics, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
 
 // ====== READ nodeDefs
 export const {
@@ -150,6 +151,7 @@ export const {
   getNodeDefChildren,
   getNodeDefChildrenInOwnPage,
   hasNodeDefChildrenEntities,
+  getNodeDefChildrenSorted,
   getNodeDefChildByName,
   getNodeDefSiblingByName,
   getNodeDefByName,
@@ -189,6 +191,7 @@ export const {
   addNodeDefsDependencies,
   getDependencyGraph,
   getNodeDefDependencies,
+  getNodeDefDependentsUuids,
   hasDependencyGraph,
   isNodeDefDependentOn,
   removeNodeDefDependencies,

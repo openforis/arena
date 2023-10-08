@@ -16,12 +16,16 @@ const ValidationFieldMessages = (props) => {
   const survey = useSurvey()
   const messages = ValidationUtils.getJointMessages({ i18n, survey, showKeys })(validation)
 
-  return messages.map(({ severity, text }, i) => (
-    <div className={`validation-field_message ${severity}`} key={i}>
-      {showIcons && <span className="icon icon-warning icon-12px icon-left" />}
-      <Markdown className="validation-field-message__text" source={text} />
+  return (
+    <div className="validation-field_messages">
+      {messages.map(({ severity, text }, i) => (
+        <div className={`validation-field_message ${severity}`} key={i}>
+          {showIcons && <span className="icon icon-warning icon-12px icon-left" />}
+          <Markdown className="validation-field-message__text" source={text} />
+        </div>
+      ))}
     </div>
-  ))
+  )
 }
 
 ValidationFieldMessages.defaultProps = {

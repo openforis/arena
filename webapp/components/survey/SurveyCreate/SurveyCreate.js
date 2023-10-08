@@ -9,6 +9,8 @@ import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { RecordCycle } from '@core/record/recordCycle'
+
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
@@ -48,6 +50,7 @@ const SurveyCreate = (props) => {
     cloneFromCycle,
     options,
     file,
+    uploading,
     uploadProgressPercent,
   } = newSurvey
 
@@ -60,6 +63,7 @@ const SurveyCreate = (props) => {
     <div className="home-survey-create">
       <div className="row">
         <ButtonGroup
+          disabled={uploading}
           groupName={template ? 'templateCreateType' : 'surveyCreateType'}
           selectedItemKey={createType}
           onChange={onCreateTypeUpdate}
@@ -87,6 +91,7 @@ const SurveyCreate = (props) => {
       </div>
       <FormItem label={i18n.t('common.name')}>
         <Input
+          disabled={uploading}
           id={TestId.surveyCreate.surveyName}
           value={name}
           validation={Validation.getFieldValidation('name')(validation)}
@@ -131,7 +136,7 @@ const SurveyCreate = (props) => {
               <Dropdown
                 items={cloneFrom.cycles}
                 itemValue={(cycleKey) => cycleKey}
-                itemLabel={(cycleKey) => String(Number(cycleKey) + 1)}
+                itemLabel={RecordCycle.getLabel}
                 onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
                 selection={cloneFromCycle}
               />
@@ -157,9 +162,9 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.import && showImport && (
         <>
-          {uploadProgressPercent >= 0 ? (
+          {uploading && uploadProgressPercent >= 0 ? (
             <div className="row">
-              <ProgressBar progress={uploadProgressPercent} />
+              <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
             </div>
           ) : (
             <>
@@ -202,7 +207,7 @@ const SurveyCreate = (props) => {
               <div className="row">
                 <Button
                   className="btn-primary"
-                  disabled={!file}
+                  disabled={!file || uploading}
                   label={'homeView.surveyCreate.startImport'}
                   onClick={onImport}
                   testId={TestId.surveyCreate.startImportBtn}

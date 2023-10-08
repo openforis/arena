@@ -1,27 +1,16 @@
-import {
-  TitleBlock,
-  ShowTitleBlock,
-  ShowLegendBlock,
-  SwitchHorizontalBlock,
-  LabelFontSizeBlock,
-  AxisTitleBlock,
-  MaxHeightBlock,
-  GroupByBlock,
-  MetricBlock,
-} from '../../blocks'
+import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { valuesToCalculations, valuesToSpec, sliderBlock } from '../../blocks/common'
 
 const bar = {
   selector: {
     title: 'Bar',
   },
   baseSpec: {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    mark: { type: 'bar' },
-    config: {
-      mark: {
-        invalid: null,
-      },
+    chartType: 'barChart',
+    chart: {
+      showLegend: false,
     },
+    query: {},
   },
   builderBlocks: {
     blocks: {
@@ -30,8 +19,50 @@ const bar = {
         subtitle: 'Config of the query for the bar chart',
         type: 'container',
         blocks: {
-          groupBy: GroupByBlock(),
-          metric: MetricBlock(),
+          groupBy: GroupByBlock({
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const transform = valuesToCalculations(value)
+
+              const groupBy = {
+                field_uuid: transform.key,
+                field: transform.as,
+                type: 'nominal',
+              }
+
+              const newSpec = {
+                ...spec,
+                query: {
+                  ...spec.query,
+                  groupBy,
+                },
+              }
+              return newSpec
+            },
+          }),
+          metric: MetricBlock({
+            valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
+              const columnValues = configItemsByPath[`${key}.column`]?.value
+              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
+              const transform = valuesToCalculations(columnValues, '-')
+              const aggTransform = valuesToCalculations(aggregationValues, '-')
+
+              const metric = {
+                field: transform.as,
+                field_uuid: transform.key,
+                aggregate: aggTransform.as,
+                type: 'quantitative',
+              }
+
+              const newSpec = {
+                ...spec,
+                query: {
+                  ...spec.query,
+                  metric,
+                },
+              }
+              return newSpec
+            },
+          }),
         },
         order: ['groupBy', 'metric'],
       },
@@ -40,14 +71,65 @@ const bar = {
         subtitle: 'Custom configuration of the chart',
         type: 'container',
         blocks: {
-          'show-title': ShowTitleBlock(),
-          title: TitleBlock(),
-          'show-legend': ShowLegendBlock(),
-          labelFontSize: LabelFontSizeBlock(),
-          xTitle: AxisTitleBlock({ id: 'xTitle', axisKey: 'x' }),
-          yTitle: AxisTitleBlock({ id: 'yTitle', axisKey: 'y' }),
-
-          maxHeight: MaxHeightBlock(),
+          'show-title': ShowLegendBlock({
+            id: 'show-legend',
+            title: 'Show Title',
+            label: 'Show title',
+            valuesToSpec: valuesToSpec('showTitle'),
+            defaultValue: false,
+          }),
+          title: TitleBlock({
+            valuesToSpec: valuesToSpec('title'),
+          }),
+          'show-legend': ShowLegendBlock({
+            valuesToSpec: valuesToSpec('showLegend'),
+            defaultValue: false,
+          }),
+          'title-size': sliderBlock('title-size', 'Title Font Size', 40),
+          'axis-size': sliderBlock('axis-size', 'Axis Font Size', 25),
+          'ticks-size': sliderBlock('ticks-size', 'Ticks Size', 15),
+          xTitle: TitleBlock({
+            id: 'xAxis',
+            title: 'Name of the X axis',
+            subtitle: 'Write here the name of the X axis',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  xAxisTitle: value,
+                },
+              }
+              return newSpec
+            },
+          }),
+          yTitle: TitleBlock({
+            id: 'yAxis',
+            title: 'Name of the Y axis',
+            subtitle: 'Write here the name of the Y axis',
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  yAxisTitle: value,
+                },
+              }
+              return newSpec
+            },
+          }),
+          maxHeight: MaxHeightBlock({
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  barMaxHeight: value,
+                },
+              }
+              return newSpec
+            },
+          }),
           stack: {
             id: 'stack',
             title: 'Stack and normalize bars',
@@ -56,31 +138,43 @@ const bar = {
             type: 'checkbox',
             defaultValue: false,
             valuesToSpec: ({ value = [], spec = {} }) => {
-              if (value) {
-                const newSpec = {
-                  ...spec,
-                  encoding: {
-                    ...(spec.encoding || {}),
-                    y: {
-                      ...(spec.encoding?.y || {}),
-                      stack: 'normalize',
-                    },
-                    xOffset: null,
-                  },
-                }
-                return newSpec
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  stackedBars: value,
+                },
               }
-              return spec
+              return newSpec
             },
           },
-          switchHorizontal: SwitchHorizontalBlock(),
+          switchHorizontal: {
+            id: 'horizontal',
+            title: 'Make chart Horizontal',
+            subtitle: 'Make Horizontal',
+            label: 'Make horizontal',
+            type: 'checkbox',
+            defaultValue: false,
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  isHorizontal: value,
+                },
+              }
+              return newSpec
+            },
+          },
         },
 
         order: [
           'show-title',
           'title',
           'show-legend',
-          'labelFontSize',
+          'title-size',
+          'axis-size',
+          'ticks-size',
           'xTitle',
           'yTitle',
           'maxHeight',

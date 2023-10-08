@@ -36,7 +36,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit,
     sortBy,
     sortOrder,
-    search,
+    search = null,
     step = null,
     recordUuid = null,
     includeRootKeyValues = true,
@@ -175,6 +175,8 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
     await NodeRepository.updateNodes({ surveyId, nodes }, t)
   })
 
+export { updateRecordDateModified } from '../repository/recordRepository'
+
 // ==== DELETE
 
 export {
@@ -184,6 +186,7 @@ export {
   deleteRecordsByCycles,
   deleteNode,
   deleteNodesByNodeDefUuids,
+  deleteNodesByUuids,
 } from './_recordManager/recordUpdateManager'
 
 // ==== VALIDATION

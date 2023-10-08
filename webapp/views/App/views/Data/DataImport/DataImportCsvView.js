@@ -15,15 +15,15 @@ import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
-import { useConfirm } from '@webapp/components/hooks'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { Button, ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
+import { ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { ImportStartButton } from './ImportStartButton'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',
@@ -48,7 +48,6 @@ export const DataImportCsvView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
-  const confirm = useConfirm()
 
   const canSelectCycle = surveyCycleKeys.length > 1
 
@@ -114,41 +113,39 @@ export const DataImportCsvView = () => {
     setStateProp('file')(files[0])
   }
 
-  const startImportJob = async ({ dryRun = false } = {}) => {
-    const job = await API.startDataImportFromCsvJob({
-      surveyId,
-      file,
-      cycle,
-      entityDefUuid: selectedEntityDefUuid,
-      dryRun,
-      insertNewRecords: dataImportType === importTypes.insertNewRecords,
-      insertMissingNodes: !preventAddingNewEntityData,
-      updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
-    })
-    dispatch(
-      JobActions.showJobMonitor({
-        job,
-        autoHide: true,
-        errorKeyHeaderName: 'dataImportView.errors.rowNum',
-        errorsExportFileName,
-        onComplete: (jobCompleted) => {
-          setState((statePrev) => ({ ...statePrev, jobCompleted }))
-        },
-      })
-    )
-  }
-  const onValidateFileClick = async () => {
-    await startImportJob({ dryRun: true })
-  }
+  const onImportJobStart = useCallback(
+    (job) => {
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          autoHide: true,
+          errorKeyHeaderName: 'dataImportView.errors.rowNum',
+          errorsExportFileName,
+          onComplete: (jobCompleted) => {
+            setState((statePrev) => ({ ...statePrev, jobCompleted }))
+          },
+        })
+      )
+    },
+    [dispatch, errorsExportFileName]
+  )
 
-  const onStartImportClick = () => {
-    confirm({ key: 'dataImportView.startImportConfirm', onOk: startImportJob })
+  const importStartParams = {
+    surveyId,
+    file,
+    cycle,
+    entityDefUuid: selectedEntityDefUuid,
+    insertNewRecords: dataImportType === importTypes.insertNewRecords,
+    insertMissingNodes: !preventAddingNewEntityData,
+    updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
   }
 
   return (
     <div className="main-container">
-      <Stepper activeStep={activeStep} steps={steps} />
-
+      <div className="steps-row">
+        <ButtonIconInfo title="dataImportView.importFromCsvStepsInfo" markdown />
+        <Stepper activeStep={activeStep} steps={steps} />
+      </div>
       <div className="internal-container">
         <div className="form">
           {canSelectCycle && (
@@ -218,15 +215,24 @@ export const DataImportCsvView = () => {
             />
 
             <div>
-              <Button disabled={!file} label={'dataImportView.validateFile'} onClick={onValidateFileClick} />
+              <ImportStartButton
+                className="btn-secondary"
+                disabled={!file}
+                label="dataImportView.validateFile"
+                startFunction={API.startDataImportFromCsvJob}
+                startFunctionParams={{ ...importStartParams, dryRun: true }}
+                onUploadComplete={onImportJobStart}
+              />
               <ButtonIconInfo title="dataImportView.validateFileInfo" />
             </div>
 
-            <Button
-              className="btn-primary start-btn"
+            <ImportStartButton
+              confirmMessageKey="dataImportView.startImportConfirm"
               disabled={!file}
-              label={'dataImportView.startImport'}
-              onClick={onStartImportClick}
+              showConfirm
+              startFunction={API.startDataImportFromCsvJob}
+              startFunctionParams={importStartParams}
+              onUploadComplete={onImportJobStart}
             />
           </div>
         )}

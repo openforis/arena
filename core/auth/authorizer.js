@@ -91,6 +91,8 @@ export const canEditRecord = (user, record) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
+export const canDeleteRecord = canEditRecord
+
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
 export const canExportRecords = _hasSurveyPermission(permissions.recordView)
@@ -183,6 +185,8 @@ export const getUserGroupsCanAssign = ({
   editingLoggedUser = false,
   showOnlySurveyGroups = false,
 }) => {
+  const groups = []
+
   let surveyGroups
   if (editingLoggedUser && !surveyInfo) {
     // This can happen for system administrators when they don't have an active survey
@@ -196,11 +200,12 @@ export const getUserGroupsCanAssign = ({
   // do not allow surveyEditor group selection (remove surveyEditor group completely?)
   surveyGroups = surveyGroups.filter((group) => AuthGroup.getName(group) !== AuthGroup.groupNames.surveyEditor)
 
-  const groups = []
+  groups.push(...surveyGroups)
+
   if (!showOnlySurveyGroups && (User.isSystemAdmin(user) || User.isSurveyManager(user))) {
     // Add SystemAdmin or SurveyManager group if current user is a SystemAdmin or SurveyManager himself
-    groups.push(...User.getAuthGroups(user))
+    const userNonSurveyGroups = User.getAuthGroups(user).filter((group) => !AuthGroup.isSurveyGroup(group))
+    groups.push(...userNonSurveyGroups)
   }
-  groups.push(...surveyGroups)
   return AuthGroup.sortGroups(groups)
 }

@@ -153,7 +153,7 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
-export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) => {
+export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, draft })
@@ -167,7 +167,13 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft }) =
     const thread = RecordsUpdateThreadService.getOrCreatedThread({ surveyId, cycle, draft: preview })
     // initialize record if empty
     if (Record.getNodesArray(record).length === 0) {
-      thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordInit, user, surveyId, recordUuid })
+      thread.postMessage({
+        type: RecordsUpdateThreadMessageTypes.recordInit,
+        user,
+        surveyId,
+        recordUuid,
+        timezoneOffset,
+      })
     }
   }
   return record
@@ -308,7 +314,16 @@ const _sendNodeUpdateMessage = ({ socketId, user, surveyId, cycle, recordUuid, d
 
 export const { fetchNodeByUuid } = RecordManager
 
-export const persistNode = async ({ socketId, user, surveyId, draft, cycle, node, file = null }) => {
+export const persistNode = async ({
+  socketId,
+  user,
+  surveyId,
+  draft,
+  cycle,
+  node,
+  file = null,
+  timezoneOffset = null,
+}) => {
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
@@ -339,11 +354,12 @@ export const persistNode = async ({ socketId, user, surveyId, draft, cycle, node
       type: RecordsUpdateThreadMessageTypes.nodePersist,
       node,
       user,
+      timezoneOffset,
     },
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid }) =>
+export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset }) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -356,6 +372,7 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       recordUuid,
       nodeUuid,
       user,
+      timezoneOffset,
     },
   })
 
@@ -363,9 +380,10 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: Node.getRecordUuid(node) })
+  const surveySummary = await SurveyManager.fetchSurveyById({ surveyId })
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
-    draft: Record.isPreview(record),
+    draft: !Survey.isPublished(surveySummary),
   })
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 

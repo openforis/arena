@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
 import { ValidatorErrorKeys } from './validatorErrorKeys'
 import * as ValidatorNameKeywords from './validatorNameKeywords'
@@ -74,6 +76,10 @@ export const validateMinLength =
   ({ errorKey = ValidatorErrorKeys.minLengthNotRespected, minLength }) =>
   (propName, item) => {
     const value = getProp(propName, '')(item)
+    if (Objects.isEmpty(value)) {
+      // if the prop is required, check it with validateRequired before calling validateMinLength
+      return null
+    }
     const length = value.length
     if (length >= minLength) {
       return null

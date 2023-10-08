@@ -74,21 +74,15 @@ const propsUI = {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left" />,
     defaultValue: { x: '', y: '', srs: '' },
-    formFieldsFn: (nodeDef) => {
-      const fields = [
-        { field: valuePropsCoordinate.x, labelKey: 'surveyForm.nodeDefCoordinate.x' },
-        { field: valuePropsCoordinate.y, labelKey: 'surveyForm.nodeDefCoordinate.y' },
-        { field: valuePropsCoordinate.srs, labelKey: 'common.srs' },
-      ]
-      const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef)
-      return [
-        ...fields,
-        ...additionalFields.map((additionalField) => ({
-          field: additionalField,
-          labelKey: `surveyForm.nodeDefCoordinate.${additionalField}`,
-        })),
-      ]
-    },
+    formFieldsFn: (nodeDef) => [
+      { field: valuePropsCoordinate.x, labelKey: 'surveyForm.nodeDefCoordinate.x' },
+      { field: valuePropsCoordinate.y, labelKey: 'surveyForm.nodeDefCoordinate.y' },
+      { field: valuePropsCoordinate.srs, labelKey: 'common.srs' },
+      ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
+        field,
+        labelKey: `surveyForm.nodeDefCoordinate.${field}`,
+      })),
+    ],
   },
 
   [taxon]: {

@@ -2,18 +2,30 @@ import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 import * as SurveyManager from '../manager/surveyManager'
 
-import SurveyPublishJob from './publish/surveyPublishJob'
-import SurveyCloneJob from './clone/surveyCloneJob'
-import ExportCsvDataJob from './export/exportCsvDataJob'
-import SurveyExportJob from './surveyExport/surveyExportJob'
-import { SchemaSummary } from './schemaSummary'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+
+import ExportCsvDataJob from './export/exportCsvDataJob'
+import SurveyCloneJob from './clone/surveyCloneJob'
+import SurveyExportJob from './surveyExport/surveyExportJob'
+import SurveyPublishJob from './publish/surveyPublishJob'
+import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
+import { SchemaSummary } from './schemaSummary'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
   RecordsUpdateThreadService.killSurveyThreads({ surveyId })
 
   const job = new SurveyPublishJob({ user, surveyId })
+
+  JobManager.executeJobThread(job)
+
+  return job
+}
+
+export const startUnpublishJob = (user, surveyId) => {
+  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
+
+  const job = new SurveyUnpublishJob({ user, surveyId })
 
   JobManager.executeJobThread(job)
 
@@ -88,4 +100,5 @@ export const {
   // UTILS
   validateNewSurvey,
   validateSurveyClone,
+  validateSurveyImportFromCollect,
 } = SurveyManager

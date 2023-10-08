@@ -1,6 +1,7 @@
 import './SurveyInfo.scss'
 
 import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -13,12 +14,14 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
-import { useConfirmDelete } from '@webapp/components/hooks'
+import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonMenu } from '@webapp/components'
 
-const SurveyInfo = () => {
+const SurveyInfo = (props) => {
+  const { firstTime } = props
+
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -30,6 +33,7 @@ const SurveyInfo = () => {
 
   const surveyName = Survey.getName(surveyInfo)
 
+  const confirm = useConfirm()
   const confirmDelete = useConfirmDelete()
 
   const onDeleteClick = useCallback(() => {
@@ -43,6 +47,18 @@ const SurveyInfo = () => {
       strongConfirmRequiredText: surveyName,
     })
   }, [dispatch, navigate, confirmDelete, surveyName])
+
+  const onUnpublishClick = useCallback(() => {
+    confirm({
+      key: 'homeView.surveyInfo.unpublishSurveyDialog.unpublishWarning',
+      params: { surveyName },
+      onOk: () => dispatch(SurveyActions.unpublishSurvey()),
+      headerText: 'homeView.surveyInfo.unpublishSurveyDialog.confirmUnpublish',
+      strongConfirm: true,
+      strongConfirmInputLabel: 'homeView.surveyInfo.unpublishSurveyDialog.confirmName',
+      strongConfirmRequiredText: surveyName,
+    })
+  }, [confirm, dispatch, surveyName])
 
   return (
     <>
@@ -71,14 +87,16 @@ const SurveyInfo = () => {
             {i18n.t(canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
-          {canEditSurvey && <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />}
+          {!firstTime && canEditSurvey && (
+            <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
+          )}
 
-          {canExportSurvey && (
+          {!firstTime && canExportSurvey && (
             <ButtonMenu
               className="btn-s btn-transparent btn-menu-export"
               iconClassName="icon-download2 icon-14px"
+              label="common.export"
               testId={TestId.dashboard.surveyExportBtn}
-              title="common.export"
               items={[
                 {
                   key: 'survey-export',
@@ -110,12 +128,41 @@ const SurveyInfo = () => {
             />
           )}
           {canEditSurvey && (
-            <Button
-              className="btn-s btn-transparent"
-              testId={TestId.dashboard.surveyDeleteBtn}
-              onClick={onDeleteClick}
-              iconClassName="icon-bin icon-12px icon-left"
-              label="common.delete"
+            <ButtonMenu
+              className="btn-s btn-transparent btn-menu-advanced"
+              iconClassName="icon-cog icon-14px"
+              label="homeView.surveyInfo.advancedFunctions"
+              testId={TestId.dashboard.advancedFunctionsBtn}
+              items={[
+                ...(Survey.isPublished(surveyInfo)
+                  ? [
+                      {
+                        key: 'survey-info-unpublish',
+                        content: (
+                          <Button
+                            className="btn-s btn-transparent"
+                            testId={TestId.dashboard.surveyUnpublishBtn}
+                            onClick={onUnpublishClick}
+                            iconClassName="icon-eye-blocked icon-12px icon-left"
+                            label="homeView.surveyInfo.unpublish"
+                          />
+                        ),
+                      },
+                    ]
+                  : []),
+                {
+                  key: 'survey-info-delete',
+                  content: (
+                    <Button
+                      className="btn-s btn-transparent"
+                      testId={TestId.dashboard.surveyDeleteBtn}
+                      onClick={onDeleteClick}
+                      iconClassName="icon-bin icon-12px icon-left"
+                      label="common.delete"
+                    />
+                  ),
+                },
+              ]}
             />
           )}
           {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
@@ -132,6 +179,14 @@ const SurveyInfo = () => {
       </div>
     </>
   )
+}
+
+SurveyInfo.propTypes = {
+  firstTime: PropTypes.bool,
+}
+
+SurveyInfo.defaultProps = {
+  firstTime: false,
 }
 
 export default SurveyInfo

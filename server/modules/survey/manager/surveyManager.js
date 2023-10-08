@@ -13,6 +13,7 @@ import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 import * as PromiseUtils from '@core/promiseUtils'
+import SystemError from '@core/systemError'
 
 import { db } from '@server/db/db'
 import { DBMigrator } from '@openforis/arena-server'
@@ -32,7 +33,6 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
-import SystemError from '@core/systemError'
 
 const assocSurveyInfo = (survey) => survey
 
@@ -42,6 +42,17 @@ const _fetchAndAssocSrss = async ({ surveyInfo }, client) => {
 
   const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
   return Survey.assocSrs(srss)(surveyInfo)
+}
+
+const _fetchAndAssocRdbInitialized = async ({ surveyInfo }, client) => {
+  const surveyId = Survey.getId(surveyInfo)
+  const rdbInitialized = await SchemaRdbRepository.selectSchemaExists(surveyId, client)
+  return Survey.assocRDBInitilized(rdbInitialized)(surveyInfo)
+}
+
+const _fetchAndAssocAdditionalInfo = async ({ surveyInfo }, client) => {
+  let surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo }, client)
+  return _fetchAndAssocRdbInitialized({ surveyInfo: surveyInfoUpdated }, client)
 }
 
 // ====== VALIDATION
@@ -54,6 +65,11 @@ export const validateNewSurvey = async ({ newSurvey }) => {
 export const validateSurveyClone = async ({ newSurvey }) => {
   const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
   return SurveyValidator.validateSurveyClone({ newSurvey, surveyInfos })
+}
+
+export const validateSurveyImportFromCollect = async ({ newSurvey }) => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)
+  return SurveyValidator.validateSurveyImportFromCollect({ newSurvey, surveyInfos })
 }
 
 const validateSurveyInfo = async (surveyInfo) =>
@@ -163,7 +179,7 @@ export const importSurvey = async (params, client = db) => {
       surveyInfo
     )
 
-    surveyInfo = await _fetchAndAssocSrss({ surveyInfo }, t)
+    surveyInfo = await _fetchAndAssocAdditionalInfo({ surveyInfo }, t)
 
     await _addUserToSurveyAdmins({ user, surveyInfo }, t)
 
@@ -188,7 +204,7 @@ export const fetchSurveyById = async ({ surveyId, draft = false, validate = fals
   ])
 
   let surveyInfoUpdated = Survey.assocAuthGroups(authGroups)(surveyInfo)
-  surveyInfoUpdated = await _fetchAndAssocSrss({ surveyInfo: surveyInfoUpdated }, client)
+  surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, client)
 
   const validation = validate ? await validateSurveyInfo(surveyInfoUpdated) : null
 
@@ -359,6 +375,9 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
       await SurveyRepository.deleteSurveyLabelsAndDescriptions(surveyId, langsDeleted, t)
     }
   })
+
+export const unpublishSurveyProps = async (surveyId, client = db) =>
+  SurveyRepository.unpublishSurveyProps(surveyId, client)
 
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 

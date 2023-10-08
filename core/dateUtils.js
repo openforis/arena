@@ -14,11 +14,10 @@ import {
 import { isBlank } from './stringUtils'
 
 export {
-  isBefore,
-  isAfter,
   parseISO,
   subDays,
   addDays,
+  addMinutes,
   differenceInDays,
   differenceInHours,
   subMonths,

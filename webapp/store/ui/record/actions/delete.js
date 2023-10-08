@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
@@ -23,7 +25,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   const nodeUuid = Node.getUuid(node)
 
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}/node/${nodeUuid}`, {
-    data: { cycle, draft },
+    data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset() },
   })
 }
 

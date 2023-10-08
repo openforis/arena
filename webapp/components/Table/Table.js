@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
 
+import LoadingBar from '../LoadingBar'
+
 import Header from './Header'
 import Content from './Content'
+import { Footer } from './Footer'
 import { useTable } from './useTable'
-import LoadingBar from '../LoadingBar'
 
 const Table = (props) => {
   const {
@@ -32,6 +34,7 @@ const Table = (props) => {
     headerProps,
     rowProps,
     selectable,
+    visibleColumnsSelectionEnabled,
   } = props
 
   const {
@@ -48,8 +51,11 @@ const Table = (props) => {
     totalCount,
     initData,
     onRowClick,
+    onVisibleColumnsChange,
     selectedItems,
+    visibleColumns,
   } = useTable({
+    columns,
     keyExtractor,
     moduleApiUri,
     module,
@@ -65,6 +71,7 @@ const Table = (props) => {
   return (
     <div className={`table ${className}`}>
       <Header
+        columns={columns}
         offset={offset}
         list={list}
         limit={limit}
@@ -74,7 +81,9 @@ const Table = (props) => {
         headerLeftComponent={headerLeftComponent}
         headerProps={headerProps}
         handleSearch={handleSearch}
+        onVisibleColumnsChange={onVisibleColumnsChange}
         selectedItems={selectedItems}
+        visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
       />
 
       <Content
@@ -97,7 +106,7 @@ const Table = (props) => {
         rowComponent={rowComponent}
         rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}
-        columns={columns}
+        columns={visibleColumns}
         rowProps={rowProps}
         expandableRows={expandableRows}
         initData={initData}
@@ -105,6 +114,7 @@ const Table = (props) => {
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
       />
+      <Footer offset={offset} list={list} limit={limit} count={count} />
     </div>
   )
 }
@@ -134,6 +144,7 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
+  visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
 }
 
 Table.defaultProps = {
@@ -158,6 +169,7 @@ Table.defaultProps = {
   rowExpandedComponent: DummyComponent,
   rowProps: {},
   selectable: true,
+  visibleColumnsSelectionEnabled: false,
 }
 
 export default Table

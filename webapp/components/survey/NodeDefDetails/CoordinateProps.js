@@ -35,14 +35,14 @@ const CoordinateProps = (props) => {
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAccuracy, value })}
           />
           <Checkbox
-            checked={NodeDef.isElevationIncluded(nodeDef)}
-            label="surveyForm.nodeDefCoordinate.elevation"
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeElevation, value })}
+            checked={NodeDef.isAltitudeIncluded(nodeDef)}
+            label="surveyForm.nodeDefCoordinate.altitude"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitude, value })}
           />
           <Checkbox
-            checked={NodeDef.isElevationAccuracyIncluded(nodeDef)}
-            label="surveyForm.nodeDefCoordinate.elevationAccuracy"
-            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeElevationAccuracy, value })}
+            checked={NodeDef.isAltitudeAccuracyIncluded(nodeDef)}
+            label="surveyForm.nodeDefCoordinate.altitudeAccuracy"
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitudeAccuracy, value })}
           />
         </div>
       </FormItem>

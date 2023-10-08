@@ -1,6 +1,7 @@
 @import 'webapp/style/vars';
 
-$tableHeaderHeight: 30px;
+$tableHeaderHeight: 50px;
+$tableFooterHeight: 30px;
 
 .table {
   overflow: hidden;
@@ -9,18 +10,23 @@ $tableHeaderHeight: 30px;
 }
 
 .table__header {
-  height: $tableHeaderHeight;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: $tableHeaderHeight;
 }
 
 .table__content {
   position: relative;
   padding: 10px;
   background-color: $white;
-  height: calc(100% - #{$tableHeaderHeight});
+  height: calc(100% - #{$tableHeaderHeight} - #{$tableFooterHeight});
   border: $tableRowBorder;
+}
+
+.table__footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .table__empty-rows {
@@ -115,7 +121,7 @@ $tableHeaderHeight: 30px;
 }
 
 .table__paginator {
-  align-self: normal;
+  align-self: flex-end;
   display: flex;
 
   button {

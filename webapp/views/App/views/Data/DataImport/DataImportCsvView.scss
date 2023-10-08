@@ -16,6 +16,10 @@
     gap: 1rem;
   }
 
+  .steps-row {
+    display: flex;
+  }
+
   .internal-container {
     display: grid;
     grid-template-columns: 0.6fr 0.4fr;

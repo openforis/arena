@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import axios from 'axios'
 
+import { Dates } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
@@ -21,6 +23,7 @@ export const checkInRecord =
       data: { record },
     } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`, {
       draft,
+      timezoneOffset: Dates.getTimezoneOffset(),
     })
 
     if (!record) {
