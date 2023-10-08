@@ -9,8 +9,8 @@ const SamplingDataChart = (surveyInfo) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { request } = await countSamplingPointData({ surveyId: surveyInfo.surveyInfo.id })
-      const response = await request
+      const countData = countSamplingPointData({ surveyId: surveyInfo.surveyInfo.id })
+      const response = await countData.request
       const totalRows = response.data.count
 
       const data1 = [dataEntry, totalRows - dataEntry]
