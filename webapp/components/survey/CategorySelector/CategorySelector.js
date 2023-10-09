@@ -140,7 +140,7 @@ export const CategorySelector = (props) => {
         </PanelRight>
       )}
       {categoryToEdit && (
-        <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')}>
+        <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')} showFooter>
           <CategoryDetails
             categoryUuid={Category.getUuid(categoryToEdit)}
             onCategoryUpdate={onCategoryUpdate}

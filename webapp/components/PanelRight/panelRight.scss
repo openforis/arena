@@ -14,6 +14,16 @@
   > * {
     padding: 20px;
   }
+
+  &.with-footer {
+    grid-template-rows: $headerHeight 1fr $footerHeight;
+  }
+}
+.panel-right__header,
+.panel-right__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .panel-right__header {
@@ -21,9 +31,6 @@
   background-color: $black;
   color: $white;
   border-bottom: 1px solid $blue;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   .btn-close {
     position: absolute;
@@ -37,9 +44,13 @@
   }
 }
 
+.panel-right__content,
+.panel-right__footer {
+  background-color: darken($greyAppBg, 1%);
+}
+
 .panel-right__content {
   position: relative;
-  background-color: darken($greyAppBg, 1%);
   overflow: auto;
 }
 

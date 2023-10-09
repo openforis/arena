@@ -5,16 +5,21 @@
   background-color: $greyAppBg;
   display: flex;
   height: calc(100vh - #{$headerHeight});
-}
 
-.app-module {
-  position: relative;
-  flex-grow: 1;
-  padding: 10px 15px;
+  .app-module {
+    position: relative;
+    flex-grow: 1;
+    padding: 10px 15px;
+    width: calc(100vw - #{$sidebarWidthClosed});
 
-  > :first-child {
-    height: 100%;
-    overflow: auto;
+    &.sidebar-open {
+      width: calc(100vw - #{$sidebarWidthOpened});
+    }
+
+    > :first-child {
+      height: 100%;
+      overflow: auto;
+    }
   }
 }
 
