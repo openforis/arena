@@ -385,6 +385,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
       },
+      samplingPointDataCompletion: 'Sampling Point Data Completion',
+      step: {
+        entry: 'Data Entry',
+        cleansing: 'Data Cleansing',
+        analysis: 'Data Analysis',
+      },
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
