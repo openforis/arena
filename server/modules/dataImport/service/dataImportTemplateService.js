@@ -107,7 +107,7 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
   await archiver.finalize()
 
   // delete temp files
-  Promise.all(tempFilePaths.map(FileUtils.deleteFileAsync))
+  await Promise.all(tempFilePaths.map(FileUtils.deleteFileAsync))
 }
 
 export const DataImportTemplateService = {
