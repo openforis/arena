@@ -85,6 +85,7 @@ const CategoryDetails = (props) => {
           />
           {!readOnly && (
             <ButtonMenu
+              className="date-import-template-menu-btn"
               label="categoryEdit.templateForDataImport"
               iconClassName="icon-download2 icon-14px"
               items={[
