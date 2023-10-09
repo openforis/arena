@@ -19,10 +19,15 @@ const SideBar = () => {
 
   return (
     <div className={`sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
-      <button type="button" className="btn-transparent sidebar__btn-toggle" onClick={SidebarActions.toggleSidebar}>
-        <span className="icon icon-16px icon-menu" />
-      </button>
-
+      <div className="sidebar__header">
+        <button
+          type="button"
+          className={`btn-transparent sidebar__btn-${isSideBarOpened ? 'close' : 'open'}`}
+          onClick={SidebarActions.toggleSidebar}
+        >
+          <span className={`icon icon-16px ${isSideBarOpened ? 'icon-arrow-left2' : 'icon-menu'}`} />
+        </button>
+      </div>
       <Modules user={user} surveyInfo={surveyInfo} pathname={pathname} sideBarOpened={isSideBarOpened} />
 
       {isSideBarOpened && <Version />}
