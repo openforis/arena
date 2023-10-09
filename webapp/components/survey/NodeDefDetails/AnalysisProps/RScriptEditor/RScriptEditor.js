@@ -104,6 +104,7 @@ const RScriptEditor = (props) => {
         script={defaultLocalScript}
         onChange={onChange}
         completer={variableNamesCompleter}
+        readOnly
       />
     </FormItem>
   )
