@@ -11,9 +11,11 @@ const SamplingDataChart = (surveyInfo) => {
   const { dataEntry, dataCleansing } = useContext(RecordsSummaryContext)
   const i18n = useI18n()
 
+  const surveyId = surveyInfo?.surveyInfo?.id
+
   useEffect(() => {
     const fetchData = async () => {
-      const countData = countSamplingPointData({ surveyId: surveyInfo.surveyInfo.id })
+      const countData = countSamplingPointData({ surveyId })
       const response = await countData.request
       const totalRows = response.data.count
 
@@ -67,7 +69,7 @@ const SamplingDataChart = (surveyInfo) => {
         .html(`${i18n.t('homeView.dashboard.step.cleansing')}: ${dataCleansing} / ${totalRows}`)
     }
     fetchData()
-  }, [])
+  }, [dataCleansing, dataEntry, i18n, surveyId])
 
   return (
     <div ref={ref} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
