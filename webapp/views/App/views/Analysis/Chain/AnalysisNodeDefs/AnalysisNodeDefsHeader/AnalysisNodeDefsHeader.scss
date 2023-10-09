@@ -11,6 +11,7 @@
   display: flex;
   align-items: center;
   padding: 4px 8px;
+  height: 3rem;
 
   div {
     margin-right: 8px;
@@ -33,10 +34,11 @@
   }
 }
 
-.analysis-node-defs-header__buttons_container{
+.analysis-node-defs-header__buttons_container {
   display: flex;
+  align-items: center;
 }
 
-.analysis-node-defs-header__filter{
+.analysis-node-defs-header__filter {
   margin-right: 8px;
 }

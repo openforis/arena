@@ -757,7 +757,7 @@ Are you sure you want to continue?`,
 
   surveysView: {
     filter: 'Filter',
-    filterPlaceholder: 'Name, label or owner',
+    filterPlaceholder: 'Filter by name, label or owner',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',
     nodes: 'Nodes',
     chains: 'Chains',
@@ -811,6 +811,7 @@ Are you sure you want to continue?`,
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
+    maxSurveysUserCanCreate: 'Max surveys user can create',
   },
 
   userPasswordChangeView: {
@@ -1001,7 +1002,7 @@ $t(common.cantUndoWarning)`,
     reportingDataCategory: 'Category table name',
     reportingDataAttribute: 'Attribute for {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Reporting data table and joins with attributes',
-    samplingNodeDefs: 'Sampling NodeDefs',
+    showSamplingAttributes: 'Show sampling attributes',
   },
 
   instancesView: {
@@ -1700,7 +1701,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   },
 
   systemErrors: {
-    somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.',
+    networkError: 'Error communicating with the server',
+    sessionExpiredRefreshPage: `Session could have expired.
+Try to refresh the page.`,
   },
 
   record: {
