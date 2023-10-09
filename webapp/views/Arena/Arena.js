@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
+import { ExpansionPanel } from '@webapp/components'
 
 import Routes from './Routes'
 
@@ -21,9 +22,14 @@ const Arena = () => {
     return (
       <div className="main__system-error">
         <div className="main__system-error-container">
-          <span className="icon icon-warning icon-24px icon-left" />
-          {i18n.t('systemErrors.somethingWentWrong')}
-          <div className="error">{systemError}</div>
+          <span className="error-message">
+            <span className="icon icon-warning icon-24px icon-left" />
+            {i18n.t('systemErrors.networkError')}
+          </span>
+          <span className="error-message__second-line">{i18n.t('systemErrors.sessionExpiredRefreshPage')}</span>
+          <ExpansionPanel className="error-details-panel" buttonLabel="common.details" startClosed>
+            <textarea className="error-details-textarea" rows={10} value={systemError} />
+          </ExpansionPanel>
         </div>
       </div>
     )
