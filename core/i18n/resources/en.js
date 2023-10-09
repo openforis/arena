@@ -1001,7 +1001,7 @@ $t(common.cantUndoWarning)`,
     reportingDataCategory: 'Category table name',
     reportingDataAttribute: 'Attribute for {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Reporting data table and joins with attributes',
-    samplingNodeDefs: 'Sampling NodeDefs',
+    showSamplingAttributes: 'Show sampling attributes',
   },
 
   instancesView: {
