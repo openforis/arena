@@ -46,17 +46,33 @@ body {
 }
 
 .main__system-error-container {
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
-  background-color: $yellow;
   color: black;
   line-height: 3rem;
-  text-align: center;
+  text-align: left;
+
+  .error-message {
+    color: red;
+  }
+
+  .error-message,
+  .error-message__second-line {
+    white-space: pre-line;
+  }
+
+  .error-details-textarea {
+    width: 100%;
+  }
 }
 
 .hidden-transition {
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0.5s, opacity 0.5s linear;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s linear;
 }
 
 .error {
