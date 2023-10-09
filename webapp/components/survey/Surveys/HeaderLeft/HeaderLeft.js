@@ -1,35 +1,29 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
-
-import { FormItem } from '@webapp/components/form/Input'
 import { TextInput } from '@webapp/components/form'
 
 const HeaderLeft = (props) => {
-  const { handleSearch, search } = props
+  const { handleSearch, search, totalCount } = props
 
-  const i18n = useI18n()
+  if (!totalCount) return null
 
   return (
-    <div>
-      <FormItem label={i18n.t('surveysView.filter')}>
-        <TextInput
-          className="surveys__header-left__input-search"
-          defaultValue={search}
-          onChange={(val) => {
-            handleSearch(val)
-          }}
-          placeholder="surveysView.filterPlaceholder"
-        />
-      </FormItem>
-    </div>
+    <TextInput
+      className="surveys__header-left__input-search"
+      defaultValue={search}
+      onChange={(val) => {
+        handleSearch(val)
+      }}
+      placeholder="surveysView.filterPlaceholder"
+    />
   )
 }
 
 HeaderLeft.propTypes = {
   handleSearch: PropTypes.func.isRequired,
   search: PropTypes.string.isRequired,
+  totalCount: PropTypes.number.isRequired,
 }
 
 export default HeaderLeft

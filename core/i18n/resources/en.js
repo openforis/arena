@@ -761,7 +761,7 @@ Are you sure you want to continue?`,
 
   surveysView: {
     filter: 'Filter',
-    filterPlaceholder: 'Name, label or owner',
+    filterPlaceholder: 'Filter by name, label or owner',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',
     nodes: 'Nodes',
     chains: 'Chains',
