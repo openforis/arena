@@ -66,12 +66,6 @@ const BasicProps = (props) => {
 
   return (
     <div className="form">
-      {NodeDef.isAnalysis(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.analysis')}>
-          <Checkbox checked disabled />
-        </FormItem>
-      )}
-
       <LabelsEditor
         inputFieldIdPrefix={TestId.nodeDefDetails.nodeDefLabels('')}
         labels={NodeDef.getLabels(nodeDef)}
