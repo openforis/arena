@@ -757,7 +757,7 @@ Are you sure you want to continue?`,
 
   surveysView: {
     filter: 'Filter',
-    filterPlaceholder: 'Name, label or owner',
+    filterPlaceholder: 'Filter by name, label or owner',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',
     nodes: 'Nodes',
     chains: 'Chains',
@@ -1001,7 +1001,7 @@ $t(common.cantUndoWarning)`,
     reportingDataCategory: 'Category table name',
     reportingDataAttribute: 'Attribute for {{level}}',
     reportingDataTableAndJoinsWithAttributes: 'Reporting data table and joins with attributes',
-    samplingNodeDefs: 'Sampling NodeDefs',
+    showSamplingAttributes: 'Show sampling attributes',
   },
 
   instancesView: {
