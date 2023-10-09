@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
 
+import { contentTypes, setContentTypeFile } from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
@@ -45,18 +46,30 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
       includeTaxonScientificName: false,
     },
   })
-  return exportModel.columns.reduce((acc, column) => {
+  const template = exportModel.columns.reduce((acc, column) => {
     const { header, nodeDef, valueProp } = column
     const value = nodeDef ? valuesByNodeDefType[NodeDef.getType(nodeDef)]({ valueProp }) : ''
     return { ...acc, [header]: value }
   }, {})
+
+  return {
+    template,
+    entityDef,
+  }
 }
 
-const writeDataImportTemplateToStream = async ({ surveyId, cycle, entityDefUuid, outputStream }) => {
-  const dataImportTemplate = await extractDataImportTemplate({ surveyId, cycle, entityDefUuid })
-  await CSVWriter.writeItemsToStream({ outputStream, items: [dataImportTemplate] })
+const exportDataImportTemplate = async ({ surveyId, cycle, entityDefUuid, res }) => {
+  const { template, entityDef } = await extractDataImportTemplate({ surveyId, cycle, entityDefUuid })
+
+  setContentTypeFile({
+    res,
+    fileName: `data_import_template_${NodeDef.getName(entityDef)}.csv`,
+    contentType: contentTypes.csv,
+  })
+
+  await CSVWriter.writeItemsToStream({ outputStream: res, items: [template] })
 }
 
 export const DataImportTemplateService = {
-  writeDataImportTemplateToStream,
+  exportDataImportTemplate,
 }

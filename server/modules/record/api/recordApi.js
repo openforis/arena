@@ -1,6 +1,6 @@
 import * as Request from '@server/utils/request'
 
-import { sendOk, setContentTypeFile, contentTypes } from '@server/utils/response'
+import { sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as User from '@core/user/user'
@@ -296,13 +296,11 @@ export const init = (app) => {
     try {
       const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
 
-      setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
-
-      await DataImportTemplateService.writeDataImportTemplateToStream({
+      await DataImportTemplateService.exportDataImportTemplate({
         surveyId,
         cycle,
         entityDefUuid,
-        outputStream: res,
+        res,
       })
     } catch (error) {
       next(error)
