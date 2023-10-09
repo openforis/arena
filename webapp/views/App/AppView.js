@@ -1,12 +1,14 @@
 import './AppView.scss'
 
 import React, { useEffect } from 'react'
+import classNames from 'classnames'
 
 import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import Header from './Header'
@@ -26,6 +28,7 @@ const AppView = () => {
     injectReducers(AppState.stateKey, AppReducer)
   }, [])
 
+  const isSideBarOpen = useIsSidebarOpened()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
 
   return (
@@ -34,7 +37,7 @@ const AppView = () => {
 
       <div className="app__container">
         <SideBar />
-        <div className="app-module">
+        <div className={classNames('app-module', { 'sidebar-open': isSideBarOpen })}>
           <ModuleSwitch
             moduleDefault={appModules.home}
             modules={[
