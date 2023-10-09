@@ -17,7 +17,7 @@ const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools
 const defaultCompleters = [snippetCompleter, textCompleter, keyWordCompleter]
 
 export const ScriptEditor = (props) => {
-  const { name, mode, script, completer, height, width, onChange } = props
+  const { name, mode, script, completer, height, width, onChange, readOnly } = props
 
   const editorRef = useRef()
 
@@ -46,6 +46,7 @@ export const ScriptEditor = (props) => {
       showGutter
       highlightActiveLine
       setOptions={{
+        readOnly,
         enableBasicAutocompletion: true,
         enableLiveAutocompletion: true,
         showLineNumbers: true,
@@ -69,10 +70,12 @@ ScriptEditor.propTypes = {
   width: PropTypes.string,
   script: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
 }
 
 ScriptEditor.defaultProps = {
   completer: null,
   height: '200px',
   width: 'inherit',
+  readOnly: false,
 }

@@ -10,6 +10,7 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { Checkbox } from '@webapp/components/form'
 
 const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDefs }) => {
   const dispatch = useDispatch()
@@ -23,14 +24,11 @@ const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDe
     <div className="analysis-node-defs-header">
       <div className="analysis-node-defs-header__buttons_container">
         {Chain.hasSamplingDesign(chain) && (
-          <div className="analysis-node-defs-header__buttons analysis-node-defs-header__filter">
-            <div>
-              <button className="btn btn-s" onClick={toggleShowSamplingNodeDefs} type="button">
-                {showSamplingNodeDefs ? i18n.t('common.hide') : i18n.t('common.show')}{' '}
-                {i18n.t('chainView.samplingNodeDefs')}
-              </button>
-            </div>
-          </div>
+          <Checkbox
+            checked={showSamplingNodeDefs}
+            label="chainView.showSamplingAttributes"
+            onChange={toggleShowSamplingNodeDefs}
+          />
         )}
         <div className="analysis-node-defs-header__buttons">
           <div>
