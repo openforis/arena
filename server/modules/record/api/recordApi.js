@@ -307,6 +307,20 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/record/importfromcsv/templates', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle } = Request.getParams(req)
+
+      await DataImportTemplateService.exportAllDataImportTemplates({
+        surveyId,
+        cycle,
+        res,
+      })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== UPDATE
 
   // RECORD promote / demote

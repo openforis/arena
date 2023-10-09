@@ -1,4 +1,4 @@
-import { PointFactory } from '@openforis/arena-core'
+import { PointFactory, Promises } from '@openforis/arena-core'
 
 import { CsvDataExportModel } from '@common/model/csvExport'
 
@@ -8,6 +8,9 @@ import * as DateUtils from '@core/dateUtils'
 
 import { contentTypes, setContentTypeFile } from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import { ZipArchiver } from '@server/utils/file/zipArchiver'
+
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const valuesByNodeDefType = {
@@ -31,8 +34,7 @@ const valuesByNodeDefType = {
   },
 }
 
-const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+const extractDataImportTemplate = async ({ survey, cycle, entityDefUuid }) => {
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const exportModel = new CsvDataExportModel({
     survey,
@@ -59,7 +61,9 @@ const extractDataImportTemplate = async ({ surveyId, cycle, entityDefUuid }) => 
 }
 
 const exportDataImportTemplate = async ({ surveyId, cycle, entityDefUuid, res }) => {
-  const { template, entityDef } = await extractDataImportTemplate({ surveyId, cycle, entityDefUuid })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+
+  const { template, entityDef } = await extractDataImportTemplate({ survey, cycle, entityDefUuid })
 
   setContentTypeFile({
     res,
@@ -70,6 +74,43 @@ const exportDataImportTemplate = async ({ surveyId, cycle, entityDefUuid, res })
   await CSVWriter.writeItemsToStream({ outputStream: res, items: [template] })
 }
 
+const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
+  setContentTypeFile({
+    res,
+    fileName: `data_import_templates.zip`,
+    contentType: contentTypes.zip,
+  })
+
+  const archiver = new ZipArchiver(res)
+
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+
+  const multipleEntityDefUuids = []
+
+  Survey.traverseMultipleEntityDefs((nodeDef) => {
+    multipleEntityDefUuids.push(NodeDef.getUuid(nodeDef))
+  })(survey)
+
+  const tempFilePaths = []
+
+  await Promises.each(multipleEntityDefUuids, async (entityDefUuid) => {
+    const { template, entityDef } = await extractDataImportTemplate({ survey, cycle, entityDefUuid })
+    const zipEntryName = `data_import_template_${NodeDef.getName(entityDef)}.csv`
+    const tempFilePath = FileUtils.newTempFilePath()
+
+    await CSVWriter.writeItemsToStream({ outputStream: FileUtils.createWriteStream(tempFilePath), items: [template] })
+
+    archiver.addFile(tempFilePath, zipEntryName)
+    tempFilePaths.push(tempFilePath)
+  })
+
+  await archiver.finalize()
+
+  // delete temp files
+  Promise.all(tempFilePaths.map(FileUtils.deleteFileAsync))
+}
+
 export const DataImportTemplateService = {
   exportDataImportTemplate,
+  exportAllDataImportTemplates,
 }
