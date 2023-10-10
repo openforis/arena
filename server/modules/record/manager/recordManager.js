@@ -115,6 +115,9 @@ export {
   fetchRecordsByUuids,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,
+  fetchRecordCreatedCountsByDatesAndUser,
+  fetchRecordCreatedCountsByUser,
+  fetchRecordCountsByStep,
   insertRecordsInBatch,
 } from '../repository/recordRepository'
 

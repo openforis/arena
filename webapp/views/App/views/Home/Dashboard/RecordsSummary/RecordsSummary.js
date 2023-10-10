@@ -1,6 +1,6 @@
 import './RecordsSummary.scss'
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
@@ -8,7 +8,8 @@ import { useI18n } from '@webapp/store/system'
 
 import Dropdown from '@webapp/components/form/Dropdown'
 
-import { useRecordsSummary, useTimeRanges } from './store'
+import { useTimeRanges } from './store'
+import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
 import Chart from './Chart'
 
@@ -17,7 +18,8 @@ const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(d
 const RecordsSummary = () => {
   const i18n = useI18n()
 
-  const { from, to, counts, timeRange, onChangeTimeRange } = useRecordsSummary()
+  const { from, to, counts, userCounts, userDateCounts, timeRange, onChangeTimeRange } =
+    useContext(RecordsSummaryContext)
   const { timeRangeItems, timeRangeSelection } = useTimeRanges({ timeRange })
 
   return (
@@ -41,8 +43,9 @@ const RecordsSummary = () => {
           />
         </div>
       </div>
-
-      {from && to && <Chart counts={counts} from={from} to={to} />}
+      {from && to && (
+        <Chart counts={counts} userCounts={userCounts} userDateCounts={userDateCounts} from={from} to={to} />
+      )}
     </div>
   )
 }
