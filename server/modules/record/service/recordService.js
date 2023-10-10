@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as Log from '@server/log/log'
 
 import * as A from '@core/arena'
+import SystemError from '@core/systemError'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
@@ -29,7 +30,7 @@ import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
-import * as FileManager from '../manager/fileManager'
+import * as FileService from './fileService'
 
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
@@ -63,6 +64,9 @@ export const {
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchRecordCreatedCountsByDates,
+  fetchRecordCreatedCountsByDatesAndUser,
+  fetchRecordCreatedCountsByUser,
+  fetchRecordCountsByStep,
   updateRecordsStep,
 } = RecordManager
 
@@ -328,6 +332,10 @@ export const persistNode = async ({
   const recordUuid = Node.getRecordUuid(node)
 
   if (file) {
+    const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+    if (filesStatistics.availableSpace < file.size) {
+      throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
+    }
     // Save file to "file" table and set fileUuid and fileName into node value
     const fileObj = RecordFile.createFile(
       Node.getFileUuid(node),
@@ -337,7 +345,7 @@ export const persistNode = async ({
       recordUuid,
       Node.getUuid(node)
     )
-    await FileManager.insertFile(surveyId, fileObj)
+    await FileService.insertFile(surveyId, fileObj)
   }
 
   _sendNodeUpdateMessage({

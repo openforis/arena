@@ -2,6 +2,7 @@
 
 .home-dashboard {
   display: grid;
-  grid-template-rows: 120px 500px 1fr;
+  grid-auto-rows: minmax(auto, min-content);
+  // grid-template-rows: auto auto auto;  
   grid-column-gap: 10px;
 }
