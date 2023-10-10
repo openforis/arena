@@ -38,28 +38,24 @@ const Dashboard = () => {
       {showFirstTimeHelp && canEditSurvey ? (
         <Helper firstTimeHelp={showFirstTimeHelp} />
       ) : (
-        <>
-          <div className="home-dashboard">
-            <RecordsSummaryContext.Provider value={recordsSummaryState}>
-              <SurveyInfo />
-              <div className="tab-menu">
-                <TabSelector tabs={tabs} currentTab={activeTab} onSelectTab={setActiveTab} />
+        <div className="home-dashboard">
+          <RecordsSummaryContext.Provider value={recordsSummaryState}>
+            <SurveyInfo />
+            <div className="tab-menu">
+              <TabSelector tabs={tabs} currentTab={activeTab} onSelectTab={setActiveTab} />
+            </div>
+            {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
+            {activeTab === 'Dashboard' && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
+                {canEditSurvey && <StorageSummary />}
+                {canEditSurvey && <RecordsByUser />}
+                {canEditSurvey && hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
               </div>
-              {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-              {activeTab === 'Dashboard' && (
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
-                    {canEditSurvey && <StorageSummary />}
-                    {canEditSurvey && <RecordsByUser />}
-                    {canEditSurvey && hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
-                  </div>
-                  {canEditSurvey && <DailyRecordsByUser />}
-                </>
-              )}
-              {activeTab === 'Record History' && <StorageSummary />}
-            </RecordsSummaryContext.Provider>
-          </div>
-        </>
+            )}
+            {activeTab === 'Dashboard' && canEditSurvey && <DailyRecordsByUser />}
+            {activeTab === 'Record History' && <StorageSummary />}
+          </RecordsSummaryContext.Provider>
+        </div>
       )}
     </SurveyDefsLoader>
   )

@@ -18,7 +18,7 @@ export const StorageSummary = () => {
   const surveyInfo = useSurveyInfo()
   const filesStatistics = Survey.getFilesStatistics(surveyInfo)
 
-  const data = ['availableSpace', 'usedSpace'].map((key) => ({
+  const data = ['availableSpace', 'usedSpace', 'totalSpace'].map((key) => ({
     name: key,
     value: filesStatistics[key],
     label: i18n.t(`homeView.dashboard.storageSummary.${key}`, {

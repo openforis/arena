@@ -7,10 +7,8 @@ import * as d3 from 'd3'
 const GaugeChart = ({ data }) => {
   const ref = useRef()
 
-  const usedSpace = data.find((d) => d.name === 'usedSpace').value
-  const usedLabel = data.find((d) => d.name === 'usedSpace').label
-  const availableSpace = data.find((d) => d.name === 'availableSpace').value
-  const totalSpace = availableSpace + usedSpace
+  const { value: usedSpace, label: usedLabel } = data.find((d) => d.name === 'usedSpace')
+  const totalSpace = data.find((d) => d.name === 'totalSpace').value
   const totalLabel = FileUtils.toHumanReadableFileSize(totalSpace)
 
   useEffect(() => {

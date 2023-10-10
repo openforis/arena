@@ -8,26 +8,27 @@ const DailyRecordsByUser = () => {
   const ref = useRef()
   const { userDateCounts } = useContext(RecordsSummaryContext)
 
-  useEffect(() => {
+  // Extract the calculation of firstDate, lastDate, and daysDiff into a separate function
+  function calculateDateData(userDateCounts) {
     let firstDate, lastDate, daysDiff
     if (userDateCounts && userDateCounts.length > 0) {
-      // Get the first and last date from the userDateCounts
       firstDate = new Date(userDateCounts[0].date)
       lastDate = new Date(userDateCounts[userDateCounts.length - 1].date)
       daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1
     } else {
-      // If userDateCounts is empty or undefined, use the last 15 days
       lastDate = new Date()
       firstDate = new Date()
       firstDate.setDate(lastDate.getDate() - 14)
       daysDiff = 15
     }
+    return { firstDate, lastDate, daysDiff }
+  }
 
-    // Group data by user and date
-    const groupedData = userDateCounts
+  // Extract the grouping of data by user and date into a separate function
+  function groupDataByUserAndDate(userDateCounts, daysDiff, lastDate) {
+    return userDateCounts
       ? userDateCounts.reduce((acc, curr) => {
           let user = curr.owner_name ? curr.owner_name : curr.owner_email
-          // If the user is an email, cut out the part after the "@", including it.
           if (!curr.owner_name) {
             user = user.substring(0, user.indexOf('@'))
           }
@@ -41,6 +42,25 @@ const DailyRecordsByUser = () => {
           return acc
         }, {})
       : {}
+  }
+
+  // Extract the filling of missing dates with 0 into a separate function
+  function fillMissingDates(groupedData, daysDiff) {
+    Object.keys(groupedData).forEach((user) => {
+      for (let i = 0; i < daysDiff; i++) {
+        if (groupedData[user][i] === undefined) {
+          groupedData[user][i] = 0
+        }
+      }
+    })
+    return groupedData
+  }
+
+  // Then, in your useEffect hook, you can call these functions:
+  useEffect(() => {
+    const { firstDate, lastDate, daysDiff } = calculateDateData(userDateCounts)
+    let groupedData = groupDataByUserAndDate(userDateCounts, daysDiff, lastDate)
+    groupedData = fillMissingDates(groupedData, daysDiff)
 
     // Fill in missing dates with 0
     Object.keys(groupedData).forEach((user) => {

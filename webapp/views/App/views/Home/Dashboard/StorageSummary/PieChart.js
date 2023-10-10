@@ -1,6 +1,7 @@
 import './pieChart.scss'
 
 import React, { useMemo, useRef } from 'react'
+import PropTypes from 'prop-types'
 
 import * as d3 from 'd3'
 
@@ -47,7 +48,7 @@ export const PieChart = ({ width, height, data }) => {
 
     return (
       <g
-        key={i}
+        key={`slice-${i}`}
         className="slice"
         onMouseEnter={() => {
           if (ref.current) {
@@ -98,4 +99,16 @@ export const PieChart = ({ width, height, data }) => {
       </g>
     </svg>
   )
+}
+
+PieChart.propTypes = {
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.number,
+      label: PropTypes.string,
+      color: PropTypes.string,
+    })
+  ).isRequired,
 }

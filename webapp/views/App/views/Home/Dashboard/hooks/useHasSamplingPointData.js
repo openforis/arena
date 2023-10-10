@@ -10,6 +10,10 @@ export const useHasSamplingPointData = () => {
   const [hasSamplingPointData, setHasSamplingPointData] = useState(false)
 
   useEffect(() => {
+    if (!survey) {
+      setHasSamplingPointData(false)
+      return
+    }
     const samplingPointDataNodeDefs = Survey.getSamplingPointDataNodeDefs(survey)
     if (samplingPointDataNodeDefs.length === 0) {
       setHasSamplingPointData(false)
@@ -25,7 +29,3 @@ export const useHasSamplingPointData = () => {
 
   return hasSamplingPointData
 }
-
-// NOTES:
-// Use the endpoint to count the total amount of sampling point data - Check where is it used.
-// Use the record summary to count the total amount of sampling point data records and cleansing data records
