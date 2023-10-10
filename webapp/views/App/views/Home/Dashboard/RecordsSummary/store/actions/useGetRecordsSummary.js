@@ -13,28 +13,30 @@ export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
   const cycle = useSurveyCycleKey()
 
   return () => {
-    ;(async () => {
-      const { timeRange } = recordsSummary
-      const now = Date.now()
-      const from = formatDate(getFromDate(now, timeRange))
-      const to = formatDate(now)
-      const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-        params: { cycle, from, to },
-      })
-      const { data: userCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-user`, {
-        params: { cycle, from, to },
-      })
-      const { data: userDateCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-user`, {
-        params: { cycle, from, to, addDate: true },
-      })
-      const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-step`, {
-        params: { cycle },
-      })
+    if (surveyId) {
+      ;(async () => {
+        const { timeRange } = recordsSummary
+        const now = Date.now()
+        const from = formatDate(getFromDate(now, timeRange))
+        const to = formatDate(now)
+        const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
+          params: { cycle, from, to },
+        })
+        const { data: userCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-user`, {
+          params: { cycle, from, to },
+        })
+        const { data: userDateCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-user`, {
+          params: { cycle, from, to, addDate: true },
+        })
+        const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-step`, {
+          params: { cycle },
+        })
 
-      const dataEntry = countsByStep.find(({ step }) => step === '1')?.count || 0
-      const dataCleansing = countsByStep.find(({ step }) => step === '2')?.count || 0
+        const dataEntry = countsByStep.find(({ step }) => step === '1')?.count || 0
+        const dataCleansing = countsByStep.find(({ step }) => step === '2')?.count || 0
 
-      setRecordsSummary({ counts, from, to, timeRange, userCounts, userDateCounts, dataEntry, dataCleansing })
-    })()
+        setRecordsSummary({ counts, from, to, timeRange, userCounts, userDateCounts, dataEntry, dataCleansing })
+      })()
+    }
   }
 }

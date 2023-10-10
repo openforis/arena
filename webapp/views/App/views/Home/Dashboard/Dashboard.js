@@ -25,6 +25,8 @@ const Dashboard = () => {
   const surveyInfo = useSurveyInfo()
   const [activeTab, setActiveTab] = useState('Dashboard')
 
+  const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
+
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
 
@@ -40,20 +42,22 @@ const Dashboard = () => {
       ) : (
         <div className="home-dashboard">
           <RecordsSummaryContext.Provider value={recordsSummaryState}>
-            <SurveyInfo />
-            <div className="tab-menu">
-              <TabSelector tabs={tabs} currentTab={activeTab} onSelectTab={setActiveTab} />
-            </div>
-            {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-            {activeTab === 'Dashboard' && (
+            {!isSurveyInfoEmpty && <SurveyInfo />}
+            {!isSurveyInfoEmpty && (
+              <div className="tab-menu">
+                <TabSelector tabs={tabs} currentTab={activeTab} onSelectTab={setActiveTab} />
+              </div>
+            )}
+            {!isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
+            {activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
                 {canEditSurvey && <StorageSummary />}
                 {canEditSurvey && <RecordsByUser />}
                 {canEditSurvey && hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
               </div>
             )}
-            {activeTab === 'Dashboard' && canEditSurvey && <DailyRecordsByUser />}
-            {activeTab === 'Record History' && <StorageSummary />}
+            {activeTab === 'Dashboard' && canEditSurvey && !isSurveyInfoEmpty && <DailyRecordsByUser />}
+            {activeTab === 'Record History' && !isSurveyInfoEmpty && <StorageSummary />}
           </RecordsSummaryContext.Provider>
         </div>
       )}
