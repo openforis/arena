@@ -1,40 +1,65 @@
-import './Dashboard.scss'
-
-import React from 'react'
-
+import React, { useState } from 'react'
 import * as Survey from '@core/survey/survey'
-
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyInfo } from '@webapp/store/survey'
-
-import SurveyInfo from './SurveyInfo'
-import ActivityLog from './ActivityLog'
-import RecordsSummary from './RecordsSummary'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import TabSelector from './TabSelector'
 import Helper, { helperTypes } from './Helper'
-
+import SamplingDataChart from './SamplingPointDataSummary/SamplingDataChart'
+import RecordsSummary from './RecordsSummary'
+import { StorageSummary } from './StorageSummary'
+import SurveyInfo from './SurveyInfo'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
+import { useRecordsSummary } from './RecordsSummary/store'
+import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
+import { RecordsSummaryContext } from './RecordsSummaryContext'
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
+import './Dashboard.scss'
+import RecordsByUser from './UserSummary/RecordsByUser'
+import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
 
-  const canEditDef = useAuthCanEditSurvey()
+  const canEditSurvey = useAuthCanEditSurvey()
   const surveyInfo = useSurveyInfo()
+  const [activeTab, setActiveTab] = useState('Dashboard')
+
+  const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
+
+  const recordsSummaryState = useRecordsSummary()
+  const hasSamplingPointData = useHasSamplingPointData()
+
+  const tabs = {
+    Dashboard: 'Dashboard',
+    RecordHistory: 'Record History',
+  }
 
   return (
-    <SurveyDefsLoader draft={canEditDef} validate={canEditDef}>
-      {showFirstTimeHelp && canEditDef ? (
+    <SurveyDefsLoader draft={canEditSurvey} validate={canEditSurvey}>
+      {showFirstTimeHelp && canEditSurvey ? (
         <Helper firstTimeHelp={showFirstTimeHelp} />
       ) : (
-        <>
-          <div className="home-dashboard">
-            <SurveyInfo />
-
-            {!Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-          </div>
-          <ActivityLog />
-        </>
+        <div className="home-dashboard">
+          <RecordsSummaryContext.Provider value={recordsSummaryState}>
+            {!isSurveyInfoEmpty && <SurveyInfo />}
+            {!isSurveyInfoEmpty && (
+              <div className="tab-menu">
+                <TabSelector tabs={tabs} currentTab={activeTab} onSelectTab={setActiveTab} />
+              </div>
+            )}
+            {!isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
+            {activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
+                {canEditSurvey && <StorageSummary />}
+                {canEditSurvey && <RecordsByUser />}
+                {canEditSurvey && hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
+              </div>
+            )}
+            {activeTab === 'Dashboard' && canEditSurvey && !isSurveyInfoEmpty && <DailyRecordsByUser />}
+            {activeTab === 'Record History' && !isSurveyInfoEmpty && <StorageSummary />}
+          </RecordsSummaryContext.Provider>
+        </div>
       )}
     </SurveyDefsLoader>
   )

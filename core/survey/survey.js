@@ -131,12 +131,13 @@ export const {
   isTemplate,
   getProps,
   getPropsDraft,
+  getFilesStatistics,
 } = SurveyInfo
 
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocFilesStatistics, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
 
 // ====== READ nodeDefs
 export const {

@@ -381,6 +381,16 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       },
       activeSurveyNotSelected: `<title>Active survey not selected</title>
         <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
+      storageSummary: {
+        availableSpace: 'Available ({{size}})',
+        usedSpace: 'Used ({{size}})',
+      },
+      samplingPointDataCompletion: 'Sampling Point Data Completion',
+      step: {
+        entry: 'Data Entry',
+        cleansing: 'Data Cleansing',
+        analysis: 'Data Analysis',
+      },
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
@@ -1693,6 +1703,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
     },
+    cannotInsertFileExceedingQuota: 'Cannot insert file: files storage quota would be exceeded',
+    cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
     userInvalid: 'Invalid user',
