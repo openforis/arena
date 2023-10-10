@@ -15,7 +15,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { getSchemaSurvey } from '@common/model/db/schemata'
 
 const tableColumns = [
   Record.keys.uuid,
@@ -61,7 +61,7 @@ export const insertRecord = async (surveyId, record, client = db) => {
   const now = new Date()
   return client.one(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
+    INSERT INTO ${getSchemaSurvey(surveyId)}.record 
     (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified)
     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8)
     RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $9)
@@ -84,7 +84,7 @@ export const insertRecord = async (surveyId, record, client = db) => {
 export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, client = db) =>
   client.none(
     DbUtils.insertAllQueryBatch(
-      `${getSurveyDBSchema(surveyId)}`,
+      `${getSchemaSurvey(surveyId)}`,
       tableName,
       tableColumns,
       records.map((record) => ({
@@ -110,7 +110,7 @@ export const countRecordsBySurveyId = async (
   return client.one(
     `
         SELECT count(*) 
-        FROM ${getSurveyDBSchema(surveyId)}.record 
+        FROM ${getSchemaSurvey(surveyId)}.record 
         WHERE preview = FALSE 
           ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
       `,
@@ -122,7 +122,7 @@ export const countRecordsBySurveyId = async (
 export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, client = db) => {
   const counts = await client.manyOrNone(
     `SELECT step, count(*)
-    FROM ${getSurveyDBSchema(surveyId)}.record 
+    FROM ${getSchemaSurvey(surveyId)}.record 
     WHERE preview = FALSE AND cycle = $1
     GROUP BY step`,
     [cycle]
@@ -200,7 +200,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       s.uuid AS survey_uuid,
       u.name as owner_name
       ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
-    FROM ${getSurveyDBSchema(surveyId)}.record r
+    FROM ${getSchemaSurvey(surveyId)}.record r
     -- GET SURVEY UUID
     JOIN survey s
       ON s.id = $/surveyId/
@@ -240,7 +240,7 @@ export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
       step,
       COUNT(*) as count
     FROM
-      ${getSurveyDBSchema(surveyId)}.record
+      ${getSchemaSurvey(surveyId)}.record
     WHERE
       cycle = $1
     GROUP BY
@@ -253,7 +253,7 @@ export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   client.oneOrNone(
     `SELECT 
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
-     FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
+     FROM ${getSchemaSurvey(surveyId)}.record WHERE uuid = $1`,
     [recordUuid, surveyId],
     dbTransformCallback(surveyId)
   )
@@ -262,7 +262,7 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
   client.map(
     `SELECT 
      ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
-     FROM ${getSurveyDBSchema(surveyId)}.record 
+     FROM ${getSchemaSurvey(surveyId)}.record 
      WHERE uuid IN ($1:csv)`,
     [recordUuids, surveyId],
     dbTransformCallback(surveyId)
@@ -271,7 +271,7 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
 export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
   client.any(`
     SELECT uuid, cycle 
-    FROM ${getSurveyDBSchema(surveyId)}.record 
+    FROM ${getSchemaSurvey(surveyId)}.record 
     WHERE preview = FALSE
     ORDER BY cycle
   `)
@@ -283,7 +283,7 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
       COUNT(r.uuid),
       to_char(date_trunc('day', r.date_created), 'YYYY-MM-DD') AS date
     FROM
-      ${getSurveyDBSchema(surveyId)}.record r
+      ${getSchemaSurvey(surveyId)}.record r
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
     AND 
@@ -308,7 +308,7 @@ export const fetchRecordCreatedCountsByDatesAndUser = async (surveyId, cycle, fr
       u.name AS owner_name,
       u.email AS owner_email
     FROM
-      ${getSurveyDBSchema(surveyId)}.record r
+      ${getSchemaSurvey(surveyId)}.record r
     JOIN public.user u ON r.owner_uuid = u.uuid
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
@@ -336,7 +336,7 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
       u.name AS owner_name,
       u.email AS owner_email  
     FROM
-      ${getSurveyDBSchema(surveyId)}.record r
+      ${getSchemaSurvey(surveyId)}.record r
     JOIN public.user u ON r.owner_uuid = u.uuid
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
@@ -358,7 +358,7 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
 
 export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModified = new Date() }, client = db) =>
   client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.record 
+    `UPDATE ${getSchemaSurvey(surveyId)}.record 
      SET date_modified = $2
      WHERE uuid = $1
     RETURNING ${recordSelectFields}`,
@@ -367,7 +367,7 @@ export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModif
 
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.record 
+    `UPDATE ${getSchemaSurvey(surveyId)}.record 
      SET validation = $1::jsonb
      WHERE uuid = $2
     RETURNING ${recordSelectFields}`,
@@ -377,7 +377,7 @@ export const updateValidation = async (surveyId, recordUuid, validation, client 
 export const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
   client.none(
     `
-      UPDATE ${getSurveyDBSchema(surveyId)}.record
+      UPDATE ${getSchemaSurvey(surveyId)}.record
       SET step = $1
       WHERE uuid = $2`,
     [step, recordUuid]
@@ -386,7 +386,7 @@ export const updateRecordStep = async (surveyId, recordUuid, step, client = db) 
 export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
   client.none(
     DbUtils.updateAllQuery(
-      getSurveyDBSchema(surveyId),
+      getSchemaSurvey(surveyId),
       'record',
       { name: 'uuid', cast: 'uuid' },
       [{ name: 'validation', cast: 'jsonb' }],
@@ -399,7 +399,7 @@ export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndV
 export const deleteRecord = async (surveyId, recordUuid, client = db) =>
   client.query(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
+    DELETE FROM ${getSchemaSurvey(surveyId)}.record
     WHERE uuid = $1
     `,
     [recordUuid]
@@ -408,7 +408,7 @@ export const deleteRecord = async (surveyId, recordUuid, client = db) =>
 export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, client = db) =>
   client.map(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
+    DELETE FROM ${getSchemaSurvey(surveyId)}.record
     WHERE preview = $1
     ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
     RETURNING uuid
@@ -420,7 +420,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, c
 export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
   client.map(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
+    DELETE FROM ${getSchemaSurvey(surveyId)}.record
     WHERE cycle IN ($1:csv)
     RETURNING uuid
   `,
@@ -429,4 +429,4 @@ export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
   )
 
 export const deleteRecordsBySurvey = async (surveyId, client = db) =>
-  client.none(`DELETE FROM ${getSurveyDBSchema(surveyId)}.record`)
+  client.none(`DELETE FROM ${getSchemaSurvey(surveyId)}.record`)
