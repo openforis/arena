@@ -217,49 +217,28 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records/dashboard/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, from, to } = Request.getParams(req)
+      const { surveyId, cycle, from, to, addDate = false, countType = 'default' } = Request.getParams(req)
 
-      const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
+      let counts
+      switch (countType) {
+        case 'user':
+          counts = addDate
+            ? await RecordService.fetchRecordCreatedCountsByDatesAndUser(surveyId, cycle, from, to)
+            : await RecordService.fetchRecordCreatedCountsByUser(surveyId, cycle, from, to)
+          break
+        case 'step':
+          counts = await RecordService.fetchRecordCountsByStep(surveyId, cycle)
+          break
+        default:
+          counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, cycle, from, to)
+          break
+      }
 
       res.json(counts)
     } catch (error) {
       next(error)
     }
   })
-
-  app.get(
-    '/survey/:surveyId/records/dashboard/count/by-user',
-    requireRecordListViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, from, to, addDate = false } = Request.getParams(req)
-
-        const counts = addDate
-          ? await RecordService.fetchRecordCreatedCountsByDatesAndUser(surveyId, cycle, from, to)
-          : await RecordService.fetchRecordCreatedCountsByUser(surveyId, cycle, from, to)
-
-        res.json(counts)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
-
-  app.get(
-    '/survey/:surveyId/records/dashboard/count/by-step',
-    requireRecordListViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle } = Request.getParams(req)
-
-        const counts = await RecordService.fetchRecordCountsByStep(surveyId, cycle)
-
-        res.json(counts)
-      } catch (error) {
-        next(error)
-      }
-    }
-  )
 
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {

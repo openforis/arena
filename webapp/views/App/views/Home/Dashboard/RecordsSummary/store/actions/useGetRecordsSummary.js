@@ -20,16 +20,16 @@ export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
         const from = formatDate(getFromDate(now, timeRange))
         const to = formatDate(now)
         const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-          params: { cycle, from, to },
+          params: { cycle, from, to, countType: 'default' },
         })
-        const { data: userCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-user`, {
-          params: { cycle, from, to },
+        const { data: userCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
+          params: { cycle, from, to, countType: 'user' },
         })
-        const { data: userDateCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-user`, {
-          params: { cycle, from, to, addDate: true },
+        const { data: userDateCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
+          params: { cycle, from, to, addDate: true, countType: 'user' },
         })
-        const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count/by-step`, {
-          params: { cycle },
+        const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
+          params: { cycle, countType: 'step' },
         })
 
         const dataEntry = countsByStep.find(({ step }) => step === '1')?.count || 0
