@@ -99,7 +99,7 @@ export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
     WHERE props -> '${RecordFile.propKeys.deleted}' IS NULL 
       OR NOT (props -> '${RecordFile.propKeys.deleted}')::BOOLEAN`,
     null,
-    (row) => row.sum
+    (row) => Number(row.sum)
   )
   return total || 0
 }

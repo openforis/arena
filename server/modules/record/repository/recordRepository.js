@@ -233,6 +233,22 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 }
 
+export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
+  client.any(
+    `
+    SELECT
+      step,
+      COUNT(*) as count
+    FROM
+      ${getSurveyDBSchema(surveyId)}.record
+    WHERE
+      cycle = $1
+    GROUP BY
+      step
+    `,
+    [String(cycle)]
+  )
+
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   client.oneOrNone(
     `SELECT 
@@ -278,6 +294,62 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
       date_trunc('day', r.date_created)
     ORDER BY
       date_trunc('day', r.date_created)
+  `,
+    [from, to, cycle]
+  )
+
+export const fetchRecordCreatedCountsByDatesAndUser = async (surveyId, cycle, from, to, client = db) =>
+  client.any(
+    `
+    SELECT
+      COUNT(r.uuid),
+      to_char(date_trunc('day', r.date_created), 'YYYY-MM-DD') AS date,
+      r.owner_uuid,
+      u.name AS owner_name,
+      u.email AS owner_email
+    FROM
+      ${getSurveyDBSchema(surveyId)}.record r
+    JOIN public.user u ON r.owner_uuid = u.uuid
+    WHERE
+      r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+    AND 
+      r.cycle = $3     
+    AND 
+      r.preview = FALSE
+    GROUP BY
+      date_trunc('day', r.date_created),
+      r.owner_uuid,
+      u.name,
+      u.email
+    ORDER BY
+      date_trunc('day', r.date_created)
+  `,
+    [from, to, cycle]
+  )
+
+export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, client = db) =>
+  client.any(
+    `
+    SELECT
+      COUNT(r.uuid),
+      r.owner_uuid,
+      u.name AS owner_name,
+      u.email AS owner_email  
+    FROM
+      ${getSurveyDBSchema(surveyId)}.record r
+    JOIN public.user u ON r.owner_uuid = u.uuid
+    WHERE
+      r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+    AND 
+      r.cycle = $3     
+    AND 
+      r.preview = FALSE
+    GROUP BY
+      r.owner_uuid,
+      u.name,
+      u.email
+    ORDER BY
+      COUNT(r.uuid) DESC
   `,
     [from, to, cycle]
   )
