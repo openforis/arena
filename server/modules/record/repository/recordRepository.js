@@ -148,7 +148,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     sortBy = 'date_created',
     sortOrder = 'DESC',
     search = null,
-    recordUuid = null,
+    recordUuids = null,
     includePreview = false,
   },
   client = db
@@ -178,7 +178,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
-  if (!A.isNull(recordUuid)) recordsSelectWhereConditions.push('r.uuid = $/recordUuid/')
+  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
   if (!A.isEmpty(search))
     recordsSelectWhereConditions.push(`${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%'`)
 
@@ -227,7 +227,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
     OFFSET $/offset:value/
   `,
-    { surveyId, cycle, step, search, limit, offset, recordUuid },
+    { surveyId, cycle, step, search, limit, offset, recordUuids },
     dbTransformCallback(surveyId, false)
   )
 }

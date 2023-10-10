@@ -89,7 +89,17 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           onChange={(e) => handleSearch(e.target.value)}
         />
       )}
-      {published && canUpdateRecordsStep && <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} />}
+      {canExportRecordsSummary && (
+        <ButtonDownload
+          testId={TestId.records.exportBtn}
+          href={`/api/survey/${surveyId}/records/summary/export`}
+          requestParams={{ cycle }}
+          label="common.export"
+        />
+      )}
+      {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
+        <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
+      )}
       {
         // Edit selected record
         selectedItemsCount === 1 && (
@@ -107,14 +117,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
         <RecordsCloneModal
           onClose={toggleRecordsCloneModalOpen}
           selectedRecordsUuids={selectedItems.map((selectedItem) => selectedItem.uuid)}
-        />
-      )}
-      {canExportRecordsSummary && (
-        <ButtonDownload
-          testId={TestId.records.exportBtn}
-          href={`/api/survey/${surveyId}/records/summary/export`}
-          requestParams={{ cycle }}
-          label="common.export"
         />
       )}
     </div>

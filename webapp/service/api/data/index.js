@@ -109,10 +109,10 @@ export const fetchRecordsCountByStep = async ({ surveyId, cycle }) => {
 }
 
 // ==== UPDATE
-export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) => {
+export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo, recordUuids }) => {
   const {
     data: { count },
-  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo })
+  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo, recordUuids })
   return { count }
 }
 

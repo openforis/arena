@@ -71,7 +71,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       sortOrder,
       search,
       step,
-      recordUuid,
+      recordUuids: recordUuid ? [recordUuid] : null,
       includePreview,
     },
     client
@@ -146,13 +146,23 @@ export {
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
 
-export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo }, client = db) =>
+export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo, recordUuids }, client = db) =>
   client.tx(async (t) => {
-    const { list: recordsToMove } = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, step: stepFrom }, t)
-    await Promise.all(
-      recordsToMove.map((record) => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t))
+    const recordsSummaryToMove = await RecordRepository.fetchRecordsSummaryBySurveyId(
+      {
+        surveyId,
+        cycle,
+        step: stepFrom,
+        recordUuids,
+      },
+      client
     )
-    return { count: recordsToMove.length }
+    await Promise.all(
+      recordsSummaryToMove.map((record) =>
+        RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
+      )
+    )
+    return { count: recordsSummaryToMove.length }
   })
 
 export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>

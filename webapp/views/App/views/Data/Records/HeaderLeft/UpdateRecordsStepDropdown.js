@@ -1,6 +1,8 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
 
+import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 
 import { useI18n } from '@webapp/store/system'
@@ -32,37 +34,57 @@ const toStepByKey = {
   [updateTypes.demoteAllRecordsFromCleansing]: RecordStep.stepNames.entry,
 }
 
-export const UpdateRecordsStepDropdown = ({ onRecordsUpdate }) => {
+export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
 
-  const onMoveAllRecords = (key) => {
+  const moveRecords = (key) => {
     const stepFrom = fromStepByKey[key]
     const stepTo = toStepByKey[key]
+    const recordsToMove = records.filter((record) => Record.getStep(record) === RecordStep.getStepIdByName(stepFrom))
+    const recordsToMoveUuids = recordsToMove.map(Record.getUuid)
+    const count = recordsToMoveUuids.length
 
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'dataView.records.confirmUpdateRecordsStep',
-        params: { stepFrom: i18n.t(`surveyForm.step.${stepFrom}`), stepTo: i18n.t(`surveyForm.step.${stepTo}`) },
-        onOk: async () => {
-          dispatch(LoaderActions.showLoader())
+    const stepFromLabel = i18n.t(`surveyForm.step.${stepFrom}`)
+    const stepToLabel = i18n.t(`surveyForm.step.${stepTo}`)
 
-          const { count } = await API.updateRecordsStep({
-            surveyId,
-            cycle,
-            stepFrom: RecordStep.getStepIdByName(stepFrom),
-            stepTo: RecordStep.getStepIdByName(stepTo),
-          })
-          dispatch(LoaderActions.hideLoader())
+    if (count === 0) {
+      dispatch(
+        NotificationActions.showNotification({
+          key: 'dataView.records.noSelectedRecordsInStep',
+          params: { step: stepFromLabel },
+        })
+      )
+    } else {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'dataView.records.confirmUpdateRecordsStep',
+          params: {
+            count,
+            stepFrom: stepFromLabel,
+            stepTo: stepToLabel,
+          },
+          onOk: async () => {
+            dispatch(LoaderActions.showLoader())
 
-          dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsUpdated', params: { count } }))
+            const { count } = await API.updateRecordsStep({
+              surveyId,
+              cycle,
+              stepFrom: RecordStep.getStepIdByName(stepFrom),
+              stepTo: RecordStep.getStepIdByName(stepTo),
+              recordUuids: recordsToMoveUuids,
+            })
+            dispatch(LoaderActions.hideLoader())
 
-          onRecordsUpdate()
-        },
-      })
-    )
+            dispatch(NotificationActions.notifyInfo({ key: 'dataView.recordsUpdated', params: { count } }))
+
+            onRecordsUpdate()
+          },
+        })
+      )
+    }
   }
 
   return (
@@ -71,9 +93,15 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate }) => {
         value: key,
         label: i18n.t(`dataView.records.${key}`),
       }))}
-      onChange={(item) => onMoveAllRecords(item.value)}
+      onChange={(item) => moveRecords(item.value)}
       placeholder={i18n.t('dataView.records.updateRecordsStep')}
       searchable={false}
+      selection={null}
     />
   )
+}
+
+UpdateRecordsStepDropdown.propTypes = {
+  onRecordsUpdate: PropTypes.func.isRequired,
+  records: PropTypes.array.isRequired,
 }
