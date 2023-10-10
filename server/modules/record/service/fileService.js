@@ -40,6 +40,22 @@ export const checkFilesStorage = async () => {
   }
 }
 
+const getSurveyFilesTotalSpace = async ({ surveyId }) => {
+  return 10 * Math.pow(1024, 3) // TODO make it configurable, fixed to 10 GB per survey now
+}
+
+export const fetchFilesStatistics = async ({ surveyId }) => {
+  const totalSpace = await getSurveyFilesTotalSpace({ surveyId })
+  const usedSpace = await FileManager.fetchTotalFilesSize({ surveyId })
+  const availableSpace = Math.max(0, totalSpace - usedSpace)
+
+  return {
+    availableSpace,
+    totalSpace,
+    usedSpace,
+  }
+}
+
 export const {
   // CREATE
   insertFile,
@@ -47,4 +63,6 @@ export const {
   fetchFileContentAsStream,
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
+  // UPDATE
+  updateFileProps,
 } = FileManager
