@@ -168,9 +168,10 @@ export const fetchRecordsSummaryBySurveyId = async (
     .join(', ')
 
   const nodeDefKeysSelectSearch = nodeDefKeys
-    ?.map(
-      (nodeDefKey) =>
-        ` (${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)})::text ilike '%$/search:value/%'`
+    ?.map((nodeDefKey) =>
+      NodeDefTable.getColumnNames(nodeDefKey)
+        .map((colName) => ` (${rootEntityTableAlias}.${colName})::text ilike '%$/search:value/%'`)
+        .join(' OR ')
     )
     .join(' OR ')
 
