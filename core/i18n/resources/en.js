@@ -566,6 +566,7 @@ $t(common.cantUndoWarning)`,
     confirmDeleteAllRecords: 'Delete all records before import?',
     confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
     deleteAllRecordsBeforeImport: 'Delete all records before import',
+    downloadAllTemplates: 'Download all templates',
     downloadTemplate: 'Download template',
     errors: {
       rowNum: 'Row #',

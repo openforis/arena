@@ -28,6 +28,6 @@ ButtonIconInfo.propTypes = {
 }
 
 ButtonIconInfo.defaultProps = {
-  useMarkdown: false,
+  markdown: false,
   ...Button.defaultProps,
 }

@@ -1,10 +1,9 @@
-import Archiver from 'archiver'
-
 import * as PromiseUtils from '@core/promiseUtils'
 import * as Category from '@core/survey/category'
 
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { ZipArchiver } from '@server/utils/file/zipArchiver'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '../manager/categoryManager'
@@ -24,9 +23,7 @@ export default class CategoriesExportJob extends Job {
     this.setContext({ tempFileName })
 
     // create archiver
-    this.archiver = Archiver('zip')
-    const outputFileStream = FileUtils.createWriteStream(outputFilePath)
-    this.archiver.pipe(outputFileStream)
+    this.archiver = new ZipArchiver(FileUtils.createWriteStream(outputFilePath))
 
     // fetch list of categories
     const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft }, this.tx)
@@ -56,7 +53,7 @@ export default class CategoriesExportJob extends Job {
 
     // write to archive
     const zipEntryName = `${Category.getName(category) || `category_${index}`}.csv`
-    await this.archiver.file(categoryTempFilePath, { name: zipEntryName })
+    this.archiver.addFile(categoryTempFilePath, zipEntryName)
 
     this.incrementProcessedItems()
   }

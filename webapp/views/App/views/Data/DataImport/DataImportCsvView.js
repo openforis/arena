@@ -185,57 +185,64 @@ export const DataImportCsvView = () => {
             </FormItem>
           )}
         </div>
-        {selectedEntityDefUuid && (
-          <div className="buttons-container">
-            <ButtonDownload
-              className="download-template-btn"
-              href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
-              label="dataImportView.downloadTemplate"
-              disabled={!selectedEntityDefUuid}
-            />
+        <div className="buttons-container">
+          <ButtonDownload
+            className="download-templates-btn"
+            href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle })}
+            label="dataImportView.downloadAllTemplates"
+          />
+          {selectedEntityDefUuid && (
+            <>
+              <ButtonDownload
+                className="download-template-btn"
+                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
+                label="dataImportView.downloadTemplate"
+                disabled={!selectedEntityDefUuid}
+              />
 
-            {dataImportType === importTypes.updateExistingRecords && (
-              <fieldset>
-                <legend>{i18n.t('dataImportView.options.header')}</legend>
-                {optionsRecordUpdate.map((optionKey) => (
-                  <Checkbox
-                    key={optionKey}
-                    checked={state[optionKey]}
-                    label={`dataImportView.options.${optionKey}`}
-                    onChange={setStateProp(optionKey)}
-                  />
-                ))}
-              </fieldset>
-            )}
-            <Dropzone
-              maxSize={fileMaxSize}
-              accept={{ 'text/csv': ['.csv'] }}
-              onDrop={onFilesDrop}
-              droppedFiles={file ? [file] : []}
-            />
+              {dataImportType === importTypes.updateExistingRecords && (
+                <fieldset>
+                  <legend>{i18n.t('dataImportView.options.header')}</legend>
+                  {optionsRecordUpdate.map((optionKey) => (
+                    <Checkbox
+                      key={optionKey}
+                      checked={state[optionKey]}
+                      label={`dataImportView.options.${optionKey}`}
+                      onChange={setStateProp(optionKey)}
+                    />
+                  ))}
+                </fieldset>
+              )}
+              <Dropzone
+                maxSize={fileMaxSize}
+                accept={{ 'text/csv': ['.csv'] }}
+                onDrop={onFilesDrop}
+                droppedFiles={file ? [file] : []}
+              />
 
-            <div>
+              <div>
+                <ImportStartButton
+                  className="btn-secondary"
+                  disabled={!file}
+                  label="dataImportView.validateFile"
+                  startFunction={API.startDataImportFromCsvJob}
+                  startFunctionParams={{ ...importStartParams, dryRun: true }}
+                  onUploadComplete={onImportJobStart}
+                />
+                <ButtonIconInfo title="dataImportView.validateFileInfo" />
+              </div>
+
               <ImportStartButton
-                className="btn-secondary"
+                confirmMessageKey="dataImportView.startImportConfirm"
                 disabled={!file}
-                label="dataImportView.validateFile"
+                showConfirm
                 startFunction={API.startDataImportFromCsvJob}
-                startFunctionParams={{ ...importStartParams, dryRun: true }}
+                startFunctionParams={importStartParams}
                 onUploadComplete={onImportJobStart}
               />
-              <ButtonIconInfo title="dataImportView.validateFileInfo" />
-            </div>
-
-            <ImportStartButton
-              confirmMessageKey="dataImportView.startImportConfirm"
-              disabled={!file}
-              showConfirm
-              startFunction={API.startDataImportFromCsvJob}
-              startFunctionParams={importStartParams}
-              onUploadComplete={onImportJobStart}
-            />
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
       {jobCompleted && (
         <DataImportCompleteDialog
