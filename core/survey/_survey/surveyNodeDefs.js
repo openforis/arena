@@ -307,6 +307,13 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
   })
 }
 
+export const traverseMultipleEntityDefs = (visitorFn) => (survey) => {
+  const { root } = getHierarchy(NodeDef.isMultipleEntity)(survey)
+  traverseHierarchyItemSync(root, (nodeDef) => {
+    visitorFn(nodeDef)
+  })
+}
+
 export const visitDescendantsAndSelf =
   ({ nodeDef = null, visitorFn }) =>
   (survey) => {

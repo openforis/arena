@@ -33,6 +33,7 @@ export {
   startDataImportFromArenaJob,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
+  getDataImportFromCsvTemplatesUrl,
   updateRecordsStep,
   exportDataQueryToTempFile,
   downloadDataQueryExport,

@@ -1,6 +1,6 @@
 import * as Request from '@server/utils/request'
 
-import { sendOk, setContentTypeFile, contentTypes } from '@server/utils/response'
+import { sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as User from '@core/user/user'
@@ -309,13 +309,25 @@ export const init = (app) => {
     try {
       const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
 
-      setContentTypeFile({ res, fileName: 'data_import_template.csv', contentType: contentTypes.csv })
-
-      await DataImportTemplateService.writeDataImportTemplateToStream({
+      await DataImportTemplateService.exportDataImportTemplate({
         surveyId,
         cycle,
         entityDefUuid,
-        outputStream: res,
+        res,
+      })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/record/importfromcsv/templates', requireRecordCreatePermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle } = Request.getParams(req)
+
+      await DataImportTemplateService.exportAllDataImportTemplates({
+        surveyId,
+        cycle,
+        res,
       })
     } catch (error) {
       next(error)
@@ -371,9 +383,9 @@ export const init = (app) => {
   app.post('/survey/:surveyId/records/step', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, cycle, stepFrom, stepTo } = Request.getParams(req)
+      const { surveyId, cycle, stepFrom, stepTo, recordUuids } = Request.getParams(req)
 
-      const { count } = await RecordService.updateRecordsStep({ user, surveyId, cycle, stepFrom, stepTo })
+      const { count } = await RecordService.updateRecordsStep({ user, surveyId, cycle, stepFrom, stepTo, recordUuids })
 
       res.json({ count })
     } catch (error) {
