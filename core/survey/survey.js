@@ -160,6 +160,7 @@ export const {
   getNodeDefParent,
   getNodeDefSource,
   getNodeDefKeys,
+  getNodeDefKeysSorted,
   isNodeDefRootKey,
   findNodeDef,
   getNodeDefAreaBasedEstimate,
