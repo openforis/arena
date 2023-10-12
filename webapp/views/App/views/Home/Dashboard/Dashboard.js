@@ -54,7 +54,7 @@ const Dashboard = () => {
             )}
             {!isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
             {activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3em', width: '90%' }}>
+              <div className="chart-container">
                 <StorageSummary />
                 <RecordsByUser />
                 {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
