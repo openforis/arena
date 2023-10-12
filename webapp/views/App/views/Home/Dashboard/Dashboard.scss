@@ -5,4 +5,13 @@
   grid-auto-rows: minmax(auto, min-content);
   // grid-template-rows: auto auto auto;  
   grid-column-gap: 10px;
+  padding-left: 20px;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 3em;
+  width: 90%;
+  margin-top: 20px; // Add this line, adjust the value as needed
 }

@@ -182,7 +182,7 @@ const DailyRecordsByUser = () => {
 
     legend
       .append('rect')
-      .attr('x', width + 10) // Adjusted x position
+      .attr('x', width + 10)
       .attr('y', (d, i) => i * 20)
       .attr('width', 12)
       .attr('height', 12)
