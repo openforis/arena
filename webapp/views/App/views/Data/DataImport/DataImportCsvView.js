@@ -186,11 +186,13 @@ export const DataImportCsvView = () => {
           )}
         </div>
         <div className="buttons-container">
-          <ButtonDownload
-            className="download-templates-btn"
-            href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle })}
-            label="dataImportView.downloadAllTemplates"
-          />
+          {!Objects.isEmpty(cycle) && (
+            <ButtonDownload
+              className="download-templates-btn"
+              href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle })}
+              label="dataImportView.downloadAllTemplates"
+            />
+          )}
           {selectedEntityDefUuid && (
             <>
               <ButtonDownload
