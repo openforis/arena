@@ -140,8 +140,7 @@ class RecordsUpdateThread extends Thread {
 
   async processMessage(msg) {
     const { type } = msg
-    // Logger.debug('processing message', type)
-    Logger.debug('processing message', JSON.stringify(msg))
+    Logger.debug('processing message', type)
 
     const messageProcessor = this.messageProcessorByType[type]
     if (messageProcessor) {
