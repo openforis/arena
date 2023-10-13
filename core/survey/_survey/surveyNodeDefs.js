@@ -144,11 +144,14 @@ export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
   return getNodeDefChildByName(parentDef, name)(survey)
 }
 
-export const getNodeDefKeys = (nodeDef) =>
-  R.pipe(
-    getNodeDefChildren(nodeDef),
-    R.filter((n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n))
-  )
+const _nodeDefKeysFilter = (n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n)
+
+export const getNodeDefKeys = (nodeDef) => (survey) => getNodeDefChildren(nodeDef)(survey).filter(_nodeDefKeysFilter)
+
+export const getNodeDefKeysSorted =
+  ({ nodeDef, cycle }) =>
+  (survey) =>
+    getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefRootKeys = (survey) => {
   const root = getNodeDefRoot(survey)
