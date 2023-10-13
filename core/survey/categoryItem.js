@@ -35,8 +35,11 @@ export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')
 export const getLabel = (language) => (item) => ObjectUtils.getLabel(language, getCode(item))(item)
 
-export const getLabelWithCode = (language) => (item) =>
-  `(${getCode(item)}) ${ObjectUtils.getLabel(language, getCode(item))(item)}`
+export const getLabelWithCode = (language) => (item) => {
+  const code = getCode(item)
+  const label = ObjectUtils.getLabel(language, code)(item)
+  return `${label} (${code})`
+}
 
 // ====== READ - Extra Props
 export const getExtra = ObjectUtils.getProp(keysProps.extra)
