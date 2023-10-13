@@ -1,3 +1,5 @@
+import * as StringUtils from '@core/stringUtils'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -22,7 +24,7 @@ const getNodeValue = ({ survey, cycle, nodeDef, node, lang }) => {
     const result = NodeDefLayout.isCodeShown(cycle)(nodeDef)
       ? CategoryItem.getLabelWithCode(lang)(categoryItem)
       : CategoryItem.getLabel(lang)(categoryItem)
-    return result ?? CategoryItem.getCode(categoryItem)
+    return result ? StringUtils.quote(result) : CategoryItem.getCode(categoryItem)
   }
   if (NodeDef.isTaxon(nodeDef)) {
     const taxon = NodeRefData.getTaxon(node)
@@ -30,8 +32,7 @@ const getNodeValue = ({ survey, cycle, nodeDef, node, lang }) => {
   }
   const value = Node.getValue(node, null)
   if (NodeDef.isText(nodeDef)) {
-    // wrap text values in quotes
-    return `'${value}'`
+    return StringUtils.quote(value)
   }
   return value
 }
