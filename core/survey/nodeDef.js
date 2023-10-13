@@ -6,12 +6,14 @@ import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import { ArrayUtils } from '@core/arrayUtils'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
 import { nodeDefType } from './nodeDefType'
 import * as NodeDefLayout from './nodeDefLayout'
 import * as NodeDefValidations from './nodeDefValidations'
+import * as NodeDefExpression from './nodeDefExpression'
 import { valuePropsTaxon } from './nodeValueProps'
 
 // ======== NODE DEF PROPERTIES
@@ -325,6 +327,21 @@ export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
+
+export const getAllExpressions = (nodeDef) => {
+  const nodeDefExpressions = [
+    ...getDefaultValues(nodeDef),
+    ...getValidationExpressions(nodeDef),
+    ...getApplicable(nodeDef),
+  ]
+  const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
+    return acc
+  }, [])
+  ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  return expressions
+}
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')

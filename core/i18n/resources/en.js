@@ -1039,7 +1039,9 @@ $t(common.cantUndoWarning)`,
 
   expression: {
     identifierNotFound: 'Attribute or entity "{{name}}" not found',
+    invalidCategoryExtraProp: 'Invalid extra property name: {{propName}}',
     invalid: 'Invalid expression: {{details}}',
+    missingFunctionParameters: 'Missing function parameters',
     undefinedFunction: 'Undefined function: {{name}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
