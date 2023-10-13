@@ -92,12 +92,17 @@
     .binary-left,
     .binary-right {
       display: flex;
+      flex: 1;
 
       .identifier,
       .dropdown-literal {
-        width: 30rem;
+        width: 100%;
         max-width: 40rem;
       }
+    }
+
+    .binary-left {
+      justify-content: end;
     }
 
     .btns {
