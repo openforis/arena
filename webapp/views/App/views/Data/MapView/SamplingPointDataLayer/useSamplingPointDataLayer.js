@@ -20,22 +20,25 @@ const itemsPageSize = 2000
 const _convertItemsToPoints = (items) => {
   const bounds = latLngBounds() // keep track of the layer bounds to calculate its center and pan the map into it
 
-  const points = items.map((item) => {
+  const points = items.reduce((acc, item) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
+    if (!latLng) return acc
+
     const [lat, long] = latLng
     const itemPoint = PointFactory.createInstance({ x: long, y: lat })
 
     bounds.extend([lat, long])
 
-    return {
+    acc.push({
       type: 'Feature',
       properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location, recordUuid },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
       },
-    }
-  })
+    })
+    return acc
+  }, [])
 
   return { points, bounds }
 }
@@ -115,7 +118,7 @@ export const useSamplingPointDataLayer = (props) => {
           const { points, bounds } = _convertItemsToPoints(items)
 
           // pan map into layer bounds center
-          if (map.getZoom() < 5) {
+          if (map.getZoom() < 5 && bounds) {
             map.panTo(bounds.getCenter())
           }
 
