@@ -85,7 +85,8 @@ export const baseLayers = [
     provider: baseLayerProviders.planet,
     periodSelectorAvailable: true,
     periodType: periodTypes.monthly,
-    url: getArenaMapUrl({ provider: baseLayerProviders.planet, period: planetDefaultPeriod }),
+    url: ({ surveyId }) =>
+      getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period: planetDefaultPeriod }),
   },
   {
     key: 'planet_biannual_mosaics',
@@ -94,7 +95,8 @@ export const baseLayers = [
     provider: baseLayerProviders.planet,
     periodSelectorAvailable: true,
     periodType: periodTypes.biannual,
-    url: getArenaMapUrl({ provider: baseLayerProviders.planet, period: planetDefaultBiannualPeriod }),
+    url: ({ surveyId }) =>
+      getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period: planetDefaultBiannualPeriod }),
   },
 ]
 
