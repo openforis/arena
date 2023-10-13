@@ -75,15 +75,15 @@ const exportDataImportTemplate = async ({ surveyId, cycle, entityDefUuid, res })
 }
 
 const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
-  setContentTypeFile({
-    res,
-    fileName: `data_import_templates.zip`,
-    contentType: contentTypes.zip,
-  })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
   const archiver = new ZipArchiver(res)
 
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+  setContentTypeFile({
+    res,
+    fileName: `data_import_templates_${Survey.getName(survey)}.zip`,
+    contentType: contentTypes.zip,
+  })
 
   const multipleEntityDefUuids = []
 
