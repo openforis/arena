@@ -122,22 +122,25 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
 
-  const samplingPointData = items.map((item) => {
+  const samplingPointData = items.reduce((acc, item) => {
     const location = CategoryItem.getExtraProp('location')(item)
+    if (!location) return acc
+
     const codes = CategoryItem.getCodesHierarchy(item)
     const point = Points.parse(location)
     const pointLatLong = Points.toLatLong(point, srsIndex)
 
     const record = recordFinder?.(item)
 
-    return {
+    acc.push({
       uuid: CategoryItem.getUuid(item),
       codes,
       latLng: [pointLatLong.y, pointLatLong.x],
       location,
       ...(record ? { recordUuid: Record.getUuid(record) } : {}),
-    }
-  })
+    })
+    return acc
+  }, [])
   return samplingPointData
 }
 
