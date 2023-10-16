@@ -1,6 +1,8 @@
 import * as R from 'ramda'
-import { uuidv4 } from '@core/uuid'
 
+import { CategoryItems } from '@openforis/arena-core'
+
+import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
 
 export const keys = {
@@ -34,12 +36,7 @@ export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')
 export const getLabel = (language) => (item) => ObjectUtils.getLabel(language, getCode(item))(item)
-
-export const getLabelWithCode = (language) => (item) => {
-  const code = getCode(item)
-  const label = ObjectUtils.getLabel(language, code)(item)
-  return `${label} (${code})`
-}
+export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
 
 // ====== READ - Extra Props
 export const getExtra = ObjectUtils.getProp(keysProps.extra)
