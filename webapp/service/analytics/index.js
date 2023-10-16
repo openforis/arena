@@ -19,7 +19,10 @@ const page = ({ type = false, properties = {} }) => {
   return _analytics({ methodName: 'page', type, properties })
 }
 const identify = ({ userId, properties = {} }) => {
-  const _traits = Object.assign({}, window?.analytics._user.traits(), properties)
+  const _traits = {
+    ...(window?.analytics._user.traits() || {}),
+    ...properties,
+  }
   window?.analytics?.identify(userId, _traits)
 }
 
@@ -34,7 +37,10 @@ const getUserId = () => {
 }
 
 const addTraits = ({ traits = {} }) => {
-  const _traits = Object.assign({}, getTraits(), traits)
+  const _traits = {
+    ...getTraits(),
+    ...traits,
+  }
   analytics.identify(getUserId(), _traits)
 }
 
