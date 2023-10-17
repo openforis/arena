@@ -16,9 +16,10 @@ const generateMonthlyPeriods = () => {
   const periods = []
   while (currentDate.getFullYear() < dateEnd.getFullYear() || currentDate.getMonth() < dateEnd.getMonth()) {
     currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1)
-    const year = currentDate.getFullYear()
-    const month = currentDate.getMonth() + 1
-    periods.push({ year, month })
+    periods.push({
+      year: currentDate.getFullYear(),
+      month: currentDate.getMonth() + 1,
+    })
   }
   return periods
 }
@@ -41,14 +42,15 @@ const generateBiannualPeriods = () => {
     periodEndDate = new Date(periodStartDate.getFullYear(), periodStartDate.getMonth() + 6)
   }
 
-  // add last period (it falls in a month not multiple of 6)
-  periods.push({
-    year: biannualPeriodsDateEnd.getFullYear(),
-    month: 6,
-    yearTo: biannualPeriodsDateEnd.getFullYear(),
-    monthTo: biannualPeriodsDateEnd.getMonth(),
-  })
-
+  // add last period if it falls in a month not multiple of 6
+  if ((biannualPeriodsDateEnd.getMonth() + 1) % 6 !== 0) {
+    periods.push({
+      year: biannualPeriodsDateEnd.getFullYear(),
+      month: 6,
+      yearTo: biannualPeriodsDateEnd.getFullYear(),
+      monthTo: biannualPeriodsDateEnd.getMonth(),
+    })
+  }
   return periods
 }
 
