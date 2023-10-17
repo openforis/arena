@@ -31,8 +31,8 @@ const { plot_id, plot_text } = plot.children
 const { tree_dec_1, tree_dec_2, tree_species } = tree.children
 
 const getCodeAndLabel = (value) => {
-  const code = value.match(new RegExp(/\([0-9]+\)/))[0].replace(/\D/g, '')
-  const label = value.replace(/\([0-9]+\) /, '')
+  const code = value.match(new RegExp(/\([0-9]+\)/))[0].replace(/\D/g, '') // extract code in parenthesis
+  const label = value.replace(/ \([0-9]+\)/, '') // remove " (code)" suffix
   return { code, label }
 }
 export default () =>
