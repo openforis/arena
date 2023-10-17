@@ -57,9 +57,9 @@ const _createRecord = (idx) => {
       srs: '4326',
       srsLabel: 'WGS 1984 (EPSG:4326)',
     },
-    [cluster_country.name]: '(0) country 0',
-    [cluster_region.name]: `(${clusterRegion}) region ${clusterRegion}`,
-    [cluster_province.name]: `(${clusterProvince}) province ${clusterProvince}`,
+    [cluster_country.name]: 'country 0 (0)',
+    [cluster_region.name]: `region ${clusterRegion} (${clusterRegion})`,
+    [cluster_province.name]: `province ${clusterProvince} (${clusterProvince})`,
     // plot
     [plot_id.name]: getRandomInRange(1, 10),
     [plot_text.name]: 'This is a plot text',

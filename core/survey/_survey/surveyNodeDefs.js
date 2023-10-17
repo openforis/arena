@@ -25,7 +25,8 @@ export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uui
 export const getNodeDefsByUuids =
   (uuids = []) =>
   (survey) =>
-    Surveys.getNodeDefsByUuids({ survey, uuids })
+    // do not throw error if node defs are missing
+    Surveys.findNodeDefsByUuids({ survey, uuids })
 
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
