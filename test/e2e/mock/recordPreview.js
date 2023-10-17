@@ -26,9 +26,9 @@ export const recordPreview = {
   },
   [cluster_boolean.name]: 'false',
   [cluster_coordinate.name]: { x: '342.432', y: '3424.231', srs: '4326', srsLabel: 'WGS 1984 (EPSG:4326)' },
-  [cluster_country.name]: '(0) country 0',
-  [cluster_region.name]: '(01) region 01',
-  [cluster_province.name]: '(012) province 012',
+  [cluster_country.name]: 'country 0 (0)',
+  [cluster_region.name]: 'region 01 (01)',
+  [cluster_province.name]: 'province 012 (012)',
   // plot
   [plot_id.name]: '1',
   [plot_text.name]: 'This is a plot text',
