@@ -36,7 +36,7 @@ const getUserId = () => {
   return window?.analytics?._user?.id() || (localStorage?.ajs_user_id ? JSON.parse(localStorage?.ajs_user_id) : {})
 }
 
-const addTraits = ({ traits = {} }) => {
+const addTraits = ({ traits = {} } = {}) => {
   const _traits = {
     ...getTraits(),
     ...traits,
