@@ -38,7 +38,7 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
         return NodeDef.getParentUuid(ancestorKeyDef) === NodeDef.getUuid(nodeDef)
       })
       if (ancestorKeys.length > 0) {
-        pathPart += ` [${ancestorKeys.join(', ')}]`
+        pathPart += `[${ancestorKeys.join(', ')}]`
       }
     }
     pathParts.unshift(pathPart)
