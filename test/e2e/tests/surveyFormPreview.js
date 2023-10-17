@@ -52,7 +52,7 @@ export default () =>
       verifyAttribute(cluster_id, '')
       verifyAttribute(cluster_boolean, 'true')
       verifyAttribute(cluster_decimal, '')
-      verifyAttribute(cluster_country, '(0) country 0')
+      verifyAttribute(cluster_country, 'country 0 (0)')
       verifyAttribute(cluster_region, '')
       verifyAttribute(cluster_province, '')
       verifyAttribute(cluster_coordinate, { x: '', y: '', srs: '4326', srsLabel: 'WGS 1984 (EPSG:4326)' })
