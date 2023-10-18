@@ -19,7 +19,7 @@ export const padStart = (length, padString) => R.pipe(String, (s) => s.padStart(
 
 const toLower = R.pipe(trim, R.toLower)
 
-export const truncate = (maxLength) => (text) => text.length > maxLength ? text.slice(0, maxLength) + '...' : text
+export const truncate = (maxLength) => (text) => (text.length > maxLength ? text.slice(0, maxLength) + '...' : text)
 
 export const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
 
@@ -43,7 +43,9 @@ export const removeNewLines = (value) => {
 
 export const nullToEmpty = (value) => (value === null ? '' : value)
 
-export const appendIfMissing = (suffix) => (text) => text.endsWith(suffix) ? text : `${text}${suffix}`
-export const prependIfMissing = (prefix) => (text) => text.startsWith(prefix) ? text : `${prefix}${text}`
-export const removePrefix = (prefix) => (text) => text.startsWith(prefix) ? text.substring(prefix.length) : text
+export const appendIfMissing = (suffix) => (text) => (text.endsWith(suffix) ? text : `${text}${suffix}`)
+export const prependIfMissing = (prefix) => (text) => (text.startsWith(prefix) ? text : `${prefix}${text}`)
+export const removePrefix = (prefix) => (text) => (text.startsWith(prefix) ? text.substring(prefix.length) : text)
 export const removeSuffix = (suffix) => (text) => text.substring(0, text.length - suffix.length)
+
+export const quote = (text) => (isBlank(text) ? '' : `'${text}'`)

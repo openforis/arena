@@ -25,7 +25,8 @@ export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uui
 export const getNodeDefsByUuids =
   (uuids = []) =>
   (survey) =>
-    Surveys.getNodeDefsByUuids({ survey, uuids })
+    // do not throw error if node defs are missing
+    Surveys.findNodeDefsByUuids({ survey, uuids })
 
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
@@ -144,11 +145,14 @@ export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
   return getNodeDefChildByName(parentDef, name)(survey)
 }
 
-export const getNodeDefKeys = (nodeDef) =>
-  R.pipe(
-    getNodeDefChildren(nodeDef),
-    R.filter((n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n))
-  )
+const _nodeDefKeysFilter = (n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n)
+
+export const getNodeDefKeys = (nodeDef) => (survey) => getNodeDefChildren(nodeDef)(survey).filter(_nodeDefKeysFilter)
+
+export const getNodeDefKeysSorted =
+  ({ nodeDef, cycle }) =>
+  (survey) =>
+    getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefRootKeys = (survey) => {
   const root = getNodeDefRoot(survey)

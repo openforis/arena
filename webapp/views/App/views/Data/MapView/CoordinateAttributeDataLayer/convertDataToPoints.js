@@ -49,7 +49,8 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey,
       const ancestorsKeys = ancestorsKeysColumns.map((column) => {
         const ancestorDef = column.nodeDef
         const rawValue = item[column.name]
-        return ValueFormatter.format({ value: rawValue, i18n, nodeDef: ancestorDef })
+        const label = item[`${column.name}_label`]
+        return ValueFormatter.format({ value: rawValue, label, i18n, nodeDef: ancestorDef })
       })
 
       acc.points.push({

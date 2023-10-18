@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import { Objects } from '@openforis/arena-core'
+import { functionNames } from '@core/expressionParser/expression'
 
 import * as Category from '../category'
 import * as NodeDef from '../nodeDef'
@@ -46,10 +47,21 @@ export const getSamplingPointDataNodeDefs = (survey) => {
   })(survey)
 }
 
+// checks if category name is used in some expressions (e.g. categoryItemProp function)
+const isCategoryUsedInExpressions = (category) => (survey) =>
+  !!SurveyNodeDefs.findNodeDef((nodeDef) => {
+    const expressions = NodeDef.getAllExpressions(nodeDef)
+    const categoryName = Category.getName(category)
+    return !!expressions.find((expression) =>
+      new RegExp(`${functionNames.categoryItemProp}\\s*\\(\\s*['|"]${categoryName}['|"]\\s*,.*\\)`).test(expression)
+    )
+  })(survey)
+
 export const isCategoryUnused = (category) => (survey) =>
   !Category.isReportingData(category) &&
   !Category.isSamplingUnitsPlanCategory(category) &&
-  Objects.isEmpty(SurveyNodeDefs.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
+  Objects.isEmpty(SurveyNodeDefs.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)) &&
+  !isCategoryUsedInExpressions(category)(survey)
 
 // ====== UPDATE
 export const assocCategories = (newCategories) => R.assoc(categories, newCategories)

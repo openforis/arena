@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
+import { useSurveyId } from '@webapp/store/survey'
+
 import { baseLayers } from './baseLayers'
 import { useMapContext } from './MapContext'
 import { WmtsComponent } from './WmtsComponent'
@@ -12,6 +14,7 @@ export const MapLayersControl = (props) => {
   const { layers } = props
 
   const user = useUser()
+  const surveyId = useSurveyId()
   const { contextObject, onBaseLayerUpdate } = useMapContext()
   const { baseLayer: contextBaseLayer } = contextObject
 
@@ -25,13 +28,16 @@ export const MapLayersControl = (props) => {
 
   const getTileUrl = useCallback(
     ({ url, apiKeyRequired, provider, user }) => {
-      if (!apiKeyRequired || typeof url === 'string') {
+      if (typeof url === 'string') {
         return url
       }
-      const apiKey = User.getMapApiKey({ provider })(user)
-      return apiKey ? url({ apiKey }) : null
+      if (apiKeyRequired) {
+        const apiKey = User.getMapApiKey({ provider })(user)
+        return apiKey ? url({ apiKey }) : null
+      }
+      return url({ surveyId })
     },
-    [user]
+    [surveyId]
   )
 
   return (
