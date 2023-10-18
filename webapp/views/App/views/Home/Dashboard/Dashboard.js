@@ -35,10 +35,6 @@ const Dashboard = () => {
     RecordHistory: 'Record History',
   }
 
-  if (!canEditSurvey) {
-    return null
-  }
-
   return (
     <SurveyDefsLoader draft={canEditSurvey} validate={canEditSurvey}>
       {showFirstTimeHelp ? (
@@ -47,21 +43,21 @@ const Dashboard = () => {
         <div className="home-dashboard">
           <RecordsSummaryContext.Provider value={recordsSummaryState}>
             {!isSurveyInfoEmpty && <SurveyInfo />}
-            {!isSurveyInfoEmpty && (
+            {!isSurveyInfoEmpty && canEditSurvey && (
               <div className="tab-menu">
                 <TabSelector tabs={tabs} currentTab={activeTab} onSelectTab={setActiveTab} />
               </div>
             )}
-            {!isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-            {activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
+            {canEditSurvey && !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
+            {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
               <div className="chart-container">
                 <StorageSummary />
-                <RecordsByUser />
+                <RecordsByUser className="records-by-user" />
                 {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
               </div>
             )}
-            {activeTab === 'Dashboard' && !isSurveyInfoEmpty && <DailyRecordsByUser />}
-            {activeTab === 'Record History' && !isSurveyInfoEmpty && <StorageSummary />}
+            {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && <DailyRecordsByUser />}
+            {canEditSurvey && activeTab === 'Record History' && !isSurveyInfoEmpty && <StorageSummary />}
           </RecordsSummaryContext.Provider>
         </div>
       )}

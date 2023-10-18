@@ -3,11 +3,22 @@ import * as d3 from 'd3'
 import { timeDay } from 'd3-time'
 import { timeFormat } from 'd3-time-format'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
+import './DailyRecordsByUser.css'
 
 const DailyRecordsByUser = () => {
   const ref = useRef()
-  const { userDateCounts } = useContext(RecordsSummaryContext)
+  const { userDateCounts, userCounts } = useContext(RecordsSummaryContext)
 
+  // Sort userCounts in descending order based on count
+  const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
+
+  // Get the top 5 users
+  const top5Users = sortedUserCounts.slice(0, 5)
+
+  // Filter userDateCounts to only include entries for the top 5 users
+  const filteredUserDateCounts = userDateCounts.filter((entry) =>
+    top5Users.some((user) => user.owner_uuid === entry.owner_uuid)
+  )
   // Extract the calculation of firstDate, lastDate, and daysDiff into a separate function
   function calculateDateData(userDateCounts) {
     let firstDate, lastDate, daysDiff
@@ -58,8 +69,8 @@ const DailyRecordsByUser = () => {
 
   // Then, in your useEffect hook, you can call these functions:
   useEffect(() => {
-    const { firstDate, lastDate, daysDiff } = calculateDateData(userDateCounts)
-    let groupedData = groupDataByUserAndDate(userDateCounts, daysDiff, lastDate)
+    const { firstDate, lastDate, daysDiff } = calculateDateData(filteredUserDateCounts)
+    let groupedData = groupDataByUserAndDate(filteredUserDateCounts, daysDiff, lastDate)
     groupedData = fillMissingDates(groupedData, daysDiff)
 
     // Fill in missing dates with 0
@@ -76,8 +87,8 @@ const DailyRecordsByUser = () => {
       records: groupedData[user],
     }))
 
-    const margin = { top: 20, right: 80, bottom: 70, left: 50 } // Adjusted margins
-    const width = window.innerWidth * 0.8 - margin.left - margin.right
+    const margin = { top: 20, right: 120, bottom: 70, left: 30 }
+    const width = window.innerWidth * 0.7 - margin.left - margin.right // Reduced width to 70% of window width
     const height = 250 - margin.top - margin.bottom
 
     const x = d3.scaleTime().range([0, width])
@@ -182,7 +193,7 @@ const DailyRecordsByUser = () => {
 
     legend
       .append('rect')
-      .attr('x', width + 10)
+      .attr('x', width + 105)
       .attr('y', (d, i) => i * 20)
       .attr('width', 12)
       .attr('height', 12)
@@ -190,11 +201,11 @@ const DailyRecordsByUser = () => {
 
     legend
       .append('text')
-      .attr('x', width + 8)
+      .attr('x', width + 100)
       .attr('y', (d, i) => i * 20 + 9)
       .attr('dy', '.15em')
       .style('text-anchor', 'end')
-      .text((d) => d.user)
+      .text((d) => (d.user.length > 12 ? d.user.substring(0, 9) + '..' : d.user)) // Truncate user name if it exceeds 15 characters
 
     svg
       .append('g')
@@ -222,7 +233,7 @@ const DailyRecordsByUser = () => {
   }, [userDateCounts])
 
   return (
-    <div ref={ref} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+    <div ref={ref} style={{ display: 'flex', justifyContent: 'left', alignItems: 'left', flexDirection: 'column' }}>
       <h4 style={{ textAlign: 'center' }}>Daily records added by user</h4>
     </div>
   )
