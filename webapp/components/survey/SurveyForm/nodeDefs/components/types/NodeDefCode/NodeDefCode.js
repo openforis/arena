@@ -61,10 +61,8 @@ const NodeDefCode = (props) => {
   }, [edit, itemsArray, nodes])
 
   const onItemAdd = (item) => {
-    const node =
-      NodeDef.isSingle(nodeDef) || entryDataQuery
-        ? nodes[0]
-        : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+    const existingNode = NodeDef.isSingle(nodeDef) || entryDataQuery ? nodes[0] : null
+    const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
     const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
     const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
