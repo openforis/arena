@@ -2,6 +2,10 @@
 
 $borderColor: $greyBorder;
 
+.app__container .app-module > .category {
+  overflow: hidden; // scrollbars managed in .category__levels
+}
+
 .category {
   display: flex;
   flex-direction: column;
@@ -39,15 +43,25 @@ $borderColor: $greyBorder;
   }
 }
 
-.category__levels {
+.category__levels-wrapper {
   flex: 1;
-  display: flex;
-  justify-content: center;
+  width: 100%;
   overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.category__levels {
+  display: flex;
+  height: 100%;
+
+  &.center-aligned {
+    align-self: center;
+  }
 
   .btn-add-level {
-    align-self: start;
     margin-left: 1rem;
+    width: 7rem;
   }
 
   .form-item {
@@ -56,7 +70,7 @@ $borderColor: $greyBorder;
 }
 
 .category__level {
-  width: 420px;
+  min-width: 420px;
   display: flex;
   flex-direction: column;
   padding: 0.5rem 1rem;
