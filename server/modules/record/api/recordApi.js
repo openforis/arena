@@ -412,8 +412,9 @@ export const init = (app) => {
     try {
       const { surveyId, recordUuids } = Request.getParams(req)
       const user = Request.getUser(req)
+      const socketId = Request.getSocketId(req)
 
-      await RecordService.deleteRecords({ user, surveyId, recordUuids })
+      await RecordService.deleteRecords({ socketId, user, surveyId, recordUuids })
 
       sendOk(res)
     } catch (error) {
