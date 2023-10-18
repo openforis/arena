@@ -7,6 +7,7 @@ import { RecordsSummaryContext } from '../RecordsSummaryContext'
 const DailyRecordsByUser = () => {
   const ref = useRef()
   const { userDateCounts, userCounts } = useContext(RecordsSummaryContext)
+
   // Sort userCounts in descending order based on count
   const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
 
@@ -85,8 +86,8 @@ const DailyRecordsByUser = () => {
       records: groupedData[user],
     }))
 
-    const margin = { top: 20, right: 80, bottom: 70, left: 50 } // Adjusted margins
-    const width = window.innerWidth * 0.8 - margin.left - margin.right
+    const margin = { top: 20, right: 120, bottom: 70, left: 30 }
+    const width = window.innerWidth * 0.7 - margin.left - margin.right // Reduced width to 70% of window width
     const height = 250 - margin.top - margin.bottom
 
     const x = d3.scaleTime().range([0, width])
@@ -191,7 +192,7 @@ const DailyRecordsByUser = () => {
 
     legend
       .append('rect')
-      .attr('x', width + 10)
+      .attr('x', width + 105)
       .attr('y', (d, i) => i * 20)
       .attr('width', 12)
       .attr('height', 12)
@@ -199,11 +200,11 @@ const DailyRecordsByUser = () => {
 
     legend
       .append('text')
-      .attr('x', width + 8)
+      .attr('x', width + 100)
       .attr('y', (d, i) => i * 20 + 9)
       .attr('dy', '.15em')
       .style('text-anchor', 'end')
-      .text((d) => d.user)
+      .text((d) => (d.user.length > 12 ? d.user.substring(0, 9) + '..' : d.user)) // Truncate user name if it exceeds 15 characters
 
     svg
       .append('g')
@@ -231,7 +232,7 @@ const DailyRecordsByUser = () => {
   }, [userDateCounts])
 
   return (
-    <div ref={ref} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+    <div ref={ref} style={{ display: 'flex', justifyContent: 'left', alignItems: 'left', flexDirection: 'column' }}>
       <h4 style={{ textAlign: 'center' }}>Daily records added by user</h4>
     </div>
   )
