@@ -6,8 +6,17 @@ import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
 const DailyRecordsByUser = () => {
   const ref = useRef()
-  const { userDateCounts } = useContext(RecordsSummaryContext)
+  const { userDateCounts, userCounts } = useContext(RecordsSummaryContext)
+  // Sort userCounts in descending order based on count
+  const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
 
+  // Get the top 5 users
+  const top5Users = sortedUserCounts.slice(0, 5)
+
+  // Filter userDateCounts to only include entries for the top 5 users
+  const filteredUserDateCounts = userDateCounts.filter((entry) =>
+    top5Users.some((user) => user.owner_uuid === entry.owner_uuid)
+  )
   // Extract the calculation of firstDate, lastDate, and daysDiff into a separate function
   function calculateDateData(userDateCounts) {
     let firstDate, lastDate, daysDiff
@@ -58,8 +67,8 @@ const DailyRecordsByUser = () => {
 
   // Then, in your useEffect hook, you can call these functions:
   useEffect(() => {
-    const { firstDate, lastDate, daysDiff } = calculateDateData(userDateCounts)
-    let groupedData = groupDataByUserAndDate(userDateCounts, daysDiff, lastDate)
+    const { firstDate, lastDate, daysDiff } = calculateDateData(filteredUserDateCounts)
+    let groupedData = groupDataByUserAndDate(filteredUserDateCounts, daysDiff, lastDate)
     groupedData = fillMissingDates(groupedData, daysDiff)
 
     // Fill in missing dates with 0
