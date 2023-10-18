@@ -3,6 +3,7 @@ import * as d3 from 'd3'
 import { timeDay } from 'd3-time'
 import { timeFormat } from 'd3-time-format'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
+import './DailyRecordsByUser.css'
 
 const DailyRecordsByUser = () => {
   const ref = useRef()
