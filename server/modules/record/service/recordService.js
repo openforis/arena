@@ -125,19 +125,19 @@ export const deleteRecord = async ({ socketId, user, surveyId, recordUuid, notif
   Logger.debug('delete record. surveyId:', surveyId, 'recordUuid:', recordUuid)
 
   const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
+  const cycle = Record.getCycle(record)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
   await RecordManager.deleteRecord(user, survey, record)
 
   RecordsUpdateThreadService.notifyRecordDeleteToSockets({ socketIdUser: socketId, recordUuid, notifySameUser })
+  RecordsUpdateThreadService.clearRecordDataFromThread({ surveyId, cycle, draft: false, recordUuid })
 }
 
-export const deleteRecords = async ({ user, surveyId, recordUuids }) => {
+export const deleteRecords = async ({ socketId, user, surveyId, recordUuids }) => {
   Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
   await PromiseUtils.each(recordUuids, async (recordUuid) => {
-    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle: Record.getCycle(record) })
-    await RecordManager.deleteRecord(user, survey, record)
+    await deleteRecord({ socketId, user, surveyId, recordUuid })
   })
 
   Logger.debug('records deleted - surveyId:', surveyId, 'recordUuids:', recordUuids)
@@ -197,7 +197,6 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
     if (Record.isEmpty(record)) {
       await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
-      RecordsUpdateThreadService.clearRecordDataFromThread({ surveyId, cycle, draft: false, recordUuid })
     }
   }
   RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
