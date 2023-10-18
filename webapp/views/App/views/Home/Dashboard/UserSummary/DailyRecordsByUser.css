@@ -1,0 +1,10 @@
+ .container {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    flex-direction: column;
+  }
+  
+  .center-text {
+    text-align: center;
+  }
