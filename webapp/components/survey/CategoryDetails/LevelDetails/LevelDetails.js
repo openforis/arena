@@ -53,14 +53,13 @@ const LevelDetails = (props) => {
         <>
           <div className="category__level-header">
             <h4 className="label">
-              {i18n.t('categoryEdit.level')} {level.index + 1}
+              {i18n.t('categoryEdit.level')} {levelIndex + 1}
             </h4>
-            {!readOnly && (
+            {!readOnly && canBeDeleted && (
               <Button
                 size="small"
                 testId={TestId.categoryDetails.levelDeleteBtn(levelIndex)}
                 onClick={() => Actions.deleteLevel({ category, level })}
-                disabled={!canBeDeleted}
                 iconClassName="icon-bin2 icon-12px"
               />
             )}

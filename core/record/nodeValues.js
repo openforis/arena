@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Objects } from '@openforis/arena-core'
+import { DateFormats, Dates, Objects } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -37,12 +37,24 @@ const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode,
   return null
 }
 
+const dateTimeComparator =
+  ({ formatsSource, formatTo }) =>
+  ({ value, valueSearch }) => {
+    const toDateTime = (val) => {
+      if (val instanceof Date) {
+        return Dates.format(val, formatTo)
+      }
+      const formatFrom = formatsSource.find((format) => Dates.isValidDateInFormat(val, format))
+      return formatFrom ? Dates.convertDate({ dateStr: val, formatFrom, formatTo }) : null
+    }
+    const dateTime = toDateTime(value)
+    const dateTimeSearch = toDateTime(valueSearch)
+    return dateTime && dateTimeSearch && dateTime === dateTimeSearch
+  }
+
 const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, record, parentNode, value, valueSearch, strict }) => {
-    if (value === valueSearch) return true
-    if (Objects.isEmpty(value) || Objects.isEmpty(valueSearch)) return false
-
     const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value, strict })
     const itemUuidSearch = extractCategoryItemUuidFromValue({
       survey,
@@ -55,7 +67,10 @@ const valueComparatorByNodeDefType = {
     return itemUuidSearch === itemUuid
   },
   [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
-  [NodeDef.nodeDefType.date]: singlePropValueEqualComparator,
+  [NodeDef.nodeDefType.date]: dateTimeComparator({
+    formatsSource: [DateFormats.dateDisplay, DateFormats.dateStorage],
+    formatTo: DateFormats.dateStorage,
+  }),
   [NodeDef.nodeDefType.decimal]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.integer]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.taxon]: ({ value, valueSearch }) => {
@@ -65,7 +80,10 @@ const valueComparatorByNodeDefType = {
     return value[Node.valuePropsTaxon.taxonUuid] === valueSearch[Node.valuePropsTaxon.taxonUuid]
   },
   [NodeDef.nodeDefType.text]: singlePropValueEqualComparator,
-  [NodeDef.nodeDefType.time]: singlePropValueEqualComparator,
+  [NodeDef.nodeDefType.time]: dateTimeComparator({
+    formatsSource: [DateFormats.timeStorage, 'HH:mm:ss'],
+    formatTo: DateFormats.timeStorage,
+  }),
 }
 
 /**
@@ -82,6 +100,9 @@ const valueComparatorByNodeDefType = {
  * @returns {boolean} - True if the values are equal.
  */
 const isValueEqual = ({ survey, nodeDef, value, valueSearch, record = null, parentNode = null, strict = false }) => {
+  if (value === valueSearch) return true
+  if (Objects.isEmpty(value) || Objects.isEmpty(valueSearch)) return false
+
   const valueComparator = valueComparatorByNodeDefType[NodeDef.getType(nodeDef)]
   return valueComparator && valueComparator({ survey, nodeDef, record, parentNode, value, valueSearch, strict })
 }
