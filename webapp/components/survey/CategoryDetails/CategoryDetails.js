@@ -23,6 +23,7 @@ import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
+import classNames from 'classnames'
 
 const MAX_LEVELS = 5
 
@@ -182,27 +183,30 @@ const CategoryDetails = (props) => {
           />
         )}
 
-        <div className="category__levels">
-          {levels.map((level) => (
-            <LevelDetails
-              key={CategoryLevel.getUuid(level)}
-              level={level}
-              state={state}
-              setState={setState}
-              single={levels.length === 1}
-            />
-          ))}
+        <div className="category__levels-wrapper">
+          <div className={classNames('category__levels', { 'center-aligned': levels.length <= 3 })}>
+            {levels.map((level) => (
+              <LevelDetails
+                key={CategoryLevel.getUuid(level)}
+                level={level}
+                state={state}
+                setState={setState}
+                single={levels.length === 1}
+              />
+            ))}
 
-          {!readOnly && (
-            <Button
-              className="btn-s btn-add-level"
-              testId={TestId.categoryDetails.addLevelBtn}
-              onClick={() => Actions.createLevel({ category })}
-              disabled={levels.length === MAX_LEVELS}
-              iconClassName="icon icon-plus icon-16px icon-left"
-              label="categoryEdit.addLevel"
-            />
-          )}
+            {!readOnly && levels.length < MAX_LEVELS && (
+              <div>
+                <Button
+                  className="btn-s btn-add-level"
+                  testId={TestId.categoryDetails.addLevelBtn}
+                  onClick={() => Actions.createLevel({ category })}
+                  iconClassName="icon icon-plus icon-16px icon-left"
+                  label="categoryEdit.addLevel"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {showClose && (
