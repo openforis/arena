@@ -38,15 +38,18 @@ const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode,
 }
 
 const dateTimeComparator =
-  ({ dateTimeFormats }) =>
+  ({ formatsSource, formatTo }) =>
   ({ value, valueSearch }) => {
-    const toISODateTime = (val) => {
-      const fromFormat = dateTimeFormats.find((format) => Dates.isValidDateInFormat(val, format))
-      return fromFormat ? Dates.convertDate(val, fromFormat, DateFormats.datetimeStorage) : null
+    const toDateTime = (val) => {
+      if (val instanceof Date) {
+        return Dates.format(val, formatTo)
+      }
+      const formatFrom = formatsSource.find((format) => Dates.isValidDateInFormat(val, format))
+      return formatFrom ? Dates.convertDate({ dateStr: val, formatFrom, formatTo }) : null
     }
-    const dateTime = toISODateTime(value)
-    const dateTimeSearch = toISODateTime(valueSearch)
-    return dateTime === dateTimeSearch
+    const dateTime = toDateTime(value)
+    const dateTimeSearch = toDateTime(valueSearch)
+    return dateTime && dateTimeSearch && dateTime === dateTimeSearch
   }
 
 const valueComparatorByNodeDefType = {
@@ -65,7 +68,8 @@ const valueComparatorByNodeDefType = {
   },
   [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
   [NodeDef.nodeDefType.date]: dateTimeComparator({
-    dateTimeFormats: [DateFormats.dateDisplay, DateFormats.dateStorage],
+    formatsSource: [DateFormats.dateDisplay, DateFormats.dateStorage],
+    formatTo: DateFormats.dateStorage,
   }),
   [NodeDef.nodeDefType.decimal]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.integer]: singlePropValueEqualComparator,
@@ -77,7 +81,8 @@ const valueComparatorByNodeDefType = {
   },
   [NodeDef.nodeDefType.text]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.time]: dateTimeComparator({
-    dateTimeFormats: [DateFormats.timeStorage, 'HH:mm:ss'],
+    formatsSource: [DateFormats.timeStorage, 'HH:mm:ss'],
+    formatTo: DateFormats.timeStorage,
   }),
 }
 
