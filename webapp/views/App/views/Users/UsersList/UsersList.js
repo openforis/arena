@@ -10,6 +10,7 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { ButtonIconEdit } from '@webapp/components'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -34,7 +35,12 @@ export const UsersList = () => {
           width: '40px',
           renderItem: ({ item }) => <ProfilePicture userUuid={User.getUuid(item)} thumbnail />,
         },
-        { key: 'email', header: 'common.email', renderItem: ({ item }) => User.getEmail(item), sortable: true },
+        {
+          key: 'email',
+          header: 'common.email',
+          renderItem: ({ item }) => <LabelWithTooltip label={User.getEmail(item)} />,
+          sortable: true,
+        },
         { key: 'name', header: 'common.name', renderItem: ({ item }) => User.getName(item), sortable: true },
         {
           key: 'status',
