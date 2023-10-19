@@ -2,7 +2,6 @@ import './NodeDefCode.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import { Surveys } from '@openforis/arena-core'
 
@@ -20,6 +19,11 @@ import { useRecord } from '@webapp/store/ui/record'
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
+
+const getCodeUuidsHierarchy = ({ survey, record, parentNode, nodeDef }) => {
+  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+  return nodeParentCode ? [...Node.getHierarchyCode(nodeParentCode), Node.getUuid(nodeParentCode)] : []
+}
 
 const NodeDefCode = (props) => {
   const {
@@ -41,12 +45,10 @@ const NodeDefCode = (props) => {
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const draft = Survey.isDraft(surveyInfo)
-  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  const codeUuidsHierarchy = nodeParentCode
-    ? R.append(Node.getUuid(nodeParentCode), Node.getHierarchyCode(nodeParentCode))
-    : []
+  const codeUuidsHierarchy = getCodeUuidsHierarchy({ survey, record, parentNode, nodeDef })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
+  const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
   const itemsArray = useItems({ survey, record, nodeDef, parentNode, draft, edit, entryDataQuery })
   const [selectedItems, setSelectedItems] = useState([])
@@ -61,7 +63,7 @@ const NodeDefCode = (props) => {
   }, [edit, itemsArray, nodes])
 
   const onItemAdd = (item) => {
-    const existingNode = NodeDef.isSingle(nodeDef) || entryDataQuery ? nodes[0] : null
+    const existingNode = singleNode ? nodes[0] : null
     const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
     const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
@@ -72,7 +74,7 @@ const NodeDefCode = (props) => {
   }
 
   const onItemRemove = (item) => {
-    if (NodeDef.isSingle(nodeDef) || entryDataQuery) {
+    if (singleNode) {
       updateNode(nodeDef, nodes[0], {}, null, {}, {})
     } else {
       const nodeToRemove = nodes.find((node) => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
