@@ -383,6 +383,15 @@ export const updateRecordStep = async (surveyId, recordUuid, step, client = db) 
     [step, recordUuid]
   )
 
+export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid }, client = db) =>
+  client.none(
+    `
+      UPDATE ${getSchemaSurvey(surveyId)}.record
+      SET owner_uuid = $1
+      WHERE owner_uuid = $2`,
+    [toOwnerUuid, fromOwnerUuid]
+  )
+
 export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
   client.none(
     DbUtils.updateAllQuery(

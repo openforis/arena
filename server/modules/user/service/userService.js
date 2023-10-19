@@ -14,21 +14,23 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
-
+import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
+import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
 import SystemError from '@core/systemError'
+
 import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 import * as Log from '@server/log/log'
 
+import * as RecordManager from '@server/modules/record/manager/recordManager'
+import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as AuthManager from '../../auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
+
 import * as UserPasswordUtils from './userPasswordUtils'
-import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
-import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
-import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
 import { SystemAdminUserValidator } from './systemAdminUserValidator'
 import * as UserInviteService from './userInviteService'
 
@@ -364,24 +366,30 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
 // DELETE
 export const { deleteUserResetPasswordExpired } = UserManager
 
-export const deleteUser = async ({ user, userUuidToRemove, surveyId }) => {
-  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true })
-  const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove)
+export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
+  db.tx(async (t) => {
+    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
+    const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove, t)
 
-  await UserManager.deleteUser({ user, userUuidToRemove, survey })
+    await UserManager.deleteUser({ user, userUuidToRemove, survey }, t)
 
-  if (User.hasAccepted(userToDelete)) {
-    // Send email
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const msgParams = {
-      name: User.getName(userToDelete),
-      surveyName: Survey.getName(surveyInfo),
-      surveyLabel: Survey.getDefaultLabel(surveyInfo),
+    await RecordManager.updateRecordsOwner(
+      { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
+      t
+    )
+
+    if (User.hasAccepted(userToDelete)) {
+      // Send email
+      const surveyInfo = Survey.getSurveyInfo(survey)
+      const msgParams = {
+        name: User.getName(userToDelete),
+        surveyName: Survey.getName(surveyInfo),
+        surveyLabel: Survey.getDefaultLabel(surveyInfo),
+      }
+      const lang = User.getLang(user)
+      await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
     }
-    const lang = User.getLang(user)
-    await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
-  }
-}
+  })
 
 // ==== User prefs
 export const { updateUserPrefs } = UserManager
