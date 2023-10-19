@@ -10,7 +10,7 @@ export const enTranslation = {
     appNameFull: '$t(common.openForis) Arena',
     apply: 'Apply',
     aggregateFunction: 'Aggregate function',
-    aggregateFunction_plural: 'Aggregate functions',
+    aggregateFunction_other: 'Aggregate functions',
     avg: 'Average',
     ascending: 'Ascending',
     areaBased: 'area-based',
