@@ -8,6 +8,22 @@
   }
 }
 
+.popper-arrow {
+  position: absolute;
+  font-size: 7px;
+  width: 3em;
+  height: 3em;
+
+  &::before {
+    content: '';
+    margin: auto;
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+  }
+}
+
 .tooltip__message-info {
   .survey-form__node-def-file__preview-image {
     grid-column-start: 2;
