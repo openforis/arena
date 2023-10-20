@@ -87,8 +87,12 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
 
   const multipleEntityDefUuids = []
 
-  Survey.traverseMultipleEntityDefs((nodeDef) => {
-    multipleEntityDefUuids.push(NodeDef.getUuid(nodeDef))
+  Survey.visitDescendantsAndSelf({
+    visitorFn: (nodeDef) => {
+      if (NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)) {
+        multipleEntityDefUuids.push(NodeDef.getUuid(nodeDef))
+      }
+    },
   })(survey)
 
   const tempFilePaths = []
