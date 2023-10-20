@@ -119,16 +119,8 @@ const RecordsByUser = () => {
   }, [userCounts])
 
   return (
-    <div
-      ref={ref}
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-      }}
-    >
-      <h4 style={{ textAlign: 'center' }}>Records added per user (Total of {totalCount})</h4>
+    <div ref={ref} className="container">
+      <h4 className="center-text">Records added per user (Total of {totalCount})</h4>
       <div ref={svgRef} style={{ height: '300px', overflowY: 'scroll' }}></div>
     </div>
   )
