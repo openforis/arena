@@ -176,7 +176,6 @@ export const {
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
-  traverseMultipleEntityDefs,
   getDescendantsAndSelf,
   visitDescendantsAndSelf,
   findDescendants,
