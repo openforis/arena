@@ -11,5 +11,5 @@
 
   .chart-scroll {
     height: 300px;
-    overflowY: scroll;
+    overflow-y: scroll;
   }
