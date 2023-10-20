@@ -1,10 +1,9 @@
 import * as R from 'ramda'
 
-import { Records, RecordNodesUpdater, Dates } from '@openforis/arena-core'
+import { Records, Dates } from '@openforis/arena-core'
 
 import * as Validation from '@core/validation/validation'
 import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
 
 import { keys } from './recordKeys'
 import * as RecordReader from './recordReader'
@@ -94,27 +93,6 @@ export const assocDateModified = (dateModified) => (record) => {
 
 export const deleteNode = (node) => (record) => {
   const nodeUuid = Node.getUuid(node)
-
-  // 1. remove entity children recursively
-  const children = RecordReader.getNodeChildren(node)(record)
-
-  // 2. remove node from index
-  let recordUpdated = RecordNodesUpdater.removeNode(node)(record)
-
-  // 3. delete children
-  recordUpdated = children.reduce((recordAcc, child) => deleteNode(child)(recordAcc), recordUpdated)
-
-  // 4. update validation
-  recordUpdated = R.pipe(
-    Validation.getValidation,
-    Validation.dissocFieldValidation(nodeUuid),
-    // Dissoc childrenCount validation
-    Validation.dissocFieldValidationsStartingWith(`${RecordValidation.prefixValidationFieldChildrenCount}${nodeUuid}`),
-    (newValidation) => Validation.assocValidation(newValidation)(recordUpdated)
-  )(recordUpdated)
-
-  // 5. remove node from record
-  delete recordUpdated[keys.nodes][nodeUuid]
-
+  const { record: recordUpdated } = Records.deleteNode(nodeUuid)(record)
   return recordUpdated
 }

@@ -5,6 +5,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 
 import { DataImportFileReader } from './dataImportFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
@@ -172,6 +173,17 @@ export default class DataImportJob extends DataImportBaseJob {
     const result = super.generateResult()
     const { dryRun } = this.context
     return { ...result, dryRun }
+  }
+
+  async beforeSuccess() {
+    await super.beforeSuccess()
+    const { surveyId } = this
+    const { cycle } = this.context
+
+    // clear records from update thread
+    this.updatedRecordsUuids.forEach((recordUuid) =>
+      RecordsUpdateThreadService.clearRecordDataFromThread({ surveyId, cycle, draft: false, recordUuid })
+    )
   }
 
   _addError(key, params = {}) {
