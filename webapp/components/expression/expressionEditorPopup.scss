@@ -103,6 +103,10 @@
 
     .binary-left {
       justify-content: end;
+
+      &:only-child {
+        justify-content: center;
+      }
     }
 
     .btns {
