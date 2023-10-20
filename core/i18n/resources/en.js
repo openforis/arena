@@ -941,7 +941,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     formLabel: 'Processing chain label',
     basic: 'Basic',
     records: 'Records',
-    recordsInStepCount: '{{recordsCount}} in {{step}} step',
+    recordsInStepCount: '{{step}}: {{recordsCount}}',
     submitOnlyAnalysisStepDataIntoR: 'Submit only analysis step data to RStudio',
     includeEntitiesWithoutData: 'Include entities without data',
     cannotStartRStudio: {
