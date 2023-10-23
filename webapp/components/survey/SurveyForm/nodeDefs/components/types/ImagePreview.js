@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Popper } from '@mui/material'
 
 import { useI18n } from '@webapp/store/system'
 import { useOnUpdate } from '@webapp/components/hooks'
 import LoadingBar from '@webapp/components/LoadingBar'
 
-const ImagePreview = ({ path, file = null }) => {
+export const ImagePreview = ({ path, file = null }) => {
   const i18n = useI18n()
 
   const imgRef = useRef(null)
@@ -46,7 +45,7 @@ const ImagePreview = ({ path, file = null }) => {
       setLoading(false)
       setError(true)
     }
-  }, [])
+  }, [path])
 
   return (
     <div className="survey-form__node-def-file__preview-image">
@@ -64,51 +63,5 @@ const ImagePreview = ({ path, file = null }) => {
         <span className="icon error icon-warning" title={i18n.t('surveyForm.nodeDefFile.errorLoadingPreview')} />
       )}
     </div>
-  )
-}
-
-export const NodeDefFileImagePreviewPopper = (props) => {
-  const { open, nodeDef, fileUrl, file } = props
-  const [arrowRef, setArrowRef] = useState(null)
-
-  return (
-    <Popper
-      open={open}
-      placement="bottom"
-      disablePortal={false}
-      modifiers={[
-        {
-          name: 'flip',
-          enabled: true,
-          options: {
-            altBoundary: true,
-            rootBoundary: 'document',
-            padding: 8,
-          },
-        },
-        {
-          name: 'preventOverflow',
-          enabled: true,
-          options: {
-            altAxis: true,
-            altBoundary: true,
-            tether: true,
-            rootBoundary: 'document',
-            padding: 8,
-          },
-        },
-        {
-          name: 'arrow',
-          enabled: true,
-          options: {
-            element: arrowRef,
-          },
-        },
-      ]}
-    >
-      <span className="popper-arrow" ref={setArrowRef} />
-
-      <ImagePreview nodeDef={nodeDef} path={fileUrl} file={file} />
-    </Popper>
   )
 }

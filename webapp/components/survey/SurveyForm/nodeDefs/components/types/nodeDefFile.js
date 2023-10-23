@@ -1,6 +1,6 @@
 import './nodeDefFile.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,15 +8,10 @@ import * as Node from '@core/record/node'
 
 import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonDownload } from '@webapp/components/buttons'
-import Tooltip from '@webapp/components/tooltip'
-import { LoadingBar } from '@webapp/components'
-import { useOnUpdate } from '@webapp/components/hooks'
-
-import { useI18n } from '@webapp/store/system'
 
 import NodeDeleteButton from '../nodeDeleteButton'
-import { Popper } from '@mui/material'
-import { NodeDefFileImagePreviewPopper } from './nodeDefFileImagePreviewPopper'
+import { ImagePreview } from './ImagePreview'
+import { TooltipNew } from './TooltipNew'
 
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
@@ -49,8 +44,6 @@ const FileInput = (props) => {
 
   const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="btn-s ellipsis" />
 
-  const [previewPopperOpen, setPreviewPopperOpen] = useState(false)
-
   return (
     <div className="survey-form__node-def-file">
       <UploadButton
@@ -66,16 +59,9 @@ const FileInput = (props) => {
           {
             // when file is an image, show the image preview in a tooltip
             isImage && (
-              <>
+              <TooltipNew leaveDelay={500} popperRenderer={() => <ImagePreview path={fileUrl} file={fileUploaded} />}>
                 {downloadButton}
-
-                <NodeDefFileImagePreviewPopper
-                  open={previewPopperOpen}
-                  nodeDef={nodeDef}
-                  file={fileUploaded}
-                  fileUrl={fileUrl}
-                />
-              </>
+              </TooltipNew>
             )
           }
           {!isImage && downloadButton}
