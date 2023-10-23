@@ -13,6 +13,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
+import { Objects } from '@openforis/arena-core'
 
 export {
   addNodeDefsCycles,
@@ -251,9 +252,13 @@ export const updateNodeDefProps = async (
           await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
         _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
       } else {
-        // node def name changed => update node def area based estimate generated name
-        const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
-        if (nameUpdated) {
+        // node def name or label changed => update node def area based estimate generated name or label
+        const nameOrLabelChanged =
+          (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
+          (NodeDef.propKeys.labels in props &&
+            !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef)))
+
+        if (nameOrLabelChanged) {
           const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
             { survey, nodeDef },
             t
