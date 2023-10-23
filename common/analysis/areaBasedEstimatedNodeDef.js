@@ -6,6 +6,12 @@ import { SamplingNodeDefs } from './samplingNodeDefs'
 
 const getName = ({ estimatedOfNodeDef }) => `${NodeDef.getName(estimatedOfNodeDef)}_ha`
 
+const getLabels = ({ estimatedOfNodeDef }) =>
+  Object.entries(NodeDef.getLabels(estimatedOfNodeDef)).reduce((acc, [lang, label]) => {
+    acc[lang] = `${label} (ha)`
+    return acc
+  }, {})
+
 const getScript = ({ survey, chain, estimatedOfNodeDef }) => {
   const nodeDefName = getName({ estimatedOfNodeDef })
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
@@ -24,6 +30,7 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
 
   const props = {
     [NodeDef.propKeys.name]: getName({ estimatedOfNodeDef }),
+    [NodeDef.propKeys.labels]: getLabels({ estimatedOfNodeDef }),
   }
 
   const advancedProps = {
@@ -48,6 +55,7 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
 
 const updateNodeDef = ({ survey, chain, nodeDefAreaBasedEstimate, areaBasedEstimatedOfNodeDef }) => {
   const name = getName({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
+  const labels = getLabels({ estimatedOfNodeDef: areaBasedEstimatedOfNodeDef })
   const script = getScript({
     survey,
     chain,
@@ -56,6 +64,7 @@ const updateNodeDef = ({ survey, chain, nodeDefAreaBasedEstimate, areaBasedEstim
 
   return A.pipe(
     NodeDef.assocProp({ key: NodeDef.propKeys.name, value: name }),
+    NodeDef.assocProp({ key: NodeDef.propKeys.labels, value: labels }),
     NodeDef.assocProp({ key: NodeDef.keysPropsAdvanced.script, value: script })
   )(nodeDefAreaBasedEstimate)
 }
