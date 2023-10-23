@@ -64,7 +64,7 @@ const valueComparatorByNodeDefType = {
       value: valueSearch,
       strict,
     })
-    return itemUuidSearch === itemUuid
+    return itemUuidSearch && itemUuid && itemUuidSearch === itemUuid
   },
   [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
   [NodeDef.nodeDefType.date]: dateTimeComparator({
