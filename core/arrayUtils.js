@@ -27,10 +27,22 @@ const fromNumberOfElements = (numOfElements) => Array.from(Array(numOfElements).
 
 const last = (array) => array[array.length - 1]
 
+const sortByProps = (props) => (array) =>
+  array.sort((item1, item2) => {
+    for (const prop of props) {
+      const value1 = item1[prop]
+      const value2 = item2[prop]
+      if (value1 < value2) return -1
+      if (value1 > value2) return 1
+    }
+    return 0
+  })
+
 export const ArrayUtils = {
   addOrRemoveItem,
   addIfNotEmpty,
   removeItemAtIndex,
   fromNumberOfElements,
   last,
+  sortByProps,
 }

@@ -7,8 +7,9 @@
     gap: 2rem;
     padding-bottom: 2rem;
 
-    .form-item {
-      grid-template-columns: 0.2fr 0.75fr;
+    .form-item,
+    .labels-editor.with-label {
+      grid-template-columns: 0.3fr 0.65fr;
     }
 
     .dropdown,
