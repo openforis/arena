@@ -1,5 +1,6 @@
 export const WebSocketEvents = {
   // Websocket events
+  connect: 'connect', // successful connection
   connection: 'connection',
   disconnect: 'disconnect',
   connectError: 'connect_error',

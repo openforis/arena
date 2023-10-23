@@ -34,8 +34,7 @@ export const openSocket = async (throwErrorFn) => {
 
   socket = io(window.location.origin)
 
-  on(WebSocketEvents.connectError, (error) => throwError(error.stack))
-  on(WebSocketEvents.error, throwError)
+  on(WebSocketEvents.connect, _addSocketIdToEveryRequest)
 
-  _addSocketIdToEveryRequest()
+  on(WebSocketEvents.error, throwError)
 }
