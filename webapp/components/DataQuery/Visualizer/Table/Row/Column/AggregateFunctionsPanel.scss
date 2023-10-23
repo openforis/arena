@@ -1,0 +1,11 @@
+.aggregate-functions-panel {
+  display: flex;
+  flex-direction: column;
+
+  .panel-right__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 1rem;
+  }
+}

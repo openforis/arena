@@ -11,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ChainManager from '../manager'
 import { Objects } from '@openforis/arena-core'
+import { ArrayUtils } from '@core/arrayUtils'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -96,16 +97,20 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
     return codeAttributeAncestorNames
   }
 
+  const categoryAttributeAncestors = codeAttributes2ndLevel.map((nodeDef) => ({
+    attribute: NodeDef.getName(nodeDef),
+    categoryName: getCategoryNameByUuid({
+      survey,
+      categoryUuid: NodeDef.getCategoryUuid(nodeDef),
+    }),
+    categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
+    ancestors: getCodeAttributeAncestorNames(nodeDef),
+  }))
+
+  ArrayUtils.sortByProps(['categoryName', 'categoryLevel'])(categoryAttributeAncestors)
+
   return {
-    categoryAttributeAncestors: codeAttributes2ndLevel.map((nodeDef) => ({
-      attribute: NodeDef.getName(nodeDef),
-      categoryName: getCategoryNameByUuid({
-        survey,
-        categoryUuid: NodeDef.getCategoryUuid(nodeDef),
-      }),
-      categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
-      ancestors: getCodeAttributeAncestorNames(nodeDef),
-    })),
+    categoryAttributeAncestors,
   }
 }
 
