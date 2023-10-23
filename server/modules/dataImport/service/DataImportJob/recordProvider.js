@@ -55,7 +55,7 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
       const value = rootKeyValuesFormatted[index]
       return `${name}=${value}`
     })
-    .join(',')
+    .join(', ')
 
   if (insertNewRecords) {
     // check if record with the same key values already exists

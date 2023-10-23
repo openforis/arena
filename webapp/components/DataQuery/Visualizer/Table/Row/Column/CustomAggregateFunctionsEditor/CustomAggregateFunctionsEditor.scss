@@ -1,28 +1,29 @@
 .custom-aggregate-functions {
-  height: 500px;
-}
-.custom-aggregate-functions .table__row-header,
-.custom-aggregate-functions .table__row {
-  display: grid;
-  grid-template-columns: 30px 1fr 50px;
-  height: fit-content;
+  flex: 1;
 
-  .form {
-    column-span: all;
-    display: flex;
-    flex-direction: column;
-    row-gap: 1rem;
-    width: 600px;
-    height: 260px;
-    max-width: none;
-    margin: auto;
+  .table__row-header,
+  .table__row {
+    display: grid;
+    grid-template-columns: 30px 1fr 50px;
+    height: fit-content;
 
-    .form-item {
-      height: auto;
-    }
+    .form {
+      column-span: all;
+      display: flex;
+      flex-direction: column;
+      row-gap: 1rem;
+      width: 600px;
+      height: 260px;
+      max-width: none;
+      margin: auto;
 
-    .button-bar {
-      position: inherit;
+      .form-item {
+        height: auto;
+      }
+
+      .button-bar {
+        position: inherit;
+      }
     }
   }
 }

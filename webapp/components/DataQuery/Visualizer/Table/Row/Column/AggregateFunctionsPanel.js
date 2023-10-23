@@ -1,3 +1,5 @@
+import './AggregateFunctionsPanel.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -32,22 +34,26 @@ export const AggregateFunctionsPanel = (props) => {
 
   return (
     <PanelRight
-      width="700px"
+      className="aggregate-functions-panel"
       header={`${nodeDefLabel} ${i18n.t('common.aggregateFunction', { count: 2 })}`}
       onClose={onClose}
+      showFooter
+      width="700px"
     >
-      {Object.keys(Query.DEFAULT_AGGREGATE_FUNCTIONS).map((aggregateFn) => (
-        <button
-          key={aggregateFn}
-          type="button"
-          className={classNames('btn btn-aggregate-fn deselectable', {
-            active: aggregateFunctions.indexOf(aggregateFn) >= 0,
-          })}
-          onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}
-        >
-          {i18n.t(`common.${aggregateFn}`)}
-        </button>
-      ))}
+      <div>
+        {Object.keys(Query.DEFAULT_AGGREGATE_FUNCTIONS).map((aggregateFn) => (
+          <button
+            key={aggregateFn}
+            type="button"
+            className={classNames('btn btn-aggregate-fn deselectable', {
+              active: aggregateFunctions.indexOf(aggregateFn) >= 0,
+            })}
+            onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}
+          >
+            {i18n.t(`common.${aggregateFn}`)}
+          </button>
+        ))}
+      </div>
       <CustomAggregateFunctionsEditor
         entityDef={entityDef}
         nodeDef={nodeDef}
