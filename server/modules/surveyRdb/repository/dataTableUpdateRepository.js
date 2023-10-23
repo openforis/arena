@@ -129,7 +129,7 @@ const _insert = (update, client) =>
   )
 
 const _delete = (update, client) =>
-  client.one(
+  client.oneOrNone(
     `DELETE FROM ${update.schemaName}.${update.tableName} 
     WHERE uuid = $1
     RETURNING uuid`,
