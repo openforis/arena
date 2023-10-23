@@ -131,6 +131,17 @@
     }
   }
 
+  .literal {
+    width: 100%;
+    max-width: 40rem;
+
+    .form-input {
+      margin-left: 0.5rem;
+      padding: 0.3rem;
+      text-align: left;
+    }
+  }
+
   .logical {
     display: grid;
     grid-row-gap: 0.8rem;
