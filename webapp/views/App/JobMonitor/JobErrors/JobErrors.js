@@ -57,11 +57,6 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
         ]}
         density="compact"
         exportFileName={exportFileName}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: 'errorKey', sort: 'asc' }],
-          },
-        }}
         rows={Object.entries(errors).map(([errorKey, error]) => ({
           errorKey,
           error,
