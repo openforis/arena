@@ -12,6 +12,7 @@ import { ButtonDownload } from '@webapp/components/buttons'
 import NodeDeleteButton from '../nodeDeleteButton'
 import { ImagePreview } from './ImagePreview'
 import { TooltipNew } from './TooltipNew'
+import { Tooltip } from '@mui/material'
 
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
@@ -42,7 +43,7 @@ const FileInput = (props) => {
 
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
 
-  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="btn-s ellipsis" />
+  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} className="btn-s ellipsis" />
 
   return (
     <div className="survey-form__node-def-file">
@@ -58,11 +59,7 @@ const FileInput = (props) => {
         <>
           {
             // when file is an image, show the image preview in a tooltip
-            isImage && (
-              <TooltipNew leaveDelay={500} popperRenderer={() => <ImagePreview path={fileUrl} file={fileUploaded} />}>
-                {downloadButton}
-              </TooltipNew>
-            )
+            isImage && <Tooltip title={<ImagePreview path={fileUrl} file={fileUploaded} />}>{downloadButton}</Tooltip>
           }
           {!isImage && downloadButton}
 
