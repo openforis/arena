@@ -1,1 +1,0 @@
-export { TooltipNew } from './TooltipNew'

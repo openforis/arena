@@ -1,6 +1,7 @@
 import './nodeDefFile.scss'
 
 import React, { useState } from 'react'
+import { Tooltip } from '@mui/material'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,8 +12,6 @@ import { ButtonDownload } from '@webapp/components/buttons'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 import { ImagePreview } from './ImagePreview'
-import { TooltipNew } from './TooltipNew'
-import { Tooltip } from '@mui/material'
 
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
@@ -40,10 +39,13 @@ const FileInput = (props) => {
       updateNode(nodeDef, node, null)
     }
   }
-
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
 
   const downloadButton = <ButtonDownload href={fileUrl} label={fileName} className="btn-s ellipsis" />
+
+  // render ImagePreview only when tooltip is shown
+  const [tooltipShown, setTooltipShown] = useState(false)
+  const tooltipTitle = tooltipShown ? <ImagePreview path={fileUrl} file={fileUploaded} /> : null
 
   return (
     <div className="survey-form__node-def-file">
@@ -59,7 +61,13 @@ const FileInput = (props) => {
         <>
           {
             // when file is an image, show the image preview in a tooltip
-            isImage && <Tooltip title={<ImagePreview path={fileUrl} file={fileUploaded} />}>{downloadButton}</Tooltip>
+            isImage && (
+              <>
+                <Tooltip arrow onOpen={() => setTooltipShown(true)} title={tooltipTitle}>
+                  {downloadButton}
+                </Tooltip>
+              </>
+            )
           }
           {!isImage && downloadButton}
 

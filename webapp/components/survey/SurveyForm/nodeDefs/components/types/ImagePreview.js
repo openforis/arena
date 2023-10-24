@@ -4,7 +4,7 @@ import { useI18n } from '@webapp/store/system'
 import { useOnUpdate } from '@webapp/components/hooks'
 import LoadingBar from '@webapp/components/LoadingBar'
 
-export const ImagePreview = ({ path, file = null }) => {
+export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
   const i18n = useI18n()
 
   const imgRef = useRef(null)
@@ -53,7 +53,10 @@ export const ImagePreview = ({ path, file = null }) => {
       {!error && (
         <img
           ref={imgRef}
-          onLoad={() => setLoading(false)}
+          onLoad={() => {
+            setLoading(false)
+            onLoadComplete?.()
+          }}
           src={imgSrc}
           style={{ display: loading ? 'none' : 'block' }}
           onError={onError}
