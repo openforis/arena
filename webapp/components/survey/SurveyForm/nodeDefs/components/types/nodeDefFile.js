@@ -63,7 +63,7 @@ const FileInput = (props) => {
             isImage && (
               <TooltipNew
                 className="image-preview-tooltip"
-                title={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
+                renderTitle={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
               >
                 {downloadButton}
               </TooltipNew>

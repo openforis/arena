@@ -1,17 +1,26 @@
 import './TooltipNew.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { Tooltip } from '@mui/material'
 
-export const TooltipNew = (props) => {
-  const { children, className, title: titleProp } = props
+import { useI18n } from '@webapp/store/system'
 
-  const titleRenderer = useMemo(
-    () => (titleProp && typeof titleProp === 'function' ? titleProp : () => titleProp),
-    [titleProp]
-  )
+import Markdown from '../markdown'
+
+export const TooltipNew = (props) => {
+  const { children, className, titleInMarkdown, title: titleProp, renderTitle } = props
+
+  const i18n = useI18n()
+
+  const defaultTitleRenderer = useCallback(() => {
+    const titleText = i18n.t(titleProp)
+    return titleInMarkdown ? <Markdown source={titleText} /> : titleText
+  }, [i18n, titleInMarkdown, titleProp])
+
+  const titleRenderer = renderTitle ? renderTitle : defaultTitleRenderer
+
   const [title, setTitle] = useState(null)
 
   const onOpen = useCallback(() => {
@@ -28,5 +37,7 @@ export const TooltipNew = (props) => {
 TooltipNew.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  title: PropTypes.oneOfType([PropTypes.string, PropTypes.func, PropTypes.node]),
+  renderTitle: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  titleInMarkdown: PropTypes.bool,
 }
