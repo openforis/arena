@@ -1477,6 +1477,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
       errorUpdatingValues: 'Error updating values',
+      multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
       recordKeyMissing: 'Missing value for key attribute "{{keyName}}"',
@@ -1525,6 +1526,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
+      entityKeyValueNotSpecified: 'Entity key value for entity "{{entityName}}" not specified',
+      missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
@@ -1736,7 +1739,6 @@ Try to refresh the page.`,
     },
     entity: {
       keyDuplicate: 'Duplicate entity key',
-      keyValueNotSpecified: 'Key value for attribute {{keyDefName}} not specified',
     },
     nodes: {
       count: {
