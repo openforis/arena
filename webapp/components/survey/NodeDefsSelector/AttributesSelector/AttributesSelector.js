@@ -21,6 +21,7 @@ const AttributesSelector = (props) => {
     lang,
     ancestorSelector,
     nodeDefLabelType,
+    nodeDefUuidsToExclude,
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
@@ -61,6 +62,7 @@ const AttributesSelector = (props) => {
   }
 
   const isNodeDefVisible = (nodeDef) =>
+    !nodeDefUuidsToExclude.includes(NodeDef.getUuid(nodeDef)) &&
     ((NodeDef.isAttribute(nodeDef) && (showMultipleAttributes || NodeDef.isSingle(nodeDef))) ||
       NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
     NodeDef.getCycles(nodeDef).includes(cycle) &&
@@ -95,6 +97,7 @@ const AttributesSelector = (props) => {
           ancestorSelector
           nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          nodeDefUuidsToExclude={[NodeDef.getUuid(nodeDefContext)]}
           onToggleAttribute={onToggleAttribute}
           filterFunction={filterFunction}
           filterTypes={filterTypes}
@@ -121,6 +124,7 @@ AttributesSelector.propTypes = {
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
+  nodeDefUuidsToExclude: PropTypes.array,
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
   showLabel: PropTypes.bool,
@@ -139,6 +143,7 @@ AttributesSelector.defaultProps = {
   filterChainUuids: [],
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
+  nodeDefUuidsToExclude: [],
   showAnalysisAttributes: false,
   showAncestors: true,
   showAncestorsLabel: true,

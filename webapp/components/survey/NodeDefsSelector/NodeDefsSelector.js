@@ -106,7 +106,7 @@ const NodeDefsSelector = (props) => {
           showAnalysisAttributes={showAnalysisAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
-          showSiblingsInSingleEntities={true}
+          showSiblingsInSingleEntities
           nodeDefLabelType={nodeDefLabelType}
         />
       )}
