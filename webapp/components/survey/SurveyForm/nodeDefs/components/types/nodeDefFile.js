@@ -42,7 +42,9 @@ const FileInput = (props) => {
   }
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
 
-  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} className="btn-s ellipsis" />
+  const downloadButton = (
+    <ButtonDownload href={fileUrl} label={fileName} title={isImage ? undefined : fileName} className="btn-s ellipsis" />
+  )
 
   return (
     <div className="survey-form__node-def-file">
@@ -59,14 +61,12 @@ const FileInput = (props) => {
           {
             // when file is an image, show the image preview in a tooltip
             isImage && (
-              <>
-                <TooltipNew
-                  className="image-preview-tooltip"
-                  title={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
-                >
-                  {downloadButton}
-                </TooltipNew>
-              </>
+              <TooltipNew
+                className="image-preview-tooltip"
+                title={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
+              >
+                {downloadButton}
+              </TooltipNew>
             )
           }
           {!isImage && downloadButton}
