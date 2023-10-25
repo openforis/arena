@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { DateFormats, Dates, Objects } from '@openforis/arena-core'
+import { CategoryItems, DateFormats, Dates, Objects } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
@@ -13,16 +13,11 @@ const singlePropValueEqualComparator = ({ value, valueSearch }) =>
 const getValueCode = (value) => (StringUtils.isString(value) ? value : value[Node.valuePropsCode.code])
 const getValueItemUuid = (value) => value[Node.valuePropsCode.itemUuid]
 
-const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode, value, strict }) => {
+const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode, value }) => {
   const itemUuid = getValueItemUuid(value)
   if (itemUuid) {
     return itemUuid
   }
-  if (strict) {
-    // strict comparison: if itemUuid is not defined, do not convert value "code" into itemUuid
-    return null
-  }
-
   // find itemUuid by code
   const code = getValueCode(value)
   if (!Objects.isEmpty(code)) {
@@ -35,6 +30,15 @@ const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode,
     return itemUuidFound
   }
   return null
+}
+
+const extractCategoryItemCodeFromValue = ({ survey, value }) => {
+  const itemUuid = getValueItemUuid(value)
+  if (itemUuid) {
+    const item = Survey.getCategoryItemByUuid(itemUuid)(survey)
+    return CategoryItems.getCode(item)
+  }
+  return getValueCode(value)
 }
 
 const dateTimeComparator =
@@ -55,14 +59,19 @@ const dateTimeComparator =
 const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, record, parentNode, value, valueSearch, strict }) => {
-    const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value, strict })
+    if (!strict || !record) {
+      // compare just codes (record not available, tricky to find the "correct" category item without knowing its parent item)
+      const code = extractCategoryItemCodeFromValue({ survey, value })
+      const codeSearch = extractCategoryItemCodeFromValue({ survey, value: valueSearch })
+      return code && codeSearch && code === codeSearch
+    }
+    const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value })
     const itemUuidSearch = extractCategoryItemUuidFromValue({
       survey,
       nodeDef,
       record,
       parentNode,
       value: valueSearch,
-      strict,
     })
     return itemUuidSearch && itemUuid && itemUuidSearch === itemUuid
   },

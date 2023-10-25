@@ -127,7 +127,7 @@ const _addEntityAndKeyValues =
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
 
       if (Objects.isEmpty(keyValue)) {
-        throw new SystemError('record.entity.keyValueNotSpecified', {
+        throw new SystemError('validationErrors.record.entityKeyValueNotSpecified', {
           keyDefName: NodeDef.getName(keyDef),
         })
       }
@@ -193,7 +193,7 @@ const _getOrCreateEntityByKeys =
         })(record)
 
     if (!entityParent) {
-      throw new SystemError('record.cannotFindAncestorForEntity', {
+      throw new SystemError('validationErrors.record.missingAncestorForEntity', {
         entityName: NodeDef.getName(entityDef),
         ancestorName: NodeDef.getName(entityParentDef),
       })
