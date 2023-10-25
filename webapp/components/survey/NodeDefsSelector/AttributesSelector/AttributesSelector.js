@@ -1,16 +1,17 @@
 import './AttributesSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
+
 import AttributeSelector from './AttributeSelector'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import classNames from 'classnames'
 
 const AttributesSelector = (props) => {
   const {
