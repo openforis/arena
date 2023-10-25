@@ -19,7 +19,7 @@ export const TooltipNew = (props) => {
     return titleInMarkdown ? <Markdown source={titleText} /> : titleText
   }, [i18n, titleInMarkdown, titleProp])
 
-  const titleRenderer = renderTitle ? renderTitle : defaultTitleRenderer
+  const titleRenderer = renderTitle ?? defaultTitleRenderer
 
   const [title, setTitle] = useState(null)
 
