@@ -1,7 +1,7 @@
 import './nodeDefFile.scss'
 
 import React, { useState } from 'react'
-import { Tooltip } from '@mui/material'
+import PropTypes from 'prop-types'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,6 +9,7 @@ import * as Node from '@core/record/node'
 
 import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonDownload } from '@webapp/components/buttons'
+import { TooltipNew } from '@webapp/components/TooltipNew'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 import { ImagePreview } from './ImagePreview'
@@ -43,10 +44,6 @@ const FileInput = (props) => {
 
   const downloadButton = <ButtonDownload href={fileUrl} label={fileName} className="btn-s ellipsis" />
 
-  // render ImagePreview only when tooltip is shown
-  const [tooltipShown, setTooltipShown] = useState(false)
-  const tooltipTitle = tooltipShown ? <ImagePreview path={fileUrl} file={fileUploaded} /> : null
-
   return (
     <div className="survey-form__node-def-file">
       <UploadButton
@@ -63,9 +60,12 @@ const FileInput = (props) => {
             // when file is an image, show the image preview in a tooltip
             isImage && (
               <>
-                <Tooltip arrow onOpen={() => setTooltipShown(true)} title={tooltipTitle}>
+                <TooltipNew
+                  className="image-preview-tooltip"
+                  title={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
+                >
                   {downloadButton}
-                </Tooltip>
+                </TooltipNew>
               </>
             )
           }
@@ -76,6 +76,17 @@ const FileInput = (props) => {
       )}
     </div>
   )
+}
+
+FileInput.propTypes = {
+  surveyInfo: PropTypes.object.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  node: PropTypes.object.isRequired,
+  readOnly: PropTypes.bool,
+  edit: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  updateNode: PropTypes.func.isRequired,
+  removeNode: PropTypes.func.isRequired,
 }
 
 const MultipleFileInput = (props) => {
@@ -90,6 +101,14 @@ const MultipleFileInput = (props) => {
   )
 }
 
+MultipleFileInput.propTypes = {
+  nodes: PropTypes.array.isRequired,
+}
+
 const NodeDefFile = (props) => (props.edit ? <FileInput {...props} /> : <MultipleFileInput {...props} />)
+
+NodeDefFile.propTypes = {
+  edit: PropTypes.bool,
+}
 
 export default NodeDefFile
