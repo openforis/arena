@@ -10,18 +10,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 const AttributeSelector = (props) => {
   const { canSelectAttributes, nodeDef, nodeDefUuidsAttributes, onToggleAttribute, showNodeDefPath, nodeDefLabelType } =
     props
 
-  const i18n = useI18n()
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefType = NodeDef.getType(nodeDef)
   const active = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
 
   return (
@@ -42,10 +39,7 @@ const AttributeSelector = (props) => {
         <NodeDefIconKey nodeDef={nodeDef} />
         {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
       </span>
-      <div className="node-def__icon-wrapper">
-        {NodeDef.isMultiple(nodeDef) && <span title={i18n.t('nodeDefEdit.basicProps.multiple')}>M</span>}
-        {NodeDefUIProps.getIconByType(nodeDefType)}
-      </div>
+      {NodeDefUIProps.getIconByNodeDef(nodeDef)}
     </button>
   )
 }

@@ -32,10 +32,7 @@ const DimensionGroup = ({ dimensionGroup }) => {
           {dimensionGroup.options?.map((dimension) => (
             <div key={dimension.name} className="charts_data-selector_dimension">
               {dimension.label}
-              <div className="icon-wrapper">
-                {dimension.sourceMultiple && <span>M</span>}
-                {dimension.icon}
-              </div>
+              {dimension.icon}
             </div>
           ))}
         </div>

@@ -28,7 +28,7 @@ const baseDimension = ({ nodeDef, language, nodeDefLabelType }) => ({
   name: NodeDef.getName(nodeDef),
   value: NodeDef.getName(nodeDef),
   label: NodeDef.getLabel(nodeDef, language, nodeDefLabelType),
-  icon: NodeDefUIProps.getIconByType(NodeDef.getType(nodeDef)),
+  icon: NodeDefUIProps.getIconByNodeDef(nodeDef),
   type: vegaTypes.nominal,
   sourceMultiple: NodeDef.isMultiple(nodeDef),
 })
