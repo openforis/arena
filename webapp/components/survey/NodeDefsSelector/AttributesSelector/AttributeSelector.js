@@ -19,7 +19,6 @@ const AttributeSelector = (props) => {
   const lang = useSurveyPreferredLang()
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefType = NodeDef.getType(nodeDef)
   const active = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
 
   return (
@@ -40,7 +39,7 @@ const AttributeSelector = (props) => {
         <NodeDefIconKey nodeDef={nodeDef} />
         {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
       </span>
-      {NodeDefUIProps.getIconByType(nodeDefType)}
+      {NodeDefUIProps.getIconByNodeDef(nodeDef)}
     </button>
   )
 }

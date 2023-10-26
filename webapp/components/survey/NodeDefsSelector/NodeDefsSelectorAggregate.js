@@ -98,9 +98,10 @@ const NodeDefsSelectorAggregate = (props) => {
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
+              showAnalysisAttributes={showAnalysisAttributes}
               showAncestorsLabel={false}
               showMultipleAttributes={false}
-              showAnalysisAttributes={showAnalysisAttributes}
+              showSiblingsInSingleEntities
             />
           </ExpansionPanel>
 

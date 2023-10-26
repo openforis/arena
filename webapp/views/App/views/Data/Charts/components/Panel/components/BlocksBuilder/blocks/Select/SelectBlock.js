@@ -3,17 +3,13 @@ import React, { useCallback, useMemo } from 'react'
 import { uuidv4 } from '@core/uuid'
 
 import { Dropdown } from '@webapp/components/form'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { NodeDefType } from '@openforis/arena-core'
 
 const icons = {
-  quantitative: <span className="icon-left node_def__icon">1.23</span>,
-  nominal: (
-    <span className="icon-left display-flex">
-      {[0, 1, 2].map((i) => (
-        <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
-      ))}
-    </span>
-  ),
-  temporal: <span className="icon icon-clock icon-left" />,
+  quantitative: NodeDefUIProps.getIconByType(NodeDefType.decimal),
+  nominal: NodeDefUIProps.getIconByType(NodeDefType.text),
+  temporal: NodeDefUIProps.getIconByType(NodeDefType.time),
 }
 
 const useOptionsAndDefaultValues = ({ block, dimensions }) => {
