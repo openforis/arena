@@ -10,7 +10,7 @@ export const enTranslation = {
     appNameFull: '$t(common.openForis) Arena',
     apply: 'Apply',
     aggregateFunction: 'Aggregate function',
-    aggregateFunction_plural: 'Aggregate functions',
+    aggregateFunction_other: 'Aggregate functions',
     avg: 'Average',
     ascending: 'Ascending',
     areaBased: 'area-based',
@@ -941,7 +941,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     formLabel: 'Processing chain label',
     basic: 'Basic',
     records: 'Records',
-    recordsInStepCount: '{{recordsCount}} in {{step}} step',
+    recordsInStepCount: '{{step}}: {{recordsCount}}',
     submitOnlyAnalysisStepDataIntoR: 'Submit only analysis step data to RStudio',
     includeEntitiesWithoutData: 'Include entities without data',
     cannotStartRStudio: {
@@ -1477,6 +1477,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
       errorUpdatingValues: 'Error updating values',
+      multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
       recordKeyMissing: 'Missing value for key attribute "{{keyName}}"',
@@ -1525,6 +1526,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
+      entityKeyValueNotSpecified: 'Entity key value for entity "{{entityName}}" not specified',
+      missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',
@@ -1736,7 +1739,6 @@ Try to refresh the page.`,
     },
     entity: {
       keyDuplicate: 'Duplicate entity key',
-      keyValueNotSpecified: 'Key value for attribute {{keyDefName}} not specified',
     },
     nodes: {
       count: {

@@ -10,33 +10,32 @@ import { JobActions } from '@webapp/store/app'
 
 import { useUser } from '@webapp/store/user'
 
-export const useWebSocket = () => {
+export const useOpenWebSocket = () => {
   const dispatch = useDispatch()
   const user = useUser()
+  const userUuid = User.getUuid(user)
 
   const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [])
 
-  const openSocket = () => {
-    ;(async () => {
-      await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
-      AppWebSocket.on(WebSocketEvents.jobUpdate, onJobUpdate)
-    })()
-  }
+  const openSocket = useCallback(async () => {
+    await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
+    AppWebSocket.on(WebSocketEvents.jobUpdate, onJobUpdate)
+  }, [onJobUpdate])
 
-  const closeSocket = () => {
+  const closeSocket = useCallback(() => {
     AppWebSocket.closeSocket()
     AppWebSocket.off(WebSocketEvents.jobUpdate, onJobUpdate)
-  }
+  }, [onJobUpdate])
 
   useEffect(() => {
-    return closeSocket
-  }, [])
+    return () => closeSocket()
+  }, [closeSocket])
 
   useEffect(() => {
-    if (user) {
+    if (userUuid) {
       openSocket()
     } else {
       closeSocket()
     }
-  }, [User.getUuid(user)])
+  }, [closeSocket, openSocket, userUuid])
 }

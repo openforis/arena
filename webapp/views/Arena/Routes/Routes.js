@@ -10,14 +10,14 @@ import Guest from '@webapp/views/Guest'
 import { NoHeaderView } from '@webapp/views/NoHeader'
 const AppView = React.lazy(() => import('../../App'))
 
-import { useWebSocket } from './useWebSocket'
+import { useOpenWebSocket } from './useOpenWebSocket'
 import Loader from './Loader'
 import DialogConfirm from './DialogConfirm'
 import Notification from './Notification'
 
 const Routes = () => {
   const user = useUser()
-  useWebSocket()
+  useOpenWebSocket()
 
   return (
     <>

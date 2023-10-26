@@ -234,11 +234,11 @@ class RecordsUpdateThread extends Thread {
   }
 
   async processSurveyClearMsg(msg) {
-    const { surveyId, cycle, draft } = msg
+    const { surveyId, cycle } = msg
 
     let keysToDelete = []
 
-    if (!Objects.isNil(cycle) && !Objects.isNil(draft)) {
+    if (!Objects.isNil(cycle)) {
       const key = this.getSurveyDataKey(msg)
       keysToDelete.push(key)
     } else {
