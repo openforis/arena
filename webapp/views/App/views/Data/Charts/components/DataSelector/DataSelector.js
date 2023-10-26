@@ -20,10 +20,7 @@ const DimensionGroup = ({ dimensionGroup }) => {
       <p>
         <button
           type="button"
-          className={classNames('btn-xs btn-toggle', {
-            '': !visible,
-            rotate: visible,
-          })}
+          className={classNames('btn-xs btn-toggle', { rotate: visible })}
           onClick={() => setVisible(!visible)}
         >
           <span className={classNames('icon icon-12px icon-play3')} />
