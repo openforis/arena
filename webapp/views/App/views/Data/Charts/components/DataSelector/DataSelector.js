@@ -20,10 +20,7 @@ const DimensionGroup = ({ dimensionGroup }) => {
       <p>
         <button
           type="button"
-          className={classNames('btn-xs btn-toggle', {
-            '': !visible,
-            rotate: visible,
-          })}
+          className={classNames('btn-xs btn-toggle', { rotate: visible })}
           onClick={() => setVisible(!visible)}
         >
           <span className={classNames('icon icon-12px icon-play3')} />
@@ -35,7 +32,10 @@ const DimensionGroup = ({ dimensionGroup }) => {
           {dimensionGroup.options?.map((dimension) => (
             <div key={dimension.name} className="charts_data-selector_dimension">
               {dimension.label}
-              {dimension.icon}
+              <div className="icon-wrapper">
+                {dimension.sourceMultiple && <span>M</span>}
+                {dimension.icon}
+              </div>
             </div>
           ))}
         </div>

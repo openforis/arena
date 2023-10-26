@@ -30,6 +30,7 @@ const baseDimension = ({ nodeDef, language, nodeDefLabelType }) => ({
   label: NodeDef.getLabel(nodeDef, language, nodeDefLabelType),
   icon: NodeDefUIProps.getIconByType(NodeDef.getType(nodeDef)),
   type: vegaTypes.nominal,
+  sourceMultiple: NodeDef.isMultiple(nodeDef),
 })
 
 const baseParser = ({ nodeDef, language, nodeDefLabelType }) => {
