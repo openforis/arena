@@ -1,15 +1,15 @@
 .container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: column;
-  }
+}
   
-  .center-text {
+.center-text {
     text-align: center;
-  }
+}
 
-  .chart-scroll {
+.chart-scroll {
     height: 300px;
     overflow-y: scroll;
-  }
+}

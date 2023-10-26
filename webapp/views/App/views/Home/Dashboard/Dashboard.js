@@ -20,13 +20,10 @@ import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
-
   const canEditSurvey = useAuthCanEditSurvey()
   const surveyInfo = useSurveyInfo()
   const [activeTab, setActiveTab] = useState('Dashboard')
-
   const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
-
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
 
@@ -50,7 +47,7 @@ const Dashboard = () => {
             )}
             {canEditSurvey && !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
             {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
-              <div className="chart-container">
+              <div className="chart-container-dashboard">
                 <StorageSummary />
                 <RecordsByUser className="records-by-user" />
                 {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
