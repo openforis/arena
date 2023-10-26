@@ -132,6 +132,13 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
+export const getIconByNodeDef = (nodeDef) => (
+  <div className="node-def__icon-wrapper">
+    {NodeDef.isMultiple(nodeDef) && <span title="Multiple">M</span>}
+    {getIconByType(NodeDef.getType(nodeDef))}
+  </div>
+)
+
 export const getNumberFormat = (nodeDef) =>
   NodeDef.isDecimal(nodeDef)
     ? NumberFormats.decimal({ decimalScale: NodeDef.getMaxNumberDecimalDigits(nodeDef) })
