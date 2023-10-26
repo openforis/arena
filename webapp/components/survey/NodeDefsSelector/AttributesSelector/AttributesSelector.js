@@ -1,16 +1,17 @@
 import './AttributesSelector.scss'
 import React from 'react'
 import * as PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
+
 import AttributeSelector from './AttributeSelector'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import classNames from 'classnames'
 
 const AttributesSelector = (props) => {
   const {
@@ -21,6 +22,7 @@ const AttributesSelector = (props) => {
     lang,
     ancestorSelector,
     nodeDefLabelType,
+    nodeDefUuidsToExclude,
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
     onToggleAttribute,
@@ -61,6 +63,7 @@ const AttributesSelector = (props) => {
   }
 
   const isNodeDefVisible = (nodeDef) =>
+    !nodeDefUuidsToExclude.includes(NodeDef.getUuid(nodeDef)) &&
     ((NodeDef.isAttribute(nodeDef) && (showMultipleAttributes || NodeDef.isSingle(nodeDef))) ||
       NodeDef.isEqual(nodeDef)(nodeDefContext)) &&
     NodeDef.getCycles(nodeDef).includes(cycle) &&
@@ -95,6 +98,7 @@ const AttributesSelector = (props) => {
           ancestorSelector
           nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          nodeDefUuidsToExclude={[NodeDef.getUuid(nodeDefContext)]}
           onToggleAttribute={onToggleAttribute}
           filterFunction={filterFunction}
           filterTypes={filterTypes}
@@ -121,6 +125,7 @@ AttributesSelector.propTypes = {
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
+  nodeDefUuidsToExclude: PropTypes.array,
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
   showLabel: PropTypes.bool,
@@ -139,6 +144,7 @@ AttributesSelector.defaultProps = {
   filterChainUuids: [],
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
+  nodeDefUuidsToExclude: [],
   showAnalysisAttributes: false,
   showAncestors: true,
   showAncestorsLabel: true,

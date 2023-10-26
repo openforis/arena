@@ -28,13 +28,16 @@
 .charts_data-selector_dimension {
   justify-content: space-between;
   display: flex;
-  flex-direction: row;
   align-items: center;
   margin: 2px 0px;
-  .icon-left {
-    font-size: 12px !important;
-  }
-  .icon {
-    font-size: 12px !important;
+
+  .icon-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .icon {
+      font-size: 12px !important;
+    }
   }
 }
