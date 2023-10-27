@@ -230,11 +230,11 @@ const DailyRecordsByUser = () => {
       .attr('transform', 'translate(' + width / 2 + ' ,' + (height + margin.bottom) + ')')
       .style('text-anchor', 'middle')
       .text('Date')
-  }, [userDateCounts])
+  }, [filteredUserDateCounts])
 
   return (
-    <div ref={ref} style={{ display: 'flex', justifyContent: 'left', alignItems: 'left', flexDirection: 'column' }}>
-      <h4 style={{ textAlign: 'center' }}>Daily records added by user</h4>
+    <div ref={ref} className="container">
+      <h4 className="center-text">Daily records added by user</h4>
     </div>
   )
 }
