@@ -1,18 +1,16 @@
 @import 'webapp/style/vars';
 
 .home-dashboard {
-  display: grid;
-  grid-auto-rows: minmax(auto, min-content);
-  // grid-template-rows: auto auto auto;  
-  grid-column-gap: 10px;
-  padding-left: 20px;
+
 }
 
-.chart-container {
+.chart-container-dashboard {
   display: flex;
+  flex: 1;
+  flex-direction: row;
   justify-content: space-between;
   gap: 3em;
-  width: 90%;
+  width: 100%;
   margin-top: 20px;
 }
 

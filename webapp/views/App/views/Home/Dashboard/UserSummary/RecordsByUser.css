@@ -1,0 +1,15 @@
+.container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+}
+  
+.center-text {
+    text-align: center;
+}
+
+.chart-scroll {
+    height: 300px;
+    overflow-y: scroll;
+}
