@@ -20,7 +20,7 @@ const bar = {
         type: 'container',
         blocks: {
           groupBy: GroupByBlock({
-            subtitle: 'Select the metric to group the data by (i.e. X axis)',
+            subtitle: 'Select the metric to group the data ( X axis )',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = valuesToCalculations(value)
               const groupBy = {
@@ -40,7 +40,7 @@ const bar = {
             },
           }),
           metric: MetricBlock({
-            subtitle: 'Select the metric to measure the data by (i.e. Y axis)',
+            subtitle: 'Select the metric to measure the data ( Y axis )',
             valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
