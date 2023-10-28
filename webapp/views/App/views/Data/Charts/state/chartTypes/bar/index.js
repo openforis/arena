@@ -16,13 +16,13 @@ const bar = {
     blocks: {
       query: {
         title: 'Query',
-        subtitle: 'Config of the query for the bar chart',
+        subtitle: '',
         type: 'container',
         blocks: {
           groupBy: GroupByBlock({
+            subtitle: 'Select the metric to group the data by (i.e. X axis)',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = valuesToCalculations(value)
-
               const groupBy = {
                 field_uuid: transform.key,
                 field: transform.as,
@@ -40,6 +40,7 @@ const bar = {
             },
           }),
           metric: MetricBlock({
+            subtitle: 'Select the metric to measure the data by (i.e. Y axis)',
             valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
@@ -68,7 +69,7 @@ const bar = {
       },
       other: {
         title: 'Custom Chart',
-        subtitle: 'Custom configuration of the chart',
+        subtitle: 'Configuration of the Chart',
         type: 'container',
         blocks: {
           'show-title': ShowLegendBlock({
@@ -76,9 +77,10 @@ const bar = {
             title: 'Show Title',
             label: 'Show title',
             valuesToSpec: valuesToSpec('showTitle'),
-            defaultValue: false,
+            defaultValue: true,
           }),
           title: TitleBlock({
+            subtitle: '',
             valuesToSpec: valuesToSpec('title'),
           }),
           'show-legend': ShowLegendBlock({
@@ -91,7 +93,7 @@ const bar = {
           xTitle: TitleBlock({
             id: 'xAxis',
             title: 'Name of the X axis',
-            subtitle: 'Write here the name of the X axis',
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
@@ -106,7 +108,7 @@ const bar = {
           yTitle: TitleBlock({
             id: 'yAxis',
             title: 'Name of the Y axis',
-            subtitle: 'Write here the name of the Y axis',
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
