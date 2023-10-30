@@ -9,7 +9,7 @@ import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const itemsPerPageValues = [15, 30, 50]
-const itemsPerPageDefault = 15
+const itemsPerPageDefault = 30
 
 const Paginator = (props) => {
   const { count, limit, offset, setLimit, setOffset } = props

@@ -5,7 +5,7 @@ const _getUrlSearchParam = ({ param, defaultValue = null }) => {
   return url.searchParams.get(param) || defaultValue
 }
 
-export const getLimit = () => Number(_getUrlSearchParam({ param: 'limit', defaultValue: 15 }))
+export const getLimit = () => Number(_getUrlSearchParam({ param: 'limit', defaultValue: 30 }))
 
 export const getOffset = () => Number(_getUrlSearchParam({ param: 'offset' }))
 
