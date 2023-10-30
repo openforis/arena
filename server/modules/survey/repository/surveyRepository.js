@@ -24,6 +24,7 @@ const _getSurveySelectFields = (alias = '') => {
     ...columns.map((c) => `${prefix}${c}`),
     selectDate(`${prefix}date_created`, 'date_created'),
     selectDate(`${prefix}date_modified`, 'date_modified'),
+    selectDate(`${prefix}date_published`, 'date_published'),
   ].join(', ')
 }
 
@@ -88,6 +89,7 @@ const _getSurveysSelectQuery = ({
   const sortFieldBySortBy = {
     [Survey.sortableKeys.dateCreated]: 's.date_created',
     [Survey.sortableKeys.dateModified]: 's.date_modified',
+    [Survey.sortableKeys.datePublished]: 's.date_published',
     [Survey.sortableKeys.name]: 's.name',
     [Survey.sortableKeys.ownerName]: 's.owner_name',
     [Survey.sortableKeys.label]: labelCol,
@@ -281,7 +283,8 @@ export const publishSurveyProps = async (surveyId, client = db) =>
         props = props || props_draft,
         props_draft = '{}'::jsonb,
         draft = false,
-        published = true
+        published = true,
+        date_published = ${DB.now}
     WHERE
         id = $1
     `,
@@ -297,7 +300,8 @@ export const unpublishSurveyProps = async (surveyId, client = db) =>
       props_draft = props || props_draft,
       props = '{}'::jsonb,
       draft = true,
-      published = false
+      published = false,
+      date_published = null
   WHERE
       id = $1
   `,

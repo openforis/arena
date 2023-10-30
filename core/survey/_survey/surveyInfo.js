@@ -15,6 +15,7 @@ export const keys = {
   ownerName: 'ownerName',
   draft: 'draft',
   published: ObjectUtils.keys.published,
+  datePublished: 'datePublished',
   authGroups: 'authGroups',
   props: ObjectUtils.keys.props,
   rdbInitialized: 'rdbInitialized',
@@ -138,6 +139,8 @@ export const getDefaultCycleKey = (surveyInfo) => {
 }
 
 export const { getDateCreated, getDateModified } = ObjectUtils
+
+export const getDatePublished = ObjectUtils.getDate(keys.datePublished)
 
 export const getCollectUri = ObjectUtils.getProp(keys.collectUri)
 
