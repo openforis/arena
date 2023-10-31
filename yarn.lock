@@ -2545,6 +2545,43 @@
     proj4 "^2.9.0"
     uuid "^9.0.1"
 
+"@openforis/arena-core@^0.0.174":
+  version "0.0.174"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.174/0dab03cf5567202a785fb42bca367a46789919ae#0dab03cf5567202a785fb42bca367a46789919ae"
+  integrity sha512-aQDqspdFuw2aTP0guFQJXcepCZ4Q15vD+3sHDMZin50E1MTtjqkbHbKtHvhPvK2k98A1h6el+w742I7mUBUc4Q==
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.3"
+    bignumber.js "^9.1.2"
+    date-fns "^2.30.0"
+    jsep "^1.3.8"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    proj4 "^2.9.0"
+    uuid "^9.0.1"
+
+"@openforis/arena-server@../arena-server":
+  version "0.1.29"
+  dependencies:
+    "@godaddy/terminus" "^4.12.1"
+    "@openforis/arena-core" "^0.0.174"
+    bcryptjs "^2.4.3"
+    body-parser "^1.20.2"
+    compression "^1.7.4"
+    connect-pg-simple "^9.0.0"
+    db-migrate "^0.11.14"
+    db-migrate-pg "^1.5.2"
+    express "^4.18.2"
+    express-fileupload "^1.4.0"
+    express-session "^1.17.2"
+    lodash.throttle "^4.1.1"
+    log4js "^6.9.1"
+    passport "^0.6.0"
+    passport-local "^1.0.0"
+    pg-promise "^11.5.4"
+    socket.io "^4.7.2"
+
 "@openforis/arena-server@^0.1.29":
   version "0.1.29"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.29/c4c803947d561a5ac0691cf24ab5a106ff8d5704#c4c803947d561a5ac0691cf24ab5a106ff8d5704"
