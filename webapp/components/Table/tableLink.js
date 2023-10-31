@@ -1,11 +1,13 @@
 import * as A from '@core/arena'
+import { TableConstants } from './constants'
 
 const _getUrlSearchParam = ({ param, defaultValue = null }) => {
   const url = new URL(window.location.href)
   return url.searchParams.get(param) || defaultValue
 }
 
-export const getLimit = () => Number(_getUrlSearchParam({ param: 'limit', defaultValue: 30 }))
+export const getLimit = () =>
+  Number(_getUrlSearchParam({ param: 'limit', defaultValue: TableConstants.itemsPerPageDefault }))
 
 export const getOffset = () => Number(_getUrlSearchParam({ param: 'offset' }))
 
