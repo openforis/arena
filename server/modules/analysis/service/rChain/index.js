@@ -13,14 +13,14 @@ import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as Chain from '@common/analysis/chain'
 
+import * as UserService from '@server/modules/user/service/userService'
+
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import * as UserManager from '@server/modules/user/manager/userManager'
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
@@ -168,9 +168,5 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
       }
     })
   })
-  // notify active users about survey update
-  const activeUserUuidsUsingSurvey = await UserManager.fetchActiveUserUuidsWithPreferredSurveyId({ surveyId })
-  activeUserUuidsUsingSurvey.forEach((userUuid) => {
-    WebSocketServer.notifyUser(userUuid, WebSocketEvent.surveyUpdate, { surveyId })
-  })
+  await UserService.notifyActiveUsersAboutSurveyUpdate({ surveyId })
 }

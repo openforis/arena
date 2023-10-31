@@ -189,10 +189,11 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, cl
     `SELECT uuid 
     FROM "user" u 
       JOIN user_sessions us
-      ON us.sess #>> '{passport,user}' = u.uuid
+      ON (us.sess #>> '{passport,user}')::uuid = u.uuid
     WHERE prefs #>> ${surveyCurrentJsonbPath} = $1 
       -- fetch users with active sessions (interactions in the last hour)
-      AND (us.expire - INTERVAL '30 days - 1 hour') > NOW() at time zone 'utc'`,
+      AND (us.expire - INTERVAL '30 days - 1 hour') > NOW() at time zone 'utc'
+    GROUP BY uuid`,
     [surveyId],
     (row) => row.uuid
   )
