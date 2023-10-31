@@ -11,7 +11,7 @@ export const ButtonIconInfo = (props) => {
   const className = classNames('btn-transparent', classNameProp)
 
   return (
-    <TooltipNew title={title} titleInMarkdown={titleUsesMarkdown}>
+    <TooltipNew title={title} isTitleMarkdown={titleUsesMarkdown}>
       <Button {...otherProps} className={className} iconClassName="icon-info icon-14px" />
     </TooltipNew>
   )

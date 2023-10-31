@@ -10,14 +10,14 @@ import { useI18n } from '@webapp/store/system'
 import Markdown from '../markdown'
 
 export const TooltipNew = (props) => {
-  const { children, className, titleInMarkdown, title: titleProp, renderTitle } = props
+  const { children, className, isTitleMarkdown, title: titleProp, renderTitle } = props
 
   const i18n = useI18n()
 
   const defaultTitleRenderer = useCallback(() => {
     const titleText = i18n.t(titleProp)
-    return titleInMarkdown ? <Markdown source={titleText} /> : titleText
-  }, [i18n, titleInMarkdown, titleProp])
+    return isTitleMarkdown ? <Markdown source={titleText} /> : titleText
+  }, [i18n, isTitleMarkdown, titleProp])
 
   const titleRenderer = renderTitle ?? defaultTitleRenderer
 
@@ -37,7 +37,7 @@ export const TooltipNew = (props) => {
 TooltipNew.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  isTitleMarkdown: PropTypes.bool,
   renderTitle: PropTypes.func,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  titleInMarkdown: PropTypes.bool,
 }
