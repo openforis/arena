@@ -28,7 +28,7 @@ const Charts = () => {
     if (D3_CHART_TYPES.includes(spec.chartType) && !chartData) {
       renderChart()
     }
-  }, [spec, chartData]) // this effect runs whenever spec or chartData changes
+  }, [spec, chartData])
 
   return (
     <div className={classNames('charts', { 'full-screen': fullScreen })}>

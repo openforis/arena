@@ -20,12 +20,12 @@ const scatter = {
     blocks: {
       query: {
         title: 'Query',
-        subtitle: 'Query for the Scatter plot',
+        subtitle: '',
         type: 'container',
         blocks: {
           metricX: SingleMetricBlock({
             id: 'metricX',
-            title: 'Metric X axis',
+            title: 'X axis',
             valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const transform = valuesToCalculations(columnValues)
@@ -47,7 +47,7 @@ const scatter = {
           }),
           metricY: SingleMetricBlock({
             id: 'metricY',
-            title: 'Metric Y axis',
+            title: 'Y axis',
             valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const transform = valuesToCalculations(columnValues)
@@ -102,7 +102,7 @@ const scatter = {
       },
       other: {
         title: 'Custom Chart',
-        subtitle: 'Custom configuration of the chart',
+        subtitle: 'Configuration of the Chart',
         type: 'container',
         blocks: {
           title: TitleBlock({
@@ -120,7 +120,7 @@ const scatter = {
           xAxis: TitleBlock({
             id: 'xAxis',
             title: 'Name of the X axis',
-            subtitle: 'Write here the name of the X axis',
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
               const newSpec = {
                 ...spec,
@@ -135,7 +135,7 @@ const scatter = {
           yAxis: TitleBlock({
             id: 'yAxis',
             title: 'Name of the Y axis',
-            subtitle: 'Write here the name of the Y axis',
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
               const newSpec = {
                 ...spec,
