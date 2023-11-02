@@ -13,10 +13,11 @@ import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import classNames from 'classnames'
 
 const DimensionGroup = ({ dimensionGroup }) => {
+  const { label, options } = dimensionGroup
   const [visible, setVisible] = useState(false)
 
   return (
-    <div className="charts_data-selector_group-dimension" key={dimensionGroup.label}>
+    <div className="charts_data-selector_group-dimension" key={label}>
       <p>
         <button
           type="button"
@@ -25,14 +26,14 @@ const DimensionGroup = ({ dimensionGroup }) => {
         >
           <span className={classNames('icon icon-12px icon-play3')} />
         </button>
-        <b>{dimensionGroup.label}</b>
+        <b>{label}</b>
       </p>
       {visible && (
         <div className="charts_data-selector_group-dimension">
-          {dimensionGroup.options?.map((dimension) => (
-            <div key={dimension.name} className="charts_data-selector_dimension">
-              {dimension.label}
-              {dimension.icon}
+          {options?.map(({ name, label: optionLabel, icon }) => (
+            <div key={name} className="charts_data-selector_dimension">
+              {optionLabel}
+              {icon}
             </div>
           ))}
         </div>
@@ -54,7 +55,8 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
         onChange={setEntityDefUuid}
         showSingleEntities={false}
         disabled={false}
-        useNameAsLabel={true}
+        useNameAsLabel={false}
+        allowEmptySelection={false}
       />
 
       <br />
@@ -64,7 +66,7 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
           <br />
           <div className="charts_data-selector_group-dimension_container">
             {dimensions
-              .filter((dimension) => dimension.options.length > 0)
+              .filter(({ options }) => options.length > 0)
               .map((dimensionGroup) => (
                 <DimensionGroup key={dimensionGroup.label} dimensionGroup={dimensionGroup} />
               ))}
@@ -77,12 +79,36 @@ const DataSelector = ({ setEntityDefUuid, entityDefUuid, dimensions, nodeDefLabe
   )
 }
 
+DimensionGroup.propTypes = {
+  dimensionGroup: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    options: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        icon: PropTypes.node,
+      })
+    ).isRequired,
+  }).isRequired,
+}
+
 DataSelector.propTypes = {
   entityDefUuid: PropTypes.string,
   setEntityDefUuid: PropTypes.func.isRequired,
   toggleLabelFunction: PropTypes.func.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
-  dimensions: PropTypes.any,
+  dimensions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          name: PropTypes.string.isRequired,
+          label: PropTypes.string.isRequired,
+          icon: PropTypes.node,
+        })
+      ),
+    })
+  ),
 }
 
 export default DataSelector
