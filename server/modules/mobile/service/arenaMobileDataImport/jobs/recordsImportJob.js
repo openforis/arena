@@ -64,12 +64,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     Object.entries(nodes).forEach(([nodeUuid, node]) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const missingParentUuid = !Node.getParentUuid(node) && !NodeDef.isRoot(nodeDef)
+      const parentUuid = Node.getParentUuid(node)
+      const missingParentUuid = (!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])
       const emptyMultipleAttribute = NodeDef.isMultiple(nodeDef) && Node.isValueBlank(node)
 
       if (missingParentUuid || emptyMultipleAttribute) {
         const messagePrefix = `node with uuid ${Node.getUuid(node)}`
-        const messageContent = missingParentUuid ? `has missing parent_uuid` : `is multiple and has an empty value`
+        const messageContent = missingParentUuid
+          ? `has missing or invalid parent_uuid`
+          : `is multiple and has an empty value`
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
         delete nodes[nodeUuid]
@@ -148,9 +151,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       .filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
       .sort((nodeA, nodeB) => nodeA.id - nodeB.id)
       .map((node) => {
-        // do side effect to avoid creating new objects
-        node[Node.keys.created] = true
-        node[Node.keys.updated] = false
+        node[Node.keys.created] = true // do side effect to avoid creating new objects
         return node
       })
     const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
