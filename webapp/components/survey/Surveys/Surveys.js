@@ -112,6 +112,14 @@ const Surveys = (props) => {
           sortable: true,
         },
         {
+          key: Survey.sortableKeys.datePublished,
+          header: 'surveysView.datePublished',
+          renderItem: ({ item }) =>
+            DateUtils.formatDateTimeDisplay(Survey.getDatePublished(Survey.getSurveyInfo(item))),
+          width: '12rem',
+          sortable: true,
+        },
+        {
           key: Survey.sortableKeys.status,
           header: 'common.status',
           renderItem: ({ item }) => Survey.getStatus(Survey.getSurveyInfo(item)),
