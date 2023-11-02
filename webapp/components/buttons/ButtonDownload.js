@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react'
+import React, { forwardRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'
 
-export const ButtonDownload = (props) => {
+export const ButtonDownload = forwardRef((props, ref) => {
   const { href, onClick: onClickProp, requestParams, ...otherProps } = props
 
   const onClick = useCallback(async () => {
@@ -16,8 +16,8 @@ export const ButtonDownload = (props) => {
     }
   }, [href, onClickProp, requestParams])
 
-  return <Button {...otherProps} onClick={onClick} />
-}
+  return <Button ref={ref} {...otherProps} onClick={onClick} />
+})
 
 ButtonDownload.propTypes = {
   ...Button.propTypes,
