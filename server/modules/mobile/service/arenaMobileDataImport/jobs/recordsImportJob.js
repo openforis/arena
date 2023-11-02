@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
@@ -13,6 +14,7 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as UserService from '@server/modules/user/service/userService'
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -38,8 +40,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
       const recordUuid = Record.getUuid(recordSummary)
 
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
-      this.cleanupRecord(record)
       this.currentRecord = record
+      await this.cleanupCurrentRecord()
 
       await this.insertOrSkipRecord()
 
@@ -47,32 +49,42 @@ export default class RecordsImportJob extends DataImportBaseJob {
     })
   }
 
-  cleanupRecord(record) {
-    const { survey } = this
+  async cleanupCurrentRecord() {
+    const { context, currentRecord: record, user, tx } = this
+    const { survey } = context
+
+    // check owner uuid: if user not defined, use the job user as owner
+    const ownerUuidSource = Record.getOwnerUuid(record)
+    const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
+    record[Record.keys.ownerUuid] = ownerSource ? ownerUuidSource : User.getUuid(user)
+
+    // remove invalid nodes and build index from scratch
     delete record['_nodesIndex']
     const nodes = Record.getNodes(record)
 
-    // remove invalid nodes
     Object.entries(nodes).forEach(([nodeUuid, node]) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const missingParentUuid = !Node.getParentUuid(node) && !NodeDef.isRoot(nodeDef)
+      const parentUuid = Node.getParentUuid(node)
+      const missingParentUuid = (!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])
       const emptyMultipleAttribute = NodeDef.isMultiple(nodeDef) && Node.isValueBlank(node)
 
       if (missingParentUuid || emptyMultipleAttribute) {
         const messagePrefix = `node with uuid ${Node.getUuid(node)}`
-        const messageContent = missingParentUuid ? `has missing parent_uuid` : `is multiple and has an empty value`
+        const messageContent = missingParentUuid
+          ? `has missing or invalid parent_uuid`
+          : `is multiple and has an empty value`
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
         delete nodes[nodeUuid]
       }
     })
     // assoc nodes and build index from scratch
-    return Record.assocNodes({ nodes, sideEffect: true })(record)
+    this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
   }
 
   async insertOrSkipRecord() {
-    const { context, currentRecord: record, user, tx } = this
-    const { survey, surveyId, conflictResolutionStrategy } = context
+    const { context, currentRecord: record, tx } = this
+    const { surveyId, conflictResolutionStrategy } = context
 
     const recordUuid = Record.getUuid(record)
 
@@ -90,7 +102,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
         await this.updateExistingRecord()
       }
     } else {
-      await this.insertNewRecord(recordUuid, user, surveyId, record, tx, survey)
+      await this.insertNewRecord()
     }
   }
 

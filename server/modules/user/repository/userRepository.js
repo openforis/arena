@@ -210,7 +210,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   )
 
 export const fetchUserByUuid = async (uuid, client = db) =>
-  client.one(
+  client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
