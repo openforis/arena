@@ -3,6 +3,7 @@ import { Dates } from '@openforis/arena-core'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as ObjectUtils from '@core/objectUtils'
@@ -37,12 +38,36 @@ export default class RecordsImportJob extends DataImportBaseJob {
       const recordUuid = Record.getUuid(recordSummary)
 
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      this.cleanupRecord(record)
       this.currentRecord = record
 
       await this.insertOrSkipRecord()
 
       this.incrementProcessedItems()
     })
+  }
+
+  cleanupRecord(record) {
+    const { survey } = this
+    delete record['_nodesIndex']
+    const nodes = Record.getNodes(record)
+
+    // remove invalid nodes
+    Object.entries(nodes).forEach(([nodeUuid, node]) => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      const missingParentUuid = !Node.getParentUuid(node) && !NodeDef.isRoot(nodeDef)
+      const emptyMultipleAttribute = NodeDef.isMultiple(nodeDef) && Node.isValueBlank(node)
+
+      if (missingParentUuid || emptyMultipleAttribute) {
+        const messagePrefix = `node with uuid ${Node.getUuid(node)}`
+        const messageContent = missingParentUuid ? `has missing parent_uuid` : `is multiple and has an empty value`
+        const messageSuffix = `: skipping it`
+        this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
+        delete nodes[nodeUuid]
+      }
+    })
+    // assoc nodes and build index from scratch
+    return Record.assocNodes({ nodes, sideEffect: true })(record)
   }
 
   async insertOrSkipRecord() {

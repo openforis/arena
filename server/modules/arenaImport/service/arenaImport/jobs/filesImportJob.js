@@ -24,7 +24,12 @@ export default class FilesImportJob extends Job {
       await PromiseUtils.each(filesSummaries, async (fileSummary) => {
         let file = { ...fileSummary }
         // load file content from a separate file
-        const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, RecordFile.getUuid(fileSummary))
+        const fileUuid = RecordFile.getUuid(fileSummary)
+        const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
+        if (!fileContent) {
+          const fileName = RecordFile.getName(fileSummary)
+          throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
+        }
         file = RecordFile.assocContent(fileContent)(file)
 
         await this.persistFile(file)
@@ -36,9 +41,10 @@ export default class FilesImportJob extends Job {
 
   async persistFile(file) {
     const { surveyId } = this.context
-    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, file.uuid, this.tx)
+    const fileUuid = RecordFile.getUuid(file)
+    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (existingFileSummary) {
-      await FileService.updateFileProps(surveyId, RecordFile.getUuid(file), RecordFile.getProps(file), this.tx)
+      await FileService.updateFileProps(surveyId, fileUuid, RecordFile.getProps(file), this.tx)
     } else {
       await FileService.insertFile(surveyId, file, this.tx)
     }
