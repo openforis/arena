@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 
+import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+
 import { db } from '@server/db/db'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -396,3 +398,11 @@ export const { updateUserPrefs } = UserManager
 
 // ==== User Invite
 export const { inviteUser } = UserInviteService
+
+// ==== WebSocket events
+export const notifyActiveUsersAboutSurveyUpdate = async ({ surveyId }) => {
+  const activeUserUuidsUsingSurvey = await UserManager.fetchActiveUserUuidsWithPreferredSurveyId({ surveyId })
+  activeUserUuidsUsingSurvey.forEach((userUuid) => {
+    WebSocketServer.notifyUser(userUuid, WebSocketEvent.surveyUpdate, { surveyId })
+  })
+}

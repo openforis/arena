@@ -115,10 +115,10 @@ GROUP BY gu.user_uuid`
     )
     ${includeSurveys ? `, user_surveys AS (${surveysSelect})` : ''}
     SELECT ${selectFields.join(', ')}, ${
-    includeSurveys
-      ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
-      : ''
-  }
+      includeSurveys
+        ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
+        : ''
+    }
       ${DbUtils.selectDate('us.last_login_time', 'last_login_time')},
       EXISTS (
         SELECT * 
@@ -181,6 +181,23 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
     [surveyId, isSystemAdmin],
     camelize
   )
+
+export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, client = db) => {
+  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+
+  return client.map(
+    `SELECT uuid 
+    FROM "user" u 
+      JOIN user_sessions us
+      ON (us.sess #>> '{passport,user}')::uuid = u.uuid
+    WHERE prefs #>> ${surveyCurrentJsonbPath} = $1 
+      -- fetch users with active sessions (interactions in the last hour)
+      AND (us.expire - INTERVAL '30 days - 1 hour') > NOW() at time zone 'utc'
+    GROUP BY uuid`,
+    [surveyId],
+    (row) => row.uuid
+  )
+}
 
 export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   client.one(

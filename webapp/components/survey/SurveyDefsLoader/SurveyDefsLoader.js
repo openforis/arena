@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -10,6 +12,7 @@ import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyI
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
@@ -18,23 +21,39 @@ const SurveyDefsLoader = (props) => {
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const ready = useSurveyDefsFetched(draft)
-  const surveyUuid = Survey.getUuid(surveyInfo)
+  const surveyId = Survey.getId(surveyInfo)
   const includeAnalysis = useAuthCanUseAnalysis()
 
   useEffect(() => {
-    if (surveyUuid && !ready) {
+    if (surveyId && !ready) {
       dispatch(SurveyActions.initSurveyDefs({ draft, validate, includeAnalysis }))
     }
-  }, [surveyUuid, ready])
+  }, [surveyId, ready])
+
+  const onSurveyUpdate = useCallback(
+    ({ surveyId: surveyUpdatedId }) => {
+      if (surveyUpdatedId === surveyId) {
+        dispatch(SurveyActions.resetSurveyDefs())
+      }
+    },
+    [dispatch, surveyId]
+  )
+
+  useEffect(() => {
+    AppWebSocket.on(WebSocketEvents.surveyUpdate, onSurveyUpdate)
+    return () => {
+      AppWebSocket.off(WebSocketEvents.surveyUpdate, onSurveyUpdate)
+    }
+  }, [onSurveyUpdate, surveyId])
 
   useOnSurveyCycleUpdate(() => {
-    if (surveyUuid) {
+    if (surveyId) {
       if (onSurveyCycleUpdate) onSurveyCycleUpdate()
       dispatch(SurveyActions.resetSurveyDefs())
     }
   })
 
-  if (!surveyUuid) {
+  if (!surveyId) {
     return <ActiveSurveyNotSelected />
   }
 
