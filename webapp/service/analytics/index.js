@@ -18,9 +18,10 @@ const track = ({ type = false, properties = {} }) => {
 const page = ({ type = false, properties = {} }) => {
   return _analytics({ methodName: 'page', type, properties })
 }
+
 const identify = ({ userId, properties = {} }) => {
   const _traits = {
-    ...(window?.analytics._user.traits() || {}),
+    ...(window?.analytics?._user?.traits() || {}),
     ...properties,
   }
   window?.analytics?.identify(userId, _traits)
@@ -32,6 +33,7 @@ const getTraits = () => {
     (localStorage?.ajs_user_traits ? JSON.parse(localStorage?.ajs_user_traits) : {})
   )
 }
+
 const getUserId = () => {
   return window?.analytics?._user?.id() || (localStorage?.ajs_user_id ? JSON.parse(localStorage?.ajs_user_id) : {})
 }
