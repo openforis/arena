@@ -115,10 +115,10 @@ GROUP BY gu.user_uuid`
     )
     ${includeSurveys ? `, user_surveys AS (${surveysSelect})` : ''}
     SELECT ${selectFields.join(', ')}, ${
-    includeSurveys
-      ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
-      : ''
-  }
+      includeSurveys
+        ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
+        : ''
+    }
       ${DbUtils.selectDate('us.last_login_time', 'last_login_time')},
       EXISTS (
         SELECT * 
@@ -193,7 +193,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   )
 
 export const fetchUserByUuid = async (uuid, client = db) =>
-  client.one(
+  client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
