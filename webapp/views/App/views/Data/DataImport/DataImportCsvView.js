@@ -143,7 +143,7 @@ export const DataImportCsvView = () => {
   return (
     <div className="main-container">
       <div className="steps-row">
-        <ButtonIconInfo title="dataImportView.importFromCsvStepsInfo" markdown />
+        <ButtonIconInfo title="dataImportView.importFromCsvStepsInfo" titleUsesMarkdown />
         <Stepper activeStep={activeStep} steps={steps} />
       </div>
       <div className="internal-container">
