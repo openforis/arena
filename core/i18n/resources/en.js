@@ -768,6 +768,7 @@ Are you sure you want to continue?`,
   },
 
   surveysView: {
+    datePublished: 'Date published',
     filter: 'Filter',
     filterPlaceholder: 'Filter by name, label or owner',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',

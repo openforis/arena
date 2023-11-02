@@ -117,6 +117,7 @@ export const {
   getDefaultCycleKey,
   getDateCreated,
   getDateModified,
+  getDatePublished,
   isPublished,
   isDraft,
   isValid,
