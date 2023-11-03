@@ -30,12 +30,22 @@ export default class FilesImportJob extends Job {
           const fileName = RecordFile.getName(fileSummary)
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
+
+        this.checkFileUuidIsInRecords(fileUuid)
+
         file = RecordFile.assocContent(fileContent)(file)
 
         await this.persistFile(file)
 
         this.incrementProcessedItems()
       })
+    }
+  }
+
+  checkFileUuidIsInRecords(fileUuid) {
+    const { recordsFileUuids } = this.context
+    if (recordsFileUuids && !recordsFileUuids.includes(fileUuid)) {
+      throw new Error(`File UUID ${fileUuid} not found in records`)
     }
   }
 
