@@ -66,7 +66,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       const parentUuid = Node.getParentUuid(node)
       const missingParentUuid = (!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])
-      const emptyMultipleAttribute = NodeDef.isMultiple(nodeDef) && Node.isValueBlank(node)
+      const emptyMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)
 
       if (missingParentUuid || emptyMultipleAttribute) {
         const messagePrefix = `node with uuid ${Node.getUuid(node)}`
