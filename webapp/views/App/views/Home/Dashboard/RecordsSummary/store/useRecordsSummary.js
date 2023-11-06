@@ -12,7 +12,7 @@ const initialState = {
   userDateCounts: [],
   dataEntry: 0,
   dataCleansing: 0,
-  timeRange: timeRanges._2Weeks,
+  timeRange: timeRanges._1Year,
 }
 
 export const useRecordsSummary = () => {
