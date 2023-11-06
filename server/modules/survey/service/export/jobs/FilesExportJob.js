@@ -17,8 +17,6 @@ export default class FilesExportJob extends Job {
   async execute() {
     const { survey, cycle, includeDataFromAllCycles, outputDir } = this.context
 
-    const surveyId = Survey.getId(survey)
-
     const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle(
       {
         user: this.user,
@@ -33,18 +31,35 @@ export default class FilesExportJob extends Job {
     // write the files in subfolders by cycle
     await PromiseUtils.each(Object.entries(fileUuidsByCycle), async ([cycle, fileUuids]) => {
       await PromiseUtils.each(fileUuids, async (fileUuid) => {
-        const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
-        const recordFileContent = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
-        const cycleFilesPath = FileUtils.join(outputDir, 'files', cycle)
-        if (!FileUtils.exists(cycleFilesPath)) {
-          await FileUtils.mkdir(cycleFilesPath)
-        }
-        const extension = RecordFile.getExtension(fileSummary)
-        const exportedFileName = Objects.isEmpty(extension) ? fileUuid : `${fileUuid}.${extension}`
-        const tempFilePath = FileUtils.join(cycleFilesPath, exportedFileName)
-        await FileUtils.writeFile(tempFilePath, recordFileContent)
+        await this.writeFile({ fileUuid, outputDir, cycle })
         this.incrementProcessedItems()
       })
     })
+  }
+
+  async writeFile({ fileUuid, outputDir, cycle }) {
+    const { survey } = this.context
+    const surveyId = Survey.getId(survey)
+
+    const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
+    if (!fileSummary) {
+      this.logWarn(`File with UUID ${fileUuid} not found`)
+      return false
+    }
+    const recordFileContent = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
+    if (!recordFileContent) {
+      this.logWarn(`File content for file with UUID ${fileUuid} not found`)
+      return false
+    }
+    const cycleFilesPath = FileUtils.join(outputDir, 'files', cycle)
+    if (!FileUtils.exists(cycleFilesPath)) {
+      await FileUtils.mkdir(cycleFilesPath)
+    }
+    const extension = RecordFile.getExtension(fileSummary)
+    const exportedFileName = Objects.isEmpty(extension) ? fileUuid : `${fileUuid}.${extension}`
+    const tempFilePath = FileUtils.join(cycleFilesPath, exportedFileName)
+    await FileUtils.writeFile(tempFilePath, recordFileContent)
+
+    return true
   }
 }
