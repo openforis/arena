@@ -10,6 +10,7 @@ import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
 import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { SchemaSummary } from './schemaSummary'
+import SurveyLabelsImportJob from './surveyLabelsImportJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -80,6 +81,18 @@ export const deleteSurvey = async (surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   await SurveyManager.deleteSurvey(surveyId)
+}
+
+export const startLabelsImportJob = ({ user, surveyId, filePath }) => {
+  const job = new SurveyLabelsImportJob({
+    user,
+    surveyId,
+    filePath,
+  })
+
+  JobManager.executeJobThread(job)
+
+  return job
 }
 
 export const {

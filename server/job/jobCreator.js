@@ -12,6 +12,7 @@ import ExportCsvDataJob from '@server/modules/survey/service/export/exportCsvDat
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
+import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
@@ -30,6 +31,7 @@ const jobClasses = [
   RecordsCloneJob,
   SurveyCloneJob,
   SurveyExportJob,
+  SurveyLabelsImportJob,
   SurveyPublishJob,
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
