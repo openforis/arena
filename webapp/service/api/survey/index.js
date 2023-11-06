@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
+import { objectToFormData } from '../utils/apiUtils'
 
 // ==== CREATE
 export const insertSurvey = async ({ newSurvey }) => {
@@ -22,4 +23,12 @@ export const fetchSurveyTemplatesPublished = async () => {
     data: { list: surveys },
   } = await axios.get(`/api/surveyTemplates`)
   return surveys
+}
+
+// ==== UPDATE
+export const startImportLabelsJob = async ({ surveyId, file }) => {
+  const formData = objectToFormData({ file })
+
+  const { data: job } = await axios.put(`/api/survey/${surveyId}/labels`, formData)
+  return job
 }
