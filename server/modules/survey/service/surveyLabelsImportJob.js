@@ -1,16 +1,30 @@
+import { Arrays } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as StringUtils from '@core/stringUtils'
 
 import Job from '@server/job/job'
 import * as CSVReader from '@server/utils/file/csvReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
-import { Arrays } from '@openforis/arena-core'
 
 const errorPrefix = `validationErrors.surveyLabelsImport.`
-const getLabelColumn = (langCode) => `label_${langCode}`
-const getDescriptionColumn = (langCode) => `description_${langCode}`
+const labelColumnPrefix = 'label_'
+const descriptionColumnPrefix = 'description_'
+const getLabelColumn = (langCode) => `${labelColumnPrefix}${langCode}`
+const getDescriptionColumn = (langCode) => `${descriptionColumnPrefix}${langCode}`
+
+const extractLabels = ({ row, langCodes, columnPrefix }) =>
+  langCodes.reduce((acc, langCode) => {
+    const value = row[`${columnPrefix}${langCode}`]
+    const label = StringUtils.trim(value)
+    if (StringUtils.isNotBlank(label)) {
+      acc[langCode] = label
+    }
+    return acc
+  }, {})
 
 export default class SurveyLabelsImportJob extends Job {
   constructor(params) {
@@ -34,17 +48,8 @@ export default class SurveyLabelsImportJob extends Job {
         const nodeDef = await this.getNodeDef({ survey, row })
         if (!nodeDef) return
 
-        const labels = langCodes.reduce((acc, langCode) => {
-          const label = row[getLabelColumn(langCode)]
-          acc[langCode] = label
-          return acc
-        }, {})
-
-        const descriptions = langCodes.reduce((acc, langCode) => {
-          const description = row[getDescriptionColumn(langCode)]
-          acc[langCode] = description
-          return acc
-        }, {})
+        const labels = extractLabels({ langCodes, row, columnPrefix: labelColumnPrefix })
+        const descriptions = extractLabels({ langCodes, row, columnPrefix: descriptionColumnPrefix })
 
         const nodeDefUpdated = A.pipe(NodeDef.assocLabels(labels), NodeDef.assocDescriptions(descriptions))(nodeDef)
         nodeDefsUpdated.push(nodeDefUpdated)
