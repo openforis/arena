@@ -19,6 +19,8 @@ import * as UserService from '@server/modules/user/service/userService'
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
     super(RecordsImportJob.type, params)
+
+    this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
   }
 
   async execute() {
@@ -76,6 +78,14 @@ export default class RecordsImportJob extends DataImportBaseJob {
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
         delete nodes[nodeUuid]
+      }
+
+      // keep track of file uuids found in record attribute values
+      if (NodeDef.isFile(nodeDef)) {
+        const fileUuid = Node.getFileUuid(node)
+        if (fileUuid) {
+          this.recordsFileUuids.add(fileUuid)
+        }
       }
     })
     // assoc nodes and build index from scratch
@@ -161,6 +171,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.insertedRecordsUuids.add(recordUuid)
 
     this.logDebug(`record insert complete (${nodesArray.length} nodes inserted)`)
+  }
+
+  async beforeSuccess() {
+    await super.beforeSuccess()
+    this.setContext({ recordsFileUuids: Array.from(this.recordsFileUuids) })
   }
 
   generateResult() {
