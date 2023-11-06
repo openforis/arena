@@ -9,7 +9,7 @@ import { uuidv4 } from '@core/uuid'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -49,7 +49,15 @@ const FormHeader = (props) => {
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
       const job = await API.startImportLabelsJob({ surveyId, file })
-      dispatch(JobActions.showJobMonitor({ job, onComplete: () => dispatch(FileUploadDialogActions.close()) }))
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          onComplete: () => {
+            dispatch(FileUploadDialogActions.close())
+            dispatch(SurveyActions.resetSurveyDefs())
+          },
+        })
+      )
     },
     [dispatch, surveyId]
   )

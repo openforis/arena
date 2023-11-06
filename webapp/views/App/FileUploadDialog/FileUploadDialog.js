@@ -44,7 +44,12 @@ export const FileUploadDialog = () => {
         <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={files} />
       </ModalBody>
       <ModalFooter>
-        <Button className="btn-primary modal-footer__item" onClick={onOkClick} label="common.ok" />
+        <Button
+          className="btn-primary modal-footer__item"
+          disabled={files.length === 0}
+          onClick={onOkClick}
+          label="common.ok"
+        />
       </ModalFooter>
     </Modal>
   )
