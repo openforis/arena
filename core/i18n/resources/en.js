@@ -5,6 +5,7 @@ export const enTranslation = {
   common: {
     active: 'Active',
     add: 'Add',
+    advancedFunctions: 'Advanced functions',
     and: 'and',
     appName: 'Arena',
     appNameFull: '$t(common.openForis) Arena',
@@ -394,7 +395,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
-      advancedFunctions: 'Advanced functions',
       confirmDeleteCycleHeader: 'Delete this cycle?',
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
@@ -1317,6 +1317,8 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       analysis: 'Analysis',
     },
     confirmNodeDelete: 'Are you sure you want to delete this item?',
+    exportLabels: 'Export labels to CSV',
+    importLabels: 'Import labels from CSV',
   },
 
   taxonomy: {
@@ -1552,6 +1554,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
     },
 
+    surveyLabelsImport: {
+      invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
+      cannotFindNodeDef: "Cannot find attribute or entity definition with name '{{name}}'",
+    },
+
     taxonomyEdit: {
       codeChangedAfterPublishing: `Published code has changed: '{{oldCode}}' => '{{newCode}}'`,
       codeDuplicate: 'Duplicate code {{value}}; $t(validationErrors.rowsDuplicate)',
@@ -1648,6 +1655,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     SurveyExportJob: 'Survey Export',
     SurveyIndexGeneratorJob: 'Survey Index Generator',
     SurveyInfoValidationJob: 'Survey Info Validation',
+    SurveyLabelsImportJob: 'Survey Labels Import',
     SurveyPropsPublishJob: 'Survey Props Publish',
     SurveyPublishJob: 'Survey Publish',
     SurveyPublishPerformJob: 'Survey Publish Perform',

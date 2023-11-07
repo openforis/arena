@@ -131,7 +131,7 @@ const SurveyInfo = (props) => {
             <ButtonMenu
               className="btn-s btn-transparent btn-menu-advanced"
               iconClassName="icon-cog icon-14px"
-              label="homeView.surveyInfo.advancedFunctions"
+              label="common.advancedFunctions"
               testId={TestId.dashboard.advancedFunctionsBtn}
               items={[
                 ...(Survey.isPublished(surveyInfo)
