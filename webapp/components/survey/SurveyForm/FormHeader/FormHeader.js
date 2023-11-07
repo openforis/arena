@@ -127,6 +127,7 @@ const FormHeader = (props) => {
                 ),
               },
             ]}
+            testId={TestId.surveyForm.advancedFunctionBtn}
           />
         )}
         <NodeDefLabelSwitch
