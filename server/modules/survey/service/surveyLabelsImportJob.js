@@ -1,5 +1,3 @@
-import { Arrays } from '@openforis/arena-core'
-
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,12 +7,9 @@ import Job from '@server/job/job'
 import * as CSVReader from '@server/utils/file/csvReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
+import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
 const errorPrefix = `validationErrors.surveyLabelsImport.`
-const labelColumnPrefix = 'label_'
-const descriptionColumnPrefix = 'description_'
-const getLabelColumn = (langCode) => `${labelColumnPrefix}${langCode}`
-const getDescriptionColumn = (langCode) => `${descriptionColumnPrefix}${langCode}`
 
 const extractLabels = ({ row, langCodes, columnPrefix }) =>
   langCodes.reduce((acc, langCode) => {
@@ -48,8 +43,12 @@ export default class SurveyLabelsImportJob extends Job {
         const nodeDef = await this.getNodeDef({ survey, row })
         if (!nodeDef) return
 
-        const labels = extractLabels({ langCodes, row, columnPrefix: labelColumnPrefix })
-        const descriptions = extractLabels({ langCodes, row, columnPrefix: descriptionColumnPrefix })
+        const labels = extractLabels({ langCodes, row, columnPrefix: SurveyLabelsExportModel.labelColumnPrefix })
+        const descriptions = extractLabels({
+          langCodes,
+          row,
+          columnPrefix: SurveyLabelsExportModel.descriptionColumnPrefix,
+        })
 
         const nodeDefUpdated = A.pipe(NodeDef.assocLabels(labels), NodeDef.assocDescriptions(descriptions))(nodeDef)
         nodeDefsUpdated.push(nodeDefUpdated)
@@ -80,10 +79,13 @@ export default class SurveyLabelsImportJob extends Job {
     const { survey } = context
     const langCodes = Survey.getLanguages(Survey.getSurveyInfo(survey))
 
-    const fixedHeaders = ['uuid', 'path']
+    const fixedHeaders = ['name']
     const dynamicHeaders = []
     langCodes.forEach((langCode) => {
-      dynamicHeaders.push(getLabelColumn(langCode), getDescriptionColumn(langCode))
+      dynamicHeaders.push(
+        SurveyLabelsExportModel.getLabelColumn(langCode),
+        SurveyLabelsExportModel.getDescriptionColumn(langCode)
+      )
     })
     const validHeaders = [...fixedHeaders, ...dynamicHeaders]
     const invalidHeaders = headers.filter((header) => !validHeaders.includes(header)).join(', ')
@@ -95,16 +97,13 @@ export default class SurveyLabelsImportJob extends Job {
   async getNodeDef({ row }) {
     const { context } = this
     const { survey } = context
-    const { uuid, path } = row
+    const { name } = row
     let nodeDef = null
-    if (uuid) {
-      nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
-    } else if (path) {
-      const name = Arrays.last(path.split('.'))
+    if (name) {
       nodeDef = Survey.getNodeDefByName(name)(survey)
     }
     if (!nodeDef) {
-      await this.addErrorAndStopCsvReader('cannotFindNodeDef', { uuid, path })
+      await this.addErrorAndStopCsvReader('cannotFindNodeDef', { name })
     }
     return nodeDef
   }

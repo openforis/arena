@@ -189,6 +189,20 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels' })
+      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+
+      await SurveyService.exportLabels({ surveyId, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== UPDATE
 
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {

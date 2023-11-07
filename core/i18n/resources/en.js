@@ -1317,6 +1317,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       analysis: 'Analysis',
     },
     confirmNodeDelete: 'Are you sure you want to delete this item?',
+    exportLabels: 'Export labels to CSV',
     importLabels: 'Import labels from CSV',
   },
 
@@ -1555,7 +1556,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     surveyLabelsImport: {
       invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
-      cannotFindNodeDef: "Cannot find attribute or entity definition with UUID '{{uuid}}' or path '{{path}}'",
+      cannotFindNodeDef: "Cannot find attribute or entity definition with name '{{name}}'",
     },
 
     taxonomyEdit: {

@@ -22,7 +22,7 @@ import { TestId } from '@webapp/utils/testId'
 import * as API from '@webapp/service/api'
 
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-import { ButtonMenu } from '@webapp/components/buttons'
+import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import FormEntryActions from '../components/formEntryActions'
@@ -114,6 +114,10 @@ const FormHeader = (props) => {
               {
                 key: 'schema-summary',
                 content: <SurveySchemaSummaryDownloadButton className="btn-transparent" />,
+              },
+              {
+                key: 'labels-export',
+                content: <ButtonDownload href={`/api/survey/${surveyId}/labels`} label="surveyForm.exportLabels" />,
               },
               {
                 key: 'labels-import',
