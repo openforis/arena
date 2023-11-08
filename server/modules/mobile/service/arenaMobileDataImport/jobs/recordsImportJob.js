@@ -13,7 +13,6 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
-import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as UserService from '@server/modules/user/service/userService'
 
 export default class RecordsImportJob extends DataImportBaseJob {
@@ -26,16 +25,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
   async execute() {
     await super.execute()
 
-    const { context, tx } = this
-    const { arenaSurveyFileZip, surveyId } = context
+    const { context } = this
+    const { arenaSurveyFileZip } = context
 
     const recordSummaries = await ArenaSurveyFileZip.getRecords(arenaSurveyFileZip)
     this.total = recordSummaries.length
 
-    if (this.total == 0) return
-
-    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
-    this.setContext({ survey })
+    if (this.total === 0) return
 
     // import records sequentially
     await PromiseUtils.each(recordSummaries, async (recordSummary) => {

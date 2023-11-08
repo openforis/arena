@@ -40,6 +40,7 @@ export const checkFilesStorage = async () => {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 const getSurveyFilesTotalSpace = async ({ surveyId }) => {
   return 10 * Math.pow(1024, 3) // TODO make it configurable, fixed to 10 GB per survey now
 }
@@ -65,4 +66,6 @@ export const {
   fetchFileSummariesBySurveyId,
   // UPDATE
   updateFileProps,
+  // DELETE
+  deleteFileByUuid,
 } = FileManager
