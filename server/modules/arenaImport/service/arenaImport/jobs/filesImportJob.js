@@ -18,6 +18,10 @@ export default class FilesImportJob extends Job {
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
     if (filesSummaries && filesSummaries.length > 0) {
+      const filesUuids = filesSummaries.map(RecordFile.getUuid)
+      this.logDebug('file UUIDs in zip file', filesUuids)
+      this.logDebug('file UUIDs found in records', this.context.recordsFileUuids)
+
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
       this.total = filesSummaries.length
@@ -50,13 +54,25 @@ export default class FilesImportJob extends Job {
   }
 
   async persistFile(file) {
-    const { surveyId } = this.context
+    const { context, tx } = this
+    const { surveyId } = context
     const fileUuid = RecordFile.getUuid(file)
+    const fileProps = RecordFile.getProps(file)
+    this.logDebug(`persisting file ${fileUuid}`)
     const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (existingFileSummary) {
-      await FileService.updateFileProps(surveyId, fileUuid, RecordFile.getProps(file), this.tx)
+      this.logDebug(`file already existing`)
+      if (RecordFile.isDeleted(existingFileSummary)) {
+        this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
+        await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+        await FileService.insertFile(surveyId, file, tx)
+      } else {
+        this.logDebug('updating props')
+        await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+      }
     } else {
-      await FileService.insertFile(surveyId, file, this.tx)
+      this.logDebug(`file not existing: inserting new file`, fileProps)
+      await FileService.insertFile(surveyId, file, tx)
     }
   }
 
