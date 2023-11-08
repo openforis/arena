@@ -314,8 +314,15 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
 
 export const visitDescendantsAndSelf =
   ({ nodeDef = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
-  (survey) =>
-    Surveys.visitDescendantsAndSelfNodeDef({ survey, nodeDef, visitor: visitorFn, traverseMethod })
+  (survey) => {
+    const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
+    return Surveys.visitDescendantsAndSelfNodeDef({
+      survey,
+      nodeDef: nodeDefToVisit,
+      visitor: visitorFn,
+      traverseMethod,
+    })
+  }
 
 export const findDescendants =
   ({ nodeDef = null, filterFn }) =>
