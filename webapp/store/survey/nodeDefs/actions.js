@@ -17,6 +17,7 @@ import { NotificationActions } from '@webapp/store/ui/notification'
 
 import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
+import { NodeDefExpressionFactory } from '@openforis/arena-core/dist/nodeDef/nodeDef'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -48,11 +49,22 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 
 // ==== CREATE
 
+const createHeader = ({ parent, cycle, props: propsParam }) => {
+  const props = { ...propsParam, [NodeDef.propKeys.isHeader]: true, [NodeDef.propKeys.readOnly]: true }
+  const propsAdvanced = {
+    [NodeDef.keysPropsAdvanced.defaultValues]: [NodeDefExpressionFactory.createInstance({ expression: '0' })],
+  }
+  return NodeDef.newNodeDef(parent, NodeDef.nodeDefType.text, [cycle], props, propsAdvanced)
+}
+
 export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const nodeDef = NodeDef.newNodeDef(parent, type, [cycle], props)
+  const nodeDef =
+    type === NodeDef.NodeDefLayoutElementTypes.header
+      ? createHeader({ parent, cycle, props })
+      : NodeDef.newNodeDef(parent, type, [cycle], props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 

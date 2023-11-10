@@ -2,7 +2,6 @@ import './addNodeDefPanel.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 import { useNavigate } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
@@ -20,9 +19,11 @@ const AddNodeDefButtons = (props) => {
 
   const i18n = useI18n()
 
+  const types = [...Object.values(NodeDef.nodeDefType), 'header']
+
   return (
     <>
-      {R.values(NodeDef.nodeDefType).map((type) => {
+      {types.map((type) => {
         const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
         // Cannot add entities when entity is rendered as table

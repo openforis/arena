@@ -12,7 +12,7 @@ const NodeDefFormItem = (props) => {
   const { edit, entry, label, lang, nodeDef, nodes, parentNode } = props
   const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
 
-  if (NodeDef.isEntity(nodeDef)) {
+  if (NodeDef.isEntity(nodeDef) || NodeDef.isHeader(nodeDef)) {
     return nodeDefComponent
   }
 

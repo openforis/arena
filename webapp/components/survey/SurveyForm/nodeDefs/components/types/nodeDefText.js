@@ -3,14 +3,27 @@ import './nodeDefText.scss'
 import React from 'react'
 import classNames from 'classnames'
 
-import { Input } from '@webapp/components/form/Input'
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
+import { Input } from '@webapp/components/form/Input'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import Markdown from '@webapp/components/markdown'
+
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
+
+const Header = ({ nodeDef }) => {
+  const lang = useSurveyPreferredLang()
+
+  return (
+    <div className="survey-form__node-def-header" style={{ backgroundColor: NodeDef.getHeaderColor(nodeDef) }}>
+      <Markdown source={NodeDef.getLabel(nodeDef, lang)} />
+    </div>
+  )
+}
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => {
   const multiline = NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine
@@ -59,13 +72,16 @@ const MultipleTextInput = (props) => {
 const NodeDefText = (props) => {
   const { edit, entryDataQuery, nodeDef, nodes } = props
 
-  return edit ? (
-    <TextInput {...props} />
-  ) : NodeDef.isMultiple(nodeDef) && !entryDataQuery ? (
-    <MultipleTextInput {...props} />
-  ) : (
-    <TextInput {...props} node={nodes[0]} />
-  )
+  if (NodeDef.isHeader(nodeDef)) {
+    return <Header nodeDef={nodeDef} />
+  }
+  if (edit) {
+    return <TextInput {...props} />
+  }
+  if (NodeDef.isMultiple(nodeDef) && !entryDataQuery) {
+    return <MultipleTextInput {...props} />
+  }
+  return <TextInput {...props} node={nodes[0]} />
 }
 
 export default NodeDefText

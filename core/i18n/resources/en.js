@@ -1153,6 +1153,14 @@ E.g. this.region = region_attribute_name
       },
     },
     textProps: {
+      headerColorLabel: 'Header color',
+      headerColor: {
+        blue: 'Blue',
+        green: 'Green',
+        orange: 'Orange',
+        red: 'Red',
+        yellow: 'Yellow',
+      },
       textInputType: 'Text input type',
       textInputTypes: {
         singleLine: 'Single line',

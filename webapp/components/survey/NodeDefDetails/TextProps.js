@@ -3,25 +3,34 @@ import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 
+import * as NodeDef from '@core/survey/nodeDef'
+
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-
-import * as NodeDef from '@core/survey/nodeDef'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
+
+import { headerColors } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import { State } from './store'
 
-const textInputTypes = ({ i18n }) =>
-  Object.keys(NodeDef.textInputTypes).map((key) => ({
+const toButtonGroupItems = ({ i18n, object, labelPrefix }) =>
+  Object.keys(object).map((key) => ({
     key,
-    label: i18n.t(`nodeDefEdit.textProps.textInputTypes.${key}`),
+    label: i18n.t(`${labelPrefix}${key}`),
   }))
 
+const headerColorItems = ({ i18n }) =>
+  toButtonGroupItems({ i18n, object: headerColors, labelPrefix: 'nodeDefEdit.textProps.headerColor.' })
+
+const textInputTypes = ({ i18n }) =>
+  toButtonGroupItems({ i18n, object: NodeDef.textInputTypes, labelPrefix: 'nodeDefEdit.textProps.textInputTypes.' })
+
 const textTransformTypes = ({ i18n }) =>
-  Object.keys(NodeDef.textTransformValues).map((labelKey) => ({
-    key: labelKey,
-    label: i18n.t(`nodeDefEdit.textProps.textTransformTypes.${labelKey}`),
-  }))
+  toButtonGroupItems({
+    i18n,
+    object: NodeDef.textTransformValues,
+    labelPrefix: 'nodeDefEdit.textProps.textTransformTypes.',
+  })
 
 const TextProps = (props) => {
   const { state, Actions } = props
@@ -30,37 +39,55 @@ const TextProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
 
-  const selectLabelValue = useCallback(
+  const onLabelValueChange = useCallback(
     (value) => {
       Actions.setProp({ state, key: NodeDef.propKeys.textTransform, value })
     },
-    [state]
+    [Actions, state]
   )
 
-  useEffect(() => {
-    if (A.isEmpty(NodeDef.getTextTransform(nodeDef))) {
-      selectLabelValue(NodeDef.textTransformValues.none)
-    }
-  }, [])
+  const headerColor = NodeDef.getHeaderColor(nodeDef)
+  const selectedHeaderColorKey = Object.keys(headerColors).find((key) => headerColors[key] === headerColor)
+
+  const onHeaderColorChange = useCallback(
+    (value) => {
+      Actions.setProp({ state, key: NodeDef.propKeys.headerColor, value: headerColors[value] })
+    },
+    [Actions, state]
+  )
 
   return (
     <>
-      <FormItem label={i18n.t('nodeDefEdit.textProps.textTransform')}>
-        <ButtonGroup
-          selectedItemKey={NodeDef.getTextTransform(nodeDef)}
-          onChange={selectLabelValue}
-          items={textTransformTypes({ i18n })}
-        />
-      </FormItem>
-      <FormItem label={i18n.t('nodeDefEdit.textProps.textInputType')}>
-        <ButtonGroup
-          selectedItemKey={NodeDef.getTextInputType(nodeDef)}
-          onChange={(value) => {
-            Actions.setProp({ state, key: NodeDef.propKeys.textInputType, value })
-          }}
-          items={textInputTypes({ i18n })}
-        />
-      </FormItem>
+      {NodeDef.isHeader(nodeDef) ? (
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.textProps.headerColorLabel')}>
+            <ButtonGroup
+              selectedItemKey={selectedHeaderColorKey}
+              onChange={onHeaderColorChange}
+              items={headerColorItems({ i18n })}
+            />
+          </FormItem>
+        </>
+      ) : (
+        <>
+          <FormItem label={i18n.t('nodeDefEdit.textProps.textTransform')}>
+            <ButtonGroup
+              selectedItemKey={NodeDef.getTextTransform(nodeDef)}
+              onChange={onLabelValueChange}
+              items={textTransformTypes({ i18n })}
+            />
+          </FormItem>
+          <FormItem label={i18n.t('nodeDefEdit.textProps.textInputType')}>
+            <ButtonGroup
+              selectedItemKey={NodeDef.getTextInputType(nodeDef)}
+              onChange={(value) => {
+                Actions.setProp({ state, key: NodeDef.propKeys.textInputType, value })
+              }}
+              items={textInputTypes({ i18n })}
+            />
+          </FormItem>
+        </>
+      )}
     </>
   )
 }

@@ -167,3 +167,11 @@ export const getDefaultPropsByType = (type, cycle) => {
   const fn = getPropByType('defaultProps')(type)
   return fn ? fn(cycle) : {}
 }
+
+export const headerColors = {
+  blue: '#b3e5fc',
+  green: '#b2dfdb',
+  orange: '#ffe0b2',
+  red: '#ffcdd2',
+  yellow: '#f0f4c3',
+}

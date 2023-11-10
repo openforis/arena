@@ -20,6 +20,10 @@ import { valuePropsTaxon } from './nodeValueProps'
 
 export { nodeDefType }
 
+export const NodeDefLayoutElementTypes = {
+  header: 'header',
+}
+
 export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
@@ -63,6 +67,8 @@ export const propKeys = {
   // Text
   textInputType: 'textInputType',
   textTransform: 'textTransform',
+  isHeader: 'isHeader',
+  headerColor: 'headerColor',
 
   // Decimal
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
@@ -249,6 +255,8 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
+export const isHeader = ObjectUtils.isPropTrue(propKeys.isHeader)
+export const getHeaderColor = getProp(propKeys.headerColor)
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
