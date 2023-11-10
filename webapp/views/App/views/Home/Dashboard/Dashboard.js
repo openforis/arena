@@ -50,11 +50,14 @@ const Dashboard = () => {
             {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
               <div className="chart-container-dashboard">
                 <StorageSummary />
-                <RecordsByUser className="records-by-user" />
+                {recordsSummaryState.counts.length > 0 && <RecordsByUser className="records-by-user" />}
                 {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
               </div>
             )}
-            {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && <DailyRecordsByUser />}
+            {canEditSurvey &&
+              activeTab === 'Dashboard' &&
+              !isSurveyInfoEmpty &&
+              recordsSummaryState.counts.length > 0 && <DailyRecordsByUser />}
             {canEditSurvey && activeTab === 'RecordHistory' && !isSurveyInfoEmpty && recordsSummaryState.counts && (
               <Chart counts={recordsSummaryState.counts} from={recordsSummaryState.from} to={recordsSummaryState.to} />
             )}
