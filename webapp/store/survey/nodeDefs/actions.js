@@ -49,22 +49,11 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 
 // ==== CREATE
 
-const createHeader = ({ parent, cycle, props: propsParam }) => {
-  const props = { ...propsParam, [NodeDef.propKeys.isHeader]: true, [NodeDef.propKeys.readOnly]: true }
-  const propsAdvanced = {
-    [NodeDef.keysPropsAdvanced.defaultValues]: [NodeDefExpressionFactory.createInstance({ expression: '0' })],
-  }
-  return NodeDef.newNodeDef(parent, NodeDef.nodeDefType.text, [cycle], props, propsAdvanced)
-}
-
 export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
 
-  const nodeDef =
-    type === NodeDef.NodeDefLayoutElementTypes.header
-      ? createHeader({ parent, cycle, props })
-      : NodeDef.newNodeDef(parent, type, [cycle], props)
+  const nodeDef = NodeDef.newNodeDef(parent, type, [cycle], props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 

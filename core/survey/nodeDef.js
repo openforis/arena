@@ -20,9 +20,7 @@ import { valuePropsTaxon } from './nodeValueProps'
 
 export { nodeDefType }
 
-export const NodeDefLayoutElementTypes = {
-  header: 'header',
-}
+export const NodeDefLayoutElementTypes = [nodeDefType.header]
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -93,7 +91,6 @@ export const propKeys = {
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 
   // layout elements
-  isHeader: 'isHeader',
   headerColor: 'headerColor',
 }
 
@@ -211,6 +208,8 @@ export const isInteger = isType(nodeDefType.integer)
 export const isTaxon = isType(nodeDefType.taxon)
 export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
+// layout elments
+export const isHeader = isType(nodeDefType.header)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
@@ -260,7 +259,6 @@ export const getTextTransformFunction = (nodeDef) =>
 
 // layout elements
 
-export const isHeader = ObjectUtils.isPropTrue(propKeys.isHeader)
 export const getHeaderColor = getProp(propKeys.headerColor)
 export const isLayoutElement = isHeader
 

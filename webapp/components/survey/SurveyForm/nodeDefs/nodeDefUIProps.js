@@ -17,7 +17,7 @@ import NodeDefText from './components/types/nodeDefText'
 import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefTime from './components/types/nodeDefTime'
 
-const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
+const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity, header } = NodeDef.nodeDefType
 
 const propsUI = {
   [integer]: {
@@ -122,7 +122,7 @@ const propsUI = {
     }),
   },
 
-  [NodeDef.NodeDefLayoutElementTypes.header]: {
+  [header]: {
     icon: <span className="icon icon-minus icon-left" />,
   },
 }

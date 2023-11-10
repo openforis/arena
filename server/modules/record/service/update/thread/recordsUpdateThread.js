@@ -160,7 +160,10 @@ class RecordsUpdateThread extends Thread {
 
     const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
+    console.log('===init record', recordUuid)
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+
+    console.log('===record1', record)
 
     record = await RecordManager.initNewRecord({
       user,
@@ -170,6 +173,7 @@ class RecordsUpdateThread extends Thread {
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
     })
+    console.log('===record2', record)
     recordsCache.set(recordUuid, record)
   }
 
