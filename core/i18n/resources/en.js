@@ -1243,6 +1243,8 @@ E.g. this.region = region_attribute_name
       taxon: 'Taxon',
       text: 'Text',
       time: 'Time',
+      // layout elments
+      header: 'Form Header',
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,

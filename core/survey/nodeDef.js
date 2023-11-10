@@ -67,8 +67,6 @@ export const propKeys = {
   // Text
   textInputType: 'textInputType',
   textTransform: 'textTransform',
-  isHeader: 'isHeader',
-  headerColor: 'headerColor',
 
   // Decimal
   maxNumberDecimalDigits: 'maxNumberDecimalDigits',
@@ -93,6 +91,10 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
+
+  // layout elements
+  isHeader: 'isHeader',
+  headerColor: 'headerColor',
 }
 
 export const textInputTypes = {
@@ -255,8 +257,12 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
+
+// layout elements
+
 export const isHeader = ObjectUtils.isPropTrue(propKeys.isHeader)
 export const getHeaderColor = getProp(propKeys.headerColor)
+export const isLayoutElement = isHeader
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -505,8 +511,9 @@ export const keepOnlyOneCycle =
 export const canNodeDefBeMultiple = (nodeDef) =>
   // Entity def but not root
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
-  // Attribute def but not analysis
-  (!isAnalysis(nodeDef) &&
+  // Attribute def but not layout element and not analysis
+  (!isLayoutElement(nodeDef) &&
+    !isAnalysis(nodeDef) &&
     R.includes(getType(nodeDef), [
       nodeDefType.decimal,
       nodeDefType.code,
@@ -526,7 +533,8 @@ export const canNodeDefTypeBeKey = (type) =>
     nodeDefType.time,
   ])
 
-export const canNodeDefBeKey = (nodeDef) => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
+export const canNodeDefBeKey = (nodeDef) =>
+  !isLayoutElement(nodeDef) && !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
 export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&

@@ -58,7 +58,7 @@ const NodeDefDetails = () => {
         </FormItem>
 
         <TabBar
-          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef)}
+          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef) && !NodeDef.isLayoutElement(nodeDef)}
           tabs={[
             {
               label: i18n.t('nodeDefEdit.basic'),

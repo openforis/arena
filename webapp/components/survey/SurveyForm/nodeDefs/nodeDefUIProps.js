@@ -121,6 +121,10 @@ const propsUI = {
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
     }),
   },
+
+  [NodeDef.NodeDefLayoutElementTypes.header]: {
+    icon: <span className="icon icon-minus icon-left" />,
+  },
 }
 
 const getPropByType =

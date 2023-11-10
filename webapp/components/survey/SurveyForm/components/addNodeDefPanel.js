@@ -19,7 +19,7 @@ const AddNodeDefButtons = (props) => {
 
   const i18n = useI18n()
 
-  const types = [...Object.values(NodeDef.nodeDefType), 'header']
+  const types = [...Object.values(NodeDef.nodeDefType), ...Object.values(NodeDef.NodeDefLayoutElementTypes)]
 
   return (
     <>
