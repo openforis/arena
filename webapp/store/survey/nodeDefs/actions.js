@@ -17,7 +17,6 @@ import { NotificationActions } from '@webapp/store/ui/notification'
 
 import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
-import { NodeDefExpressionFactory } from '@openforis/arena-core/dist/nodeDef/nodeDef'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
