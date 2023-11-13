@@ -1,0 +1,8 @@
+@import '../../../SurveyFormVars';
+
+.survey-form__node-def-form-header {
+  border: $formBorder;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+}
