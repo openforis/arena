@@ -13,6 +13,9 @@ export { LoaderActions, useLoader } from './loader'
 // ====== DialogConfirm
 export { DialogConfirmActions, useDialogConfirm } from './dialogConfirm'
 
+// ====== FileUploadDialog
+export { FileUploadDialogActions, useFileUploadDialog } from './fileUploadDialog'
+
 // ====== SurveyForm
 export { SurveyFormActions, SurveyFormState } from './surveyForm'
 

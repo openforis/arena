@@ -29,6 +29,7 @@ export const {
   fetchUserProfilePicture,
   fetchSystemAdministratorsEmail,
   fetchUsersIntoStream,
+  fetchActiveUserUuidsWithPreferredSurveyId,
   updateNamePasswordAndStatus,
   updatePassword,
   resetUsersPrefsSurveyCycle,

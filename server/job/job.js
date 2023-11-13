@@ -421,6 +421,10 @@ export default class Job {
     this._logger.info(...msgs)
   }
 
+  logWarn(...msgs) {
+    this._logger.warn(...msgs)
+  }
+
   logError(...msgs) {
     this._logger.error(...msgs)
   }

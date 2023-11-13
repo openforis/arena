@@ -13,6 +13,8 @@ import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as Chain from '@common/analysis/chain'
 
+import * as UserService from '@server/modules/user/service/userService'
+
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -166,4 +168,5 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
       }
     })
   })
+  await UserService.notifyActiveUsersAboutSurveyUpdate({ surveyId })
 }

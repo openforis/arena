@@ -7,6 +7,7 @@ import RecordsImportJob from './jobs/recordsImportJob'
 import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 export default class ArenaMobileDataImportJob extends Job {
   /**
@@ -24,12 +25,16 @@ export default class ArenaMobileDataImportJob extends Job {
   async onStart() {
     await super.onStart()
 
-    const { filePath } = this.context
+    const { context, tx } = this
+    const { filePath, surveyId } = context
 
     const arenaSurveyFileZip = new FileZip(filePath)
     await arenaSurveyFileZip.init()
 
     this.setContext({ arenaSurveyFileZip })
+
+    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
+    this.setContext({ survey })
   }
 
   async beforeSuccess() {

@@ -162,6 +162,7 @@ export const TestId = {
   },
   surveyForm: {
     addSubPageBtn: 'add-sub-page-btn',
+    advancedFunctionBtn: 'advanced-functions-btn',
     codeInputDropdown: (name) => `${name}-code`,
     coordinateX: (name) => `${name}-x`,
     coordinateY: (name) => `${name}-y`,

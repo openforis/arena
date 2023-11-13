@@ -43,7 +43,7 @@ export {
   startRecordsCloneJob,
 } from './data'
 export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
-export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
+export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey, startImportLabelsJob } from './survey'
 export {
   fetchNodeDef,
   fetchNodeDefs,

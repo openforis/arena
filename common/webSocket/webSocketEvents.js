@@ -12,6 +12,8 @@ export const WebSocketEvents = {
   nodesUpdateCompleted: 'nodesUpdateCompleted',
   nodeValidationsUpdate: 'nodeValidationsUpdate',
   recordDelete: 'recordDelete',
+  surveyUpdate: 'surveyUpdate',
+
   error: 'threadError',
   recordSessionExpired: 'recordSessionExpired',
   applicationError: 'applicationError',
