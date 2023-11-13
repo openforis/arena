@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 
-import { Surveys } from '@openforis/arena-core'
+import { Surveys, TraverseMethod } from '@openforis/arena-core'
+
+import Queue from '@core/queue'
 
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
@@ -9,7 +11,6 @@ import * as NodeDefValidations from '../nodeDefValidations'
 import * as Category from '../category'
 import * as SurveyInfo from './surveyInfo'
 import * as SurveyNodeDefsIndex from './surveyNodeDefsIndex'
-import Queue from '@core/queue'
 
 const nodeDefsKey = 'nodeDefs'
 
@@ -312,22 +313,15 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
 }
 
 export const visitDescendantsAndSelf =
-  ({ nodeDef = null, visitorFn }) =>
+  ({ nodeDef = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
   (survey) => {
-    const queue = new Queue()
-
-    queue.enqueue(nodeDef || getNodeDefRoot(survey))
-
-    while (!queue.isEmpty()) {
-      const nodeDefCurrent = queue.dequeue()
-
-      visitorFn(nodeDefCurrent)
-
-      if (NodeDef.isEntity(nodeDefCurrent)) {
-        const childrenDefs = getNodeDefChildren(nodeDefCurrent)(survey)
-        queue.enqueueItems(childrenDefs)
-      }
-    }
+    const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
+    return Surveys.visitDescendantsAndSelfNodeDef({
+      survey,
+      nodeDef: nodeDefToVisit,
+      visitor: visitorFn,
+      traverseMethod,
+    })
   }
 
 export const findDescendants =

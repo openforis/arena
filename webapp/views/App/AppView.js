@@ -13,6 +13,7 @@ import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import Header from './Header'
 import JobMonitor from './JobMonitor'
+import { FileUploadDialog } from './FileUploadDialog'
 import ServiceErrors from './ServiceErrors'
 import SideBar from './SideBar'
 
@@ -75,6 +76,7 @@ const AppView = () => {
       </div>
 
       <JobMonitor />
+      <FileUploadDialog />
       <ServiceErrors />
     </>
   )

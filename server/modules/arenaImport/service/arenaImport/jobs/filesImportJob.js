@@ -18,13 +18,25 @@ export default class FilesImportJob extends Job {
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
     if (filesSummaries && filesSummaries.length > 0) {
+      const filesUuids = filesSummaries.map(RecordFile.getUuid)
+      this.logDebug('file UUIDs in zip file', filesUuids)
+      this.logDebug('file UUIDs found in records', this.context.recordsFileUuids)
+
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
       this.total = filesSummaries.length
       await PromiseUtils.each(filesSummaries, async (fileSummary) => {
         let file = { ...fileSummary }
         // load file content from a separate file
-        const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, RecordFile.getUuid(fileSummary))
+        const fileUuid = RecordFile.getUuid(fileSummary)
+        const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
+        if (!fileContent) {
+          const fileName = RecordFile.getName(fileSummary)
+          throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
+        }
+
+        this.checkFileUuidIsInRecords(fileUuid)
+
         file = RecordFile.assocContent(fileContent)(file)
 
         await this.persistFile(file)
@@ -34,13 +46,33 @@ export default class FilesImportJob extends Job {
     }
   }
 
+  checkFileUuidIsInRecords(fileUuid) {
+    const { recordsFileUuids } = this.context
+    if (recordsFileUuids && !recordsFileUuids.includes(fileUuid)) {
+      throw new Error(`File UUID ${fileUuid} not found in records`)
+    }
+  }
+
   async persistFile(file) {
-    const { surveyId } = this.context
-    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, file.uuid, this.tx)
+    const { context, tx } = this
+    const { surveyId } = context
+    const fileUuid = RecordFile.getUuid(file)
+    const fileProps = RecordFile.getProps(file)
+    this.logDebug(`persisting file ${fileUuid}`)
+    const existingFileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
     if (existingFileSummary) {
-      await FileService.updateFileProps(surveyId, RecordFile.getUuid(file), RecordFile.getProps(file), this.tx)
+      this.logDebug(`file already existing`)
+      if (RecordFile.isDeleted(existingFileSummary)) {
+        this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
+        await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+        await FileService.insertFile(surveyId, file, tx)
+      } else {
+        this.logDebug('updating props')
+        await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+      }
     } else {
-      await FileService.insertFile(surveyId, file, this.tx)
+      this.logDebug(`file not existing: inserting new file`, fileProps)
+      await FileService.insertFile(surveyId, file, tx)
     }
   }
 

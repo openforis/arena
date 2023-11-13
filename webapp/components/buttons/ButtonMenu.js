@@ -39,7 +39,7 @@ export const ButtonMenu = (props) => {
 
       <Menu anchorEl={anchorEl} className={menuClassName} open={open} onClose={closeMenu}>
         {items.map((item) => (
-          <MenuItem key={item.key} onClick={onItemClick(item)}>
+          <MenuItem key={item.key} className="button-menu__item" onClick={onItemClick(item)}>
             {item.content ? (
               item.content
             ) : (
