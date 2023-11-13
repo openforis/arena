@@ -21,7 +21,12 @@ const exportLabels = async ({ surveyId, outputStream }) => {
         ...languages.reduce(
           (labelsAcc, lang) => ({
             ...labelsAcc,
-            [SurveyLabelsExportModel.getLabelColumn(lang)]: NodeDef.getLabel(nodeDef, lang),
+            [SurveyLabelsExportModel.getLabelColumn(lang)]: NodeDef.getLabel(
+              nodeDef,
+              lang,
+              NodeDef.NodeDefLabelTypes.label,
+              false
+            ),
           }),
           {}
         ),
