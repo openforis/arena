@@ -20,7 +20,7 @@ import { valuePropsTaxon } from './nodeValueProps'
 
 export { nodeDefType }
 
-export const NodeDefLayoutElementTypes = [nodeDefType.header]
+export const NodeDefLayoutElementTypes = [nodeDefType.formHeader]
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -209,7 +209,7 @@ export const isTaxon = isType(nodeDefType.taxon)
 export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
 // layout elments
-export const isHeader = isType(nodeDefType.header)
+export const isFormHeader = isType(nodeDefType.formHeader)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
@@ -260,7 +260,7 @@ export const getTextTransformFunction = (nodeDef) =>
 // layout elements
 
 export const getHeaderColor = getProp(propKeys.headerColor)
-export const isLayoutElement = isHeader
+export const isLayoutElement = isFormHeader
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)

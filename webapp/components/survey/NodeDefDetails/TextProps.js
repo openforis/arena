@@ -1,7 +1,5 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-
-import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -58,7 +56,7 @@ const TextProps = (props) => {
 
   return (
     <>
-      {NodeDef.isHeader(nodeDef) ? (
+      {NodeDef.isFormHeader(nodeDef) ? (
         <>
           <FormItem label={i18n.t('nodeDefEdit.textProps.headerColorLabel')}>
             <ButtonGroup

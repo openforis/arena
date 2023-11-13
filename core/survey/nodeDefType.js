@@ -11,5 +11,5 @@ export const nodeDefType = {
   file: 'file',
   entity: 'entity',
   // layout elements
-  header: 'header',
+  formHeader: 'formHeader',
 }

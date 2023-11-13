@@ -7,17 +7,19 @@ import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValuePro
 
 import { NumberFormats } from '@webapp/components/form/Input'
 
+import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefCode from './components/types/NodeDefCode'
+import NodeDefCoordinate from './components/types/nodeDefCoordinate'
+import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
+import NodeDefFormHeader from './components/types/nodeDefFormHeader'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
-import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCode from './components/types/NodeDefCode'
-import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
-import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefTime from './components/types/nodeDefTime'
 
-const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity, header } = NodeDef.nodeDefType
+const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity, formHeader } =
+  NodeDef.nodeDefType
 
 const propsUI = {
   [integer]: {
@@ -122,7 +124,8 @@ const propsUI = {
     }),
   },
 
-  [header]: {
+  [formHeader]: {
+    component: NodeDefFormHeader,
     icon: <span className="icon icon-minus icon-left" />,
   },
 }
