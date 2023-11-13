@@ -176,9 +176,17 @@ export const getDefaultPropsByType = (type, cycle) => {
 }
 
 export const headerColors = {
-  blue: '#b3e5fc',
-  green: '#b2dfdb',
-  orange: '#ffe0b2',
-  red: '#ffcdd2',
-  yellow: '#f0f4c3',
+  blue: 'blue',
+  green: 'green',
+  orange: 'orange',
+  red: 'red',
+  yellow: 'yellow',
+}
+
+export const headerColorCodesByColor = {
+  [headerColors.blue]: '#b3e5fc',
+  [headerColors.green]: '#b2dfdb',
+  [headerColors.orange]: '#ffe0b2',
+  [headerColors.red]: '#ffcdd2',
+  [headerColors.yellow]: '#f0f4c3',
 }

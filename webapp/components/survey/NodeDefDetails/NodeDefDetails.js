@@ -53,7 +53,7 @@ const NodeDefDetails = () => {
             }
           />
           <div className="attribute-selector">
-            {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
+            {i18n.t(`surveyForm.addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
           </div>
         </FormItem>
 

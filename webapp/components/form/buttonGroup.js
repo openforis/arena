@@ -5,40 +5,52 @@ import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
 
-const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => (
+const ButtonGroup = ({
+  items,
+  groupName,
+  multiple,
+  selectedItemKey,
+  onChange,
+  disabled: disabledProp,
+  deselectable,
+  className,
+}) => (
   <div className={`btn-group${className ? ` ${className}` : ''}`}>
     {items.map((item) => {
-      const selected = selectedItemKey === item.key || (multiple && R.includes(item.key, selectedItemKey))
+      const { key, disabled, icon, label } = item
+      const selected = selectedItemKey === key || (multiple && R.includes(key, selectedItemKey))
       return (
         <button
-          data-testid={groupName ? `${groupName}_${item.key}` : null}
-          key={item.key}
+          data-testid={groupName ? `${groupName}_${key}` : null}
+          key={key}
           type="button"
           className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
           onClick={() => {
             let value
             if (multiple) {
-              value = R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
+              value = R.ifElse(R.always(selected), R.without(key), R.append(key))(selectedItemKey)
             } else if (selected) {
               value = null
             } else {
-              value = item.key
+              value = key
             }
             onChange(value)
           }}
-          aria-disabled={Boolean(item.disabled) || disabled}
+          aria-disabled={Boolean(disabled) || disabledProp}
         >
-          {item.label}
+          {icon && icon({ key })}
+          {label}
         </button>
       )
     })}
   </div>
 )
 
-export const toButtonGroupItems = ({ i18n, object, labelPrefix }) =>
+export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =>
   Object.keys(object).map((key) => ({
     key,
     label: i18n.t(`${labelPrefix}${key}`),
+    icon,
   }))
 
 ButtonGroup.propTypes = {

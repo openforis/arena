@@ -1,0 +1,11 @@
+.btn-group.form-header-color-btn-group {
+  button {
+    display: flex;
+    gap: 1rem;
+
+    .form-header-color-icon {
+      height: 1rem;
+      width: 1rem;
+    }
+  }
+}
