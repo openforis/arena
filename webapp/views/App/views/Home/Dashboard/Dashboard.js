@@ -17,6 +17,7 @@ import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
 import './Dashboard.scss'
 import RecordsByUser from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
+import Chart from './RecordsSummary/Chart'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
@@ -49,12 +50,17 @@ const Dashboard = () => {
             {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
               <div className="chart-container-dashboard">
                 <StorageSummary />
-                <RecordsByUser className="records-by-user" />
+                {recordsSummaryState.counts.length > 0 && <RecordsByUser className="records-by-user" />}
                 {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
               </div>
             )}
-            {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && <DailyRecordsByUser />}
-            {canEditSurvey && activeTab === 'Record History' && !isSurveyInfoEmpty && <StorageSummary />}
+            {canEditSurvey &&
+              activeTab === 'Dashboard' &&
+              !isSurveyInfoEmpty &&
+              recordsSummaryState.counts.length > 0 && <DailyRecordsByUser />}
+            {canEditSurvey && activeTab === 'RecordHistory' && !isSurveyInfoEmpty && recordsSummaryState.counts && (
+              <Chart counts={recordsSummaryState.counts} from={recordsSummaryState.from} to={recordsSummaryState.to} />
+            )}
           </RecordsSummaryContext.Provider>
         </div>
       )}
