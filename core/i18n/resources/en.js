@@ -1152,7 +1152,7 @@ E.g. this.region = region_attribute_name
         other: 'Other',
       },
     },
-    textProps: {
+    formHeaderProps: {
       headerColorLabel: 'Header color',
       headerColor: {
         blue: 'Blue',
@@ -1161,6 +1161,8 @@ E.g. this.region = region_attribute_name
         red: 'Red',
         yellow: 'Yellow',
       },
+    },
+    textProps: {
       textInputType: 'Text input type',
       textInputTypes: {
         singleLine: 'Single line',
@@ -1244,7 +1246,7 @@ E.g. this.region = region_attribute_name
       text: 'Text',
       time: 'Time',
       // layout elments
-      header: 'Form Header',
+      formHeader: 'Form Header',
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,

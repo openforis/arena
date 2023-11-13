@@ -35,6 +35,12 @@ const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, di
   </div>
 )
 
+export const toButtonGroupItems = ({ i18n, object, labelPrefix }) =>
+  Object.keys(object).map((key) => ({
+    key,
+    label: i18n.t(`${labelPrefix}${key}`),
+  }))
+
 ButtonGroup.propTypes = {
   items: PropTypes.array,
   groupName: PropTypes.string,

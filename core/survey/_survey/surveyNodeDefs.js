@@ -41,8 +41,6 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) =>
       ).length > 1
   )
 
-const filterNodeDefsNotLayoutElements = (nodeDefs) => nodeDefs.filter((nodeDef) => !NodeDef.isLayoutElement(nodeDef))
-
 export const getNodeDefChildren =
   (nodeDef, includeAnalysis = true, includeLayoutElements = false) =>
   (survey) => {

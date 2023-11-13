@@ -19,11 +19,9 @@ const AddNodeDefButtons = (props) => {
 
   const i18n = useI18n()
 
-  const types = [...Object.values(NodeDef.nodeDefType), ...NodeDef.NodeDefLayoutElementTypes]
-
   return (
     <>
-      {types.map((type) => {
+      {Object.values(NodeDef.nodeDefType).map((type) => {
         const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
         // Cannot add entities when entity is rendered as table
