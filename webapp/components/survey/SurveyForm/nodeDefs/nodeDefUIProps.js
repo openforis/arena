@@ -21,6 +21,22 @@ import NodeDefTime from './components/types/nodeDefTime'
 const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity, formHeader } =
   NodeDef.nodeDefType
 
+export const headerColors = {
+  blue: 'blue',
+  green: 'green',
+  orange: 'orange',
+  red: 'red',
+  yellow: 'yellow',
+}
+
+export const headerColorRgbCodesByColor = {
+  [headerColors.blue]: '#b3e5fc',
+  [headerColors.green]: '#b2dfdb',
+  [headerColors.orange]: '#ffb38a',
+  [headerColors.red]: '#f97c7c',
+  [headerColors.yellow]: '#fffdaf',
+}
+
 const propsUI = {
   [integer]: {
     icon: <span className="icon-left node_def__icon">123</span>,
@@ -127,6 +143,9 @@ const propsUI = {
   [formHeader]: {
     component: NodeDefFormHeader,
     icon: <span className="icon icon-minus icon-left" />,
+    defaultProps: () => ({
+      [NodeDef.propKeys.headerColor]: headerColors.blue,
+    }),
   },
 }
 
@@ -173,20 +192,4 @@ export const getValidationsEnabledByType = getPropByType('validations', true)
 export const getDefaultPropsByType = (type, cycle) => {
   const fn = getPropByType('defaultProps')(type)
   return fn ? fn(cycle) : {}
-}
-
-export const headerColors = {
-  blue: 'blue',
-  green: 'green',
-  orange: 'orange',
-  red: 'red',
-  yellow: 'yellow',
-}
-
-export const headerColorCodesByColor = {
-  [headerColors.blue]: '#b3e5fc',
-  [headerColors.green]: '#b2dfdb',
-  [headerColors.orange]: '#ffe0b2',
-  [headerColors.red]: '#ffcdd2',
-  [headerColors.yellow]: '#f0f4c3',
 }

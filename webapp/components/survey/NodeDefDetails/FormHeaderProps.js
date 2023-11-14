@@ -9,7 +9,7 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/buttonGroup'
 
-import { headerColors, headerColorCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { headerColors, headerColorRgbCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import { State } from './store'
 
@@ -19,7 +19,7 @@ const headerColorItems = ({ i18n }) =>
     object: headerColors,
     labelPrefix: 'nodeDefEdit.formHeaderProps.headerColor.',
     icon: ({ key }) => (
-      <span className="form-header-color-icon" style={{ backgroundColor: headerColorCodesByColor[key] }} />
+      <span className="form-header-color-icon" style={{ backgroundColor: headerColorRgbCodesByColor[key] }} />
     ),
   })
 
@@ -31,7 +31,6 @@ const FormHeaderProps = (props) => {
   const nodeDef = State.getNodeDef(state)
 
   const headerColor = NodeDef.getHeaderColor(nodeDef)
-  const selectedHeaderColorKey = Object.keys(headerColors).find((key) => headerColors[key] === headerColor)
 
   const onHeaderColorChange = useCallback(
     (value) => {
@@ -44,7 +43,7 @@ const FormHeaderProps = (props) => {
     <FormItem label={i18n.t('nodeDefEdit.formHeaderProps.headerColorLabel')}>
       <ButtonGroup
         className="form-header-color-btn-group"
-        selectedItemKey={selectedHeaderColorKey}
+        selectedItemKey={headerColor}
         onChange={onHeaderColorChange}
         items={headerColorItems({ i18n })}
       />

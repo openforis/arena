@@ -15,7 +15,7 @@ const NodeDefFormHeader = (props) => {
 
   const lang = useSurveyPreferredLang()
 
-  const backgroundColor = NodeDefUIProps.headerColorCodesByColor[NodeDef.getHeaderColor(nodeDef)]
+  const backgroundColor = NodeDefUIProps.headerColorRgbCodesByColor[NodeDef.getHeaderColor(nodeDef)]
 
   return (
     <div className="survey-form__node-def-form-header" style={{ backgroundColor }}>
