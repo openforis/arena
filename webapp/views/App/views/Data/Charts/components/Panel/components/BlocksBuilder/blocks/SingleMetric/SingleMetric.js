@@ -6,16 +6,7 @@ import RenderByType from '../BlockRenderer/BlockRenderer'
 import { ButtonAdd } from '@webapp/components'
 
 const SinglePopoverContent = (props) => {
-  const {
-    config,
-    configItemsByPath,
-    configActions,
-    blockPath,
-    dimensions,
-    block,
-    setIsPopoverOpen,
-    metric,
-  } = props
+  const { config, configItemsByPath, configActions, blockPath, dimensions, block, setIsPopoverOpen, metric } = props
   const { blocks, order } = block
 
   const [draftMetric, setDraftMetric] = useState(metric)

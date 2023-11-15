@@ -1,4 +1,4 @@
-import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { TitleBlock, ShowLegendBlock, MetricBlock, GroupByBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
 
 const pie = {
@@ -6,74 +6,60 @@ const pie = {
     title: 'Pie',
   },
   baseSpec: {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    layer: [
-      {
-        mark: { type: 'arc', innerRadius: 40, outerRadius: 80 },
-      },
-    ],
+    chartType: 'pieChart',
+    chart: {
+      titleSize: '20',
+      showLegend: true,
+    },
+    query: {},
   },
   builderBlocks: {
     blocks: {
       query: {
         title: 'Query',
-        subtitle: 'Here we config the query of the pie',
+        subtitle: '',
         type: 'container',
         blocks: {
           groupBy: GroupByBlock({
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = valuesToCalculations(value)
-
-              const color = {
+              const groupBy = {
+                field_uuid: transform.key,
                 field: transform.as,
                 type: 'nominal',
-                legend: {
-                  titleFontSize: 8,
-                  labelFontSize: 5,
-                },
-
-                impute: {
-                  value: 'NULL',
-                },
               }
 
               const newSpec = {
                 ...spec,
-                transform: [transform],
-                encoding: {
-                  ...(spec.encoding || {}),
-                  color,
+                query: {
+                  ...spec.query,
+                  groupBy,
                 },
               }
-
               return newSpec
             },
           }),
           metric: MetricBlock({
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
+            subtitle: '',
+            valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
+              const transform = valuesToCalculations(columnValues, '-')
+              const aggTransform = valuesToCalculations(aggregationValues, '-')
 
-              const transform = valuesToCalculations(columnValues)
-
-              // TODO: Improve the way out of the aggregation
-              const ag = aggregationValues?.[0]?.value
-
-              const theta = {
+              const metric = {
                 field: transform.as,
+                field_uuid: transform.key,
+                aggregate: aggTransform.as,
                 type: 'quantitative',
-                aggregate: ag,
-                impute: {
-                  value: 'NULL',
-                },
-                stack: true,
               }
 
               const newSpec = {
                 ...spec,
-                encoding: {
-                  ...(spec.encoding || {}),
-                  theta: theta,
+                query: {
+                  ...spec.query,
+                  metric,
                 },
               }
               return newSpec
@@ -84,30 +70,28 @@ const pie = {
       },
       other: {
         title: 'Custom Chart',
-        subtitle: 'Custom configuration of the chart',
+        subtitle: 'Configuration of the Chart',
         type: 'container',
         blocks: {
-          'show-title': ShowTitleBlock(),
-          title: TitleBlock(),
-          'show-legend': ShowLegendBlock({
+          title: TitleBlock({
             valuesToSpec: ({ value = [], spec = {} }) => {
-              let legend = {
-                titleFontSize: 8,
-                labelFontSize: 5,
-              }
-
-              if (!value) {
-                legend = false
-              }
-
               const newSpec = {
                 ...spec,
-                encoding: {
-                  ...(spec.encoding || {}),
-                  color: {
-                    ...(spec.encoding?.color || {}),
-                    legend: legend,
-                  },
+                chart: {
+                  ...spec.chart,
+                  title: value,
+                },
+              }
+              return newSpec
+            },
+          }),
+          'show-legend': ShowLegendBlock({
+            valuesToSpec: ({ value = [], spec = {} }) => {
+              const newSpec = {
+                ...spec,
+                chart: {
+                  ...spec.chart,
+                  showLegend: value,
                 },
               }
               return newSpec
@@ -118,24 +102,20 @@ const pie = {
             title: 'Radio',
             subtitle: '',
             type: 'slider',
-            params: { min: 0, max: 80, step: 1, default: 40, unit: 'px' },
+            params: { min: 0, max: 80, step: 1, default: 0, unit: 'px' },
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
-                layer: [
-                  {
-                    mark: {
-                      ...(spec.layer[0].mark || {}),
-                      innerRadius: value,
-                    },
-                  },
-                ],
+                chart: {
+                  ...spec.chart,
+                  innerRadius: value,
+                },
               }
               return newSpec
             },
           },
         },
-        order: ['show-title', 'title', 'show-legend', 'donut-radio'],
+        order: ['title', 'show-legend', 'donut-radio'],
       },
     },
     order: ['query', 'other'],

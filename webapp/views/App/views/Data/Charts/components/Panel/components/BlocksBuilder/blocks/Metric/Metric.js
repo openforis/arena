@@ -168,8 +168,17 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
 const MetricBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
   const { title, subtitle } = block
 
-  const options = useMemo(() => block.options || dimensions, [dimensions, block])
-  const flatOptions = useMemo(() => block.options || options.flatMap((d) => d.options), [options, block])
+  const options = useMemo(() => {
+    const metrics = configItemsByPath?.[blockPath]?.value || []
+    return (block.options || dimensions).filter((option) => !metrics.some((metric) => metric.key === option.key))
+  }, [dimensions, block, configItemsByPath, blockPath])
+
+  const flatOptions = useMemo(() => {
+    const metrics = configItemsByPath?.[blockPath]?.value || []
+    return (block.options || options.flatMap((d) => d.options)).filter(
+      (option) => !metrics.some((metric) => metric.key === option.key)
+    )
+  }, [options, block, configItemsByPath, blockPath])
 
   const metrics = useMemo(() => configItemsByPath?.[blockPath]?.value || [], [configItemsByPath, blockPath])
 

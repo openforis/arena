@@ -82,7 +82,7 @@ const DailyRecordsByUser = () => {
       }))
 
       const margin = { top: 20, right: 120, bottom: 70, left: 30 }
-      const width = window.innerWidth * 0.7 - margin.left - margin.right // Reduced width to 70% of window width
+      const width = window.innerWidth * 0.725 - margin.left - margin.right
       const height = 250 - margin.top - margin.bottom
 
       const x = d3.scaleTime().range([0, width])
@@ -102,7 +102,7 @@ const DailyRecordsByUser = () => {
         svg = d3
           .select(ref.current)
           .append('svg')
-          .attr('width', width + margin.left + margin.right)
+          .attr('width', width + margin.left + margin.right + window.innerWidth * 0.15)
           .attr('height', height + margin.top + margin.bottom)
       }
       // Clear the SVG
@@ -154,7 +154,6 @@ const DailyRecordsByUser = () => {
       tooltip.style('z-index', '10')
       tooltip.style('color', 'black')
 
-      // Add dots to line
       user
         .selectAll('dot')
         .data((d) => d.records.map((record) => ({ record, user: d.user })))
@@ -187,7 +186,7 @@ const DailyRecordsByUser = () => {
 
       legend
         .append('rect')
-        .attr('x', width + 105)
+        .attr('x', width) // Adjust the x attribute to start where the chart ends
         .attr('y', (d, i) => i * 20)
         .attr('width', 12)
         .attr('height', 12)
@@ -195,11 +194,11 @@ const DailyRecordsByUser = () => {
 
       legend
         .append('text')
-        .attr('x', width + 100)
+        .attr('x', width + 15) // Adjust the x attribute to place the text to the right of the color rectangle
         .attr('y', (d, i) => i * 20 + 9)
         .attr('dy', '.15em')
-        .style('text-anchor', 'end')
-        .text((d) => (d.user.length > 12 ? d.user.substring(0, 9) + '..' : d.user)) // Truncate user name if it exceeds 15 characters
+        .style('text-anchor', 'start') // Adjust the text-anchor attribute to start
+        .text((d) => d.user) // Remove the code that truncates the user name
 
       svg
         .append('g')
@@ -208,6 +207,7 @@ const DailyRecordsByUser = () => {
         .selectAll('text')
         .attr('transform', 'rotate(-45)')
         .style('text-anchor', 'end')
+        .style('font-size', '12px')
 
       svg
         .append('g')
@@ -229,6 +229,7 @@ const DailyRecordsByUser = () => {
 
   return (
     <div className="container">
+      <h4 className="center-text">Daily records added by user</h4>
       <Select
         isMulti
         options={sortedUserCounts.map((user) => ({
@@ -242,8 +243,8 @@ const DailyRecordsByUser = () => {
               : []
           )
         }
+        styles={{ menu: (provided) => ({ ...provided, width: '300px' }) }}
       />
-      <h4 className="center-text">Daily records added by user</h4>
       <div ref={ref} className="chart-container"></div>
     </div>
   )

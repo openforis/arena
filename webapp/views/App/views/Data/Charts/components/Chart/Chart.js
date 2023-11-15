@@ -4,14 +4,28 @@ import Split from 'react-split'
 import Data from './components/Data'
 import ScatterPlot from './components/ChartTypes/ScatterPlot/'
 import BarChart from './components/ChartTypes/BarChart/'
+import PieChart from './components/ChartTypes/PieChart/'
 import './Chart.scss'
 
-const Chart = ({ data, specs, draft, renderChart, fullScreen }) => {
+const Chart = ({ data, specs, fullScreen }) => {
   const chartType = specs?.chartType
   const hasData = Boolean(data)
   const hasSvg = Boolean(data?.svg)
 
-  const ChartComponent = chartType === 'scatterPlot' ? ScatterPlot : BarChart
+  let ChartComponent
+  switch (chartType) {
+    case 'scatterPlot':
+      ChartComponent = ScatterPlot
+      break
+    case 'barChart':
+      ChartComponent = BarChart
+      break
+    case 'pieChart':
+      ChartComponent = PieChart
+      break
+    default:
+      ChartComponent = null
+  }
 
   if (!hasData) {
     return null
@@ -19,15 +33,10 @@ const Chart = ({ data, specs, draft, renderChart, fullScreen }) => {
 
   return (
     <div className="charts_chart__container">
-      {draft && !['scatterPlot', 'barChart'].includes(chartType) && (
-        <div className="charts_chart_draft_overlay">
-          <button onClick={renderChart}>rerender</button>
-        </div>
-      )}
       {(chartType || hasSvg) && (
         <Split sizes={[70, 30]} expandToMin={true} className="wrap wrap_vertical" direction="vertical">
           <div className="charts_chart__image_container">
-            {chartType ? (
+            {ChartComponent ? (
               <ChartComponent specs={specs} originalData={data} />
             ) : (
               hasSvg && (
