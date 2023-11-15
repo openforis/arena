@@ -1,9 +1,11 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { uuidv4 } from '@core/uuid'
 import './SingleMetric.scss'
 import { Popover } from 'react-tiny-popover'
 import RenderByType from '../BlockRenderer/BlockRenderer'
 import { ButtonAdd } from '@webapp/components'
+import PropTypes from 'prop-types'
+import Metric from '../Metric'
 
 const SinglePopoverContent = (props) => {
   const { config, configItemsByPath, configActions, blockPath, dimensions, block, setIsPopoverOpen, metric } = props
@@ -50,6 +52,17 @@ const SinglePopoverContent = (props) => {
   )
 }
 
+SinglePopoverContent.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
+  setIsPopoverOpen: PropTypes.func.isRequired,
+  metric: PropTypes.object,
+}
+
 const SingleCustomPopover = (props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const { metric, config, configItemsByPath, configActions, blockPath, children, block, dimensions } = props
@@ -94,6 +107,17 @@ const SingleCustomPopover = (props) => {
       </div>
     </Popover>
   )
+}
+
+SingleCustomPopover.propTypes = {
+  metric: PropTypes.object,
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  block: PropTypes.object.isRequired,
+  dimensions: PropTypes.array.isRequired,
 }
 
 const SingleMetricBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
@@ -143,6 +167,15 @@ const SingleMetricBlock = ({ config, configItemsByPath, configActions, blockPath
       <span className="block__number-options">{flatOptions.length} Option(s)</span>
     </div>
   )
+}
+
+SingleMetricBlock.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
 }
 
 export default SingleMetricBlock
