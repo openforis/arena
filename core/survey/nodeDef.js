@@ -255,8 +255,8 @@ export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
-export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
-  let firstPart = null
+export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true) => {
+  let firstPart = ''
   const name = getName(nodeDef)
 
   if (type === NodeDefLabelTypes.name) {
@@ -267,13 +267,13 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
     if (!StringUtils.isBlank(label)) {
       if (type === NodeDefLabelTypes.label) {
         firstPart = label
-      } else if (type === NodeDefLabelTypes.labelAndName && !StringUtils.isBlank(label)) {
+      } else if (type === NodeDefLabelTypes.labelAndName) {
         firstPart = `${label} [${name}]`
       }
     }
   }
   // default to name
-  if (StringUtils.isBlank(firstPart)) {
+  if (StringUtils.isBlank(firstPart) && defaultToName) {
     firstPart = name
   }
 
