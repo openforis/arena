@@ -90,7 +90,7 @@ const RecordsByUser = () => {
       .append('text')
       .attr('class', 'userLabel')
       .text((d) => d)
-      .attr('x', padding.left)
+      .attr('x', padding.left + 5) // Added a space before the name
       .attr('y', (d) => yScale(d) + yScale.bandwidth() / 2 + padding.top)
       .attr('fill', 'black')
   }, [userCounts])

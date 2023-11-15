@@ -49,8 +49,8 @@ const Dashboard = () => {
             {canEditSurvey && !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
             {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
               <div className="chart-container-dashboard">
-                <StorageSummary />
                 {recordsSummaryState.counts.length > 0 && <RecordsByUser className="records-by-user" />}
+                <StorageSummary />
                 {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
               </div>
             )}
