@@ -134,7 +134,7 @@ PieChart.propTypes = {
       innerRadius: PropTypes.string,
     }).isRequired,
   }).isRequired,
-  originalData: PropTypes.array.isRequired,
+  originalData: PropTypes.object.isRequired,
 }
 
 export default React.memo(PieChart)

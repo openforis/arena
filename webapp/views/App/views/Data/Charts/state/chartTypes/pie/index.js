@@ -17,11 +17,9 @@ const pie = {
     blocks: {
       query: {
         title: 'Query',
-        subtitle: '',
         type: 'container',
         blocks: {
           groupBy: GroupByBlock({
-            subtitle: '',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = valuesToCalculations(value)
               const groupBy = {
@@ -41,7 +39,6 @@ const pie = {
             },
           }),
           metric: MetricBlock({
-            subtitle: '',
             valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
               const columnValues = configItemsByPath[`${key}.column`]?.value
               const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
