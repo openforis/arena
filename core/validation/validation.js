@@ -48,7 +48,7 @@ export const newInstance = (valid = true, fields = {}, errors = [], warnings = [
 // ====== READ
 
 export const isValid = R.propOr(true, keys.valid)
-export const isNotValid = (validation) => !isValid(validation)
+export const isNotValid = (validation) => validation && !isValid(validation)
 export const getFieldValidations = R.propOr({}, keys.fields)
 export const getFieldValidation = (field) => R.pathOr(newInstance(), [keys.fields, field])
 

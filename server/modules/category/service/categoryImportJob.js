@@ -132,23 +132,23 @@ export default class CategoryImportJob extends Job {
   // End of methods that can be overridden by subclasses
 
   async _fetchOrCreateCategory() {
+    const { surveyId, user, tx } = this
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
       return CategoryManager.fetchCategoryAndLevelsByUuid(
         {
-          surveyId: this.surveyId,
+          surveyId,
           categoryUuid,
           draft: true,
           includeValidation: false,
         },
-        this.tx
+        tx
       )
     }
-
     const category = Category.newCategory({
       [Category.keysProps.name]: CategoryImportJobParams.getCategoryName(this.params),
     })
-    return CategoryManager.insertCategory({ user: this.user, surveyId: this.surveyId, category, system: true }, this.tx)
+    return CategoryManager.insertCategory({ user, surveyId, category, system: true }, tx)
   }
 
   async _importLevels() {

@@ -73,7 +73,7 @@ const CategoryDetails = (props) => {
           {!readOnly && (
             <UploadButton
               className="import-btn"
-              label={i18n.t('common.csvImport')}
+              label="common.csvImport"
               accept=".csv"
               onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
             />

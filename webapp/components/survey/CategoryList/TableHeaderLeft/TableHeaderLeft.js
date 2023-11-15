@@ -3,8 +3,10 @@ import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router'
 
 import * as Category from '@core/survey/category'
+
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import { ButtonDownload } from '@webapp/components/buttons'
+import { UploadButton } from '@webapp/components/form'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
@@ -43,6 +45,13 @@ const TableHeaderLeft = (props) => {
       <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
 
       <ButtonDownload label="common.exportAll" onClick={Actions.exportAll} />
+
+      <UploadButton
+        inputFieldId="taxonomy-upload-input"
+        label="categoryList.batchImport"
+        accept=".zip"
+        onChange={([file]) => Actions.startBatchImport({ file })}
+      />
     </>
   )
 }
