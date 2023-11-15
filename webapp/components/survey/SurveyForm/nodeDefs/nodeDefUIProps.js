@@ -1,6 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { FormHeaderColor } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
@@ -21,20 +23,12 @@ import NodeDefTime from './components/types/nodeDefTime'
 const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity, formHeader } =
   NodeDef.nodeDefType
 
-export const headerColors = {
-  blue: 'blue',
-  green: 'green',
-  orange: 'orange',
-  red: 'red',
-  yellow: 'yellow',
-}
-
 export const headerColorRgbCodesByColor = {
-  [headerColors.blue]: '#b3e5fc',
-  [headerColors.green]: '#b2dfdb',
-  [headerColors.orange]: '#ffb38a',
-  [headerColors.red]: '#f97c7c',
-  [headerColors.yellow]: '#fffdaf',
+  [FormHeaderColor.blue]: '#b3e5fc',
+  [FormHeaderColor.green]: '#b2dfdb',
+  [FormHeaderColor.orange]: '#ffb38a',
+  [FormHeaderColor.red]: '#f97c7c',
+  [FormHeaderColor.yellow]: '#fffdaf',
 }
 
 const propsUI = {
@@ -144,7 +138,7 @@ const propsUI = {
     component: NodeDefFormHeader,
     icon: <span className="icon icon-minus icon-left" />,
     defaultProps: () => ({
-      [NodeDef.propKeys.headerColor]: headerColors.blue,
+      [NodeDef.propKeys.headerColor]: FormHeaderColor.blue,
     }),
   },
 }

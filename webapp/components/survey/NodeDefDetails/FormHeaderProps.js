@@ -3,20 +3,22 @@ import './FormHeaderProps.scss'
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
+import { FormHeaderColor } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/buttonGroup'
 
-import { headerColors, headerColorRgbCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { headerColorRgbCodesByColor } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import { State } from './store'
 
 const headerColorItems = ({ i18n }) =>
   toButtonGroupItems({
     i18n,
-    object: headerColors,
+    object: FormHeaderColor,
     labelPrefix: 'nodeDefEdit.formHeaderProps.headerColor.',
     icon: ({ key }) => (
       <span className="form-header-color-icon" style={{ backgroundColor: headerColorRgbCodesByColor[key] }} />
@@ -34,7 +36,7 @@ const FormHeaderProps = (props) => {
 
   const onHeaderColorChange = useCallback(
     (value) => {
-      Actions.setProp({ state, key: NodeDef.propKeys.headerColor, value: headerColors[value] })
+      Actions.setProp({ state, key: NodeDef.propKeys.headerColor, value: FormHeaderColor[value] })
     },
     [Actions, state]
   )
