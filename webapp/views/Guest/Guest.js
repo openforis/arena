@@ -35,7 +35,7 @@ const OfArenaBanner = () => (
 )
 
 const Guest = () => (
-  <>
+  <div className="guest__wrapper">
     <div className="guest__bg" />
 
     <OfArenaLogo />
@@ -64,7 +64,7 @@ const Guest = () => (
         },
       ]}
     />
-  </>
+  </div>
 )
 
 export default Guest
