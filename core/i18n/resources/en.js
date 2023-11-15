@@ -1338,6 +1338,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
 
   categoryList: {
     batchImport: 'Import categories in batch (from ZIP)',
+    batchImportCompleteSuccessfully: '{{importedCategories}} categories imported successfully!',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',

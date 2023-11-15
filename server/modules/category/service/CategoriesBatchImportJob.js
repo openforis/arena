@@ -8,6 +8,7 @@ import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
 import CategoryBatchImportJob from './CategoryBatchImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 
@@ -36,6 +37,8 @@ export default class CategoriesBatchImportJob extends Job {
     if (!(await this.validateCategoryNames(categoryNames))) {
       return
     }
+    this.total = categoryNames.length
+
     const innerJobs = entryNames.map((entryName) => {
       const categoryName = extractCategoryNameFromZipEntryName(entryName)
       return new CategoryBatchImportJob({
@@ -78,6 +81,13 @@ export default class CategoriesBatchImportJob extends Job {
       }
     }
     return true
+  }
+
+  generateResult() {
+    return {
+      ...super.generateResult(),
+      importedCategories: this.total,
+    }
   }
 }
 

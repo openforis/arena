@@ -9,5 +9,5 @@ export const useActions = ({ setState }) => ({
   edit: useEdit({ setState }),
   select: useSelect({ setState }),
   exportAll: useExportAll(),
-  startBatchImport: useStartBatchImport(),
+  startBatchImport: useStartBatchImport({ setState }),
 })

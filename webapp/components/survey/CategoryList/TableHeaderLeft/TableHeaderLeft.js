@@ -16,10 +16,10 @@ import { useActions, State } from '../store'
 
 const TableHeaderLeft = (props) => {
   const { headerProps } = props
-  const { state } = headerProps
+  const { state, setState } = headerProps
   const navigate = useNavigate()
 
-  const Actions = useActions({})
+  const Actions = useActions({ setState })
 
   const inCategoriesPath = useIsCategoriesRoute()
   const canEditSurvey = useAuthCanEditSurvey()
