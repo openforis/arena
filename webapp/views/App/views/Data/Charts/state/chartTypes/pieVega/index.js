@@ -56,7 +56,6 @@ const pieVega = {
 
               const transform = valuesToCalculations(columnValues)
 
-              // TODO: Improve the way out of the aggregation
               const ag = aggregationValues?.[0]?.value
 
               const theta = {
