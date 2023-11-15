@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { uuidv4 } from '@core/uuid'
 import './Metric.scss'
 import { Popover } from 'react-tiny-popover'
@@ -76,6 +77,18 @@ const PopoverContent = (props) => {
   )
 }
 
+PopoverContent.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
+  setIsPopoverOpen: PropTypes.func.isRequired,
+  values: PropTypes.object,
+  metric: PropTypes.object,
+}
+
 const CustomPopover = (props) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const { metric, values, config, configItemsByPath, configActions, blockPath, children, block, dimensions } = props
@@ -123,6 +136,18 @@ const CustomPopover = (props) => {
   )
 }
 
+CustomPopover.propTypes = {
+  metric: PropTypes.object,
+  values: PropTypes.object,
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  block: PropTypes.object.isRequired,
+  dimensions: PropTypes.array.isRequired,
+}
+
 const Metric = ({ config, configItemsByPath, configActions, blockPath, dimensions, block, metric }) => {
   const values = useMemo(() => {
     const blockItems = block.order.reduce((valuesInBlock, orderKey) => {
@@ -163,6 +188,16 @@ const Metric = ({ config, configItemsByPath, configActions, blockPath, dimension
       </div>
     </CustomPopover>
   )
+}
+
+Metric.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
+  metric: PropTypes.object.isRequired,
 }
 
 const MetricBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
@@ -219,6 +254,15 @@ const MetricBlock = ({ config, configItemsByPath, configActions, blockPath, dime
       <span className="block__number-options">{flatOptions.length} Option(s)</span>
     </div>
   )
+}
+
+MetricBlock.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
 }
 
 export default MetricBlock

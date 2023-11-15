@@ -9,7 +9,7 @@ const vega = require('vega')
 const vegaLite = require('vega-lite')
 
 const generateChart = async ({ chartSpec, data }) => {
-  if (D3_CHART_TYPES && D3_CHART_TYPES.includes(chartSpec.chartType)) {
+  if (D3_CHART_TYPES?.includes(chartSpec.chartType)) {
     return data
   } else {
     const spec = {

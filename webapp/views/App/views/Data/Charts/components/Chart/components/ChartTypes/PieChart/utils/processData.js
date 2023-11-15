@@ -46,13 +46,15 @@ export const processData = (originalData, specs) => {
   })
   const data = Object.keys(aggregatedData).map((key) => {
     let value
+    let sortedValues
+    let mid
     switch (aggregateType) {
       case 'avg':
         value = aggregatedData[key].sum / aggregatedData[key].count
         break
       case 'median':
-        const sortedValues = aggregatedData[key].values.sort((a, b) => a - b)
-        const mid = Math.floor(sortedValues.length / 2)
+        sortedValues = aggregatedData[key].values.sort((a, b) => a - b)
+        mid = Math.floor(sortedValues.length / 2)
         value = sortedValues.length % 2 !== 0 ? sortedValues[mid] : (sortedValues[mid - 1] + sortedValues[mid]) / 2
         break
       case 'count':
