@@ -61,8 +61,6 @@ Chart.propTypes = {
   data: PropTypes.object,
   specs: PropTypes.object,
   fullScreen: PropTypes.bool,
-  draft: PropTypes.bool,
-  renderChart: PropTypes.func.isRequired,
 }
 
 export default Chart
