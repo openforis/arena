@@ -89,7 +89,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           onChange={(e) => handleSearch(e.target.value)}
         />
       )}
-      {canExportRecordsSummary && (
+      {canExportRecordsSummary && totalCount > 0 && (
         <ButtonDownload
           testId={TestId.records.exportBtn}
           href={`/api/survey/${surveyId}/records/summary/export`}
