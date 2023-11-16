@@ -15,12 +15,12 @@ export const useStartBatchImport = ({ setState }) => {
 
   const onJobComplete = useCallback(
     async (job) => {
-      const { importedCategories } = JobSerialized.getResult(job)
+      const { importedCategories, insertedCategories, updatedCategories } = JobSerialized.getResult(job)
       setState({ categoriesRequestedAt: Date.now() })
       dispatch(
         NotificationActions.notifyInfo({
           key: 'categoryList.batchImportCompleteSuccessfully',
-          params: { importedCategories },
+          params: { importedCategories, insertedCategories, updatedCategories },
         })
       )
     },

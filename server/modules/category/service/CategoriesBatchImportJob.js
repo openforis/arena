@@ -2,7 +2,6 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
-import * as ValidationResult from '@core/validation/validationResult'
 
 import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
@@ -17,6 +16,8 @@ const extractCategoryNameFromZipEntryName = (entryName) => FileUtils.getBaseName
 export default class CategoriesBatchImportJob extends Job {
   constructor(params) {
     super(CategoriesBatchImportJob.type, params)
+    this.insertedCategories = 0
+    this.updatedCategories = 0
   }
 
   async onStart() {
@@ -41,18 +42,24 @@ export default class CategoriesBatchImportJob extends Job {
 
     const innerJobs = entryNames.map((entryName) => {
       const categoryName = extractCategoryNameFromZipEntryName(entryName)
+      const existingCategory = Survey.getCategoryByName(categoryName)(survey)
+      const existingCategoryUuid = existingCategory ? Category.getUuid(existingCategory) : null
+      if (existingCategory) {
+        this.updatedCategories += 1
+      } else {
+        this.insertedCategories += 1
+      }
       return new CategoryBatchImportJob({
         user,
         fileZipEntryName: entryName,
         [CategoryImportJobParams.keys.categoryName]: categoryName,
+        [CategoryImportJobParams.keys.categoryUuid]: existingCategoryUuid,
       })
     })
     this.innerJobs = innerJobs
   }
 
   async validateCategoryNames(categoryNames) {
-    const { survey } = this.context
-
     const categoryNameValidations = await Promise.all(
       categoryNames.map((categoryName) =>
         Validator.validateName(Validation.messageKeys.nameInvalid, { name: categoryName })('name', {
@@ -65,28 +72,17 @@ export default class CategoriesBatchImportJob extends Job {
       this.addError({ error: notValidValidation })
       await this.setStatusFailed()
       return false
-    } else {
-      const surveyCategoryNames = Survey.getCategoriesArray(survey).map(Category.getName)
-      const duplicateCategoryName = categoryNames.find((categoryName) => surveyCategoryNames.includes(categoryName))
-      if (duplicateCategoryName) {
-        this.addError({
-          error: Validation.newInstance(false, {}, [
-            ValidationResult.newInstance(Validation.messageKeys.categoryImport.nameDuplicate, {
-              name: duplicateCategoryName,
-            }),
-          ]),
-        })
-        await this.setStatusFailed()
-        return false
-      }
     }
     return true
   }
 
   generateResult() {
+    const { insertedCategories, updatedCategories, total } = this
     return {
       ...super.generateResult(),
-      importedCategories: this.total,
+      importedCategories: total,
+      insertedCategories,
+      updatedCategories,
     }
   }
 }
