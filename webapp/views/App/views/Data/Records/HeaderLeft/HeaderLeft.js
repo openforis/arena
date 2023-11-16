@@ -94,7 +94,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           testId={TestId.records.exportBtn}
           href={`/api/survey/${surveyId}/records/summary/export`}
           requestParams={{ cycle }}
-          label="common.export"
+          label="dataView.records.exportList"
         />
       )}
       {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
