@@ -11,21 +11,11 @@ const checkFilesSize = (files, maxSizeMB) =>
     : true
 
 const UploadButton = (props) => {
+  const { inputFieldId, label: labelProp, disabled, showLabel, showIcon, maxSize, accept, onChange, className } = props
+
   const i18n = useI18n()
-
-  const {
-    inputFieldId,
-    label = i18n.t('common.upload'),
-    disabled,
-    showLabel,
-    showIcon,
-    maxSize,
-    accept,
-    onChange,
-    className,
-  } = props
-
   const fileInput = useRef(null)
+  const label = i18n.t(labelProp)
 
   return (
     <>
@@ -78,7 +68,7 @@ UploadButton.defaultProps = {
   className: 'btn', // Custom css class
   disabled: false,
   inputFieldId: null,
-  label: null,
+  label: 'common.upload',
   maxSize: 10, // Mega bytes
   onChange: null,
   showLabel: true,

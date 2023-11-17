@@ -75,7 +75,7 @@ const ProfilePictureEditor = (props) => {
         <div>
           {i18n.t('userView.dragAndDrop')}{' '}
           <UploadButton
-            label={i18n.t('userView.upload')}
+            label="userView.upload"
             showLabel
             showIcon={false}
             className="btn btn-transparent btn-upload"
