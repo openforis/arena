@@ -6,28 +6,19 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as SQL from '../../../../../common/model/db/sql'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
 
-const _getMultipleAttributeInnerSelect = ({ viewDataNodeDef, columnNodeDef }) => {
-  const { survey, tableData } = viewDataNodeDef
-
-  const multAttrDef = columnNodeDef.nodeDef
-  const nodeDefName = NodeDef.getName(columnNodeDef.nodeDef)
-  const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
-
-  return `SELECT json_agg(${multAttrDataTable.alias}.${nodeDefName}) 
-          FROM ${multAttrDataTable.nameAliased}
-          WHERE ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
-}
-
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
   viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) => {
-    const { tableData } = viewDataNodeDef
-    if (NodeDef.isEqual(columnNodeDef.nodeDef)(viewDataNodeDef.nodeDef)) {
-      if (!NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
+    const { tableData, survey } = viewDataNodeDef
+    const { nodeDef } = columnNodeDef
+    if (NodeDef.isEqual(nodeDef)(viewDataNodeDef.nodeDef)) {
+      if (!NodeDef.isMultipleAttribute(nodeDef)) {
         return [`${tableData.columnUuid} AS ${columnNodeDef.name}`]
       }
-    } else if (NodeDef.isMultipleAttribute(columnNodeDef.nodeDef)) {
-      if (NodeDef.canMultipleAttributeBeAggregated(columnNodeDef.nodeDef)) {
-        return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })}) AS ${columnNodeDef.name}`]
+    } else if (NodeDef.isMultipleAttribute(nodeDef)) {
+      if (NodeDef.canMultipleAttributeBeAggregated(nodeDef)) {
+        const multAttrDataTable = new TableDataNodeDef(survey, nodeDef)
+        return columnNodeDef.names.map((colName) => `${multAttrDataTable.alias}.${colName}`)
+        // return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })})`]
       } else {
         // skip multiple attributes that cannot be aggregated into a single column yet
         return []
@@ -43,6 +34,35 @@ const _getSelectFieldKeys = (viewDataNodeDef) => {
     return [`'${NodeDef.getUuid(nodeDef)}'`, `${viewDataNodeDef.tableData.alias}.${columnNodeDef.name}`]
   })
   return `${SQL.jsonBuildObject(...keys)} AS ${ViewDataNodeDef.columnSet.keys}`
+}
+
+const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNodeDef }) => {
+  const { survey, tableData } = viewDataNodeDef
+  const { nodeDef: multAttrDef, names: columnNames } = multAttrColumnNodeDef
+  const multAttrDataTable = new TableDataNodeDef(survey, multAttrDef)
+
+  return `LEFT JOIN 
+  (
+    SELECT 
+      ${multAttrDataTable.columnParentUuid}, 
+      ${columnNames.map((colName) => `json_agg(${multAttrDataTable.alias}.${colName}) AS ${colName}`).join(', ')}
+    FROM ${multAttrDataTable.nameAliased}
+    GROUP BY ${multAttrDataTable.columnParentUuid}
+  ) AS ${multAttrDataTable.alias}
+  ON ${multAttrDataTable.columnParentUuid} = ${tableData.columnUuid}`
+}
+
+const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
+  const { columnNodeDefs, nodeDef: viewNodeDef } = viewDataNodeDef
+  if (NodeDef.isMultipleAttribute(viewNodeDef)) return ''
+
+  const multAttributeColumnNodeDefs = columnNodeDefs.filter((columnNodeDef) => {
+    const { nodeDef } = columnNodeDef
+    return NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef)
+  })
+  return multAttributeColumnNodeDefs
+    .map((multAttrColumnNodeDef) => _getJoinWithMultipleAttributeTable({ viewDataNodeDef, multAttrColumnNodeDef }))
+    .join(' ')
 }
 
 /**
@@ -83,18 +103,19 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
         ..._getSelectFieldNodeDefs(viewDataNodeDef),
       ]
 
+  const jointWithParentView = viewDataParent
+    ? `LEFT JOIN ${viewDataParent.nameAliased}  
+            ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
+    : ''
+
   const query = `
     CREATE VIEW ${viewDataNodeDef.nameQualified} AS ( 
       SELECT 
         ${selectFields.filter(Boolean).join(', ')}
       FROM 
         ${tableData.nameAliased}
-      ${
-        viewDataParent
-          ? `LEFT JOIN ${viewDataParent.nameAliased}  
-            ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
-          : ''
-      }
+      ${jointWithParentView}
+      ${_getJoinsWithMultipleAttributeDataTables(viewDataNodeDef)}
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
 

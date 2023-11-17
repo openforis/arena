@@ -11,7 +11,10 @@ const getColValue = ({ nodeDef, col, row, i18n }) => {
   const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
   if (Objects.isEmpty(value)) return ''
   const values = Array.isArray(value) ? value : [value]
-  return values.map((val) => ValueFormatter.format({ i18n, nodeDef, value: val })).join(', ')
+  return values
+    .map((val) => ValueFormatter.format({ i18n, nodeDef, value: val }))
+    .filter((val) => !Objects.isEmpty(val))
+    .join(', ')
 }
 
 const ColumnData = (props) => {
