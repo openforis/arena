@@ -3,6 +3,7 @@ import axios from 'axios'
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import { cancelableGetRequest } from '../cancelableRequest'
+import { objectToFormData } from '../utils/apiUtils'
 
 // READ
 export const fetchCategories = async ({ surveyId, draft = true, validate = false, search = '' }) => {
@@ -55,6 +56,14 @@ export const startExportAllCategoriesJob = async ({ surveyId, draft = true }) =>
     data: { job },
   } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft })
 
+  return { job }
+}
+
+export const startCategoriesBatchImportJob = async ({ surveyId, file }) => {
+  const formData = objectToFormData({ file })
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/categories/import`, formData)
   return { job }
 }
 

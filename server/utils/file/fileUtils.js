@@ -50,10 +50,18 @@ export const getFileSize = (path) => {
   return size
 }
 
+const getFileName = (file) => (typeof file === 'string' ? file : file.name)
+
 export const getFileExtension = (file) => {
-  const fileName = typeof file === 'string' ? file : file.name
-  const extension = fileName.split('.').pop()
-  return extension
+  const fileName = getFileName(file)
+  const lastIndexOfDot = fileName.lastIndexOf('.')
+  return lastIndexOfDot > 0 ? fileName.substring(lastIndexOfDot + 1) : fileName
+}
+
+export const getBaseName = (file) => {
+  const fileName = getFileName(file)
+  const lastIndexOfDot = fileName.lastIndexOf('.')
+  return lastIndexOfDot > 0 ? fileName.substring(0, lastIndexOfDot) : fileName
 }
 
 export const deleteFile = (path) => fs.unlinkSync(path)

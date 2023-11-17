@@ -43,6 +43,7 @@ export const ValidatorErrorKeys = {
     emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
     emptyFile: 'validationErrors.categoryImport.emptyFile',
     invalidParentItemOrder: 'validationErrors.categoryImport.invalidParentItemOrder',
+    nameDuplicate: 'validationErrors.categoryImport.nameDuplicate',
     srsNotDefined: 'validationErrors.categoryImport.srsNotDefined',
   },
 

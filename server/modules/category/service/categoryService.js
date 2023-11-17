@@ -10,15 +10,16 @@ import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import { CategoryImportTemplateGenerator } from '@server/modules/category/manager/categoryImportTemplateGenerator'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
-import * as CategoryManager from '../manager/categoryManager'
-import { CategoryImportTemplateGenerator } from '../manager/categoryImportTemplateGenerator'
 import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
+import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -30,6 +31,12 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
 
   JobManager.executeJobThread(job)
 
+  return job
+}
+
+export const createBatchImportJob = ({ user, surveyId, filePath }) => {
+  const job = new CategoriesBatchImportJob({ user, surveyId, filePath })
+  JobManager.executeJobThread(job)
   return job
 }
 
