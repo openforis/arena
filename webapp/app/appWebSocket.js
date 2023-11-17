@@ -11,7 +11,7 @@ let socket = null
 const _addSocketIdToEveryRequest = () => {
   axios.interceptors.request.use((config) => {
     // eslint-disable-next-line no-param-reassign
-    config.headers.socketid = socket.id
+    config.headers.socketid = socket?.id
     return config
   })
 }
