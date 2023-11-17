@@ -55,6 +55,7 @@ const UserPasswordChange = () => {
               autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
               label={i18n.t(`userPasswordChangeView.${key}`)}
               onChange={setStateProp(key)}
+              value={form[key]}
             />
           </ValidationTooltip>
 
