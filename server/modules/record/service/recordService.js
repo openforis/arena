@@ -2,6 +2,8 @@ import * as fs from 'fs'
 
 import * as Log from '@server/log/log'
 
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+
 import * as A from '@core/arena'
 import SystemError from '@core/systemError'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -86,11 +88,15 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
     const validation = Validation.getValidation(recordSummary)
     return {
       step: Record.getStep(recordSummary),
-      ...nodeDefKeys.reduce((keysAcc, nodeDef) => {
-        const name = NodeDef.getName(nodeDef)
-        const value = recordSummary[A.camelize(name)]
-        const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
-        return { ...keysAcc, [name]: value && formatter ? formatter({ value }) : value }
+      ...nodeDefKeys.reduce((keysAcc, nodeDefKey) => {
+        const nodeDefKeyColumnNames = NodeDefTable.getColumnNames(nodeDefKey)
+        nodeDefKeyColumnNames.forEach((nodeDefKeyColumnName) => {
+          const value = recordSummary[A.camelize(nodeDefKeyColumnName)]
+          const formatter = valueFormattersByType[NodeDef.getType(nodeDefKey)]
+          const valueFormatted = formatter ? formatter({ value }) : value
+          keysAcc[nodeDefKeyColumnName] = valueFormatted
+        })
+        return keysAcc
       }, {}),
       data_created: DateUtils.formatDateTimeExport(Record.getDateCreated(recordSummary)),
       date_modified: DateUtils.formatDateTimeExport(Record.getDateModified(recordSummary)),
@@ -105,7 +111,7 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   const fields = [
-    ...nodeDefKeys.map(NodeDef.getName),
+    ...nodeDefKeys.flatMap((nodeDefKey) => NodeDefTable.getColumnNames(nodeDefKey)),
     'step',
     'owner_name',
     'data_created',

@@ -161,10 +161,10 @@ export const fetchRecordsSummaryBySurveyId = async (
     {}
   )
   const nodeDefKeysSelect = nodeDefKeys
-    ?.map(
-      (nodeDefKey) =>
-        `${rootEntityTableAlias}.${getNodeDefKeyColumnName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
-    )
+    ?.flatMap((nodeDefKey) => {
+      const colNames = NodeDefTable.getColumnNames(nodeDefKey)
+      return colNames.map((keyColName) => `${rootEntityTableAlias}.${keyColName} AS ${keyColName}`)
+    })
     .join(', ')
 
   const nodeDefKeysSelectSearch = nodeDefKeys
