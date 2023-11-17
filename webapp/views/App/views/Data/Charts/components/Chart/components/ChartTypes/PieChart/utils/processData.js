@@ -9,36 +9,38 @@ export const processData = (originalData, specs) => {
   originalData?.chartResult?.forEach((item) => {
     const categoryValue = item[groupByField] || 'No Category'
     const metricValue = parseFloat(item[metricField])
+    let categoryData = aggregatedData[categoryValue]
 
     if (!isNaN(metricValue)) {
-      if (!aggregatedData[categoryValue]) {
+      if (!categoryData) {
         // Initialize if not present
-        aggregatedData[categoryValue] = {
+        categoryData = {
           sum: metricValue,
           count: 1,
           values: [metricValue],
         }
+        aggregatedData[categoryValue] = categoryData
       } else {
         // Perform aggregation based on the specified type
         switch (aggregateType) {
           case 'max':
-            aggregatedData[categoryValue].sum = Math.max(aggregatedData[categoryValue].sum, metricValue)
+            categoryData.sum = Math.max(categoryData.sum, metricValue)
             break
           case 'sum':
-            aggregatedData[categoryValue].sum += metricValue
+            categoryData.sum += metricValue
             break
           case 'min':
-            aggregatedData[categoryValue].sum = Math.min(aggregatedData[categoryValue].sum, metricValue)
+            categoryData.sum = Math.min(categoryData.sum, metricValue)
             break
           case 'avg':
-            aggregatedData[categoryValue].sum += metricValue
-            aggregatedData[categoryValue].count += 1
+            categoryData.sum += metricValue
+            categoryData.count += 1
             break
           case 'median':
-            aggregatedData[categoryValue].values.push(metricValue)
+            categoryData.values.push(metricValue)
             break
           case 'count':
-            aggregatedData[categoryValue].count += 1
+            categoryData.count += 1
             break
         }
       }
@@ -48,20 +50,21 @@ export const processData = (originalData, specs) => {
     let value
     let sortedValues
     let mid
+    const categoryData = aggregatedData[key]
     switch (aggregateType) {
       case 'avg':
-        value = aggregatedData[key].sum / aggregatedData[key].count
+        value = categoryData.sum / categoryData.count
         break
       case 'median':
-        sortedValues = aggregatedData[key].values.sort((a, b) => a - b)
+        sortedValues = categoryData.values.sort((a, b) => a - b)
         mid = Math.floor(sortedValues.length / 2)
         value = sortedValues.length % 2 !== 0 ? sortedValues[mid] : (sortedValues[mid - 1] + sortedValues[mid]) / 2
         break
       case 'count':
-        value = aggregatedData[key].count
+        value = categoryData.count
         break
       default:
-        value = aggregatedData[key].sum
+        value = categoryData.sum
     }
     return {
       category: key,

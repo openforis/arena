@@ -12,20 +12,19 @@ const Chart = ({ data, specs, fullScreen }) => {
   const hasData = Boolean(data)
   const hasSvg = Boolean(data?.svg)
 
-  let ChartComponent
-  switch (chartType) {
-    case 'scatterPlot':
-      ChartComponent = ScatterPlot
-      break
-    case 'barChart':
-      ChartComponent = BarChart
-      break
-    case 'pieChart':
-      ChartComponent = PieChart
-      break
-    default:
-      ChartComponent = null
+  const CHART_TYPES = {
+    SCATTER_PLOT: 'scatterPlot',
+    BAR_CHART: 'barChart',
+    PIE_CHART: 'pieChart',
   }
+
+  const chartComponentByType = {
+    [CHART_TYPES.SCATTER_PLOT]: ScatterPlot,
+    [CHART_TYPES.BAR_CHART]: BarChart,
+    [CHART_TYPES.PIE_CHART]: PieChart,
+  }
+
+  const ChartComponent = chartComponentByType[chartType]
 
   if (!hasData) {
     return null

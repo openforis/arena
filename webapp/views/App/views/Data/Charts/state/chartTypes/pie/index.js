@@ -71,28 +71,22 @@ const pie = {
         type: 'container',
         blocks: {
           title: TitleBlock({
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  title: value,
-                },
-              }
-              return newSpec
-            },
+            valuesToSpec: ({ value = [], spec = {} }) => ({
+              ...spec,
+              chart: {
+                ...spec.chart,
+                title: value,
+              },
+            }),
           }),
           'show-legend': ShowLegendBlock({
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  showLegend: value,
-                },
-              }
-              return newSpec
-            },
+            valuesToSpec: ({ value = [], spec = {} }) => ({
+              ...spec,
+              chart: {
+                ...spec.chart,
+                showLegend: value,
+              },
+            }),
           }),
           'donut-radio': {
             id: 'donut-radio',
@@ -100,16 +94,13 @@ const pie = {
             subtitle: '',
             type: 'slider',
             params: { min: 0, max: 80, step: 1, default: 0, unit: 'px' },
-            valuesToSpec: ({ value = [], spec = {} }) => {
-              const newSpec = {
-                ...spec,
-                chart: {
-                  ...spec.chart,
-                  innerRadius: value,
-                },
-              }
-              return newSpec
-            },
+            valuesToSpec: ({ value = [], spec = {} }) => ({
+              ...spec,
+              chart: {
+                ...spec.chart,
+                innerRadius: value,
+              },
+            }),
           },
         },
         order: ['title', 'show-legend', 'donut-radio'],
