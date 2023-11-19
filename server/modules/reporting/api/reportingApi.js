@@ -3,13 +3,13 @@ import * as Request from '@server/utils/request'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import { requireRecordListViewPermission } from '../../auth/authApiMiddleware'
 import { Query } from '../../../../common/model/query'
+import { D3_CHART_TYPES } from '../../../../webapp/views/App/views/Data/Charts/constants/chartTypes'
 
 const vega = require('vega')
 const vegaLite = require('vega-lite')
 
 const generateChart = async ({ chartSpec, data }) => {
-  if (chartSpec.chartType === 'scatterPlot' || chartSpec.chartType === 'barChart') {
-    // return raw data if scatterPlot is requested
+  if (D3_CHART_TYPES?.includes(chartSpec.chartType)) {
     return data
   } else {
     const spec = {
