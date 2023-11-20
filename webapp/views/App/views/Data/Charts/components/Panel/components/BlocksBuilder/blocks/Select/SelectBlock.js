@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
+import PropTypes from 'prop-types'
 
 import { uuidv4 } from '@core/uuid'
 
@@ -94,9 +95,18 @@ const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, 
           defaultSelection={defaultValues}
         />
       )}
-      <span className="block__number-options">{flatOptions.length} Option(s)</span>
     </div>
   )
+}
+
+SelectBlock.propTypes = {
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  values: PropTypes.object,
 }
 
 export default SelectBlock
