@@ -96,7 +96,7 @@ const PieChart = ({ specs, originalData }) => {
   }
 
   const drawPie = (svg, data, pie, radius, colorScale, categoryField, innerRadiusPercentage) => {
-    const innerRadius = (radius * innerRadiusPercentage) / 100 // Calculate inner radius based on the percentage
+    const innerRadius = (radius * innerRadiusPercentage) / 100
     const arc = d3.arc().innerRadius(innerRadius).outerRadius(radius)
 
     const pieData = pie(data)
@@ -115,8 +115,8 @@ const PieChart = ({ specs, originalData }) => {
   const appendChartTitle = (svgContainer, width, margin, titleSize, title) => {
     svgContainer
       .append('text')
-      .attr('x', (width + margin.left + margin.right) / 2) // Center the title in the SVG container
-      .attr('y', margin.top / 2) // Position the title in the middle of the top margin
+      .attr('x', (width + margin.left + margin.right) / 2)
+      .attr('y', margin.top / 2)
       .attr('text-anchor', 'middle')
       .style('font-size', titleSize + 'px')
       .text(title)

@@ -66,6 +66,7 @@ const bar = {
             id: 'aggregation',
             title: 'Aggregation Method',
             subtitle: '',
+            isMulti: false,
             optionsParams: {
               options: [
                 { value: 'average', label: 'Average', name: 'avg', type: 'aggregation' },

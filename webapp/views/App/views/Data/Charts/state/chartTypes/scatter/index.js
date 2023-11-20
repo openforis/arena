@@ -1,4 +1,4 @@
-import { TitleBlock, ShowLegendBlock, MaxHeightBlock, SingleMetricBlock } from '../../blocks'
+import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
 
 const scatter = {
@@ -23,12 +23,14 @@ const scatter = {
         subtitle: '',
         type: 'container',
         blocks: {
-          metricX: SingleMetricBlock({
+          metricX: GroupByBlock({
             id: 'metricX',
             title: 'X axis',
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const transform = valuesToCalculations(columnValues)
+            subtitle: '',
+            isMulti: false,
+            optionsParams: { filter: ['quantitative'] },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
 
               const xMetric = {
                 field: transform.as,
@@ -45,12 +47,14 @@ const scatter = {
               return newSpec
             },
           }),
-          metricY: SingleMetricBlock({
+          metricY: GroupByBlock({
             id: 'metricY',
             title: 'Y axis',
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const transform = valuesToCalculations(columnValues)
+            subtitle: '',
+            isMulti: false,
+            optionsParams: { filter: ['quantitative'] },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
 
               const yMetric = {
                 field: transform.as,
@@ -67,20 +71,14 @@ const scatter = {
               return newSpec
             },
           }),
-          category: SingleMetricBlock({
+          category: GroupByBlock({
             id: 'category',
             title: 'Category',
-            blocks: {
-              column: {
-                id: 'column',
-                title: 'Column',
-                type: 'select',
-                optionsParams: { filter: ['nominal'] },
-              },
-            },
-            valuesToSpec: ({ value = [], spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const transform = valuesToCalculations(columnValues)
+            subtitle: '',
+            isMulti: false,
+            optionsParams: { filter: ['nominal'] },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
 
               const category = {
                 field: transform.as,
@@ -106,7 +104,7 @@ const scatter = {
         type: 'container',
         blocks: {
           title: TitleBlock({
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+            valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
@@ -121,7 +119,7 @@ const scatter = {
             id: 'xAxis',
             title: 'Name of the X axis',
             subtitle: '',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+            valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
@@ -136,7 +134,7 @@ const scatter = {
             id: 'yAxis',
             title: 'Name of the Y axis',
             subtitle: '',
-            valuesToSpec: ({ value = [], spec = {}, configItemsByPath }) => {
+            valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
                 chart: {
