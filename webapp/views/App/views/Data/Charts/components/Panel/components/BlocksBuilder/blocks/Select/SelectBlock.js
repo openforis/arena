@@ -15,10 +15,14 @@ const icons = {
 
 const useOptionsAndDefaultValues = ({ block, dimensions }) => {
   const { optionsParams = {} } = block
-  const { filter = [] } = optionsParams
+  const { filter = [], options: predefinedOptions = [] } = optionsParams
 
   const options = useMemo(() => {
     const _filter = (option) => (filter.length > 0 && option.type ? filter.includes(option.type) : true)
+
+    if (predefinedOptions.length > 0) {
+      return predefinedOptions
+    }
 
     if (block.options) {
       return block.options.filter(_filter)
@@ -29,10 +33,14 @@ const useOptionsAndDefaultValues = ({ block, dimensions }) => {
         options: (dimension.options || []).filter(_filter),
       })
     )
-  }, [dimensions, block, filter])
+  }, [dimensions, block, filter, predefinedOptions])
 
-  const flatOptions = useMemo(() => block.options || options.flatMap((d) => d.options), [options, block])
-
+  const flatOptions = useMemo(() => {
+    if (predefinedOptions.length > 0) {
+      return predefinedOptions
+    }
+    return block.options || options.flatMap((d) => d.options)
+  }, [options, block, predefinedOptions])
   return { options, flatOptions }
 }
 

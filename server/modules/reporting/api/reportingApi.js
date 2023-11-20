@@ -40,10 +40,16 @@ export const init = (app) => {
       const limit = chartSpec.chartType === 'scatterPlot' ? 10000 : null
 
       // Modify the query to include aggregation if chartType is barChart
-      if (chartSpec.chartType === 'barChart' && chartSpec.query && chartSpec.query.metric && chartSpec.query.groupBy) {
+      if (
+        chartSpec.chartType === 'barChart' &&
+        chartSpec.query &&
+        chartSpec.query.metric &&
+        chartSpec.query.groupBy &&
+        chartSpec.query.aggregation
+      ) {
         const groupByFieldUuid = chartSpec.query.groupBy.field_uuid
         const metricFieldUuid = chartSpec.query.metric.field_uuid
-        const aggregateFunction = chartSpec.query.metric.aggregate
+        const aggregateFunction = chartSpec.query.aggregation.type
         const mode = 'aggregate'
 
         query = Query.assocDimensions([groupByFieldUuid])(query)
@@ -59,7 +65,6 @@ export const init = (app) => {
 
         query = Query.assocMode(mode)(query)
       }
-
       const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, limit })
 
       const chartResult = await generateChart({ chartSpec, data })
