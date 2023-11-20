@@ -30,6 +30,10 @@ const Charts = () => {
     }
   }, [spec, chartData])
 
+  useEffect(() => {
+    updateSpec(JSON.stringify({ ...spec, query: {}, chart: {} }))
+  }, [spec.chartType])
+
   return (
     <div className={classNames('charts', { 'full-screen': fullScreen })}>
       <div className="charts_header">
