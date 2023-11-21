@@ -9,10 +9,8 @@ export const configToSpec = ({ config, configItemsByPath }) => {
   const builderBlocks = chartsConfig?.[config.type]?.builderBlocks
   let _spec = chartsConfig?.[config.type]?.baseSpec
   _spec = Object.entries(configItemsByPath).reduce((newSpec, [key, entry]) => {
-    const block = key.split('.').reduce((_block, _key) => {
-      return _block.blocks[_key]
-    }, builderBlocks)
-    if (block && block.valuesToSpec) {
+    const block = key.split('.').reduce((_block, _key) => _block?.blocks[_key], builderBlocks)
+    if (block?.valuesToSpec) {
       return block.valuesToSpec({ value: entry.value, spec: newSpec, key, configItemsByPath })
     }
     return newSpec
