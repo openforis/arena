@@ -1,30 +1,36 @@
 import * as pgPromise from 'pg-promise'
 
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
-import * as SQL from '../../../../../common/model/db/sql'
-import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../../common/model/db'
+import * as SQL from '@common/model/db/sql'
+import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
+
+const canJoinWithMultipleAttributeTable = ({ nodeDef, viewNodeDef }) =>
+  NodeDef.isMultipleAttribute(nodeDef) &&
+  NodeDef.canMultipleAttributeBeAggregated(nodeDef) &&
+  !NodeDef.isEqual(nodeDef)(viewNodeDef) &&
+  NodeDef.isDescendantOf(viewNodeDef)(nodeDef)
 
 const _getSelectFieldNodeDefs = (viewDataNodeDef) =>
   viewDataNodeDef.columnNodeDefs.flatMap((columnNodeDef) => {
-    const { tableData, survey } = viewDataNodeDef
-    const { nodeDef } = columnNodeDef
-    if (NodeDef.isEqual(nodeDef)(viewDataNodeDef.nodeDef)) {
-      if (!NodeDef.isMultipleAttribute(nodeDef)) {
-        return [`${tableData.columnUuid} AS ${columnNodeDef.name}`]
+    const { nodeDef: viewNodeDef, tableData, survey } = viewDataNodeDef
+    const { nodeDef, name: colName, names: colNames, namesFull } = columnNodeDef
+    const isMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef)
+    if (NodeDef.isEqual(nodeDef)(viewNodeDef)) {
+      if (!isMultipleAttribute) {
+        return [`${tableData.columnUuid} AS ${colName}`]
       }
-    } else if (NodeDef.isMultipleAttribute(nodeDef)) {
-      if (NodeDef.canMultipleAttributeBeAggregated(nodeDef)) {
+    } else if (isMultipleAttribute && NodeDef.isDescendantOf(viewNodeDef)(nodeDef)) {
+      if (canJoinWithMultipleAttributeTable({ nodeDef, viewNodeDef })) {
         const multAttrDataTable = new TableDataNodeDef(survey, nodeDef)
-        return columnNodeDef.names.map((colName) => `${multAttrDataTable.alias}.${colName}`)
-        // return [`(${_getMultipleAttributeInnerSelect({ viewDataNodeDef, columnNodeDef })})`]
+        return colNames.map((colName) => `${multAttrDataTable.alias}.${colName}`)
       } else {
         // skip multiple attributes that cannot be aggregated into a single column yet
         return []
       }
     }
-    return columnNodeDef.namesFull
+    return namesFull
   })
 
 const _getSelectFieldKeys = (viewDataNodeDef) => {
@@ -54,12 +60,11 @@ const _getJoinWithMultipleAttributeTable = ({ viewDataNodeDef, multAttrColumnNod
 
 const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
   const { columnNodeDefs, nodeDef: viewNodeDef } = viewDataNodeDef
-  if (NodeDef.isMultipleAttribute(viewNodeDef)) return ''
 
-  const multAttributeColumnNodeDefs = columnNodeDefs.filter((columnNodeDef) => {
-    const { nodeDef } = columnNodeDef
-    return NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef)
-  })
+  const multAttributeColumnNodeDefs = columnNodeDefs.filter((columnNodeDef) =>
+    canJoinWithMultipleAttributeTable({ nodeDef: columnNodeDef.nodeDef, viewNodeDef })
+  )
+
   return multAttributeColumnNodeDefs
     .map((multAttrColumnNodeDef) => _getJoinWithMultipleAttributeTable({ viewDataNodeDef, multAttrColumnNodeDef }))
     .join(' ')
@@ -103,7 +108,7 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
         ..._getSelectFieldNodeDefs(viewDataNodeDef),
       ]
 
-  const jointWithParentView = viewDataParent
+  const joinWithParentView = viewDataParent
     ? `LEFT JOIN ${viewDataParent.nameAliased}  
             ON ${viewDataParent.columnUuid} = ${tableData.columnParentUuid}`
     : ''
@@ -114,10 +119,9 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
         ${selectFields.filter(Boolean).join(', ')}
       FROM 
         ${tableData.nameAliased}
-      ${jointWithParentView}
+      ${joinWithParentView}
       ${_getJoinsWithMultipleAttributeDataTables(viewDataNodeDef)}
       ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
      )`
-
   return client.query(query)
 }
