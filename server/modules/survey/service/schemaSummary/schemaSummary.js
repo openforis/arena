@@ -10,6 +10,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   const pathParts = []
@@ -49,7 +50,14 @@ const getValidationsSummary = ({ nodeDef }) => {
 
 export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-  const nodeDefs = Survey.getNodeDefsArray(survey)
+  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
+    (nodeDef) =>
+      // exclude "weight" node def created by the processing chain
+      !(
+        NodeDef.isAnalysis(nodeDef) &&
+        NodeDef.getName(nodeDef) === SamplingNodeDefs.SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME
+      )
+  )
   const pathByNodeDefUuid = nodeDefs.reduce(
     (paths, nodeDef) => ({ ...paths, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
     {}
