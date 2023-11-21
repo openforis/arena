@@ -1,5 +1,6 @@
 import { TitleBlock, ShowLegendBlock, GroupByBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
+import { aggregationOptions } from '../common'
 
 const pie = {
   selector: {
@@ -21,44 +22,34 @@ const pie = {
         blocks: {
           groupBy: GroupByBlock({
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const transform = valuesToCalculations(value)
-              const groupBy = {
-                field_uuid: transform.key,
-                field: transform.as,
-                type: 'nominal',
-              }
+              const { key: field_uuid, as: field } = valuesToCalculations(value)
+              const groupBy = { field_uuid, field, type: 'nominal' }
 
-              const newSpec = {
+              return {
                 ...spec,
                 query: {
                   ...spec.query,
                   groupBy,
                 },
               }
-              return newSpec
             },
           }),
           metric: GroupByBlock({
             id: 'metric',
             title: 'Metric',
-            subtitle: 'Select the metric to measure the data ( Y axis )',
+            subtitle: '',
             optionsParams: { filter: ['quantitative'] },
             valuesToSpec: ({ spec = {}, value = [] }) => {
-              const transform = valuesToCalculations(value)
-              const metric = {
-                field: transform.as,
-                field_uuid: transform.key,
-                type: 'quantitative',
-              }
+              const { as: field, key: field_uuid } = valuesToCalculations(value)
+              const metric = { field, field_uuid, type: 'quantitative' }
 
-              const newSpec = {
+              return {
                 ...spec,
                 query: {
                   ...spec.query,
                   metric,
                 },
               }
-              return newSpec
             },
           }),
           aggregation: GroupByBlock({
@@ -67,30 +58,17 @@ const pie = {
             subtitle: '',
             isMulti: false,
             optionsParams: {
-              options: [
-                { value: 'average', label: 'Average', name: 'avg', type: 'aggregation' },
-                { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
-                { value: 'max', label: 'Maximum', name: 'max', type: 'aggregation' },
-                { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
-                { value: 'min', label: 'Minimum', name: 'min', type: 'aggregation' },
-                { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
-              ],
+              options: aggregationOptions,
             },
-            valuesToSpec: ({ spec = {}, value = [] }) => {
-              const transform = valuesToCalculations(value)
-              const aggregation = {
-                type: transform.as,
-              }
-
-              const newSpec = {
-                ...spec,
-                query: {
-                  ...spec.query,
-                  aggregation,
+            valuesToSpec: ({ spec = {}, value = [] }) => ({
+              ...spec,
+              query: {
+                ...spec.query,
+                aggregation: {
+                  type: valuesToCalculations(value).as,
                 },
-              }
-              return newSpec
-            },
+              },
+            }),
           }),
         },
         order: ['groupBy', 'metric', 'aggregation'],
