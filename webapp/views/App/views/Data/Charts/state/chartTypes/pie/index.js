@@ -1,5 +1,6 @@
-import { TitleBlock, ShowLegendBlock, MetricBlock, GroupByBlock } from '../../blocks'
+import { TitleBlock, ShowLegendBlock, GroupByBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
+import { aggregationOptions } from '../common'
 
 const pie = {
   selector: {
@@ -21,49 +22,56 @@ const pie = {
         blocks: {
           groupBy: GroupByBlock({
             valuesToSpec: ({ value = [], spec = {} }) => {
-              const transform = valuesToCalculations(value)
-              const groupBy = {
-                field_uuid: transform.key,
-                field: transform.as,
-                type: 'nominal',
-              }
+              const { key: field_uuid, as: field } = valuesToCalculations(value)
+              const groupBy = { field_uuid, field, type: 'nominal' }
 
-              const newSpec = {
+              return {
                 ...spec,
                 query: {
                   ...spec.query,
                   groupBy,
                 },
               }
-              return newSpec
             },
           }),
-          metric: MetricBlock({
-            valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              const transform = valuesToCalculations(columnValues, '-')
-              const aggTransform = valuesToCalculations(aggregationValues, '-')
+          metric: GroupByBlock({
+            id: 'metric',
+            title: 'Metric',
+            subtitle: '',
+            optionsParams: { filter: ['quantitative'] },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const { as: field, key: field_uuid } = valuesToCalculations(value)
+              const metric = { field, field_uuid, type: 'quantitative' }
 
-              const metric = {
-                field: transform.as,
-                field_uuid: transform.key,
-                aggregate: aggTransform.as,
-                type: 'quantitative',
-              }
-
-              const newSpec = {
+              return {
                 ...spec,
                 query: {
                   ...spec.query,
                   metric,
                 },
               }
-              return newSpec
             },
           }),
+          aggregation: GroupByBlock({
+            id: 'aggregation',
+            title: 'Aggregation Method',
+            subtitle: '',
+            isMulti: false,
+            optionsParams: {
+              options: aggregationOptions,
+            },
+            valuesToSpec: ({ spec = {}, value = [] }) => ({
+              ...spec,
+              query: {
+                ...spec.query,
+                aggregation: {
+                  type: valuesToCalculations(value).as,
+                },
+              },
+            }),
+          }),
         },
-        order: ['groupBy', 'metric'],
+        order: ['groupBy', 'metric', 'aggregation'],
       },
       other: {
         title: 'Custom Chart',

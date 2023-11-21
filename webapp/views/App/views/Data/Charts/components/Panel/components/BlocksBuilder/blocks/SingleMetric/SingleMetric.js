@@ -123,9 +123,6 @@ SingleCustomPopover.propTypes = {
 const SingleMetricBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
   const { title, subtitle } = block
 
-  const options = useMemo(() => block.options || dimensions, [dimensions, block])
-  const flatOptions = useMemo(() => block.options || options.flatMap((d) => d.options), [options, block])
-
   const metric = useMemo(() => configItemsByPath?.[blockPath]?.value[0] || null, [configItemsByPath, blockPath])
 
   return (
@@ -164,7 +161,6 @@ const SingleMetricBlock = ({ config, configItemsByPath, configActions, blockPath
           />
         )}
       </div>
-      <span className="block__number-options">{flatOptions.length} Option(s)</span>
     </div>
   )
 }
