@@ -87,7 +87,12 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     if (this.viewDataParent) {
       columns.unshift(
         ...this.viewDataParent.columnNodeDefs
-          .filter((parentColumnNodeDef) => !NodeDef.isMultipleAttribute(parentColumnNodeDef.nodeDef))
+          .filter(
+            (parentColumnNodeDef) =>
+              !NodeDef.isMultipleAttribute(parentColumnNodeDef.nodeDef) ||
+              (!NodeDef.isEqual(parentColumnNodeDef.nodeDef)(this.nodeDef) &&
+                NodeDef.canMultipleAttributeBeAggregated(parentColumnNodeDef.nodeDef))
+          )
           .map((columnNodeDef) => new ColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef))
       )
     }
