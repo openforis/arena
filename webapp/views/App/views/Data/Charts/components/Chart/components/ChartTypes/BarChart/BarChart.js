@@ -7,7 +7,7 @@ const BarChart = ({ specs, originalData }) => {
   const chartRef = useRef()
 
   useEffect(() => {
-    if (!specs?.query?.metric || !specs?.query?.groupBy) return
+    if (!specs?.query?.metric || !specs?.query?.groupBy || !specs?.query?.aggregation) return
 
     const groupByField = specs.query.groupBy.field
 
@@ -16,8 +16,8 @@ const BarChart = ({ specs, originalData }) => {
       if (originalData?.chartResult) {
         data = originalData.chartResult.map((item) => ({
           groupBy: item[groupByField],
-          [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]: parseFloat(
-            item[`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]
+          [`${specs.query.metric.field}_${specs.query.aggregation.type || 'sum'}`]: parseFloat(
+            item[`${specs.query.metric.field}_${specs.query.aggregation.type || 'sum'}`]
           ),
         }))
       } else {
@@ -27,7 +27,7 @@ const BarChart = ({ specs, originalData }) => {
       renderBarChart(
         data,
         specs,
-        [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`],
+        [`${specs.query.metric.field}_${specs.query.aggregation.type || 'sum'}`],
         groupByField,
         chartRef
       )
@@ -46,6 +46,9 @@ BarChart.propTypes = {
       }).isRequired,
       groupBy: PropTypes.shape({
         field: PropTypes.string.isRequired,
+      }).isRequired,
+      aggregation: PropTypes.shape({
+        type: PropTypes.string.isRequired,
       }).isRequired,
     }).isRequired,
   }).isRequired,

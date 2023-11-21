@@ -1,7 +1,7 @@
 export const processData = (originalData, specs) => {
   const groupByField = specs?.query?.groupBy?.field
   const metricField = specs?.query?.metric?.field
-  const aggregateType = specs?.query?.metric?.aggregate
+  const aggregateType = specs?.query?.aggregation?.type || 'sum'
 
   let aggregatedData = {}
 
