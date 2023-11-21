@@ -76,6 +76,7 @@ export default () =>
         await expect(Object.keys(nodeDefData)).toEqual([
           'uuid',
           'path',
+          'parentEntity',
           'type',
           'label_en',
           'label_fr',
@@ -85,6 +86,8 @@ export default () =>
           'multiple',
           'readOnly',
           'hiddenInMobile',
+          'hiddenInForm',
+          'allowOnlyDeviceCoordinate',
           'relevantIf',
           'hiddenWhenNotRelevant',
           'defaultValue',
