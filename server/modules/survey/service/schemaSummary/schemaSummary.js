@@ -87,24 +87,28 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
 
     return {
       uuid,
+      name: NodeDef.getName(nodeDef),
       path: pathByNodeDefUuid[uuid],
-      type,
+      parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
       // labels
       ...languages.reduce(
         (labelsAcc, lang) => ({ ...labelsAcc, [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang) }),
         {}
       ),
+      type,
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
       taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+      hiddenInForm: String(NodeDef.isHidden(nodeDef)),
+      allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
       relevantIf,
       hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
       defaultValue: getDefaultValuesSummary({ nodeDef }),
       defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
-      defaultValueEvaluateOnce: NodeDef.isDefaultValueEvaluatedOneTime(nodeDef),
+      defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
