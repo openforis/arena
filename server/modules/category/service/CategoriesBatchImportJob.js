@@ -11,7 +11,11 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import CategoryBatchImportJob from './CategoryBatchImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 
-const extractCategoryNameFromZipEntryName = (entryName) => FileUtils.getBaseName(entryName)
+const extractCategoryNameFromZipEntryName = (entryName) => {
+  const lastIndexOfDirSeparator = entryName.lastIndexOf('/')
+  const fileName = lastIndexOfDirSeparator > 0 ? entryName.substring(lastIndexOfDirSeparator + 1) : entryName
+  return FileUtils.getBaseName(fileName)
+}
 
 export default class CategoriesBatchImportJob extends Job {
   constructor(params) {
@@ -33,11 +37,13 @@ export default class CategoriesBatchImportJob extends Job {
     await fileZip.init()
     this.setContext({ fileZip })
 
-    const entryNames = fileZip.getEntryNames()
-    const categoryNames = entryNames.map(extractCategoryNameFromZipEntryName)
-    if (!(await this.validateCategoryNames(categoryNames))) {
+    if (!(await this.validateZipFile())) {
       return
     }
+
+    const entryNames = fileZip.getEntryNames()
+    const categoryNames = entryNames.map(extractCategoryNameFromZipEntryName)
+
     this.total = categoryNames.length
 
     const innerJobs = entryNames.map((entryName) => {
@@ -59,17 +65,43 @@ export default class CategoriesBatchImportJob extends Job {
     this.innerJobs = innerJobs
   }
 
+  async validateZipFile() {
+    const { fileZip } = this.context
+    const fileEntryNames = fileZip.getEntryNames()
+
+    let errorKey = null
+
+    if (fileEntryNames.length === 0) {
+      errorKey = 'validationErrors.categoryImport.emptyFile'
+    } else if (fileZip.getEntryNames({ excludeDirectories: false }).length > fileEntryNames.length) {
+      // invalid zip file: it contains at least one directory
+      errorKey = 'validationErrors.categoryImport.invalidImportFile'
+    }
+    if (errorKey) {
+      this.addError({
+        error: Validation.newInstance(false, {}, [{ key: errorKey }]),
+      })
+      await this.setStatusFailed()
+      return false
+    }
+    const categoryNames = fileEntryNames.map(extractCategoryNameFromZipEntryName)
+    if (!(await this.validateCategoryNames(categoryNames))) {
+      return false
+    }
+    return true
+  }
+
   async validateCategoryNames(categoryNames) {
-    const categoryNameValidations = await Promise.all(
+    const categoryNameValidationErrors = await Promise.all(
       categoryNames.map((categoryName) =>
         Validator.validateName(Validation.messageKeys.nameInvalid, { name: categoryName })('name', {
           name: categoryName,
         })
       )
     )
-    const notValidValidation = categoryNameValidations.find(Validation.isNotValid)
-    if (notValidValidation) {
-      this.addError({ error: notValidValidation })
+    const firstValidationError = categoryNameValidationErrors.find((validationError) => !!validationError)
+    if (firstValidationError) {
+      this.addError({ error: Validation.newInstance(false, {}, [firstValidationError]) })
       await this.setStatusFailed()
       return false
     }

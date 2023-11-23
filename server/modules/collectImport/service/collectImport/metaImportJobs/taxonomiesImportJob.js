@@ -43,7 +43,7 @@ export default class TaxonomiesImportJob extends Job {
 
     const taxonomies = []
 
-    const speciesFileNames = collectSurveyFileZip.getEntryNames(SPECIES_FILES_PATH)
+    const speciesFileNames = collectSurveyFileZip.getEntryNames({ path: SPECIES_FILES_PATH })
 
     for (const speciesFileName of speciesFileNames) {
       if (this.isCanceled()) {

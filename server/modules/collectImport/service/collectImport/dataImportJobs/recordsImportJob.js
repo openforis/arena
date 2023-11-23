@@ -126,7 +126,7 @@ export default class RecordsImportJob extends Job {
     const steps = [1, 2, 3]
 
     for (const step of steps) {
-      const entryNames = collectSurveyFileZip.getEntryNames(this.getEntriesPath({ step }))
+      const entryNames = collectSurveyFileZip.getEntryNames({ path: this.getEntriesPath({ step }) })
       if (!R.isEmpty(entryNames)) {
         return entryNames
       }
