@@ -1469,6 +1469,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
+      invalidImportFile: 'ZIP file must contain only .csv files (one for each category), without any directories',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
       nameDuplicate: 'A category with the same name already exists: {{name}}',
       srsNotDefined: 'SRS with code {{srs}} not defined in survey',
