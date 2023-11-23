@@ -75,11 +75,12 @@ export default () =>
         const nodeDefData = data[index]
         await expect(Object.keys(nodeDefData)).toEqual([
           'uuid',
+          'name',
           'path',
           'parentEntity',
-          'type',
           'label_en',
           'label_fr',
+          'type',
           'key',
           'categoryName',
           'taxonomyName',
