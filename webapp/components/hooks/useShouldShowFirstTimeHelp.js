@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react'
 
 import * as ActivityLogObject from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 const hasActivityOfType = ({ messages, activityType }) => messages.some((message) => activityType === message.type)
 
-const determineHelperType = ({ messages, helperTypes }) => {
-  if (hasActivityOfType({ messages, activityType: ActivityLogObject.type.nodeDefCreate })) {
+const determineHelperType = ({ numberOfNodeDefs, messages, helperTypes }) => {
+  if (numberOfNodeDefs > 1) {
     return false
   }
   if (hasActivityOfType({ messages, activityType: ActivityLogObject.type.surveyPropUpdate })) {
@@ -17,7 +17,9 @@ const determineHelperType = ({ messages, helperTypes }) => {
 }
 
 export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) => {
-  const surveyInfo = useSurveyInfo()
+  const survey = useSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const numberOfNodeDefs = Survey.getNodeDefsArray(survey).length
   const [messages, setMessages] = useState([])
   const [help, setHelp] = useState(false)
 
@@ -35,11 +37,15 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
   }, [surveyInfo])
 
   useEffect(() => {
-    if (messages.length > 0 && messages.length < 10) {
-      const helperType = determineHelperType({ messages, helperTypes })
+    if (
+      numberOfNodeDefs === 1 && // only root entity def
+      messages.length > 0 &&
+      messages.length < 10
+    ) {
+      const helperType = determineHelperType({ survey, messages, helperTypes })
       setHelp(helperType)
     }
-  }, [messages])
+  }, [numberOfNodeDefs, messages])
 
   return help
 }
