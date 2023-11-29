@@ -53,6 +53,7 @@ const Table = (props) => {
     onRowClick,
     onVisibleColumnsChange,
     selectedItems,
+    visibleColumnKeys,
     visibleColumns,
   } = useTable({
     columns,
@@ -84,6 +85,7 @@ const Table = (props) => {
         onVisibleColumnsChange={onVisibleColumnsChange}
         selectedItems={selectedItems}
         visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
+        visibleColumnKeys={visibleColumnKeys}
       />
 
       <Content

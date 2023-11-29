@@ -11,13 +11,18 @@ const Header = (props) => {
     onVisibleColumnsChange,
     totalCount,
     visibleColumnsSelectionEnabled,
+    visibleColumnKeys,
   } = props
 
   return (
     <div className="table__header">
       {React.createElement(headerLeftComponent, { ...props, ...headerProps })}
       {visibleColumnsSelectionEnabled && totalCount > 0 && (
-        <VisibleColumnsMenu columns={columns} onSelectionChange={onVisibleColumnsChange} />
+        <VisibleColumnsMenu
+          columns={columns}
+          onSelectionChange={onVisibleColumnsChange}
+          selectedColumnKeys={visibleColumnKeys}
+        />
       )}
     </div>
   )
@@ -34,6 +39,7 @@ Header.propTypes = {
   onVisibleColumnsChange: PropTypes.func.isRequired,
   totalCount: PropTypes.number.isRequired,
   visibleColumnsSelectionEnabled: PropTypes.bool,
+  visibleColumnKeys: PropTypes.array.isRequired,
 }
 
 Header.defaultProps = {

@@ -1,10 +1,13 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
+import { useDispatch } from 'react-redux'
+
+import { ArrayUtils } from '@core/arrayUtils'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
-import { ArrayUtils } from '@core/arrayUtils'
+import { TablesActions, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 export const useTable = ({
   columns,
@@ -15,8 +18,15 @@ export const useTable = ({
   onRowClick: onRowClickProp,
   selectable,
 }) => {
+  const dispatch = useDispatch()
+
   const [totalCount, setTotalCount] = useState(0)
-  const [visibleColumns, setVisibleColumns] = useState(columns)
+
+  const visibleColumnKeys = useTableVisibleColumns(module) || columns.map((column) => column.key)
+  const visibleColumns = useMemo(
+    () => columns.filter((column) => visibleColumnKeys.includes(column.key)),
+    [columns, visibleColumnKeys]
+  )
 
   const navigate = useNavigate()
   const surveyId = useSurveyId()
@@ -118,9 +128,9 @@ export const useTable = ({
 
   const onVisibleColumnsChange = useCallback(
     (visibleColumnKeys) => {
-      setVisibleColumns(columns.filter((column) => visibleColumnKeys.includes(column.key)))
+      dispatch(TablesActions.updateVisibleColumns({ module, visibleColumns: visibleColumnKeys }))
     },
-    [columns]
+    [module]
   )
 
   return {
@@ -139,6 +149,7 @@ export const useTable = ({
     onRowClick,
     onVisibleColumnsChange,
     selectedItems,
+    visibleColumnKeys,
     visibleColumns,
   }
 }
