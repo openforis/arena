@@ -33,7 +33,11 @@ const useChartRender = (spec, query) => {
 
   // Call renderChart only when necessary data is available
   useEffect(() => {
-    if (spec.chartType === 'barChart' ? spec.metric && spec.query && spec.query.groupBy : spec.metric) {
+    if (
+      spec.chartType === 'barChart'
+        ? spec.metric && spec.metric.field !== '' && spec.query && spec.query.groupBy && spec.query.groupBy.field !== ''
+        : spec.metric && spec.metric.field !== ''
+    ) {
       renderChart()
     }
   }, [spec, renderChart])
