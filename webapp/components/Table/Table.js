@@ -116,7 +116,7 @@ const Table = (props) => {
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
       />
-      <Footer offset={offset} list={list} limit={limit} count={count} />
+      <Footer count={count} limit={limit} list={list} module={module} offset={offset} />
     </div>
   )
 }

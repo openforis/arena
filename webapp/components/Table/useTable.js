@@ -7,7 +7,7 @@ import { ArrayUtils } from '@core/arrayUtils'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
-import { TablesActions, useTableVisibleColumns } from '@webapp/store/ui/tables'
+import { TablesActions, useTableMaxRows, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 export const useTable = ({
   columns,
@@ -27,13 +27,15 @@ export const useTable = ({
     () => columns.filter((column) => visibleColumnKeys.includes(column.key)),
     [columns, visibleColumnKeys]
   )
+  const limitInState = useTableMaxRows(module)
+  const limitInLink = getLimit()
+  const limit = limitInState ?? limitInLink
 
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   const offset = getOffset()
-  const limit = getLimit()
   const sort = getSort()
   const search = getSearch()
 
