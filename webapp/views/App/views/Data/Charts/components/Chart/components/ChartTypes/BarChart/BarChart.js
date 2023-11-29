@@ -7,8 +7,15 @@ const BarChart = ({ specs, originalData }) => {
   const chartRef = useRef()
 
   useEffect(() => {
-    if (!specs?.query?.metric || !specs?.query?.groupBy || !specs?.query?.aggregation) return
-
+    if (
+      !specs?.query?.metric?.field ||
+      specs?.query?.metric?.field === '' ||
+      !specs?.query?.groupBy?.field ||
+      specs?.query?.groupBy?.field === '' ||
+      !specs?.query?.aggregation?.type ||
+      specs?.query?.aggregation?.type === ''
+    )
+      return
     const groupByField = specs.query.groupBy.field
 
     if (groupByField) {
@@ -42,7 +49,6 @@ BarChart.propTypes = {
     query: PropTypes.shape({
       metric: PropTypes.shape({
         field: PropTypes.string.isRequired,
-        aggregate: PropTypes.string,
       }).isRequired,
       groupBy: PropTypes.shape({
         field: PropTypes.string.isRequired,
