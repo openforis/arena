@@ -37,6 +37,13 @@ export default class RFileReadData extends RFileSystem {
     super(rChain, 'read-data')
   }
 
+  async initSchemaSummary() {
+    const { survey, cycle } = this.rChain
+
+    const schemaSummaryCSV = arenaGetCSV(ApiRoutes.survey.schemaSummary({ surveyId: Survey.getId(survey), cycle }))
+    await this.appendContent(setVar('arena.schemaSummary', schemaSummaryCSV))
+  }
+
   async initEntitiesData() {
     const { chainUuid, survey, cycle, entities } = this.rChain
 
@@ -118,6 +125,8 @@ export default class RFileReadData extends RFileSystem {
     await super.init()
 
     const { listCategories, listTaxonomies } = this.rChain
+
+    await this.initSchemaSummary()
 
     await this.initEntitiesData()
 
