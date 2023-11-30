@@ -21,6 +21,7 @@ const pie = {
         type: 'container',
         blocks: {
           groupBy: GroupByBlock({
+            isMulti: false,
             valuesToSpec: ({ value = [], spec = {} }) => {
               const { key: field_uuid, as: field } = valuesToCalculations(value)
               const groupBy = { field_uuid, field, type: 'nominal' }
@@ -38,6 +39,7 @@ const pie = {
             id: 'metric',
             title: 'Metric',
             subtitle: '',
+            isMulti: false,
             optionsParams: { filter: ['quantitative'] },
             valuesToSpec: ({ spec = {}, value = [] }) => {
               const { as: field, key: field_uuid } = valuesToCalculations(value)
