@@ -110,7 +110,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
         // Delete selected records
         canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
       }
-      {canCloneRecords && (
+      {canCloneRecords && totalCount > 0 && (
         <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
       )}
       {recordsCloneModalOpen && (
