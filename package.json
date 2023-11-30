@@ -107,7 +107,7 @@
     "@mui/x-data-grid": "^6.14.0",
     "@mui/x-date-pickers": "^6.14.0",
     "@openforis/arena-core": "^0.0.177",
-    "@openforis/arena-server": "^0.1.30",
+    "@openforis/arena-server": "^0.1.31",
     "@sendgrid/mail": "^7.7.0",
     "@shopify/draggable": "^1.0.0-beta.8",
     "ace-builds": "^1.27.0",
