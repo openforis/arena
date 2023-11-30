@@ -10,6 +10,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   const pathParts = []
@@ -47,9 +48,16 @@ const getValidationsSummary = ({ nodeDef }) => {
     .join('\n')
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
+export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-  const nodeDefs = Survey.getNodeDefsArray(survey)
+  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
+    (nodeDef) =>
+      // exclude "weight" node def created by the processing chain
+      !(
+        NodeDef.isAnalysis(nodeDef) &&
+        NodeDef.getName(nodeDef) === SamplingNodeDefs.SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME
+      )
+  )
   const pathByNodeDefUuid = nodeDefs.reduce(
     (paths, nodeDef) => ({ ...paths, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
     {}
@@ -77,7 +85,7 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
     return Taxonomy.getName(taxonomy) || ''
   }
 
-  const items = nodeDefs.map((nodeDef) => {
+  return nodeDefs.map((nodeDef) => {
     const { uuid, type } = nodeDef
 
     const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
@@ -87,30 +95,37 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
 
     return {
       uuid,
+      name: NodeDef.getName(nodeDef),
       path: pathByNodeDefUuid[uuid],
-      type,
+      parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
       // labels
       ...languages.reduce(
         (labelsAcc, lang) => ({ ...labelsAcc, [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang) }),
         {}
       ),
+      type,
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
       taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
       hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+      hiddenInForm: String(NodeDef.isHidden(nodeDef)),
+      allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
       relevantIf,
       hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
       defaultValue: getDefaultValuesSummary({ nodeDef }),
       defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
-      defaultValueEvaluateOnce: NodeDef.isDefaultValueEvaluatedOneTime(nodeDef),
+      defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }
   })
+}
 
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
+  const items = await generateSchemaSummaryItems({ surveyId, cycle })
   await CSVWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false } })
 }

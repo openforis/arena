@@ -4,23 +4,23 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import circleToPolygon from 'circle-to-polygon'
+import L from 'leaflet'
 
-import { PointFactory } from '@openforis/arena-core'
+import { Objects, PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
-import L from 'leaflet'
 
 import { Button, ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
-import { useAltitude } from '../common/useAltitude'
+import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+
+import { useAltitude } from '../common/useAltitude'
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -80,6 +80,10 @@ export const CoordinateAttributePopUp = (props) => {
     popupRef.current?.close()
   }, [flyToPreviousPoint, pointFeature])
 
+  const path = useMemo(
+    () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
+    [ancestorsKeys, attributeDef, lang, survey]
+  )
   const onEarthMapButtonClick = useCallback(() => {
     let geojson
     if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
@@ -96,14 +100,10 @@ export const CoordinateAttributePopUp = (props) => {
       const bounds = SamplingPolygon.generateBounds({ latitude, longitude })
       geojson = L.rectangle(bounds).toGeoJSON()
     }
-    const earthMapUrl = 'https://earthmap.org/?polygon=' + JSON.stringify(geojson)
+    Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
+    const earthMapUrl = 'https://earthmap.org/?aoi=global&polygon=' + JSON.stringify(geojson)
     window.open(earthMapUrl, 'EarthMap')
-  }, [latitude, longitude, surveyInfo])
-
-  const path = useMemo(
-    () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
-    [ancestorsKeys, attributeDef, lang, survey]
-  )
+  }, [latitude, longitude, path, surveyInfo])
 
   const content = `**${path}**
 * **X**: ${point.x}

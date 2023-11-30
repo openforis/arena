@@ -89,12 +89,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           onChange={(e) => handleSearch(e.target.value)}
         />
       )}
-      {canExportRecordsSummary && (
+      {canExportRecordsSummary && totalCount > 0 && (
         <ButtonDownload
           testId={TestId.records.exportBtn}
           href={`/api/survey/${surveyId}/records/summary/export`}
           requestParams={{ cycle }}
-          label="common.export"
+          label="dataView.records.exportList"
         />
       )}
       {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
@@ -110,7 +110,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
         // Delete selected records
         canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
       }
-      {canCloneRecords && (
+      {canCloneRecords && totalCount > 0 && (
         <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
       )}
       {recordsCloneModalOpen && (

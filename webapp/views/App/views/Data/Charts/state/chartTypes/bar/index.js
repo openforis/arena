@@ -1,4 +1,4 @@
-import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock } from '../../blocks'
 import { valuesToCalculations, valuesToSpec, sliderBlock } from '../../blocks/common'
 
 const bar = {
@@ -39,18 +39,16 @@ const bar = {
               return newSpec
             },
           }),
-          metric: MetricBlock({
+          metric: GroupByBlock({
+            id: 'metric',
+            title: 'Metric',
             subtitle: 'Select the metric to measure the data ( Y axis )',
-            valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              const transform = valuesToCalculations(columnValues, '-')
-              const aggTransform = valuesToCalculations(aggregationValues, '-')
-
+            optionsParams: { filter: ['quantitative'] },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
               const metric = {
                 field: transform.as,
                 field_uuid: transform.key,
-                aggregate: aggTransform.as,
                 type: 'quantitative',
               }
 
@@ -64,8 +62,39 @@ const bar = {
               return newSpec
             },
           }),
+          aggregation: GroupByBlock({
+            id: 'aggregation',
+            title: 'Aggregation Method',
+            subtitle: '',
+            isMulti: false,
+            optionsParams: {
+              options: [
+                { value: 'average', label: 'Average', name: 'avg', type: 'aggregation' },
+                { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
+                { value: 'max', label: 'Maximum', name: 'max', type: 'aggregation' },
+                { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
+                { value: 'min', label: 'Minimum', name: 'min', type: 'aggregation' },
+                { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
+              ],
+            },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
+              const aggregation = {
+                type: transform.as,
+              }
+
+              const newSpec = {
+                ...spec,
+                query: {
+                  ...spec.query,
+                  aggregation,
+                },
+              }
+              return newSpec
+            },
+          }),
         },
-        order: ['groupBy', 'metric'],
+        order: ['groupBy', 'metric', 'aggregation'],
       },
       other: {
         title: 'Custom Chart',

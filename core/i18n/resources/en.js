@@ -673,6 +673,7 @@ Are you sure you want to continue?`,
       demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
       demoteAllRecordsFromCleansing: 'Cleansing -> Entry',
       editRecord: 'Edit record',
+      exportList: 'Export list',
       filterPlaceholder: 'Filter by keys or owner',
       viewRecord: 'View record',
       owner: 'Owner',
@@ -1349,6 +1350,10 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
   },
 
   categoryList: {
+    batchImport: 'Import categories in batch (from ZIP)',
+    batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
+{{insertedCategories}} new
+{{updatedCategories}} updated`,
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
@@ -1476,7 +1481,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
+      invalidImportFile: 'ZIP file must contain only .csv files (one for each category), without any directories',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
+      nameDuplicate: 'A category with the same name already exists: {{name}}',
       srsNotDefined: 'SRS with code {{srs}} not defined in survey',
     },
 
@@ -1643,7 +1650,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     ArenaMobileDataImportJob: 'Arena Mobile Data Import',
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
+    CategoriesBatchImportJob: 'Categories Import',
     CategoryImportJob: 'Category Import',
+    CategoryBatchImportJob: 'Category Import',
     ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
     ChainsValidationJob: 'Processing Chains Validation',
     ChainsImportJob: 'Chains Import',

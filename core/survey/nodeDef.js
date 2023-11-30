@@ -267,8 +267,8 @@ export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
-export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
-  let firstPart = null
+export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true) => {
+  let firstPart = ''
   const name = getName(nodeDef)
 
   if (type === NodeDefLabelTypes.name) {
@@ -279,13 +279,13 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
     if (!StringUtils.isBlank(label)) {
       if (type === NodeDefLabelTypes.label) {
         firstPart = label
-      } else if (type === NodeDefLabelTypes.labelAndName && !StringUtils.isBlank(label)) {
+      } else if (type === NodeDefLabelTypes.labelAndName) {
         firstPart = `${label} [${name}]`
       }
     }
   }
   // default to name
-  if (StringUtils.isBlank(firstPart)) {
+  if (StringUtils.isBlank(firstPart) && defaultToName) {
     firstPart = name
   }
 
@@ -432,6 +432,11 @@ export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
 export const assocLabels = (labels) => assocProp({ key: propKeys.labels, value: labels })
+export const assocLabel =
+  ({ label, lang }) =>
+  (nodeDef) =>
+    assocLabels({ ...getLabels(nodeDef), [lang]: label })(nodeDef)
+
 export const assocDescriptions = (descriptions) => assocProp({ key: propKeys.descriptions, value: descriptions })
 
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)

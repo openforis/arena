@@ -8,8 +8,9 @@
   display: flex;
   flex: 1;
   flex-direction: row;
-  justify-content: space-between;
-  gap: 3em;
+  justify-content: center;
+  align-items: center;
+  gap: 5em;
   width: 100%;
   margin-top: 20px;
 }
@@ -17,4 +18,6 @@
 .records-by-user {
   height: 300px;
   overflow-y: auto;
+  justify-content: center;
+  align-items: center;
 }

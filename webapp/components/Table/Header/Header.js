@@ -4,12 +4,19 @@ import PropTypes from 'prop-types'
 import { VisibleColumnsMenu } from './VisibleColumnsMenu'
 
 const Header = (props) => {
-  const { columns, headerLeftComponent, headerProps, onVisibleColumnsChange, visibleColumnsSelectionEnabled } = props
+  const {
+    columns,
+    headerLeftComponent,
+    headerProps,
+    onVisibleColumnsChange,
+    totalCount,
+    visibleColumnsSelectionEnabled,
+  } = props
 
   return (
     <div className="table__header">
       {React.createElement(headerLeftComponent, { ...props, ...headerProps })}
-      {visibleColumnsSelectionEnabled && (
+      {visibleColumnsSelectionEnabled && totalCount > 0 && (
         <VisibleColumnsMenu columns={columns} onSelectionChange={onVisibleColumnsChange} />
       )}
     </div>
@@ -25,6 +32,7 @@ Header.propTypes = {
   list: PropTypes.array.isRequired,
   offset: PropTypes.number.isRequired,
   onVisibleColumnsChange: PropTypes.func.isRequired,
+  totalCount: PropTypes.number.isRequired,
   visibleColumnsSelectionEnabled: PropTypes.bool,
 }
 

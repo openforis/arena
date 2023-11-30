@@ -1,21 +1,14 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useCallback, useMemo, useState, useEffect } from 'react'
 import { uuidv4 } from '@core/uuid'
 import './SingleMetric.scss'
 import { Popover } from 'react-tiny-popover'
 import RenderByType from '../BlockRenderer/BlockRenderer'
 import { ButtonAdd } from '@webapp/components'
+import PropTypes from 'prop-types'
+import Metric from '../Metric'
 
 const SinglePopoverContent = (props) => {
-  const {
-    config,
-    configItemsByPath,
-    configActions,
-    blockPath,
-    dimensions,
-    block,
-    setIsPopoverOpen,
-    metric,
-  } = props
+  const { config, configItemsByPath, configActions, blockPath, dimensions, block, setIsPopoverOpen, metric } = props
   const { blocks, order } = block
 
   const [draftMetric, setDraftMetric] = useState(metric)
@@ -57,6 +50,17 @@ const SinglePopoverContent = (props) => {
       </div>
     </div>
   )
+}
+
+SinglePopoverContent.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
+  setIsPopoverOpen: PropTypes.func.isRequired,
+  metric: PropTypes.object,
 }
 
 const SingleCustomPopover = (props) => {
@@ -105,11 +109,19 @@ const SingleCustomPopover = (props) => {
   )
 }
 
+SingleCustomPopover.propTypes = {
+  metric: PropTypes.object,
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  block: PropTypes.object.isRequired,
+  dimensions: PropTypes.array.isRequired,
+}
+
 const SingleMetricBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
   const { title, subtitle } = block
-
-  const options = useMemo(() => block.options || dimensions, [dimensions, block])
-  const flatOptions = useMemo(() => block.options || options.flatMap((d) => d.options), [options, block])
 
   const metric = useMemo(() => configItemsByPath?.[blockPath]?.value[0] || null, [configItemsByPath, blockPath])
 
@@ -149,9 +161,17 @@ const SingleMetricBlock = ({ config, configItemsByPath, configActions, blockPath
           />
         )}
       </div>
-      <span className="block__number-options">{flatOptions.length} Option(s)</span>
     </div>
   )
+}
+
+SingleMetricBlock.propTypes = {
+  config: PropTypes.object.isRequired,
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
 }
 
 export default SingleMetricBlock

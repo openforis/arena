@@ -19,7 +19,7 @@ import { Button, ButtonDelete, ButtonIconEditOrView } from '@webapp/components'
 
 import TableHeaderLeft from './TableHeaderLeft'
 
-import { useActions, useLocalState } from './store'
+import { State, useActions, useLocalState } from './store'
 
 const CategoryList = (props) => {
   const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
@@ -38,6 +38,7 @@ const CategoryList = (props) => {
 
   const canEdit = useAuthCanEditSurvey()
   const survey = useSurvey()
+  const requestedAt = State.getCategoriesRequestedAt(state)
 
   const columns = [
     // POSITION
@@ -145,9 +146,9 @@ const CategoryList = (props) => {
     <Table
       className="categories"
       module="categories"
-      restParams={{ draft: canEdit, validate: canEdit }}
+      restParams={{ draft: canEdit, requestedAt, validate: canEdit }}
       headerLeftComponent={TableHeaderLeft}
-      headerProps={{ state }}
+      headerProps={{ state, setState }}
       columns={columns}
     />
   )

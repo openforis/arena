@@ -61,6 +61,24 @@ export const init = (app) => {
   )
 
   app.post(
+    '/survey/:surveyId/categories/import',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const filePath = Request.getFilePath(req)
+
+        const job = CategoryService.createBatchImportJob({ user, surveyId, filePath })
+
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
     '/survey/:surveyId/categories/:categoryUuid/levels',
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {

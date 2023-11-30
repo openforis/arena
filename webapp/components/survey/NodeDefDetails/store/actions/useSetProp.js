@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -63,9 +64,29 @@ const _onUpdateReadOnly = ({ nodeDef, value: readOnly }) => {
   return nodeDef
 }
 
+const _generateLabelFromName = (name) => {
+  // name is in snake case
+  const parts = name.split(/[_|-]/).filter(Boolean)
+  if (parts.length > 0) {
+    parts[0] = StringUtils.capitalizeFirstLetter(parts[0])
+  }
+  return parts.join(' ')
+}
+
+const _onUpdateName = ({ nodeDef, nodeDefPrev, value: name, lang }) => {
+  const prevNameCapitalized = _generateLabelFromName(NodeDef.getName(nodeDefPrev))
+  const prevLabel = NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false)
+  if (StringUtils.isBlank(prevLabel) || prevNameCapitalized === prevLabel) {
+    const nameCapitalized = _generateLabelFromName(name)
+    return NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDef)
+  }
+  return nodeDef
+}
+
 const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
+  [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.readOnly]: _onUpdateReadOnly,
 }
 
@@ -73,6 +94,7 @@ export const useSetProp = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
   const surveyCycleKey = useSelector(SurveyState.getSurveyCycleKey)
+  const lang = useSelector(SurveyState.getSurveyPreferredLang)
   const validateNodeDef = useValidate({ setState })
 
   return useCallback(({ state, key, value = null }) => {
@@ -86,7 +108,14 @@ export const useSetProp = ({ setState }) => {
 
     const propUpdater = updateFunctionByProp[key]
     if (propUpdater) {
-      nodeDefUpdated = propUpdater({ survey, surveyCycleKey, nodeDef: nodeDefUpdated, value })
+      nodeDefUpdated = propUpdater({
+        survey,
+        surveyCycleKey,
+        lang,
+        nodeDef: nodeDefUpdated,
+        nodeDefPrev: nodeDef,
+        value,
+      })
     }
 
     validateNodeDef({ state, nodeDefUpdated })

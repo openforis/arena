@@ -51,7 +51,7 @@ const GaugeChart = ({ data }) => {
 
   return (
     <div ref={ref} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-      <h4 style={{ textAlign: 'center' }}>Storage Usage</h4>
+      <h4 style={{ textAlign: 'center' }}>Storage usage (Files)</h4>
       <div id="tooltip0" style={{ visibility: 'visible' }}>{`${usedLabel} out of ${totalLabel}`}</div>
     </div>
   )

@@ -12,6 +12,7 @@ export {
   cleanupCategory,
   convertToReportingDataCategory,
   startExportAllCategoriesJob,
+  startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
 } from './categories'

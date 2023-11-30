@@ -1,8 +1,9 @@
-import * as R from 'ramda'
 import StreamZip from 'node-stream-zip'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as Log from '@server/log/log'
+
+const hiddenFilePaths = ['__MACOSX']
 
 export default class FileZip {
   constructor(file) {
@@ -61,13 +62,25 @@ export default class FileZip {
       : null
   }
 
-  getEntryNames(path = '') {
-    return R.pipe(
-      R.filter(R.propEq('isDirectory', false)),
-      R.keys,
-      R.filter(R.startsWith(path)),
-      R.map((entry) => entry.slice(path.length))
-    )(this.streamZip.entries())
+  getEntryNames({ path = '', excludeHiddenFiles = true, excludeDirectories = true } = {}) {
+    const entries = this.streamZip.entries()
+    return Object.values(entries).reduce((acc, entry) => {
+      const { name, isDirectory } = entry
+      if (
+        (excludeDirectories && isDirectory) ||
+        (excludeHiddenFiles && hiddenFilePaths.find((hiddenFilePath) => name.startsWith(hiddenFilePath)))
+      ) {
+        return acc
+      }
+      if (path) {
+        if (name.startsWith(path)) {
+          acc.push(name.slice(path.length))
+        }
+      } else {
+        acc.push(name)
+      }
+      return acc
+    }, [])
   }
 
   close() {
