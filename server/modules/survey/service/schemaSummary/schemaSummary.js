@@ -48,7 +48,7 @@ const getValidationsSummary = ({ nodeDef }) => {
     .join('\n')
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
+export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) =>
@@ -85,7 +85,7 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
     return Taxonomy.getName(taxonomy) || ''
   }
 
-  const items = nodeDefs.map((nodeDef) => {
+  return nodeDefs.map((nodeDef) => {
     const { uuid, type } = nodeDef
 
     const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
@@ -123,6 +123,9 @@ export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => 
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }
   })
+}
 
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
+  const items = await generateSchemaSummaryItems({ surveyId, cycle })
   await CSVWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false } })
 }
