@@ -22,9 +22,13 @@ export const useTable = ({
 
   const [totalCount, setTotalCount] = useState(0)
 
-  const visibleColumnKeys = useTableVisibleColumns(module) || columns.map((column) => column.key)
+  const visibleColumnKeysInStore = useTableVisibleColumns(module)
+  const visibleColumnKeys = useMemo(
+    () => visibleColumnKeysInStore ?? columns?.map((column) => column.key) ?? [],
+    [columns, visibleColumnKeysInStore]
+  )
   const visibleColumns = useMemo(
-    () => columns.filter((column) => visibleColumnKeys.includes(column.key)),
+    () => columns?.filter((column) => visibleColumnKeys.includes(column.key)) ?? [],
     [columns, visibleColumnKeys]
   )
   const limitInState = useTableMaxRows(module)
@@ -129,8 +133,8 @@ export const useTable = ({
   )
 
   const onVisibleColumnsChange = useCallback(
-    (visibleColumnKeys) => {
-      dispatch(TablesActions.updateVisibleColumns({ module, visibleColumns: visibleColumnKeys }))
+    (visibleColumnKeysUpdated) => {
+      dispatch(TablesActions.updateVisibleColumns({ module, visibleColumns: visibleColumnKeysUpdated }))
     },
     [module]
   )
