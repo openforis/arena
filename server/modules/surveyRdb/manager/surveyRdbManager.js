@@ -193,7 +193,16 @@ export const fetchViewDataAgg = async (params) => {
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
-  { survey, cycle, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
+  {
+    survey,
+    cycle,
+    includeCategoryItemsLabels,
+    includeAnalysis,
+    recordOwnerUuid = null,
+    recordUuids = null,
+    outputDir,
+    callback,
+  },
   client = db
 ) => {
   const addCycle = Survey.getCycleKeys(survey).length > 1
@@ -223,6 +232,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     let query = Query.create({ entityDefUuid })
     const queryAttributeDefsUuids = ancestorKeys.concat(childDefs).map(NodeDef.getUuid)
     query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+    query = Query.assocFilterRecordUuids(recordUuids)(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 

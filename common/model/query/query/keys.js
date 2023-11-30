@@ -8,6 +8,7 @@ export const keys = {
   dimensions: 'dimensions',
   measures: 'measures',
   filterRecordUuid: 'filterRecordUuid',
+  filterRecordUuids: 'filterRecordUuids',
 }
 
 export const modes = {
