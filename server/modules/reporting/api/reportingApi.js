@@ -44,8 +44,11 @@ export const init = (app) => {
         chartSpec.chartType === 'barChart' &&
         chartSpec.query &&
         chartSpec.query.metric &&
+        chartSpec.query.metric.field !== '' &&
         chartSpec.query.groupBy &&
-        chartSpec.query.aggregation
+        chartSpec.query.groupBy.field !== '' &&
+        chartSpec.query.aggregation &&
+        chartSpec.query.aggregation.type !== ''
       ) {
         const groupByFieldUuid = chartSpec.query.groupBy.field_uuid
         const metricFieldUuid = chartSpec.query.metric.field_uuid

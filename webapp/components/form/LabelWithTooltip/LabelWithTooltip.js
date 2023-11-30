@@ -33,13 +33,14 @@ export const LabelWithTooltip = (props) => {
 
 LabelWithTooltip.propTypes = {
   className: PropTypes.string,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   style: PropTypes.object,
   children: PropTypes.node,
 }
 
 LabelWithTooltip.defaultProps = {
   className: undefined,
+  label: '',
   style: {},
   children: null,
 }

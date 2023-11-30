@@ -62,12 +62,12 @@ export default class FileZip {
       : null
   }
 
-  getEntryNames(path = '', excludeHiddenFiles = true) {
+  getEntryNames({ path = '', excludeHiddenFiles = true, excludeDirectories = true } = {}) {
     const entries = this.streamZip.entries()
     return Object.values(entries).reduce((acc, entry) => {
       const { name, isDirectory } = entry
       if (
-        isDirectory ||
+        (excludeDirectories && isDirectory) ||
         (excludeHiddenFiles && hiddenFilePaths.find((hiddenFilePath) => name.startsWith(hiddenFilePath)))
       ) {
         return acc

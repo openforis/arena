@@ -27,7 +27,7 @@ export const getFilesSummaries = async (zipFile) => _getJson(zipFile, ExportFile
 export const getFile = async (zipFile, fileUuid) => zipFile.getEntryData(ExportFile.file({ fileUuid }))
 // Deprecated
 export const getFileUuidsOld = async (zipFile) => {
-  const entryNames = (await zipFile.getEntryNames(ExportFile.filesDir)) || []
+  const entryNames = (await zipFile.getEntryNames({ path: ExportFile.filesDir })) || []
   // extract uuids from entry names
   return entryNames.map((entryName) => entryName.slice(1, entryName.length - 5))
 }
