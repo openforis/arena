@@ -38,7 +38,7 @@ const ButtonGroup = ({
           }}
           aria-disabled={Boolean(disabled) || disabledProp}
         >
-          {icon && icon({ key })}
+          {icon?.({ key })}
           {label}
         </button>
       )
