@@ -139,11 +139,11 @@ export const renderStackedBars = (svg, data, metricAggregationNames, scales, col
 
       const pos = isHorizontal ? [event.pageY, event.pageX] : [event.pageX, event.pageY]
       tooltip
-        .html(`Group: ${d.data.groupBy} <br/> Metric: ${metricName} <br/> Value: ${metricValue}`)
+        .html(`Group: ${d.data.groupBy} <br/> Metric: ${metricName} <br/> Value: ${metricValue.toFixed(2)}`)
         .style('left', pos[0] + 10 + 'px')
         .style('top', pos[1] - 10 + 'px')
       tooltip
-        .html(`Group: ${d.data.groupBy} <br/> Metric: ${metricName} <br/> Value: ${metricValue}`)
+        .html(`Group: ${d.data.groupBy} <br/> Metric: ${metricName} <br/> Value: ${metricValue.toFixed(2)}`)
         .style('left', event.pageX + 10 + 'px')
         .style('top', event.pageY - 10 + 'px')
     })
@@ -167,7 +167,7 @@ export const renderSingleMetricBars = (svg, data, metricAggregationNames, chartP
     .on('mouseover', function (event, d) {
       tooltip.transition().duration(200).style('opacity', 0.9)
       tooltip
-        .html(`Group: ${d.groupBy} <br/> Value: ${d[metricAggregationNames[0]]}`)
+        .html(`Group: ${d.groupBy} <br/> Value: ${d[metricAggregationNames[0]].toFixed(2)}`)
         .style('left', event.pageX + 10 + 'px')
         .style('top', event.pageY - 10 + 'px')
     })

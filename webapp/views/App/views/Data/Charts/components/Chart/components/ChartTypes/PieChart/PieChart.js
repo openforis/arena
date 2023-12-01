@@ -1,13 +1,11 @@
 import * as d3 from 'd3'
 import PropTypes from 'prop-types'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import './PieChart.css'
 import { processData } from './utils/processData'
 
-const PieChart = ({ specs, originalData }) => {
+const PieChart = ({ specs, originalData, chartRef }) => {
   const { data, categoryField, valueField } = processData(originalData, specs)
-
-  const chartRef = useRef()
 
   useEffect(() => {
     renderPieChart()
@@ -135,6 +133,7 @@ PieChart.propTypes = {
     }).isRequired,
   }).isRequired,
   originalData: PropTypes.object.isRequired,
+  chartRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
 }
 
 export default React.memo(PieChart)
