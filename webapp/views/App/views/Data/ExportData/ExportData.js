@@ -101,7 +101,12 @@ const ExportData = (props) => {
         ))}
       </ExpansionPanel>
 
-      <Button testId={TestId.dataExport.prepareExport} onClick={onExportClick} label="dataExportView.startExport" />
+      <Button
+        className="btn-primary"
+        label="dataExportView.startExport"
+        onClick={onExportClick}
+        testId={TestId.dataExport.prepareExport}
+      />
     </div>
   )
 }

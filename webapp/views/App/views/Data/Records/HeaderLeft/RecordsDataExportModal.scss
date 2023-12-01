@@ -1,0 +1,19 @@
+.records-data-export {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    gap: 3rem;
+
+    .form-item {
+      width: 40rem;
+    }
+
+    .source-form-item {
+      .form-label {
+        align-self: self-start;
+        padding-top: 8px;
+      }
+    }
+  }
+}
