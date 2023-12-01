@@ -98,6 +98,18 @@ export const getNodeDefDescendantsInSingleEntities =
       // visit nodes inside single entities
       queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
     }
+    if (sorted) {
+      // analysis node defs at the end
+      return [...descendants].sort((descendant1, descendant2) => {
+        const isAnalysis1 = NodeDef.isAnalysis(descendant1)
+        const isAnalysis2 = NodeDef.isAnalysis(descendant2)
+        if (isAnalysis1 === isAnalysis2) {
+          // both node defs are analysis or not: keep previous order
+          return descendants.indexOf(descendant1) - descendants.indexOf(descendant2)
+        }
+        return isAnalysis1 && !isAnalysis2 ? 1 : -1
+      })
+    }
     return descendants
   }
 
