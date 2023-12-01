@@ -1,6 +1,6 @@
 import './VisibleColumnsMenu.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -11,16 +11,13 @@ import { ButtonMenu } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 
 export const VisibleColumnsMenu = (props) => {
-  const { columns, onSelectionChange } = props
+  const { columns, onSelectionChange, selectedColumnKeys } = props
 
   const availableColumns = columns.filter((column) => !Objects.isEmpty(column.header) && column.header !== '#')
-
-  const [selectedColumnKeys, setSelectedColumnKeys] = useState(columns.map((col) => col.key))
 
   const onColummSelectionChange = useCallback(
     (key) => () => {
       const selectedColumnKeysNext = ArrayUtils.addOrRemoveItem({ item: key })(selectedColumnKeys)
-      setSelectedColumnKeys(selectedColumnKeysNext)
       onSelectionChange(selectedColumnKeysNext)
     },
     [onSelectionChange, selectedColumnKeys]
@@ -55,4 +52,5 @@ export const VisibleColumnsMenu = (props) => {
 VisibleColumnsMenu.propTypes = {
   columns: PropTypes.array.isRequired,
   onSelectionChange: PropTypes.func.isRequired,
+  selectedColumnKeys: PropTypes.array,
 }

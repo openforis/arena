@@ -231,6 +231,11 @@ export const fetchViewData = async (params, client = db) => {
       queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
       queryBuilder.addParams({ recordUuid })
     }
+    const recordUuids = Query.getFilterRecordUuids(query)
+    if (recordUuids?.length > 0) {
+      queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} IN ($/recordUuids:csv/)`)
+      queryBuilder.addParams({ recordUuids })
+    }
   }
 
   if (!Objects.isEmpty(recordSteps)) {

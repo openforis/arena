@@ -136,10 +136,11 @@ export const fetchEntitiesDataToCsvFiles = async ({
   user,
   survey,
   cycle: cycleParam,
-  outputDir,
+  recordUuids,
   includeCategoryItemsLabels,
   includeAnalysis,
   includeDataFromAllCycles,
+  outputDir,
   callback,
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
@@ -150,6 +151,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
     survey,
     cycle,
     outputDir,
+    recordUuids,
     includeCategoryItemsLabels,
     includeAnalysis,
     recordOwnerUuid,

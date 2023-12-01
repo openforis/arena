@@ -15,6 +15,7 @@ import { TestId } from '@webapp/utils/testId'
 import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit } from '@webapp/components'
 import {
   useAuthCanDeleteRecords,
+  useAuthCanExportRecords,
   useAuthCanExportRecordsList,
   useAuthCanUpdateRecordsStep,
   useAuthCanUseAnalysis,
@@ -24,6 +25,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
+import { RecordsDataExportModal } from './RecordsDataExportModal'
 
 const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
   const dispatch = useDispatch()
@@ -40,19 +42,25 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const canDeleteSelectedRecords = useAuthCanDeleteRecords(selectedItems)
   const canExportRecordsSummary = useAuthCanExportRecordsList()
+  const canExportRecordsData = useAuthCanExportRecords()
   const lastCycle = cycles[cycles.length - 1]
   const canCloneRecords = canAnalyzeRecords && cycles.length > 1 && cycle !== lastCycle
 
   const selectedItemsCount = selectedItems.length
+  const selectedRecordsUuids = selectedItems.map((selectedItem) => selectedItem.uuid)
 
-  const [state, setState] = useState({ recordsCloneModalOpen: false })
-  const { recordsCloneModalOpen } = state
+  const [state, setState] = useState({ recordsCloneModalOpen: false, recordsDataExportModalOpen: false })
+  const { recordsCloneModalOpen, recordsDataExportModalOpen } = state
 
   const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
 
   const toggleRecordsCloneModalOpen = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsCloneModalOpen: !recordsCloneModalOpen }))
   }, [recordsCloneModalOpen])
+
+  const toggleRecordsDataExportModalOpen = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, recordsDataExportModalOpen: !recordsDataExportModalOpen }))
+  }, [recordsDataExportModalOpen])
 
   const onDeleteConfirm = useCallback(
     () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
@@ -89,35 +97,43 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           onChange={(e) => handleSearch(e.target.value)}
         />
       )}
-      {canExportRecordsSummary && totalCount > 0 && (
-        <ButtonDownload
-          testId={TestId.records.exportBtn}
-          href={`/api/survey/${surveyId}/records/summary/export`}
-          requestParams={{ cycle }}
-          label="dataView.records.exportList"
-        />
+      {totalCount > 0 && (
+        <>
+          {canExportRecordsSummary && (
+            <ButtonDownload
+              testId={TestId.records.exportBtn}
+              href={`/api/survey/${surveyId}/records/summary/export`}
+              requestParams={{ cycle }}
+              label="dataView.records.exportList"
+            />
+          )}
+          {canExportRecordsData && (
+            <ButtonDownload label="dataView.records.exportData" onClick={toggleRecordsDataExportModalOpen} />
+          )}
+          {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
+            <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
+          )}
+          {
+            // Edit selected record
+            selectedItemsCount === 1 && (
+              <ButtonIconEdit onClick={onSelectedRecordClick} title="dataView.editSelectedRecord" />
+            )
+          }
+          {
+            // Delete selected records
+            canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
+          }
+          {canCloneRecords && (
+            <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
+          )}
+        </>
       )}
-      {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
-        <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
-      )}
-      {
-        // Edit selected record
-        selectedItemsCount === 1 && (
-          <ButtonIconEdit onClick={onSelectedRecordClick} title="dataView.editSelectedRecord" />
-        )
-      }
-      {
-        // Delete selected records
-        canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
-      }
-      {canCloneRecords && totalCount > 0 && (
-        <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
-      )}
+
       {recordsCloneModalOpen && (
-        <RecordsCloneModal
-          onClose={toggleRecordsCloneModalOpen}
-          selectedRecordsUuids={selectedItems.map((selectedItem) => selectedItem.uuid)}
-        />
+        <RecordsCloneModal onClose={toggleRecordsCloneModalOpen} selectedRecordsUuids={selectedRecordsUuids} />
+      )}
+      {recordsDataExportModalOpen && (
+        <RecordsDataExportModal onClose={toggleRecordsDataExportModalOpen} recordUuids={selectedRecordsUuids} />
       )}
     </div>
   )
