@@ -5,19 +5,17 @@ import './ScatterPlot.css'
 import { createLegend } from './utils/legend'
 import { processData } from './utils/processData'
 
-const ScatterPlot = ({ specs, originalData }) => {
+const ScatterPlot = ({ specs, originalData, chartRef }) => {
   const { data, xField, yField } = processData(originalData, specs)
-  const chartRef = useRef()
 
-  // Shape symbols
   const shapeSymbols = [
-    d3.symbolCircle, // Circle
-    d3.symbolCross, // Cross
-    d3.symbolDiamond, // Diamond
-    d3.symbolSquare, // Square
-    d3.symbolStar, // Star
-    d3.symbolTriangle, // Triangle
-    d3.symbolWye, // Wye
+    d3.symbolCircle,
+    d3.symbolCross,
+    d3.symbolDiamond,
+    d3.symbolSquare,
+    d3.symbolStar,
+    d3.symbolTriangle,
+    d3.symbolWye,
   ]
 
   useEffect(() => {

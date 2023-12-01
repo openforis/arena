@@ -3,9 +3,7 @@ import PropTypes from 'prop-types'
 import { renderBarChart } from './utils/render'
 import './BarChart.css'
 
-const BarChart = ({ specs, originalData }) => {
-  const chartRef = useRef()
-
+const BarChart = ({ specs, originalData, chartRef }) => {
   useEffect(() => {
     if (
       !specs?.query?.metric?.field ||

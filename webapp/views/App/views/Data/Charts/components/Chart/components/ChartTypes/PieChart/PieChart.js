@@ -4,10 +4,8 @@ import React, { useEffect, useRef } from 'react'
 import './PieChart.css'
 import { processData } from './utils/processData'
 
-const PieChart = ({ specs, originalData }) => {
+const PieChart = ({ specs, originalData, chartRef }) => {
   const { data, categoryField, valueField } = processData(originalData, specs)
-
-  const chartRef = useRef()
 
   useEffect(() => {
     renderPieChart()
