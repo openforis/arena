@@ -132,6 +132,7 @@ const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
       delete nodeDefsByUuid[NodeDef.getUuid(nodeDef)]
     }
   })
+  return nodeDefsByUuid
 }
 
 export const fetchNodeDefsBySurveyId = async (
@@ -152,8 +153,7 @@ export const fetchNodeDefsBySurveyId = async (
   )
   const nodeDefsByUuid = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 
-  _filterOutInvalidNodeDefs(nodeDefsByUuid)
-  return nodeDefsByUuid
+  return _filterOutInvalidNodeDefs(nodeDefsByUuid)
 }
 
 // ======= UPDATE
