@@ -124,6 +124,17 @@ export const insertNodeDef = async (
 
 export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 
+const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
+  Object.values(nodeDefsByUuid).forEach((nodeDef) => {
+    const parentUuid = NodeDef.getParentUuid(nodeDef)
+    // invalid parent UUID
+    if (parentUuid && !nodeDefsByUuid[parentUuid]) {
+      delete nodeDefsByUuid[NodeDef.getUuid(nodeDef)]
+    }
+  })
+  return nodeDefsByUuid
+}
+
 export const fetchNodeDefsBySurveyId = async (
   {
     surveyId,
@@ -140,7 +151,9 @@ export const fetchNodeDefsBySurveyId = async (
     { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
     client
   )
-  return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+  const nodeDefsByUuid = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+
+  return _filterOutInvalidNodeDefs(nodeDefsByUuid)
 }
 
 // ======= UPDATE
