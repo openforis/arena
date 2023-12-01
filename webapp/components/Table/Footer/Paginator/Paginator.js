@@ -29,11 +29,10 @@ const Paginator = (props) => {
           itemLabel={A.identity}
           selection={limit}
           onChange={(limitUpdated) => {
-            if (TableConstants.itemsPerPageValues.includes(Number(limitUpdated))) {
-              setLimit(limitUpdated)
-            } else {
-              setLimit(TableConstants.itemsPerPageDefault)
-            }
+            const limitNext = TableConstants.itemsPerPageValues.includes(Number(limitUpdated))
+              ? limitUpdated
+              : TableConstants.itemsPerPageDefault
+            setLimit(limitNext)
           }}
         />
       </div>
