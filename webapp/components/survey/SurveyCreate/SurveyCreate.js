@@ -134,11 +134,13 @@ const SurveyCreate = (props) => {
           {cloneFrom?.cycles?.length > 1 && (
             <FormItem label={i18n.t('common.cycle')}>
               <Dropdown
+                className="cycle-dropdown"
                 items={cloneFrom.cycles}
                 itemValue={(cycleKey) => cycleKey}
                 itemLabel={RecordCycle.getLabel}
                 onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
                 selection={cloneFromCycle}
+                validation={Validation.getFieldValidation('cloneFromCycle')(validation)}
               />
             </FormItem>
           )}
