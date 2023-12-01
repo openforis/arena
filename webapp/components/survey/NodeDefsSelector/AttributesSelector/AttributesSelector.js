@@ -53,10 +53,12 @@ const AttributesSelector = (props) => {
       childDefs = Survey.getNodeDefDescendantsInSingleEntities({
         nodeDef: nodeDefContext,
         includeAnalysis,
+        cycle,
+        sorted: true,
         filterFn: (n) => NodeDef.isAttribute(n) && (showMultipleAttributes || NodeDef.isSingle(n)),
       })(survey)
     } else {
-      childDefs = Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey)
+      childDefs = Survey.getNodeDefChildrenSorted({ nodeDef: nodeDefContext, cycle, includeAnalysis })(survey)
     }
   } else {
     childDefs = [nodeDefContext] // Multiple attribute
