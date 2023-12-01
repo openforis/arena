@@ -27,8 +27,9 @@ const Chart = ({ data, specs, fullScreen, chartRef }) => {
   const ChartComponent = chartComponentByType[chartType]
 
   const downloadPng = () => {
-    if (chartRef && chartRef.current) {
-      const svgElement = chartRef.current.querySelector('svg')
+    const chart = chartRef?.current
+    if (chart) {
+      const svgElement = chart.querySelector('svg')
       if (svgElement) {
         // Serialize SVG
         const serializer = new XMLSerializer()
@@ -76,7 +77,7 @@ const Chart = ({ data, specs, fullScreen, chartRef }) => {
       <button onClick={downloadPng}>Download PNG</button>
       {(chartType || hasSvg) && (
         <Split sizes={[70, 30]} expandToMin={true} className="wrap wrap_vertical" direction="vertical">
-          <div className="charts_chart__image_container" chartRef={chartRef}>
+          <div className="charts_chart__image_container">
             {ChartComponent ? (
               <ChartComponent specs={specs} originalData={data} chartRef={chartRef} />
             ) : (
@@ -102,12 +103,7 @@ Chart.propTypes = {
   data: PropTypes.object,
   specs: PropTypes.object,
   fullScreen: PropTypes.bool,
-  chartRef: PropTypes.oneOfType([
-    // Either a function
-    PropTypes.func,
-    // Or the instance of a DOM native element (see the note about SSR)
-    PropTypes.shape({ current: PropTypes.instanceOf(Element) }),
-  ]),
+  chartRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
 }
 
 export default Chart

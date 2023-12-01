@@ -1,7 +1,9 @@
-import * as d3 from 'd3'
-import PropTypes from 'prop-types'
-import React, { useEffect, useRef } from 'react'
 import './ScatterPlot.css'
+
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
+import * as d3 from 'd3'
+
 import { createLegend } from './utils/legend'
 import { processData } from './utils/processData'
 
@@ -234,6 +236,7 @@ ScatterPlot.propTypes = {
     }).isRequired,
   }).isRequired,
   originalData: PropTypes.array.isRequired,
+  chartRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
 }
 
 export default React.memo(ScatterPlot)
