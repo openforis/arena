@@ -53,12 +53,12 @@ const NodeDefDetails = () => {
             }
           />
           <div className="attribute-selector">
-            {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
+            {i18n.t(`surveyForm.addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
           </div>
         </FormItem>
 
         <TabBar
-          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef)}
+          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef) && !NodeDef.isLayoutElement(nodeDef)}
           tabs={[
             {
               label: i18n.t('nodeDefEdit.basic'),

@@ -25,7 +25,7 @@ export default () =>
         page.click('text="Login"'),
       ])
 
-      const header = await page.$('.header')
+      const header = await page.$('.app-header')
       await expect(header).not.toBe(null)
     })
   })

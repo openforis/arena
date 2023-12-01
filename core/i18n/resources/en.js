@@ -1153,6 +1153,16 @@ E.g. this.region = region_attribute_name
         other: 'Other',
       },
     },
+    formHeaderProps: {
+      headerColorLabel: 'Header color',
+      headerColor: {
+        blue: 'Blue',
+        green: 'Green',
+        orange: 'Orange',
+        red: 'Red',
+        yellow: 'Yellow',
+      },
+    },
     textProps: {
       textInputType: 'Text input type',
       textInputTypes: {
@@ -1236,6 +1246,8 @@ E.g. this.region = region_attribute_name
       taxon: 'Taxon',
       text: 'Text',
       time: 'Time',
+      // layout elments
+      formHeader: 'Form Header',
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,

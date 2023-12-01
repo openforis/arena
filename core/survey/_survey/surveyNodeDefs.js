@@ -42,26 +42,31 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) =>
   )
 
 export const getNodeDefChildren =
-  (nodeDef, includeAnalysis = true) =>
+  (nodeDef, includeAnalysis = true, includeLayoutElements = false) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
-    let childDefs = Surveys.getNodeDefChildren({ survey: surveyIndexed, nodeDef, includeAnalysis })
+    let childDefs = Surveys.getNodeDefChildren({
+      survey: surveyIndexed,
+      nodeDef,
+      includeAnalysis,
+      includeLayoutElements,
+    })
     childDefs = filterNodeDefsWithoutSiblings(childDefs)
     return childDefs
   }
 
 export const getNodeDefChildrenSorted =
-  ({ nodeDef, includeAnalysis = false, cycle = null }) =>
+  ({ nodeDef, includeAnalysis = false, cycle = null, includeLayoutElements = false }) =>
   (survey) => {
-    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef, includeAnalysis, cycle })
+    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, cycle, nodeDef, includeAnalysis, includeLayoutElements })
     childDefs = filterNodeDefsWithoutSiblings(childDefs)
     return childDefs
   }
 
 export const getNodeDefChildrenInOwnPage =
-  ({ nodeDef, cycle }) =>
+  ({ nodeDef, cycle, includeAnalysis = true, includeLayoutElements = false }) =>
   (survey) => {
-    const children = getNodeDefChildren(nodeDef)(survey)
+    const children = getNodeDefChildren(nodeDef, includeAnalysis, includeLayoutElements)(survey)
     const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
     const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
     if (childrenIndex.length === 0) return childrenInOwnPage

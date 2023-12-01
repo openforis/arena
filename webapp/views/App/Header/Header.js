@@ -51,8 +51,8 @@ const Header = () => {
   const surveyTitle = surveyLabel ? `${surveyLabel} [${surveyName}]` : surveyName
 
   return (
-    <div className={classNames('header', { 'sidebar-open': isSideBarOpen })}>
-      <div className="header__logo">
+    <div className={classNames('app-header', { 'sidebar-open': isSideBarOpen })}>
+      <div className="app-header__logo">
         <a href="https://www.openforis.org" target="_blank" rel="noopener noreferrer" className="flex-center">
           <img src="/img/of_icon.png" alt="Open Foris" />
         </a>
@@ -60,7 +60,7 @@ const Header = () => {
 
       <Breadcrumbs />
 
-      <div className="header__survey">
+      <div className="app-header__survey">
         {Survey.isValid(surveyInfo) && (
           <>
             <Link
@@ -68,7 +68,7 @@ const Header = () => {
               to={appModuleUri(homeModules.surveyInfo)}
               className="btn-s btn-transparent"
             >
-              <LabelWithTooltip className="header__survey-title" label={surveyTitle} />
+              <LabelWithTooltip className="app-header__survey-title" label={surveyTitle} />
             </Link>
             <CycleSelector
               selectedCycle={surveyCycleKey}
@@ -80,7 +80,7 @@ const Header = () => {
             />
             <SurveyPreferredLanguageSelector />
             {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
-            <div className="header__loader-wrapper">{appSaving && <Spinner size={25} />}</div>
+            <div className="app-header__loader-wrapper">{appSaving && <Spinner size={25} />}</div>
           </>
         )}
       </div>
@@ -89,7 +89,7 @@ const Header = () => {
       <div></div>
 
       <button
-        className="header__btn-user"
+        className="app-header__btn-user"
         data-testid={TestId.header.userBtn}
         onClick={(event) => {
           event.preventDefault()

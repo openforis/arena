@@ -25,7 +25,8 @@
       background-color: rgba($green, 0.85);
     }
 
-    &.entity {
+    &.entity,
+    &.formHeader {
       margin-top: 0.7rem;
     }
   }

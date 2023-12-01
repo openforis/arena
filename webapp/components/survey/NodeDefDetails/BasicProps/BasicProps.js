@@ -27,6 +27,7 @@ import CodeProps from '../CodeProps'
 import CoordinateProps from '../CoordinateProps'
 import DecimalProps from '../DecimalProps'
 import FileProps from '../FileProps'
+import FormHeaderProps from '../FormHeaderProps'
 import TaxonProps from '../TaxonProps'
 import TextProps from '../TextProps'
 import AnalysisProps from '../AnalysisProps'
@@ -37,6 +38,7 @@ const basicPropsComponentByType = {
   [NodeDef.nodeDefType.coordinate]: CoordinateProps,
   [NodeDef.nodeDefType.decimal]: DecimalProps,
   [NodeDef.nodeDefType.file]: FileProps,
+  [NodeDef.nodeDefType.formHeader]: FormHeaderProps,
   [NodeDef.nodeDefType.taxon]: TaxonProps,
   [NodeDef.nodeDefType.text]: TextProps,
 }

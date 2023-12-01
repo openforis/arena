@@ -1,27 +1,23 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-
-import * as NodeDef from '@core/survey/nodeDef'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
+import ButtonGroup, { toButtonGroupItems } from '@webapp/components/form/buttonGroup'
 
 import { State } from './store'
 
 const textInputTypes = ({ i18n }) =>
-  Object.keys(NodeDef.textInputTypes).map((key) => ({
-    key,
-    label: i18n.t(`nodeDefEdit.textProps.textInputTypes.${key}`),
-  }))
+  toButtonGroupItems({ i18n, object: NodeDef.textInputTypes, labelPrefix: 'nodeDefEdit.textProps.textInputTypes.' })
 
 const textTransformTypes = ({ i18n }) =>
-  Object.keys(NodeDef.textTransformValues).map((labelKey) => ({
-    key: labelKey,
-    label: i18n.t(`nodeDefEdit.textProps.textTransformTypes.${labelKey}`),
-  }))
+  toButtonGroupItems({
+    i18n,
+    object: NodeDef.textTransformValues,
+    labelPrefix: 'nodeDefEdit.textProps.textTransformTypes.',
+  })
 
 const TextProps = (props) => {
   const { state, Actions } = props
@@ -30,25 +26,19 @@ const TextProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
 
-  const selectLabelValue = useCallback(
+  const onLabelValueChange = useCallback(
     (value) => {
       Actions.setProp({ state, key: NodeDef.propKeys.textTransform, value })
     },
-    [state]
+    [Actions, state]
   )
-
-  useEffect(() => {
-    if (A.isEmpty(NodeDef.getTextTransform(nodeDef))) {
-      selectLabelValue(NodeDef.textTransformValues.none)
-    }
-  }, [])
 
   return (
     <>
       <FormItem label={i18n.t('nodeDefEdit.textProps.textTransform')}>
         <ButtonGroup
           selectedItemKey={NodeDef.getTextTransform(nodeDef)}
-          onChange={selectLabelValue}
+          onChange={onLabelValueChange}
           items={textTransformTypes({ i18n })}
         />
       </FormItem>
