@@ -53,6 +53,7 @@ const Table = (props) => {
     onRowClick,
     onVisibleColumnsChange,
     selectedItems,
+    visibleColumnKeys,
     visibleColumns,
   } = useTable({
     columns,
@@ -84,6 +85,7 @@ const Table = (props) => {
         onVisibleColumnsChange={onVisibleColumnsChange}
         selectedItems={selectedItems}
         visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
+        visibleColumnKeys={visibleColumnKeys}
       />
 
       <Content
@@ -114,7 +116,7 @@ const Table = (props) => {
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
       />
-      <Footer offset={offset} list={list} limit={limit} count={count} />
+      <Footer count={count} limit={limit} list={list} module={module} offset={offset} />
     </div>
   )
 }
