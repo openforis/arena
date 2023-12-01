@@ -50,9 +50,10 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
 }
 
 export const startExportCsvDataJob = ({
+  user,
   surveyId,
   cycle,
-  user,
+  recordUuids,
   includeCategories,
   includeCategoryItemsLabels,
   includeAnalysis,
@@ -63,6 +64,7 @@ export const startExportCsvDataJob = ({
     user,
     surveyId,
     cycle,
+    recordUuids,
     includeCategories,
     includeCategoryItemsLabels,
     includeAnalysis,
