@@ -21,6 +21,7 @@ const bar = {
         blocks: {
           groupBy: GroupByBlock({
             subtitle: 'Select the metric to group the data (X axis)',
+            isMulti: false,
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = valuesToCalculations(value)
               const groupBy = {
@@ -43,6 +44,7 @@ const bar = {
             id: 'metric',
             title: 'Metric',
             subtitle: 'Select the metric to measure the data (Y axis)',
+            isMulti: false,
             optionsParams: { filter: ['quantitative'] },
             valuesToSpec: ({ spec = {}, value = [] }) => {
               const transform = valuesToCalculations(value)
