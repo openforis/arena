@@ -80,8 +80,8 @@ export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle }) => {
 }
 
 // ==== DATA EXPORT
-export const startExportDataToCSVJob = async ({ surveyId, cycle, options }) => {
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-export/csv`, { cycle, ...options })
+export const startExportDataToCSVJob = async ({ surveyId, cycle, recordUuids, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-export/csv`, { cycle, recordUuids, ...options })
   const { job } = data
   return job
 }

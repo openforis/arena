@@ -20,6 +20,7 @@ export const init = (app) => {
         const {
           surveyId,
           cycle,
+          recordUuids,
           includeCategories,
           includeCategoryItemsLabels,
           includeAnalysis,
@@ -30,9 +31,10 @@ export const init = (app) => {
         const user = Request.getUser(req)
 
         const job = SurveyService.startExportCsvDataJob({
+          user,
           surveyId,
           cycle,
-          user,
+          recordUuids,
           includeCategories,
           includeCategoryItemsLabels,
           includeAnalysis,
