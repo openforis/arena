@@ -717,6 +717,7 @@ Are you sure you want to continue?`,
       source: {
         label: 'Source',
         allRecords: 'All records',
+        filteredRecords: 'Only filtered records',
         selectedRecord: 'Only selected record',
         selectedRecord_other: 'Only selected {{count}} records',
       },

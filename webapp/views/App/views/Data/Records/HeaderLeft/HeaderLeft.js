@@ -133,7 +133,11 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
         <RecordsCloneModal onClose={toggleRecordsCloneModalOpen} selectedRecordsUuids={selectedRecordsUuids} />
       )}
       {recordsDataExportModalOpen && (
-        <RecordsDataExportModal onClose={toggleRecordsDataExportModalOpen} recordUuids={selectedRecordsUuids} />
+        <RecordsDataExportModal
+          onClose={toggleRecordsDataExportModalOpen}
+          recordUuids={selectedRecordsUuids}
+          search={search}
+        />
       )}
     </div>
   )

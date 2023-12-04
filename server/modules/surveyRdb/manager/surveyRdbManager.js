@@ -1,11 +1,15 @@
 import pgPromise from 'pg-promise'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 import { db } from '../../../db/db'
 import * as CSVWriter from '../../../utils/file/csvWriter'
@@ -199,7 +203,8 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeCategoryItemsLabels,
     includeAnalysis,
     recordOwnerUuid = null,
-    recordUuids = null,
+    recordUuids: recordUuidsParam = null,
+    search = null,
     outputDir,
     callback,
   },
@@ -210,6 +215,23 @@ export const fetchEntitiesDataToCsvFiles = async (
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
+
+  let recordUuids = null
+  if (recordUuidsParam) {
+    recordUuids = recordUuidsParam
+  } else if (!Objects.isEmpty(search)) {
+    const surveyId = Survey.getId(survey)
+    const nodeDefRoot = Survey.getNodeDefRoot(survey)
+    const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+    const recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
+      surveyId,
+      nodeDefRoot,
+      nodeDefKeys,
+      cycle,
+      search,
+    })
+    recordUuids = recordsSummaries.length > 0 ? recordsSummaries.map(Record.getUuid) : null
+  }
 
   callback?.({ total: nodeDefs.length })
 

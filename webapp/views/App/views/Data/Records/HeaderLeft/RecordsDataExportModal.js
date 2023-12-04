@@ -7,12 +7,12 @@ import { Modal, ModalBody } from '@webapp/components/modal'
 import ExportData from '../../ExportData'
 
 export const RecordsDataExportModal = (props) => {
-  const { onClose, recordUuids } = props
+  const { onClose, recordUuids, search } = props
 
   return (
     <Modal className="records-data-export" onClose={onClose} showCloseButton title="dataView.dataExport.title">
       <ModalBody>
-        <ExportData sourceSelectionAvailable recordUuids={recordUuids} />
+        <ExportData search={search} recordUuids={recordUuids} sourceSelectionAvailable />
       </ModalBody>
     </Modal>
   )
@@ -21,4 +21,5 @@ export const RecordsDataExportModal = (props) => {
 RecordsDataExportModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   recordUuids: PropTypes.array,
+  search: PropTypes.string,
 }

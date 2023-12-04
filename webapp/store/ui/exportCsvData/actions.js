@@ -10,13 +10,13 @@ import { TestId } from '@webapp/utils/testId'
 import * as API from '@webapp/service/api'
 
 export const startCSVExport =
-  ({ recordUuids, options }) =>
+  ({ recordUuids, search, options }) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const job = await API.startExportDataToCSVJob({ surveyId, cycle, recordUuids, options })
+    const job = await API.startExportDataToCSVJob({ surveyId, cycle, recordUuids, search, options })
 
     dispatch(
       JobActions.showJobMonitor({
