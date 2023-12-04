@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { uuidv4 } from '@core/uuid'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
@@ -16,6 +17,8 @@ export { keys } from './_record/recordKeys'
 
 // ====== CREATE
 
+const arenaAppId = 'arena'
+
 export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
@@ -23,6 +26,7 @@ export const newRecord = (user, cycle, preview = false, dateCreated = null, step
   [keys.cycle]: cycle,
   [keys.preview]: preview,
   [keys.dateCreated]: dateCreated,
+  [keys.info]: { createdWith: { appId: arenaAppId, appVersion: ProcessUtils.ENV.applicationVersion } },
 })
 
 // ====== READ
@@ -41,6 +45,7 @@ export const isInAnalysisStep = (record) => {
 export const getCycle = R.prop(keys.cycle)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
+export const getInfo = R.prop(keys.info)
 
 export const { getNodes, getNodesArray, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
 
