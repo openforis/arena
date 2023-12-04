@@ -21,7 +21,6 @@ export default () =>
     gotoSurveyCreate()
 
     test(`Import survey `, async () => {
-      test.setTimeout(20000)
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'surveyCreateType', type: 'import' })))
       await page.click(getSelector(TestId.surveyCreate.optionIncludeDataCheckbox))
       const input = page.locator('.home-survey-create .dropzone input')
@@ -41,7 +40,7 @@ export default () =>
 
       surveyImport.name = json.survey.props.name
       await page.reload()
-    })
+    }, 20000)
 
     gotoHome()
 
