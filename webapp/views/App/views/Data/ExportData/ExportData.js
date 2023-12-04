@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
@@ -32,11 +34,12 @@ const defaultOptionsSelection = {
 
 const sources = {
   allRecords: 'allRecords',
+  filteredRecords: 'filteredRecords',
   selectedRecords: 'selectedRecords',
 }
 
 const ExportData = (props) => {
-  const { sourceSelectionAvailable, recordUuids } = props
+  const { recordUuids, search, sourceSelectionAvailable } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -58,30 +61,36 @@ const ExportData = (props) => {
     dispatch(
       ExportCsvDataActions.startCSVExport({
         recordUuids: source === sources.selectedRecords ? recordUuids : null,
+        search: source === sources.filteredRecords ? search : null,
         options: selectedOptions,
       })
     )
 
+  const availableSources = [
+    {
+      key: sources.allRecords,
+      label: `dataView.dataExport.source.allRecords`,
+    },
+  ]
+  if (sourceSelectionAvailable && recordUuids.length > 0) {
+    availableSources.push({
+      key: sources.selectedRecords,
+      label: `dataView.dataExport.source.selectedRecord`,
+      labelParams: { count: recordUuids.length },
+    })
+  }
+  if (sourceSelectionAvailable && !Objects.isEmpty(search)) {
+    availableSources.push({
+      key: sources.filteredRecords,
+      label: `dataView.dataExport.source.filteredRecords`,
+    })
+  }
+
   return (
     <div className="export">
-      {sourceSelectionAvailable && recordUuids.length > 0 && (
+      {availableSources.length > 1 && (
         <FormItem className="source-form-item" label={i18n.t('dataView.dataExport.source.label')}>
-          <RadioButtonGroup
-            onChange={onSourceChange}
-            value={source}
-            items={[
-              {
-                key: sources.allRecords,
-                label: `dataView.dataExport.source.allRecords`,
-              },
-              {
-                key: sources.selectedRecords,
-                label: `dataView.dataExport.source.selectedRecord`,
-                labelParams: { count: recordUuids.length },
-                disabled: recordUuids.length === 0,
-              },
-            ]}
-          />
+          <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />
         </FormItem>
       )}
       <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
@@ -113,6 +122,7 @@ const ExportData = (props) => {
 
 ExportData.propTypes = {
   recordUuids: PropTypes.array,
+  search: PropTypes.string,
   sourceSelectionAvailable: PropTypes.bool,
 }
 
