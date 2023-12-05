@@ -135,17 +135,19 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 
 // ==== READ
 
-const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
+const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [], t }) => {
   // Assoc auth groups
 
-  const _userGroups = R.isEmpty(userGroups) ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user)) : userGroups
+  const _userGroups = R.isEmpty(userGroups)
+    ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
+    : userGroups
   let userUpdated = User.assocAuthGroups(_userGroups)(user)
 
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
     const invitation = invitationsByUserUuid[userUuid]
     const invitationValid =
-      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
+      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid, t))
     userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
@@ -163,6 +165,7 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
         user,
         invitationsByUserUuid,
         userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+        t,
       })
     )
   )
