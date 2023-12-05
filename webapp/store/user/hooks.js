@@ -10,6 +10,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import * as API from '@webapp/service/api'
 
 import * as UserState from './state'
 
@@ -91,4 +92,18 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
   }, [data])
 
   return profilePicture
+}
+
+export const useUserName = ({ userUuid, active = true }) => {
+  const [userName, setUserName] = useState(null)
+
+  useEffect(() => {
+    if (userUuid && active) {
+      API.fetchUser({ userUuid }).then((user) => {
+        setUserName(User.getName(user) ?? User.getEmail(user))
+      })
+    }
+  }, [active, userUuid])
+
+  return userName
 }

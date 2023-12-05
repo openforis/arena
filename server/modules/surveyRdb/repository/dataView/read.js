@@ -77,19 +77,23 @@ const _prepareSelectFields = ({
   streamMode,
   includeFileAttributeDefs = true,
 }) => {
+  const alwaysIncludedFields = [
+    viewDataNodeDef.columnRecordUuid,
+    viewDataNodeDef.columnRecordOwnerUuid,
+    `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`,
+  ]
   if (columnNodeDefs) {
     queryBuilder.select(
-      viewDataNodeDef.columnRecordUuid,
+      ...alwaysIncludedFields,
       ...viewDataNodeDef.columnNodeDefs
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
-        .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)),
-      `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`
+        .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
     )
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
     queryBuilder.select(
-      viewDataNodeDef.columnRecordUuid,
+      ...alwaysIncludedFields,
       `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`,
       viewDataNodeDef.columnUuid,
       // selected node def columns
