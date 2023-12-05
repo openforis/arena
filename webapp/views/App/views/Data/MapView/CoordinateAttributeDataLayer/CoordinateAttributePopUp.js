@@ -18,6 +18,7 @@ import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
 import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
+import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import { useAltitude } from '../common/useAltitude'
@@ -50,7 +51,7 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 export const CoordinateAttributePopUp = (props) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
 
-  const { recordUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
+  const { recordUuid, recordOwnerUuid, parentUuid, point, ancestorsKeys } = pointFeature.properties
   const [longitude, latitude] = pointFeature.geometry.coordinates
 
   const popupRef = useRef(null)
@@ -63,7 +64,9 @@ export const CoordinateAttributePopUp = (props) => {
   const [open, setOpen] = useState(false)
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
+  // fetch altitude and record owner name only when popup is open
   const altitude = useAltitude({ survey, point: pointLatLong, active: open })
+  const recordOwnerName = useUserName({ userUuid: recordOwnerUuid, active: open })
 
   const onRemove = useCallback(() => {
     setOpen(false)
@@ -109,7 +112,8 @@ export const CoordinateAttributePopUp = (props) => {
 * **X**: ${point.x}
 * **Y**: ${point.y}
 * **SRS**: ${point.srs}
-* **${i18n.t('mapView.altitude')}**: ${altitude}`
+* **${i18n.t('mapView.altitude')}**: ${altitude}
+* **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
 
   return (
     <Popup
