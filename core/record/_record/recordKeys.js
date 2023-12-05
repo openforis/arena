@@ -4,6 +4,7 @@ export const keys = {
   cycle: ObjectUtils.keys.cycle,
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
+  info: 'info',
   nodes: 'nodes',
   ownerName: 'ownerName',
   ownerUuid: 'ownerUuid',
