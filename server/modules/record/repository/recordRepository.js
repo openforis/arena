@@ -26,6 +26,7 @@ const tableColumns = [
   'date_created',
   'date_modified',
   'validation',
+  'info',
 ]
 const tableName = 'record'
 
@@ -94,6 +95,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         date_created: Record.getDateCreated(record),
         date_modified: Record.getDateModified(record),
         validation: JSON.stringify(Validation.isObjValid(record) ? {} : Record.getValidation(record)),
+        info: Record.getInfo(record),
       }))
     )
   )
