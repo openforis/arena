@@ -44,7 +44,7 @@ export const isInAnalysisStep = (record) => {
 export const getCycle = R.prop(keys.cycle)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
-export const getInfo = R.prop(keys.info)
+export const getInfo = R.propOr({}, keys.info)
 
 export const { getNodes, getNodesArray, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
 
