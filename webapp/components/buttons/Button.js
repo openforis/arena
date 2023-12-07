@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
+import { Objects } from '@openforis/arena-core'
+import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {
   const {
@@ -11,6 +13,7 @@ export const Button = forwardRef((props, ref) => {
     disabled,
     iconClassName,
     id,
+    isTitleMarkdown,
     label: labelProp,
     labelParams,
     onClick,
@@ -28,10 +31,10 @@ export const Button = forwardRef((props, ref) => {
   const title = titleProp
     ? i18n.t(titleProp, titleParams)
     : !showLabel && labelProp
-    ? i18n.t(labelProp, labelParams)
-    : null
+      ? i18n.t(labelProp, labelParams)
+      : null
 
-  return (
+  const btn = (
     <button
       ref={ref}
       id={id}
@@ -41,13 +44,20 @@ export const Button = forwardRef((props, ref) => {
       type="button"
       className={classNames('btn', className, { 'btn-s': size === 'small' })}
       onClick={onClick}
-      title={title}
       {...otherProps}
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {label}
       {children}
     </button>
+  )
+  if (Objects.isEmpty(title)) {
+    return btn
+  }
+  return (
+    <TooltipNew title={title} isTitleMarkdown={isTitleMarkdown}>
+      {btn}
+    </TooltipNew>
   )
 })
 
@@ -57,6 +67,7 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
+  isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
   labelParams: PropTypes.object,
   onClick: PropTypes.func,
@@ -73,6 +84,7 @@ Button.defaultProps = {
   disabled: false,
   iconClassName: null,
   id: null,
+  isTitleMarkdown: false,
   label: null,
   labelParams: null,
   onClick: null,

@@ -6,7 +6,7 @@ const keys = {
   variable: 'variable',
 }
 
-const orders = {
+export const orders = {
   asc: 'asc',
   desc: 'desc',
 }
@@ -26,11 +26,13 @@ export const isOrderAsc = isOrder(orders.asc)
 export const isOrderDesc = isOrder(orders.desc)
 
 // ====== UPDATE
-const assocOrder = A.assoc(keys.order)
+export const assocOrder = A.assoc(keys.order)
 export const assocOrderAsc = assocOrder(orders.asc)
 export const assocOrderDesc = assocOrder(orders.desc)
-export const assocVariable = ({ label, variable }) => (sort) => ({
-  ...sort,
-  [keys.label]: label,
-  [keys.variable]: variable,
-})
+export const assocVariable =
+  ({ label, variable }) =>
+  (sort) => ({
+    ...sort,
+    [keys.label]: label,
+    [keys.variable]: variable,
+  })

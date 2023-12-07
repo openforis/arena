@@ -5,16 +5,12 @@ import classNames from 'classnames'
 
 import { SortCriteria } from '@common/model/query'
 
-import { useI18n } from '@webapp/store/system'
-
 import Dropdown from '@webapp/components/form/Dropdown'
-import Tooltip from '@webapp/components/tooltip'
+import { Button } from '@webapp/components/buttons'
 
 const SortCriteriaEditor = (props) => {
   const { onChange, onDelete, placeholder, sortCriteria, variables, variablesAvailable } = props
   const selection = placeholder ? null : variables.find(({ value }) => value === SortCriteria.getVariable(sortCriteria))
-
-  const i18n = useI18n()
 
   return (
     <div className="sort-criteria-editor">
@@ -28,27 +24,16 @@ const SortCriteriaEditor = (props) => {
       />
 
       <div className="sort-criteria-editor__order">
-        <Tooltip messages={placeholder ? null : [i18n.t('common.ascending')]}>
-          <button
-            type="button"
-            aria-disabled={placeholder}
-            className={classNames('btn', 'btn-xs', { active: !placeholder && SortCriteria.isOrderAsc(sortCriteria) })}
-            onClick={() => onChange(SortCriteria.assocOrderAsc(sortCriteria))}
-          >
-            <span className="icon icon-sort-amount-asc icon-14px" />
-          </button>
-        </Tooltip>
-
-        <Tooltip messages={placeholder ? null : [i18n.t('common.descending')]}>
-          <button
-            type="button"
-            aria-disabled={placeholder}
-            className={classNames('btn', 'btn-xs', { active: !placeholder && SortCriteria.isOrderDesc(sortCriteria) })}
-            onClick={() => onChange(SortCriteria.assocOrderDesc(sortCriteria))}
-          >
-            <span className="icon icon-sort-amount-desc icon-14px" />
-          </button>
-        </Tooltip>
+        {Object.values(SortCriteria.orders).map((order) => (
+          <Button
+            key={order}
+            disabled={placeholder}
+            className={classNames('btn-xs', { active: !placeholder && SortCriteria.getOrder(sortCriteria) === order })}
+            onClick={() => onChange(SortCriteria.assocOrder(order)(sortCriteria))}
+            iconClassName={`icon-sort-amount-${order}`}
+            title={placeholder ? null : order === SortCriteria.orders.asc ? 'common.ascending' : 'common.descending'}
+          />
+        ))}
       </div>
 
       <button type="button" className="btn btn-xs btn-transparent" onClick={onDelete} aria-disabled={placeholder}>
