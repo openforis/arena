@@ -29,7 +29,7 @@ const Header = (props) => {
 }
 
 Header.propTypes = {
-  columns: PropTypes.array.isRequired,
+  columns: PropTypes.array,
   count: PropTypes.number.isRequired,
   headerLeftComponent: PropTypes.elementType.isRequired,
   headerProps: PropTypes.object,

@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import { useI18n } from '@webapp/store/system'
 import InputChips from '@webapp/components/form/InputChips'
 
-import { getLanguageLabel, languages as appLanguages } from '@core/app/languages'
+import { getLanguageLabel, languageItemsSortedByEnLabel as appLanguages } from '@core/app/languages'
 
 const LanguagesEditor = (props) => {
   const { idInput, languages, setLanguages, readOnly } = props
