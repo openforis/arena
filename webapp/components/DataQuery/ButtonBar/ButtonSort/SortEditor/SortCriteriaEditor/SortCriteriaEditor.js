@@ -8,6 +8,11 @@ import { SortCriteria } from '@common/model/query'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Button } from '@webapp/components/buttons'
 
+const titleKeyByOrder = {
+  [SortCriteria.orders.asc]: 'common.ascending',
+  [SortCriteria.orders.desc]: 'common.descending',
+}
+
 const SortCriteriaEditor = (props) => {
   const { onChange, onDelete, placeholder, sortCriteria, variables, variablesAvailable } = props
   const selection = placeholder ? null : variables.find(({ value }) => value === SortCriteria.getVariable(sortCriteria))
@@ -31,7 +36,7 @@ const SortCriteriaEditor = (props) => {
             className={classNames('btn-xs', { active: !placeholder && SortCriteria.getOrder(sortCriteria) === order })}
             onClick={() => onChange(SortCriteria.assocOrder(order)(sortCriteria))}
             iconClassName={`icon-sort-amount-${order}`}
-            title={placeholder ? null : order === SortCriteria.orders.asc ? 'common.ascending' : 'common.descending'}
+            title={placeholder ? null : titleKeyByOrder[order]}
           />
         ))}
       </div>
