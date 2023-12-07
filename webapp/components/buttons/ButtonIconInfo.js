@@ -3,7 +3,6 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import { Button } from './Button'
-import { TooltipNew } from '../TooltipNew'
 
 export const ButtonIconInfo = (props) => {
   const { className: classNameProp, title, titleUsesMarkdown, ...otherProps } = props
@@ -11,9 +10,13 @@ export const ButtonIconInfo = (props) => {
   const className = classNames('btn-transparent', classNameProp)
 
   return (
-    <TooltipNew title={title} isTitleMarkdown={titleUsesMarkdown}>
-      <Button {...otherProps} className={className} iconClassName="icon-info icon-14px" />
-    </TooltipNew>
+    <Button
+      {...otherProps}
+      className={className}
+      iconClassName="icon-info icon-14px"
+      title={title}
+      isTitleMarkdown={titleUsesMarkdown}
+    />
   )
 }
 

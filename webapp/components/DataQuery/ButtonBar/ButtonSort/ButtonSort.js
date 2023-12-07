@@ -6,7 +6,7 @@ import { Query, Sort, SortCriteria } from '@common/model/query'
 
 import { useI18n } from '@webapp/store/system'
 
-import Tooltip from '@webapp/components/tooltip'
+import { Button } from '@webapp/components/buttons'
 
 import { State } from '../store'
 import SortEditor from './SortEditor'
@@ -24,17 +24,13 @@ const ButtonSort = (props) => {
 
   return (
     <>
-      <Tooltip messages={tooltipMessages}>
-        <button
-          type="button"
-          title={i18n.t('dataView.sort')}
-          className={classNames('btn', 'btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
-          onClick={Actions.togglePanelSort}
-          aria-disabled={disabled}
-        >
-          <span className="icon icon-sort-amount-asc icon-14px" />
-        </button>
-      </Tooltip>
+      <Button
+        className={classNames('btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
+        disabled={disabled}
+        iconClassName="icon-sort-amount-asc icon-16px"
+        onClick={Actions.togglePanelSort}
+        title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : 'dataView.sort'}
+      />
 
       {State.showPanelSort(state) && (
         <SortEditor
