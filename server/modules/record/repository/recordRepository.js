@@ -26,6 +26,7 @@ const tableColumns = [
   'date_created',
   'date_modified',
   'validation',
+  'info',
 ]
 const tableName = 'record'
 
@@ -62,9 +63,9 @@ export const insertRecord = async (surveyId, record, client = db) => {
   return client.one(
     `
     INSERT INTO ${getSchemaSurvey(surveyId)}.record 
-    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $9)
+    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified, info)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $10)
     `,
     [
       Record.getOwnerUuid(record),
@@ -75,6 +76,7 @@ export const insertRecord = async (surveyId, record, client = db) => {
       Validation.isObjValid(record) ? {} : Record.getValidation(record),
       Dates.formatForStorage(Record.getDateCreated(record) || now),
       Dates.formatForStorage(Record.getDateModified(record) || now),
+      Record.getInfo(record),
       surveyId,
     ],
     dbTransformCallback(surveyId)
@@ -93,6 +95,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         date_created: Record.getDateCreated(record),
         date_modified: Record.getDateModified(record),
         validation: JSON.stringify(Validation.isObjValid(record) ? {} : Record.getValidation(record)),
+        info: Record.getInfo(record),
       }))
     )
   )
