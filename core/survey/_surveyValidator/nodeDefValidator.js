@@ -159,10 +159,15 @@ const validateMaxFileSize = (_propName, nodeDef) => {
   return null
 }
 
+const validateNameIsNotKeyword = (propName, nodeDef) => {
+  if (NodeDef.isSampling(nodeDef)) return null
+  return Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword)(propName, nodeDef)
+}
+
 const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
-    Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
+    validateNameIsNotKeyword,
     Validator.validateName(Validation.messageKeys.nodeDefEdit.nameInvalid),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(Survey.getNodeDefsArray(survey)),
   ],

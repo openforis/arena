@@ -20,6 +20,7 @@ const keywords = [
   'unique',
   'uuid',
   'value',
+  'weight',
 ]
 
 export const isKeyword = (value) => keywords.includes(value)
