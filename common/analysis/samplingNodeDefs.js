@@ -90,37 +90,38 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
       NodeDef.isEntity(descendantEntity) && (NodeDef.isMultiple(descendantEntity) || NodeDef.isRoot(descendantEntity))
   )
 
+  const createAreaNodeDefIfNecessary = ({ existingNodeDef, nodeDefParent, isWeight }) => {
+    if (existingNodeDef) {
+      // weight def already existing
+      validNodeDefsAlreadyExisting.push(existingNodeDef)
+    } else {
+      const newSamplingNodeDef = newEntityAreaNodeDef({
+        nodeDefParent,
+        baseUnitNodeDef,
+        chainUuid,
+        cycleKeys,
+        isWeight,
+      })
+      nodeDefsToCreate.push(newSamplingNodeDef)
+    }
+  }
+
   descendantEntities.forEach((nodeDefParent) => {
     const childDefs = Survey.getNodeDefChildren(nodeDefParent, true)(survey)
     const existingEntityAreaNodeDef = childDefs.find((childDef) =>
       isEntityAreaNodeDef({ nodeDef: childDef, nodeDefParent })
     )
-    const parentIsBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
-    const existingWeightNodeDef = parentIsBaseUnit ? childDefs.find(isWeightNodeDef) : null
+    const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
+    const existingNodeDef = isBaseUnit ? childDefs.find(isWeightNodeDef) : null
     const hasAreaBasedDef = childDefs.some((childDef) => NodeDef.isAreaBasedEstimatedOf(childDef))
 
-    if (hasAreaBasedDef || parentIsBaseUnit) {
-      if (existingWeightNodeDef) {
-        // weight def already existing
-        validNodeDefsAlreadyExisting.push(existingWeightNodeDef)
-      } else if (parentIsBaseUnit) {
+    if (hasAreaBasedDef || isBaseUnit) {
+      if (isBaseUnit) {
         // create new weight node def only for base unit entity
-        const newSamplingNodeDef = newEntityAreaNodeDef({
-          nodeDefParent,
-          baseUnitNodeDef,
-          chainUuid,
-          cycleKeys,
-          isWeight: true,
-        })
-        nodeDefsToCreate.push(newSamplingNodeDef)
-      }
-      if (existingEntityAreaNodeDef) {
-        // entity area node def already existing
-        validNodeDefsAlreadyExisting.push(existingEntityAreaNodeDef)
-      } else {
-        // create new entity area node def
-        const newSamplingNodeDef = newEntityAreaNodeDef({ nodeDefParent, baseUnitNodeDef, chainUuid, cycleKeys })
-        nodeDefsToCreate.push(newSamplingNodeDef)
+        createAreaNodeDefIfNecessary({ existingNodeDef, nodeDefParent, isWeight: true })
+      } else if (hasAreaBasedDef) {
+        // create new plot_area node def only if there is an area based node def
+        createAreaNodeDefIfNecessary({ existingNodeDef, nodeDefParent, isWeight: false })
       }
     } else if (existingEntityAreaNodeDef) {
       // delete entity area node defs when entity doesn't have any area based node def
@@ -163,8 +164,8 @@ const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }
 }
 
 export const SamplingNodeDefs = {
-  SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME: WEIGHT_NODE_DEF_NAME,
   getEntityAreaNodeDefName,
+  isWeightNodeDef,
   isEntityAreaNodeDef,
   isBaseUnitEntityAreaNodeDef,
   determinePlotAreaNodeDefs,
