@@ -40,10 +40,10 @@ export const columnNameRecordOwnerUuid = 'record_owner_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const getNodeDefColumns = (survey, nodeDef) =>
+export const getNodeDefColumns = ({ survey, nodeDef, includeAnalysis = false }) =>
   NodeDef.isEntity(nodeDef)
     ? R.pipe(
-        Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef }),
+        Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef, includeAnalysis }),
         R.filter(NodeDef.isSingleAttribute),
         R.sortBy(R.ascend(R.prop('id')))
       )(survey)
@@ -59,13 +59,15 @@ export const getName = NodeDefTable.getTableName
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const getColumnNames = (survey, nodeDef) => [
+export const getColumnNames = ({ survey, nodeDef, includeAnalysis = false }) => [
   columnNameUuuid,
   columnNameParentUuuid,
   ...(NodeDef.isRoot(nodeDef)
     ? [columnNameRecordUuid, columnNameRecordCycle, columnNameRecordStep, columnNameRecordOwnerUuid]
     : []),
-  ...R.flatten(getNodeDefColumns(survey, nodeDef).map((nodeDefCol) => DataCol.getNames(nodeDefCol))),
+  ...R.flatten(
+    getNodeDefColumns({ survey, nodeDef, includeAnalysis }).map((nodeDefCol) => DataCol.getNames(nodeDefCol))
+  ),
 ]
 
 // eslint-disable-next-line
