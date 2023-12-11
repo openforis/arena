@@ -112,16 +112,17 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
       isEntityAreaNodeDef({ nodeDef: childDef, nodeDefParent })
     )
     const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
-    const existingNodeDef = isBaseUnit ? childDefs.find(isWeightNodeDef) : null
-    const hasAreaBasedDef = childDefs.some((childDef) => NodeDef.isAreaBasedEstimatedOf(childDef))
+    const hasAreaBasedDef = childDefs.some(NodeDef.isAreaBasedEstimatedOf)
 
     if (hasAreaBasedDef || isBaseUnit) {
       if (isBaseUnit) {
+        const existingNodeDef = childDefs.find(isWeightNodeDef)
         // create new weight node def only for base unit entity
         createAreaNodeDefIfNecessary({ existingNodeDef, nodeDefParent, isWeight: true })
-      } else if (hasAreaBasedDef) {
+      }
+      if (hasAreaBasedDef) {
         // create new plot_area node def only if there is an area based node def
-        createAreaNodeDefIfNecessary({ existingNodeDef, nodeDefParent, isWeight: false })
+        createAreaNodeDefIfNecessary({ existingNodeDef: existingEntityAreaNodeDef, nodeDefParent, isWeight: false })
       }
     } else if (existingEntityAreaNodeDef) {
       // delete entity area node defs when entity doesn't have any area based node def
