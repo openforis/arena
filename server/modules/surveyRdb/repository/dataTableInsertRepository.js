@@ -88,11 +88,12 @@ const getSelectQuery = ({
 export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, client) => {
   const surveyId = Survey.getId(survey)
   const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
+  const includeAnalysis = true
 
   const nodeDefAncestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   const nodeDefContext = NodeDef.isEntity(nodeDef) ? nodeDef : nodeDefAncestorMultipleEntity
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
+  const nodeDefColumns = DataTable.getNodeDefColumns({ survey, nodeDef, includeAnalysis })
   const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
 
   // 1. create materialized view
@@ -133,7 +134,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
       insertAllQuery(
         SchemaRdb.getName(surveyId),
         NodeDefTable.getTableName(nodeDef, nodeDefAncestorMultipleEntity),
-        DataTable.getColumnNames(survey, nodeDef),
+        DataTable.getColumnNames({ survey, nodeDef, includeAnalysis }),
         nodesRowValues
       )
     )
