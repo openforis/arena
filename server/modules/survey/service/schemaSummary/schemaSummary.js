@@ -53,10 +53,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) =>
       // exclude "weight" node def created by the processing chain
-      !(
-        NodeDef.isAnalysis(nodeDef) &&
-        NodeDef.getName(nodeDef) === SamplingNodeDefs.SAMPLING_PLOT_AREA_NODE_DEF_BASE_UNIT_NAME
-      )
+      !(NodeDef.isAnalysis(nodeDef) && SamplingNodeDefs.isWeightNodeDef(nodeDef))
   )
   const pathByNodeDefUuid = nodeDefs.reduce(
     (paths, nodeDef) => ({ ...paths, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
