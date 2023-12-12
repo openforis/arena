@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 
 const columnDataType = {
@@ -12,7 +13,7 @@ const getMainColumn = ({ nodeDef, dataType }) => ({ header: NodeDef.getName(node
 
 const columnsByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.boolean })],
-  [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     const result = [
       { header: nodeDefName, nodeDef, dataType: columnDataType.text, valueProp: Node.valuePropsCode.code },
@@ -26,7 +27,17 @@ const columnsByNodeDefType = {
       })
     }
     if (expandCategoryItems) {
-      Survey.getcae
+      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+      const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+      const items = Survey.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
+      items.forEach((item) => {
+        result.push({
+          header: `${nodeDefName}_${CategoryItem.getCode(item)}`,
+          nodeDef,
+          dataType: columnDataType.boolean,
+          valueProp: Node.valuePropsCode.label,
+        })
+      })
     }
     return result
   },
