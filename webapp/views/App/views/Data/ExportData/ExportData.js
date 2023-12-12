@@ -18,6 +18,7 @@ import { useI18n } from '@webapp/store/system'
 
 const exportOptions = {
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',
+  expandCategoryItems: 'Expand category items (add one boolean column for every category item)',
   includeCategories: 'includeCategories',
   includeAnalysis: 'includeAnalysis',
   includeDataFromAllCycles: 'includeDataFromAllCycles',
@@ -26,6 +27,7 @@ const exportOptions = {
 
 const defaultOptionsSelection = {
   [exportOptions.includeCategoryItemsLabels]: true,
+  [exportOptions.expandCategoryItems]: false,
   [exportOptions.includeCategories]: false,
   [exportOptions.includeAnalysis]: false,
   [exportOptions.includeDataFromAllCycles]: false,

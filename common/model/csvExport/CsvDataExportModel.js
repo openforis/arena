@@ -12,21 +12,23 @@ const getMainColumn = ({ nodeDef, dataType }) => ({ header: NodeDef.getName(node
 
 const columnsByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.boolean })],
-  [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels }) => {
+  [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
-    return [
+    const result = [
       { header: nodeDefName, nodeDef, dataType: columnDataType.text, valueProp: Node.valuePropsCode.code },
-      ...(includeCategoryItemsLabels
-        ? [
-            {
-              header: `${nodeDefName}_label`,
-              nodeDef,
-              dataType: columnDataType.text,
-              valueProp: Node.valuePropsCode.label,
-            },
-          ]
-        : []),
     ]
+    if (includeCategoryItemsLabels) {
+      result.push({
+        header: `${nodeDefName}_label`,
+        nodeDef,
+        dataType: columnDataType.text,
+        valueProp: Node.valuePropsCode.label,
+      })
+    }
+    if (expandCategoryItems) {
+      Survey.getcae
+    }
+    return result
   },
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
@@ -91,6 +93,7 @@ const DEFAULT_OPTIONS = {
   includeAnalysis: true,
   includeAncestorAttributes: false,
   includeCategoryItemsLabels: true,
+  expandCategoryItems: false,
   includeReadOnlyAttributes: true,
   includeTaxonScientificName: true,
   includeFiles: true,
@@ -128,13 +131,14 @@ export class CsvDataExportModel {
   }
 
   _createColumnsFromAttributeDefs(attributeDefs) {
+    const { survey } = this
     const { includeCategoryItemsLabels, includeTaxonScientificName } = this.options
 
     return attributeDefs.reduce((acc, nodeDef) => {
       const columnsGetter = columnsByNodeDefType[NodeDef.getType(nodeDef)]
 
       const columnsPerAttribute = columnsGetter
-        ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
+        ? columnsGetter({ survey, nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
         : []
 
       if (NodeDef.isKey(nodeDef)) {
