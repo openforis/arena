@@ -35,7 +35,7 @@ arena.getToFile = function (url, query = NULL, file) {
 arena.getCSV = function (url, query = NULL) {
   tmp <- tempfile()
   arena.getToFile(url, query, file = tmp)
-  content <- read.csv(tmp)
+  content <- suppressWarnings(read.csv(tmp))
   rm(tmp)
   return(content)
 }
