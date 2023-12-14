@@ -8,6 +8,15 @@ import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
+const maxExpandedCategoryItems = 20
+
+const visitCategoryItems = ({ survey, nodeDef, itemVisitor }) => {
+  const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
+  if (items.length <= maxExpandedCategoryItems) {
+    items.forEach(itemVisitor)
+  }
+}
+
 const fieldsExtractorByNodeDefType = {
   [NodeDef.nodeDefType.code]: ({ survey, columnNodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
     const { name: mainColumnName, names: columnNames, nodeDef } = columnNodeDef
@@ -17,23 +26,29 @@ const fieldsExtractorByNodeDefType = {
       return [mainColumnName]
     } else {
       const result = []
-      if (includeCategoryItemsLabels && NodeDef.isSingle(nodeDef)) {
-        // label column included only for single attributes
+      if (
+        includeCategoryItemsLabels &&
+        (NodeDef.isSingle(nodeDef) || NodeDef.isMultipleAttribute(columnNodeDef.table.nodeDef))
+      ) {
+        // label column included only for single attributes or multiple attributes in their own table
         result.push(...columnNames)
       } else {
         result.push(mainColumnName)
       }
       if (expandCategoryItems) {
         // add expanded category items columns
-        const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
-        result.push(
-          ...items.map((item) =>
-            CsvDataExportModel.getExpandedCategoryItemColumnHeader({
-              nodeDef,
-              code: CategoryItem.getCode(item),
-            })
-          )
-        )
+        visitCategoryItems({
+          survey,
+          nodeDef,
+          itemVisitor: (item) => {
+            result.push(
+              CsvDataExportModel.getExpandedCategoryItemColumnHeader({
+                nodeDef,
+                code: CategoryItem.getCode(item),
+              })
+            )
+          },
+        })
       }
       return result
     }
@@ -104,16 +119,19 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const nodeDefCodeCols = nodeDefCols.filter(NodeDef.isCode)
   return (obj) => {
-    nodeDefCodeCols.forEach((nodeDefCode) => {
-      const items = Survey.getNodeDefCategoryItems(nodeDefCode)(survey)
-      const values = obj[NodeDef.getName(nodeDefCode)]
-      items.forEach((item) => {
-        const code = CategoryItem.getCode(item)
-        const colName = CsvDataExportModel.getExpandedCategoryItemColumnHeader({
-          nodeDef: nodeDefCode,
-          code,
-        })
-        obj[colName] = values.includes(code)
+    nodeDefCodeCols.forEach((nodeDef) => {
+      const values = obj[NodeDef.getName(nodeDef)]
+      visitCategoryItems({
+        survey,
+        nodeDef,
+        itemVisitor: (item) => {
+          const code = CategoryItem.getCode(item)
+          const colName = CsvDataExportModel.getExpandedCategoryItemColumnHeader({
+            nodeDef,
+            code,
+          })
+          obj[colName] = values.includes(code)
+        },
       })
     })
     return obj
