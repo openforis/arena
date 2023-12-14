@@ -18,7 +18,7 @@ import { useI18n } from '@webapp/store/system'
 
 const exportOptions = {
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',
-  expandCategoryItems: 'Expand category items (add one boolean column for every category item)',
+  expandCategoryItems: 'expandCategoryItems',
   includeCategories: 'includeCategories',
   includeAnalysis: 'includeAnalysis',
   includeDataFromAllCycles: 'includeDataFromAllCycles',
@@ -98,6 +98,7 @@ const ExportData = (props) => {
       <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
         {[
           exportOptions.includeCategoryItemsLabels,
+          exportOptions.expandCategoryItems,
           exportOptions.includeCategories,
           ...(canAnalyzeRecords ? [exportOptions.includeAnalysis] : []),
           ...(cycles.length > 1 ? [exportOptions.includeDataFromAllCycles] : []),

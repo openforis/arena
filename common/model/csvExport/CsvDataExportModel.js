@@ -1,6 +1,5 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 
 const columnDataType = {
@@ -8,6 +7,8 @@ const columnDataType = {
   numeric: 'numeric',
   text: 'text',
 }
+
+const getExpandedCategoryItemColumnHeader = ({ nodeDef, code }) => `${NodeDef.getName(nodeDef)}__${code}`
 
 const getMainColumn = ({ nodeDef, dataType }) => ({ header: NodeDef.getName(nodeDef), nodeDef, dataType })
 
@@ -32,7 +33,7 @@ const columnsByNodeDefType = {
       const items = Survey.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
       items.forEach((item) => {
         result.push({
-          header: `${nodeDefName}_${CategoryItem.getCode(item)}`,
+          header: getExpandedCategoryItemColumnHeader({ nodeDef, code: item.getCode(item) }),
           nodeDef,
           dataType: columnDataType.boolean,
           valueProp: Node.valuePropsCode.label,
@@ -212,5 +213,7 @@ export class CsvDataExportModel {
     return this.columns.find((column) => column.header === header)
   }
 }
+
+CsvDataExportModel.getExpandedCategoryItemColumnHeader = getExpandedCategoryItemColumnHeader
 
 CsvDataExportModel.columnDataType = columnDataType

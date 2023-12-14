@@ -8,7 +8,6 @@ import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 import { db } from '../../../db/db'
@@ -23,6 +22,7 @@ import * as DataTableInsertRepository from '../repository/dataTableInsertReposit
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
+import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
 
 // ==== DDL
 
@@ -42,30 +42,6 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
 
 // ==== DML
-
-const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItemsLabels = true }) => {
-  const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
-  const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
-
-  // Consider only user selected fields (from column node defs)
-  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
-  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fields = nodeDefCols.flatMap((nodeDefCol) => {
-    if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDefCol)) {
-      // keep only code column
-      return [NodeDef.getName(nodeDefCol)]
-    }
-    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const columnNames = columnNodeDef.names
-    if (NodeDef.isCoordinate(nodeDefCol)) {
-      // exclude geometry column
-      return columnNames.filter((name) => name !== columnNodeDef.name)
-    }
-    return columnNames
-  })
-  // Cycle is 0-based
-  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
-}
 
 /**
  * Executes a select query on an entity definition data view.
@@ -99,6 +75,7 @@ export const fetchViewData = async (params, client = db) => {
     streamOutput = null,
     addCycle = false,
     includeCategoryItemsLabels = true,
+    expandCategoryItems = false,
   } = params
 
   // Fetch data
@@ -121,39 +98,25 @@ export const fetchViewData = async (params, client = db) => {
   if (streamOutput) {
     const fields = columnNodeDefs
       ? null // all fields will be included in the CSV file
-      : _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
-
+      : SurveyRdbCsvExport.getCsvExportFields({
+          survey,
+          query,
+          addCycle,
+          includeCategoryItemsLabels,
+          expandCategoryItems,
+        })
     await db.stream(result, (dbStream) => {
-      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
+      const csvTransform = CSVWriter.transformJsonToCsv({
+        fields,
+        options: {
+          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({ survey, query, expandCategoryItems }),
+        },
+      })
       dbStream.pipe(csvTransform).pipe(streamOutput)
     })
     return null
   }
   return result
-}
-
-const _getExportFieldsAgg = ({ survey, query }) => {
-  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-
-  const fields = []
-  // dimensions
-  Query.getDimensions(query).forEach((dimension) => {
-    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(viewDataNodeDef.survey)
-    fields.push(new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name)
-  })
-  // measures
-  Array.from(Query.getMeasures(query).entries()).forEach(([nodeDefUuid, aggFunctions]) => {
-    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    aggFunctions.forEach((aggregateFnOrUuid) => {
-      const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
-        nodeDef: nodeDefMeasure,
-        aggregateFn: aggregateFnOrUuid,
-      })
-      fields.push(fieldAlias)
-    })
-  })
-  return fields
 }
 
 /**
@@ -187,7 +150,7 @@ export const fetchViewDataAgg = async (params) => {
 
   if (streamOutput) {
     await db.stream(result, (dbStream) => {
-      const fields = _getExportFieldsAgg({ survey, query })
+      const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
       const csvTransform = CSVWriter.transformJsonToCsv({ fields })
       dbStream.pipe(csvTransform).pipe(streamOutput)
     })
@@ -201,6 +164,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     survey,
     cycle,
     includeCategoryItemsLabels,
+    expandCategoryItems,
     includeAnalysis,
     recordOwnerUuid = null,
     recordUuids: recordUuidsParam = null,
@@ -244,16 +208,17 @@ export const fetchEntitiesDataToCsvFiles = async (
       ? Survey.getNodeDefDescendantAttributesInSingleEntities({
           nodeDef: nodeDefContext,
           includeAnalysis,
+          includeMultipleAttributes: !!expandCategoryItems,
           sorted: true,
           cycle,
         })(survey)
       : [nodeDefContext] // Multiple attribute
 
-    const ancestorKeys = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
+    const ancestorKeysDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
 
     let query = Query.create({ entityDefUuid })
-    const queryAttributeDefsUuids = ancestorKeys.concat(childDefs).map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+    const ancestorKeyDefsUuids = ancestorKeysDefs.concat(childDefs).map(NodeDef.getUuid)
+    query = Query.assocAttributeDefUuids(ancestorKeyDefsUuids)(query)
     query = Query.assocFilterRecordUuids(recordUuids)(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
@@ -267,6 +232,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         query,
         addCycle,
         includeCategoryItemsLabels,
+        expandCategoryItems,
       },
       client
     )

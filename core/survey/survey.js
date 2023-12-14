@@ -4,6 +4,8 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
 
+import * as NodeDef from './nodeDef'
+
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
 import * as SurveyInfo from './_survey/surveyInfo'
@@ -273,6 +275,13 @@ export const {
   getCategoryItemByHierarchicalCodes,
   getCategoryItemsInLevel,
 } = SurveyRefDataIndex
+
+export const getNodeDefCategoryItems = (nodeDef) => (survey) => {
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  return SurveyRefDataIndex.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
+}
+
 // Taxon index
 export const {
   getTaxonByCode,

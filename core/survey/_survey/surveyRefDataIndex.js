@@ -92,7 +92,7 @@ export const getCategoryItemByHierarchicalCodes =
 export const getCategoryItemsInLevel =
   ({ categoryUuid, levelIndex = 0 }) =>
   (survey) => {
-    const rootItems = Surveys.getCategoryItems({ survey, categoryUuid })
+    const rootItems = Surveys.getCategoryItems({ survey, categoryUuid, parentItemUuid: null })
     if (levelIndex === 0) return rootItems
 
     let itemsPrevLevel = [...rootItems]
