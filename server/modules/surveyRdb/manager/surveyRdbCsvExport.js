@@ -8,6 +8,42 @@ import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
+const fieldsExtractorByNodeDefType = {
+  [NodeDef.nodeDefType.code]: ({ survey, columnNodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
+    const { name: mainColumnName, names: columnNames, nodeDef } = columnNodeDef
+
+    if (!includeCategoryItemsLabels && !expandCategoryItems) {
+      // keep only code column
+      return [mainColumnName]
+    } else {
+      const result = []
+      if (includeCategoryItemsLabels && NodeDef.isSingle(nodeDef)) {
+        // label column included only for single attributes
+        result.push(...columnNames)
+      } else {
+        result.push(mainColumnName)
+      }
+      if (expandCategoryItems) {
+        // add expanded category items columns
+        const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
+        result.push(
+          ...items.map((item) =>
+            CsvDataExportModel.getExpandedCategoryItemColumnHeader({
+              nodeDef,
+              code: CategoryItem.getCode(item),
+            })
+          )
+        )
+      }
+      return result
+    }
+  },
+  [NodeDef.nodeDefType.coordinate]: ({ columnNodeDef }) => {
+    // exclude geometry column
+    return columnNodeDef.names.filter((name) => name !== columnNodeDef.name)
+  },
+}
+
 const getCsvExportFields = ({
   survey,
   query,
@@ -23,38 +59,16 @@ const getCsvExportFields = ({
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const fields = nodeDefCols.flatMap((nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const columnNames = columnNodeDef.names
-    const mainColumnName = columnNodeDef.name
-    if (NodeDef.isCode(nodeDefCol)) {
-      if (!includeCategoryItemsLabels && !expandCategoryItems) {
-        // keep only code column
-        return [mainColumnName]
-      } else {
-        const result = []
-        if (includeCategoryItemsLabels && NodeDef.isSingle(nodeDefCol)) {
-          result.push(...columnNames)
-        } else {
-          result.push(mainColumnName)
-        }
-        if (expandCategoryItems) {
-          // add expanded category items columns
-          const items = Survey.getNodeDefCategoryItems(nodeDefCol)(survey)
-          result.push(
-            ...items.map((item) =>
-              CsvDataExportModel.getExpandedCategoryItemColumnHeader({
-                nodeDef: nodeDefCol,
-                code: CategoryItem.getCode(item),
-              })
-            )
-          )
-        }
-        return result
-      }
-    } else if (NodeDef.isCoordinate(nodeDefCol)) {
-      // exclude geometry column
-      return columnNames.filter((name) => name !== columnNodeDef.name)
+    const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
+    if (fieldsExtractor) {
+      return fieldsExtractor({
+        survey,
+        columnNodeDef,
+        includeCategoryItemsLabels,
+        expandCategoryItems,
+      })
     } else {
-      return columnNames
+      return columnNodeDef.names
     }
   })
   // Cycle is 0-based
