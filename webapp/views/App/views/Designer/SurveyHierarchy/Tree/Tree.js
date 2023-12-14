@@ -5,8 +5,10 @@ import { elementOffset } from '@webapp/utils/domUtils'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 
+const treeNodeWidth = 80
+const treeNodeHeight = 10
 const nodeWidth = 150
-const nodeHeight = 40
+const nodeHeight = 80
 const nodeLabelDist = 19
 const nodeLinkLength = 230
 
@@ -120,7 +122,7 @@ export default class Tree {
     this.tree = d3
       .tree()
       .size([height, width])
-      .nodeSize([50, 10])
+      .nodeSize([treeNodeWidth, treeNodeHeight])
       .separation((a, b) => (a.parent === b.parent ? 1 : 2))
 
     // Assigns parent, children, height, depth
