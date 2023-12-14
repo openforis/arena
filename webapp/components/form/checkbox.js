@@ -10,9 +10,10 @@ import { useI18n } from '@webapp/store/system'
 
 import ValidationTooltip from '../validationTooltip'
 import { LabelWithTooltip } from './LabelWithTooltip'
+import { ButtonIconInfo } from '../buttons'
 
 const Checkbox = (props) => {
-  const { className, id, validation, checked, label, onChange: onChangeProp, disabled, radio } = props
+  const { className, id, validation, checked, info, label, onChange: onChangeProp, disabled, radio } = props
 
   const i18n = useI18n()
 
@@ -40,6 +41,7 @@ const Checkbox = (props) => {
         >
           <span className={classNameIconContainer} />
           <LabelWithTooltip label={i18n.t(label)} />
+          {info && <ButtonIconInfo title={i18n.t(info)} />}
         </button>
       </ValidationTooltip>
     </div>
@@ -51,6 +53,7 @@ Checkbox.propTypes = {
   id: PropTypes.string,
   checked: PropTypes.bool,
   disabled: PropTypes.bool,
+  info: PropTypes.string,
   label: PropTypes.string,
   onChange: PropTypes.func,
   radio: PropTypes.bool,

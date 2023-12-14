@@ -25,6 +25,10 @@ const exportOptions = {
   includeFiles: 'includeFiles',
 }
 
+const infoMessageKeyByOption = {
+  expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
+}
+
 const defaultOptionsSelection = {
   [exportOptions.includeCategoryItemsLabels]: true,
   [exportOptions.expandCategoryItems]: false,
@@ -107,6 +111,7 @@ const ExportData = (props) => {
           <Checkbox
             key={optionKey}
             checked={selectedOptions[optionKey]}
+            info={infoMessageKeyByOption[optionKey]}
             label={`dataExportView.options.${optionKey}`}
             onChange={onOptionChange(optionKey)}
           />
