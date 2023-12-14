@@ -32,35 +32,38 @@
         font-size: 0.8rem;
         letter-spacing: 0;
         padding: 0.2rem 0.5rem;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-      }
 
-      .node-grid {
-        display: flex;
-        align-items: center;
-        border: 1px solid $greyBorder;
-        justify-content: space-between;
-        transition: background-color 1s ease;
-        background-color: white;
-        height: 38px;
-        padding: 6px;
+        .node-grid {
+          display: flex;
+          align-items: center;
+          border: 1px solid $greyBorder;
+          justify-content: space-between;
+          transition: background-color 1s ease;
+          background-color: white;
+          height: auto;
+          padding: 6px;
 
-        .btn {
-          transform: rotate(-90deg);
-          padding: 0.3rem;
-        }
+          .btn {
+            transform: rotate(-90deg);
+            padding: 0.3rem;
+          }
 
-        &.node-virtual {
-          background-color: $grey;
-        }
+          &.node-virtual {
+            background-color: $grey;
+          }
 
-        &.highlight {
-          background-color: $blueLightActive;
+          &.highlight {
+            background-color: $blueLightActive;
+          }
+
+          .node-label {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+          }
         }
       }
 
