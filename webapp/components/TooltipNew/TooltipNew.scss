@@ -10,11 +10,13 @@
   }
 
   .MuiTooltip-tooltip {
+    font-size: medium;
     color: $colorTextPrimary;
-    background-color: $greyAppBg;
+    background-color: $tooltipBg;
+    border: 1px solid $tooltipBg;
 
     .MuiTooltip-arrow {
-      color: $greyAppBg;
+      color: $tooltipBg;
     }
   }
 }
