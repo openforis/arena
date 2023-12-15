@@ -16,6 +16,7 @@ import * as Validation from '@core/validation/validation'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSchemaSurvey } from '@common/model/db/schemata'
+import { ColumnNodeDef } from '@common/model/db'
 
 const tableColumns = [
   Record.keys.uuid,
@@ -159,10 +160,11 @@ export const fetchRecordsSummaryBySurveyId = async (
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColumnName = NodeDefTable.getColumnName
   const getNodeDefKeyColAlias = NodeDef.getName
-  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce(
-    (acc, key) => ({ ...acc, [getNodeDefKeyColAlias(key)]: getNodeDefKeyColumnName(key) }),
-    {}
-  )
+  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, key) => {
+    const colName = NodeDef.isCode(key) ? ColumnNodeDef.getCodeLabelColumnName(key) : getNodeDefKeyColumnName(key)
+    acc[getNodeDefKeyColAlias(key)] = colName
+    return acc
+  }, {})
   const nodeDefKeysSelect = nodeDefKeys
     ?.flatMap((nodeDefKey) => {
       const colNames = NodeDefTable.getColumnNames(nodeDefKey)
@@ -188,6 +190,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
+  const sortByColumnName = toSnakeCase(sortBy)
 
   return client.map(
     `
@@ -222,9 +225,9 @@ export const fetchRecordsSummaryBySurveyId = async (
     ${whereCondition}
 
     ORDER BY ${
-      nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(toSnakeCase(sortBy))
-        ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[toSnakeCase(sortBy)]}`
-        : `r.${toSnakeCase(sortBy)}`
+      nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(sortByColumnName)
+        ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[sortByColumnName]}`
+        : `r.${sortByColumnName}`
     } ${sortOrder}
 
     ${limit ? 'LIMIT $/limit:value/' : ''}

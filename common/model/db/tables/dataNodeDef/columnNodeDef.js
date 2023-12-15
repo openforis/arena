@@ -8,8 +8,10 @@ import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
 
+const columnSuffixCodeLabel = '_label'
+
 const columnNamesSuffixGetterByType = {
-  [nodeDefType.code]: () => ['', '_label'],
+  [nodeDefType.code]: () => ['', columnSuffixCodeLabel],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const suffixes = ['', '_x', '_y', '_srs']
     const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef)
@@ -102,8 +104,15 @@ export default class ColumnNodeDef {
   get types() {
     return this._types
   }
+
+  get codeLabelColumn() {
+    if (!NodeDef.isCode(this.nodeDef)) return null
+    return `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}`
+  }
 }
 
+ColumnNodeDef.columnSuffixCodeLabel = columnSuffixCodeLabel
+ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
 ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
