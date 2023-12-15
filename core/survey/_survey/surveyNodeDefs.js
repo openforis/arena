@@ -93,7 +93,7 @@ export const getNodeDefDescendantsInSingleEntities =
         ? getNodeDefChildrenSorted({ nodeDef: entityDefCurrent, includeAnalysis, cycle })(survey)
         : getNodeDefChildren(entityDefCurrent, includeAnalysis)(survey)
 
-      descendants.push(...entityDefCurrentChildren.filter(filterFn))
+      descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
 
       // visit nodes inside single entities
       queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
@@ -116,13 +116,14 @@ export const getNodeDefDescendantsInSingleEntities =
 export const getNodeDefDescendantAttributesInSingleEntities = ({
   nodeDef,
   includeAnalysis = false,
+  includeMultipleAttributes = false,
   sorted = false,
   cycle = null,
 }) =>
   getNodeDefDescendantsInSingleEntities({
     nodeDef,
     includeAnalysis,
-    filterFn: NodeDef.isSingleAttribute,
+    filterFn: includeMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute,
     sorted,
     cycle,
   })

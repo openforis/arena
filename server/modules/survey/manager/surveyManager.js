@@ -256,11 +256,20 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
 }
 
 export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
-  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    includeAnalysis = true,
+    backup = false,
+  },
   client = db
 ) => {
   const survey = await fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, cycle, draft, advanced, validate, includeDeleted, backup },
+    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup },
     client
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex(surveyId, draft, client)
