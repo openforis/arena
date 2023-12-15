@@ -152,12 +152,10 @@ const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }
 
   // put the "weight" node def first
   samplingDefs.sort((samplingDef1, samplingDef2) => {
-    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) {
-      return -1
-    }
-    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) {
-      return 1
-    }
+    if (isWeightNodeDef(samplingDef1)) return -1
+    if (isWeightNodeDef(samplingDef2)) return 1
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef1 })) return -1
+    if (isBaseUnitEntityAreaNodeDef({ survey, chain, nodeDef: samplingDef2 })) return 1
     return 0
   })
 
