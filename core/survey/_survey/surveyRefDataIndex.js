@@ -3,6 +3,7 @@ import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
 
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 import { Objects, SurveyRefDataFactory, Surveys } from '@openforis/arena-core'
@@ -87,6 +88,26 @@ export const getCategoryItemByHierarchicalCodes =
   ({ categoryUuid, codesPath }) =>
   (survey) =>
     Surveys.getCategoryItemByCodePaths({ survey, categoryUuid, codePaths: codesPath })
+
+export const getCategoryItemsInLevel =
+  ({ categoryUuid, levelIndex = 0 }) =>
+  (survey) => {
+    const rootItems = Surveys.getCategoryItems({ survey, categoryUuid, parentItemUuid: null })
+    if (levelIndex === 0) return rootItems
+
+    let itemsPrevLevel = [...rootItems]
+    let currentLevelIndex = 1
+    while (currentLevelIndex <= levelIndex) {
+      const itemsInLevel = []
+      itemsPrevLevel.forEach((item) => {
+        const parentItemUuid = CategoryItem.getUuid(item)
+        itemsInLevel.push(...Surveys.getCategoryItems({ survey, categoryUuid, parentItemUuid }))
+      })
+      currentLevelIndex += 1
+      itemsPrevLevel = itemsInLevel
+    }
+    return itemsPrevLevel
+  }
 
 // ==== taxonomy index
 

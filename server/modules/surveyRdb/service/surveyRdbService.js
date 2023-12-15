@@ -14,7 +14,7 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
 
-const _fetchSurvey = async (surveyId, cycle) => {
+const _fetchSurvey = async ({ surveyId, cycle }) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
   return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced: true })
 }
@@ -56,7 +56,7 @@ export const fetchViewData = async (params) => {
   if (typeof query === 'string') {
     parsedQuery = A.parse(query)
   }
-  const survey = await _fetchSurvey(surveyId, cycle)
+  const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   const data = Query.isModeAggregate(parsedQuery)
@@ -89,7 +89,7 @@ export const fetchViewData = async (params) => {
 export const countTable = async (params) => {
   const { user, surveyId, cycle, query } = params
 
-  const survey = await _fetchSurvey(surveyId, cycle)
+  const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   return Query.isModeAggregate(query)
@@ -98,7 +98,7 @@ export const countTable = async (params) => {
 }
 
 export const fetchTableRowsCountByEntityDefUuid = async ({ surveyId, cycle, entityDefUuids = [] }) => {
-  const survey = await _fetchSurvey(surveyId, cycle)
+  const survey = await _fetchSurvey({ surveyId, cycle })
 
   return SurveyRdbManager.fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
 }
@@ -139,6 +139,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   recordUuids,
   search,
   includeCategoryItemsLabels,
+  expandCategoryItems,
   includeAnalysis,
   includeDataFromAllCycles,
   outputDir,
@@ -155,6 +156,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
     recordUuids,
     search,
     includeCategoryItemsLabels,
+    expandCategoryItems,
     includeAnalysis,
     recordOwnerUuid,
     callback,

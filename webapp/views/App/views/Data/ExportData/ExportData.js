@@ -18,14 +18,20 @@ import { useI18n } from '@webapp/store/system'
 
 const exportOptions = {
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',
+  expandCategoryItems: 'expandCategoryItems',
   includeCategories: 'includeCategories',
   includeAnalysis: 'includeAnalysis',
   includeDataFromAllCycles: 'includeDataFromAllCycles',
   includeFiles: 'includeFiles',
 }
 
+const infoMessageKeyByOption = {
+  expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
+}
+
 const defaultOptionsSelection = {
   [exportOptions.includeCategoryItemsLabels]: true,
+  [exportOptions.expandCategoryItems]: false,
   [exportOptions.includeCategories]: false,
   [exportOptions.includeAnalysis]: false,
   [exportOptions.includeDataFromAllCycles]: false,
@@ -96,6 +102,7 @@ const ExportData = (props) => {
       <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
         {[
           exportOptions.includeCategoryItemsLabels,
+          exportOptions.expandCategoryItems,
           exportOptions.includeCategories,
           ...(canAnalyzeRecords ? [exportOptions.includeAnalysis] : []),
           ...(cycles.length > 1 ? [exportOptions.includeDataFromAllCycles] : []),
@@ -104,6 +111,7 @@ const ExportData = (props) => {
           <Checkbox
             key={optionKey}
             checked={selectedOptions[optionKey]}
+            info={infoMessageKeyByOption[optionKey]}
             label={`dataExportView.options.${optionKey}`}
             onChange={onOptionChange(optionKey)}
           />
