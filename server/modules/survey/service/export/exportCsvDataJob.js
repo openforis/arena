@@ -24,8 +24,6 @@ export default class ExportCsvDataJob extends Job {
   async onStart() {
     await super.onStart()
 
-    const { surveyId, cycle, includeAnalysis, includeDataFromAllCycles } = this.context
-
     // exportUuid will be used when dowloading the generated output file
     // the generated zip file will be named `${exportUuid}.zip`
     const exportUuid = this.uuid
@@ -37,17 +35,30 @@ export default class ExportCsvDataJob extends Job {
 
     await FileUtils.mkdir(outputDir)
 
-    const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
-      surveyId,
-      cycle: includeDataFromAllCycles ? undefined : cycle,
-      includeAnalysis,
-    })
+    const survey = await this._fetchSurvey()
 
     this.setContext({
       exportUuid,
       outputDir,
       survey,
     })
+  }
+
+  async _fetchSurvey() {
+    const { surveyId, cycle, includeAnalysis, includeDataFromAllCycles, expandCategoryItems } = this.context
+    const cycleToFetch = includeDataFromAllCycles ? undefined : cycle
+
+    return expandCategoryItems
+      ? await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+          surveyId,
+          cycle: cycleToFetch,
+          includeAnalysis,
+        })
+      : await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
+          surveyId,
+          cycle: cycleToFetch,
+          includeAnalysis,
+        })
   }
 
   async beforeSuccess() {

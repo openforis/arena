@@ -55,15 +55,23 @@ const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
 }
 
-const _selectsByNodeDefType =
+const _selectFieldsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const { name: alias, names, nameFull, namesFull } = columnNodeDef
+    const { name: alias, names, nameFull, namesFull, nodeDef } = columnNodeDef
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
       return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
+    }
+    if (
+      NodeDef.isCode(nodeDef) &&
+      NodeDef.isMultiple(nodeDef) &&
+      !NodeDef.isMultipleAttribute(viewDataNodeDef.nodeDef)
+    ) {
+      // include code attribute label column only if the view is relative to the multiple attribute
+      return nameFull
     }
     return namesFull
   }
@@ -87,17 +95,16 @@ const _prepareSelectFields = ({
       ...alwaysIncludedFields,
       ...viewDataNodeDef.columnNodeDefs
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
-        .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
+        .flatMap((columnNodeDef) => _selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
     )
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
     queryBuilder.select(
       ...alwaysIncludedFields,
-      `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode })),
+      ...nodeDefCols.flatMap(_selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
