@@ -2,7 +2,7 @@ arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
   
-  # Check whether response containts error
+  # Check whether response contains error
   respNames <- names(respJson)
   error <- NA
   if("error" %in% respNames){
