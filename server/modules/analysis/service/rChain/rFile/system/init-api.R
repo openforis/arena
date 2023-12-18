@@ -35,7 +35,11 @@ arena.getToFile = function (url, query = NULL, file) {
 arena.getCSV = function (url, query = NULL) {
   tmp <- tempfile()
   arena.getToFile(url, query, file = tmp)
-  content <- suppressWarnings(read.csv(tmp))
+  if (file.info(tmp)$size > 0) {
+    content <- suppressWarnings(read.csv(tmp))
+  } else {
+    content <- NULL
+  }
   rm(tmp)
   return(content)
 }
