@@ -95,7 +95,7 @@ const _addOrUpdateAttribute =
 
     const value = _adaptValue({ survey, record, parentNode: entity, attributeDef, value: valueParam })
 
-    if (!attribute) {
+    if (!attribute || NodeDef.isMultipleAttribute(attributeDef)) {
       // create new attribute
       const updateResult = new RecordUpdateResult({ record })
       const attributeCreated = Node.newNode(attributeDefUuid, record.uuid, entity, value)
@@ -240,8 +240,36 @@ const _afterNodesUpdate = async ({ survey, record, nodes, timezoneOffset, sideEf
   return updateResult
 }
 
-const updateAttributesWithValues =
+const getOrCreateEntityByKeys =
   ({ survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  async (record) => {
+    const updateResult = new RecordUpdateResult({ record })
+
+    const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
+      survey,
+      entityDefUuid,
+      valuesByDefUuid,
+      insertMissingNodes,
+      sideEffect,
+    })(record)
+
+    if (updateResultEntity) {
+      updateResult.merge(updateResultEntity)
+
+      const dependentsUpdateResult = await _afterNodesUpdate({
+        survey,
+        record: updateResultEntity.record,
+        nodes: updateResultEntity.nodes,
+        timezoneOffset,
+        sideEffect,
+      })
+      updateResult.merge(dependentsUpdateResult)
+    }
+    return { entity, updateResult }
+  }
+
+const updateAttributesInEntityWithValues =
+  ({ survey, entity, valuesByDefUuid, timezoneOffset, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -260,20 +288,9 @@ const updateAttributesWithValues =
       updateResult.merge(dependentsUpdateResult)
     }
 
-    // 1. get or create context entity
-    const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
-      survey,
-      entityDefUuid,
-      valuesByDefUuid,
-      insertMissingNodes,
-      sideEffect,
-    })(record)
+    const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
 
-    await updateDependentNodes(updateResultEntity)
-
-    const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-
-    // 2. consider only attributes descendants of the specified entity
+    // consider only attributes descendants of the specified entity
 
     const valuesByDefUuidEntriesInDescendantAttributes = Object.entries(valuesByDefUuid).filter(
       ([attributeDefUuid]) => {
@@ -287,7 +304,7 @@ const updateAttributesWithValues =
       }
     )
 
-    // 3. update attribute values
+    // update attribute values
     await Promises.each(valuesByDefUuidEntriesInDescendantAttributes, async ([attributeDefUuid, value]) => {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
 
@@ -309,6 +326,37 @@ const updateAttributesWithValues =
 
       await updateDependentNodes(attributeUpdateResult)
     })
+    return updateResult
+  }
+
+const updateAttributesWithValues =
+  ({ survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  async (record) => {
+    const updateResult = new RecordUpdateResult({ record })
+
+    // 1. get or create context entity
+    const { entity, updateResult: updateResultEntity } = await getOrCreateEntityByKeys({
+      survey,
+      entityDefUuid,
+      valuesByDefUuid,
+      timezoneOffset,
+      insertMissingNodes,
+      sideEffect,
+    })(record)
+
+    updateResult.merge(updateResultEntity)
+
+    // 2. update values in descendant attributes
+    const updateResultAttributes = await updateAttributesInEntityWithValues({
+      survey,
+      entity,
+      valuesByDefUuid,
+      timezoneOffset,
+      sideEffect,
+    })(updateResult.record)
+
+    updateResult.merge(updateResultAttributes)
+
     return updateResult
   }
 
@@ -429,7 +477,9 @@ const replaceUpdatedNodes =
 export const RecordNodesUpdater = {
   createNodeAndDescendants,
   createRootEntity,
+  getOrCreateEntityByKeys,
   updateNodesDependents,
+  updateAttributesInEntityWithValues,
   updateAttributesWithValues,
   replaceUpdatedNodes,
 }

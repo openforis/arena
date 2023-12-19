@@ -44,16 +44,16 @@ export default class DataImportJob extends DataImportBaseJob {
   }
 
   validateParameters() {
-    const { survey, entityDefUuid, insertNewRecords } = this.context
+    const { survey, nodeDefUuid, insertNewRecords } = this.context
 
-    if (!entityDefUuid || !Survey.getNodeDefByUuid(entityDefUuid)(survey)) {
+    if (!nodeDefUuid || !Survey.getNodeDefByUuid(nodeDefUuid)(survey)) {
       throw new Error('Entity to import data into not specified')
     }
 
     if (insertNewRecords) {
       // when inserting new records, only root entity can be selected
       const rootEntityDef = Survey.getNodeDefRoot(survey)
-      if (NodeDef.getUuid(rootEntityDef) !== entityDefUuid) {
+      if (NodeDef.getUuid(rootEntityDef) !== nodeDefUuid) {
         throw new Error('New records can be inserted only selecting the root entity definition')
       }
     }
@@ -89,14 +89,14 @@ export default class DataImportJob extends DataImportBaseJob {
   }
 
   async startCsvReader() {
-    const { cycle, entityDefUuid, filePath, survey } = this.context
+    const { cycle, nodeDefUuid, filePath, survey } = this.context
 
     try {
       this.csvReader = await DataImportFileReader.createReader({
         filePath,
         survey,
         cycle,
-        entityDefUuid,
+        nodeDefUuid,
         onRowItem: async (item) => this.onRowItem(item),
         onTotalChange: (total) => (this.total = total),
       })
@@ -117,7 +117,7 @@ export default class DataImportJob extends DataImportBaseJob {
 
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
-    const { entityDefUuid, insertMissingNodes, survey } = context
+    const { nodeDefUuid, insertMissingNodes, survey } = context
 
     if (this.isCanceled()) {
       return
@@ -138,12 +138,29 @@ export default class DataImportJob extends DataImportBaseJob {
       })
       this.currentRecord = record
 
-      const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesWithValues({
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const ancestorMultipleEntityDef = NodeDef.isMultipleAttribute(nodeDef)
+        ? Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+        : nodeDef
+      const entityDefUuid = NodeDef.getUuid(ancestorMultipleEntityDef)
+
+      const sideEffect = true
+
+      const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
         survey,
         entityDefUuid,
         valuesByDefUuid,
         insertMissingNodes,
-        sideEffect: true,
+        sideEffect,
+      })(this.currentRecord)
+
+      this.currentRecord = entityUpdateResult.record
+
+      const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesInEntityWithValues({
+        survey,
+        entity,
+        valuesByDefUuid,
+        sideEffect,
       })(this.currentRecord)
 
       this.currentRecord = recordUpdated
@@ -167,6 +184,10 @@ export default class DataImportJob extends DataImportBaseJob {
       const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
       this._addError(errorKey, params)
     }
+  }
+
+  onRecordParentEntityGet({ record, entity, valuesByDefUuid }) {
+    // clear multiple attributes
   }
 
   generateResult() {

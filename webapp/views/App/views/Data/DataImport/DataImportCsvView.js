@@ -15,14 +15,15 @@ import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
+import { ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import { ImportStartButton } from './ImportStartButton'
 
 const importTypes = {
@@ -57,7 +58,7 @@ export const DataImportCsvView = () => {
     file: null,
     jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
-    selectedEntityDefUuid: null,
+    selectedNodeDefUuid: null,
     // options
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
@@ -69,7 +70,7 @@ export const DataImportCsvView = () => {
     file,
     jobCompleted,
     nodeDefLabelType,
-    selectedEntityDefUuid,
+    selectedNodeDefUuid,
     // options
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
@@ -81,7 +82,7 @@ export const DataImportCsvView = () => {
 
   const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
-  const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
+  const onNodeDefSelect = (nodeDef) => setStateProp('selectedNodeDefUuid')(NodeDef.getUuid(nodeDef))
 
   const onNodeDefLabelTypeChange = useCallback(() => {
     const nodeDefLabelTypeNext =
@@ -95,12 +96,12 @@ export const DataImportCsvView = () => {
         const stateNext = { ...statePrev, dataImportType: value }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
-          stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
+          stateNext.selectedNodeDefUuid = NodeDef.getUuid(nodeDefRoot)
           stateNext.preventAddingNewEntityData = false
           stateNext.preventUpdatingRecordsInAnalysis = false
         } else {
           stateNext.preventUpdatingRecordsInAnalysis = true
-          stateNext.selectedEntityDefUuid = null
+          stateNext.selectedNodeDefUuid = null
         }
         stateNext.file = null
         return stateNext
@@ -134,7 +135,7 @@ export const DataImportCsvView = () => {
     surveyId,
     file,
     cycle,
-    entityDefUuid: selectedEntityDefUuid,
+    nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
@@ -168,12 +169,13 @@ export const DataImportCsvView = () => {
           )}
 
           {dataImportType && (
-            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoEntity')}>
+            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoMultipleEntityOrAttribute')}>
               <>
                 <EntitySelectorTree
                   nodeDefLabelType={nodeDefLabelType}
-                  nodeDefUuidActive={selectedEntityDefUuid}
-                  onSelect={onEntitySelect}
+                  nodeDefUuidActive={selectedNodeDefUuid}
+                  onlyEntities={false}
+                  onSelect={onNodeDefSelect}
                   isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />
                 <NodeDefLabelSwitch
@@ -193,13 +195,13 @@ export const DataImportCsvView = () => {
               label="dataImportView.downloadAllTemplates"
             />
           )}
-          {selectedEntityDefUuid && (
+          {selectedNodeDefUuid && (
             <>
               <ButtonDownload
                 className="download-template-btn"
-                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
+                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedNodeDefUuid })}
                 label="dataImportView.downloadTemplate"
-                disabled={!selectedEntityDefUuid}
+                disabled={!selectedNodeDefUuid}
               />
 
               {dataImportType === importTypes.updateExistingRecords && (

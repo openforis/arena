@@ -79,7 +79,9 @@ export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes
 export const {
   createNodeAndDescendants,
   createRootEntity,
+  getOrCreateEntityByKeys,
   updateNodesDependents,
+  updateAttributesInEntityWithValues,
   updateAttributesWithValues,
   replaceUpdatedNodes,
 } = RecordNodesUpdater
