@@ -20,7 +20,7 @@ import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
 import { NodeValueFormatter } from '../nodeValueFormatter'
 
-const { createNodeAndDescendants, createRootEntity } = CoreRecordUpdater
+const { createNodeAndDescendants, createRootEntity, deleteNodes } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 const _valueAdapterByType = {
@@ -474,6 +474,21 @@ const replaceUpdatedNodes =
     })
   }
 
+const deleteNodesInEntityByNodeDefUuid =
+  ({ survey, entity, nodeDefUuids, sideEffect = false }) =>
+  async (record) => {
+    const updateResult = new RecordUpdateResult({ record })
+
+    const nodeUudisToDelete = []
+    nodeDefUuids.forEach((nodeDefUuid) => {
+      const children = RecordReader.getNodeChildrenByDefUuid(entity, nodeDefUuid)(record)
+      nodeUudisToDelete.push(...children.map(Node.getUuid))
+    })
+
+    const nodesDeleteUpdateResult = await deleteNodes({ survey, record, nodeUuids: nodeUudisToDelete, sideEffect })
+    return updateResult.merge(nodesDeleteUpdateResult)
+  }
+
 export const RecordNodesUpdater = {
   createNodeAndDescendants,
   createRootEntity,
@@ -482,4 +497,5 @@ export const RecordNodesUpdater = {
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
   replaceUpdatedNodes,
+  deleteNodesInEntityByNodeDefUuid,
 }

@@ -1,6 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -16,6 +17,7 @@ export default class DataImportJob extends DataImportBaseJob {
     super(type, params)
 
     this.csvReader = null
+    this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
   }
 
   async execute() {
@@ -156,6 +158,8 @@ export default class DataImportJob extends DataImportBaseJob {
 
       this.currentRecord = entityUpdateResult.record
 
+      await this.clearMultipleAttributeValues({ survey, entity, valuesByDefUuid, sideEffect })
+
       const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesInEntityWithValues({
         survey,
         entity,
@@ -186,8 +190,28 @@ export default class DataImportJob extends DataImportBaseJob {
     }
   }
 
-  onRecordParentEntityGet({ record, entity, valuesByDefUuid }) {
-    // clear multiple attributes
+  async clearMultipleAttributeValues({ entity, valuesByDefUuid, sideEffect }) {
+    const { context } = this
+    const { survey } = context
+
+    const multipleAttributeDefsBeingUpdated = Object.keys(valuesByDefUuid)
+      .map((nodeDefUuid) => Survey.getNodeDefByUuid(nodeDefUuid)(survey))
+      .filter(NodeDef.isMultipleAttribute)
+    const entityUuid = Node.getUuid(entity)
+    if (multipleAttributeDefsBeingUpdated.length > 0 && !this.entitiesWithMultipleAttributesClearedByUuid[entityUuid]) {
+      const nodeDefUuidsToClear = multipleAttributeDefsBeingUpdated.map(NodeDef.getUuid)
+      const entityClearUpdateResult = await Record.deleteNodesInEntityByNodeDefUuid({
+        survey,
+        entity,
+        nodeDefUuids: nodeDefUuidsToClear,
+        sideEffect,
+      })(this.currentRecord)
+
+      this.currentRecord = entityClearUpdateResult.record
+      this.entitiesWithMultipleAttributesClearedByUuid[entityUuid] = true
+
+      await this.persistUpdatedNodes({ nodesUpdated: entityClearUpdateResult.nodes })
+    }
   }
 
   generateResult() {
