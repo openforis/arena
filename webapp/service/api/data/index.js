@@ -30,7 +30,7 @@ export const startCollectRecordsImportJob = async ({
 export const startDataImportFromCsvJob = async ({
   surveyId,
   cycle,
-  entityDefUuid,
+  nodeDefUuid,
   file,
   dryRun = false,
   insertNewRecords = false,
@@ -41,7 +41,7 @@ export const startDataImportFromCsvJob = async ({
 }) => {
   const formData = objectToFormData({
     cycle,
-    entityDefUuid,
+    nodeDefUuid,
     file,
     dryRun,
     insertNewRecords,
