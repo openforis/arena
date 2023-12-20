@@ -130,7 +130,7 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
             nodeDef,
             code,
           })
-          obj[colName] = values.includes(code)
+          obj[colName] = values?.includes(code)
         },
       })
     })
