@@ -116,6 +116,7 @@ const EntitySelectorTreeNode = (props) => {
             nodeDef={nodeDefChild}
             nodeDefLabelType={nodeDefLabelType}
             nodeDefUuidActive={nodeDefUuidActive}
+            onlyEntities={onlyEntities}
             onlyPages={onlyPages}
             onSelect={onSelect}
           />

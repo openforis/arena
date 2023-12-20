@@ -199,7 +199,7 @@ export const DataImportCsvView = () => {
             <>
               <ButtonDownload
                 className="download-template-btn"
-                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedNodeDefUuid })}
+                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, nodeDefUuid: selectedNodeDefUuid })}
                 label="dataImportView.downloadTemplate"
                 disabled={!selectedNodeDefUuid}
               />
