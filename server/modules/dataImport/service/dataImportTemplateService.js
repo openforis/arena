@@ -34,12 +34,12 @@ const valuesByNodeDefType = {
   },
 }
 
-const extractDataImportTemplate = async ({ survey, cycle, entityDefUuid }) => {
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid }) => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const exportModel = new CsvDataExportModel({
     survey,
     cycle,
-    nodeDefContext: entityDef,
+    nodeDefContext: nodeDef,
     options: {
       includeAnalysis: false,
       includeCategoryItemsLabels: false,
@@ -56,18 +56,18 @@ const extractDataImportTemplate = async ({ survey, cycle, entityDefUuid }) => {
 
   return {
     template,
-    entityDef,
+    nodeDef,
   }
 }
 
-const exportDataImportTemplate = async ({ surveyId, cycle, entityDefUuid, res }) => {
+const exportDataImportTemplate = async ({ surveyId, cycle, nodeDefUuid, res }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const { template, entityDef } = await extractDataImportTemplate({ survey, cycle, entityDefUuid })
+  const { template, nodeDef } = await extractDataImportTemplate({ survey, cycle, nodeDefUuid })
 
   setContentTypeFile({
     res,
-    fileName: `data_import_template_${NodeDef.getName(entityDef)}.csv`,
+    fileName: `data_import_template_${NodeDef.getName(nodeDef)}.csv`,
     contentType: contentTypes.csv,
   })
 
@@ -85,21 +85,21 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
     contentType: contentTypes.zip,
   })
 
-  const multipleEntityDefUuids = []
+  const multipleNodeDefUuids = []
 
   Survey.visitDescendantsAndSelf({
     visitorFn: (nodeDef) => {
-      if (NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)) {
-        multipleEntityDefUuids.push(NodeDef.getUuid(nodeDef))
+      if (NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)) {
+        multipleNodeDefUuids.push(NodeDef.getUuid(nodeDef))
       }
     },
   })(survey)
 
   const tempFilePaths = []
 
-  await Promises.each(multipleEntityDefUuids, async (entityDefUuid) => {
-    const { template, entityDef } = await extractDataImportTemplate({ survey, cycle, entityDefUuid })
-    const zipEntryName = `data_import_template_${NodeDef.getName(entityDef)}.csv`
+  await Promises.each(multipleNodeDefUuids, async (nodeDefUuid) => {
+    const { template, nodeDef } = await extractDataImportTemplate({ survey, cycle, nodeDefUuid })
+    const zipEntryName = `data_import_template_${NodeDef.getName(nodeDef)}.csv`
     const tempFilePath = FileUtils.newTempFilePath()
 
     await CSVWriter.writeItemsToStream({ outputStream: FileUtils.createWriteStream(tempFilePath), items: [template] })
