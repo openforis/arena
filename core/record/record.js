@@ -79,9 +79,12 @@ export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes
 export const {
   createNodeAndDescendants,
   createRootEntity,
+  getOrCreateEntityByKeys,
   updateNodesDependents,
+  updateAttributesInEntityWithValues,
   updateAttributesWithValues,
   replaceUpdatedNodes,
+  deleteNodesInEntityByNodeDefUuid,
 } = RecordNodesUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
