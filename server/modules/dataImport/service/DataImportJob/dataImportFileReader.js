@@ -124,18 +124,18 @@ const validateHeaders =
  * @param {!string} [params.filePath] - File path to be read.
  * @param {!object} [params.survey] - The survey object.
  * @param {!string} [params.cycle] - The survey cycle.
- * @param {!string} [params.entityDefUuid] - The UUID of the entity definition where data will be imported.
+ * @param {!string} [params.nodeDefUuid] - The UUID of the node definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
  * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
  * @returns {Promise} - Result promise. It resolves when the file is fully read.
  */
-const createReader = async ({ filePath, survey, cycle, entityDefUuid, onRowItem, onTotalChange }) => {
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+const createReader = async ({ filePath, survey, cycle, nodeDefUuid, onRowItem, onTotalChange }) => {
+  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
   const csvDataExportModel = new CsvDataExportModel({
     survey,
     cycle,
-    nodeDefContext: entityDef,
+    nodeDefContext,
     options: {
       includeCategoryItemsLabels: false,
       includeTaxonScientificName: false,

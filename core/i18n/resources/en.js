@@ -590,7 +590,7 @@ $t(common.cantUndoWarning)`,
 7. Start import
 `,
     importIntoCycle: 'Import into cycle',
-    importIntoEntity: 'Import into entity',
+    importIntoMultipleEntityOrAttribute: 'Import into multiple entity or attribute',
     importType: {
       label: 'Import type',
       insertNewRecords: 'Insert new records',

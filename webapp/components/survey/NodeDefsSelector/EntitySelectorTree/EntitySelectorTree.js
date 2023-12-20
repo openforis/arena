@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { EntitySelectorTreeNode } from './EntitySelectorTreeNode'
 
 const EntitySelectorTree = (props) => {
-  const { getLabelSuffix, isDisabled, nodeDefLabelType, nodeDefUuidActive, onlyPages, onSelect } = props
+  const { getLabelSuffix, isDisabled, nodeDefLabelType, nodeDefUuidActive, onlyEntities, onlyPages, onSelect } = props
   const survey = useSurvey()
   const i18n = useI18n()
 
@@ -43,6 +43,7 @@ const EntitySelectorTree = (props) => {
         nodeDef={nodeDefRoot}
         nodeDefLabelType={nodeDefLabelType}
         nodeDefUuidActive={nodeDefUuidActive}
+        onlyEntities={onlyEntities}
         onlyPages={onlyPages}
         onSelect={onSelect}
         setExpanded={setExpanded}
@@ -56,6 +57,7 @@ EntitySelectorTree.propTypes = {
   isDisabled: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidActive: PropTypes.string,
+  onlyEntities: PropTypes.bool,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
 }
@@ -65,6 +67,7 @@ EntitySelectorTree.defaultProps = {
   isDisabled: () => false,
   nodeDefLabelType: null,
   nodeDefUuidActive: null,
+  onlyEntities: true,
   onlyPages: false,
 }
 

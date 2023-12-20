@@ -13,7 +13,7 @@ export class NodesDeleteBatchPersister extends BatchPersister {
           {
             user: this.user,
             surveyId: this.surveyId,
-            nodeUuids: Object.values(nodes).map(Node.getUuid),
+            nodeUuids: nodes.map(Node.getUuid),
             systemActivity: true,
           },
           this.tx

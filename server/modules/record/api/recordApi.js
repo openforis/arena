@@ -99,7 +99,7 @@ export const init = (app) => {
       const {
         surveyId,
         cycle,
-        entityDefUuid,
+        nodeDefUuid,
         dryRun,
         insertNewRecords,
         insertMissingNodes,
@@ -113,7 +113,7 @@ export const init = (app) => {
         surveyId,
         filePath,
         cycle,
-        entityDefUuid,
+        nodeDefUuid,
         dryRun,
         insertNewRecords,
         insertMissingNodes,
