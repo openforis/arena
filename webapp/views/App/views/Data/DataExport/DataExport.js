@@ -1,4 +1,4 @@
-import './ExportData.scss'
+import './DataExport.scss'
 
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -46,7 +46,7 @@ const sources = {
   selectedRecords: 'selectedRecords',
 }
 
-const ExportData = (props) => {
+const DataExport = (props) => {
   const { recordUuids, search, sourceSelectionAvailable } = props
 
   const dispatch = useDispatch()
@@ -131,14 +131,14 @@ const ExportData = (props) => {
   )
 }
 
-ExportData.propTypes = {
+DataExport.propTypes = {
   recordUuids: PropTypes.array,
   search: PropTypes.string,
   sourceSelectionAvailable: PropTypes.bool,
 }
 
-ExportData.defaultProps = {
+DataExport.defaultProps = {
   sourceSelectionAvailable: false,
 }
 
-export default ExportData
+export default DataExport
