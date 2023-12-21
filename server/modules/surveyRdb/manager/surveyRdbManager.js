@@ -159,12 +159,32 @@ export const fetchViewDataAgg = async (params) => {
   return result
 }
 
+const _determineRecordUuidsFilter = async ({ survey, cycle, recordUuidsParam, search }) => {
+  if (recordUuidsParam) return recordUuidsParam
+
+  if (!Objects.isEmpty(search)) {
+    const surveyId = Survey.getId(survey)
+    const nodeDefRoot = Survey.getNodeDefRoot(survey)
+    const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+    const recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
+      surveyId,
+      nodeDefRoot,
+      nodeDefKeys,
+      cycle,
+      search,
+    })
+    return recordsSummaries.length > 0 ? recordsSummaries.map(Record.getUuid) : null
+  }
+  return null
+}
+
 export const fetchEntitiesDataToCsvFiles = async (
   {
     survey,
     cycle,
     includeCategoryItemsLabels,
     expandCategoryItems,
+    includeAncestorAttributes,
     includeAnalysis,
     recordOwnerUuid = null,
     recordUuids: recordUuidsParam = null,
@@ -180,24 +200,18 @@ export const fetchEntitiesDataToCsvFiles = async (
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
 
-  let recordUuids = null
-  if (recordUuidsParam) {
-    recordUuids = recordUuidsParam
-  } else if (!Objects.isEmpty(search)) {
-    const surveyId = Survey.getId(survey)
-    const nodeDefRoot = Survey.getNodeDefRoot(survey)
-    const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
-    const recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
-      surveyId,
-      nodeDefRoot,
-      nodeDefKeys,
-      cycle,
-      search,
-    })
-    recordUuids = recordsSummaries.length > 0 ? recordsSummaries.map(Record.getUuid) : null
-  }
+  const recordUuids = await _determineRecordUuidsFilter({ survey, cycle, recordUuidsParam, search })
 
   callback?.({ total: nodeDefs.length })
+
+  const getChildAttributes = (nodeDef) =>
+    Survey.getNodeDefDescendantAttributesInSingleEntities({
+      nodeDef,
+      includeAnalysis,
+      includeMultipleAttributes: !!expandCategoryItems,
+      sorted: true,
+      cycle,
+    })(survey)
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
@@ -205,20 +219,26 @@ export const fetchEntitiesDataToCsvFiles = async (
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities({
-          nodeDef: nodeDefContext,
-          includeAnalysis,
-          includeMultipleAttributes: !!expandCategoryItems,
-          sorted: true,
-          cycle,
-        })(survey)
-      : [nodeDefContext] // Multiple attribute
+      ? getChildAttributes(nodeDefContext)
+      : // Multiple attribute
+        [nodeDefContext]
 
-    const ancestorKeysDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
+    const ancestorDefs = []
+    if (includeAncestorAttributes) {
+      Survey.visitAncestors(
+        nodeDefContext,
+        (nodeDef) => {
+          ancestorDefs.push(...getChildAttributes(nodeDef))
+        },
+        false
+      )(survey)
+    } else {
+      ancestorDefs.push(...Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey))
+    }
 
     let query = Query.create({ entityDefUuid })
-    const ancestorKeyDefsUuids = ancestorKeysDefs.concat(childDefs).map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(ancestorKeyDefsUuids)(query)
+    const ancestorAttributeDefUuids = ancestorDefs.concat(childDefs).map(NodeDef.getUuid)
+    query = Query.assocAttributeDefUuids(ancestorAttributeDefUuids)(query)
     query = Query.assocFilterRecordUuids(recordUuids)(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
