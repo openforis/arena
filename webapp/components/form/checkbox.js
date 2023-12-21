@@ -41,7 +41,7 @@ const Checkbox = (props) => {
         >
           <span className={classNameIconContainer} />
           <LabelWithTooltip label={i18n.t(label)} />
-          {info && <ButtonIconInfo title={i18n.t(info)} />}
+          {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
         </button>
       </ValidationTooltip>
     </div>
