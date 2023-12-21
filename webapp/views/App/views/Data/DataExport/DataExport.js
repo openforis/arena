@@ -1,4 +1,4 @@
-import './ExportData.scss'
+import './DataExport.scss'
 
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -20,6 +20,7 @@ const exportOptions = {
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',
   expandCategoryItems: 'expandCategoryItems',
   includeCategories: 'includeCategories',
+  includeAncestorAttributes: 'includeAncestorAttributes',
   includeAnalysis: 'includeAnalysis',
   includeDataFromAllCycles: 'includeDataFromAllCycles',
   includeFiles: 'includeFiles',
@@ -33,6 +34,7 @@ const defaultOptionsSelection = {
   [exportOptions.includeCategoryItemsLabels]: true,
   [exportOptions.expandCategoryItems]: false,
   [exportOptions.includeCategories]: false,
+  [exportOptions.includeAncestorAttributes]: false,
   [exportOptions.includeAnalysis]: false,
   [exportOptions.includeDataFromAllCycles]: false,
   [exportOptions.includeFiles]: false,
@@ -44,7 +46,7 @@ const sources = {
   selectedRecords: 'selectedRecords',
 }
 
-const ExportData = (props) => {
+const DataExport = (props) => {
   const { recordUuids, search, sourceSelectionAvailable } = props
 
   const dispatch = useDispatch()
@@ -104,6 +106,7 @@ const ExportData = (props) => {
           exportOptions.includeCategoryItemsLabels,
           exportOptions.expandCategoryItems,
           exportOptions.includeCategories,
+          exportOptions.includeAncestorAttributes,
           ...(canAnalyzeRecords ? [exportOptions.includeAnalysis] : []),
           ...(cycles.length > 1 ? [exportOptions.includeDataFromAllCycles] : []),
           exportOptions.includeFiles,
@@ -128,14 +131,14 @@ const ExportData = (props) => {
   )
 }
 
-ExportData.propTypes = {
+DataExport.propTypes = {
   recordUuids: PropTypes.array,
   search: PropTypes.string,
   sourceSelectionAvailable: PropTypes.bool,
 }
 
-ExportData.defaultProps = {
+DataExport.defaultProps = {
   sourceSelectionAvailable: false,
 }
 
-export default ExportData
+export default DataExport
