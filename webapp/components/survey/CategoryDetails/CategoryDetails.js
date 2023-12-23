@@ -75,7 +75,9 @@ const CategoryDetails = (props) => {
               className="import-btn"
               label="common.csvImport"
               accept=".csv"
-              onOk={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
+              onOk={({ files, onUploadProgress }) =>
+                Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+              }
             />
           )}
           <ButtonDownload

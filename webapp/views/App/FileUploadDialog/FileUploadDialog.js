@@ -3,7 +3,7 @@ import './FileUploadDialog.scss'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
+import { Button, Dropzone, Modal, ModalBody, ModalFooter, ProgressBar } from '@webapp/components'
 
 import { FileUploadDialogActions, useFileUploadDialog } from '@webapp/store/ui'
 
@@ -16,7 +16,7 @@ export const FileUploadDialog = () => {
 
   const [state, setState] = useState(initialState)
 
-  const { files } = state
+  const { files, uploadProgressPercent, uploading } = state
 
   useEffect(() => {
     if (!open) {
@@ -32,8 +32,13 @@ export const FileUploadDialog = () => {
     dispatch(FileUploadDialogActions.close())
   }, [dispatch])
 
-  const onOkClick = useCallback(() => {
-    onOk(files)
+  const onUploadProgress = (progressEvent) => {
+    const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+    setState((statePrev) => ({ ...statePrev, uploadProgressPercent, uploading: uploadProgressPercent < 100 }))
+  }
+
+  const onOkClick = useCallback(async () => {
+    await onOk({ files, onUploadProgress })
   }, [files, onOk])
 
   if (!open) return null
@@ -42,11 +47,14 @@ export const FileUploadDialog = () => {
     <Modal className="file-upload-dialog" title={title} onClose={onClose} showCloseButton>
       <ModalBody>
         <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={files} />
+        {uploading && uploadProgressPercent >= 0 && (
+          <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
+        )}
       </ModalBody>
       <ModalFooter>
         <Button
           className="btn-primary modal-footer__item"
-          disabled={files.length === 0}
+          disabled={files.length === 0 || uploading}
           onClick={onOkClick}
           label="common.ok"
         />
