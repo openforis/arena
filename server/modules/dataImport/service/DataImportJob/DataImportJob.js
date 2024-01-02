@@ -1,3 +1,5 @@
+import { RecordUpdateResult } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -148,6 +150,8 @@ export default class DataImportJob extends DataImportBaseJob {
 
       const sideEffect = true
 
+      const updateResult = new RecordUpdateResult({ record: this.currentRecord })
+
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
         survey,
         entityDefUuid,
@@ -156,19 +160,22 @@ export default class DataImportJob extends DataImportBaseJob {
         sideEffect,
       })(this.currentRecord)
 
-      this.currentRecord = entityUpdateResult.record
+      updateResult.merge(entityUpdateResult)
+      this.currentRecord = updateResult.record
 
-      await this.clearMultipleAttributeValues({ survey, entity, valuesByDefUuid, sideEffect })
+      await this.clearMultipleAttributeValues({ entity, valuesByDefUuid, sideEffect })
 
-      const { record: recordUpdated, nodes: nodesUpdated } = await Record.updateAttributesInEntityWithValues({
+      const updateResultUpdateAttributes = await Record.updateAttributesInEntityWithValues({
         survey,
         entity,
         valuesByDefUuid,
         sideEffect,
       })(this.currentRecord)
 
-      this.currentRecord = recordUpdated
+      updateResult.merge(updateResultUpdateAttributes)
+      this.currentRecord = updateResult.record
 
+      const nodesUpdated = updateResult.nodes
       await this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
