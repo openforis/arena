@@ -73,6 +73,7 @@ const ItemDetails = (props) => {
       id={prefixId}
       data-testid={TestId.categoryDetails.item(levelIndex, index)}
       className={classNames('category__item', { active, 'not-valid': !Validation.isValid(validation) })}
+      key={CategoryItem.getUuid(item)}
       onKeyDown={setActive}
       onClick={setActive}
       ref={elemRef}

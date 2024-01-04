@@ -279,7 +279,6 @@ export default class CategoryImportJob extends Job {
           reader.cancel()
           return
         }
-
         await this._onRow(itemRow)
       },
       onTotalChange: (total) => {

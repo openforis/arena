@@ -32,14 +32,14 @@ export const FileUploadDialog = () => {
     dispatch(FileUploadDialogActions.close())
   }, [dispatch])
 
-  const onUploadProgress = (progressEvent) => {
+  const onUploadProgress = useCallback((progressEvent) => {
     const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
     setState((statePrev) => ({ ...statePrev, uploadProgressPercent, uploading: uploadProgressPercent < 100 }))
-  }
+  }, [])
 
   const onOkClick = useCallback(async () => {
     await onOk({ files, onUploadProgress })
-  }, [files, onOk])
+  }, [files, onOk, onUploadProgress])
 
   if (!open) return null
 

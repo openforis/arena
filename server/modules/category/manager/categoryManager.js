@@ -171,7 +171,7 @@ export const { createImportSummaryFromStream } = CategoryImportSummaryGenerator
 export const createImportSummary = async ({ surveyId, filePath }) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true })
   const defaultLang = Survey.getDefaultLanguage(surveyInfo)
-  return await CategoryImportSummaryGenerator.createImportSummary({ filePath, defaultLang })
+  return CategoryImportSummaryGenerator.createImportSummary({ filePath, defaultLang })
 }
 
 // ====== READ
