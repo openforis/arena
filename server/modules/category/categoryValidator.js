@@ -146,7 +146,6 @@ const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
   addItemsToStack(itemsFirstLevel)
 
   while (!R.isEmpty(stack)) {
-    // console.time('item')
     const item = stack[stack.length - 1] // Do not pop item: it can be visited again
     const { siblingsAndSelfByCode } = item
     const itemUuid = CategoryItem.getUuid(item)
