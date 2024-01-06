@@ -119,8 +119,10 @@ const _validateItemExtraProps =
 const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
   const levelsArray = Category.getLevelsArray(category)
   const categoryLevelsByUuid = ObjectUtils.toIndexedObj(levelsArray, CategoryLevel.getUuid)
-  const getItemLevelIndex = (item) => CategoryLevel.getIndex(categoryLevelsByUuid[CategoryItem.getLevelUuid(item)])
-  const isItemLeaf = (item) => getItemLevelIndex(item) === levelsArray.length - 1
+  const isItemLeaf = (item) => {
+    const level = categoryLevelsByUuid[CategoryItem.getLevelUuid(item)]
+    return CategoryLevel.getIndex(level) === levelsArray.length - 1
+  }
   const itemsValidationsByUuid = {}
   let errorFound = false
 
@@ -223,13 +225,26 @@ const categoryValidators = (categories) => ({
 const validateCategoryProps = async (categories, category) =>
   Validator.validate(category, categoryValidators(categories))
 
-export const validateCategory = async ({ survey, categories, category, items }) => {
+export const validateCategory = async ({
+  survey,
+  categories,
+  category,
+  items,
+  validateLevels: _validateLevels = true,
+  validateItems: _validateItems = true,
+}) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
-  const itemsByParentUuid = ObjectUtils.groupByProp(CategoryItem.getParentUuid)(items)
+  const itemsByParentUuid =
+    _validateLevels || _validateItems ? ObjectUtils.groupByProp(CategoryItem.getParentUuid)(items) : {}
   const categoryValidation = await validateCategoryProps(categories, category)
-  const levelsValidation = await validateLevels(category, itemsByParentUuid)
-  const itemsValidation = await validateItems({ category, itemsByParentUuid, srsIndex })
+  const prevValidation = Category.getValidation(category)
+  const levelsValidation = _validateLevels
+    ? await validateLevels(category, itemsByParentUuid)
+    : Validation.getFieldValidation(keys.levels)(prevValidation)
+  const itemsValidation = _validateItems
+    ? await validateItems({ category, itemsByParentUuid, srsIndex })
+    : Validation.getFieldValidation(keys.items)(prevValidation)
 
   return R.pipe(
     Validation.setValid(R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),

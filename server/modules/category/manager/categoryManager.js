@@ -31,7 +31,10 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 // ====== VALIDATION
 
-const _validateCategoryFromCategories = async ({ survey, categories, categoryUuid }, client = db) => {
+const _validateCategoryFromCategories = async (
+  { survey, categories, categoryUuid, validateLevels = true, validateItems = true },
+  client = db
+) => {
   const surveyId = Survey.getId(survey)
   const category = R.prop(categoryUuid, categories)
   const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
@@ -40,27 +43,35 @@ const _validateCategoryFromCategories = async ({ survey, categories, categoryUui
     categories: R.values(categories),
     category,
     items,
+    validateLevels,
+    validateItems,
   })
   await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
   return Validation.assocValidation(validation)(category)
 }
 
-export const validateCategory = async ({ survey, categoryUuid }, client = db) => {
+export const validateCategory = async (
+  { survey, categoryUuid, validateLevels = true, validateItems = true },
+  client = db
+) => {
   const surveyId = Survey.getId(survey)
   const categories = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId(
     { surveyId, draft: true, includeValidation: true },
     client
   )
-  return _validateCategoryFromCategories({ survey, categories, categoryUuid }, client)
+  return _validateCategoryFromCategories({ survey, categories, categoryUuid, validateLevels, validateItems }, client)
 }
 
-const _validateCategory = async ({ surveyId, categoryUuid }, client = db) => {
+const _validateCategory = async (
+  { surveyId, categoryUuid, validateLevels = true, validateItems = true },
+  client = db
+) => {
   let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const srsCodes = Survey.getSRSCodes(survey)
   const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
   survey = Survey.assocSrs(srss)(survey)
 
-  return validateCategory({ survey, categoryUuid }, client)
+  return validateCategory({ survey, categoryUuid, validateLevels, validateItems }, client)
 }
 
 export const validateCategories = async (survey, client = db) => {
@@ -229,7 +240,9 @@ export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, va
         t
       ),
     ])
-    return _validateCategory({ surveyId, categoryUuid }, t)
+    const validateLevels = false
+    const validateItems = [Category.keysProps.itemExtraDef].includes(key)
+    return _validateCategory({ surveyId, categoryUuid, validateLevels, validateItems }, t)
   })
 
 const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t) => {
