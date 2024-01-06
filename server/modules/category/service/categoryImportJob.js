@@ -319,7 +319,6 @@ export default class CategoryImportJob extends Job {
         }
       }
     }
-
     this.incrementProcessedItems()
   }
 

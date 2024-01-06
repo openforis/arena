@@ -105,13 +105,28 @@ export const setInPath =
 export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
 // ====== UTILS / uuid
+const _getProp = (propName) => (item) =>
+  typeof propName === 'string' ? R.path(propName.split('.'))(item) : propName(item)
+
 export const toIndexedObj = (array, propName) =>
   array.reduce((acc, item) => {
-    const prop = R.path(propName.split('.'), item)
+    const prop = _getProp(propName)(item)
     acc[prop] = item
     return acc
   }, {})
 
 export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
+
+export const groupByProp = (propNameOrFunction) => (items) =>
+  items.reduce((acc, item) => {
+    const prop = _getProp(propNameOrFunction)(item)
+    let itemsByProp = acc[prop]
+    if (!itemsByProp) {
+      itemsByProp = []
+      acc[prop] = itemsByProp
+    }
+    itemsByProp.push(item)
+    return acc
+  }, {})
 
 export const clone = (obj) => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))

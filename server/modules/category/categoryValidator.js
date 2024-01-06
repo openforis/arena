@@ -10,6 +10,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
+import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
 const keys = {
@@ -20,7 +21,7 @@ const keys = {
 
 // ====== LEVELS
 
-const getItemChildren = (parentItemUuid) => (itemsByParentUuid) => R.propOr([], parentItemUuid)(itemsByParentUuid)
+const getItemChildren = (parentItemUuid) => (itemsByParentUuid) => itemsByParentUuid[parentItemUuid] ?? []
 
 const validateNotEmptyFirstLevelItems = (itemsByParentUuid) => (_propName, level) =>
   CategoryLevel.getIndex(level) === 0 && R.isEmpty(getItemChildren(null)(itemsByParentUuid))
@@ -54,8 +55,7 @@ const validateLevels = async (category, itemsByParentUuid) => {
 // ====== ITEMS
 
 const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
-  const isUnique = R.pipe(R.prop(CategoryItem.getCode(item)), R.length, R.equals(1))(siblingsAndSelfByCode)
-
+  const isUnique = siblingsAndSelfByCode[CategoryItem.getCode(item)]?.length === 1
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
 }
 
@@ -117,6 +117,10 @@ const _validateItemExtraProps =
   }
 
 const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
+  const levelsArray = Category.getLevelsArray(category)
+  const categoryLevelsByUuid = ObjectUtils.toIndexedObj(levelsArray, CategoryLevel.getUuid)
+  const getItemLevelIndex = (item) => CategoryLevel.getIndex(categoryLevelsByUuid[CategoryItem.getLevelUuid(item)])
+  const isItemLeaf = (item) => getItemLevelIndex(item) === levelsArray.length - 1
   const itemsValidationsByUuid = {}
   let errorFound = false
 
@@ -125,21 +129,16 @@ const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
   const stack = []
 
   // Keep track of already visited items: if not leaf, they will be validated only when already visited
-  const visitedIds = {}
+  const visitedUuids = {}
 
   const addItemsToStack = (items) => {
     // Group sibling items by code to optimize item code uniqueness check
     // do it only one time for every sibling
-    const siblingsAndSelfByCode = R.groupBy(CategoryItem.getCode, items)
-    stack.push(
-      ...R.map(
-        (item) => ({
-          item,
-          siblingsAndSelfByCode,
-        }),
-        items
-      )
-    )
+    const siblingsAndSelfByCode = ObjectUtils.groupByProp(CategoryItem.getCode)(items)
+    items.forEach((item) => {
+      item.siblingsAndSelfByCode = siblingsAndSelfByCode
+      stack.push(item)
+    })
   }
 
   // Start with the first level items
@@ -147,11 +146,13 @@ const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
   addItemsToStack(itemsFirstLevel)
 
   while (!R.isEmpty(stack)) {
-    const { item, siblingsAndSelfByCode } = stack[stack.length - 1] // Do not pop item: it can be visited again
+    // console.time('item')
+    const item = stack[stack.length - 1] // Do not pop item: it can be visited again
+    const { siblingsAndSelfByCode } = item
     const itemUuid = CategoryItem.getUuid(item)
-    const isLeaf = Category.isItemLeaf(item)(category)
-    const itemChildren = getItemChildren(itemUuid)(itemsByParentUuid)
-    const visited = Boolean(visitedIds[item.id])
+    const isLeaf = isItemLeaf(item)
+    const itemChildren = isLeaf ? [] : getItemChildren(itemUuid)(itemsByParentUuid)
+    const visited = !!visitedUuids[itemUuid]
 
     let validation = null
 
@@ -164,6 +165,7 @@ const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
     validation = _validateItemExtraProps({ extraDefs: Category.getItemExtraDef(category), validation, srsIndex })(item)
 
     if (isLeaf || R.isEmpty(itemChildren)) {
+      delete item['siblingsAndSelfByCode']
       stack.pop() // It won't be visited again, remove it from stack
     } else if (visited) {
       // All descendants have been validated, add children validation to the item validation
@@ -184,6 +186,7 @@ const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
         )(validation)
       }
 
+      delete item['siblingsAndSelfByCode']
       stack.pop()
     } else {
       // Keep the item in the stack, postpone item validation, validate descendant items first
@@ -196,9 +199,8 @@ const validateItems = async ({ category, itemsByParentUuid, srsIndex }) => {
       errorFound = errorFound || Validation.isError(validation)
     }
 
-    visitedIds[item.id] = true
+    visitedUuids[itemUuid] = true
   }
-
   const valid = R.isEmpty(itemsValidationsByUuid)
   if (valid) return null
 
@@ -225,8 +227,7 @@ const validateCategoryProps = async (categories, category) =>
 export const validateCategory = async ({ survey, categories, category, items }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
-  const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid)(items)
-
+  const itemsByParentUuid = ObjectUtils.groupByProp(CategoryItem.getParentUuid)(items)
   const categoryValidation = await validateCategoryProps(categories, category)
   const levelsValidation = await validateLevels(category, itemsByParentUuid)
   const itemsValidation = await validateItems({ category, itemsByParentUuid, srsIndex })
