@@ -19,9 +19,14 @@ const Dropzone = (props) => {
 
   const maxSize = maxSizeMB * 1000 * 1000
 
-  const acceptedExtensions = useMemo(
-    () => Object.values(acceptProp).flat().map(Strings.removePrefix('.')),
+  const acceptPropObject = useMemo(
+    () => (typeof acceptProp === 'string' ? { '': acceptProp } : acceptProp), // workaround to accept extensions containing special characters
     [acceptProp]
+  )
+
+  const acceptedExtensions = useMemo(
+    () => Object.values(acceptPropObject).flat().map(Strings.removePrefix('.')),
+    [acceptPropObject]
   )
 
   const acceptedExtensionsText = acceptedExtensions
@@ -30,7 +35,7 @@ const Dropzone = (props) => {
 
   const acceptedExtensionsHaveInvalidCharacters = acceptedExtensions.some((extension) => /\W/.test(extension))
 
-  const accept = acceptedExtensionsHaveInvalidCharacters ? undefined : acceptProp
+  const accept = acceptedExtensionsHaveInvalidCharacters ? undefined : acceptPropObject
 
   const validateFiles = useCallback(
     (files) => {
@@ -38,7 +43,7 @@ const Dropzone = (props) => {
         // Dropzone component filters out the files exceeding the specified max size
         return i18n.t('dropzone.error.fileTooBig')
       }
-      if (accept) {
+      if (acceptProp && typeof acceptProp === 'object') {
         // 'accept' is specified and files have been accepted successfully
         return null
       }
@@ -51,7 +56,7 @@ const Dropzone = (props) => {
       }
       return null
     },
-    [accept, acceptedExtensions]
+    [acceptProp, acceptedExtensions]
   )
 
   const onDrop = useCallback(
@@ -104,7 +109,7 @@ const Dropzone = (props) => {
 }
 
 Dropzone.propTypes = {
-  accept: PropTypes.object,
+  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   disabled: PropTypes.bool,
   maxSize: PropTypes.number, // max file size in MB
   multiple: PropTypes.bool,

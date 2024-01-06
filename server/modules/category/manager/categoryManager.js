@@ -32,7 +32,7 @@ import * as CategoryRepository from '../repository/categoryRepository'
 // ====== VALIDATION
 
 const _validateCategoryFromCategories = async (
-  { survey, categories, categoryUuid, validateLevels = true, validateItems = true },
+  { survey, categories, categoryUuid, validateLevels = true, validateItems = true, onProgress = null },
   client = db
 ) => {
   const surveyId = Survey.getId(survey)
@@ -45,13 +45,14 @@ const _validateCategoryFromCategories = async (
     items,
     validateLevels,
     validateItems,
+    onProgress,
   })
   await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
   return Validation.assocValidation(validation)(category)
 }
 
 export const validateCategory = async (
-  { survey, categoryUuid, validateLevels = true, validateItems = true },
+  { survey, categoryUuid, validateLevels = true, validateItems = true, onProgress = null },
   client = db
 ) => {
   const surveyId = Survey.getId(survey)
@@ -59,7 +60,10 @@ export const validateCategory = async (
     { surveyId, draft: true, includeValidation: true },
     client
   )
-  return _validateCategoryFromCategories({ survey, categories, categoryUuid, validateLevels, validateItems }, client)
+  return _validateCategoryFromCategories(
+    { survey, categories, categoryUuid, validateLevels, validateItems, onProgress },
+    client
+  )
 }
 
 const _validateCategory = async (

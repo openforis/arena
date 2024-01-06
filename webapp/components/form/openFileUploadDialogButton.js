@@ -33,7 +33,7 @@ const OpenFileUploadDialogButton = (props) => {
 }
 
 OpenFileUploadDialogButton.propTypes = {
-  accept: PropTypes.string,
+  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   className: PropTypes.string,
   disabled: PropTypes.bool,
   label: PropTypes.string,
