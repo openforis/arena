@@ -19,6 +19,7 @@ import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
+import { CategoryValidationJob } from './CategoryValidationJob'
 
 class CategoryImportInternalJob extends Job {
   constructor(params, type = 'CategoryImportInternalJob') {
@@ -88,20 +89,10 @@ class CategoryImportInternalJob extends Job {
 
   async beforeSuccess() {
     await super.beforeSuccess()
-
-    // // Validate category
-    // this.logDebug('category validation start')
-    // this.category = await CategoryManager.validateCategory(
-    //   { survey: this.survey, categoryUuid: Category.getUuid(this.category) },
-    //   this.tx
-    // )
-    // this.logDebug('category validation end')
-
-    // this.setResult({
-    //   category: this.category,
-    // })
-
-    this.setContext({ survey: this.survey, category: this.category })
+    this.setContext({
+      survey: this.survey,
+      category: this.category,
+    })
   }
 
   // Start of methods that can be overridden by subclasses
@@ -370,38 +361,18 @@ class CategoryImportInternalJob extends Job {
   }
 }
 
-class CategoryImportValidationJob extends Job {
-  constructor(params, type = 'CategoryImportValidationJob') {
-    super(type, params)
-  }
-
-  async execute() {
-    const { category, survey } = this.context
-    const categoryUpdated = await CategoryManager.validateCategory(
-      {
-        survey,
-        categoryUuid: Category.getUuid(category),
-        onProgress: ({ total }) => {
-          this.total = total
-          this.incrementProcessedItems()
-        },
-      },
-      this.tx
-    )
-    this.setContext({ category: categoryUpdated })
-  }
-}
-
 export default class CategoryImportJob extends Job {
   constructor(params, type = CategoryImportJob.type) {
-    super(type, params, [new CategoryImportInternalJob(params), new CategoryImportValidationJob(params)])
+    super(type, params, [new CategoryImportInternalJob(params), new CategoryValidationJob(params)])
   }
 
   generateResult() {
     const result = super.generateResult()
     const { category } = this.context
-    result.category = category
-    return result
+    return {
+      ...result,
+      category,
+    }
   }
 }
 

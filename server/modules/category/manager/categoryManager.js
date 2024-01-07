@@ -66,14 +66,27 @@ export const validateCategory = async (
   )
 }
 
+const _fetchSurvey = async ({ surveyId }, client = db) => {
+  let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
+  const srsCodes = Survey.getSRSCodes(survey)
+  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
+  return Survey.assocSrs(srss)(survey)
+}
+
+export const validateCategoryItem = async ({ surveyId, category, itemUuid, prevItem }, client = db) => {
+  const categoryUuid = Category.getUuid(category)
+  const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
+  const item = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: itemUuid, draft: true }, client)
+  const validation = await CategoryValidator.validateItem({ category, items, item, prevItem })
+  await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
+  return Validation.assocValidation(validation)(category)
+}
+
 const _validateCategory = async (
   { surveyId, categoryUuid, validateLevels = true, validateItems = true },
   client = db
 ) => {
-  let survey = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const srsCodes = Survey.getSRSCodes(survey)
-  const srss = await SrsRepository.fetchSRSsByCodes({ srsCodes }, client)
-  survey = Survey.assocSrs(srss)(survey)
+  let survey = await _fetchSurvey({ surveyId }, client)
 
   return validateCategory({ survey, categoryUuid, validateLevels, validateItems }, client)
 }
@@ -365,6 +378,7 @@ const _newCategoryItemUpdateLogActivity = (categoryUuid, item, key, value, syste
 
 export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key, value, client = db) =>
   client.tx(async (t) => {
+    const prevItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: itemUuid, draft: true }, t)
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
     await Promise.all([
       markSurveyDraft(surveyId, t),
@@ -376,9 +390,14 @@ export const updateItemProp = async (user, surveyId, categoryUuid, itemUuid, key
       ),
     ])
 
+    const category = await CategoryRepository.fetchCategoryAndLevelsByUuid(
+      { surveyId, categoryUuid, draft: true, includeValidation: true },
+      client
+    )
+    const shouldValidate = [CategoryItem.keysProps.code, CategoryItem.keysProps.extra].includes(key)
     return {
       item,
-      category: await _validateCategory({ surveyId, categoryUuid }, t),
+      category: shouldValidate ? await validateCategoryItem({ surveyId, category, itemUuid, prevItem }, t) : category,
     }
   })
 
