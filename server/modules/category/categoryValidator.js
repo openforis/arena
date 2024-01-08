@@ -299,6 +299,17 @@ export const validateItems = async ({ category, itemsToValidate }) => {
   return Validation.cleanup(categoryValidationUpdated)
 }
 
+export const deleteEmptyLevelError = ({ category, levelUuid }) => {
+  const validation = Category.getValidation(category)
+  const level = Category.getLevelByUuid(levelUuid)(category)
+  const levelIndex = CategoryLevel.getIndex(level)
+  const levelsValidation = Validation.getFieldValidation(keys.levels)(validation)
+  const levelValidation = Validation.getFieldValidation(levelIndex)(levelsValidation)
+  const levelValidationUpdated = Validation.dissocFieldValidation(keys.items)(levelValidation)
+  const levelsValidationUpdated = Validation.assocFieldValidation(levelIndex, levelValidationUpdated)(levelsValidation)
+  return Validation.cleanup(Validation.assocFieldValidation(keys.levels, levelsValidationUpdated)(validation))
+}
+
 class ItemsCache {
   constructor(items) {
     this.items = items

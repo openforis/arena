@@ -31,6 +31,11 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 // ====== VALIDATION
 
+const _updateCategoryValidation = async ({ surveyId, category, validation }, client) => {
+  const categoryUuid = Category.getUuid(category)
+  await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
+  return Validation.assocValidation(validation)(category)
+}
 const _validateCategoryFromCategories = async (
   { survey, categories, categoryUuid, validateLevels = true, validateItems = true, onProgress = null, stopIfFn = null },
   client = db
@@ -48,8 +53,7 @@ const _validateCategoryFromCategories = async (
     onProgress,
     stopIfFn,
   })
-  await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
-  return Validation.assocValidation(validation)(category)
+  return _updateCategoryValidation({ surveyId, category, validation }, client)
 }
 
 export const validateCategory = async (
@@ -94,8 +98,7 @@ const _validateCategoryItemsWithCodes = async ({ surveyId, categoryUuid, levelUu
   const category = await _fetchCategory({ surveyId, categoryUuid }, client)
   const validation = await CategoryValidator.validateItems({ category, itemsToValidate })
 
-  await CategoryRepository.updateCategoryValidation(surveyId, categoryUuid, validation, client)
-  return Validation.assocValidation(validation)(category)
+  return _updateCategoryValidation({ surveyId, category, validation }, client)
 }
 
 const _validateCategoryItem = async ({ surveyId, categoryUuid, itemUuid, prevItem }, client = db) => {
@@ -198,13 +201,13 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemInsert, logContent, false, t),
     ])
     const levelUuid = CategoryItem.getLevelUuid(item)
-    return {
-      category: await _validateCategoryItemsWithCodes(
-        { surveyId, categoryUuid, levelUuid, codes: [CategoryItem.getCode(item)] },
-        t
-      ),
-      item,
-    }
+    let category = await _validateCategoryItemsWithCodes(
+      { surveyId, categoryUuid, levelUuid, codes: [CategoryItem.getCode(item)] },
+      t
+    )
+    const validation = CategoryValidator.deleteEmptyLevelError({ category, levelUuid })
+    category = await _updateCategoryValidation({ surveyId, category, validation }, t)
+    return { category, item }
   })
 
 /**
