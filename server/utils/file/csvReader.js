@@ -5,6 +5,28 @@ import { SystemError } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from './fileUtils'
 
+const _extractValidHeaders = (row) => {
+  // remove last empty columns
+  const headers = []
+  let nonEmptyHeaderFound = false
+  for (let index = row.length - 1; index >= 0; index--) {
+    const header = StringUtils.trim(row[index])
+
+    if (StringUtils.isBlank(header)) {
+      if (nonEmptyHeaderFound) {
+        throw new SystemError('appErrors.csv.emptyHeaderFound', { columnPosition: index + 1 })
+      }
+    } else {
+      nonEmptyHeaderFound = true
+      headers.unshift(header)
+    }
+  }
+  if (!nonEmptyHeaderFound) {
+    throw new SystemError('appErrors.csv.emptyHeadersFound')
+  }
+  return headers
+}
+
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
   const jobStatus = { canceled: false }
 
@@ -15,28 +37,6 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       cancel()
       throw error
     }
-  }
-
-  const _extractValidHeaders = (row) => {
-    // remove last empty columns
-    const _headers = []
-    let nonEmptyHeaderFound = false
-    for (let index = row.length - 1; index >= 0; index--) {
-      const header = StringUtils.trim(row[index])
-
-      if (StringUtils.isBlank(header)) {
-        if (nonEmptyHeaderFound) {
-          throw new SystemError('appErrors.csv.emptyHeaderFound', { columnPosition: index + 1 })
-        }
-      } else {
-        nonEmptyHeaderFound = true
-        _headers.unshift(header)
-      }
-    }
-    if (!nonEmptyHeaderFound) {
-      throw new SystemError('appErrors.csv.emptyHeadersFound')
-    }
-    return _headers
   }
 
   const parser = stream.pipe(
