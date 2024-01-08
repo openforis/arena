@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as A from '@core/arena'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, Strings } from '@openforis/arena-core'
 
 import {
   getSurveyDBSchema,
@@ -228,6 +228,22 @@ export const fetchItemsByCategoryUuid = async (
   )
 
   return backup || draft ? items : R.filter((item) => item.published)(items)
+}
+
+export const fetchItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+  const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.', true)
+  const items = await client.map(
+    `
+      SELECT i.* 
+      FROM ${getSurveyDBSchema(surveyId)}.category_item i
+      WHERE i.level_uuid = $1 AND COALESCE(${codeColumn}, '') = $2
+     ORDER BY i.id
+    `,
+    [levelUuid, Strings.defaultIfEmpty('')(code)],
+    (def) => DB.transformCallback(def, draft, true)
+  )
+
+  return draft ? items : R.filter((item) => item.published)(items)
 }
 
 export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = false }, client = db) => {

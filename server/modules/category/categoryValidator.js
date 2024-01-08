@@ -259,20 +259,10 @@ export const validateCategory = async ({
   )(categoryValidation)
 }
 
-export const validateItem = async ({ category, items, item, prevItem = null }) => {
+export const validateItems = async ({ category, itemsToValidate }) => {
   const prevValidation = Category.getValidation(category)
-  const itemsCache = new ItemsCache(items)
-  const siblingItems =
-    Category.getItemLevelIndex(item) === 0 ? itemsCache.getFirstLevelItems() : itemsCache.getSiblingItems(item)
-  const siblingsAndSelfByCode = ObjectUtils.groupByProp(CategoryItem.getCode)(siblingItems)
+  const siblingsAndSelfByCode = ObjectUtils.groupByProp(CategoryItem.getCode)(itemsToValidate)
   const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
-  const itemsToValidate = []
-  itemsToValidate.push(item)
-  // validate items with same code (before update)
-  itemsToValidate.push(...(siblingsAndSelfByCode[CategoryItem.getCode(prevItem)] ?? []))
-  // validate items with same code (after update)
-  itemsToValidate.push(...(siblingsAndSelfByCode[CategoryItem.getCode(item)] ?? []))
-
   let itemsValidationUpdated = prevItemsValidation
 
   const _validateItem = async (itm) => {
