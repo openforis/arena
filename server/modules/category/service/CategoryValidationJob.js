@@ -19,6 +19,7 @@ export class CategoryValidationJob extends Job {
           this.total = total
           this.incrementProcessedItems()
         },
+        stopIfFn: () => this.isCanceled(),
       },
       this.tx
     )

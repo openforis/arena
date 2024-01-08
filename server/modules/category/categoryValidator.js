@@ -114,9 +114,9 @@ const _validateItemExtraProps =
       : validation
   }
 
-const validateAllItems = async ({ survey, category, itemsCache, onProgress = null }) => {
+const validateAllItems = async ({ survey, category, itemsCache, onProgress = null, stopIfFn = null }) => {
   const itemsToValidate = itemsCache.getFirstLevelItems()
-  return validateItemsAndDescendants({ survey, category, itemsCache, itemsToValidate, onProgress })
+  return validateItemsAndDescendants({ survey, category, itemsCache, itemsToValidate, onProgress, stopIfFn })
 }
 
 const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validation }) => {
@@ -146,7 +146,14 @@ const _createItemsInvalidValidationResult = ({ errorFound, itemsValidationsByUui
   return Validation.newInstance(false, { ...itemsValidationsByUuid }, errors, warnings)
 }
 
-const validateItemsAndDescendants = async ({ survey, category, itemsCache, itemsToValidate, onProgress = null }) => {
+const validateItemsAndDescendants = async ({
+  survey,
+  category,
+  itemsCache,
+  itemsToValidate,
+  onProgress = null,
+  stopIfFn = null,
+}) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
   const extraDefs = Category.getItemExtraDef(category)
@@ -183,7 +190,7 @@ const validateItemsAndDescendants = async ({ survey, category, itemsCache, items
 
   pushItems(itemsToValidate)
 
-  while (!R.isEmpty(stack)) {
+  while (!R.isEmpty(stack) && !stopIfFn?.()) {
     const item = stack[stack.length - 1] // Do not pop item: it can be visited again
     const { siblingsAndSelfByCode } = item
     const itemUuid = CategoryItem.getUuid(item)
@@ -248,6 +255,7 @@ export const validateCategory = async ({
   validateLevels: _validateLevels = true,
   validateItems: _validateItems = true,
   onProgress = null,
+  stopIfFn = null,
 }) => {
   const itemsCache = _validateLevels || _validateItems ? new ItemsCache(items) : null
   const categoryValidation = await validateCategoryProps(categories, category)
@@ -258,7 +266,7 @@ export const validateCategory = async ({
     : Validation.getFieldValidation(keys.levels)(prevValidation)
 
   const itemsValidation = _validateItems
-    ? await validateAllItems({ survey, category, itemsCache, onProgress })
+    ? await validateAllItems({ survey, category, itemsCache, onProgress, stopIfFn })
     : Validation.getFieldValidation(keys.items)(prevValidation)
 
   return R.pipe(
