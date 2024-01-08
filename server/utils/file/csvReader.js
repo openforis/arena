@@ -27,6 +27,15 @@ const _extractValidHeaders = (row) => {
   return headers
 }
 
+const _rowToObject = ({ headers, row }) =>
+  headers.reduce(
+    (acc, header, index) =>
+      Object.assign(acc, {
+        [header]: StringUtils.trim(row[index]),
+      }),
+    {}
+  )
+
 export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
   const jobStatus = { canceled: false }
 
@@ -47,25 +56,14 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     let headers = null
     let total = 0
 
-    const _indexRowByHeaders = (row) =>
-      headers
-        ? headers.reduce(
-            (accRow, header, index) =>
-              Object.assign(accRow, {
-                [header]: StringUtils.trim(row[index]),
-              }),
-            {}
-          )
-        : row
-
     const _processRow = async (row) => {
       // Skip first row (headers)
-      if (total++ > 0 && onTotalChange) {
-        onTotalChange(total)
+      if (total++ > 0) {
+        onTotalChange?.(total)
       }
       if (headers) {
         // Headers have been read, process row
-        if (onRow) await _tryOrCancel(onRow(_indexRowByHeaders(row)))
+        if (onRow) await _tryOrCancel(onRow(_rowToObject({ headers, row })))
       } else {
         // Process headers
         headers = _extractValidHeaders(row)
