@@ -25,7 +25,7 @@ const OpenFileUploadDialogButton = (props) => {
     <Button
       className={className}
       disabled={disabled}
-      onClick={() => onClick()}
+      onClick={onClick}
       iconClassName={showIcon ? 'icon-upload2' : null}
       label={showLabel ? label : null}
     />
@@ -33,7 +33,7 @@ const OpenFileUploadDialogButton = (props) => {
 }
 
 OpenFileUploadDialogButton.propTypes = {
-  accept: PropTypes.string,
+  accept: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   className: PropTypes.string,
   disabled: PropTypes.bool,
   label: PropTypes.string,

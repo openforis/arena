@@ -42,7 +42,13 @@ export const { getValidation } = Validation
 
 const getLevels = R.propOr({}, keys.levels)
 export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
-export const getLevelByUuid = (uuid) => R.pipe(getLevelsArray, R.find(R.propEq('uuid', uuid)))
+export const getLevelByUuid = (uuid) =>
+  R.pipe(
+    getLevels,
+    R.values,
+    R.find((level) => CategoryLevel.getUuid(level) === uuid)
+  )
+export const getLevelsSize = R.pipe(getLevels, R.values, R.length)
 export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
 
 const getLevelsCount = (category) => Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
@@ -87,11 +93,13 @@ export const assocLevel =
 // ITEMS
 // ========
 
-export const getItemLevelIndex = (item) => (category) =>
-  R.pipe(CategoryItem.getLevelUuid, (levelUuid) => getLevelByUuid(levelUuid)(category), CategoryLevel.getIndex)(item)
+export const getItemLevelIndex = (item) => (category) => {
+  const levelUuid = CategoryItem.getLevelUuid(item)
+  const level = getLevelByUuid(levelUuid)(category)
+  return CategoryLevel.getIndex(level)
+}
 
-export const isItemLeaf = (item) => (category) =>
-  getItemLevelIndex(item)(category) === getLevelsArray(category).length - 1
+export const isItemLeaf = (item) => (category) => getItemLevelIndex(item)(category) === getLevelsSize(category) - 1
 
 export const getItemValidation = (item) =>
   R.pipe(

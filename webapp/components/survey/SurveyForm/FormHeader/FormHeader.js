@@ -126,7 +126,7 @@ const FormHeader = (props) => {
                     className="btn-transparent"
                     label="surveyForm.importLabels"
                     accept=".csv"
-                    onOk={(files) => onLabelsImportFileSelected(files[0])}
+                    onOk={({ files }) => onLabelsImportFileSelected(files[0])}
                   />
                 ),
               },

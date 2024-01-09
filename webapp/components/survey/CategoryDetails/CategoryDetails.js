@@ -3,6 +3,7 @@ import './CategoryDetails.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
+import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
@@ -16,14 +17,13 @@ import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { Checkbox, UploadButton } from '@webapp/components/form'
+import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import { ExtraPropDefsEditor } from '../ExtraPropDefsEditor'
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
-import classNames from 'classnames'
 
 const MAX_LEVELS = 5
 
@@ -71,11 +71,13 @@ const CategoryDetails = (props) => {
           </FormItem>
 
           {!readOnly && (
-            <UploadButton
+            <OpenFileUploadDialogButton
               className="import-btn"
               label="common.csvImport"
               accept=".csv"
-              onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
+              onOk={({ files, onUploadProgress }) =>
+                Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+              }
             />
           )}
           <ButtonDownload
