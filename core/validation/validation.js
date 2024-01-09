@@ -40,9 +40,9 @@ export const messageKeys = ValidatorErrorKeys
 
 export const newInstance = (valid = true, fields = {}, errors = [], warnings = []) => ({
   [keys.valid]: valid,
-  [keys.fields]: fields,
-  [keys.errors]: errors,
-  [keys.warnings]: warnings,
+  ...(A.isEmpty(fields) ? {} : { [keys.fields]: fields }),
+  ...(A.isEmpty(errors) ? {} : { [keys.errors]: errors }),
+  ...(A.isEmpty(warnings) ? {} : { [keys.warnings]: warnings }),
 })
 
 // ====== READ

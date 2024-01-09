@@ -28,6 +28,7 @@ import * as CategoryValidator from '../categoryValidator'
 import * as CategoryExportManager from './categoryExportManager'
 import * as CategoryImportSummaryGenerator from './categoryImportSummaryGenerator'
 import * as CategoryRepository from '../repository/categoryRepository'
+import { CategoryValidation } from '../categoryValidation'
 
 // ====== VALIDATION
 
@@ -205,8 +206,8 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
       { surveyId, categoryUuid, levelUuid, codes: [CategoryItem.getCode(item)] },
       t
     )
-    const validation = CategoryValidator.deleteEmptyLevelError({ category, levelUuid })
-    category = await _updateCategoryValidation({ surveyId, category, validation }, t)
+    const { validation: validationUpdated } = CategoryValidation.deleteEmptyLevelError({ levelUuid })(category)
+    category = await _updateCategoryValidation({ surveyId, category, validation: validationUpdated }, t)
     return { category, item }
   })
 
