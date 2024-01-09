@@ -9,10 +9,12 @@ import { State } from '../../state'
 export const useUploadCategory = ({ setState }) => {
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ categoryUuid, file }) => {
+  return useCallback(async ({ categoryUuid, file, onUploadProgress }) => {
     const formData = objectToFormData({ file })
 
-    const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData)
+    const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData, {
+      onUploadProgress,
+    })
 
     setState(State.assocImportSummary({ summary }))
   }, [])

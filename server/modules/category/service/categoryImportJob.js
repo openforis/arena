@@ -19,9 +19,10 @@ import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
+import { CategoryValidationJob } from './CategoryValidationJob'
 
-export default class CategoryImportJob extends Job {
-  constructor(params, type = CategoryImportJob.type) {
+class CategoryImportInternalJob extends Job {
+  constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)
 
     this.survey = null
@@ -88,16 +89,8 @@ export default class CategoryImportJob extends Job {
 
   async beforeSuccess() {
     await super.beforeSuccess()
-
-    // Validate category
-    this.logDebug('category validation start')
-    this.category = await CategoryManager.validateCategory(
-      { survey: this.survey, categoryUuid: Category.getUuid(this.category) },
-      this.tx
-    )
-    this.logDebug('category validation end')
-
-    this.setResult({
+    this.setContext({
+      survey: this.survey,
       category: this.category,
     })
   }
@@ -279,7 +272,6 @@ export default class CategoryImportJob extends Job {
           reader.cancel()
           return
         }
-
         await this._onRow(itemRow)
       },
       onTotalChange: (total) => {
@@ -320,7 +312,6 @@ export default class CategoryImportJob extends Job {
         }
       }
     }
-
     this.incrementProcessedItems()
   }
 
@@ -367,6 +358,21 @@ export default class CategoryImportJob extends Job {
     this.addError({
       error: Validation.newInstance(false, {}, [{ key, params }]),
     })
+  }
+}
+
+export default class CategoryImportJob extends Job {
+  constructor(params, type = CategoryImportJob.type) {
+    super(type, params, [new CategoryImportInternalJob(params), new CategoryValidationJob(params)])
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    const { category } = this.context
+    return {
+      ...result,
+      category,
+    }
   }
 }
 
