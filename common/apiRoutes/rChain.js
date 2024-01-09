@@ -9,7 +9,7 @@ export const chainStatusExec = (surveyId, chainUuid) => `${getRChainPath(surveyI
 export const chainUserScripts = (surveyId, chainUuid) => `${getRChainPath(surveyId)}/chains/${chainUuid}/userScripts`
 
 // category
-export const categoryItemsData = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}`
+export const categoryItemsCsv = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}.csv`
 
 // taxonomy
 export const taxonomyItemsData = (surveyId, taxonomyUuid) => `${getRChainPath(surveyId)}/taxonomies/${taxonomyUuid}`

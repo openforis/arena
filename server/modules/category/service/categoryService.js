@@ -40,7 +40,14 @@ export const createBatchImportJob = ({ user, surveyId, filePath }) => {
   return job
 }
 
-export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => {
+export const exportCategory = async ({
+  surveyId,
+  categoryUuid,
+  draft,
+  language = null,
+  includeReportingDataCumulativeArea = false,
+  res,
+}) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const fileName = ExportFileNameGenerator.generate({
@@ -50,7 +57,14 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
   })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  await CategoryManager.exportCategoryToStream({ survey, categoryUuid, draft, outputStream: res })
+  await CategoryManager.exportCategoryToStream({
+    survey,
+    categoryUuid,
+    draft,
+    language,
+    includeReportingDataCumulativeArea,
+    outputStream: res,
+  })
 }
 
 export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {

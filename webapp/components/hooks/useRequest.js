@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
  * Sends a request using the specified function and cancels the request on unmount.
  *
  * @param {!object} params - The parameters.
- * @param {boolean} [params.condition=true] - Wheter to execute the request on dependencies update.
+ * @param {boolean} [params.condition=true] - Whether to execute the request on dependencies update.
  * @param {object} [params.defaultValue=null] - The default value returned.
  * @param {Array} [params.dependencies=[]] - Effect dependencies (the request will be performed again when they change).
  * @param {Function} [params.requestFunction] - The request function.

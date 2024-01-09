@@ -70,19 +70,20 @@ export const init = (app) => {
 
   // ====== READ - Category items
   app.get(
-    ApiRoutes.rChain.categoryItemsData(':surveyId', ':categoryUuid'),
+    ApiRoutes.rChain.categoryItemsCsv(':surveyId', ':categoryUuid'),
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
         const { surveyId, categoryUuid, language, draft } = Request.getParams(req)
 
-        const itemsSummary = await CategoryService.fetchCategoryItemsSummary({
+        await CategoryService.exportCategory({
           surveyId,
           categoryUuid,
           language,
           draft,
+          includeReportingDataCumulativeArea: true,
+          res,
         })
-        res.json(itemsSummary)
       } catch (error) {
         next(error)
       }

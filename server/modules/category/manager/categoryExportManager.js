@@ -28,7 +28,10 @@ const categoryItemExportTransformer =
     return obj
   }
 
-export const exportCategoryToStream = async ({ survey, categoryUuid, draft, outputStream }, client = db) => {
+export const exportCategoryToStream = async (
+  { survey, categoryUuid, draft, language = null, includeReportingDataCumulativeArea = false, outputStream },
+  client = db
+) => {
   const surveyId = Survey.getId(survey)
   const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
 
@@ -38,7 +41,9 @@ export const exportCategoryToStream = async ({ survey, categoryUuid, draft, outp
   const { stream: categoryStream, headers } = CategoryRepository.generateCategoryExportStreamAndHeaders({
     surveyId,
     category,
+    defaultLanguage: language,
     languages,
+    includeReportingDataCumulativeArea,
   })
 
   return client.stream(categoryStream, (dbStream) => {
