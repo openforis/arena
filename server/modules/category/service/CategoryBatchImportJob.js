@@ -2,11 +2,11 @@ import * as Survey from '@core/survey/survey'
 
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
-import CategoryImportJob from './categoryImportJob'
+import CategoryImportJob, { CategoryImportInternalJob } from './categoryImportJob'
 
-export default class CategoryBatchImportJob extends CategoryImportJob {
+class CategoryBatchImportInternalJob extends CategoryImportInternalJob {
   constructor(params) {
-    super(params, 'CategoryBatchImportJob')
+    super(params, 'CategoryBatchImportInternalJob')
   }
 
   async createReadStream() {
@@ -24,5 +24,11 @@ export default class CategoryBatchImportJob extends CategoryImportJob {
       stream,
       defaultLang,
     })
+  }
+}
+
+export default class CategoryBatchImportJob extends CategoryImportJob {
+  constructor(params) {
+    super(params, 'CategoryBatchImportJob', CategoryBatchImportInternalJob)
   }
 }
