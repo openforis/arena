@@ -351,10 +351,11 @@ export const updateCategoryItemExtraDefItem = async (
     // - remove unnecessary information (uuid, name)
     // - index stored object by extra def name
     const itemExtraDefsToStore = itemExtraDefsArrayUpdated.reduce(
-      (acc, item) => ({
+      (acc, item, index) => ({
         ...acc,
         [ExtraPropDef.getName(item)]: ExtraPropDef.newItem({
           dataType: ExtraPropDef.getDataType(item),
+          index,
         }),
       }),
       {}
@@ -496,6 +497,7 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
       ...itemExtraDef,
       [Category.reportingDataItemExtraDefKeys.area]: ExtraPropDef.newItem({
         dataType: ExtraPropDef.dataTypes.number,
+        index: Object.values(itemExtraDef).length,
       }),
     }
     categoryUpdated = Category.assocItemExtraDef(itemExtraDefUpdated)(categoryUpdated)
