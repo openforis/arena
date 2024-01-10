@@ -17,7 +17,6 @@ import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
-import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
@@ -40,7 +39,17 @@ export const createBatchImportJob = ({ user, surveyId, filePath }) => {
   return job
 }
 
-export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => {
+export const exportCategory = async ({
+  surveyId,
+  categoryUuid,
+  draft,
+  language = null,
+  includeSingleCode = false,
+  includeCodeJoint = false,
+  includeLevelPosition = false,
+  includeReportingDataCumulativeArea = false,
+  res,
+}) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const fileName = ExportFileNameGenerator.generate({
@@ -50,7 +59,17 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
   })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  await CategoryManager.exportCategoryToStream({ survey, categoryUuid, draft, outputStream: res })
+  await CategoryManager.exportCategoryToStream({
+    survey,
+    categoryUuid,
+    draft,
+    language,
+    includeSingleCode,
+    includeCodeJoint,
+    includeLevelPosition,
+    includeReportingDataCumulativeArea,
+    outputStream: res,
+  })
 }
 
 export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {
@@ -149,13 +168,6 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     return acc
   }, [])
   return samplingPointData
-}
-
-export const fetchCategoryItemsSummary = async ({ surveyId, categoryUuid, language, draft = false }) => {
-  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-  const items = await fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft })
-
-  return CategoryItemsSummaryBuilder.toItemsSummary({ category, items, language })
 }
 
 export const {

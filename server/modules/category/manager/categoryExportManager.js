@@ -1,14 +1,18 @@
+import { Objects, Points } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { CategoryExportFile } from '@core/survey/categoryExportFile'
 
 import { db } from '@server/db/db'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
-import { Objects, Points } from '@openforis/arena-core'
+
+const levelPositionField = 'level'
 
 const categoryItemExportTransformer =
-  ({ category }) =>
+  ({ category, language = null, includeLevelPosition = false }) =>
   (obj) => {
     const extraDefs = Category.getItemExtraDefsArray(category)
     extraDefs.forEach((extraDef) => {
@@ -25,26 +29,96 @@ const categoryItemExportTransformer =
         }
       }
     })
+    if (language) {
+      obj.label = obj[`label_${language}`]
+      obj.description = obj[`description_${language}`]
+    }
+    if (includeLevelPosition) {
+      obj[levelPositionField] = obj['level_index'] + 1
+    }
     return obj
   }
 
-export const exportCategoryToStream = async ({ survey, categoryUuid, draft, outputStream }, client = db) => {
+const getCategoryExportHeaders = ({
+  category,
+  languages = [],
+  language = null,
+  includeSingleCode = false,
+  includeCodeJoint = false,
+  includeLevelPosition = false,
+  includeCumulativeArea = false,
+}) => {
+  const levels = Category.getLevelsArray(category)
+  const flat = levels.length === 1
+  const headers = []
+  if (includeSingleCode) {
+    headers.push('code')
+  }
+  if (includeCodeJoint) {
+    headers.push(CategoryRepository.codeJointField)
+  }
+  if (includeLevelPosition) {
+    headers.push(levelPositionField)
+  }
+  headers.push(...levels.map((level) => CategoryExportFile.getLevelCodeHeader({ level, flat })))
+  if (language) {
+    headers.push('label', 'description')
+  }
+  headers.push(...languages.map((language) => CategoryExportFile.getLabelHeader({ language })))
+  headers.push(...languages.map((language) => CategoryExportFile.getDescriptionHeader({ language })))
+  headers.push(
+    ...Category.getItemExtraDefsArray(category).flatMap((extraPropDef) =>
+      CategoryExportFile.getExtraPropHeaders({ extraPropDef })
+    )
+  )
+  if (includeCumulativeArea) {
+    headers.push(CategoryRepository.cumulativeAreaField)
+  }
+  return headers
+}
+
+export const exportCategoryToStream = async (
+  {
+    survey,
+    categoryUuid,
+    draft,
+    language = null,
+    includeSingleCode = false,
+    includeCodeJoint = false,
+    includeLevelPosition = false,
+    includeReportingDataCumulativeArea = false,
+    outputStream,
+  },
+  client = db
+) => {
   const surveyId = Survey.getId(survey)
   const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+  const includeCumulativeArea = Category.isReportingData(category) && includeReportingDataCumulativeArea
 
   // get survey languages
   const languages = Survey.getLanguages(survey)
 
-  const { stream: categoryStream, headers } = CategoryRepository.generateCategoryExportStreamAndHeaders({
+  const categoryStream = CategoryRepository.generateCategoryExportStream({
     surveyId,
     category,
     languages,
+    includeCumulativeArea,
+  })
+
+  const headers = getCategoryExportHeaders({
+    category,
+    languages,
+    language,
+    includeSingleCode,
+    includeCodeJoint,
+    includeLevelPosition,
+    includeCumulativeArea,
   })
 
   return client.stream(categoryStream, (dbStream) => {
     const csvTransform = CSVWriter.transformJsonToCsv({
       fields: headers,
-      options: { objectTransformer: categoryItemExportTransformer({ category }) },
+      options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
     })
     dbStream.pipe(csvTransform).pipe(outputStream)
   })

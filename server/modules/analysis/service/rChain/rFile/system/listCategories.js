@@ -2,7 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as ApiRoutes from '@common/apiRoutes'
 
-import { arenaGet, dfVar, setVar } from '../../rFunctions'
+import { arenaGetCSV, dfVar, setVar } from '../../rFunctions'
 
 export default class ListCategories {
   constructor(rChain) {
@@ -37,7 +37,7 @@ export default class ListCategories {
 
     // get category items
     const dfCategoryItems = this.getDfCategoryItems(category)
-    const getCategoryItems = arenaGet(ApiRoutes.rChain.categoryItemsData(Survey.getId(survey), categoryUuid), {
+    const getCategoryItems = arenaGetCSV(ApiRoutes.rChain.categoryItemsCsv(Survey.getId(survey), categoryUuid), {
       language: `'${language}'`,
     })
 
