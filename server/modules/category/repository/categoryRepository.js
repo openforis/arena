@@ -384,7 +384,7 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
     }
   )
 
-export const { generateCategoryExportStreamAndHeaders } = CategoryExportRepository
+export const { codeJointField, cumulativeAreaField, generateCategoryExportStream } = CategoryExportRepository
 
 // ============== UPDATE
 
