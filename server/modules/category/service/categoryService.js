@@ -17,7 +17,6 @@ import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
-import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
@@ -45,6 +44,9 @@ export const exportCategory = async ({
   categoryUuid,
   draft,
   language = null,
+  includeSingleCode = false,
+  includeCodeJoint = false,
+  includeLevelPosition = false,
   includeReportingDataCumulativeArea = false,
   res,
 }) => {
@@ -62,6 +64,9 @@ export const exportCategory = async ({
     categoryUuid,
     draft,
     language,
+    includeSingleCode,
+    includeCodeJoint,
+    includeLevelPosition,
     includeReportingDataCumulativeArea,
     outputStream: res,
   })
@@ -163,13 +168,6 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
     return acc
   }, [])
   return samplingPointData
-}
-
-export const fetchCategoryItemsSummary = async ({ surveyId, categoryUuid, language, draft = false }) => {
-  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-  const items = await fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft })
-
-  return CategoryItemsSummaryBuilder.toItemsSummary({ category, items, language })
 }
 
 export const {
