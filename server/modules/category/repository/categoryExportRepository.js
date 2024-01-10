@@ -1,6 +1,7 @@
 import { Schemata } from '@openforis/arena-server'
 
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as DbUtils from '@server/db/dbUtils'
@@ -64,7 +65,9 @@ const generateCategoryExportQuery = ({
   const levels = Category.getLevelsArray(category)
   const extraProps = Category.getItemExtraDefKeys(category)
   const queryPrefix = getQueryPrefix({ surveyId })
-  const codesFields = levels.map((_, index) => `COALESCE(level_codes[${index + 1}], '') AS level_${index + 1}_code`)
+  const codesFields = levels.map(
+    (level, index) => `COALESCE(level_codes[${index + 1}], '') AS ${CategoryLevel.getName(level)}_code`
+  )
   const getLabelsOrDescriptionsFields = (propName, aliasPrefix) =>
     languages.map(
       (lang) => `(${DbUtils.getPropColCombined(propName, draft, 'i.', false)}) ->> '${lang}' AS ${aliasPrefix}_${lang}`

@@ -116,11 +116,14 @@ export const getItemExtraDefKeys = (category) => {
 }
 export const getItemExtraDefsArray = (category) =>
   // add uuid and name to each extra def item definition and put them in a array
-  Object.entries(getItemExtraDef(category)).map(([name, item]) => ({
-    ...item,
-    uuid: uuidv4(),
-    name,
-  }))
+  Object.entries(getItemExtraDef(category))
+    .map(([name, item], index) => ({
+      ...item,
+      uuid: uuidv4(),
+      name,
+      index: ExtraPropDef.getIndex(item) ?? index,
+    }))
+    .sort((itemA, itemB) => ExtraPropDef.getIndex(itemA) - ExtraPropDef.getIndex(itemB))
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 

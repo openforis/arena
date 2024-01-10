@@ -21,7 +21,7 @@ import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
 import { CategoryValidationJob } from './CategoryValidationJob'
 
-class CategoryImportInternalJob extends Job {
+export class CategoryImportInternalJob extends Job {
   constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)
 
@@ -112,6 +112,7 @@ class CategoryImportInternalJob extends Job {
         const itemKey = CategoryImportSummary.getItemKey(item)
         accExtraDef[itemKey] = ExtraPropDef.newItem({
           dataType: CategoryImportSummary.getItemDataType(item),
+          index: Object.values(accExtraDef).length,
         })
       }
       return accExtraDef
@@ -362,8 +363,8 @@ class CategoryImportInternalJob extends Job {
 }
 
 export default class CategoryImportJob extends Job {
-  constructor(params, type = CategoryImportJob.type) {
-    super(type, params, [new CategoryImportInternalJob(params), new CategoryValidationJob(params)])
+  constructor(params, type = CategoryImportJob.type, internalJobConstructor = CategoryImportInternalJob) {
+    super(type, params, [new internalJobConstructor(params), new CategoryValidationJob(params)])
   }
 
   generateResult() {
