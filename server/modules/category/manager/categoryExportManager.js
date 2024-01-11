@@ -43,6 +43,7 @@ const getCategoryExportHeaders = ({
   category,
   languages = [],
   language = null,
+  includeUuid = false,
   includeSingleCode = false,
   includeCodeJoint = false,
   includeLevelPosition = false,
@@ -51,6 +52,9 @@ const getCategoryExportHeaders = ({
   const levels = Category.getLevelsArray(category)
   const flat = levels.length === 1
   const headers = []
+  if (includeUuid) {
+    headers.push('uuid')
+  }
   if (includeSingleCode) {
     headers.push('code')
   }
@@ -83,6 +87,7 @@ export const exportCategoryToStream = async (
     categoryUuid,
     draft,
     language = null,
+    includeUuid = false,
     includeSingleCode = false,
     includeCodeJoint = false,
     includeLevelPosition = false,
@@ -109,6 +114,7 @@ export const exportCategoryToStream = async (
     category,
     languages,
     language,
+    includeUuid,
     includeSingleCode,
     includeCodeJoint,
     includeLevelPosition,
