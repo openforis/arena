@@ -79,6 +79,7 @@ const generateCategoryExportQuery = ({
   )
 
   const selectFields = [
+    'i.uuid',
     'code',
     'l.index as level_index',
     `ARRAY_TO_STRING(level_codes, '${codeJointSeparator}') AS ${codeJointField}`,
