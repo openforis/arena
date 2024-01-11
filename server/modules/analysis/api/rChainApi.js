@@ -81,6 +81,7 @@ export const init = (app) => {
           categoryUuid,
           language,
           draft,
+          includeUuid: true,
           includeSingleCode: true,
           includeCodeJoint: true,
           includeLevelPosition: true,
