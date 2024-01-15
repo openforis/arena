@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
+import { Schemata } from '@common/model/db'
 import {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
@@ -19,6 +20,8 @@ import * as Category from '../../../../core/survey/category'
 import * as CategoryLevel from '../../../../core/survey/categoryLevel'
 import * as CategoryItem from '../../../../core/survey/categoryItem'
 import * as CategoryExportRepository from './categoryExportRepository'
+
+const maxCategoryItemsInIndex = 10000
 
 // ============== CREATE
 
@@ -352,8 +355,36 @@ export const fetchItemsByLevelIndex = async (
   )
 }
 
-export const fetchIndex = async (surveyId, draft = false, client = db) =>
-  client.map(
+export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const counts = await client.many(
+    `SELECT l.category_uuid, COUNT(i.*) 
+    FROM ${schema}.category_item i
+     JOIN ${schema}.category_level l 
+        ON l.uuid = i.level_uuid
+    ${draft ? '' : `WHERE i.props::text <> '{}'::text`}
+    GROUP BY l.category_uuid`
+  )
+  return counts.reduce((acc, row) => {
+    acc[row.category_uuid] = Number(row.count)
+    return acc
+  }, {})
+}
+
+const fetchCategoryUuidsExceedingMaxItems = async ({ surveyId, draft }, client) => {
+  const itemsCountIndexedByCategoryUuid = await fetchItemsCountIndexedByCategoryUuid({ surveyId, draft }, client)
+  return Object.entries(itemsCountIndexedByCategoryUuid).reduce((acc, [categoryUuid, count]) => {
+    if (count > maxCategoryItemsInIndex) {
+      acc.push(categoryUuid)
+    }
+    return acc
+  }, [])
+}
+
+export const fetchIndex = async (surveyId, draft = false, client = db) => {
+  const categoryUuidsExceedingMaxItems = await fetchCategoryUuidsExceedingMaxItems({ surveyId, draft }, client)
+
+  return client.map(
     `
     SELECT 
       l.category_uuid,
@@ -369,9 +400,10 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
        ${getSurveyDBSchema(surveyId)}.category_level l
     ON
       i.level_uuid = l.uuid
+    WHERE l.category_uuid NOT IN ($1:csv)
     ORDER BY l.category_uuid, i.id
     `,
-    [],
+    [categoryUuidsExceedingMaxItems],
     (row) => {
       const rowTransformed = dbTransformCallback(row, draft, true)
       Objects.setInPath({
@@ -383,6 +415,7 @@ export const fetchIndex = async (surveyId, draft = false, client = db) =>
       return rowTransformed
     }
   )
+}
 
 export const { codeJointField, cumulativeAreaField, generateCategoryExportStream } = CategoryExportRepository
 
