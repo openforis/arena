@@ -34,7 +34,7 @@ const _getType = (nodeDef, node) => {
 const _getColumnNames = ({ nodeDef, type }) =>
   type === types.insert
     ? [
-        DataTable.columnNameUuuid,
+        DataTable.columnNameUuid,
         ...(NodeDef.isRoot(nodeDef)
           ? [
               DataTable.columnNameRecordUuid,
@@ -43,7 +43,7 @@ const _getColumnNames = ({ nodeDef, type }) =>
               DataTable.columnNameRecordOwnerUuid,
             ]
           : []),
-        DataTable.columnNameParentUuuid,
+        DataTable.columnNameParentUuid,
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getNames(nodeDef)
           : []),
