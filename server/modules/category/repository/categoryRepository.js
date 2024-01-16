@@ -381,8 +381,13 @@ const fetchCategoryUuidsExceedingMaxItems = async ({ surveyId, draft }, client) 
   }, [])
 }
 
-export const fetchIndex = async (surveyId, draft = false, client = db) => {
-  const categoryUuidsExceedingMaxItems = await fetchCategoryUuidsExceedingMaxItems({ surveyId, draft }, client)
+export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories = true }, client = db) => {
+  const categoryUuidsExceedingMaxItems = includeBigCategories
+    ? []
+    : await fetchCategoryUuidsExceedingMaxItems({ surveyId, draft }, client)
+  const allCategoriesIncluded = includeBigCategories || categoryUuidsExceedingMaxItems.length === 0
+  const whereCondition = allCategoriesIncluded ? '' : 'WHERE l.category_uuid NOT IN ($1:csv)'
+  const queryParams = allCategoriesIncluded ? [] : [categoryUuidsExceedingMaxItems]
 
   return client.map(
     `
@@ -400,10 +405,10 @@ export const fetchIndex = async (surveyId, draft = false, client = db) => {
        ${getSurveyDBSchema(surveyId)}.category_level l
     ON
       i.level_uuid = l.uuid
-    WHERE l.category_uuid NOT IN ($1:csv)
+    ${whereCondition}
     ORDER BY l.category_uuid, i.id
     `,
-    [categoryUuidsExceedingMaxItems],
+    queryParams,
     (row) => {
       const rowTransformed = dbTransformCallback(row, draft, true)
       Objects.setInPath({

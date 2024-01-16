@@ -3,22 +3,17 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import * as Node from '@core/record/node'
 import * as DataRow from './dataRow'
 import * as DataCol from './dataCol'
 
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const columnNameUuuid = 'uuid'
+export const columnNameUuid = 'uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const columnNameParentUuuid = 'parent_uuid'
-/**
- * @deprecated - Use TableDataNodeDef.
- */
-export const columnNameAncestorUuid = 'ancestor_uuid'
+export const columnNameParentUuid = 'parent_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
@@ -60,8 +55,8 @@ export const getName = NodeDefTable.getTableName
  * @deprecated - Use TableDataNodeDef.
  */
 export const getColumnNames = ({ survey, nodeDef, includeAnalysis = false }) => [
-  columnNameUuuid,
-  columnNameParentUuuid,
+  columnNameUuid,
+  columnNameParentUuid,
   ...(NodeDef.isRoot(nodeDef)
     ? [columnNameRecordUuid, columnNameRecordCycle, columnNameRecordStep, columnNameRecordOwnerUuid]
     : []),
@@ -74,19 +69,13 @@ export const getColumnNames = ({ survey, nodeDef, includeAnalysis = false }) => 
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
-  const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
-
+export const getRowValues = ({ survey, nodeDef, nodeRow, nodeDefColumns }) => {
+  const rowValues = DataRow.getValues({ survey, nodeRow, nodeDefColumns })
   return [
-    Node.getUuid(nodeRow),
-    nodeRow[columnNameAncestorUuid],
-    ...(NodeDef.isRoot(nodeDefRow)
-      ? [
-          nodeRow[columnNameRecordUuid],
-          nodeRow[columnNameRecordCycle],
-          nodeRow[columnNameRecordStep],
-          nodeRow[columnNameRecordOwnerUuid],
-        ]
+    nodeRow.uuid,
+    nodeRow.ancestorUuid,
+    ...(NodeDef.isRoot(nodeDef)
+      ? [nodeRow.recordUuid, nodeRow.recordCycle, nodeRow.recordStep, nodeRow.recordOwnerUuid]
       : []),
     ...rowValues,
   ]

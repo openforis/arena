@@ -8,6 +8,7 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
 export const tableColumnsInsert = [
@@ -35,6 +36,14 @@ const dbTransformCallback = (node) => {
 }
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
+
+const _getAncestorUuidSelectField = (ancestorDef) => {
+  const nodeAncestorEntityHierarchyIndex = ancestorDef ? NodeDef.getMetaHierarchy(ancestorDef).length : null
+  return nodeAncestorEntityHierarchyIndex === null
+    ? 'null'
+    : `(n.meta -> '${Node.metaKeys.hierarchy}' ->> ${nodeAncestorEntityHierarchyIndex})::uuid`
+}
+
 /**
  * It builds the node select query.
  *
@@ -43,9 +52,16 @@ const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null
  * @param {boolean} [params.includeRefData = true] - If true, category item and taxon item associated to the node value will be fetched.
  * @param {boolean} [params.draft = true] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
  * @param {boolean} [params.excludeRecordUuid = false] - If true, the record uuid won't be included in the fetch (useful when selecting by record_uuid to make the query faster).
+ * @param {boolean} [params.ancestorDef = null] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
  * @returns {Array} - List of fetched nodes.
  */
-const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, excludeRecordUuid = false }) => {
+export const getNodeSelectQuery = ({
+  surveyId,
+  includeRefData = true,
+  draft = true,
+  excludeRecordUuid = false,
+  ancestorDef = null,
+}) => {
   const schema = getSurveyDBSchema(surveyId)
 
   const selectFields = (excludeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect)
@@ -56,6 +72,8 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, ex
     return `SELECT ${selectFields} FROM ${schema}.node n`
   }
 
+  const ancestorUuidField = _getAncestorUuidSelectField(ancestorDef)
+
   // include ref data (category items, taxa, etc.)
 
   const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
@@ -65,6 +83,10 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, ex
   return `
     SELECT
         ${selectFields},
+        r.cycle AS record_cycle,
+        r.step AS record_step,
+        r.owner_uuid AS record_owner_uuid,
+        ${ancestorUuidField} AS ancestor_uuid,
         CASE
             WHEN n.value->>'taxonUuid' IS NOT NULL
             THEN json_build_object( 'taxon',json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid, 'props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') )
@@ -75,6 +97,10 @@ const _getNodeSelectQuery = ({ surveyId, includeRefData = true, draft = true, ex
         (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})
     FROM
         ${schema}.node n
+    JOIN
+        ${schema}.record r 
+    ON 
+        r.uuid = n.record_uuid
     LEFT OUTER JOIN
         ${schema}.category_item c
     ON
@@ -154,7 +180,7 @@ export const fetchNodesByRecordUuid = async (
 ) =>
   client.map(
     `
-    ${_getNodeSelectQuery({ surveyId, includeRefData, draft, excludeRecordUuid: true })}
+    ${getNodeSelectQuery({ surveyId, includeRefData, draft, excludeRecordUuid: true })}
     WHERE n.record_uuid = $1
     order by n.date_created
     `,
@@ -178,7 +204,7 @@ export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
 export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft }, client = db) =>
   client.map(
     `
-    ${_getNodeSelectQuery({ surveyId, draft })}
+    ${getNodeSelectQuery({ surveyId, draft })}
     WHERE n.uuid IN ($1:list)
   `,
     [nodeUuids],
@@ -191,7 +217,7 @@ export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, 
 export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   client.map(
     `
-    ${_getNodeSelectQuery({ surveyId, draft: false })}
+    ${getNodeSelectQuery({ surveyId, draft: false })}
     WHERE n.record_uuid = $1
       AND n.parent_uuid ${nodeUuid ? '= $2' : 'is null'}
       AND n.node_def_uuid IN ($3:csv)`,
