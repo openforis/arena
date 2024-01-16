@@ -1064,8 +1064,8 @@ $t(common.cantUndoWarning)`,
     invalid: 'Invalid expression: {{details}}',
     missingFunctionParameters: 'Missing function parameters',
     undefinedFunction: 'Undefined function: {{name}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   },
 
   // ====== Help views
@@ -1104,9 +1104,11 @@ $t(common.appNameFull)
       categoryItemProp:
         'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
       distance: 'Returns the distance (in meters) between the specified coordinates',
+      first: 'Returns the first value or node of the specified multiple attribute or entity',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
+      last: 'Returns the last value or node of the specified multiple attribute or entity',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
       max: 'Take the maximum of the arguments',
@@ -1743,8 +1745,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
     invalidSyntax: 'Expression syntax is invalid',
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArgs}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArgs}} (got {{numArgs}})',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
     record: {
       entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
     },
