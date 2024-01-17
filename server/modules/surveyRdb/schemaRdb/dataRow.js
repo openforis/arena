@@ -1,16 +1,14 @@
 import * as R from 'ramda'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 import * as DataCol from './dataCol'
 
 const getNodeCol = (nodeDefCol, nodeRow) => {
   const nodeDefUuidCol = NodeDef.getUuid(nodeDefCol)
-  const nodeDefUuidRow = Node.getNodeDefUuid(nodeRow)
-  // Attribute column in multiple attribute table (value of its own table)
-  const nodeCol = nodeDefUuidRow === nodeDefUuidCol ? nodeRow : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
+  const nodeDefUuidRow = nodeRow.node_def_uuid
 
-  return nodeCol
+  // Attribute column in multiple attribute table (value of its own table)
+  return nodeDefUuidRow === nodeDefUuidCol ? nodeRow : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
 }
 
 export const getValues = ({ survey, nodeRow, nodeDefColumns }) => {

@@ -17,6 +17,10 @@ export const columnNameParentUuid = 'parent_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
  */
+export const columnNameAncestorUuid = 'ancestor_uuid'
+/**
+ * @deprecated - Use TableDataNodeDef.
+ */
 export const columnNameRecordUuid = 'record_uuid'
 /**
  * @deprecated - Use TableDataNodeDef.
@@ -72,10 +76,15 @@ export const getColumnNames = ({ survey, nodeDef, includeAnalysis = false }) => 
 export const getRowValues = ({ survey, nodeDef, nodeRow, nodeDefColumns }) => {
   const rowValues = DataRow.getValues({ survey, nodeRow, nodeDefColumns })
   return [
-    nodeRow.uuid,
-    nodeRow.ancestorUuid,
+    nodeRow[columnNameUuid],
+    nodeRow[columnNameAncestorUuid],
     ...(NodeDef.isRoot(nodeDef)
-      ? [nodeRow.recordUuid, nodeRow.recordCycle, nodeRow.recordStep, nodeRow.recordOwnerUuid]
+      ? [
+          nodeRow[columnNameRecordUuid],
+          nodeRow[columnNameRecordCycle],
+          nodeRow[columnNameRecordStep],
+          nodeRow[columnNameRecordOwnerUuid],
+        ]
       : []),
     ...rowValues,
   ]

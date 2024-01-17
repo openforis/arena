@@ -1,6 +1,5 @@
 import { insertAllQuery } from '@server/db/dbUtils'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
@@ -12,12 +11,10 @@ import * as NodeRepository from '@server/modules/record/repository/nodeRepositor
 import * as DataTable from '../schemaRdb/dataTable'
 
 const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity, nodeDefColumnsUuids }) => {
-  const nodesSelect = `${NodeRepository.getNodeSelectQuery({
-    surveyId,
-    includeRefData: true,
-    excludeRecordUuid: false,
-    ancestorDef: nodeDefAncestorMultipleEntity,
-  })}
+  const getNodeSelectQuery = (ancestorDef) =>
+    NodeRepository.getNodeSelectQuery({ surveyId, includeRefData: true, includeRecordInfo: true, ancestorDef })
+
+  const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
     WHERE n.node_def_uuid = $1
     ORDER BY n.id`
 
@@ -25,12 +22,8 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
     return nodesSelect
   }
 
-  const childrenNodesSelect = NodeRepository.getNodeSelectQuery({
-    surveyId,
-    includeRefData: true,
-    excludeRecordUuid: false,
-    ancestorDef: nodeDefContext,
-  })
+  const childrenNodesSelect = getNodeSelectQuery(nodeDefContext)
+
   // join node table with node table itself to get children attribute values
 
   return `WITH n AS (${nodesSelect}), 
@@ -48,29 +41,19 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
             json_object_agg(c.node_def_uuid::text, json_build_object(
                 'uuid', c.uuid, 
                 'nodeDefUuid', c.node_def_uuid, 
-                'value', c.value,
+                'value', c.value, 
                 'refData', c.ref_data
             )) AS children
           FROM c
           WHERE
-            c.ancestor_uuid IN (SELECT uuid FROM n)
-            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($2:csv)' : ''}
-            AND c.value IS NOT NULL
+            c.value IS NOT NULL
+            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($2:csv)' : ''} 
           GROUP BY
             c.ancestor_uuid
         ) c
       ON
         c.ancestor_uuid = n.uuid`
 }
-
-const selectQueryCallback = (row) => ({
-  // camelize everything but "children" because it is an object indexed by uuid and the uuid itself would be camelized
-  ...A.camelizePartial({ skip: ['children'] })(row),
-  children: Object.entries(row.children ?? {}).reduce((acc, [childDefUuid, childNode]) => {
-    acc[childDefUuid] = A.camelize(childNode)
-    return acc
-  }, {}),
-})
 
 export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, client) => {
   const surveyId = Survey.getId(survey)
@@ -103,13 +86,11 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
     const offset = i * limit
 
     // 2. fetch nodes
-    const nodes = await client.map(
+    const nodes = await client.any(
       `SELECT * FROM ${viewName} 
       ORDER BY id 
       OFFSET ${offset} 
-      LIMIT ${limit}`,
-      [],
-      selectQueryCallback
+      LIMIT ${limit}`
     )
 
     if (stopIfFunction?.()) {

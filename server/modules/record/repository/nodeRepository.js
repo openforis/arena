@@ -8,8 +8,16 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as Taxon from '@core/survey/taxon'
+
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
+
+const { keys: refDataKeys } = NodeRefData
+const { keys: categoryItemKeys } = CategoryItem
+const { keys: taxonKeys } = Taxon
 
 export const tableColumnsInsert = [
   'uuid',
@@ -60,59 +68,59 @@ export const getNodeSelectQuery = ({
   includeRefData = true,
   draft = true,
   excludeRecordUuid = false,
+  includeRecordInfo = false,
   ancestorDef = null,
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (excludeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect)
-    .map((field) => `n.${field}`)
-    .join(', ')
+  const selectFields = (excludeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect).map(
+    (field) => `n.${field}`
+  )
 
-  if (!includeRefData) {
+  selectFields.push(`(SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})`)
+
+  const fromParts = [`${schema}.node n`]
+
+  if (!includeRefData && !includeRecordInfo) {
     return `SELECT ${selectFields} FROM ${schema}.node n`
   }
 
-  const ancestorUuidField = _getAncestorUuidSelectField(ancestorDef)
+  if (includeRecordInfo) {
+    selectFields.push(
+      'r.cycle AS record_cycle',
+      'r.step AS record_step',
+      'r.owner_uuid AS record_owner_uuid',
+      `${_getAncestorUuidSelectField(ancestorDef)} AS ancestor_uuid`
+    )
+    fromParts.push(`JOIN ${schema}.record r ON r.uuid = n.record_uuid`)
+  }
 
-  // include ref data (category items, taxa, etc.)
+  if (includeRefData) {
+    // include ref data (category items, taxa, etc.)
 
-  const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
-  const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
-  const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
+    const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
+    const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
+    const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
 
-  return `
-    SELECT
-        ${selectFields},
-        r.cycle AS record_cycle,
-        r.step AS record_step,
-        r.owner_uuid AS record_owner_uuid,
-        ${ancestorUuidField} AS ancestor_uuid,
-        CASE
-            WHEN n.value->>'taxonUuid' IS NOT NULL
-            THEN json_build_object( 'taxon',json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid, 'props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') )
-            WHEN n.value->>'itemUuid' IS NOT NULL
-            THEN json_build_object( 'category_item',json_build_object('id',c.id, 'uuid',c.uuid, 'level_uuid',c.level_uuid, 'parent_uuid',c.parent_uuid, 'props',${propsCategoryItem}) )
-            ELSE NULL
-        END AS ref_data,
-        (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})
-    FROM
-        ${schema}.node n
-    JOIN
-        ${schema}.record r 
-    ON 
-        r.uuid = n.record_uuid
-    LEFT OUTER JOIN
-        ${schema}.category_item c
-    ON
-        (n.value->>'${Node.valuePropsCode.itemUuid}')::uuid = c.uuid
-    LEFT OUTER JOIN
-        ${schema}.taxon t
-    ON
-        (n.value->>'${Node.valuePropsTaxon.taxonUuid}')::uuid = t.uuid
-    LEFT OUTER JOIN
-        ${schema}.taxon_vernacular_name v
-    ON
-        (n.value->>'${Node.valuePropsTaxon.vernacularNameUuid}')::uuid = v.uuid`
+    selectFields.push(
+      ` CASE
+          WHEN n.value->>'taxonUuid' IS NOT NULL
+          THEN json_build_object('${refDataKeys.taxon}', json_build_object('id',t.id, 'uuid',t.uuid, '${taxonKeys.taxonomyUuid}',t.taxonomy_uuid, 'props',${propsTaxon}, '${taxonKeys.vernacularNameUuid}',v.uuid, '${taxonKeys.vernacularLanguage}',(${propsVernacularName})->>'lang', '${taxonKeys.vernacularName}', (${propsVernacularName})->>'name') )
+          WHEN n.value->>'itemUuid' IS NOT NULL
+          THEN json_build_object('${refDataKeys.categoryItem}', json_build_object('id',c.id, 'uuid', c.uuid, '${categoryItemKeys.levelUuid}', c.level_uuid, '${categoryItemKeys.parentUuid}', c.parent_uuid, 'props',${propsCategoryItem}) )
+          ELSE NULL
+      END AS ref_data`
+    )
+    fromParts.push(`
+      LEFT OUTER JOIN ${schema}.category_item c
+      ON (n.value->>'${Node.valuePropsCode.itemUuid}')::uuid = c.uuid
+      LEFT OUTER JOIN ${schema}.taxon t
+      ON (n.value->>'${Node.valuePropsTaxon.taxonUuid}')::uuid = t.uuid
+      LEFT OUTER JOIN ${schema}.taxon_vernacular_name v
+      ON (n.value->>'${Node.valuePropsTaxon.vernacularNameUuid}')::uuid = v.uuid`)
+  }
+
+  return `SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
 }
 
 // ============== CREATE
