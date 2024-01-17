@@ -357,7 +357,7 @@ export const fetchItemsByLevelIndex = async (
 
 export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = false }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const counts = await client.many(
+  const counts = await client.any(
     `SELECT l.category_uuid, COUNT(i.*) 
     FROM ${schema}.category_item i
      JOIN ${schema}.category_level l 
