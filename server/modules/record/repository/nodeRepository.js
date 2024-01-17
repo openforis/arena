@@ -81,10 +81,6 @@ export const getNodeSelectQuery = ({
 
   const fromParts = [`${schema}.node n`]
 
-  if (!includeRefData && !includeRecordInfo) {
-    return `SELECT ${selectFields} FROM ${schema}.node n`
-  }
-
   if (includeRecordInfo) {
     selectFields.push(
       'r.cycle AS record_cycle',
