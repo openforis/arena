@@ -4,6 +4,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as NodeRefData from '@core/record/nodeRefData'
+import * as Node from '@core/record/node'
 
 import * as SurveySchemaRepository from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
@@ -39,10 +41,10 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
           SELECT
             c.ancestor_uuid,
             json_object_agg(c.node_def_uuid::text, json_build_object(
-                'uuid', c.uuid, 
-                'nodeDefUuid', c.node_def_uuid, 
-                'value', c.value, 
-                'refData', c.ref_data
+                '${Node.keys.uuid}', c.uuid,
+                '${Node.keys.nodeDefUuid}', c.node_def_uuid,
+                '${Node.keys.value}', c.value,
+                '${NodeRefData.keys.refData}', c.ref_data
             )) AS children
           FROM c
           WHERE
