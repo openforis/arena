@@ -2,6 +2,7 @@ export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
   fetchCategories,
+  fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
   fetchCategoryItems,

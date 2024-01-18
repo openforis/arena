@@ -14,6 +14,7 @@ export const keys = {
   levels: 'levels',
   props: ObjectUtils.keys.props,
   items: 'items',
+  itemsCount: 'itemsCount', // available only in data entry
   published: ObjectUtils.keys.published,
   levelsCount: 'levelsCount', // populated only on fetch
 }
@@ -57,6 +58,8 @@ export const isHierarchical = (category) => !isFlat(category)
 
 export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
+
+export const getItemsCount = R.propOr(-1, keys.itemsCount)
 
 // ====== UPDATE
 export const assocProp =
@@ -142,6 +145,8 @@ export const newCategory = (props = {}, levels = null) => {
     [keys.levels]: levels || [newLevel(category)],
   }
 }
+
+export const assocItemsCount = (count) => R.assoc(keys.itemsCount, count)
 
 // UTILS
 export const isLevelDeleteAllowed = (level) => (category) =>

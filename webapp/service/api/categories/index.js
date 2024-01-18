@@ -15,6 +15,15 @@ export const fetchCategories = async ({ surveyId, draft = true, validate = false
   return categories
 }
 
+export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = true, search = '' }) => {
+  const {
+    data: { list: categories },
+  } = await axios.get(`/api/survey/${surveyId}/categories/items-count`, {
+    params: { draft, search },
+  })
+  return categories
+}
+
 export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, validate = true }) => {
   const {
     data: { category },

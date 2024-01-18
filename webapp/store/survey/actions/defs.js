@@ -1,4 +1,6 @@
 import * as ObjectUtils from '@core/objectUtils'
+import * as Category from '@core/survey/category'
+
 import * as API from '@webapp/service/api'
 import { LoaderActions } from '@webapp/store/ui/loader'
 
@@ -19,16 +21,21 @@ export const initSurveyDefs =
 
       const { nodeDefs, nodeDefsValidation } = await API.fetchNodeDefs({ surveyId, params })
 
-      const categories = ObjectUtils.toUuidIndexedObj(await API.fetchCategories({ surveyId, draft }))
-      const taxonomies = ObjectUtils.toUuidIndexedObj(await API.fetchTaxonomies({ surveyId, draft }))
+      const itemsCountByCategoryUuid = await API.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
+      const categories = await API.fetchCategories({ surveyId, draft }).map((category) => {
+        const itemsCount = itemsCountByCategoryUuid[Category.getUuid(category)]
+        return Category.assocItemsCount(itemsCount)(category)
+      })
+
+      const taxonomies = await API.fetchTaxonomies({ surveyId, draft })
 
       dispatch({
         type: surveyDefsLoad,
         draft,
-        categories,
+        categories: ObjectUtils.toUuidIndexedObj(categories),
         nodeDefs,
         nodeDefsValidation,
-        taxonomies,
+        taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies),
       })
       dispatch(LoaderActions.hideLoader())
     }
