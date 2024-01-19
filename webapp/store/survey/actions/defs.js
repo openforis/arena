@@ -22,7 +22,7 @@ export const initSurveyDefs =
       const { nodeDefs, nodeDefsValidation } = await API.fetchNodeDefs({ surveyId, params })
 
       const itemsCountByCategoryUuid = await API.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
-      const categories = await API.fetchCategories({ surveyId, draft }).map((category) => {
+      const categories = (await API.fetchCategories({ surveyId, draft })).map((category) => {
         const itemsCount = itemsCountByCategoryUuid[Category.getUuid(category)]
         return Category.assocItemsCount(itemsCount)(category)
       })
