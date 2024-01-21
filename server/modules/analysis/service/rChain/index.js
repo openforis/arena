@@ -21,6 +21,7 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
+import { RecordsProvider } from './RecordsProvider'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
@@ -85,7 +86,11 @@ export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid
     const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entityDef, analysisNodeDefs }, tx)
     const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes({ survey, analysisNodeDefs }, tx)
 
+    const recordsProvider = new RecordsProvider({ surveyId, tx })
+
     await CSVReader.createReaderFromStream(stream, null, async (row) => {
+      const { record_uuid: recordUuid } = row
+      const record = await recordsProvider.getOrFetch(recordUuid)
       await massiveUpdateData.push(row)
       await massiveUpdateNodes.push(row)
     }).start()
