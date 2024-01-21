@@ -1,3 +1,4 @@
+import * as Record from '@core/record/record'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { ItemsCache } from './ItemsCache'
 
@@ -17,5 +18,9 @@ export class RecordsProvider {
       this._recordsCache.add(recordUuid, record)
     }
     return record
+  }
+
+  add(record) {
+    this._recordsCache.add(Record.getUuid(record), record)
   }
 }

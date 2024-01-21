@@ -22,18 +22,22 @@ export default class DataImportJob extends DataImportBaseJob {
     this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
   }
 
+  async onStart() {
+    await super.onStart()
+    await this.fetchSurvey()
+  }
+
   async execute() {
     super.execute()
 
     const { context } = this
     const { abortOnErrors, dryRun } = context
 
-    await this.fetchSurvey()
-
     this.validateParameters()
 
     await this.fetchRecordsSummary()
 
+    this.csvReader = await this.createCsvReader()
     await this.startCsvReader()
 
     if (!this.hasErrors() && this.processed === 0) {
@@ -92,19 +96,21 @@ export default class DataImportJob extends DataImportBaseJob {
     this.setContext({ recordsSummary: recordsSummary.list })
   }
 
-  async startCsvReader() {
+  async createCsvReader() {
     const { cycle, nodeDefUuid, filePath, survey } = this.context
 
-    try {
-      this.csvReader = await DataImportFileReader.createReader({
-        filePath,
-        survey,
-        cycle,
-        nodeDefUuid,
-        onRowItem: async (item) => this.onRowItem(item),
-        onTotalChange: (total) => (this.total = total),
-      })
+    return DataImportFileReader.createReader({
+      filePath,
+      survey,
+      cycle,
+      nodeDefUuid,
+      onRowItem: async (item) => this.onRowItem(item),
+      onTotalChange: (total) => (this.total = total),
+    })
+  }
 
+  async startCsvReader() {
+    try {
       await this.csvReader.start()
     } catch (e) {
       const errorKey = e.key || e.toString()
