@@ -5,16 +5,14 @@ import * as Record from '@core/record/record'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import { DataImportFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import FileZip from '@server/utils/file/fileZip'
 
-import * as AnalysisManager from '../../manager'
 import { RecordsProvider } from './RecordsProvider'
 
 export default class PersistResultsJob extends DataImportJob {
   async onStart() {
     const { surveyId, tx } = this
-    const { chainUuid, cycle, nodeDefUuid, filePath } = this.context
+    const { nodeDefUuid, filePath } = this.context
     await super.onStart()
 
     // survey is fetched after onStart is called
@@ -28,16 +26,13 @@ export default class PersistResultsJob extends DataImportJob {
     const entityDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const zipEntryName = `${NodeDef.getName(entityDef)}.csv`
     this.stream = await this.fileZip.getEntryStream(zipEntryName)
-
-    const chain = await AnalysisManager.fetchChain({ surveyId, chainUuid }, tx)
-    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity: entityDef, chain, cycle, chainUuid }, tx)
   }
 
   async fetchSurvey() {
     const { surveyId, tx } = this
     const { cycle } = this.context
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       {
         surveyId,
         cycle,
@@ -47,7 +42,6 @@ export default class PersistResultsJob extends DataImportJob {
       },
       tx
     )
-    this.setContext({ survey })
   }
 
   async createCsvReader() {
@@ -58,8 +52,8 @@ export default class PersistResultsJob extends DataImportJob {
       survey,
       cycle,
       nodeDefUuid,
-      onRowItem: this.onRowItem.bind(this),
-      // onTotalChange: (total) => (this.total = total),
+      onRowItem: async (item) => this.onRowItem(item),
+      onTotalChange: (total) => (this.total = total),
       includeAnalysis: true,
       validateHeaders: false,
     })
@@ -68,21 +62,31 @@ export default class PersistResultsJob extends DataImportJob {
   async onRowItem(item) {
     const { survey } = this.context
     const { errors, row, valuesByDefUuid } = item
+
+    if (errors.length > 0) {
+      errors.forEach((error) => {
+        this._addError(error.key || error.toString(), error.params)
+      })
+      await this.setStatusFailed()
+      return
+    }
     const { record_uuid: recordUuid, parent_uuid: entityUuid } = row
     const record = await this.recordsProvider.getOrFetch(recordUuid)
     const entity = Record.getNodeByUuid(entityUuid)(record)
-    const updateResultUpdateAttributes = await Record.updateAttributesInEntityWithValues({
+    const { nodes: nodesUpdated, record: recordUpdated } = await Record.updateAttributesInEntityWithValues({
       survey,
       entity,
       valuesByDefUuid,
       sideEffect: true,
     })(record)
 
-    this.currentRecord = updateResultUpdateAttributes.record
-    this.recordsProvider.add(this.currentRecord)
+    this.currentRecord = recordUpdated
+    this.recordsProvider.add(recordUpdated)
 
-    // await massiveUpdateData.push(row)
-    // await massiveUpdateNodes.push(row)
+    await this.persistUpdatedNodes({ nodesUpdated })
+
+    // current record could have been changed (e.g. node flags removed etc): update records cache too
+    this.recordsProvider.add(this.currentRecord)
   }
 
   async onEnd() {

@@ -15,7 +15,7 @@ export class RecordsProvider {
 
     if (!record) {
       record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
-      this._recordsCache.add(recordUuid, record)
+      this.add(record)
     }
     return record
   }

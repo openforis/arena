@@ -24,7 +24,8 @@ export default class DataImportJob extends DataImportBaseJob {
 
   async onStart() {
     await super.onStart()
-    await this.fetchSurvey()
+    const survey = await this.fetchSurvey()
+    this.setContext({ survey })
   }
 
   async execute() {
@@ -71,11 +72,10 @@ export default class DataImportJob extends DataImportBaseJob {
     const { surveyId, tx } = this
     const { cycle } = this.context
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: false, advanced: true },
       tx
     )
-    this.setContext({ survey })
   }
 
   async fetchRecordsSummary() {

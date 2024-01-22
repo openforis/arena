@@ -140,7 +140,9 @@ export const init = (app) => {
       try {
         const filePath = Request.getFilePath(req)
         const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
-        await AnalysisService.persistResults({ surveyId, cycle, entityDefUuid, chainUuid, filePath })
+        const user = Request.getUser(req)
+
+        await AnalysisService.persistResults({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath })
 
         Response.sendOk(res)
       } catch (e) {
