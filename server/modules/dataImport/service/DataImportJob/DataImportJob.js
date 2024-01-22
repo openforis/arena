@@ -14,6 +14,8 @@ import { DataImportFileReader } from './dataImportFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
 import DataImportBaseJob from './DataImportBaseJob'
 
+const defaultErrorKey = 'error'
+
 export default class DataImportJob extends DataImportBaseJob {
   constructor(params, type = DataImportJob.type) {
     super(type, params)
@@ -246,8 +248,12 @@ export default class DataImportJob extends DataImportBaseJob {
 
   _addError(key, params = {}) {
     this.addError({
-      error: Validation.newInstance(false, {}, [{ key, params }]),
+      [defaultErrorKey]: Validation.newInstance(false, {}, [{ key, params }]),
     })
+  }
+
+  getError() {
+    return Object.values(this.errors)[0]?.[defaultErrorKey]
   }
 }
 
