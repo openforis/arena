@@ -3,11 +3,12 @@ import * as PromiseUtils from '@core/promiseUtils'
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
-import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordStep from '@core/record/recordStep'
+import { ValidationUtils } from '@core/validation/validationUtils'
+import i18n from '@core/i18n/i18nFactory'
 
 import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
@@ -21,6 +22,7 @@ import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbMa
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
+import PersistResultsJob from './PersistResultsJob'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
   new RChain(surveyId, cycle, chainUuid, serverUrl).init()
@@ -56,45 +58,14 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
 
 // ==== UPDATE
 
-export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, advanced: true, draft: true })
-
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-
-  const chain = await AnalysisManager.fetchChain({
-    surveyId,
-    chainUuid,
-  })
-
-  const analysisNodeDefs = Survey.getAnalysisNodeDefs({
-    chain,
-    entityDefUuid,
-    showSamplingNodeDefs: true,
-    hideAreaBasedEstimate: false,
-  })(survey)
-  if (analysisNodeDefs.length === 0) return
-
-  const fileZip = new FileZip(filePath)
-  await fileZip.init()
-  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDef)}.csv`)
-  await db.tx(async (tx) => {
-    // Reset node results
-    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity: entityDef, chain, cycle, chainUuid }, tx)
-
-    // Insert node results
-    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entityDef, analysisNodeDefs }, tx)
-    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes({ survey, analysisNodeDefs }, tx)
-
-    await CSVReader.createReaderFromStream(stream, null, async (row) => {
-      await massiveUpdateData.push(row)
-      await massiveUpdateNodes.push(row)
-    }).start()
-
-    await massiveUpdateData.flush()
-    await massiveUpdateNodes.flush()
-  })
-
-  fileZip.close()
+export const persistResults = async ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+  const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
+  await job.start()
+  if (job.isFailed()) {
+    const validationError = job.getError()
+    const errorMessage = ValidationUtils.getJointMessage({ i18n })(validationError)
+    throw new Error(`error persisting results: ${errorMessage}`)
+  }
 }
 
 const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {

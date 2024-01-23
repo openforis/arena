@@ -19,14 +19,14 @@ import { JobEvent } from './jobEvent'
  * - (end)
  * -- succeed
  * -- failed
- * -- canceled
+ * -- canceled.
  *
  * Methods that can be overwritten by subclasses:
  * - onStart (in tx)
  * - execute (in tx)
  * - beforeSuccess (in tx)
  * - beforeEnd (in tx)
- * - onEnd (out of tx)
+ * - onEnd (out of tx).
  */
 export default class Job {
   constructor(type, params = {}, innerJobs = []) {
@@ -64,6 +64,7 @@ export default class Job {
    * otherwise the "execute' method will be invoked.
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
+   * @param client
    */
   async start(client = db) {
     this.logDebug('start')
@@ -157,7 +158,7 @@ export default class Job {
   }
 
   /**
-   * Abstract method to be extended by subclasses
+   * Abstract method to be extended by subclasses.
    */
   async execute() {
     // to be extended by subclasses
@@ -221,7 +222,7 @@ export default class Job {
 
   /**
    * Called when the job just has been started
-   * (it runs INSIDE the current db transaction)
+   * (it runs INSIDE the current db transaction).
    */
   async onStart() {
     this.startTime = new Date()
@@ -231,7 +232,7 @@ export default class Job {
   /**
    * Called before onEnd only if the status will change to 'success'.
    * Prepares the result
-   * (it runs INSIDE the current db transaction)
+   * (it runs INSIDE the current db transaction).
    */
   async beforeSuccess() {
     this.setResult(this.generateResult())
@@ -244,7 +245,7 @@ export default class Job {
   /**
    * Called before onEnd.
    * Used to flush the resources used by the job before it terminates completely.
-   * (it runs INSIDE the current db transaction)
+   * (it runs INSIDE the current db transaction).
    */
   async beforeEnd() {
     // To be extended by subclasses
@@ -252,7 +253,7 @@ export default class Job {
 
   /**
    * Called when the job status changes to success, failed or canceled
-   * (it runs OUTSIDE of the current db transaction)
+   * (it runs OUTSIDE of the current db transaction).
    */
   async onEnd() {
     this.endTime = new Date()
