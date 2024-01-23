@@ -45,7 +45,7 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
-    const category = Survey.getCategoryItemByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
       const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
       if (!itemUuid) {

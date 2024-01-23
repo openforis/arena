@@ -9,6 +9,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 import * as DateTimeUtils from '@core/dateUtils'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
@@ -22,6 +23,14 @@ const getValueFromItem = (nodeDefCol, columnName, item = {}, isInProps = false) 
   const prop = camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
 
   return isInProps ? NodeDef.getProp(prop)(item) : A.propOr(null, prop, item)
+}
+
+const _extractCategoryItem = ({ survey, node }) => {
+  let item = NodeRefData.getCategoryItem(node)
+  if (item) return item
+
+  const itemUuid = Node.getCategoryItemUuid(node)
+  return itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
 }
 
 const nodeValuePropProcessor =
@@ -76,9 +85,7 @@ const props = {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const defaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-      const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
-
+      const item = _extractCategoryItem({ survey, node: nodeCol })
       return (_node, columnName) => {
         if (!item) return null
 

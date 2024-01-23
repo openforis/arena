@@ -85,7 +85,10 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
     const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
-    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, draft: fetchDraft }, tx)
+    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, draft: fetchDraft, includeBigCategories: false },
+      tx
+    )
   }
 }
 

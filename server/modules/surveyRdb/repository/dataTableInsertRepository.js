@@ -2,62 +2,35 @@ import { insertAllQuery } from '@server/db/dbUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import * as NodeRefData from '@core/record/nodeRefData'
+import * as Node from '@core/record/node'
 
 import * as SurveySchemaRepository from '../../survey/repository/surveySchemaRepositoryUtils'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
 import * as DataTable from '../schemaRdb/dataTable'
 
-const getSelectQuery = ({
-  surveySchema,
-  nodeDef,
-  nodeDefContext,
-  nodeDefAncestorMultipleEntity,
-  nodeDefColumnsUuids,
-}) => {
-  const nodeAncestorEntityHierarchyIndex = nodeDefAncestorMultipleEntity
-    ? NodeDef.getMetaHierarchy(nodeDefAncestorMultipleEntity).length
-    : null
-  const nodeAncestorUuidColumn =
-    nodeAncestorEntityHierarchyIndex === null
-      ? 'null'
-      : `(n.meta -> '${Node.metaKeys.hierarchy}' ->> ${nodeAncestorEntityHierarchyIndex})::uuid`
+const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity, nodeDefColumnsUuids }) => {
+  const getNodeSelectQuery = (ancestorDef) =>
+    NodeRepository.getNodeSelectQuery({ surveyId, includeRefData: true, includeRecordInfo: true, ancestorDef })
 
-  const selectNodeRows = `
-    SELECT
-      n.id, n.uuid, n.node_def_uuid, n.parent_uuid, n.value, 
-      ${nodeAncestorUuidColumn} AS ancestor_uuid
-      ${
-        NodeDef.isRoot(nodeDef)
-          ? `, n.record_uuid, 
-      r.cycle AS record_cycle,
-      r.step AS record_step,
-      r.owner_uuid AS record_owner_uuid`
-          : ''
-      }
-    FROM
-      ${surveySchema}.node n
-    JOIN
-      ${surveySchema}.record r 
-    ON 
-      r.uuid = n.record_uuid
-    WHERE 
-      n.node_def_uuid = $1
+  const nodesSelect = `${getNodeSelectQuery(nodeDefAncestorMultipleEntity)}
+    WHERE n.node_def_uuid = $1
     ORDER BY n.id`
 
   if (NodeDef.isAttribute(nodeDef)) {
-    return selectNodeRows
+    return nodesSelect
   }
+
+  const childrenNodesSelect = getNodeSelectQuery(nodeDefContext)
 
   // join node table with node table itself to get children attribute values
 
-  const childrenAncestorEntityHierarchyIndex = NodeDef.getMetaHierarchy(nodeDefContext).length
-  const childrenAncestorUuidColumn = `(c.meta -> '${Node.metaKeys.hierarchy}' ->> ${childrenAncestorEntityHierarchyIndex})::uuid`
+  return `WITH n AS (${nodesSelect}), 
+        c AS (${childrenNodesSelect})
 
-  return `
-      WITH n AS (${selectNodeRows})
       SELECT
         n.*,
         c.children
@@ -66,20 +39,19 @@ const getSelectQuery = ({
       LEFT OUTER JOIN
         (
           SELECT
-            ${childrenAncestorUuidColumn} AS ancestor_uuid,
+            c.ancestor_uuid,
             json_object_agg(c.node_def_uuid::text, json_build_object(
-                'uuid', c.uuid, 
-                'nodeDefUuid', c.node_def_uuid, 
-                'value', c.value
+                '${Node.keys.uuid}', c.uuid,
+                '${Node.keys.nodeDefUuid}', c.node_def_uuid,
+                '${Node.keys.value}', c.value,
+                '${NodeRefData.keys.refData}', c.ref_data
             )) AS children
-          FROM
-            ${surveySchema}.node c
+          FROM c
           WHERE
-            ${childrenAncestorUuidColumn} IN (SELECT uuid FROM n)
-            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($2:csv)' : ''}
-            AND c.value IS NOT NULL
+            c.value IS NOT NULL
+            ${nodeDefColumnsUuids.length > 0 ? 'AND c.node_def_uuid IN ($2:csv)' : ''} 
           GROUP BY
-            ancestor_uuid
+            c.ancestor_uuid
         ) c
       ON
         c.ancestor_uuid = n.uuid`
@@ -99,7 +71,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
   // 1. create materialized view
   const viewName = `${surveySchema}.m_view_data`
   const selectQuery = getSelectQuery({
-    surveySchema,
+    surveyId,
     nodeDef,
     nodeDefContext,
     nodeDefAncestorMultipleEntity,
@@ -127,7 +99,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
       break
     }
     // 3. convert nodes into values
-    const nodesRowValues = nodes.map((nodeRow) => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns))
+    const nodesRowValues = nodes.map((nodeRow) => DataTable.getRowValues({ survey, nodeDef, nodeRow, nodeDefColumns }))
 
     // 4. insert node values
     await client.none(
