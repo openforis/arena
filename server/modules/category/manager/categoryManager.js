@@ -43,7 +43,9 @@ const _validateCategoryFromCategories = async (
 ) => {
   const surveyId = Survey.getId(survey)
   const category = R.prop(categoryUuid, categories)
-  const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
+  const items = validateItems
+    ? await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
+    : []
   const validation = await CategoryValidator.validateCategory({
     survey,
     categories: R.values(categories),
