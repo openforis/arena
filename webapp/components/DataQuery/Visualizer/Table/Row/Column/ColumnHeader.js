@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
@@ -30,8 +31,9 @@ const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const field = getFieldByViewColumnName({ columnName, nodeDef })
+  const fieldCamelized = A.camelize(field)
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
-  return `surveyForm.${nodeDefTypePrefix}.${field}`
+  return `surveyForm.${nodeDefTypePrefix}.${fieldCamelized}`
 }
 
 const ColumnHeader = (props) => {
