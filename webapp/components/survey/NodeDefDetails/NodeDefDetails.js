@@ -51,6 +51,7 @@ const NodeDefDetails = () => {
             onChange={(value) =>
               Actions.setProp({ state, key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
             }
+            readOnly={!NodeDef.canNameBeEdited(nodeDef)}
           />
           <div className="attribute-selector">
             {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
