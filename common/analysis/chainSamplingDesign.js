@@ -6,6 +6,7 @@ const keysProps = {
   areaWeightingMethod: 'areaWeightingMethod',
   baseUnitNodeDefUuid: 'baseUnitNodeDefUuid',
   clusteringNodeDefUuid: 'clusteringNodeDefUuid',
+  firstPhaseCategoryUuid: 'firstPhaseCategoryUuid',
   postStratificationAttributeDefUuid: 'postStratificationAttributeDefUuid',
   reportingDataCategoryUuid: 'reportingDataCategoryUuid',
   reportingDataAttributeDefsByLevelUuid: 'reportingDataAttributeDefsByLevelUuid',
@@ -18,6 +19,7 @@ const samplingStrategies = {
   systematic: 'systematic',
   stratifiedRandom: 'stratifiedRandom',
   stratifiedSystematic: 'stratifiedSystematic',
+  twoPhase: 'twoPhase',
   // doublePhase: 'doublePhase'
 }
 
@@ -26,6 +28,7 @@ const isPropTrue = (prop) => (obj) => A.prop(prop)(obj) === true
 const isAreaWeightingMethod = isPropTrue(keysProps.areaWeightingMethod)
 const getBaseUnitNodeDefUuid = A.prop(keysProps.baseUnitNodeDefUuid)
 const getClusteringNodeDefUuid = A.prop(keysProps.clusteringNodeDefUuid)
+const getFirstPhaseCategoryUuid = A.prop(keysProps.firstPhaseCategoryUuid)
 const getPostStratificationAttributeDefUuid = A.prop(keysProps.postStratificationAttributeDefUuid)
 const getReportingDataCategoryUuid = A.prop(keysProps.reportingDataCategoryUuid)
 const getReportingDataAttributeDefUuid = ({ categoryLevelUuid }) =>
@@ -49,6 +52,8 @@ const isStratificationNotSpecifiedAllowed = () => {
   // return getSamplingStrategy(chain) === samplingStrategies.doublePhase
 }
 
+const isFirstPhaseCategorySelectionEnabled = (chain) => getSamplingStrategy(chain) === samplingStrategies.twoPhase
+
 // UPDATE
 
 const assocBaseUnitNodeDefUuid = (baseUnitNodeDefUuid) => A.assoc(keysProps.baseUnitNodeDefUuid, baseUnitNodeDefUuid)
@@ -57,6 +62,9 @@ const assocAreaWeightingMethod = (areaWeightingMethod) => A.assoc(keysProps.area
 
 const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   A.assoc(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
+
+const assocFirstPhaseCategoryUuid = (firstPhaseCategoryUuid) =>
+  A.assoc(keysProps.firstPhaseCategoryUuid, firstPhaseCategoryUuid)
 
 const assocPostStratificationAttributeDefUuid = (postStratificationAttributeDefUuid) =>
   A.assoc(keysProps.postStratificationAttributeDefUuid, postStratificationAttributeDefUuid)
@@ -111,9 +119,11 @@ export const ChainSamplingDesign = {
   getBaseUnitNodeDefUuid,
   isAreaWeightingMethod,
   getClusteringNodeDefUuid,
+  getFirstPhaseCategoryUuid,
   isPostStratificationEnabled,
   getReportingDataAttributeDefUuid,
   getReportingDataCategoryUuid,
+  isFirstPhaseCategorySelectionEnabled,
   isStratificationEnabled,
   isStratificationNotSpecifiedAllowed,
   getPostStratificationAttributeDefUuid,
@@ -124,6 +134,7 @@ export const ChainSamplingDesign = {
   assocAreaWeightingMethod,
   assocBaseUnitNodeDefUuid,
   assocClusteringNodeDefUuid,
+  assocFirstPhaseCategoryUuid,
   assocPostStratificationAttributeDefUuid,
   assocReportingDataCategoryUuid,
   assocReportingDataAttributeDefUuid,
