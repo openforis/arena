@@ -91,6 +91,7 @@ export default () =>
           'allowOnlyDeviceCoordinate',
           'relevantIf',
           'hiddenWhenNotRelevant',
+          'itemsFilter',
           'defaultValue',
           'defaultValueApplyIf',
           'defaultValueEvaluateOnce',
