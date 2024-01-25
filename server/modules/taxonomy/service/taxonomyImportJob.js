@@ -109,11 +109,11 @@ export default class TaxonomyImportJob extends Job {
       // extra prop defs
       const extraPropsColumns = filterExtraPropsColumns(headers)
 
-      this.extraPropsDefs = extraPropsColumns.reduce((extraPropsAcc, header) => {
+      this.extraPropsDefs = extraPropsColumns.reduce((extraPropsAcc, header, index) => {
         const extraPropNameNormalized = StringUtils.normalizeName(header)
         return {
           ...extraPropsAcc,
-          [extraPropNameNormalized]: { key: extraPropNameNormalized, originalHeader: header },
+          [extraPropNameNormalized]: { key: extraPropNameNormalized, originalHeader: header, index },
         }
       }, {})
       this.taxonomyImportManager = new TaxonomyImportManager({
