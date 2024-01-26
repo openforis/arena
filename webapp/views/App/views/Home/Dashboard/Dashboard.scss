@@ -1,7 +1,12 @@
 @import 'webapp/style/vars';
 
 .home-dashboard {
+  display: flex;
+  flex-direction: column;
 
+  .tabs-wrapper {
+    flex: 1;
+  }
 }
 
 .chart-container-dashboard {

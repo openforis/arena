@@ -1,1 +1,1 @@
-export { default } from './RecordsSummary'
+export { default } from './RecordsSummaryPeriodSelector'

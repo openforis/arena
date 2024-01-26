@@ -1,4 +1,4 @@
-import './RecordsSummary.scss'
+import './RecordsSummaryPeriodSelector.scss'
 
 import React, { useContext } from 'react'
 
@@ -13,7 +13,7 @@ import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
 const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : '')
 
-const RecordsSummary = () => {
+const RecordsSummaryPeriodSelector = () => {
   const i18n = useI18n()
 
   const { from, to, timeRange, onChangeTimeRange } = useContext(RecordsSummaryContext)
@@ -44,4 +44,4 @@ const RecordsSummary = () => {
   )
 }
 
-export default RecordsSummary
+export default RecordsSummaryPeriodSelector

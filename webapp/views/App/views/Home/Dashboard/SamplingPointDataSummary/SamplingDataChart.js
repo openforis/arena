@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useContext } from 'react'
 import * as d3 from 'd3'
 
+import * as Survey from '@core/survey/survey'
+
 import { countSamplingPointData } from '@webapp/service/api/categories'
+import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
-const SamplingDataChart = (surveyInfo) => {
+const SamplingDataChart = () => {
   const ref = useRef()
   const { dataEntry, dataCleansing } = useContext(RecordsSummaryContext)
   const i18n = useI18n()
-
-  const surveyId = surveyInfo?.surveyInfo?.id
+  const surveyInfo = useSurveyInfo()
+  const surveyId = Survey.getId(surveyInfo)
 
   useEffect(() => {
     const fetchData = async () => {
