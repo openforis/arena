@@ -127,7 +127,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
 
     const { email, props } = userAccessRequest
     const { country: countryCode } = props
-    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : null
+    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : ''
 
     // send the emails only after use access request has been inserted into the db
     const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
