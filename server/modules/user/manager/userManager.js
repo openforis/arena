@@ -367,3 +367,10 @@ export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db
       UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
     ])
   })
+
+export const deleteExpiredInvitationsAndUsers = (client = db) =>
+  client.tx(async (t) => {
+    const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
+    const deletedUsers = await UserRepository.deleteUsersWithExpiredInvitation(t)
+    return { deletedInvitations, deletedUsers }
+  })

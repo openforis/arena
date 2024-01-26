@@ -256,6 +256,7 @@ export const {
   fetchUserProfilePicture,
   countUserAccessRequests,
   fetchUserAccessRequests,
+  deleteExpiredInvitationsAndUsers,
 } = UserManager
 
 export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {

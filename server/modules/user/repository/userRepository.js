@@ -365,3 +365,20 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
     [cycleKeysDeleted]
   )
 }
+
+export const deleteUsersWithExpiredInvitation = (client = db) =>
+  client.any(
+    `
+    DELETE FROM "user" u
+    WHERE 
+      password IS NULL 
+      AND status = '${User.userStatus.INVITED}'
+      AND NOT EXISTS (
+        SELECT * 
+        FROM user_invitation ui
+        WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
+      )
+    RETURNING ${columnsCommaSeparated}`,
+    [],
+    camelize
+  )
