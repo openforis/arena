@@ -118,6 +118,6 @@ export const useSetProp = ({ setState }) => {
       })
     }
 
-    validateNodeDef({ state, nodeDefUpdated })
+    validateNodeDef({ nodeDefUpdated })
   }, [])
 }
