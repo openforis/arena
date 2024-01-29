@@ -4,6 +4,7 @@ import { CategoryItems } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -20,6 +21,17 @@ export const keysProps = {
   descriptions: ObjectUtils.keysProps.descriptions,
   index: 'index',
 }
+
+const codeAllowedCharacters = [
+  '-', // minus symbol first to avoid considering it as a range in the RegExp
+  '*',
+  '+',
+  '\\\\', // single backslash "\" character (it requires a double escape to be used in the RegExp)
+  '\\/',
+  '|',
+  '\\w',
+]
+const codeNotAllowedCharactersRegExp = new RegExp(`[^${codeAllowedCharacters.join('')}]`, 'g')
 
 // ====== CREATE
 export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
@@ -75,3 +87,10 @@ export const getAncestorCodes = (item) => {
 }
 
 export const getCodesHierarchy = (item) => [...getAncestorCodes(item), getCode(item)]
+
+export const normalizeCode = R.pipe(
+  StringUtils.leftTrim,
+  R.toLower,
+  R.replace(codeNotAllowedCharactersRegExp, '_'),
+  R.slice(0, 40)
+)
