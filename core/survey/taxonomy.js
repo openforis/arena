@@ -29,12 +29,15 @@ export const getExtraPropsDefs = ObjectUtils.getProp(keysProps.extraPropsDefs, {
 export const getExtraPropKeys = (taxonomy) => Object.keys(getExtraPropsDefs(taxonomy))
 export const getExtraPropsDefsArray = (taxonomy) =>
   // add uuid and name to each extra prop definition and put them in a array
-  Object.entries(getExtraPropsDefs(taxonomy)).map(([name, extraPropDef]) => ({
-    ...extraPropDef,
-    uuid: uuidv4(),
-    name,
-    dataType: ExtraPropDef.getDataType(extraPropDef),
-  }))
+  Object.entries(getExtraPropsDefs(taxonomy))
+    .sort(([, prop1], [, prop2]) => ExtraPropDef.getIndex(prop1) - ExtraPropDef.getIndex(prop2))
+    .map(([name, extraPropDef]) => ({
+      ...extraPropDef,
+      uuid: uuidv4(),
+      dataType: ExtraPropDef.getDataType(extraPropDef),
+      index: ExtraPropDef.getIndex(extraPropDef),
+      name,
+    }))
 
 // UPDATE
 export const assocExtraPropsDefs = (extraPropsDefs) => (taxonomy) =>
