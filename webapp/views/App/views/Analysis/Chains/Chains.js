@@ -12,13 +12,11 @@ import Table from '@webapp/components/Table'
 import ErrorBadge from '@webapp/components/errorBadge'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
 
 import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
   const navigate = useNavigate()
-  const i18n = useI18n()
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
 
@@ -59,19 +57,19 @@ const ChainsView = () => {
         {
           key: Chain.keys.dateCreated,
           header: 'common.dateCreated',
-          renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Chain.getDateCreated(item)),
+          renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Chain.getDateCreated(item)),
           width: '12rem',
         },
         {
           key: Chain.keys.dateModified,
           header: 'common.dateLastModified',
-          renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Chain.getDateModified(item)),
+          renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Chain.getDateModified(item)),
           width: '12rem',
         },
         {
           key: Chain.keys.dateExecuted,
           header: 'chainView.dateExecuted',
-          renderItem: ({ item }) => DateUtils.getRelativeDate(i18n, Chain.getDateExecuted(item)),
+          renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Chain.getDateExecuted(item)),
           width: '12rem',
         },
         {
