@@ -32,10 +32,19 @@ export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
           params: { cycle, countType: 'step' },
         })
 
-        const dataEntry = countsByStep.find(({ step }) => step === '1')?.count || 0
-        const dataCleansing = countsByStep.find(({ step }) => step === '2')?.count || 0
+        const [dataEntry, dataCleansing, dataAnalysis] = Object.values(countsByStep)
 
-        setRecordsSummary({ counts, from, to, timeRange, userCounts, userDateCounts, dataEntry, dataCleansing })
+        setRecordsSummary({
+          counts,
+          from,
+          to,
+          timeRange,
+          userCounts,
+          userDateCounts,
+          dataEntry,
+          dataCleansing,
+          dataAnalysis,
+        })
       })()
     }
   }

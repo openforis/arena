@@ -13,41 +13,45 @@ const width = 300
 const height = 300
 const innerRadius1 = 120
 const innerRadius2 = 90
+const innerRadius3 = 60
 const outerRadius1 = Math.min(width, height) / 2
 const outerRadius2 = innerRadius1
-const dataEntryColor = '#b3e2cd'
-const dataCleansingColor = '#fdcdac'
-const notCompletedColor = '#eeeeee'
+const outerRadius3 = innerRadius2
+const dataEntryColor = '#fdcdac'
+const dataCleansingColor = '#fde8aa'
+const dataAnalysisColor = '#b3e2cd'
+// const notCompletedColor = '#eeeeee'
 
 const SamplingDataChart = () => {
   const chartContainerRef = useRef()
-  const { dataEntry, dataCleansing } = useContext(RecordsSummaryContext)
+  const { dataEntry, dataCleansing, dataAnalysis } = useContext(RecordsSummaryContext)
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const surveyId = Survey.getId(surveyInfo)
 
-  const svg = d3
-    .select(chartContainerRef.current)
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height)
-    .append('g')
-    .attr('transform', `translate(${width / 2}, ${height / 2})`)
-
   useEffect(() => {
+    const svg = d3
+      .select(chartContainerRef.current)
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('transform', `translate(${width / 2}, ${height / 2})`)
+
     const fetchData = async () => {
       const countData = countSamplingPointData({ surveyId })
       const response = await countData.request
       const totalItems = response.data.count
 
-      const totalDataEntryItems = dataEntry + dataCleansing
-      const data1 = [totalDataEntryItems, totalItems - totalDataEntryItems]
-      const data2 = [dataCleansing, totalItems - dataCleansing]
-      const dataEntryCompletionPerc = Math.floor((totalDataEntryItems * 100) / totalItems)
+      const dataEntryCompletionPerc = Math.floor((dataEntry * 100) / totalItems)
       const dataCleansingCompletionPerc = Math.floor((dataCleansing * 100) / totalItems)
+      const dataAnalysisCompletionPerc = Math.floor((dataAnalysis * 100) / totalItems)
+      const data1 = [dataEntry, totalItems - dataEntry]
+      const data2 = [dataCleansing, totalItems - dataCleansing]
+      const data3 = [dataAnalysis, totalItems - dataAnalysis]
 
       const generatePie = ({ id, innerRadius, outerRadius, data, color, legendId, legendText }) => {
-        const colorFn = d3.scaleOrdinal([color, notCompletedColor])
+        const colorFn = d3.scaleOrdinal([color, `${color}60`])
         const arcGenerator = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)
         svg
           .selectAll(id)
@@ -60,7 +64,7 @@ const SamplingDataChart = () => {
         d3.select(`#${legendId}`).style('visibility', 'visible').html(legendText)
       }
 
-      // Create first pie
+      // Create data entry records pie
       generatePie({
         id: 'pie1',
         innerRadius: innerRadius1,
@@ -70,10 +74,10 @@ const SamplingDataChart = () => {
         legendId: 'dataEntryLegend',
         legendText: `${i18n.t(
           'homeView.dashboard.step.entry'
-        )}: ${dataEntryCompletionPerc}% (${totalDataEntryItems} / ${totalItems})`,
+        )}: ${dataEntryCompletionPerc}% (${dataEntry} / ${totalItems})`,
       })
 
-      // Create second pie
+      // Create data cleansing records pie
       generatePie({
         id: 'pie2',
         innerRadius: innerRadius2,
@@ -85,15 +89,29 @@ const SamplingDataChart = () => {
           'homeView.dashboard.step.cleansing'
         )}: ${dataCleansingCompletionPerc}% (${dataCleansing} / ${totalItems})`,
       })
+
+      // Create data analyisis records pie
+      generatePie({
+        id: 'pie3',
+        innerRadius: innerRadius3,
+        outerRadius: outerRadius3,
+        data: data3,
+        color: dataAnalysisColor,
+        legendId: 'dataAnalysisLegend',
+        legendText: `${i18n.t(
+          'homeView.dashboard.step.analysis'
+        )}: ${dataAnalysisCompletionPerc}% (${dataAnalysis} / ${totalItems})`,
+      })
     }
     fetchData()
-  }, [dataCleansing, dataEntry, i18n, surveyId, svg])
+  }, [dataAnalysis, dataCleansing, dataEntry, i18n, surveyId])
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
       <h4 style={{ textAlign: 'center' }}>{i18n.t('homeView.dashboard.samplingPointDataCompletion')}</h4>
       <div id="dataEntryLegend" />
       <div id="dataCleansingLegend" />
+      <div id="dataAnalysisLegend" />
       <div ref={chartContainerRef}></div>
     </div>
   )
