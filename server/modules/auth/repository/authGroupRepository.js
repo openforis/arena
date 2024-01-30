@@ -112,6 +112,27 @@ export const fetchUsersGroups = async (userUuids, client = db) =>
     dbTransformCallback
   )
 
+export const fetchSingleUserSurveyUuids = async ({ userUuids }, client = db) => {
+  const role = AuthGroup.groupNames.surveyAdmin
+  return client.map(
+    `
+    SELECT ag.survey_uuid
+    FROM auth_group_user agu
+      JOIN auth_group ag ON ag."uuid" = agu.group_uuid 
+    WHERE ag."name" = '${role}' 
+      AND agu.user_uuid IN ($1:csv)
+      -- only one user/role associated to the same survey
+      AND NOT EXISTS (
+        SELECT * 
+        FROM auth_group_user agu2
+          JOIN auth_group ag2 ON ag2."uuid" = agu2.group_uuid
+        WHERE ag2.survey_uuid = ag.survey_uuid and ag."name" <> '${role}'
+      )
+`,
+    [userUuids]
+  )
+}
+
 // ==== UPDATE
 
 export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {

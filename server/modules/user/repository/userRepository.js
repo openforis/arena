@@ -249,6 +249,24 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
     (row) => row.profile_picture
   )
 
+export const fetchUsersWithExpiredInvitation = (client = db) =>
+  client.map(
+    `
+    SELECT ${columnsCommaSeparated}
+    FROM "user"
+    WHERE 
+      password IS NULL 
+      AND status = '${User.userStatus.INVITED}'
+      AND NOT EXISTS (
+        SELECT * 
+        FROM user_invitation ui
+        WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
+      )
+    RETURNING ${columnsCommaSeparated}`,
+    [],
+    camelize
+  )
+
 export const fetchSystemAdministratorsEmail = async (client = db) =>
   client.map(
     `
