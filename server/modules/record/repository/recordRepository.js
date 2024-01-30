@@ -240,7 +240,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 }
 
 export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
-  client.any(
+  client.map(
     `
     SELECT
       step,
@@ -252,7 +252,8 @@ export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
     GROUP BY
       step
     `,
-    [String(cycle)]
+    [String(cycle)],
+    (row) => ({ step: row.step, count: Number(row.count) })
   )
 
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
