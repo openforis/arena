@@ -5,7 +5,7 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useAuthCanEditSurvey, useUserIsSystemAdmin } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { Tabs } from '@webapp/components/Tabs'
@@ -31,6 +31,7 @@ const Dashboard = () => {
   const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
+  const isSystemAdmnin = useUserIsSystemAdmin()
 
   const tabItems = []
 
@@ -74,11 +75,13 @@ const Dashboard = () => {
       content: <SamplingDataChart />,
     })
   }
-  tabItems.push({
-    key: 'activeUsers',
-    label: 'homeView.dashboard.activeUsers',
-    content: <ActiveUsers />,
-  })
+  if (isSystemAdmnin) {
+    tabItems.push({
+      key: 'activeUsers',
+      label: 'homeView.dashboard.activeUsers',
+      content: <ActiveUsers />,
+    })
+  }
 
   return (
     <SurveyDefsLoader draft={canEditSurvey} validate={canEditSurvey}>
