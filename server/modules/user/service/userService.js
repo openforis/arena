@@ -406,11 +406,13 @@ export const deleteExpiredInvitationsUsersAndSurveys = (client = db) =>
     }
     const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
     const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(t)
-    const deletedUsersEmails = deletedUsers.map(User.getEmail)
-    await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, t)
+    if (deletedUsers.length > 0) {
+      const deletedUsersEmails = deletedUsers.map(User.getEmail)
+      await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, t)
+    }
     await UserManager.deleteExpiredUserAccessRequests(t)
 
-    return { deletedInvitations, deletedUsers, deletedSurveyIds: surveyIds }
+    return { deletedSurveyIds: surveyIds, deletedInvitations, deletedUsers }
   })
 
 // ==== User prefs
