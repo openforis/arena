@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { getLanguageISO639part2Label } from '@core/app/languages'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
@@ -8,7 +9,9 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
 const TaxaTableRowHeader = (props) => {
-  const { vernacularLanguageCodes, taxonomyUuid, extraPropsDefs } = props
+  const { extraPropsDefsArray, taxonomyUuid, vernacularLanguageCodes } = props
+
+  const extraPropKeys = extraPropsDefsArray.map(ExtraPropDef.getName)
 
   const i18n = useI18n()
 
@@ -23,17 +26,17 @@ const TaxaTableRowHeader = (props) => {
         const header = `${getLanguageISO639part2Label(lang)} (${lang})`
         return <LabelWithTooltip key={`vernacular_name_header_${taxonomyUuid}_${lang}`} label={header} />
       })}
-      {Object.keys(extraPropsDefs).map((extraPropName) => (
-        <LabelWithTooltip key={`extra_prop_header_${extraPropName}`} label={extraPropName} />
+      {extraPropKeys.map((extraPropKey) => (
+        <LabelWithTooltip key={`extra_prop_header_${extraPropKey}`} label={extraPropKey} />
       ))}
     </>
   )
 }
 
 TaxaTableRowHeader.propTypes = {
+  extraPropsDefsArray: PropTypes.array.isRequired,
   taxonomyUuid: PropTypes.string.isRequired,
   vernacularLanguageCodes: PropTypes.array.isRequired,
-  extraPropsDefs: PropTypes.object.isRequired,
 }
 
 export default TaxaTableRowHeader
