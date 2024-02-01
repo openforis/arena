@@ -2,6 +2,7 @@ import * as camelize from 'camelize'
 import { db } from '@server/db/db'
 
 import * as AuthGroup from '@core/auth/authGroup'
+import * as UserRepository from '../../user/repository/userRepository'
 
 const dbTransformCallback = camelize
 
@@ -112,15 +113,16 @@ export const fetchUsersGroups = async (userUuids, client = db) =>
     dbTransformCallback
   )
 
-export const fetchSingleUserSurveyUuids = async ({ userUuids }, client = db) => {
+export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) => {
   const role = AuthGroup.groupNames.surveyAdmin
   return client.map(
     `
-    SELECT ag.survey_uuid
+    SELECT s.id
     FROM auth_group_user agu
-      JOIN auth_group ag ON ag."uuid" = agu.group_uuid 
+      JOIN auth_group ag ON ag.uuid = agu.group_uuid 
+      JOIN "user" u ON u.uuid = agu.user_uuid
+      JOIN survey s ON s.uuid = ag.survey_uuid
     WHERE ag."name" = '${role}' 
-      AND agu.user_uuid IN ($1:csv)
       -- only one user/role associated to the same survey
       AND NOT EXISTS (
         SELECT * 
@@ -128,8 +130,9 @@ export const fetchSingleUserSurveyUuids = async ({ userUuids }, client = db) => 
           JOIN auth_group ag2 ON ag2."uuid" = agu2.group_uuid
         WHERE ag2.survey_uuid = ag.survey_uuid and ag."name" <> '${role}'
       )
-`,
-    [userUuids]
+      AND ${UserRepository.expiredInvitationWhereCondition}`,
+    [],
+    (row) => row.id
   )
 }
 

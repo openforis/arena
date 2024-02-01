@@ -34,10 +34,13 @@ export const {
   updatePassword,
   resetUsersPrefsSurveyCycle,
   importNewUser,
+  deleteUsersWithExpiredInvitation,
 } = UserRepository
 
 export const { findResetPasswordUserUuidByUuid, deleteUserResetPasswordByUuid, deleteUserResetPasswordExpired } =
   UserResetPasswordRepository
+
+export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
 
@@ -227,6 +230,8 @@ export {
   fetchUserAccessRequests,
   fetchUserAccessRequestByUuid,
   fetchUserAccessRequestByEmail,
+  deleteUserAccessRequestsByEmail,
+  deleteExpiredUserAccessRequests,
 } from '../repository/userAccessRequestRepository'
 
 export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
@@ -366,11 +371,4 @@ export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db
       ),
       UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
     ])
-  })
-
-export const deleteExpiredInvitationsAndUsers = (client = db) =>
-  client.tx(async (t) => {
-    const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
-    const deletedUsers = await UserRepository.deleteUsersWithExpiredInvitation(t)
-    return { deletedInvitations, deletedUsers }
   })

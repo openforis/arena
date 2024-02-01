@@ -6,15 +6,18 @@ const Logger = Log.getLogger('ExpiredUserInvitationsCleanup')
 
 import * as UserService from '@server/modules/user/service/userService'
 
-const entriesType = 'expired user invitations'
+const entriesType = 'expired user invitations and surveys'
 
 const deleteExpiredItems = async () => {
   try {
     Logger.debug(`Deleting ${entriesType}`)
 
-    const { deletedInvitations, deletedUsers } = await UserService.deleteExpiredInvitationsAndUsers()
+    const { deletedInvitations, deletedUsers, deletedSurveyIds } =
+      await UserService.deleteExpiredInvitationsUsersAndSurveys()
 
-    Logger.debug(`${deletedInvitations.length} ${entriesType} deleted and ${deletedUsers.length} users deleted`)
+    Logger.debug(
+      `${deletedInvitations.length} ${entriesType} deleted, ${deletedUsers.length} users deleted, ${deletedSurveyIds.length} surveys deleted`
+    )
   } catch (error) {
     Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
   }

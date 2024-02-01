@@ -249,19 +249,21 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
     (row) => row.profile_picture
   )
 
+export const expiredInvitationWhereCondition = `
+  u.password IS NULL 
+  AND u.status = '${User.userStatus.INVITED}'
+  AND NOT EXISTS (
+    SELECT * 
+    FROM user_invitation ui
+    WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
+)`
+
 export const fetchUsersWithExpiredInvitation = (client = db) =>
   client.map(
     `
     SELECT ${columnsCommaSeparated}
-    FROM "user"
-    WHERE 
-      password IS NULL 
-      AND status = '${User.userStatus.INVITED}'
-      AND NOT EXISTS (
-        SELECT * 
-        FROM user_invitation ui
-        WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
-      )
+    FROM "user" u
+    WHERE ${expiredInvitationWhereCondition}
     RETURNING ${columnsCommaSeparated}`,
     [],
     camelize
@@ -388,14 +390,7 @@ export const deleteUsersWithExpiredInvitation = (client = db) =>
   client.any(
     `
     DELETE FROM "user" u
-    WHERE 
-      password IS NULL 
-      AND status = '${User.userStatus.INVITED}'
-      AND NOT EXISTS (
-        SELECT * 
-        FROM user_invitation ui
-        WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
-      )
+    WHERE ${expiredInvitationWhereCondition}
     RETURNING ${columnsCommaSeparated}`,
     [],
     camelize

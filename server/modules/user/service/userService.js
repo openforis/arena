@@ -25,6 +25,7 @@ import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 import * as Log from '@server/log/log'
 
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -256,7 +257,6 @@ export const {
   fetchUserProfilePicture,
   countUserAccessRequests,
   fetchUserAccessRequests,
-  deleteExpiredInvitationsAndUsers,
 } = UserManager
 
 export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
@@ -392,6 +392,25 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
       const lang = User.getLang(user)
       await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
     }
+  })
+
+export const deleteExpiredInvitationsUsersAndSurveys = (client = db) =>
+  client.tx(async (t) => {
+    const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(t)
+    for await (const surveyId of surveyIds) {
+      const activityLogsCount = await ActivityLogManager.count({ surveyId }, t)
+      // delete survey only if it is brand new
+      if (activityLogsCount < 5) {
+        await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
+      }
+    }
+    const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
+    const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(t)
+    const deletedUsersEmails = deletedUsers.map(User.getEmail)
+    await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, t)
+    await UserManager.deleteExpiredUserAccessRequests(t)
+
+    return { deletedInvitations, deletedUsers, deletedSurveyIds: surveyIds }
   })
 
 // ==== User prefs
