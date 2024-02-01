@@ -1,6 +1,7 @@
 import './Tabs.scss'
 
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import MuiTabs from '@mui/material/Tabs'
 import MuiTab from '@mui/material/Tab'
@@ -18,6 +19,8 @@ export const Tabs = (props) => {
     setSelectedIndex(newIndex)
   }
 
+  const selectedItem = items[selectedIndex]
+
   return (
     <div className={classNames('tabs-wrapper', { vertical: orientation === 'vertical' })}>
       <MuiTabs onChange={onChange} orientation={orientation} value={selectedIndex}>
@@ -25,11 +28,20 @@ export const Tabs = (props) => {
           <MuiTab key={item.key} label={i18n.t(item.label)} />
         ))}
       </MuiTabs>
-      {items.map((item, index) => (
-        <div key={item.key} className="tab-content" hidden={selectedIndex !== index}>
-          {item.content}
+      {selectedItem && (
+        <div key={selectedItem.key} className="tab-content">
+          {selectedItem.content}
         </div>
-      ))}
+      )}
     </div>
   )
+}
+
+Tabs.propTypes = {
+  items: PropTypes.array.isRequired,
+  orientation: PropTypes.oneOf(['vertical', 'horizontal']),
+}
+
+Tabs.defaultProps = {
+  orientation: 'horizontal',
 }

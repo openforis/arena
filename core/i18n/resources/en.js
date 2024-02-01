@@ -358,6 +358,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   homeView: {
     dashboard: {
+      activeUsers: 'Active users',
       exportWithData: 'Export with data',
       exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
       surveyPropUpdate: {
@@ -383,6 +384,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activeSurveyNotSelected: `<title>Active survey not selected</title>
         <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
       storageSummary: {
+        title: 'Storage use',
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
       },

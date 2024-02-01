@@ -22,6 +22,7 @@ import { RecordsSummaryContext } from './RecordsSummaryContext'
 import RecordsByUser from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 import TotalRecordsSummaryChart from './RecordsSummary/Chart'
+import { ActiveUsers } from './ActiveUsers'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
@@ -40,17 +41,17 @@ const Dashboard = () => {
     tabItems.push(
       {
         key: 'recordsByUser',
-        label: 'recordsByUser',
+        label: 'homeView.dashboard.recordsByUser',
         content: <RecordsByUser className="records-by-user" />,
       },
       {
         key: 'dailyRecordsByUser',
-        label: 'dailyRecordsByUser',
+        label: 'homeView.dashboard.dailyRecordsByUser',
         content: <DailyRecordsByUser />,
       },
       {
         key: 'totalRecords',
-        label: 'totalRecords',
+        label: 'homeView.dashboard.totalRecords',
         content: (
           <TotalRecordsSummaryChart
             counts={recordsSummaryState.counts}
@@ -63,16 +64,21 @@ const Dashboard = () => {
   }
   tabItems.push({
     key: 'storageSummary',
-    label: 'storageSummary',
+    label: 'homeView.dashboard.storageSummary.title',
     content: <StorageSummary />,
   })
   if (hasSamplingPointData) {
     tabItems.push({
       key: 'samplingDataSummary',
-      label: 'samplingDataSummary',
+      label: 'homeView.dashboard.samplingDataSummary',
       content: <SamplingDataChart />,
     })
   }
+  tabItems.push({
+    key: 'activeUsers',
+    label: 'homeView.dashboard.activeUsers',
+    content: <ActiveUsers />,
+  })
 
   return (
     <SurveyDefsLoader draft={canEditSurvey} validate={canEditSurvey}>

@@ -12,6 +12,19 @@ import * as DbUtils from '@server/db/dbUtils'
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
 
+const userSortBy = {
+  email: 'email',
+  name: 'name',
+  lastLoginTime: 'last_login_time',
+  status: 'status',
+}
+
+const orderByFieldBySortBy = {
+  [userSortBy.email]: 'email',
+  [userSortBy.name]: 'name',
+  [userSortBy.lastLoginTime]: 'status, last_login_time', // 'status' is used to group users that have accepted invitation, otherwise they have never logged in
+  [userSortBy.status]: 'status',
+}
 // In sql queries, user table must be surrounded by "" e.g. "user"
 
 // CREATE
@@ -79,16 +92,18 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     (row) => Number(row.count)
   )
 
-const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC', includeSurveys = false }) => {
+const _usersSelectQuery = ({
+  selectFields,
+  sortBy = userSortBy.email,
+  sortOrder = 'ASC',
+  includeSurveys = false,
+  whereConditions = [],
+}) => {
   // check sort by parameters
-  const orderByFieldBySortBy = {
-    email: 'email',
-    name: 'name',
-    last_login_time: 'status, last_login_time', // 'status' is used to group users that have accepted invitation, otherwise they have never logged in
-    status: 'status',
-  }
   const orderBy = orderByFieldBySortBy[sortBy] || 'email'
-  const orderByDirection = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+  const orderByDirection = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+
+  const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
 
   const surveysSelect = `SELECT 
   gu.user_uuid AS user_uuid,
@@ -136,6 +151,7 @@ GROUP BY gu.user_uuid`
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
+    ${whereClause}
     ORDER BY ${orderBy} ${orderByDirection}`
 }
 
@@ -144,7 +160,7 @@ export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', s
     `${_usersSelectQuery({ selectFields, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    { sortBy, sortOrder },
+    [],
     camelize
   )
 
@@ -275,6 +291,25 @@ export const countSystemAdministrators = async (client = db) =>
   `,
     [AuthGroup.groupNames.systemAdmin],
     (row) => Number(row.count)
+  )
+
+const _getActiveUsersSelectQuery = () =>
+  _usersSelectQuery({
+    selectFields,
+    sortBy: userSortBy.lastLoginTime,
+    sortOrder: 'DESC',
+    whereConditions: [`last_login_time > NOW() - INTERVAL '1 hour'`],
+  })
+
+export const countActiveUsers = async (client = db) =>
+  client.one(`SELECT COUNT(u.*) FROM (${_getActiveUsersSelectQuery()}) AS u`, [], (row) => Number(row.count))
+
+export const fetchActiveUsers = async ({ limit = 100 } = {}, client = db) =>
+  client.map(
+    `${_getActiveUsersSelectQuery()}
+    LIMIT $/limit/`,
+    { limit },
+    camelize
   )
 
 // ==== UPDATE
