@@ -58,7 +58,7 @@ const _updateAttributeValue = ({
   attributeDef,
   attribute,
   value,
-  dateModified = new Date(),
+  dateModified: dataModifiedParam = null,
   sideEffect = false,
 }) => {
   if (
@@ -71,12 +71,14 @@ const _updateAttributeValue = ({
       parentNode: entity,
       strict: true,
     }) ||
-    dateModified // always update attribute when dateModified changes
+    dataModifiedParam // always update attribute when dateModified changes
   ) {
     // update existing attribute (if value changed);
     // do not update meta defaultValue applied flag (value could have been a default value already)
-    const attributeUpdated = A.pipe(Node.assocValue(value), Node.assocUpdated(true), (nodeUpdated) =>
-      dateModified ? Node.assocDateModified(dateModified)(nodeUpdated) : nodeUpdated
+    const attributeUpdated = A.pipe(
+      Node.assocValue(value),
+      Node.assocUpdated(true),
+      Node.assocDateModified(dataModifiedParam ?? new Date())
     )(attribute)
 
     const updateResult = new RecordUpdateResult({ record })
@@ -92,7 +94,6 @@ const _addOrUpdateAttribute =
   (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
-
     const value = _adaptValue({ survey, record, parentNode: entity, attributeDef, value: valueParam })
 
     if (!attribute || NodeDef.isMultipleAttribute(attributeDef)) {

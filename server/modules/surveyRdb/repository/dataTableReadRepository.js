@@ -40,7 +40,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
     ? ''
     : `AND ${getColEqualCondition(DataTable.columnNameRecordUuid)}
-         AND ${getColEqualCondition(DataTable.columnNameParentUuuid)}`
+         AND ${getColEqualCondition(DataTable.columnNameParentUuid)}`
 
   return await client.any(
     `
@@ -52,13 +52,13 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
       r.cycle = $1 
       AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
-      SELECT ${aliasB}.${DataTable.columnNameUuuid}
+      SELECT ${aliasB}.${DataTable.columnNameUuid}
       FROM ${tableName} ${aliasB}
       WHERE
         --same cycle
         ${aliasB}.${DataTable.columnNameRecordCycle} = $1
         --different node uuid 
-        AND ${aliasA}.${DataTable.columnNameUuuid} != ${aliasB}.${DataTable.columnNameUuuid}
+        AND ${aliasA}.${DataTable.columnNameUuid} != ${aliasB}.${DataTable.columnNameUuid}
         ${recordAndParentEqualCondition}
         --same key node(s) values
         AND (${equalKeysCondition})
@@ -90,7 +90,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
       ${table}
     WHERE
       ${DataTable.columnNameRecordUuid} = $1
-      ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.columnNameUuuid} = $2`}`,
+      ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.columnNameUuid} = $2`}`,
     [recordUuid, nodeUuid],
     (row) => (row ? Object.values(row) : [])
   )

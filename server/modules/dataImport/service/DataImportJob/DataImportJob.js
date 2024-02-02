@@ -14,6 +14,8 @@ import { DataImportFileReader } from './dataImportFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
 import DataImportBaseJob from './DataImportBaseJob'
 
+const defaultErrorKey = 'error'
+
 export default class DataImportJob extends DataImportBaseJob {
   constructor(params, type = DataImportJob.type) {
     super(type, params)
@@ -22,18 +24,23 @@ export default class DataImportJob extends DataImportBaseJob {
     this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
   }
 
+  async onStart() {
+    await super.onStart()
+    const survey = await this.fetchSurvey()
+    this.setContext({ survey })
+  }
+
   async execute() {
     super.execute()
 
     const { context } = this
     const { abortOnErrors, dryRun } = context
 
-    await this.fetchSurvey()
-
     this.validateParameters()
 
     await this.fetchRecordsSummary()
 
+    this.csvReader = await this.createCsvReader()
     await this.startCsvReader()
 
     if (!this.hasErrors() && this.processed === 0) {
@@ -67,11 +74,10 @@ export default class DataImportJob extends DataImportBaseJob {
     const { surveyId, tx } = this
     const { cycle } = this.context
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+    return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, cycle, draft: false, advanced: true },
       tx
     )
-    this.setContext({ survey })
   }
 
   async fetchRecordsSummary() {
@@ -92,19 +98,21 @@ export default class DataImportJob extends DataImportBaseJob {
     this.setContext({ recordsSummary: recordsSummary.list })
   }
 
-  async startCsvReader() {
+  async createCsvReader() {
     const { cycle, nodeDefUuid, filePath, survey } = this.context
 
-    try {
-      this.csvReader = await DataImportFileReader.createReader({
-        filePath,
-        survey,
-        cycle,
-        nodeDefUuid,
-        onRowItem: async (item) => this.onRowItem(item),
-        onTotalChange: (total) => (this.total = total),
-      })
+    return DataImportFileReader.createReader({
+      filePath,
+      survey,
+      cycle,
+      nodeDefUuid,
+      onRowItem: async (item) => this.onRowItem(item),
+      onTotalChange: (total) => (this.total = total),
+    })
+  }
 
+  async startCsvReader() {
+    try {
       await this.csvReader.start()
     } catch (e) {
       const errorKey = e.key || e.toString()
@@ -240,8 +248,12 @@ export default class DataImportJob extends DataImportBaseJob {
 
   _addError(key, params = {}) {
     this.addError({
-      error: Validation.newInstance(false, {}, [{ key, params }]),
+      [defaultErrorKey]: Validation.newInstance(false, {}, [{ key, params }]),
     })
+  }
+
+  getError() {
+    return Object.values(this.errors)[0]?.[defaultErrorKey]
   }
 }
 

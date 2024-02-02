@@ -8,8 +8,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
-
 import * as CSVReader from '@server/utils/file/csvReader'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 const VALUE_PROP_DEFAULT = 'value'
 
@@ -45,7 +45,7 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
-    const category = Survey.getCategoryItemByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+    const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
       const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
       if (!itemUuid) {
@@ -110,7 +110,7 @@ const checkRequiredHeadersNotMissing =
     }
   }
 
-const validateHeaders =
+const _validateHeaders =
   ({ csvDataExportModel }) =>
   async (headers) => {
     checkAllHeadersAreValid({ csvDataExportModel })(headers)
@@ -129,7 +129,26 @@ const validateHeaders =
  * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
  * @returns {Promise} - Result promise. It resolves when the file is fully read.
  */
-const createReader = async ({ filePath, survey, cycle, nodeDefUuid, onRowItem, onTotalChange }) => {
+const createReader = ({ filePath, survey, cycle, nodeDefUuid, onRowItem, onTotalChange }) =>
+  createReaderFromStream({
+    stream: FileUtils.createReadStream(filePath),
+    survey,
+    cycle,
+    nodeDefUuid,
+    onRowItem,
+    onTotalChange,
+  })
+
+const createReaderFromStream = ({
+  stream,
+  survey,
+  cycle,
+  nodeDefUuid,
+  onRowItem,
+  onTotalChange,
+  includeAnalysis = false,
+  validateHeaders = true,
+}) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
   const csvDataExportModel = new CsvDataExportModel({
@@ -140,13 +159,15 @@ const createReader = async ({ filePath, survey, cycle, nodeDefUuid, onRowItem, o
       includeCategoryItemsLabels: false,
       includeTaxonScientificName: false,
       includeFiles: false,
-      includeAnalysis: false,
+      includeAnalysis,
     },
   })
 
-  return CSVReader.createReaderFromFile(
-    filePath,
-    validateHeaders({ csvDataExportModel }),
+  return CSVReader.createReaderFromStream(
+    stream,
+    (headers) => {
+      if (validateHeaders) _validateHeaders({ csvDataExportModel })(headers)
+    },
     async (row) => {
       // combine several columns into single values for every attribute definition
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
@@ -183,7 +204,7 @@ const createReader = async ({ filePath, survey, cycle, nodeDefUuid, onRowItem, o
         return acc
       }, {})
 
-      await onRowItem({ valuesByDefUuid, errors })
+      await onRowItem({ row, valuesByDefUuid, errors })
     },
     onTotalChange
   )
@@ -191,4 +212,5 @@ const createReader = async ({ filePath, survey, cycle, nodeDefUuid, onRowItem, o
 
 export const DataImportFileReader = {
   createReader,
+  createReaderFromStream,
 }

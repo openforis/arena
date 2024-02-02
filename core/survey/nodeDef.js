@@ -547,3 +547,5 @@ export const isDisplayInEnabled = isEntityAndNotRoot
 
 export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
+
+export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)

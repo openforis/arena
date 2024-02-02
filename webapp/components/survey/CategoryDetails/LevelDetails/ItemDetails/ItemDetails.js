@@ -8,7 +8,6 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
-import { normalizeName } from '@core/stringUtils'
 
 import { Button, ButtonDelete } from '@webapp/components'
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -102,7 +101,9 @@ const ItemDetails = (props) => {
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
-              onChange={(value) => updateProp({ key: CategoryItem.keysProps.code, value: normalizeName(value) })}
+              onChange={(value) =>
+                updateProp({ key: CategoryItem.keysProps.code, value: CategoryItem.normalizeCode(value) })
+              }
               readOnly={readOnly}
             />
           </FormItem>

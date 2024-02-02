@@ -124,12 +124,27 @@ export const insertNodeDef = async (
 
 export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 
+const _fixMetaHierarchy = ({ nodeDefsByUuid, nodeDef }) => {
+  const h = []
+  let currentNodeDef = nodeDef
+  while (currentNodeDef) {
+    const parentUuid = NodeDef.getParentUuid(currentNodeDef)
+    if (parentUuid) {
+      h.unshift(parentUuid)
+    }
+    currentNodeDef = nodeDefsByUuid[parentUuid]
+  }
+  nodeDefsByUuid[NodeDef.getUuid(nodeDef)] = NodeDef.assocMetaHierarchy(h)(nodeDef)
+}
+
 const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
-  Object.values(nodeDefsByUuid).forEach((nodeDef) => {
+  Object.entries(nodeDefsByUuid).forEach(([nodeDefUuid, nodeDef]) => {
     const parentUuid = NodeDef.getParentUuid(nodeDef)
     // invalid parent UUID
     if (parentUuid && !nodeDefsByUuid[parentUuid]) {
-      delete nodeDefsByUuid[NodeDef.getUuid(nodeDef)]
+      delete nodeDefsByUuid[nodeDefUuid]
+    } else if (parentUuid && NodeDef.getMetaHierarchy(nodeDef).length === 0) {
+      _fixMetaHierarchy({ nodeDefsByUuid, nodeDef })
     }
   })
   return nodeDefsByUuid
