@@ -50,7 +50,7 @@ const NodeDefCode = (props) => {
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
-  const itemsArray = useItems({ survey, record, nodeDef, parentNode, draft, edit, entryDataQuery })
+  const itemsArray = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
   const [selectedItems, setSelectedItems] = useState([])
 
   // On items or nodes change, update selectedItems
