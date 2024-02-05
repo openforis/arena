@@ -56,8 +56,7 @@ const NodeDefCode = (props) => {
   // On items or nodes change, update selectedItems
   useEffect(() => {
     if (!edit) {
-      const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = itemsArray.filter((item) => selectedItemUuids.includes(CategoryItem.getUuid(item)))
+      const selectedItemsUpdate = nodes.map(NodeRefData.getCategoryItem)
       setSelectedItems(selectedItemsUpdate)
     }
   }, [edit, itemsArray, nodes])
