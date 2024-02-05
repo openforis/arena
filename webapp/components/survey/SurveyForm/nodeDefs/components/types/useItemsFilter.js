@@ -1,19 +1,24 @@
-import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { Objects, RecordExpressionEvaluator } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-export const useItemsFilter = ({ survey, nodeDef, record, parentNode, items, alwaysIncludeItemFunction = null }) => {
-  const itemsFilter = NodeDef.getItemsFilter(nodeDef)
+import { RecordState } from '@webapp/store/ui/record'
+import { SurveyState } from '@webapp/store/survey'
 
-  return useMemo(() => {
-    const itemsArray = Object.values(items || {})
-    if (itemsArray.length === 0 || Objects.isEmpty(itemsFilter)) return itemsArray
+export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFunction = null }) =>
+  useSelector((state) => {
+    const itemsFilter = NodeDef.getItemsFilter(nodeDef)
+
+    if (items.length === 0 || Objects.isEmpty(itemsFilter)) return items
+
+    const survey = SurveyState.getSurvey(state)
+    const record = RecordState.getRecord(state)
 
     const expressionEvaluator = new RecordExpressionEvaluator()
 
-    return itemsArray.filter((item) => {
+    return items.filter((item) => {
       if (alwaysIncludeItemFunction?.(item)) return true
 
       try {
@@ -29,5 +34,4 @@ export const useItemsFilter = ({ survey, nodeDef, record, parentNode, items, alw
         return false
       }
     })
-  }, [items, itemsFilter, alwaysIncludeItemFunction, parentNode, record, survey])
-}
+  }, Objects.isEqual)

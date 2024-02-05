@@ -22,12 +22,13 @@ export const fetchSurveyFull = async ({
   surveyId,
   cycle,
   draft = true,
+  advanced = false,
   includeAnalysis = false,
   validate = false,
 } = {}) => {
   const {
     data: { survey },
-  } = await axios.get(`/api/survey/${surveyId}/full`, { params: { cycle, draft, includeAnalysis, validate } })
+  } = await axios.get(`/api/survey/${surveyId}/full`, { params: { cycle, draft, advanced, includeAnalysis, validate } })
   return survey
 }
 

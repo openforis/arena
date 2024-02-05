@@ -153,7 +153,7 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/full', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, draft, includeAnalysis, validate } = Request.getParams(req)
+      const { surveyId, cycle, draft, advanced, includeAnalysis, validate } = Request.getParams(req)
       const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const [survey] = await Promise.all([
@@ -161,6 +161,7 @@ export const init = (app) => {
           surveyId,
           cycle,
           draft,
+          advanced,
           includeAnalysis,
           includeBigCategories: false,
           validate,

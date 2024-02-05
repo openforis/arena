@@ -17,21 +17,17 @@ export const initSurveyDefs =
       dispatch(LoaderActions.showLoader())
 
       const surveyId = SurveyState.getSurveyId(state)
-      const params = { surveyId, draft, validate, cycle: SurveyState.getSurveyCycleKey(state), includeAnalysis }
+      const cycle = SurveyState.getSurveyCycleKey(state)
 
-      const survey = await API.fetchSurveyFull(params)
-
+      const survey = await API.fetchSurveyFull({ surveyId, draft, advanced: true, validate, cycle, includeAnalysis })
       const itemsCountByCategoryUuid = await API.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
+
       Survey.getCategoriesArray(survey).forEach((category) => {
         const itemsCount = itemsCountByCategoryUuid[Category.getUuid(category)]
         Category.setItemsCount(itemsCount)(category)
       })
 
-      dispatch({
-        ...survey,
-        type: surveyDefsLoad,
-        draft,
-      })
+      dispatch({ type: surveyDefsLoad, ...survey, draft })
       dispatch(LoaderActions.hideLoader())
     }
   }

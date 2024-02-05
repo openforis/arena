@@ -8,12 +8,12 @@ import * as Taxon from '@core/survey/taxon'
 import { useTaxa } from './useTaxa'
 
 const NodeDefTaxonAutocompleteItemRenderer = (props) => {
-  const { item: taxon, ...otherProps } = props
+  const { item: taxon, onKeyDown, onMouseDown } = props
 
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
-    <div {...otherProps} key={Taxon.getUuid(taxon)} className="item" tabIndex="1">
+    <div key={Taxon.getUuid(taxon)} className="item" onKeyDown={onKeyDown} onMouseDown={onMouseDown} tabIndex="1">
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>
       {vernacularLang && <div style={{ gridColumn: 2 }}>{`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}</div>}
@@ -67,6 +67,8 @@ NodeDefTaxonAutocompleteDialog.defaultProps = {
 
 NodeDefTaxonAutocompleteItemRenderer.propTypes = {
   item: PropTypes.object.isRequired,
+  onKeyDown: PropTypes.func,
+  onMouseDown: PropTypes.func,
 }
 
 export default NodeDefTaxonAutocompleteDialog
