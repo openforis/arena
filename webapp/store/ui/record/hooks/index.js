@@ -5,6 +5,7 @@ import * as Node from '@core/record/node'
 
 import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../state'
+import { Objects } from '@openforis/arena-core'
 
 export const useRecord = () => useSelector(RecordState.getRecord)
 export const useRecordNode = ({ nodeUuid }) => {
@@ -18,4 +19,11 @@ export const useRecordParentCategoryItemUuid = ({ nodeDef, parentNode }) =>
     const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
     return Node.getCategoryItemUuid(nodeParentCode)
   })
+export const useRecordCodeAttributesUuidsHierarchy = ({ nodeDef, parentNode }) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    const record = RecordState.getRecord(state)
+    const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+    return parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), Node.getUuid(parentCodeAttribute)] : []
+  }, Objects.isEqual)
 export const useIsRecordViewWithoutHeader = () => useSelector(RecordState.hasNoHeader)

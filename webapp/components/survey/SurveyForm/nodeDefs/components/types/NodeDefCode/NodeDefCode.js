@@ -9,21 +9,15 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useRecord } from '@webapp/store/ui/record'
 
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
-
-const getCodeUuidsHierarchy = ({ survey, record, parentNode, nodeDef }) => {
-  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  return nodeParentCode ? [...Node.getHierarchyCode(nodeParentCode), Node.getUuid(nodeParentCode)] : []
-}
+import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
 const NodeDefCode = (props) => {
   const {
@@ -41,16 +35,16 @@ const NodeDefCode = (props) => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
-  const record = useRecord()
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const draft = Survey.isDraft(surveyInfo)
-  const codeUuidsHierarchy = getCodeUuidsHierarchy({ survey, record, parentNode, nodeDef })
+
+  const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
-  const itemsArray = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
+  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
   const [selectedItems, setSelectedItems] = useState([])
 
   // On items or nodes change, update selectedItems
@@ -59,14 +53,14 @@ const NodeDefCode = (props) => {
       const selectedItemsUpdate = nodes.map(NodeRefData.getCategoryItem)
       setSelectedItems(selectedItemsUpdate)
     }
-  }, [edit, itemsArray, nodes])
+  }, [edit, items, nodes])
 
   const onItemAdd = (item) => {
     const existingNode = singleNode ? nodes[0] : null
     const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
     const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
-    const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
+    const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
     const refData = { [NodeRefData.keys.categoryItem]: item }
 
     updateNode(nodeDef, node, value, null, meta, refData)
@@ -95,7 +89,7 @@ const NodeDefCode = (props) => {
       edit={edit}
       entryDataQuery={entryDataQuery}
       itemLabelFunction={itemLabelFunction}
-      items={itemsArray}
+      items={items}
       nodeDef={nodeDef}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}
@@ -107,7 +101,7 @@ const NodeDefCode = (props) => {
       canEditRecord={canEditRecord}
       edit={edit}
       itemLabelFunction={itemLabelFunction}
-      items={itemsArray}
+      items={items}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}
       readOnly={readOnly}
