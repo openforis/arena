@@ -1,4 +1,4 @@
-import * as ObjectUtils from '@core/objectUtils'
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
 import * as API from '@webapp/service/api'
@@ -17,25 +17,20 @@ export const initSurveyDefs =
       dispatch(LoaderActions.showLoader())
 
       const surveyId = SurveyState.getSurveyId(state)
-      const params = { draft, validate, cycle: SurveyState.getSurveyCycleKey(state), includeAnalysis }
+      const params = { surveyId, draft, validate, cycle: SurveyState.getSurveyCycleKey(state), includeAnalysis }
 
-      const { nodeDefs, nodeDefsValidation } = await API.fetchNodeDefs({ surveyId, params })
+      const survey = await API.fetchSurveyFull(params)
 
       const itemsCountByCategoryUuid = await API.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
-      const categories = (await API.fetchCategories({ surveyId, draft })).map((category) => {
+      Survey.getCategoriesArray(survey).forEach((category) => {
         const itemsCount = itemsCountByCategoryUuid[Category.getUuid(category)]
-        return Category.assocItemsCount(itemsCount)(category)
+        Category.setItemsCount(itemsCount)(category)
       })
 
-      const taxonomies = await API.fetchTaxonomies({ surveyId, draft })
-
       dispatch({
+        ...survey,
         type: surveyDefsLoad,
         draft,
-        categories: ObjectUtils.toUuidIndexedObj(categories),
-        nodeDefs,
-        nodeDefsValidation,
-        taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies),
       })
       dispatch(LoaderActions.hideLoader())
     }

@@ -147,6 +147,9 @@ export const newCategory = (props = {}, levels = null) => {
 }
 
 export const assocItemsCount = (count) => R.assoc(keys.itemsCount, count)
+export const setItemsCount = (count) => (category) => {
+  category[keys.itemsCount] = count
+}
 
 // UTILS
 export const isLevelDeleteAllowed = (level) => (category) =>
