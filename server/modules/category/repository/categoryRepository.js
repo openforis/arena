@@ -284,18 +284,30 @@ export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db
     (r) => parseInt(r.count, 10)
   )
 
-export const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
+export const fetchItemsByParentUuid = async (
+  { surveyId, categoryUuid, parentUuid = null, draft = false, searchValue = null, lang = null },
+  client = db
+) => {
+  const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
+  const labelsCol = DbUtils.getPropColCombined(CategoryItem.keysProps.labels, draft, 'i.')
+
+  const searchValueCondition = Objects.isEmpty(searchValue)
+    ? ''
+    : `AND (lower(${codeCol}) LIKE $/search/ OR lower(${labelsCol} ->> '${lang}') LIKE $/search/`
+
+  const search = String(searchValue).toLocaleLowerCase().trim()
   const items = await client.map(
     `
     SELECT i.* 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
       ON l.uuid = i.level_uuid
-    WHERE l.category_uuid = $1 
+    WHERE l.category_uuid = $/categoryUuid/ 
       AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
+      ${searchValueCondition}
     ORDER BY i.id
   `,
-    [categoryUuid],
+    { categoryUuid, search },
     (def) => dbTransformCallback(def, draft, true)
   )
 

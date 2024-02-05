@@ -283,10 +283,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, parentUuid, draft } = Request.getParams(req)
+        const { surveyId, categoryUuid, parentUuid, draft, searchValue, lang } = Request.getParams(req)
 
         const items = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
+          await CategoryService.fetchItemsByParentUuid({ surveyId, categoryUuid, parentUuid, draft, searchValue, lang })
         )
 
         res.json({ items })

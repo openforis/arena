@@ -8,6 +8,7 @@ import { Surveys } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
@@ -39,6 +40,8 @@ const NodeDefCode = (props) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const draft = Survey.isDraft(surveyInfo)
 
+  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+  const itemsCount = Category.getItemsCount(category)
   const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
@@ -83,6 +86,8 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
+  const autocomplete = itemsCount > 2
+
   return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (
     <NodeDefCodeDropdown
       canEditRecord={canEditRecord}
@@ -90,6 +95,7 @@ const NodeDefCode = (props) => {
       entryDataQuery={entryDataQuery}
       itemLabelFunction={itemLabelFunction}
       items={items}
+      autocomplete={autocomplete}
       nodeDef={nodeDef}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}

@@ -49,8 +49,14 @@ export const useDropdown = ({
       if (searchMinCharsReached && !loading) {
         setState({ items: [], loading: true })
       }
-      const _items = searchMinCharsReached && itemsProp ? await itemsProp(inputValue) : []
-
+      let _items = searchMinCharsReached && itemsProp ? await itemsProp(inputValue) : []
+      if (_items?.data?.items) {
+        // items is the result of a fetch
+        _items = _items.data.items
+        if (typeof _items === 'object') {
+          _items = Object.values(_items)
+        }
+      }
       setState({ items: _items, loading: false })
     }
   }, [asyncItemsLoading, itemsProp, searchMinCharsReached, loading, inputValue])

@@ -34,10 +34,17 @@ export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, vali
   return category
 }
 
-export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, parentUuid = null }) =>
+export const fetchCategoryItems = ({
+  surveyId,
+  categoryUuid,
+  draft = true,
+  parentUuid = null,
+  searchValue = null,
+  lang = null,
+}) =>
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    data: { draft, parentUuid },
+    data: { draft, parentUuid, searchValue, lang },
   })
 
 export const fetchCategoryItemsInLevelRequest = ({ surveyId, categoryUuid, levelIndex, draft = true }) =>

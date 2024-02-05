@@ -11,6 +11,7 @@ import { Objects } from '@openforis/arena-core'
 
 const NodeDefCodeDropdown = (props) => {
   const {
+    autocomplete,
     canEditRecord,
     edit,
     entryDataQuery,
@@ -26,6 +27,7 @@ const NodeDefCodeDropdown = (props) => {
   const entryDisabled = edit || !canEditRecord || readOnly
 
   const disabled = R.isEmpty(items)
+  const minCharactersToAutocomplete = autocomplete ? 1 : 0
 
   return (
     <div className="survey-form__node-def-code">
@@ -36,6 +38,7 @@ const NodeDefCodeDropdown = (props) => {
           disabled={disabled}
           itemKey="uuid"
           itemLabel={itemLabelFunction}
+          minCharactersToAutocomplete={minCharactersToAutocomplete}
           selection={selectedItems}
           onItemAdd={onItemAdd}
           onItemRemove={onItemRemove}
@@ -46,6 +49,7 @@ const NodeDefCodeDropdown = (props) => {
           itemValue="uuid"
           itemLabel={itemLabelFunction}
           items={items}
+          minCharactersToAutocomplete={minCharactersToAutocomplete}
           onChange={(item) => {
             // NB: onItemRemove is not possible?
             if (item) onItemAdd(item)

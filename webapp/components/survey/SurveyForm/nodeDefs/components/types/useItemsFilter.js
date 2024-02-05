@@ -18,6 +18,8 @@ export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFu
 
     const expressionEvaluator = new RecordExpressionEvaluator()
 
+    if (!Array.isArray(items)) return []
+
     return items.filter((item) => {
       if (alwaysIncludeItemFunction?.(item)) return true
 
