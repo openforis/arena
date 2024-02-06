@@ -64,6 +64,7 @@ export const getExtraProp = (extraPropKey) => (taxon) => {
 
 export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
 export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
+export const isUnkOrUnlTaxon = (taxon) => isUnlistedTaxon(taxon) || isUnknownTaxon(taxon)
 
 export const { isEqual } = ObjectUtils
 
