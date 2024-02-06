@@ -5,8 +5,9 @@ import * as R from 'ramda'
 import { Objects } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { TestId } from '@webapp/utils/testId'
 
+import { TestId } from '@webapp/utils/testId'
+import { useI18n } from '@webapp/store/system'
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
 
@@ -24,6 +25,8 @@ const NodeDefCodeDropdown = (props) => {
     readOnly,
     selectedItems,
   } = props
+
+  const i18n = useI18n()
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -56,6 +59,7 @@ const NodeDefCodeDropdown = (props) => {
             if (item) onItemAdd(item)
             else onItemRemove(item)
           }}
+          placeholder={autocomplete ? i18n.t('surveyForm.nodeDefCode.typeCodeOrLabel') : undefined}
           readOnly={entryDisabled}
           selection={Objects.isEmpty(selectedItems) ? null : R.head(selectedItems)}
           testId={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
