@@ -2,12 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import { TestId } from '@webapp/utils/testId'
 
 import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
-import { Objects } from '@openforis/arena-core'
 
 const NodeDefCodeDropdown = (props) => {
   const {
@@ -65,11 +66,12 @@ const NodeDefCodeDropdown = (props) => {
 }
 
 NodeDefCodeDropdown.propTypes = {
+  autocomplete: PropTypes.bool,
   canEditRecord: PropTypes.bool,
   edit: PropTypes.bool,
   entryDataQuery: PropTypes.bool,
   itemLabelFunction: PropTypes.func.isRequired,
-  items: PropTypes.arrayOf(PropTypes.object),
+  items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
   nodeDef: PropTypes.object.isRequired,
   onItemAdd: PropTypes.func.isRequired,
   onItemRemove: PropTypes.func.isRequired,
@@ -78,6 +80,7 @@ NodeDefCodeDropdown.propTypes = {
 }
 
 NodeDefCodeDropdown.defaultProps = {
+  autocomplete: false,
   canEditRecord: false,
   edit: false,
   entryDataQuery: false,
