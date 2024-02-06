@@ -2,7 +2,7 @@ import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
 import React, { useEffect } from 'react'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -11,7 +11,7 @@ import * as Record from '@core/record/record'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
+import { SurveyFormActions, SurveyFormState, useNotAvailableEntityPageUuids } from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
@@ -51,10 +51,10 @@ const SurveyForm = (props) => {
 
   const i18n = useI18n()
   const dispatch = useDispatch()
-  const state = useSelector((rootState) => rootState)
+  const notAvailablePageEntityDefsUuids = useNotAvailableEntityPageUuids({ edit })
+
   const isSideBarOpened = useIsSidebarOpened()
   const survey = useSurvey()
-  const nodeDefRoot = Survey.getNodeDefRoot(survey)
   const editAllowed = edit && canEditDef
 
   let className = editAllowed ? ' edit' : ''
@@ -145,15 +145,7 @@ const SurveyForm = (props) => {
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
               <EntitySelectorTree
-                isDisabled={(nodeDefArg) => {
-                  const parentNodeArg = SurveyFormState.getFormPageParentNode(nodeDefArg)(state)
-                  return !(
-                    edit ||
-                    NodeDef.isRoot(nodeDefArg) ||
-                    NodeDef.getUuid(nodeDefRoot) === NodeDef.getParentUuid(nodeDefArg) ||
-                    Boolean(parentNodeArg)
-                  )
-                }}
+                isDisabled={(nodeDefArg) => notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))}
                 nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
                 onlyPages
                 onSelect={(nodeDefToSelect) => {
