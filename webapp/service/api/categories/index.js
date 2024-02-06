@@ -39,12 +39,12 @@ export const fetchCategoryItems = ({
   categoryUuid,
   draft = true,
   parentUuid = null,
-  searchValue = null,
+  search = null,
   lang = null,
 }) =>
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    data: { draft, parentUuid, searchValue, lang },
+    data: { draft, parentUuid, search, lang },
   })
 
 export const fetchCategoryItemsInLevelRequest = ({ surveyId, categoryUuid, levelIndex, draft = true }) =>

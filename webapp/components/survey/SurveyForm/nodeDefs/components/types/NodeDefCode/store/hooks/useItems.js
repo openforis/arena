@@ -10,8 +10,6 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordParentCategoryItemUuid } from '@webapp/store/ui/record/hooks'
 import * as API from '@webapp/service/api'
 
-const minItemsForAsyncLoading = 2
-
 export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
@@ -23,15 +21,15 @@ export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) =
 
   const items = useMemo(() => {
     if (edit || (levelIndex > 0 && !parentCategoryItemUuid)) return []
-    if (itemsCount > minItemsForAsyncLoading) {
+    if (itemsCount > Category.maxCategoryItemsInIndex) {
       const surveyId = Survey.getId(survey)
-      return (searchValue) => {
+      return (search) => {
         return API.fetchCategoryItems({
           surveyId,
           categoryUuid,
           draft,
           parentUuid: parentCategoryItemUuid,
-          searchValue,
+          search,
           lang,
         }).request
       }

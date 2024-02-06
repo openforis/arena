@@ -42,6 +42,8 @@ const NodeDefCode = (props) => {
 
   const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
   const itemsCount = Category.getItemsCount(category)
+  const autocomplete = itemsCount > Category.maxCategoryItemsInIndex
+
   const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
@@ -86,9 +88,7 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
-  const autocomplete = itemsCount > 2
-
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (
+  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete ? (
     <NodeDefCodeDropdown
       canEditRecord={canEditRecord}
       edit={edit}

@@ -21,8 +21,6 @@ import * as CategoryLevel from '../../../../core/survey/categoryLevel'
 import * as CategoryItem from '../../../../core/survey/categoryItem'
 import * as CategoryExportRepository from './categoryExportRepository'
 
-const maxCategoryItemsInIndex = 10000
-
 // ============== CREATE
 
 export const insertCategory = async ({ surveyId, category, backup = false, client = db }) => {
@@ -284,18 +282,25 @@ export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db
     (r) => parseInt(r.count, 10)
   )
 
+const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
+  if (Objects.isEmpty(searchValue)) return ''
+  const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
+  const labelsCol = DbUtils.getPropColCombined(CategoryItem.keysProps.labels, draft, 'i.', false)
+  return `AND (
+    lower(${codeCol}) LIKE $/search/ 
+    OR lower(${labelsCol} ->> '${lang}') LIKE $/search/
+  )`
+}
+
+const _getSearchQueryParam = ({ searchValue }) =>
+  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%').replaceAll('*', '%')}%`
+
 export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, searchValue = null, lang = null },
+  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null },
   client = db
 ) => {
-  const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
-  const labelsCol = DbUtils.getPropColCombined(CategoryItem.keysProps.labels, draft, 'i.')
-
-  const searchValueCondition = Objects.isEmpty(searchValue)
-    ? ''
-    : `AND (lower(${codeCol}) LIKE $/search/ OR lower(${labelsCol} ->> '${lang}') LIKE $/search/`
-
-  const search = String(searchValue).toLocaleLowerCase().trim()
+  const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
+  const search = _getSearchQueryParam({ searchValue })
   const items = await client.map(
     `
     SELECT i.* 
@@ -386,7 +391,7 @@ export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = f
 const fetchCategoryUuidsExceedingMaxItems = async ({ surveyId, draft }, client) => {
   const itemsCountIndexedByCategoryUuid = await fetchItemsCountIndexedByCategoryUuid({ surveyId, draft }, client)
   return Object.entries(itemsCountIndexedByCategoryUuid).reduce((acc, [categoryUuid, count]) => {
-    if (count > maxCategoryItemsInIndex) {
+    if (count > Category.maxCategoryItemsInIndex) {
       acc.push(categoryUuid)
     }
     return acc
