@@ -120,7 +120,6 @@ class RecordsUpdateThread extends Thread {
       cycle,
       draft,
       advanced: true,
-      includeBigCategories: false,
     })
 
     // If in preview mode, unpublished dependencies have not been stored in the db, so we need to build them

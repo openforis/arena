@@ -45,10 +45,11 @@ export const useDropdown = ({
     !minCharactersToAutocomplete || minCharactersToAutocomplete <= inputValue?.trim()?.length
 
   const fetchItems = useCallback(async () => {
-    if (searchMinCharsReached && !loading) {
+    if (!searchMinCharsReached) return
+    if (!loading) {
       updateState({ items: [], loading: true })
     }
-    let _items = searchMinCharsReached && itemsProp ? await itemsProp(inputValue) : []
+    let _items = itemsProp ? await itemsProp(inputValue) : []
     if (_items?.data?.items) {
       // items is the result of a fetch
       _items = _items.data.items
@@ -70,7 +71,7 @@ export const useDropdown = ({
   // fetch items on items prop or input value update (only if async items loading is active)
   useEffect(() => {
     initializeItems()
-  }, [asyncItemsLoading, itemsProp, inputValue])
+  }, [asyncItemsLoading, initializeItems, itemsProp, inputValue])
 
   // set title to control component
   useEffect(() => {
@@ -130,14 +131,6 @@ export const useDropdown = ({
 
   const options = items.map(itemToOption)
 
-  const findOptionByValue = useCallback(
-    (value) =>
-      options
-        .flatMap((option) => (option.options ? option.options : [option]))
-        .find((option) => option.value === value),
-    [options]
-  )
-
   const selectionToValue = useCallback(
     (sel) => {
       if (sel === null) return null // force resetting selection
@@ -145,12 +138,12 @@ export const useDropdown = ({
 
       if (multiple) {
         // selection is an array of items
-        return sel.map((selectedItem) => findOptionByValue(getOptionValue(selectedItem)))
+        return sel.map(itemToOption)
       }
       // selection is a single item
-      return findOptionByValue(getOptionValue(sel))
+      return itemToOption(sel)
     },
-    [findOptionByValue, getOptionValue, multiple]
+    [itemToOption, multiple]
   )
 
   const defaultValue = selectionToValue(defaultSelection)
