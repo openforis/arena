@@ -203,12 +203,8 @@ export const init = (app) => {
       try {
         const { surveyId, draft } = Request.getParams(req)
 
-        const categoriesByUuid = await CategoryService.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft })
-        const counts = Object.keys(categoriesByUuid).reduce((acc, uuid) => {
-          acc[uuid] = 10
-          return acc
-        }, {})
-        res.json(counts)
+        const countsByCategoryUuid = await CategoryService.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
+        res.json(countsByCategoryUuid)
       } catch (error) {
         next(error)
       }

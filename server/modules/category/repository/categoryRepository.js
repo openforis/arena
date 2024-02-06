@@ -293,7 +293,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 }
 
 const _getSearchQueryParam = ({ searchValue }) =>
-  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%').replaceAll('*', '%')}%`
+  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
 export const fetchItemsByParentUuid = async (
   { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null },
@@ -302,8 +302,7 @@ export const fetchItemsByParentUuid = async (
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const search = _getSearchQueryParam({ searchValue })
   const items = await client.map(
-    `
-    SELECT i.* 
+    `SELECT i.* 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
       ON l.uuid = i.level_uuid
@@ -311,7 +310,7 @@ export const fetchItemsByParentUuid = async (
       AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
       ${searchValueCondition}
     ORDER BY i.id
-  `,
+    LIMIT 1000`,
     { categoryUuid, search },
     (def) => dbTransformCallback(def, draft, true)
   )
