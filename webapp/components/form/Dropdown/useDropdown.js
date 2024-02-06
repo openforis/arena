@@ -33,7 +33,7 @@ export const useDropdown = ({
 
   const [state, setState] = useState({
     items: asyncItemsLoading ? [] : itemsProp,
-    loading: asyncItemsLoading,
+    loading: false,
     inputValue: selectRef?.current?.inputRef?.value,
   })
 
@@ -71,7 +71,7 @@ export const useDropdown = ({
   // fetch items on items prop or input value update (only if async items loading is active)
   useEffect(() => {
     initializeItems()
-  }, [asyncItemsLoading, initializeItems, itemsProp, inputValue])
+  }, [asyncItemsLoading, itemsProp, inputValue])
 
   // set title to control component
   useEffect(() => {
