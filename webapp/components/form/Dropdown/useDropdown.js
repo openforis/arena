@@ -34,7 +34,7 @@ export const useDropdown = ({
   const [state, setState] = useState({
     items: asyncItemsLoading ? [] : itemsProp,
     loading: false,
-    inputValue: selectRef?.current?.inputRef?.value,
+    inputValue: selectRef?.current?.inputRef?.value ?? '',
   })
 
   const updateState = useCallback((newProps) => setState((statePrev) => ({ ...statePrev, ...newProps })), [])
