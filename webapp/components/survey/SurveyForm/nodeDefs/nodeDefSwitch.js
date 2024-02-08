@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as R from 'ramda'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -72,12 +73,10 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
       !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
-    const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
     return {
       nodes,
       nodesEmpty,
       canAddNode,
-      readOnly,
     }
   }, Objects.isEqual)
 
@@ -92,6 +91,7 @@ const NodeDefSwitch = (props) => {
   const nodeDefLabelType = useNodeDefLabelType()
   const lang = useSurveyPreferredLang()
   const label = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
+  const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef)
 
   const [isHovering, setIsHovering] = useState(false)
 
@@ -152,10 +152,11 @@ const NodeDefSwitch = (props) => {
     _setIsHovering(false)
   }, [_setIsHovering])
 
-  const propagatedProps = {
+  const nestedComponentsProps = {
     ...props,
     ...entryProps,
     surveyInfo,
+    readOnly,
     label,
     lang,
     updateNode,
@@ -177,12 +178,24 @@ const NodeDefSwitch = (props) => {
       {renderType === NodeDefLayout.renderType.tableHeader ? (
         <NodeDefTableCellHeader nodeDef={nodeDef} label={label} lang={lang} />
       ) : renderType === NodeDefLayout.renderType.tableBody ? (
-        <NodeDefTableCellBody {...propagatedProps} />
+        <NodeDefTableCellBody {...nestedComponentsProps} />
       ) : (
-        <NodeDefFormItem {...propagatedProps} />
+        <NodeDefFormItem {...nestedComponentsProps} />
       )}
     </div>
   )
+}
+
+NodeDefSwitch.propTypes = {
+  canEditDef: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  edit: PropTypes.bool,
+  empty: PropTypes.bool,
+  entry: PropTypes.bool,
+  nodeDef: PropTypes.object.isRequired,
+  parentNode: PropTypes.object,
+  preview: PropTypes.bool,
+  renderType: PropTypes.string,
 }
 
 export default NodeDefSwitch
