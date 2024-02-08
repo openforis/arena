@@ -6,7 +6,7 @@ export class RecordsProvider {
   constructor({ surveyId, tx }) {
     this.surveyId = surveyId
     this.tx = tx
-    this._recordsCache = new ItemsCache()
+    this._recordsCache = new ItemsCache({ maxItems: 10 })
   }
 
   async getOrFetch(recordUuid) {

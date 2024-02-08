@@ -190,6 +190,7 @@ export const {
   fetchItemsByCategoryUuid,
   countItemsByLevelIndex,
   fetchItemsByLevelIndex,
+  fetchItemsCountIndexedByCategoryUuid,
 
   updateCategoryProp,
   updateCategoryItemExtraDefItem,

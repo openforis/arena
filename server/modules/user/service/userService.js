@@ -394,7 +394,7 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
   })
 
 // ==== User prefs
-export const { updateUserPrefs } = UserManager
+export const { updateUserPrefs, updateUserPrefsAndFetchGroups } = UserManager
 
 // ==== User Invite
 export const { inviteUser } = UserInviteService
