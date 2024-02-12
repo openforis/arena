@@ -5,6 +5,8 @@ import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
+import * as JobSerialized from '@common/job/jobSerialized'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
@@ -15,7 +17,7 @@ import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 
-import { ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
+import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
@@ -131,6 +133,16 @@ export const DataImportCsvView = () => {
     [dispatch, errorsExportFileName]
   )
 
+  const onJobCompletedDialogClose = useCallback(() => {
+    setState((statePrev) => {
+      const stateNext = { ...statePrev, jobCompleted: null }
+      if (JobSerialized.isSucceeded(jobCompleted)) {
+        stateNext.file = null
+      }
+      return stateNext
+    })
+  }, [jobCompleted])
+
   const importStartParams = {
     surveyId,
     file,
@@ -205,8 +217,7 @@ export const DataImportCsvView = () => {
               />
 
               {dataImportType === importTypes.updateExistingRecords && (
-                <fieldset>
-                  <legend>{i18n.t('dataImportView.options.header')}</legend>
+                <ExpansionPanel buttonLabel="dataImportView.options.header" startClosed>
                   {optionsRecordUpdate.map((optionKey) => (
                     <Checkbox
                       key={optionKey}
@@ -215,7 +226,7 @@ export const DataImportCsvView = () => {
                       onChange={setStateProp(optionKey)}
                     />
                   ))}
-                </fieldset>
+                </ExpansionPanel>
               )}
               <Dropzone
                 maxSize={fileMaxSize}
@@ -251,7 +262,7 @@ export const DataImportCsvView = () => {
       {jobCompleted && (
         <DataImportCompleteDialog
           job={jobCompleted}
-          onClose={() => setStateProp('jobCompleted')(null)}
+          onClose={onJobCompletedDialogClose}
           errorsExportFileName={errorsExportFileName}
         />
       )}

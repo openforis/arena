@@ -88,7 +88,6 @@ NodeDefCodeDropdown.defaultProps = {
   canEditRecord: false,
   edit: false,
   entryDataQuery: false,
-  items: [],
   readOnly: false,
   selectedItems: [],
 }
