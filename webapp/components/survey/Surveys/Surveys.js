@@ -19,6 +19,7 @@ import Table from '@webapp/components/Table'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import HeaderLeft from './HeaderLeft'
+import { RecordsCountIcon } from './RecordsCountIcon'
 
 const Surveys = (props) => {
   const { module, moduleApiUri, template } = props
@@ -138,7 +139,7 @@ const Surveys = (props) => {
               {
                 key: 'records',
                 header: 'surveysView.records',
-                renderItem: ({ item }) => item.recordsCount,
+                renderItem: RecordsCountIcon,
                 width: '5rem',
               },
               {
