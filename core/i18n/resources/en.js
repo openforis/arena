@@ -358,6 +358,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   homeView: {
     dashboard: {
+      activeSurveyNotSelected: `<title>Active survey not selected</title>
+      <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
       activeUsers: 'Active users',
       exportWithData: 'Export with data',
       exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
@@ -381,8 +383,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         <br />
         `,
       },
-      activeSurveyNotSelected: `<title>Active survey not selected</title>
-        <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
       storageSummary: {
         title: 'Storage use',
         availableSpace: 'Available ({{size}})',
@@ -394,6 +394,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         cleansing: 'Data Cleansing',
         analysis: 'Data Analysis',
       },
+      // records' summary
+      recordsByUser: 'Records by user',
+      dailyRecordsByUser: 'Daily records by user',
+      totalRecords: 'Total records',
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {

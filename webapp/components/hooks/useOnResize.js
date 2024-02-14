@@ -8,5 +8,5 @@ export default (callback, elementRef) => {
     return () => {
       resizeObserver.disconnect()
     }
-  }, [])
+  }, [callback, elementRef])
 }

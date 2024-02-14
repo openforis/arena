@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useContext, useState } from 'react'
 import * as d3 from 'd3'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
+import RecordsSummaryPeriodSelector from '../RecordsSummary/RecordsSummaryPeriodSelector'
 
 const RecordsByUser = () => {
   const ref = useRef()
@@ -113,7 +114,8 @@ const RecordsByUser = () => {
   }, [userCounts])
 
   return (
-    <div ref={ref} className="container">
+    <div ref={ref} className="records-by-user container">
+      <RecordsSummaryPeriodSelector />
       <h4 className="center-text">Records added per user (Total of {totalCount})</h4>
       <div ref={svgRef} style={{ height: '300px', overflowY: 'auto' }}></div>
     </div>

@@ -12,7 +12,6 @@ import { Tabs } from '@webapp/components/Tabs'
 
 import Helper, { helperTypes } from './Helper'
 import SamplingDataChart from './SamplingPointDataSummary/SamplingDataChart'
-import RecordsSummaryPeriodSelector from './RecordsSummary/RecordsSummaryPeriodSelector'
 import { StorageSummary } from './StorageSummary'
 import SurveyInfo from './SurveyInfo'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
@@ -43,7 +42,7 @@ const Dashboard = () => {
       {
         key: 'recordsByUser',
         label: 'homeView.dashboard.recordsByUser',
-        content: <RecordsByUser className="records-by-user" />,
+        content: <RecordsByUser />,
       },
       {
         key: 'dailyRecordsByUser',
@@ -70,8 +69,8 @@ const Dashboard = () => {
   })
   if (hasSamplingPointData) {
     tabItems.push({
-      key: 'samplingDataSummary',
-      label: 'homeView.dashboard.samplingDataSummary',
+      key: 'samplingPointDataCompletion',
+      label: 'homeView.dashboard.samplingPointDataCompletion',
       content: <SamplingDataChart />,
     })
   }
@@ -91,7 +90,6 @@ const Dashboard = () => {
         <div className="home-dashboard">
           <RecordsSummaryContext.Provider value={recordsSummaryState}>
             {!isSurveyInfoEmpty && <SurveyInfo />}
-            {hasRecords && <RecordsSummaryPeriodSelector />}
             <Tabs items={tabItems} orientation="vertical" />
             {/* {canEditSurvey && !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
             {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (

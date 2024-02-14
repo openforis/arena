@@ -6,6 +6,20 @@
 
   .tabs-wrapper {
     flex: 1;
+
+    .MuiTabs-root {
+      min-width: 300px;
+    }
+  }
+
+  .tab-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .chart-wrapper {
+      flex: 1;
+    }
   }
 }
 
