@@ -235,8 +235,8 @@ const DailyRecordsByUser = () => {
         onChange={(selectedOptions) => setSelectedUsers(selectedOptions)}
         placeholder={i18n.t('homeView.dashboard.selectUsers')}
       />
-      <div className="chart-wrapper" ref={wrapperRef}>
-        <div ref={containerRef} className="chart-container"></div>
+      <div className="dashboard-chart-wrapper" ref={wrapperRef}>
+        <div ref={containerRef} className="dashboard-chart-container"></div>
       </div>
     </>
   )
