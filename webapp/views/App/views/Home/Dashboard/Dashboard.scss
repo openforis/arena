@@ -1,5 +1,7 @@
 @import 'webapp/style/vars';
 
+$surveyInfoBarHeight: 140px;
+
 .home-dashboard {
   display: flex;
   flex-direction: column;
@@ -7,6 +9,8 @@
   .tabs-wrapper {
     flex: 1;
     border-top: 1px solid $greyBorder;
+    /* fix max height to get scrollbars only inside the tab content */
+    max-height: calc(100vh - #{$headerHeight} - #{$surveyInfoBarHeight});
 
     .MuiTabs-root {
       min-width: 300px;

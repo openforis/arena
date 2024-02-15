@@ -15,7 +15,6 @@ const barMouseOverColor = '#6baed6'
 
 const RecordsByUser = () => {
   const i18n = useI18n()
-  const ref = useRef()
   const wrapperRef = useRef()
   const svgContainerRef = useRef()
   const { width: wrapperWidth } = useElementOffset(wrapperRef)
@@ -24,7 +23,9 @@ const RecordsByUser = () => {
 
   useEffect(() => {
     const data = userCounts.map((userCount) => parseInt(userCount.count))
+
     const users = userCounts.map((userCount) => userCount.owner_name ?? userCount.owner_email)
+
     const newTotalCount = data.reduce((acc, userCount) => acc + userCount, 0)
     setTotalCount(newTotalCount)
 
@@ -35,22 +36,26 @@ const RecordsByUser = () => {
     const d3ContainerSelection = d3.select(svgContainerRef.current)
     let svg = d3ContainerSelection.select('svg')
     if (svg.empty()) {
-      svg = d3.select(svgContainerRef.current).append('svg')
+      svg = d3ContainerSelection.append('svg')
     }
     svg.selectAll('*').remove()
     svg.attr('width', svgWidth).attr('height', svgHeight)
 
+    const xTicks = d3.max(data) + 3
+
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data) + 3])
+      .domain([0, xTicks])
       .range([0 + padding.left, 500 - padding.right])
+
     const yScale = d3
       .scaleBand()
       .domain(users)
       .range([0 + padding.top, svgHeight - padding.bottom])
       .padding(0.1)
 
-    const xAxis = d3.axisTop(xScale)
+    const xAxis = d3.axisTop(xScale).ticks(xTicks).tickFormat(d3.format('d'))
+
     const yAxis = d3.axisLeft(yScale).tickFormat(() => '')
 
     svg.append('g').attr('transform', `translate(0,${padding.top})`).call(xAxis)
@@ -95,31 +100,16 @@ const RecordsByUser = () => {
       .attr('fill', 'black')
   }, [userCounts, wrapperWidth])
 
-  useEffect(() => {
-    const handleResize = () => {
-      const svg = d3.select(svgContainerRef.current).select('svg')
-      const div = d3.select(ref.current)
-      const barHeight = 60
-      const svgHeight = userCounts.length * barHeight
-      svg.attr('height', svgHeight + padding.top + padding.bottom)
-      div.style('height', Math.min(svgHeight, 300) + 'px')
-    }
-
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [userCounts])
-
   return (
-    <div ref={ref} className="records-by-user container">
+    <>
       <h4 className="chart-header">{i18n.t('homeView.dashboard.recordsAddedPerUserWithCount', { totalCount })}</h4>
+
       <RecordsSummaryPeriodSelector />
+
       <div className="chart-wrapper" ref={wrapperRef}>
         <div ref={svgContainerRef}></div>
       </div>
-    </div>
+    </>
   )
 }
 
