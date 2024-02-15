@@ -1,19 +1,17 @@
-import './DailyRecordsByUser.css'
-
 import React, { useEffect, useRef, useContext, useState } from 'react'
 import * as d3 from 'd3'
 import { timeDay } from 'd3-time'
 import { timeFormat } from 'd3-time-format'
-import Select from 'react-select'
 
 import { useElementOffset } from '@webapp/components/hooks'
+import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummary/RecordsSummaryPeriodSelector'
 
-const internalAreaMargin = { top: 20, right: 20, bottom: 120, left: 20 }
 const svgMargin = { top: 10, right: 10, bottom: 10, left: 10 }
+const internalAreaMargin = { top: 20, right: 20, bottom: 120, left: 20 }
 
 const calculateDateData = (userDateCounts) => {
   let firstDate, lastDate, daysDiff
@@ -72,17 +70,24 @@ const DailyRecordsByUser = () => {
   const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
 
   useEffect(() => {
-    if (selectedUsers.length > 0) {
-      // Filter userDateCounts to only include entries for the selected users
-      const filtered = userDateCounts.filter((entry) =>
-        selectedUsers.some((user) => user.owner_uuid === entry.owner_uuid)
-      )
-      setFilteredUserDateCounts(filtered)
-    }
+    const filteredUserDataCountsNext =
+      selectedUsers.length > 0
+        ? // Filter userDateCounts to only include entries for the selected users
+          userDateCounts.filter((entry) => selectedUsers.some((user) => user.owner_uuid === entry.owner_uuid))
+        : []
+    setFilteredUserDateCounts(filteredUserDataCountsNext)
   }, [selectedUsers, userDateCounts])
 
   useEffect(() => {
-    if (!filteredUserDateCounts.length) return
+    // Select the SVG if it exists, otherwise create a new one
+    const d3ContainerSelection = d3.select(containerRef.current)
+    let svg = d3ContainerSelection.select('svg')
+    // Clear the SVG
+    svg.selectAll('*').remove()
+
+    if (!filteredUserDateCounts.length) {
+      return
+    }
 
     const svgWidth = width - internalAreaMargin.left - internalAreaMargin.right
     const svgHeight = height - svgMargin.top - svgMargin.bottom
@@ -105,9 +110,7 @@ const DailyRecordsByUser = () => {
       .x((d, i) => xScale(timeDay.offset(lastDate, -i)))
       .y0(areaHeight)
       .y1((d) => yScale(d))
-    // Select the SVG if it exists, otherwise create a new one
-    const d3ContainerSelection = d3.select(containerRef.current)
-    let svg = d3ContainerSelection.select('svg')
+
     if (svg.empty()) {
       svg = d3ContainerSelection.append('svg')
     }
@@ -178,8 +181,8 @@ const DailyRecordsByUser = () => {
         tooltip.transition().duration(100).style('opacity', 0.9)
         tooltip
           .html('Records: ' + d.record + '<br/>' + 'User: ' + d.user)
-          .style('left', event.pageX + 'px')
-          .style('top', event.pageY - 28 + 'px')
+          .style('left', event.layerX + 20 + 'px')
+          .style('top', event.layerY - 28 + 'px')
       })
       .on('mouseout', function () {
         d3.select(this).transition().duration(20).attr('r', 3)
@@ -196,14 +199,14 @@ const DailyRecordsByUser = () => {
     const legend = svg.selectAll('.legend').data(data).enter().append('g').attr('class', 'legend')
     legend
       .append('rect')
-      .attr('x', svgWidth - 20) // Adjust the x attribute to start where the chart ends
+      .attr('x', svgWidth - 150) // Adjust the x attribute to start where the chart ends
       .attr('y', (d, i) => i * 20)
       .attr('width', 12)
       .attr('height', 12)
       .attr('fill', (d) => color(d.user))
     legend
       .append('text')
-      .attr('x', svgWidth - 150) // Adjust the x attribute to place the text to the right of the color rectangle
+      .attr('x', svgWidth - 130) // Adjust the x attribute to place the text to the right of the color rectangle
       .attr('y', (d, i) => i * 20 + 9)
       .attr('dy', '.15em')
       .style('text-anchor', 'start') // Adjust the text-anchor attribute to start
@@ -240,23 +243,17 @@ const DailyRecordsByUser = () => {
 
   return (
     <>
+      <h4 className="chart-header">{i18n.t('homeView.dashboard.dailyRecordsByUser')}</h4>
+
       <RecordsSummaryPeriodSelector />
 
-      <h4 className="center-text">{i18n.t('homeView.dashboard.dailyRecordsByUser')}</h4>
-      <Select
-        isMulti
-        options={sortedUserCounts.map((user) => ({
-          value: user.owner_uuid,
-          label: user.owner_name || user.owner_email,
-        }))}
-        onChange={(selectedOptions) =>
-          setSelectedUsers(
-            selectedOptions
-              ? selectedOptions.map((option) => sortedUserCounts.find((user) => user.owner_uuid === option.value))
-              : []
-          )
-        }
-        styles={{ menu: (provided) => ({ ...provided, width: '300px' }) }}
+      <Dropdown
+        multiple
+        items={sortedUserCounts}
+        itemLabel={(user) => user.owner_name ?? user.owner_email}
+        itemValue={(user) => user.owner_uuid}
+        onChange={(selectedOptions) => setSelectedUsers(selectedOptions)}
+        placeholder={i18n.t('homeView.dashboard.selectUsers')}
       />
       <div className="chart-wrapper" ref={wrapperRef}>
         <div ref={containerRef} className="chart-container"></div>

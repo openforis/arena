@@ -20,26 +20,22 @@ const RecordsSummaryPeriodSelector = () => {
   const { timeRangeItems, timeRangeSelection } = useTimeRanges({ timeRange })
 
   return (
-    <div className="home-dashboard__records-summary">
-      <div className="home-dashboard__records-summary-header">
-        <h6>
-          {i18n.t('homeView.recordsSummary.recordsAdded', {
-            from: formatDate(from),
-            to: formatDate(to),
-          })}
-        </h6>
-
-        <div className="time-range">
-          <span className="icon icon-calendar icon-12px icon-left" />
-          <Dropdown
-            clearable={false}
-            items={timeRangeItems}
-            onChange={(item) => onChangeTimeRange({ timeRange: item.value })}
-            searchable={false}
-            selection={timeRangeSelection}
-          />
-        </div>
+    <div className="home-dashboard__records-period-selector">
+      <div>{i18n.t('homeView.recordsSummary.recordsAddedInTheLast')}</div>
+      <div className="time-range">
+        <span className="icon icon-calendar icon-12px icon-left" />
+        <Dropdown
+          clearable={false}
+          items={timeRangeItems}
+          onChange={(item) => onChangeTimeRange({ timeRange: item.value })}
+          searchable={false}
+          selection={timeRangeSelection}
+        />
       </div>
+      {i18n.t('homeView.recordsSummary.fromToPeriod', {
+        from: formatDate(from),
+        to: formatDate(to),
+      })}
     </div>
   )
 }

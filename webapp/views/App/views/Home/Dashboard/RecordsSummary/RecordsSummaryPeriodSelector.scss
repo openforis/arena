@@ -1,33 +1,12 @@
 @import 'webapp/style/vars';
 
-.home-dashboard__records-summary {
-  padding: 10px;
-  background-color: $white;
-  display: grid;
-  grid-template-rows: 25px 1fr;
-  position: relative;
-  border: 1px solid $greyBorder;
-}
-
-.home-dashboard__records-summary-header {
+.home-dashboard__records-period-selector {
   display: flex;
   align-items: center;
-  justify-content: space-around;
 
   .time-range {
     display: flex;
     align-items: center;
     padding: 0.5rem 1rem;
-    background-color: $blueLightFocus;
-
-    .dropdown {
-      border-bottom: none;
-      grid-template-columns: 100px 20px;
-
-      * {
-        font-size: 0.8rem;
-        font-weight: 600;
-      }
-    }
   }
 }
