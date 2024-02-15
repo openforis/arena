@@ -21,6 +21,7 @@
 
     .chart-wrapper {
       flex: 1;
+      overflow-y: auto;
     }
   }
 
@@ -40,9 +41,9 @@
   margin-top: 20px;
 }
 
-.records-by-user {
-  height: 300px;
-  overflow-y: auto;
-  justify-content: center;
-  align-items: center;
-}
+// .records-by-user {
+//   height: 300px;
+//   overflow-y: auto;
+//   justify-content: center;
+//   align-items: center;
+// }

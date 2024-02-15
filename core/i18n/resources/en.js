@@ -396,6 +396,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       },
       // records' summary
       recordsByUser: 'Records by user',
+      recordsAddedPerUserWithCount: 'Records added per user (Total of {{totalCount}})',
       dailyRecordsByUser: 'Daily records by user',
       totalRecords: 'Total records',
       selectUsers: 'Select users...',

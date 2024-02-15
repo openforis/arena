@@ -9,6 +9,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummary/RecordsSummaryPeriodSelector'
+import { ChartUtils } from '../chartUtils'
 
 const svgMargin = { top: 10, right: 10, bottom: 10, left: 10 }
 const internalAreaMargin = { top: 20, right: 20, bottom: 120, left: 20 }
@@ -64,7 +65,7 @@ const DailyRecordsByUser = () => {
   const { userDateCounts, userCounts } = useContext(RecordsSummaryContext)
   const [selectedUsers, setSelectedUsers] = useState([])
   const [filteredUserDateCounts, setFilteredUserDateCounts] = useState([])
-  const { height, width } = useElementOffset(wrapperRef)
+  const { height: wrapperHeight, width: wrapperWidth } = useElementOffset(wrapperRef)
 
   // Sort userCounts in descending order based on count
   const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
@@ -89,11 +90,11 @@ const DailyRecordsByUser = () => {
       return
     }
 
-    const svgWidth = width - internalAreaMargin.left - internalAreaMargin.right
-    const svgHeight = height - svgMargin.top - svgMargin.bottom
+    const svgWidth = wrapperWidth - internalAreaMargin.left - internalAreaMargin.right
+    const svgHeight = wrapperHeight - svgMargin.top - svgMargin.bottom
 
     const areaWidth = svgWidth - internalAreaMargin.left - internalAreaMargin.right
-    const areaHeight = height - internalAreaMargin.top - internalAreaMargin.bottom
+    const areaHeight = wrapperHeight - internalAreaMargin.top - internalAreaMargin.bottom
 
     const { firstDate, lastDate, daysDiff } = calculateDateData(filteredUserDateCounts)
     let groupedData = groupDataByUserAndDate(filteredUserDateCounts, daysDiff, lastDate)
@@ -152,19 +153,7 @@ const DailyRecordsByUser = () => {
       .style('fill', 'none')
 
     // Add tooltip
-    let tooltip = d3ContainerSelection.select('.tooltip')
-    if (tooltip.empty()) {
-      tooltip = d3ContainerSelection
-        .append('div')
-        .attr('class', 'tooltip')
-        .style('opacity', 0)
-        .style('background-color', 'white')
-        .style('padding', '5px')
-        .style('border-radius', '5px')
-        .style('position', 'absolute')
-        .style('z-index', '10')
-        .style('color', 'black')
-    }
+    const tooltip = ChartUtils.buildTooltip({ d3ContainerSelection })
 
     // user data dots
     user
@@ -178,21 +167,12 @@ const DailyRecordsByUser = () => {
       .style('fill', (d) => color(d.user))
       .on('mouseover', function (event, d) {
         d3.select(this).transition().duration(100).attr('r', 6)
-        tooltip.transition().duration(100).style('opacity', 0.9)
-        tooltip
-          .html('Records: ' + d.record + '<br/>' + 'User: ' + d.user)
-          .style('left', event.layerX + 20 + 'px')
-          .style('top', event.layerY - 28 + 'px')
+        tooltip.html('Records: ' + d.record + '<br/>' + 'User: ' + d.user)
+        ChartUtils.showTooltip({ tooltip, event })
       })
       .on('mouseout', function () {
         d3.select(this).transition().duration(20).attr('r', 3)
-        tooltip
-          .transition()
-          .duration(200)
-          .style('opacity', 0)
-          .on('end', function () {
-            tooltip.html('')
-          })
+        ChartUtils.hideTooltip({ tooltip })
       })
 
     // legend
@@ -236,10 +216,10 @@ const DailyRecordsByUser = () => {
     // X axis label
     svg
       .append('text')
-      .attr('transform', 'translate(' + svgWidth / 2 + ' ,' + (height - 50) + ')')
+      .attr('transform', 'translate(' + svgWidth / 2 + ' ,' + (wrapperHeight - 50) + ')')
       .style('text-anchor', 'middle')
       .text('Date')
-  }, [filteredUserDateCounts, height, width])
+  }, [filteredUserDateCounts, wrapperHeight, wrapperWidth])
 
   return (
     <>
