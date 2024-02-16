@@ -8,7 +8,7 @@ import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
-import RecordsSummaryPeriodSelector from '../RecordsSummary/RecordsSummaryPeriodSelector'
+import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
 import { ChartUtils } from '../chartUtils'
 
 const svgMargin = { top: 10, right: 10, bottom: 10, left: 10 }

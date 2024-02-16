@@ -15,12 +15,12 @@ import SamplingPointDataChart from './SamplingPointDataSummary/SamplingPointData
 import { StorageSummary } from './StorageSummary'
 import SurveyInfo from './SurveyInfo'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
-import { useRecordsSummary } from './RecordsSummary/store'
+import { useRecordsSummary } from './RecordsSummaryPeriodSelector/store'
 import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 import { RecordsSummaryContext } from './RecordsSummaryContext'
 import RecordsByUser from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
-import TotalRecordsSummaryChart from './RecordsSummary/Chart'
+import TotalRecordsSummaryChart from './TotalRecordsSummaryChart'
 import { ActiveUsers } from './ActiveUsers'
 
 const Dashboard = () => {

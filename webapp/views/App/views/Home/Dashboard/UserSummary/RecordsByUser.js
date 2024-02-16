@@ -5,7 +5,7 @@ import { useElementOffset } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
-import RecordsSummaryPeriodSelector from '../RecordsSummary/RecordsSummaryPeriodSelector'
+import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
 import { ChartUtils } from '../chartUtils'
 
 const padding = { top: 20, right: 20, bottom: 20, left: 20 }

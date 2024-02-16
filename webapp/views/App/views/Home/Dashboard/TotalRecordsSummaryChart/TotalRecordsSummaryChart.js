@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import './Chart.scss'
+import './TotalRecordsSummaryChart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
@@ -13,7 +13,7 @@ import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
 
-const Chart = (props) => {
+const TotalRecordsSummaryChart = (props) => {
   const { counts, from, to } = props
 
   const chartRef = useRef(null)
@@ -58,10 +58,10 @@ const Chart = (props) => {
   )
 }
 
-Chart.propTypes = {
+TotalRecordsSummaryChart.propTypes = {
   counts: PropTypes.array.isRequired,
   from: PropTypes.string.isRequired,
   to: PropTypes.string.isRequired,
 }
 
-export default Chart
+export default TotalRecordsSummaryChart
