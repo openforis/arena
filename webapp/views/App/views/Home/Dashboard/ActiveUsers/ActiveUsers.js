@@ -18,39 +18,43 @@ export const ActiveUsers = () => {
   useInterval(updateRequestTime, updateInterval)
 
   return (
-    <Table
-      columns={[
-        {
-          key: 'name',
-          header: 'common.name',
-          renderItem: ({ item }) => <LabelWithTooltip label={User.getName(item)} />,
-          width: 'minmax(15rem, 1fr)',
-        },
-        {
-          key: 'email',
-          header: 'common.email',
-          renderItem: ({ item }) => <LabelWithTooltip label={User.getEmail(item)} />,
-          width: 'minmax(15rem, 1fr)',
-        },
-        {
-          key: 'lastLogin',
-          header: 'usersView.lastLogin',
-          width: '14rem',
-          renderItem: ({ item }) => {
-            const lastLoginTime = User.getLastLoginTime(item)
-            if (lastLoginTime) {
-              return DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime)
-            } else if (User.hasAccepted(item)) {
-              return i18n.t('usersView.moreThan30DaysAgo')
-            }
+    <>
+      <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.activeUsers')}</h4>
+      <Table
+        className="dashboard-active-users-table"
+        columns={[
+          {
+            key: 'name',
+            header: 'common.name',
+            renderItem: ({ item }) => <LabelWithTooltip label={User.getName(item)} />,
+            width: 'minmax(15rem, 1fr)',
           },
-        },
-      ]}
-      module="users-active"
-      moduleApiUri="/api/users-active"
-      restParams={{ requestTime }}
-      showFooter={false}
-      showHeader={false}
-    />
+          {
+            key: 'email',
+            header: 'common.email',
+            renderItem: ({ item }) => <LabelWithTooltip label={User.getEmail(item)} />,
+            width: 'minmax(15rem, 1fr)',
+          },
+          {
+            key: 'lastLogin',
+            header: 'usersView.lastLogin',
+            width: '14rem',
+            renderItem: ({ item }) => {
+              const lastLoginTime = User.getLastLoginTime(item)
+              if (lastLoginTime) {
+                return DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime)
+              } else if (User.hasAccepted(item)) {
+                return i18n.t('usersView.moreThan30DaysAgo')
+              }
+            },
+          },
+        ]}
+        module="users-active"
+        moduleApiUri="/api/users-active"
+        restParams={{ requestTime }}
+        showFooter={false}
+        showHeader={false}
+      />
+    </>
   )
 }
