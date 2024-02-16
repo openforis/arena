@@ -23,14 +23,14 @@ $surveyInfoBarHeight: 140px;
     flex-direction: column;
     padding: 20px;
 
+    .dashboard-chart-header {
+      text-align: center;
+    }
+
     .dashboard-chart-wrapper {
       flex: 1;
       overflow-y: auto;
     }
-  }
-
-  .chart-header {
-    text-align: center;
   }
 }
 

@@ -11,7 +11,7 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { Tabs } from '@webapp/components/Tabs'
 
 import Helper, { helperTypes } from './Helper'
-import SamplingDataChart from './SamplingPointDataSummary/SamplingDataChart'
+import SamplingPointDataChart from './SamplingPointDataSummary/SamplingPointDataChart'
 import { StorageSummary } from './StorageSummary'
 import SurveyInfo from './SurveyInfo'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
@@ -70,8 +70,8 @@ const Dashboard = () => {
   if (hasSamplingPointData) {
     tabItems.push({
       key: 'samplingPointDataCompletion',
-      label: 'homeView.dashboard.samplingPointDataCompletion',
-      content: <SamplingDataChart />,
+      label: 'homeView.dashboard.samplingPointDataCompletion.title',
+      content: <SamplingPointDataChart />,
     })
   }
   if (isSystemAdmnin) {

@@ -223,7 +223,7 @@ const DailyRecordsByUser = () => {
 
   return (
     <>
-      <h4 className="chart-header">{i18n.t('homeView.dashboard.dailyRecordsByUser')}</h4>
+      <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.dailyRecordsByUser')}</h4>
 
       <RecordsSummaryPeriodSelector />
 

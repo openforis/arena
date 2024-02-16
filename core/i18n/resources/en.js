@@ -388,7 +388,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
       },
-      samplingPointDataCompletion: 'Sampling Point Data Completion',
+      samplingPointDataCompletion: {
+        title: 'Sampling Point Data Completion',
+        totalItems: 'Total items: {{totalItems}}',
+      },
       step: {
         entry: 'Data Entry',
         cleansing: 'Data Cleansing',

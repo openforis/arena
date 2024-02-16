@@ -102,7 +102,9 @@ const RecordsByUser = () => {
 
   return (
     <>
-      <h4 className="chart-header">{i18n.t('homeView.dashboard.recordsAddedPerUserWithCount', { totalCount })}</h4>
+      <h4 className="dashboard-chart-header">
+        {i18n.t('homeView.dashboard.recordsAddedPerUserWithCount', { totalCount })}
+      </h4>
 
       <RecordsSummaryPeriodSelector />
 
