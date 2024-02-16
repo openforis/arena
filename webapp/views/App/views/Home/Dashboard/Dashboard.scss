@@ -15,39 +15,21 @@ $surveyInfoBarHeight: 140px;
     .MuiTabs-root {
       min-width: 300px;
     }
-  }
 
-  .tab-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-
-    .dashboard-chart-header {
-      text-align: center;
-    }
-
-    .dashboard-chart-wrapper {
+    .tab-content {
       flex: 1;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+
+      .dashboard-chart-header {
+        text-align: center;
+      }
+
+      .dashboard-chart-wrapper {
+        flex: 1;
+        overflow-y: auto;
+      }
     }
   }
 }
-
-.chart-container-dashboard {
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 5em;
-  width: 100%;
-  margin-top: 20px;
-}
-
-// .records-by-user {
-//   height: 300px;
-//   overflow-y: auto;
-//   justify-content: center;
-//   align-items: center;
-// }

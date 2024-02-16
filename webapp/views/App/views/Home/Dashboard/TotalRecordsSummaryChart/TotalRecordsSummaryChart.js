@@ -6,8 +6,11 @@ import PropTypes from 'prop-types'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useOnResize } from '@webapp/components/hooks'
-import { elementOffset } from '@webapp/utils/domUtils'
+import { useElementOffset } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+
+import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
+
 import YAxis, { getScale as getYScale } from './components/yAxis'
 import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
@@ -16,12 +19,13 @@ import DataPath from './components/dataPath'
 const TotalRecordsSummaryChart = (props) => {
   const { counts, from, to } = props
 
-  const chartRef = useRef(null)
-
+  const i18n = useI18n()
+  const wrapperRef = useRef(null)
   const [chartProps, setChartProps] = useState(null)
+  const { width, height } = useElementOffset(wrapperRef)
 
-  const updateChartProps = () => {
-    const { width, height } = elementOffset(chartRef.current)
+  useEffect(() => {
+    if (!width || !height) return
 
     const chartPropsUpdate = {
       width,
@@ -38,22 +42,24 @@ const TotalRecordsSummaryChart = (props) => {
       xScale: (date) => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
       yScale: getYScale(counts, chartPropsUpdate),
     })
-  }
-
-  useOnResize(updateChartProps, chartRef)
-
-  useEffect(updateChartProps, [counts, from, to])
+  }, [counts, from, height, to, width])
 
   return (
-    <div className="home-dashboard__records-summary__chart" ref={chartRef}>
-      {chartProps && (
-        <svg width={chartProps.width} height={chartProps.height}>
-          <YAxis {...props} chartProps={chartProps} />
-          <XAxis {...props} chartProps={chartProps} />
-          <DataPath {...props} chartProps={chartProps} />
-          <DataPoints {...props} chartProps={chartProps} />
-        </svg>
-      )}
+    <div className="home-dashboard__records-summary__chart">
+      <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.dailyRecordsByUser')}</h4>
+
+      <RecordsSummaryPeriodSelector />
+
+      <div className="dashboard-chart-wrapper" ref={wrapperRef}>
+        {chartProps && (
+          <svg width={chartProps.width} height={chartProps.height}>
+            <YAxis {...props} chartProps={chartProps} />
+            <XAxis {...props} chartProps={chartProps} />
+            <DataPath {...props} chartProps={chartProps} />
+            <DataPoints {...props} chartProps={chartProps} />
+          </svg>
+        )}
+      </div>
     </div>
   )
 }

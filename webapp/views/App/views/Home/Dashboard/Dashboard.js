@@ -11,7 +11,7 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { Tabs } from '@webapp/components/Tabs'
 
 import Helper, { helperTypes } from './Helper'
-import SamplingPointDataChart from './SamplingPointDataSummary/SamplingPointDataChart'
+import SamplingPointDataSummary from './SamplingPointDataSummary'
 import { StorageSummary } from './StorageSummary'
 import SurveyInfo from './SurveyInfo'
 import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogMessages'
@@ -71,7 +71,7 @@ const Dashboard = () => {
     tabItems.push({
       key: 'samplingPointDataCompletion',
       label: 'homeView.dashboard.samplingPointDataCompletion.title',
-      content: <SamplingPointDataChart />,
+      content: <SamplingPointDataSummary />,
     })
   }
   if (isSystemAdmnin) {
@@ -91,21 +91,6 @@ const Dashboard = () => {
           <RecordsSummaryContext.Provider value={recordsSummaryState}>
             {!isSurveyInfoEmpty && <SurveyInfo />}
             <Tabs items={tabItems} orientation="vertical" />
-            {/* {canEditSurvey && !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && <RecordsSummary />}
-            {canEditSurvey && activeTab === 'Dashboard' && !isSurveyInfoEmpty && (
-              <div className="chart-container-dashboard">
-                {recordsSummaryState.counts.length > 0 && <RecordsByUser className="records-by-user" />}
-                <StorageSummary />
-                {hasSamplingPointData && <SamplingDataChart surveyInfo={surveyInfo} />}
-              </div>
-            )}
-            {canEditSurvey &&
-              activeTab === 'Dashboard' &&
-              !isSurveyInfoEmpty &&
-              recordsSummaryState.counts.length > 0 && <DailyRecordsByUser />}
-            {canEditSurvey && activeTab === 'RecordHistory' && !isSurveyInfoEmpty && recordsSummaryState.counts && (
-              <Chart counts={recordsSummaryState.counts} from={recordsSummaryState.from} to={recordsSummaryState.to} />
-            )} */}
           </RecordsSummaryContext.Provider>
         </div>
       )}

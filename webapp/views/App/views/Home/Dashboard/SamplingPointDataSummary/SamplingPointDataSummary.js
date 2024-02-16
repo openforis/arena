@@ -22,7 +22,7 @@ const dataCleansingColor = '#fde8aa'
 const dataAnalysisColor = '#b3e2cd'
 const notCompletedColor = '#eeeeee'
 
-const SamplingPointDataChart = () => {
+const SamplingPointDataSummary = () => {
   const chartContainerRef = useRef()
   const { dataEntry, dataCleansing, dataAnalysis } = useContext(RecordsSummaryContext)
   const i18n = useI18n()
@@ -76,7 +76,7 @@ const SamplingPointDataChart = () => {
       .attr('d', d3.arc().innerRadius(innerRadius).outerRadius(outerRadius))
       .attr('fill', (d) => colorScale(d.data[0]))
       .attr('stroke', 'black')
-      .style('stroke-width', '2px')
+      .style('stroke-width', '1px')
 
     // d3.select(`#${legendId}`).style('visibility', 'visible').html(legendText)
   }, [data, dataAnalysis, dataCleansing, dataEntry, i18n, surveyId, totalItems])
@@ -105,4 +105,4 @@ const SamplingPointDataChart = () => {
   )
 }
 
-export default SamplingPointDataChart
+export default SamplingPointDataSummary

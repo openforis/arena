@@ -108,7 +108,7 @@ const RecordsByUser = () => {
 
       <RecordsSummaryPeriodSelector />
 
-      <div className="chart-wrapper" ref={wrapperRef}>
+      <div className="dashboard-chart-wrapper" ref={wrapperRef}>
         <div ref={svgContainerRef}></div>
       </div>
     </>
