@@ -1307,6 +1307,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       buttonCode: 'Button code',
       code: '$t(common.code)',
       label: '$t(common.label)',
+      typeCodeOrLabel: 'Type code or label',
     },
     nodeDefBoolean: {
       labelValue: {

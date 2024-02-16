@@ -107,7 +107,7 @@ const props = {
           return Taxon.getCode(taxon)
         }
         // Scientific_name
-        if (Taxon.isUnlistedTaxon(taxon)) {
+        if (Taxon.isUnkOrUnlTaxon(taxon)) {
           // Scientific name from node value
           return Node.getScientificName(node)
         }

@@ -1,7 +1,7 @@
 import { Arrays } from '@openforis/arena-core'
 
 export class ItemsCache {
-  constructor({ maxItems = 10 } = {}) {
+  constructor({ maxItems = 1000 } = {}) {
     this._maxItems = maxItems
     this._itemsByKey = {}
     this._lastAccessedKeys = []
@@ -21,6 +21,10 @@ export class ItemsCache {
   _updateLastAccessedKey(key) {
     this._lastAccessedKeys = Arrays.removeItem(key)(this._lastAccessedKeys)
     this._lastAccessedKeys.unshift(key)
+  }
+
+  has(key) {
+    return !!this.get(key)
   }
 
   get(key) {
