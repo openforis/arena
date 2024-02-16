@@ -126,6 +126,15 @@ export const init = (app) => {
     }
   })
 
+  const _sendSurvey = async ({ survey, user, res }) => {
+    let surveyUpdated = survey
+    if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
+      const surveyId = Survey.getId(survey)
+      surveyUpdated = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+    }
+    res.json({ survey: surveyUpdated })
+  }
+
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
@@ -136,13 +145,30 @@ export const init = (app) => {
         UserService.updateUserPrefs(user),
       ])
 
-      let surveyUpdated = survey
+      await _sendSurvey({ survey, user, res })
+    } catch (error) {
+      next(error)
+    }
+  })
 
-      if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
-        surveyUpdated = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
-      }
+  app.get('/survey/:surveyId/full', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, draft, advanced, includeAnalysis, validate } = Request.getParams(req)
+      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
-      res.json({ survey: surveyUpdated })
+      const [survey] = await Promise.all([
+        SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+          surveyId,
+          cycle,
+          draft,
+          advanced,
+          includeAnalysis,
+          includeBigCategories: false,
+          validate,
+        }),
+        UserService.updateUserPrefs(user),
+      ])
+      await _sendSurvey({ survey, user, res })
     } catch (error) {
       next(error)
     }

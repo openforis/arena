@@ -28,7 +28,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     // Survey not found with user pref
     // removing user pref
     const _user = User.deletePrefSurvey(surveyId)(user)
-    sendResponse(res, await UserService.updateUserPrefs(_user))
+    sendResponse(res, await UserService.updateUserPrefsAndFetchGroups(_user))
   }
 }
 

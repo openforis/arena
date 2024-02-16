@@ -20,6 +20,18 @@ import {
   dbTransformCallback,
 } from '../../survey/repository/surveySchemaRepositoryUtils'
 
+const searchTypes = {
+  equals: 'equals',
+  includes: 'includes',
+  startsWith: 'startsWith',
+}
+
+const searchValueProcessorByType = {
+  [searchTypes.equals]: A.identity,
+  [searchTypes.includes]: (value) => `%${value}%`,
+  [searchTypes.startsWith]: (value) => `${value}%`,
+}
+
 const getTaxonVernacularNameSelectFields = (draft) => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
@@ -296,8 +308,8 @@ export const fetchTaxaWithVernacularNamesStream = ({
       (langCode) =>
         `(SELECT
             string_agg(${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')}, '${
-          TaxonVernacularName.NAMES_SEPARATOR
-        }') as names
+              TaxonVernacularName.NAMES_SEPARATOR
+            }') as names
         FROM
             ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn
         WHERE
@@ -345,8 +357,12 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
     (taxon) => dbTransformCallback(taxon, draft, true)
   )
 
-const toSearchValue = (filterValue) =>
-  filterValue ? String(filterValue).trim().toLowerCase().replace(/\*/g, '%') : null
+const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
+  if (A.isEmpty(filterValue)) return null
+  let searchValue = String(filterValue).trim().toLowerCase().replace(/\*/g, '%')
+  searchValue = searchValueProcessorByType[searchType](searchValue)
+  return searchValue
+}
 
 export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
   const searchValue = toSearchValue(code)
@@ -383,12 +399,12 @@ export const findTaxaByCodeOrScientificName = async (
   draft = false,
   client = db
 ) => {
-  const searchValue = toSearchValue(`*${filterValue}*`)
-  const whereCondition = `
-    ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
+  const searchValue = toSearchValue(filterValue, searchTypes.includes)
+  const whereCondition = searchValue
+    ? `${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
      OR  
-    ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft)}
-    `
+    ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft)}`
+    : null
 
   return findTaxaByCondition(
     surveyId,
@@ -402,7 +418,7 @@ export const findTaxaByCodeOrScientificName = async (
 }
 
 export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
-  const searchValue = toSearchValue(`*${filterValue}*`)
+  const searchValue = toSearchValue(filterValue, searchTypes.includes)
   const filterCondition = searchValue
     ? DbUtils.getPropFilterCondition(TaxonVernacularName.keysProps.name, draft, 'vn.')
     : ''
