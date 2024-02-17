@@ -13,6 +13,7 @@ import { ChartUtils } from '../chartUtils'
 
 const svgMargin = { top: 10, right: 10, bottom: 10, left: 10 }
 const internalAreaMargin = { top: 20, right: 20, bottom: 120, left: 20 }
+const tickWidth = 25
 
 const calculateDateData = (userDateCounts) => {
   let firstDate, lastDate, daysDiff
@@ -125,8 +126,11 @@ const DailyRecordsByUser = () => {
     // Set the domain for the x-axis to be 5 days before the first date and 5 days after the last date
     const currentDate = new Date()
     const fiveDaysAfterLastDate = timeDay.offset(lastDate, 5)
+    const lowerLimitDate = timeDay.offset(firstDate, -5)
     const upperLimitDate = fiveDaysAfterLastDate > currentDate ? currentDate : fiveDaysAfterLastDate
-    xScale.domain([timeDay.offset(firstDate, -5), upperLimitDate])
+    const totalDays = timeDay.count(lowerLimitDate, upperLimitDate)
+
+    xScale.domain([lowerLimitDate, upperLimitDate])
     yScale.domain([0, d3.max(data, (d) => d3.max(d.records))])
 
     const user = svg.selectAll('.user').data(data).enter().append('g').attr('class', 'user')
@@ -193,10 +197,11 @@ const DailyRecordsByUser = () => {
       .text((d) => d.user) // Remove the code that truncates the user name
 
     // X axis
+    const xAxisVisibleTicks = Math.min(Math.ceil(areaWidth / tickWidth), totalDays)
     svg
       .append('g')
       .attr('transform', 'translate(0,' + areaHeight + internalAreaMargin.top + ')')
-      .call(d3.axisBottom(xScale).ticks(d3.timeDay.every(1)).tickFormat(timeFormat('%Y-%m-%d')))
+      .call(d3.axisBottom(xScale).ticks(xAxisVisibleTicks).tickFormat(timeFormat('%Y-%m-%d')))
       .selectAll('text')
       .attr('transform', 'rotate(-45)')
       .style('text-anchor', 'end')

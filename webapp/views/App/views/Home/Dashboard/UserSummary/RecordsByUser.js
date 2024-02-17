@@ -8,10 +8,11 @@ import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
 import { ChartUtils } from '../chartUtils'
 
-const padding = { top: 20, right: 20, bottom: 20, left: 20 }
+const padding = { top: 20, right: 50, bottom: 20, left: 20 }
 const barHeight = 60
 const barColor = '#b3cde3'
 const barMouseOverColor = '#6baed6'
+const tickWidth = 30
 
 const RecordsByUser = () => {
   const i18n = useI18n()
@@ -41,12 +42,12 @@ const RecordsByUser = () => {
     svg.selectAll('*').remove()
     svg.attr('width', svgWidth).attr('height', svgHeight)
 
-    const xTicks = d3.max(data) + 3
+    const xAxisMaxValue = d3.max(data) + 3
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, xTicks])
-      .range([0 + padding.left, 500 - padding.right])
+      .domain([0, xAxisMaxValue])
+      .range([0 + padding.left, wrapperWidth - padding.right - 50])
 
     const yScale = d3
       .scaleBand()
@@ -54,7 +55,8 @@ const RecordsByUser = () => {
       .range([0 + padding.top, svgHeight - padding.bottom])
       .padding(0.1)
 
-    const xAxis = d3.axisTop(xScale).ticks(xTicks).tickFormat(d3.format('d'))
+    const xAxisVisibleTicks = Math.min(xAxisMaxValue, Math.ceil(svgWidth / tickWidth))
+    const xAxis = d3.axisTop(xScale).ticks(xAxisVisibleTicks).tickFormat(d3.format('d'))
 
     const yAxis = d3.axisLeft(yScale).tickFormat(() => '')
 
