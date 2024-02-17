@@ -77,8 +77,6 @@ const SamplingPointDataSummary = () => {
       .attr('fill', (d) => colorScale(d.data[0]))
       .attr('stroke', 'black')
       .style('stroke-width', '1px')
-
-    // d3.select(`#${legendId}`).style('visibility', 'visible').html(legendText)
   }, [data, dataAnalysis, dataCleansing, dataEntry, i18n, surveyId, totalItems])
 
   if (!totalItems) return null
