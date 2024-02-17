@@ -20,7 +20,7 @@ const outerRadius = Math.min(width, height) / 2 - 2
 const dataEntryColor = '#fdcdac'
 const dataCleansingColor = '#fde8aa'
 const dataAnalysisColor = '#b3e2cd'
-const notCompletedColor = '#eeeeee'
+const remainingItemsColor = '#eeeeee'
 
 const SamplingPointDataSummary = () => {
   const chartContainerRef = useRef()
@@ -35,7 +35,7 @@ const SamplingPointDataSummary = () => {
       [RecordStep.stepNames.entry]: dataEntry,
       [RecordStep.stepNames.cleansing]: dataCleansing,
       [RecordStep.stepNames.analysis]: dataAnalysis,
-      totalItems,
+      remainingItems: totalItems - dataEntry - dataCleansing - dataAnalysis,
     }),
     [dataAnalysis, dataCleansing, dataEntry, totalItems]
   )
@@ -63,7 +63,7 @@ const SamplingPointDataSummary = () => {
     const colorScale = d3
       .scaleOrdinal()
       .domain(Object.entries(data))
-      .range([dataEntryColor, dataCleansingColor, dataAnalysisColor, notCompletedColor])
+      .range([dataEntryColor, dataCleansingColor, dataAnalysisColor, remainingItemsColor])
 
     const pie = d3.pie().value((d) => d[1])
     const dataReady = pie(Object.entries(data))

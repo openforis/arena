@@ -30,7 +30,7 @@ export const Tabs = (props) => {
       </MuiTabs>
       {selectedItem && (
         <div key={selectedItem.key} className="tab-content">
-          {selectedItem.content}
+          {selectedItem.renderContent()}
         </div>
       )}
     </div>

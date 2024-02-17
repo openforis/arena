@@ -42,17 +42,17 @@ const Dashboard = () => {
       {
         key: 'recordsByUser',
         label: 'homeView.dashboard.recordsByUser',
-        content: <RecordsByUser />,
+        renderContent: () => <RecordsByUser />,
       },
       {
         key: 'dailyRecordsByUser',
         label: 'homeView.dashboard.dailyRecordsByUser',
-        content: <DailyRecordsByUser />,
+        renderContent: () => <DailyRecordsByUser />,
       },
       {
         key: 'totalRecords',
         label: 'homeView.dashboard.totalRecords',
-        content: (
+        renderContent: () => (
           <TotalRecordsSummaryChart
             counts={recordsSummaryState.counts}
             from={recordsSummaryState.from}
@@ -65,20 +65,20 @@ const Dashboard = () => {
   tabItems.push({
     key: 'storageSummary',
     label: 'homeView.dashboard.storageSummary.title',
-    content: <StorageSummary />,
+    renderContent: () => <StorageSummary />,
   })
   if (hasSamplingPointData) {
     tabItems.push({
       key: 'samplingPointDataCompletion',
       label: 'homeView.dashboard.samplingPointDataCompletion.title',
-      content: <SamplingPointDataSummary />,
+      renderContent: () => <SamplingPointDataSummary />,
     })
   }
   if (isSystemAdmnin) {
     tabItems.push({
       key: 'activeUsers',
       label: 'homeView.dashboard.activeUsers',
-      content: <ActiveUsers />,
+      renderContent: () => <ActiveUsers />,
     })
   }
 
