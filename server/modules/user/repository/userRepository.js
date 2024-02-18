@@ -92,20 +92,7 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     (row) => Number(row.count)
   )
 
-const _usersSelectQuery = ({
-  selectFields,
-  sortBy = userSortBy.email,
-  sortOrder = 'ASC',
-  includeSurveys = false,
-  whereConditions = [],
-}) => {
-  // check sort by parameters
-  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
-  const orderByDirection = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
-
-  const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
-
-  const surveysSelect = `SELECT 
+const _userSurveysSelect = `SELECT 
   gu.user_uuid AS user_uuid,
   STRING_AGG(
       (s.props || s.props_draft) ->> 'name' || ' (' || g.name || ')', 
@@ -119,16 +106,32 @@ FROM survey s
   LEFT JOIN user_invitation ui ON ui.survey_uuid = s.uuid AND ui.user_uuid = gu.user_uuid
 GROUP BY gu.user_uuid`
 
-  return `
-    WITH us AS (
-      SELECT DISTINCT ON (us.sess #>> '{passport,user}')
-        (us.sess #>> '{passport,user}')::uuid AS user_uuid,
-        (us.expire - interval '30 days') AS last_login_time
-      FROM user_sessions us
-      WHERE us.sess #>> '{passport,user}' IS NOT NULL
-      ORDER BY us.sess #>> '{passport,user}', expire DESC
-    )
-    ${includeSurveys ? `, user_surveys AS (${surveysSelect})` : ''}
+const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
+  WITH us AS (
+    SELECT DISTINCT ON (us.sess #>> '{passport,user}')
+      (us.sess #>> '{passport,user}')::uuid AS user_uuid,
+      (us.expire - interval '30 days') AS last_login_time
+    FROM user_sessions us
+    WHERE us.sess #>> '{passport,user}' IS NOT NULL
+    ORDER BY us.sess #>> '{passport,user}', expire DESC
+  )
+  ${includeSurveys ? `, user_surveys AS (${_userSurveysSelect})` : ''}
+  `
+
+const _usersSelectQuery = ({
+  selectFields,
+  sortBy = userSortBy.email,
+  sortOrder = 'ASC',
+  includeSurveys = false,
+  whereConditions = [],
+}) => {
+  // check sort by parameters
+  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
+  const orderByDirection = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+
+  const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+
+  return `${getUsersSelectQueryPrefix({ includeSurveys })}
     SELECT ${selectFields.join(', ')}, ${
       includeSurveys
         ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
@@ -175,11 +178,12 @@ export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
 
 export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>
   client.map(
-    `
+    `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
         ${columnsCommaSeparated},
         (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
-        ui.invited_date
+        ui.invited_date,
+        ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
     FROM "user" u
     JOIN survey s ON s.id = $1
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
@@ -190,7 +194,9 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
       ON u.uuid = ui.user_uuid
       AND s.uuid = ui.survey_uuid
       AND ui.removed_date is null
-    GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date
+    LEFT OUTER JOIN us
+      ON us.user_uuid = u.uuid
+    GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date, us.last_login_time
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
