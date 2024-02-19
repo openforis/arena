@@ -16,6 +16,7 @@ const RowHeader = (props) => {
       <div>{i18n.t('usersView.invitedBy')}</div>
       <div>{i18n.t('usersView.invitedDate')}</div>
       <div>{i18n.t('usersView.accepted')}</div>
+      <div>{i18n.t('usersView.lastLogin')}</div>
     </>
   )
 }

@@ -41,30 +41,35 @@ export const UsersList = () => {
           renderItem: ({ item }) => <LabelWithTooltip label={User.getEmail(item)} />,
           sortable: true,
         },
-        { key: 'name', header: 'common.name', renderItem: ({ item }) => User.getName(item), sortable: true },
+        {
+          key: 'name',
+          header: 'common.name',
+          renderItem: ({ item }) => <LabelWithTooltip label={User.getName(item)} />,
+          sortable: true,
+        },
         {
           key: 'status',
           header: 'usersView.accepted',
-          width: '10rem',
+          width: '7rem',
           renderItem: ({ item }) => User.hasAccepted(item) && <span className="icon icon-checkmark" />,
           sortable: true,
         },
         {
           key: 'is-system-admin',
           header: 'authGroups.systemAdmin.label',
-          width: '15rem',
+          width: '12rem',
           renderItem: ({ item }) => User.isSystemAdmin(item) && <span className="icon icon-checkmark" />,
         },
         {
           key: 'is-survey-manager',
           header: 'authGroups.surveyManager.label',
-          width: '15rem',
+          width: '11rem',
           renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
         },
         {
           key: 'last_login_time',
           header: 'usersView.lastLogin',
-          width: '14rem',
+          width: '12rem',
           renderItem: ({ item }) => {
             const lastLoginTime = User.getLastLoginTime(item)
             if (lastLoginTime) {
