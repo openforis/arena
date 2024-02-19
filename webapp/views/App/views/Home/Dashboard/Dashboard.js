@@ -5,7 +5,7 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
-import { useAuthCanEditSurvey, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { Tabs } from '@webapp/components/Tabs'
@@ -21,7 +21,6 @@ import { RecordsSummaryContext } from './RecordsSummaryContext'
 import RecordsByUser from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 import TotalRecordsSummaryChart from './TotalRecordsSummaryChart'
-import { ActiveUsers } from './ActiveUsers'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
@@ -30,7 +29,6 @@ const Dashboard = () => {
   const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
-  const isSystemAdmnin = useUserIsSystemAdmin()
 
   const tabItems = []
 
@@ -72,13 +70,6 @@ const Dashboard = () => {
       key: 'samplingPointDataCompletion',
       label: 'homeView.dashboard.samplingPointDataCompletion.title',
       renderContent: () => <SamplingPointDataSummary />,
-    })
-  }
-  if (isSystemAdmnin) {
-    tabItems.push({
-      key: 'activeUsers',
-      label: 'homeView.dashboard.activeUsers',
-      renderContent: () => <ActiveUsers />,
     })
   }
 
