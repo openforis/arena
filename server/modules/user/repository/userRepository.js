@@ -1,6 +1,6 @@
 import { db } from '@server/db/db'
 
-import * as camelize from 'camelize'
+import camelize from 'camelize'
 
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -297,25 +297,6 @@ export const countSystemAdministrators = async (client = db) =>
   `,
     [AuthGroup.groupNames.systemAdmin],
     (row) => Number(row.count)
-  )
-
-const _getActiveUsersSelectQuery = () =>
-  _usersSelectQuery({
-    selectFields,
-    sortBy: userSortBy.lastLoginTime,
-    sortOrder: 'DESC',
-    whereConditions: [`last_login_time > NOW() - INTERVAL '1 hour'`],
-  })
-
-export const countActiveUsers = async (client = db) =>
-  client.one(`SELECT COUNT(u.*) FROM (${_getActiveUsersSelectQuery()}) AS u`, [], (row) => Number(row.count))
-
-export const fetchActiveUsers = async ({ limit = 100 } = {}, client = db) =>
-  client.map(
-    `${_getActiveUsersSelectQuery()}
-    LIMIT $/limit/`,
-    { limit },
-    camelize
   )
 
 // ==== UPDATE

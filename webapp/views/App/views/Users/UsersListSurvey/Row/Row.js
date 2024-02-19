@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
+import * as DateUtils from '@core/dateUtils'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
@@ -11,9 +12,8 @@ import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
 import { ButtonInvite } from '@webapp/components'
-
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
-import * as DateUtils from '@core/dateUtils'
 
 const Row = (props) => {
   const { row: userListItem, emailVisible } = props
@@ -28,6 +28,9 @@ const Row = (props) => {
   const email = User.getEmail(userListItem)
   const invitedBy = User.getInvitedBy(userListItem)
   const invitedDate = User.getInvitedDate(userListItem)
+  const invitedDateFormatted = DateUtils.convertDateTimeFromISOToDisplay(invitedDate) ?? ''
+  const lastLoginTime = User.getLastLoginTime(userListItem)
+  const lastLoginTimeFormatted = DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime) ?? ''
 
   const handleResendInvitation = useOnInviteRepeat({ userToInvite: userListItem, hasToNavigate: false })
 
@@ -39,21 +42,17 @@ const Row = (props) => {
       <div data-testid={TestId.userList.name}>{User.getName(userListItem)}</div>
       {emailVisible && (
         <div data-testid={TestId.userList.email} data-value={email}>
-          {email}
+          <LabelWithTooltip label={email} />
         </div>
       )}
       <div data-testid={TestId.userList.authGroup} data-value={authGroupName}>
-        {i18n.t(`authGroups.${authGroupName}.label_plural`)}
+        <LabelWithTooltip label={i18n.t(`authGroups.${authGroupName}.label_plural`)} />
       </div>
       <div data-testid={TestId.userList.invitedBy} data-value={invitedBy}>
-        {invitedBy}
+        <LabelWithTooltip label={invitedBy} />
       </div>
-      <div
-        data-testid={TestId.userList.invitedDate}
-        data-value={invitedDate}
-        title={invitedDate ? DateUtils.format(DateUtils.parseISO(invitedDate), DateUtils.formats.datetimeDefault) : ''}
-      >
-        {invitedDate ? DateUtils.format(DateUtils.parseISO(invitedDate), DateUtils.formats.dateDefault) : ''}
+      <div data-testid={TestId.userList.invitedDate} data-value={invitedDate}>
+        {invitedDateFormatted}
       </div>
       <div>
         {User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}
@@ -63,6 +62,9 @@ const Row = (props) => {
         {User.isInvited(userListItem) && (
           <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
         )}
+      </div>
+      <div data-testid={TestId.userList.lastLogin} data-value={lastLoginTime}>
+        {lastLoginTimeFormatted}
       </div>
       <div data-testid={TestId.userList.edit}>
         <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />

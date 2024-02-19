@@ -5,7 +5,7 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'
-import { useAuthCanEditSurvey, useUserIsSystemAdmin } from '@webapp/store/user'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { Tabs } from '@webapp/components/Tabs'
@@ -21,7 +21,6 @@ import { RecordsSummaryContext } from './RecordsSummaryContext'
 import RecordsByUser from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 import TotalRecordsSummaryChart from './TotalRecordsSummaryChart'
-import { ActiveUsers } from './ActiveUsers'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
@@ -30,56 +29,51 @@ const Dashboard = () => {
   const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
-  const isSystemAdmnin = useUserIsSystemAdmin()
 
   const tabItems = []
 
-  const hasRecords =
-    canEditSurvey && !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && recordsSummaryState.counts.length > 0
+  const hasRecords = !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && recordsSummaryState.counts.length > 0
 
   if (hasRecords) {
-    tabItems.push(
-      {
-        key: 'recordsByUser',
-        label: 'homeView.dashboard.recordsByUser',
-        renderContent: () => <RecordsByUser />,
-      },
-      {
-        key: 'dailyRecordsByUser',
-        label: 'homeView.dashboard.dailyRecordsByUser',
-        renderContent: () => <DailyRecordsByUser />,
-      },
-      {
-        key: 'totalRecords',
-        label: 'homeView.dashboard.totalRecords',
-        renderContent: () => (
-          <TotalRecordsSummaryChart
-            counts={recordsSummaryState.counts}
-            from={recordsSummaryState.from}
-            to={recordsSummaryState.to}
-          />
-        ),
-      }
-    )
-  }
-  tabItems.push({
-    key: 'storageSummary',
-    label: 'homeView.dashboard.storageSummary.title',
-    renderContent: () => <StorageSummary />,
-  })
-  if (hasSamplingPointData) {
+    if (canEditSurvey) {
+      tabItems.push(
+        {
+          key: 'recordsByUser',
+          label: 'homeView.dashboard.recordsByUser',
+          renderContent: () => <RecordsByUser />,
+        },
+        {
+          key: 'totalRecords',
+          label: 'homeView.dashboard.totalRecords',
+          renderContent: () => (
+            <TotalRecordsSummaryChart
+              counts={recordsSummaryState.counts}
+              from={recordsSummaryState.from}
+              to={recordsSummaryState.to}
+            />
+          ),
+        }
+      )
+    }
     tabItems.push({
-      key: 'samplingPointDataCompletion',
-      label: 'homeView.dashboard.samplingPointDataCompletion.title',
-      renderContent: () => <SamplingPointDataSummary />,
+      key: 'dailyRecordsByUser',
+      label: 'homeView.dashboard.dailyRecordsByUser',
+      renderContent: () => <DailyRecordsByUser />,
     })
   }
-  if (isSystemAdmnin) {
+  if (canEditSurvey) {
     tabItems.push({
-      key: 'activeUsers',
-      label: 'homeView.dashboard.activeUsers',
-      renderContent: () => <ActiveUsers />,
+      key: 'storageSummary',
+      label: 'homeView.dashboard.storageSummary.title',
+      renderContent: () => <StorageSummary />,
     })
+    if (hasSamplingPointData) {
+      tabItems.push({
+        key: 'samplingPointDataCompletion',
+        label: 'homeView.dashboard.samplingPointDataCompletion.title',
+        renderContent: () => <SamplingPointDataSummary />,
+      })
+    }
   }
 
   return (

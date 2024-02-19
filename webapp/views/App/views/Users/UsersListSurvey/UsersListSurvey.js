@@ -28,7 +28,7 @@ const UsersListSurvey = () => {
       module="users-survey"
       moduleApiUri={`/api/survey/${surveyId}/users`}
       className="users-list"
-      gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 50px`}
+      gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 10rem 50px`}
       headerLeftComponent={HeaderLeft}
       rowHeaderComponent={(headerProps) => RowHeader({ ...headerProps, emailVisible })}
       rowComponent={(rowProps) => Row({ ...rowProps, emailVisible })}

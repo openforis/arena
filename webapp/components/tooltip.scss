@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .tooltip {
   &:hover {
@@ -12,9 +12,9 @@
 .tooltip__message {
   background-color: $yellow;
   padding: 1rem;
-  opacity: .97;
+  opacity: 0.97;
   font-weight: 600;
-  font-size: .85rem;
+  font-size: 0.85rem;
   color: black;
   visibility: visible;
   position: fixed;
@@ -24,12 +24,12 @@
   z-index: $zIndex20Dropdown;
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     bottom: 100%;
     left: 1rem;
-    margin-left: -.5rem;
-    border: .5rem solid;
+    margin-left: -0.5rem;
+    border: 0.5rem solid;
     border-color: transparent transparent $yellow transparent;
   }
 }
@@ -38,13 +38,16 @@
   @extend .tooltip;
 
   .form-input {
-    border-bottom: 2px solid rgba($red, .6);
+    border-bottom: 2px solid rgba($red, 0.6);
   }
 
   .btn-checkbox .icon {
     border: 2px solid rgba($red, 0.6);
   }
 
+  .MuiTextField-root fieldset {
+    border: 1px solid red;
+  }
 }
 
 .tooltip__message-error,
@@ -54,7 +57,7 @@
 
   color: white;
   border: 1px solid;
-  opacity: .97;
+  opacity: 0.97;
 
   &:after {
     border-color: transparent;

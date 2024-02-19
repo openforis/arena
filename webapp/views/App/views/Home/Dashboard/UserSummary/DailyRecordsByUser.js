@@ -3,6 +3,8 @@ import * as d3 from 'd3'
 import { timeDay } from 'd3-time'
 import { timeFormat } from 'd3-time-format'
 
+import * as User from '@core/user/user'
+
 import { useElementOffset } from '@webapp/components/hooks'
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
@@ -10,17 +12,23 @@ import { useI18n } from '@webapp/store/system'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
 import { ChartUtils } from '../chartUtils'
+import { useUser } from '@webapp/store/user'
+import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
+
+const dayInMs = 1000 * 60 * 60 * 24
 
 const svgMargin = { top: 10, right: 10, bottom: 10, left: 10 }
 const internalAreaMargin = { top: 20, right: 20, bottom: 120, left: 20 }
 const tickWidth = 25
+const dataDotRadius = 4
+const dataDotRadiusMouseOver = 6
 
 const calculateDateData = (userDateCounts) => {
   let firstDate, lastDate, daysDiff
   if (userDateCounts && userDateCounts.length > 0) {
     firstDate = new Date(userDateCounts[0].date)
     lastDate = new Date(userDateCounts[userDateCounts.length - 1].date)
-    daysDiff = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1
+    daysDiff = Math.ceil((lastDate - firstDate) / dayInMs) + 1
   } else {
     daysDiff = 15
     lastDate = new Date()
@@ -40,7 +48,7 @@ const groupDataByUserAndDate = (userDateCounts, daysDiff, lastDate) => {
     if (!acc[user]) {
       acc[user] = Array.from({ length: daysDiff }, () => 0)
     }
-    const dateIndex = Math.floor((lastDate - new Date(curr.date)) / (1000 * 60 * 60 * 24))
+    const dateIndex = Math.floor((lastDate - new Date(curr.date)) / dayInMs)
     if (dateIndex < daysDiff) {
       acc[user][dateIndex] = parseInt(curr.count)
     }
@@ -67,9 +75,18 @@ const DailyRecordsByUser = () => {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [filteredUserDateCounts, setFilteredUserDateCounts] = useState([])
   const { height: wrapperHeight, width: wrapperWidth } = useElementOffset(wrapperRef)
+  const canViewAllUsers = useAuthCanViewAllUsers()
+  const user = useUser()
 
   // Sort userCounts in descending order based on count
   const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
+
+  useEffect(() => {
+    if (!canViewAllUsers) {
+      const selectedItem = userCounts.find((item) => item.owner_uuid === User.getUuid(user))
+      setSelectedUsers(selectedItem ? [selectedItem] : [])
+    }
+  }, [user, canViewAllUsers, userCounts])
 
   useEffect(() => {
     const filteredUserDataCountsNext =
@@ -91,11 +108,11 @@ const DailyRecordsByUser = () => {
       return
     }
 
-    const svgWidth = wrapperWidth - internalAreaMargin.left - internalAreaMargin.right
+    const svgWidth = wrapperWidth - svgMargin.left - svgMargin.right
     const svgHeight = wrapperHeight - svgMargin.top - svgMargin.bottom
 
     const areaWidth = svgWidth - internalAreaMargin.left - internalAreaMargin.right
-    const areaHeight = wrapperHeight - internalAreaMargin.top - internalAreaMargin.bottom
+    const areaHeight = svgHeight - internalAreaMargin.top - internalAreaMargin.bottom
 
     const { firstDate, lastDate, daysDiff } = calculateDateData(filteredUserDateCounts)
     let groupedData = groupDataByUserAndDate(filteredUserDateCounts, daysDiff, lastDate)
@@ -106,7 +123,7 @@ const DailyRecordsByUser = () => {
     }))
     const xScale = d3.scaleTime().range([0, areaWidth])
     const yScale = d3.scaleLinear().range([areaHeight, 0])
-    const color = d3.scaleOrdinal(d3.schemeCategory10)
+    const color = d3.scaleOrdinal(d3.schemeCategory10).domain(data.map((d) => d.user))
     const area = d3
       .area()
       .x((d, i) => xScale(timeDay.offset(lastDate, -i)))
@@ -122,16 +139,16 @@ const DailyRecordsByUser = () => {
     svg.selectAll('*').remove()
     svg = svg.append('g').attr('transform', 'translate(' + internalAreaMargin.left + ',' + internalAreaMargin.top + ')')
 
-    color.domain(data.map((d) => d.user))
     // Set the domain for the x-axis to be 5 days before the first date and 5 days after the last date
     const currentDate = new Date()
     const fiveDaysAfterLastDate = timeDay.offset(lastDate, 5)
     const lowerLimitDate = timeDay.offset(firstDate, -5)
     const upperLimitDate = fiveDaysAfterLastDate > currentDate ? currentDate : fiveDaysAfterLastDate
     const totalDays = timeDay.count(lowerLimitDate, upperLimitDate)
+    const maxRecords = d3.max(data, (d) => d3.max(d.records)) + 1 // 1 record more to avoid being to close to the border of the chart
 
     xScale.domain([lowerLimitDate, upperLimitDate])
-    yScale.domain([0, d3.max(data, (d) => d3.max(d.records))])
+    yScale.domain([0, maxRecords])
 
     const user = svg.selectAll('.user').data(data).enter().append('g').attr('class', 'user')
     user
@@ -165,17 +182,17 @@ const DailyRecordsByUser = () => {
       .data((d) => d.records.map((record) => ({ record, user: d.user })))
       .enter()
       .append('circle')
-      .attr('r', 3)
+      .attr('r', dataDotRadius)
       .attr('cx', (d, i) => xScale(timeDay.offset(lastDate, -i)))
       .attr('cy', (d) => yScale(d.record))
       .style('fill', (d) => color(d.user))
-      .on('mouseover', function (event, d) {
-        d3.select(this).transition().duration(100).attr('r', 6)
+      .on('mouseover', (event, d) => {
+        d3.select(this).transition().duration(100).attr('r', dataDotRadiusMouseOver)
         tooltip.html('Records: ' + d.record + '<br/>' + 'User: ' + d.user)
         ChartUtils.showTooltip({ tooltip, event })
       })
-      .on('mouseout', function () {
-        d3.select(this).transition().duration(20).attr('r', 3)
+      .on('mouseout', () => {
+        d3.select(this).transition().duration(20).attr('r', dataDotRadius)
         ChartUtils.hideTooltip({ tooltip })
       })
 
@@ -208,9 +225,15 @@ const DailyRecordsByUser = () => {
       .style('font-size', '12px')
 
     // Y axis label
+    const yAxisVisibleTicks = Math.min(Math.ceil(areaHeight / tickWidth), maxRecords)
     svg
       .append('g')
-      .call(d3.axisLeft(yScale).tickFormat((d) => Math.floor(d)))
+      .call(
+        d3
+          .axisLeft(yScale)
+          .ticks(yAxisVisibleTicks)
+          .tickFormat((d) => Math.floor(d))
+      )
       .append('text')
       .attr('transform', 'rotate(-90)')
       .attr('y', 6)
@@ -232,14 +255,16 @@ const DailyRecordsByUser = () => {
 
       <RecordsSummaryPeriodSelector />
 
-      <Dropdown
-        multiple
-        items={sortedUserCounts}
-        itemLabel={(user) => user.owner_name ?? user.owner_email}
-        itemValue={(user) => user.owner_uuid}
-        onChange={(selectedOptions) => setSelectedUsers(selectedOptions)}
-        placeholder={i18n.t('homeView.dashboard.selectUsers')}
-      />
+      {canViewAllUsers && (
+        <Dropdown
+          multiple
+          items={sortedUserCounts}
+          itemLabel={(user) => user.owner_name ?? user.owner_email}
+          itemValue={(user) => user.owner_uuid}
+          onChange={(selectedOptions) => setSelectedUsers(selectedOptions)}
+          placeholder={i18n.t('homeView.dashboard.selectUsers')}
+        />
+      )}
       <div className="dashboard-chart-wrapper" ref={wrapperRef}>
         <div ref={containerRef} className="dashboard-chart-container"></div>
       </div>

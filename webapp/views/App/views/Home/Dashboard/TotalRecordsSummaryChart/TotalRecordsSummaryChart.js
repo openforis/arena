@@ -45,12 +45,12 @@ const TotalRecordsSummaryChart = (props) => {
   }, [counts, from, height, to, width])
 
   return (
-    <div className="home-dashboard__records-summary__chart">
+    <>
       <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.totalRecords')}</h4>
 
       <RecordsSummaryPeriodSelector />
 
-      <div className="dashboard-chart-wrapper" ref={wrapperRef}>
+      <div className="dashboard-chart-wrapper total-records-chart" ref={wrapperRef}>
         {chartProps && (
           <svg width={chartProps.width} height={chartProps.height}>
             <YAxis {...props} chartProps={chartProps} />
@@ -60,7 +60,7 @@ const TotalRecordsSummaryChart = (props) => {
           </svg>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

@@ -1,12 +1,6 @@
 @import 'webapp/style/vars';
 
-.home-dashboard__records-summary__chart {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
+.total-records-chart {
   svg {
     position: absolute;
   }
