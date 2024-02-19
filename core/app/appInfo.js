@@ -1,6 +1,7 @@
 import { ENV } from '@core/processUtils'
 
 const arenaAppId = 'arena'
+const arenaMobileId = 'arena-mobile'
 
 const keys = {
   appId: 'appId',
@@ -14,6 +15,7 @@ const newAppInfo = ({ appId = arenaAppId, appVersion = ENV.applicationVersion } 
 
 export const AppInfo = {
   arenaAppId,
+  arenaMobileId,
   keys,
   newAppInfo,
 }

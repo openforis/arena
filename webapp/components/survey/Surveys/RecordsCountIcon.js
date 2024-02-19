@@ -3,25 +3,25 @@ import PropTypes from 'prop-types'
 
 import { AppInfo } from '@core/app/appInfo'
 
-const arenaMobileId = 'am'
-
 const getAppIdWithMoreRecords = (recordsCountByApp) => {
   const sortedEntries = Object.entries(recordsCountByApp).sort(
     ({ count: count1 }, { count: count2 }) => count1 - count2
   )
-  return sortedEntries[0]?.[0] ?? AppInfo.arenaAppId
+  const firstEntry = sortedEntries[0]
+  const firstEntryKey = firstEntry?.[0]
+  return firstEntryKey ?? AppInfo.arenaAppId
 }
 
 const iconByAppId = {
   [AppInfo.arenaAppId]: 'of_arena_icon.png',
-  [arenaMobileId]: 'of_arena_mobile_icon.png',
+  [AppInfo.arenaMobileId]: 'of_arena_mobile_icon.png',
 }
 
-const unknownAppIcon = 'question_mark_icon_32x32.png'
+const unknownAppIcon = 'question_mark_icon_20x20.png'
 
 const appNameById = {
   [AppInfo.arenaAppId]: 'Arena',
-  [arenaMobileId]: 'Arena Mobile',
+  [AppInfo.arenaMobileId]: 'Arena Mobile',
 }
 
 export const RecordsCountIcon = (props) => {
