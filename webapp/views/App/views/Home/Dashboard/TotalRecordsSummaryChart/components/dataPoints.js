@@ -24,6 +24,11 @@ const DataPointTooltip = ({ dataPoint, i18n }) => {
   )
 }
 
+DataPointTooltip.propTypes = {
+  dataPoint: PropTypes.object.isRequired,
+  i18n: PropTypes.object.isRequired,
+}
+
 const DataPoints = (props) => {
   const i18n = useI18n()
 

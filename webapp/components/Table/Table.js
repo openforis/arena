@@ -34,6 +34,8 @@ const Table = (props) => {
     headerProps,
     rowProps,
     selectable,
+    showFooter,
+    showHeader,
     visibleColumnsSelectionEnabled,
   } = props
 
@@ -71,22 +73,24 @@ const Table = (props) => {
 
   return (
     <div className={`table ${className}`}>
-      <Header
-        columns={columns}
-        offset={offset}
-        list={list}
-        limit={limit}
-        count={count}
-        totalCount={totalCount}
-        search={search}
-        headerLeftComponent={headerLeftComponent}
-        headerProps={headerProps}
-        handleSearch={handleSearch}
-        onVisibleColumnsChange={onVisibleColumnsChange}
-        selectedItems={selectedItems}
-        visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
-        visibleColumnKeys={visibleColumnKeys}
-      />
+      {showHeader && (
+        <Header
+          columns={columns}
+          offset={offset}
+          list={list}
+          limit={limit}
+          count={count}
+          totalCount={totalCount}
+          search={search}
+          headerLeftComponent={headerLeftComponent}
+          headerProps={headerProps}
+          handleSearch={handleSearch}
+          onVisibleColumnsChange={onVisibleColumnsChange}
+          selectedItems={selectedItems}
+          visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
+          visibleColumnKeys={visibleColumnKeys}
+        />
+      )}
 
       <Content
         cellTestIdExtractor={cellTestIdExtractor}
@@ -116,7 +120,7 @@ const Table = (props) => {
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
       />
-      <Footer count={count} limit={limit} list={list} module={module} offset={offset} />
+      {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
     </div>
   )
 }
@@ -146,6 +150,8 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
+  showFooter: PropTypes.bool,
+  showHeader: PropTypes.bool,
   visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
 }
 
@@ -171,6 +177,8 @@ Table.defaultProps = {
   rowExpandedComponent: DummyComponent,
   rowProps: {},
   selectable: true,
+  showFooter: true,
+  showHeader: true,
   visibleColumnsSelectionEnabled: false,
 }
 
