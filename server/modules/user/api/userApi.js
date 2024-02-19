@@ -158,6 +158,24 @@ export const init = (app) => {
     }
   })
 
+  app.get('/users-active/count', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+    try {
+      const count = await UserService.countActiveUsers()
+      res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/users-active', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+    try {
+      const list = await UserService.fetchActiveUsers()
+      res.json({ list })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
