@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
+import * as DateUtils from '@core/dateUtils'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
@@ -11,10 +12,8 @@ import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
 import { ButtonInvite } from '@webapp/components'
-
-import ProfilePicture from '@webapp/components/profilePicture'
-import * as DateUtils from '@core/dateUtils'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import ProfilePicture from '@webapp/components/profilePicture'
 
 const Row = (props) => {
   const { row: userListItem, emailVisible } = props
