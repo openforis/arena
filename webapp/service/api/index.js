@@ -2,6 +2,7 @@ export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
   fetchCategories,
+  fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
   fetchCategoryItems,
@@ -44,7 +45,13 @@ export {
   startRecordsCloneJob,
 } from './data'
 export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
-export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey, startImportLabelsJob } from './survey'
+export {
+  fetchSurveyFull,
+  fetchSurveys,
+  fetchSurveyTemplatesPublished,
+  insertSurvey,
+  startImportLabelsJob,
+} from './survey'
 export {
   fetchNodeDef,
   fetchNodeDefs,

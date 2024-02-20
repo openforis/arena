@@ -416,7 +416,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = (client = db) =>
   })
 
 // ==== User prefs
-export const { updateUserPrefs } = UserManager
+export const { updateUserPrefs, updateUserPrefsAndFetchGroups } = UserManager
 
 // ==== User Invite
 export const { inviteUser } = UserInviteService

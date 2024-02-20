@@ -1,3 +1,5 @@
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -10,7 +12,6 @@ import * as ValidationResult from '@core/validation/validationResult'
 
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
   const pathParts = []
@@ -111,6 +112,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
       relevantIf,
       hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
+      itemsFilter: NodeDef.getItemsFilter(nodeDef),
       defaultValue: getDefaultValuesSummary({ nodeDef }),
       defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
       defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),

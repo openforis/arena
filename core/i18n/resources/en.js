@@ -358,6 +358,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 
   homeView: {
     dashboard: {
+      activeSurveyNotSelected: `<title>Active survey not selected</title>
+      <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
+      activeUsers: 'Active users',
       exportWithData: 'Export with data',
       exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
       surveyPropUpdate: {
@@ -380,18 +383,26 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         <br />
         `,
       },
-      activeSurveyNotSelected: `<title>Active survey not selected</title>
-        <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
       storageSummary: {
+        title: 'Storage use',
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
       },
-      samplingPointDataCompletion: 'Sampling Point Data Completion',
+      samplingPointDataCompletion: {
+        title: 'Sampling Point Data Completion',
+        totalItems: 'Total items: {{totalItems}}',
+      },
       step: {
         entry: 'Data Entry',
         cleansing: 'Data Cleansing',
         analysis: 'Data Analysis',
       },
+      // records' summary
+      recordsByUser: 'Records by user',
+      recordsAddedPerUserWithCount: 'Records added per user (Total of {{totalCount}})',
+      dailyRecordsByUser: 'Daily records by user',
+      totalRecords: 'Total records',
+      selectUsers: 'Select users...',
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
@@ -460,15 +471,16 @@ $t(common.cantUndoWarning)`,
       title: 'Collect Import Report',
     },
     recordsSummary: {
-      recordsAdded: 'Records added from {{from}} to {{to}}',
+      recordsAddedInTheLast: 'Records added in the last:',
+      fromToPeriod: 'from {{from}} to {{to}}',
       record: '{{count}} Record',
-      record_plural: '{{count}} Records',
+      record_other: '{{count}} Records',
       week: '{{count}} Week',
-      week_plural: '{{count}} Weeks',
+      week_other: '{{count}} Weeks',
       month: '{{count}} Month',
-      month_plural: '{{count}} Months',
+      month_other: '{{count}} Months',
       year: '{{count}} Year',
-      year_plural: '{{count}} Years',
+      year_other: '{{count}} Years',
     },
   },
 
@@ -1295,6 +1307,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       buttonCode: 'Button code',
       code: '$t(common.code)',
       label: '$t(common.label)',
+      typeCodeOrLabel: 'Type code or label',
     },
     nodeDefBoolean: {
       labelValue: {

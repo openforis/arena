@@ -9,11 +9,14 @@ import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
 import { ExtraPropDef } from './extraPropDef'
 
+export const maxCategoryItemsInIndex = 10000
+
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
   levels: 'levels',
   props: ObjectUtils.keys.props,
   items: 'items',
+  itemsCount: 'itemsCount', // available only in data entry
   published: ObjectUtils.keys.published,
   levelsCount: 'levelsCount', // populated only on fetch
 }
@@ -57,6 +60,8 @@ export const isHierarchical = (category) => !isFlat(category)
 
 export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
+
+export const getItemsCount = R.propOr(-1, keys.itemsCount)
 
 // ====== UPDATE
 export const assocProp =
@@ -141,6 +146,11 @@ export const newCategory = (props = {}, levels = null) => {
     ...category,
     [keys.levels]: levels || [newLevel(category)],
   }
+}
+
+export const assocItemsCount = (count) => R.assoc(keys.itemsCount, count)
+export const setItemsCount = (count) => (category) => {
+  category[keys.itemsCount] = count
 }
 
 // UTILS

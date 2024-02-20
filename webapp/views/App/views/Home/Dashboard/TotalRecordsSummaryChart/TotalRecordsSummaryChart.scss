@@ -1,9 +1,6 @@
 @import 'webapp/style/vars';
 
-.home-dashboard__records-summary__chart {
-  height: 100%;
-  position: relative;
-
+.total-records-chart {
   svg {
     position: absolute;
   }

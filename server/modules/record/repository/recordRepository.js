@@ -239,8 +239,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
 }
 
-export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
-  client.any(
+export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) => {
+  const countsArray = await client.any(
     `
     SELECT
       step,
@@ -254,6 +254,13 @@ export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) =>
     `,
     [String(cycle)]
   )
+  return Object.values(RecordStep.steps).reduce((acc, step) => {
+    const stepId = RecordStep.getId(step)
+    const count = Number(countsArray.find((countRow) => countRow.step === stepId)?.count ?? 0)
+    acc[stepId] = count
+    return acc
+  }, {})
+}
 
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   client.oneOrNone(

@@ -252,6 +252,7 @@ export const {
   countItemsByLevelIndex,
   fetchItemsByLevelIndex,
   fetchItemsByCategoryUuid,
+  fetchItemsCountIndexedByCategoryUuid,
   insertItems: insertItemsInBatch,
 } = CategoryRepository
 

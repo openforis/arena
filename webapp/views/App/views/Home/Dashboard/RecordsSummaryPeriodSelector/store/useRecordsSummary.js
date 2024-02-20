@@ -22,7 +22,11 @@ export const useRecordsSummary = () => {
     setRecordsSummary,
   })
 
-  useEffect(onGetRecordsSummary, [recordsSummary.timeRange])
+  const { timeRange } = recordsSummary
+
+  useEffect(() => {
+    onGetRecordsSummary()
+  }, [onGetRecordsSummary, timeRange])
 
   const onChangeTimeRange = ({ timeRange }) => {
     setRecordsSummary({ ...recordsSummary, timeRange })

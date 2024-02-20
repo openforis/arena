@@ -17,7 +17,7 @@ const actionHandlers = {
   [SurveyActions.surveyDefsReset]: () => ({}),
 
   // NodeDefsValidation load
-  [SurveyActions.surveyDefsLoad]: (_state, { nodeDefsValidation }) => nodeDefsValidation,
+  [SurveyActions.surveyDefsLoad]: (_state, { nodeDefsValidation = {} }) => nodeDefsValidation,
   [NodeDefsActions.nodeDefsValidationUpdate]: (state, { nodeDefsValidation }) =>
     Validation.mergeValidation(nodeDefsValidation)(state),
 }

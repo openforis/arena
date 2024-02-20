@@ -14,11 +14,17 @@ export const stepNames = {
   analysis: 'analysis',
 }
 
-export const steps = [
-  { id: '1', name: stepNames.entry },
-  { id: '2', name: stepNames.cleansing },
-  { id: '3', name: stepNames.analysis },
-]
+export const entryCode = '1'
+export const cleansingCode = '2'
+export const analysisCode = '3'
+
+export const stepCodes = {
+  [stepNames.entry]: entryCode,
+  [stepNames.cleansing]: cleansingCode,
+  [stepNames.analysis]: analysisCode,
+}
+
+export const steps = Object.keys(stepNames).map((name) => ({ id: stepCodes[name], name }))
 
 export const getStepId = R.prop(keys.id)
 

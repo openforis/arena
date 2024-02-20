@@ -348,8 +348,10 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUserPrefs = async (user) => ({
-  ...(await UserRepository.updateUserPrefs(user)),
+export const updateUserPrefs = async (user) => UserRepository.updateUserPrefs(user)
+
+export const updateUserPrefsAndFetchGroups = async (user) => ({
+  ...(await updateUserPrefs(user)),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
 

@@ -1,23 +1,15 @@
-import { BaseProtocol, Schemata } from '@openforis/arena-server'
+import { BaseProtocol } from '@openforis/arena-server'
 
-import * as DB from '../../../../db'
-
-import * as ObjectUtils from '../../../../../core/objectUtils'
-import { TableChain } from '../../../../../common/model/db'
+import { TableChain } from '@common/model/db'
 import * as Chain from '@common/analysis/chain'
+
+import * as A from '@core/arena'
+
+import * as DB from '@server/db'
 
 export const transformCallback = (row) => {
   if (!row) return {}
-  /* eslint-disable-next-line camelcase */
-  const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
-
-  return {
-    /* eslint-disable-next-line camelcase */
-    ...(date_created ? { [ObjectUtils.keys.dateCreated]: date_created } : {}),
-    /* eslint-disable-next-line camelcase */
-    ...(date_modified ? { [ObjectUtils.keys.dateModified]: date_modified } : {}),
-    ...rest,
-  }
+  return A.pipe(DB.mergeProps(), A.camelizePartial({ limitToLevel: 1 }))(row)
 }
 
 /**
@@ -76,19 +68,8 @@ export const fetchChains = async (params, client = DB.client) => {
  */
 export const fetchChain = async (params, client = DB.client) => {
   const { surveyId, chainUuid } = params
-  const schema = Schemata.getSchemaSurvey(surveyId)
-  const chainColumns = TableChain.columnSet
 
-  return client.oneOrNone(
-    ` SELECT
-  ${Object.values(chainColumns)
-    .map((columnName) => `_c.${columnName}`)
-    .join(',')}
-  FROM
-    ${schema}.${TableChain.tableName} AS _c
-  WHERE _c.uuid = $1
-  GROUP BY _c.uuid`,
-    [chainUuid],
-    transformCallback
-  )
+  const tableChain = new TableChain(surveyId)
+
+  return client.oneOrNone(tableChain.getSelect({ chainUuid }), [chainUuid], transformCallback)
 }
