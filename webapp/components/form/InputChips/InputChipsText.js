@@ -60,11 +60,7 @@ const InputChipsText = (props) => {
             value={State.getInputFieldValue(state)}
             placeholder={placeholder}
           />
-          <Button
-            onClick={() => {
-              // onItemAdd(item)
-            }}
-          />
+          <Button onClick={Actions.onItemAddClick} />
         </div>
       )}
     </div>
