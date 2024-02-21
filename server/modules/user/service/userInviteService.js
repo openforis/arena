@@ -144,40 +144,7 @@ export const inviteUser = async (
   }
 
   return client.tx(async (t) => {
-    if (userToInvite) {
-      const userToInviteUuid = User.getUuid(userToInvite)
-
-      // User to invite already exists
-
-      if (User.hasAccepted(userToInvite)) {
-        // User has already accepted an invitation previously
-        // Check can be invited
-        _checkUserCanBeInvited(userToInvite, surveyUuid)
-
-        // Add user to group (accept automatically the invitation)
-        await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-        // Send email
-        await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
-      } else if (repeatInvitation) {
-        // User has a pending invitation still
-        await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
-      } else {
-        // check if there is an old removed invitation; in that case allow the user to be invited again;
-        const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-          surveyUuid,
-          userUuid: userToInviteUuid,
-        })
-        if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
-          throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
-        } else {
-          // Add user to group
-          await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-
-          await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
-        }
-      }
-      return { userInvited: userToInvite }
-    } else {
+    if (!userToInvite) {
       // User to invite does not exist, he has never been invited
       // Check if he can be invited
       const userInvited = await _inviteNewUserAndSendEmail(
@@ -186,5 +153,36 @@ export const inviteUser = async (
       )
       return { userInvited }
     }
+    // User to invite already exists
+    const userToInviteUuid = User.getUuid(userToInvite)
+
+    if (User.hasAccepted(userToInvite)) {
+      // User has already accepted an invitation previously
+      // Check can be invited
+      _checkUserCanBeInvited(userToInvite, surveyUuid)
+
+      // Add user to group (accept automatically the invitation)
+      await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+      // Send email
+      await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
+    } else if (repeatInvitation) {
+      // User has a pending invitation still
+      await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
+    } else {
+      // check if there is an old removed invitation; in that case allow the user to be invited again;
+      const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+        surveyUuid,
+        userUuid: userToInviteUuid,
+      })
+      if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
+        throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
+      } else {
+        // Add user to group
+        await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+
+        await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
+      }
+    }
+    return { userInvited: userToInvite }
   })
 }
