@@ -55,6 +55,7 @@ export const NodeDefEntitySelectorDialog = (props) => {
         <FormItem label={i18n.t(entitySelectLabel)}>
           <EntitySelector
             hierarchy={Survey.getHierarchy()(survey)}
+            nodeDefLabelType={NodeDef.NodeDefLabelTypes.labelAndName}
             nodeDefUuidEntity={selectedEntityDefUuid}
             onChange={onChange}
             showSingleEntities
