@@ -13,6 +13,7 @@ import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
+import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
 
 import { TestId } from '@webapp/utils/testId'
@@ -37,13 +38,13 @@ const UserInviteComponent = () => {
   return (
     <div className="user-invite form">
       <FormItem label={i18n.t('common.email')}>
-        <Input
+        <InputChipsText
           id={TestId.userInvite.email}
           placeholder={i18n.t('common.email')}
-          value={UserInvite.getEmail(userInvite)}
+          selection={[]}
           validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
           textTransformFunction={(value) => value.trim().toLowerCase()}
-          onChange={(value) => onUpdate({ name: UserInvite.keys.email, value })}
+          onChange={(items) => onUpdate({ name: UserInvite.keys.email, items })}
         />
       </FormItem>
       <FormItem label={i18n.t('common.group')}>
