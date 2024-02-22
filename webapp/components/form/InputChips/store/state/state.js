@@ -1,3 +1,5 @@
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 const keys = {
@@ -7,6 +9,7 @@ const keys = {
   // only for InputChipText
   inputFieldValue: 'inputFieldValue',
   textTransformFunction: 'textTransformFunction',
+  isInputFieldValueValid: 'isInputFieldValueValid',
 }
 
 // ====== READ
@@ -14,6 +17,7 @@ export const getItemKey = A.prop(keys.itemKey)
 export const getItemLabel = A.prop(keys.itemLabel)
 export const getInputFieldValue = A.prop(keys.inputFieldValue)
 export const getTextTransformFunction = A.prop(keys.textTransformFunction)
+export const getIsInputFieldValueValid = A.prop(keys.isInputFieldValueValid)
 
 // ====== CREATE
 const _createGetItemProp =
@@ -24,11 +28,25 @@ const _createGetItemProp =
     return prop(item)
   }
 
-export const create = ({ itemLabel = null, itemKey = null, textTransformFunction = null } = {}) => ({
+export const create = ({
+  itemLabel = null,
+  itemKey = null,
+  isInputFieldValueValid = null,
+  textTransformFunction = null,
+} = {}) => ({
   [keys.itemLabel]: _createGetItemProp(itemLabel),
   [keys.itemKey]: _createGetItemProp(itemKey),
+  [keys.isInputFieldValueValid]: isInputFieldValueValid,
   [keys.textTransformFunction]: textTransformFunction,
 })
 
 // ===== UPDATE
 export const assocInputFieldValue = A.assoc(keys.inputFieldValue)
+
+// ===== UTILS
+export const canAddItem = (state) => {
+  const isInputFieldValueValid = getIsInputFieldValueValid(state)
+  if (!isInputFieldValueValid) return true
+  const inputFieldValue = getInputFieldValue(state)
+  return !Objects.isEmpty(inputFieldValue) && isInputFieldValueValid(inputFieldValue)
+}

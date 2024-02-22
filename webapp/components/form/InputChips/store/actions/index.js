@@ -7,7 +7,7 @@ import { useRejectSelectedItems } from './useRejectSelectedItems'
 export const useActions = ({ onChange, onItemAdd, onItemRemove, setState }) => ({
   onDropdownChange: useOnDropdownChange({ onChange, onItemAdd }),
   onInputFieldChange: useOnInputFieldChange({ setState }),
-  onItemAddClick: useOnItemAddClick(),
+  onItemAddClick: useOnItemAddClick({ onChange, setState }),
   removeItem: useRemoveItem({ onChange, onItemRemove }),
   rejectSelectedItems: useRejectSelectedItems(),
 })

@@ -64,7 +64,7 @@ export const validatePositiveNumber =
   }
 
 export const validateEmail =
-  ({ errorKey }) =>
+  ({ errorKey } = { errorKey: ValidatorErrorKeys.invalidEmail }) =>
   (propName, item) => {
     const email = getProp(propName)(item)
     return email && !validEmailRegex.test(email) ? { key: errorKey } : null

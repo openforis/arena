@@ -1,4 +1,5 @@
 export const ValidatorErrorKeys = {
+  invalidEmail: 'validationErrors.invalidEmail',
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
   invalidDate: 'validationErrors.invalidDate',

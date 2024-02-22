@@ -4,11 +4,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import { Button } from '@webapp/components/buttons'
+import { ButtonAdd } from '@webapp/components/buttons'
+
+import { TextInput } from '../TextInput'
 
 import { useLocalState, State } from './store'
 import Chip from './Chip'
-import { TextInput } from '../TextInput'
 
 const InputChipsText = (props) => {
   const {
@@ -22,37 +23,35 @@ const InputChipsText = (props) => {
     validation,
     placeholder,
     textTransformFunction,
+    isInputFieldValueValid,
     onChange,
-    onItemAdd,
-    onItemRemove,
   } = props
 
   const { state, Actions } = useLocalState({
+    isInputFieldValueValid,
     textTransformFunction,
     onChange,
-    onItemAdd,
-    onItemRemove,
   })
 
   return (
-    <div className={classNames('form-input-chip', className)}>
-      {selection.map((item) => (
-        <Chip
-          key={State.getItemKey(state)(item)}
-          item={item}
-          itemLabel={State.getItemLabel(state)(item)}
-          onDelete={Actions.removeItem({ selection, state })}
-          canBeRemoved={selection.length > requiredItems}
-          readOnly={readOnly}
-        />
-      ))}
-
+    <div className={classNames('form-input-chip-text', className)}>
+      <div className="chips-wrapper">
+        {selection.map((item) => (
+          <Chip
+            key={item}
+            item={item}
+            itemLabel={State.getItemLabel(state)(item)}
+            onDelete={Actions.removeItem({ selection, state })}
+            canBeRemoved={selection.length > requiredItems}
+            readOnly={readOnly}
+          />
+        ))}
+      </div>
       {!readOnly && (
-        <div>
+        <div className="input-field-row">
           <TextInput
             id={idInput}
             onChange={Actions.onInputFieldChange}
-            selection={null}
             minCharactersToAutocomplete={minCharactersToAutocomplete}
             disabled={disabled}
             textTransformFunction={textTransformFunction}
@@ -60,7 +59,7 @@ const InputChipsText = (props) => {
             value={State.getInputFieldValue(state)}
             placeholder={placeholder}
           />
-          <Button onClick={Actions.onItemAddClick} />
+          <ButtonAdd disabled={!State.canAddItem(state)} onClick={() => Actions.onItemAddClick({ selection })} />
         </div>
       )}
     </div>
@@ -79,7 +78,8 @@ InputChipsText.propTypes = {
   disabled: PropTypes.bool,
   validation: PropTypes.object,
   placeholder: PropTypes.string,
-  textTransformFunction: PropTypes.string,
+  textTransformFunction: PropTypes.func,
+  isInputFieldValueValid: PropTypes.func,
 
   onChange: PropTypes.func,
   onItemAdd: PropTypes.func,
@@ -97,6 +97,7 @@ InputChipsText.defaultProps = {
   disabled: false,
   validation: {},
   placeholder: undefined,
+  isInputFieldValueValid: () => true,
 
   onChange: null, // Callback to receive all selection change
   onItemAdd: null, // Callback to receive added item

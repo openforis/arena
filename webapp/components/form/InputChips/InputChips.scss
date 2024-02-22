@@ -22,6 +22,30 @@
   }
 }
 
+.form-input-chip-text {
+  display: flex;
+  flex-direction: column;
+
+  .chips-wrapper {
+    display: flex;
+    flex-flow: wrap;
+
+    .form-input {
+      padding: 0;
+      border: none;
+    }
+  }
+
+  .input-field-row {
+    display: flex;
+    align-items: center;
+
+    input {
+      padding: 0.5rem;
+    }
+  }
+}
+
 .form-input-chip-item {
   display: flex;
   height: 17px;

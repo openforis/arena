@@ -7,6 +7,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -29,6 +30,7 @@ const UserInviteComponent = () => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
 
+  const emails = UserInvite.getEmails(userInvite)
   const validation = UserInvite.getValidation(userInvite)
   const selectedGroupUuid = UserInvite.getGroupUuid(userInvite)
   const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo })
@@ -40,11 +42,12 @@ const UserInviteComponent = () => {
       <FormItem label={i18n.t('common.email')}>
         <InputChipsText
           id={TestId.userInvite.email}
+          isInputFieldValueValid={(value) => !Validator.validateEmail({ errorKey: '' })('value', { value })}
+          onChange={(value) => onUpdate({ name: UserInvite.keys.emails, value })}
           placeholder={i18n.t('common.email')}
-          selection={[]}
+          selection={emails}
           validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
           textTransformFunction={(value) => value.trim().toLowerCase()}
-          onChange={(items) => onUpdate({ name: UserInvite.keys.email, items })}
         />
       </FormItem>
       <FormItem label={i18n.t('common.group')}>

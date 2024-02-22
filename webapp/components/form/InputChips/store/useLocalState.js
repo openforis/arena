@@ -9,12 +9,14 @@ export const useLocalState = ({
   onItemRemove,
   itemKey = null,
   itemLabel = null,
+  isInputFieldValueValid = null,
   textTransformFunction = null,
 }) => {
   const [state, setState] = useState(() =>
     State.create({
       itemKey,
       itemLabel,
+      isInputFieldValueValid,
       textTransformFunction,
     })
   )

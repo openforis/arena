@@ -1460,6 +1460,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   // ===== All validation errors
   validationErrors: {
     // Common
+    invalidEmail: 'Invalid email',
     invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
     invalidDate: 'Invalid date',
