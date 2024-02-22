@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useContext, useState, useMemo } from 'react'
 import * as d3 from 'd3'
 
 import * as Survey from '@core/survey/survey'
-
 import * as RecordStep from '@core/record/recordStep'
 
 import { countSamplingPointData } from '@webapp/service/api/categories'
@@ -12,6 +11,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
+import { Legend } from './Legend'
 
 const width = 300
 const height = 300
@@ -21,6 +21,7 @@ const dataEntryColor = '#fdcdac'
 const dataCleansingColor = '#fde8aa'
 const dataAnalysisColor = '#b3e2cd'
 const remainingItemsColor = '#eeeeee'
+const colors = [dataEntryColor, dataCleansingColor, dataAnalysisColor, remainingItemsColor]
 
 const SamplingPointDataSummary = () => {
   const chartContainerRef = useRef()
@@ -31,13 +32,16 @@ const SamplingPointDataSummary = () => {
   const [totalItems, setTotalItems] = useState(0)
 
   const data = useMemo(
-    () => ({
-      [RecordStep.stepNames.entry]: dataEntry,
-      [RecordStep.stepNames.cleansing]: dataCleansing,
-      [RecordStep.stepNames.analysis]: dataAnalysis,
-      remainingItems: totalItems - dataEntry - dataCleansing - dataAnalysis,
-    }),
-    [dataAnalysis, dataCleansing, dataEntry, totalItems]
+    () => [
+      { name: i18n.t(`homeView.dashboard.step.${RecordStep.stepNames.entry}`), value: dataEntry },
+      { name: i18n.t(`homeView.dashboard.step.${RecordStep.stepNames.cleansing}`), value: dataCleansing },
+      { name: i18n.t(`homeView.dashboard.step.${RecordStep.stepNames.analysis}`), value: dataAnalysis },
+      {
+        name: i18n.t('homeView.dashboard.samplingPointDataCompletion.remainingItems'),
+        value: totalItems - dataEntry - dataCleansing - dataAnalysis,
+      },
+    ],
+    [dataAnalysis, dataCleansing, dataEntry, i18n, totalItems]
   )
 
   useEffect(() => {
@@ -60,13 +64,10 @@ const SamplingPointDataSummary = () => {
       .append('g')
       .attr('transform', `translate(${width / 2}, ${height / 2})`)
 
-    const colorScale = d3
-      .scaleOrdinal()
-      .domain(Object.entries(data))
-      .range([dataEntryColor, dataCleansingColor, dataAnalysisColor, remainingItemsColor])
+    const colorScale = d3.scaleOrdinal().domain(data).range(colors)
 
-    const pie = d3.pie().value((d) => d[1])
-    const dataReady = pie(Object.entries(data))
+    const pie = d3.pie().value((d) => d.value)
+    const dataReady = pie(data)
 
     svg
       .selectAll('sampling_point_data_pie')
@@ -74,10 +75,10 @@ const SamplingPointDataSummary = () => {
       .enter()
       .append('path')
       .attr('d', d3.arc().innerRadius(innerRadius).outerRadius(outerRadius))
-      .attr('fill', (d) => colorScale(d.data[0]))
+      .attr('fill', (d) => colorScale(d.data.name))
       .attr('stroke', 'black')
       .style('stroke-width', '1px')
-  }, [data, dataAnalysis, dataCleansing, dataEntry, i18n, surveyId, totalItems])
+  }, [data, totalItems])
 
   if (!totalItems) return null
 
@@ -86,18 +87,7 @@ const SamplingPointDataSummary = () => {
       <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.samplingPointDataCompletion.title')}</h4>
       <div className="internal-container">
         <div ref={chartContainerRef}></div>
-        <div className="legend">
-          <div>{i18n.t('homeView.dashboard.samplingPointDataCompletion.totalItems', { totalItems })}</div>
-          {Object.values(RecordStep.stepNames).map((stepName) => {
-            const recordsInStep = data[stepName]
-            const percent = Math.floor((recordsInStep * 100) / totalItems)
-            return (
-              <div key={stepName}>
-                {i18n.t(`homeView.dashboard.step.${stepName}`)}: {recordsInStep} ({percent}%)
-              </div>
-            )
-          })}
-        </div>
+        <Legend totalItems={totalItems} data={data} colors={colors} />
       </div>
     </div>
   )
