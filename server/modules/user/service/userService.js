@@ -25,6 +25,7 @@ import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 import * as Log from '@server/log/log'
 
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -127,7 +128,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
 
     const { email, props } = userAccessRequest
     const { country: countryCode } = props
-    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : null
+    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : ''
 
     // send the emails only after use access request has been inserted into the db
     const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
@@ -391,6 +392,27 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
       const lang = User.getLang(user)
       await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
     }
+  })
+
+export const deleteExpiredInvitationsUsersAndSurveys = (client = db) =>
+  client.tx(async (t) => {
+    const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(t)
+    for await (const surveyId of surveyIds) {
+      const activityLogsCount = await ActivityLogManager.count({ surveyId }, t)
+      // delete survey only if it is brand new
+      if (activityLogsCount < 5) {
+        await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
+      }
+    }
+    const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
+    const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(t)
+    if (deletedUsers.length > 0) {
+      const deletedUsersEmails = deletedUsers.map(User.getEmail)
+      await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, t)
+    }
+    await UserManager.deleteExpiredUserAccessRequests(t)
+
+    return { deletedSurveyIds: surveyIds, deletedInvitations, deletedUsers }
   })
 
 // ==== User prefs
