@@ -71,3 +71,13 @@ export const insertManyBatch = async ({ survey, userInvitations }, client = db) 
       }))
     )
   )
+
+export const deleteExpiredInvitations = async (client = db) =>
+  client.any(
+    `
+    DELETE FROM user_invitation 
+    WHERE invited_date < NOW() - INTERVAL '1 MONTH' 
+    RETURNING *`,
+    [],
+    camelize
+  )

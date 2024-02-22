@@ -7,7 +7,7 @@ import * as User from '@core/user/user'
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const titleItems = User.titleKeys.map((value) => ({ value }))
+const titleItems = User.titleKeysArray.map((value) => ({ value }))
 
 const DropdownUserTitle = (props) => {
   const { disabled, user, onChange, validation } = props
