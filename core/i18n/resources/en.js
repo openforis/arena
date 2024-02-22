@@ -52,6 +52,7 @@ Do you want to ignore them?`,
     draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
+    email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
 
 Please inform the person to check also the Spam/Junk mail folder.`,
@@ -948,6 +949,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     surveyNotPublishedWarning: `**Warning**: survey is not published.
       Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
+    typeEmail: 'Type an email address, then press the Add button',
   },
 
   user: {

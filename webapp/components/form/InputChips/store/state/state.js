@@ -15,7 +15,7 @@ const keys = {
 // ====== READ
 export const getItemKey = A.prop(keys.itemKey)
 export const getItemLabel = A.prop(keys.itemLabel)
-export const getInputFieldValue = A.prop(keys.inputFieldValue)
+export const getInputFieldValue = A.propOr('', keys.inputFieldValue)
 export const getTextTransformFunction = A.prop(keys.textTransformFunction)
 export const getIsInputFieldValueValid = A.prop(keys.isInputFieldValueValid)
 

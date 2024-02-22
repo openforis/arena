@@ -11,7 +11,7 @@ export const keys = {
 
 // ===== CREATE
 export const newUserGroupInvitation = (email, groupUuid) => ({
-  [keys.email]: email,
+  [keys.emails]: [email],
   [keys.groupUuid]: groupUuid,
 })
 

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { ButtonAdd } from '@webapp/components/buttons'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { TextInput } from '../TextInput'
 
@@ -49,16 +50,17 @@ const InputChipsText = (props) => {
       </div>
       {!readOnly && (
         <div className="input-field-row">
-          <TextInput
-            id={idInput}
-            onChange={Actions.onInputFieldChange}
-            minCharactersToAutocomplete={minCharactersToAutocomplete}
-            disabled={disabled}
-            textTransformFunction={textTransformFunction}
-            validation={validation}
-            value={State.getInputFieldValue(state)}
-            placeholder={placeholder}
-          />
+          <ValidationTooltip validation={validation}>
+            <TextInput
+              id={idInput}
+              onChange={Actions.onInputFieldChange}
+              minCharactersToAutocomplete={minCharactersToAutocomplete}
+              disabled={disabled}
+              textTransformFunction={textTransformFunction}
+              value={State.getInputFieldValue(state)}
+              placeholder={placeholder}
+            />
+          </ValidationTooltip>
           <ButtonAdd disabled={!State.canAddItem(state)} onClick={() => Actions.onItemAddClick({ selection })} />
         </div>
       )}

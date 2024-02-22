@@ -127,8 +127,7 @@ export const inviteUser = async (
 
   const lang = User.getLang(user)
   const i18n = await i18nFactory.createI18nAsync(lang)
-  const email = UserGroupInvitation.getEmail(invitation)
-  const userToInvite = await UserManager.fetchUserByEmail(email)
+  const emails = UserGroupInvitation.getEmails(invitation)
   const message = UserGroupInvitation.getMessage(invitation)
   const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
   const invitingUserName = _getPrettyFormatUserName({ user, i18n })
@@ -144,47 +143,50 @@ export const inviteUser = async (
   }
 
   return client.tx(async (t) => {
-    if (userToInvite) {
-      const userToInviteUuid = User.getUuid(userToInvite)
+    for await (const email of emails) {
+      const userToInvite = await UserManager.fetchUserByEmail(email, t)
+      if (userToInvite) {
+        const userToInviteUuid = User.getUuid(userToInvite)
 
-      // User to invite already exists
+        // User to invite already exists
 
-      if (User.hasAccepted(userToInvite)) {
-        // User has already accepted an invitation previously
-        // Check can be invited
-        _checkUserCanBeInvited(userToInvite, surveyUuid)
+        if (User.hasAccepted(userToInvite)) {
+          // User has already accepted an invitation previously
+          // Check can be invited
+          _checkUserCanBeInvited(userToInvite, surveyUuid)
 
-        // Add user to group (accept automatically the invitation)
-        await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-        // Send email
-        await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
-      } else if (repeatInvitation) {
-        // User has a pending invitation still
-        await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
-      } else {
-        // check if there is an old removed invitation; in that case allow the user to be invited again;
-        const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-          surveyUuid,
-          userUuid: userToInviteUuid,
-        })
-        if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
-          throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
-        } else {
-          // Add user to group
+          // Add user to group (accept automatically the invitation)
           await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-
+          // Send email
+          await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
+        } else if (repeatInvitation) {
+          // User has a pending invitation still
           await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
+        } else {
+          // check if there is an old removed invitation; in that case allow the user to be invited again;
+          const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+            surveyUuid,
+            userUuid: userToInviteUuid,
+          })
+          if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
+            throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
+          } else {
+            // Add user to group
+            await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+
+            await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
+          }
         }
+        return { userInvited: userToInvite }
+      } else {
+        // User to invite does not exist, he has never been invited
+        // Check if he can be invited
+        const userInvited = await _inviteNewUserAndSendEmail(
+          { user, email, group, survey, surveyCycleKey, emailParams, i18n },
+          t
+        )
+        return { userInvited }
       }
-      return { userInvited: userToInvite }
-    } else {
-      // User to invite does not exist, he has never been invited
-      // Check if he can be invited
-      const userInvited = await _inviteNewUserAndSendEmail(
-        { user, email, group, survey, surveyCycleKey, emailParams, i18n },
-        t
-      )
-      return { userInvited }
     }
   })
 }

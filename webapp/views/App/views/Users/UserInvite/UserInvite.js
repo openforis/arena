@@ -13,9 +13,9 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
+import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
-import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
 
 import { TestId } from '@webapp/utils/testId'
 
@@ -39,14 +39,14 @@ const UserInviteComponent = () => {
 
   return (
     <div className="user-invite form">
-      <FormItem label={i18n.t('common.email')}>
+      <FormItem label={i18n.t('common.email', { count: 2 })}>
         <InputChipsText
           id={TestId.userInvite.email}
-          isInputFieldValueValid={(value) => !Validator.validateEmail({ errorKey: '' })('value', { value })}
+          isInputFieldValueValid={Validator.isEmailValueValid}
           onChange={(value) => onUpdate({ name: UserInvite.keys.emails, value })}
-          placeholder={i18n.t('common.email')}
+          placeholder={i18n.t('userInviteView.typeEmail')}
           selection={emails}
-          validation={Validation.getFieldValidation(UserInvite.keys.email)(validation)}
+          validation={Validation.getFieldValidation(UserInvite.keys.emails)(validation)}
           textTransformFunction={(value) => value.trim().toLowerCase()}
         />
       </FormItem>
