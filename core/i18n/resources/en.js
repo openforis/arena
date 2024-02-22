@@ -53,9 +53,6 @@ Do you want to ignore them?`,
     edit: 'Edit',
     email: 'Email',
     email_other: 'Emails',
-    emailSentConfirmation: `An email to {{email}} has been sent.
-
-Please inform the person to check also the Spam/Junk mail folder.`,
     emailSentToSelfConfirmation: `You should have received an email to {{email}}.
 
 Please check also the Spam/Junk mail folder.`,
@@ -872,6 +869,12 @@ Are you sure you want to continue?`,
   userInviteView: {
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
+    emailSentConfirmation: `An email to {{email}} has been sent.
+
+    Please inform the person to check also the Spam/Junk mail folder.`,
+    emailSentConfirmationWithSkippedEmails: `$t(userInviteView.emailSentConfirmation)
+    
+    {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `

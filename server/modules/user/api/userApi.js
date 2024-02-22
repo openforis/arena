@@ -35,8 +35,15 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
       try {
-        await UserService.inviteUsers({ user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation })
-        Response.sendOk(res)
+        const { skippedEmails } = await UserService.inviteUsers({
+          user,
+          surveyId,
+          surveyCycleKey,
+          invitation,
+          serverUrl,
+          repeatInvitation,
+        })
+        res.json({ skippedEmails })
       } catch (e) {
         const errorKey = e.key || 'appErrors.generic'
         const errorParams = e.params || { text: e.message }
