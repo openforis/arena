@@ -23,6 +23,8 @@ const RecordsByUser = () => {
   const [totalCount, setTotalCount] = useState(0)
 
   useEffect(() => {
+    if (!wrapperWidth) return
+
     const data = userCounts.map((userCount) => parseInt(userCount.count))
 
     const users = userCounts.map((userCount) => userCount.owner_name ?? userCount.owner_email)
