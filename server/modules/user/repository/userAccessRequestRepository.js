@@ -87,3 +87,17 @@ export const updateUserAccessRequestStatus = ({ userUuid, email, status }, clien
   `,
     { email, status, userUuid }
   )
+
+export const deleteUserAccessRequestsByEmail = ({ emails }, client = db) =>
+  client.none(
+    `DELETE FROM user_access_request 
+    WHERE email IN ($1:csv)`,
+    [emails]
+  )
+
+export const deleteExpiredUserAccessRequests = (client = db) =>
+  client.none(
+    `DELETE FROM user_access_request 
+    WHERE status = '${UserAccessRequest.status.CREATED}' 
+      AND date_created < NOW() - INTERVAL '1 MONTH'`
+  )
