@@ -44,9 +44,10 @@ export const create = ({
 export const assocInputFieldValue = A.assoc(keys.inputFieldValue)
 
 // ===== UTILS
-export const canAddItem = (state) => {
+export const isValueValid = (value) => (state) => {
   const isInputFieldValueValid = getIsInputFieldValueValid(state)
   if (!isInputFieldValueValid) return true
-  const inputFieldValue = getInputFieldValue(state)
-  return !Objects.isEmpty(inputFieldValue) && isInputFieldValueValid(inputFieldValue)
+  return !Objects.isEmpty(value) && isInputFieldValueValid(value)
 }
+
+export const canAddItem = (state) => isValueValid(getInputFieldValue(state))

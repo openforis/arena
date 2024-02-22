@@ -53,7 +53,7 @@ const InputChipsText = (props) => {
           <ValidationTooltip validation={validation}>
             <TextInput
               id={idInput}
-              onChange={Actions.onInputFieldChange}
+              onChange={Actions.onInputFieldChange({ selection })}
               minCharactersToAutocomplete={minCharactersToAutocomplete}
               disabled={disabled}
               textTransformFunction={textTransformFunction}
