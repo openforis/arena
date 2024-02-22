@@ -20,9 +20,9 @@ import * as UserInvitationManager from '../manager/userInvitationManager'
 
 const _getPrettyFormatUserName = ({ user, i18n }) => {
   const parts = []
-  const title = User.getTitle(user)
-  if (title) {
-    parts.push(i18n.t(`user.titleValues.${title}`))
+  const titleKey = User.getTitle(user)
+  if (titleKey && titleKey !== User.titleKeys.preferNotToSay) {
+    parts.push(i18n.t(`user.titleValues.${titleKey}`))
   }
   parts.push(User.getName(user))
   return parts.join(' ')
