@@ -871,6 +871,7 @@ Are you sure you want to continue?`,
 
   userInviteView: {
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
+    confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `

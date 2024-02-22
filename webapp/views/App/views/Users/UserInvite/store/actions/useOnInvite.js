@@ -38,7 +38,7 @@ const _performInvite =
         dispatch(
           NotificationActions.notifyInfo({
             key: 'common.emailSentConfirmation',
-            params: { email: UserInvite.getEmail(userInvite) },
+            params: { email: UserInvite.getEmailsJoint(userInvite) },
           })
         )
         navigate(appModuleUri(userModules.usersSurvey))
@@ -69,10 +69,11 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
 
       if (AuthGroup.isSystemAdminGroup(group)) {
         // ask for a confirmation when user is inviting someone else as system administrator
+        const emails = UserInvite.getEmails(userInvite)
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'userInviteView.confirmInviteSystemAdmin',
-            params: { email: UserInvite.getEmail(userInvite) },
+            params: { email: UserInvite.getEmailsJoint(userInvite), count: emails.length },
             onOk: invite,
           })
         )

@@ -220,7 +220,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
     }
 
     // 4) invite user to that group and send email
-    const { userInvited } = await UserInviteService.inviteUser(
+    const { userInvited } = await UserInviteService.inviteUsers(
       {
         user,
         surveyId: Survey.getId(survey),
@@ -397,7 +397,7 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
 export const { updateUserPrefs, updateUserPrefsAndFetchGroups } = UserManager
 
 // ==== User Invite
-export const { inviteUser } = UserInviteService
+export const { inviteUsers } = UserInviteService
 
 // ==== WebSocket events
 export const notifyActiveUsersAboutSurveyUpdate = async ({ surveyId }) => {

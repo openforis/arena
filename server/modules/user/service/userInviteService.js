@@ -111,26 +111,20 @@ const _repeatInvitation = async ({ user, survey, userToInvite, email, emailParam
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
 }
 
-export const inviteUser = async (
-  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
-  client = db
+const _inviteUser = async (
+  { user, i18n, email, survey, invitation, group, repeatInvitation, surveyCycleKey, serverUrl },
+  t
 ) => {
-  const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
-  const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
-  const groupName = AuthGroup.getName(group)
+  const lang = User.getLang(user)
 
-  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, client)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyUuid = Survey.getUuid(surveyInfo)
 
-  _checkCanInviteToGroup({ user, group, surveyInfo })
-
-  const lang = User.getLang(user)
-  const i18n = await i18nFactory.createI18nAsync(lang)
-  const emails = UserGroupInvitation.getEmails(invitation)
   const message = UserGroupInvitation.getMessage(invitation)
   const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
   const invitingUserName = _getPrettyFormatUserName({ user, i18n })
+
+  const groupName = AuthGroup.getName(group)
 
   const emailParams = {
     invitingUserName,
@@ -142,51 +136,85 @@ export const inviteUser = async (
     message: messageParam,
   }
 
-  return client.tx(async (t) => {
-    for await (const email of emails) {
-      const userToInvite = await UserManager.fetchUserByEmail(email, t)
-      if (userToInvite) {
-        const userToInviteUuid = User.getUuid(userToInvite)
+  const userToInvite = await UserManager.fetchUserByEmail(email, t)
+  if (userToInvite) {
+    const userToInviteUuid = User.getUuid(userToInvite)
 
-        // User to invite already exists
+    // User to invite already exists
+    if (User.hasAccepted(userToInvite)) {
+      // User has already accepted an invitation previously
+      // Check can be invited
+      _checkUserCanBeInvited(userToInvite, surveyUuid)
 
-        if (User.hasAccepted(userToInvite)) {
-          // User has already accepted an invitation previously
-          // Check can be invited
-          _checkUserCanBeInvited(userToInvite, surveyUuid)
-
-          // Add user to group (accept automatically the invitation)
-          await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-          // Send email
-          await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
-        } else if (repeatInvitation) {
-          // User has a pending invitation still
-          await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
-        } else {
-          // check if there is an old removed invitation; in that case allow the user to be invited again;
-          const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-            surveyUuid,
-            userUuid: userToInviteUuid,
-          })
-          if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
-            throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
-          } else {
-            // Add user to group
-            await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-
-            await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
-          }
-        }
-        return { userInvited: userToInvite }
+      // Add user to group (accept automatically the invitation)
+      await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+      // Send email
+      await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
+    } else if (repeatInvitation) {
+      // User has a pending invitation still
+      await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
+    } else {
+      // check if there is an old removed invitation; in that case allow the user to be invited again;
+      const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+        surveyUuid,
+        userUuid: userToInviteUuid,
+      })
+      if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
+        throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
       } else {
-        // User to invite does not exist, he has never been invited
-        // Check if he can be invited
-        const userInvited = await _inviteNewUserAndSendEmail(
-          { user, email, group, survey, surveyCycleKey, emailParams, i18n },
-          t
-        )
-        return { userInvited }
+        // Add user to group
+        await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+
+        await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
       }
     }
+    return userToInvite
+  } else {
+    // User to invite does not exist, he has never been invited
+    // Check if he can be invited
+    const userInvited = await _inviteNewUserAndSendEmail(
+      { user, email, group, survey, surveyCycleKey, emailParams, i18n },
+      t
+    )
+    return userInvited
+  }
+}
+
+export const inviteUsers = async (
+  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
+  client = db
+) => {
+  const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
+  const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
+
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, client)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
+  _checkCanInviteToGroup({ user, group, surveyInfo })
+
+  const lang = User.getLang(user)
+  const i18n = await i18nFactory.createI18nAsync(lang)
+  const emails = UserGroupInvitation.getEmails(invitation)
+
+  return client.tx(async (t) => {
+    const invitedUsers = []
+    for await (const email of emails) {
+      const invitedUser = await _inviteUser(
+        {
+          user,
+          i18n,
+          email,
+          survey,
+          invitation,
+          group,
+          repeatInvitation,
+          surveyCycleKey,
+          serverUrl,
+        },
+        t
+      )
+      invitedUsers.push(invitedUser)
+    }
+    return invitedUsers
   })
 }
