@@ -174,6 +174,8 @@ const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUui
 }
 
 const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
+  if (users.length === 0) return users
+
   const usersUuids = users.map(User.getUuid)
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
@@ -215,15 +217,12 @@ export const fetchUsersBySurveyId = async ({ surveyId, offset = 0, limit = null 
   client.tx(async (t) => {
     const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, t)).map(User.dissocPrivateProps)
     const usersUuids = users.map(User.getUuid)
-    const invitations = await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t)
-    const invitationsByUserUuid = invitations.reduce(
-      (_invitationsByUserUuid, invitation) => ({
-        ..._invitationsByUserUuid,
-        [invitation.user_uuid]: invitation.result,
-      }),
-      {}
-    )
-
+    const invitations =
+      usersUuids.length > 0 ? await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t) : []
+    const invitationsByUserUuid = invitations.reduce((acc, invitation) => {
+      acc[invitation.user_uuid] = invitation.result
+      return acc
+    }, {})
     return _attachAuthGroupsAndInvitationToUsers({ users, invitationsByUserUuid, t })
   })
 
