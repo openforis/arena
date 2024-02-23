@@ -53,6 +53,9 @@ Do you want to ignore them?`,
     edit: 'Edit',
     email: 'Email',
     email_other: 'Emails',
+    emailSentConfirmation: `An email to {{email}} has been sent.
+
+    Please inform the person to check also the Spam/Junk mail folder.`,
     emailSentToSelfConfirmation: `You should have received an email to {{email}}.
 
 Please check also the Spam/Junk mail folder.`,
@@ -870,10 +873,7 @@ Are you sure you want to continue?`,
   userInviteView: {
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
-    emailSentConfirmation: `An email to {{email}} has been sent.
-
-    Please inform the person to check also the Spam/Junk mail folder.`,
-    emailSentConfirmationWithSkippedEmails: `$t(userInviteView.emailSentConfirmation)
+    emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
     
     {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
     groupPermissions: {
@@ -1778,6 +1778,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
+    userHasRole_other: 'The given users have already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
     userNotAllowedToChangePref: 'User not allowed to change pref',

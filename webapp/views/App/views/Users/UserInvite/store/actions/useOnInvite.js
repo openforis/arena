@@ -36,7 +36,7 @@ const _showInvitationSuccessfulMessage = ({ dispatch, userInvite, skippedEmails 
         skippedEmails: skippedEmails.join(', '),
       },
       severity,
-      timeout: 10000,
+      timeout: hasSkippedEmails ? 0 : 10000,
     })
   )
 }
@@ -56,8 +56,15 @@ const _performInvite =
       const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
       const { errorKey, errorParams, skippedEmails } = data
 
+      const emails = UserInvite.getEmails(userInvite)
+      const invitedEmails = emails.filter((email) => !skippedEmails?.includes(email))
+
       if (errorKey) {
         dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
+      } else if (invitedEmails.length === 0) {
+        dispatch(
+          NotificationActions.notifyError({ key: 'appErrors.userHasRole', params: { count: skippedEmails.length } })
+        )
       } else {
         _showInvitationSuccessfulMessage({ dispatch, userInvite, skippedEmails })
         navigate(appModuleUri(userModules.usersSurvey))
