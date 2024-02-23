@@ -15,6 +15,7 @@ export const TextInput = (props) => {
     id,
     label: labelProp,
     name,
+    onBlur,
     onChange: onChangeProp,
     placeholder: placeholderProp,
     readOnly,
@@ -50,6 +51,7 @@ export const TextInput = (props) => {
         endAdornment,
       }}
       name={name}
+      onBlur={onBlur}
       onChange={onChange}
       placeholder={placeholder}
       disabled={disabled || readOnly}
@@ -68,6 +70,7 @@ TextInput.propTypes = {
   id: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string,
+  onBlur: PropTypes.func,
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,

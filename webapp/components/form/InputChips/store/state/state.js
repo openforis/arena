@@ -50,4 +50,4 @@ export const isValueValid = (value) => (state) => {
   return !Objects.isEmpty(value) && isInputFieldValueValid(value)
 }
 
-export const canAddItem = (state) => isValueValid(getInputFieldValue(state))
+export const canAddItem = (state) => isValueValid(getInputFieldValue(state))(state)

@@ -34,6 +34,8 @@ const InputChipsText = (props) => {
     onChange,
   })
 
+  const canAddItem = State.canAddItem(state)
+
   return (
     <div className={classNames('form-input-chip-text', className)}>
       <div className="chips-wrapper">
@@ -54,6 +56,9 @@ const InputChipsText = (props) => {
             <TextInput
               id={idInput}
               onChange={Actions.onInputFieldChange({ selection })}
+              onBlur={() => {
+                if (canAddItem) Actions.onItemAddClick({ selection })
+              }}
               minCharactersToAutocomplete={minCharactersToAutocomplete}
               disabled={disabled}
               textTransformFunction={textTransformFunction}
@@ -61,7 +66,7 @@ const InputChipsText = (props) => {
               placeholder={placeholder}
             />
           </ValidationTooltip>
-          <ButtonAdd disabled={!State.canAddItem(state)} onClick={() => Actions.onItemAddClick({ selection })} />
+          <ButtonAdd disabled={!canAddItem} onClick={() => Actions.onItemAddClick({ selection })} />
         </div>
       )}
     </div>
