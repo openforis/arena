@@ -63,7 +63,7 @@ export const validatePositiveNumber =
     return value && value <= 0 ? { key: errorKey, params: errorParams } : null
   }
 
-export const isEmailValueValid = (email) => !email || validEmailRegex.test(email)
+export const isEmailValueValid = (email) => Objects.isEmpty(email) || validEmailRegex.test(email)
 
 export const validateEmail =
   ({ errorKey } = { errorKey: ValidatorErrorKeys.invalidEmail }) =>

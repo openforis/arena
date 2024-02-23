@@ -24,7 +24,7 @@ const _createGetItemProp =
   (prop = null) =>
   (item) => {
     if (!prop) return item
-    if (prop.constructor === String) return A.prop(item)
+    if (prop.constructor === String) return A.prop(prop)(item)
     return prop(item)
   }
 
