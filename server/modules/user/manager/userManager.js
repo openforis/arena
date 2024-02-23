@@ -211,14 +211,9 @@ export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = 
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
-export const fetchUsersBySurveyId = async (
-  { surveyId, offset = 0, limit = null, isSystemAdmin = false },
-  client = db
-) =>
+export const fetchUsersBySurveyId = async ({ surveyId, offset = 0, limit = null }, client = db) =>
   client.tx(async (t) => {
-    const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)).map(
-      User.dissocPrivateProps
-    )
+    const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, t)).map(User.dissocPrivateProps)
     const usersUuids = users.map(User.getUuid)
     const invitations = await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t)
     const invitationsByUserUuid = invitations.reduce(

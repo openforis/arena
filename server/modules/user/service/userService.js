@@ -236,24 +236,14 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
 
 // ====== READ
 
-export const fetchUsersBySurveyId = async ({ user, surveyId, offset = 0, limit = null }) => {
-  const isSystemAdmin = User.isSystemAdmin(user)
-
-  return UserManager.fetchUsersBySurveyId({ surveyId, offset, limit, isSystemAdmin })
-}
-
-export const countUsersBySurveyId = async (user, surveyId) => {
-  const isSystemAdmin = User.isSystemAdmin(user)
-
-  return UserManager.countUsersBySurveyId(surveyId, isSystemAdmin)
-}
-
 export const {
   countUsers,
+  countUsersBySurveyId,
   exportUserAccessRequestsIntoStream,
   fetchUsers,
   fetchUserByUuid,
   fetchUserByUuidWithPassword,
+  fetchUsersBySurveyId,
   fetchUserProfilePicture,
   countUserAccessRequests,
   fetchUserAccessRequests,
