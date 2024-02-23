@@ -390,6 +390,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       samplingPointDataCompletion: {
         title: 'Sampling Point Data Completion',
         totalItems: 'Total items: {{totalItems}}',
+        remainingItems: 'Remaining items',
       },
       step: {
         entry: 'Data Entry',

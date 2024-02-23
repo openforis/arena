@@ -10,6 +10,7 @@ import { Colors } from '@webapp/utils/colors'
 const clusterRadius = 100
 const clusterMaxZoom = 17
 const initialZoom = 12
+const leavesLimit = 100
 
 export const useMapClusters = (props) => {
   const { points } = props
@@ -74,7 +75,7 @@ export const useMapClusters = (props) => {
     (cluster) => {
       const { id, properties } = cluster
       const { cluster: isCluster } = properties
-      return isCluster ? supercluster.getLeaves(id) : []
+      return isCluster ? supercluster.getLeaves(id, leavesLimit) : []
     },
     [supercluster]
   )

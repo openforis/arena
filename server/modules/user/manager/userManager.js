@@ -34,24 +34,43 @@ export const {
   updatePassword,
   resetUsersPrefsSurveyCycle,
   importNewUser,
+  deleteUsersWithExpiredInvitation,
 } = UserRepository
 
 export const { findResetPasswordUserUuidByUuid, deleteUserResetPasswordByUuid, deleteUserResetPasswordExpired } =
   UserResetPasswordRepository
 
+export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
+
 // ==== CREATE
+const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo }, client = db) => {
+  const groupsToAdd = []
+  if (
+    (AuthGroup.isSurveyManagerGroup(group) || AuthGroup.getName(group) === AuthGroup.groupNames.surveyAdmin) &&
+    !User.isSurveyManager(userToAdd)
+  ) {
+    const surveyManagerGroup = await AuthGroupRepository.fetchGroupByName(
+      { name: AuthGroup.groupNames.surveyManager },
+      client
+    )
+    groupsToAdd.push(surveyManagerGroup)
+  }
+  if (AuthGroup.isSurveyGroup(group)) {
+    groupsToAdd.push(group)
+  } else if (AuthGroup.isSystemAdminGroup(group) && User.isSystemAdmin(user) && !User.isSystemAdmin(userToAdd)) {
+    groupsToAdd.push(User.getSystemAdminGroup(user))
+  } else if (AuthGroup.isSurveyManagerGroup(group)) {
+    // accepting user access request
+    // when adding user to survey manager group, make him survey admin of the specified survey
+    groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
+  }
+  return groupsToAdd
+}
 
 export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-    const groupsToAdd = []
-    if (!AuthGroup.isSurveyManagerGroup(group) || !User.isSurveyManager(userToAdd)) {
-      groupsToAdd.push(group)
-    }
-    if (AuthGroup.isSurveyManagerGroup(group)) {
-      // when adding user to survey manager group, make him survey admin of the specified survey
-      groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
-    }
+    const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)
     await PromiseUtils.each(groupsToAdd, async (groupToAdd) => {
       const groupUuid = groupToAdd.uuid
       await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
@@ -227,6 +246,8 @@ export {
   fetchUserAccessRequests,
   fetchUserAccessRequestByUuid,
   fetchUserAccessRequestByEmail,
+  deleteUserAccessRequestsByEmail,
+  deleteExpiredUserAccessRequests,
 } from '../repository/userAccessRequestRepository'
 
 export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {

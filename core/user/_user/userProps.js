@@ -19,7 +19,12 @@ export const keysProps = {
 const privateProps = [keysProps.mapApiKeyByProvider]
 const restrictedProps = [keysProps.maxSurveys]
 
-export const titleKeys = ['mr', 'ms', 'preferNotToSay']
+export const titleKeys = {
+  mr: 'mr',
+  ms: 'ms',
+  preferNotToSay: 'preferNotToSay',
+}
+export const titleKeysArray = Object.keys(titleKeys)
 
 // ====== CREATE
 export const newProps = (propsParam) =>

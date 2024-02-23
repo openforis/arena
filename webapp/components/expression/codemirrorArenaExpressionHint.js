@@ -53,14 +53,14 @@ const getVariableCompletion = ({ group = null, variable, token }) => {
 
   const textParts = []
   if (group) {
-    textParts.push(`${group.label}`)
+    textParts.push(group.label)
   }
   if (label && label !== value) {
     textParts.push(`${label} (${value})`)
   } else {
     textParts.push(value)
   }
-  const text = textParts.join(' / ')
+  const text = textParts.join('.')
   const data = { text, value }
 
   return {

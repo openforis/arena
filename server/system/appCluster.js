@@ -14,6 +14,7 @@ import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
+import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -56,4 +57,5 @@ export const run = async () => {
   await UserResetPasswordCleanup.init()
   await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
+  await ExpiredUserInvitationsCleanup.init()
 }
