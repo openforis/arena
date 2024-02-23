@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { NotificationActions } from '@webapp/store/ui'
 import { State } from '../state'
 
-export const useOnItemAddClick = ({ onChange, setState }) => {
+export const useOnItemAddClick = ({ onChange, onItemAdd, setState }) => {
   const dispatch = useDispatch()
 
   return useCallback(
@@ -16,9 +16,10 @@ export const useOnItemAddClick = ({ onChange, setState }) => {
           return statePrev
         }
         onChange([...selection, value])
+        onItemAdd?.(value)
         return State.assocInputFieldValue('')(statePrev)
       })
     },
-    [dispatch, onChange, setState]
+    [dispatch, onChange, onItemAdd, setState]
   )
 }

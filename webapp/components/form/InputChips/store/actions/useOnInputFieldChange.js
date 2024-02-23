@@ -4,7 +4,7 @@ import { Objects } from '@openforis/arena-core'
 
 import { State } from '../state'
 
-const multipleValuesSeparatorRegEx = /[\s\n;,]+/
+const multipleValuesSeparatorRegEx = /[\s;,]+/
 
 const transformText = ({ state, value }) => {
   const textTransformFunction = State.getTextTransformFunction(state)

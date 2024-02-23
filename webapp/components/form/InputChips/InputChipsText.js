@@ -26,12 +26,16 @@ const InputChipsText = (props) => {
     textTransformFunction,
     isInputFieldValueValid,
     onChange,
+    onItemAdd,
+    onItemRemove,
   } = props
 
   const { state, Actions } = useLocalState({
     isInputFieldValueValid,
     textTransformFunction,
     onChange,
+    onItemAdd,
+    onItemRemove,
   })
 
   const canAddItem = State.canAddItem(state)
