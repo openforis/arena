@@ -5,12 +5,13 @@ const arenaMobileId = 'arena-mobile'
 
 const keys = {
   appId: 'appId',
-  appVersion: 'appVersion',
+  platform: 'platform',
+  version: 'version',
 }
 
-const newAppInfo = ({ appId = arenaAppId, appVersion = ENV.applicationVersion } = {}) => ({
+const newAppInfo = ({ appId = arenaAppId, version = ENV.applicationVersion } = {}) => ({
   [keys.appId]: appId,
-  [keys.appVersion]: appVersion,
+  [keys.version]: version,
 })
 
 export const AppInfo = {
