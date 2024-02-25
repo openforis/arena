@@ -81,7 +81,7 @@ const FileInput = (props) => {
 FileInput.propTypes = {
   surveyInfo: PropTypes.object.isRequired,
   nodeDef: PropTypes.object.isRequired,
-  node: PropTypes.object.isRequired,
+  node: PropTypes.object,
   readOnly: PropTypes.bool,
   edit: PropTypes.bool,
   canEditRecord: PropTypes.bool,

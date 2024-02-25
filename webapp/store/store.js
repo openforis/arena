@@ -28,7 +28,8 @@ const createReducer = (asyncReducers) =>
 // App store
 export const store = configureStore({
   reducer: createReducer(),
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat([appErrorsMiddleware]),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat([appErrorsMiddleware]),
 })
 
 store.asyncReducers = {}
