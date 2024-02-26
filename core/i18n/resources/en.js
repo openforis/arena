@@ -52,9 +52,10 @@ Do you want to ignore them?`,
     draft: 'Draft',
     edit: 'Edit',
     email: 'Email',
+    email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
 
-Please inform the person to check also the Spam/Junk mail folder.`,
+    Please inform the person to check also the Spam/Junk mail folder.`,
     emailSentToSelfConfirmation: `You should have received an email to {{email}}.
 
 Please check also the Spam/Junk mail folder.`,
@@ -88,6 +89,7 @@ Please check also the Spam/Junk mail folder.`,
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
+    itemAlreadyAdded: 'Item already added',
     label: 'Label',
     label_plural: 'Labels',
     language: 'Language',
@@ -870,6 +872,10 @@ Are you sure you want to continue?`,
 
   userInviteView: {
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
+    confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
+    emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
+    
+    {{skppedEmailsCount}} addresses have been skipped (they have been already invited to this survey previously): {{skippedEmails}}`,
     groupPermissions: {
       label: 'Permissions',
       systemAdmin: `
@@ -948,6 +954,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     surveyNotPublishedWarning: `**Warning**: survey is not published.
       Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
+    typeEmail: 'Type an email address, then press the Add button',
   },
 
   user: {
@@ -1461,6 +1468,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   // ===== All validation errors
   validationErrors: {
     // Common
+    invalidEmail: 'Invalid email',
     invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
     invalidDate: 'Invalid date',
@@ -1770,6 +1778,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
     userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
     userHasRole: 'The given user has already a role in this survey',
+    userHasRole_other: 'The given users have already a role in this survey',
     userInvalid: 'Invalid user',
     userIsAdmin: 'The given user is already a system administrator',
     userNotAllowedToChangePref: 'User not allowed to change pref',
