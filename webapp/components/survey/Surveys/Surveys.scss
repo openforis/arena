@@ -7,4 +7,12 @@
       padding: 0.5rem;
     }
   }
+
+  .records-count {
+    width: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 0.2rem;
+  }
 }
