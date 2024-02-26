@@ -25,7 +25,7 @@ const Chip = (props) => {
 }
 
 Chip.propTypes = {
-  item: PropTypes.object,
+  item: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   itemLabel: PropTypes.string,
   readOnly: PropTypes.bool,
 
