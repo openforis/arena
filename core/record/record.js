@@ -2,21 +2,20 @@ import * as R from 'ramda'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { uuidv4 } from '@core/uuid'
-import { ENV } from '@core/processUtils'
 
+import { AppInfo } from '@core/app/appInfo'
 import * as Validation from '@core/validation/validation'
 import * as User from '@core/user/user'
 import * as RecordStep from './recordStep'
 
-import { keys } from './_record/recordKeys'
+import { keys, infoKeys } from './_record/recordKeys'
 import * as RecordReader from './_record/recordReader'
 import * as RecordUpdater from './_record/recordUpdater'
 import { RecordNodesUpdater } from './_record/recordNodesUpdater'
 
-export { keys } from './_record/recordKeys'
+export { keys, infoKeys } from './_record/recordKeys'
 
 // ====== CREATE
-const appId = 'arena'
 
 export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
   [keys.uuid]: uuidv4(),
@@ -25,7 +24,7 @@ export const newRecord = (user, cycle, preview = false, dateCreated = null, step
   [keys.cycle]: cycle,
   [keys.preview]: preview,
   [keys.dateCreated]: dateCreated,
-  [keys.info]: { createdWith: { appId, appVersion: ENV.applicationVersion } },
+  [keys.info]: { [infoKeys.createdWith]: AppInfo.newAppInfo() },
 })
 
 // ====== READ
