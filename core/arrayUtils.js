@@ -25,7 +25,9 @@ const removeItemAtIndex =
 
 const fromNumberOfElements = (numOfElements) => Array.from(Array(numOfElements).keys())
 
-const last = (array) => array[array.length - 1]
+const first = (array) => array?.[0]
+
+const last = (array) => (array?.length > 0 ? array[array.length - 1] : undefined)
 
 const sortByProps = (props) => (array) =>
   array.sort((item1, item2) => {
@@ -43,6 +45,7 @@ export const ArrayUtils = {
   addIfNotEmpty,
   removeItemAtIndex,
   fromNumberOfElements,
+  first,
   last,
   sortByProps,
 }

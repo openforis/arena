@@ -8,6 +8,7 @@ import * as A from '@core/arena'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
+import { AppInfo } from '@core/app/appInfo'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
@@ -120,6 +121,26 @@ export const countRecordsBySurveyId = async (
       `,
     { cycle },
     (row) => Number(row.count)
+  )
+}
+
+export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, client = db) => {
+  const counts = await client.any(
+    `
+        SELECT info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}' AS created_with, count(*)
+        FROM ${getSchemaSurvey(surveyId)}.record 
+        WHERE preview = FALSE 
+          ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
+        GROUP BY info
+      `,
+    { cycle }
+  )
+  return counts.reduce(
+    (acc, { created_with: createdWith, count }) => ({
+      ...acc,
+      [createdWith ?? AppInfo.arenaAppId]: Number(count),
+    }),
+    {}
   )
 }
 
