@@ -54,9 +54,24 @@ export default class CategoriesImportJob extends Job {
       },
       this.tx
     )
-    const items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, Category.getUuid(categoryInserted))
+    const categoryUuid = Category.getUuid(categoryInserted)
+    let items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, categoryUuid)
     if (items.length > 0) {
+      // category items in a single file
       await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
+    } else {
+      // big category: items splitted in parts
+      const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile: arenaSurveyFileZip, categoryUuid })
+      let partIndex = 0
+      while (partIndex < partsCount) {
+        items = await ArenaSurveyFileZip.getCategoryItemsPart({
+          zipFile: arenaSurveyFileZip,
+          categoryUuid,
+          index: partIndex,
+        })
+        await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
+        partIndex = partIndex + 1
+      }
     }
   }
 }

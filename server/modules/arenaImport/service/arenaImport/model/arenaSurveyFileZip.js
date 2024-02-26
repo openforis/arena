@@ -15,8 +15,16 @@ export const getTaxa = async (zipFile, taxonomyUuid) => _getJson(zipFile, Export
 // Categories
 export const getCategories = async (zipFile) => _getJson(zipFile, ExportFile.categories, {})
 export const getCategoryItems = async (zipFile, categoryUuid) =>
-  _getJson(zipFile, ExportFile.categoryItems({ categoryUuid }), [])
-
+  _getJson(zipFile, ExportFile.categoryItemsSingleFile({ categoryUuid }), [])
+export const getCategoryItemsPart = async ({ zipFile, categoryUuid, index = 0 }) =>
+  _getJson(zipFile, ExportFile.categoryItemsPart({ categoryUuid, index }), [])
+export const getCategoryItemsPartsCount = ({ zipFile, categoryUuid }) => {
+  let count = 0
+  while (zipFile.hasEntry(ExportFile.categoryItemsPart({ categoryUuid, index: count }))) {
+    count = count + 1
+  }
+  return count
+}
 // Records
 export const getRecords = async (zipFile) => _getJson(zipFile, ExportFile.records, [])
 export const hasRecords = async (zipFile) => (await getRecords(zipFile)).length > 0

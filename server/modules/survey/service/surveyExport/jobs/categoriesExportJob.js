@@ -34,16 +34,20 @@ export default class CategoriesExportJob extends Job {
     await PromiseUtils.each(categoriesUuids, async (categoryUuid) => {
       const itemsCount = itemsCountByCategoryUuid[categoryUuid]
       const totalPages = Math.ceil(itemsCount / itemsBatchSize)
-      const pages = ArrayUtils.fromNumberOfElements(totalPages)
+      const pageIndexes = ArrayUtils.fromNumberOfElements(totalPages)
 
-      for await (const pageIndex of pages) {
+      for await (const pageIndex of pageIndexes) {
         const offset = pageIndex * itemsBatchSize
         const itemsData = await CategoryService.fetchItemsByCategoryUuid(
           { surveyId, categoryUuid, backup, draft, offset, limit: itemsBatchSize },
           this.tx
         )
+        const fileName =
+          totalPages === 1
+            ? ExportFile.categoryItemsSingleFile({ categoryUuid })
+            : ExportFile.categoryItemsPart({ categoryUuid, index: pageIndex })
         archive.append(JSON.stringify(itemsData, null, 2), {
-          name: ExportFile.categoryItemsPage({ categoryUuid, pageIndex }),
+          name: fileName,
         })
       }
 

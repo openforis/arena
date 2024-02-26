@@ -13,9 +13,8 @@ const dir = {
 export const ExportFile = {
   activityLog: ({ index }) => [dir.activityLog, `activityLog_${index}.json`].join(separator),
   categories: [dir.categories, 'categories.json'].join(separator),
-  categoryItems: ({ categoryUuid }) => [dir.categories, `${categoryUuid}.json`].join(separator),
-  categoryItemsPage: ({ categoryUuid, pageIndex }) =>
-    [dir.categories, `${categoryUuid}_${pageIndex}.json`].join(separator),
+  categoryItemsSingleFile: ({ categoryUuid }) => [dir.categories, `${categoryUuid}.json`].join(separator),
+  categoryItemsPart: ({ categoryUuid, index }) => [dir.categories, `${categoryUuid}_${index}.json`].join(separator),
   chains: [dir.chains, 'chains.json'].join(separator),
   chain: ({ chainUuid }) => [dir.chains, `${chainUuid}.json`].join(separator),
   filesDir: dir.files,
