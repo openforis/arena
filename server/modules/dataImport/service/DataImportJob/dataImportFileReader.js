@@ -165,8 +165,10 @@ const createReaderFromStream = ({
 
   return CSVReader.createReaderFromStream(
     stream,
-    (headers) => {
-      if (validateHeaders) _validateHeaders({ csvDataExportModel })(headers)
+    async (headers) => {
+      if (validateHeaders) {
+        await _validateHeaders({ csvDataExportModel })(headers)
+      }
     },
     async (row) => {
       // combine several columns into single values for every attribute definition
