@@ -88,10 +88,10 @@ const _validateItemExtraProps =
   ({ extraDefs, validation, srsIndex }) =>
   (item) => {
     const _validateItemExtraProp = ({ key, extra }) => {
-      if (StringUtils.isBlank(extra[key])) {
+      const extraDef = extraDefs[key]
+      if (!extraDef || StringUtils.isBlank(extra[key])) {
         return null
       }
-      const extraDef = extraDefs[key]
       const extraDefType = extraDef[ExtraPropDef.keys.dataType]
       return _extraPropValidators[extraDefType]({ key, extra, srsIndex })
     }

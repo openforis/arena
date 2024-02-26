@@ -312,12 +312,12 @@ export const fetchUserSurveysInfo = async (
     return Promise.all(
       surveys.map(async (survey) => {
         const surveyId = Survey.getId(survey)
+        const canHaveData = Survey.canHaveData(survey)
         return {
           ...survey,
           nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
-          recordsCount: Survey.canHaveData(survey)
-            ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx)
-            : 0,
+          recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
+          recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
           chainsCount: await ChainRepository.countChains({ surveyId }, tx),
           filesSize: await FileManager.fetchTotalFilesSize({ surveyId }, tx),
         }

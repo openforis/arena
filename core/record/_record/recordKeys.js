@@ -13,3 +13,8 @@ export const keys = {
   surveyUuid: 'surveyUuid',
   uuid: ObjectUtils.keys.uuid,
 }
+
+export const infoKeys = {
+  createdWith: 'createdWith',
+  modifiedWith: 'modifiedWith',
+}

@@ -22,6 +22,36 @@
   }
 }
 
+.form-input-chip-text {
+  display: flex;
+  flex-direction: column;
+
+  .chips-wrapper {
+    display: flex;
+    flex-flow: wrap;
+
+    .form-input-chip-item {
+      font-size: 1rem;
+    }
+
+    .form-input {
+      padding: 0;
+      border: none;
+    }
+  }
+
+  .input-field-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    input {
+      width: 30rem;
+      padding: 0.5rem;
+    }
+  }
+}
+
 .form-input-chip-item {
   display: flex;
   height: 17px;
