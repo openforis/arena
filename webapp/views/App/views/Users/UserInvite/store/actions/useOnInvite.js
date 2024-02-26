@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router'
 import axios from 'axios'
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Authorizer from '@core/auth/authorizer'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
@@ -12,10 +14,32 @@ import * as UserInvite from '@core/user/userGroupInvitation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions, LoaderActions, NotificationActions, NotificationState } from '@webapp/store/ui'
 import { useUser } from '@webapp/store/user'
 
 import { validateUserInvite } from './validate'
+
+const _showInvitationSuccessfulMessage = ({ dispatch, userInvite, skippedEmails }) => {
+  const hasSkippedEmails = !Objects.isEmpty(skippedEmails)
+  const severity = hasSkippedEmails ? NotificationState.severityType.warning : NotificationState.severityType.info
+  const emails = UserInvite.getEmails(userInvite)
+  const invitedEmails = emails.filter((email) => !skippedEmails.includes(email))
+  const infoMessageKey = hasSkippedEmails
+    ? 'userInviteView.emailSentConfirmationWithSkippedEmails'
+    : 'userInviteView.emailSentConfirmation'
+  dispatch(
+    NotificationActions.showNotification({
+      key: infoMessageKey,
+      params: {
+        email: invitedEmails.join(', '),
+        skppedEmailsCount: skippedEmails.length,
+        skippedEmails: skippedEmails.join(', '),
+      },
+      severity,
+      timeout: hasSkippedEmails ? 0 : 10000,
+    })
+  )
+}
 
 const _performInvite =
   ({ dispatch, navigate, surveyId, surveyCycleKey, userInvite, repeatInvitation }) =>
@@ -30,17 +54,19 @@ const _performInvite =
       )(userInvite)
 
       const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, userInviteParams)
-      const { errorKey, errorParams } = data
+      const { errorKey, errorParams, skippedEmails } = data
+
+      const emails = UserInvite.getEmails(userInvite)
+      const invitedEmails = emails.filter((email) => !skippedEmails?.includes(email))
 
       if (errorKey) {
         dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
-      } else {
+      } else if (invitedEmails.length === 0) {
         dispatch(
-          NotificationActions.notifyInfo({
-            key: 'common.emailSentConfirmation',
-            params: { email: UserInvite.getEmail(userInvite) },
-          })
+          NotificationActions.notifyError({ key: 'appErrors.userHasRole', params: { count: skippedEmails.length } })
         )
+      } else {
+        _showInvitationSuccessfulMessage({ dispatch, userInvite, skippedEmails })
         navigate(appModuleUri(userModules.usersSurvey))
       }
     } finally {
@@ -69,10 +95,11 @@ export const useOnInvite = ({ userInvite, setUserInvite, repeatInvitation = fals
 
       if (AuthGroup.isSystemAdminGroup(group)) {
         // ask for a confirmation when user is inviting someone else as system administrator
+        const emails = UserInvite.getEmails(userInvite)
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'userInviteView.confirmInviteSystemAdmin',
-            params: { email: UserInvite.getEmail(userInvite) },
+            params: { email: UserInvite.getEmailsJoint(userInvite), count: emails.length },
             onOk: invite,
           })
         )
