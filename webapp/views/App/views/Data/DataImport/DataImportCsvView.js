@@ -112,9 +112,7 @@ export const DataImportCsvView = () => {
     [survey]
   )
 
-  const onFilesDrop = (files) => {
-    setStateProp('file')(files[0])
-  }
+  const onFilesDrop = useCallback((files) => setStateProp('file')(files[0]), [setStateProp])
 
   const onImportJobStart = useCallback(
     (job) => {
@@ -134,13 +132,15 @@ export const DataImportCsvView = () => {
   )
 
   const onJobCompletedDialogClose = useCallback(() => {
-    setState((statePrev) => {
-      const stateNext = { ...statePrev, jobCompleted: null }
-      if (JobSerialized.isSucceeded(jobCompleted)) {
-        stateNext.file = null
-      }
-      return stateNext
-    })
+    if (JobSerialized.isSucceeded(jobCompleted)) {
+      setState((statePrev) => {
+        const stateNext = { ...statePrev, jobCompleted: null }
+        if (JobSerialized.isSucceeded(jobCompleted) && !JobSerialized.getResult(jobCompleted).dryRun) {
+          stateNext.file = null
+        }
+        return stateNext
+      })
+    }
   }, [jobCompleted])
 
   const importStartParams = {
