@@ -37,7 +37,7 @@ export default class CategoriesImportJob extends Job {
   }
 
   async _insertCategory({ category }) {
-    const { arenaSurveyFileZip, backup, surveyId } = this.context
+    const { arenaSurveyFileZip: zipFile, backup, surveyId } = this.context
 
     const categoryWithLevels = Category.assocLevelsArray(
       Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(Category.getUuid(category)))
@@ -55,20 +55,16 @@ export default class CategoriesImportJob extends Job {
       this.tx
     )
     const categoryUuid = Category.getUuid(categoryInserted)
-    let items = await ArenaSurveyFileZip.getCategoryItems(arenaSurveyFileZip, categoryUuid)
+    let items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
     if (items.length > 0) {
       // category items in a single file
       await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
     } else {
       // big category: items splitted in parts
-      const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile: arenaSurveyFileZip, categoryUuid })
+      const partsCount = ArenaSurveyFileZip.getCategoryItemsPartsCount({ zipFile, categoryUuid })
       let partIndex = 0
       while (partIndex < partsCount) {
-        items = await ArenaSurveyFileZip.getCategoryItemsPart({
-          zipFile: arenaSurveyFileZip,
-          categoryUuid,
-          index: partIndex,
-        })
+        items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
         await CategoryService.insertItemsInBatch({ surveyId, items, backup }, this.tx)
         partIndex = partIndex + 1
       }

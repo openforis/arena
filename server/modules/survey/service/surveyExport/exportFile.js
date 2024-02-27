@@ -25,6 +25,7 @@ export const ExportFile = {
   survey: 'survey.json',
   taxonomies: [dir.taxonomies, 'taxonomies.json'].join(separator),
   taxa: ({ taxonomyUuid }) => [dir.taxonomies, `${taxonomyUuid}.json`].join(separator),
+  taxaPart: ({ taxonomyUuid, index }) => [dir.taxonomies, `${taxonomyUuid}_${index}.json`].join(separator),
   users: [dir.users, 'users.json'].join(separator),
   userInvitations: [dir.users, 'userInvitations.json'].join(separator),
   userProfilePicture: ({ userUuid }) => [dir.userProfilePictures, userUuid].join(separator),
