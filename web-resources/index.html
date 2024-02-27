@@ -1,29 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <title>Open Foris - Arena</title>
 
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="apple-touch-icon" sizes="57x57" href="/img/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/img/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/img/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/img/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/img/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/img/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/img/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/img/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
-    <link rel="manifest" href="/img/manifest.json">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/img/ms-icon-144x144.png">
-    <meta name="theme-color" content="#ffffff">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
+    <!-- start of favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon/favicon-96x96.png" />
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/img/favicon/apple-57x57-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/img/favicon/apple-60x60-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/img/favicon/apple-72x72-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon/apple-76x76-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/img/favicon/apple-114x114-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/img/favicon/apple-120x120-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/favicon/apple-144x144-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/favicon/apple-152x152-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon/apple-180x180-touch-icon.png" />
+
+    <link rel="icon" type="image/png" sizes="196x196" href="/img/favicon/android-chrome-196x196.png" />
+
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="/img/favicon/windows-tile.png" />
+    <meta name="msapplication-square70x70logo" content="/img/favicon/windows-small-tile.png" />
+    <meta name="msapplication-square150x150logo" content="/img/favicon/windows-medium-tile.png" />
+    <meta name="msapplication-wide310x150logo" content="/img/favicon/windows-wide-tile.png" />
+    <meta name="msapplication-square310x310logo" content="/img/favicon/windows-large-tile.png" />
+    <!-- end of favicon -->
+
+    <meta name="theme-color" content="#ffffff" />
 
     <style>
       #preloader-wrapper {
@@ -34,26 +44,26 @@
         align-items: center;
         flex-direction: column;
       }
-      
-      #preloader-loader-container{
+
+      #preloader-loader-container {
         height: min(128px, 30vw);
         width: min(128px, 30vw);
         position: relative;
       }
-    
+
       .preloader-loader__ball {
         position: absolute;
-        left: 0; 
-        right: 0; 
-        margin-left: auto; 
-        margin-right: auto; 
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
         opacity: 0;
         width: 80px;
         height: 80px;
-        background-color:#84ac67;
+        background-color: #84ac67;
         border-radius: 100%;
         -webkit-animation: ball-scale-multiple 1s 0s linear infinite;
-        animation: ball-scale-multiple 1s 0s linear infinite; 
+        animation: ball-scale-multiple 1s 0s linear infinite;
       }
 
       .preloader-loader__ball:nth-child(2) {
@@ -65,50 +75,95 @@
         -webkit-animation-delay: -0.2s;
         animation-delay: -0.2s;
       }
-      
 
-@keyframes ball-scale-multiple {
-  0% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
-    opacity: 0;
-  }
+      @keyframes ball-scale-multiple {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+          opacity: 0;
+        }
 
-  5% {
-    opacity: 1;
-  }
+        5% {
+          opacity: 1;
+        }
 
-  100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-
-
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
     </style>
-</head>
-<body>
-  <!-- Preloader container -->
-  <div id="preloader-wrapper">
-    
-    
+  </head>
+  <body>
+    <!-- Preloader container -->
+    <div id="preloader-wrapper">
       <div id="preloader-loader-container">
         <div class="preloader-loader__ball"></div>
         <div class="preloader-loader__ball"></div>
         <div class="preloader-loader__ball"></div>
       </div>
-      
-      
+
       <span>Open Foris Arena is loading, please wait...</span>
-  </div>
-  <!-- React app container-->
-  <div id="main"></div>
-</body>
-<script>
-    !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="341GM5a42C5YvtBclvmqDJC8qfAye9tq";analytics.SNIPPET_VERSION="4.13.2";
-    analytics.load("341GM5a42C5YvtBclvmqDJC8qfAye9tq");
-    analytics.page();
-    }}();
+    </div>
+    <!-- React app container-->
+    <div id="main"></div>
+  </body>
+  <script>
+    !(function () {
+      var analytics = (window.analytics = window.analytics || [])
+      if (!analytics.initialize)
+        if (analytics.invoked) window.console && console.error && console.error('Segment snippet included twice.')
+        else {
+          analytics.invoked = !0
+          analytics.methods = [
+            'trackSubmit',
+            'trackClick',
+            'trackLink',
+            'trackForm',
+            'pageview',
+            'identify',
+            'reset',
+            'group',
+            'track',
+            'ready',
+            'alias',
+            'debug',
+            'page',
+            'once',
+            'off',
+            'on',
+            'addSourceMiddleware',
+            'addIntegrationMiddleware',
+            'setAnonymousId',
+            'addDestinationMiddleware',
+          ]
+          analytics.factory = function (e) {
+            return function () {
+              var t = Array.prototype.slice.call(arguments)
+              t.unshift(e)
+              analytics.push(t)
+              return analytics
+            }
+          }
+          for (var e = 0; e < analytics.methods.length; e++) {
+            var key = analytics.methods[e]
+            analytics[key] = analytics.factory(key)
+          }
+          analytics.load = function (key, e) {
+            var t = document.createElement('script')
+            t.type = 'text/javascript'
+            t.async = !0
+            t.src = 'https://cdn.segment.com/analytics.js/v1/' + key + '/analytics.min.js'
+            var n = document.getElementsByTagName('script')[0]
+            n.parentNode.insertBefore(t, n)
+            analytics._loadOptions = e
+          }
+          analytics._writeKey = '341GM5a42C5YvtBclvmqDJC8qfAye9tq'
+          analytics.SNIPPET_VERSION = '4.13.2'
+          analytics.load('341GM5a42C5YvtBclvmqDJC8qfAye9tq')
+          analytics.page()
+        }
+    })()
   </script>
 </html>
