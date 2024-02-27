@@ -212,7 +212,7 @@ export const fetchCategoryAndLevelsByUuid = async (
 }
 
 export const fetchItemsByCategoryUuid = async (
-  { surveyId, categoryUuid, draft = false, backup = false },
+  { surveyId, categoryUuid, draft = false, backup = false, limit = null, offset = null },
   client = db
 ) => {
   const items = await client.map(
@@ -221,10 +221,12 @@ export const fetchItemsByCategoryUuid = async (
       FROM ${getSurveyDBSchema(surveyId)}.category_item i
       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
         ON l.uuid = i.level_uuid
-        AND l.category_uuid = $1
+        AND l.category_uuid = $/categoryUuid/
      ORDER BY i.id
+     ${offset ? 'OFFSET $/offset/' : ''}
+     ${limit ? 'LIMIT $/limit/' : ''}
     `,
-    [categoryUuid],
+    { categoryUuid, offset, limit },
     (def) => DB.transformCallback(def, draft, true, backup)
   )
 
