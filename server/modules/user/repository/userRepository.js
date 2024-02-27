@@ -87,7 +87,8 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     ON gu.user_uuid = u.uuid
     JOIN auth_group g
     ON g.uuid = gu.group_uuid
-    AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))`,
+    AND g.survey_uuid = s.uuid 
+    AND g.name <> '${AuthGroup.groupNames.systemAdmin}'`,
     [surveyId, countSystemAdmins],
     (row) => Number(row.count)
   )
@@ -176,7 +177,7 @@ export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
   await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
 
-export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>
+export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
   client.map(
     `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
@@ -189,7 +190,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-      AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))
+      AND (g.survey_uuid = s.uuid AND g.name <> '${AuthGroup.groupNames.systemAdmin}')
     LEFT OUTER JOIN user_invitation ui
       ON u.uuid = ui.user_uuid
       AND s.uuid = ui.survey_uuid
@@ -200,7 +201,7 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, i
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [surveyId, isSystemAdmin],
+    [surveyId],
     camelize
   )
 
