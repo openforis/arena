@@ -1,0 +1,1 @@
+Favicon generated with https://www.better-converter.com/ Favicon Generator / iOS, Android, Web
