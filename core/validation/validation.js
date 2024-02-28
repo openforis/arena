@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
+import { Objects } from '@openforis/arena-core'
 
 // Const objectInvalid = {
 //   [keys.valid]: false,
@@ -50,7 +51,15 @@ export const newInstance = (valid = true, fields = {}, errors = [], warnings = [
 export const isValid = R.propOr(true, keys.valid)
 export const isNotValid = (validation) => validation && !isValid(validation)
 export const getFieldValidations = R.propOr({}, keys.fields)
-export const getFieldValidation = (field) => R.pathOr(newInstance(), [keys.fields, field])
+export const getFieldValidation = (field, defaultValue = newInstance()) => R.pathOr(defaultValue, [keys.fields, field])
+export const getFieldValidationsByFields = (fields) => (validation) =>
+  fields.reduce((acc, field) => {
+    const fieldValidation = getFieldValidation(field, null)(validation)
+    if (fieldValidation) {
+      acc[field] = fieldValidation
+    }
+    return acc
+  }, {})
 
 export const getErrors = R.propOr([], keys.errors)
 export const isError = (validation) =>
@@ -154,6 +163,11 @@ export const assocFieldValidation = (field, fieldValidation) =>
   R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
 
 export const dissocFieldValidation = (field) => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
+export const deleteFieldValidation = (field) => (validation) =>
+  R.pipe(
+    (validation) => Objects.dissocPath({ obj: validation, path: [keys.fields, field], sideEffect: true }),
+    cleanup
+  )(validation)
 /**
  * Iterates over all the field validations and remove the ones starting with the specified value.
  *
@@ -190,6 +204,20 @@ export const mergeValidation = (validationNext) => (validationPrev) => {
   })
   const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
   return cleanup(validationResult)
+}
+
+export const mergeFieldValidations = (fieldValidationsNext) => (fieldValidationsPrev) => {
+  const result = Object.entries(fieldValidationsNext).reduce((acc, [field, fieldValidation]) => {
+    const prevFieldValidation = fieldValidationsPrev[field]
+    acc[field] = prevFieldValidation ? mergeValidation(fieldValidation)(prevFieldValidation) : fieldValidation
+    return acc
+  }, {})
+  Object.entries(fieldValidationsPrev).forEach(([field, prevFieldValidation]) => {
+    if (!result[field]) {
+      result[field] = prevFieldValidation
+    }
+  })
+  return result
 }
 
 // Object
