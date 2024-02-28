@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
@@ -18,15 +19,11 @@ export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
 export const mergeAndPersistValidation = async (survey, record, nodesValidation, tx) => {
-  console.log('==== oldRecordValidation', JSON.stringify(Record.getValidation(record)))
-
   const recordValidationUpdated = R.pipe(
     Record.getValidation,
     Validation.mergeValidation(nodesValidation),
     Validation.updateCounts
   )(record)
-
-  console.log('==== validation', JSON.stringify(recordValidationUpdated))
 
   const recordUpdated = Validation.assocValidation(recordValidationUpdated)(record)
 
@@ -46,47 +43,64 @@ const isRootUniqueNodesUpdated = ({ survey, nodes }) =>
     })
   )(nodes)
 
-export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordUniqueness, tx) => {
-  // 1. validate nodes
-  const nodesValidation = await RecordValidator.validateNodes({ survey, record, nodes })
-  console.log('---nodesValidation', JSON.stringify(nodesValidation))
+const _assocRecordKeysValidationToNodeValidations = ({ validationsByUuidPrev, validationsByUuidNext }) =>
+  Object.entries(validationsByUuidNext).reduce((acc, [nodeUuid, nodeValidationNext]) => {
+    const nodeValidationPrev = validationsByUuidPrev[nodeUuid]
+    const recordKeysValidation = Validation.getFieldValidation(RecordValidation.keys.recordKeys)(nodeValidationNext)
+    const nodeValidationUpdated = nodeValidationPrev
+      ? Validation.assocFieldValidation(
+          RecordValidation.keys.recordKeys,
+          recordKeysValidation,
+          false
+        )(nodeValidationPrev)
+      : nodeValidationNext
+    acc[nodeUuid] = Validation.recalculateValidity(nodeValidationUpdated)
+    return acc
+  }, {})
 
-  // 2. validate record uniqueness
+export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordUniqueness, tx) => {
+  // 1. validate node values
+  const nodesValueValidation = await RecordValidator.validateNodes({ survey, record, nodes })
+  const nodesValueValidationsByUuid = Validation.getFieldValidations(nodesValueValidation)
+  // 1.a. workaraound: always define value field validation even when validation is valid to allow cleaning up errors later
+  Object.values(nodesValueValidationsByUuid).forEach((nodeValueValidation) => {
+    if (Validation.isValid(nodeValueValidation)) {
+      Validation.setField('value', Validation.newInstance())(nodeValueValidation)
+    }
+  })
+
+  // 2. validate record unique nodes
   const uniqueNodesValidationByNodeUuid =
     validateRecordUniqueness && !Record.isPreview(record) && isRootUniqueNodesUpdated({ survey, nodes })
       ? await RecordUniquenessValidator.validateRecordUniqueNodes({ survey, record }, tx)
       : {}
 
+  // 3. get previous validation of unique nodes
   const uniqueNodesUuids = Object.keys(uniqueNodesValidationByNodeUuid)
   const oldUniqueNodesValidationByNodeUuid = Validation.getFieldValidationsByFields(uniqueNodesUuids)(
     Record.getValidation(record)
   )
-  const nodeValidationsByUuid = Validation.getFieldValidations(nodesValidation)
 
-  const uniqueNodesValidationByUuidMerged = Validation.mergeFieldValidations(uniqueNodesValidationByNodeUuid)(
-    oldUniqueNodesValidationByNodeUuid
-  )
-  // delete attribute value validation for unique nodes if they are valid
-  Object.entries(uniqueNodesValidationByUuidMerged).forEach(([nodeUuid, uniqueNodeValidation]) => {
-    console.log('---nodeUuid', nodeUuid)
-    const nodeValidation = nodesValidation[nodeUuid]
-    console.log('---is valid', Validation.isValid(nodeValidation))
-    console.log('---uniqueNodeValidation before', uniqueNodeValidation)
-    if (nodeValidation && Validation.isValid(nodeValidation)) {
-      Validation.deleteFieldValidation('value')(uniqueNodeValidation)
-    }
-    console.log('---uniqueNodeValidation after', uniqueNodeValidation)
+  // 4. merge unique nodes previous validation with new one
+  const uniqueNodesValidationMergedByUuid = _assocRecordKeysValidationToNodeValidations({
+    validationsByUuidNext: uniqueNodesValidationByNodeUuid,
+    validationsByUuidPrev: oldUniqueNodesValidationByNodeUuid,
   })
-  console.log('---uniqueNodesValidationByUuidMerged', uniqueNodesValidationByUuidMerged)
-  const mergedNodeValidationsByNodeUuid = Validation.mergeFieldValidations(nodeValidationsByUuid)(
-    uniqueNodesValidationByUuidMerged
-  )
 
-  console.log('---mergedFieldValidation', JSON.stringify(mergedNodeValidationsByNodeUuid))
+  // 5. add recordKeys validation to nodes values validation
+  const uniqueNodesValidationWithValueValidationByUuid = _assocRecordKeysValidationToNodeValidations({
+    validationsByUuidNext: uniqueNodesValidationMergedByUuid,
+    validationsByUuidPrev: nodesValueValidationsByUuid,
+  })
 
-  const validation = Validation.recalculateValidity(Validation.newInstance(true, mergedNodeValidationsByNodeUuid))
+  // 6. generate full validation object
+  const fullNodesValidationByUuid = {
+    ...nodesValueValidationsByUuid,
+    ...uniqueNodesValidationWithValueValidationByUuid,
+  }
+  const validation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
 
-  // 4. persist validation
+  // 7. persist validation
   await mergeAndPersistValidation(survey, record, validation, tx)
 
   return validation

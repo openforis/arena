@@ -159,8 +159,8 @@ export const setFieldValidations = (fieldValidations) => ObjectUtils.setInPath([
 export const setErrors = (errors) => ObjectUtils.setInPath([keys.errors], errors)
 export const setWarnings = (warnings) => ObjectUtils.setInPath([keys.warnings], warnings)
 
-export const assocFieldValidation = (field, fieldValidation) =>
-  R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
+export const assocFieldValidation = (field, fieldValidation, doCleanup = true) =>
+  R.pipe(R.assocPath([keys.fields, field], fieldValidation), (val) => (doCleanup ? cleanup(val) : val))
 
 export const dissocFieldValidation = (field) => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
 export const deleteFieldValidation = (field) => (validation) =>
@@ -196,26 +196,16 @@ export const mergeValidation = (validationNext) => (validationPrev) => {
       // field validation valid: remove it from resulting validation
       delete validationFieldsResult[fieldKey]
     } else {
-      // field validtion not valid: deep merge it with the previous one
-      validationFieldsResult[fieldKey] = R.mergeDeepRight(validationFieldsResult[fieldKey])(validationFieldNext)
+      // field validation not valid: deep merge it with the previous one
+      const validationFieldPrev = validationFieldsResult[fieldKey]
+      const validationFieldMerged = validationFieldPrev
+        ? mergeValidation(validationFieldNext)(validationFieldPrev)
+        : validationFieldNext
+      validationFieldsResult[fieldKey] = validationFieldMerged
     }
   })
   const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
   return cleanup(validationResult)
-}
-
-export const mergeFieldValidations = (fieldValidationsNext) => (fieldValidationsPrev) => {
-  const result = Object.entries(fieldValidationsNext).reduce((acc, [field, fieldValidation]) => {
-    const prevFieldValidation = fieldValidationsPrev[field]
-    acc[field] = prevFieldValidation ? mergeValidation(fieldValidation)(prevFieldValidation) : fieldValidation
-    return acc
-  }, {})
-  Object.entries(fieldValidationsPrev).forEach(([field, prevFieldValidation]) => {
-    if (!result[field]) {
-      result[field] = prevFieldValidation
-    }
-  })
-  return result
 }
 
 // Object
