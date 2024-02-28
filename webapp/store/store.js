@@ -1,6 +1,5 @@
-import { applyMiddleware, combineReducers, createStore, compose } from 'redux'
-import createDebounce from 'redux-debounced'
-import thunkMiddleware from 'redux-thunk'
+import { combineReducers } from 'redux'
+import { configureStore } from '@reduxjs/toolkit'
 
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
 
@@ -26,16 +25,12 @@ const createReducer = (asyncReducers) =>
     ...asyncReducers,
   })
 
-// App middleware
-const middleware = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
-
-const composeEnhancers =
-  typeof window === 'object' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
-    : compose
-
 // App store
-export const store = createStore(createReducer({}), composeEnhancers(applyMiddleware(...middleware)))
+export const store = configureStore({
+  reducer: createReducer(),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat([appErrorsMiddleware]),
+})
 
 store.asyncReducers = {}
 

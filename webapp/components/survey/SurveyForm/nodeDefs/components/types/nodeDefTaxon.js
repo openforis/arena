@@ -207,6 +207,6 @@ NodeDefTaxon.propTypes = {
   parentNode: PropTypes.object,
   readOnly: PropTypes.bool,
   renderType: PropTypes.string,
-  surveyId: PropTypes.number.isRequired,
+  surveyId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   updateNode: PropTypes.func.isRequired,
 }
