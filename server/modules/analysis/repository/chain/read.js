@@ -62,14 +62,15 @@ export const fetchChains = async (params, client = DB.client) => {
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
+ * @param {boolean} params.includeScript - Whether to include script columns.
  * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
 export const fetchChain = async (params, client = DB.client) => {
-  const { surveyId, chainUuid } = params
+  const { surveyId, chainUuid, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)
 
-  return client.oneOrNone(tableChain.getSelect({ chainUuid }), [chainUuid], transformCallback)
+  return client.oneOrNone(tableChain.getSelect({ chainUuid, includeScript }), [chainUuid], transformCallback)
 }
