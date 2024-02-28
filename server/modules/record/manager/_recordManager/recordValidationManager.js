@@ -7,7 +7,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
 import * as Record from '@core/record/record'
-import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
@@ -43,21 +42,6 @@ const isRootUniqueNodesUpdated = ({ survey, nodes }) =>
     })
   )(nodes)
 
-const _assocRecordKeysValidationToNodeValidations = ({ validationsByUuidPrev, validationsByUuidNext }) =>
-  Object.entries(validationsByUuidNext).reduce((acc, [nodeUuid, nodeValidationNext]) => {
-    const nodeValidationPrev = validationsByUuidPrev[nodeUuid]
-    const recordKeysValidation = Validation.getFieldValidation(RecordValidation.keys.recordKeys)(nodeValidationNext)
-    const nodeValidationUpdated = nodeValidationPrev
-      ? Validation.assocFieldValidation(
-          RecordValidation.keys.recordKeys,
-          recordKeysValidation,
-          false
-        )(nodeValidationPrev)
-      : nodeValidationNext
-    acc[nodeUuid] = Validation.recalculateValidity(nodeValidationUpdated)
-    return acc
-  }, {})
-
 export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordUniqueness, tx) => {
   // 1. validate node values
   const nodesValueValidation = await RecordValidator.validateNodes({ survey, record, nodes })
@@ -82,16 +66,16 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
   )
 
   // 4. merge unique nodes previous validation with new one
-  const uniqueNodesValidationMergedByUuid = _assocRecordKeysValidationToNodeValidations({
-    validationsByUuidNext: uniqueNodesValidationByNodeUuid,
-    validationsByUuidPrev: oldUniqueNodesValidationByNodeUuid,
-  })
+  const uniqueNodesValidationMergedByUuid = Validation.mergeFieldValidations(
+    uniqueNodesValidationByNodeUuid,
+    oldUniqueNodesValidationByNodeUuid
+  )
 
-  // 5. add recordKeys validation to nodes values validation
-  const uniqueNodesValidationWithValueValidationByUuid = _assocRecordKeysValidationToNodeValidations({
-    validationsByUuidNext: uniqueNodesValidationMergedByUuid,
-    validationsByUuidPrev: nodesValueValidationsByUuid,
-  })
+  // 5. merge unique nodes validation with nodes values validation
+  const uniqueNodesValidationWithValueValidationByUuid = Validation.mergeFieldValidations(
+    uniqueNodesValidationMergedByUuid,
+    nodesValueValidationsByUuid
+  )
 
   // 6. generate full validation object
   const fullNodesValidationByUuid = {

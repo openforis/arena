@@ -186,27 +186,38 @@ export const dissocFieldValidationsStartingWith = (fieldStartsWith) => (validati
     cleanup
   )(validation)
 
-export const mergeValidation = (validationNext) => (validationPrev) => {
-  const validationFieldsResult = { ...getFieldValidations(validationPrev) }
-  const validationFieldsNext = getFieldValidations(validationNext)
+export const mergeValidation =
+  (validationNext, doCleanup = true) =>
+  (validationPrev) => {
+    const validationFieldsResult = { ...getFieldValidations(validationPrev) }
+    const validationFieldsNext = getFieldValidations(validationNext)
 
-  // iterate over new field validations: remove valid ones, merge invalid ones with previous ones
-  Object.entries(validationFieldsNext).forEach(([fieldKey, validationFieldNext]) => {
-    if (isValid(validationFieldNext)) {
-      // field validation valid: remove it from resulting validation
-      delete validationFieldsResult[fieldKey]
-    } else {
-      // field validation not valid: deep merge it with the previous one
-      const validationFieldPrev = validationFieldsResult[fieldKey]
-      const validationFieldMerged = validationFieldPrev
-        ? mergeValidation(validationFieldNext)(validationFieldPrev)
-        : validationFieldNext
-      validationFieldsResult[fieldKey] = validationFieldMerged
-    }
-  })
-  const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
-  return cleanup(validationResult)
-}
+    // iterate over new field validations: remove valid ones, merge invalid ones with previous ones
+    Object.entries(validationFieldsNext).forEach(([fieldKey, validationFieldNext]) => {
+      if (isValid(validationFieldNext)) {
+        // field validation valid: remove it from resulting validation
+        delete validationFieldsResult[fieldKey]
+      } else {
+        // field validation not valid: deep merge it with the previous one
+        const validationFieldPrev = validationFieldsResult[fieldKey]
+        const validationFieldMerged = validationFieldPrev
+          ? mergeValidation(validationFieldNext, false)(validationFieldPrev)
+          : validationFieldNext
+        validationFieldsResult[fieldKey] = validationFieldMerged
+      }
+    })
+    const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
+    return doCleanup ? cleanup(validationResult) : validationResult
+  }
+
+export const mergeFieldValidations = (fieldValidationsNext, fieldValidationsPrev) =>
+  Object.entries(fieldValidationsNext).reduce((acc, [fieldKey, fieldValidationNext]) => {
+    const fieldValidationPrev = fieldValidationsPrev[fieldKey]
+    acc[fieldKey] = fieldValidationPrev
+      ? mergeValidation(fieldValidationNext, false)(fieldValidationPrev)
+      : fieldValidationNext
+    return acc
+  }, {})
 
 // Object
 
