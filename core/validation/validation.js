@@ -164,10 +164,8 @@ export const assocFieldValidation = (field, fieldValidation) =>
 
 export const dissocFieldValidation = (field) => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
 export const deleteFieldValidation = (field) => (validation) =>
-  R.pipe(
-    (validation) => Objects.dissocPath({ obj: validation, path: [keys.fields, field], sideEffect: true }),
-    cleanup
-  )(validation)
+  Objects.dissocPath({ obj: validation, path: [keys.fields, field], sideEffect: true })
+
 /**
  * Iterates over all the field validations and remove the ones starting with the specified value.
  *

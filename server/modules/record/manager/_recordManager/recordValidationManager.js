@@ -71,10 +71,11 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
     console.log('---nodeUuid', nodeUuid)
     const nodeValidation = nodesValidation[nodeUuid]
     console.log('---is valid', Validation.isValid(nodeValidation))
+    console.log('---uniqueNodeValidation before', uniqueNodeValidation)
     if (nodeValidation && Validation.isValid(nodeValidation)) {
       Validation.deleteFieldValidation('value')(uniqueNodeValidation)
     }
-    console.log('---uniqueNodeValidation', uniqueNodeValidation)
+    console.log('---uniqueNodeValidation after', uniqueNodeValidation)
   })
   console.log('---uniqueNodesValidationByUuidMerged', uniqueNodesValidationByUuidMerged)
   const mergedNodeValidationsByNodeUuid = Validation.mergeFieldValidations(nodeValidationsByUuid)(
