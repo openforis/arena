@@ -159,8 +159,8 @@ export const setFieldValidations = (fieldValidations) => ObjectUtils.setInPath([
 export const setErrors = (errors) => ObjectUtils.setInPath([keys.errors], errors)
 export const setWarnings = (warnings) => ObjectUtils.setInPath([keys.warnings], warnings)
 
-export const assocFieldValidation = (field, fieldValidation, doCleanup = true) =>
-  R.pipe(R.assocPath([keys.fields, field], fieldValidation), (val) => (doCleanup ? cleanup(val) : val))
+export const assocFieldValidation = (field, fieldValidation) =>
+  R.pipe(R.assocPath([keys.fields, field], fieldValidation), cleanup)
 
 export const dissocFieldValidation = (field) => R.pipe(R.dissocPath([keys.fields, field]), cleanup)
 export const deleteFieldValidation = (field) => (validation) =>
@@ -195,8 +195,12 @@ export const mergeValidation =
     // iterate over new field validations: remove valid ones, merge invalid ones with previous ones
     Object.entries(validationFieldsNext).forEach(([fieldKey, validationFieldNext]) => {
       if (isValid(validationFieldNext)) {
-        // field validation valid: remove it from resulting validation
-        delete validationFieldsResult[fieldKey]
+        if (doCleanup) {
+          // field validation valid: remove it from resulting validation
+          delete validationFieldsResult[fieldKey]
+        } else {
+          validationFieldsResult[fieldKey] = newInstance()
+        }
       } else {
         // field validation not valid: deep merge it with the previous one
         const validationFieldPrev = validationFieldsResult[fieldKey]
