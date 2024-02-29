@@ -463,6 +463,9 @@ export const updateLayout = (updateFn) => (nodeDef) => {
   return assocLayout(layoutUpdated)(nodeDef)
 }
 
+export const updateLayoutProp = ({ cycle, prop, value }) =>
+  updateLayout(NodeDefLayout.assocLayoutProp(cycle, prop, value))
+
 export const copyLayout =
   ({ cycleFrom, cyclesTo }) =>
   (nodeDef) =>
@@ -549,3 +552,15 @@ export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
 
 export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
+export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
+  !isKey(nodeDef) && !isMultiple(nodeDef) && NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+export const clearNotApplicableProps = (cycle) => (nodeDef) => {
+  if (
+    !canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
+    NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDef))
+  ) {
+    return updateLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary, value: false })(nodeDef)
+  }
+  return nodeDef
+}
