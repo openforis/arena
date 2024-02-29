@@ -97,13 +97,15 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
 export const useUserName = ({ userUuid, active = true }) => {
   const [userName, setUserName] = useState(null)
 
+  const canViewAllUsers = useAuthCanViewAllUsers()
+
   useEffect(() => {
-    if (userUuid && active) {
+    if (canViewAllUsers && userUuid && active) {
       API.fetchUser({ userUuid }).then((user) => {
         setUserName(User.getName(user) ?? User.getEmail(user))
       })
     }
-  }, [active, userUuid])
+  }, [active, canViewAllUsers, userUuid])
 
   return userName
 }
