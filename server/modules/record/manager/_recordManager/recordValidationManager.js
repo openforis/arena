@@ -43,20 +43,48 @@ const isRootUniqueNodesUpdated = ({ survey, nodes }) =>
   )(nodes)
 
 export const validateNodesAndPersistValidation = async (survey, record, nodes, validateRecordUniqueness, tx) => {
-  // 1. validate nodes
-  const nodesValidation = await RecordValidator.validateNodes({ survey, record, nodes })
+  // 1. validate node values
+  const nodesValueValidation = await RecordValidator.validateNodes({ survey, record, nodes })
+  const nodesValueValidationsByUuid = Validation.getFieldValidations(nodesValueValidation)
+  // 1.a. workaraound: always define value field validation even when validation is valid to allow cleaning up errors later
+  Object.values(nodesValueValidationsByUuid).forEach((nodeValueValidation) => {
+    if (Validation.isValid(nodeValueValidation)) {
+      Validation.setField('value', Validation.newInstance())(nodeValueValidation)
+    }
+  })
 
-  // 2. validate record uniqueness
-  const recordUniqueNodesValidation =
+  // 2. validate record unique nodes
+  const uniqueNodesValidationByNodeUuid =
     validateRecordUniqueness && !Record.isPreview(record) && isRootUniqueNodesUpdated({ survey, nodes })
       ? await RecordUniquenessValidator.validateRecordUniqueNodes({ survey, record }, tx)
       : {}
 
-  // 3. merge validations
-  const validationFields = R.mergeDeepLeft(recordUniqueNodesValidation, Validation.getFieldValidations(nodesValidation))
-  const validation = Validation.recalculateValidity(Validation.newInstance(true, validationFields))
+  // 3. get previous validation of unique nodes
+  const uniqueNodesUuids = Object.keys(uniqueNodesValidationByNodeUuid)
+  const oldUniqueNodesValidationByNodeUuid = Validation.getFieldValidationsByFields(uniqueNodesUuids)(
+    Record.getValidation(record)
+  )
 
-  // 4. persist validation
+  // 4. merge unique nodes previous validation with new one
+  const uniqueNodesValidationMergedByUuid = Validation.mergeFieldValidations(
+    uniqueNodesValidationByNodeUuid,
+    oldUniqueNodesValidationByNodeUuid
+  )
+
+  // 5. merge unique nodes validation with nodes values validation
+  const uniqueNodesValidationWithValueValidationByUuid = Validation.mergeFieldValidations(
+    uniqueNodesValidationMergedByUuid,
+    nodesValueValidationsByUuid
+  )
+
+  // 6. generate full validation object
+  const fullNodesValidationByUuid = {
+    ...nodesValueValidationsByUuid,
+    ...uniqueNodesValidationWithValueValidationByUuid,
+  }
+  const validation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
+
+  // 7. persist validation
   await mergeAndPersistValidation(survey, record, validation, tx)
 
   return validation
