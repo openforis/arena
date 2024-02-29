@@ -39,7 +39,9 @@ export const dispatchWindowResize = () => {
 export const copyToClipboard = async (text) => {
   try {
     await navigator.clipboard.writeText(text)
+    return true
   } catch (error) {
     // ignore it
+    return false
   }
 }

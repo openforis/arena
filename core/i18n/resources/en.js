@@ -828,6 +828,8 @@ Are you sure you want to continue?`,
     roleInCurrentSurvey: 'Role in current survey',
     userNotInvitedToAnySurvey: `User not invited to any survey`,
     confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
+    copyInvitationLink: 'Copy invitation link to clipboard',
+    invitationLinkCopiedToClipboard: 'Invitation link copied to your clipboard',
   },
 
   usersAccessRequestView: {
