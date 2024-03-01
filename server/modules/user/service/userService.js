@@ -76,6 +76,7 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
  *
  * @param {!string} email - Email of the user.
  * @param {!string} serverUrl - Address of the server.
+ * @returns {Promise<object>} - THe generated password reset uuid.
  */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
