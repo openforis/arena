@@ -267,12 +267,10 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
 
   if (
     !User.isSystemAdmin(user) &&
-    (userToUpdateWillBeSystemAdmin ||
-      User.isSystemAdmin(userToUpdateOld) ||
-      userToUpdateWillBeSurveyManager ||
-      User.isSurveyManager(userToUpdateOld))
+    (userToUpdateWillBeSystemAdmin || // only system admins can assign system admin role
+      User.isSystemAdmin(userToUpdateOld) || // only system admins can edit other system admins
+      (userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
   ) {
-    // only system admins can update other system admins or survey managers or assign that group
     throw new UnauthorizedError(User.getName(user))
   }
 

@@ -26,7 +26,7 @@ const _showInvitationSuccessfulMessage = ({ dispatch, userInvite, skippedEmails 
   const invitedEmails = emails.filter((email) => !skippedEmails.includes(email))
   const infoMessageKey = hasSkippedEmails
     ? 'userInviteView.emailSentConfirmationWithSkippedEmails'
-    : 'userInviteView.emailSentConfirmation'
+    : 'common.emailSentConfirmation'
   dispatch(
     NotificationActions.showNotification({
       key: infoMessageKey,
