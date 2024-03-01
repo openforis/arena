@@ -552,15 +552,38 @@ export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
 
 export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
+export const canBeHiddenInMobile = (nodeDef) =>
+  !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
+
 export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
-  !isKey(nodeDef) && !isMultiple(nodeDef) && NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+  !isKey(nodeDef) &&
+  !isMultiple(nodeDef) &&
+  !isFile(nodeDef) &&
+  NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
-  if (
-    !canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
-    NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDef))
-  ) {
-    return updateLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary, value: false })(nodeDef)
+  let nodeDefUpdated = nodeDef
+  // clear hidden in mobile if not applicable
+  if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
+    nodeDefUpdated = updateLayoutProp({
+      cycle,
+      prop: NodeDefLayout.keys.hiddenInMobile,
+      value: false,
+    })(nodeDefUpdated)
   }
-  return nodeDef
+  // clear inclulde in multiple entity summary if not applicable
+  if (
+    !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
+    NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDefUpdated))
+  ) {
+    nodeDefUpdated = updateLayoutProp({
+      cycle,
+      prop: NodeDefLayout.keys.includedInMultipleEntitySummary,
+      value: false,
+    })(nodeDefUpdated)
+  }
+  return nodeDefUpdated
 }
+
+export const canHaveMobileProps = (cycle) => (nodeDef) =>
+  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)

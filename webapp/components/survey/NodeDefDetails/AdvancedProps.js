@@ -41,16 +41,17 @@ const AdvancedProps = (props) => {
 
   return (
     <div className="form">
-      <fieldset className="mobile-props-container">
-        <legend>{i18n.t('nodeDefEdit.mobileProps.title')}</legend>
-        <div className="internal-container">
-          {createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
-
-          {NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
-            createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
-        </div>
-      </fieldset>
-
+      {NodeDef.canHaveMobileProps(cycle)(nodeDef) && (
+        <fieldset className="mobile-props-container">
+          <legend>{i18n.t('nodeDefEdit.mobileProps.title')}</legend>
+          <div className="internal-container">
+            {NodeDef.canBeHiddenInMobile(nodeDef) &&
+              createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
+            {NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
+              createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
+          </div>
+        </fieldset>
+      )}
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
