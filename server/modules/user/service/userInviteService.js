@@ -18,6 +18,8 @@ import * as AuthManager from '@server/modules/auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 
+export const getResetPasswordUrl = ({ serverUrl, uuid }) => `${serverUrl}/guest/resetPassword/${uuid}`
+
 const _getPrettyFormatUserName = ({ user, i18n }) => {
   const parts = []
   const titleKey = User.getTitle(user)
@@ -35,7 +37,7 @@ const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, 
   // Add reset password url to message params
   const msgParams = {
     ...emailParams,
-    urlResetPassword: `${serverUrl}/guest/resetPassword/${uuid}`,
+    urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
   await Mailer.sendEmail({ to: email, msgKey: 'emails.userInvite', msgParams, i18n })

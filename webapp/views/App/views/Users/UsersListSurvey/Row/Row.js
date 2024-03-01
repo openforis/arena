@@ -14,17 +14,18 @@ import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/
 import { ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
+import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
 
 const Row = (props) => {
   const { row: userListItem, emailVisible } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
-
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
 
   const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(userListItem)
   const authGroupName = AuthGroup.getName(authGroup)
+  const userUuid = User.getUuid(userListItem)
   const email = User.getEmail(userListItem)
   const invitedBy = User.getInvitedBy(userListItem)
   const invitedDate = User.getInvitedDate(userListItem)
@@ -37,7 +38,7 @@ const Row = (props) => {
   return (
     <>
       <div data-testid={TestId.userList.profilePicture} className="users-list__cell-profile-picture">
-        <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail />
+        <ProfilePicture userUuid={userUuid} thumbnail />
       </div>
       <div data-testid={TestId.userList.name}>{User.getName(userListItem)}</div>
       {emailVisible && (
@@ -60,7 +61,10 @@ const Row = (props) => {
           <span className="icon icon-crying icon-16px icon-invitation-expired" />
         )}
         {User.isInvited(userListItem) && (
-          <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
+          <div>
+            <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
+            <CopyInvitationLinkButton email={email} userUuid={userUuid} />
+          </div>
         )}
       </div>
       <div data-testid={TestId.userList.lastLogin} data-value={lastLoginTime}>

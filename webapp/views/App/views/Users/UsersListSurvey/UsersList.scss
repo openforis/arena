@@ -10,10 +10,11 @@
   .icon-invitation-expired {
     color: $red;
   }
-  .icon-invitation-retry{
+  .icon-invitation-retry,
+  .icon-invitation-link {
     border: none;
     background: transparent;
-    &:hover{
+    &:hover {
       color: $orange;
     }
   }

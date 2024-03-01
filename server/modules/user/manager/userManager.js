@@ -37,8 +37,12 @@ export const {
   deleteUsersWithExpiredInvitation,
 } = UserRepository
 
-export const { findResetPasswordUserUuidByUuid, deleteUserResetPasswordByUuid, deleteUserResetPasswordExpired } =
-  UserResetPasswordRepository
+export const {
+  fetchResetPasswordUuidByUserUuid,
+  findResetPasswordUserUuidByUuid,
+  deleteUserResetPasswordByUuid,
+  deleteUserResetPasswordExpired,
+} = UserResetPasswordRepository
 
 export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
 
