@@ -98,12 +98,17 @@ export const init = (app) => {
 
   // ==== READ
 
-  const _getUser = async (req, res) => {
+  const _fetchUser = async (req) => {
     const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
     // show private info only if fetching the same user of the request
     const userResult = User.isEqual(Request.getUser(req))(user) ? user : User.dissocPrivateProps(user)
-    res.json(userResult)
+    return userResult
+  }
+
+  const _getUser = async (req, res) => {
+    const user = await _fetchUser(req)
+    res.json(user)
   }
 
   app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
@@ -188,6 +193,20 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/user/:userUuid/name',
+    AuthMiddleware.requireUserNameViewPermission,
+    async (req, res, next) => {
+      try {
+        const user = await _fetchUser(req)
+        const name = user ? User.getName(user) : null
+        res.json(name)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {

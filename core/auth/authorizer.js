@@ -130,12 +130,7 @@ export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 // READ
 export const canViewSurveyUsers = _hasSurveyPermission(permissions.userInvite)
 
-export const canViewUser = (user, _surveyInfo, userToView) =>
-  // system admin
-  User.isSystemAdmin(user) ||
-  // same user
-  User.isEqual(userToView)(user) ||
-  // both users have an auth group in the same survey
+const _usersBelongToSameSurvey = ({ user, userToView }) =>
   User.getAuthGroups(user).some(
     (authGroupUser) =>
       AuthGroup.isSurveyGroup(authGroupUser) &&
@@ -146,8 +141,16 @@ export const canViewUser = (user, _surveyInfo, userToView) =>
       )
   )
 
+export const canViewUser = (user, surveyInfo, userToView) =>
+  User.isSystemAdmin(user) ||
+  User.isEqual(userToView)(user) ||
+  _usersBelongToSameSurvey({ user, userToView, surveyInfo })
+
 export const canViewOtherUsersEmail = ({ user, surveyInfo }) =>
   User.isSystemAdmin(user) || canInviteUsers(user, surveyInfo)
+
+export const canViewOtherUsersNameInSameSurvey = (user, surveyInfo) =>
+  _hasSurveyPermission(permissions.recordView)(user, surveyInfo)
 
 export const canViewAllUsers = (user) => User.isSystemAdmin(user)
 
