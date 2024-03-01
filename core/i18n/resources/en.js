@@ -1173,6 +1173,7 @@ $t(common.appNameFull)
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
+      includedInMultipleEntitySummary: 'Include in multiple entity summary',
       itemsFilter: 'Items filter',
       itemsFilterInfo: `Expression used to filter selectable items.
 In the expression, the word "this" will refer to the item itself. 
@@ -1195,6 +1196,9 @@ E.g. this.region = region_attribute_name
         audio: 'Audio',
         other: 'Other',
       },
+    },
+    mobileProps: {
+      title: 'Mobile App',
     },
     textProps: {
       textInputType: 'Text input type',
