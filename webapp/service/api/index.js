@@ -71,6 +71,7 @@ export {
   createAccessRequest,
   acceptAccessRequest,
   fetchUser,
+  fetchUserName,
   fetchUserResetPasswordUrl,
   fetchUserSurveys,
   changeUserPassword,

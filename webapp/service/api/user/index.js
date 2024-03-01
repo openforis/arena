@@ -29,6 +29,11 @@ export const fetchUserResetPasswordUrl = async ({ userUuid, surveyId }) => {
   return url
 }
 
+export const fetchUserName = async ({ userUuid, surveyId }) => {
+  const { data: name } = await axios.get(`/api/survey/${surveyId}/user/${userUuid}/name`)
+  return name
+}
+
 export const fetchUserSurveys = async ({ userUuid }) => {
   const {
     data: { surveys },
