@@ -25,6 +25,6 @@ export const notifyError = ({ key, params, timeout }) =>
   showNotification({ key, params, timeout, severity: NotificationState.severityType.error })
 
 export const hideNotification = () => (dispatch) => {
-  dispatch(cancelDebouncedAction(NOTIFICATION_HIDE))
+  cancelDebouncedAction(NOTIFICATION_HIDE)
   dispatch({ type: NOTIFICATION_HIDE })
 }
