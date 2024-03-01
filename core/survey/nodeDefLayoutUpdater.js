@@ -63,10 +63,9 @@ export const updateLayoutProp =
   (survey) => {
     const renderTypePrev = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev || nodeDef)
 
-    let nodeDefUpdated = NodeDef.updateLayout((layout) => {
-      const layoutUpdated = NodeDefLayout.assocLayoutProp(surveyCycleKey, key, value)(layout)
-      return layoutUpdated
-    })(nodeDef)
+    let nodeDefUpdated = NodeDef.updateLayoutProp({ cycle: surveyCycleKey, prop: key, value })(nodeDef)
+    nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
+
     const nodeDefsUpdated = { [nodeDef.uuid]: nodeDefUpdated }
     let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
 

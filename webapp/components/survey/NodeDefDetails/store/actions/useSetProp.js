@@ -118,6 +118,8 @@ export const useSetProp = ({ setState }) => {
       })
     }
 
+    nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
+
     validateNodeDef({ nodeDefUpdated })
   }, [])
 }
