@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -8,24 +7,19 @@ import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
 
 import { TestId } from '@webapp/utils/testId'
-import { copyToClipboard } from '@webapp/utils/domUtils'
-import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
-import { Button, ButtonInvite } from '@webapp/components'
+import { ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
-import { NotificationActions } from '@webapp/store/ui'
+import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
 
 const Row = (props) => {
   const { row: userListItem, emailVisible } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
-  const surveyId = Survey.getId(surveyInfo)
-
-  const dispatch = useDispatch()
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
 
@@ -40,16 +34,6 @@ const Row = (props) => {
   const lastLoginTimeFormatted = DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime) ?? ''
 
   const handleResendInvitation = useOnInviteRepeat({ userToInvite: userListItem, hasToNavigate: false })
-  const handleCopyInvitationLink = useCallback(
-    async (e) => {
-      e.stopPropagation()
-      const url = await API.fetchUserResetPasswordUrl({ userUuid, surveyId })
-      if (await copyToClipboard(url)) {
-        dispatch(NotificationActions.notifyInfo({ key: 'usersView.invitationLinkCopiedToClipboard' }))
-      }
-    },
-    [surveyId, userUuid]
-  )
 
   return (
     <>
@@ -79,13 +63,7 @@ const Row = (props) => {
         {User.isInvited(userListItem) && (
           <div>
             <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
-            <Button
-              className="icon-invitation-link"
-              iconClassName="icon-link icon-12px"
-              label="usersView.copyInvitationLink"
-              onClick={handleCopyInvitationLink}
-              showLabel={false}
-            />
+            <CopyInvitationLinkButton email={email} userUuid={userUuid} />
           </div>
         )}
       </div>
