@@ -113,28 +113,29 @@ export const fetchUsersGroups = async (userUuids, client = db) =>
     dbTransformCallback
   )
 
-export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) => {
-  const role = AuthGroup.groupNames.surveyAdmin
-  return client.map(
+export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
+  client.map(
     `
     SELECT s.id
     FROM auth_group_user agu
       JOIN auth_group ag ON ag.uuid = agu.group_uuid 
       JOIN "user" u ON u.uuid = agu.user_uuid
       JOIN survey s ON s.uuid = ag.survey_uuid
-    WHERE ag."name" = '${role}' 
+    WHERE
+      NOT s.template
+      AND ag."name" = '${AuthGroup.groupNames.surveyAdmin}' 
       -- only one user/role associated to the same survey
       AND NOT EXISTS (
         SELECT * 
         FROM auth_group_user agu2
           JOIN auth_group ag2 ON ag2."uuid" = agu2.group_uuid
-        WHERE ag2.survey_uuid = ag.survey_uuid and ag."name" <> '${role}'
+        WHERE ag2.survey_uuid = ag.survey_uuid
+          AND agu2.user_uuid <> agu.user_uuid
       )
       AND ${UserRepository.expiredInvitationWhereCondition}`,
     [],
     (row) => row.id
   )
-}
 
 // ==== UPDATE
 
