@@ -264,6 +264,14 @@ export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = 
   return backup || draft || item.published ? item : null
 }
 
+export const countItemsSurveyId = async ({ surveyId }, client = db) =>
+  client.one(
+    `SELECT COUNT(*) 
+    FROM ${getSurveyDBSchema(surveyId)}.category_item`,
+    [],
+    (r) => Number(r.count)
+  )
+
 export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = db) =>
   client.one(
     `SELECT COUNT(*) 

@@ -15,6 +15,7 @@ export const {
   fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
   countTaxonomiesBySurveyId,
+  countTaxaBySurveyId,
   countTaxaByTaxonomyUuid,
   findTaxaByCode,
   findTaxaByScientificName,

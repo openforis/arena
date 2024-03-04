@@ -190,12 +190,23 @@ export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
     (r) => parseInt(r.count, 10)
   )
 
+export const countTaxaBySurveyId = async ({ surveyId, draft = false }, client = db) =>
+  client.one(
+    `SELECT COUNT(*) 
+    FROM ${getSurveyDBSchema(surveyId)}.taxon t
+    ${draft ? '' : `WHERE t.props <> '{}'::jsonb`}
+    `,
+    [],
+    (r) => Number(r.count)
+  )
+
 export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) =>
   client.one(
     `
       SELECT COUNT(*) 
-      FROM ${getSurveyDBSchema(surveyId)}.taxon
-      WHERE taxonomy_uuid = $1`,
+      FROM ${getSurveyDBSchema(surveyId)}.taxon t
+      WHERE t.taxonomy_uuid = $1
+      ${draft ? '' : `t.props <> '{}'::jsonb`}`,
     [taxonomyUuid],
     (r) => parseInt(r.count, 10)
   )
