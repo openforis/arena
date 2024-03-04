@@ -1,7 +1,7 @@
 @import 'webapp/style/vars';
 
 .home-dashboard__survey-info {
-  padding: 1rem 2rem 1rem 1rem;
+  padding: 1rem;
 
   header h3 {
     position: relative;
@@ -9,7 +9,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 35ch; /* max number of characters for ellipsis */
+    max-width: calc(100vw - 310px);
   }
 
   .survey-status {
@@ -23,5 +23,13 @@
   .btn-menu-export,
   .btn-menu-advanced {
     display: inline-block;
+  }
+}
+
+.sidebar-open {
+  .home-dashboard__survey-info {
+    header h3 {
+      max-width: calc(100vw - 460px);
+    }
   }
 }
