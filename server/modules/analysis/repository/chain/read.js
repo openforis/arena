@@ -9,7 +9,7 @@ import * as DB from '@server/db'
 
 export const transformCallback = (row) => {
   if (!row) return {}
-  return A.pipe(DB.TmergeProps(), A.camelizePartial({ limitToLevel: 1 }))(row)
+  return A.pipe(DB.mergeProps(), A.camelizePartial({ limitToLevel: 1 }))(row)
 }
 
 /**
