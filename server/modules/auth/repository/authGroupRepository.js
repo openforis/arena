@@ -122,7 +122,7 @@ export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
       JOIN "user" u ON u.uuid = agu.user_uuid
       JOIN survey s ON s.uuid = ag.survey_uuid
     WHERE
-      NOT s.template
+      NOT s.template AND NOT s.published
       AND ag."name" = '${AuthGroup.groupNames.surveyAdmin}' 
       -- only one user/role associated to the same survey
       AND NOT EXISTS (
