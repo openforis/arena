@@ -22,7 +22,7 @@ export const init = (app) => {
 
       const { surveyId, cycle } = Request.getParams(req)
 
-      const totalCategoryItems = await CategoryService.countItemsSurveyId({ surveyId })
+      const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
       Logger.info('total category items', totalCategoryItems)
 
       const totalTaxa = await TaxonomyService.countTaxaBySurveyId({ surveyId })

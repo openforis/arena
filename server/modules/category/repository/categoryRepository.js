@@ -264,7 +264,7 @@ export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = 
   return backup || draft || item.published ? item : null
 }
 
-export const countItemsSurveyId = async ({ surveyId }, client = db) => {
+export const countItemsBySurveyId = async ({ surveyId }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   return client.one(
     `SELECT COUNT(*) 

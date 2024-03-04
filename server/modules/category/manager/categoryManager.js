@@ -248,7 +248,7 @@ export const createImportSummary = async ({ surveyId, filePath }) => {
 // ====== READ
 export const {
   countCategories,
-  countItemsSurveyId,
+  countItemsBySurveyId,
   countItemsByCategoryUuid,
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
