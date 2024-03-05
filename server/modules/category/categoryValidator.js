@@ -24,7 +24,7 @@ const keys = {
 const validateNotEmptyFirstLevelItems =
   ({ itemsCache, bigCategory }) =>
   (_propName, level) =>
-    CategoryLevel.getIndex(level) === 0 && !bigCategory && R.isEmpty(itemsCache.getFirstLevelItems())
+    CategoryLevel.getIndex(level) === 0 && !bigCategory && R.isEmpty(itemsCache?.getFirstLevelItems())
       ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
       : null
 
@@ -271,13 +271,13 @@ export const validateCategory = async ({
     : Validation.getFieldValidation(keys.levels)(prevValidation)
 
   const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
-  const nextItemsValidation =
-    _validateItems && itemsCache
-      ? await validateAllItems({ survey, category, itemsCache, onProgress, stopIfFn })
-      : bigCategory
-        ? Validation.newInstance() // cannot calculate items validation (too many items): consider them as always valid
-        : null
-
+  let nextItemsValidation = null
+  if (_validateItems && itemsCache) {
+    nextItemsValidation = await validateAllItems({ survey, category, itemsCache, onProgress, stopIfFn })
+  } else if (bigCategory) {
+    // cannot calculate items validation (too many items): consider them as always valid
+    nextItemsValidation = Validation.newInstance()
+  }
   const itemsValidation = nextItemsValidation ?? prevItemsValidation
 
   return R.pipe(
