@@ -397,16 +397,17 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
     }
   })
 
-export const deleteExpiredInvitationsUsersAndSurveys = (client = db) =>
-  client.tx(async (t) => {
-    const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(t)
-    for await (const surveyId of surveyIds) {
-      const activityLogsCount = await ActivityLogManager.count({ surveyId }, t)
-      // delete survey only if it is brand new
-      if (activityLogsCount < 5) {
-        await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
-      }
+export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
+  const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
+  Logger.info('IDs of surveys to be deleted (if without any activity):', surveyIds)
+  for await (const surveyId of surveyIds) {
+    const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
+    // delete survey only if it is brand new
+    if (activityLogsCount < 5) {
+      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
     }
+  }
+  return client.tx(async (t) => {
     const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
     const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(t)
     if (deletedUsers.length > 0) {
@@ -417,6 +418,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = (client = db) =>
 
     return { deletedSurveyIds: surveyIds, deletedInvitations, deletedUsers }
   })
+}
 
 // ==== User prefs
 export const { updateUserPrefs, updateUserPrefsAndFetchGroups } = UserManager
