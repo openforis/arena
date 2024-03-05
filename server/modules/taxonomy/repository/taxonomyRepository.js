@@ -206,7 +206,7 @@ export const countTaxaBySurveyId = async ({ surveyId, draft = false }, client = 
 }
 
 export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const publishedCondition = draft ? '' : `AND t.props <> '{}'::jsonb`
   return client.one(
     `
