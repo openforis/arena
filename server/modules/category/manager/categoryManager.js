@@ -48,7 +48,7 @@ const _validateCategoryFromCategories = async (
     : 0
   const bigCategory = itemsCount > Category.maxCategoryItemsInIndex
   const items =
-    validateItems && !bigCategory
+    (validateItems || validateLevels) && !bigCategory
       ? await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
       : null
   const validation = await CategoryValidator.validateCategory({
@@ -127,8 +127,7 @@ const _validateCategory = async (
   { surveyId, categoryUuid, validateLevels = true, validateItems = true },
   client = db
 ) => {
-  let survey = await _fetchSurvey({ surveyId }, client)
-
+  const survey = await _fetchSurvey({ surveyId }, client)
   return validateCategory({ survey, categoryUuid, validateLevels, validateItems }, client)
 }
 
