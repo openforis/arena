@@ -764,7 +764,7 @@ Are you sure you want to continue?`,
       showControlPoints: `Control points`,
       showPlotReferencePoint: `Plot reference point`,
     },
-    samplingPointDataLayerName: 'Sampling point data - level {{levelIndex}}',
+    samplingPointDataLayerName: 'Sampling point data - level {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
       title: 'Sampling Point Item',

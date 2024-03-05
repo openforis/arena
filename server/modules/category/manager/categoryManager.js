@@ -46,14 +46,16 @@ const _validateCategoryFromCategories = async (
   const itemsCount = validateItems
     ? await CategoryRepository.countItemsByCategoryUuid(surveyId, categoryUuid, client)
     : 0
+  const bigCategory = itemsCount > Category.maxCategoryItemsInIndex
   const items =
-    validateItems && itemsCount <= Category.maxCategoryItemsInIndex
+    validateItems && !bigCategory
       ? await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
-      : []
+      : null
   const validation = await CategoryValidator.validateCategory({
     survey,
     categories: R.values(categories),
     category,
+    bigCategory,
     items,
     validateLevels,
     validateItems,

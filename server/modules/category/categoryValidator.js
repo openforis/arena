@@ -21,27 +21,31 @@ const keys = {
 
 // ====== LEVELS
 
-const validateNotEmptyFirstLevelItems = (itemsCache) => (_propName, level) =>
-  CategoryLevel.getIndex(level) === 0 && R.isEmpty(itemsCache.getFirstLevelItems())
-    ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
-    : null
+const validateNotEmptyFirstLevelItems =
+  ({ itemsCache, bigCategory }) =>
+  (_propName, level) =>
+    CategoryLevel.getIndex(level) === 0 && !bigCategory && R.isEmpty(itemsCache.getFirstLevelItems())
+      ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
+      : null
 
-const levelValidators = (levels, itemsCache) => ({
+const levelValidators = ({ levels, itemsCache, bigCategory }) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels),
   ],
-  [keys.items]: [validateNotEmptyFirstLevelItems(itemsCache)],
+  [keys.items]: [validateNotEmptyFirstLevelItems({ itemsCache, bigCategory })],
 })
 
-const validateLevel = (levels, itemsCache) => async (level) =>
-  Validator.validate(level, levelValidators(levels, itemsCache))
+const validateLevel =
+  ({ levels, itemsCache, bigCategory }) =>
+  async (level) =>
+    Validator.validate(level, levelValidators({ levels, itemsCache, bigCategory }))
 
-const validateLevels = async (category, itemsCache) => {
+const validateLevels = async ({ category, itemsCache, bigCategory }) => {
   const levels = Category.getLevelsArray(category)
 
-  const validations = await Promise.all(levels.map(validateLevel(levels, itemsCache)))
+  const validations = await Promise.all(levels.map(validateLevel({ levels, itemsCache, bigCategory })))
 
   const valid = R.all(Validation.isValid, validations)
 
@@ -252,22 +256,29 @@ export const validateCategory = async ({
   categories,
   category,
   items,
+  bigCategory = false,
   validateLevels: _validateLevels = true,
   validateItems: _validateItems = true,
   onProgress = null,
   stopIfFn = null,
 }) => {
-  const itemsCache = _validateLevels || _validateItems ? new ItemsCache(items) : null
+  const itemsCache = !bigCategory && items && (_validateLevels || _validateItems) ? new ItemsCache(items) : null
   const categoryValidation = await validateCategoryProps(categories, category)
   const prevValidation = Category.getValidation(category)
 
   const levelsValidation = _validateLevels
-    ? await validateLevels(category, itemsCache)
+    ? await validateLevels({ category, itemsCache, bigCategory })
     : Validation.getFieldValidation(keys.levels)(prevValidation)
 
-  const itemsValidation = _validateItems
-    ? await validateAllItems({ survey, category, itemsCache, onProgress, stopIfFn })
-    : Validation.getFieldValidation(keys.items)(prevValidation)
+  const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
+  const nextItemsValidation =
+    _validateItems && itemsCache
+      ? await validateAllItems({ survey, category, itemsCache, onProgress, stopIfFn })
+      : bigCategory
+        ? Validation.newInstance() // cannot calculate items validation (too many items): consider them as always valid
+        : null
+
+  const itemsValidation = nextItemsValidation ?? prevItemsValidation
 
   return R.pipe(
     Validation.setValid(R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),
