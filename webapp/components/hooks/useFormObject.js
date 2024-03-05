@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import * as R from 'ramda'
 
 import * as Validation from '@core/validation/validation'
 
@@ -21,24 +20,28 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     })()
   }, [state.obj])
 
-  const setObjectField = (field, value) => {
-    setState(statePrev => ({
+  const setObjectFields = (fieldValuePairs) => {
+    setState((statePrev) => ({
       ...statePrev,
-      obj: R.assoc(field, value, statePrev.obj),
+      obj: { ...statePrev.obj, ...fieldValuePairs },
     }))
   }
 
-  const setValidation = validation =>
-    setState(statePrev => ({
+  const setObjectField = (field, value) => {
+    setObjectFields({ [field]: value })
+  }
+
+  const setValidation = (validation) =>
+    setState((statePrev) => ({
       ...statePrev,
       validation,
     }))
 
-  const getFieldValidation = field =>
+  const getFieldValidation = (field) =>
     state.validationEnabled ? Validation.getFieldValidation(field)(state.validation) : null
 
   const enableValidation = () => {
-    setState(statePrev => ({
+    setState((statePrev) => ({
       ...statePrev,
       validationEnabled: true,
     }))
@@ -47,6 +50,7 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
   return {
     object: state.obj,
     objectValid: Validation.isValid(state.validation),
+    setObjectFields,
     setObjectField,
     setValidation,
     enableValidation,
