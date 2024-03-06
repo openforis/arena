@@ -23,7 +23,7 @@ jobs:
       - uses: microsoft/playwright-github-action@v1
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.12.1'
+          node-version: '20.11.1'
           always-auth: true
           auth-token: ${{secrets.ACCESS_TOKEN}}
           registry-url: 'https://npm.pkg.github.com'

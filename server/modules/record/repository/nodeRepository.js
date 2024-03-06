@@ -34,13 +34,12 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
-// camelize all but "meta"
 const dbTransformCallback = (node) => {
   // do not camelize meta properties
-  const nodeTransformed = A.camelizePartial({ skip: [Node.keys.meta] })(node)
+  A.camelizePartial({ skip: [Node.keys.meta], sideEffect: true })(node)
   // cast id to Number
-  nodeTransformed.id = Number(node.id)
-  return nodeTransformed
+  node.id = Number(node.id)
+  return node
 }
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
