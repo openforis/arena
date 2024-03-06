@@ -4,6 +4,8 @@ import * as toSnakeCase from 'to-snake-case'
 
 import { Objects } from '@openforis/arena-core'
 
+import { Schemata } from '@common/model/db'
+
 import * as A from '@core/arena'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
@@ -190,15 +192,32 @@ export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
     (r) => parseInt(r.count, 10)
   )
 
-export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) =>
-  client.one(
+export const countTaxaBySurveyId = async ({ surveyId, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const whereCondition = draft ? '' : `WHERE t.props <> '{}'::jsonb`
+  return client.one(
+    `SELECT COUNT(*) 
+    FROM ${schema}.taxon t
+    ${whereCondition}
+    `,
+    [],
+    (r) => Number(r.count)
+  )
+}
+
+export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const publishedCondition = draft ? '' : `AND t.props <> '{}'::jsonb`
+  return client.one(
     `
       SELECT COUNT(*) 
-      FROM ${getSurveyDBSchema(surveyId)}.taxon
-      WHERE taxonomy_uuid = $1`,
+      FROM ${schema}.taxon t
+      WHERE t.taxonomy_uuid = $1
+      ${publishedCondition}`,
     [taxonomyUuid],
     (r) => parseInt(r.count, 10)
   )
+}
 
 export const fetchTaxa = async (
   { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },

@@ -264,6 +264,16 @@ export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = 
   return backup || draft || item.published ? item : null
 }
 
+export const countItemsBySurveyId = async ({ surveyId }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return client.one(
+    `SELECT COUNT(*) 
+    FROM ${schema}.category_item`,
+    [],
+    (r) => Number(r.count)
+  )
+}
+
 export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = db) =>
   client.one(
     `SELECT COUNT(*) 

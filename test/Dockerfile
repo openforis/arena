@@ -2,7 +2,7 @@
 # to make this work faster when there have been changes.
 ############################################################
 
-FROM node:18.12.1 AS test
+FROM node:20.11.1 AS test
 
 # Install Chromium dependencies, git and netcat
 RUN apt-get update; \

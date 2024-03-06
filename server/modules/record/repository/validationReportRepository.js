@@ -86,7 +86,7 @@ const query = ({ surveyId, recordUuid }) => {
     ORDER BY r.date_created, n.id`
 }
 
-const _rowToItem = A.camelizePartial({ limitToLevel: 1 })
+const _rowToItem = A.camelizePartial({ limitToLevel: 1, sideEffect: true })
 
 export const fetchValidationReport = async (
   { surveyId, cycle, offset = 0, limit = null, recordUuid = null },
