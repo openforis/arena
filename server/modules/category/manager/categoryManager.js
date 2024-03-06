@@ -51,6 +51,7 @@ const _validateCategoryFromCategories = async (
     (validateItems || validateLevels) && !bigCategory
       ? await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
       : null
+
   const validation = await CategoryValidator.validateCategory({
     survey,
     categories: R.values(categories),
@@ -93,19 +94,28 @@ const _fetchCategory = async ({ surveyId, categoryUuid }, client = db) =>
     client
   )
 
-const _validateCategoryItemsWithCodes = async ({ surveyId, categoryUuid, levelUuid, codes }, client = db) => {
+const _validateSpecifiedCategoryItems = async (
+  { surveyId, categoryUuid, levelUuid, codes = [], parentUuids = [] },
+  client = db
+) => {
   const draft = true
-  const itemsToValidate = []
+  const itemsToValidate = (
+    await Promise.all([
+      ...codes.map((code) => CategoryRepository.fetchItemsByLevelAndCode({ surveyId, levelUuid, code, draft }, client)),
+      ...parentUuids.map((uuid) => CategoryRepository.fetchItemByUuid({ surveyId, uuid, draft }, client)),
+    ])
+  ).flat()
 
-  for await (const code of codes) {
-    const siblingItemsWithSameCode = await CategoryRepository.fetchItemsByLevelAndCode(
-      { surveyId, levelUuid, code, draft },
-      client
-    )
-    itemsToValidate.push(...siblingItemsWithSameCode)
-  }
   const category = await _fetchCategory({ surveyId, categoryUuid }, client)
-  const validation = await CategoryValidator.validateItems({ category, itemsToValidate })
+  const itemsCountByItemUuid = await CategoryRepository.fetchChildrenItemsCountByItemUuid(
+    {
+      surveyId,
+      categoryUuid,
+      draft,
+    },
+    client
+  )
+  const validation = await CategoryValidator.validateItems({ category, itemsToValidate, itemsCountByItemUuid })
 
   return _updateCategoryValidation({ surveyId, category, validation }, client)
 }
@@ -120,7 +130,7 @@ const _validateCategoryItem = async ({ surveyId, categoryUuid, itemUuid, prevIte
   if (prevCode !== code) {
     codes.push(prevCode)
   }
-  return _validateCategoryItemsWithCodes({ surveyId, categoryUuid, levelUuid, codes }, client)
+  return _validateSpecifiedCategoryItems({ surveyId, categoryUuid, levelUuid, codes }, client)
 }
 
 const _validateCategory = async (
@@ -209,7 +219,7 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemInsert, logContent, false, t),
     ])
     const levelUuid = CategoryItem.getLevelUuid(item)
-    let category = await _validateCategoryItemsWithCodes(
+    let category = await _validateSpecifiedCategoryItems(
       { surveyId, categoryUuid, levelUuid, codes: [CategoryItem.getCode(item)] },
       t
     )
@@ -259,6 +269,7 @@ export const {
   fetchItemsByLevelIndex,
   fetchItemsByCategoryUuid,
   fetchItemsCountIndexedByCategoryUuid,
+  fetchChildrenItemsCountByItemUuid,
   insertItems: insertItemsInBatch,
 } = CategoryRepository
 
@@ -663,8 +674,10 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemDelete, logContent, false, t),
     ])
-
-    return _validateCategoryItemsWithCodes({ surveyId, categoryUuid, levelUuid, codes: [code] }, t)
+    return _validateSpecifiedCategoryItems(
+      { surveyId, categoryUuid, levelUuid, codes: [code], parentUuids: [CategoryItem.getParentUuid(item)] },
+      t
+    )
   })
 
 export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = db) => {

@@ -61,18 +61,20 @@ const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) 
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
 }
 
-const validateNotEmptyChildrenItems = (isLeaf, itemChildren) => () =>
-  !isLeaf && R.isEmpty(itemChildren)
-    ? { key: Validation.messageKeys.categoryEdit.childrenEmpty, severity: ValidationResult.severity.warning }
-    : null
+const validateNotEmptyChildrenItems =
+  ({ isLeaf, childrenCount }) =>
+  () =>
+    !isLeaf && childrenCount === 0
+      ? { key: Validation.messageKeys.categoryEdit.childrenEmpty, severity: ValidationResult.severity.warning }
+      : null
 
-const itemValidators = (isLeaf, itemChildren, siblingsAndSelfByCode) => ({
+const itemValidators = ({ isLeaf, siblingsAndSelfByCode, childrenCount = 0 }) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
     validateItemCodeUniqueness(siblingsAndSelfByCode),
   ],
-  [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemChildren)],
+  [keys.children]: [validateNotEmptyChildrenItems({ isLeaf, childrenCount })],
 })
 
 const _extraPropValidators = {
@@ -200,14 +202,15 @@ const validateItemsAndDescendants = async ({
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = itemsCache.getItemChildren(itemUuid)
+    const childrenCount = itemChildren.length
     const visited = !!visitedUuids[itemUuid]
 
     let validation = null
 
-    if (visited || R.isEmpty(itemChildren)) {
+    if (visited || childrenCount === 0) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
       /* eslint-disable no-await-in-loop */
-      validation = await Validator.validate(item, itemValidators(isLeaf, itemChildren, siblingsAndSelfByCode))
+      validation = await Validator.validate(item, itemValidators({ isLeaf, siblingsAndSelfByCode, childrenCount }))
 
       validation = _validateItemExtraProps({ extraDefs, validation, srsIndex })(item)
 
@@ -287,16 +290,21 @@ export const validateCategory = async ({
   )(categoryValidation)
 }
 
-export const validateItems = async ({ category, itemsToValidate }) => {
+export const validateItems = async ({ category, itemsToValidate, itemsCountByItemUuid }) => {
   const prevValidation = Category.getValidation(category)
   const siblingsAndSelfByCode = ObjectUtils.groupByProp(CategoryItem.getCode)(itemsToValidate)
   const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
   let itemsValidationUpdated = prevItemsValidation
 
-  const _validateItem = async (itm) => {
-    const itemUuid = CategoryItem.getUuid(itm)
-    const isLeaf = Category.isItemLeaf(itm)(category)
-    let itemValidation = await Validator.validate(itm, itemValidators(isLeaf, null, siblingsAndSelfByCode))
+  const _validateItem = async (item) => {
+    const itemUuid = CategoryItem.getUuid(item)
+    const isLeaf = Category.isItemLeaf(item)(category)
+    const childrenCount = itemsCountByItemUuid[itemUuid] ?? 0
+
+    let itemValidation = await Validator.validate(
+      item,
+      itemValidators({ isLeaf, siblingsAndSelfByCode, childrenCount })
+    )
     const prevItemValidation = Validation.getFieldValidation(itemUuid)(prevItemsValidation)
     // keep previous errors or warnings (e.g. invalid children)
     itemValidation = R.pipe(
