@@ -102,7 +102,7 @@ export const useSamplingPointDataLayer = (props) => {
 
   const overlayInnerName = i18n.t(
     loading ? 'mapView.samplingPointDataLayerNameLoading' : 'mapView.samplingPointDataLayerName',
-    { levelIndex }
+    { level: levelIndex + 1 }
   )
 
   // add icon close to name

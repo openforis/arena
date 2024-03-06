@@ -203,17 +203,20 @@ export const inviteUsers = async (
   const skippedEmails = []
   for await (const email of emails) {
     try {
-      const invitedUser = await _inviteUser({
-        user,
-        i18n,
-        email,
-        survey,
-        invitation,
-        group,
-        repeatInvitation,
-        surveyCycleKey,
-        serverUrl,
-      })
+      const invitedUser = await _inviteUser(
+        {
+          user,
+          i18n,
+          email,
+          survey,
+          invitation,
+          group,
+          repeatInvitation,
+          surveyCycleKey,
+          serverUrl,
+        },
+        client
+      )
       invitedUsers.push(invitedUser)
     } catch (e) {
       if (emails.length === 1) {

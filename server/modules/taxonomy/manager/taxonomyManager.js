@@ -90,7 +90,7 @@ export const fetchTaxonomiesBySurveyId = async (
     : taxonomies
 }
 
-export const { countTaxonomiesBySurveyId, countTaxaByTaxonomyUuid } = TaxonomyRepository
+export const { countTaxonomiesBySurveyId, countTaxaBySurveyId, countTaxaByTaxonomyUuid } = TaxonomyRepository
 
 const validateTaxonomy = async (surveyId, taxonomies, taxonomy, draft, client = db) => {
   const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(

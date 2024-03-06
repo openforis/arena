@@ -9,10 +9,11 @@ import { useSurveyCycleKeys } from '@webapp/store/survey'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const CycleSelector = (props) => {
-  const { selectedCycle, filterFunction, onChange } = props
+  const { cycleKeys: cycleKeysProp, selectedCycle, filterFunction, onChange } = props
 
   const i18n = useI18n()
-  const cycleKeys = useSurveyCycleKeys()
+  const cycleKeysInState = useSurveyCycleKeys()
+  const cycleKeys = cycleKeysProp ?? cycleKeysInState
 
   if (cycleKeys.length === 1) {
     return null
@@ -37,6 +38,7 @@ const CycleSelector = (props) => {
 }
 
 CycleSelector.propTypes = {
+  cycleKeys: PropTypes.array,
   filterFunction: PropTypes.func,
   selectedCycle: PropTypes.string,
   onChange: PropTypes.func,
