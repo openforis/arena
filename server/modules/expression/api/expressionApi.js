@@ -21,7 +21,7 @@ const toItem =
           }
         : {
             value: Taxon.getCode(item),
-            label: Taxon.getScientificName(item),
+            label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}`,
           }
       : null
 
