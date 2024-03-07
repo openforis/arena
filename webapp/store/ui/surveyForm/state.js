@@ -26,7 +26,12 @@ const keys = {
 
 // ====== nodeDefUuidPage
 
-export const assocFormActivePage = (nodeDef) => R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
+export const assocFormActivePage = (nodeDef) =>
+  R.ifElse(
+    R.always(R.isNil(nodeDef)),
+    R.dissoc(keys.nodeDefUuidPage),
+    R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
+  )
 
 export const getFormActivePageNodeDef = (state) => {
   const survey = SurveyState.getSurvey(state)
