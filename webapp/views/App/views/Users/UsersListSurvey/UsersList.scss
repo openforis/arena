@@ -7,9 +7,7 @@
 }
 
 .users-list {
-  .icon-invitation-expired {
-    color: $red;
-  }
+  .icon-invitation-expired,
   .icon-invitation-retry,
   .icon-invitation-link {
     width: 1rem;
@@ -18,5 +16,8 @@
     &:hover {
       color: $orange;
     }
+  }
+  .icon-invitation-expired {
+    color: $red;
   }
 }

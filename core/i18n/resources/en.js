@@ -828,6 +828,7 @@ Are you sure you want to continue?`,
     roleInCurrentSurvey: 'Role in current survey',
     userNotInvitedToAnySurvey: `User not invited to any survey`,
     confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
+    invitationExpiredClickToSendAgainTheInvitation: 'Invitation expired: click to send again the invitation',
     copyInvitationLink: 'Copy invitation link to clipboard',
     copyInvitationLinkConfirmMessage: `If the invited user hasn't received any emails at the address {{email}},  
 you can copy the invitation link to the clipboard and share it with him in other ways.

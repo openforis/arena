@@ -407,17 +407,15 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
       await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
     }
   }
-  return client.tx(async (t) => {
-    const deletedInvitations = await UserInvitationManager.deleteExpiredInvitations(t)
-    const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(t)
-    if (deletedUsers.length > 0) {
-      const deletedUsersEmails = deletedUsers.map(User.getEmail)
-      await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, t)
-    }
-    await UserManager.deleteExpiredUserAccessRequests(t)
-
-    return { deletedSurveyIds: surveyIds, deletedInvitations, deletedUsers }
-  })
+  Logger.debug('deleting users with expired invitations')
+  const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(client)
+  if (deletedUsers.length > 0) {
+    Logger.debug('deleting expired users access requests by expired invitations')
+    const deletedUsersEmails = deletedUsers.map(User.getEmail)
+    await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
+  }
+  Logger.debug('deleting expired users access requests')
+  await UserManager.deleteExpiredUserAccessRequests(client)
 }
 
 // ==== User prefs
