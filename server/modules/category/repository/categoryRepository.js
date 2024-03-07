@@ -233,16 +233,33 @@ export const fetchItemsByCategoryUuid = async (
   return backup || draft ? items : R.filter((item) => item.published)(items)
 }
 
+const getWhereConditionItemsWithLevelAndCode = ({ draft, tableAlias = 'i' }) => {
+  const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, `${tableAlias}.`, true)
+  return `${tableAlias}.level_uuid = $/levelUuid/ AND COALESCE(${codeColumn}, '') = $/code/`
+}
+
+export const countItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const row = await client.one(
+    `SELECT COUNT(*) 
+     FROM ${schema}.category_item i
+     WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
+  `,
+    { levelUuid, code: Strings.defaultIfEmpty('')(code) }
+  )
+  return Number(row.count)
+}
+
 export const fetchItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
-  const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.', true)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const items = await client.map(
     `
       SELECT i.* 
-      FROM ${getSurveyDBSchema(surveyId)}.category_item i
-      WHERE i.level_uuid = $1 AND COALESCE(${codeColumn}, '') = $2
+      FROM ${schema}.category_item i
+      WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
      ORDER BY i.id
     `,
-    [levelUuid, Strings.defaultIfEmpty('')(code)],
+    { levelUuid, code: Strings.defaultIfEmpty('')(code) },
     (def) => DB.transformCallback(def, draft, true)
   )
 
