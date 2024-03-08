@@ -279,7 +279,12 @@ export const expiredInvitationWhereCondition = `
     SELECT * 
     FROM user_invitation ui
     WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
-)`
+  )
+  AND NOT EXISTS (
+    SELECT * 
+    FROM user_access_request uar
+    WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 MONTH'
+  )`
 
 export const fetchUsersWithExpiredInvitation = (client = db) =>
   client.map(
