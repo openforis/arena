@@ -65,7 +65,15 @@ const getChildDefVariables = ({ survey, childDef, mode, lang, editorType, nodeDe
   return []
 }
 
-const getVariablesFromAncestors = ({ survey, nodeDefContext, mode, lang, editorType, nodeDefCurrent = null }) => {
+const getVariablesFromAncestors = ({
+  survey,
+  nodeDefContext,
+  mode,
+  lang,
+  editorType,
+  nodeDefCurrent = null,
+  includeAnalysis = false,
+}) => {
   const variables = []
   const stack = []
   const entitiesVisitedByUuid = {}
@@ -91,7 +99,7 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, mode, lang, editorT
       visitNext(source)
     } else {
       // get variables from every child def
-      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
       nodeDefChildren.forEach((childDef) => {
         variables.push(...getChildDefVariables({ survey, childDef, mode, lang, editorType, nodeDefCurrent }))
 
