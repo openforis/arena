@@ -11,7 +11,7 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
-import { ButtonInvite } from '@webapp/components'
+import { Button, ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
@@ -58,13 +58,19 @@ const Row = (props) => {
       <div>
         {User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}
         {User.isInvited(userListItem) && User.isInvitationExpired(userListItem) && (
-          <span className="icon icon-crying icon-16px icon-invitation-expired" />
+          <Button
+            className="icon-invitation-expired"
+            iconClassName="icon-crying icon-16px"
+            label="usersView.invitationExpiredClickToSendAgainTheInvitation"
+            onClick={handleResendInvitation}
+            showLabel={false}
+          />
         )}
         {User.isInvited(userListItem) && (
-          <div>
+          <>
             <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
             <CopyInvitationLinkButton email={email} userUuid={userUuid} />
-          </div>
+          </>
         )}
       </div>
       <div data-testid={TestId.userList.lastLogin} data-value={lastLoginTime}>
