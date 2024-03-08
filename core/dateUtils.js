@@ -128,7 +128,7 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo })
   if (R.isNil(dateStr) || R.isEmpty(dateStr)) {
     return null
   }
-  const dateParsed = parse(dateStr, formatFrom)
+  const dateParsed = typeof dateStr === 'object' ? dateStr : parse(dateStr, formatFrom)
   if (!isValidDateObject(dateParsed)) {
     return null
   }

@@ -25,6 +25,12 @@ const valueFormattersByType = {
       formatFrom: DateUtils.formats.datetimeISO,
       formatTo: DateUtils.formats.dateDefault,
     }),
+  [NodeDef.nodeDefType.time]: ({ value }) =>
+    DateUtils.convertDate({
+      dateStr: value,
+      formatFrom: 'HH:mm:ss',
+      formatTo: DateUtils.formats.timeStorage,
+    }),
 }
 
 const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid, lang }) => {
