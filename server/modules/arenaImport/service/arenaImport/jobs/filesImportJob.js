@@ -20,7 +20,7 @@ export default class FilesImportJob extends Job {
     if (filesSummaries?.length > 0) {
       const filesUuids = filesSummaries.map(RecordFile.getUuid)
 
-      await this.checkRecordsFilesUuidsAreValid(filesUuids)
+      await this.checkFileUuidsAreValid(filesUuids)
 
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
@@ -87,7 +87,7 @@ export default class FilesImportJob extends Job {
     }
   }
 
-  async checkRecordsFilesUuidsAreValid(filesUuids) {
+  async checkFileUuidsAreValid(filesUuids) {
     const { recordsFileUuids } = this.context
 
     this.logInfo('file UUIDs in zip file', filesUuids)
