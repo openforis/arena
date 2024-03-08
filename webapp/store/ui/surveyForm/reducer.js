@@ -62,7 +62,7 @@ const actionHandlers = {
     R.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
       SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
-      R.isNil(nodeDefActivePage) ? R.identity : SurveyFormState.assocFormActivePage(nodeDefActivePage)
+      SurveyFormState.assocFormActivePage(nodeDefActivePage)
     )(state),
 }
 

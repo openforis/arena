@@ -371,7 +371,7 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
        WHERE taxonomy_uuid = $/taxonomyUuid/ 
          ${whereCondition ? ` AND (${whereCondition})` : ''}
        ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
-       LIMIT 25`,
+       LIMIT 100`,
     { taxonomyUuid, searchValue },
     (taxon) => dbTransformCallback(taxon, draft, true)
   )
