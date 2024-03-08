@@ -9,7 +9,7 @@ const arithmeticOperatorsAllowedByNodeDefType = {
   [nodeDefType.boolean]: false,
   [nodeDefType.code]: true,
   [nodeDefType.coordinate]: false,
-  [nodeDefType.date]: true,
+  [nodeDefType.date]: false,
   [nodeDefType.decimal]: true,
   [nodeDefType.integer]: true,
   [nodeDefType.taxon]: false,
@@ -19,16 +19,34 @@ const arithmeticOperatorsAllowedByNodeDefType = {
 const isArithmeticOperatorAllowed = ({ leftOperandNodeDefType }) =>
   !leftOperandNodeDefType || arithmeticOperatorsAllowedByNodeDefType[leftOperandNodeDefType]
 
+const allComparisonOperatorsAllowedByNodeDefType = {
+  [nodeDefType.boolean]: false,
+  [nodeDefType.code]: true,
+  [nodeDefType.coordinate]: false,
+  [nodeDefType.date]: true,
+  [nodeDefType.decimal]: true,
+  [nodeDefType.integer]: true,
+  [nodeDefType.taxon]: false,
+  [nodeDefType.text]: true,
+  [nodeDefType.time]: true,
+}
+
+const isAllComparisonOperatorsAllowed = ({ leftOperandNodeDefType }) =>
+  !leftOperandNodeDefType || allComparisonOperatorsAllowedByNodeDefType[leftOperandNodeDefType]
+
 export const useAvailableOperatorValues = ({ isBoolean, leftOperand, nodeDefCurrent }) => {
   const leftOperandName = Expression.getName(leftOperand)
   const leftOperandNodeDefTemp = useNodeDefByName(leftOperandName)
   const leftOperandNodeDef = leftOperandName === Expression.thisVariable ? nodeDefCurrent : leftOperandNodeDefTemp
   const leftOperandNodeDefType = NodeDef.getType(leftOperandNodeDef)
 
-  const availableOperatorValues = Object.values(Expression.operators.comparison)
+  const availableOperators = { ...Expression.operators.comparisonEquality }
 
   if (!isBoolean && isArithmeticOperatorAllowed({ leftOperandNodeDefType })) {
-    availableOperatorValues.push(...Object.values(Expression.operators.arithmetic))
+    Object.assign(availableOperators, Expression.operators.arithmetic)
   }
-  return availableOperatorValues
+  if (!isBoolean && isAllComparisonOperatorsAllowed({ leftOperandNodeDefType })) {
+    Object.assign(availableOperators, Expression.operators.comparison)
+  }
+  return Object.values(availableOperators)
 }
