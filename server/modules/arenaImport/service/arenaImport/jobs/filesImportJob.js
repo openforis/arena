@@ -17,10 +17,10 @@ export default class FilesImportJob extends Job {
     const { arenaSurveyFileZip } = this.context
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
-    if (filesSummaries && filesSummaries.length > 0) {
+    if (filesSummaries?.length > 0) {
       const filesUuids = filesSummaries.map(RecordFile.getUuid)
-      this.logDebug('file UUIDs in zip file', filesUuids)
-      this.logDebug('file UUIDs found in records', this.context.recordsFileUuids)
+
+      await this.checkRecordsFilesUuidsAreValid(filesUuids)
 
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
@@ -43,6 +43,8 @@ export default class FilesImportJob extends Job {
 
         this.incrementProcessedItems()
       })
+    } else {
+      this.logInfo('no files found')
     }
   }
 
@@ -83,5 +85,18 @@ export default class FilesImportJob extends Job {
     if (totalSize > filesStatistics.availableSpace) {
       throw new SystemError('cannotImportFilesExceedingQuota')
     }
+  }
+
+  async checkRecordsFilesUuidsAreValid(filesUuids) {
+    const { recordsFileUuids } = this.context
+
+    this.logInfo('file UUIDs in zip file', filesUuids)
+    this.logInfo('file UUIDs found in records', recordsFileUuids)
+
+    recordsFileUuids?.forEach((recordFileUuid) => {
+      if (!filesUuids.includes(recordFileUuid)) {
+        throw new Error(`missing file with UUID ${recordFileUuid}`)
+      }
+    })
   }
 }
