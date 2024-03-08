@@ -416,6 +416,8 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   }
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)
+
+  return { deletedUsers, deletedSurveyIds: surveyIds }
 }
 
 // ==== User prefs
