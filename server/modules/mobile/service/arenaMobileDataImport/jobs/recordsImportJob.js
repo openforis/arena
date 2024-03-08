@@ -7,7 +7,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
-import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
@@ -152,15 +151,18 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await RecordManager.insertRecord(user, surveyId, record, true, tx)
 
     // insert nodes (add them to batch persister)
-    const nodesArray = Record.getNodesArray(record)
+    const nodesArray = []
+    const nodesIndexedByUuid = {}
+
+    Record.getNodesArray(record).forEach((node) => {
       // check that the node definition associated to the node has not been deleted from the survey
-      .filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
-      .sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-      .map((node) => {
+      if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         node[Node.keys.created] = true // do side effect to avoid creating new objects
-        return node
-      })
-    const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
+        nodesArray.push(node)
+        nodesIndexedByUuid[Node.getUuid(node)] = node
+      }
+    })
+    nodesArray.sort((nodeA, nodeB) => nodeA.id - nodeB.id)
 
     await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid, dateModified: Record.getDateModified(record) })
 
@@ -171,7 +173,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   async beforeSuccess() {
     await super.beforeSuccess()
-    this.setContext({ recordsFileUuids: Array.from(this.recordsFileUuids) })
+    const recordsFileUuidsArray = Array.from(this.recordsFileUuids)
+    const recordsFilesCount = recordsFileUuidsArray.length
+    if (recordsFilesCount > 0) {
+      this.logInfo(`found ${recordsFilesCount} files:`, recordsFileUuidsArray)
+    }
+    this.setContext({ recordsFileUuids: recordsFileUuidsArray })
   }
 
   generateResult() {
