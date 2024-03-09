@@ -1,9 +1,9 @@
+import { Objects } from '@openforis/arena-core'
+
 import SystemError from '@core/systemError'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
-
 import * as FileService from '@server/modules/record/service/fileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
@@ -17,15 +17,14 @@ export default class FilesImportJob extends Job {
     const { arenaSurveyFileZip } = this.context
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
+
+    await this.checkFileUuidsAreValid(filesSummaries)
+
     if (filesSummaries?.length > 0) {
-      const filesUuids = filesSummaries.map(RecordFile.getUuid)
-
-      await this.checkFileUuidsAreValid(filesUuids)
-
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
       this.total = filesSummaries.length
-      await PromiseUtils.each(filesSummaries, async (fileSummary) => {
+      for await (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
         // load file content from a separate file
         const fileUuid = RecordFile.getUuid(fileSummary)
@@ -35,23 +34,14 @@ export default class FilesImportJob extends Job {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
 
-        this.checkFileUuidIsInRecords(fileUuid)
-
         file = RecordFile.assocContent(fileContent)(file)
 
         await this.persistFile(file)
 
         this.incrementProcessedItems()
-      })
+      }
     } else {
       this.logInfo('no files found')
-    }
-  }
-
-  checkFileUuidIsInRecords(fileUuid) {
-    const { recordsFileUuids } = this.context
-    if (recordsFileUuids && !recordsFileUuids.includes(fileUuid)) {
-      throw new Error(`File UUID ${fileUuid} not found in records`)
     }
   }
 
@@ -87,16 +77,29 @@ export default class FilesImportJob extends Job {
     }
   }
 
-  async checkFileUuidsAreValid(filesUuids) {
+  async checkFileUuidsAreValid(filesSummaries) {
     const { recordsFileUuids } = this.context
 
-    this.logInfo('file UUIDs in zip file', filesUuids)
-    this.logInfo('file UUIDs found in records', recordsFileUuids)
+    if (Objects.isEmpty(recordsFileUuids)) {
+      // no files to restore in the records
+      return
+    }
+    if (Objects.isEmpty(filesSummaries)) {
+      // files data in records but not in the files folder being restored
+      throw new Error('missing files summary file')
+    }
 
-    recordsFileUuids?.forEach((recordFileUuid) => {
-      if (!filesUuids.includes(recordFileUuid)) {
-        throw new Error(`missing file with UUID ${recordFileUuid}`)
-      }
-    })
+    const filesUuids = filesSummaries.map(RecordFile.getUuid)
+    const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
+      (recordFileUuid) => !filesUuids.includes(recordFileUuid)
+    )
+    if (missingRecordFileUuidsInFiles.length > 0) {
+      throw new Error(`missing files with UUIDs ${missingRecordFileUuidsInFiles}`)
+    }
+
+    const missingFileUuids = filesUuids.filter((fileUuid) => !recordsFileUuids.includes(fileUuid))
+    if (missingFileUuids.length > 0) {
+      throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
+    }
   }
 }
