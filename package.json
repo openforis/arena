@@ -3,7 +3,7 @@
   "name": "open-foris-arena",
   "engines": {
     "node": "^20.11.1",
-    "yarn": "^1.22.21"
+    "yarn": "^1.22.19"
   },
   "scripts": {
     "build-dev": "cross-env NODE_ENV=development webpack --mode development --config webpack.config.babel.js",
