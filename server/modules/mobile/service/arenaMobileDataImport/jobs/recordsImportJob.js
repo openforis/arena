@@ -56,7 +56,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   trackFileUuids({ nodes }) {
     // keep track of file uuids found in record attribute values
-    const { survey } = context
+    const { survey } = this.context
     Object.values(nodes).forEach((node) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       if (NodeDef.isFile(nodeDef)) {
