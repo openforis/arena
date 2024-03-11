@@ -6,6 +6,8 @@ import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
 
 const categoryTempVar = 'Category'
 const categoryValuesTempVar = 'Category_values'
+const computedCategoryLabelCol = 'computed_category_label'
+const computedCategoryUuidCol = 'computed_category_uuid'
 
 /**
  * Class that models a data frame step results.
@@ -104,19 +106,18 @@ export default class DfResults {
         const query = `
             SELECT 
                 r.*,
-                c.label as computed_category_label,
-                c.uuid as computed_category_uuid
+                c.label as ${computedCategoryLabelCol},
+                c.uuid as ${computedCategoryUuidCol}
             FROM ${this.name} r
             LEFT OUTER JOIN ${categoryTempVar} c
             ON r.${nodeVarName} = c.code  
         `
         this.scripts.push(setVar(categoryValuesTempVar, sqldf(query)))
 
-        this.scripts.push(setVar(`${this.name}$${nodeVarName}_code`, `${categoryValuesTempVar}$${nodeVarName}`))
-        this.scripts.push(
-          setVar(`${this.name}$${nodeVarName}_label`, `${categoryValuesTempVar}$computed_category_label`)
-        )
-        this.scripts.push(setVar(`${this.name}$${nodeVarName}_uuid`, `${categoryValuesTempVar}$computed_category_uuid`))
+        const dfColumnPrefix = `${this.name}$${nodeVarName}`
+        this.scripts.push(setVar(`${dfColumnPrefix}_code`, `${categoryValuesTempVar}$${nodeVarName}`))
+        this.scripts.push(setVar(`${dfColumnPrefix}_label`, `${categoryValuesTempVar}$${computedCategoryLabelCol}`))
+        this.scripts.push(setVar(`${dfColumnPrefix}_uuid`, `${categoryValuesTempVar}$${computedCategoryUuidCol}`))
 
         // remove temp category variable
         this.scripts.push(rm(categoryTempVar))
