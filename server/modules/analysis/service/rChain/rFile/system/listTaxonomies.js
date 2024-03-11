@@ -46,8 +46,10 @@ export default class ListTaxonomies {
 
   initTaxonomies() {
     // Init taxonomies named list
-    this.scripts.push(setVar(this.name, 'list()'))
-    this._taxonomies.forEach((taxonomy) => this.initTaxonomy(taxonomy))
+    if (this._taxonomies.length > 0) {
+      this.scripts.push(setVar(this.name, 'list()'))
+      this._taxonomies.forEach((taxonomy) => this.initTaxonomy(taxonomy))
+    }
   }
 
   initList() {
