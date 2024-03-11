@@ -23,6 +23,7 @@ export {
   useSurveyPreferredLang,
   useSurveySrsIndex,
   useOnSurveyCycleUpdate,
+  useNodeDefByName,
   useNodeDefByUuid,
   useNodeDefsByUuids,
   useNodeDefLabel,

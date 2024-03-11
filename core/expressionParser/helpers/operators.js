@@ -5,9 +5,13 @@ const logical = {
   or: { value: '||', label: '||' },
 }
 
-const comparison = {
+const comparisonEquality = {
   eq: { value: '==', label: '=' },
   notEq: { value: '!=', label: '!=' },
+}
+
+const comparison = {
+  ...comparisonEquality,
   gt: { value: '>', label: '>' },
   less: { value: '<', label: '<' },
   gtOrEq: { value: '>=', label: '>=' },
@@ -48,6 +52,7 @@ const js2sqlOperators = {
 
 export const operators = {
   logical,
+  comparisonEquality,
   comparison,
   arithmetic,
   binary,
