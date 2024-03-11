@@ -82,6 +82,12 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
         formatFrom: DateUtils.formats.datetimeISO,
         formatTo: DateUtils.formats.dateDefault,
       }),
+    [NodeDef.nodeDefType.time]: ({ value }) =>
+      DateUtils.convertDate({
+        dateStr: value,
+        formatFrom: 'HH:mm:ss',
+        formatTo: DateUtils.formats.timeStorage,
+      }),
   }
 
   const objectTransformer = (recordSummary) => {
