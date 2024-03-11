@@ -1397,6 +1397,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    itemsCount: 'Items count',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
