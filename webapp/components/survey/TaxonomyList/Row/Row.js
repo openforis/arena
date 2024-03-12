@@ -1,7 +1,6 @@
 import './Row.scss'
 import React from 'react'
 
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -36,10 +35,7 @@ const Row = (props) => {
         <ErrorBadge validation={taxonomy.validation} />
       </div>
       <div className="taxonomy-row__badge-container">
-        <WarningBadge
-          show={A.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(taxonomy))(survey))}
-          label={i18n.t('itemsTable.unused')}
-        />
+        <WarningBadge show={Survey.isTaxonomyUnused(taxonomy)(survey)} label={i18n.t('itemsTable.unused')} />
       </div>
 
       {(canSelect || selected) && (

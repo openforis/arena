@@ -265,7 +265,8 @@ export const {
 } = SurveyCategories
 
 // ====== Taxonomies
-export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
+export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies, isTaxonomyUnused } =
+  SurveyTaxonomies
 
 // ====== Survey Reference data index
 // Category index
