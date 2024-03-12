@@ -164,8 +164,8 @@ export const fetchTaxonomiesBySurveyId = async (
     )
   }
   if (!backup && !draft) {
-    // exclude not published taxonomies
-    whereConditions.push(DbUtils.getPublishedCondition({ draft: backup || draft }))
+    // exclude not published (draft) taxonomies
+    whereConditions.push(DbUtils.getPublishedCondition({ draft: false }))
   }
   whereConditions.push(DbUtils.getPublishedCondition({ draft, tableAlias: 'tt' }))
 
