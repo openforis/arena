@@ -154,14 +154,7 @@ const Literal = (props) => {
         )
       }
       default:
-        return (
-          <input
-            className="form-input"
-            value={nodeValueString}
-            size={25}
-            onChange={(e) => onChangeValue(e.target.value)}
-          />
-        )
+        return <Input onChange={onChangeValue} value={nodeValueString} />
     }
   }
 
