@@ -104,8 +104,6 @@ const _getFetchCategoriesAndLevelsQuery = ({
 
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft)
 
-  const getPropsPublishedCondition = ({ draft, tableAlias }) => (draft ? '' : `${tableAlias}.props::text <> '{}'::text`)
-
   return `
     WITH
       level AS 
@@ -117,7 +115,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
           ${schema}.category_level l
           LEFT JOIN ${schema}.category_item i 
             ON i.level_uuid = l.uuid
-        ${DbUtils.getWhereClause(getPropsPublishedCondition({ draft, tableAlias: 'i' }))}
+        ${DbUtils.getWhereClause(DbUtils.getPublishedCondition({ draft, tableAlias: 'i' }))}
         GROUP BY l.id
       ),
       levels AS
@@ -133,7 +131,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
           )) AS levels
         FROM
           level l
-        ${DbUtils.getWhereClause(getPropsPublishedCondition({ draft, tableAlias: 'l' }))}
+        ${DbUtils.getWhereClause(DbUtils.getPublishedCondition({ draft, tableAlias: 'l' }))}
         GROUP BY
           l.category_uuid
       ),
