@@ -27,6 +27,7 @@ const NodeDefExpressionsProp = (props) => {
     canBeConstant,
     isBoolean,
     hideAdvanced,
+    excludeCurrentNodeDef,
     mode,
   } = props
 
@@ -56,6 +57,7 @@ const NodeDefExpressionsProp = (props) => {
       canBeConstant={canBeConstant}
       isBoolean={isBoolean}
       hideAdvanced={hideAdvanced}
+      excludeCurrentNodeDef={excludeCurrentNodeDef}
     />
   )
 }
@@ -80,6 +82,7 @@ NodeDefExpressionsProp.propTypes = {
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
+  excludeCurrentNodeDef: PropTypes.bool,
 }
 
 NodeDefExpressionsProp.defaultProps = {
@@ -96,6 +99,7 @@ NodeDefExpressionsProp.defaultProps = {
   canBeConstant: false,
   isBoolean: true,
   hideAdvanced: false,
+  excludeCurrentNodeDef: false,
 }
 
 export default NodeDefExpressionsProp
