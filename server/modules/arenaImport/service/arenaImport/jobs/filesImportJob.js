@@ -81,7 +81,7 @@ export default class FilesImportJob extends Job {
     const { recordsFileUuids } = this.context
 
     if (Objects.isEmpty(recordsFileUuids)) {
-      // no files to restore in the records
+      this.logDebug('no files to restore in the records')
       return
     }
     if (Objects.isEmpty(filesSummaries)) {
@@ -90,6 +90,8 @@ export default class FilesImportJob extends Job {
     }
 
     const filesUuids = filesSummaries.map(RecordFile.getUuid)
+    this.logDebug(`file uuids to be imported: ${filesUuids}`)
+
     const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
       (recordFileUuid) => !filesUuids.includes(recordFileUuid)
     )
@@ -97,9 +99,10 @@ export default class FilesImportJob extends Job {
       throw new Error(`missing files with UUIDs ${missingRecordFileUuidsInFiles}`)
     }
 
-    const missingFileUuids = filesUuids.filter((fileUuid) => !recordsFileUuids.includes(fileUuid))
-    if (missingFileUuids.length > 0) {
-      throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
-    }
+    // TODO check if it's necessary to check that all files are in the updated records data
+    // const missingFileUuids = filesUuids.filter((fileUuid) => !recordsFileUuids.includes(fileUuid))
+    // if (missingFileUuids.length > 0) {
+    //   throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
+    // }
   }
 }
