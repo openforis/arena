@@ -42,15 +42,13 @@ const BinaryOperand = (props) => {
             Expression.isLiteral(nodeOperand) ? ' active' : ''
           }`}
           onClick={() => {
-            const nodeUpdate =
-              isLeft && !isBoolean
-                ? R.pipe(
-                    R.assoc(type, Expression.newLiteral()),
-                    R.assoc('operator', ''),
-                    R.assoc(BinaryOperandType.right, Expression.newIdentifier())
-                  )(node)
-                : R.assoc(type, Expression.newLiteral(), node)
-
+            let nodeUpdate = R.assoc(type, Expression.newLiteral(), node)
+            if (isLeft && !isBoolean) {
+              nodeUpdate = R.pipe(
+                R.assoc('operator', ''),
+                R.assoc(BinaryOperandType.right, Expression.newIdentifier())
+              )(nodeUpdate)
+            }
             onChange(nodeUpdate)
           }}
         >

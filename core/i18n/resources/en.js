@@ -1834,8 +1834,8 @@ Try to refresh the page.`,
     and: 'AND',
     or: 'OR',
     group: 'Group',
-    var: 'Var',
-    const: 'Const',
+    var: 'Variable',
+    const: 'Constant value',
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',

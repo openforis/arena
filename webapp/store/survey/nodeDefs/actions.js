@@ -243,7 +243,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
-  const surveyWithDependencies = Survey.buildAndAssocDependencyGraph({ ...survey })
+  const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
   const nodeDefDependents = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
 
   const nodeDefDependentsNotDescendants = nodeDefDependents.filter(

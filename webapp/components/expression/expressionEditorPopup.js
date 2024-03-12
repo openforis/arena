@@ -49,6 +49,7 @@ const ExpressionEditorPopup = (props) => {
     variables,
   } = useExpressionEditorPopupState({
     canBeConstant,
+    excludeCurrentNodeDef,
     expr,
     mode,
     type: types,
