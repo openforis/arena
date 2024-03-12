@@ -192,7 +192,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const recordsFileUuidsArray = Array.from(this.recordsFileUuids)
     const recordsFilesCount = recordsFileUuidsArray.length
     if (recordsFilesCount > 0) {
-      this.logInfo(`found ${recordsFilesCount} files:`, recordsFileUuidsArray)
+      this.logDebug(`found ${recordsFilesCount} files:`, recordsFileUuidsArray)
     }
     this.setContext({ recordsFileUuids: recordsFileUuidsArray })
   }
