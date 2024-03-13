@@ -165,9 +165,11 @@ export const fetchTaxonomiesBySurveyId = async (
   }
   if (!backup && !draft) {
     // exclude not published (draft) taxonomies
-    whereConditions.push(DbUtils.getPublishedCondition({ draft: false }))
+    whereConditions.push(
+      DbUtils.getPublishedCondition({ draft: false, tableAlias: 't' }),
+      DbUtils.getPublishedCondition({ draft: false, tableAlias: 'tt' })
+    )
   }
-  whereConditions.push(DbUtils.getPublishedCondition({ draft, tableAlias: 'tt' }))
 
   return client.map(
     `SELECT t.*, COUNT(tt.*) AS taxa_count
