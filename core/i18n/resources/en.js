@@ -1389,6 +1389,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
     },
+    taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
   },
 
@@ -1397,6 +1398,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    itemsCount: 'Items count',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',

@@ -148,30 +148,37 @@ export const fetchTaxonomiesBySurveyId = async (
   { surveyId, draft = false, backup = false, limit = null, offset = 0, search = null },
   client = db
 ) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const propColName = DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)
+  const propColDescription = DbUtils.getPropColCombined(Taxonomy.keysProps.descriptions, draft)
+
   const whereConditions = []
   if (search) {
     whereConditions.push(
-      `${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)} ILIKE $/search/
+      `${propColName} ILIKE $/search/
         OR 
-      EXISTS(
-        SELECT FROM jsonb_each_text(coalesce((${DbUtils.getPropColCombined(
-          Taxonomy.keysProps.descriptions,
-          draft
-        )})::jsonb, '{}'::jsonb))
+      EXISTS (
+        SELECT FROM jsonb_each_text(coalesce((${propColDescription})::jsonb, '{}'::jsonb))
         WHERE value ILIKE $/search/
-        )
-      `
+      )`
     )
   }
   if (!backup && !draft) {
-    // exclude not published taxonomies
-    whereConditions.push(`props::text <> '{}'::text`)
+    // exclude not published (draft) taxonomies
+    whereConditions.push(
+      DbUtils.getPublishedCondition({ draft: false, tableAlias: 't' }),
+      DbUtils.getPublishedCondition({ draft: false, tableAlias: 'tt' })
+    )
   }
+
   return client.map(
-    `SELECT * 
-     FROM ${getSurveyDBSchema(surveyId)}.taxonomy
-     ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''}
-     ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)}, id
+    `SELECT t.*, COUNT(tt.*) AS taxa_count
+     FROM ${schema}.taxonomy t
+     LEFT JOIN ${schema}.taxon tt 
+       ON tt.taxonomy_uuid = t.uuid
+     ${DbUtils.getWhereClause(...whereConditions)}
+     GROUP BY t.id
+     ORDER BY ${DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft, 't.')}, id
      LIMIT ${limit ? `$/limit/` : 'ALL'}
      ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     {
