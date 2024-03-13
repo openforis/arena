@@ -85,6 +85,7 @@ const AdvancedProps = (props) => {
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant
             isBoolean={NodeDef.isBoolean(nodeDef)}
+            excludeCurrentNodeDef
           />
           <div className="form_row without-label">
             <Checkbox
@@ -113,6 +114,7 @@ const AdvancedProps = (props) => {
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}
         isContextParent
+        excludeCurrentNodeDef
       />
 
       <div className="form_row without-label">

@@ -22,6 +22,7 @@ const ADVANCED_EXPRESSION_SUFFIX = '\n'
 export const useExpressionEditorPopupState = (props) => {
   const {
     canBeConstant,
+    excludeCurrentNodeDef,
     expr,
     mode,
     type,
@@ -137,6 +138,7 @@ export const useExpressionEditorPopupState = (props) => {
     lang,
     groupByParent,
     editorType,
+    excludeCurrentNodeDef,
   })
 
   return {
