@@ -13,11 +13,16 @@ const addOrRemoveItem =
     return result
   }
 
-const addIfNotEmpty = (item) => (array) => {
-  if (Objects.isEmpty(item)) return array
-  array.push(item)
-  return array
-}
+const addIfNotEmpty =
+  (...items) =>
+  (array) => {
+    items.forEach((item) => {
+      if (!Objects.isEmpty(item)) {
+        array.push(item)
+      }
+    })
+    return array
+  }
 
 const removeItemAtIndex =
   ({ index }) =>

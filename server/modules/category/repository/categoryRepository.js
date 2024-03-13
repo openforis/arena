@@ -89,6 +89,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
   limit = null,
   search = null,
 }) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+
   const propsFields = (tableAlias) => {
     if (backup) {
       // keep both props and propsDraft
@@ -104,6 +106,18 @@ const _getFetchCategoriesAndLevelsQuery = ({
 
   return `
     WITH
+      level AS 
+      (
+        SELECT
+          l.*,
+          COUNT (i.*) as items_count
+        FROM
+          ${schema}.category_level l
+          LEFT JOIN ${schema}.category_item i 
+            ON i.level_uuid = l.uuid
+        ${DbUtils.getWhereClause(DbUtils.getPublishedCondition({ draft, tableAlias: 'i' }))}
+        GROUP BY l.id
+      ),
       levels AS
       (
         SELECT
@@ -112,17 +126,19 @@ const _getFetchCategoriesAndLevelsQuery = ({
             'id', l.id, 
             'uuid', l.uuid, 
             'index', l.index, 
+            'itemsCount', l.items_count,
             ${propsFields('l')}
           )) AS levels
         FROM
-          ${getSurveyDBSchema(surveyId)}.category_level l
+          level l
+        ${DbUtils.getWhereClause(DbUtils.getPublishedCondition({ draft, tableAlias: 'l' }))}
         GROUP BY
           l.category_uuid
       ),
       c AS
       (
         SELECT * 
-        FROM ${getSurveyDBSchema(surveyId)}.category
+        FROM ${schema}.category
         ${search ? `WHERE ${nameColumn} ILIKE $/search/` : ''} 
         ORDER BY ${nameColumn}
         ${offset ? 'OFFSET $/offset/' : ''}
