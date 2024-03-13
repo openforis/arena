@@ -7,6 +7,8 @@ import classNames from 'classnames'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
+import { TextInput } from '../TextInput'
+import { TextField } from '@mui/material'
 
 export const Input = React.forwardRef((props, ref) => {
   const {
@@ -48,10 +50,8 @@ export const Input = React.forwardRef((props, ref) => {
         onChange(textTransformFunction(newValue))
       }
     },
-    [onChange]
+    [inputRef, onChange, selectionAllowed, textTransformFunction]
   )
-
-  const onChangeEvent = useCallback((event) => handleValueChange(event.target.value), [handleValueChange])
 
   const onFormattedValueChange = useCallback(
     ({ formattedValue }) => formattedValue !== valueText && handleValueChange(formattedValue),
@@ -74,6 +74,7 @@ export const Input = React.forwardRef((props, ref) => {
           autoComplete="off"
           disabled={disabled}
           className={className}
+          customInput={TextField}
           getInputRef={(el) => {
             inputRef.current = el
           }}
@@ -91,26 +92,45 @@ export const Input = React.forwardRef((props, ref) => {
           {...numberFormat}
         />
       ) : (
-        React.createElement(inputType, {
-          ref: inputRef,
-          'aria-disabled': disabled,
-          autoComplete: 'off',
-          className,
-          'data-testid': id,
-          disabled,
-          id,
-          maxLength,
-          name,
-          onBlur,
-          onChange: onChangeEvent,
-          onFocus,
-          placeholder,
-          readOnly,
-          rows: inputType === 'textarea' ? 4 : null,
-          title,
-          type,
-          value,
-        })
+        <TextInput
+          ref={inputRef}
+          autoComplete="off"
+          className={className}
+          disabled={disabled}
+          id={id}
+          maxLength={maxLength}
+          name={name}
+          onBlur={onBlur}
+          onChange={handleValueChange}
+          onFocus={onFocus}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          rows={inputType === 'textarea' ? 4 : null}
+          testId={id}
+          title={title}
+          type={type}
+          value={value}
+        />
+        // React.createElement(inputType, {
+        //   ref: inputRef,
+        //   'aria-disabled': disabled,
+        //   autoComplete: 'off',
+        //   className,
+        //   'data-testid': id,
+        //   disabled,
+        //   id,
+        //   maxLength,
+        //   name,
+        //   onBlur,
+        //   onChange: onChangeEvent,
+        //   onFocus,
+        //   placeholder,
+        //   readOnly,
+        //   rows: inputType === 'textarea' ? 4 : null,
+        //   title,
+        //   type,
+        //   value,
+        // })
       )}
     </ValidationTooltip>
   )
