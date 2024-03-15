@@ -1,7 +1,10 @@
 import { Readable } from 'stream'
 
-import { db } from '@server/db/db'
+import { Schemata } from '@common/model/db'
+
 import * as RecordFile from '@core/record/recordFile'
+
+import { db } from '@server/db/db'
 
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -93,9 +96,10 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
 }
 
 export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const total = await client.oneOrNone(
     `SELECT SUM(COALESCE((props -> '${RecordFile.propKeys.size}')::INTEGER, 0))
-    FROM ${getSurveyDBSchema(surveyId)}.file
+    FROM ${schema}.file
     WHERE NOT COALESCE((props -> '${RecordFile.propKeys.deleted}')::BOOLEAN, false)`,
     null,
     (row) => Number(row.sum)
