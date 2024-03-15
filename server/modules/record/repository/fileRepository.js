@@ -8,7 +8,7 @@ import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositor
 const SUMMARY_FIELDS = ['id', 'uuid', 'props']
 const SUMMARY_FIELDS_COMMA_SEPARATED = SUMMARY_FIELDS.join(', ')
 
-const NOT_DELETED_CONDITION = `props ->> '${RecordFile.propKeys.deleted}' IS NULL OR props ->> '${RecordFile.propKeys.deleted}' <> 'true'`
+const NOT_DELETED_CONDITION = `COALESCE(props ->> '${RecordFile.propKeys.deleted}', 'false') <> 'true'`
 
 // ============== CREATE
 
@@ -94,10 +94,9 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
 
 export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
   const total = await client.oneOrNone(
-    `SELECT SUM((props ->> '${RecordFile.propKeys.size}')::INTEGER)
+    `SELECT SUM(COALESCE((props -> '${RecordFile.propKeys.size}')::INTEGER, 0))
     FROM ${getSurveyDBSchema(surveyId)}.file
-    WHERE props -> '${RecordFile.propKeys.deleted}' IS NULL 
-      OR NOT (props -> '${RecordFile.propKeys.deleted}')::BOOLEAN`,
+    WHERE NOT COALESCE((props -> '${RecordFile.propKeys.deleted}')::BOOLEAN, false)`,
     null,
     (row) => Number(row.sum)
   )
@@ -143,6 +142,27 @@ export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
       WHERE content IS NOT NULL
       `
   )
+
+export const cleanupFileProps = async ({ surveyId, fileSummary }, client = db) => {
+  const fileUuid = RecordFile.getUuid(fileSummary)
+  const fileSummaryUpdated = RecordFile.cleanupInvalidProps(fileSummary)
+  return updateFileProps(surveyId, fileUuid, RecordFile.getProps(fileSummaryUpdated), client)
+}
+
+export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
+  client.tx(async (t) => {
+    const fileSummariesToClean = await t.manyOrNone(
+      `SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
+      FROM ${getSurveyDBSchema(surveyId)}.file
+      WHERE ${NOT_DELETED_CONDITION} 
+        AND (props ->> '${RecordFile.invalidPropKeys.fileName}') IS NOT NULL `
+    )
+    const count = fileSummariesToClean?.length ?? 0
+    if (count > 0) {
+      await t.batch(fileSummariesToClean.map((fileSummary) => cleanupFileProps({ surveyId, fileSummary }, t)))
+    }
+    return count
+  })
 
 // ============== DELETE
 export const deleteFileByUuid = async (surveyId, uuid, client = db) =>
