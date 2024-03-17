@@ -6,6 +6,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -73,7 +74,22 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     if (!NodeDef.isCode(nodeDef)) return ''
 
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-    return Category.getName(category) || ''
+    if (!category) return ''
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    let levelNameSuffix = ''
+    if (levelIndex > 0) {
+      const level = Category.getLevelByIndex(levelIndex)(category)
+      const levelName = CategoryLevel.getName(level)
+      levelNameSuffix = `[${levelName}]`
+    }
+    const categoryName = Category.getName(category)
+    return `${categoryName}${levelNameSuffix}`
+  }
+
+  const getParentCodeAttribute = (nodeDef) => {
+    if (!NodeDef.isCode(nodeDef)) return ''
+    const parentCodeAttribute = Survey.getNodeDefParentCode(nodeDef)(survey)
+    return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
   }
 
   const getTaxonomyName = (nodeDef) => {
@@ -104,6 +120,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       type,
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
+      parentCode: getParentCodeAttribute(nodeDef),
       taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
