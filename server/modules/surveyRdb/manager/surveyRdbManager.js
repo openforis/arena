@@ -259,7 +259,10 @@ export const fetchEntitiesDataToCsvFiles = async (
   })
 }
 
-export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwnerUuid = null }, client = db) => {
+export const fetchEntitiesFileUuidsByCycle = async (
+  { survey, cycle, recordOwnerUuid = null, filterRecordUuids = null },
+  client = db
+) => {
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
@@ -279,9 +282,11 @@ export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwner
     }
 
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    let query = Query.create({ entityDefUuid })
-    const queryAttributeDefsUuids = childrenFileDefs.map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+    const query = Query.create({
+      entityDefUuid,
+      attributeDefUuids: childrenFileDefs.map(NodeDef.getUuid),
+      filterRecordUuids,
+    })
 
     const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)

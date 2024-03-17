@@ -17,11 +17,13 @@ export const create = ({
   entityDefUuid = null,
   displayType = defaults[keys.displayType],
   attributeDefUuids = [],
+  filterRecordUuids = [],
 } = {}) => ({
   ...defaults,
   [keys.displayType]: displayType,
   [keys.entityDefUuid]: entityDefUuid,
   [keys.attributeDefUuids]: attributeDefUuids,
+  [keys.filterRecordUuids]: filterRecordUuids,
 })
 
 // ====== READ

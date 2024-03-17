@@ -15,7 +15,7 @@ export default class FilesExportJob extends Job {
   }
 
   async execute() {
-    const { survey, cycle, includeDataFromAllCycles, outputDir } = this.context
+    const { survey, cycle, includeDataFromAllCycles, outputDir, recordUuids } = this.context
 
     const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle(
       {
@@ -23,6 +23,7 @@ export default class FilesExportJob extends Job {
         survey,
         cycle,
         includeDataFromAllCycles,
+        filterRecordUuids: recordUuids,
       },
       this.tx
     )
