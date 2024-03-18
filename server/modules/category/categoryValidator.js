@@ -231,7 +231,8 @@ const validateItemsAndDescendants = async ({
       }
     }
     itemsValidationsByUuid[itemUuid] = validation
-    errorFound = errorFound || !Validation.isValid(validation) || Validation.isError(validation)
+
+    errorFound = errorFound || (Validation.isNotValid(validation) && Validation.isError(validation))
 
     visitedUuids[itemUuid] = true
   }
