@@ -145,11 +145,12 @@ const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validati
   return validation
 }
 
-const _createItemsInvalidValidationResult = ({ errorFound, itemsValidationsByUuid }) => {
+const _createItemsInvalidValidationResult = ({ errorsFound, warningsFound, itemsValidationsByUuid }) => {
   const validationResult = { key: Validation.messageKeys.categoryEdit.itemsInvalid }
-  const errors = errorFound ? [validationResult] : []
-  const warnings = errorFound ? [] : [validationResult]
-  return Validation.newInstance(!errorFound, { ...itemsValidationsByUuid }, errors, warnings)
+  const errors = errorsFound ? [validationResult] : []
+  const warnings = warningsFound ? [validationResult] : []
+  const valid = !errorsFound && !warningsFound
+  return Validation.newInstance(valid, { ...itemsValidationsByUuid }, errors, warnings)
 }
 
 const validateItemsAndDescendants = async ({
@@ -165,7 +166,8 @@ const validateItemsAndDescendants = async ({
   const extraDefs = Category.getItemExtraDef(category)
 
   const itemsValidationsByUuid = {}
-  let errorFound = false
+  let errorsFound = false
+  let warningsFound = false
 
   // Visit the items from the first to the lowest level (DFS)
   // validate first the leaf items, then up to the first level
@@ -232,11 +234,12 @@ const validateItemsAndDescendants = async ({
     }
     itemsValidationsByUuid[itemUuid] = validation
 
-    errorFound = errorFound || (Validation.isNotValid(validation) && Validation.isError(validation))
+    errorsFound = errorsFound || (Validation.isNotValid(validation) && Validation.isError(validation))
+    warningsFound = warningsFound || (Validation.isNotValid(validation) && Validation.isWarning(validation))
 
     visitedUuids[itemUuid] = true
   }
-  return _createItemsInvalidValidationResult({ errorFound, itemsValidationsByUuid })
+  return _createItemsInvalidValidationResult({ errorsFound, warningsFound, itemsValidationsByUuid })
 }
 
 // ====== CATEGORY
