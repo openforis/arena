@@ -72,6 +72,11 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
   )} WHERE v.${idColumnName}::${idColCast} = t.${idColumnName}::${idColCast}`
 }
 
+export const getPropsPublishedCondition = ({ draft, tableAlias = null }) => {
+  const prefix = tableAlias ? `${tableAlias}.` : ''
+  return draft ? '' : `${prefix}props::text <> '{}'::text`
+}
+
 /**
  * Combines draft and published props.
  *
