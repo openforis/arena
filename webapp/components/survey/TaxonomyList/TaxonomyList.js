@@ -13,7 +13,7 @@ const TaxonomyList = (props) => {
 
   const canEdit = useAuthCanEditSurvey()
 
-  let gridTemplateColumns = 'repeat(2, 1fr) 8rem repeat(2, 6rem)'
+  let gridTemplateColumns = 'repeat(2, 1fr) 8rem 8rem repeat(2, 6rem)'
   if (canSelect) {
     // select button
     gridTemplateColumns += ' 6rem'

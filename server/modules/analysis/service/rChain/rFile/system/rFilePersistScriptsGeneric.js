@@ -26,7 +26,7 @@ export default class RFilePersistScriptsGeneric extends RFileSystem {
   }
 
   getHeaderScript() {
-    return `if(checkGlobalErrors("${this.fileName} cannot be executed.")) {`
+    return `if (checkGlobalErrors("${this.fileName} cannot be executed.")) {`
   }
 
   getFooterScript() {

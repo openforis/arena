@@ -46,14 +46,24 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = ({ survey, childDef, mode, lang, editorType, nodeDefCurrent = null }) => {
+const getChildDefVariables = ({
+  survey,
+  childDef,
+  mode,
+  lang,
+  editorType,
+  nodeDefCurrent = null,
+  excludeCurrentNodeDef = false,
+}) => {
   if (Expression.isValidExpressionType(childDef)) {
     // exclude nodes that reference the current one
     const referenceCurrentNode =
       Boolean(nodeDefCurrent) &&
       Survey.isNodeDefDependentOn(NodeDef.getUuid(childDef), NodeDef.getUuid(nodeDefCurrent))(survey)
 
-    if (!referenceCurrentNode) {
+    const currentNodeDefExcluded = excludeCurrentNodeDef && nodeDefCurrent && NodeDef.isEqual(nodeDefCurrent)(childDef)
+
+    if (!referenceCurrentNode && !currentNodeDefExcluded) {
       if (editorType === ExpressionEditorType.basic || mode === Expression.modes.json) {
         return getJsVariables(childDef)
       }
@@ -65,7 +75,16 @@ const getChildDefVariables = ({ survey, childDef, mode, lang, editorType, nodeDe
   return []
 }
 
-const getVariablesFromAncestors = ({ survey, nodeDefContext, mode, lang, editorType, nodeDefCurrent = null }) => {
+const getVariablesFromAncestors = ({
+  survey,
+  nodeDefContext,
+  mode,
+  lang,
+  editorType,
+  nodeDefCurrent = null,
+  includeAnalysis = false,
+  excludeCurrentNodeDef = false,
+}) => {
   const variables = []
   const stack = []
   const entitiesVisitedByUuid = {}
@@ -91,9 +110,11 @@ const getVariablesFromAncestors = ({ survey, nodeDefContext, mode, lang, editorT
       visitNext(source)
     } else {
       // get variables from every child def
-      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
+      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
       nodeDefChildren.forEach((childDef) => {
-        variables.push(...getChildDefVariables({ survey, childDef, mode, lang, editorType, nodeDefCurrent }))
+        variables.push(
+          ...getChildDefVariables({ survey, childDef, mode, lang, editorType, nodeDefCurrent, excludeCurrentNodeDef })
+        )
 
         // if the child def is a single entity, include variables from the descendants of that entity
         if (NodeDef.isSingleEntity(childDef)) {
@@ -117,7 +138,13 @@ const getThisVariable = ({ mode, variables, nodeDefCurrent }) => {
   }
 }
 
-const getVariablesGroupedByParentUuid = ({ variables, survey, mode, nodeDefCurrent = null }) => {
+const getVariablesGroupedByParentUuid = ({
+  variables,
+  survey,
+  mode,
+  nodeDefCurrent = null,
+  excludeCurrentNodeDef = false,
+}) => {
   const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
       ...byParentUuid,
@@ -137,7 +164,7 @@ const getVariablesGroupedByParentUuid = ({ variables, survey, mode, nodeDefCurre
     })
     .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
 
-  if (!nodeDefCurrent) {
+  if (!nodeDefCurrent || excludeCurrentNodeDef) {
     return groups
   }
   // always show current variable at the beginning
@@ -167,25 +194,44 @@ export const getVariables = ({
   groupByParent,
   editorType,
   nodeDefCurrent = null,
+  excludeCurrentNodeDef = false,
 }) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
-  const variables = getVariablesFromAncestors({ survey, nodeDefContext, nodeDefCurrent, mode, lang, editorType })
+  const variables = getVariablesFromAncestors({
+    survey,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    lang,
+    editorType,
+    excludeCurrentNodeDef,
+  })
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
+  return groupByParent
+    ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, excludeCurrentNodeDef })
+    : variables
 }
 
-export const getVariablesChildren = ({ survey, nodeDefContext, nodeDefCurrent, mode, lang, groupByParent }) => {
+export const getVariablesChildren = ({
+  survey,
+  nodeDefContext,
+  nodeDefCurrent,
+  mode,
+  lang,
+  groupByParent,
+  excludeCurrentNodeDef,
+}) => {
   if (!NodeDef.isEntity(nodeDefContext)) {
     return []
   }
   const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext)(survey)
 
   const variables = nodeDefChildren.reduce((variablesAcc, childDef) => {
-    variablesAcc.push(...getChildDefVariables({ survey, childDef, mode, lang, nodeDefCurrent }))
+    variablesAcc.push(...getChildDefVariables({ survey, childDef, mode, lang, nodeDefCurrent, excludeCurrentNodeDef }))
     return variablesAcc
   }, [])
 

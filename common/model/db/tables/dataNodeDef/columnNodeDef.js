@@ -9,6 +9,8 @@ import * as SQL from '../../sql'
 const { nodeDefType } = NodeDef
 
 const columnSuffixCodeLabel = '_label'
+const columnSuffixTaxonScientificName = '_scientific_name'
+const columnSuffixTaxonVernacularName = '_vernacular_name'
 
 const columnNamesSuffixGetterByType = {
   [nodeDefType.code]: () => ['', columnSuffixCodeLabel],
@@ -18,7 +20,7 @@ const columnNamesSuffixGetterByType = {
     suffixes.push(...additionalFields.map((field) => `_${toSnakeCase(field)}`))
     return suffixes
   },
-  [nodeDefType.taxon]: () => ['', '_scientific_name'],
+  [nodeDefType.taxon]: () => ['', columnSuffixTaxonScientificName, columnSuffixTaxonVernacularName],
   [nodeDefType.file]: () => ['_file_uuid', '_file_name'],
 }
 
@@ -36,7 +38,7 @@ const colTypesGetterByType = {
   [nodeDefType.entity]: () => [SQL.types.uuid],
   [nodeDefType.file]: () => [SQL.types.uuid, SQL.types.varchar],
   [nodeDefType.integer]: () => [SQL.types.bigint],
-  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar],
+  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar, SQL.types.varchar, SQL.types.varchar],
   [nodeDefType.text]: () => [SQL.types.varchar],
   [nodeDefType.time]: () => [SQL.types.time],
 }
@@ -112,9 +114,14 @@ export default class ColumnNodeDef {
 }
 
 ColumnNodeDef.columnSuffixCodeLabel = columnSuffixCodeLabel
+ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
+ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
+
 ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
+
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
+
 ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
   const columnName = ColumnNodeDef.getColumnName(nodeDef)
   if (Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)) {

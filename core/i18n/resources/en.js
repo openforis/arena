@@ -828,6 +828,7 @@ Are you sure you want to continue?`,
     roleInCurrentSurvey: 'Role in current survey',
     userNotInvitedToAnySurvey: `User not invited to any survey`,
     confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
+    invitationExpiredClickToSendAgainTheInvitation: 'Invitation expired: click to send again the invitation',
     copyInvitationLink: 'Copy invitation link to clipboard',
     copyInvitationLinkConfirmMessage: `If the invited user hasn't received any emails at the address {{email}},  
 you can copy the invitation link to the clipboard and share it with him in other ways.
@@ -1388,6 +1389,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
     },
+    taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
   },
 
@@ -1396,6 +1398,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
 {{insertedCategories}} new
 {{updatedCategories}} updated`,
+    itemsCount: 'Items count',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
@@ -1831,8 +1834,8 @@ Try to refresh the page.`,
     and: 'AND',
     or: 'OR',
     group: 'Group',
-    var: 'Var',
-    const: 'Const',
+    var: 'Variable',
+    const: 'Constant value',
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',

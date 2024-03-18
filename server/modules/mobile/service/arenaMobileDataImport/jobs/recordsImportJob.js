@@ -47,6 +47,24 @@ export default class RecordsImportJob extends DataImportBaseJob {
     })
   }
 
+  trackFileUuid = ({ node }) => {
+    const fileUuid = Node.getFileUuid(node)
+    if (fileUuid && (Node.isCreated(node) || Node.isUpdated(node))) {
+      this.recordsFileUuids.add(fileUuid)
+    }
+  }
+
+  trackFileUuids({ nodes }) {
+    // keep track of file uuids found in record attribute values
+    const { survey } = this.context
+    Object.values(nodes).forEach((node) => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      if (NodeDef.isFile(nodeDef)) {
+        this.trackFileUuid({ node })
+      }
+    })
+  }
+
   async cleanupCurrentRecord() {
     const { context, currentRecord: record, user, tx } = this
     const { survey } = context
@@ -74,14 +92,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
         delete nodes[nodeUuid]
-      }
-
-      // keep track of file uuids found in record attribute values
-      if (NodeDef.isFile(nodeDef)) {
-        const fileUuid = Node.getFileUuid(node)
-        if (fileUuid) {
-          this.recordsFileUuids.add(fileUuid)
-        }
       }
     })
     // assoc nodes and build index from scratch
@@ -136,6 +146,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     })(recordTarget)
     this.currentRecord = recordTargetUpdated
 
+    this.trackFileUuids({ nodes: nodesUpdated })
+
     await this.persistUpdatedNodes({ nodesUpdated, dateModified: Record.getDateModified(record) })
 
     this.updatedRecordsUuids.add(recordUuid)
@@ -152,14 +164,20 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await RecordManager.insertRecord(user, surveyId, record, true, tx)
 
     // insert nodes (add them to batch persister)
-    const nodesArray = Record.getNodesArray(record)
+    const nodesArray = []
+
+    Record.getNodesArray(record).forEach((node) => {
       // check that the node definition associated to the node has not been deleted from the survey
-      .filter((node) => !!Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey))
-      .sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-      .map((node) => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      if (nodeDef) {
         node[Node.keys.created] = true // do side effect to avoid creating new objects
-        return node
-      })
+        nodesArray.push(node)
+        if (NodeDef.isFile(nodeDef)) {
+          this.trackFileUuid({ node })
+        }
+      }
+    })
+    nodesArray.sort((nodeA, nodeB) => nodeA.id - nodeB.id)
     const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
 
     await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid, dateModified: Record.getDateModified(record) })
@@ -171,7 +189,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   async beforeSuccess() {
     await super.beforeSuccess()
-    this.setContext({ recordsFileUuids: Array.from(this.recordsFileUuids) })
+    const recordsFileUuidsArray = Array.from(this.recordsFileUuids)
+    const recordsFilesCount = recordsFileUuidsArray.length
+    if (recordsFilesCount > 0) {
+      this.logDebug(`found ${recordsFilesCount} files:`, recordsFileUuidsArray)
+    }
+    this.setContext({ recordsFileUuids: recordsFileUuidsArray })
   }
 
   generateResult() {

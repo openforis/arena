@@ -1,9 +1,9 @@
+import { Objects } from '@openforis/arena-core'
+
 import SystemError from '@core/systemError'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
-
 import * as FileService from '@server/modules/record/service/fileService'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
@@ -17,15 +17,14 @@ export default class FilesImportJob extends Job {
     const { arenaSurveyFileZip } = this.context
 
     const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
-    if (filesSummaries && filesSummaries.length > 0) {
-      const filesUuids = filesSummaries.map(RecordFile.getUuid)
-      this.logDebug('file UUIDs in zip file', filesUuids)
-      this.logDebug('file UUIDs found in records', this.context.recordsFileUuids)
 
+    await this.checkFileUuidsAreValid(filesSummaries)
+
+    if (filesSummaries?.length > 0) {
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
       this.total = filesSummaries.length
-      await PromiseUtils.each(filesSummaries, async (fileSummary) => {
+      for await (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
         // load file content from a separate file
         const fileUuid = RecordFile.getUuid(fileSummary)
@@ -35,21 +34,14 @@ export default class FilesImportJob extends Job {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
 
-        this.checkFileUuidIsInRecords(fileUuid)
-
         file = RecordFile.assocContent(fileContent)(file)
 
         await this.persistFile(file)
 
         this.incrementProcessedItems()
-      })
-    }
-  }
-
-  checkFileUuidIsInRecords(fileUuid) {
-    const { recordsFileUuids } = this.context
-    if (recordsFileUuids && !recordsFileUuids.includes(fileUuid)) {
-      throw new Error(`File UUID ${fileUuid} not found in records`)
+      }
+    } else {
+      this.logInfo('no files found')
     }
   }
 
@@ -83,5 +75,34 @@ export default class FilesImportJob extends Job {
     if (totalSize > filesStatistics.availableSpace) {
       throw new SystemError('cannotImportFilesExceedingQuota')
     }
+  }
+
+  async checkFileUuidsAreValid(filesSummaries) {
+    const { recordsFileUuids } = this.context
+
+    if (Objects.isEmpty(recordsFileUuids)) {
+      this.logDebug('no files to restore in the records')
+      return
+    }
+    if (Objects.isEmpty(filesSummaries)) {
+      // files data in records but not in the files folder being restored
+      throw new Error('missing files summary file')
+    }
+
+    const filesUuids = filesSummaries.map(RecordFile.getUuid)
+    this.logDebug(`file uuids to be imported: ${filesUuids}`)
+
+    const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
+      (recordFileUuid) => !filesUuids.includes(recordFileUuid)
+    )
+    if (missingRecordFileUuidsInFiles.length > 0) {
+      throw new Error(`missing files with UUIDs ${missingRecordFileUuidsInFiles}`)
+    }
+
+    // TODO check if it's necessary to check that all files are in the updated records data
+    // const missingFileUuids = filesUuids.filter((fileUuid) => !recordsFileUuids.includes(fileUuid))
+    // if (missingFileUuids.length > 0) {
+    //   throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
+    // }
   }
 }

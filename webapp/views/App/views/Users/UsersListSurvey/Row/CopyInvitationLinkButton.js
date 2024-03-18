@@ -40,7 +40,7 @@ export const CopyInvitationLinkButton = (props) => {
   return (
     <Button
       className="icon-invitation-link"
-      iconClassName="icon-link icon-12px"
+      iconClassName="icon-left icon-link icon-12px"
       label="usersView.copyInvitationLink"
       onClick={handleCopyInvitationLink}
       showLabel={false}

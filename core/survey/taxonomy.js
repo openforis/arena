@@ -7,6 +7,11 @@ import * as StringUtils from '@core/stringUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { ExtraPropDef } from './extraPropDef'
 
+export const keys = {
+  // not stored in db
+  taxaCount: 'taxaCount',
+}
+
 export const keysProps = {
   name: ObjectUtils.keys.name,
   descriptions: ObjectUtils.keysProps.descriptions,
@@ -38,6 +43,7 @@ export const getExtraPropsDefsArray = (taxonomy) =>
       index: ExtraPropDef.getIndex(extraPropDef),
       name,
     }))
+export const getTaxaCount = R.prop(keys.taxaCount)
 
 // UPDATE
 export const assocExtraPropsDefs = (extraPropsDefs) => (taxonomy) =>
