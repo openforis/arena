@@ -249,16 +249,33 @@ export const fetchItemsByCategoryUuid = async (
   return backup || draft ? items : R.filter((item) => item.published)(items)
 }
 
+const getWhereConditionItemsWithLevelAndCode = ({ draft, tableAlias = 'i' }) => {
+  const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, `${tableAlias}.`, true)
+  return `${tableAlias}.level_uuid = $/levelUuid/ AND COALESCE(${codeColumn}, '') = $/code/`
+}
+
+export const countItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const row = await client.one(
+    `SELECT COUNT(*) 
+     FROM ${schema}.category_item i
+     WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
+  `,
+    { levelUuid, code: Strings.defaultIfEmpty('')(code) }
+  )
+  return Number(row.count)
+}
+
 export const fetchItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
-  const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.', true)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const items = await client.map(
     `
       SELECT i.* 
-      FROM ${getSurveyDBSchema(surveyId)}.category_item i
-      WHERE i.level_uuid = $1 AND COALESCE(${codeColumn}, '') = $2
+      FROM ${schema}.category_item i
+      WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
      ORDER BY i.id
     `,
-    [levelUuid, Strings.defaultIfEmpty('')(code)],
+    { levelUuid, code: Strings.defaultIfEmpty('')(code) },
     (def) => DB.transformCallback(def, draft, true)
   )
 
@@ -401,16 +418,39 @@ export const fetchItemsByLevelIndex = async (
 
 export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = false }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
+  const propsPublishedCondition = DbUtils.getPropsPublishedCondition({ draft, tableAlias: 'i' })
+  const whereClause = propsPublishedCondition ? `WHERE ${propsPublishedCondition}` : ''
   const counts = await client.any(
     `SELECT l.category_uuid, COUNT(i.*) 
     FROM ${schema}.category_item i
      JOIN ${schema}.category_level l 
         ON l.uuid = i.level_uuid
-    ${draft ? '' : `WHERE i.props::text <> '{}'::text`}
+    ${whereClause}
     GROUP BY l.category_uuid`
   )
   return counts.reduce((acc, row) => {
     acc[row.category_uuid] = Number(row.count)
+    return acc
+  }, {})
+}
+
+export const fetchChildrenItemsCountByItemUuid = async ({ surveyId, categoryUuid, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const propsPublishedCondition = DbUtils.getPropsPublishedCondition({ draft, tableAlias: 'ci' })
+  const whereCondtions = ['cl.category_uuid  = $/categoryUuid/ ']
+  if (propsPublishedCondition) {
+    whereCondtions.push(propsPublishedCondition)
+  }
+  const rows = await client.any(
+    `SELECT ci.parent_uuid, count(*)
+    FROM ${schema}.category_item ci 
+      JOIN ${schema}.category_level cl on cl.uuid = ci.level_uuid 
+    WHERE ${whereCondtions.join(' AND ')}
+    GROUP by ci.parent_uuid`,
+    { categoryUuid }
+  )
+  return rows.reduce((acc, row) => {
+    acc[row.parent_uuid] = Number(row.count)
     return acc
   }, {})
 }
