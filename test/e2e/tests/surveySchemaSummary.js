@@ -83,6 +83,7 @@ export default () =>
           'type',
           'key',
           'categoryName',
+          'parentCode',
           'taxonomyName',
           'multiple',
           'readOnly',
