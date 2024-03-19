@@ -123,7 +123,11 @@ export default class DataImportJob extends DataImportBaseJob {
 
   async cancel() {
     await super.cancel()
+    this.csvReader?.cancel()
+  }
 
+  async setStatusFailed() {
+    await super.setStatusFailed()
     this.csvReader?.cancel()
   }
 

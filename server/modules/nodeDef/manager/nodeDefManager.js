@@ -182,7 +182,7 @@ const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
   ]).length > 0
 
 export const updateNodeDefProps = async (
-  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
+  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
   client = db
 ) =>
   client.tx(async (t) => {
@@ -306,7 +306,7 @@ export const updateNodeDefProps = async (
       ...Object.values(nodeDefsUpdated).map((nodeDefToUpdate) =>
         _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
       ),
-      markSurveyDraft(surveyId, t),
+      ...(markSurveyAsDraft ? [markSurveyDraft(surveyId, t)] : []),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
 
