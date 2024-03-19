@@ -5,6 +5,9 @@ import { arenaInfo, sourceWithTryCatch, source } from '../rFunctions'
 
 const _contentSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
 
+const pathsWithErrorThrown = ['system/init', 'system/close']
+const pathsWithErrorsIgnored = ['system/statistical-analysis']
+
 export const padStart = StringUtils.padStart(3, '0')
 
 export default class RFile {
@@ -49,9 +52,12 @@ export default class RFile {
   async init(commentedOut = false) {
     await FileUtils.appendFile(this.path)
 
-    const shouldCatchErrors = this.path.includes('system/init') || this.path.includes('system/close')
+    const shouldThrowErrors = pathsWithErrorThrown.some((path) => this.path.includes(path))
+    const ignoreErrors = pathsWithErrorsIgnored.some((path) => this.path.includes(path))
 
-    let fileArenaContent = shouldCatchErrors ? source(this.pathRelative) : sourceWithTryCatch(this.pathRelative)
+    let fileArenaContent = shouldThrowErrors
+      ? source(this.pathRelative)
+      : sourceWithTryCatch(this.pathRelative, ignoreErrors)
 
     if (commentedOut) {
       fileArenaContent = `# ${fileArenaContent}`
