@@ -117,6 +117,16 @@ export const updateCategoryItemExtraDefItem = async ({
   return category
 }
 
+export const updateCategoryItemProp = async ({ surveyId, categoryUuid, itemUuid, key, value }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/items/${itemUuid}`, {
+    key,
+    value,
+  })
+  return category
+}
+
 export const cleanupCategory = async ({ surveyId, categoryUuid }) => {
   const {
     data: { deleted, updated },

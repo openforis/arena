@@ -1432,7 +1432,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
     deleteItem: 'Delete item',
-    level: 'Level',
+    level: {
+      title: 'Level {{levelPosition}}',
+      noItemsDefined: 'No items defined',
+      selectItemFromPreviousLevel: 'Select an item from the previous level',
+    },
 
     importSummary: {
       columns: 'Column',
