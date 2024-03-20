@@ -132,7 +132,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const script = getZipEntryAsText(scriptEntryName)
 
           await NodeDefManager.updateNodeDefProps(
-            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
+            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
             tx
           )
         })
