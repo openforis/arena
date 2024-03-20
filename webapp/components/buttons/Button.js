@@ -17,6 +17,8 @@ export const Button = forwardRef((props, ref) => {
     label: labelProp,
     labelParams,
     onClick,
+    primary,
+    secondary,
     showLabel,
     size,
     testId,
@@ -42,7 +44,11 @@ export const Button = forwardRef((props, ref) => {
       disabled={disabled ? disabled : undefined}
       aria-disabled={disabled ? disabled : undefined}
       type="button"
-      className={classNames('btn', className, { 'btn-s': size === 'small' })}
+      className={classNames('btn', className, {
+        'btn-s': size === 'small',
+        'btn-primary': primary,
+        'btn-secondary': secondary,
+      })}
       onClick={onClick}
       {...otherProps}
     >
@@ -71,6 +77,8 @@ Button.propTypes = {
   label: PropTypes.string,
   labelParams: PropTypes.object,
   onClick: PropTypes.func,
+  primary: PropTypes.bool,
+  secondary: PropTypes.bool,
   showLabel: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,

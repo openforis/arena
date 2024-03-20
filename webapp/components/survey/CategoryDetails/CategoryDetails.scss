@@ -87,6 +87,11 @@ $borderColor: $greyBorder;
     justify-content: space-between;
   }
 
+  .category__level-items-message {
+    align-self: center;
+    padding: 1rem;
+  }
+
   .category__level-items-header {
     display: flex;
     justify-content: center;

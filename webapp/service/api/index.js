@@ -16,6 +16,7 @@ export {
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
+  updateCategoryItemProp,
 } from './categories'
 export { fetchChains, getChainSummaryExportUrl } from './analysis'
 
