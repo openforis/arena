@@ -213,7 +213,7 @@ const CategoryDetails = (props) => {
 
         {showClose && (
           <div className="button-bar">
-            <Button onClick={Actions.onDoneClick} label="common.done" />
+            <Button onClick={Actions.onDoneClick} label="common.done" primary />
           </div>
         )}
       </div>
