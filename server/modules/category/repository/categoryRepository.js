@@ -24,8 +24,7 @@ import * as CategoryExportRepository from './categoryExportRepository'
 // ============== CREATE
 
 export const insertCategory = async ({ surveyId, category, backup = false, client = db }) => {
-  const props = backup ? Category.getProps(category) : {}
-  const propsDraft = backup ? Category.getPropsDraft(category) : Category.getProps(category)
+  const { props, propsDraft } = Category.getPropsAndPropsDraft({ backup })(category)
   return client.one(
     `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props, props_draft)
@@ -37,8 +36,7 @@ export const insertCategory = async ({ surveyId, category, backup = false, clien
 }
 
 export const insertLevel = async ({ surveyId, level, backup = false, client = db }) => {
-  const props = backup ? CategoryLevel.getProps(level) : {}
-  const propsDraft = backup ? CategoryLevel.getPropsDraft(level) : CategoryLevel.getProps(level)
+  const { props, propsDraft } = CategoryLevel.getPropsAndPropsDraft({ backup })(level)
   return client.one(
     `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props, props_draft)
@@ -60,13 +58,16 @@ export const insertItem = async (surveyId, item, client = db) =>
   )
 
 export const insertItems = async ({ surveyId, items, backup = false }, client = db) => {
-  const values = items.map((item) => [
-    CategoryItem.getUuid(item),
-    CategoryItem.getLevelUuid(item),
-    CategoryItem.getParentUuid(item),
-    backup ? CategoryItem.getProps(item) : {},
-    backup ? CategoryItem.getPropsDraft(item) : CategoryItem.getProps(item),
-  ])
+  const values = items.map((item) => {
+    const { props, propsDraft } = CategoryItem.getPropsAndPropsDraft({ backup })(item)
+    return [
+      CategoryItem.getUuid(item),
+      CategoryItem.getLevelUuid(item),
+      CategoryItem.getParentUuid(item),
+      props,
+      propsDraft,
+    ]
+  })
 
   await client.none(
     DbUtils.insertAllQuery(

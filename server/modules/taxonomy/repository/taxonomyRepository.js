@@ -43,10 +43,7 @@ const getTaxonVernacularNameSelectFields = (draft) => `
 // ============== CREATE
 
 export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, client = db) => {
-  // backup: preserve both props and props draft
-  const props = backup ? Taxonomy.getProps(taxonomy) : {}
-  const propsDraft = backup ? Taxonomy.getPropsDraft(taxonomy) : Taxonomy.getProps(taxonomy)
-
+  const { props, propsDraft } = Taxonomy.getPropsAndPropsDraft({ backup })(taxonomy)
   return client.one(
     `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props, props_draft)
@@ -88,13 +85,7 @@ const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, 
     R.values,
     R.flatten,
     R.map((vernacularName) => {
-      // if not backup, ignore published props
-      const props = backup ? TaxonVernacularName.getProps(vernacularName) : {}
-      // if backup, keep both props and propsDraft
-      const propsDraft = backup
-        ? TaxonVernacularName.getPropsDraft(vernacularName)
-        : TaxonVernacularName.getProps(vernacularName)
-
+      const { props, propsDraft } = TaxonVernacularName.getPropsAndPropsDraft({ backup })(vernacularName)
       return client.none(
         `INSERT INTO 
          ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (uuid, taxon_uuid, props, props_draft)
@@ -110,10 +101,7 @@ const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, 
   )(vernacularNames)
 
 const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => {
-  // if backup, keep both props and props draft
-  const propsDraft = backup ? Taxon.getPropsDraft(taxon) : Taxon.getProps(taxon)
-  // always insert with draft props if not backup
-  const props = backup ? Taxon.getProps(taxon) : {}
+  const { props, propsDraft } = Taxon.getPropsAndPropsDraft({ backup })(taxon)
 
   return client.batch([
     client.none(

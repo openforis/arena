@@ -37,6 +37,13 @@ const createInnerJobs = (params) => {
   ]
 }
 
+const transformParams = (params) => {
+  const { backup: backupParam = true, options = { includeData: true }, ...paramsRest } = params
+  const { includeData } = options
+  const backup = backupParam && includeData
+  return { backup, options, ...paramsRest }
+}
+
 export default class ArenaImportJob extends Job {
   /**
    * Creates a new import job to import a survey in Arena format.
@@ -51,8 +58,8 @@ export default class ArenaImportJob extends Job {
    * @returns {ArenaImportJob} - The import job.
    */
   constructor(params) {
-    const { backup = true, options = { includeData: true }, ...paramsRest } = params
-    super(ArenaImportJob.type, { ...paramsRest, backup, options }, createInnerJobs(params))
+    const paramsTransformed = transformParams(params)
+    super(ArenaImportJob.type, paramsTransformed, createInnerJobs(paramsTransformed))
   }
 
   async beforeSuccess() {

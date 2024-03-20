@@ -130,3 +130,16 @@ export const groupByProp = (propNameOrExtractor) => (items) =>
   }, {})
 
 export const clone = (obj) => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
+
+export const getPropsAndPropsDraft =
+  ({ backup = false } = {}) =>
+  (obj) => {
+    // if not backup, keep published props empty (consider only )
+    // if backup, keep both props and propsDraft
+    const props = getProps(obj)
+    const propsDraft = getPropsDraft(obj)
+    return {
+      props: backup ? props : {},
+      propsDraft: backup ? propsDraft : { ...props, propsDraft },
+    }
+  }
