@@ -42,8 +42,17 @@ export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 })
 
 // ====== READ
-export const { getDescription, getDescriptions, getLabels, getProps, getPropsDraft, getUuid, isEqual, isPublished } =
-  ObjectUtils
+export const {
+  getDescription,
+  getDescriptions,
+  getLabels,
+  getProps,
+  getPropsDraft,
+  getPropsAndPropsDraft,
+  getUuid,
+  isEqual,
+  isPublished,
+} = ObjectUtils
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')

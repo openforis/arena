@@ -161,6 +161,7 @@ export const {
   getProp,
   getProps,
   getPropsDraft,
+  getPropsAndPropsDraft,
   getUuid,
   getId,
   isEqual,
@@ -312,6 +313,20 @@ export const getPropOrDraftAdvanced =
   (prop, defaultTo = null) =>
   (nodeDef) =>
     getPropAdvancedDraft(prop, getPropAdvanced(prop, defaultTo)(nodeDef))(nodeDef)
+
+export const getAllPropsAndAllPropsDraft =
+  ({ backup = false }) =>
+  (nodeDef) => {
+    const { props, propsDraft } = ObjectUtils.getPropsAndPropsDraft({ backup })(nodeDef)
+    const propsAdvanced = getPropsAdvanced(nodeDef)
+    const propsAdvancedDraft = getPropsAdvancedDraft(nodeDef)
+    return {
+      props,
+      propsDraft,
+      propsAdvanced: backup ? propsAdvanced : {},
+      propsAdvancedDraft: backup ? propsAdvancedDraft : { ...propsAdvanced, ...propsAdvancedDraft },
+    }
+  }
 
 export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
 export const hasAdvancedPropsApplicableDraft = (nodeDef) => R.prop(keys.draftAdvancedApplicable, nodeDef) === true
