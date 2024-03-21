@@ -53,6 +53,7 @@ const Table = (props) => {
     totalCount,
     initData,
     onRowClick,
+    onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
     visibleColumnKeys,
@@ -109,6 +110,7 @@ const Table = (props) => {
         offset={offset}
         onRowClick={onRowClick}
         onRowDoubleClick={onRowDoubleClick}
+        onRowsScroll={onRowsScroll}
         rowComponent={rowComponent}
         rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}
