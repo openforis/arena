@@ -18,7 +18,8 @@ export default class SurveyCreatorJob extends Job {
   }
 
   async execute() {
-    const { arenaSurvey, backup, surveyInfoTarget, arenaSurveyFileZip } = this.context
+    const { arenaSurvey, backup, surveyInfoTarget, arenaSurveyFileZip, options } = this.context
+    const { includeData } = options ?? {}
 
     const surveyInfoArenaSurvey = Survey.getSurveyInfo(arenaSurvey)
 
@@ -45,7 +46,9 @@ export default class SurveyCreatorJob extends Job {
 
     // import survey as published only if it has records and if the survey being imported is published already
     const published =
-      (await ArenaSurveyFileZip.hasRecords(arenaSurveyFileZip)) && Survey.isPublished(surveyInfoArenaSurvey)
+      includeData &&
+      (await ArenaSurveyFileZip.hasRecords(arenaSurveyFileZip)) &&
+      Survey.isPublished(surveyInfoArenaSurvey)
     const draft = !published
     const template = isTemplate({ backup, surveyInfoArenaSurvey, surveyInfoTarget })
     const collectProps = collectUri && !template ? { collectUri, collectNodeDefsInfoByPath } : {}
