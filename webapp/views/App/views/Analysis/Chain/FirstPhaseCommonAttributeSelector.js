@@ -8,16 +8,16 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import { BaseUnitCodeAttributeSelector } from './BaseUnitCodeAttributeSelector'
 
-export const StratumAttributeSelector = () => {
+export const FirstPhaseCommonAttributeSelector = () => {
   const dispatch = useDispatch()
   const chain = useChain()
   const samplingDesign = Chain.getSamplingDesign(chain)
 
   const onChange = useCallback(
-    (stratumDefUuid) => {
-      const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(
-        chain
-      )
+    (attrDefUuid) => {
+      const chainUpdated = Chain.updateSamplingDesign(
+        ChainSamplingDesign.assocFirstPhaseCommonAttributeUuid(attrDefUuid)
+      )(chain)
       dispatch(ChainActions.updateChain({ chain: chainUpdated }))
     },
     [chain, dispatch]
@@ -25,9 +25,9 @@ export const StratumAttributeSelector = () => {
 
   return (
     <BaseUnitCodeAttributeSelector
-      allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
-      label="chainView.stratumAttribute"
-      selectedNodeDefUuid={ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)}
+      info="chainView.firstPhaseCommonAttribute.info"
+      label="chainView.firstPhaseCommonAttribute.label"
+      selectedNodeDefUuid={ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(samplingDesign)}
       onChange={onChange}
     />
   )
