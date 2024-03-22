@@ -36,4 +36,4 @@ export const assocDefsFetched = ({ draft, includeAnalysis, validate }) =>
     A.assoc(keys.validate, validate)
   )
 
-export const resetDefsFetched = () => {}
+export const resetDefsFetched = () => ({})
