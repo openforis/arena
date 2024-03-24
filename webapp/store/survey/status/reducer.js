@@ -15,7 +15,8 @@ const actionHandlers = {
 
   [SurveyActions.surveyDefsReset]: SurveyStatusState.resetDefsFetched,
 
-  [SurveyActions.surveyDefsLoad]: (state, { draft }) => SurveyStatusState.assocDefsFetched(draft)(state),
+  [SurveyActions.surveyDefsLoad]: (state, { draft, includeAnalysis, validate }) =>
+    SurveyStatusState.assocDefsFetched({ draft, includeAnalysis, validate })(state),
 }
 
 export default exportReducer(actionHandlers)
