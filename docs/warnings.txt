@@ -1,0 +1,181 @@
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/argcomplete-3.2.3.dist-info/LICENSE.rst:3: WARNING: Block quote ends without a blank line; unexpected unindent.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/argcomplete-3.2.3.dist-info/LICENSE.rst:4: WARNING: Block quote ends without a blank line; unexpected unindent.[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/base.rst:3: ERROR: Error in "currentmodule" directive:
+maximum 1 argument(s) allowed, 3 supplied.
+
+.. currentmodule:: {{ module }}[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/class.rst:3: ERROR: Error in "currentmodule" directive:
+maximum 1 argument(s) allowed, 3 supplied.
+
+.. currentmodule:: {{ module }}[39;49;00m
+[91mWARNING: invalid signature for autoclass ('{{ objname }}')[39;49;00m
+[91mWARNING: don't know which module to import for autodocumenting '{{ objname }}' (try placing a "module" or "currentmodule" directive in the document, or giving an explicit module name)[39;49;00m
+[91mWARNING: invalid signature for automodule ('{{ fullname }}')[39;49;00m
+[91mWARNING: don't know which module to import for autodocumenting '{{ fullname }}' (try placing a "module" or "currentmodule" directive in the document, or giving an explicit module name)[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/module.rst:53: ERROR: Unknown directive type "autosummary".
+
+.. autosummary::
+   :toctree:
+   :recursive:[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/module.rst:56: WARNING: Explicit markup ends without a blank line; unexpected unindent.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/module.rst:58: WARNING: Definition list ends without a blank line; unexpected unindent.[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:342: ERROR: Malformed table.
+
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/4/home_icon.PNG       | - Management of survey properties; delete a survey;export a survey; settings for visual assessment |
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/4/survey_tools.PNG    | - Design or edit data entry forms.                                                                 |
+|                                                                                         | - Visual view on survey hierarchy.                                                                 |
+|                                                                                         | - Management of categories (i.e., code lists).                                                     |
+|                                                                                         | - Management of taxonomic tables (i.e., species lists).                                            |
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/4/data_tools.PNG      | - Add, view, edit, clone, delete data.                                                             |
+|                                                                                         | - Data queries, and access to data cleansing.                                                      |
+|                                                                                         | - Map view & data editing; access to Earth Map.                                                    |
+|                                                                                         | - Data visualization (under development).                                                          |
+|                                                                                         | - Export data into Comma Separated Files (CSV).                                                    |
+|                                                                                         | - Import CSV/Collect/Collect Mobile data.                                                          |
+|                                                                                         | - Data validation report, and access to data cleansing.                                            |
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/4/analysis_tools.PNG  | - Create, edit, delete data processing chains,run RStudio.                                         |
+|                                                                                         | - Show/stop RStudio (online) server (running process).                                             |
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/4/users_tools.PNG     | - User management.                                                                                 |
+|                                                                                         | - Invitation of new users.                                                                         |
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/4/help_tools.PNG      | - Link to this manual .                                                                            |
+|                                                                                         | - Arena version number, links to Arena repositories in GitHub.                                     |
+|                                                                                         | - Legal Disclaimer.                                                                                |
++-----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:820: ERROR: Malformed table.
+
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Method                       |   Icon                                                                                   |    Explanation                                                                   |
++==============================+==========================================================================================+==================================================================================+
+| Add a new subpage            + .. image:: _static/media/Images/7/7.2/subpage_icon.png + Add a new entity (table/form)                                                    |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Define the number of columns + .. image:: _static/media/Images/7/7.2/columns_icon.png + The default number of columns is 3, this can be changed [1 - 12]                 |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Add a new object             + .. image:: _static/media/Images/7/7.2/add_object.PNG   +  add a new entity or attribute                                                   |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Delete an object             + .. image:: _static/media/Images/7/7.2/delete_object.PNG+  deletes an entity or attribute                                                  |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Rename an object             + .. image:: _static/media/Images/7/7.2/rename_object.PNG+ change name of attribute (except for published surveys )                         |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Resize an object             + .. image:: _static/media/Images/7/7.2/resize_icon.PNG  + Move the cursor to the lower right corner of the object, and then drag to resize |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Change order of attributes   +                                                                                          + Drag to an object and drop it to a new place in the forms                        |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Preview the survey           + .. image:: _static/media/Images/7/7.2/preview_icon.png + Previews a survey                                                                |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Move up/down                 + .. image:: _static/media/Images/7/7.2/move_icon.png    + Moves a selected node up or down                                                 |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+
+| Add/Edit objects' properties + .. image:: _static/media/Images/7/7.2/edit_object.PNG  + Adds/changes all properties e.g. labels,default values,validation rules          |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------+[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:854: ERROR: Malformed table.
+
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Data Type                    |   Icon                                                                                   |             Notes                                                                                  |
++==============================+==========================================================================================+====================================================================================================+
+| Boolean                      + .. image:: _static/media/Images/7/7.2/boolean_icon.png + True/false ;yes/no                                                                                 |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Code                         + .. image:: _static/media/Images/7/7.2/code_icon.png    + Refers to categorical variables ie code lists. Will be explained further in the Categories Chapter |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Coordinate                   + .. image:: _static/media/Images/7/7.2/coordinate.png   + Enters  geographical coordinates.                                                                  |
+|                              +                                                                                          + Optional properties: accuracy, altitude, altitude accuracy                                         |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Date                         + .. image:: _static/media/Images/7/7.2/date_icon.png    + Entered in dd/mm/yyyy format                                                                       |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Time                         + .. image:: _static/media/Images/7/7.2/time_icon.png    + Entered in HH:MM format                                                                            |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| File                         + .. image:: _static/media/Images/7/7.2/file_icon.png    + Allows upload of files(photo,audio,video,documents)                                                |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Integer                      + .. image:: _static/media/Images/7/7.2/integer_icon.png + Numbers with no decimal digits                                                                     |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Numeric                      + .. image:: _static/media/Images/7/7.2/numeric_icon.png + Numbers with decimal digits .Default number of decimals (6 digits)                                 |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Taxon                        + .. image:: _static/media/Images/7/7.2/taxon_icon.png   + Read more at Taxonomies                                                                            |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
+| Text                         + .. image:: _static/media/Images/7/7.2/text_icon.png    + Allows to add free text                                                                            |
++------------------------------+------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:1047: ERROR: Malformed table.
+
++------------------------------+------------------------------------------------------------------------------------------+
+|Command Button                |   Icon                                                                                   |
++==============================+==========================================================================================+
+| Edit                         + .. image:: _static/media/Images/9/9.2/edit_icon.png    |
++------------------------------+------------------------------------------------------------------------------------------+
+| Delete                       + .. image:: _static/media/Images/9/9.2/delete_icon.png  |
++------------------------------+------------------------------------------------------------------------------------------+
+| View Locked Records          + .. image:: _static/media/Images/9/9.2/lockdrecord.png  |
+|                              +                                                                                          |
++------------------------------+------------------------------------------------------------------------------------------+
+| Sorting/Odering Records      + .. image:: _static/media/Images/9/9.2/sorted_recds.png |
++------------------------------+------------------------------------------------------------------------------------------+[39;49;00m
+/home/dguerrero/1_modules/arena/docs/index.rst:1368: CRITICAL: Title level inconsistent:
+
+Viewing Map Data
+^^^^^^^^^^^^^^^^
+/home/dguerrero/1_modules/arena/docs/index.rst:1444: CRITICAL: Title level inconsistent:
+
+Sample-based Image Interpretation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:1502: ERROR: Malformed table.
+
++---------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/9/9.6/sampling_point_item.png               | **Sampling point Item**                                                                                |
+|                                                                                                               | -Level code (in the Sampling Point Data),coordinates,elevation (derived from)                          |
+|                                                                                                               | `Open Topo Data <https://www.opentopodata.org/>`_                                                      |
+|                                                                                                               | -‘Create new record’ button,                                                                           |
+|                                                                                                               | -Previous (<=) / Next (=>) buttons: move to the previous/next item in the Sampling Point Data table.   |
+|                                                                                                               |                                                                                                        |
++---------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/9/9.6/coordinate_record.PNG                 | **A record with coordinate data**                                                                      |
+|                                                                                                               | - record’s key attributes                                                                              |
+|                                                                                                               | - coordinates (SRS as in imputed data) and elevation                                                   |
+|                                                                                                               | - "Edit Record"  button                                                                                |
+|                                                                                                               | - Owner of the record                                                                                  |
+|                                                                                                               | - Previous (<=) / Next (=>) buttons: move to the previous/next record in the record list               |
++---------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+
+| .. image:: _static/media/Images/9/9.6/extend_icon.PNG                       | -In the Edit Record view, this button opens up a floatable browser window that can be moved            |
+|                                                                                                               | (for example to a second monitor)                                                                      |
++---------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------+[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:1633: ERROR: Malformed table.
+
++---------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+
+| .. image:: _static/media/Images/9/9.7/data_export_options.png   + - For categorical data,exports both code and labels(2 columns)            |
+|                                                                                                   + - Includes category tables as separate files.                             |
+|                                                                                                   + - Include computed result variables from RStudio process.                 |
+|                                                                                                   + - In case of a multicycle survey, you can export data from all cycles.    |
+|                                                                                                   + - Include all files (e.g. images, documents)                              |
++---------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+[39;49;00m
+[31m/home/dguerrero/1_modules/arena/docs/index.rst:1736: ERROR: Malformed table.
+
++---------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+
+| .. image:: _static/media/Images/9/9.8/updating_options.png      + - Allow/Prevent adding new entities, such as new sample plots into the    |
+|                                                                                                   +   database.[default:Allow]                                                |
+|                                                                                                   +                                                                           |
+|                                                                                                   + - Allow/Prevent updating records that are locked (i.e. in the Analysis    |
+|                                                                                                   +   stage) [default:Prevent]                                                |
++---------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/index.rst:1540: WARNING: Footnote [4] is not referenced.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/index.rst:3157: WARNING: Footnote [#] is not referenced.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/index.rst:3159: WARNING: Footnote [#] is not referenced.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/index.rst:3161: WARNING: Footnote [#] is not referenced.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/index.rst:3163: WARNING: Footnote [#] is not referenced.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/index.rst:3165: WARNING: Footnote [#] is not referenced.[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/Jinja2-3.1.3.dist-info/LICENSE.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/MarkupSafe-2.1.5.dist-info/LICENSE.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/alabaster-0.7.16.dist-info/LICENSE.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/argcomplete-3.2.3.dist-info/LICENSE.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/bleach/_vendor/README.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/bleach/_vendor/html5lib-1.1.dist-info/AUTHORS.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/click-8.1.7.dist-info/LICENSE.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/imagesize-1.4.1.dist-info/LICENSE.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/mistune-0.8.4.dist-info/DESCRIPTION.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/prompt_toolkit-3.0.43.dist-info/AUTHORS.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/base.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/class.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx/ext/autosummary/templates/autosummary/module.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/sphinx_intl-2.1.0.dist-info/AUTHORS.rst: WARNING: document isn't included in any toctree[39;49;00m
+[91m/home/dguerrero/1_modules/arena/docs/.nox/docs/lib/python3.10/site-packages/webencodings-0.5.1.dist-info/DESCRIPTION.rst: WARNING: document isn't included in any toctree[39;49;00m
