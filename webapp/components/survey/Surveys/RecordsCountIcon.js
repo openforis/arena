@@ -3,38 +3,46 @@ import PropTypes from 'prop-types'
 
 import { AppInfo } from '@core/app/appInfo'
 
-const getAppIdWithMoreRecords = (recordsCountByApp) => {
-  const sortedEntries = Object.entries(recordsCountByApp).sort(
-    ({ count: count1 }, { count: count2 }) => count1 - count2
-  )
-  const firstEntry = sortedEntries[0]
-  const firstEntryKey = firstEntry?.[0]
-  return firstEntryKey ?? AppInfo.arenaAppId
-}
+import { AppIcon } from '@webapp/components/AppIcon'
+import { useI18n } from '@webapp/store/system'
 
-const iconByAppId = {
-  [AppInfo.arenaAppId]: 'of_arena_icon.png',
-  [AppInfo.arenaMobileId]: 'of_arena_mobile_icon.png',
-}
+const multipleAppsIconOffset = 8
+const appIconZindexStart = 100
 
-const unknownAppIcon = 'question_mark_icon_20x20.png'
-
-const appNameById = {
-  [AppInfo.arenaAppId]: 'Arena',
-  [AppInfo.arenaMobileId]: 'Arena Mobile',
-}
+const getSortedAppCountsEntries = (recordsCountByApp) =>
+  Object.entries(recordsCountByApp).sort(([_id1, count1], [_id2, count2]) => count2 - count1)
 
 export const RecordsCountIcon = (props) => {
   const { item } = props
   const { recordsCount, recordsCountByApp } = item
 
-  const moreRecordsAppId = getAppIdWithMoreRecords(recordsCountByApp)
-  const icon = iconByAppId[moreRecordsAppId] ?? unknownAppIcon
-  const appName = appNameById[moreRecordsAppId] ?? moreRecordsAppId
+  const i18n = useI18n()
+
+  const sortedAppCountsEntries = getSortedAppCountsEntries(recordsCountByApp)
+  const multipleApps = sortedAppCountsEntries.length > 1
+
+  const countSummary = multipleApps
+    ? `${i18n.t('surveysView.recordsCreatedWithMoreApps')} 
+${sortedAppCountsEntries.map(([appId, count]) => `${AppInfo.getAppNameById(appId)}: ${count}`).join('\n')}`
+    : undefined
+
   return (
     <div className="records-count">
       <span>{recordsCount}</span>
-      <img src={`/img/${icon}`} height={20} alt={moreRecordsAppId} title={appName} />
+      <span className="app-icons-wrapper">
+        {sortedAppCountsEntries.map(([appId], index) => (
+          <AppIcon
+            key={appId}
+            appId={appId}
+            style={{
+              position: 'absolute',
+              zIndex: appIconZindexStart - index,
+              left: `${multipleAppsIconOffset * index}px`,
+            }}
+            title={multipleApps ? countSummary : undefined}
+          />
+        ))}
+      </span>
     </div>
   )
 }

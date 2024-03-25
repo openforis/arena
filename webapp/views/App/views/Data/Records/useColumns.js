@@ -16,6 +16,7 @@ import { useUser } from '@webapp/store/user'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
+import { AppIcon } from '@webapp/components/AppIcon'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()
@@ -82,10 +83,16 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       })),
       {
         key: Record.keys.dateCreated,
+        className: 'date-created-col',
         header: 'common.dateCreated',
         sortable: true,
-        renderItem: ({ item: record }) => DateUtils.formatDateTimeDisplay(Record.getDateCreated(record)),
-        width: '11rem',
+        renderItem: ({ item: record }) => (
+          <>
+            {DateUtils.formatDateTimeDisplay(Record.getDateCreated(record))}
+            <AppIcon appId={Record.getCreatedWithAppId(record)} />
+          </>
+        ),
+        width: '12rem',
       },
       {
         key: Record.keys.dateModified,
