@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
+import { DbOrder } from '@server/db'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
@@ -122,13 +123,13 @@ const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
 const _usersSelectQuery = ({
   selectFields,
   sortBy = userSortBy.email,
-  sortOrder = 'ASC',
+  sortOrder = DbOrder.asc,
   includeSurveys = false,
   whereConditions = [],
 }) => {
   // check sort by parameters
-  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
-  const orderByDirection = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+  const orderBy = orderByFieldBySortBy[sortBy] ?? 'email'
+  const orderByDirection = DbOrder.normalize(sortOrder)
 
   const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
 
@@ -156,7 +157,7 @@ const _usersSelectQuery = ({
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
     ${whereClause}
-    ORDER BY ${orderBy} ${orderByDirection}`
+    ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
 
 export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
