@@ -23,7 +23,12 @@ export const RecordsCountIcon = (props) => {
 
   const countSummary = multipleApps
     ? `${i18n.t('surveysView.recordsCreatedWithMoreApps')} 
-${sortedAppCountsEntries.map(([appId, count]) => `${AppInfo.getAppNameById(appId)}: ${count}`).join('\n')}`
+${sortedAppCountsEntries
+  .map(([appId, count]) => {
+    const appName = AppInfo.getAppNameById(appId)
+    return `${appName}: ${count}`
+  })
+  .join('\n')}`
     : undefined
 
   return (
