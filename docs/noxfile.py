@@ -26,4 +26,4 @@ def docs(session):
     session.run("sphinx-build", "-b", "html", source, html, "-w", "warnings.txt")
 
     # check for untracked documentation warnings
-    session.run("python", "tests/check_warnings.py")
+    session.run("python", "_tests/check_warnings.py")
