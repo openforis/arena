@@ -17,7 +17,7 @@ const nodeDefToItem = (nodeDef) => ({
 })
 
 export const BaseUnitCodeAttributeSelector = (props) => {
-  const { allowEmptySelection, info, label, onChange: onChangeProp, selectedNodeDefUuid } = props
+  const { allowEmptySelection, info, label, nodeDefFilter, onChange: onChangeProp, selectedNodeDefUuid } = props
 
   const i18n = useI18n()
   const chain = useChain()
@@ -42,13 +42,14 @@ export const BaseUnitCodeAttributeSelector = (props) => {
             // only code attributes
             NodeDef.isCode(descendantDef) &&
             // avoid duplicates
-            !result.some(NodeDef.isEqual(descendantDef))
+            !result.some(NodeDef.isEqual(descendantDef)) &&
+            (!nodeDefFilter || nodeDefFilter(descendantDef))
         )
       )
     })(survey)
 
     return result
-  }, [baseUnitNodeDef, survey])
+  }, [baseUnitNodeDef, nodeDefFilter, survey])
 
   const onChange = useCallback((item) => onChangeProp(item?.value), [onChangeProp])
 
@@ -69,6 +70,7 @@ BaseUnitCodeAttributeSelector.propTypes = {
   allowEmptySelection: PropTypes.bool,
   info: PropTypes.string,
   label: PropTypes.string.isRequired,
+  nodeDefFilter: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   selectedNodeDefUuid: PropTypes.string,
 }

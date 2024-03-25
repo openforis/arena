@@ -98,7 +98,7 @@ const assocClusteringNodeDefUuid = (clusteringNodeDefUuid) =>
   A.assoc(keysProps.clusteringNodeDefUuid, clusteringNodeDefUuid)
 
 const assocFirstPhaseCategoryUuid = (firstPhaseCategoryUuid) =>
-  A.assoc(keysProps.firstPhaseCategoryUuid, firstPhaseCategoryUuid)
+  A.pipe(dissocFirstPhaseCommonAttributeUuid, A.assoc(keysProps.firstPhaseCategoryUuid, firstPhaseCategoryUuid))
 
 const assocFirstPhaseCommonAttributeUuid = (firstPhaseCommonAttributeUuid) =>
   A.assoc(keysProps.firstPhaseCommonAttributeUuid, firstPhaseCommonAttributeUuid)
