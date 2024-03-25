@@ -31,6 +31,7 @@ export const exportSurvey =
             href={`/api/survey/${surveyId}/export/download`}
             requestParams={{ fileName, surveyName, includeData, includeActivityLog }}
             onClick={() => dispatch(JobActions.hideJobMonitor())}
+            primary
           />
         ),
       })

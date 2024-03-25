@@ -987,6 +987,11 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
     firstPhaseCategory: '1st phase category',
+    firstPhaseCommonAttribute: {
+      label: 'Common attribute',
+      info: `Attribute in common between base unit and 1st phase table 
+(it must be a code attribute with the same name of an extra property defined for the 1st phase category)`,
+    },
     formLabel: 'Processing chain label',
     basic: 'Basic',
     records: 'Records',
