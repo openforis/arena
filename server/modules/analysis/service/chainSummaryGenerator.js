@@ -146,6 +146,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   // const postStratificationAttributeDef = getNodeDefByUuid(
   //   ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
   // )
+  const firstPhaseCommonAttributeDef = getNodeDefByUuid(
+    ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(chainSamplingDesign)
+  )
   const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
@@ -182,6 +185,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
             categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
           }),
         }
+      : {}),
+    ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
       ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank
