@@ -7,5 +7,13 @@
       pointer-events: none;
       top: 0.5rem;
     }
+    .date-created-col {
+      display: flex;
+      align-items: center;
+
+      .app-icon {
+        margin: 2px;
+      }
+    }
   }
 }

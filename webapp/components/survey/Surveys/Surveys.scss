@@ -14,5 +14,11 @@
     align-items: center;
     justify-content: end;
     gap: 0.2rem;
+
+    .app-icons-wrapper {
+      position: relative;
+      width: 30px;
+      height: 20px;
+    }
   }
 }
