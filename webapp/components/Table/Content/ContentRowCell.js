@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 export const ContentRowCell = (props) => {
   const { active, cellTestIdExtractor, column, item, itemPosition, itemSelected, initData } = props
@@ -12,4 +13,14 @@ export const ContentRowCell = (props) => {
       {renderItem({ active, item, itemPosition, itemSelected, initData })}
     </div>
   )
+}
+
+ContentRowCell.propTypes = {
+  active: PropTypes.bool,
+  cellTestIdExtractor: PropTypes.func,
+  column: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired,
+  itemPosition: PropTypes.number,
+  itemSelected: PropTypes.object,
+  initData: PropTypes.func,
 }
