@@ -16,11 +16,11 @@ export const ContentRowCell = (props) => {
 }
 
 ContentRowCell.propTypes = {
-  active: PropTypes.bool,
+  active: PropTypes.bool.isRequired,
   cellTestIdExtractor: PropTypes.func,
   column: PropTypes.object.isRequired,
   item: PropTypes.object.isRequired,
-  itemPosition: PropTypes.number,
-  itemSelected: PropTypes.object,
-  initData: PropTypes.func,
+  itemPosition: PropTypes.number.isRequired,
+  itemSelected: PropTypes.bool.isRequired,
+  initData: PropTypes.func.isRequired,
 }
