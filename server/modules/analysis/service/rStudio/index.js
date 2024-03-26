@@ -1,27 +1,29 @@
 import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 
-const rstudioCodeTokens = {}
-const EXPIRATION_RSTUDIO_TOKEN = 48 * 60 * 60 * 1000 // 48h
+const tokenInfoByToken = {}
+const TOKEN_EXPIRATION = 48 * 60 * 60 * 1000 // 48h
 
 export const generateRStudioToken = ({ chainUuid }) => {
   const token = uuidv4()
-  rstudioCodeTokens[token] = { chainUuid, createdAt: Date.now() }
+  tokenInfoByToken[token] = { chainUuid, createdAt: Date.now() }
 
   setTimeout(() => {
-    delete rstudioCodeTokens[token]
-  }, EXPIRATION_RSTUDIO_TOKEN)
+    delete tokenInfoByToken[token]
+  }, TOKEN_EXPIRATION)
 
   return token
 }
 
 const isRStudioTokenValid = ({ token, chainUuid }) => {
-  const chain = rstudioCodeTokens[token]
-  if (!chain) return false
-  const { chainUuid: chainUuidSaved, createdAt } = chain
+  const tokenInfo = tokenInfoByToken[token]
+  if (!tokenInfo) return false
+
+  const { chainUuid: chainUuidSaved, createdAt } = tokenInfo
+
   if (chainUuidSaved !== chainUuid) return false
-  if (createdAt + EXPIRATION_RSTUDIO_TOKEN < Date.now()) return false
-  return true
+
+  return createdAt + TOKEN_EXPIRATION >= Date.now()
 }
 
 export const checkRStudioToken = ({ token, chainUuid }) => {
