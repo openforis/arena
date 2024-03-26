@@ -31,15 +31,19 @@ export default class ListTaxonomies {
   }
 
   initTaxonomy(taxonomy) {
-    const { survey } = this.rChain
+    const { survey, token } = this.rChain
     const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     // get taxa
     const dfTaxonomyyItems = this.getDfTaxonomyItems(taxonomy)
-    const getTaxonomyItems = arenaGet(ApiRoutes.rChain.taxonomyItemsData(Survey.getId(survey), taxonomyUuid), {
-      language: `'${language}'`,
-    })
+    const getTaxonomyItems = arenaGet(
+      ApiRoutes.rChain.taxonomyItemsData({ surveyId: Survey.getId(survey), taxonomyUuid }),
+      {
+        language: `'${language}'`,
+        token: `'${token}'`,
+      }
+    )
 
     this.scripts.push(setVar(dfTaxonomyyItems, getTaxonomyItems))
   }

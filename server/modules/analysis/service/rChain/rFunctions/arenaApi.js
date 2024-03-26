@@ -11,6 +11,7 @@ export const arenaPost = (url, params = {}) => `arena.post('${url}', body = ${li
 
 export const arenaPut = (url, params = {}) => `arena.put('${url}', body = ${list(params)})`
 
-export const arenaPutFile = (url, filePath) => `arena.putFile('${url}', filePath = '${filePath}')`
+export const arenaPutFile = (url, filePath, params = {}) =>
+  `arena.putFile('${url}', filePath = '${filePath}',  body = ${list(params)})`
 
 export const arenaDelete = (url, params = {}) => `arena.delete('${url}', body = ${list(params)})`

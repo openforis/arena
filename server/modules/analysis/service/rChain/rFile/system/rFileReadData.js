@@ -45,7 +45,7 @@ export default class RFileReadData extends RFileSystem {
   }
 
   async initEntitiesData() {
-    const { chainUuid, survey, cycle, entities } = this.rChain
+    const { chainUuid, survey, cycle, entities, token } = this.rChain
 
     await PromiseUtils.each(entities, async (entityDef) => {
       // Fetch entity data
@@ -56,7 +56,8 @@ export default class RFileReadData extends RFileSystem {
           cycle,
           chainUuid,
           entityUuid: NodeDef.getUuid(entityDef),
-        })
+        }),
+        { token: `'${token}'` }
       )
       await this.appendContent(setVar(dfName, dataCSV))
       await this.appendContentToConvertDataTypes({ entityDef })
@@ -66,7 +67,7 @@ export default class RFileReadData extends RFileSystem {
   }
 
   async initMultipleAttributesData({ entityDef }) {
-    const { chainUuid, survey, cycle } = this.rChain
+    const { chainUuid, survey, cycle, token } = this.rChain
 
     const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, false)(survey).filter(NodeDef.isMultipleAttribute)
     await PromiseUtils.each(multipleAttrDefs, async (multipleAttrDef) => {
@@ -77,7 +78,8 @@ export default class RFileReadData extends RFileSystem {
           cycle,
           chainUuid,
           attributeDefUuid: NodeDef.getUuid(multipleAttrDef),
-        })
+        }),
+        { token: `'${token}'` }
       )
       await this.appendContent(setVar(dfName, dataCSV))
     })

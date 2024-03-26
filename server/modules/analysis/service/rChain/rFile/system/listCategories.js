@@ -31,15 +31,20 @@ export default class ListCategories {
   }
 
   initCategory(category) {
-    const { survey } = this.rChain
+    const { chainUuid, survey, token } = this.rChain
+
     const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
     const categoryUuid = Category.getUuid(category)
 
     // get category items
     const dfCategoryItems = this.getDfCategoryItems(category)
-    const getCategoryItems = arenaGetCSV(ApiRoutes.rChain.categoryItemsCsv(Survey.getId(survey), categoryUuid), {
-      language: `'${language}'`,
-    })
+    const getCategoryItems = arenaGetCSV(
+      ApiRoutes.rChain.categoryItemsCsv({ surveyId: Survey.getId(survey), chainUuid, categoryUuid }),
+      {
+        language: `'${language}'`,
+        token: `'${token}'`,
+      }
+    )
 
     this.scripts.push(setVar(dfCategoryItems, getCategoryItems))
   }

@@ -7,7 +7,7 @@ import { AppIcon } from '@webapp/components/AppIcon'
 import { useI18n } from '@webapp/store/system'
 
 const multipleAppsIconOffset = 8
-const appIconZindexStart = 100
+const appIconZindexStart = 5
 
 const getSortedAppCountsEntries = (recordsCountByApp) =>
   Object.entries(recordsCountByApp).sort(([_id1, count1], [_id2, count2]) => count2 - count1)
