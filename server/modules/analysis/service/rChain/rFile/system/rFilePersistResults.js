@@ -8,7 +8,7 @@ import { writeCsv, arenaPutFile, zipr } from '../../rFunctions'
 import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
 
 const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
-  const { chainUuid, surveyId, cycle, dirResults, token } = rChain
+  const { chainUuid, surveyId, cycle, dirResults } = rChain
   const { name: dfResultName, dfSourceName } = dfResults
   const scripts = []
 
@@ -22,8 +22,7 @@ const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   scripts.push(
     arenaPutFile(
       ApiRoutes.rChain.entityData({ surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }),
-      fileZip,
-      { token: `'${token}'` }
+      fileZip
     )
   )
   return scripts

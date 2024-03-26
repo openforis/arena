@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
+
 import * as ApiRoutes from '@common/apiRoutes'
 
 import { arenaGet, dfVar, setVar } from '../../rFunctions'
@@ -31,19 +32,12 @@ export default class ListTaxonomies {
   }
 
   initTaxonomy(taxonomy) {
-    const { survey, token } = this.rChain
-    const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+    const { surveyId } = this.rChain
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     // get taxa
     const dfTaxonomyyItems = this.getDfTaxonomyItems(taxonomy)
-    const getTaxonomyItems = arenaGet(
-      ApiRoutes.rChain.taxonomyItemsData({ surveyId: Survey.getId(survey), taxonomyUuid }),
-      {
-        language: `'${language}'`,
-        token: `'${token}'`,
-      }
-    )
+    const getTaxonomyItems = arenaGet(ApiRoutes.rChain.taxonomyItemsData({ surveyId, taxonomyUuid }))
 
     this.scripts.push(setVar(dfTaxonomyyItems, getTaxonomyItems))
   }

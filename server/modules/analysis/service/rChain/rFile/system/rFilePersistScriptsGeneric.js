@@ -10,13 +10,13 @@ import { arenaPutFile, dirCreate, unlink, zipr } from '../../rFunctions'
  */
 export default class RFilePersistScriptsGeneric extends RFileSystem {
   async appendSendToServerScripts({ dirName, zipName }) {
-    const { surveyId, chainUuid, dirResults, token } = this.rChain
+    const { surveyId, chainUuid, dirResults } = this.rChain
     const zipFile = FileUtils.join(dirResults, zipName)
 
     await this.logInfo(`'Persisting ${zipName} started'`)
     await this.appendContent(
       zipr(zipFile, dirName),
-      arenaPutFile(ApiRoutes.rChain.chainUserScripts({ surveyId, chainUuid }), zipFile, { token: `'${token}'` })
+      arenaPutFile(ApiRoutes.rChain.chainUserScripts({ surveyId, chainUuid }), zipFile)
     )
     await this.logInfo(`'Persisting ${zipName} completed'`)
   }

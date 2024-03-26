@@ -98,7 +98,12 @@ class RChain {
   }
 
   get serverUrl() {
-    return this._serverUrl
+    let url = this._serverUrl
+    if (url.startsWith('http://') && !url.startsWith('http://localhost')) {
+      url = url.replace('http://', 'https://')
+    }
+    url = StringUtils.appendIfMissing('/')(url)
+    return url
   }
 
   get token() {

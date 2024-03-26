@@ -1,4 +1,7 @@
 import * as PromiseUtils from '@core/promiseUtils'
+import { quote } from '@core/stringUtils'
+import * as Survey from '@core/survey/survey'
+
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import RFileSystem from './rFileSystem'
@@ -38,11 +41,13 @@ export default class RFileInit extends RFileSystem {
       await Promise.all([FileUtils.copyFile(fileInitSrc, fileInitDest), this.appendContent(source(fileInitSourcePath))])
     })
 
-    let serverUrl = this.rChain.serverUrl
-    const { token } = this.rChain
-    if (serverUrl.startsWith('http://') && !serverUrl.startsWith('http://localhost')) {
-      serverUrl = serverUrl.replace('http://', 'https://')
-    }
-    return this.appendContent(setVar('arena.token', `'${token}'`), setVar('arena.host', `'${serverUrl}/'`))
+    const { survey, serverUrl, token } = this.rChain
+    const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+
+    return this.appendContent(
+      setVar('arena.token', quote(token)),
+      setVar('arena.host', quote(serverUrl)),
+      setVar('arena.preferredLanguage', quote(language))
+    )
   }
 }
