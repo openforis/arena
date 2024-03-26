@@ -2,7 +2,7 @@ import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 
 const rstudioCodeTokens = {}
-const EXPIRATION_RSTUDIO_TOKEN = 60 * 60 * 1000
+const EXPIRATION_RSTUDIO_TOKEN = 48 * 60 * 60 * 1000 // 48h
 
 export const generateRStudioToken = ({ chainUuid }) => {
   const token = uuidv4()
