@@ -1,4 +1,5 @@
 import './EntitySelectorTreeNode.scss'
+
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'

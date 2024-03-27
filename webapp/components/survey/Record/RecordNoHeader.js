@@ -1,9 +1,10 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import Record from './Record'
 import SurveyDefsLoader from '../SurveyDefsLoader/SurveyDefsLoader'
 
-export const RecordNoHeader = (props) => {
+const RecordNoHeader = (props) => {
   const { recordUuid, pageNodeUuid } = props
 
   return (
@@ -12,3 +13,10 @@ export const RecordNoHeader = (props) => {
     </SurveyDefsLoader>
   )
 }
+
+RecordNoHeader.propTypes = {
+  recordUuid: PropTypes.string.isRequired,
+  pageNodeUuid: PropTypes.string,
+}
+
+export default RecordNoHeader

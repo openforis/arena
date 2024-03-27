@@ -17,7 +17,8 @@ import { FileUploadDialog } from './FileUploadDialog'
 import ServiceErrors from './ServiceErrors'
 import SideBar from './SideBar'
 
-import Analysis from './views/Analysis' // TODO load Analysis module lazily
+// import Analysis from './views/Analysis' // TODO load Analysis module lazily
+const Analysis = React.lazy(() => import('./views/Analysis'))
 const Data = React.lazy(() => import('./views/Data'))
 const Designer = React.lazy(() => import('./views/Designer'))
 const Home = React.lazy(() => import('./views/Home'))
