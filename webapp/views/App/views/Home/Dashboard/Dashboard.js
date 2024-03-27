@@ -18,7 +18,7 @@ import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogM
 import { useRecordsSummary } from './RecordsSummaryPeriodSelector/store'
 import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 import { RecordsSummaryContext } from './RecordsSummaryContext'
-import RecordsByUser from './UserSummary/RecordsByUser'
+import { RecordsByUser } from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 import TotalRecordsSummaryChart from './TotalRecordsSummaryChart'
 
