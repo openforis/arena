@@ -1087,6 +1087,9 @@ $t(common.cantUndoWarning)`,
     entityWithoutData: 'Entity {{name}} has no data; $t(chain.entityExcludedInRStudioScripts)',
     entityNotInCurrentCycle:
       'Entity {{name}} is not available in the selected cycle; $t(chain.entityExcludedInRStudioScripts)',
+    error: {
+      invalidToken: 'Invalid or expired token',
+    },
   },
 
   itemsTable: {

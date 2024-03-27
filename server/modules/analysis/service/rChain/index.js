@@ -24,8 +24,8 @@ import * as AnalysisManager from '../../manager'
 import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
 
-export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
-  new RChain(surveyId, cycle, chainUuid, serverUrl).init()
+export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
+  new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
 export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {

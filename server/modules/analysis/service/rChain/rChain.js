@@ -37,13 +37,14 @@ const FILE_R_PROFILE = FileUtils.join(__dirname, 'rFile', '.Rprofile')
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
 
 class RChain {
-  constructor(surveyId, cycle, chainUuid, serverUrl) {
+  constructor({ surveyId, cycle, chainUuid, serverUrl, token }) {
     this._surveyId = surveyId
     this._survey = null
     this._cycle = cycle
     this._chainUuid = chainUuid
     this._chain = null
     this._serverUrl = serverUrl
+    this._token = token
 
     this._dirNames = RChain.dirNames
     this._dir = null
@@ -97,7 +98,16 @@ class RChain {
   }
 
   get serverUrl() {
-    return this._serverUrl
+    let url = this._serverUrl
+    if (url.startsWith('http://') && !url.startsWith('http://localhost')) {
+      url = url.replace('http://', 'https://')
+    }
+    url = StringUtils.appendIfMissing('/')(url)
+    return url
+  }
+
+  get token() {
+    return this._token
   }
 
   get cycle() {
