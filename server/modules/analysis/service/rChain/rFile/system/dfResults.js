@@ -1,3 +1,4 @@
+import { quote } from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { ColumnNodeDef, TableNode, ViewDataNodeDef } from '@common/model/db'
@@ -73,7 +74,7 @@ export default class DfResults {
       ? Survey.getNodeDefParent(this.entity)(this.survey)
       : this.entity
     const setUuids = [
-      { name: NodeDef.keysPropsAdvanced.chainUuid, value: `'${this.rChain.chainUuid}'` },
+      { name: NodeDef.keysPropsAdvanced.chainUuid, value: quote(this.rChain.chainUuid) },
       {
         name: TableNode.columnSet.recordUuid,
         value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),

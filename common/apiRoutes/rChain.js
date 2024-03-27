@@ -1,22 +1,25 @@
 import { getSurveyPath } from '@common/apiRoutes/survey'
 
-const getRChainPath = (surveyId) => `${getSurveyPath(surveyId)}/rChain`
+const getRChainPath = ({ surveyId, chainUuid }) => `${getSurveyPath(surveyId)}/rChain/chains/${chainUuid}`
 
-const getRChainCyclePath = (surveyId, cycle) => `${getRChainPath(surveyId)}/cycles/${cycle}`
+const getRChainCyclePath = ({ surveyId, chainUuid, cycle }) =>
+  `${getRChainPath({ surveyId, chainUuid })}/cycles/${cycle}`
 
 // chain
-export const chainStatusExec = (surveyId, chainUuid) => `${getRChainPath(surveyId)}/chains/${chainUuid}/statusExec`
-export const chainUserScripts = (surveyId, chainUuid) => `${getRChainPath(surveyId)}/chains/${chainUuid}/userScripts`
+export const chainStatusExec = ({ surveyId, chainUuid }) => `${getRChainPath({ surveyId, chainUuid })}/statusExec`
+export const chainUserScripts = ({ surveyId, chainUuid }) => `${getRChainPath({ surveyId, chainUuid })}/userScripts`
 
 // category
-export const categoryItemsCsv = (surveyId, categoryUuid) => `${getRChainPath(surveyId)}/categories/${categoryUuid}.csv`
+export const categoryItemsCsv = ({ surveyId, chainUuid, categoryUuid }) =>
+  `${getRChainPath({ surveyId, chainUuid })}/categories/${categoryUuid}.csv`
 
 // taxonomy
-export const taxonomyItemsData = (surveyId, taxonomyUuid) => `${getRChainPath(surveyId)}/taxonomies/${taxonomyUuid}`
+export const taxonomyItemsData = ({ surveyId, chainUuid, taxonomyUuid }) =>
+  `${getRChainPath({ surveyId, chainUuid })}/taxonomies/${taxonomyUuid}`
 
 // entity
-export const entityData = ({ surveyId, cycle, chainUuid, entityUuid }) =>
-  `${getRChainCyclePath(surveyId, cycle)}/chains/${chainUuid}/entities/${entityUuid}/data`
+export const entityData = ({ surveyId, chainUuid, cycle, entityUuid }) =>
+  `${getRChainCyclePath({ surveyId, chainUuid, cycle })}/entities/${entityUuid}/data`
 
-export const multipleAttributeData = ({ surveyId, cycle, chainUuid, attributeDefUuid }) =>
-  `${getRChainCyclePath(surveyId, cycle)}/chains/${chainUuid}/attributes/${attributeDefUuid}/data`
+export const multipleAttributeData = ({ surveyId, chainUuid, cycle, attributeDefUuid }) =>
+  `${getRChainCyclePath({ surveyId, chainUuid, cycle })}/attributes/${attributeDefUuid}/data`

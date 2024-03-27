@@ -4,6 +4,8 @@ import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
 
+import { quote } from '@core/stringUtils'
+
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
@@ -429,7 +431,7 @@ export const fetchRecordsCountByRootNodesValue = async (
       ON ${filterColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
       ON n.record_uuid = r.record_uuid
-      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
+      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => quote(NodeDef.getUuid(nodeDefKey))).join(', ')})
     WHERE
       ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $/cycle/
       AND ${filterCondition}
