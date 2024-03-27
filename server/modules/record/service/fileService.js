@@ -57,6 +57,16 @@ export const fetchFilesStatistics = async ({ surveyId }) => {
   }
 }
 
+export const cleanupAllSurveysFilesProps = async () => {
+  const surveyIds = await SurveyManager.fetchAllSurveyIds()
+  let count = 0
+  for await (const surveyId of surveyIds) {
+    const cleanedFiles = await FileManager.cleanupSurveyFilesProps({ surveyId })
+    count += cleanedFiles
+  }
+  return count
+}
+
 export const {
   // CREATE
   insertFile,

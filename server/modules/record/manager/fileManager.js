@@ -143,4 +143,5 @@ export const {
   // UPDATE
   markRecordFilesAsDeleted,
   updateFileProps,
+  cleanupSurveyFilesProps,
 } = FileRepository

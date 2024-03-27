@@ -26,6 +26,9 @@ export default class FilesImportJob extends Job {
       this.total = filesSummaries.length
       for await (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
+
+        file = RecordFile.cleanupInvalidProps(file)
+
         // load file content from a separate file
         const fileUuid = RecordFile.getUuid(fileSummary)
         const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
