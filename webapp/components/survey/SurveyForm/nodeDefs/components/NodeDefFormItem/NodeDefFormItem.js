@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { FormItem } from '@webapp/components/form/Input'
-
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { FormItem } from '@webapp/components/form/Input'
+
 import * as NodeDefUiProps from '../../nodeDefUIProps'
+
 import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 
 const NodeDefFormItem = (props) => {

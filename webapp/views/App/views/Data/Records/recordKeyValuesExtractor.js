@@ -1,10 +1,10 @@
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
+import * as DateUtils from '@core/dateUtils'
+import * as Record from '@core/record/record'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Record from '@core/record/record'
-import * as DateUtils from '@core/dateUtils'
+import * as Survey from '@core/survey/survey'
 
 const valueFormattersByType = {
   [NodeDef.nodeDefType.code]: ({ cycle, nodeDef, value: code, categoryItemsByCodeDefUuid, lang }) => {

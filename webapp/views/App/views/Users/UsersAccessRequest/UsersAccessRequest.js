@@ -4,22 +4,20 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as UserAccessRequest from '@core/user/userAccessRequest'
 import { Countries } from '@core/Countries'
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
-
-import Table from '@webapp/components/Table/Table'
-import PanelRight from '@webapp/components/PanelRight'
-
-import { useI18n } from '@webapp/store/system'
-import * as API from '@webapp/service/api'
+import * as UserAccessRequest from '@core/user/userAccessRequest'
 
 import { Button } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import PanelRight from '@webapp/components/PanelRight'
+import Table from '@webapp/components/Table/Table'
+import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
 
-import { TableHeaderLeft } from './TableHeaderLeft'
 import { AcceptRequestPanel } from './AcceptRequestPanel'
+import { TableHeaderLeft } from './TableHeaderLeft'
 
 const iconByStatus = ({ i18n }) => ({
   [UserAccessRequest.status.ACCEPTED]: (

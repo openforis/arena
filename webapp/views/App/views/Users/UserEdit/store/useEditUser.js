@@ -1,19 +1,19 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useCallback, useEffect, useState } from 'react'
 import * as R from 'ramda'
+import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
+import * as AuthGroup from '@core/auth/authGroup'
+import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
 
 import { useQuery } from '@webapp/components/hooks'
-import { useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/store/user'
-import { NotificationActions } from '@webapp/store/ui'
 import * as API from '@webapp/service/api'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
+import { useUser } from '@webapp/store/user'
 
 import { useActions } from './actions'
 

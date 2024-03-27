@@ -2,16 +2,17 @@ import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as StringUtils from '@core/stringUtils'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 
-import { NotificationActions } from '@webapp/store/ui'
 import { SurveyState } from '@webapp/store/survey'
+import { NotificationActions } from '@webapp/store/ui'
+
+import { State } from '../state'
 
 import { useValidate } from './useValidate'
-import { State } from '../state'
 
 const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
   if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {

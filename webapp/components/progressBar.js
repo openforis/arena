@@ -1,8 +1,8 @@
 import './progressBar.scss'
 
 import React from 'react'
-import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import { LinearProgress } from '@mui/material'
 
 const ProgressBarWithLabel = (props) => {

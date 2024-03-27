@@ -1,16 +1,15 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
-
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 
 import { useQuery } from '@webapp/components/hooks'
-import { useUser, UserActions } from '@webapp/store/user'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyId } from '@webapp/store/survey'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { UserActions, useUser } from '@webapp/store/user'
 
 import { validateUserEdit } from './validate'
 

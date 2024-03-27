@@ -2,24 +2,22 @@ import './nodeDefCoordinate.scss'
 
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
 import classNames from 'classnames'
+import { useSelector } from 'react-redux'
 
-import * as StringUtils from '@core/stringUtils'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { useI18n } from '@webapp/store/system'
-import { RecordState } from '@webapp/store/ui/record'
+import * as Survey from '@core/survey/survey'
 
 import { Button, Map, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { RecordState } from '@webapp/store/ui/record'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 

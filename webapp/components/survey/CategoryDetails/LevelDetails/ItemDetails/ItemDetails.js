@@ -2,25 +2,25 @@ import './itemDetails.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
 import { Button, ButtonDelete } from '@webapp/components'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../../store'
-import classNames from 'classnames'
+
 import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
 
 const ItemDetails = (props) => {

@@ -1,9 +1,8 @@
 import axios from 'axios'
 
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-
-import { SystemActions } from '@webapp/store/system'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
+import { SystemActions } from '@webapp/store/system'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'

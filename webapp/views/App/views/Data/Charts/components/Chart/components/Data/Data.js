@@ -1,6 +1,8 @@
+import './Data.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
-import './Data.scss'
+
 import DataTable from '../DataTable'
 
 const Data = ({ data, fullScreen }) => {

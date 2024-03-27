@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import { LoaderActions } from '@webapp/store/ui/loader'
 import { SurveyState } from '@webapp/store/survey'
+import { LoaderActions } from '@webapp/store/ui/loader'
 
 import { ChainActionTypes } from './actionTypes'
 

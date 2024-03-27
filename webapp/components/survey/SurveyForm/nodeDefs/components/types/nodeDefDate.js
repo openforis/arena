@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react'
-
 import PropTypes from 'prop-types'
 
+import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 
 import { DateInput } from '@webapp/components/form/DateTimeInput'
-import * as DateUtils from '@core/dateUtils'
 
 const dateFormat = {
   display: DateUtils.formats.dateDefault,

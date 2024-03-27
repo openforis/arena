@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import useChartSpec from './useChartSpec'
 import useChartConfig from './useChartConfig'
 import useChartRender from './useChartRender'
+import useChartSpec from './useChartSpec'
 
 const useChart = (query, table, setTable) => {
   const [draft, setDraft] = useState(null)

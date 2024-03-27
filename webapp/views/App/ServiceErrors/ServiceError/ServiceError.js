@@ -1,12 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import * as R from 'ramda'
 import { useDispatch } from 'react-redux'
 
-import * as R from 'ramda'
-
-import { ServiceErrorActions, useI18n } from '@webapp/store/system'
-
 import Markdown from '@webapp/components/markdown'
+import { ServiceErrorActions, useI18n } from '@webapp/store/system'
 
 const ServiceError = ({ error }) => {
   const i18n = useI18n()

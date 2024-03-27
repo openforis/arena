@@ -1,24 +1,23 @@
 import './CategorySelector.scss'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
-import * as API from '@webapp/service/api'
-import { TestId } from '@webapp/utils/testId'
-
-import { useNotifyWarning } from '@webapp/components/hooks'
 import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useNotifyWarning } from '@webapp/components/hooks'
 import PanelRight from '@webapp/components/PanelRight'
-import CategoryList from '@webapp/components/survey/CategoryList'
-import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
+import CategoryDetails from '@webapp/components/survey/CategoryDetails'
+import CategoryList from '@webapp/components/survey/CategoryList'
+import * as API from '@webapp/service/api'
+import { useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 export const CategorySelector = (props) => {
   const {

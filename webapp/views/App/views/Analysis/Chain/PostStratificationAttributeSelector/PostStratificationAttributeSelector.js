@@ -4,12 +4,11 @@ import { useDispatch } from 'react-redux'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'

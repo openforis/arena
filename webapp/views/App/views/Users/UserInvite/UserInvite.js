@@ -9,14 +9,12 @@ import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
-import { useSurveyInfo } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-import { useUser } from '@webapp/store/user'
-
 import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
-
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import DropdownUserGroup from '../DropdownUserGroup'

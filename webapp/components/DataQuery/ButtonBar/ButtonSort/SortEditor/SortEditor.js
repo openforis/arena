@@ -1,13 +1,15 @@
 import './sortEditor.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import PanelRight from '@webapp/components/PanelRight'
-import { useI18n } from '@webapp/store/system'
 import { Sort, SortCriteria } from '@common/model/query'
 
-import { useSortEditor } from './store'
+import PanelRight from '@webapp/components/PanelRight'
+import { useI18n } from '@webapp/store/system'
+
 import SortCriteriaEditor from './SortCriteriaEditor'
+import { useSortEditor } from './store'
 
 const SortEditor = (props) => {
   const { onChange, onClose, query } = props

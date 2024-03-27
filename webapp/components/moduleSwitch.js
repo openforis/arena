@@ -1,8 +1,8 @@
 import './moduleSwitch.scss'
 
 import React, { useEffect } from 'react'
-import { Route, Routes, useNavigate } from 'react-router'
 import PropTypes from 'prop-types'
+import { Route, Routes, useNavigate } from 'react-router'
 
 import { app, appModuleUri } from '@webapp/app/appModules'
 import { useIsInRoute } from '@webapp/components/hooks'

@@ -5,20 +5,20 @@ import PropTypes from 'prop-types'
 
 import { Surveys } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Category from '@core/survey/category'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
-import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
-import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
+import { useItems } from './store'
 
 const NodeDefCode = (props) => {
   const {

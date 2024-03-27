@@ -1,8 +1,10 @@
 import { useCallback } from 'react'
 import axios from 'axios'
 
-import * as A from '@core/arena'
 import { Query } from '@common/model/query'
+
+import * as A from '@core/arena'
+
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 export const throttleTime = 250

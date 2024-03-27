@@ -4,6 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Modal, ModalBody } from '@webapp/components/modal'
+
 import DataExport from '../../DataExport'
 
 export const RecordsDataExportModal = (props) => {

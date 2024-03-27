@@ -4,20 +4,20 @@ import React, { useEffect } from 'react'
 import classNames from 'classnames'
 
 import { appModules } from '@webapp/app/appModules'
-import { AppReducer, AppState } from '@webapp/store/app'
-import { injectReducers } from '@webapp/store'
-
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { injectReducers } from '@webapp/store'
+import { AppReducer, AppState } from '@webapp/store/app'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
+import { FileUploadDialog } from './FileUploadDialog'
 import Header from './Header'
 import JobMonitor from './JobMonitor'
-import { FileUploadDialog } from './FileUploadDialog'
 import ServiceErrors from './ServiceErrors'
 import SideBar from './SideBar'
 
-import Analysis from './views/Analysis' // TODO load Analysis module lazily
+// import Analysis from './views/Analysis' // TODO load Analysis module lazily
+const Analysis = React.lazy(() => import('./views/Analysis'))
 const Data = React.lazy(() => import('./views/Data'))
 const Designer = React.lazy(() => import('./views/Designer'))
 const Home = React.lazy(() => import('./views/Home'))

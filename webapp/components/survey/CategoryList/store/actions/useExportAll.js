@@ -1,10 +1,8 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as API from '@webapp/service/api'
-
 import { ButtonDownload } from '@webapp/components/buttons'
-
+import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId } from '@webapp/store/survey'
 

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import ReactDOM from 'react-dom'
-import * as R from 'ramda'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import * as R from 'ramda'
+import ReactDOM from 'react-dom'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 

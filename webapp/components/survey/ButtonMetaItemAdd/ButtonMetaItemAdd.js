@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
-import * as API from '@webapp/service/api'
-
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { ButtonAdd } from '@webapp/components'
+import * as API from '@webapp/service/api'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 export const metaItemTypes = {
   taxonomy: 'taxonomy',

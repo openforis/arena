@@ -2,13 +2,14 @@ import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as SurveyValidator from '@core/survey/surveyValidator'
+
+import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
+import * as SurveyState from '@webapp/store/survey/state'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
-import * as SurveyState from '@webapp/store/survey/state'
-import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 import { State } from '../state'
 
 // Persists the temporary changes applied to the node def in the state

@@ -4,15 +4,14 @@ import { useNavigate } from 'react-router'
 
 import * as Category from '@core/survey/category'
 
-import { useIsCategoriesRoute } from '@webapp/components/hooks'
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { ButtonDownload } from '@webapp/components/buttons'
 import { UploadButton } from '@webapp/components/form'
-
-import { designerModules, appModuleUri } from '@webapp/app/appModules'
+import { useIsCategoriesRoute } from '@webapp/components/hooks'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { useActions, State } from '../store'
+import { State, useActions } from '../store'
 
 const TableHeaderLeft = (props) => {
   const { headerProps } = props

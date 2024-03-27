@@ -4,9 +4,9 @@ import * as R from 'ramda'
 
 import { TestId } from '@webapp/utils/testId'
 
-import * as SideBarModule from '../utils'
 import ModuleLink from '../ModuleLink'
 import SubModules from '../SubModules'
+import * as SideBarModule from '../utils'
 
 const Module = forwardRef((props, ref) => {
   const { surveyInfo, module, pathname, sideBarOpened, isOver, onMouseEnter } = props

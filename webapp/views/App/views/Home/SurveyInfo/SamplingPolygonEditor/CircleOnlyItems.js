@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
+
 import { FormPropertyItem } from './FormPropertyItem'
 
 export const CircleOnlyItems = (props) => {

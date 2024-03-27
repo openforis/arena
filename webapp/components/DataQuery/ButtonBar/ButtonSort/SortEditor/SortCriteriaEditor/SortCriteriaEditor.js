@@ -1,12 +1,13 @@
 import './sortCriteriaEditor.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { SortCriteria } from '@common/model/query'
 
-import Dropdown from '@webapp/components/form/Dropdown'
 import { Button } from '@webapp/components/buttons'
+import Dropdown from '@webapp/components/form/Dropdown'
 
 const titleKeyByOrder = {
   [SortCriteria.orders.asc]: 'common.ascending',

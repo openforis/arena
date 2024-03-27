@@ -1,15 +1,17 @@
+import './BlocksBuilder.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
 import { chartsConfig } from '../../../../state/config'
-import ContainerBlock from './blocks/Container'
-import SelectBlock from './blocks/Select'
-import MetricBlock from './blocks/Metric'
-import SingleMetricBlock from './blocks/SingleMetric'
-import InputBlock from './blocks/Input'
-import SliderBlock from './blocks/Slider'
+
 import CheckboxBlock from './blocks/Checkbox'
-import './BlocksBuilder.scss'
+import ContainerBlock from './blocks/Container'
+import InputBlock from './blocks/Input'
+import MetricBlock from './blocks/Metric'
+import SelectBlock from './blocks/Select'
+import SingleMetricBlock from './blocks/SingleMetric'
+import SliderBlock from './blocks/Slider'
 
 const RenderByType = {
   container: ContainerBlock,

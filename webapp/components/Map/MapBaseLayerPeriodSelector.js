@@ -1,20 +1,21 @@
 import './MapBaseLayerPeriodSelector.scss'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { useMap, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
+import { TileLayer, useMap } from 'react-leaflet'
 require('leaflet-side-by-side')
 
 import * as User from '@core/user/user'
-import { useUser } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
 
 import * as API from '@webapp/service/api'
+import { useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
+
+import { Checkbox } from '../form'
 
 import { baseLayerUrlByProviderFunction } from './baseLayers'
 import { useMapContextBaseLayer } from './MapContext'
-import { Checkbox } from '../form'
-import { useSurveyId } from '@webapp/store/survey'
 
 const getPeriodValue = (period) => {
   const { year, month, yearTo } = period

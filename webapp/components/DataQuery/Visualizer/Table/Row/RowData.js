@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { ColumnData, ColumnDataEdit } from './Column'

@@ -2,12 +2,12 @@ import { useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as RecordValidation from '@core/record/recordValidation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 import { SurveyState } from '@webapp/store/survey'

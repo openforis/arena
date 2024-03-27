@@ -1,11 +1,10 @@
 import { useCallback } from 'react'
 
 import * as API from '@webapp/service/api'
-
 import { useSurveyId } from '@webapp/store/survey'
 
-import { useFetchLevelItems } from '../item/useFetchLevelItems'
 import { State } from '../../state'
+import { useFetchLevelItems } from '../item/useFetchLevelItems'
 
 export const useInit = ({ setState }) => {
   const surveyId = useSurveyId()

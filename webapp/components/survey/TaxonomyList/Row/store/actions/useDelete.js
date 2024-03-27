@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+
 import * as A from '@core/arena'
-
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Survey from '@core/survey/survey'
+import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurvey, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { State } from '../state'
 

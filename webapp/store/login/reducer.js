@@ -1,9 +1,8 @@
+import { SystemActions } from '@webapp/store/system'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActions } from '@webapp/store/system'
-
-import * as LoginState from './state'
 import * as LoginActions from './actions'
+import * as LoginState from './state'
 
 const actionHandlers = {
   [LoginActions.loginEmailUpdate]: (state, { email }) => LoginState.assocEmail(email)(state),

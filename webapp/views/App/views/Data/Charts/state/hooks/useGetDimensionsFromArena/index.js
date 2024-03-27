@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { Query } from '@common/model/query'
+
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import getArenaDimensions from './utils/getSelfAttributesAndAncestors'

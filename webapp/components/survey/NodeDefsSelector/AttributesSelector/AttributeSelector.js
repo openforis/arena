@@ -1,14 +1,15 @@
 import './AttributeSelector.scss'
+
 import React from 'react'
 import * as PropTypes from 'prop-types'
-import * as R from 'ramda'
 import classNames from 'classnames'
+import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefIconKey'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {

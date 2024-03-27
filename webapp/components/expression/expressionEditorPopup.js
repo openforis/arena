@@ -6,17 +6,16 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
+import PanelRight from '@webapp/components/PanelRight'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import PanelRight from '@webapp/components/PanelRight'
-
-import { useExpressionEditorPopupState } from './expressionEditorPopupState'
+import { Button } from '../buttons'
 
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
+import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 import { ExpressionEditorType } from './expressionEditorType'
-import { Button } from '../buttons'
 
 const ExpressionEditorPopup = (props) => {
   const {

@@ -1,1 +1,1 @@
-export { store, injectReducers } from './store'
+export { injectReducers, store } from './store'

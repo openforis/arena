@@ -1,4 +1,4 @@
-import { ShowTitleBlock, TitleBlock, ShowLegendBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { GroupByBlock, MetricBlock, ShowLegendBlock, ShowTitleBlock, TitleBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
 
 const pieVega = {

@@ -1,17 +1,17 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
-import { useI18n } from '@webapp/store/system'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurvey } from '@webapp/store/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 export const ClusteringEntitySelector = () => {
   const dispatch = useDispatch()

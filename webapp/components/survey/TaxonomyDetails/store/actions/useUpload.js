@@ -4,11 +4,11 @@ import { useDispatch } from 'react-redux'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as API from '@webapp/service/api'
-
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'
+
 import { useRefreshTaxonomy } from './useRefreshTaxonomy'
 
 export const useUpload = ({ setState }) => {

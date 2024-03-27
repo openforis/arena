@@ -2,13 +2,13 @@ import './DataImport.scss'
 
 import React from 'react'
 
-import { useI18n } from '@webapp/store/system'
-
 import TabBar from '@webapp/components/tabBar'
+import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import { DataImportCsvView } from './DataImportCsvView'
-import { CollectDataImportView } from './DataImportCollectView'
+
 import { DataImportArenaView } from './DataImportArenaView'
+import { CollectDataImportView } from './DataImportCollectView'
+import { DataImportCsvView } from './DataImportCsvView'
 
 const DataImport = () => {
   const i18n = useI18n()

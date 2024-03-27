@@ -4,14 +4,15 @@ import React, { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import * as User from '@core/user/user'
+
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
-import { useSurveyId } from '@webapp/store/survey'
 import Table from '@webapp/components/Table/Table'
+import { useSurveyId } from '@webapp/store/survey'
+import { useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
 
 import HeaderLeft from './HeaderLeft'
-import RowHeader from './RowHeader'
 import Row from './Row'
+import RowHeader from './RowHeader'
 
 const UsersListSurvey = () => {
   const navigate = useNavigate()

@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
-
 import * as NodeDef from '@core/survey/nodeDef'
+
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
 
 import { State } from './store'
 

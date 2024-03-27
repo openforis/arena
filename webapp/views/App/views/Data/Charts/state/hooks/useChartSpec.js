@@ -1,4 +1,5 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
 import { chartsConfig } from '../config'
 
 const BASE_SPEC = {

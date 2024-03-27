@@ -1,16 +1,15 @@
 import './SurveyHierarchy.scss'
 
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
+import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
-import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
-import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
-import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
 
 import Tree from './Tree'
 

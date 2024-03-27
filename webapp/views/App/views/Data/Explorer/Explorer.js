@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
 
 import { Query } from '@common/model/query'
+
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
-import { ExplorerStorage } from '@webapp/service/storage/explorer'
-
 import DataQuery from '@webapp/components/DataQuery'
 import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
+import { ExplorerStorage } from '@webapp/service/storage/explorer'
 
 const Explorer = () => {
   const queryStorage = ExplorerStorage.getQuery()

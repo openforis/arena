@@ -1,16 +1,15 @@
 import './DialogConfirm.scss'
 
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
+import { useDispatch } from 'react-redux'
 
-import { DialogConfirmActions, useDialogConfirm } from '@webapp/store/ui'
-
+import { Button, ButtonCancel } from '@webapp/components'
+import Markdown from '@webapp/components/markdown'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
-import Markdown from '@webapp/components/markdown'
+import { DialogConfirmActions, useDialogConfirm } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
-import { Button, ButtonCancel } from '@webapp/components'
 
 const DialogConfirm = () => {
   const dispatch = useDispatch()

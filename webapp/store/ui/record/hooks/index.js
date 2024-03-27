@@ -1,11 +1,13 @@
 import { useSelector } from 'react-redux'
 
-import * as Record from '@core/record/record'
+import { Objects } from '@openforis/arena-core'
+
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 
 import { SurveyState } from '@webapp/store/survey'
+
 import * as RecordState from '../state'
-import { Objects } from '@openforis/arena-core'
 
 export const useRecord = () => useSelector(RecordState.getRecord)
 export const useRecordNode = ({ nodeUuid }) => {

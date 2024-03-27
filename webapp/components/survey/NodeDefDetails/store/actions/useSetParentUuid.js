@@ -4,9 +4,11 @@ import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
-import { useValidate } from './useValidate'
-import { State } from '../state'
 import { useSurvey } from '@webapp/store/survey'
+
+import { State } from '../state'
+
+import { useValidate } from './useValidate'
 
 export const useSetParentUuid = ({ setState }) => {
   const validateNodeDef = useValidate({ setState })

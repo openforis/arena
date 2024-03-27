@@ -2,9 +2,9 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeKeys from '@core/record/nodeKeys'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 const _getParams = (survey, i18n) => (activityLog) => {
   const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)

@@ -1,32 +1,30 @@
 import './nodeDefs.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import * as R from 'ramda'
-import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
+import * as R from 'ramda'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 
 import { SurveyState, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
-
-import * as NodeDefUiProps from './nodeDefUIProps'
-
 import { useNodeDefLabelType } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEditButtons from './components/nodeDefEditButtons'
+import NodeDefFormItem from './components/NodeDefFormItem'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
-import NodeDefFormItem from './components/NodeDefFormItem'
+import * as NodeDefUiProps from './nodeDefUIProps'
 
 const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   const keyDefs = Survey.getNodeDefKeys(nodeDef)(survey)

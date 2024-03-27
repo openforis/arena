@@ -3,11 +3,11 @@ import './nodeDefText.scss'
 import React from 'react'
 import classNames from 'classnames'
 
+import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+
 import { Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'

@@ -1,28 +1,27 @@
 import './Chain.scss'
 
 import React, { useCallback, useEffect } from 'react'
-import { useParams } from 'react-router'
 import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router'
 
-import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
-import ButtonBar from './ButtonBar'
+import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
 import { AnalysisNodeDefs } from './AnalysisNodeDefs'
+import ButtonBar from './ButtonBar'
 import { ChainBasicProps } from './ChainBasicProps'
 import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
-import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
   const i18n = useI18n()

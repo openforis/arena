@@ -1,11 +1,10 @@
 import * as Survey from '@core/survey/survey'
 
+import { SystemActions } from '@webapp/store/system'
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
-import { SystemActions } from '@webapp/store/system'
-
-import { NodeDefsActions } from '../nodeDefs'
 import * as SurveyActions from '../actions'
+import { NodeDefsActions } from '../nodeDefs'
 
 const actionHandlers = {
   // Reset state

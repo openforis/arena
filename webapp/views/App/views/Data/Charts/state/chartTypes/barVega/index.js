@@ -1,13 +1,13 @@
 import {
-  TitleBlock,
-  ShowTitleBlock,
-  ShowLegendBlock,
-  SwitchHorizontalBlock,
-  LabelFontSizeBlock,
   AxisTitleBlock,
-  MaxHeightBlock,
   GroupByBlock,
+  LabelFontSizeBlock,
+  MaxHeightBlock,
   MetricBlock,
+  ShowLegendBlock,
+  ShowTitleBlock,
+  SwitchHorizontalBlock,
+  TitleBlock,
 } from '../../blocks'
 
 const barVega = {

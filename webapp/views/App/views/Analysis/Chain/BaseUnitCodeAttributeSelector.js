@@ -1,15 +1,14 @@
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
-import { useChain } from '@webapp/store/ui/chain'
+import * as Survey from '@core/survey/survey'
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useChain } from '@webapp/store/ui/chain'
 
 const nodeDefToItem = (nodeDef) => ({
   value: NodeDef.getUuid(nodeDef),

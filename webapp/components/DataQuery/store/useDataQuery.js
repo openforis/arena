@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import * as A from '@core/arena'
 import { Query } from '@common/model/query'
+
+import * as A from '@core/arena'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 

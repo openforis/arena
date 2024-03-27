@@ -1,5 +1,5 @@
-import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
+import axios from 'axios'
 
 /**
  * Sends a request using the specified function and cancels the request on unmount.

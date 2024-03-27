@@ -9,9 +9,9 @@ import {
   appModuleUri,
   dataModules,
   designerModules,
+  helpModules,
   homeModules,
   userModules,
-  helpModules,
 } from '@webapp/app/appModules'
 
 const keys = {

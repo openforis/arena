@@ -8,10 +8,11 @@ import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
 import * as Validation from '@core/validation/validation'
 
-import CycleEditor from './CycleEditor'
-import { useSurveyCycleKey } from '@webapp/store/survey'
 import { ButtonAdd } from '@webapp/components'
 import { useConfirmDelete } from '@webapp/components/hooks'
+import { useSurveyCycleKey } from '@webapp/store/survey'
+
+import CycleEditor from './CycleEditor'
 
 const CyclesEditor = (props) => {
   const { cycles, readOnly, setCycles, validation } = props

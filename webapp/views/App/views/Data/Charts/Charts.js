@@ -1,17 +1,19 @@
 import './Charts.scss'
-import React, { useState, useEffect, useRef } from 'react'
-import { Query } from '@common/model/query'
-import { Button } from '@webapp/components/buttons'
-import Chart from './components/Chart'
-import Panel from './components/Panel'
-import DataSelector from './components/DataSelector'
-import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
-import { D3_CHART_TYPES } from './constants/chartTypes'
 
+import React, { useEffect, useRef, useState } from 'react'
+import classNames from 'classnames'
 import Split from 'react-split'
 
-import { useGetDimensionsFromArena, useChart } from './state/hooks'
-import classNames from 'classnames'
+import { Query } from '@common/model/query'
+
+import { Button } from '@webapp/components/buttons'
+import { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
+
+import Chart from './components/Chart'
+import DataSelector from './components/DataSelector'
+import Panel from './components/Panel'
+import { D3_CHART_TYPES } from './constants/chartTypes'
+import { useChart, useGetDimensionsFromArena } from './state/hooks'
 
 const Charts = () => {
   const [fullScreen, setFullScreen] = useState(false)

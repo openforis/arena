@@ -1,13 +1,12 @@
 import axios from 'axios'
 
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
-import { SurveyState } from '@webapp/store/survey'
-import { UserState } from '@webapp/store/user'
-import { LoaderActions } from '@webapp/store/ui'
+import * as Record from '@core/record/record'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { SurveyState } from '@webapp/store/survey'
+import { LoaderActions } from '@webapp/store/ui'
+import { UserState } from '@webapp/store/user'
 
 import * as ActionTypes from './actionTypes'
 import { recordNodesUpdate } from './common'

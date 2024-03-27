@@ -1,14 +1,15 @@
 import { useCallback, useMemo } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
-import { useItemsFilter } from '../../../useItemsFilter'
+import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordParentCategoryItemUuid } from '@webapp/store/ui/record/hooks'
-import * as API from '@webapp/service/api'
+
+import { useItemsFilter } from '../../../useItemsFilter'
 
 export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) => {
   const survey = useSurvey()

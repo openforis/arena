@@ -3,8 +3,8 @@ import './Instances.scss'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
-import * as User from '@core/user/user'
 import * as A from '@core/arena'
+import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
@@ -52,7 +52,7 @@ const Instances = () => {
       <p>{i18n.t('instancesView.title')}</p>
       {!A.isEmpty(instance) && (
         <div className="instance-row">
-          <a href={url} target="_blank">
+          <a href={url} target="_blank" rel="noreferrer">
             <p>
               {instance.Purpose || 'RStudio'} - {instance.instanceId}{' '}
             </p>

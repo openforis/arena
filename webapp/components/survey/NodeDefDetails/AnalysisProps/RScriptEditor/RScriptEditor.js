@@ -3,16 +3,15 @@ import './RScriptEditor.scss'
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as CategoryItem from '@core/survey/categoryItem'
-
-import { useI18n, useLang } from '@webapp/store/system'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
-import { useSurvey } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n, useLang } from '@webapp/store/system'
 
 const RScriptEditor = (props) => {
   const [defaultLocalScript, setDefaultLocalScript] = useState('')

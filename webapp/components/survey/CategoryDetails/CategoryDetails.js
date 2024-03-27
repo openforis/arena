@@ -2,27 +2,26 @@ import './CategoryDetails.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useParams } from 'react-router'
 import classNames from 'classnames'
+import { useParams } from 'react-router'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
-
 import { ExtraPropDefsEditor } from '../ExtraPropDefsEditor'
+
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
-
 import { State, useActions, useLocalState } from './store'
 
 const MAX_LEVELS = 5

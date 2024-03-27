@@ -2,11 +2,11 @@ import './modal.scss'
 
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'
+import MuiModal from '@mui/material/Modal'
 
-import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 export const ModalClose = ({ _children, onClose }) => (
   <div className="modal-close" onClick={() => onClose()}>

@@ -1,17 +1,16 @@
 import React from 'react'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
-
 import { appModules, homeModules } from '@webapp/app/appModules'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
-import Dashboard from './Dashboard'
 import CollectImportReport from './CollectImportReport'
-import SurveyList from './SurveyList'
+import Dashboard from './Dashboard'
 import SurveyCreate from './SurveyCreate'
 import SurveyInfo from './SurveyInfo'
-import TemplateList from './TemplateList'
+import SurveyList from './SurveyList'
 import TemplateCreate from './TemplateCreate'
+import TemplateList from './TemplateList'
 
 const Home = () => {
   const canCreateSurvey = useAuthCanCreateSurvey()

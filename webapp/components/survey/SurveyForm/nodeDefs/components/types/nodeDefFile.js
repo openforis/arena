@@ -3,15 +3,16 @@ import './nodeDefFile.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { uuidv4 } from '@core/uuid'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+import { uuidv4 } from '@core/uuid'
 
-import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonDownload } from '@webapp/components/buttons'
+import UploadButton from '@webapp/components/form/uploadButton'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 
 import NodeDeleteButton from '../nodeDeleteButton'
+
 import { ImagePreview } from './ImagePreview'
 
 const FileInput = (props) => {

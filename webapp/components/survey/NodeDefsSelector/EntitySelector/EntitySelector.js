@@ -1,16 +1,16 @@
 import './EntitySelector.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
-
-import { TestId } from '@webapp/utils/testId'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const getDropdownItems = ({
   emptySelection,

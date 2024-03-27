@@ -2,8 +2,8 @@ import '../form.scss'
 
 import React, { useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { NumericFormat } from 'react-number-format'
 import classNames from 'classnames'
+import { NumericFormat } from 'react-number-format'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'

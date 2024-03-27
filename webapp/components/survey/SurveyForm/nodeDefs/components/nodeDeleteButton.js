@@ -1,9 +1,8 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
-
 import { RecordActions } from '@webapp/store/ui/record'
 
 const NodeDeleteButton = (props) => {

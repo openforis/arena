@@ -1,19 +1,19 @@
-import React, { useEffect, useRef, useContext, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import { timeDay } from 'd3-time'
 import { timeFormat } from 'd3-time-format'
 
 import * as User from '@core/user/user'
 
-import { useElementOffset } from '@webapp/components/hooks'
 import { Dropdown } from '@webapp/components/form'
+import { useElementOffset } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
-
-import { RecordsSummaryContext } from '../RecordsSummaryContext'
-import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
-import { ChartUtils } from '../chartUtils'
 import { useUser } from '@webapp/store/user'
 import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
+
+import { ChartUtils } from '../chartUtils'
+import { RecordsSummaryContext } from '../RecordsSummaryContext'
+import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
 
 const dayInMs = 1000 * 60 * 60 * 24
 

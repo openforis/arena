@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
+import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { ResizableBox } from 'react-resizable'
-import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'

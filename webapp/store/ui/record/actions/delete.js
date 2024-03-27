@@ -2,14 +2,15 @@ import axios from 'axios'
 
 import { Dates } from '@openforis/arena-core'
 
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 
 import { AppSavingActions } from '@webapp/store/app'
 import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as RecordState from '../state'
+
 import * as ActionTypes from './actionTypes'
 
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {

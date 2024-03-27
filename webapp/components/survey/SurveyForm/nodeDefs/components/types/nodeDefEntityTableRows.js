@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import * as R from 'ramda'
+import { useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import { debounce } from '@core/functionsDefer'
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
-import * as Node from '@core/record/node'
-import { debounce } from '@core/functionsDefer'
+import * as Survey from '@core/survey/survey'
 
-import { elementOffset } from '@webapp/utils/domUtils'
 import { SurveyState } from '@webapp/store/survey'
+import { elementOffset } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'

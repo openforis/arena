@@ -5,10 +5,9 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import { useJob, JobActions } from '@webapp/store/app'
-
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+import { JobActions, useJob } from '@webapp/store/app'
 
 import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'

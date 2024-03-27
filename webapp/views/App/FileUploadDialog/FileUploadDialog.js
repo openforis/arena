@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter, ProgressBar } from '@webapp/components'
-
 import { FileUploadDialogActions, useFileUploadDialog } from '@webapp/store/ui'
 
 const initialState = { files: [] }

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 
 import { Query, Sort } from '@common/model/query'
-import * as Expression from '@core/expressionParser/expression'
-import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
 
-import { useLang } from '@webapp/store/system'
+import * as Expression from '@core/expressionParser/expression'
+
+import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
 import { useNodeDefByUuid, useSurvey } from '@webapp/store/survey'
+import { useLang } from '@webapp/store/system'
 
 const getVariables = ({ survey, entityDef, attributeDefUuids, lang }) =>
   ExpressionVariables.getVariables({

@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
+
 import * as Survey from '@core/survey/survey'
 
 const _isChainDeleted = () => R.pipe(ActivityLog.getChainUuid, R.isNil)

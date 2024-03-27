@@ -1,16 +1,15 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Taxon from '@core/survey/taxon'
-
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as Record from '@core/record/record'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
+import * as Taxon from '@core/survey/taxon'
 
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
+
 import * as SurveyFormState from './state'
 
 /**

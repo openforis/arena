@@ -7,26 +7,24 @@ import { Objects } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
-
-import * as API from '@webapp/service/api'
-
-import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import * as API from '@webapp/service/api'
+import { JobActions } from '@webapp/store/app'
+import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
-import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
 import { ImportStartButton } from './ImportStartButton'
+import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
 
 const importTypes = {
   updateExistingRecords: 'updateExistingRecords',

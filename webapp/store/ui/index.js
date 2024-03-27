@@ -1,6 +1,6 @@
 // ====== Ui
-import * as UiState from './state'
 import UiReducer from './reducer'
+import * as UiState from './state'
 
 export { UiReducer, UiState }
 

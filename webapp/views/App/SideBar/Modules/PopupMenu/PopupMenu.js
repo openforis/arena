@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
-import * as SideBarModule from '../utils'
-
 import SubModules from '../SubModules'
+import * as SideBarModule from '../utils'
 
 const PopupMenu = (props) => {
   const { module, moduleElement, pathname, onClose, overSidebar } = props

@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKeys } from '@webapp/store/survey'
-
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useSurveyCycleKeys } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const CycleSelector = (props) => {
   const { cycleKeys: cycleKeysProp, selectedCycle, filterFunction, onChange } = props

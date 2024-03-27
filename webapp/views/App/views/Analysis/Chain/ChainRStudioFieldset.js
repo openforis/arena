@@ -1,12 +1,13 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { Checkbox } from '@webapp/components/form'
+import * as Validation from '@core/validation/validation'
+
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
+import { Checkbox } from '@webapp/components/form'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 export const ChainRStudioFieldset = (props) => {
   const { updateChain } = props

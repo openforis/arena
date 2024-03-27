@@ -2,20 +2,19 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { TestId } from '@webapp/utils/testId'
 
 import { ButtonGroup, Checkbox, Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
 

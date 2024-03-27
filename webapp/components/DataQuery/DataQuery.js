@@ -1,4 +1,5 @@
 import './dataQuery.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -7,12 +8,13 @@ import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
 
-import { useDataQuery } from './store'
-import QueryNodeDefsSelector from './QueryNodeDefsSelector'
-import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
-import Visualizer from './Visualizer'
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
+
+import ButtonBar from './ButtonBar'
+import QueryNodeDefsSelector from './QueryNodeDefsSelector'
+import { useDataQuery } from './store'
+import Visualizer from './Visualizer'
 
 const DataQuery = (props) => {
   const { query, onChangeQuery } = props

@@ -1,7 +1,8 @@
 import './InputSwitch.scss'
+
 import React from 'react'
-import ReactSwitch from 'react-switch'
 import PropTypes from 'prop-types'
+import ReactSwitch from 'react-switch'
 
 const InputSwitch = (props) => {
   const { checked, disabled, onChange } = props

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Rectangle, Circle } from 'react-leaflet'
-import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
+import GeometryUtil from 'leaflet-geometryutil'
+import { Circle, Rectangle } from 'react-leaflet'
 
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 

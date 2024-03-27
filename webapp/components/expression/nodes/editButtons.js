@@ -4,12 +4,12 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
 
-const EditButtons = props => {
+const EditButtons = (props) => {
   const { node, onChange, canDelete = false, onDelete } = props
 
   const i18n = useI18n()
 
-  const addLogicalExpr = operator =>
+  const addLogicalExpr = (operator) =>
     onChange({
       type: Expression.types.BinaryExpression,
       operator,

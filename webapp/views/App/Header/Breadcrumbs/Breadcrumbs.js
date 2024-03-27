@@ -2,11 +2,10 @@ import './Breadcrumbs.scss'
 
 import React from 'react'
 import { useLocation } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as AppModules from '@webapp/app/appModules'
-
 import { useI18n } from '@webapp/store/system'
-import { Link } from 'react-router-dom'
 
 export const Breadcrumbs = () => {
   const location = useLocation()

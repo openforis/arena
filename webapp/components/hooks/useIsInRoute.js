@@ -1,5 +1,6 @@
 import { matchPath, useLocation } from 'react-router'
-import { designerModules, appModuleUri } from '@webapp/app/appModules'
+
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 export const useIsInRoute = (path) => {
   const { pathname: currentPathName } = useLocation()
@@ -11,7 +12,7 @@ export const useIsInRoute = (path) => {
 /**
  * Uses the window location pathname value to always get the current location path
  * (it can be useful in component unmount callbacks where the location coming from useLocation
- * could give an old value of the location itself in the unmount callback)
+ * could give an old value of the location itself in the unmount callback).
  *
  * @returns {Function} - Function to test if a path is in the current location.
  */

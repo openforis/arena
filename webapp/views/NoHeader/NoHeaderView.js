@@ -2,9 +2,10 @@ import React from 'react'
 
 import { noHeaderModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import { RecordNoHeader } from '@webapp/components/survey/Record/RecordNoHeader'
 
-export const NoHeaderView = () => {
+const RecordNoHeader = React.lazy(() => import('../../components/survey/Record/RecordNoHeader'))
+
+const NoHeaderView = () => {
   return (
     <ModuleSwitch
       moduleDefault={noHeaderModules.record}
@@ -17,3 +18,5 @@ export const NoHeaderView = () => {
     />
   )
 }
+
+export default NoHeaderView

@@ -6,7 +6,7 @@ export { SurveyFormActions, SurveyFormReducer, SurveyFormState }
 export {
   useNodeDefLabelType,
   useNodeDefPage,
-  useShowPageNavigation,
-  usePagesUuidMap,
   useNotAvailableEntityPageUuids,
+  usePagesUuidMap,
+  useShowPageNavigation,
 } from './hooks'

@@ -1,11 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { getLanguageISO639part2Label } from '@core/app/languages'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-
 import { useI18n } from '@webapp/store/system'
 
 const TaxaTableRowHeader = (props) => {

@@ -5,7 +5,7 @@
     "plugin:prettier/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:jest-playwright/recommended"
+    "plugin:jest-playwright/recommended",
   ],
   "env": {
     "browser": true,
@@ -13,12 +13,12 @@
     "es6": true,
     "jest": true,
     "mocha": true,
-    "node": true
+    "node": true,
   },
   "globals": {
-    "step": "readonly"
+    "step": "readonly",
   },
-  "plugins": ["prettier", "jsdoc", "react", "react-hooks"],
+  "plugins": ["prettier", "jsdoc", "react", "react-hooks", "simple-import-sort"],
   "rules": {
     "no-console": "error",
     "no-underscore-dangle": 0,
@@ -53,18 +53,50 @@
     "jsdoc/require-returns-check": 2,
     "jsdoc/require-returns-description": 2,
     "jsdoc/require-returns-type": 2,
-    "jsdoc/valid-types": 2
+    "jsdoc/valid-types": 2,
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
   },
-
+  "overrides": [
+    {
+      "files": ["**/*.js", "**/*.ts", "**/*.tsx"],
+      "rules": {
+        "simple-import-sort/imports": [
+          "error",
+          {
+            "groups": [
+              // Style imports first
+              ["^.+\\.s?css$"],
+              // `react` first, `prop-types` second, then packages starting with a character
+              ["^react$", "^prop-types", "^[a-z]", "^@(?!openforis|core|common|server|webapp)"],
+              ["^~"],
+              // OpenForis Packages
+              ["^@openforis"],
+              ["^@common"],
+              ["^@core"],
+              ["^@server"],
+              ["^@webapp"],
+              // Imports starting with `../`
+              ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+              // Imports starting with `./`
+              ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+              // Side effect imports
+              ["^\\u0000"],
+            ],
+          },
+        ],
+      },
+    },
+  ],
   "settings": {
     "import/resolver": {
       "node": {},
       "webpack": {
-        "config": "webpack.config.babel.js"
-      }
+        "config": "webpack.config.babel.js",
+      },
     },
     "react": {
-      "version": "detect"
-    }
-  }
+      "version": "detect",
+    },
+  },
 }

@@ -1,16 +1,15 @@
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import * as Survey from '@core/survey/survey'
 
 import { Button } from '@webapp/components/buttons'
+import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import { FormItem } from '@webapp/components/form/Input'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 export const NodeDefEntitySelectorDialog = (props) => {
   const {

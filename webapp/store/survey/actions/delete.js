@@ -1,12 +1,13 @@
 import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
 
 import * as SurveyState from '../state'
+
 import { surveyDelete } from './actionTypes'
 
 export const deleteSurvey = (navigate) => async (dispatch, getState) => {

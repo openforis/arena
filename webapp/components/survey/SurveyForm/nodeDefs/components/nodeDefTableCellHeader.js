@@ -10,6 +10,7 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
+
 import NodeDefIconKey from './NodeDefIconKey'
 import { NodeDefInfoIcon } from './NodeDefInfoIcon'
 

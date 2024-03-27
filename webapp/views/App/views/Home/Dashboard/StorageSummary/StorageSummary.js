@@ -3,10 +3,10 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 import GaugeChart from './GaugeChart'
-import { useI18n } from '@webapp/store/system'
 
 const colorsByKey = {
   availableSpace: 'green',

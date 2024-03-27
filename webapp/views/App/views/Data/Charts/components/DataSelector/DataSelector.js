@@ -2,15 +2,14 @@ import './DataSelector.scss'
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
-import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-
-import classNames from 'classnames'
+import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const DimensionGroup = ({ dimensionGroup }) => {
   const { label, options } = dimensionGroup

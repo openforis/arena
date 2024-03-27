@@ -1,8 +1,10 @@
 import axios from 'axios'
 
-import * as A from '@core/arena'
-import { Query } from '@common/model/query'
 import { ConflictResolutionStrategy } from '@common/dataImport'
+import { Query } from '@common/model/query'
+
+import * as A from '@core/arena'
+
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD

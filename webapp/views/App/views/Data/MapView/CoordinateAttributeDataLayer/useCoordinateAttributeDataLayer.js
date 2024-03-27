@@ -6,18 +6,19 @@ import { Objects } from '@openforis/arena-core'
 import { Query } from '@common/model/query'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { useDataQuery } from '@webapp/components/DataQuery/store'
+import { useOnWebSocketEvent } from '@webapp/components/hooks'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
-import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
+
 import { convertDataToPoints } from './convertDataToPoints'
+import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
 export const useCoordinateAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props

@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react'
-
 import './Slider.scss'
+
+import React, { useCallback } from 'react'
 
 const SliderBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
   const { params, title, subtitle, id } = block

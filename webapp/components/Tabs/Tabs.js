@@ -3,8 +3,8 @@ import './Tabs.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import MuiTabs from '@mui/material/Tabs'
 import MuiTab from '@mui/material/Tab'
+import MuiTabs from '@mui/material/Tabs'
 
 import { useI18n } from '@webapp/store/system'
 

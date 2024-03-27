@@ -2,16 +2,13 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/store/system'
-
 import { FormItem } from '@webapp/components/form/Input'
-import { useSurvey } from '@webapp/store/survey'
-
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const AnalysisEntitySelector = (props) => {
   const i18n = useI18n()

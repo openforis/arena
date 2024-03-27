@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import Checkbox from '@webapp/components/form/checkbox'
-import { ButtonIconEdit } from '@webapp/components'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { ButtonIconEdit } from '@webapp/components'
+import Checkbox from '@webapp/components/form/checkbox'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
 import { useCollectImportReportItem } from './store'
 

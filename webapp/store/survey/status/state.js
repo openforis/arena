@@ -1,4 +1,5 @@
 import * as A from '@core/arena'
+
 import * as SurveyState from '../state'
 
 export const stateKey = 'status'

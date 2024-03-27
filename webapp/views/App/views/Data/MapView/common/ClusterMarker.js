@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Marker, Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { Marker, Popup, useMap } from 'react-leaflet'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'

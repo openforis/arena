@@ -1,6 +1,6 @@
 // ====== app
-import * as AppState from './state'
 import AppReducer from './reducer'
+import * as AppState from './state'
 
 export { AppReducer, AppState }
 

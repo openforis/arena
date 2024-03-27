@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
+import * as Survey from '@core/survey/survey'
 
-import { useLang } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { useLang } from '@webapp/store/system'
 
+import { ExpressionEditorType } from './expressionEditorType'
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'
-import { ExpressionEditorType } from './expressionEditorType'
 
 const initialState = {
   query: '',

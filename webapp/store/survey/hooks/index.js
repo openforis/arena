@@ -2,8 +2,8 @@ import { useSelector } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { useOnUpdate } from '@webapp/components/hooks'
 

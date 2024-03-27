@@ -1,27 +1,27 @@
 import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
-import * as StringUtils from '@core/stringUtils'
 import * as Expression from '@core/expressionParser/expression'
-
-import { SurveyState } from '@webapp/store/survey'
-import { useI18n, useLang } from '@webapp/store/system'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { Input } from '@webapp/components/form/Input'
-import { DateInput } from '@webapp/components/form/DateTimeInput'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { SurveyState } from '@webapp/store/survey'
+import { useI18n, useLang } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
+
 import { BinaryOperandType } from './binaryOperand'
 
 const isValueText = (nodeDef, value) =>

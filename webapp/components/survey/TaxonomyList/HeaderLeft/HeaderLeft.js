@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
+import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const HeaderLeft = (props) => {

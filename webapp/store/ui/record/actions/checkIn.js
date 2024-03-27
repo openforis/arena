@@ -1,12 +1,12 @@
-import * as R from 'ramda'
 import axios from 'axios'
+import * as R from 'ramda'
 
 import { Dates } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 
 import { SurveyState } from '@webapp/store/survey'
 import { LoaderActions } from '@webapp/store/ui'

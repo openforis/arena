@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
 
-import * as API from '@webapp/service/api'
 import { ButtonDownload as ButtonDownloadSimple } from '@webapp/components/buttons'
+import * as API from '@webapp/service/api'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 const ButtonDownload = (props) => {

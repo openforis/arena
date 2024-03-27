@@ -1,6 +1,6 @@
 import * as DialogConfirmActions from './actions'
-import * as DialogConfirmState from './state'
-import DialogConfirmReducer from './reducer'
 import { useDialogConfirm } from './hooks'
+import DialogConfirmReducer from './reducer'
+import * as DialogConfirmState from './state'
 
 export { DialogConfirmActions, DialogConfirmReducer, DialogConfirmState, useDialogConfirm }

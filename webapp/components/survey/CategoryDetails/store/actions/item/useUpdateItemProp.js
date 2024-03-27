@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as API from '@webapp/service/api'
 import { AppSavingActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
-import * as API from '@webapp/service/api'
-
 import { debounceAction } from '@webapp/utils/reduxUtils'
+
 import { State } from '../../state'
 
 const _putPropAction =

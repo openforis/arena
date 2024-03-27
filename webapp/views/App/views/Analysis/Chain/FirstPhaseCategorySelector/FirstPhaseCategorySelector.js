@@ -2,13 +2,14 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
-import * as Category from '@core/survey/category'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
+import * as Category from '@core/survey/category'
+
 import { FormItem } from '@webapp/components/form/Input'
+import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 export const FirstPhaseCategorySelector = () => {
   const dispatch = useDispatch()

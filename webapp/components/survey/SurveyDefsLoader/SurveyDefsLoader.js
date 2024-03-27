@@ -2,18 +2,16 @@ import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+
 import * as Survey from '@core/survey/survey'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-
-import { useI18n } from '@webapp/store/system'
-
-import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { RecordState } from '@webapp/store/ui/record'
-
 import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { RecordState } from '@webapp/store/ui/record'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props

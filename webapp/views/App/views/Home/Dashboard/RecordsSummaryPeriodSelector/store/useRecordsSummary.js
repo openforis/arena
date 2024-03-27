@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
-
-import { useActions } from './actions'
+import { useEffect, useState } from 'react'
 
 import { timeRanges } from './utils/timeRanges'
+import { useActions } from './actions'
 
 const initialState = {
   from: '',

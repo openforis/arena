@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import * as SurveyRdbApi from '@webapp/service/api/surveyRdb'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'

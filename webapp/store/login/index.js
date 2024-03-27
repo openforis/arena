@@ -1,6 +1,6 @@
 import * as LoginActions from './actions'
+import LoginReducer from './reducer'
 import * as LoginState from './state'
 import * as LoginValidator from './validator'
-import LoginReducer from './reducer'
 
-export { LoginActions, LoginState, LoginValidator, LoginReducer }
+export { LoginActions, LoginReducer, LoginState, LoginValidator }

@@ -3,24 +3,21 @@ import './CategoryList.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
-import Table from '@webapp/components/Table'
+import { Button, ButtonDelete, ButtonIconEditOrView } from '@webapp/components'
 import ErrorBadge from '@webapp/components/errorBadge'
+import Table from '@webapp/components/Table'
 import WarningBadge from '@webapp/components/warningBadge'
-
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { Button, ButtonDelete, ButtonIconEditOrView } from '@webapp/components'
-
-import TableHeaderLeft from './TableHeaderLeft'
-
 import { State, useActions, useLocalState } from './store'
+import TableHeaderLeft from './TableHeaderLeft'
 
 const getType = ({ category }) => {
   if (Category.isReportingData(category)) return 'reportingData'

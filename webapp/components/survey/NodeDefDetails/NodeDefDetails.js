@@ -6,20 +6,18 @@ import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
+import { FormItem, Input } from '@webapp/components/form/Input'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import TabBar from '@webapp/components/tabBar'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import TabBar from '@webapp/components/tabBar'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-
-import ButtonBar from './ButtonBar'
-import ValidationsProps from './ValidationsProps'
 import AdvancedProps from './AdvancedProps'
-import BasicProps from './BasicProps'
 import AnalysisEntitySelector from './AnalysisEntitySelector'
-
+import BasicProps from './BasicProps'
+import ButtonBar from './ButtonBar'
 import { State, useNodeDefDetails } from './store'
+import ValidationsProps from './ValidationsProps'
 
 const NodeDefDetails = () => {
   const i18n = useI18n()

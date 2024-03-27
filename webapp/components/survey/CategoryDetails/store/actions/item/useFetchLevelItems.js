@@ -4,7 +4,6 @@ import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as API from '@webapp/service/api'
-
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 

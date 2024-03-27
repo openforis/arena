@@ -1,13 +1,12 @@
 import React, { useEffect, useRef } from 'react'
-import ReactDOMServer from 'react-dom/server.browser'
-
+import PropTypes from 'prop-types'
 import * as d3 from 'd3'
 import d3Tip from 'd3-tip'
-
-import { useI18n } from '@webapp/store/system'
+import ReactDOMServer from 'react-dom/server.browser'
 
 import * as DateUtils from '@core/dateUtils'
-import PropTypes from 'prop-types'
+
+import { useI18n } from '@webapp/store/system'
 
 const DataPointTooltip = ({ dataPoint, i18n }) => {
   const { __data__: data } = dataPoint

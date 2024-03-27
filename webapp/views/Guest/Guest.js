@@ -1,12 +1,13 @@
 import './Guest.scss'
+
 import React from 'react'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
 import { guestModules } from '@webapp/app/appModules'
-import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
-import ForgotPassword from '@webapp/views/Guest/views/ForgotPassword'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
 import AccessRequest from '@webapp/views/Guest/views/AccessRequest'
+import ForgotPassword from '@webapp/views/Guest/views/ForgotPassword'
 import Login from '@webapp/views/Guest/views/Login'
+import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
 
 const OfArenaLogo = () => (
   <a

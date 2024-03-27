@@ -2,21 +2,20 @@ import './MapView.scss'
 
 import React, { useCallback, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-
-import * as API from '@webapp/service/api'
-import { useSurvey } from '@webapp/store/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import * as API from '@webapp/service/api'
+import { useSurvey } from '@webapp/store/survey'
 
-import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
-import { useRandomColors } from './useRandomColor'
 import { RecordEditModal } from './RecordEditModal'
+import { SamplingPointDataLayer } from './SamplingPointDataLayer'
+import { useRandomColors } from './useRandomColor'
 
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)

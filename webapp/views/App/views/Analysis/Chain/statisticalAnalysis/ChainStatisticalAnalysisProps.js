@@ -4,24 +4,26 @@ import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'
-import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import * as Survey from '@core/survey/survey'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
-import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
-
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import WarningBadge from '@webapp/components/warningBadge'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
-import { DimensionsSelector } from './DimensionsSelector'
+import WarningBadge from '@webapp/components/warningBadge'
+import { useSurvey } from '@webapp/store/survey'
+import { useEntityDataCount } from '@webapp/store/surveyRdb/hooks'
+import { useI18n } from '@webapp/store/system'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { debounceAction } from '@webapp/utils/reduxUtils'
+
 import { PValueSelector } from '../PValueSelector'
+
+import { DimensionsSelector } from './DimensionsSelector'
 
 export const ChainStatisticalAnalysisProps = () => {
   const dispatch = useDispatch()

@@ -5,8 +5,8 @@ import * as JobSerialized from '@common/job/jobSerialized'
 
 import { useI18n } from '@webapp/store/system'
 
-import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
+import JobProgress from '../../JobProgress'
 
 const InnerJob = ({ isCurrentJob, innerJob, index }) => {
   const i18n = useI18n()

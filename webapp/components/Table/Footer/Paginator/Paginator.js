@@ -5,8 +5,9 @@ import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 
-import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useI18n } from '@webapp/store/system'
+
 import { TableConstants } from '../../constants'
 
 const Paginator = (props) => {

@@ -1,11 +1,11 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 

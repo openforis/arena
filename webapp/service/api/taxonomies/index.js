@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 import * as A from '@core/arena'
-
 import * as Taxonomy from '@core/survey/taxonomy'
 
 // ==== READ

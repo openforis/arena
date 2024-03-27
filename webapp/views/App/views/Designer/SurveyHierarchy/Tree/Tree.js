@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 
 import * as NodeDef from '@core/survey/nodeDef'
+
 import { elementOffset } from '@webapp/utils/domUtils'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }

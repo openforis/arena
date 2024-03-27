@@ -7,14 +7,14 @@ import { Objects } from '@openforis/arena-core'
 
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 const sources = {

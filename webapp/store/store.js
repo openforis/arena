@@ -2,12 +2,10 @@ import { combineReducers } from 'redux'
 import { configureStore } from '@reduxjs/toolkit'
 
 import appErrorsMiddleware from '@webapp/app/appErrorsMiddleware'
-
-// == app reducer
-
-import { SystemState, SystemReducer } from '@webapp/store/system'
 import { LoginReducer, LoginState } from '@webapp/store/login'
 import { SurveyReducer, SurveyState } from '@webapp/store/survey'
+// == app reducer
+import { SystemReducer, SystemState } from '@webapp/store/system'
 import { UiReducer, UiState } from '@webapp/store/ui'
 import { UserReducer, UserState } from '@webapp/store/user'
 

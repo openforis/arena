@@ -1,1 +1,1 @@
-export { default, helperTypes} from './Helper'
+export { default, helperTypes } from './Helper'

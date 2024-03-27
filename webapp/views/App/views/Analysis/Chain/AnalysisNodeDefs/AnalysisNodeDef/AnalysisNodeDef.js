@@ -1,19 +1,19 @@
 import './AnalysisNodeDef.scss'
+
 import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import { useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, NodeDefsActions, useSurveyPreferredLang, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
-
 import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/warningBadge'
+import { NodeDefsActions, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
   const dispatch = useDispatch()

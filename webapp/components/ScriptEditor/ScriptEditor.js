@@ -2,9 +2,8 @@ import './ScriptEditor.scss'
 
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-
-import AceEditor from 'react-ace'
 import * as ace from 'ace-builds'
+import AceEditor from 'react-ace'
 
 import 'ace-builds/webpack-resolver'
 import 'ace-builds/src-noconflict/mode-r'

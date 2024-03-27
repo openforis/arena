@@ -1,4 +1,4 @@
-import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock } from '../../blocks'
+import { GroupByBlock, MaxHeightBlock, ShowLegendBlock, TitleBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
 
 const scatter = {

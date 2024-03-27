@@ -1,18 +1,16 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
+import { useDispatch } from 'react-redux'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
 
-import { FormItem } from '@webapp/components/form/Input'
 import { Button } from '@webapp/components/buttons'
-
-import { DialogConfirmActions } from '@webapp/store/ui'
-import { useI18n } from '@webapp/store/system'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { FormItem } from '@webapp/components/form/Input'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
-
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 const NodeDefEntityFormNodeSelect = (props) => {

@@ -1,19 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
+import * as Authorizer from '@core/auth/authorizer'
 import * as Record from '@core/record/record'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
-import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
-
-import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
-import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 const Row = (props) => {
   const { rowNo, row } = props

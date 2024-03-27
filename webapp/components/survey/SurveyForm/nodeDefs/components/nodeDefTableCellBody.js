@@ -9,6 +9,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
+
 import NodeDefErrorBadge from './nodeDefErrorBadge'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
 

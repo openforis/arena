@@ -1,13 +1,13 @@
 import React from 'react'
-import classNames from 'classnames'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { Button } from '@webapp/components'
+import Markdown from '@webapp/components/markdown'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
-import Markdown from '@webapp/components/markdown'
 import JobErrors from '@webapp/views/App/JobMonitor/JobErrors'
 
 const determineContentKey = ({ jobType, dryRun, hasErrors }) => {

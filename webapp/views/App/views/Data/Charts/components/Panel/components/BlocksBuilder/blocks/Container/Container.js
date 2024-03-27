@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
 import './Container.scss'
-import * as A from '@core/arena'
-import { Button } from '@webapp/components'
-import RenderByType from '../BlockRenderer/BlockRenderer'
+
+import React, { useState } from 'react'
 import classNames from 'classnames'
+
+import * as A from '@core/arena'
+
+import { Button } from '@webapp/components'
+
+import RenderByType from '../BlockRenderer/BlockRenderer'
 const ContainerBlock = ({ config, configItemsByPath, configActions, blockPath = '', dimensions, block }) => {
   const [isVisible, setIsVisible] = useState(true)
   const { title, subtitle, blocks, order } = block

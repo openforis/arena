@@ -3,19 +3,18 @@ import './UsersList.scss'
 import React from 'react'
 import { useNavigate } from 'react-router'
 
-import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
+import * as User from '@core/user/user'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import Table from '@webapp/components/Table'
-import ProfilePicture from '@webapp/components/profilePicture'
 import { ButtonIconEdit } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-
+import ProfilePicture from '@webapp/components/profilePicture'
+import Table from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 
-import { UserSurveysTable } from './UserSurveysTable'
 import { TableHeaderLeft } from './TableHeaderLeft'
+import { UserSurveysTable } from './UserSurveysTable'
 
 export const UsersList = () => {
   const navigate = useNavigate()

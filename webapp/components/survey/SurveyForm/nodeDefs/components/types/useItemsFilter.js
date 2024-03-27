@@ -4,8 +4,8 @@ import { Objects, RecordExpressionEvaluator } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
+import { RecordState } from '@webapp/store/ui/record'
 
 export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFunction = null }) =>
   useSelector((state) => {

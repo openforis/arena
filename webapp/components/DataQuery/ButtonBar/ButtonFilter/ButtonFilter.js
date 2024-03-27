@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
+
+import * as Expression from '@core/expressionParser/expression'
 
 import { ButtonIconFilter } from '@webapp/components/buttons'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'

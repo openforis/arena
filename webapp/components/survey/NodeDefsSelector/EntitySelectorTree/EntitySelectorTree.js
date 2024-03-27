@@ -1,9 +1,11 @@
 import './EntitySelectorTree.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
+
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 

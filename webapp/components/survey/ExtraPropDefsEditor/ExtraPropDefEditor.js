@@ -5,9 +5,9 @@ import * as StringUtils from '@core/stringUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { Dropdown } from '@webapp/components/form'
 import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from '@webapp/components'
+import { Dropdown } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
 
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'
 

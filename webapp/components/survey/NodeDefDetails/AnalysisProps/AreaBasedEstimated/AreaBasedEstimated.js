@@ -4,11 +4,10 @@ import PropTypes from 'prop-types'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
-import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const AreaBasedEstimated = (props) => {
   const { nodeDef, state, Actions } = props

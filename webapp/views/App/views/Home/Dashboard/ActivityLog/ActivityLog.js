@@ -1,16 +1,14 @@
 import './ActivityLog.scss'
 
 import React from 'react'
-import * as R from 'ramda'
 import classNames from 'classnames'
+import * as R from 'ramda'
 
 import { useOnIntersect } from '@webapp/components/hooks'
-
 import { useI18n } from '@webapp/store/system'
 
-import { useActivityLog, ActivityLogMessage } from './store'
-
 import Message from './Message'
+import { ActivityLogMessage, useActivityLog } from './store'
 
 const ActivityLog = () => {
   const i18n = useI18n()

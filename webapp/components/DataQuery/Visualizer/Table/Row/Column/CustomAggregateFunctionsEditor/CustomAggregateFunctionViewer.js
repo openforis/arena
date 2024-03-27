@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Checkbox from '@webapp/components/form/checkbox'
 import { ButtonIconEdit } from '@webapp/components'
+import Checkbox from '@webapp/components/form/checkbox'
 
 export const CustomAggregateFunctionViewer = (props) => {
   const { fn, selected, onSelectionChange, setEditedUuid } = props

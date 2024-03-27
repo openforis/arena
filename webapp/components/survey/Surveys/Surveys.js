@@ -5,18 +5,17 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
+import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
-import { FileUtils } from '@webapp/utils/fileUtils'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
+import Table from '@webapp/components/Table'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-
-import Table from '@webapp/components/Table'
-import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'

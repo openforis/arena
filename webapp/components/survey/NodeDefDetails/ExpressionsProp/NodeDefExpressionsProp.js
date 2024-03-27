@@ -2,14 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
-import * as Expression from '@core/expressionParser/expression'
-
-import ExpressionsProp from './ExpressionsProp'
 
 import { State } from '../store'
+
+import ExpressionsProp from './ExpressionsProp'
 
 const NodeDefExpressionsProp = (props) => {
   const {

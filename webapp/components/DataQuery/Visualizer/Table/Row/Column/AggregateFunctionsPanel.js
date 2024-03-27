@@ -4,12 +4,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
 
-import PanelRight from '@webapp/components/PanelRight'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
+import PanelRight from '@webapp/components/PanelRight'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 

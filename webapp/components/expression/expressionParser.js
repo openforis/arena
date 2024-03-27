@@ -1,8 +1,7 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
-
 import { isNotBlank } from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 export const parseQuery = (query, mode, canBeConstant) => {
   const exprQuery = Expression.fromString(query, mode)
@@ -45,12 +44,12 @@ export const getLiteralSearchParams = (survey, nodeDef, preferredLang) => {
           lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
         }
       : nodeDef && NodeDef.isTaxon(nodeDef)
-      ? {
-          surveyId,
-          type: NodeDef.nodeDefType.taxon,
-          taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
-        }
-      : null
+        ? {
+            surveyId,
+            type: NodeDef.nodeDefType.taxon,
+            taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
+          }
+        : null
 
   return literalSearchParams
 }

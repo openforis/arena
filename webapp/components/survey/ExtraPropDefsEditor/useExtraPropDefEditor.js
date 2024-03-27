@@ -4,8 +4,8 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
 import { useConfirm } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
 
 export const useExtraPropDefEditor = (props) => {
   const { index, extraPropDef: extraPropDefProp, extraPropDefs, onItemDelete, onItemUpdate } = props

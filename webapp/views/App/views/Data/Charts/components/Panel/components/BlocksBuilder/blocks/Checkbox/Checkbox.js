@@ -1,6 +1,8 @@
-import React, { useCallback, useMemo } from 'react'
-import * as A from '@core/arena'
 import './Checkbox.scss'
+
+import React, { useCallback, useMemo } from 'react'
+
+import * as A from '@core/arena'
 
 const CheckboxBlock = ({ configItemsByPath, configActions, blockPath, block }) => {
   const { title, subtitle, label, id, isRadio = false, defaultValue = false } = block

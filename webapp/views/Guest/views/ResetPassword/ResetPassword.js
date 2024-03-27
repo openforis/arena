@@ -1,16 +1,16 @@
 import './ResetPassword.scss'
+
 import React from 'react'
 
 import * as User from '@core/user/user'
 
+import { Button } from '@webapp/components'
+import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/components/form'
+import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
 
-import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
-
 import { useResetPassword } from './store/hooks'
-import { Button } from '@webapp/components'
-import { PasswordInput, PasswordStrengthChecker, TextInput } from '@webapp/components/form'
 
 const ResetPassword = () => {
   const i18n = useI18n()

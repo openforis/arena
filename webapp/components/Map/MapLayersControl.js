@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react'
-import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 
 import * as User from '@core/user/user'
-import { useUser } from '@webapp/store/user'
+
 import { useSurveyId } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
 import { baseLayers } from './baseLayers'
 import { useMapContext } from './MapContext'

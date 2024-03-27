@@ -1,13 +1,12 @@
 import './panelRight.scss'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-
-import { TestId } from '@webapp/utils/testId'
+import ReactDOM from 'react-dom'
 
 import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const PanelRight = (props) => {
   const { children, className, header, onClose, showFooter, width } = props
