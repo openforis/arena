@@ -1,3 +1,11 @@
+arena.prepareQueryParams = function(query) {
+  actualQuery <- list(language = arena.preferredLanguage, token = arena.token)
+  if (!is.null(query)) {
+    actualQuery <- c(actualQuery, query)
+  }
+  return(actualQuery)
+}
+
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
@@ -24,12 +32,12 @@ arena.getApiUrl = function(url) {
 }
 
 arena.get = function(url, query = NULL) {
-  resp <- httr::GET(arena.getApiUrl(url), query = query)
+  resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query))
   return(arena.parseResponse(resp))
 }
 
 arena.getToFile = function (url, query = NULL, file) {
-  httr::GET(arena.getApiUrl(url), query = query, write_disk(file))
+  httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), write_disk(file))
 }
 
 arena.getCSV = function (url, query = NULL) {
@@ -45,12 +53,12 @@ arena.getCSV = function (url, query = NULL) {
 }
 
 arena.post = function(url, body) {
-  resp <- httr::POST(arena.getApiUrl(url), body = body)
+  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
   return(arena.parseResponse(resp))
 }
 
 arena.put = function(url, body) {
-  resp <- httr::PUT(arena.getApiUrl(url), body = body)
+  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
   return(arena.parseResponse(resp))
 }
 
@@ -61,7 +69,7 @@ arena.putFile = function(url, filePath) {
 }
 
 arena.delete = function(url, body) {
-  resp <- httr::DELETE(arena.getApiUrl(url), body = body)
+  resp <- httr::DELETE(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
   return(arena.parseResponse(resp))
 }
 
