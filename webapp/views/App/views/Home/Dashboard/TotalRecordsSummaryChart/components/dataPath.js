@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-
-import * as R from 'ramda'
 import * as d3 from 'd3'
 import { interpolatePath as d3interpolatePath } from 'd3-interpolate-path'
+import * as R from 'ramda'
 
 const DataPath = (props) => {
   const { counts, from, to, chartProps } = props

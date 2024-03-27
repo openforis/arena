@@ -1,7 +1,9 @@
 import { useCallback, useLayoutEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { Sortable } from '@shopify/draggable'
+
 import * as NodeDef from '@core/survey/nodeDef'
+
 import { NodeDefsActions } from '@webapp/store/survey'
 
 export const useSortAnalysisNodeDefs = ({ analysisNodeDefsContainerRef, analysisNodeDefs = [] }) => {

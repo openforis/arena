@@ -2,16 +2,16 @@ import './LabelsEditor.scss'
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import * as A from '@core/arena'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as A from '@core/arena'
 
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
-import Label from './Label'
 import ButtonToggle from './ButtonToggle'
+import Label from './Label'
 
 const MAX_PREVIEW_LANGUAGES = 1
 

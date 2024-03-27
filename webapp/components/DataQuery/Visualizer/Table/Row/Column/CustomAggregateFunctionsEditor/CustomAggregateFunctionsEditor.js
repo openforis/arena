@@ -3,9 +3,9 @@ import './CustomAggregateFunctionsEditor.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { ButtonNew } from '@webapp/components'
 import { useI18n } from '@webapp/store/system'
 
-import { ButtonNew } from '@webapp/components'
 import { CustomAggregateFunctionEditor } from './CustomAggregateFunctionEditor'
 import { CustomAggregateFunctionViewer } from './CustomAggregateFunctionViewer'
 import { useCustomAggregateFunctionsEditor } from './useCustomAggregateFunctionsEditor'

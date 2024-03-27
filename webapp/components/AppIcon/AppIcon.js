@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { AppInfo } from '@core/app/appInfo'
+
 import { useI18n } from '@webapp/store/system'
 
 const iconByAppId = {

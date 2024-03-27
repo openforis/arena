@@ -6,13 +6,15 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
-import { TestId } from '@webapp/utils/testId'
+
+import { useNodeDefByUuid } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
+import { Button } from '../buttons'
 
 import ExpressionEditorPopup from './expressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
-import { useNodeDefByUuid } from '@webapp/store/survey'
-import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
   const {

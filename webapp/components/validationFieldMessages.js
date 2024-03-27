@@ -4,10 +4,9 @@ import React from 'react'
 
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import Markdown from '@webapp/components/markdown'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-
-import Markdown from '@webapp/components/markdown'
 
 const ValidationFieldMessages = (props) => {
   const { showIcons, showKeys, validation } = props

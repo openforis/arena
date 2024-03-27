@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import { Button } from '@webapp/components'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
-import { copyToClipboard } from '@webapp/utils/domUtils'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import { copyToClipboard } from '@webapp/utils/domUtils'
 
 export const CopyInvitationLinkButton = (props) => {
   const { email, userUuid } = props

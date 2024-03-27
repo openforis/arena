@@ -4,7 +4,9 @@ import { useSelector } from 'react-redux'
 import * as Survey from '@core/survey/survey'
 
 import { SurveyState } from '@webapp/store/survey'
+
 import { State } from '../state'
+
 import { useValidate } from './useValidate'
 
 export const useSetLayoutProp = ({ setState }) => {

@@ -1,16 +1,17 @@
 import './AnalysisNodeDefsHeader.scss'
+
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import * as Chain from '@common/analysis/chain'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { useI18n } from '@webapp/store/system'
-
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { Checkbox } from '@webapp/components/form'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { useI18n } from '@webapp/store/system'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 const AnalysisNodeDefsHeader = ({ toggleShowSamplingNodeDefs, showSamplingNodeDefs }) => {
   const dispatch = useDispatch()

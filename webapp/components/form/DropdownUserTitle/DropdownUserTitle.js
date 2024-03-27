@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import * as User from '@core/user/user'
 
-import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useI18n } from '@webapp/store/system'
 
 const titleItems = User.titleKeysArray.map((value) => ({ value }))
 

@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import * as API from '@webapp/service/api'
-
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'

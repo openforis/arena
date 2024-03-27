@@ -1,14 +1,14 @@
 import React from 'react'
-import { useNavigate } from 'react-router'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
 
 import { updateQuery } from '@webapp/components/Table/tableLink'
+import { TablesActions } from '@webapp/store/ui/tables'
 
 import Paginator from './Paginator'
-import { TablesActions } from '@webapp/store/ui/tables'
 
 export const Footer = (props) => {
   const { count, limit, list, module, offset } = props

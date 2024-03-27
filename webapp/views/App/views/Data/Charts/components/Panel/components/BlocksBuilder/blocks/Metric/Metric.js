@@ -1,10 +1,14 @@
-import React, { useCallback, useMemo, useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
-import { uuidv4 } from '@core/uuid'
 import './Metric.scss'
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
 import { Popover } from 'react-tiny-popover'
-import RenderByType from '../BlockRenderer/BlockRenderer'
+
+import { uuidv4 } from '@core/uuid'
+
 import { ButtonAdd } from '@webapp/components'
+
+import RenderByType from '../BlockRenderer/BlockRenderer'
 
 const PopoverContent = (props) => {
   const {

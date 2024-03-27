@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 
-import { useFetchLevelItems } from './useFetchLevelItems'
-
 import { State } from '../../state'
+
+import { useFetchLevelItems } from './useFetchLevelItems'
 
 export const useSetItemActive = ({ setState }) => {
   const fetchLevelItems = useFetchLevelItems({ setState })

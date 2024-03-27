@@ -4,11 +4,11 @@ import classNames from 'classnames'
 
 import { Query, Sort, SortCriteria } from '@common/model/query'
 
+import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 
-import { Button } from '@webapp/components/buttons'
-
 import { State } from '../store'
+
 import SortEditor from './SortEditor'
 
 const ButtonSort = (props) => {

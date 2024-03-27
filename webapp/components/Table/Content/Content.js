@@ -1,15 +1,14 @@
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-
 import * as R from 'ramda'
 
 import LoadingBar from '@webapp/components/LoadingBar'
-
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import { ContentRowCells } from './ContentRowCells'
+
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
+import { ContentRowCells } from './ContentRowCells'
 
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">

@@ -1,17 +1,17 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
-import { Responsive, WidthProvider } from 'react-grid-layout'
 import classNames from 'classnames'
+import { Responsive, WidthProvider } from 'react-grid-layout'
+import { useDispatch, useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
-import * as Node from '@core/record/node'
+import * as Survey from '@core/survey/survey'
 
-import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
 import { useIsMountedRef } from '@webapp/components/hooks'
+import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 

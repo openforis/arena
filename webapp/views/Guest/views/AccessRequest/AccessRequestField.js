@@ -7,12 +7,12 @@ import { Countries } from '@core/Countries'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Validation from '@core/validation/validation'
 
-import { FormItem } from '@webapp/components/form/Input'
-
-import { useI18n } from '@webapp/store/system'
-import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { useI18n } from '@webapp/store/system'
+
+import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 
 const CountryField = (props) => {
   const { field, onChange, value } = props

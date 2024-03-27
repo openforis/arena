@@ -1,9 +1,11 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
-import * as A from '@core/arena'
 
 import { Query } from '@common/model/query'
-import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+
+import * as A from '@core/arena'
+
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 const getUrl = ({ surveyId, query }) => `/api/reporting/${surveyId}/${Query.getEntityDefUuid(query)}/chart`
 

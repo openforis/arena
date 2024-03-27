@@ -1,9 +1,8 @@
 import './ServiceErrors.scss'
 
 import React from 'react'
-import { CSSTransition, TransitionGroup } from 'react-transition-group'
-
 import * as R from 'ramda'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import { useServiceErrors } from '@webapp/store/system'
 

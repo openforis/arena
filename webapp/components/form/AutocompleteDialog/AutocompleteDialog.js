@@ -1,11 +1,11 @@
 import './AutocompleteDialog.scss'
 
-import React, { useCallback, useRef, useMemo } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 
-import { useLocalState, State } from './store'
+import { State, useLocalState } from './store'
 
 const AutocompleteDialog = (props) => {
   const {

@@ -1,13 +1,12 @@
 import React from 'react'
 import { useNavigate } from 'react-router'
 
+import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
 
-import { analysisModules, appModuleUri } from '@webapp/app/appModules'
-
+import HeaderLeft from './HeaderLeft'
 import Row from './Row'
 import RowHeader from './RowHeader'
-import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
   const navigate = useNavigate()

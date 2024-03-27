@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+
 import { useRefreshCategory } from './useRefreshCategory'
-import { useDispatch } from 'react-redux'
 
 export const useUpdateCategoryItemExtraPropItem = ({ setState }) => {
   const dispatch = useDispatch()

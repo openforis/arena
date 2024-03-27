@@ -2,9 +2,9 @@ import { latLngBounds } from 'leaflet'
 
 import { Points } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
+
+import * as Survey from '@core/survey/survey'
 
 import { ValueFormatter } from '@webapp/components/DataQuery'
 

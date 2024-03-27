@@ -2,13 +2,11 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import { useFormObject } from '@webapp/components/hooks'
 import { EmailInput } from '@webapp/components/form'
-
-import Error from '@webapp/views/Guest/Error'
-
+import { useFormObject } from '@webapp/components/hooks'
+import { LoginActions, LoginState, LoginValidator } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
-import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
+import Error from '@webapp/views/Guest/Error'
 
 const ForgotPassword = () => {
   const initialEmail = useSelector(LoginState.getEmail)

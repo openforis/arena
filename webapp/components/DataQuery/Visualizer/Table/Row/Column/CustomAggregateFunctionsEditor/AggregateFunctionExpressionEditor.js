@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import { ViewDataNodeDef } from '@common/model/db'
 
-import { useSurvey } from '@webapp/store/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
+import { useSurvey } from '@webapp/store/survey'
 
 export const AggregateFunctionExpressionEditor = (props) => {
   const { expression, entityDef, onChange } = props

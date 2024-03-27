@@ -1,18 +1,18 @@
 import './HeaderLeft.scss'
+
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
-import * as Survey from '@core/survey/survey'
 import * as StringUtils from '@core/stringUtils'
-
-import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
-import { RecordActions } from '@webapp/store/ui/record'
-
-import { TestId } from '@webapp/utils/testId'
+import * as Survey from '@core/survey/survey'
 
 import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit } from '@webapp/components'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { RecordActions } from '@webapp/store/ui/record'
 import {
   useAuthCanDeleteRecords,
   useAuthCanExportRecords,
@@ -20,12 +20,12 @@ import {
   useAuthCanUpdateRecordsStep,
   useAuthCanUseAnalysis,
 } from '@webapp/store/user/hooks'
-import { DialogConfirmActions } from '@webapp/store/ui'
-import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
-import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
+
 import { RecordsDataExportModal } from './RecordsDataExportModal'
+import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 
 const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
   const dispatch = useDispatch()

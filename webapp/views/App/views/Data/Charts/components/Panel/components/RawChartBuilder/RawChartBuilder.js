@@ -1,20 +1,21 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react'
+import './RawChartBuilder.scss'
+
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import * as ace from 'ace-builds'
+import classNames from 'classnames'
+import AceEditor from 'react-ace'
+
 import * as A from '@core/arena'
 
-import * as ace from 'ace-builds'
-import AceEditor from 'react-ace'
-import { useI18n } from '@webapp/store/system'
 import PanelRight from '@webapp/components/PanelRight'
+import { useI18n } from '@webapp/store/system'
 
 import 'ace-builds/webpack-resolver'
 import 'ace-builds/src-noconflict/mode-json'
 import 'ace-builds/src-noconflict/theme-github'
 import 'ace-builds/src-noconflict/ext-searchbox'
 import 'ace-builds/src-noconflict/ext-language_tools'
-
-import './RawChartBuilder.scss'
-import classNames from 'classnames'
 
 const aceLangTools = ace.require('ace/ext/language_tools')
 const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools

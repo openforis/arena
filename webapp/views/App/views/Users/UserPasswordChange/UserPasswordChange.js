@@ -2,18 +2,16 @@ import './UserPasswordChange.scss'
 
 import React, { useState } from 'react'
 
-import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
-
-import * as API from '@webapp/service/api'
-
-import { useI18n } from '@webapp/store/system'
+import * as Validation from '@core/validation/validation'
 
 import { Button, ButtonBack } from '@webapp/components'
-import { useNotifyInfo } from '@webapp/components/hooks'
 import { PasswordInput, PasswordStrengthChecker } from '@webapp/components/form'
+import { useNotifyInfo } from '@webapp/components/hooks'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import * as API from '@webapp/service/api'
+import { useI18n } from '@webapp/store/system'
 
 const defaultState = { form: UserPasswordChangeForm.newForm(), validation: {} }
 

@@ -1,5 +1,4 @@
 import * as A from '@core/arena'
-
 import * as Category from '@core/survey/category'
 
 export const stateKey = 'categories'

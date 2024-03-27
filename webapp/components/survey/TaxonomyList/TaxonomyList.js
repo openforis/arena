@@ -1,12 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import Table from '@webapp/components/Table/Table'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import HeaderLeft from './HeaderLeft'
-import RowHeader from './RowHeader'
 import Row from './Row'
+import RowHeader from './RowHeader'
 
 const TaxonomyList = (props) => {
   const { canSelect, selectedItemUuid, onSelect: onTaxonomySelect, onTaxonomyOpen, onTaxonomyCreated } = props

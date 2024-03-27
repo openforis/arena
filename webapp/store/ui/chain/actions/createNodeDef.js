@@ -1,5 +1,5 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'

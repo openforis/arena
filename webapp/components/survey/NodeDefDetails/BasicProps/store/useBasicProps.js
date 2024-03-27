@@ -1,16 +1,17 @@
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
+import { Surveys } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { State } from '../../store'
+
 import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
 import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
-
-import { State } from '../../store'
-import { Surveys } from '@openforis/arena-core'
 
 export const useBasicProps = (props) => {
   const { state } = props

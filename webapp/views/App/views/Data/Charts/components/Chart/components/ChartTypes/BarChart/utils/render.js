@@ -1,12 +1,13 @@
 import * as d3 from 'd3'
+
 import {
-  renderTooltip,
-  renderTitle,
-  renderLegend,
   renderAxes,
-  renderStackedBars,
-  renderSingleMetricBars,
   renderGroupedBars,
+  renderLegend,
+  renderSingleMetricBars,
+  renderStackedBars,
+  renderTitle,
+  renderTooltip,
 } from './renderHelpers'
 
 const setupChart = (data, specs, metricAggregationNames, chartRef) => {

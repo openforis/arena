@@ -1,17 +1,16 @@
 import React, { useMemo } from 'react'
-import { DataGrid as MuiDataGrid, GridFooter, GridFooterContainer, GridToolbarExport } from '@mui/x-data-grid'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import { DataGrid as MuiDataGrid, GridFooter, GridFooterContainer, GridToolbarExport } from '@mui/x-data-grid'
 
 const FooterWithExport =
   ({ exportFileName }) =>
-  () =>
-    (
-      <GridFooterContainer>
-        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
-        <GridFooter />
-      </GridFooterContainer>
-    )
+  () => (
+    <GridFooterContainer>
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+      <GridFooter />
+    </GridFooterContainer>
+  )
 
 const DataGrid = (props) => {
   const {

@@ -1,22 +1,19 @@
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import * as Validation from '@core/validation/validation'
 
-import * as API from '@webapp/service/api'
-
-import { debounceAction } from '@webapp/utils/reduxUtils'
-
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-
+import * as API from '@webapp/service/api'
 import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
 import { NotificationActions } from '@webapp/store/ui/notification'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
-import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
+import * as SurveyState from '../state'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'

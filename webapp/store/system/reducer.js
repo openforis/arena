@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
 
-import { SystemErrorReducer, SystemErrorState } from './systemError'
-import { SystemStatusReducer, SystemStatusState } from './status'
 import { ServiceErrorReducer, ServiceErrorState } from './serviceError'
+import { SystemStatusReducer, SystemStatusState } from './status'
+import { SystemErrorReducer, SystemErrorState } from './systemError'
 
 export default combineReducers({
   [SystemErrorState.stateKey]: SystemErrorReducer,

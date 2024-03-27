@@ -4,17 +4,16 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 
 import { appModules, userModules } from '@webapp/app/appModules'
-
 import ModuleSwitch from '@webapp/components/moduleSwitch'
-import { useUser } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
+import UserEdit from './UserEdit'
+import UserInvite from './UserInvite'
+import UserPasswordChange from './UserPasswordChange'
+import { UsersAccessRequest } from './UsersAccessRequest'
 import { UsersList } from './UsersList'
 import UsersListSurvey from './UsersListSurvey'
-import UserInvite from './UserInvite'
-import UserEdit from './UserEdit'
-import { UsersAccessRequest } from './UsersAccessRequest'
-import UserPasswordChange from './UserPasswordChange'
 
 const Users = () => {
   const user = useUser()

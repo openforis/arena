@@ -3,6 +3,7 @@ import './uploadButton.scss'
 import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
+
 import { useI18n } from '@webapp/store/system'
 
 const checkFilesSize = (files, maxSizeMB) =>

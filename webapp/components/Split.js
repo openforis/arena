@@ -1,9 +1,9 @@
 import './Split.scss'
 
 import React from 'react'
-import ReactSplit from 'react-split'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import ReactSplit from 'react-split'
 
 export const Split = (props) => {
   const { className, children, direction, expandToMin, minSize, sizes } = props

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
 
 import * as Category from '@core/survey/category'
 

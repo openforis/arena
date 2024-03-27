@@ -3,21 +3,19 @@ import './Records.scss'
 import React, { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import * as Record from '@core/record/record'
-
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
-import { useSurveyCycleKey, useNodeDefRootKeys } from '@webapp/store/survey'
+import * as Record from '@core/record/record'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
-
-import Table from '@webapp/components/Table'
 import { LoadingBar } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
+import Table from '@webapp/components/Table'
+import { useNodeDefRootKeys, useSurveyCycleKey } from '@webapp/store/survey'
 
 import HeaderLeft from './HeaderLeft'
-import { useNodeDefKeysCategoryItemsInLevel } from './useNodeDefKeysCategoryItemsInLevel'
 import { useColumns } from './useColumns'
+import { useNodeDefKeysCategoryItemsInLevel } from './useNodeDefKeysCategoryItemsInLevel'
 
 const Records = () => {
   const navigate = useNavigate()

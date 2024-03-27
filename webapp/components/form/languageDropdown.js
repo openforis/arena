@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { getLanguageLabel, languageItemsSortedByEnLabel } from '@core/app/languages'
 
 import { useI18n } from '@webapp/store/system'
+
 import Dropdown from './Dropdown'
 
 const LanguageDropdown = (props) => {

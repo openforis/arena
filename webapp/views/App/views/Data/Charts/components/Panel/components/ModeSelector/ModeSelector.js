@@ -1,8 +1,8 @@
+import './ModeSelector.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-
-import './ModeSelector.scss'
 
 const ModeSelector = ({ modes, currentMode, onSelectMode }) => {
   return (

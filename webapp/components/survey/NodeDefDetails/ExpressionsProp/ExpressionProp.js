@@ -1,18 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as ValidationResult from '@core/validation/validationResult'
-import * as Expression from '@core/expressionParser/expression'
-
-import { useI18n } from '@webapp/store/system'
-import { TestId } from '@webapp/utils/testId'
 
 import ExpressionEditor from '@webapp/components/expression/expressionEditor'
 import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const ExpressionProp = (props) => {
   const {

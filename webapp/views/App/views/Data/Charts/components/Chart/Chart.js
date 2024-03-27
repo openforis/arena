@@ -1,11 +1,13 @@
+import './Chart.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import Split from 'react-split'
-import Data from './components/Data'
-import ScatterPlot from './components/ChartTypes/ScatterPlot/'
+
 import BarChart from './components/ChartTypes/BarChart/'
 import PieChart from './components/ChartTypes/PieChart/'
-import './Chart.scss'
+import ScatterPlot from './components/ChartTypes/ScatterPlot/'
+import Data from './components/Data'
 
 const Chart = ({ data, specs, fullScreen, chartRef }) => {
   const chartType = specs?.chartType

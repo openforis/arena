@@ -1,8 +1,8 @@
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
+
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as ActivityLogMessageParserUtils from '../utils'
 

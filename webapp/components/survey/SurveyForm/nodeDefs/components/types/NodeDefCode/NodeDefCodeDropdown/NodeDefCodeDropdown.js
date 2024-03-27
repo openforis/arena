@@ -6,10 +6,10 @@ import { Objects } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { TestId } from '@webapp/utils/testId'
-import { useI18n } from '@webapp/store/system'
-import InputChips from '@webapp/components/form/InputChips'
 import Dropdown from '@webapp/components/form/Dropdown'
+import InputChips from '@webapp/components/form/InputChips'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
 const NodeDefCodeDropdown = (props) => {
   const {

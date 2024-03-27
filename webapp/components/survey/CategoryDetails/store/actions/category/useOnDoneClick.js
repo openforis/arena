@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 

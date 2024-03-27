@@ -1,6 +1,6 @@
-import React, { useCallback } from 'react'
-
 import './Input.scss'
+
+import React, { useCallback } from 'react'
 
 const InputBlock = ({ config, configItemsByPath, configActions, blockPath, dimensions, block }) => {
   const { title, subtitle, id } = block

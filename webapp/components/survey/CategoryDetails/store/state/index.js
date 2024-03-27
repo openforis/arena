@@ -1,5 +1,4 @@
 import { create } from './create'
-
 import {
   getCategory,
   getImportSummary,
@@ -7,29 +6,28 @@ import {
   getItemActiveLastLevelIndex,
   getItemsArray,
   getOnCategoryUpdate,
-  isItemActiveLeaf,
   isCategoryEmpty,
   isCleaned,
   isEditingItemExtraDefs,
+  isItemActiveLeaf,
 } from './read'
-
 import {
   assocCategory,
   assocCategoryProp,
-  assocLevelProp,
-  assocItems,
-  assocItem,
-  assocItemProp,
-  assocItemActive,
-  dissocItemActive,
-  dissocItemsActive,
-  dissocItem,
-  dissocItems,
-  assocImportSummary,
-  assocImportSummaryItemDataType,
-  dissocImportSummary,
   assocCleaned,
   assocEditingItemExtraDefs,
+  assocImportSummary,
+  assocImportSummaryItemDataType,
+  assocItem,
+  assocItemActive,
+  assocItemProp,
+  assocItems,
+  assocLevelProp,
+  dissocImportSummary,
+  dissocItem,
+  dissocItemActive,
+  dissocItems,
+  dissocItemsActive,
 } from './update'
 
 export const State = {

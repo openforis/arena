@@ -2,12 +2,14 @@ import './dropdown.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactSelect, { components, createFilter } from 'react-select'
 import classNames from 'classnames'
+import ReactSelect, { components, createFilter } from 'react-select'
 
-import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { TestId } from '@webapp/utils/testId'
+
 import { LabelWithTooltip } from '../LabelWithTooltip'
+
 import { useDropdown } from './useDropdown'
 
 const OptionComponent =

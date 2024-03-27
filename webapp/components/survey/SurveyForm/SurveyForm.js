@@ -4,28 +4,27 @@ import './react-grid-layout.scss'
 import React, { useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { SurveyState, useSurvey } from '@webapp/store/survey'
-import { SurveyFormActions, SurveyFormState, useNotAvailableEntityPageUuids } from '@webapp/store/ui/surveyForm'
-import { RecordState } from '@webapp/store/ui/record'
-import { useI18n } from '@webapp/store/system'
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
-import { TestId } from '@webapp/utils/testId'
-import { dispatchWindowResize } from '@webapp/utils/domUtils'
-import { useOnUpdate, useLocationPathMatcher } from '@webapp/components/hooks'
-
-import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-
 import { Split } from '@webapp/components'
-import { FormPagesEditButtons } from './components/FormPageEditButtons'
-import FormHeader from './FormHeader'
+import { useLocationPathMatcher, useOnUpdate } from '@webapp/components/hooks'
+import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import { SurveyState, useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { RecordState } from '@webapp/store/ui/record'
+import { SurveyFormActions, SurveyFormState, useNotAvailableEntityPageUuids } from '@webapp/store/ui/surveyForm'
+import { dispatchWindowResize } from '@webapp/utils/domUtils'
+import { TestId } from '@webapp/utils/testId'
+
 import AddNodeDefPanel from './components/addNodeDefPanel'
+import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
+import FormHeader from './FormHeader'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
   Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>

@@ -2,13 +2,14 @@ import './Dropzone.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
-import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'
+import ReactDropzone from 'react-dropzone'
 
 import { Strings } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
+
 import { Alert } from '../Alert'
 
 const Dropzone = (props) => {

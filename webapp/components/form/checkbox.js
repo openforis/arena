@@ -8,9 +8,10 @@ import { Objects } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 
-import ValidationTooltip from '../validationTooltip'
-import { LabelWithTooltip } from './LabelWithTooltip'
 import { ButtonIconInfo } from '../buttons'
+import ValidationTooltip from '../validationTooltip'
+
+import { LabelWithTooltip } from './LabelWithTooltip'
 
 const Checkbox = (props) => {
   const { className, id, validation, checked, info, label, onChange: onChangeProp, disabled, radio } = props

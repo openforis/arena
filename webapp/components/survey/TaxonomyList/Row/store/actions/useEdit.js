@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router'
 
+import * as Taxonomy from '@core/survey/taxonomy'
+
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
-
-import * as Taxonomy from '@core/survey/taxonomy'
 
 import { State } from '../state'
 

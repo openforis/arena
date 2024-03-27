@@ -1,12 +1,11 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { debounceAction } from '@webapp/utils/reduxUtils'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as API from '@webapp/service/api'
-
-import { useSurveyId, SurveyActions } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { debounceAction } from '@webapp/utils/reduxUtils'
 
 import { State } from '../state'
 

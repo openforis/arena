@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react'
-
-import * as R from 'ramda'
-import * as d3 from 'd3'
 import PropTypes from 'prop-types'
+import * as d3 from 'd3'
+import * as R from 'ramda'
 
 const getMax = (counts) => counts.reduce((maxAcc, item) => Math.max(maxAcc, item.count), 0)
 

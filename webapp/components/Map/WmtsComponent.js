@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { LayersControl, TileLayer } from 'react-leaflet'
 
-import { useSurveyId } from '@webapp/store/survey'
-
 import * as API from '@webapp/service/api'
+import { useSurveyId } from '@webapp/store/survey'
 
 /**
  * This component is not ready, but can be used for demo purposes.

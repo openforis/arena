@@ -2,7 +2,6 @@ import './buttonGroup.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import * as R from 'ramda'
 
 const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => (

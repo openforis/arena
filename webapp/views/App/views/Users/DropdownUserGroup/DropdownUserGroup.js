@@ -4,12 +4,11 @@ import PropTypes from 'prop-types'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
 
-import { TestId } from '@webapp/utils/testId'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyInfo } from '@webapp/store/survey'
-
-import { useUser } from '@webapp/store/user'
 import Dropdown from '@webapp/components/form/Dropdown'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 const DropdownUserGroup = (props) => {
   const { editingLoggedUser, groupUuid, disabled, validation, onChange, showOnlySurveyGroups } = props

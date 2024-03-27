@@ -1,16 +1,13 @@
 import React from 'react'
 
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import ModuleSwitch from '@webapp/components/moduleSwitch'
-import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
-
-import TaxonomyList from '@webapp/components/survey/TaxonomyList'
-import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
-
-import CategoryList from '@webapp/components/survey/CategoryList'
-import CategoryDetails from '@webapp/components/survey/CategoryDetails'
-
 import { appModules, designerModules } from '@webapp/app/appModules'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
+import CategoryDetails from '@webapp/components/survey/CategoryDetails'
+import CategoryList from '@webapp/components/survey/CategoryList'
+import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
+import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
+import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import FormDesigner from './FormDesigner'

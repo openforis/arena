@@ -2,13 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
+
 import Binary from './binary'
 import Call from './call'
-import Sequence from './sequence'
 import Identifier from './identifier'
 import Literal from './literal'
 import Logical from './logical'
 import Member from './member'
+import Sequence from './sequence'
 
 const componentFns = {
   [Expression.types.Identifier]: () => Identifier,

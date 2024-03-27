@@ -1,12 +1,13 @@
 import { useSelector } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
+import { Objects } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { SurveyState } from '@webapp/store/survey'
 
 import * as SurveyFormState from './state'
-import { Objects } from '@openforis/arena-core'
 
 export const useNodeDefLabelType = () => useSelector(SurveyFormState.getNodeDefLabelType)
 

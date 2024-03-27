@@ -1,10 +1,11 @@
 import './ResizableModal.scss'
 
 import React, { useEffect, useRef } from 'react'
-import ReactModal from 'react-modal-resizable-draggable'
 import classNames from 'classnames'
+import ReactModal from 'react-modal-resizable-draggable'
 
 import { useI18n } from '@webapp/store/system'
+
 import { Button, ButtonIconClose } from '../buttons'
 
 export const ResizableModal = (props) => {

@@ -1,6 +1,5 @@
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActions } from '@webapp/store/system'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as TablesActions from './actions'
 import * as TablesState from './state'

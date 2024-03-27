@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Survey from '@core/survey/survey'
 
-import { NotificationActions, DialogConfirmActions } from '@webapp/store/ui'
 import { SurveyActions, useSurvey } from '@webapp/store/survey'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { State } from '../../state'
 

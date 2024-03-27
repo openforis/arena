@@ -2,18 +2,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
+import Checkbox from '@webapp/components/form/checkbox'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
-import Checkbox from '@webapp/components/form/checkbox'
 import ExpressionsProp from './ExpressionsProp'
 import { State } from './store'
 

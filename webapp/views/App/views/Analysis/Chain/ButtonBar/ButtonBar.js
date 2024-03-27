@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom'
 
 import * as Chain from '@common/analysis/chain'
 
-import * as API from '@webapp/service/api'
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { ButtonDelete, ButtonDownload } from '@webapp/components'
+import * as API from '@webapp/service/api'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 const ButtonBar = () => {
   const dispatch = useDispatch()

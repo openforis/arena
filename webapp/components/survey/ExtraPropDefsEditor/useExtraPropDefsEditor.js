@@ -4,8 +4,8 @@ import { ArrayUtils } from '@core/arrayUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import { useConfirm } from '@webapp/components/hooks'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 export const useExtraPropDefsEditor = (props) => {
   const { extraPropDefs: extraPropDefsProp, onExtraPropDefDelete, onExtraPropDefUpdate } = props

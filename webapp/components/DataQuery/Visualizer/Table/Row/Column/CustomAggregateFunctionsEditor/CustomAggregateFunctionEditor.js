@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as StringUtils from '@core/stringUtils'
 import { AggregateFunction } from '@core/survey/aggregateFunction'
 import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
-import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
-
-import { FormItem, Input } from '@webapp/components/form/Input'
 import { ButtonCancel, ButtonDelete, ButtonSave } from '@webapp/components'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
+
 import { AggregateFunctionExpressionEditor } from './AggregateFunctionExpressionEditor'
 
 export const CustomAggregateFunctionEditor = (props) => {

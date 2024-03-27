@@ -3,14 +3,12 @@ import { useDispatch } from 'react-redux'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
-import * as Validation from '@core/validation/validation'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
+import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
-
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-
 import * as ValidationUtils from '@webapp/utils/validationUtils'
 
 export const useAcceptRequestPanel = (props) => {

@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
 import * as Srs from '@core/geo/srs'
+import * as Survey from '@core/survey/survey'
 
-import { useSurveyInfo } from '@webapp/store/survey'
 import { Dropdown } from '@webapp/components/form'
+import { useSurveyInfo } from '@webapp/store/survey'
 
 const SrsDropdown = (props) => {
   const { disabled, onChange, readOnly, selectedSrsCode, testId } = props

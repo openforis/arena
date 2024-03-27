@@ -1,8 +1,8 @@
 import * as SystemActions from './actions'
-import * as SystemState from './state'
 import SystemReducer from './reducer'
+import * as SystemState from './state'
 
-export { SystemActions, SystemState, SystemReducer }
+export { SystemActions, SystemReducer, SystemState }
 
 // ====== system error
 export { SystemErrorActions, useSystemError } from './systemError'

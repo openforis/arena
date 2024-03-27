@@ -5,8 +5,10 @@ import React, { useCallback, useState } from 'react'
 import * as Survey from '@core/survey/survey'
 
 import { useSurveyInfo } from '@webapp/store/survey'
+
 import { ButtonIconGear } from '../buttons'
 import { Checkbox } from '../form'
+
 import { useMapContext } from './MapContext'
 import { MapOptions } from './mapOptions'
 

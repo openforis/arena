@@ -1,32 +1,30 @@
 import './Header.scss'
 
 import React, { useRef, useState } from 'react'
+import classNames from 'classnames'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import classNames from 'classnames'
 
-import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { Spinner } from '@webapp/components'
+import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { usePrevious } from '@webapp/components/hooks'
+import ProfilePicture from '@webapp/components/profilePicture'
+import CycleSelector from '@webapp/components/survey/CycleSelector'
+import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
+import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { useIsAppSaving } from '@webapp/store/app'
 import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
 import { useLang } from '@webapp/store/system'
 import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
-
-import { Spinner } from '@webapp/components'
-import { usePrevious } from '@webapp/components/hooks'
-import ProfilePicture from '@webapp/components/profilePicture'
-import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
-import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
-import CycleSelector from '@webapp/components/survey/CycleSelector'
-
-import UserPopupMenu from './UserPopupMenu'
 import { Breadcrumbs } from './Breadcrumbs'
-import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
+import UserPopupMenu from './UserPopupMenu'
 
 const Header = () => {
   const dispatch = useDispatch()

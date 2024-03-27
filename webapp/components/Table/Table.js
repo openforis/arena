@@ -5,9 +5,9 @@ import * as ObjectUtils from '@core/objectUtils'
 
 import LoadingBar from '../LoadingBar'
 
-import Header from './Header'
 import Content from './Content'
 import { Footer } from './Footer'
+import Header from './Header'
 import { useTable } from './useTable'
 
 const Table = (props) => {

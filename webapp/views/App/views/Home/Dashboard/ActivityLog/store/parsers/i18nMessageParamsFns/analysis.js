@@ -1,8 +1,9 @@
 import * as R from 'ramda'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as ActivityLog from '@common/activityLog/activityLog'
+
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 const _getChainLabel = (lang) => R.pipe(ActivityLog.getChainLabels, R.prop(lang))
 

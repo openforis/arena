@@ -1,7 +1,8 @@
 import React from 'react'
 
-import ModuleSwitch from '@webapp/components/moduleSwitch'
 import { appModules, helpModules } from '@webapp/app/appModules'
+import ModuleSwitch from '@webapp/components/moduleSwitch'
+
 import { About } from './About'
 
 const Help = () => (

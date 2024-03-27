@@ -1,21 +1,20 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as StringUtils from '@core/stringUtils'
-
-import { Query } from '@common/model/query'
 import { ColumnNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
+import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
-import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
+import { useColumn } from './store'
 
 const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
   if (columnName === NodeDef.getName(nodeDef)) {

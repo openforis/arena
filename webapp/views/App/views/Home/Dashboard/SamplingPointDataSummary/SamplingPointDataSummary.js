@@ -1,16 +1,17 @@
 import './SamplingPointDataSummary.scss'
 
-import React, { useEffect, useRef, useContext, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from 'd3'
 
-import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
+import * as Survey from '@core/survey/survey'
 
 import { countSamplingPointData } from '@webapp/service/api/categories'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
+
 import { Legend } from './Legend'
 
 const width = 300

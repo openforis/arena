@@ -6,8 +6,8 @@ import classNames from 'classnames'
 
 import Dropdown from '../Dropdown'
 
-import { useLocalState, State } from './store'
 import Chip from './Chip'
+import { State, useLocalState } from './store'
 
 const InputChips = (props) => {
   const {

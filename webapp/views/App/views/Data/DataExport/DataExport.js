@@ -1,20 +1,19 @@
 import './DataExport.scss'
 
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
 
-import { TestId } from '@webapp/utils/testId'
-
-import { ExportCsvDataActions } from '@webapp/store/ui'
 import { Button, ExpansionPanel, RadioButtonGroup } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { FormItem } from '@webapp/components/form/Input'
+import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { ExportCsvDataActions } from '@webapp/store/ui'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 const exportOptions = {
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',

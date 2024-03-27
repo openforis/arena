@@ -1,5 +1,5 @@
 import * as SidebarActions from './actions'
-import * as SidebarStorage from './storage'
 import { useIsSidebarOpened } from './hooks'
+import * as SidebarStorage from './storage'
 
 export { SidebarActions, SidebarStorage, useIsSidebarOpened }

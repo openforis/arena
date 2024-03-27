@@ -1,12 +1,12 @@
 import * as R from 'ramda'
 
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import { NodeDefsActions, SurveyActions } from '@webapp/store/survey'
 import { SystemActions } from '@webapp/store/system'
-import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
+import { exportReducer } from '@webapp/utils/reduxUtils'
+
 import * as RecordActions from '../record/actions'
 
 import * as SurveyFormActions from './actions'

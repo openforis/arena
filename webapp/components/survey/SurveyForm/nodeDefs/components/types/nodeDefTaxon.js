@@ -1,23 +1,23 @@
 import './nodeDefTaxon.scss'
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { connect } from 'react-redux'
-import * as R from 'ramda'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
+import * as R from 'ramda'
+import { connect } from 'react-redux'
 
-import { FormItem } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
-
-import * as Taxon from '@core/survey/taxon'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as StringUtils from '@core/stringUtils'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Taxon from '@core/survey/taxon'
 
-import { TestId } from '@webapp/utils/testId'
-import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import { FormItem } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 const { code, scientificName, vernacularName, vernacularNameUuid, taxonUuid } = Node.valuePropsTaxon

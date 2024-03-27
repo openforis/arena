@@ -1,10 +1,11 @@
 import React from 'react'
-import { LayersControl, LayerGroup } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { LayerGroup, LayersControl } from 'react-leaflet'
 
 import { ClusterMarker, useFlyToPoint } from '../common'
-import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
+
 import { SamplingPointDataMarker } from './SamplingPointDataMarker'
+import { useSamplingPointDataLayer } from './useSamplingPointDataLayer'
 
 export const SamplingPointDataLayer = (props) => {
   const { markersColor, onRecordEditClick, createRecordFromSamplingPointDataItem } = props

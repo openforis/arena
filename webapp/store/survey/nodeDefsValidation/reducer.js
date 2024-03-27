@@ -1,8 +1,7 @@
 import * as Validation from '@core/validation/validation'
 
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import { SystemActions } from '@webapp/store/system'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as SurveyActions from '../actions'
 import { NodeDefsActions } from '../nodeDefs'

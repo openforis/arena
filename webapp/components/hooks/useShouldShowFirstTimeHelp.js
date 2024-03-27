@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import * as ActivityLogObject from '@common/activityLog/activityLog'
+
 import * as Survey from '@core/survey/survey'
+
 import { useSurvey } from '@webapp/store/survey'
 
 const hasActivityOfType = ({ messages, activityType }) => messages.some((message) => activityType === message.type)

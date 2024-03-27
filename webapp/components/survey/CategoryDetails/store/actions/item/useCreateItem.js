@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 

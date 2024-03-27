@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import { ButtonDownload } from '@webapp/components/buttons'
-import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 const SurveySchemaSummaryDownloadButton = (props) => {

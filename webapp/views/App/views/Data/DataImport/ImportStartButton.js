@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import { Button, ProgressBar } from '@webapp/components'
 import { DialogConfirmActions } from '@webapp/store/ui'

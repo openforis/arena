@@ -3,11 +3,10 @@ import PropTypes from 'prop-types'
 
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
-
-import { FormItem } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
+import { FormItem } from '@webapp/components/form/Input'
+import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const CyclesSelector = (props) => {
   const { cyclesKeysSelectable, cyclesKeysSelected, disabled, onChange } = props

@@ -1,8 +1,9 @@
 import React from 'react'
-import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { LayerGroup, LayersControl } from 'react-leaflet'
 
 import { ClusterMarker, useFlyToPoint } from '../common'
+
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
 

@@ -1,9 +1,11 @@
 import './errorBadge.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as Validation from '@core/validation/validation'
+
 import { useI18n } from '@webapp/store/system'
 
 import ValidationTooltip from './validationTooltip'

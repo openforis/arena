@@ -1,19 +1,20 @@
 import './buttonBar.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import { useIsAppSaving } from '@webapp/store/app'
-import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanCleanseRecords } from '@webapp/store/user'
 
-import { useButtonBar } from './store'
 import ButtonDownload from './ButtonDownload'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { useButtonBar } from './store'
 
 const ButtonBar = (props) => {
   const {

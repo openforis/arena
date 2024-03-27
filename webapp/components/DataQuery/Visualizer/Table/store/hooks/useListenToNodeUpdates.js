@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as Validation from '@core/validation/validation'
 import { Query } from '@common/model/query'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-import * as AppWebSocket from '@webapp/app/appWebSocket'
 
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
+import * as Validation from '@core/validation/validation'
+
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 import { AppSavingActions } from '@webapp/store/app'
 
 const updateValues = ({ data, nodes }) =>

@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as RecordStep from '@core/record/recordStep'
-import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
-import { useI18n } from '@webapp/store/system'
+import * as RecordStep from '@core/record/recordStep'
+import * as Survey from '@core/survey/survey'
+import * as Validation from '@core/validation/validation'
+
+import { Checkbox } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+import CyclesSelector from '@webapp/components/survey/CyclesSelector'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useChain } from '@webapp/store/ui/chain'
 import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
 
-import * as API from '@webapp/service/api'
-
-import { FormItem } from '@webapp/components/form/Input'
-import { Checkbox } from '@webapp/components/form'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioFieldset } from './ChainRStudioFieldset'
 
 export const ChainBasicProps = (props) => {

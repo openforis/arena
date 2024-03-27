@@ -1,17 +1,17 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { Popup } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
 
-import Markdown from '@webapp/components/markdown'
-
-import { useI18n } from '@webapp/store/system'
 import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
-import { useAuthCanCreateRecord } from '@webapp/store/user'
+import Markdown from '@webapp/components/markdown'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanCreateRecord } from '@webapp/store/user'
+
 import { useAltitude } from '../common/useAltitude'
 
 export const SamplingPointDataItemPopup = (props) => {

@@ -9,8 +9,8 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { TextInput } from '../TextInput'
 
-import { useLocalState, State } from './store'
 import Chip from './Chip'
+import { State, useLocalState } from './store'
 
 const InputChipsText = (props) => {
   const {

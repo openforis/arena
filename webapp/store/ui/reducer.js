@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux'
 
-import { FileUploadDialogReducer, FileUploadDialogState } from './fileUploadDialog'
-import { NotificationReducer, NotificationState } from './notification'
-import { LoaderReducer, LoaderState } from './loader'
+import { ChainReducer } from './chain'
 import { DialogConfirmReducer, DialogConfirmState } from './dialogConfirm'
+import { FileUploadDialogReducer, FileUploadDialogState } from './fileUploadDialog'
+import { LoaderReducer, LoaderState } from './loader'
+import { NotificationReducer, NotificationState } from './notification'
 import { RecordReducer, RecordState } from './record'
 import { SurveyFormReducer, SurveyFormState } from './surveyForm'
 import { TablesReducer, TablesState } from './tables'
-import { ChainReducer } from './chain'
 
 export default combineReducers({
   [FileUploadDialogState.stateKey]: FileUploadDialogReducer,

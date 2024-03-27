@@ -5,19 +5,18 @@ import * as JobSerialized from '@common/job/jobSerialized'
 
 import { RecordCycle } from '@core/record/recordCycle'
 
-import * as API from '@webapp/service/api'
-
-import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
-import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
-
-import { NotificationActions } from '@webapp/store/ui'
 import { Dropzone } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
+import * as API from '@webapp/service/api'
+import { JobActions } from '@webapp/store/app'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { NotificationActions } from '@webapp/store/ui'
+import { useAuthCanDeleteAllRecords } from '@webapp/store/user'
 import { FileUtils } from '@webapp/utils/fileUtils'
+
 import { ImportStartButton } from './ImportStartButton'
 
 const fileMaxSize = 1000 // 1 GB

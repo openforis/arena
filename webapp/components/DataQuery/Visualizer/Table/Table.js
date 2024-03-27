@@ -1,10 +1,11 @@
 import './table.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 
-import { RowHeader, RowData } from './Row'
+import { RowData, RowHeader } from './Row'
 import { useTable } from './store'
 
 const Table = (props) => {

@@ -4,13 +4,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import AvatarEditor from 'react-avatar-editor'
 
-import * as FileTypes from '@webapp/utils/fileTypes'
-
-import { useFileDrop } from '@webapp/components/hooks'
-import { useProfilePicture } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
-
 import UploadButton from '@webapp/components/form/uploadButton'
+import { useFileDrop } from '@webapp/components/hooks'
+import { useI18n } from '@webapp/store/system'
+import { useProfilePicture } from '@webapp/store/user'
+import * as FileTypes from '@webapp/utils/fileTypes'
 
 const profilePicturePlaceholderImg = '/img/user-profile-picture-default.png'
 

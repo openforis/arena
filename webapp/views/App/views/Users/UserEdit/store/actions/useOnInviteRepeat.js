@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import axios from 'axios'
-
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
@@ -8,9 +7,8 @@ import * as User from '@core/user/user'
 import * as UserInvite from '@core/user/userGroupInvitation'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true }) => {
   const dispatch = useDispatch()

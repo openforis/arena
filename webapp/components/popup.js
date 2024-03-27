@@ -1,6 +1,7 @@
 import './popup.scss'
 
 import React from 'react'
+
 import { elementOffset } from '@webapp/utils/domUtils'
 
 class Popup extends React.PureComponent {

@@ -12,5 +12,5 @@ ButtonNew.propTypes = {
 
 ButtonNew.defaultProps = {
   ...Button.defaultProps,
-  label: "common.new"
+  label: 'common.new',
 }

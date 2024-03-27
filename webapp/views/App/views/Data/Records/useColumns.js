@@ -1,22 +1,21 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as A from '@core/arena'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
-import * as Validation from '@core/validation/validation'
-import * as DateUtils from '@core/dateUtils'
 import * as Authorizer from '@core/auth/authorizer'
+import * as DateUtils from '@core/dateUtils'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Validation from '@core/validation/validation'
 
-import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
-
-import ErrorBadge from '@webapp/components/errorBadge'
-import { TestId } from '@webapp/utils/testId'
 import { Button } from '@webapp/components'
-import { useUser } from '@webapp/store/user'
-
-import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
-import { RecordDeleteButton } from './RecordDeleteButton'
 import { AppIcon } from '@webapp/components/AppIcon'
+import ErrorBadge from '@webapp/components/errorBadge'
+import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
+
+import { RecordDeleteButton } from './RecordDeleteButton'
+import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()

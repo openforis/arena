@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as Languages from '@core/app/languages'
+import * as A from '@core/arena'
+import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import Dropdown from '@webapp/components/form/Dropdown'
-
 import { useI18n } from '@webapp/store/system'
 
 const _getColumnSummaryKey = ({ item }) => {

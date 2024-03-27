@@ -1,8 +1,7 @@
 import * as A from '@core/arena'
-
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
+import * as NumberUtils from '@core/numberUtils'
+import * as NodeDef from '@core/survey/nodeDef'
 
 const formatters = {
   [NodeDef.nodeDefType.boolean]: ({ value, i18n, nodeDef }) =>

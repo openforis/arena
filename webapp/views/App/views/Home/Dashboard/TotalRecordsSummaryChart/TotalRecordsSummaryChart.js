@@ -11,10 +11,10 @@ import { useI18n } from '@webapp/store/system'
 
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
 
-import YAxis, { getScale as getYScale } from './components/yAxis'
-import XAxis, { getScale as getXScale } from './components/xAxis'
-import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
+import DataPoints from './components/dataPoints'
+import XAxis, { getScale as getXScale } from './components/xAxis'
+import YAxis, { getScale as getYScale } from './components/yAxis'
 
 const TotalRecordsSummaryChart = (props) => {
   const { counts, from, to } = props

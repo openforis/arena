@@ -4,12 +4,12 @@ import React, { useContext } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
+import Dropdown from '@webapp/components/form/Dropdown'
 import { useI18n } from '@webapp/store/system'
 
-import Dropdown from '@webapp/components/form/Dropdown'
+import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
 import { useTimeRanges } from './store'
-import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
 const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : '')
 

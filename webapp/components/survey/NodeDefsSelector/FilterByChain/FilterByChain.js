@@ -1,14 +1,14 @@
 import './FilterByChain.scss'
-import React, { useState, useEffect } from 'react'
+
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as Chain from '@common/analysis/chain'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyPreferredLang, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
-
 import * as API from '@webapp/service/api'
+import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
   const surveyId = useSurveyId()

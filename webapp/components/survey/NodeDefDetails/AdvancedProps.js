@@ -1,18 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-
-import { useI18n } from '@webapp/store/system'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyCycleKey } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
+import * as Validation from '@core/validation/validation'
 
 import { ButtonIconInfo } from '@webapp/components/buttons'
-import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 import NodeDefExpressionsProp from './ExpressionsProp/NodeDefExpressionsProp'
 import { State } from './store'

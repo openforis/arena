@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { FileUtils } from '@webapp/utils/fileUtils'
-
 import * as d3 from 'd3'
+
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 const GaugeChart = ({ data }) => {
   const ref = useRef()

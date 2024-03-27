@@ -23,44 +23,45 @@ const calculateNewIndexWithOffset = ({ offset, focusedItemIndex, itemsSize }) =>
 
 export const useOnListItemKeyDown = ({ onItemSelect, onClose, focusItem }) =>
   useCallback(
-    ({ state }) => (event) => {
-      event.stopPropagation()
-      event.preventDefault()
+    ({ state }) =>
+      (event) => {
+        event.stopPropagation()
+        event.preventDefault()
 
-      const list = State.getList(state)
-      const items = State.getItems(state)
-      const focusedItemIndex = State.getFocusedItemIndex(state)
-      const inputField = State.getInputField(state)
+        const list = State.getList(state)
+        const items = State.getItems(state)
+        const focusedItemIndex = State.getFocusedItemIndex(state)
+        const inputField = State.getInputField(state)
 
-      const itemsSize = State.getItemsSize(state)
+        const itemsSize = State.getItemsSize(state)
 
-      if (itemsSize > 0) {
-        switch (event.key) {
-          case KeyboardKeys.Enter:
-          case KeyboardKeys.Space:
-            onItemSelect(items[focusedItemIndex])
-            break
-          case KeyboardKeys.Escape:
-            onClose()
-            inputField.focus()
-            break
-          case KeyboardKeys.PageUp:
-          case KeyboardKeys.PageDown:
-          case KeyboardKeys.ArrowUp:
-          case KeyboardKeys.ArrowDown:
-            focusItem({
-              list,
-              index: calculateNewIndexWithOffset({
-                offset: offsetByKey[event.key],
-                focusedItemIndex,
-                itemsSize,
-              }),
-            })
-            break
-          default:
-          // Do nothing
+        if (itemsSize > 0) {
+          switch (event.key) {
+            case KeyboardKeys.Enter:
+            case KeyboardKeys.Space:
+              onItemSelect(items[focusedItemIndex])
+              break
+            case KeyboardKeys.Escape:
+              onClose()
+              inputField.focus()
+              break
+            case KeyboardKeys.PageUp:
+            case KeyboardKeys.PageDown:
+            case KeyboardKeys.ArrowUp:
+            case KeyboardKeys.ArrowDown:
+              focusItem({
+                list,
+                index: calculateNewIndexWithOffset({
+                  offset: offsetByKey[event.key],
+                  focusedItemIndex,
+                  itemsSize,
+                }),
+              })
+              break
+            default:
+            // Do nothing
+          }
         }
-      }
-    },
+      },
     []
   )

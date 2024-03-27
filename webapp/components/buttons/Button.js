@@ -2,8 +2,10 @@ import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
 import { Objects } from '@openforis/arena-core'
+
+import { useI18n } from '@webapp/store/system'
+
 import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {

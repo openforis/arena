@@ -1,8 +1,8 @@
 import './tooltip.scss'
 
 import React from 'react'
-import ReactDom from 'react-dom'
 import * as R from 'ramda'
+import ReactDom from 'react-dom'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 

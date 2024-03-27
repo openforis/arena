@@ -1,16 +1,16 @@
 import './KmlUploader.scss'
 
 import React, { useEffect, useState } from 'react'
+import L from 'leaflet'
 import { useMap } from 'react-leaflet'
 
 import { useI18n } from '@webapp/store/system'
 
-import L from 'leaflet'
-
 require('./L.KML')
 
-import { ZipForEach } from '@webapp/utils/zipUtils'
 import shp from 'shpjs'
+
+import { ZipForEach } from '@webapp/utils/zipUtils'
 
 export const KmlUploader = () => {
   const map = useMap()

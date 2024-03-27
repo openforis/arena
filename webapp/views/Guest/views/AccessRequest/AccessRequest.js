@@ -6,11 +6,10 @@ import * as UserAccessRequest from '@core/user/userAccessRequest'
 
 import Markdown from '@webapp/components/markdown'
 import { ReCaptcha } from '@webapp/components/ReCaptcha'
-
 import { useI18n } from '@webapp/store/system'
 
-import { useAccessRequest } from './useAccessRequest'
 import { AccessRequestField } from './AccessRequestField'
+import { useAccessRequest } from './useAccessRequest'
 
 const AccessRequest = () => {
   const i18n = useI18n()

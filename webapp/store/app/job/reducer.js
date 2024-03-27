@@ -1,7 +1,6 @@
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as JobActions from './actions'
-
 import * as JobState from './state'
 
 const actionHandlers = {

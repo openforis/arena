@@ -34,8 +34,8 @@ export const useMap = (props) => {
       markerPoint && Points.isValid(markerPoint, srsIndex)
         ? markerPoint
         : centerPoint && Points.isValid(centerPoint, srsIndex)
-        ? centerPoint
-        : PointFactory.createInstance({ x: 0, y: 0 })
+          ? centerPoint
+          : PointFactory.createInstance({ x: 0, y: 0 })
 
     setState((statePrev) => ({
       ...statePrev,

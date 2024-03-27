@@ -1,7 +1,9 @@
+import { useMemo } from 'react'
+
 import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey/hooks'
-import { useMemo } from 'react'
+
 import { useDataCountByEntityDefUuid } from './useDataCountByEntityDefUuid'
 
 export const useEntityDataCount = (entityDefUuid) => {

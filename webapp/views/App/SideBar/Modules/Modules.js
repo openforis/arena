@@ -1,10 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import * as SideBarModule from './utils'
-
 import Module from './Module'
 import PopupMenu from './PopupMenu'
+import * as SideBarModule from './utils'
 
 const Modules = (props) => {
   const { user, surveyInfo, pathname, sideBarOpened } = props

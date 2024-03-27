@@ -1,12 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import * as R from 'ramda'
 
-import { useI18n } from '@webapp/store/system'
-import InputChips from '@webapp/components/form/InputChips'
-
 import { getLanguageLabel, languageItemsSortedByEnLabel as appLanguages } from '@core/app/languages'
+
+import InputChips from '@webapp/components/form/InputChips'
+import { useI18n } from '@webapp/store/system'
 
 const LanguagesEditor = (props) => {
   const { idInput, languages, setLanguages, readOnly } = props

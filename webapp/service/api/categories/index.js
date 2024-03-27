@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
+
 import { cancelableGetRequest } from '../cancelableRequest'
 import { objectToFormData } from '../utils/apiUtils'
 

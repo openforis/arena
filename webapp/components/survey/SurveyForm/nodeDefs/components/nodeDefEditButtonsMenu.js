@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button, ButtonMenu } from '@webapp/components'
+import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
 

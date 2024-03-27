@@ -1,14 +1,15 @@
 import React, { useCallback } from 'react'
-import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { CircleMarker } from 'react-leaflet'
 
 import * as Survey from '@core/survey/survey'
 
-import { MarkerTooltip, useLayerMarker } from '../common'
-import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
-import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
-
 import { useSurveyInfo } from '@webapp/store/survey'
+
+import { MarkerTooltip, useLayerMarker } from '../common'
+
+import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
+import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 
 const markerRadius = 10
 const fillOpacity = 0.5

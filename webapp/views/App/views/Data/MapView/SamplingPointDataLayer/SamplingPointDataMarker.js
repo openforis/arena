@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react'
-import { CircleMarker } from 'react-leaflet'
 import PropTypes from 'prop-types'
+import { CircleMarker } from 'react-leaflet'
 
 import { MarkerTooltip, useLayerMarker } from '../common'
+
 import { SamplingPointDataItemPopup } from './SamplingPointDataItemPopup'
 
 const markerRadius = 10

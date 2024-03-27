@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
-import { DateInput } from '@webapp/components/form/DateTimeInput'
 import { DateFormats, Dates } from '@openforis/arena-core'
+
+import { DateInput } from '@webapp/components/form/DateTimeInput'
+import { useI18n } from '@webapp/store/system'
 
 const DateContainer = ({ date, keyLabel, readOnly, onChange: onChangeProp }) => {
   const i18n = useI18n()

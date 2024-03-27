@@ -1,17 +1,18 @@
 /* eslint-disable no-useless-escape */
 import axios from 'axios'
-import * as ProcessUtils from '@core/processUtils'
+
 import * as Chain from '@common/analysis/chain'
 
-import * as User from '@core/user/user'
-import * as Survey from '@core/survey/survey'
 import * as DateUtils from '@core/dateUtils'
+import * as ProcessUtils from '@core/processUtils'
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
 
-import { copyToClipboard } from '@webapp/utils/domUtils'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { SurveyState } from '@webapp/store/survey'
-import { UserState } from '@webapp/store/user'
 import * as API from '@webapp/service/api'
+import { SurveyState } from '@webapp/store/survey'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { UserState } from '@webapp/store/user'
+import { copyToClipboard } from '@webapp/utils/domUtils'
 
 import { ChainState } from '../state'
 

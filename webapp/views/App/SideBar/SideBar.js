@@ -7,8 +7,8 @@ import { SidebarActions, useIsSidebarOpened } from '@webapp/service/storage/side
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
-import Version from './Version'
 import Modules from './Modules'
+import Version from './Version'
 
 const SideBar = () => {
   const { pathname } = useLocation()

@@ -1,17 +1,16 @@
 import './nodeDefEntityForm.scss'
 
 import React, { useEffect } from 'react'
-import { connect, useDispatch } from 'react-redux'
 import * as R from 'ramda'
+import { connect, useDispatch } from 'react-redux'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-
-import { RecordState } from '@webapp/store/ui/record'
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
+import * as Record from '@core/record/record'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import NodeDefErrorBadge from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefErrorBadge'
+import { RecordState } from '@webapp/store/ui/record'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 
 import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'

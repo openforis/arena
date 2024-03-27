@@ -6,12 +6,13 @@ import Switch from 'react-switch'
 
 import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
 
-import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
 
 import SamplingPolygonShapeEditor from '../SamplingPolygonShapeEditor'
-import { FormPropertyItem } from './FormPropertyItem'
+
 import { CircleOnlyItems } from './CircleOnlyItems'
+import { FormPropertyItem } from './FormPropertyItem'
 import { RectangleOnlyItems } from './RectangleOnlyItems'
 
 const SamplingPolygonEditor = (props) => {

@@ -1,8 +1,8 @@
 import CodeMirror from 'codemirror/lib/codemirror'
 
-import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
+import * as Survey from '@core/survey/survey'
 
 import * as ExpressionVariables from './expressionVariables'
 

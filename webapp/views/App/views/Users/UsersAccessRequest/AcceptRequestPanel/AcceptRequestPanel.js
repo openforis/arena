@@ -2,12 +2,12 @@ import React from 'react'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
-import * as Validation from '@core/validation/validation'
 import * as UserAccessRequestAccept from '@core/user/userAccessRequestAccept'
+import * as Validation from '@core/validation/validation'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import Dropdown from '@webapp/components/form/Dropdown'
 import { Button } from '@webapp/components/buttons'
+import Dropdown from '@webapp/components/form/Dropdown'
+import { FormItem, Input } from '@webapp/components/form/Input'
 
 import { useAcceptRequestPanel } from './useAcceptRequestPanel'
 

@@ -1,51 +1,53 @@
-export { fetchUserAndSurvey } from './fetchUserAndSurvey'
-
+export { fetchActivityLogs } from './activityLog'
+export { fetchChains, getChainSummaryExportUrl } from './analysis'
+export { cancelableGetRequest } from './cancelableRequest'
 export {
-  fetchCategories,
-  fetchItemsCountIndexedByCategoryUuid,
-  fetchCategory,
-  createCategory,
-  fetchCategoryItems,
-  fetchCategoryItemsInLevelRequest,
-  countSamplingPointData,
-  fetchSamplingPointData,
-  deleteCategory,
   cleanupCategory,
   convertToReportingDataCategory,
-  startExportAllCategoriesJob,
+  countSamplingPointData,
+  createCategory,
+  deleteCategory,
+  fetchCategories,
+  fetchCategory,
+  fetchCategoryItems,
+  fetchCategoryItemsInLevelRequest,
+  fetchItemsCountIndexedByCategoryUuid,
+  fetchSamplingPointData,
   startCategoriesBatchImportJob,
-  updateCategoryProp,
+  startExportAllCategoriesJob,
   updateCategoryItemExtraDefItem,
   updateCategoryItemProp,
+  updateCategoryProp,
 } from './categories'
-export { fetchChains, getChainSummaryExportUrl } from './analysis'
-
-export {
-  fetchTaxonomies,
-  fetchTaxonomy,
-  createTaxonomy,
-  uploadTaxa,
-  updateTaxonomy,
-  updateTaxonomyExtraPropDef,
-  deleteTaxonomyIfEmpty,
-} from './taxonomies'
-export { fetchActivityLogs } from './activityLog'
 export {
   createRecordFromSamplingPointDataItem,
+  downloadDataQueryExport,
+  downloadExportedDataToCSVUrl,
+  exportDataQueryToTempFile,
+  fetchRecordsCountByStep,
+  getDataImportFromCsvTemplatesUrl,
+  getDataImportFromCsvTemplateUrl,
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
   startDataImportFromCsvJob,
-  getDataImportFromCsvTemplateUrl,
-  getDataImportFromCsvTemplatesUrl,
-  updateRecordsStep,
-  exportDataQueryToTempFile,
-  downloadDataQueryExport,
-  fetchRecordsCountByStep,
   startExportDataToCSVJob,
-  downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
+  updateRecordsStep,
 } from './data'
-export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export { fetchUserAndSurvey } from './fetchUserAndSurvey'
+export { fetchAltitude, fetchAvailableMapPeriods, fetchMapWmtsCapabilities, testMapApiKey } from './map'
+export {
+  deleteNodeDef,
+  deleteNodeDefs,
+  fetchNodeDef,
+  fetchNodeDefs,
+  moveNodeDef,
+  postNodeDef,
+  postNodeDefs,
+  putNodeDefProps,
+  putNodeDefsProps,
+} from './nodeDef'
+export { createInstance, getCurrentInstance, terminateInstance } from './rStudio'
 export {
   fetchSurveyFull,
   fetchSurveys,
@@ -54,28 +56,21 @@ export {
   startImportLabelsJob,
 } from './survey'
 export {
-  fetchNodeDef,
-  fetchNodeDefs,
-  moveNodeDef,
-  putNodeDefProps,
-  putNodeDefsProps,
-  postNodeDef,
-  postNodeDefs,
-  deleteNodeDef,
-  deleteNodeDefs,
-} from './nodeDef'
-
-export { cancelableGetRequest } from './cancelableRequest'
-export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
-
+  createTaxonomy,
+  deleteTaxonomyIfEmpty,
+  fetchTaxonomies,
+  fetchTaxonomy,
+  updateTaxonomy,
+  updateTaxonomyExtraPropDef,
+  uploadTaxa,
+} from './taxonomies'
 export {
-  createAccessRequest,
   acceptAccessRequest,
+  changeUserPassword,
+  createAccessRequest,
   fetchUser,
   fetchUserName,
   fetchUserResetPasswordUrl,
   fetchUserSurveys,
-  changeUserPassword,
 } from './user'
-
 export { contentTypes, objectToFormData } from './utils/apiUtils'

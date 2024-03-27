@@ -1,6 +1,6 @@
 import * as ServiceErrorActions from './actions'
-import * as ServiceErrorState from './state'
-import ServiceErrorReducer from './reducer'
 import { useServiceErrors } from './hooks'
+import ServiceErrorReducer from './reducer'
+import * as ServiceErrorState from './state'
 
-export { ServiceErrorActions, ServiceErrorState, ServiceErrorReducer, useServiceErrors }
+export { ServiceErrorActions, ServiceErrorReducer, ServiceErrorState, useServiceErrors }

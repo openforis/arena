@@ -2,14 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { TestId } from '@webapp/utils/testId'
 
 import ErrorBadge from '@webapp/components/errorBadge'
+import { TestId } from '@webapp/utils/testId'
 
 import useValidation from './useValidation'
 
 const NodeDefErrorBadge = (props) => {
-  const { children, edit, node, nodeDef, nodes, parentNode, insideTable} = props
+  const { children, edit, node, nodeDef, nodes, parentNode, insideTable } = props
   const validation = useValidation({ edit, node, nodeDef, nodes, parentNode })
 
   return (

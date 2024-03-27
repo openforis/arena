@@ -1,6 +1,7 @@
 import './warningBadge.scss'
 
 import React from 'react'
+
 import { useI18n } from '@webapp/store/system'
 
 const WarningBadge = ({ show, label, showLabel, title, titleParams }) => {

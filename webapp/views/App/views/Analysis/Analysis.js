@@ -3,17 +3,16 @@ import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 
-import { appModules, appModuleUri, analysisModules } from '@webapp/app/appModules'
-
+import { analysisModules, appModules, appModuleUri } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import CategoryDetails from '@webapp/components/survey/CategoryDetails'
 import NodeDefDetails from '@webapp/components/survey/NodeDefDetails'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-
-import Chains from './Chains'
-import Chain from './Chain'
-import Instances from './Instances'
 import { useSurveyInfo } from '@webapp/store/survey'
+
+import Chain from './Chain'
+import Chains from './Chains'
+import Instances from './Instances'
 // import Entities from './Entities'
 
 const Analysis = () => {

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 import * as Record from '@core/record/record'
+
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
 

@@ -2,21 +2,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as Validation from '@core/validation/validation'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import ErrorBadge from '@webapp/components/errorBadge'
 import { Button } from '@webapp/components'
-
+import ErrorBadge from '@webapp/components/errorBadge'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../store'
+
 import { ItemsList } from './ItemsList'
 
 const LevelDetails = (props) => {

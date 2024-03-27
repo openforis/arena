@@ -5,10 +5,11 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { Tooltip } from '@mui/material'
 
+import { Objects } from '@openforis/arena-core'
+
 import { useI18n } from '@webapp/store/system'
 
 import Markdown from '../markdown'
-import { Objects } from '@openforis/arena-core'
 
 export const TooltipNew = (props) => {
   const { children, className, isTitleMarkdown, title: titleProp, renderTitle } = props

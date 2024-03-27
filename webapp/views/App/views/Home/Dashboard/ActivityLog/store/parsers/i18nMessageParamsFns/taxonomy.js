@@ -1,5 +1,7 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
+
 import * as Taxonomy from '@core/survey/taxonomy'
+
 import * as ActivityLogMessageParserUtils from '../utils'
 
 export default {

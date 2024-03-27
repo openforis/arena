@@ -1,13 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useSurvey } from '@webapp/store/survey'
-
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
 
-import { NodeDefsSelectorAggregate, NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+
+import { NodeDefsSelector, NodeDefsSelectorAggregate } from '@webapp/components/survey/NodeDefsSelector'
+import { useSurvey } from '@webapp/store/survey'
 
 const QueryNodeDefsSelector = (props) => {
   const { nodeDefLabelType, query, onChangeQuery } = props

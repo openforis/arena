@@ -2,17 +2,17 @@ import './ExpressionsProp.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
-import * as R from 'ramda'
 import classNames from 'classnames'
+import * as R from 'ramda'
+import { useDispatch } from 'react-redux'
 
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
-import * as Expression from '@core/expressionParser/expression'
-
-import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { FormItem } from '@webapp/components/form/Input'
+import { DialogConfirmActions } from '@webapp/store/ui'
+
 import ExpressionProp from './ExpressionProp'
 
 const ExpressionsProp = (props) => {

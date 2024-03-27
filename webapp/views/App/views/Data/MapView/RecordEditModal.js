@@ -1,18 +1,18 @@
 import React, { useCallback } from 'react'
 
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
+import * as Record from '@core/record/record'
+import * as Survey from '@core/survey/survey'
 
+import { appModuleUri, noHeaderModules } from '@webapp/app/appModules'
 import { ResizableModal } from '@webapp/components'
 import RecordEditor from '@webapp/components/survey/Record'
-import { useRecord } from '@webapp/store/ui/record'
-import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { appModuleUri, noHeaderModules } from '@webapp/app/appModules'
-import { WindowUtils } from '@webapp/utils/windowUtils'
+import { useI18n } from '@webapp/store/system'
+import { useRecord } from '@webapp/store/ui/record'
 import { getViewportDimensions } from '@webapp/utils/domUtils'
+import { WindowUtils } from '@webapp/utils/windowUtils'
 
 const DEFAULT_HEIGHT = 600
 const DEFAULT_WIDTH = 1000

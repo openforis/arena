@@ -1,18 +1,20 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Category from '@core/survey/category'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import * as Category from '@core/survey/category'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+
 import { SurveyState } from '@webapp/store/survey'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import { BaseUnitCodeAttributeSelector } from './BaseUnitCodeAttributeSelector'
-import { Objects } from '@openforis/arena-core'
 
 export const FirstPhaseCommonAttributeSelector = () => {
   const dispatch = useDispatch()

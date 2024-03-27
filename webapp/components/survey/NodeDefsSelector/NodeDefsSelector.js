@@ -1,18 +1,17 @@
 import './NodeDefsSelector.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
-
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
-import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { ButtonIconFilter } from '@webapp/components/buttons'
-
-import { useI18n } from '@webapp/store/system'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'

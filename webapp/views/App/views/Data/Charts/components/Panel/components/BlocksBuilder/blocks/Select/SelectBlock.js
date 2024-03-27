@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
+import { NodeDefType } from '@openforis/arena-core'
+
 import { uuidv4 } from '@core/uuid'
 
 import { Dropdown } from '@webapp/components/form'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
-import { NodeDefType } from '@openforis/arena-core'
 
 const icons = {
   quantitative: NodeDefUIProps.getIconByType(NodeDefType.decimal),

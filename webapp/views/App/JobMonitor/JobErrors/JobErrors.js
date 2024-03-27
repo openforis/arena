@@ -2,15 +2,15 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+
 import { ValidationUtils } from '@core/validation/validationUtils'
 
-import { useI18n } from '@webapp/store/system'
-
-import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
-import { DataGrid } from '@webapp/components/DataGrid'
-import { useSurvey } from '@webapp/store/survey'
 import { ExpansionPanel } from '@webapp/components'
+import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const validationWrapper = (fields) => ({
   valid: false,

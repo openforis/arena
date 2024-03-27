@@ -3,7 +3,6 @@ import { useCallback } from 'react'
 import * as A from '@core/arena'
 
 import * as API from '@webapp/service/api'
-
 import { useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../state'

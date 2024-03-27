@@ -1,20 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
+import { useDispatch } from 'react-redux'
 
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
-
-import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanEditRecord } from '@webapp/store/user'
-import { RecordActions, useRecordNode } from '@webapp/store/ui/record'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import ErrorBadge from '@webapp/components/errorBadge'
 import NodeDefTableCellBody from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellBody'
+import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
+import { RecordActions, useRecordNode } from '@webapp/store/ui/record'
+import { useAuthCanEditRecord } from '@webapp/store/user'
 
 import { useColumn } from './store'
 

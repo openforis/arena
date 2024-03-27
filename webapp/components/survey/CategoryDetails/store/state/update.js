@@ -1,14 +1,13 @@
 import * as R from 'ramda'
 
 import * as A from '@core/arena'
-
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import { keys } from './keys'
-import { getCategory, getItems, getImportSummary } from './read'
+import { getCategory, getImportSummary, getItems } from './read'
 
 export const assocCategory = ({ category }) => A.assoc(keys.category, category)
 

@@ -1,5 +1,5 @@
-import { useFetchData } from './useFetchData'
 import { useFetchCount } from './useFetchCount'
+import { useFetchData } from './useFetchData'
 
 export const useActions = ({ setData, setCount }) => {
   const { fetchData, resetData } = useFetchData({ setData })

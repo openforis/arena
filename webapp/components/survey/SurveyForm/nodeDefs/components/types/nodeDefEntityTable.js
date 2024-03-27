@@ -1,4 +1,5 @@
 import './nodeDefEntityTable.scss'
+
 import React from 'react'
 
 import * as Node from '@core/record/node'
@@ -8,6 +9,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
+
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = (props) => {

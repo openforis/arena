@@ -1,11 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import { useI18n } from '@webapp/store/system'
+
 import { ValueFormatter } from '../../../../valueFormatter'
 
 import { useColumn } from './store'
-import { Objects } from '@openforis/arena-core'
 
 const getColValue = ({ nodeDef, col, row, i18n }) => {
   const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null

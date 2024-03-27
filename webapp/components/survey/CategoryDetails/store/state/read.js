@@ -1,9 +1,9 @@
 import * as R from 'ramda'
 
 import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as StringUtils from '@core/stringUtils'
 
 import { keys } from './keys'
 

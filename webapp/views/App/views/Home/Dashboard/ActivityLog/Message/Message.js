@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useI18n } from '@webapp/store/system'
-import ProfilePicture from '@webapp/components/profilePicture'
-
 import Markdown from '@webapp/components/markdown'
+import ProfilePicture from '@webapp/components/profilePicture'
+import { useI18n } from '@webapp/store/system'
 
 import { ActivityLogMessage } from '../store'
 

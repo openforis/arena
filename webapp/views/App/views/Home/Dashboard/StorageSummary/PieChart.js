@@ -2,7 +2,6 @@ import './pieChart.scss'
 
 import React, { useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
-
 import * as d3 from 'd3'
 
 const MARGIN_X = 150

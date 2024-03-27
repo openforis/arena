@@ -1,27 +1,24 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
 
 import { appModules, dataModules } from '@webapp/app/appModules'
-
+import ModuleSwitch from '@webapp/components/moduleSwitch'
+import Record from '@webapp/components/survey/Record'
+import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
-
-import ModuleSwitch from '@webapp/components/moduleSwitch'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
-import Record from '@webapp/components/survey/Record'
-
 import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 
-import ValidationReport from './ValidationReport'
-import Records from './Records'
-import Explorer from './Explorer'
 import Charts from './Charts'
 import DataExport from './DataExport'
 import DataImport from './DataImport'
+import Explorer from './Explorer'
 import { MapView } from './MapView'
+import Records from './Records'
+import ValidationReport from './ValidationReport'
 
 const Data = () => {
   const dispatch = useDispatch()

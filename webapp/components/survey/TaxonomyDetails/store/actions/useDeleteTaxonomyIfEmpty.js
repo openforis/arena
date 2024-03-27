@@ -1,10 +1,11 @@
 import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as API from '@webapp/service/api'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+
 import { State } from '../state'
-import { useDispatch } from 'react-redux'
 
 export const useDeleteTaxonomyIfEmpty = ({ setState }) => {
   const navigate = useNavigate()

@@ -1,13 +1,13 @@
 import { useCallback, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as User from '@core/user/user'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
+
+import * as User from '@core/user/user'
+
 import * as AppWebSocket from '@webapp/app/appWebSocket'
-
-import { SystemErrorActions } from '@webapp/store/system'
 import { JobActions } from '@webapp/store/app'
-
+import { SystemErrorActions } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 export const useOpenWebSocket = () => {

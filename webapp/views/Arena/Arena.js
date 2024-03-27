@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { SystemActions, useSystemError, useI18n, useSystemStatusReady } from '@webapp/store/system'
 import { ExpansionPanel } from '@webapp/components'
+import { SystemActions, useI18n, useSystemError, useSystemStatusReady } from '@webapp/store/system'
 
 import Routes from './Routes'
 

@@ -1,5 +1,7 @@
-import * as A from '@core/arena'
 import * as R from 'ramda'
+
+import * as A from '@core/arena'
+
 import { elementOffset } from '@webapp/utils/domUtils'
 
 const keys = {

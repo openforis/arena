@@ -2,13 +2,13 @@ import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as Survey from '@core/survey/survey'
 
-import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+import * as API from '@webapp/service/api'
 import { SurveyActions, useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import * as API from '@webapp/service/api'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 const _delete =
   ({ survey, category, callback }) =>

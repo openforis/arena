@@ -3,17 +3,16 @@ import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
-import * as API from '@webapp/service/api'
-
-import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
-
-import { NotificationActions } from '@webapp/store/ui'
 import { Dropzone } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
+import * as API from '@webapp/service/api'
+import { JobActions } from '@webapp/store/app'
+import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { NotificationActions } from '@webapp/store/ui'
 import { FileUtils } from '@webapp/utils/fileUtils'
+
 import { ImportStartButton } from './ImportStartButton'
 
 const fileMaxSize = 1000 // 1 GB

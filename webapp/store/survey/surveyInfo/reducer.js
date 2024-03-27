@@ -1,14 +1,13 @@
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
 import * as Survey from '@core/survey/survey'
 
 // App actions
 import { SystemActions } from '@webapp/store/system'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as SurveyActions from '../actions'
-import * as SurveyInfoActions from './actions'
 import { NodeDefsActions } from '../nodeDefs'
 
+import * as SurveyInfoActions from './actions'
 import * as SurveyInfoState from './state'
 
 const actionHandlers = {

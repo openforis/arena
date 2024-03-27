@@ -1,20 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
+
+import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useChain } from '@webapp/store/ui/chain'
 
 import BaseUnitSelector from './BaseUnitSelector'
-import { StratumAttributeSelector } from './StratumAttributeSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
-import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { FirstPhaseCategorySelector } from './FirstPhaseCategorySelector'
 import { FirstPhaseCommonAttributeSelector } from './FirstPhaseCommonAttributeSelector'
+import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
+import { StratumAttributeSelector } from './StratumAttributeSelector'
 
 export const ChainSamplingDesignProps = (props) => {
   const { updateChain } = props

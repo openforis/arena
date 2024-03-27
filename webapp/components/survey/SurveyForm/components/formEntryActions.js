@@ -8,15 +8,14 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
-import { RecordActions, useRecord } from '@webapp/store/ui/record'
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
-
-import { TestId } from '@webapp/utils/testId'
-import { Button } from '@webapp/components/buttons'
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { RecordActions, useRecord } from '@webapp/store/ui/record'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
+import { useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+import { TestId } from '@webapp/utils/testId'
 
 const RecordEntryButtons = () => {
   const i18n = useI18n()

@@ -1,11 +1,11 @@
 import { createChain } from './createChain'
-import { fetchChain } from './fetchChain'
-import { updateChain } from './updateChain'
-import { deleteChain } from './deleteChain'
-import { resetChainStore } from './resetChainStore'
 import { createNodeDef } from './createNodeDef'
-import { openRStudio } from './openRStudio'
+import { deleteChain } from './deleteChain'
+import { fetchChain } from './fetchChain'
 import { fetchRecordsCountByStep } from './fetchRecordsCountByStep'
+import { openRStudio } from './openRStudio'
+import { resetChainStore } from './resetChainStore'
+import { updateChain } from './updateChain'
 
 export { ChainActionTypes } from './actionTypes'
 

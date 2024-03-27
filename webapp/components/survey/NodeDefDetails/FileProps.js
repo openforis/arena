@@ -2,13 +2,12 @@ import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
-
-import { useI18n } from '@webapp/store/system'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
+
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
 
 import { State } from './store'
 

@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+
 import * as SystemState from '../state'
 
 export const stateKey = 'status'

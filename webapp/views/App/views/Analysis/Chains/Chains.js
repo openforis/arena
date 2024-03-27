@@ -1,4 +1,5 @@
 import './Chains.scss'
+
 import React from 'react'
 import { useNavigate } from 'react-router'
 
@@ -6,12 +7,10 @@ import * as Chain from '@common/analysis/chain'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-
-import Table from '@webapp/components/Table'
-import ErrorBadge from '@webapp/components/errorBadge'
-
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
+import ErrorBadge from '@webapp/components/errorBadge'
+import Table from '@webapp/components/Table'
+import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import HeaderLeft from './HeaderLeft'
 

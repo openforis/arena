@@ -1,9 +1,9 @@
 import React from 'react'
 
 import SurveyForm from '@webapp/components/survey/SurveyForm'
+import { useI18n } from '@webapp/store/system'
 
 import { useLocalState } from './store'
-import { useI18n } from '@webapp/store/system'
 
 const Record = (props) => {
   const { recordUuid, pageNodeUuid, noHeader = false } = props

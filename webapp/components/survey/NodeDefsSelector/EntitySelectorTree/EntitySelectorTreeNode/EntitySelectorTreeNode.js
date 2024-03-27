@@ -4,18 +4,17 @@ import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import * as Survey from '@core/survey/survey'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-
-import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
-import { useRecord } from '@webapp/store/ui/record'
-import { TestId } from '@webapp/utils/testId'
+import * as Survey from '@core/survey/survey'
 
 import { useOnUpdate } from '@webapp/components/hooks'
+import { useNodeDefLabel, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useRecord } from '@webapp/store/ui/record'
+import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
+import { TestId } from '@webapp/utils/testId'
 
 const EntitySelectorTreeNode = (props) => {
   const {

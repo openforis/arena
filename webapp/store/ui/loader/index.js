@@ -1,6 +1,6 @@
 import * as LoaderActions from './actions'
-import * as LoaderState from './state'
-import LoaderReducer from './reducer'
 import { useLoader } from './hooks'
+import LoaderReducer from './reducer'
+import * as LoaderState from './state'
 
-export { LoaderActions, LoaderState, LoaderReducer, useLoader }
+export { LoaderActions, LoaderReducer, LoaderState, useLoader }

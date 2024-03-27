@@ -4,11 +4,10 @@ import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'
 
+import { ButtonDelete } from '@webapp/components'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { RecordActions } from '@webapp/store/ui/record'
-
-import { ButtonDelete } from '@webapp/components'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 

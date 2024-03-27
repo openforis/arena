@@ -1,9 +1,11 @@
 import './expansionPanel.scss'
+
 import React, { useEffect, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
+
 import { Button } from '../buttons'
 
 const closeClassName = 'close'

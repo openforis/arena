@@ -1,17 +1,15 @@
 import './Login.scss'
+
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
-
-import { useFormObject } from '@webapp/components/hooks'
 import { EmailInput, PasswordInput } from '@webapp/components/form'
-
-import Error from '@webapp/views/Guest/Error'
-
+import { useFormObject } from '@webapp/components/hooks'
+import { LoginActions, LoginState, LoginValidator } from '@webapp/store/login'
 import { useI18n } from '@webapp/store/system'
-import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
+import Error from '@webapp/views/Guest/Error'
 
 const Login = () => {
   const error = useSelector(LoginState.getError)

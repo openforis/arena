@@ -1,18 +1,19 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import CodeMirror from 'codemirror/lib/codemirror'
-import 'codemirror/addon/hint/show-hint'
 
-import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
+import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
+
+import 'codemirror/addon/hint/show-hint'
 
 const AdvancedExpressionEditorPopup = (props) => {
   const { query, mode, nodeDefCurrent, excludeCurrentNodeDef, isContextParent, updateDraftQuery } = props

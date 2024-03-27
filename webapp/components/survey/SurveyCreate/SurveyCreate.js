@@ -5,28 +5,26 @@ import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router'
 
 import * as A from '@core/arena'
-
+import { RecordCycle } from '@core/record/recordCycle'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import { RecordCycle } from '@core/record/recordCycle'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-
-import { useI18n } from '@webapp/store/system'
-import { useSurveyInfo } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
-import { contentTypes } from '@webapp/service/api'
-
+import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
+import { Checkbox, Dropdown } from '@webapp/components/form'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
-import { Checkbox, Dropdown } from '@webapp/components/form'
-import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
+import { contentTypes } from '@webapp/service/api'
+import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
+
+import { SurveyDropdown } from '../SurveyDropdown'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
-import { SurveyDropdown } from '../SurveyDropdown'
 
 const SurveyCreate = (props) => {
   const { showImport, submitButtonLabel, template } = props

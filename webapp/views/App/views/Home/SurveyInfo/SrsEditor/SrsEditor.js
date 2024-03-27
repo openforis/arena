@@ -7,9 +7,8 @@ import axios from 'axios'
 import * as Srs from '@core/geo/srs'
 
 import InputChips from '@webapp/components/form/InputChips'
-
-import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 const SrsEditor = (props) => {
   const { srs, validation, readOnly, setSrs } = props

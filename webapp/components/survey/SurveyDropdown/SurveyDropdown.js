@@ -3,10 +3,10 @@ import './SurveyDropdown.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { Dropdown } from '@webapp/components/form'
 import { useSurveyDropdownOptions } from './useSurveyDropdownOptions'
 
 const SurveyDropdown = (props) => {

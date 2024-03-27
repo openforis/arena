@@ -1,17 +1,15 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
 
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
-
-import * as API from '@webapp/service/api'
-
 import Dropdown from '@webapp/components/form/Dropdown'
+import * as API from '@webapp/service/api'
+import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 export const updateTypes = {
   promoteAllRecordsToCleansing: 'promoteAllRecordsToCleansing',

@@ -1,16 +1,16 @@
 import './Row.scss'
+
 import React from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n, useLang } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
-
 import { Button, ButtonIconEditOrView } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n, useLang } from '@webapp/store/system'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { State, useLocalState } from './store'
 

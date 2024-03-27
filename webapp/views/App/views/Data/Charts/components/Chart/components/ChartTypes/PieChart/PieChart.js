@@ -1,7 +1,9 @@
-import * as d3 from 'd3'
-import PropTypes from 'prop-types'
-import React, { useEffect } from 'react'
 import './PieChart.css'
+
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
+import * as d3 from 'd3'
+
 import { processData } from './utils/processData'
 
 const PieChart = ({ specs, originalData, chartRef }) => {

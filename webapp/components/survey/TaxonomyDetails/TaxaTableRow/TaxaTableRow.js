@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 const TaxaTableRow = (props) => {
   const { extraPropsDefsArray, idx, offset, row: taxon, vernacularLanguageCodes } = props

@@ -1,4 +1,4 @@
-import { TitleBlock, ShowLegendBlock, GroupByBlock } from '../../blocks'
+import { GroupByBlock, ShowLegendBlock, TitleBlock } from '../../blocks'
 import { valuesToCalculations } from '../../blocks/common'
 import { aggregationOptions } from '../common'
 

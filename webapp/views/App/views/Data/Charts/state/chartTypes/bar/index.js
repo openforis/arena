@@ -1,5 +1,5 @@
-import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock } from '../../blocks'
-import { valuesToCalculations, valuesToSpec, sliderBlock } from '../../blocks/common'
+import { GroupByBlock, MaxHeightBlock, ShowLegendBlock, TitleBlock } from '../../blocks'
+import { sliderBlock, valuesToCalculations, valuesToSpec } from '../../blocks/common'
 
 const bar = {
   selector: {

@@ -1,9 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
 import { useOnUpdate } from '@webapp/components/hooks'
 import LoadingBar from '@webapp/components/LoadingBar'
+import { useI18n } from '@webapp/store/system'
 
 export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
   const i18n = useI18n()

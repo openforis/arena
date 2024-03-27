@@ -3,10 +3,11 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
-import { FormItem } from '@webapp/components/form/Input'
-import { Checkbox } from '@webapp/components/form'
 import { ButtonIconInfo } from '@webapp/components/buttons'
+import { Checkbox } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
+
 import { State } from './store'
 
 const CoordinateProps = (props) => {

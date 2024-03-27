@@ -5,13 +5,13 @@ import PropTypes from 'prop-types'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button } from '@webapp/components/buttons'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+
+import { State, useActions } from '../store'
 
 import TableHeader from './TableHeader'
 import TableRow from './TableRow'
-
-import { State, useActions } from '../store'
 
 const ImportSummary = (props) => {
   const { state, setState } = props

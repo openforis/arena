@@ -1,11 +1,9 @@
 import * as A from '@core/arena'
 
-import { exportReducer } from '@webapp/utils/reduxUtils'
-
-import { SystemActions } from '@webapp/store/system'
-
 import { SurveyActions } from '@webapp/store/survey'
+import { SystemActions } from '@webapp/store/system'
 import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
+import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import * as RecordActions from './actions'
 import * as RecordState from './state'

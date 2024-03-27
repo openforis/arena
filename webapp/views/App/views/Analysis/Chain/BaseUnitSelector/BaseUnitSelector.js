@@ -9,14 +9,11 @@ import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
-
-import { useSurvey } from '@webapp/store/survey'
-
-import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
-
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
+import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 /*
     BASE_UNIT annotations

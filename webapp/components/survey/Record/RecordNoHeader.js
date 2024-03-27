@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import Record from './Record'
 import SurveyDefsLoader from '../SurveyDefsLoader/SurveyDefsLoader'
+
+import Record from './Record'
 
 const RecordNoHeader = (props) => {
   const { recordUuid, pageNodeUuid } = props

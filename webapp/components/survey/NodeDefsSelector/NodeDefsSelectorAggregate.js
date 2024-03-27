@@ -1,19 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Expression from '@core/expressionParser/expression'
-import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
+import { Query } from '@common/model/query'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import AttributeSelector from './AttributesSelector/AttributeSelector'
 import AttributesSelector from './AttributesSelector/AttributesSelector'
 import EntitySelector from './EntitySelector'
-import AttributeSelector from './AttributesSelector/AttributeSelector'
 
 const PREV_CALCULATIONS_ENABLED = false
 const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {

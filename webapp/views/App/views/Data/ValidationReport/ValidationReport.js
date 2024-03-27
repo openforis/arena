@@ -4,16 +4,15 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
+import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { ButtonBack } from '@webapp/components/buttons'
+import Table from '@webapp/components/Table'
 import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import Table from '@webapp/components/Table'
-import { ButtonBack } from '@webapp/components/buttons'
-
-import RowHeader from './RowHeader'
-import Row from './Row'
 import { HeaderLeft } from './HeaderLeft'
+import Row from './Row'
+import RowHeader from './RowHeader'
 
 const ValidationReport = () => {
   const navigate = useNavigate()

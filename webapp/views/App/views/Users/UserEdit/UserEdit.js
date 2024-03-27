@@ -3,28 +3,25 @@ import './UserEdit.scss'
 import React from 'react'
 import { useNavigate, useParams } from 'react-router'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-import * as AuthGroup from '@core/auth/authGroup'
 
-import { useI18n } from '@webapp/store/system'
-
-import ProfilePicture from '@webapp/components/profilePicture'
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { Button, ButtonDelete, ButtonInvite, ButtonSave } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
-import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
-
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import ProfilePicture from '@webapp/components/profilePicture'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import DropdownUserGroup from '../DropdownUserGroup'
 
 import ProfilePictureEditor from './ProfilePictureEditor'
-
 import { useEditUser } from './store'
-import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 const UserEdit = () => {
   const { userUuid } = useParams()

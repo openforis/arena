@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
+import { useMap } from 'react-leaflet'
 
 import { PointFactory } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as Survey from '@core/survey/survey'
 
 import { useIsMountedRef } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
-
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 

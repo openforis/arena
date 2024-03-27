@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useContext, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 
 import { useElementOffset } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 
+import { ChartUtils } from '../chartUtils'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
-import { ChartUtils } from '../chartUtils'
 
 const padding = { top: 20, right: 50, bottom: 20, left: 20 }
 const barHeight = 60

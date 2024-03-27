@@ -2,20 +2,20 @@ import './nodeDefEditButtons.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
+import { Button } from '@webapp/components'
+import { NodeDefsActions } from '@webapp/store/survey'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
 import { elementOffset } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions } from '@webapp/store/survey'
-import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { Button } from '@webapp/components'
 
 import { NodeDefEditButtonsMenu } from './nodeDefEditButtonsMenu'
 

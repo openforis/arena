@@ -1,10 +1,10 @@
-import isItemDeletedFnsSurvey from './survey'
-import isItemDeletedFnsCategory from './category'
-import isItemDeletedFnsTaxonomy from './taxonomy'
-import isItemDeletedFnsRecord from './record'
-import isItemDeletedFnsNode from './node'
-import isItemDeletedFnsUser from './user'
 import isItemDeletedFnsAnalysis from './analysis'
+import isItemDeletedFnsCategory from './category'
+import isItemDeletedFnsNode from './node'
+import isItemDeletedFnsRecord from './record'
+import isItemDeletedFnsSurvey from './survey'
+import isItemDeletedFnsTaxonomy from './taxonomy'
+import isItemDeletedFnsUser from './user'
 
 export default {
   ...isItemDeletedFnsSurvey,

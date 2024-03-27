@@ -1,6 +1,5 @@
-import { NotificationActions } from '@webapp/store/ui'
-
 import { appModules, appModuleUri } from '@webapp/app/appModules'
+import { NotificationActions } from '@webapp/store/ui'
 
 const _navigateToModuleDataHome = (navigate) => navigate(appModuleUri(appModules.data))
 

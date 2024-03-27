@@ -5,8 +5,8 @@ import * as A from '@core/arena'
 import { AggregateFunction } from '@core/survey/aggregateFunction'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { DialogConfirmActions } from '@webapp/store/ui'
 import { NodeDefsActions } from '@webapp/store/survey'
+import { DialogConfirmActions } from '@webapp/store/ui'
 
 export const useCustomAggregateFunctionsEditor = (props) => {
   const { nodeDef } = props
