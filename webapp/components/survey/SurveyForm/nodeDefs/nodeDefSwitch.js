@@ -159,6 +159,7 @@ const NodeDefSwitch = (props) => {
     readOnly,
     label,
     lang,
+    createNodePlaceholder,
     updateNode,
     removeNode,
   }
