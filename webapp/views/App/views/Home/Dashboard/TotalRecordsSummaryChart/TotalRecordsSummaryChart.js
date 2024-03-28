@@ -41,8 +41,6 @@ const TotalRecordsSummaryChart = (props) => {
 
 TotalRecordsSummaryChart.propTypes = {
   counts: PropTypes.array.isRequired,
-  from: PropTypes.string.isRequired,
-  to: PropTypes.string.isRequired,
 }
 
 export default TotalRecordsSummaryChart
