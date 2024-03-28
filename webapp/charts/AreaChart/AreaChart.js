@@ -23,7 +23,7 @@ const margin = {
 const fillOpacity = '70'
 
 export const AreaChart = (props) => {
-  const { data, dataKeys, labelDataKey } = props
+  const { data, allowDecimals, dataKeys, labelDataKey } = props
 
   const colors = useRandomColors(dataKeys.length, { onlyDarkColors: true })
 
@@ -32,7 +32,7 @@ export const AreaChart = (props) => {
       <ReChartsAreaChart data={data} margin={margin}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={labelDataKey} />
-        <YAxis />
+        <YAxis allowDecimals={allowDecimals} />
         <Tooltip />
         {dataKeys.map((dataKey, index) => {
           const color = `${colors[index]}${fillOpacity}`
@@ -44,6 +44,7 @@ export const AreaChart = (props) => {
 }
 
 AreaChart.propTypes = {
+  allowDecimals: PropTypes.bool,
   data: PropTypes.array.isRequired,
   dataKeys: PropTypes.array.isRequired,
   labelDataKey: PropTypes.string,
@@ -51,6 +52,7 @@ AreaChart.propTypes = {
 }
 
 AreaChart.defaultProps = {
+  allowDecimals: true,
   labelDataKey: 'name',
   showLegend: true,
 }
