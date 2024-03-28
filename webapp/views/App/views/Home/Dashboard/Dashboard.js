@@ -45,13 +45,7 @@ const Dashboard = () => {
         {
           key: 'totalRecords',
           label: 'homeView.dashboard.totalRecords',
-          renderContent: () => (
-            <TotalRecordsSummaryChart
-              counts={recordsSummaryState.counts}
-              from={recordsSummaryState.from}
-              to={recordsSummaryState.to}
-            />
-          ),
+          renderContent: () => <TotalRecordsSummaryChart counts={recordsSummaryState.counts} />,
         }
       )
     }
