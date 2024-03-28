@@ -48,11 +48,9 @@ AreaChart.propTypes = {
   data: PropTypes.array.isRequired,
   dataKeys: PropTypes.array.isRequired,
   labelDataKey: PropTypes.string,
-  showLegend: PropTypes.bool,
 }
 
 AreaChart.defaultProps = {
   allowDecimals: true,
   labelDataKey: 'name',
-  showLegend: true,
 }

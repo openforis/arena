@@ -31,13 +31,14 @@ const calculateDateData = (userDateCounts) => {
 
 const groupDataByDate = (userDateCounts) =>
   userDateCounts.reduce((acc, item) => {
-    const { count, date, owner_email } = item
+    const { count, date } = item
+    const key = getDataKey(item)
     let obj = acc[date]
     if (!obj) {
       obj = { date }
       acc[date] = obj
     }
-    obj[owner_email] = Number(count)
+    obj[key] = Number(count)
     return acc
   }, {})
 
@@ -70,6 +71,11 @@ const generateChartData = ({ dataKeys, firstDate, daysDiff, userDateCounts }) =>
   return data
 }
 
+const getDataKey = (item) => {
+  const { owner_name, owner_email } = item
+  return owner_name ?? owner_email.substring(0, owner_email.indexOf('@'))
+}
+
 const DailyRecordsByUser = () => {
   const i18n = useI18n()
   const { userDateCounts, userCounts } = useContext(RecordsSummaryContext)
@@ -83,7 +89,7 @@ const DailyRecordsByUser = () => {
   const chartData = useMemo(() => {
     const { firstDate, daysDiff } = calculateDateData(userDateCounts)
 
-    const dataKeys = selectedUsers.map((item) => item.owner_email)
+    const dataKeys = selectedUsers.map(getDataKey)
 
     const data = generateChartData({ dataKeys, firstDate, daysDiff, userDateCounts })
 

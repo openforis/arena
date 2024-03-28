@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {
   LineChart as ReChartsLineChart,
   Line,
@@ -34,4 +35,10 @@ export const LineChart = (props) => {
       </ReChartsLineChart>
     </ResponsiveContainer>
   )
+}
+
+LineChart.propTypes = {
+  data: PropTypes.array.isRequired,
+  dataKey: PropTypes.string.isRequired,
+  labelDataKey: PropTypes.string.isRequired,
 }
