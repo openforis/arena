@@ -1,7 +1,6 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import './TotalRecordsSummaryChart.scss'
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
@@ -9,13 +8,25 @@ import { useI18n } from '@webapp/store/system'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
 
 import { LineChart } from '@webapp/charts/LineChart'
+import { DateFormats, Dates } from '@openforis/arena-core'
 
 const TotalRecordsSummaryChart = (props) => {
   const { counts } = props
 
   const i18n = useI18n()
 
-  const chartData = counts
+  const chartData = useMemo(
+    () =>
+      counts.map(({ date, count }) => ({
+        date: Dates.convertDate({
+          dateStr: date,
+          formatFrom: DateFormats.dateStorage,
+          formatTo: DateFormats.dateDisplay,
+        }),
+        count: Number(count),
+      })),
+    [counts]
+  )
 
   return (
     <>
