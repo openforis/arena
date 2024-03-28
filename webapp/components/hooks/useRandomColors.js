@@ -1,13 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-const possibleColors = {
+const lightColors = {
   aqua: '#00ffff',
+  lightblue: '#add8e6',
+  lightcyan: '#e0ffff',
+  lightgreen: '#90ee90',
+  lightgrey: '#d3d3d3',
+  lightpink: '#ffb6c1',
+  lightyellow: '#ffffe0',
+  white: '#ffffff',
+}
+
+const darkColors = {
   azure: '#f0ffff',
   beige: '#f5f5dc',
   // black: '#000000',
   blue: '#0000ff',
   brown: '#a52a2a',
-  cyan: '#00ffff',
   darkblue: '#00008b',
   darkcyan: '#008b8b',
   darkgrey: '#a9a9a9',
@@ -25,25 +34,27 @@ const possibleColors = {
   green: '#008000',
   indigo: '#4b0082',
   khaki: '#f0e68c',
-  lightblue: '#add8e6',
-  lightcyan: '#e0ffff',
-  lightgreen: '#90ee90',
-  lightgrey: '#d3d3d3',
-  lightpink: '#ffb6c1',
-  lightyellow: '#ffffe0',
   lime: '#00ff00',
-  magenta: '#ff00ff',
   maroon: '#800000',
   navy: '#000080',
   olive: '#808000',
   orange: '#ffa500',
   pink: '#ffc0cb',
   purple: '#800080',
-  violet: '#800080',
   red: '#ff0000',
   silver: '#c0c0c0',
-  white: '#ffffff',
   yellow: '#ffff00',
+}
+
+const possibleColors = {
+  ...darkColors,
+  ...lightColors,
+}
+
+const determineAvailableColors = ({ onlyLightColors = false, onlyDarkColors = false } = {}) => {
+  if (onlyLightColors) return lightColors
+  if (onlyDarkColors) return darkColors
+  return possibleColors
 }
 
 export const useRandomColor = (dependencies = []) => {
@@ -70,11 +81,12 @@ export const useRandomColor = (dependencies = []) => {
   }
 }
 
-export const useRandomColors = (size) => {
+export const useRandomColors = (size, { onlyDarkColors = false, onlyLightColors = false } = {}) => {
   const [colors, setColors] = useState([])
 
   useEffect(() => {
-    const availableColors = [...Object.values(possibleColors)]
+    const availableColorsObj = determineAvailableColors({ onlyDarkColors, onlyLightColors })
+    const availableColors = [...Object.values(availableColorsObj)]
 
     const colorsUpdated = []
 
