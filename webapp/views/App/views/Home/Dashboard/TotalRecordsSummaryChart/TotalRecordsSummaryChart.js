@@ -1,5 +1,3 @@
-import './TotalRecordsSummaryChart.scss'
-
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
