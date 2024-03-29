@@ -13,9 +13,11 @@ import { PieChart } from '@webapp/charts/PieChart'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
-const dataEntryColor = '#f13838'
-const dataCleansingColor = '#e99614'
-const dataAnalysisColor = '#35af6b'
+const colorByStep = {
+  [RecordStep.stepNames.entry]: '#f13838',
+  [RecordStep.stepNames.cleansing]: '#e99614',
+  [RecordStep.stepNames.analysis]: '#35af6b',
+}
 const remainingItemsColor = '#c1b7b7'
 
 const SamplingPointDataSummary = () => {
@@ -25,31 +27,30 @@ const SamplingPointDataSummary = () => {
   const surveyId = Survey.getId(surveyInfo)
   const [totalItems, setTotalItems] = useState(0)
 
-  const data = useMemo(
-    () => [
-      {
-        name: i18n.t(`homeView.dashboard.step.${RecordStep.stepNames.entry}`),
-        value: dataEntry,
-        color: dataEntryColor,
-      },
-      {
-        name: i18n.t(`homeView.dashboard.step.${RecordStep.stepNames.cleansing}`),
-        value: dataCleansing,
-        color: dataCleansingColor,
-      },
-      {
-        name: i18n.t(`homeView.dashboard.step.${RecordStep.stepNames.analysis}`),
-        value: dataAnalysis,
-        color: dataAnalysisColor,
-      },
-      {
-        name: i18n.t('homeView.dashboard.samplingPointDataCompletion.remainingItems'),
-        value: totalItems - dataEntry - dataCleansing - dataAnalysis,
-        color: remainingItemsColor,
-      },
-    ],
-    [dataAnalysis, dataCleansing, dataEntry, i18n, totalItems]
-  )
+  const data = useMemo(() => {
+    const valueByStep = {
+      [RecordStep.stepNames.entry]: dataEntry,
+      [RecordStep.stepNames.cleansing]: dataCleansing,
+      [RecordStep.stepNames.analysis]: dataAnalysis,
+    }
+    const dataItems = []
+    Object.values(RecordStep.stepNames).forEach((step) => {
+      const value = valueByStep[step]
+      if (value > 0) {
+        dataItems.push({
+          name: i18n.t(`homeView.dashboard.step.${step}`),
+          value,
+          color: colorByStep[step],
+        })
+      }
+    })
+    dataItems.push({
+      name: i18n.t('homeView.dashboard.samplingPointDataCompletion.remainingItems'),
+      value: totalItems - dataEntry - dataCleansing - dataAnalysis,
+      color: remainingItemsColor,
+    })
+    return dataItems
+  }, [dataAnalysis, dataCleansing, dataEntry, i18n, totalItems])
 
   useEffect(() => {
     const fetchTotalItems = async () => {
