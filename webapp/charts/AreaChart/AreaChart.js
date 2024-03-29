@@ -13,13 +13,6 @@ import {
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
-const margin = {
-  top: 10,
-  right: 30,
-  left: 0,
-  bottom: 0,
-}
-
 const fillOpacity = '70'
 
 export const AreaChart = (props) => {
@@ -29,7 +22,7 @@ export const AreaChart = (props) => {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <ReChartsAreaChart data={data} margin={margin}>
+      <ReChartsAreaChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={labelDataKey} />
         <YAxis allowDecimals={allowDecimals} />

@@ -52,14 +52,14 @@ PieChart.propTypes = {
   data: PropTypes.array.isRequired,
   dataKey: PropTypes.string,
   endAngle: PropTypes.number,
-  height: PropTypes.number,
+  height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   innerRadius: PropTypes.number,
   label: PropTypes.bool,
   outerRadius: PropTypes.number,
   startAngle: PropTypes.number,
   showLegend: PropTypes.bool,
   showTooltip: PropTypes.bool,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
 PieChart.defaultProps = {
