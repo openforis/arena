@@ -135,6 +135,13 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo })
   return format(dateParsed, formatTo)
 }
 
+export const convertDateFromISOToDisplay = (dateStr) =>
+  convertDate({
+    dateStr,
+    formatFrom: formats.dateISO,
+    formatTo: formats.dateDefault,
+  })
+
 export const convertDateTimeFromISOToDisplay = (dateStr) =>
   convertDate({
     dateStr,

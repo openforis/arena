@@ -13,18 +13,12 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const margin = {
-  top: 5,
-  right: 30,
-  left: 20,
-  bottom: 5,
-}
-
 const barFill = '#3885ca'
 const activeBarFill = 'green'
 const activeBarStroke = '#3885ca'
 const maxBarSize = 30
 const tickMaxChars = 20
+const verticalLayoutYAxisWidth = 150
 
 export const BarChart = (props) => {
   const { data, dataKey, labelDataKey, layout, showLegend } = props
@@ -37,7 +31,7 @@ export const BarChart = (props) => {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <ReChartsBarChart data={data} layout={layout} margin={margin}>
+      <ReChartsBarChart data={data} layout={layout}>
         <CartesianGrid strokeDasharray="3 3" />
         {layout === 'horizontal' && (
           <>
@@ -48,7 +42,12 @@ export const BarChart = (props) => {
         {layout === 'vertical' && (
           <>
             <XAxis type="number" />
-            <YAxis dataKey={labelDataKey} tickFormatter={tickFormatter} type="category" width={250} />
+            <YAxis
+              dataKey={labelDataKey}
+              tickFormatter={tickFormatter}
+              type="category"
+              width={verticalLayoutYAxisWidth}
+            />
           </>
         )}
         <Tooltip cursor={{ fill: 'transparent' }} />

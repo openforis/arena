@@ -1,16 +1,16 @@
 import React, { useEffect, useContext, useState, useMemo } from 'react'
 
 import * as User from '@core/user/user'
+import { convertDateFromISOToDisplay } from '@core/dateUtils'
 
+import { AreaChart } from '@webapp/charts/AreaChart'
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
+import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
-import { useUser } from '@webapp/store/user'
-import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
-import { AreaChart } from '@webapp/charts/AreaChart'
-import { addDays, formatDateISO } from '@core/dateUtils'
 
 const dayInMs = 1000 * 60 * 60 * 24
 
@@ -33,43 +33,18 @@ const groupDataByDate = (userDateCounts) =>
   userDateCounts.reduce((acc, item) => {
     const { count, date } = item
     const key = getDataKey(item)
-    let obj = acc[date]
+    const dateFormatted = convertDateFromISOToDisplay(date)
+    let obj = acc[dateFormatted]
     if (!obj) {
-      obj = { date }
-      acc[date] = obj
+      obj = { date: dateFormatted }
+      acc[dateFormatted] = obj
     }
     obj[key] = Number(count)
     return acc
   }, {})
 
-const generateChartData = ({ dataKeys, firstDate, daysDiff, userDateCounts }) => {
-  const data = []
-
-  if (dataKeys.length > 0) {
-    const dataGroupedByDate = groupDataByDate(userDateCounts)
-
-    let currentDate = new Date(firstDate)
-    let count = 0
-    const zeroValuesItem = dataKeys.reduce((acc, dataKey) => {
-      acc[dataKey] = 0
-      return acc
-    }, {})
-    while (count < daysDiff) {
-      const currentDateFormatted = formatDateISO(currentDate)
-      let item = dataGroupedByDate[currentDateFormatted]
-      if (!item) {
-        item = {
-          date: currentDateFormatted,
-          ...zeroValuesItem,
-        }
-      }
-      data.push(item)
-      currentDate = addDays(currentDate, 1)
-      count += 1
-    }
-  }
-  return data
-}
+const generateChartData = ({ dataKeys, userDateCounts }) =>
+  dataKeys.length > 0 ? Object.values(groupDataByDate(userDateCounts)) : []
 
 const getDataKey = (item) => {
   const { owner_name, owner_email } = item

@@ -11,17 +11,20 @@ export const RecordsByUser = () => {
   const i18n = useI18n()
   const { userCounts } = useContext(RecordsSummaryContext)
 
-  const chartData = useMemo(() => {
-    return userCounts.map((userCount) => {
-      const { owner_name, owner_email, count } = userCount
-      return {
+  const { chartData, totalCount } = useMemo(() => {
+    const chartData = []
+    let totalCount = 0
+    userCounts.forEach((userCount) => {
+      const { owner_name, owner_email, count: cnt } = userCount
+      const count = Number(cnt)
+      chartData.push({
         name: owner_name ?? owner_email,
-        count: Number(count),
-      }
+        count,
+      })
+      totalCount += count
     })
+    return { chartData, totalCount }
   }, [userCounts])
-
-  const totalCount = useMemo(() => userCounts.reduce((acc, userCount) => acc + Number(userCount), 0), [userCounts])
 
   return (
     <>
