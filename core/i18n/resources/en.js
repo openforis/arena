@@ -387,9 +387,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
       },
       storageSummary: {
-        title: 'Storage use',
+        title: 'Storage use (files)',
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
+        usedSpaceOutOf: `Used {{percent}}% ({{used}} out of {{total}})`,
       },
       samplingPointDataCompletion: {
         title: 'Sampling Point Data Completion',
