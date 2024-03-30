@@ -408,6 +408,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       dailyRecordsByUser: 'Daily records by user',
       totalRecords: 'Total records',
       selectUsers: 'Select users...',
+      noRecordsAddedInSelectedPeriod: 'No records added in the selected period',
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {

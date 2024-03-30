@@ -6,6 +6,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
+import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
 
 export const RecordsByUser = () => {
   const i18n = useI18n()
@@ -34,7 +35,11 @@ export const RecordsByUser = () => {
 
       <RecordsSummaryPeriodSelector />
 
-      <BarChart data={chartData} dataKey="count" layout="vertical" showLegend={false} />
+      {chartData?.length > 0 ? (
+        <BarChart data={chartData} dataKey="count" layout="vertical" showLegend={false} />
+      ) : (
+        <NoRecordsAddedInSelectedPeriod />
+      )}
     </>
   )
 }

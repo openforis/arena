@@ -14,14 +14,14 @@ const lineStroke = '#8884d8'
 const lineFill = '#8884d8'
 
 export const LineChart = (props) => {
-  const { data, dataKey, labelDataKey } = props
+  const { allowDecimals, data, dataKey, labelDataKey } = props
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ReChartsLineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={labelDataKey} />
-        <YAxis />
+        <YAxis allowDecimals={allowDecimals} />
         <Tooltip />
         <Line type="monotone" dataKey={dataKey} stroke={lineStroke} fill={lineFill} />
       </ReChartsLineChart>
@@ -30,7 +30,12 @@ export const LineChart = (props) => {
 }
 
 LineChart.propTypes = {
+  allowDecimals: PropTypes.bool,
   data: PropTypes.array.isRequired,
   dataKey: PropTypes.string.isRequired,
   labelDataKey: PropTypes.string.isRequired,
+}
+
+LineChart.defaultProps = {
+  allowDecimals: true,
 }

@@ -2,11 +2,13 @@ import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { convertDateFromISOToDisplay } from '@core/dateUtils'
+
+import { LineChart } from '@webapp/charts/LineChart'
+
 import { useI18n } from '@webapp/store/system'
 
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
-
-import { LineChart } from '@webapp/charts/LineChart'
+import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
 
 const TotalRecordsSummaryChart = (props) => {
   const { counts } = props
@@ -28,7 +30,11 @@ const TotalRecordsSummaryChart = (props) => {
 
       <RecordsSummaryPeriodSelector />
 
-      <LineChart data={chartData} dataKey="count" labelDataKey="date" />
+      {chartData?.length > 0 ? (
+        <LineChart allowDecimals={false} data={chartData} dataKey="count" labelDataKey="date" />
+      ) : (
+        <NoRecordsAddedInSelectedPeriod />
+      )}
     </>
   )
 }

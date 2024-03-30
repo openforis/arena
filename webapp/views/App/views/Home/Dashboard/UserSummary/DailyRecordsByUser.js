@@ -10,7 +10,8 @@ import { useUser } from '@webapp/store/user'
 import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
 
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
-import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector/RecordsSummaryPeriodSelector'
+import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
+import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
 
 const dayInMs = 1000 * 60 * 60 * 24
 
@@ -77,6 +78,8 @@ const DailyRecordsByUser = () => {
     if (!canViewAllUsers) {
       const selectedItem = userCounts.find((item) => item.owner_uuid === User.getUuid(user))
       setSelectedUsers(selectedItem ? [selectedItem] : [])
+    } else {
+      setSelectedUsers([])
     }
   }, [user, canViewAllUsers, userCounts])
 
@@ -96,9 +99,11 @@ const DailyRecordsByUser = () => {
           placeholder={i18n.t('homeView.dashboard.selectUsers')}
         />
       )}
-      {data.length > 0 && dataKeys.length > 0 && (
+      {dataKeys.length === 0 ? (
+        <NoRecordsAddedInSelectedPeriod />
+      ) : data.length > 0 ? (
         <AreaChart allowDecimals={false} data={data} dataKeys={dataKeys} labelDataKey="date" />
-      )}
+      ) : null}
     </>
   )
 }

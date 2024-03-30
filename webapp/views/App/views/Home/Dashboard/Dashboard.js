@@ -32,7 +32,7 @@ const Dashboard = () => {
 
   const tabItems = []
 
-  const hasRecords = !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && recordsSummaryState.counts.length > 0
+  const hasRecords = !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo)
 
   if (hasRecords) {
     if (canEditSurvey) {
