@@ -94,7 +94,7 @@ const DailyRecordsByUser = () => {
 
       <RecordsSummaryPeriodSelector />
 
-      {canViewAllUsers && sortedUserCounts?.length > 0 && (
+      {canViewAllUsers && sortedUserCounts.length > 0 && (
         <Dropdown
           multiple
           items={sortedUserCounts}
