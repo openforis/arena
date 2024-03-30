@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 const lightColors = {
   aqua: '#00ffff',
+  azure: '#f0ffff',
+  beige: '#f5f5dc',
+  khaki: '#f0e68c',
   lightblue: '#add8e6',
   lightcyan: '#e0ffff',
   lightgreen: '#90ee90',
@@ -12,8 +15,6 @@ const lightColors = {
 }
 
 const darkColors = {
-  azure: '#f0ffff',
-  beige: '#f5f5dc',
   // black: '#000000',
   blue: '#0000ff',
   brown: '#a52a2a',
@@ -33,7 +34,6 @@ const darkColors = {
   gold: '#ffd700',
   green: '#008000',
   indigo: '#4b0082',
-  khaki: '#f0e68c',
   lime: '#00ff00',
   maroon: '#800000',
   navy: '#000080',

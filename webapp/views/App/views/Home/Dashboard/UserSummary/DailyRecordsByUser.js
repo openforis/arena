@@ -78,8 +78,6 @@ const DailyRecordsByUser = () => {
     if (!canViewAllUsers) {
       const selectedItem = userCounts.find((item) => item.owner_uuid === User.getUuid(user))
       setSelectedUsers(selectedItem ? [selectedItem] : [])
-    } else {
-      setSelectedUsers([])
     }
   }, [user, canViewAllUsers, userCounts])
 
@@ -89,7 +87,7 @@ const DailyRecordsByUser = () => {
 
       <RecordsSummaryPeriodSelector />
 
-      {canViewAllUsers && (
+      {canViewAllUsers && sortedUserCounts?.length > 0 && (
         <Dropdown
           multiple
           items={sortedUserCounts}
