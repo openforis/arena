@@ -16,9 +16,10 @@ import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 const fillOpacity = '70'
 
 export const AreaChart = (props) => {
-  const { data, allowDecimals, dataKeys, labelDataKey } = props
+  const { data, allowDecimals, colors: colorsProp, dataKeys, labelDataKey } = props
 
-  const colors = useRandomColors(dataKeys.length, { onlyDarkColors: true })
+  const randomColors = useRandomColors(dataKeys.length, { onlyDarkColors: true })
+  const colors = colorsProp ?? randomColors
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -38,6 +39,7 @@ export const AreaChart = (props) => {
 
 AreaChart.propTypes = {
   allowDecimals: PropTypes.bool,
+  colors: PropTypes.array,
   data: PropTypes.array.isRequired,
   dataKeys: PropTypes.array.isRequired,
   labelDataKey: PropTypes.string,

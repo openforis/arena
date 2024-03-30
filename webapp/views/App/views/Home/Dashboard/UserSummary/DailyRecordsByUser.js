@@ -12,6 +12,7 @@ import { useAuthCanViewAllUsers } from '@webapp/store/user/hooks'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 import RecordsSummaryPeriodSelector from '../RecordsSummaryPeriodSelector'
 import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
+import { useRandomColorsPerKeys } from './useRandomColorsPerKeys'
 
 const dayInMs = 1000 * 60 * 60 * 24
 
@@ -62,6 +63,12 @@ const DailyRecordsByUser = () => {
   // Sort userCounts in descending order based on count
   const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
 
+  const allUserUuids = useMemo(() => userCounts.map(({ owner_uuid }) => owner_uuid), [userCounts])
+  const colors = useRandomColorsPerKeys({
+    keys: allUserUuids,
+    selectedKeys: selectedUsers.map(({ owner_uuid }) => owner_uuid),
+    onlyDarkColors: true,
+  })
   const chartData = useMemo(() => {
     const { firstDate, daysDiff } = calculateDateData(userDateCounts)
 
@@ -93,14 +100,14 @@ const DailyRecordsByUser = () => {
           items={sortedUserCounts}
           itemLabel={(user) => user.owner_name ?? user.owner_email}
           itemValue={(user) => user.owner_uuid}
-          onChange={(selectedOptions) => setSelectedUsers(selectedOptions)}
+          onChange={setSelectedUsers}
           placeholder={i18n.t('homeView.dashboard.selectUsers')}
         />
       )}
       {dataKeys.length === 0 ? (
         <NoRecordsAddedInSelectedPeriod />
       ) : data.length > 0 ? (
-        <AreaChart allowDecimals={false} data={data} dataKeys={dataKeys} labelDataKey="date" />
+        <AreaChart allowDecimals={false} colors={colors} data={data} dataKeys={dataKeys} labelDataKey="date" />
       ) : null}
     </>
   )

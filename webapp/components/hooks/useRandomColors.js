@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 const lightColors = {
   aqua: '#00ffff',
@@ -81,27 +81,22 @@ export const useRandomColor = (dependencies = []) => {
   }
 }
 
-export const useRandomColors = (size, { onlyDarkColors = false, onlyLightColors = false } = {}) => {
-  const [colors, setColors] = useState([])
-
-  useEffect(() => {
+export const useRandomColors = (size, { onlyDarkColors = false, onlyLightColors = false } = {}) =>
+  useMemo(() => {
     const availableColorsObj = determineAvailableColors({ onlyDarkColors, onlyLightColors })
     const availableColors = [...Object.values(availableColorsObj)]
 
-    const colorsUpdated = []
+    const colors = []
 
     for (let count = 0; count < size; count++) {
       // pick a color randomly among the available (not used) ones
       const colorIndex = Math.floor(Math.random() * availableColors.length)
       const color = availableColors[colorIndex]
 
-      colorsUpdated.push(color)
+      colors.push(color)
 
       availableColors.splice(colorIndex, 1)
     }
 
-    setColors(colorsUpdated)
-  }, [size])
-
-  return colors
-}
+    return colors
+  }, [onlyDarkColors, onlyLightColors, size])
