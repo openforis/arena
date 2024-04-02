@@ -32,12 +32,12 @@ export default class ListTaxonomies {
   }
 
   initTaxonomy(taxonomy) {
-    const { surveyId } = this.rChain
+    const { chainUuid, surveyId } = this.rChain
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     // get taxa
     const dfTaxonomyyItems = this.getDfTaxonomyItems(taxonomy)
-    const getTaxonomyItems = arenaGet(ApiRoutes.rChain.taxonomyItemsData({ surveyId, taxonomyUuid }))
+    const getTaxonomyItems = arenaGet(ApiRoutes.rChain.taxonomyItemsData({ surveyId, chainUuid, taxonomyUuid }))
 
     this.scripts.push(setVar(dfTaxonomyyItems, getTaxonomyItems))
   }
