@@ -104,11 +104,11 @@ const DailyRecordsByUser = () => {
           placeholder={i18n.t('homeView.dashboard.selectUsers')}
         />
       )}
-      {dataKeys.length === 0 ? (
-        <NoRecordsAddedInSelectedPeriod />
-      ) : data.length > 0 ? (
+      {dataKeys.length === 0 && <NoRecordsAddedInSelectedPeriod />}
+
+      {dataKeys.length > 0 && data.length > 0 && (
         <AreaChart allowDecimals={false} colors={colors} data={data} dataKeys={dataKeys} labelDataKey="date" />
-      ) : null}
+      )}
     </>
   )
 }
