@@ -1,3 +1,4 @@
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -138,8 +139,27 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformer = ({ survey, query, expandCategoryItems }) =>
-  expandCategoryItems ? getCsvObjectTransformerExpandCategoryItems({ survey, query }) : null
+const getCsvObjectTransformerNullsToEmpty = () => {
+  return (obj) => {
+    Object.entries(obj).forEach(([key, value]) => {
+      if (A.isNull(value)) {
+        obj[key] = ''
+      }
+    })
+    return obj
+  }
+}
+
+const getCsvObjectTransformer = ({ survey, query, expandCategoryItems, nullsToEmpty = false }) => {
+  const transformers = []
+  if (expandCategoryItems) {
+    transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
+  }
+  if (nullsToEmpty) {
+    transformers.push(getCsvObjectTransformerNullsToEmpty())
+  }
+  return transformers.length === 0 ? null : A.pipe(...transformers)
+}
 
 export const SurveyRdbCsvExport = {
   getCsvExportFields,
