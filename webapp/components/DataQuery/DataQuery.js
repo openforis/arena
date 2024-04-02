@@ -1,7 +1,9 @@
 import './dataQuery.scss'
+
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import Chip from '@mui/material/Chip'
 
 import { Query } from '@common/model/query'
 
@@ -13,6 +15,7 @@ import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
+import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
 
 const DataQuery = (props) => {
   const { query, onChangeQuery } = props
@@ -58,11 +61,9 @@ const DataQuery = (props) => {
             onNodeDefLabelTypeChange={toggleLabelFunction}
             setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
           />
-
-          {dataLoaded && Query.getDisplayType(query) === Query.displayTypes.table && count && (
-            <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
-          )}
         </div>
+
+        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} query={query} />
 
         <Visualizer
           query={query}
@@ -76,6 +77,12 @@ const DataQuery = (props) => {
           onChangeQuery={onChangeQuery}
           setData={setData}
         />
+
+        {dataLoaded && Query.getDisplayType(query) === Query.displayTypes.table && count && (
+          <div className="table__footer">
+            <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
+          </div>
+        )}
       </div>
     </div>
   )

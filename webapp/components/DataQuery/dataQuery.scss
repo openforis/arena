@@ -4,8 +4,12 @@
   grid-column-gap: 10px;
   justify-content: center;
   height: 100%;
-}
 
-.data-query.nodedefs-selector-off {
-  grid-template-columns: 0 1fr;
+  &.nodedefs-selector-off {
+    grid-template-columns: 0 1fr;
+  }
+
+  .data-query__selected-attributes {
+    display: flex;
+  }
 }
