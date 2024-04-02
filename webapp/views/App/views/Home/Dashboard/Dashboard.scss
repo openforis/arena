@@ -23,17 +23,13 @@ $surveyInfoBarHeight: 140px;
       gap: 1rem;
       padding: 20px;
 
-      .dashboard-chart-header {
+      .dashboard-chart-header,
+      .dashboard-chart-subtitle {
         text-align: center;
       }
 
-      .dashboard-chart-wrapper {
-        flex: 1;
-        overflow-y: auto;
-      }
-
-      .dashboard-active-users-table {
-        flex: 1;
+      .recharts-responsive-container {
+        align-self: center;
       }
     }
   }

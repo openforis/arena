@@ -18,7 +18,7 @@ import { useFetchMessages } from './ActivityLog/store/actions/useGetActivityLogM
 import { useRecordsSummary } from './RecordsSummaryPeriodSelector/store'
 import { useHasSamplingPointData } from './hooks/useHasSamplingPointData'
 import { RecordsSummaryContext } from './RecordsSummaryContext'
-import RecordsByUser from './UserSummary/RecordsByUser'
+import { RecordsByUser } from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 import TotalRecordsSummaryChart from './TotalRecordsSummaryChart'
 
@@ -32,7 +32,7 @@ const Dashboard = () => {
 
   const tabItems = []
 
-  const hasRecords = !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo) && recordsSummaryState.counts.length > 0
+  const hasRecords = !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo)
 
   if (hasRecords) {
     if (canEditSurvey) {
@@ -45,13 +45,7 @@ const Dashboard = () => {
         {
           key: 'totalRecords',
           label: 'homeView.dashboard.totalRecords',
-          renderContent: () => (
-            <TotalRecordsSummaryChart
-              counts={recordsSummaryState.counts}
-              from={recordsSummaryState.from}
-              to={recordsSummaryState.to}
-            />
-          ),
+          renderContent: () => <TotalRecordsSummaryChart counts={recordsSummaryState.counts} />,
         }
       )
     }
