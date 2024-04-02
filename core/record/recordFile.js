@@ -17,6 +17,11 @@ export const propKeys = {
   nodeUuid: 'nodeUuid',
 }
 
+export const invalidPropKeys = {
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+}
+
 export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUuid) => ({
   [keys.uuid]: uuid,
   [keys.props]: {
@@ -50,3 +55,24 @@ export const getExtension = R.pipe(getName, getExtensionFromFileName)
 
 // UPDATE
 export const assocContent = R.assoc(keys.content)
+const assocProps = R.assoc(keys.props)
+
+const hasInvalidProps = (file) => Object.hasOwn(getProps(file), invalidPropKeys.fileName)
+
+export const cleanupInvalidProps = (file) => {
+  if (!hasInvalidProps(file)) {
+    return file
+  }
+  const props = getProps(file)
+
+  const propsUpdated = {
+    [propKeys.name]: props[invalidPropKeys.fileName],
+    [propKeys.size]: props[invalidPropKeys.fileSize],
+    [propKeys.recordUuid]: props[propKeys.recordUuid],
+    [propKeys.nodeUuid]: props[propKeys.nodeUuid],
+  }
+  if (props.deleted) {
+    propsUpdated[propKeys.deleted] = true
+  }
+  return assocProps(propsUpdated)(file)
+}
