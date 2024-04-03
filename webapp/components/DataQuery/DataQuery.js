@@ -3,7 +3,6 @@ import './dataQuery.scss'
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import Chip from '@mui/material/Chip'
 
 import { Query } from '@common/model/query'
 
@@ -63,7 +62,7 @@ const DataQuery = (props) => {
           />
         </div>
 
-        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} query={query} />
+        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} query={query} onChangeQuery={onChangeQuery} />
 
         <Visualizer
           query={query}

@@ -1,0 +1,18 @@
+@import 'webapp/style/partials';
+
+.data-query__selected-attributes {
+  display: flex;
+}
+
+.data-query__selected-attribute-chip.MuiChip-root {
+  background-color: white;
+
+  &.draggable-mirror {
+    background-color: lighten($orangeLight, 10%);
+    border: 1px dashed $blue;
+  }
+  &.draggable-source--is-dragging {
+    color: transparent;
+    background-color: transparent;
+  }
+}
