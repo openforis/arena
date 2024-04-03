@@ -76,6 +76,7 @@ export const fetchViewData = async (params, client = db) => {
     addCycle = false,
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
+    nullsToEmpty = false,
   } = params
 
   // Fetch data
@@ -109,7 +110,12 @@ export const fetchViewData = async (params, client = db) => {
       const csvTransform = CSVWriter.transformJsonToCsv({
         fields,
         options: {
-          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({ survey, query, expandCategoryItems }),
+          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({
+            survey,
+            query,
+            expandCategoryItems,
+            nullsToEmpty,
+          }),
         },
       })
       dbStream.pipe(csvTransform).pipe(streamOutput)
