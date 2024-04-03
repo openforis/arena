@@ -2,21 +2,23 @@ import './DataQuerySelectedAttributes.scss'
 
 import React, { useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
-import Chip from '@mui/material/Chip'
 
 import * as NodeDef from '@core/survey/nodeDef'
+
 import { Query } from '@common/model/query'
-import { useNodeDefsByUuids, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useSortable } from './useSortable'
+
 import { FormItem } from '@webapp/components/form/Input'
+import { useSortable } from '@webapp/components/hooks'
+import { useNodeDefsByUuids } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+
+import { DataQuerySelectedAttributeChip } from './DataQuerySelectedAttributeChip'
 
 export const DataQuerySelectedAttributes = (props) => {
   const { nodeDefLabelType, onChangeQuery, query } = props
 
   const i18n = useI18n()
   const containerRef = useRef(null)
-  const lang = useSurveyPreferredLang()
   const queryAttributeDefs = useNodeDefsByUuids(Query.getAttributeDefUuids(query))
 
   const onAttributeDefsSort = useCallback(
@@ -29,7 +31,7 @@ export const DataQuerySelectedAttributes = (props) => {
   useSortable({
     containerRef,
     draggableClassName: '.data-query__selected-attribute-chip',
-    handleClassName: '.data-query__selected-attribute-chip',
+    handleClassName: '.data-query__selected-attribute-chip .MuiChip-label',
     items: queryAttributeDefs,
     onItemsSort: onAttributeDefsSort,
   })
@@ -44,11 +46,12 @@ export const DataQuerySelectedAttributes = (props) => {
     >
       <div className="data-query__selected-attributes-wrapper" ref={containerRef}>
         {queryAttributeDefs.map((attributeDef) => (
-          <Chip
+          <DataQuerySelectedAttributeChip
             key={NodeDef.getUuid(attributeDef)}
-            className="data-query__selected-attribute-chip"
-            label={NodeDef.getLabelWithType({ nodeDef: attributeDef, lang, type: nodeDefLabelType })}
-            variant="outlined"
+            attributeDef={attributeDef}
+            nodeDefLabelType={nodeDefLabelType}
+            onChangeQuery={onChangeQuery}
+            query={query}
           />
         ))}
       </div>

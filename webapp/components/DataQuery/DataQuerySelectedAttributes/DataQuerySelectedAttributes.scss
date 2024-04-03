@@ -4,10 +4,17 @@
   display: flex;
   height: auto;
   flex: 1;
+
+  .form-label {
+    text-wrap: nowrap;
+  }
 }
 
 .data-query__selected-attributes-wrapper {
+  flex: 1;
   display: flex;
+  flex-flow: wrap;
+  gap: 0.3rem;
 }
 
 .data-query__selected-attribute-chip.MuiChip-root {
