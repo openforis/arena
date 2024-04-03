@@ -98,9 +98,9 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
 export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const total = await client.oneOrNone(
-    `SELECT SUM(COALESCE((props -> '${RecordFile.propKeys.size}')::INTEGER, 0))
+    `SELECT SUM(COALESCE((props ->> '${RecordFile.propKeys.size}')::INTEGER, 0))
     FROM ${schema}.file
-    WHERE NOT COALESCE((props -> '${RecordFile.propKeys.deleted}')::BOOLEAN, false)`,
+    WHERE ${NOT_DELETED_CONDITION}`,
     null,
     (row) => Number(row.sum)
   )
