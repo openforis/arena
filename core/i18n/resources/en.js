@@ -734,6 +734,10 @@ Are you sure you want to continue?`,
     },
     recordsUpdated: '{{count}} records updated successfully!',
     rowNum: 'Row #',
+    selectedAttributes: {
+      info: 'Drag&Drop to sort them',
+      label: 'Selected attributes:',
+    },
     showValidationReport: 'Show validation report',
     sort: 'Sort records',
     dataExport: {

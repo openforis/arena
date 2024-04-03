@@ -8,9 +8,7 @@
   > div {
     display: flex;
     align-items: center;
-    border-top: 1px solid $greyBorder;
-    border-left: 1px solid $greyBorder;
-    border-right: 1px solid $greyBorder;
+    border: 1px solid $greyBorder;
   }
 
   button,
