@@ -16,7 +16,7 @@ export const ContentRowCell = (props) => {
 }
 
 ContentRowCell.propTypes = {
-  active: PropTypes.bool.isRequired,
+  active: PropTypes.bool,
   cellTestIdExtractor: PropTypes.func,
   column: PropTypes.object.isRequired,
   item: PropTypes.object.isRequired,
