@@ -1,0 +1,31 @@
+@import 'webapp/style/partials';
+
+.data-query__selected-attributes-form-item {
+  display: flex;
+  height: auto;
+  flex: 1;
+
+  .form-label {
+    text-wrap: nowrap;
+  }
+}
+
+.data-query__selected-attributes-wrapper {
+  flex: 1;
+  display: flex;
+  flex-flow: wrap;
+  gap: 0.3rem;
+}
+
+.data-query__selected-attribute-chip.MuiChip-root {
+  background-color: white;
+
+  &.draggable-mirror {
+    background-color: lighten($orangeLight, 10%);
+    border: 1px dashed $blue;
+  }
+  &.draggable-source--is-dragging {
+    color: transparent;
+    background-color: transparent;
+  }
+}
