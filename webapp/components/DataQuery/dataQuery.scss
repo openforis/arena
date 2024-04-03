@@ -8,4 +8,9 @@
   &.nodedefs-selector-off {
     grid-template-columns: 0 1fr;
   }
+
+  .data-query__container {
+    display: flex;
+    flex-direction: column;
+  }
 }

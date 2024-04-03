@@ -8,10 +8,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
 import { useNodeDefsByUuids, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useSortable } from './useSortable'
+import { FormItem } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
 
 export const DataQuerySelectedAttributes = (props) => {
   const { nodeDefLabelType, onChangeQuery, query } = props
 
+  const i18n = useI18n()
   const containerRef = useRef(null)
   const lang = useSurveyPreferredLang()
   const queryAttributeDefs = useNodeDefsByUuids(Query.getAttributeDefUuids(query))
@@ -31,17 +34,25 @@ export const DataQuerySelectedAttributes = (props) => {
     onItemsSort: onAttributeDefsSort,
   })
 
+  if (queryAttributeDefs.length === 0) return null
+
   return (
-    <div className="data-query__selected-attributes" ref={containerRef}>
-      {queryAttributeDefs.map((attributeDef) => (
-        <Chip
-          key={NodeDef.getUuid(attributeDef)}
-          className="data-query__selected-attribute-chip"
-          label={NodeDef.getLabelWithType({ nodeDef: attributeDef, lang, type: nodeDefLabelType })}
-          variant="outlined"
-        />
-      ))}
-    </div>
+    <FormItem
+      className="data-query__selected-attributes-form-item"
+      info={i18n.t('dataView.selectedAttributes.info')}
+      label={i18n.t('dataView.selectedAttributes.label')}
+    >
+      <div className="data-query__selected-attributes-wrapper" ref={containerRef}>
+        {queryAttributeDefs.map((attributeDef) => (
+          <Chip
+            key={NodeDef.getUuid(attributeDef)}
+            className="data-query__selected-attribute-chip"
+            label={NodeDef.getLabelWithType({ nodeDef: attributeDef, lang, type: nodeDefLabelType })}
+            variant="outlined"
+          />
+        ))}
+      </div>
+    </FormItem>
   )
 }
 

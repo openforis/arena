@@ -1,6 +1,12 @@
 @import 'webapp/style/partials';
 
-.data-query__selected-attributes {
+.data-query__selected-attributes-form-item {
+  display: flex;
+  height: auto;
+  flex: 1;
+}
+
+.data-query__selected-attributes-wrapper {
   display: flex;
 }
 
