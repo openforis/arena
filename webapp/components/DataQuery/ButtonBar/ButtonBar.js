@@ -5,6 +5,8 @@ import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+
 import { useIsAppSaving } from '@webapp/store/app'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
@@ -13,7 +15,7 @@ import { useButtonBar } from './store'
 import ButtonDownload from './ButtonDownload'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import ButtonShowQueries from './ButtonShowQueries'
 
 const ButtonBar = (props) => {
   const {
@@ -36,6 +38,8 @@ const ButtonBar = (props) => {
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
 
+  const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
+
   return (
     <div className="data-query-button-bar">
       <div>
@@ -47,6 +51,8 @@ const ButtonBar = (props) => {
         >
           <span className="icon icon-tab icon-14px" />
         </button>
+
+        <ButtonShowQueries state={state} Actions={Actions} />
 
         <button
           type="button"
@@ -74,19 +80,19 @@ const ButtonBar = (props) => {
         <div>
           <ButtonFilter
             query={query}
-            disabled={modeEdit || !dataLoaded || dataLoading}
+            disabled={queryChangeDisabled}
             onChangeQuery={onChangeQuery}
             state={state}
             Actions={Actions}
           />
           <ButtonSort
             query={query}
-            disabled={modeEdit || !dataLoaded || dataLoading}
+            disabled={queryChangeDisabled}
             onChangeQuery={onChangeQuery}
             state={state}
             Actions={Actions}
           />
-          <ButtonDownload query={query} disabled={modeEdit || !dataLoaded || dataLoading} />
+          <ButtonDownload query={query} disabled={queryChangeDisabled} />
         </div>
       )}
 

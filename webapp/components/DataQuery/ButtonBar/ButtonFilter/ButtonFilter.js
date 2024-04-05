@@ -28,7 +28,7 @@ const ButtonFilter = (props) => {
         title={filter ? Expression.toString(filter, Expression.modes.sql) : 'dataView.filterRecords.buttonTitle'}
       />
 
-      {State.showPanelFilter(state) && (
+      {State.isPanelFilterShown(state) && (
         <ExpressionEditorPopup
           nodeDefUuidContext={entityDefUuid}
           query={filter ? Expression.toString(filter) : ''}

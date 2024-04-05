@@ -32,7 +32,7 @@ const ButtonSort = (props) => {
         title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : 'dataView.sort'}
       />
 
-      {State.showPanelSort(state) && (
+      {State.isPanelSortShow(state) && (
         <SortEditor
           query={query}
           onChange={(sortUpdated) => {
