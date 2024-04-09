@@ -1,59 +1,46 @@
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 
-// import { UUIDs } from '@openforis/arena-core'
-// import { DataQuerySummaries } from '@openforis/arena-server'
+import { DataQuerySummaries } from '@openforis/arena-core'
 
-// import { FormItem, Input } from '@webapp/components/form/Input'
-// import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-// import { ButtonSave } from '@webapp/components/buttons'
+import * as StringUtils from '@core/stringUtils'
 
-// import * as API from '@webapp/service/api'
-// import { useI18n } from '@webapp/store/system'
-// import { useSurveyId } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+
+import { FormItem, Input } from '@webapp/components/form/Input'
+import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { ButtonNew, ButtonSave } from '@webapp/components/buttons'
 
 export const DataQueryEditForm = (props) => {
-  //   const { dataQuerySummary, query } = props
+  const { querySummary, setQuerySummary, onNew, onSave } = props
 
-  //   const i18n = useI18n()
-  //   const surveyId = useSurveyId()
-
-  //   const [state, setState] = useState({
-  //     editedQuerySummary: dataQuerySummary ?? DataQuerySummaries.create(),
-  //   })
-  //   const { editedQuerySummary } = state
-
-  //   const updateDataQuerySummary = (updatedDataQuerySummary) =>
-  //     setState((statePrev) => ({
-  //       ...statePrev,
-  //       editedQuerySummary: updatedDataQuerySummary,
-  //     }))
-
-  //   const onSaveClick = useCallback(async () => {
-  //     const insertedDataQuerySummary = await API.insertDataQuerySummary({ surveyId, querySummary: editedQuerySummary })
-  //     console.log(insertedDataQuerySummary)
-  //   }, [editedQuerySummary, surveyId])
+  const i18n = useI18n()
 
   return (
-    <>
-      {/* <FormItem label={i18n.t('common.name')}>
+    <div className="data-query-form">
+      <FormItem label={i18n.t('common.name')}>
         <Input
-          onChange={(value) => updateDataQuerySummary(DataQuerySummaries.assocName(value))}
-          value={DataQuerySummaries.getName(editedQuerySummary)}
+          onChange={(value) =>
+            setQuerySummary(DataQuerySummaries.assocName(StringUtils.normalizeName(value))(querySummary))
+          }
+          value={DataQuerySummaries.getName(querySummary)}
         />
       </FormItem>
 
       <LabelsEditor
-        labels={DataQuerySummaries.getLabels(editedQuerySummary)}
-        onChange={(labels) => updateDataQuerySummary(DataQuerySummaries.assocLabels(labels))}
+        onChange={(labels) => setQuerySummary(DataQuerySummaries.assocLabels(labels)(querySummary))}
+        labels={DataQuerySummaries.getLabels(querySummary)}
       />
 
       <LabelsEditor
         formLabelKey="common.description"
-        labels={DataQuerySummaries.getDescriptions(editedQuerySummary)}
-        onChange={(descriptions) => updateDataQuerySummary(DataQuerySummaries.assocDescriptions(descriptions))}
+        labels={DataQuerySummaries.getDescriptions(querySummary)}
+        onChange={(descriptions) => setQuerySummary(DataQuerySummaries.assocDescriptions(descriptions)(querySummary))}
       />
 
-      <ButtonSave onClick={onSaveClick} /> */}
-    </>
+      <div className="button-bar">
+        <ButtonNew onClick={onNew} />
+        <ButtonSave onClick={onSave} />
+      </div>
+    </div>
   )
 }

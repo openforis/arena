@@ -8,7 +8,8 @@ import { State } from '../store'
 import DataQueriesPanel from './DataQueriesPanel'
 
 const ButtonShowQueries = (props) => {
-  const { disabled, query, onChangeQuery, state, Actions } = props
+  const { disabled, query, onChangeQuery, state, Actions, selectedQuerySummaryUuid, setSelectedQuerySummaryUuid } =
+    props
 
   return (
     <>
@@ -17,11 +18,17 @@ const ButtonShowQueries = (props) => {
         disabled={disabled}
         iconClassName="icon-list icon-16px"
         onClick={Actions.togglePanelQueries}
-        title="dataView.queries"
+        label="dataView.queries"
       />
 
       {State.isPanelQueriesShown(state) && (
-        <DataQueriesPanel query={query} onChangeQuery={onChangeQuery} onClose={Actions.togglePanelQueries} />
+        <DataQueriesPanel
+          query={query}
+          onChangeQuery={onChangeQuery}
+          onClose={Actions.togglePanelQueries}
+          selectedQuerySummaryUuid={selectedQuerySummaryUuid}
+          setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
+        />
       )}
     </>
   )
@@ -29,7 +36,7 @@ const ButtonShowQueries = (props) => {
 
 ButtonShowQueries.propTypes = {
   disabled: PropTypes.bool.isRequired,
-  query: PropTypes.object.isRequired,
+  query: PropTypes.object,
   onChangeQuery: PropTypes.func.isRequired,
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,

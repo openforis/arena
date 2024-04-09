@@ -1,0 +1,36 @@
+.data-queries-panel {
+  display: flex;
+  flex-direction: column;
+
+  .panel-right__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+
+    .data-query-form,
+    .data-queries-table {
+      width: 100%;
+    }
+
+    .data-query-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .form-item {
+        height: auto;
+      }
+
+      .form-item,
+      .labels-editor.with-label {
+        grid-template-columns: 0.3fr 0.7fr;
+        width: 100%;
+      }
+    }
+
+    .data-queries-table {
+      flex: 1;
+    }
+  }
+}

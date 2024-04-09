@@ -28,6 +28,8 @@ const ButtonBar = (props) => {
     onChangeQuery,
     onNodeDefLabelTypeChange,
     setNodeDefsSelectorVisible,
+    selectedQuerySummaryUuid,
+    setSelectedQuerySummaryUuid,
   } = props
 
   const i18n = useI18n()
@@ -52,7 +54,14 @@ const ButtonBar = (props) => {
           <span className="icon icon-tab icon-14px" />
         </button>
 
-        <ButtonShowQueries state={state} Actions={Actions} />
+        <ButtonShowQueries
+          query={query}
+          onChangeQuery={onChangeQuery}
+          state={state}
+          Actions={Actions}
+          selectedQuerySummaryUuid={selectedQuerySummaryUuid}
+          setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
+        />
 
         <button
           type="button"
