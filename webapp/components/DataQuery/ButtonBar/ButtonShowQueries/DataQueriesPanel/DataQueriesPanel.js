@@ -20,7 +20,8 @@ const DataQueriesPanel = (props) => {
   const lang = useSurveyPreferredLang()
   const surveyId = useSurveyId()
 
-  const [editedQuerySummary, setEditedQuerySummary] = useState({})
+  const [editedQuerySummary, setEditedQuerySummary] = useState({ content: query })
+  const [queriesRequestedAt, setQueriesRequestedAt] = useState(Date.now())
 
   const fetchAndSetEditedQuerySummary = useCallback(
     async ({ querySummaryUuid }) => {
@@ -44,22 +45,32 @@ const DataQueriesPanel = (props) => {
   )
 
   const onNew = useCallback(() => {
-    setEditedQuerySummary(DataQuerySummaries.create({ content: query }))
+    setEditedQuerySummary({})
     setSelectedQuerySummaryUuid(null)
-  }, [query])
+  }, [setSelectedQuerySummaryUuid])
 
   const onSave = useCallback(async () => {
-    if (!DataQuerySummaries.getUuid(editedQuerySummary)) {
-      const querySummaryToInsert = { ...editedQuerySummary, uuid: UUIDs.v4(), content: query }
+    if (DataQuerySummaries.getUuid(editedQuerySummary)) {
+      await API.updateDataQuerySummary({ surveyId, querySummary: editedQuerySummary })
+    } else {
+      const querySummaryUuid = UUIDs.v4()
+      const querySummaryToInsert = { ...editedQuerySummary, uuid: querySummaryUuid, content: query }
       const insertedDataQuerySummary = await API.insertDataQuerySummary({
         surveyId,
         querySummary: querySummaryToInsert,
       })
       setEditedQuerySummary(insertedDataQuerySummary)
-    } else {
-      await API.updateDataQuerySummary({ surveyId, querySummary: editedQuerySummary })
+      setSelectedQuerySummaryUuid(querySummaryUuid)
     }
-  }, [editedQuerySummary, query, surveyId])
+    setQueriesRequestedAt(Date.now())
+  }, [editedQuerySummary, query, setSelectedQuerySummaryUuid, surveyId])
+
+  const onDelete = useCallback(async () => {
+    const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
+    await API.deleteDataQuerySummary({ surveyId, querySummaryUuid })
+    setQueriesRequestedAt(Date.now())
+    setEditedQuerySummary({})
+  }, [editedQuerySummary, surveyId])
 
   const onTableRowClick = useCallback(
     async (selectedQuerySummary) => {
@@ -92,6 +103,7 @@ const DataQueriesPanel = (props) => {
   return (
     <PanelRight className="data-queries-panel" onClose={onClose} width="50vw" header={i18n.t('queries')}>
       <DataQueryEditForm
+        onDelete={onDelete}
         onNew={onNew}
         onSave={onSave}
         querySummary={editedQuerySummary}
@@ -100,10 +112,11 @@ const DataQueriesPanel = (props) => {
 
       <Table
         className="data-queries-table"
-        module="data_queries"
         columns={columns}
         isRowActive={isTableRowActive}
+        module="data_queries"
         onRowClick={onTableRowClick}
+        restParams={{ requestedAt: queriesRequestedAt }}
         selectable
       />
     </PanelRight>

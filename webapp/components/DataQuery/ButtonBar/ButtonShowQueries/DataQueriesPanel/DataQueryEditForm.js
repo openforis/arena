@@ -8,10 +8,10 @@ import { useI18n } from '@webapp/store/system'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import { ButtonNew, ButtonSave } from '@webapp/components/buttons'
+import { ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
 
 export const DataQueryEditForm = (props) => {
-  const { querySummary, setQuerySummary, onNew, onSave } = props
+  const { querySummary, setQuerySummary, onDelete, onNew, onSave } = props
 
   const i18n = useI18n()
 
@@ -40,6 +40,7 @@ export const DataQueryEditForm = (props) => {
       <div className="button-bar">
         <ButtonNew onClick={onNew} />
         <ButtonSave onClick={onSave} />
+        <ButtonDelete onClick={onDelete} />
       </div>
     </div>
   )

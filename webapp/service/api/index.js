@@ -45,7 +45,12 @@ export {
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
 } from './data'
-export { insertDataQuerySummary, fetchDataQuerySummary, updateDataQuerySummary } from './dataQuery'
+export {
+  insertDataQuerySummary,
+  fetchDataQuerySummary,
+  updateDataQuerySummary,
+  deleteDataQuerySummary,
+} from './dataQuery'
 export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export {
   fetchSurveyFull,

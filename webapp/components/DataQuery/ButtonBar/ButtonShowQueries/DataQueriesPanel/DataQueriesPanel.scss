@@ -27,6 +27,20 @@
         grid-template-columns: 0.3fr 0.7fr;
         width: 100%;
       }
+
+      .button-bar {
+        width: 100%;
+        justify-content: space-between;
+
+        .btn-new {
+          align-self: flex-start;
+        }
+
+        .btn-delete {
+          position: inherit;
+          align-self: flex-end;
+        }
+      }
     }
 
     .data-queries-table {
