@@ -674,6 +674,10 @@ Are you sure you want to continue?`,
 
   dataView: {
     aggregateMode: 'Aggregate Mode',
+    dataQueries: {
+      deleteConfirmMessage: 'Delete the query "{{name}}"?',
+      manageQueries: 'Manage queries',
+    },
     editSelectedRecord: 'Edit selected record',
     editMode: 'Edit Mode',
     filterAttributeTypes: 'Filter attribute types',

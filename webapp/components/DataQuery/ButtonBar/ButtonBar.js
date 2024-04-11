@@ -54,15 +54,6 @@ const ButtonBar = (props) => {
           <span className="icon icon-tab icon-14px" />
         </button>
 
-        <ButtonShowQueries
-          query={query}
-          onChangeQuery={onChangeQuery}
-          state={state}
-          Actions={Actions}
-          selectedQuerySummaryUuid={selectedQuerySummaryUuid}
-          setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
-        />
-
         <button
           type="button"
           title={i18n.t('dataView.aggregateMode')}
@@ -106,6 +97,15 @@ const ButtonBar = (props) => {
       )}
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
+
+      <ButtonShowQueries
+        query={query}
+        onChangeQuery={onChangeQuery}
+        state={state}
+        Actions={Actions}
+        selectedQuerySummaryUuid={selectedQuerySummaryUuid}
+        setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
+      />
     </div>
   )
 }

@@ -11,7 +11,7 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
 
 export const DataQueryEditForm = (props) => {
-  const { querySummary, setQuerySummary, onDelete, onNew, onSave } = props
+  const { draft, querySummary, setQuerySummary, onDelete, onNew, onSave, selectedQuerySummaryUuid } = props
 
   const i18n = useI18n()
 
@@ -39,8 +39,8 @@ export const DataQueryEditForm = (props) => {
 
       <div className="button-bar">
         <ButtonNew onClick={onNew} />
-        <ButtonSave onClick={onSave} />
-        <ButtonDelete onClick={onDelete} />
+        <ButtonSave disabled={!draft} onClick={onSave} />
+        {selectedQuerySummaryUuid && <ButtonDelete onClick={onDelete} />}
       </div>
     </div>
   )
