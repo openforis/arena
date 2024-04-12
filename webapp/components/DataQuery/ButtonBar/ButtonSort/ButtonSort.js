@@ -25,11 +25,12 @@ const ButtonSort = (props) => {
   return (
     <>
       <Button
-        className={classNames('btn-s', 'btn-edit', { highlight: !Sort.isEmpty(sort) })}
+        className={classNames('btn-edit', { highlight: !Sort.isEmpty(sort) })}
         disabled={disabled}
         iconClassName="icon-sort-amount-asc icon-16px"
+        label="dataView.sort"
         onClick={Actions.togglePanelSort}
-        title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : 'dataView.sort'}
+        title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : undefined}
       />
 
       {State.isPanelSortShow(state) && (

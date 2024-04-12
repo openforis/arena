@@ -4,17 +4,18 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
+import { Button } from '../buttons'
 
 const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => (
   <div className={`btn-group${className ? ` ${className}` : ''}`}>
     {items.map((item) => {
       const selected = selectedItemKey === item.key || (multiple && R.includes(item.key, selectedItemKey))
       return (
-        <button
-          data-testid={groupName ? `${groupName}_${item.key}` : null}
+        <Button
           key={item.key}
-          type="button"
-          className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
+          className={`btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
+          disabled={Boolean(item.disabled) || disabled}
+          iconClassName={item.iconClassName}
           onClick={() => {
             let value
             if (multiple) {
@@ -26,10 +27,9 @@ const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, di
             }
             onChange(value)
           }}
-          aria-disabled={Boolean(item.disabled) || disabled}
-        >
-          {item.label}
-        </button>
+          label={item.label}
+          testId={groupName ? `${groupName}_${item.key}` : null}
+        />
       )
     })}
   </div>

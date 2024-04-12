@@ -22,10 +22,11 @@ const ButtonFilter = (props) => {
   return (
     <>
       <ButtonIconFilter
-        className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
+        className={`btn btn-edit${filter ? ' highlight' : ''}`}
         disabled={disabled}
         onClick={Actions.togglePanelFilter}
-        title={filter ? Expression.toString(filter, Expression.modes.sql) : 'dataView.filterRecords.buttonTitle'}
+        label="dataView.filterRecords.buttonTitle"
+        title={filter ? Expression.toString(filter, Expression.modes.sql) : undefined}
       />
 
       {State.isPanelFilterShown(state) && (

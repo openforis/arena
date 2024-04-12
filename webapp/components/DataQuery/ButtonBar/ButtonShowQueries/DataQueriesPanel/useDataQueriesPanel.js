@@ -55,7 +55,7 @@ export const useDataQueriesPanel = ({
     } else {
       const querySummaryToInsert = DataQuerySummaries.create({
         content: query,
-        props: DataQuerySummaries.getProps(editedQuerySummary),
+        props: editedQuerySummary.props,
       })
       const insertedDataQuerySummary = await API.insertDataQuerySummary({
         surveyId,
@@ -78,7 +78,7 @@ export const useDataQueriesPanel = ({
   const onDelete = useCallback(() => {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'dataView.dataQueries.deleteConfirmMessage',
+        key: 'dataView.dataQuery.deleteConfirmMessage',
         params: { name: DataQuerySummaries.getName(editedQuerySummary) },
         onOk: doDelete,
       })

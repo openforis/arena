@@ -29,16 +29,21 @@
       }
 
       .button-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         width: 100%;
-        justify-content: space-between;
 
         .btn-new {
-          align-self: flex-start;
+          justify-self: start;
+        }
+
+        .btn-save {
+          justify-self: center;
         }
 
         .btn-delete {
           position: inherit;
-          align-self: flex-end;
+          justify-self: end;
         }
       }
     }

@@ -6,6 +6,8 @@ import classNames from 'classnames'
 import { Query } from '@common/model/query'
 
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { ButtonGroup } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
 
 import { useIsAppSaving } from '@webapp/store/app'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
@@ -36,7 +38,6 @@ const ButtonBar = (props) => {
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const modeEdit = Query.isModeRawEdit(query)
-  const modeAggregate = Query.isModeAggregate(query)
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
 
@@ -44,37 +45,45 @@ const ButtonBar = (props) => {
 
   return (
     <div className="data-query-button-bar">
-      <div>
-        <button
-          type="button"
-          title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
-          className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-          onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
-        >
-          <span className="icon icon-tab icon-14px" />
-        </button>
+      <button
+        type="button"
+        title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
+        className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
+        onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
+      >
+        <span className="icon icon-tab icon-14px" />
+      </button>
 
-        <button
-          type="button"
-          title={i18n.t('dataView.aggregateMode')}
-          className={classNames('btn', 'btn-s', 'btn-edit', { highlight: Query.isModeAggregate(query) })}
-          onClick={() => onChangeQuery(Query.toggleModeAggregate(query))}
-          aria-disabled={appSaving || modeEdit || !nodeDefsSelectorVisible}
-        >
-          <span className="icon icon-sigma icon-14px" />
-        </button>
-        {canEdit && hasSelection && (
-          <button
-            type="button"
-            title={i18n.t('dataView.editMode')}
-            className={classNames('btn', 'btn-s', 'btn-edit', { highlight: modeEdit })}
-            onClick={() => onChangeQuery(Query.toggleModeEdit(query))}
-            aria-disabled={appSaving || modeAggregate || dataEmpty || !dataLoaded}
-          >
-            <span className="icon icon-pencil2 icon-14px" />
-          </button>
-        )}
-      </div>
+      <FormItem className="mode-form-item" label={i18n.t('dataView.dataQuery.mode.label')}>
+        <ButtonGroup
+          disabled={appSaving || !nodeDefsSelectorVisible}
+          groupName="queryMode"
+          selectedItemKey={Query.getMode(query)}
+          onChange={(mode) => onChangeQuery(Query.assocMode(mode)(query))}
+          items={[
+            {
+              key: Query.modes.raw,
+              iconClassName: 'icon-file-text2',
+              label: 'dataView.dataQuery.mode.raw',
+            },
+            {
+              key: Query.modes.aggregate,
+              iconClassName: 'icon-sigma',
+              label: 'dataView.dataQuery.mode.aggregate',
+            },
+            ...(canEdit && hasSelection
+              ? [
+                  {
+                    key: Query.modes.rawEdit,
+                    iconClassName: 'icon-pencil2',
+                    label: 'dataView.dataQuery.mode.rawEdit',
+                    disabled: dataEmpty,
+                  },
+                ]
+              : []),
+          ]}
+        />
+      </FormItem>
 
       {hasSelection && (
         <div>

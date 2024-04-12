@@ -1,6 +1,6 @@
 import './dataQuery.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -17,7 +17,7 @@ import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
 
 const DataQuery = (props) => {
-  const { query, onChangeQuery: onChangeQueryProp } = props
+  const { query, onChangeQuery } = props
 
   const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
   const {
@@ -36,16 +36,6 @@ const DataQuery = (props) => {
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const [selectedQuerySummaryUuid, setSelectedQuerySummaryUuid] = useState(null)
-
-  const onChangeQuery = useCallback(
-    (queryUpdated) => {
-      onChangeQueryProp(queryUpdated)
-      if (selectedQuerySummaryUuid && Query.getEntityDefUuid(query) !== Query.getEntityDefUuid(queryUpdated)) {
-        setSelectedQuerySummaryUuid(null)
-      }
-    },
-    [onChangeQueryProp, query, selectedQuerySummaryUuid]
-  )
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>

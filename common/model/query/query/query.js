@@ -27,7 +27,7 @@ export const create = ({
 })
 
 // ====== READ
-export { displayTypes }
+export { displayTypes, modes }
 export const getMode = A.prop(keys.mode)
 export const getDisplayType = A.prop(keys.displayType)
 export const getFilter = A.prop(keys.filter)
