@@ -35,11 +35,15 @@ const ButtonShowQueries = (props) => {
 }
 
 ButtonShowQueries.propTypes = {
-  disabled: PropTypes.bool.isRequired,
+  disabled: PropTypes.bool,
   query: PropTypes.object,
   onChangeQuery: PropTypes.func.isRequired,
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
+}
+
+ButtonShowQueries.defaultProps = {
+  disabled: false,
 }
 
 export default ButtonShowQueries

@@ -17,17 +17,39 @@ export const useDataQueriesPanel = ({
 }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
-  const [fetchedQuerySummary, setFetchedQuerySummary] = useState(null)
-  const [editedQuerySummary, setEditedQuerySummary] = useState({})
-  const [queriesRequestedAt, setQueriesRequestedAt] = useState(Date.now())
+  const [state, setState] = useState({
+    fetchedQuerySummary: null,
+    editedQuerySummary: {},
+    queriesRequestedAt: Date.now(),
+  })
+  const { fetchedQuerySummary, editedQuerySummary, queriesRequestedAt } = state
 
-  const draft = !Objects.isEqual(fetchedQuerySummary, editedQuerySummary)
+  const draft =
+    !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
+    !Objects.isEqual(DataQuerySummaries.getContent(editedQuerySummary), query)
+
+  const setEditedQuerySummary = useCallback((querySummary) => {
+    setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummary }))
+  }, [])
+
+  const resetState = useCallback(() => {
+    setState((statePrev) => ({
+      ...statePrev,
+      editedQuerySummary: {},
+      fetchedQuerySummary: null,
+      queriesRequestedAt: Date.now(),
+    }))
+    setSelectedQuerySummaryUuid(null)
+  }, [setSelectedQuerySummaryUuid])
 
   const fetchAndSetEditedQuerySummary = useCallback(
     async ({ querySummaryUuid }) => {
       const querySummaryFetched = await API.fetchDataQuerySummary({ surveyId, querySummaryUuid })
-      setFetchedQuerySummary(querySummaryFetched)
-      setEditedQuerySummary(querySummaryFetched)
+      setState((statePrev) => ({
+        ...statePrev,
+        fetchedQuerySummary: querySummaryFetched,
+        editedQuerySummary: querySummaryFetched,
+      }))
       const fetchedQuery = DataQuerySummaries.getContent(querySummaryFetched)
       onChangeQuery(fetchedQuery)
     },
@@ -46,14 +68,15 @@ export const useDataQueriesPanel = ({
   )
 
   const onNew = useCallback(() => {
-    setEditedQuerySummary({})
-    setSelectedQuerySummaryUuid(null)
-  }, [setSelectedQuerySummaryUuid])
+    resetState()
+  }, [resetState])
 
   const onSave = useCallback(async () => {
+    let querySummaryFetchedUpdated = null
     if (DataQuerySummaries.getUuid(editedQuerySummary)) {
       const querySummaryToUpdate = DataQuerySummaries.assocContent(query)(editedQuerySummary)
-      await API.updateDataQuerySummary({ surveyId, querySummary: querySummaryToUpdate })
+      const querySummaryUpdated = await API.updateDataQuerySummary({ surveyId, querySummary: querySummaryToUpdate })
+      querySummaryFetchedUpdated = DataQuerySummaries.assocContent(query)(querySummaryUpdated)
     } else {
       const querySummaryToInsert = DataQuerySummaries.create({
         content: query,
@@ -63,19 +86,22 @@ export const useDataQueriesPanel = ({
         surveyId,
         querySummary: querySummaryToInsert,
       })
-      setEditedQuerySummary(insertedDataQuerySummary)
+      querySummaryFetchedUpdated = DataQuerySummaries.assocContent(query)(insertedDataQuerySummary)
       setSelectedQuerySummaryUuid(DataQuerySummaries.getUuid(querySummaryToInsert))
     }
-    setQueriesRequestedAt(Date.now())
+    setState((statePrev) => ({
+      ...statePrev,
+      editedQuerySummary: querySummaryFetchedUpdated,
+      fetchedQuerySummary: querySummaryFetchedUpdated,
+      queriesRequestedAt: Date.now(),
+    }))
   }, [editedQuerySummary, query, setSelectedQuerySummaryUuid, surveyId])
 
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
     await API.deleteDataQuerySummary({ surveyId, querySummaryUuid })
-    setQueriesRequestedAt(Date.now())
-    setEditedQuerySummary({})
-    setSelectedQuerySummaryUuid(null)
-  }, [editedQuerySummary, setSelectedQuerySummaryUuid, surveyId])
+    resetState()
+  }, [editedQuerySummary, resetState, surveyId])
 
   const onDelete = useCallback(() => {
     dispatch(
