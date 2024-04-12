@@ -37,7 +37,8 @@ export class CategoryImportInternalJob extends Job {
   async onStart() {
     await super.onStart()
 
-    this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
+    this.survey =
+      this.contextSurvey ?? (await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx))
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
