@@ -42,6 +42,7 @@ export const getMeasures = A.prop(keys.measures)
 // mode
 const isMode = (mode) => (query) => getMode(query) === mode
 export const isModeAggregate = isMode(modes.aggregate)
+export const isModeRaw = isMode(modes.raw)
 export const isModeRawEdit = isMode(modes.rawEdit)
 
 // utils
@@ -59,17 +60,17 @@ export const assocFilter = A.assoc(keys.filter)
 export const assocFilterRecordUuid = A.assoc(keys.filterRecordUuid)
 export const assocFilterRecordUuids = A.assoc(keys.filterRecordUuids)
 export const assocSort = A.assoc(keys.sort)
-export const assocMode = A.assoc(keys.mode)
 
-// mode
-export const toggleModeAggregate = (query) => ({
-  ...create({ entityDefUuid: getEntityDefUuid(query) }),
-  [keys.mode]: isModeAggregate(query) ? modes.raw : modes.aggregate,
-})
-export const toggleModeEdit = (query) => ({
-  ...query,
-  [keys.mode]: isModeRawEdit(query) ? modes.raw : modes.rawEdit,
-})
+const cleanup = (query) => {
+  if (isModeAggregate(query)) {
+    return assocAttributeDefUuids([])(query)
+  } else if (isModeRaw(query)) {
+    return A.pipe(assocDimensions([]), assocMeasures(new Map()))(query)
+  }
+  return query
+}
+
+export const assocMode = (mode) => A.pipe(A.assoc(keys.mode, mode), cleanup)
 
 export const toggleMeasureAggregateFunction =
   ({ nodeDefUuid, aggregateFn }) =>

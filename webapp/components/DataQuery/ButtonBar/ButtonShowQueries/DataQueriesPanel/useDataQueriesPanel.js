@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux'
 
 import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 
+import { Query } from '@common/model/query'
+
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
@@ -85,13 +87,30 @@ export const useDataQueriesPanel = ({
     )
   }, [dispatch, doDelete, editedQuerySummary])
 
-  const onTableRowClick = useCallback(
+  const doQuerySummarySelection = useCallback(
     async (selectedQuerySummary) => {
       const querySummaryUuid = DataQuerySummaries.getUuid(selectedQuerySummary)
       setSelectedQuerySummaryUuid(querySummaryUuid)
-      fetchAndSetEditedQuerySummary({ querySummaryUuid })
+      await fetchAndSetEditedQuerySummary({ querySummaryUuid })
     },
     [fetchAndSetEditedQuerySummary, setSelectedQuerySummaryUuid]
+  )
+
+  const onTableRowClick = useCallback(
+    async (selectedQuerySummary) => {
+      if (Query.hasSelection(query)) {
+        dispatch(
+          DialogConfirmActions.showDialogConfirm({
+            key: 'dataView.dataQuery.replaceQueryConfirmMessage',
+            params: { name: DataQuerySummaries.getName(editedQuerySummary) },
+            onOk: async () => doQuerySummarySelection(selectedQuerySummary),
+          })
+        )
+      } else {
+        await doQuerySummarySelection(selectedQuerySummary)
+      }
+    },
+    [dispatch, doQuerySummarySelection, editedQuerySummary, query]
   )
 
   return {
