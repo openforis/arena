@@ -684,7 +684,6 @@ Are you sure you want to continue?`,
       },
     },
     editSelectedRecord: 'Edit selected record',
-    editMode: 'Edit Mode',
     filterAttributeTypes: 'Filter attribute types',
     filterRecords: {
       buttonTitle: 'Filter',
