@@ -21,7 +21,9 @@ export const useDataQueriesPanel = ({
   const [editedQuerySummary, setEditedQuerySummary] = useState({})
   const [queriesRequestedAt, setQueriesRequestedAt] = useState(Date.now())
 
-  const draft = !Objects.isEqual(fetchedQuerySummary, editedQuerySummary)
+  const draft =
+    !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
+    !Objects.isEqual(DataQuerySummaries.getContent(fetchedQuerySummary), query)
 
   const fetchAndSetEditedQuerySummary = useCallback(
     async ({ querySummaryUuid }) => {
