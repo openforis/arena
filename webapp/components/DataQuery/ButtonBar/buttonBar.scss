@@ -2,6 +2,7 @@
 
 .data-query-button-bar {
   display: flex;
+  flex-flow: wrap;
   gap: 15px;
   align-items: center;
 
