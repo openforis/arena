@@ -4,10 +4,12 @@ import { useDispatch } from 'react-redux'
 import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
+import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
 export const useDataQueriesPanel = ({
   query,
@@ -18,19 +20,28 @@ export const useDataQueriesPanel = ({
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const [state, setState] = useState({
-    fetchedQuerySummary: null,
     editedQuerySummary: {},
+    fetchedQuerySummary: null,
+    dataQuerySummaries: [],
     queriesRequestedAt: Date.now(),
   })
-  const { fetchedQuerySummary, editedQuerySummary, queriesRequestedAt } = state
+  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt } = state
 
   const draft =
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
     !Objects.isEqual(DataQuerySummaries.getContent(editedQuerySummary), query)
 
-  const setEditedQuerySummary = useCallback((querySummary) => {
-    setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummary }))
-  }, [])
+  const setEditedQuerySummary = useCallback(
+    async (querySummaryUpdated) => {
+      const validation = await DataQuerySummaryValidator.validate({
+        dataQuerySummary: querySummaryUpdated,
+        dataQuerySummaries,
+      })
+      const querySummaryWithValidation = Validation.assocValvalidationidation(validation)(querySummaryUpdated)
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation }))
+    },
+    [dataQuerySummaries]
+  )
 
   const resetState = useCallback(() => {
     setState((statePrev) => ({
@@ -41,6 +52,14 @@ export const useDataQueriesPanel = ({
     }))
     setSelectedQuerySummaryUuid(null)
   }, [setSelectedQuerySummaryUuid])
+
+  const fetchDataQuerySummaries = useCallback(async () => {
+    const dataQuerySummaries = await API.fetchDataQuerySummaries({
+      surveyId,
+      excludedUuid: selectedQuerySummaryUuid,
+    })
+    setState((statePrev) => ({ ...statePrev, dataQuerySummaries }))
+  }, [selectedQuerySummaryUuid, surveyId])
 
   const fetchAndSetEditedQuerySummary = useCallback(
     async ({ querySummaryUuid }) => {
@@ -60,7 +79,8 @@ export const useDataQueriesPanel = ({
     if (selectedQuerySummaryUuid) {
       fetchAndSetEditedQuerySummary({ querySummaryUuid: selectedQuerySummaryUuid })
     }
-  }, [fetchAndSetEditedQuerySummary, selectedQuerySummaryUuid])
+    fetchDataQuerySummaries()
+  }, [fetchAndSetEditedQuerySummary, fetchDataQuerySummaries, selectedQuerySummaryUuid])
 
   const isTableRowActive = useCallback(
     (row) => DataQuerySummaries.getUuid(row) === selectedQuerySummaryUuid,

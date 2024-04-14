@@ -15,6 +15,8 @@ import Table from '@webapp/components/Table'
 import { DataQueryEditForm } from './DataQueryEditForm'
 import { useDataQueriesPanel } from './useDataQueriesPanel'
 
+const dataQueriesModuleName = 'data_queries'
+
 const DataQueriesPanel = (props) => {
   const { onClose, onChangeQuery, query, selectedQuerySummaryUuid, setSelectedQuerySummaryUuid } = props
 
@@ -79,7 +81,7 @@ const DataQueriesPanel = (props) => {
         className="data-queries-table"
         columns={columns}
         isRowActive={isTableRowActive}
-        module="data_queries"
+        module={dataQueriesModuleName}
         onRowClick={onTableRowClick}
         restParams={{ requestedAt: queriesRequestedAt }}
         selectable
