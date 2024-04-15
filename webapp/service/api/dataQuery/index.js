@@ -1,30 +1,16 @@
 import axios from 'axios'
 
-import { DataQuerySummaries, Objects } from '@openforis/arena-core'
+import { DataQuerySummaries } from '@openforis/arena-core'
 
 const getDataQueriesEndpoint = ({ surveyId }) => `/api/survey/${surveyId}/data_queries`
 const getDataQueryEndpoint = ({ surveyId, querySummaryUuid }) =>
   `${getDataQueriesEndpoint({ surveyId })}/${querySummaryUuid}`
 
-const _prepareDataQuerySummaryToStore = (querySummary) => {
-  const contentOriginal = DataQuerySummaries.getContent(querySummary)
-  const content = Objects.stringify(contentOriginal)
-  return { ...querySummary, content }
-}
-
-const _parseQuerySummaryFetchedWithContent = (querySummaryFetched) => {
-  const contentFetched = DataQuerySummaries.getContent(querySummaryFetched)
-  const contentToString = JSON.stringify(contentFetched)
-  const content = Objects.parse(contentToString)
-  return { ...querySummaryFetched, content }
-}
-
 // CREATE
 export const insertDataQuerySummary = async ({ surveyId, querySummary }) => {
   const querySummaryUuid = DataQuerySummaries.getUuid(querySummary)
   const url = getDataQueryEndpoint({ surveyId, querySummaryUuid })
-  const querySummaryToStore = _prepareDataQuerySummaryToStore(querySummary)
-  const { data: querySummaryInserted } = await axios.post(url, querySummaryToStore)
+  const { data: querySummaryInserted } = await axios.post(url, querySummary)
   return querySummaryInserted
 }
 
@@ -32,7 +18,7 @@ export const insertDataQuerySummary = async ({ surveyId, querySummary }) => {
 export const fetchDataQuerySummary = async ({ surveyId, querySummaryUuid }) => {
   const url = getDataQueryEndpoint({ surveyId, querySummaryUuid })
   const { data: querySummaryFetched } = await axios.get(url)
-  return _parseQuerySummaryFetchedWithContent(querySummaryFetched)
+  return querySummaryFetched
 }
 
 export const fetchDataQuerySummaries = async ({ surveyId }) => {
@@ -47,8 +33,7 @@ export const fetchDataQuerySummaries = async ({ surveyId }) => {
 export const updateDataQuerySummary = async ({ surveyId, querySummary }) => {
   const querySummaryUuid = DataQuerySummaries.getUuid(querySummary)
   const url = getDataQueryEndpoint({ surveyId, querySummaryUuid })
-  const querySummaryToStore = _prepareDataQuerySummaryToStore(querySummary)
-  const { data: querySummaryUpdated } = await axios.put(url, querySummaryToStore)
+  const { data: querySummaryUpdated } = await axios.put(url, querySummary)
   return querySummaryUpdated
 }
 

@@ -1,8 +1,6 @@
 import { useCallback } from 'react'
 import axios from 'axios'
 
-import * as A from '@core/arena'
-
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import { getUrl } from './useFetchData'
@@ -20,7 +18,7 @@ export const useFetchCount = ({ setCount }) => {
         try {
           const { data } = await axios.post(`${getUrl({ surveyId, query })}/count`, {
             cycle,
-            query: A.stringify(query),
+            query,
           })
           setCount({ data, loading: false, loaded: true })
         } catch (e) {

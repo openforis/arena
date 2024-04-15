@@ -37,7 +37,7 @@ export const useDataQueriesPanel = ({
         dataQuerySummary: querySummaryUpdated,
         dataQuerySummaries,
       })
-      const querySummaryWithValidation = Validation.assocValvalidationidation(validation)(querySummaryUpdated)
+      const querySummaryWithValidation = Validation.assocValidation(validation)(querySummaryUpdated)
       setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation }))
     },
     [dataQuerySummaries]

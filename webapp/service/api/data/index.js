@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { objectToFormData } from '../utils/apiUtils'
@@ -99,7 +98,7 @@ export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
     data: { tempFileName },
   } = await axios.post(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/start`, {
     cycle,
-    query: A.stringify(query),
+    query,
   })
   return tempFileName
 }

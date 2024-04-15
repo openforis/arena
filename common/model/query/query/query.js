@@ -28,16 +28,19 @@ export const create = ({
 
 // ====== READ
 export { displayTypes, modes }
+const getPropOrDefault = (key) => A.propOr(defaults[key], key)
 export const getMode = A.prop(keys.mode)
 export const getDisplayType = A.prop(keys.displayType)
 export const getFilter = A.prop(keys.filter)
 export const getFilterRecordUuid = A.prop(keys.filterRecordUuid)
 export const getFilterRecordUuids = A.prop(keys.filterRecordUuids)
-export const getSort = A.prop(keys.sort)
+export const getSort = getPropOrDefault(keys.sort)
 export const getEntityDefUuid = A.prop(keys.entityDefUuid)
-export const getAttributeDefUuids = A.prop(keys.attributeDefUuids)
-export const getDimensions = A.prop(keys.dimensions)
-export const getMeasures = A.prop(keys.measures)
+export const getAttributeDefUuids = getPropOrDefault(keys.attributeDefUuids)
+export const getDimensions = getPropOrDefault(keys.dimensions)
+export const getMeasures = getPropOrDefault(keys.measures)
+export const getMeasuresKeys = A.pipe(getMeasures, Object.keys)
+export const getMeasureAggregateFunctions = (nodeDefUuid) => (query) => getMeasures(query)?.[nodeDefUuid] ?? []
 
 // mode
 const isMode = (mode) => (query) => getMode(query) === mode
@@ -65,7 +68,7 @@ const cleanup = (query) => {
   if (isModeAggregate(query)) {
     return assocAttributeDefUuids([])(query)
   } else if (isModeRaw(query)) {
-    return A.pipe(assocDimensions([]), assocMeasures(new Map()))(query)
+    return A.pipe(assocDimensions(defaults[keys.dimensions]), assocMeasures(defaults[keys.measures]))(query)
   }
   return query
 }
@@ -76,7 +79,8 @@ export const toggleMeasureAggregateFunction =
   ({ nodeDefUuid, aggregateFn }) =>
   (query) => {
     const measures = getMeasures(query)
-    const aggregateFns = measures.get(nodeDefUuid)
+    const aggregateFns = measures[nodeDefUuid] ?? []
     const aggregateFnsUpdated = ArrayUtils.addOrRemoveItem({ item: aggregateFn })(aggregateFns)
-    return assocMeasures(measures.set(nodeDefUuid, aggregateFnsUpdated))(query)
+    const measuresUpdated = { ...measures, [nodeDefUuid]: aggregateFnsUpdated }
+    return assocMeasures(measuresUpdated)(query)
   }

@@ -30,7 +30,7 @@ export const useDataQuery = ({ query, limitData = true }) => {
   const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
   const measures = Query.getMeasures(query)
-  const measuresAggregateFnsSize = Array.from(measures.values()).flat().length
+  const measuresAggregateFnsSize = Object.values(measures).flat().length
   const filter = Query.getFilter(query)
   const filterRecordUuid = Query.getFilterRecordUuid(query)
   const sort = Query.getSort(query)
