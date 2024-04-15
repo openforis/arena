@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
-import { DialogConfirmActions } from '@webapp/store/ui'
+import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
 export const useDataQueriesPanel = ({
@@ -24,8 +24,9 @@ export const useDataQueriesPanel = ({
     fetchedQuerySummary: null,
     dataQuerySummaries: [],
     queriesRequestedAt: Date.now(),
+    validating: false,
   })
-  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt } = state
+  const { editedQuerySummary, fetchedQuerySummary, dataQuerySummaries, queriesRequestedAt, validating } = state
 
   const draft =
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
@@ -33,12 +34,13 @@ export const useDataQueriesPanel = ({
 
   const setEditedQuerySummary = useCallback(
     async (querySummaryUpdated) => {
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated, validating: true }))
       const validation = await DataQuerySummaryValidator.validate({
         dataQuerySummary: querySummaryUpdated,
         dataQuerySummaries,
       })
       const querySummaryWithValidation = Validation.assocValidation(validation)(querySummaryUpdated)
-      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation }))
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation, validating: false }))
     },
     [dataQuerySummaries]
   )
@@ -92,6 +94,12 @@ export const useDataQueriesPanel = ({
   }, [resetState])
 
   const onSave = useCallback(async () => {
+    if (validating) return
+    const validation = Validation.getValidation(editedQuerySummary)
+    if (Validation.isNotValid(validation)) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
+      return
+    }
     let querySummaryFetchedUpdated = null
     if (DataQuerySummaries.getUuid(editedQuerySummary)) {
       const querySummaryToUpdate = DataQuerySummaries.assocContent(query)(editedQuerySummary)
@@ -115,7 +123,7 @@ export const useDataQueriesPanel = ({
       fetchedQuerySummary: querySummaryFetchedUpdated,
       queriesRequestedAt: Date.now(),
     }))
-  }, [editedQuerySummary, query, setSelectedQuerySummaryUuid, surveyId])
+  }, [dispatch, editedQuerySummary, query, setSelectedQuerySummaryUuid, surveyId, validating])
 
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
@@ -169,5 +177,6 @@ export const useDataQueriesPanel = ({
     onTableRowClick,
     queriesRequestedAt,
     setEditedQuerySummary,
+    validating,
   }
 }

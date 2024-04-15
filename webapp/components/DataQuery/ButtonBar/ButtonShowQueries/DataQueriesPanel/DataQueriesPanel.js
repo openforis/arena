@@ -30,6 +30,7 @@ const DataQueriesPanel = (props) => {
     setEditedQuerySummary,
     onTableRowClick,
     queriesRequestedAt,
+    validating,
   } = useDataQueriesPanel({
     query,
     onChangeQuery,
@@ -75,6 +76,7 @@ const DataQueriesPanel = (props) => {
           querySummary={editedQuerySummary}
           selectedQuerySummaryUuid={selectedQuerySummaryUuid}
           setQuerySummary={setEditedQuerySummary}
+          validating={validating}
         />
       )}
       <Table
