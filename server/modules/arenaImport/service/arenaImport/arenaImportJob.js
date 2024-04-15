@@ -73,18 +73,18 @@ export default class ArenaImportJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { arenaSurveyFileZip, backup, filePath, surveyId } = this.context
+    const { arenaSurveyFileZip, cloning, filePath, surveyId } = this.context
 
     if (arenaSurveyFileZip) {
       arenaSurveyFileZip.close()
     }
 
     if (surveyId) {
-      if (backup) {
-        await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
-      } else {
-        // if not backup (cloning) survey temporary flag or delete will be managed by parent SurveyCloneJob
+      if (cloning) {
+        // when cloning, survey temporary flag or delete will be managed by parent SurveyCloneJob
         this.logDebug(`skipping 'temporary' flag remove for survey ${surveyId}`)
+      } else {
+        await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
       }
     }
     FileUtils.deleteFile(filePath)
