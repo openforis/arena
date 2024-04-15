@@ -3,6 +3,7 @@ import React from 'react'
 import { DataQuerySummaries } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
+import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -11,9 +12,11 @@ import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
 
 export const DataQueryEditForm = (props) => {
-  const { draft, querySummary, setQuerySummary, onDelete, onNew, onSave, selectedQuerySummaryUuid } = props
+  const { draft, querySummary, setQuerySummary, onDelete, onNew, onSave, selectedQuerySummaryUuid, validating } = props
 
   const i18n = useI18n()
+
+  const validation = Validation.getValidation(querySummary)
 
   return (
     <div className="data-query-form">
@@ -22,6 +25,7 @@ export const DataQueryEditForm = (props) => {
           onChange={(value) =>
             setQuerySummary(DataQuerySummaries.assocName(StringUtils.normalizeName(value))(querySummary))
           }
+          validation={Validation.getFieldValidation('name')(validation)}
           value={DataQuerySummaries.getName(querySummary)}
         />
       </FormItem>
@@ -39,7 +43,7 @@ export const DataQueryEditForm = (props) => {
 
       <div className="button-bar">
         <ButtonNew onClick={onNew} />
-        <ButtonSave disabled={!draft} onClick={onSave} />
+        <ButtonSave disabled={!draft || validating} onClick={onSave} />
         {selectedQuerySummaryUuid && <ButtonDelete onClick={onDelete} />}
       </div>
     </div>
