@@ -35,6 +35,14 @@ export const fetchDataQuerySummary = async ({ surveyId, querySummaryUuid }) => {
   return _parseQuerySummaryFetchedWithContent(querySummaryFetched)
 }
 
+export const fetchDataQuerySummaries = async ({ surveyId }) => {
+  const url = getDataQueriesEndpoint({ surveyId })
+  const {
+    data: { list },
+  } = await axios.get(url)
+  return list
+}
+
 // UPDATE
 export const updateDataQuerySummary = async ({ surveyId, querySummary }) => {
   const querySummaryUuid = DataQuerySummaries.getUuid(querySummary)

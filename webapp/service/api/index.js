@@ -48,6 +48,7 @@ export {
 export {
   insertDataQuerySummary,
   fetchDataQuerySummary,
+  fetchDataQuerySummaries,
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'

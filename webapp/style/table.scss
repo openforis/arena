@@ -13,7 +13,7 @@ $tableFooterHeight: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: $tableHeaderHeight;
+  min-height: $tableHeaderHeight;
 }
 
 .table__content {
