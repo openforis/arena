@@ -73,8 +73,8 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
 
   // 5. merge unique nodes validation with nodes values validation
   const uniqueNodesValidationWithValueValidationByUuid = Validation.mergeFieldValidations(
-    uniqueNodesValidationMergedByUuid,
-    nodesValueValidationsByUuid
+    nodesValueValidationsByUuid,
+    uniqueNodesValidationMergedByUuid
   )
 
   // 6. generate full validation object
