@@ -1,10 +1,12 @@
 import * as R from 'ramda'
 
-import * as A from '@core/arena'
-
-import * as ObjectUtils from '@core/objectUtils'
-import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 import { Objects } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
+
+import * as ValidationResult from './validationResult'
+import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 
 // Const objectInvalid = {
 //   [keys.valid]: false,
@@ -192,6 +194,9 @@ export const mergeValidation =
     const validationFieldsResult = { ...getFieldValidations(validationPrev) }
     const validationFieldsNext = getFieldValidations(validationNext)
 
+    console.log('===validationFieldsPrev', JSON.stringify(validationFieldsResult))
+    console.log('===validationNext', JSON.stringify(validationNext))
+
     // iterate over new field validations: remove valid ones, merge invalid ones with previous ones
     Object.entries(validationFieldsNext).forEach(([fieldKey, validationFieldNext]) => {
       if (isValid(validationFieldNext)) {
@@ -210,7 +215,32 @@ export const mergeValidation =
         validationFieldsResult[fieldKey] = validationFieldMerged
       }
     })
-    const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
+
+    const validationResult = {
+      ...validationPrev,
+      [keys.fields]: validationFieldsResult,
+    }
+    const errors = getErrors(validationNext)
+
+    // const errors = [...getErrors(validationPrev)]
+    // const errorsNext = getErrors(validationNext)
+    // errorsNext.forEach((errorNext) => {
+    //   const errorKey = ValidationResult.getKey(errorNext)
+    //   if (!errors.find((error) => ValidationResult.getKey(error) === errorKey)) {
+    //     errors.push(errorNext)
+    //   }
+    // })
+    // if (isValid(validationNext) && !A.isEmpty(errors) && !A.isEmpty(errorKeysEvaluated)) {
+    //   // remove errors with evaluated keys from the list if "next" validation is valid
+    //   errors = errors.filter((error) => !errorKeysEvaluated.includes(ValidationResult.getKey(error)))
+    // }
+    validationResult[keys.errors] = errors
+    const warnings = isValid(validationNext) ? null : getWarnings(validationNext)
+    if (!A.isEmpty(warnings)) {
+      validationResult[keys.warnings] = warnings
+    }
+    console.log('===validationResult', JSON.stringify(validationResult))
+
     return doCleanup ? cleanup(validationResult) : validationResult
   }
 
