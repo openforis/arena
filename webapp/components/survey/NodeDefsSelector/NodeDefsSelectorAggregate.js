@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -51,10 +51,12 @@ const NodeDefsSelectorAggregate = (props) => {
 
   const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })
 
+  const measuresNodeDefUuids = useMemo(() => Object.keys(measures), [measures])
+
   const onToggleMeasure = (nodeDefUuid) => {
-    const measuresUpdate = new Map(measures)
-    if (measuresUpdate.has(nodeDefUuid)) {
-      measuresUpdate.delete(nodeDefUuid)
+    const measuresUpdate = { ...measures }
+    if (measuresUpdate[nodeDefUuid]) {
+      delete measuresUpdate[nodeDefUuid]
     } else {
       let aggregateFn
       const variablePrevStep = variablesPrevSteps.find((variable) => StepVariable.getUuid(variable) === nodeDefUuid)
@@ -64,7 +66,7 @@ const NodeDefsSelectorAggregate = (props) => {
       } else {
         aggregateFn = Query.DEFAULT_AGGREGATE_FUNCTIONS.sum
       }
-      measuresUpdate.set(nodeDefUuid, [aggregateFn])
+      measuresUpdate[nodeDefUuid] = [aggregateFn]
     }
     onChangeMeasures(measuresUpdate)
   }
@@ -113,7 +115,7 @@ const NodeDefsSelectorAggregate = (props) => {
               filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
-              nodeDefUuidsAttributes={[...measures.keys()]}
+              nodeDefUuidsAttributes={measuresNodeDefUuids}
               showAncestors={false}
               showMultipleAttributes={false}
               showAnalysisAttributes={showAnalysisAttributes}
@@ -130,7 +132,7 @@ const NodeDefsSelectorAggregate = (props) => {
                     key={variableNodeDefUuid}
                     nodeDef={childDef}
                     nodeDefLabelType={nodeDefLabelType}
-                    nodeDefUuidsAttributes={[...measures.keys()]}
+                    nodeDefUuidsAttributes={measuresNodeDefUuids}
                     nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}
                     onToggleAttribute={onToggleMeasure}
                   />

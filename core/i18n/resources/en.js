@@ -673,12 +673,21 @@ Are you sure you want to continue?`,
   },
 
   dataView: {
-    aggregateMode: 'Aggregate Mode',
+    dataQuery: {
+      deleteConfirmMessage: 'Delete the query "{{name}}"?',
+      manageQueries: 'Manage queries',
+      mode: {
+        label: 'Mode:',
+        aggregate: 'Aggregate',
+        raw: 'Raw',
+        rawEdit: 'Raw edit',
+      },
+      replaceQueryConfirmMessage: 'Replace current query with the selected one?',
+    },
     editSelectedRecord: 'Edit selected record',
-    editMode: 'Edit Mode',
     filterAttributeTypes: 'Filter attribute types',
     filterRecords: {
-      buttonTitle: 'Filter records',
+      buttonTitle: 'Filter',
       expressionEditorHeader: 'Expression to filter records',
     },
     invalidRecord: 'Invalid record',
@@ -739,7 +748,7 @@ Are you sure you want to continue?`,
       label: 'Selected attributes:',
     },
     showValidationReport: 'Show validation report',
-    sort: 'Sort records',
+    sort: 'Sort',
     dataExport: {
       source: {
         label: 'Source',

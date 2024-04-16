@@ -20,8 +20,7 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
   const queryBuilder = new SqlSelectAggBuilder({ viewDataNodeDef })
 
   // SELECT measures
-  const measures = Query.getMeasures(query)
-  Array.from(measures.entries()).forEach(([nodeDefUuid, aggFunctions], index) =>
+  Object.entries(Query.getMeasures(query)).forEach(([nodeDefUuid, aggFunctions], index) =>
     queryBuilder.selectMeasure({ aggFunctions, nodeDefUuid, index, cycle, filter: Query.getFilter(query) })
   )
 

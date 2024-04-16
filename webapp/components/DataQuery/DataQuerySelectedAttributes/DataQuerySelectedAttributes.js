@@ -41,7 +41,7 @@ export const DataQuerySelectedAttributes = (props) => {
   return (
     <FormItem
       className="data-query__selected-attributes-form-item"
-      info={i18n.t('dataView.selectedAttributes.info')}
+      info="dataView.selectedAttributes.info"
       label={i18n.t('dataView.selectedAttributes.label')}
     >
       <div className="data-query__selected-attributes-wrapper" ref={containerRef}>

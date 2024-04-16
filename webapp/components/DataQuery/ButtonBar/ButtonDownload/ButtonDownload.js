@@ -20,7 +20,7 @@ const ButtonDownload = (props) => {
     API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName })
   }
 
-  return <ButtonDownloadSimple disabled={disabled} title="common.csvExport" showLabel={false} onClick={onClick} />
+  return <ButtonDownloadSimple disabled={disabled} label="common.csvExport" onClick={onClick} />
 }
 
 ButtonDownload.propTypes = {

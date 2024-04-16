@@ -15,7 +15,7 @@ export const useTable = ({ data, query, nodeDefsSelectorVisible, setData }) => {
   const [colWidth, setColWidth] = useState(null)
 
   const nodeDefColUuids = Query.isModeAggregate(query)
-    ? [...Query.getDimensions(query).values(), ...Query.getMeasures(query).keys()]
+    ? [...Query.getDimensions(query), ...Query.getMeasuresKeys(query)]
     : Query.getAttributeDefUuids(query)
   const nodeDefCols = useNodeDefsByUuids(nodeDefColUuids)
   const columnNames = nodeDefCols.flatMap(ColumnNodeDef.getColumnNames)
