@@ -7,7 +7,7 @@ import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
 
-import { DataExplorerHooks } from '@webapp/store/dataExplorer'
+import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
@@ -16,7 +16,6 @@ import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
-import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 const DataQuery = () => {
   const query = DataExplorerSelectors.useQuery()
