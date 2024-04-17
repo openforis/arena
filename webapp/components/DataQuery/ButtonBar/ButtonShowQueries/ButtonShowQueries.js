@@ -8,7 +8,7 @@ import { State } from '../store'
 import DataQueriesPanel from './DataQueriesPanel'
 
 const ButtonShowQueries = (props) => {
-  const { disabled, query, onChangeQuery, state, Actions } = props
+  const { disabled, onChangeQuery, state, Actions } = props
 
   return (
     <>
@@ -21,7 +21,7 @@ const ButtonShowQueries = (props) => {
       />
 
       {State.isPanelQueriesShown(state) && (
-        <DataQueriesPanel query={query} onChangeQuery={onChangeQuery} onClose={Actions.togglePanelQueries} />
+        <DataQueriesPanel onChangeQuery={onChangeQuery} onClose={Actions.togglePanelQueries} />
       )}
     </>
   )
@@ -29,7 +29,6 @@ const ButtonShowQueries = (props) => {
 
 ButtonShowQueries.propTypes = {
   disabled: PropTypes.bool,
-  query: PropTypes.object,
   onChangeQuery: PropTypes.func.isRequired,
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,

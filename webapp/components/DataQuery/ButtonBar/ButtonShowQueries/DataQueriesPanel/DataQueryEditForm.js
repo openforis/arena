@@ -7,7 +7,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { DataExplorerState } from '@webapp/store/dataExplorer'
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
@@ -20,7 +20,7 @@ export const DataQueryEditForm = (props) => {
 
   const validation = Validation.getValidation(querySummary)
 
-  const selectedQuerySummaryUuid = useSelector(DataExplorerState.getSelectedQuerySummaryUuid)
+  const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
 
   return (
     <div className="data-query-form">

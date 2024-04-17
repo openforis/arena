@@ -18,21 +18,21 @@ import { useDataQueriesPanel } from './useDataQueriesPanel'
 const dataQueriesModuleName = 'data_queries'
 
 const DataQueriesPanel = (props) => {
-  const { onClose, onChangeQuery, query } = props
+  const { onClose, onChangeQuery } = props
 
   const {
     draft,
+    editedQuerySummary,
     isTableRowActive,
     onNew,
     onSave,
     onDelete,
-    editedQuerySummary,
-    setEditedQuerySummary,
     onTableRowClick,
+    query,
     queriesRequestedAt,
+    setEditedQuerySummary,
     validating,
   } = useDataQueriesPanel({
-    query,
     onChangeQuery,
   })
 

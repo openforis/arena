@@ -1,5 +1,7 @@
 import './buttonBar.scss'
-import React from 'react'
+
+import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -10,6 +12,7 @@ import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useIsAppSaving } from '@webapp/store/app'
+import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -26,15 +29,22 @@ const ButtonBar = (props) => {
     dataLoading,
     nodeDefLabelType,
     nodeDefsSelectorVisible,
-    query,
-    onChangeQuery,
     onNodeDefLabelTypeChange,
     setNodeDefsSelectorVisible,
   } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
+  const query = DataExplorerSelectors.useQuery()
+  const onChangeQuery = useCallback(
+    (queryUpdated) => {
+      dispatch(DataExplorerActions.setQuery(queryUpdated))
+    },
+    [dispatch]
+  )
+
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
@@ -105,7 +115,7 @@ const ButtonBar = (props) => {
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
 
-      <ButtonShowQueries query={query} onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+      <ButtonShowQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
     </div>
   )
 }
@@ -114,10 +124,8 @@ ButtonBar.propTypes = {
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
-  query: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
   setNodeDefsSelectorVisible: PropTypes.func.isRequired,
 }

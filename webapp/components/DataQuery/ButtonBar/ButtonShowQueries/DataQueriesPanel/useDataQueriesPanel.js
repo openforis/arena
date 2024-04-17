@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 
@@ -7,17 +7,18 @@ import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
-import { DataExplorerActions, DataExplorerState } from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
-export const useDataQueriesPanel = ({ query, onChangeQuery }) => {
+export const useDataQueriesPanel = ({ onChangeQuery }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
 
-  const selectedQuerySummaryUuid = useSelector(DataExplorerState.getSelectedQuerySummaryUuid)
+  const query = DataExplorerSelectors.useQuery()
+  const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
 
   const [state, setState] = useState({
     editedQuerySummary: {},
@@ -32,17 +33,27 @@ export const useDataQueriesPanel = ({ query, onChangeQuery }) => {
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
     !Objects.isEqual(DataQuerySummaries.getContent(editedQuerySummary), query)
 
+  const validateEditedQuerySummary = useCallback(async () => {
+    setState((statePrev) => ({ ...statePrev, validating: true }))
+    const validation = await DataQuerySummaryValidator.validate({
+      dataQuerySummary: editedQuerySummary,
+      dataQuerySummaries,
+    })
+    const querySummaryWithValidation = Validation.assocValidation(validation)(editedQuerySummary)
+    setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation, validating: false }))
+    return validation
+  }, [dataQuerySummaries, editedQuerySummary])
+
   const setEditedQuerySummary = useCallback(
     async (querySummaryUpdated) => {
-      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated, validating: true }))
-      const validation = await DataQuerySummaryValidator.validate({
-        dataQuerySummary: querySummaryUpdated,
-        dataQuerySummaries,
-      })
-      const querySummaryWithValidation = Validation.assocValidation(validation)(querySummaryUpdated)
-      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation, validating: false }))
+      setState(
+        (statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated }),
+        async () => {
+          await validateEditedQuerySummary()
+        }
+      )
     },
-    [dataQuerySummaries]
+    [validateEditedQuerySummary]
   )
 
   const resetState = useCallback(() => {
@@ -95,8 +106,10 @@ export const useDataQueriesPanel = ({ query, onChangeQuery }) => {
 
   const onSave = useCallback(async () => {
     if (validating) return
-    const validation = Validation.getValidation(editedQuerySummary)
-    if (Validation.isNotValid(validation)) {
+    const validationUpdated = Validation.hasValidation(editedQuerySummary)
+      ? Validation.getValidation(editedQuerySummary)
+      : await validateEditedQuerySummary()
+    if (Validation.isNotValid(validationUpdated)) {
       dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
       return
     }
@@ -123,7 +136,7 @@ export const useDataQueriesPanel = ({ query, onChangeQuery }) => {
       fetchedQuerySummary: querySummaryFetchedUpdated,
       queriesRequestedAt: Date.now(),
     }))
-  }, [dispatch, editedQuerySummary, query, surveyId, validating])
+  }, [dispatch, editedQuerySummary, query, surveyId, validateEditedQuerySummary, validating])
 
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
@@ -175,6 +188,7 @@ export const useDataQueriesPanel = ({ query, onChangeQuery }) => {
     onSave,
     onDelete,
     onTableRowClick,
+    query,
     queriesRequestedAt,
     setEditedQuerySummary,
     validating,
