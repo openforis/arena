@@ -29,6 +29,9 @@ const ENV = {
   pgDatabase,
   pgSsl: process.env.PGSSL === 'true',
   // EMAIL
+  emailService: process.env.EMAIL_SERVICE || 'sendgrid',
+  emailAuthUser: process.env.EMAIL_AUTH_USER,
+  emailAuthPassword: process.env.EMAIL_AUTH_PASSWORD,
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
