@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
@@ -202,9 +203,9 @@ export const fetchEntitiesDataToCsvFiles = async (
 ) => {
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
-    (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
-  )
+  const nodeDefs = Survey.findDescendants({
+    filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+  })(survey)
 
   const recordUuids = await _determineRecordUuidsFilter({ survey, cycle, recordUuidsParam, search })
 
@@ -221,7 +222,9 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const outputFilePath = FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`)
+    const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
+    const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.csv`
+    const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
