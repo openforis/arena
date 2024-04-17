@@ -22,9 +22,6 @@ import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
 import * as JobManager from '@server/job/jobManager'
-import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
-import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
-import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -280,49 +277,6 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   streamTransformer.pipe(res)
 
   await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
-}
-
-// DATA IMPORT
-export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
-  const job = new CollectDataImportJob({
-    user,
-    surveyId,
-    filePath,
-    deleteAllRecords,
-    cycle,
-    forceImport,
-  })
-  JobManager.executeJobThread(job)
-  return job
-}
-
-export const startCSVDataImportJob = ({
-  user,
-  surveyId,
-  filePath,
-  cycle,
-  nodeDefUuid,
-  dryRun = false,
-  insertNewRecords = false,
-  insertMissingNodes = false,
-  updateRecordsInAnalysis = false,
-  abortOnErrors = true,
-}) => {
-  const jobParams = {
-    user,
-    surveyId,
-    filePath,
-    cycle,
-    nodeDefUuid,
-    dryRun,
-    insertNewRecords,
-    insertMissingNodes,
-    updateRecordsInAnalysis,
-    abortOnErrors,
-  }
-  const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
-  JobManager.executeJobThread(job)
-  return job
 }
 
 // RECORDS CLONE
