@@ -6,8 +6,23 @@ import * as i18nFactory from '@core/i18n/i18nFactory'
 
 sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
 
-const from = ProcessUtils.ENV.adminEmail
-const pass = ProcessUtils.ENV.adminPassword
+const emailServices = {
+  sendgrid: 'sendgrid',
+  office365: 'office365',
+}
+
+const emailService = ProcessUtils.ENV.emailService
+
+const from = ProcessUtils.ENV.emailAuthUser || ProcessUtils.ENV.adminEmail
+const pass = ProcessUtils.ENV.emailAuthPassword
+
+const office365TransportOptions = {
+  host: 'smtp.office365.com',
+  port: '587',
+  auth: { user: from, pass },
+  secureConnection: true,
+  tls: { ciphers: 'SSLv3' },
+}
 
 const sendEmailSendgrid = async ({ to, subject, html }) => {
   if (Array.isArray(to)) {
@@ -18,28 +33,16 @@ const sendEmailSendgrid = async ({ to, subject, html }) => {
 }
 
 const sendEmailMSOffice365 = async ({ to, subject, html, text = null }) => {
-  try {
-    const transportOptions = {
-      host: 'smtp.office365.com',
-      port: '587',
-      auth: { user: from, pass },
-      secureConnection: true,
-      tls: { ciphers: 'SSLv3' },
-    }
+  const mailTransport = nodemailer.createTransport(office365TransportOptions)
 
-    const mailTransport = nodemailer.createTransport(transportOptions)
-
-    await mailTransport.sendMail({
-      from,
-      to,
-      replyTo: from,
-      subject,
-      html,
-      text,
-    })
-  } catch (error) {
-    console.log('---error', error)
-  }
+  await mailTransport.sendMail({
+    from,
+    to,
+    replyTo: from,
+    subject,
+    html,
+    text,
+  })
 }
 
 export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = null, lang = 'en' }) => {
@@ -48,6 +51,11 @@ export const sendEmail = async ({ to, msgKey, msgParams = {}, i18n: i18nParam = 
   const subject = i18n.t(`${msgKey}.subject`, msgParams)
   const html = i18n.t(`${msgKey}.body`, msgParams)
 
-  // await sendEmailSendgrid({ to, subject, html })
-  await sendEmailMSOffice365({ to, subject, html })
+  if (emailService === emailServices.sendgrid) {
+    await sendEmailSendgrid({ to, subject, html })
+  } else if (emailService === emailServices.office365) {
+    await sendEmailMSOffice365({ to, subject, html })
+  } else {
+    throw new Error('Invalid email service specified: ' + emailService)
+  }
 }
