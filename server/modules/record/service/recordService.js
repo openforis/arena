@@ -226,7 +226,13 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   const objectTransformer = (item) => {
+    const nodeDef = RecordValidationReportItem.getNodeDef(survey)(item)
+    const name = NodeDef.getName(nodeDef)
+    const label = NodeDef.getLabel(nodeDef, lang)
     const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
+    const pathLabels = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.label })(
+      item
+    )
     const validation = RecordValidationReportItem.getValidation(item)
 
     const errors = ValidationUtils.getJointMessage({
@@ -245,6 +251,9 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
 
     return {
       path,
+      path_labels: pathLabels,
+      name,
+      label,
       errors,
       warnings,
       record_step: RecordValidationReportItem.getRecordStep(item),
@@ -256,6 +265,9 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   }
   const headers = [
     'path',
+    'path_labels',
+    'name',
+    'label',
     'errors',
     'warnings',
     'record_step',
