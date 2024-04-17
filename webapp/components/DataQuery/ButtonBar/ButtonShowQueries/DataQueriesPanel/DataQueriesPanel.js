@@ -18,7 +18,7 @@ import { useDataQueriesPanel } from './useDataQueriesPanel'
 const dataQueriesModuleName = 'data_queries'
 
 const DataQueriesPanel = (props) => {
-  const { onClose, onChangeQuery, query, selectedQuerySummaryUuid, setSelectedQuerySummaryUuid } = props
+  const { onClose, onChangeQuery, query } = props
 
   const {
     draft,
@@ -34,8 +34,6 @@ const DataQueriesPanel = (props) => {
   } = useDataQueriesPanel({
     query,
     onChangeQuery,
-    selectedQuerySummaryUuid,
-    setSelectedQuerySummaryUuid,
   })
 
   const i18n = useI18n()
@@ -74,7 +72,6 @@ const DataQueriesPanel = (props) => {
           onNew={onNew}
           onSave={onSave}
           querySummary={editedQuerySummary}
-          selectedQuerySummaryUuid={selectedQuerySummaryUuid}
           setQuerySummary={setEditedQuerySummary}
           validating={validating}
         />

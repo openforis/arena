@@ -30,8 +30,6 @@ const ButtonBar = (props) => {
     onChangeQuery,
     onNodeDefLabelTypeChange,
     setNodeDefsSelectorVisible,
-    selectedQuerySummaryUuid,
-    setSelectedQuerySummaryUuid,
   } = props
 
   const i18n = useI18n()
@@ -107,14 +105,7 @@ const ButtonBar = (props) => {
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
 
-      <ButtonShowQueries
-        query={query}
-        onChangeQuery={onChangeQuery}
-        state={state}
-        Actions={Actions}
-        selectedQuerySummaryUuid={selectedQuerySummaryUuid}
-        setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
-      />
+      <ButtonShowQueries query={query} onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
     </div>
   )
 }

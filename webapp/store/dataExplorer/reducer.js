@@ -12,9 +12,12 @@ export const slice = createSlice({
   name: 'dataQuery',
   initialState,
   reducers: {
-    setEditMode: (state) => DataExplorerState.assocEditMode(state),
-    setQuery: (state) => DataExplorerState.assocQuery(state),
-    setSelectedQuerySummaryUuid: (state) => DataExplorerState.assocSelectedQuerySummaryUuid(state),
+    setEditMode: (state, action) => DataExplorerState.assocEditMode(action.payload)(state),
+
+    setQuery: (state, action) => DataExplorerState.assocQuery(action.payload)(state),
+
+    setSelectedQuerySummaryUuid: (state, action) =>
+      DataExplorerState.assocSelectedQuerySummaryUuid(action.payload)(state),
   },
 })
 

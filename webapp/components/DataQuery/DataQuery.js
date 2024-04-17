@@ -35,7 +35,6 @@ const DataQuery = (props) => {
   } = useDataQuery({ query })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
-  const [selectedQuerySummaryUuid, setSelectedQuerySummaryUuid] = useState(null)
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
@@ -60,8 +59,6 @@ const DataQuery = (props) => {
             onChangeQuery={onChangeQuery}
             onNodeDefLabelTypeChange={toggleLabelFunction}
             setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
-            selectedQuerySummaryUuid={selectedQuerySummaryUuid}
-            setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
           />
         </div>
 

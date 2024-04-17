@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 
@@ -7,18 +7,18 @@ import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
+import { DataExplorerActions, DataExplorerState } from '@webapp/store/dataExplorer'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
-export const useDataQueriesPanel = ({
-  query,
-  onChangeQuery,
-  selectedQuerySummaryUuid,
-  setSelectedQuerySummaryUuid,
-}) => {
+export const useDataQueriesPanel = ({ query, onChangeQuery }) => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+
+  const selectedQuerySummaryUuid = useSelector(DataExplorerState.getSelectedQuerySummaryUuid)
+
   const [state, setState] = useState({
     editedQuerySummary: {},
     fetchedQuerySummary: null,
@@ -52,8 +52,8 @@ export const useDataQueriesPanel = ({
       fetchedQuerySummary: null,
       queriesRequestedAt: Date.now(),
     }))
-    setSelectedQuerySummaryUuid(null)
-  }, [setSelectedQuerySummaryUuid])
+    dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(null))
+  }, [dispatch])
 
   const fetchDataQuerySummaries = useCallback(async () => {
     const dataQuerySummaries = await API.fetchDataQuerySummaries({
@@ -115,7 +115,7 @@ export const useDataQueriesPanel = ({
         querySummary: querySummaryToInsert,
       })
       querySummaryFetchedUpdated = DataQuerySummaries.assocContent(query)(insertedDataQuerySummary)
-      setSelectedQuerySummaryUuid(DataQuerySummaries.getUuid(querySummaryToInsert))
+      dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(DataQuerySummaries.getUuid(querySummaryToInsert)))
     }
     setState((statePrev) => ({
       ...statePrev,
@@ -123,7 +123,7 @@ export const useDataQueriesPanel = ({
       fetchedQuerySummary: querySummaryFetchedUpdated,
       queriesRequestedAt: Date.now(),
     }))
-  }, [dispatch, editedQuerySummary, query, setSelectedQuerySummaryUuid, surveyId, validating])
+  }, [dispatch, editedQuerySummary, query, surveyId, validating])
 
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
@@ -144,10 +144,10 @@ export const useDataQueriesPanel = ({
   const doQuerySummarySelection = useCallback(
     async (selectedQuerySummary) => {
       const querySummaryUuid = DataQuerySummaries.getUuid(selectedQuerySummary)
-      setSelectedQuerySummaryUuid(querySummaryUuid)
+      dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(querySummaryUuid))
       await fetchAndSetEditedQuerySummary({ querySummaryUuid })
     },
-    [fetchAndSetEditedQuerySummary, setSelectedQuerySummaryUuid]
+    [dispatch, fetchAndSetEditedQuerySummary]
   )
 
   const onTableRowClick = useCallback(
