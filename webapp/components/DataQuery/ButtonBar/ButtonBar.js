@@ -1,7 +1,6 @@
 import './buttonBar.scss'
 
-import React, { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -12,7 +11,7 @@ import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
+import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -33,17 +32,11 @@ const ButtonBar = (props) => {
     setNodeDefsSelectorVisible,
   } = props
 
-  const dispatch = useDispatch()
   const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const query = DataExplorerSelectors.useQuery()
-  const onChangeQuery = useCallback(
-    (queryUpdated) => {
-      dispatch(DataExplorerActions.setQuery(queryUpdated))
-    },
-    [dispatch]
-  )
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
@@ -95,21 +88,9 @@ const ButtonBar = (props) => {
 
       {hasSelection && (
         <div>
-          <ButtonFilter
-            query={query}
-            disabled={queryChangeDisabled}
-            onChangeQuery={onChangeQuery}
-            state={state}
-            Actions={Actions}
-          />
-          <ButtonSort
-            query={query}
-            disabled={queryChangeDisabled}
-            onChangeQuery={onChangeQuery}
-            state={state}
-            Actions={Actions}
-          />
-          <ButtonDownload query={query} disabled={queryChangeDisabled} />
+          <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
+          <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
+          <ButtonDownload disabled={queryChangeDisabled} />
         </div>
       )}
 

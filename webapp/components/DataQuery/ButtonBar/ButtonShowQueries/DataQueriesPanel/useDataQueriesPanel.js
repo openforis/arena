@@ -7,15 +7,16 @@ import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
-import { DataExplorerActions, DataExplorerSelectors } from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
-export const useDataQueriesPanel = ({ onChangeQuery }) => {
+export const useDataQueriesPanel = () => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const query = DataExplorerSelectors.useQuery()
   const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
@@ -33,25 +34,24 @@ export const useDataQueriesPanel = ({ onChangeQuery }) => {
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
     !Objects.isEqual(DataQuerySummaries.getContent(editedQuerySummary), query)
 
-  const validateEditedQuerySummary = useCallback(async () => {
-    setState((statePrev) => ({ ...statePrev, validating: true }))
-    const validation = await DataQuerySummaryValidator.validate({
-      dataQuerySummary: editedQuerySummary,
-      dataQuerySummaries,
-    })
-    const querySummaryWithValidation = Validation.assocValidation(validation)(editedQuerySummary)
-    setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation, validating: false }))
-    return validation
-  }, [dataQuerySummaries, editedQuerySummary])
+  const validateEditedQuerySummary = useCallback(
+    async (querySummaryUpdated) => {
+      setState((statePrev) => ({ ...statePrev, validating: true }))
+      const validation = await DataQuerySummaryValidator.validate({
+        dataQuerySummary: querySummaryUpdated,
+        dataQuerySummaries,
+      })
+      const querySummaryWithValidation = Validation.assocValidation(validation)(querySummaryUpdated)
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation, validating: false }))
+      return validation
+    },
+    [dataQuerySummaries]
+  )
 
   const setEditedQuerySummary = useCallback(
     async (querySummaryUpdated) => {
-      setState(
-        (statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated }),
-        async () => {
-          await validateEditedQuerySummary()
-        }
-      )
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated }))
+      await validateEditedQuerySummary(querySummaryUpdated)
     },
     [validateEditedQuerySummary]
   )
@@ -106,9 +106,11 @@ export const useDataQueriesPanel = ({ onChangeQuery }) => {
 
   const onSave = useCallback(async () => {
     if (validating) return
+
     const validationUpdated = Validation.hasValidation(editedQuerySummary)
       ? Validation.getValidation(editedQuerySummary)
-      : await validateEditedQuerySummary()
+      : await validateEditedQuerySummary(editedQuerySummary)
+
     if (Validation.isNotValid(validationUpdated)) {
       dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
       return

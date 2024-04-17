@@ -1,14 +1,13 @@
 import './dataQuery.scss'
 
-import React, { useCallback, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from 'react'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
 
-import { DataExplorerActions } from '@webapp/store/dataExplorer'
+import { DataExplorerHooks } from '@webapp/store/dataExplorer'
 
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
@@ -20,16 +19,8 @@ import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 const DataQuery = () => {
-  const dispatch = useDispatch()
-
   const query = DataExplorerSelectors.useQuery()
-
-  const onChangeQuery = useCallback(
-    (queryUpdated) => {
-      dispatch(DataExplorerActions.setQuery(queryUpdated))
-    },
-    [dispatch]
-  )
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
   const {
@@ -72,7 +63,7 @@ const DataQuery = () => {
           />
         </div>
 
-        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} query={query} onChangeQuery={onChangeQuery} />
+        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
           query={query}

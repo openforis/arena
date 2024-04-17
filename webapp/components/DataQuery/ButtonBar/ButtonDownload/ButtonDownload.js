@@ -3,12 +3,17 @@ import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
 
-import * as API from '@webapp/service/api'
 import { ButtonDownload as ButtonDownloadSimple } from '@webapp/components/buttons'
+
+import * as API from '@webapp/service/api'
+
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 const ButtonDownload = (props) => {
-  const { disabled, query } = props
+  const { disabled } = props
+
+  const query = DataExplorerSelectors.useQuery()
 
   const entityDefUuid = Query.getEntityDefUuid(query)
 
@@ -25,7 +30,6 @@ const ButtonDownload = (props) => {
 
 ButtonDownload.propTypes = {
   disabled: PropTypes.bool.isRequired,
-  query: PropTypes.object.isRequired,
 }
 
 export default ButtonDownload

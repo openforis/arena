@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
 
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
+
 import Table from './Table'
 
 const components = {
@@ -10,23 +12,14 @@ const components = {
 }
 
 const Visualizer = (props) => {
-  const {
-    query,
-    data,
-    dataEmpty,
-    dataLoading,
-    dataLoadingError,
-    nodeDefLabelType,
-    nodeDefsSelectorVisible,
-    offset,
-    onChangeQuery,
-    setData,
-  } = props
+  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, nodeDefsSelectorVisible, offset, setData } =
+    props
+
+  const query = DataExplorerSelectors.useQuery()
 
   return (
     <div className="table__content">
       {React.createElement(components[Query.getDisplayType(query)], {
-        query,
         data,
         dataEmpty,
         dataLoading,
@@ -34,7 +27,6 @@ const Visualizer = (props) => {
         nodeDefLabelType,
         nodeDefsSelectorVisible,
         offset,
-        onChangeQuery,
         setData,
       })}
     </div>
@@ -49,8 +41,6 @@ Visualizer.propTypes = {
   nodeDefLabelType: PropTypes.string.isRequired,
   nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
-  query: PropTypes.object.isRequired,
   setData: PropTypes.func.isRequired,
 }
 

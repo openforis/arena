@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import { DataQuerySummaries } from '@openforis/arena-core'
 
@@ -52,4 +52,14 @@ export const DataQueryEditForm = (props) => {
       </div>
     </div>
   )
+}
+
+DataQueryEditForm.propTypes = {
+  draft: PropTypes.bool,
+  querySummary: PropTypes.object.isRequired,
+  setQuerySummary: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  validating: PropTypes.bool,
 }
