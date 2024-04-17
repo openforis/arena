@@ -5,6 +5,7 @@ import { CsvDataExportModel } from '@common/model/csvExport'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as DateUtils from '@core/dateUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import { contentTypes, setContentTypeFile } from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
@@ -85,21 +86,16 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
     contentType: contentTypes.zip,
   })
 
-  const multipleNodeDefUuids = []
-
-  Survey.visitDescendantsAndSelf({
-    visitorFn: (nodeDef) => {
-      if (NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)) {
-        multipleNodeDefUuids.push(NodeDef.getUuid(nodeDef))
-      }
-    },
-  })(survey)
+  const multipleNodeDefUuids = Survey.findDescendants({
+    filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+  })(survey).map(NodeDef.getUuid)
 
   const tempFilePaths = []
 
-  await Promises.each(multipleNodeDefUuids, async (nodeDefUuid) => {
+  await Promises.each(multipleNodeDefUuids, async (nodeDefUuid, idx) => {
     const { template, nodeDef } = await extractDataImportTemplate({ survey, cycle, nodeDefUuid })
-    const zipEntryName = `data_import_template_${NodeDef.getName(nodeDef)}.csv`
+    const prefix = `data_import_template_${StringUtils.padStart(2, '0')(String(idx + 1))}`
+    const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.csv`
     const tempFilePath = FileUtils.newTempFilePath()
 
     await CSVWriter.writeItemsToStream({ outputStream: FileUtils.createWriteStream(tempFilePath), items: [template] })

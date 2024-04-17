@@ -21,7 +21,7 @@ export const startCollectRecordsImportJob = async ({
 } = {}) => {
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -48,7 +48,7 @@ export const startDataImportFromCsvJob = async ({
     updateRecordsInAnalysis,
     abortOnErrors,
   })
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcsv`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/csv`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -67,12 +67,12 @@ export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, onUpl
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle }) => {
   const params = new URLSearchParams({ nodeDefUuid, cycle })
-  return `/api/survey/${surveyId}/record/importfromcsv/template?${params.toString()}`
+  return `/api/survey/${surveyId}/data-import/csv/template?${params.toString()}`
 }
 
 export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle }) => {
   const params = new URLSearchParams({ cycle })
-  return `/api/survey/${surveyId}/record/importfromcsv/templates?${params.toString()}`
+  return `/api/survey/${surveyId}/data-import/csv/templates?${params.toString()}`
 }
 
 // ==== DATA EXPORT

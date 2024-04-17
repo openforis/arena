@@ -1763,7 +1763,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
     // export csv data
-    ExportCsvDataJob: 'Export CSV data',
+    DataExportJob: 'Export CSV data',
     ZipCreationJob: 'ZIP file Creation',
     CSVDataExtraction: 'Data Export',
     // import arena survey
