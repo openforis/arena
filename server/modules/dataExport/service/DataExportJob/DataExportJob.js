@@ -16,9 +16,9 @@ const createInternalJobs = ({ includeCategories, includeFiles }) => [
   new ZipCreationJob(),
 ]
 
-export default class ExportCsvDataJob extends Job {
+export default class DataExportJob extends Job {
   constructor(params) {
-    super(ExportCsvDataJob.type, params, createInternalJobs(params))
+    super(DataExportJob.type, params, createInternalJobs(params))
   }
 
   async onStart() {
@@ -80,4 +80,4 @@ export default class ExportCsvDataJob extends Job {
   }
 }
 
-ExportCsvDataJob.type = 'ExportCsvDataJob'
+DataExportJob.type = 'DataExportJob'
