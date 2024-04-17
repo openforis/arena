@@ -6,11 +6,10 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 
 export const useColumn = ({ colWidth, query, nodeDef }) => {
   const modeEdit = Query.isModeRawEdit(query)
+  const modeAggregate = Query.isModeAggregate(query)
 
-  const aggregateFunctions = Query.isModeAggregate(query)
-    ? Query.getMeasures(query).get(NodeDef.getUuid(nodeDef))
-    : null
-  const isMeasure = Boolean(aggregateFunctions)
+  const aggregateFunctions = modeAggregate ? Query.getMeasureAggregateFunctions(NodeDef.getUuid(nodeDef))(query) : null
+  const isMeasure = modeAggregate && aggregateFunctions.length > 0
   const columnNames = isMeasure
     ? // for every measure add a column for each aggregate function
       aggregateFunctions.map((aggregateFn) => ColumnNodeDef.getColumnNameAggregateFunction({ nodeDef, aggregateFn }))

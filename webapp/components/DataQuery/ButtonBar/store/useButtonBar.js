@@ -7,8 +7,9 @@ export const useButtonBar = () => {
 
   const Actions = {
     closePanels: () => setState(State.create()),
-    togglePanelFilter: () => setState((statePrev) => State.togglePanelFilter(statePrev)),
-    togglePanelSort: () => setState((statePrev) => State.togglePanelSort(statePrev)),
+    togglePanelFilter: () => setState(State.togglePanelFilter),
+    togglePanelSort: () => setState(State.togglePanelSort),
+    togglePanelQueries: () => setState(State.togglePanelQueries),
   }
 
   return { state, Actions }

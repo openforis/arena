@@ -1,10 +1,11 @@
 import * as R from 'ramda'
 
-import * as A from '@core/arena'
-
-import * as ObjectUtils from '@core/objectUtils'
-import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 import { Objects } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
+
+import { ValidatorErrorKeys } from './_validator/validatorErrorKeys'
 
 // Const objectInvalid = {
 //   [keys.valid]: false,
@@ -210,18 +211,27 @@ export const mergeValidation =
         validationFieldsResult[fieldKey] = validationFieldMerged
       }
     })
-    const validationResult = { ...validationPrev, [keys.fields]: validationFieldsResult }
-    return doCleanup ? cleanup(validationResult) : validationResult
+
+    const validationResult = {
+      ...validationPrev,
+      [keys.fields]: validationFieldsResult,
+    }
+    validationResult[keys.errors] = getErrors(validationNext)
+    validationResult[keys.warnings] = getWarnings(validationNext)
+
+    return doCleanup ? cleanup(validationResult) : recalculateValidity(validationResult)
   }
 
-export const mergeFieldValidations = (fieldValidationsNext, fieldValidationsPrev) =>
-  Object.entries(fieldValidationsNext).reduce((acc, [fieldKey, fieldValidationNext]) => {
+export const mergeFieldValidations = (fieldValidationsNext, fieldValidationsPrev) => {
+  const result = { ...fieldValidationsPrev }
+  Object.entries(fieldValidationsNext).forEach(([fieldKey, fieldValidationNext]) => {
     const fieldValidationPrev = fieldValidationsPrev[fieldKey]
-    acc[fieldKey] = fieldValidationPrev
+    result[fieldKey] = fieldValidationPrev
       ? mergeValidation(fieldValidationNext, false)(fieldValidationPrev)
       : fieldValidationNext
-    return acc
-  }, {})
+  })
+  return result
+}
 
 // Object
 

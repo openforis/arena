@@ -102,7 +102,7 @@ const getCsvExportFieldsAgg = ({ survey, query }) => {
     fields.push(new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name)
   })
   // measures
-  Array.from(Query.getMeasures(query).entries()).forEach(([nodeDefUuid, aggFunctions]) => {
+  Object.entries(Query.getMeasures(query)).forEach(([nodeDefUuid, aggFunctions]) => {
     const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     aggFunctions.forEach((aggregateFnOrUuid) => {
       const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({

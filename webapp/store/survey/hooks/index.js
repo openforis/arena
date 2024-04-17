@@ -11,8 +11,8 @@ import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
 
 // ==== Survey
-export const useSurveyDefsFetched = ({ draft, validate }) =>
-  useSelector(SurveyStatusState.isFetchedWithSameParams({ draft, validate }))
+export const useSurveyDefsFetched = ({ draft, includeAnalysis, validate }) =>
+  useSelector(SurveyStatusState.isFetchedWithSameParams({ draft, includeAnalysis, validate }))
 export const useSurvey = () => useSelector(SurveyState.getSurvey)
 export const useSurveyId = () => useSelector(SurveyState.getSurveyId)
 export const useSurveyInfo = () => useSelector(SurveyState.getSurveyInfo)

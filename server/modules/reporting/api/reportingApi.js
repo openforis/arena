@@ -35,7 +35,7 @@ export const init = (app) => {
 
       const chartSpec = A.parse(chart)
 
-      let query = A.parse(queryParam)
+      let query = queryParam
 
       const limit = chartSpec.chartType === 'scatterPlot' ? 10000 : null
 
@@ -57,21 +57,20 @@ export const init = (app) => {
 
         query = Query.assocDimensions([groupByFieldUuid])(query)
 
-        // Convert measures to a Map object before passing it to Query.assocMeasures
-        const measures = new Map(
-          Object.entries({
-            [metricFieldUuid]: [aggregateFunction],
-          })
-        )
+        const measures = { [metricFieldUuid]: [aggregateFunction] }
 
         query = Query.assocMeasures(measures)(query)
 
         query = Query.assocMode(mode)(query)
       }
-      const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, limit })
+      if (Query.hasSelection(query)) {
+        const data = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, limit })
 
-      const chartResult = await generateChart({ chartSpec, data })
-      res.json({ chartResult })
+        const chartResult = await generateChart({ chartSpec, data })
+        res.json({ chartResult })
+      } else {
+        res.json({ chartResult: [] })
+      }
     } catch (error) {
       next(error)
     }

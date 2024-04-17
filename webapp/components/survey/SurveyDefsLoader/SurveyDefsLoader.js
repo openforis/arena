@@ -20,10 +20,10 @@ const SurveyDefsLoader = (props) => {
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const surveyInfo = useSurveyInfo()
-  const ready = useSurveyDefsFetched({ draft, validate })
-  const surveyId = Survey.getId(surveyInfo)
   const includeAnalysis = useAuthCanUseAnalysis()
+  const surveyInfo = useSurveyInfo()
+  const surveyId = Survey.getId(surveyInfo)
+  const ready = useSurveyDefsFetched({ draft, includeAnalysis, validate })
   const recordPreviewUuid = useSelector(RecordState.getRecordUuidPreview)
 
   useEffect(() => {

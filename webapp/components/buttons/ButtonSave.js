@@ -6,7 +6,7 @@ import { Button } from './Button'
 export const ButtonSave = (props) => (
   <Button
     {...props}
-    className={classNames('btn-primary', props.className)}
+    className={classNames('btn-primary btn-save', props.className)}
     iconClassName="icon-floppy-disk icon-12px"
   />
 )
