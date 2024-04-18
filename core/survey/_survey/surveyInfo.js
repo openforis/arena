@@ -171,7 +171,9 @@ export const assocRDBInitilized = R.assoc(keys.rdbInitialized)
 
 // ====== UTILS
 
-export const isValid = (surveyInfo) => surveyInfo && surveyInfo.id
+export const isValid = (surveyInfo) => !!surveyInfo?.id
+export const canHaveRecords = (surveyInfo) =>
+  isValid(surveyInfo) && !isTemplate(surveyInfo) && isRdbInitialized(surveyInfo)
 
 // ====== AUTH GROUPS
 
