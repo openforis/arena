@@ -37,6 +37,7 @@ export const DataImportArenaView = () => {
           job,
           autoHide: true,
           onComplete: async (jobCompleted) => {
+            setFile(null)
             const { processed, insertedRecords, skippedRecords, updatedRecords } = JobSerialized.getResult(jobCompleted)
             dispatch(
               NotificationActions.notifyInfo({
@@ -51,13 +52,13 @@ export const DataImportArenaView = () => {
     [dispatch]
   )
 
-  const onFilesDrop = async (files) => {
+  const onFilesDrop = useCallback(async (files) => {
     const _file = files.filter((file) => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)
     })[0]
     setFile(_file)
-  }
+  }, [])
 
   return (
     <div className="data-import">
