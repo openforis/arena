@@ -26,15 +26,14 @@ const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
   const canEditSurvey = useAuthCanEditSurvey()
   const surveyInfo = useSurveyInfo()
-  const isSurveyInfoEmpty = Object.keys(surveyInfo).length === 0
   const recordsSummaryState = useRecordsSummary()
   const hasSamplingPointData = useHasSamplingPointData()
 
   const tabItems = []
 
-  const hasRecords = !isSurveyInfoEmpty && !Survey.isTemplate(surveyInfo)
+  const canHaveRecords = Survey.canHaveRecords(surveyInfo)
 
-  if (hasRecords) {
+  if (canHaveRecords) {
     if (canEditSurvey) {
       tabItems.push(
         {
@@ -54,19 +53,20 @@ const Dashboard = () => {
       label: 'homeView.dashboard.dailyRecordsByUser',
       renderContent: () => <DailyRecordsByUser />,
     })
-  }
-  if (canEditSurvey) {
-    tabItems.push({
-      key: 'storageSummary',
-      label: 'homeView.dashboard.storageSummary.title',
-      renderContent: () => <StorageSummary />,
-    })
-    if (hasSamplingPointData) {
+
+    if (canEditSurvey) {
       tabItems.push({
-        key: 'samplingPointDataCompletion',
-        label: 'homeView.dashboard.samplingPointDataCompletion.title',
-        renderContent: () => <SamplingPointDataSummary />,
+        key: 'storageSummary',
+        label: 'homeView.dashboard.storageSummary.title',
+        renderContent: () => <StorageSummary />,
       })
+      if (hasSamplingPointData) {
+        tabItems.push({
+          key: 'samplingPointDataCompletion',
+          label: 'homeView.dashboard.samplingPointDataCompletion.title',
+          renderContent: () => <SamplingPointDataSummary />,
+        })
+      }
     }
   }
 
@@ -77,7 +77,7 @@ const Dashboard = () => {
       ) : (
         <div className="home-dashboard">
           <RecordsSummaryContext.Provider value={recordsSummaryState}>
-            {!isSurveyInfoEmpty && <SurveyInfo />}
+            {Survey.isValid(surveyInfo) && <SurveyInfo />}
             <Tabs items={tabItems} orientation="vertical" />
           </RecordsSummaryContext.Provider>
         </div>
