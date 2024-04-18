@@ -1,3 +1,5 @@
+const isTrue = (val) => String(val).toLocaleLowerCase() === 'true' || String(val) === '1'
+
 const environments = {
   development: 'development',
   production: 'production',
@@ -15,9 +17,9 @@ const ENV = {
   arenaDist: process.env.ARENA_DIST,
   arenaPort: process.env.PORT || process.env.ARENA_PORT || '9090',
   nodeEnv: process.env.NODE_ENV || environments.development,
-  debug: Boolean(process.env.DEBUG),
+  debug: isTrue(process.env.DEBUG),
   tempFolder: process.env.TEMP_FOLDER || '/tmp/arena_upload',
-  buildReport: process.env.BUILD_REPORT === 'true',
+  buildReport: isTrue(process.env.BUILD_REPORT),
   // APP VERSION
   applicationVersion: process.env.APPLICATION_VERSION,
   // DB
@@ -27,7 +29,7 @@ const ENV = {
   pgHost,
   pgPort,
   pgDatabase,
-  pgSsl: process.env.PGSSL === 'true',
+  pgSsl: isTrue(process.env.PGSSL),
   // EMAIL
   emailService: process.env.EMAIL_SERVICE || 'sendgrid',
   emailAuthUser: process.env.EMAIL_AUTH_USER,
@@ -38,13 +40,14 @@ const ENV = {
   // SESSION
   sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
   // SERVER
-  useHttps: process.env.USE_HTTPS === 'true',
+  useHttps: isTrue(process.env.USE_HTTPS),
   // RStudio Server
   rStudioDownloadServerUrl: process.env.RSTUDIO_DOWNLOAD_SERVER_URL,
   rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
   rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
   rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
   // ReCaptcha
+  reCaptchaEnabled: isTrue(process.env.RECAPTCHA_ENABLED),
   reCaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
   reCaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
   // Map
