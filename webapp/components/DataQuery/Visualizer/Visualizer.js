@@ -12,8 +12,7 @@ const components = {
 }
 
 const Visualizer = (props) => {
-  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, nodeDefsSelectorVisible, offset, setData } =
-    props
+  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
 
   const query = DataExplorerSelectors.useQuery()
 
@@ -25,7 +24,6 @@ const Visualizer = (props) => {
         dataLoading,
         dataLoadingError,
         nodeDefLabelType,
-        nodeDefsSelectorVisible,
         offset,
         setData,
       })}
@@ -39,7 +37,6 @@ Visualizer.propTypes = {
   dataLoading: PropTypes.bool.isRequired,
   dataLoadingError: PropTypes.bool,
   nodeDefLabelType: PropTypes.string.isRequired,
-  nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
   setData: PropTypes.func.isRequired,
 }

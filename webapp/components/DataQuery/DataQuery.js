@@ -1,6 +1,6 @@
 import './dataQuery.scss'
 
-import React, { useState } from 'react'
+import React from 'react'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
@@ -20,8 +20,7 @@ import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
 const DataQuery = () => {
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
-
-  const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
+  const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const {
     count,
     data,
@@ -56,9 +55,7 @@ const DataQuery = () => {
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}
             nodeDefLabelType={nodeDefLabelType}
-            nodeDefsSelectorVisible={nodeDefsSelectorVisible}
             onNodeDefLabelTypeChange={toggleLabelFunction}
-            setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
           />
         </div>
 
@@ -71,7 +68,6 @@ const DataQuery = () => {
           dataLoading={dataLoading}
           dataLoadingError={dataLoadingError}
           nodeDefLabelType={nodeDefLabelType}
-          nodeDefsSelectorVisible={nodeDefsSelectorVisible}
           offset={offset}
           onChangeQuery={onChangeQuery}
           setData={setData}

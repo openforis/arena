@@ -1,6 +1,7 @@
 import './buttonBar.scss'
 
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -11,7 +12,7 @@ import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -22,20 +23,14 @@ import ButtonSort from './ButtonSort'
 import ButtonShowQueries from './ButtonShowQueries'
 
 const ButtonBar = (props) => {
-  const {
-    dataEmpty,
-    dataLoaded,
-    dataLoading,
-    nodeDefLabelType,
-    nodeDefsSelectorVisible,
-    onNodeDefLabelTypeChange,
-    setNodeDefsSelectorVisible,
-  } = props
+  const { dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const query = DataExplorerSelectors.useQuery()
+  const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const modeEdit = Query.isModeRawEdit(query)
@@ -50,7 +45,7 @@ const ButtonBar = (props) => {
         type="button"
         title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
         className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-        onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
+        onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
       >
         <span className="icon icon-tab icon-14px" />
       </button>
@@ -106,9 +101,7 @@ ButtonBar.propTypes = {
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
-  nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
-  setNodeDefsSelectorVisible: PropTypes.func.isRequired,
 }
 
 export default ButtonBar

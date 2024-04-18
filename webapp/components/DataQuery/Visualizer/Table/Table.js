@@ -9,13 +9,12 @@ import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
 const Table = (props) => {
-  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, nodeDefsSelectorVisible, offset, setData } =
-    props
+  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
 
   const i18n = useI18n()
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
-  const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, query, nodeDefsSelectorVisible, setData })
+  const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData })
 
   if (!colWidth) return null
 
@@ -64,7 +63,6 @@ Table.propTypes = {
   dataLoading: PropTypes.bool,
   dataLoadingError: PropTypes.bool,
   nodeDefLabelType: PropTypes.string.isRequired,
-  nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
   setData: PropTypes.func.isRequired,
 }
