@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import { DataQuerySummaries } from '@openforis/arena-core'
 
@@ -6,17 +7,20 @@ import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
 
 export const DataQueryEditForm = (props) => {
-  const { draft, querySummary, setQuerySummary, onDelete, onNew, onSave, selectedQuerySummaryUuid, validating } = props
+  const { draft, querySummary, setQuerySummary, onDelete, onNew, onSave, validating } = props
 
   const i18n = useI18n()
 
   const validation = Validation.getValidation(querySummary)
+
+  const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
 
   return (
     <div className="data-query-form">
@@ -48,4 +52,14 @@ export const DataQueryEditForm = (props) => {
       </div>
     </div>
   )
+}
+
+DataQueryEditForm.propTypes = {
+  draft: PropTypes.bool,
+  querySummary: PropTypes.object.isRequired,
+  setQuerySummary: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onNew: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  validating: PropTypes.bool,
 }

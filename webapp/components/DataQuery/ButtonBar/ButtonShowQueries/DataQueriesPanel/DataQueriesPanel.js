@@ -1,6 +1,7 @@
 import './DataQueriesPanel.scss'
 
 import React, { useMemo } from 'react'
+import PropTypes from 'prop-types'
 
 import { DataQuerySummaries } from '@openforis/arena-core'
 
@@ -18,25 +19,21 @@ import { useDataQueriesPanel } from './useDataQueriesPanel'
 const dataQueriesModuleName = 'data_queries'
 
 const DataQueriesPanel = (props) => {
-  const { onClose, onChangeQuery, query, selectedQuerySummaryUuid, setSelectedQuerySummaryUuid } = props
+  const { onClose } = props
 
   const {
     draft,
+    editedQuerySummary,
     isTableRowActive,
     onNew,
     onSave,
     onDelete,
-    editedQuerySummary,
-    setEditedQuerySummary,
     onTableRowClick,
-    queriesRequestedAt,
-    validating,
-  } = useDataQueriesPanel({
     query,
-    onChangeQuery,
-    selectedQuerySummaryUuid,
-    setSelectedQuerySummaryUuid,
-  })
+    queriesRequestedAt,
+    setEditedQuerySummary,
+    validating,
+  } = useDataQueriesPanel()
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -74,7 +71,6 @@ const DataQueriesPanel = (props) => {
           onNew={onNew}
           onSave={onSave}
           querySummary={editedQuerySummary}
-          selectedQuerySummaryUuid={selectedQuerySummaryUuid}
           setQuerySummary={setEditedQuerySummary}
           validating={validating}
         />
@@ -91,6 +87,10 @@ const DataQueriesPanel = (props) => {
       />
     </PanelRight>
   )
+}
+
+DataQueriesPanel.propTypes = {
+  onClose: PropTypes.func.isRequired,
 }
 
 export default DataQueriesPanel

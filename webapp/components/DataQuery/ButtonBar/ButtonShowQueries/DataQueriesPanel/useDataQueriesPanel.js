@@ -7,18 +7,20 @@ import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
 import * as API from '@webapp/service/api'
+import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurveyId } from '@webapp/store/survey'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
+
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
 
-export const useDataQueriesPanel = ({
-  query,
-  onChangeQuery,
-  selectedQuerySummaryUuid,
-  setSelectedQuerySummaryUuid,
-}) => {
+export const useDataQueriesPanel = () => {
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
+
+  const query = DataExplorerSelectors.useQuery()
+  const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
+
   const [state, setState] = useState({
     editedQuerySummary: {},
     fetchedQuerySummary: null,
@@ -32,17 +34,26 @@ export const useDataQueriesPanel = ({
     !Objects.isEqual(fetchedQuerySummary, editedQuerySummary) ||
     !Objects.isEqual(DataQuerySummaries.getContent(editedQuerySummary), query)
 
-  const setEditedQuerySummary = useCallback(
+  const validateEditedQuerySummary = useCallback(
     async (querySummaryUpdated) => {
-      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated, validating: true }))
+      setState((statePrev) => ({ ...statePrev, validating: true }))
       const validation = await DataQuerySummaryValidator.validate({
         dataQuerySummary: querySummaryUpdated,
         dataQuerySummaries,
       })
       const querySummaryWithValidation = Validation.assocValidation(validation)(querySummaryUpdated)
       setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryWithValidation, validating: false }))
+      return validation
     },
     [dataQuerySummaries]
+  )
+
+  const setEditedQuerySummary = useCallback(
+    async (querySummaryUpdated) => {
+      setState((statePrev) => ({ ...statePrev, editedQuerySummary: querySummaryUpdated }))
+      await validateEditedQuerySummary(querySummaryUpdated)
+    },
+    [validateEditedQuerySummary]
   )
 
   const resetState = useCallback(() => {
@@ -52,8 +63,8 @@ export const useDataQueriesPanel = ({
       fetchedQuerySummary: null,
       queriesRequestedAt: Date.now(),
     }))
-    setSelectedQuerySummaryUuid(null)
-  }, [setSelectedQuerySummaryUuid])
+    dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(null))
+  }, [dispatch])
 
   const fetchDataQuerySummaries = useCallback(async () => {
     const dataQuerySummaries = await API.fetchDataQuerySummaries({
@@ -95,8 +106,12 @@ export const useDataQueriesPanel = ({
 
   const onSave = useCallback(async () => {
     if (validating) return
-    const validation = Validation.getValidation(editedQuerySummary)
-    if (Validation.isNotValid(validation)) {
+
+    const validationUpdated = Validation.hasValidation(editedQuerySummary)
+      ? Validation.getValidation(editedQuerySummary)
+      : await validateEditedQuerySummary(editedQuerySummary)
+
+    if (Validation.isNotValid(validationUpdated)) {
       dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave', timeout: 3000 }))
       return
     }
@@ -115,7 +130,7 @@ export const useDataQueriesPanel = ({
         querySummary: querySummaryToInsert,
       })
       querySummaryFetchedUpdated = DataQuerySummaries.assocContent(query)(insertedDataQuerySummary)
-      setSelectedQuerySummaryUuid(DataQuerySummaries.getUuid(querySummaryToInsert))
+      dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(DataQuerySummaries.getUuid(querySummaryToInsert)))
     }
     setState((statePrev) => ({
       ...statePrev,
@@ -123,7 +138,7 @@ export const useDataQueriesPanel = ({
       fetchedQuerySummary: querySummaryFetchedUpdated,
       queriesRequestedAt: Date.now(),
     }))
-  }, [dispatch, editedQuerySummary, query, setSelectedQuerySummaryUuid, surveyId, validating])
+  }, [dispatch, editedQuerySummary, query, surveyId, validateEditedQuerySummary, validating])
 
   const doDelete = useCallback(async () => {
     const querySummaryUuid = DataQuerySummaries.getUuid(editedQuerySummary)
@@ -144,10 +159,10 @@ export const useDataQueriesPanel = ({
   const doQuerySummarySelection = useCallback(
     async (selectedQuerySummary) => {
       const querySummaryUuid = DataQuerySummaries.getUuid(selectedQuerySummary)
-      setSelectedQuerySummaryUuid(querySummaryUuid)
+      dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(querySummaryUuid))
       await fetchAndSetEditedQuerySummary({ querySummaryUuid })
     },
-    [fetchAndSetEditedQuerySummary, setSelectedQuerySummaryUuid]
+    [dispatch, fetchAndSetEditedQuerySummary]
   )
 
   const onTableRowClick = useCallback(
@@ -175,6 +190,7 @@ export const useDataQueriesPanel = ({
     onSave,
     onDelete,
     onTableRowClick,
+    query,
     queriesRequestedAt,
     setEditedQuerySummary,
     validating,
