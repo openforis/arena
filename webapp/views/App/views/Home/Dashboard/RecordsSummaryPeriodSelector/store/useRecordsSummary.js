@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
-import { useActions } from './actions'
+import * as Survey from '@core/survey/survey'
+
+import { useSurveyInfo } from '@webapp/store/survey'
 
 import { timeRanges } from './utils/timeRanges'
+import { useActions } from './actions'
 
 const initialState = {
   from: '',
@@ -16,6 +19,10 @@ const initialState = {
 }
 
 export const useRecordsSummary = () => {
+  const surveyInfo = useSurveyInfo()
+
+  const canHaveRecords = Survey.canHaveRecords(surveyInfo)
+
   const [recordsSummary, setRecordsSummary] = useState(initialState)
   const { onGetRecordsSummary } = useActions({
     recordsSummary,
@@ -28,9 +35,19 @@ export const useRecordsSummary = () => {
     onGetRecordsSummary()
   }, [onGetRecordsSummary, timeRange])
 
-  const onChangeTimeRange = ({ timeRange }) => {
-    setRecordsSummary({ ...recordsSummary, timeRange })
-  }
+  const onChangeTimeRange = useCallback(
+    ({ timeRange }) => {
+      setRecordsSummary({ ...recordsSummary, timeRange })
+    },
+    [recordsSummary]
+  )
+
+  useEffect(() => {
+    if (!canHaveRecords) {
+      setRecordsSummary(initialState)
+    }
+  }, [canHaveRecords])
+
   return {
     ...recordsSummary,
 
