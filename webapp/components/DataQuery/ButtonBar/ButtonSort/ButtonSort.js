@@ -4,6 +4,7 @@ import classNames from 'classnames'
 
 import { Query, Sort, SortCriteria } from '@common/model/query'
 
+import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
 
 import { Button } from '@webapp/components/buttons'
@@ -12,7 +13,11 @@ import { State } from '../store'
 import SortEditor from './SortEditor'
 
 const ButtonSort = (props) => {
-  const { disabled, query, onChangeQuery, state, Actions } = props
+  const { disabled, state, Actions } = props
+
+  const query = DataExplorerSelectors.useQuery()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
+
   const sort = Query.getSort(query)
 
   const i18n = useI18n()
@@ -37,7 +42,7 @@ const ButtonSort = (props) => {
         <SortEditor
           query={query}
           onChange={(sortUpdated) => {
-            onChangeQuery(Query.assocSort(sortUpdated))
+            onChangeQuery(Query.assocSort(sortUpdated)(query))
             Actions.closePanels()
           }}
           onClose={Actions.closePanels}
@@ -48,11 +53,9 @@ const ButtonSort = (props) => {
 }
 
 ButtonSort.propTypes = {
-  disabled: PropTypes.bool.isRequired,
-  query: PropTypes.object.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
-  state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
+  disabled: PropTypes.bool.isRequired,
+  state: PropTypes.object.isRequired,
 }
 
 export default ButtonSort

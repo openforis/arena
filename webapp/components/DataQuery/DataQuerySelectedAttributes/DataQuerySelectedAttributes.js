@@ -9,16 +9,20 @@ import { Query } from '@common/model/query'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { useSortable } from '@webapp/components/hooks'
+
+import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useNodeDefsByUuids } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { DataQuerySelectedAttributeChip } from './DataQuerySelectedAttributeChip'
 
 export const DataQuerySelectedAttributes = (props) => {
-  const { nodeDefLabelType, onChangeQuery, query } = props
+  const { nodeDefLabelType } = props
 
   const i18n = useI18n()
   const containerRef = useRef(null)
+  const query = DataExplorerSelectors.useQuery()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
   const queryAttributeDefs = useNodeDefsByUuids(Query.getAttributeDefUuids(query))
 
   const onAttributeDefsSort = useCallback(
@@ -61,6 +65,4 @@ export const DataQuerySelectedAttributes = (props) => {
 
 DataQuerySelectedAttributes.propTypes = {
   nodeDefLabelType: PropTypes.string,
-  onChangeQuery: PropTypes.func.isRequired,
-  query: PropTypes.object.isRequired,
 }

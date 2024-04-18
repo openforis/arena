@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import { useSurvey } from '@webapp/store/survey'
@@ -8,13 +8,19 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
 
 import { NodeDefsSelectorAggregate, NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
+import { DataExplorerHooks } from '@webapp/store/dataExplorer'
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer/selectors'
 
 const QueryNodeDefsSelector = (props) => {
-  const { nodeDefLabelType, query, onChangeQuery } = props
+  const { nodeDefLabelType } = props
+
+  const query = DataExplorerSelectors.useQuery()
 
   const survey = useSurvey()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
-  const onChangeEntity = (entityDefUuid) => onChangeQuery(Query.create({ entityDefUuid }))
+
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
+  const onChangeEntity = useCallback((entityDefUuid) => onChangeQuery(Query.create({ entityDefUuid })), [onChangeQuery])
 
   return Query.isModeAggregate(query) ? (
     <NodeDefsSelectorAggregate
@@ -23,12 +29,8 @@ const QueryNodeDefsSelector = (props) => {
       dimensions={Query.getDimensions(query)}
       measures={Query.getMeasures(query)}
       onChangeEntity={onChangeEntity}
-      onChangeMeasures={(measuresUpdate) => {
-        onChangeQuery(Query.assocMeasures(measuresUpdate)(query))
-      }}
-      onChangeDimensions={(dimensionsUpdate) => {
-        onChangeQuery(Query.assocDimensions(dimensionsUpdate)(query))
-      }}
+      onChangeMeasures={(measuresUpdate) => onChangeQuery(Query.assocMeasures(measuresUpdate)(query))}
+      onChangeDimensions={(dimensionsUpdate) => onChangeQuery(Query.assocDimensions(dimensionsUpdate)(query))}
       showAnalysisAttributes
     />
   ) : (
@@ -38,9 +40,9 @@ const QueryNodeDefsSelector = (props) => {
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
       nodeDefUuidsAttributes={Query.getAttributeDefUuids(query)}
       onChangeEntity={onChangeEntity}
-      onChangeAttributes={(nodeDefUuidsAttributesUpdated) => {
+      onChangeAttributes={(nodeDefUuidsAttributesUpdated) =>
         onChangeQuery(Query.assocAttributeDefUuids(nodeDefUuidsAttributesUpdated)(query))
-      }}
+      }
       showAnalysisAttributes
     />
   )
@@ -48,8 +50,6 @@ const QueryNodeDefsSelector = (props) => {
 
 QueryNodeDefsSelector.propTypes = {
   nodeDefLabelType: PropTypes.string,
-  query: PropTypes.object.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
 }
 
 QueryNodeDefsSelector.defaultProps = {

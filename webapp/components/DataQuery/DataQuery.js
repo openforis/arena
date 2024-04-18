@@ -1,12 +1,13 @@
 import './dataQuery.scss'
 
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
+
+import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
@@ -16,10 +17,10 @@ import Visualizer from './Visualizer'
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
 
-const DataQuery = (props) => {
-  const { query, onChangeQuery } = props
-
-  const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
+const DataQuery = () => {
+  const query = DataExplorerSelectors.useQuery()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
+  const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const {
     count,
     data,
@@ -35,11 +36,10 @@ const DataQuery = (props) => {
   } = useDataQuery({ query })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
-  const [selectedQuerySummaryUuid, setSelectedQuerySummaryUuid] = useState(null)
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} query={query} onChangeQuery={onChangeQuery} />
+      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} />
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -54,18 +54,12 @@ const DataQuery = (props) => {
             dataEmpty={dataEmpty}
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}
-            query={query}
             nodeDefLabelType={nodeDefLabelType}
-            nodeDefsSelectorVisible={nodeDefsSelectorVisible}
-            onChangeQuery={onChangeQuery}
             onNodeDefLabelTypeChange={toggleLabelFunction}
-            setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
-            selectedQuerySummaryUuid={selectedQuerySummaryUuid}
-            setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
           />
         </div>
 
-        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} query={query} onChangeQuery={onChangeQuery} />
+        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
           query={query}
@@ -74,7 +68,6 @@ const DataQuery = (props) => {
           dataLoading={dataLoading}
           dataLoadingError={dataLoadingError}
           nodeDefLabelType={nodeDefLabelType}
-          nodeDefsSelectorVisible={nodeDefsSelectorVisible}
           offset={offset}
           onChangeQuery={onChangeQuery}
           setData={setData}
@@ -88,15 +81,6 @@ const DataQuery = (props) => {
       </div>
     </div>
   )
-}
-
-DataQuery.propTypes = {
-  query: PropTypes.object.isRequired,
-  onChangeQuery: PropTypes.func,
-}
-
-DataQuery.defaultProps = {
-  onChangeQuery: () => {},
 }
 
 export default DataQuery
