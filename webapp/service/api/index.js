@@ -79,8 +79,9 @@ export {
   createAccessRequest,
   acceptAccessRequest,
   fetchUser,
-  fetchUserName,
   fetchUserResetPasswordUrl,
+  fetchUserName,
+  fetchUsersBySurvey,
   fetchUserSurveys,
   changeUserPassword,
 } from './user'

@@ -217,17 +217,23 @@ export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = 
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
-export const fetchUsersBySurveyId = async ({ surveyId, offset = 0, limit = null }, client = db) =>
+export const fetchUsersBySurveyId = async (
+  { surveyId, offset = 0, limit = null, onlyAccepted = false, includeSystemAdmins = false },
+  client = db
+) =>
   client.tx(async (t) => {
-    const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, t)).map(User.dissocPrivateProps)
-    const usersUuids = users.map(User.getUuid)
+    const users = (await UserRepository.fetchUsersBySurveyId({ surveyId, offset, limit, includeSystemAdmins }, t)).map(
+      User.dissocPrivateProps
+    )
+    const usersFiltered = users.filter((user) => !onlyAccepted || User.hasAccepted(user))
+    const usersUuids = usersFiltered.map(User.getUuid)
     const invitations =
       usersUuids.length > 0 ? await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t) : []
     const invitationsByUserUuid = invitations.reduce((acc, invitation) => {
       acc[invitation.user_uuid] = invitation.result
       return acc
     }, {})
-    return _attachAuthGroupsAndInvitationToUsers({ users, invitationsByUserUuid, t })
+    return _attachAuthGroupsAndInvitationToUsers({ users: usersFiltered, invitationsByUserUuid, t })
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
