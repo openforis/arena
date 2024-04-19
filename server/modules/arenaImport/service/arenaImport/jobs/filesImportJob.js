@@ -14,9 +14,7 @@ export default class FilesImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurveyFileZip } = this.context
-
-    const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
+    const filesSummaries = await this.fetchFilesSummaries()
 
     await this.checkFileUuidsAreValid(filesSummaries)
 
@@ -31,7 +29,7 @@ export default class FilesImportJob extends Job {
 
         // load file content from a separate file
         const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
+        const fileContent = await this.fetchFileContent({ fileUuid })
         if (!fileContent) {
           const fileName = RecordFile.getName(fileSummary)
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
@@ -46,6 +44,17 @@ export default class FilesImportJob extends Job {
     } else {
       this.logInfo('no files found')
     }
+  }
+
+  async fetchFilesSummaries() {
+    const { arenaSurveyFileZip } = this.context
+    return ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  async fetchFileContent({ fileName, fileUuid }) {
+    const { arenaSurveyFileZip } = this.context
+    return ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
   }
 
   async persistFile(file) {

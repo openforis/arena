@@ -653,6 +653,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       abortOnErrors: 'Abort on errors',
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
+      includeFiles: 'Include files',
     },
     startImport: 'Start import',
     startImportConfirm: `By pressing 'Ok' you will start the import process.

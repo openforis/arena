@@ -168,6 +168,7 @@ export const DataImportCsvView = () => {
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+    includeFiles,
   }
 
   return (

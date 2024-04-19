@@ -10,9 +10,10 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 
-import { DataImportFileReader } from './dataImportFileReader'
+import { DataImportCsvFileReader } from './dataImportCsvFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
 import DataImportBaseJob from './DataImportBaseJob'
+import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
 
@@ -20,6 +21,7 @@ export default class DataImportJob extends DataImportBaseJob {
   constructor(params, type = DataImportJob.type) {
     super(type, params)
 
+    this.dataImportFileReader = null
     this.csvReader = null
     this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
   }
@@ -28,6 +30,11 @@ export default class DataImportJob extends DataImportBaseJob {
     await super.onStart()
     const survey = await this.fetchSurvey()
     this.setContext({ survey })
+
+    const { includeFiles, filePath } = this.context
+
+    this.dataImportFileReader = new DataImportFileReader({ filePath, includeFiles })
+    await this.dataImportFileReader.init()
   }
 
   async execute() {
@@ -99,13 +106,19 @@ export default class DataImportJob extends DataImportBaseJob {
   }
 
   async createCsvReader() {
-    const { cycle, nodeDefUuid, filePath, survey } = this.context
+    const { cycle, nodeDefUuid, survey, includeFiles } = this.context
 
-    return DataImportFileReader.createReader({
-      filePath,
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const nodeDefName = NodeDef.getName(nodeDef)
+
+    const stream = await this.dataImportFileReader.getCsvFileStream({ nodeDefName })
+
+    return DataImportCsvFileReader.createReaderFromStream({
+      stream,
       survey,
       cycle,
       nodeDefUuid,
+      includeFiles,
       onRowItem: async (item) => this.onRowItem(item),
       onTotalChange: (total) => (this.total = total),
     })
@@ -231,6 +244,11 @@ export default class DataImportJob extends DataImportBaseJob {
 
       await this.persistUpdatedNodes({ nodesUpdated: entityClearUpdateResult.nodes })
     }
+  }
+
+  async onEnd() {
+    await super.onEnd()
+    this.dataImportFileReader?.close()
   }
 
   generateResult() {

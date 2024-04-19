@@ -27,6 +27,7 @@ export const startCSVDataImportJob = ({
   insertNewRecords = false,
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
+  includeFiles = false,
   abortOnErrors = true,
 }) => {
   const jobParams = {
@@ -39,6 +40,7 @@ export const startCSVDataImportJob = ({
     insertNewRecords,
     insertMissingNodes,
     updateRecordsInAnalysis,
+    includeFiles,
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
