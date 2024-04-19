@@ -164,6 +164,7 @@ export const init = (app) => {
           advanced,
           includeAnalysis,
           includeBigCategories: false,
+          includeBigTaxonomies: false,
           validate,
         }),
         UserService.updateUserPrefs(user),
