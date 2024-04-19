@@ -19,7 +19,7 @@ export const keysProps = {
   extraPropsDefs: 'extraPropsDefs',
 }
 
-export const maxTaxaInIndex = 5000
+export const maxTaxaInIndex = 1000
 
 // ====== CREATE
 export const newTaxonomy = (props = {}) => ({
