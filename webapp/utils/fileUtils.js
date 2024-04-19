@@ -35,7 +35,13 @@ const toHumanReadableFileSize = (bytes, { si = true, decimalPlaces = 1 } = {}) =
   return bytes.toFixed(decimalPlaces) + ' ' + units[unitIndex]
 }
 
+const acceptByExtension = {
+  csv: { 'text/csv': ['.csv'] },
+  zip: { 'application/zip': ['.zip'] },
+}
+
 export const FileUtils = {
   getExtension,
   toHumanReadableFileSize,
+  acceptByExtension,
 }
