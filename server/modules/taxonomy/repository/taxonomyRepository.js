@@ -214,6 +214,32 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
   )
 }
 
+const fetchTaxaCountIndexedByTaxonomyUuid = async ({ surveyId, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const propsPublishedCondition = DbUtils.getPropsPublishedCondition({ draft, tableAlias: 't' })
+  const whereClause = propsPublishedCondition ? `WHERE ${propsPublishedCondition}` : ''
+  const counts = await client.any(
+    `SELECT t.taxonomy_uuid, COUNT(t.*) 
+    FROM ${schema}.taxon t
+    ${whereClause}
+    GROUP BY t.taxonomy_uuid`
+  )
+  return counts.reduce((acc, row) => {
+    acc[row.taxonomy_uuid] = Number(row.count)
+    return acc
+  }, {})
+}
+
+const fetchTaxonomyUuidsExceedingMaxItems = async ({ surveyId, draft }, client) => {
+  const itemsCountIndexedByTaxonomyUuid = await fetchTaxaCountIndexedByTaxonomyUuid({ surveyId, draft }, client)
+  return Object.entries(itemsCountIndexedByTaxonomyUuid).reduce((acc, [taxonomyUuid, count]) => {
+    if (count > Taxonomy.maxTaxaInIndex) {
+      acc.push(taxonomyUuid)
+    }
+    return acc
+  }, [])
+}
+
 export const fetchTaxa = async (
   { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },
   client = db
@@ -240,10 +266,35 @@ export const fetchTaxa = async (
   )
 
 export const fetchTaxaWithVernacularNames = async (
-  { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },
+  {
+    surveyId,
+    taxonomyUuid = null,
+    draft = false,
+    includeBigTaxonomies = true,
+    backup = false,
+    limit = null,
+    offset = 0,
+  },
   client = db
-) =>
-  client.map(
+) => {
+  const taxonomyUuidsExceedingMaxItems = includeBigTaxonomies
+    ? []
+    : await fetchTaxonomyUuidsExceedingMaxItems({ surveyId, draft }, client)
+  const allTaxonomiesIncluded = includeBigTaxonomies || taxonomyUuidsExceedingMaxItems.length === 0
+  const whereCondtions = []
+  if (taxonomyUuid) {
+    whereCondtions.push('t.taxonomy_uuid = $/taxonomyUuid/')
+  }
+  if (!allTaxonomiesIncluded) {
+    whereCondtions.push('t.taxonomy_uuid NOT IN ($/excludedTaxonomyUuids:csv/)')
+  }
+  const whereCondition = DbUtils.getWhereClause(...whereCondtions)
+
+  const queryParams = { taxonomyUuid, limit, offset }
+  if (!allTaxonomiesIncluded && taxonomyUuidsExceedingMaxItems.length > 0) {
+    queryParams.excludedTaxonomyUuids = taxonomyUuidsExceedingMaxItems
+  }
+  return client.map(
     `
       WITH vernacular_names AS (
         SELECT
@@ -289,15 +340,15 @@ export const fetchTaxaWithVernacularNames = async (
           vernacular_names vn
       ON
           vn.taxon_uuid = t.uuid
-      ${taxonomyUuid ? 'WHERE t.taxonomy_uuid = $/taxonomyUuid/' : ''}
+      ${whereCondition}
       GROUP BY
           t.taxonomy_uuid, t.id
       ORDER BY
           t.id
-      LIMIT ${limit ? limit : 'ALL'} 
+      LIMIT ${limit ? '$/limit/' : 'ALL'} 
       OFFSET $/offset/
     `,
-    { taxonomyUuid, offset },
+    queryParams,
     (row) => {
       const rowTransformed = DB.transformCallback(row, draft, true, backup)
       Objects.setInPath({
@@ -309,6 +360,7 @@ export const fetchTaxaWithVernacularNames = async (
       return rowTransformed
     }
   )
+}
 
 export const fetchTaxaWithVernacularNamesStream = ({
   surveyId,

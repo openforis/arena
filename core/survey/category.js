@@ -9,7 +9,7 @@ import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
 import { ExtraPropDef } from './extraPropDef'
 
-export const maxCategoryItemsInIndex = 10000
+export const maxCategoryItemsInIndex = 1000
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
