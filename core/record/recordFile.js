@@ -24,7 +24,7 @@ export const invalidPropKeys = {
   fileSize: 'fileSize',
 }
 
-export const createFile = ({ uuid, name, size, content, recordUuid, nodeUuid }) => ({
+export const createFile = ({ name, uuid = null, size = null, content = null, recordUuid = null, nodeUuid = null }) => ({
   [keys.uuid]: uuid ?? uuidv4(),
   [keys.props]: {
     [propKeys.name]: name,
@@ -35,7 +35,7 @@ export const createFile = ({ uuid, name, size, content, recordUuid, nodeUuid }) 
   [keys.content]: content,
 })
 
-export const createFileFromNode = ({ node, size, content }) =>
+export const createFileFromNode = ({ node, size = null, content = null }) =>
   createFile({
     uuid: Node.getFileUuid(node),
     name: Node.getFileName(node),

@@ -14,11 +14,4 @@ export default class DataFilesImportJob extends FilesImportJob {
     const { dataImportFileReader } = this.context
     return dataImportFileReader.getFile({ fileName, fileUuid })
   }
-
-  async persistFile(file) {
-    const { dryRun } = this.context
-    if (!dryRun) {
-      super.persistFile(file)
-    }
-  }
 }

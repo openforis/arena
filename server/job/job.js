@@ -1,3 +1,4 @@
+import pgPromise from 'pg-promise'
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import { db } from '@server/db/db'
@@ -64,7 +65,7 @@ export default class Job {
    * otherwise the "execute' method will be invoked.
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
-   * @param client
+   * @param {pgPromise.IDatabase} [client=db] - The database client.
    */
   async start(client = db) {
     this.logDebug('start')
@@ -240,6 +241,12 @@ export default class Job {
 
   generateResult() {
     return {}
+  }
+
+  combineInnerJobsResults() {
+    const results = {}
+    this.innerJobs.forEach((innerJob) => Object.assign(results, innerJob.result ?? {}))
+    return results
   }
 
   /**

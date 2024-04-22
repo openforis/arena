@@ -14,9 +14,12 @@ export default class DataImportJob extends Job {
   }
 
   generateResult() {
-    // get result from csv data import job
-    const csvDataImportJob = this.innerJobs[0]
-    return csvDataImportJob?.result || {}
+    const result = super.combineInnerJobsResults()
+    const { includeFiles } = this.context
+    return {
+      ...result,
+      includeFiles,
+    }
   }
 
   onEnd() {

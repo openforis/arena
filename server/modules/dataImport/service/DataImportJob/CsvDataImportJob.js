@@ -27,7 +27,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
     this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
-    this.deletedFilesByUuid = {}
+    this.filesToDeleteByUuid = {}
   }
 
   async onStart() {
@@ -66,7 +66,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
       this.setContext({
         dataImportFileReader: this.dataImportFileReader,
         updatedFilesByUuid: this.updatedFilesByUuid,
-        deletedFilesByUuid: this.deletedFilesByUuid,
+        filesToDeleteByUuid: this.filesToDeleteByUuid,
       })
     }
   }
@@ -259,7 +259,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
   }
 
   updateFilesSummary({ originalRecord, nodesUpdatedArray }) {
-    const { context, updatedFilesByUuid, updatedFilesByName } = this
+    const { context, updatedFilesByUuid, updatedFilesByName, filesToDeleteByUuid } = this
     const { survey } = context
     nodesUpdatedArray.forEach((node) => {
       const nodeDefUuid = Node.getNodeDefUuid(node)
@@ -267,8 +267,8 @@ export default class CsvDataImportJob extends DataImportBaseJob {
       if (NodeDef.isFile(nodeDef)) {
         const oldNode = Record.getNodeByUuid(Node.getUuid(node))(originalRecord)
         if (!Node.isValueBlank(oldNode)) {
-          const deletedFileUuid = Node.getFileUuid(oldNode)
-          this.deletedFilesByUuid[deletedFileUuid] = RecordFile.createFileFromNode({ node: oldNode })
+          const fileToDeleteUuid = Node.getFileUuid(oldNode)
+          filesToDeleteByUuid[fileToDeleteUuid] = RecordFile.createFileFromNode({ node: oldNode })
         }
         if (!Node.isValueBlank(node)) {
           const fileSummary = RecordFile.createFileFromNode({ node })
