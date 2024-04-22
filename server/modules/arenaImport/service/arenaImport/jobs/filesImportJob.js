@@ -29,13 +29,14 @@ export default class FilesImportJob extends Job {
 
         // load file content from a separate file
         const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileContent = await this.fetchFileContent({ fileUuid })
+        const fileName = RecordFile.getName(fileSummary)
+        const fileContent = await this.fetchFileContent({ fileName, fileUuid })
         if (!fileContent) {
-          const fileName = RecordFile.getName(fileSummary)
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
-
         file = RecordFile.assocContent(fileContent)(file)
+        // update file size with actual file content length
+        file = RecordFile.assocSize(fileContent.length)(file)
 
         await this.persistFile(file)
 

@@ -5,7 +5,20 @@ export default class DataFilesImportJob extends FilesImportJob {
     super(params)
   }
 
-  async fetchFilesSummaries() {}
+  async fetchFilesSummaries() {
+    const { updatedFilesByUuid } = this.context
+    return Object.values(updatedFilesByUuid)
+  }
 
-  async fetchFileContent({ fileName, fileUuid }) {}
+  async fetchFileContent({ fileName, fileUuid }) {
+    const { dataImportFileReader } = this.context
+    return dataImportFileReader.getFile({ fileName, fileUuid })
+  }
+
+  async persistFile(file) {
+    const { dryRun } = this.context
+    if (!dryRun) {
+      super.persistFile(file)
+    }
+  }
 }

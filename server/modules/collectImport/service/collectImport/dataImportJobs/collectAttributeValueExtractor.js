@@ -89,14 +89,14 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
   if (content) {
     const fileUuid = uuidv4()
     const fileSize = Buffer.byteLength(content)
-    const file = RecordFile.createFile(
-      fileUuid,
-      fileName,
-      fileSize,
+    const file = RecordFile.createFile({
+      uuid: fileUuid,
+      name: fileName,
+      size: fileSize,
       content,
-      Node.getRecordUuid(node),
-      Node.getUuid(node)
-    )
+      recordUuid: Node.getRecordUuid(node),
+      nodeUuid: Node.getUuid(node),
+    })
     await FileManager.insertFile(Survey.getId(survey), file, tx)
 
     return {

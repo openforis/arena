@@ -1,8 +1,8 @@
 import * as JobManager from '@server/job/jobManager'
 
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
-import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
+import DataImportJob from './DataImportJob/DataImportJob'
 
 export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
   const job = new CollectDataImportJob({

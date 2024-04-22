@@ -314,14 +314,14 @@ export const persistNode = async ({
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
     // Save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile(
-      Node.getFileUuid(node),
-      file.name,
-      file.size,
-      fs.readFileSync(file.tempFilePath),
+    const fileObj = RecordFile.createFile({
+      uuid: Node.getFileUuid(node),
+      name: file.name,
+      size: file.size,
+      content: fs.readFileSync(file.tempFilePath),
       recordUuid,
-      Node.getUuid(node)
-    )
+      nodeUuid: Node.getUuid(node),
+    })
     await FileService.insertFile(surveyId, fileObj)
   }
 
