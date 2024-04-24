@@ -22,9 +22,7 @@ const Tooltip = (props) => {
 
   const messageElementClassName = `tooltip__message${type ? `-${type}` : ''} ${position}`
 
-  const hidePopup = useCallback(() => {
-    // setState({ messageElement: null })
-  }, [])
+  const hidePopup = useCallback(() => setState({ messageElement: null }), [])
 
   useEffect(() => {
     if (!showContent && messageElement) {
@@ -45,29 +43,25 @@ const Tooltip = (props) => {
   }, [calculateMessageElementHeight, position, tooltipRef])
 
   const onMouseEnter = useCallback(() => {
-    if (showContent) {
-      const style = getStyle()
-      const className = messageElementClassName
+    if (!showContent) return
 
-      if (messageComponent || !Objects.isEmpty(messages)) {
-        setState({
-          messageElement: (
-            <div className={className} style={style}>
-              {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
-            </div>
-          ),
-        })
-      }
+    const style = getStyle()
+    const className = messageElementClassName
+
+    if (messageComponent || !Objects.isEmpty(messages)) {
+      setState({
+        messageElement: (
+          <div className={className} style={style}>
+            {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
+          </div>
+        ),
+      })
     }
   }, [getStyle, messageComponent, messageElementClassName, messages, showContent])
 
-  const onMouseLeave = useCallback(() => {
-    hidePopup()
-  }, [hidePopup])
+  const onMouseLeave = useCallback(() => hidePopup(), [hidePopup])
 
-  const onBlur = useCallback(() => {
-    hidePopup()
-  }, [hidePopup])
+  const onBlur = useCallback(() => hidePopup(), [hidePopup])
 
   const classSuffix = type ? `-${type}` : ''
   const mainClassName = `tooltip${classSuffix}`
