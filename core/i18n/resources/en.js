@@ -763,6 +763,8 @@ Are you sure you want to continue?`,
     dataVis: {
       errorLoadingData: 'Error loading data',
       noData: 'This query returned no data',
+      noSelection:
+        'Please make your selection using the left side panel or select an existing query from "Manage queries"',
     },
   },
 

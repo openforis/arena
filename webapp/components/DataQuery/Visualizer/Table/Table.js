@@ -2,6 +2,8 @@ import './table.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Query } from '@common/model/query'
+
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
 
@@ -18,6 +20,9 @@ const Table = (props) => {
 
   if (!colWidth) return null
 
+  if (!Query.hasSelection(query)) {
+    return <div className="no-data">{i18n.t('dataView.dataVis.noSelection')}</div>
+  }
   if (dataEmpty && !dataLoading && !dataLoadingError) {
     return <div className="no-data">{i18n.t('dataView.dataVis.noData')}</div>
   }
