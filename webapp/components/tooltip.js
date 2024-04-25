@@ -1,6 +1,6 @@
 import './tooltip.scss'
 
-import React, { createRef, useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import ReactDom from 'react-dom'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -16,7 +16,7 @@ const Tooltip = (props) => {
     props
 
   const [state, setState] = useState({ messageElement: null })
-  const tooltipRef = createRef(null)
+  const containerRef = useRef(null)
 
   const { messageElement } = state
 
@@ -37,12 +37,12 @@ const Tooltip = (props) => {
   }, [messages])
 
   const getStyle = useCallback(() => {
-    const elemOffset = tooltipRef.current && elementOffset(tooltipRef.current)
+    const elemOffset = containerRef.current && elementOffset(containerRef.current)
     if (!elemOffset) return {}
     const offsetTop = position === 'bottom' ? elemOffset.height : -elemOffset.height - calculateMessageElementHeight()
     const top = elemOffset.top + offsetTop
     return { top, left: elemOffset.left }
-  }, [calculateMessageElementHeight, position, tooltipRef])
+  }, [calculateMessageElementHeight, position, containerRef])
 
   const onMouseEnter = useCallback(() => {
     if (!showContent) return
@@ -77,7 +77,7 @@ const Tooltip = (props) => {
       data-testid={testId || id}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      ref={tooltipRef}
+      ref={containerRef}
       onBlur={onBlur}
     >
       {children}
