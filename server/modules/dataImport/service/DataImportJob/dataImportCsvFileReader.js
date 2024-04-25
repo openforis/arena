@@ -197,7 +197,7 @@ const createReaderFromStream = ({
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
 
-        if (!Object.prototype.hasOwnProperty.call(row, header)) return valuesByDefUuidAcc
+        if (!Object.hasOwn(row, header)) return valuesByDefUuidAcc
 
         const cellValue = row[header]
         if (Objects.isEmpty(cellValue)) return valuesByDefUuidAcc

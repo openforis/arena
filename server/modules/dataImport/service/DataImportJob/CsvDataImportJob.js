@@ -220,11 +220,9 @@ export default class CsvDataImportJob extends DataImportBaseJob {
       if (newRecord) {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
         this.insertedRecordsUuids.add(recordUuid)
-      } else {
-        if (nodesUpdatedArray.length > 0) {
-          this.updatedValues += nodesUpdatedArray.length
-          this.updatedRecordsUuids.add(recordUuid)
-        }
+      } else if (nodesUpdatedArray.length > 0) {
+        this.updatedValues += nodesUpdatedArray.length
+        this.updatedRecordsUuids.add(recordUuid)
       }
       this.updateFilesSummary({ originalRecord: record, nodesUpdatedArray })
     } catch (e) {
