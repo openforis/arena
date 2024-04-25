@@ -20,7 +20,9 @@ const Tooltip = (props) => {
 
   const { messageElement } = state
 
-  const messageElementClassName = `tooltip__message${type ? `-${type}` : ''} ${position}`
+  const typeClassNameSuffix = type ? `-${type}` : ''
+
+  const messageElementClassName = `tooltip__message${typeClassNameSuffix} ${position}`
 
   const hidePopup = useCallback(() => setState({ messageElement: null }), [])
 
@@ -63,8 +65,7 @@ const Tooltip = (props) => {
 
   const onBlur = useCallback(() => hidePopup(), [hidePopup])
 
-  const classSuffix = type ? `-${type}` : ''
-  const mainClassName = `tooltip${classSuffix}`
+  const mainClassName = `tooltip${typeClassNameSuffix}`
   const tooltipClass = classNames(mainClassName, className, {
     howerable: showContent,
     'inside-table': insideTable,
@@ -95,10 +96,8 @@ Tooltip.propTypes = {
   messageComponent: PropTypes.node,
   position: PropTypes.oneOf(['bottom', 'top']),
   showContent: PropTypes.bool,
-  showKeys: PropTypes.bool,
   testId: PropTypes.string,
   type: PropTypes.oneOf(['info', 'error', 'warning']),
-  validation: PropTypes.object,
 }
 
 Tooltip.defaultProps = {
