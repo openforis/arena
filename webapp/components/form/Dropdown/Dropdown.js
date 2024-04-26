@@ -68,6 +68,7 @@ const Dropdown = (props) => {
     testId,
     title,
     validation,
+    validationTooltipPosition,
   } = props
 
   const {
@@ -104,6 +105,7 @@ const Dropdown = (props) => {
       id={id}
       testId={testId}
       validation={validation}
+      position={validationTooltipPosition}
     >
       <ReactSelect
         className="dropdown"
@@ -158,6 +160,7 @@ Dropdown.propTypes = {
   testId: PropTypes.string,
   title: PropTypes.string,
   validation: PropTypes.object,
+  validationTooltipPosition: PropTypes.oneOf(['bottom', 'top']),
 }
 
 Dropdown.defaultProps = {
@@ -184,6 +187,7 @@ Dropdown.defaultProps = {
   testId: null,
   title: null,
   validation: {},
+  validationTooltipPosition: 'top',
 }
 
 export default Dropdown

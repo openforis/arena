@@ -26,11 +26,23 @@
   &:after {
     content: '';
     position: absolute;
-    bottom: 100%;
     left: 1rem;
     margin-left: -0.5rem;
     border: 0.5rem solid;
-    border-color: transparent transparent $yellow transparent;
+  }
+
+  &.bottom {
+    &:after {
+      bottom: 100%;
+      border-color: transparent transparent $yellow transparent;
+    }
+  }
+
+  &.top {
+    &:after {
+      top: 100%;
+      border-color: $yellow transparent transparent transparent;
+    }
   }
 }
 
@@ -68,8 +80,11 @@
   background-color: $red;
   border-color: $red;
 
-  &:after {
+  &.bottom:after {
     border-bottom-color: $red;
+  }
+  &.top:after {
+    border-top-color: $red;
   }
 }
 
@@ -77,8 +92,11 @@
   background-color: $orange;
   border-color: $orange;
 
-  &:after {
+  &.bottom:after {
     border-bottom-color: $orange;
+  }
+  &.top:after {
+    border-top-color: $orange;
   }
 }
 
@@ -86,7 +104,10 @@
   background-color: $greyAppBg;
   border-color: $greyAppBg;
 
-  &:after {
+  &.bottom:after {
     border-bottom-color: $greyAppBg;
+  }
+  &.top:after {
+    border-top-color: $greyAppBg;
   }
 }
