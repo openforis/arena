@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { useSurvey } from '@webapp/store/survey'
-
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
+
+import { useSurvey } from '@webapp/store/survey'
 
 import { NodeDefsSelectorAggregate, NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import { DataExplorerHooks } from '@webapp/store/dataExplorer'
@@ -15,14 +15,24 @@ const QueryNodeDefsSelector = (props) => {
   const { nodeDefLabelType } = props
 
   const query = DataExplorerSelectors.useQuery()
+  const modeAggregate = Query.isModeAggregate(query)
 
   const survey = useSurvey()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
 
   const onChangeQuery = DataExplorerHooks.useSetQuery()
-  const onChangeEntity = useCallback((entityDefUuid) => onChangeQuery(Query.create({ entityDefUuid })), [onChangeQuery])
+  const onChangeEntity = useCallback(
+    (entityDefUuid) => {
+      let newQuery = Query.create({ entityDefUuid })
+      if (modeAggregate) {
+        newQuery = Query.assocMode(Query.modes.aggregate)(newQuery)
+      }
+      onChangeQuery(newQuery)
+    },
+    [modeAggregate, onChangeQuery]
+  )
 
-  return Query.isModeAggregate(query) ? (
+  return modeAggregate ? (
     <NodeDefsSelectorAggregate
       nodeDefLabelType={nodeDefLabelType}
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
