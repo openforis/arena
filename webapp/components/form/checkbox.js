@@ -12,8 +12,29 @@ import ValidationTooltip from '../validationTooltip'
 import { LabelWithTooltip } from './LabelWithTooltip'
 import { ButtonIconInfo } from '../buttons'
 
+const determineIconClassName = ({ radio, checked, indeterminate }) => {
+  if (radio) {
+    return checked ? 'icon-radio-checked' : 'icon-radio-unchecked'
+  }
+  if (indeterminate) {
+    return 'icon-stop2'
+  }
+  return checked ? 'icon-checkbox-checked' : 'icon-checkbox-unchecked'
+}
+
 const Checkbox = (props) => {
-  const { className, id, validation, checked, info, label, onChange: onChangeProp, disabled, radio } = props
+  const {
+    className,
+    id,
+    validation,
+    checked,
+    indeterminate,
+    info,
+    label,
+    onChange: onChangeProp,
+    disabled,
+    radio,
+  } = props
 
   const i18n = useI18n()
 
@@ -26,8 +47,8 @@ const Checkbox = (props) => {
   )
 
   const hasLabel = !Objects.isEmpty(label)
-  const classNameIcon = `icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked`
-  const classNameIconContainer = classNames(`icon icon-18px ${classNameIcon}`, { ['icon-left']: hasLabel })
+  const iconClassName = determineIconClassName({ radio, checked, indeterminate })
+  const iconContainerClassName = classNames(`icon icon-18px ${iconClassName}`, { ['icon-left']: hasLabel })
 
   return (
     <div className={className} style={{ justifySelf: 'start' }}>
@@ -39,7 +60,7 @@ const Checkbox = (props) => {
           onClick={onChange}
           aria-disabled={disabled}
         >
-          <span className={classNameIconContainer} />
+          <span className={iconContainerClassName} />
           <LabelWithTooltip label={i18n.t(label)} />
           {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
         </button>
@@ -53,6 +74,7 @@ Checkbox.propTypes = {
   id: PropTypes.string,
   checked: PropTypes.bool,
   disabled: PropTypes.bool,
+  indeterminate: PropTypes.bool,
   info: PropTypes.string,
   label: PropTypes.string,
   onChange: PropTypes.func,
@@ -64,6 +86,7 @@ Checkbox.defaultProps = {
   id: null,
   checked: false,
   disabled: false,
+  indeterminate: false,
   label: null,
   onChange: null,
   radio: false,
