@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
@@ -13,24 +13,25 @@ export const FilesCell = (props) => {
   const { filesCount, filesMissing, filesSize } = item
 
   const filesSizeFormatted = FileUtils.toHumanReadableFileSize(filesSize)
-  const titleParts = []
-  if (filesCount > 0) {
-    titleParts.push(i18n.t('surveysView.filesTotal', { count: filesCount }))
-  }
-  if (filesMissing > 0) {
-    titleParts.push(i18n.t('surveysView.filesMissing', { count: filesMissing }))
-  }
 
-  if (titleParts.length > 0) {
-    const title = titleParts.join('\n\n')
-    return (
-      <TooltipNew isTitleMarkdown title={title}>
-        {filesSizeFormatted}
-      </TooltipNew>
-    )
-  } else {
-    return <span>{filesSizeFormatted}</span>
-  }
+  const titleParts = useMemo(() => {
+    const parts = []
+    if (filesCount > 0) {
+      parts.push(i18n.t('surveysView.filesTotal', { count: filesCount }))
+    }
+    if (filesMissing > 0) {
+      parts.push(i18n.t('surveysView.filesMissing', { count: filesMissing }))
+    }
+    return parts
+  }, [filesCount, filesMissing, i18n])
+
+  return titleParts.length > 0 ? (
+    <TooltipNew isTitleMarkdown title={titleParts.join('\n\n')}>
+      {filesSizeFormatted}
+    </TooltipNew>
+  ) : (
+    <span>{filesSizeFormatted}</span>
+  )
 }
 
 FilesCell.propTypes = {
