@@ -110,6 +110,7 @@ export const CategorySelector = (props) => {
         itemValue={Category.keys.uuid}
         itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
+        validationTooltipPosition="top"
         selection={category}
         onChange={onChange}
       />
