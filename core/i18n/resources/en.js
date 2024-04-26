@@ -828,6 +828,8 @@ Are you sure you want to continue?`,
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
     files: 'Files',
+    filesMissing: ' Missing files: {{count}}',
+    filesTotal: 'Total files: {{count}}',
   },
 
   usersView: {

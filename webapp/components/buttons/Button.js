@@ -57,7 +57,7 @@ export const Button = forwardRef((props, ref) => {
       {children}
     </button>
   )
-  if (Objects.isEmpty(title)) {
+  if (Objects.isEmpty(title) || disabled) {
     return btn
   }
   return (

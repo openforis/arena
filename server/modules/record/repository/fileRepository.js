@@ -95,16 +95,16 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
   return contentBuffer ? Readable.from(contentBuffer) : null
 }
 
-export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
+export const fetchCountAndTotalFilesSize = async ({ surveyId }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const total = await client.oneOrNone(
-    `SELECT SUM(COALESCE((props ->> '${RecordFile.propKeys.size}')::INTEGER, 0))
+  const { count, total } = await client.one(
+    `SELECT COUNT(*), SUM(COALESCE((props ->> '${RecordFile.propKeys.size}')::INTEGER, 0))
     FROM ${schema}.file
     WHERE ${NOT_DELETED_CONDITION}`,
     null,
-    (row) => Number(row.sum)
+    (row) => ({ count: Number(row.count), total: Number(row.sum) })
   )
-  return total || 0
+  return { count, total }
 }
 
 // ============== UPDATE

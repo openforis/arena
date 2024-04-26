@@ -2,16 +2,17 @@ import * as R from 'ramda'
 
 import { Dates } from '@openforis/arena-core'
 
+import { Schemata } from '@common/model/db'
+
 import * as A from '@core/arena'
-
-import { db } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
-
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
+
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -116,6 +117,22 @@ export const getNodeSelectQuery = ({
   }
 
   return `SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
+}
+
+export const countNodesWithMissingFile = async ({ surveyId }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return client.one(
+    `SELECT COUNT(n.*) 
+    FROM ${schema}.node n 
+      JOIN ${schema}.node_def nd 
+        ON n.node_def_uuid = nd.uuid 
+        AND nd.type = '${NodeDef.nodeDefType.file}'
+    WHERE 
+      n.value IS NOT NULL 
+      AND (n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
+    [],
+    (row) => Number(row.count)
+  )
 }
 
 // ============== CREATE
