@@ -17,9 +17,9 @@ import { useUser } from '@webapp/store/user'
 import Table from '@webapp/components/Table'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
+import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
-import { FilesCell } from './FilesCell'
 
 const Surveys = (props) => {
   const { module, moduleApiUri, template } = props
@@ -146,7 +146,7 @@ const Surveys = (props) => {
                 key: 'files',
                 className: 'files',
                 header: 'surveysView.files',
-                renderItem: FilesCell,
+                renderItem: TableCellFiles,
                 width: '5rem',
               },
               {

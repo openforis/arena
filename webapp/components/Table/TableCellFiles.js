@@ -5,7 +5,7 @@ import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 
-export const FilesCell = (props) => {
+export const TableCellFiles = (props) => {
   const { item } = props
 
   const i18n = useI18n()
@@ -14,17 +14,17 @@ export const FilesCell = (props) => {
 
   const title = useMemo(() => {
     const filesSizeFormatted = FileUtils.toHumanReadableFileSize(filesSize)
-    return i18n.t('surveysView.filesTotalSize', { size: filesSizeFormatted })
+    return i18n.t('files.totalSize', { size: filesSizeFormatted })
   }, [filesSize, i18n])
 
-  if (filesCount === 0) {
-    return <span>-</span>
+  if (!filesCount && !filesMissing) {
+    return <span>0</span>
   }
   return (
     <>
       <TooltipNew title={title}>{filesCount}</TooltipNew>
       {filesMissing > 0 && (
-        <TooltipNew title={i18n.t('surveysView.filesMissing', { count: filesMissing })}>
+        <TooltipNew title={i18n.t('files.missing', { count: filesMissing })}>
           <span className="icon icon-warning icon-12px icon-left" />
         </TooltipNew>
       )}
@@ -32,6 +32,6 @@ export const FilesCell = (props) => {
   )
 }
 
-FilesCell.propTypes = {
+TableCellFiles.propTypes = {
   item: PropTypes.object.isRequired,
 }

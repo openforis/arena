@@ -54,7 +54,7 @@ const Records = () => {
       visibleColumnsSelectionEnabled
       columns={columns}
       module="records/summary"
-      restParams={{ cycle, recordsRequestedAt }}
+      restParams={{ cycle, includeCounts: true, recordsRequestedAt }}
       className="records"
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={HeaderLeft}
