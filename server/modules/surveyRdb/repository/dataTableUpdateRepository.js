@@ -16,6 +16,7 @@ const _hasTable = (nodeDef) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nod
 const _getType = (nodeDef, node) => {
   const created = Node.isCreated(node)
   const deleted = Node.isDeleted(node)
+  const updated = Node.isUpdated(node)
   const withTable = _hasTable(nodeDef)
 
   if (withTable) {
@@ -24,6 +25,9 @@ const _getType = (nodeDef, node) => {
     }
     if (deleted) {
       return types.delete
+    }
+    if (updated && NodeDef.isMultipleAttribute(nodeDef)) {
+      return types.update
     }
   } else if (!deleted) {
     return types.update
