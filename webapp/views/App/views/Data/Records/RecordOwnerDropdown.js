@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as User from '@core/user/user'
 
@@ -18,7 +18,7 @@ export const RecordOwnerDropdown = (props) => {
   const [state, setState] = useState({ loading: true, users: [] })
 
   const { users } = state
-  const selectedUser = users.find((user) => User.getUuid(user) === selectedUuid)
+  const selectedUser = useMemo(() => users.find((user) => User.getUuid(user) === selectedUuid), [selectedUuid, users])
 
   const fetchUsers = useCallback(async () => {
     const usersFetched = await API.fetchUsersBySurvey({

@@ -26,10 +26,10 @@ export const RecordOwnerColumn = (props) => {
 
   const onContainerClick = useCallback(
     (e) => {
-      if (editing) {
-        e.stopPropagation()
-        e.preventDefault()
-      }
+      // if (editing) {
+      //   // e.stopPropagation()
+      //   e.preventDefault()
+      // }
     },
     [editing]
   )
@@ -40,9 +40,13 @@ export const RecordOwnerColumn = (props) => {
     setState((statePrev) => ({ ...statePrev, editing: true }))
   }, [])
 
+  const onChange = useCallback((selected) => {
+    console.log(selected)
+  }, [])
+
   return canEdit ? (
     <div onClick={onContainerClick} onMouseOver={onContainerMouseOver} onMouseLeave={onContainerMouseLeave}>
-      {editing && <RecordOwnerDropdown selectedUuid={Record.getOwnerUuid(record)} onChange={() => {}} />}
+      {editing && <RecordOwnerDropdown selectedUuid={Record.getOwnerUuid(record)} onChange={onChange} />}
       {!editing && ownerName}
       {hovering && !editing && <ButtonIconEdit onClick={onEditClick} />}
     </div>

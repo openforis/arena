@@ -38,6 +38,7 @@ export {
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
   updateRecordsStep,
+  updateRecordOwner,
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordsCountByStep,

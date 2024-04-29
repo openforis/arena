@@ -122,6 +122,11 @@ export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo, rec
   return { count }
 }
 
+export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }) => {
+  const { data } = await axios.post(`/survey/${surveyId}/record/${recordUuid}/owner`, { ownerUuid })
+  return data
+}
+
 // ==== RECORDS CLONE
 export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recordsUuids }) => {
   const {

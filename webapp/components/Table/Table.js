@@ -34,6 +34,7 @@ const Table = (props) => {
     headerProps,
     rowProps,
     selectable,
+    selectOnClick,
     showFooter,
     showHeader,
     visibleColumnsSelectionEnabled,
@@ -66,6 +67,7 @@ const Table = (props) => {
     onRowClick: onRowClickProp,
     restParams,
     selectable,
+    selectOnClick,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -152,6 +154,7 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
+  selectOnClick: PropTypes.bool,
   showFooter: PropTypes.bool,
   showHeader: PropTypes.bool,
   visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
@@ -179,6 +182,7 @@ Table.defaultProps = {
   rowExpandedComponent: DummyComponent,
   rowProps: {},
   selectable: true,
+  selectOnClick: true,
   showFooter: true,
   showHeader: true,
   visibleColumnsSelectionEnabled: false,

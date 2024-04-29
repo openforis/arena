@@ -308,6 +308,19 @@ export const init = (app) => {
     }
   })
 
+  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId, recordUuid, ownerUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await RecordService.updateRecordOwner({ user, surveyId, recordUuid, ownerUuid })
+
+      sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
   app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res, next) => {
     try {
