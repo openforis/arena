@@ -829,7 +829,7 @@ Are you sure you want to continue?`,
     recordsCreatedWithMoreApps: 'Records created with more apps:',
     files: 'Files',
     filesMissing: ' Missing files: {{count}}',
-    filesTotal: 'Total files: {{count}}',
+    filesTotalSize: 'Total size: {{size}}',
   },
 
   usersView: {

@@ -12,25 +12,23 @@ export const FilesCell = (props) => {
 
   const { filesCount, filesMissing, filesSize } = item
 
-  const filesSizeFormatted = FileUtils.toHumanReadableFileSize(filesSize)
+  const title = useMemo(() => {
+    const filesSizeFormatted = FileUtils.toHumanReadableFileSize(filesSize)
+    return i18n.t('surveysView.filesTotalSize', { size: filesSizeFormatted })
+  }, [filesSize, i18n])
 
-  const titleParts = useMemo(() => {
-    const parts = []
-    if (filesCount > 0) {
-      parts.push(i18n.t('surveysView.filesTotal', { count: filesCount }))
-    }
-    if (filesMissing > 0) {
-      parts.push(i18n.t('surveysView.filesMissing', { count: filesMissing }))
-    }
-    return parts
-  }, [filesCount, filesMissing, i18n])
-
-  return titleParts.length > 0 ? (
-    <TooltipNew isTitleMarkdown title={titleParts.join('\n\n')}>
-      {filesSizeFormatted}
-    </TooltipNew>
-  ) : (
-    <span>{filesSizeFormatted}</span>
+  if (filesCount === 0) {
+    return <span>-</span>
+  }
+  return (
+    <>
+      <TooltipNew title={title}>{filesCount}</TooltipNew>
+      {filesMissing > 0 && (
+        <TooltipNew title={i18n.t('surveysView.filesMissing', { count: filesMissing })}>
+          <span className="icon icon-warning icon-12px icon-left" />
+        </TooltipNew>
+      )}
+    </>
   )
 }
 

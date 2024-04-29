@@ -144,6 +144,7 @@ const Surveys = (props) => {
               },
               {
                 key: 'files',
+                className: 'files',
                 header: 'surveysView.files',
                 renderItem: FilesCell,
                 width: '5rem',
