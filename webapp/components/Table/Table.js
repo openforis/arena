@@ -12,6 +12,7 @@ import { useTable } from './useTable'
 
 const Table = (props) => {
   const {
+    cellProps,
     cellTestIdExtractor,
     className,
     columns,
@@ -96,6 +97,7 @@ const Table = (props) => {
       )}
 
       <Content
+        cellProps={cellProps}
         cellTestIdExtractor={cellTestIdExtractor}
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
@@ -132,6 +134,7 @@ const Table = (props) => {
 const DummyComponent = () => <div />
 
 Table.propTypes = {
+  cellProps: PropTypes.object,
   cellTestIdExtractor: PropTypes.func,
   className: PropTypes.string,
   columns: PropTypes.array,
@@ -161,6 +164,7 @@ Table.propTypes = {
 }
 
 Table.defaultProps = {
+  cellProps: {},
   cellTestIdExtractor: null,
   className: '',
   columns: null,

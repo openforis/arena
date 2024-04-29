@@ -51,6 +51,7 @@ const Records = () => {
 
   return (
     <Table
+      cellProps={{ onRecordsUpdate }}
       className="records"
       columns={columns}
       gridTemplateColumns={gridTemplateColumns}
@@ -62,7 +63,6 @@ const Records = () => {
       onRowDoubleClick={navigateToRecord}
       restParams={{ cycle, recordsRequestedAt }}
       rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
-      selectOnClick={false}
       visibleColumnsSelectionEnabled
     />
   )

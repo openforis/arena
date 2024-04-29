@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 
@@ -35,6 +36,8 @@ export const RecordOwnerDropdown = (props) => {
 
   return (
     <Dropdown
+      className="width100"
+      clearable={false}
       items={users}
       itemValue={User.keys.uuid}
       itemLabel={(user) => User.getName(user) ?? User.getEmail(user)}
@@ -43,4 +46,9 @@ export const RecordOwnerDropdown = (props) => {
       selection={selectedUser}
     />
   )
+}
+
+RecordOwnerDropdown.propTypes = {
+  selectedUuid: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
 }

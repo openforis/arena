@@ -190,7 +190,7 @@ export { updateRecordDateModified, updateRecordsOwner } from '../repository/reco
 export const updateRecordOwner = async ({ user, surveyId, recordUuid, ownerUuid }, client = db) =>
   client.tx(async (t) => {
     const logContent = { recordUuid, ownerUuid }
-    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordOwnerUpdate, logContent, t)
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordOwnerUpdate, logContent, false, t)
     await RecordRepository.updateRecordOwner({ surveyId, recordUuid, ownerUuid }, t)
   })
 

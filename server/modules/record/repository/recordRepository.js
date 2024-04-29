@@ -423,7 +423,7 @@ export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }, cli
     `
       UPDATE ${getSchemaSurvey(surveyId)}.record
       SET owner_uuid = $/ownerUuid/
-      WHERE record_uuid = $/recordUuid/`,
+      WHERE uuid = $/recordUuid/`,
     { recordUuid, ownerUuid }
   )
 

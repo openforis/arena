@@ -104,6 +104,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: Record.keys.ownerName,
+        className: 'width100',
         header: 'dataView.records.owner',
         renderItem: RecordOwnerColumn,
       },
