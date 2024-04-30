@@ -13,6 +13,7 @@ export const TableCellFiles = (props) => {
   const { filesCount, filesMissing, filesSize } = item
 
   const title = useMemo(() => {
+    if (!filesSize) return undefined
     const filesSizeFormatted = FileUtils.toHumanReadableFileSize(filesSize)
     return i18n.t('files.totalSize', { size: filesSizeFormatted })
   }, [filesSize, i18n])
@@ -22,7 +23,7 @@ export const TableCellFiles = (props) => {
   }
   return (
     <>
-      <TooltipNew title={title}>{filesCount}</TooltipNew>
+      {filesSize && <TooltipNew title={title}>{filesCount}</TooltipNew>}
       {filesMissing > 0 && (
         <TooltipNew title={i18n.t('files.missing', { count: filesMissing })}>
           <span className="icon icon-warning icon-12px icon-left" />
