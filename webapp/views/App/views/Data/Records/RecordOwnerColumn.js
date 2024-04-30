@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import * as Record from '@core/record/record'
@@ -8,10 +9,10 @@ import { ButtonIconEdit } from '@webapp/components'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanCleanseRecords } from '@webapp/store/user/hooks'
+import { DialogConfirmActions } from '@webapp/store/ui'
+import { KeyboardKeys } from '@webapp/utils/keyboardKeys'
 
 import { RecordOwnerDropdown } from './RecordOwnerDropdown'
-import { DialogConfirmActions } from '@webapp/store/ui'
-import { useDispatch } from 'react-redux'
 
 export const RecordOwnerColumn = (props) => {
   const { item: record, onRecordsUpdate } = props
@@ -27,20 +28,30 @@ export const RecordOwnerColumn = (props) => {
 
   const canEdit = useAuthCanCleanseRecords()
 
-  const onContainerMouseOver = useCallback(() => {
-    if (!hovering) {
-      setState((statePrev) => ({ ...statePrev, hovering: true }))
-    }
-  }, [hovering])
+  const setHovering = useCallback(
+    (hoveringNew) => {
+      if (hoveringNew !== hovering) {
+        setState((statePrev) => ({ ...statePrev, hovering: hoveringNew }))
+      }
+    },
+    [hovering]
+  )
 
-  const onContainerMouseLeave = useCallback(() => {
-    if (hovering) {
-      setState((statePrev) => ({ ...statePrev, hovering: false }))
-    }
-  }, [hovering])
+  const setEditing = useCallback(
+    (editingNew) => {
+      if (editingNew !== editing) {
+        setState((statePrev) => ({ ...statePrev, editing: editingNew }))
+      }
+    },
+    [editing]
+  )
+
+  const onContainerMouseOver = useCallback(() => setHovering(true), [setHovering])
+  const onContainerMouseLeave = useCallback(() => setHovering(false), [setHovering])
 
   const onContainerClick = useCallback(
     (e) => {
+      // prevent table row selection on click
       if (editing) {
         e.stopPropagation()
         e.preventDefault()
@@ -49,11 +60,25 @@ export const RecordOwnerColumn = (props) => {
     [editing]
   )
 
-  const onEditClick = useCallback((e) => {
-    e.stopPropagation()
-    e.preventDefault()
-    setState((statePrev) => ({ ...statePrev, editing: true }))
-  }, [])
+  const onContainerFocus = useCallback(() => setHovering(true), [setHovering])
+
+  const onContainerKeyDown = useCallback(
+    (e) => {
+      if (e.key === KeyboardKeys.Space) {
+        setEditing(true)
+      }
+    },
+    [setEditing]
+  )
+
+  const onEditClick = useCallback(
+    (e) => {
+      e.stopPropagation()
+      e.preventDefault()
+      setEditing(true)
+    },
+    [setEditing]
+  )
 
   const onChangeConfirmed = useCallback(
     async ({ selectedOwnerUuid }) => {
@@ -87,8 +112,12 @@ export const RecordOwnerColumn = (props) => {
     <div
       className="width100"
       onClick={onContainerClick}
+      onFocus={onContainerFocus}
+      onKeyDown={onContainerKeyDown}
       onMouseOver={onContainerMouseOver}
       onMouseLeave={onContainerMouseLeave}
+      role="button"
+      tabIndex={0}
     >
       {editing && <RecordOwnerDropdown selectedUuid={ownerUuid} onChange={onChange} />}
       {!editing && ownerName}
