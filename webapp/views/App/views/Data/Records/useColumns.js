@@ -9,14 +9,15 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { TestId } from '@webapp/utils/testId'
 import { Button } from '@webapp/components'
+import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
-import { AppIcon } from '@webapp/components/AppIcon'
+import { RecordOwnerColumn } from './RecordOwnerColumn'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()
@@ -103,8 +104,10 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: Record.keys.ownerName,
+        className: 'width100',
         header: 'dataView.records.owner',
-        renderItem: ({ item: record }) => Record.getOwnerName(record),
+        renderItem: RecordOwnerColumn,
+        width: 'minmax(auto, 15rem)',
       },
       {
         key: Record.keys.step,

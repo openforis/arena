@@ -187,6 +187,13 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
 
 export { updateRecordDateModified, updateRecordsOwner } from '../repository/recordRepository'
 
+export const updateRecordOwner = async ({ user, surveyId, recordUuid, ownerUuid }, client = db) =>
+  client.tx(async (t) => {
+    const logContent = { recordUuid, ownerUuid }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordOwnerUpdate, logContent, false, t)
+    await RecordRepository.updateRecordOwner({ surveyId, recordUuid, ownerUuid }, t)
+  })
+
 // ==== DELETE
 
 export {

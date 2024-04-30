@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export const ContentRowCell = (props) => {
-  const { active, cellTestIdExtractor, column, item, itemPosition, itemSelected, initData } = props
+  const { active, cellTestIdExtractor, column, item, itemPosition, itemSelected, initData, ...otherProps } = props
 
   const { key, className, renderItem } = column
 
@@ -10,7 +10,7 @@ export const ContentRowCell = (props) => {
 
   return (
     <div key={key} className={className} data-testid={testId}>
-      {renderItem({ active, item, itemPosition, itemSelected, initData })}
+      {renderItem({ ...otherProps, active, item, itemPosition, itemSelected, initData })}
     </div>
   )
 }

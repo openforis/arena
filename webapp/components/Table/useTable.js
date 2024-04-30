@@ -17,6 +17,7 @@ export const useTable = ({
   restParams,
   onRowClick: onRowClickProp,
   selectable,
+  selectOnClick,
 }) => {
   const dispatch = useDispatch()
 
@@ -130,7 +131,7 @@ export const useTable = ({
       if (onRowClickProp) {
         await onRowClickProp(item)
       }
-      if (selectable) {
+      if (selectable && selectOnClick) {
         const key = keyExtractor({ item })
         const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
           item,
@@ -139,7 +140,7 @@ export const useTable = ({
         setSelectedItems(selectedItemsUpdated)
       }
     },
-    [keyExtractor, onRowClickProp, selectable]
+    [keyExtractor, onRowClickProp, selectOnClick, selectable]
   )
 
   const onVisibleColumnsChange = useCallback(
