@@ -214,6 +214,12 @@ Do you want to proceed?`,
     pageNotFound: 'Page not found',
   },
 
+  files: {
+    header: 'Files',
+    missing: ' Missing files: {{count}}',
+    totalSize: 'Total size: {{size}}',
+  },
+
   sidebar: {
     logout: 'Logout',
   },
@@ -831,7 +837,6 @@ Are you sure you want to continue?`,
     chains: 'Chains',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
-    files: 'Files',
   },
 
   usersView: {

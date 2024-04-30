@@ -47,7 +47,7 @@ const getSurveyFilesTotalSpace = async ({ surveyId }) => {
 
 export const fetchFilesStatistics = async ({ surveyId }) => {
   const totalSpace = await getSurveyFilesTotalSpace({ surveyId })
-  const usedSpace = await FileManager.fetchTotalFilesSize({ surveyId })
+  const { total: usedSpace } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
   const availableSpace = Math.max(0, totalSpace - usedSpace)
 
   return {

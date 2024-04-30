@@ -10,12 +10,12 @@ import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
-import { FileUtils } from '@webapp/utils/fileUtils'
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table'
+import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import HeaderLeft from './HeaderLeft'
@@ -135,9 +135,9 @@ const Surveys = (props) => {
         },
         {
           key: 'files',
-          header: 'surveysView.files',
+          header: 'files.header',
           hidden: true,
-          renderItem: ({ item }) => FileUtils.toHumanReadableFileSize(item.filesSize),
+          renderItem: TableCellFiles,
           width: '5rem',
         },
         {

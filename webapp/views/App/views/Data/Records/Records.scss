@@ -15,5 +15,12 @@
         margin: 2px;
       }
     }
+    .files-col {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.2rem;
+    }
   }
 }

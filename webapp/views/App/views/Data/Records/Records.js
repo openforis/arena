@@ -61,7 +61,7 @@ const Records = () => {
       noItemsLabelKey="dataView.records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
       onRowDoubleClick={navigateToRecord}
-      restParams={{ cycle, recordsRequestedAt }}
+      restParams={{ cycle, includeCounts: true, recordsRequestedAt }}
       rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
       visibleColumnsSelectionEnabled
     />

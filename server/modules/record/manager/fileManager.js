@@ -139,7 +139,7 @@ export const {
   fetchFileSummariesBySurveyId,
   fetchFileSummaryByUuid,
   fetchFileUuidsBySurveyId,
-  fetchTotalFilesSize,
+  fetchCountAndTotalFilesSize,
   // UPDATE
   markRecordFilesAsDeleted,
   updateFileProps,

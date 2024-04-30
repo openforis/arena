@@ -14,6 +14,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '../repository/recordRepository'
+import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
@@ -41,6 +42,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     recordUuid = null,
     includeRootKeyValues = true,
     includePreview = false,
+    includeCounts = false,
   },
   client = db
 ) => {
@@ -77,9 +79,32 @@ export const fetchRecordsSummaryBySurveyId = async (
     client
   )
 
+  if (!includeCounts) {
+    return {
+      nodeDefKeys,
+      list,
+    }
+  }
+
+  const listWithCounts = []
+  for await (const recordSummary of list) {
+    const recordUuid = Record.getUuid(recordSummary)
+    const { count: filesCount, total: filesSize } = await FileRepository.fetchCountAndTotalFilesSize(
+      { surveyId, recordUuid },
+      client
+    )
+    const filesMissing = await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid }, client)
+
+    listWithCounts.push({
+      ...recordSummary,
+      filesCount,
+      filesSize,
+      filesMissing,
+    })
+  }
   return {
     nodeDefKeys,
-    list,
+    list: listWithCounts,
   }
 }
 

@@ -5,6 +5,7 @@ import { Schemata } from '@common/model/db'
 import * as RecordFile from '@core/record/recordFile'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -95,16 +96,21 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
   return contentBuffer ? Readable.from(contentBuffer) : null
 }
 
-export const fetchTotalFilesSize = async ({ surveyId }, client = db) => {
+export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
-  const total = await client.oneOrNone(
-    `SELECT SUM(COALESCE((props ->> '${RecordFile.propKeys.size}')::INTEGER, 0))
+  const whereConditions = [NOT_DELETED_CONDITION]
+  if (recordUuid) {
+    whereConditions.push(`(props ->> '${RecordFile.propKeys.recordUuid}')::uuid = $/recordUuid/`)
+  }
+  const whereClause = DbUtils.getWhereClause(...whereConditions)
+  const { count, total } = await client.one(
+    `SELECT COUNT(*), SUM(COALESCE((props ->> '${RecordFile.propKeys.size}')::INTEGER, 0))
     FROM ${schema}.file
-    WHERE ${NOT_DELETED_CONDITION}`,
-    null,
-    (row) => Number(row.sum)
+    ${whereClause}`,
+    { recordUuid },
+    (row) => ({ count: Number(row.count), total: Number(row.sum) })
   )
-  return total || 0
+  return { count, total }
 }
 
 // ============== UPDATE
