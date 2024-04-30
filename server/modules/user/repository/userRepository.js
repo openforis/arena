@@ -178,7 +178,10 @@ export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
   await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
 
-export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
+export const fetchUsersBySurveyId = async (
+  { surveyId, offset = 0, limit = null, includeSystemAdmins = false },
+  client = db
+) =>
   client.map(
     `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
@@ -191,7 +194,8 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, c
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-      AND (g.survey_uuid = s.uuid AND g.name <> '${AuthGroup.groupNames.systemAdmin}')
+      AND (g.survey_uuid = s.uuid AND g.name <> '${AuthGroup.groupNames.systemAdmin}'
+      ${includeSystemAdmins ? `OR g.name = '${AuthGroup.groupNames.systemAdmin}'` : ''})
     LEFT OUTER JOIN user_invitation ui
       ON u.uuid = ui.user_uuid
       AND s.uuid = ui.survey_uuid

@@ -17,16 +17,27 @@ export const useTable = ({
   restParams,
   onRowClick: onRowClickProp,
   selectable,
+  selectOnClick,
 }) => {
   const dispatch = useDispatch()
 
   const [totalCount, setTotalCount] = useState(0)
 
   const visibleColumnKeysInStore = useTableVisibleColumns(module)
-  const visibleColumnKeys = useMemo(
-    () => visibleColumnKeysInStore ?? columns?.map((column) => column.key) ?? [],
-    [columns, visibleColumnKeysInStore]
-  )
+  const visibleColumnKeys = useMemo(() => {
+    if (visibleColumnKeysInStore) {
+      return visibleColumnKeysInStore
+    }
+    if (columns) {
+      return columns.reduce((acc, column) => {
+        if (!column.hidden) {
+          acc.push(column.key)
+        }
+        return acc
+      }, [])
+    }
+    return []
+  }, [columns, visibleColumnKeysInStore])
   const visibleColumns = useMemo(
     () => columns?.filter((column) => visibleColumnKeys.includes(column.key)) ?? [],
     [columns, visibleColumnKeys]
@@ -120,7 +131,7 @@ export const useTable = ({
       if (onRowClickProp) {
         await onRowClickProp(item)
       }
-      if (selectable) {
+      if (selectable && selectOnClick) {
         const key = keyExtractor({ item })
         const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
           item,
@@ -129,7 +140,7 @@ export const useTable = ({
         setSelectedItems(selectedItemsUpdated)
       }
     },
-    [keyExtractor, onRowClickProp, selectable]
+    [keyExtractor, onRowClickProp, selectOnClick, selectable]
   )
 
   const onVisibleColumnsChange = useCallback(

@@ -67,6 +67,7 @@ export const {
   fetchRecordCreatedCountsByUser,
   fetchRecordCountsByStep,
   updateRecordsStep,
+  updateRecordOwner,
 } = RecordManager
 
 export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {

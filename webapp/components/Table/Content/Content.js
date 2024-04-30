@@ -27,6 +27,7 @@ LoadingRows.propTypes = {
 
 const Content = (props) => {
   const {
+    cellProps,
     columns,
     expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
@@ -77,7 +78,7 @@ const Content = (props) => {
 
   const hasColumns = columns?.length > 0
   const rowComponent = hasColumns
-    ? (_props) => <ContentRowCells {..._props} columns={columns} itemSelected={_props.selected} />
+    ? (_props) => <ContentRowCells {..._props} cellProps={cellProps} columns={columns} itemSelected={_props.selected} />
     : rowComponentParam
 
   const rowHeaderComponent = hasColumns
@@ -123,6 +124,7 @@ const Content = (props) => {
 }
 
 Content.propTypes = {
+  cellProps: PropTypes.object,
   columns: PropTypes.array,
   expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,

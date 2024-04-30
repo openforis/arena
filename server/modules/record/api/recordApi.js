@@ -132,11 +132,12 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records/summary', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)
+      const { surveyId, cycle, includeCounts, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)
 
       const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId({
         surveyId,
         cycle,
+        includeCounts,
         offset,
         limit,
         sortBy,
@@ -303,6 +304,19 @@ export const init = (app) => {
       const { count } = await RecordService.updateRecordsStep({ user, surveyId, cycle, stepFrom, stepTo, recordUuids })
 
       res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId, recordUuid, ownerUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await RecordService.updateRecordOwner({ user, surveyId, recordUuid, ownerUuid })
+
+      sendOk(res)
     } catch (error) {
       next(error)
     }

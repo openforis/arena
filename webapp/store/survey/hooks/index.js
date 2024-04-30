@@ -48,3 +48,9 @@ export const useNodeDefValidationByUuid = (uuid) =>
     const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
     return Survey.getNodeDefValidation(nodeDef)(survey)
   })
+export const useSurveyHasFileAttributes = () =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    const fileDefs = Survey.findDescendants({ filterFn: NodeDef.isFile })(survey)
+    return fileDefs.length > 0
+  })

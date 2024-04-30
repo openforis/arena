@@ -214,6 +214,12 @@ Do you want to proceed?`,
     pageNotFound: 'Page not found',
   },
 
+  files: {
+    header: 'Files',
+    missing: ' Missing files: {{count}}',
+    totalSize: 'Total size: {{size}}',
+  },
+
   sidebar: {
     logout: 'Logout',
   },
@@ -711,6 +717,7 @@ Are you sure you want to continue?`,
       confirmDeleteSelectedRecord_one: `Delete the selected record?`,
       confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
+      confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
       deleteRecord: 'Delete record',
       demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
       demoteAllRecordsFromCleansing: 'Cleansing -> Entry',
@@ -839,7 +846,6 @@ Are you sure you want to continue?`,
     chains: 'Chains',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
-    files: 'Files',
   },
 
   usersView: {

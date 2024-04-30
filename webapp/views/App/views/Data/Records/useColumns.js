@@ -9,19 +9,24 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import { useNodeDefRootKeys, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import ErrorBadge from '@webapp/components/errorBadge'
-import { TestId } from '@webapp/utils/testId'
 import { Button } from '@webapp/components'
+import { AppIcon } from '@webapp/components/AppIcon'
+import ErrorBadge from '@webapp/components/errorBadge'
+import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
+
+import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
+import { useSurveyHasFileAttributes } from '@webapp/store/survey/hooks'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
-import { AppIcon } from '@webapp/components/AppIcon'
+import { RecordOwnerColumn } from './RecordOwnerColumn'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()
   const user = useUser()
   const nodeDefKeys = useNodeDefRootKeys()
+  const hasFileAttributes = useSurveyHasFileAttributes()
 
   const onRecordEditButtonClick = useCallback(
     (record) => (event) => {
@@ -101,10 +106,23 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         renderItem: ({ item: record }) => DateUtils.formatDateTimeDisplay(Record.getDateModified(record)),
         width: '11rem',
       },
+      ...(hasFileAttributes
+        ? [
+            {
+              key: 'files',
+              className: 'files-col',
+              header: 'files.header',
+              renderItem: TableCellFiles,
+              width: '4rem',
+            },
+          ]
+        : []),
       {
         key: Record.keys.ownerName,
+        className: 'width100',
         header: 'dataView.records.owner',
-        renderItem: ({ item: record }) => Record.getOwnerName(record),
+        renderItem: RecordOwnerColumn,
+        width: 'minmax(auto, 15rem)',
       },
       {
         key: Record.keys.step,
@@ -151,5 +169,5 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         width: '80px',
       },
     ]
-  }, [categoryItemsByCodeDefUuid, lang, nodeDefKeys, onRecordEditButtonClick, onRecordsUpdate, user])
+  }, [categoryItemsByCodeDefUuid, hasFileAttributes, lang, nodeDefKeys, onRecordEditButtonClick, onRecordsUpdate, user])
 }

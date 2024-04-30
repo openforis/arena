@@ -24,6 +24,7 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileManager from '@server/modules/record/manager/fileManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
@@ -317,13 +318,16 @@ export const fetchUserSurveysInfo = async (
       surveys.map(async (survey) => {
         const surveyId = Survey.getId(survey)
         const canHaveData = Survey.canHaveData(survey)
+        const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
         return {
           ...survey,
           nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
           recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
           recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
           chainsCount: await ChainRepository.countChains({ surveyId }, tx),
-          filesSize: await FileManager.fetchTotalFilesSize({ surveyId }, tx),
+          filesCount,
+          filesSize,
+          filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
         }
       })
     )
