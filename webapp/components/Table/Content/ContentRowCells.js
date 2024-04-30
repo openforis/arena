@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'
 
@@ -7,6 +8,7 @@ import { ContentRowCell } from './ContentRowCell'
 export const ContentRowCells = (props) => {
   const {
     active,
+    cellProps,
     cellTestIdExtractor,
     columns,
     expandableRows,
@@ -31,6 +33,7 @@ export const ContentRowCells = (props) => {
           item={item}
           itemPosition={itemPosition}
           itemSelected={itemSelected}
+          {...cellProps}
         />
       ))}
       {expandableRows && (
@@ -45,4 +48,23 @@ export const ContentRowCells = (props) => {
       )}
     </>
   )
+}
+
+ContentRowCells.propTypes = {
+  active: PropTypes.bool,
+  cellProps: PropTypes.object,
+  cellTestIdExtractor: PropTypes.func,
+  columns: PropTypes.array.isRequired,
+  expandableRows: PropTypes.bool,
+  initData: PropTypes.func,
+  isRowExpandable: PropTypes.func.isRequired,
+  item: PropTypes.object.isRequired,
+  itemPosition: PropTypes.number.isRequired,
+  itemSelected: PropTypes.object,
+  onRowExpandToggle: PropTypes.func.isRequired,
+  rowExpanded: PropTypes.bool,
+}
+
+ContentRowCells.defaultProps = {
+  cellProps: {},
 }

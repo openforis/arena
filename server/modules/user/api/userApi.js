@@ -184,9 +184,16 @@ export const init = (app) => {
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, offset, limit } = Request.getParams(req)
+      const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId({ user, surveyId, offset, limit })
+      const list = await UserService.fetchUsersBySurveyId({
+        user,
+        surveyId,
+        offset,
+        limit,
+        onlyAccepted,
+        includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
+      })
 
       res.json({ list })
     } catch (error) {

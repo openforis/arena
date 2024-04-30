@@ -38,6 +38,7 @@ export {
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
   updateRecordsStep,
+  updateRecordOwner,
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordsCountByStep,
@@ -79,8 +80,9 @@ export {
   createAccessRequest,
   acceptAccessRequest,
   fetchUser,
-  fetchUserName,
   fetchUserResetPasswordUrl,
+  fetchUserName,
+  fetchUsersBySurvey,
   fetchUserSurveys,
   changeUserPassword,
 } from './user'
