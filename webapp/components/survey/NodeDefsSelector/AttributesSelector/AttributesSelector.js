@@ -3,15 +3,19 @@ import React from 'react'
 import * as PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+import { Arrays } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import ExpansionPanel from '@webapp/components/expansionPanel'
+import { Checkbox } from '@webapp/components/form'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
-import ExpansionPanel from '@webapp/components/expansionPanel'
-
 import AttributeSelector from './AttributeSelector'
+
+const minDefsToShowSelectAll = 5
 
 const AttributesSelector = (props) => {
   const {
@@ -25,6 +29,7 @@ const AttributesSelector = (props) => {
     nodeDefUuidsToExclude,
     nodeDefUuidEntity,
     nodeDefUuidsAttributes,
+    onAttributesSelection,
     onToggleAttribute,
     showAnalysisAttributes,
     showAncestors,
@@ -76,11 +81,25 @@ const AttributesSelector = (props) => {
       filterChainUuids.includes(NodeDef.getChainUuid(nodeDef)))
 
   const visibleChildDefs = childDefs.filter(isNodeDefVisible)
+  const visibleChildDefUuids = visibleChildDefs.map(NodeDef.getUuid)
+  const selectedCount = Arrays.intersection(visibleChildDefUuids, nodeDefUuidsAttributes).length
+  const allSelected = selectedCount === visibleChildDefUuids.length
+  const allSelectionIndeterminate = selectedCount > 0 && !allSelected
+
+  const onSelectAll = (selected) => onAttributesSelection({ attributeDefUuids: visibleChildDefUuids, selected })
 
   return (
     <div className={classNames('attributes-selector', { ancestor: ancestorSelector })}>
       {visibleChildDefs.length > 0 && (
         <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
+          {onAttributesSelection && visibleChildDefs.length > minDefsToShowSelectAll && (
+            <Checkbox
+              checked={allSelected}
+              indeterminate={allSelectionIndeterminate}
+              label="common.selectAll"
+              onChange={onSelectAll}
+            />
+          )}
           {visibleChildDefs.map((childDef) => (
             <AttributeSelector
               key={NodeDef.getUuid(childDef)}
@@ -101,6 +120,7 @@ const AttributesSelector = (props) => {
           nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           nodeDefUuidsToExclude={[NodeDef.getUuid(nodeDefContext)]}
+          onAttributesSelection={onAttributesSelection}
           onToggleAttribute={onToggleAttribute}
           filterFunction={filterFunction}
           filterTypes={filterTypes}
@@ -128,6 +148,7 @@ AttributesSelector.propTypes = {
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
   nodeDefUuidsToExclude: PropTypes.array,
+  onAttributesSelection: PropTypes.func,
   onToggleAttribute: PropTypes.func.isRequired,
   showAncestors: PropTypes.bool,
   showLabel: PropTypes.bool,

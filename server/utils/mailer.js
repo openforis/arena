@@ -13,14 +13,15 @@ const emailServices = {
 
 const emailService = ProcessUtils.ENV.emailService
 
-const from = ProcessUtils.ENV.emailAuthUser || ProcessUtils.ENV.adminEmail
-const pass = ProcessUtils.ENV.emailAuthPassword
+const authUser = ProcessUtils.ENV.emailAuthUser
+const authPass = ProcessUtils.ENV.emailAuthPassword
+const from = ProcessUtils.ENV.adminEmail || authUser
 
 const office365TransportOptions = {
   host: 'smtp.office365.com',
   port: '587',
-  auth: { user: from, pass },
-  secureConnection: true,
+  auth: { user: authUser, pass: authPass },
+  secure: true,
   tls: { ciphers: 'SSLv3' },
 }
 

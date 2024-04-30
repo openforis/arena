@@ -266,6 +266,7 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     includeAnalysis = true,
     backup = false,
     includeBigCategories = true,
+    includeBigTaxonomies = true,
   },
   client = db
 ) => {
@@ -274,7 +275,10 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     client
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex({ surveyId, draft, includeBigCategories }, client)
-  const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client)
+  const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames(
+    { surveyId, draft, includeBigTaxonomies },
+    client
+  )
 
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }

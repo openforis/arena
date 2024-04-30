@@ -122,7 +122,6 @@ export const {
   getDatePublished,
   isPublished,
   isDraft,
-  isValid,
   isFromCollect,
   isRdbInitialized,
   getCollectUri,
@@ -135,6 +134,8 @@ export const {
   getProps,
   getPropsDraft,
   getFilesStatistics,
+  isValid,
+  canHaveRecords,
 } = SurveyInfo
 
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo

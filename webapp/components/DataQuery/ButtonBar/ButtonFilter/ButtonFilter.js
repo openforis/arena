@@ -7,14 +7,18 @@ import { Query } from '@common/model/query'
 import { ButtonIconFilter } from '@webapp/components/buttons'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
 import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
+
+import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
 
 import { State } from '../store'
 
 const ButtonFilter = (props) => {
-  const { disabled, query, onChangeQuery, state, Actions } = props
+  const { disabled, state, Actions } = props
 
   const i18n = useI18n()
+  const query = DataExplorerSelectors.useQuery()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
@@ -37,7 +41,7 @@ const ButtonFilter = (props) => {
           types={[ExpressionEditorType.basic]}
           header={i18n.t('dataView.filterRecords.expressionEditorHeader')}
           onChange={({ expr }) => {
-            onChangeQuery(Query.assocFilter(expr))
+            onChangeQuery(Query.assocFilter(expr)(query))
             Actions.closePanels()
           }}
           onClose={Actions.closePanels}
@@ -49,8 +53,6 @@ const ButtonFilter = (props) => {
 
 ButtonFilter.propTypes = {
   disabled: PropTypes.bool.isRequired,
-  query: PropTypes.object.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
 }

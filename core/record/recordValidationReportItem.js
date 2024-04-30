@@ -35,7 +35,7 @@ const getKeysSelf = R.propOr({}, keys.keysSelf)
 
 const isValidationCount = R.pipe(getValidationCountChildDefUuid, R.isNil, R.not)
 
-const getNodeDef = (survey) => (item) => Survey.getNodeDefByUuid(getNodeDefUuid(item))(survey)
+export const getNodeDef = (survey) => (item) => Survey.getNodeDefByUuid(getNodeDefUuid(item))(survey)
 
 const getKeysHierarchy = (survey) => (item) =>
   R.pipe(

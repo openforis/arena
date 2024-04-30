@@ -148,7 +148,7 @@ const NodeDefsSelectorAggregate = (props) => {
 
 NodeDefsSelectorAggregate.propTypes = {
   dimensions: PropTypes.arrayOf(String).isRequired,
-  measures: PropTypes.instanceOf(Map).isRequired,
+  measures: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidEntity: PropTypes.string,
   onChangeEntity: PropTypes.func.isRequired,

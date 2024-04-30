@@ -1,5 +1,7 @@
 import './buttonBar.scss'
+
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -10,6 +12,7 @@ import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useIsAppSaving } from '@webapp/store/app'
+import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -20,23 +23,16 @@ import ButtonSort from './ButtonSort'
 import ButtonShowQueries from './ButtonShowQueries'
 
 const ButtonBar = (props) => {
-  const {
-    dataEmpty,
-    dataLoaded,
-    dataLoading,
-    nodeDefLabelType,
-    nodeDefsSelectorVisible,
-    query,
-    onChangeQuery,
-    onNodeDefLabelTypeChange,
-    setNodeDefsSelectorVisible,
-    selectedQuerySummaryUuid,
-    setSelectedQuerySummaryUuid,
-  } = props
+  const { dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
+  const query = DataExplorerSelectors.useQuery()
+  const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
+  const onChangeQuery = DataExplorerHooks.useSetQuery()
+
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
@@ -49,7 +45,7 @@ const ButtonBar = (props) => {
         type="button"
         title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
         className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-        onClick={() => setNodeDefsSelectorVisible(!nodeDefsSelectorVisible)}
+        onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
       >
         <span className="icon icon-tab icon-14px" />
       </button>
@@ -87,34 +83,15 @@ const ButtonBar = (props) => {
 
       {hasSelection && (
         <div>
-          <ButtonFilter
-            query={query}
-            disabled={queryChangeDisabled}
-            onChangeQuery={onChangeQuery}
-            state={state}
-            Actions={Actions}
-          />
-          <ButtonSort
-            query={query}
-            disabled={queryChangeDisabled}
-            onChangeQuery={onChangeQuery}
-            state={state}
-            Actions={Actions}
-          />
-          <ButtonDownload query={query} disabled={queryChangeDisabled} />
+          <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
+          <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
+          <ButtonDownload disabled={queryChangeDisabled} />
         </div>
       )}
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
 
-      <ButtonShowQueries
-        query={query}
-        onChangeQuery={onChangeQuery}
-        state={state}
-        Actions={Actions}
-        selectedQuerySummaryUuid={selectedQuerySummaryUuid}
-        setSelectedQuerySummaryUuid={setSelectedQuerySummaryUuid}
-      />
+      <ButtonShowQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
     </div>
   )
 }
@@ -123,12 +100,8 @@ ButtonBar.propTypes = {
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
-  query: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
-  nodeDefsSelectorVisible: PropTypes.bool.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
-  setNodeDefsSelectorVisible: PropTypes.func.isRequired,
 }
 
 export default ButtonBar
