@@ -15,12 +15,14 @@ import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 
+const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
+
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info('server initialization start')
 
-  const arenaApp = await ArenaServer.init()
+  const arenaApp = await ArenaServer.init({ fileSizeLimit })
   const { express: app } = arenaApp
 
   if (ProcessUtils.isEnvDevelopment) {

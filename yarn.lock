@@ -2781,6 +2781,27 @@
     proj4 "^2.11.0"
     uuid "^9.0.1"
 
+"@openforis/arena-server@../arena-server":
+  version "0.1.31"
+  dependencies:
+    "@godaddy/terminus" "^4.12.1"
+    "@openforis/arena-core" "^0.0.188"
+    bcryptjs "^2.4.3"
+    body-parser "^1.20.2"
+    compression "^1.7.4"
+    connect-pg-simple "^9.0.0"
+    db-migrate "^0.11.14"
+    db-migrate-pg "^1.5.2"
+    express "^4.18.2"
+    express-fileupload "^1.4.0"
+    express-session "^1.17.2"
+    lodash.throttle "^4.1.1"
+    log4js "^6.9.1"
+    passport "^0.6.0"
+    passport-local "^1.0.0"
+    pg-promise "^11.5.4"
+    socket.io "^4.7.2"
+
 "@openforis/arena-server@^0.1.32":
   version "0.1.32"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.32/58dc1a4ac098ea4f46a023db7f3a020e98db2221#58dc1a4ac098ea4f46a023db7f3a020e98db2221"
