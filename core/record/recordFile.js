@@ -2,6 +2,8 @@ import * as R from 'ramda'
 
 import { truncate } from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
+import { uuidv4 } from '@core/uuid'
+import * as Node from './node'
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -22,16 +24,26 @@ export const invalidPropKeys = {
   fileSize: 'fileSize',
 }
 
-export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUuid) => ({
-  [keys.uuid]: uuid,
+export const createFile = ({ name, uuid = null, size = null, content = null, recordUuid = null, nodeUuid = null }) => ({
+  [keys.uuid]: uuid ?? uuidv4(),
   [keys.props]: {
-    [propKeys.name]: fileName,
-    [propKeys.size]: fileSize,
+    [propKeys.name]: name,
+    [propKeys.size]: size,
     [propKeys.recordUuid]: recordUuid,
     [propKeys.nodeUuid]: nodeUuid,
   },
   [keys.content]: content,
 })
+
+export const createFileFromNode = ({ node, size = null, content = null }) =>
+  createFile({
+    uuid: Node.getFileUuid(node),
+    name: Node.getFileName(node),
+    recordUuid: Node.getRecordUuid(node),
+    nodeUuid: Node.getUuid(node),
+    size,
+    content,
+  })
 
 const getExtensionFromFileName = (fileName) => R.pipe(R.split('.'), R.tail)(fileName)
 
@@ -55,6 +67,8 @@ export const getExtension = R.pipe(getName, getExtensionFromFileName)
 
 // UPDATE
 export const assocContent = R.assoc(keys.content)
+export const assocSize = (size) => ObjectUtils.setProp(propKeys.size, size)
+
 const assocProps = R.assoc(keys.props)
 
 const hasInvalidProps = (file) => Object.hasOwn(getProps(file), invalidPropKeys.fileName)

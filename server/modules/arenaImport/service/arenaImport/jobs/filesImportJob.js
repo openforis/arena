@@ -11,12 +11,14 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 export default class FilesImportJob extends Job {
   constructor(params) {
     super('FilesImportJob', params)
+
+    this.insertedFileUuids = []
+    this.updatedFileUuids = []
+    this.deletedFileUuids = []
   }
 
   async execute() {
-    const { arenaSurveyFileZip } = this.context
-
-    const filesSummaries = await ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
+    const filesSummaries = await this.fetchFilesSummaries()
 
     await this.checkFileUuidsAreValid(filesSummaries)
 
@@ -24,6 +26,7 @@ export default class FilesImportJob extends Job {
       await this.checkFilesNotExceedingAvailableQuota(filesSummaries)
 
       this.total = filesSummaries.length
+
       for await (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
 
@@ -31,26 +34,41 @@ export default class FilesImportJob extends Job {
 
         // load file content from a separate file
         const fileUuid = RecordFile.getUuid(fileSummary)
-        const fileContent = await ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
+        const fileName = RecordFile.getName(fileSummary)
+        const fileContent = await this.fetchFileContent({ fileName, fileUuid })
         if (!fileContent) {
-          const fileName = RecordFile.getName(fileSummary)
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
         }
-
         file = RecordFile.assocContent(fileContent)(file)
+
+        // update file size with actual file content length
+        file = RecordFile.assocSize(Buffer.byteLength(fileContent))(file)
 
         await this.persistFile(file)
 
         this.incrementProcessedItems()
       }
+
+      await this.deleteOrphanFiles()
     } else {
       this.logInfo('no files found')
     }
   }
 
+  async fetchFilesSummaries() {
+    const { arenaSurveyFileZip } = this.context
+    return ArenaSurveyFileZip.getFilesSummaries(arenaSurveyFileZip)
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  async fetchFileContent({ fileName, fileUuid }) {
+    const { arenaSurveyFileZip } = this.context
+    return ArenaSurveyFileZip.getFile(arenaSurveyFileZip, fileUuid)
+  }
+
   async persistFile(file) {
     const { context, tx } = this
-    const { surveyId } = context
+    const { surveyId, dryRun } = context
     const fileUuid = RecordFile.getUuid(file)
     const fileProps = RecordFile.getProps(file)
     this.logDebug(`persisting file ${fileUuid}`)
@@ -59,15 +77,24 @@ export default class FilesImportJob extends Job {
       this.logDebug(`file already existing`)
       if (RecordFile.isDeleted(existingFileSummary)) {
         this.logDebug(`file previously marked as deleted: delete permanently and insert a new one`)
-        await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
-        await FileService.insertFile(surveyId, file, tx)
+        if (!dryRun) {
+          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+          await FileService.insertFile(surveyId, file, tx)
+        }
+        this.insertedFileUuids.push(fileUuid)
       } else {
         this.logDebug('updating props')
-        await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+        if (!dryRun) {
+          await FileService.updateFileProps(surveyId, fileUuid, fileProps, tx)
+        }
+        this.updatedFileUuids.push(fileUuid)
       }
     } else {
       this.logDebug(`file not existing: inserting new file`, fileProps)
-      await FileService.insertFile(surveyId, file, tx)
+      if (!dryRun) {
+        await FileService.insertFile(surveyId, file, tx)
+      }
+      this.insertedFileUuids.push(fileUuid)
     }
   }
 
@@ -107,5 +134,30 @@ export default class FilesImportJob extends Job {
     // if (missingFileUuids.length > 0) {
     //   throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
     // }
+  }
+
+  async deleteOrphanFiles() {
+    const { context, tx } = this
+    const { dryRun, filesToDeleteByUuid, updatedFilesByUuid, surveyId } = context
+    const filesToDeleteArray = Object.values(filesToDeleteByUuid)
+    for await (const file of filesToDeleteArray) {
+      const fileUuid = RecordFile.getUuid(file)
+      if (!updatedFilesByUuid[fileUuid]) {
+        if (!dryRun) {
+          await FileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+        }
+        this.deletedFileUuids.push(fileUuid)
+      }
+    }
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    return {
+      ...result,
+      insertedFiles: this.insertedFileUuids.length,
+      updatedFiles: this.updatedFileUuids.length,
+      deletedFiles: this.deletedFileUuids.length,
+    }
   }
 }

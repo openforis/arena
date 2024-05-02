@@ -41,6 +41,7 @@ export const init = (app) => {
         insertNewRecords,
         insertMissingNodes,
         updateRecordsInAnalysis,
+        includeFiles,
         abortOnErrors,
       } = Request.getParams(req)
       const filePath = Request.getFilePath(req)
@@ -55,6 +56,7 @@ export const init = (app) => {
         insertNewRecords,
         insertMissingNodes,
         updateRecordsInAnalysis,
+        includeFiles,
         abortOnErrors,
       })
       const jobSerialized = JobUtils.jobToJSON(job)

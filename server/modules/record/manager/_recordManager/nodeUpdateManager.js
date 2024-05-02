@@ -236,7 +236,8 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   nodeDependentUniqueAttributes = Object.values(nodeDependentUniqueAttributes).reduce((nodesAcc, nodeDependent) => {
     const nodeDependentUuid = Node.getUuid(nodeDependent)
     const deleted = !Record.getNodeByUuid(nodeDependentUuid)(recordUpdated)
-    const nodeDependentUpdated = Node.assocDeleted(deleted)(nodeDependent)
+    const nodeDependentUpdated =
+      Node.isDeleted(nodeDependent) !== deleted ? Node.assocDeleted(deleted)(nodeDependent) : nodeDependent
     return { ...nodesAcc, [nodeDependentUuid]: nodeDependentUpdated }
   }, {})
 
