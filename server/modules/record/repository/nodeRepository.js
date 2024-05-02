@@ -35,9 +35,24 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
+const nodeKeyByColumnName = {
+  date_created: Node.keys.dateCreated,
+  date_modified: Node.keys.dateModified,
+  node_def_uuid: Node.keys.nodeDefUuid,
+  parent_uuid: Node.keys.parentUuid,
+  record_uuid: Node.keys.recordUuid,
+  survey_uuid: Node.keys.surveyUuid,
+}
+
 const dbTransformCallback = (node) => {
-  // do not camelize meta properties
-  A.camelizePartial({ skip: [Node.keys.meta], sideEffect: true })(node)
+  // camelize keys
+  Object.entries(nodeKeyByColumnName).forEach(([columnName, key]) => {
+    const val = node[columnName]
+    if (val !== undefined) {
+      node[key] = val
+    }
+    delete node[columnName]
+  })
   // cast id to Number
   node.id = Number(node.id)
   return node
