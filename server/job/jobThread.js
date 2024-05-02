@@ -29,12 +29,8 @@ class JobThread extends Thread {
     }
   }
 
-  get jobSummary() {
-    return jobToJSON(this.job)
-  }
-
   sendJobToParentThread() {
-    this.postMessage(this.jobSummary)
+    this.postMessage(jobToJSON(this.job))
   }
 }
 

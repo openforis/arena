@@ -162,7 +162,7 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        const job = await AnalysisService.startPersistResultsJob({
+        const job = AnalysisService.startPersistResultsJob({
           user,
           surveyId,
           cycle,
@@ -171,7 +171,7 @@ export const init = (app) => {
           filePath,
         })
 
-        res.json({ job: JobUtils.jobToJSON(job) })
+        res.json(JobUtils.jobToJSON(job))
       } catch (e) {
         next(e)
       }

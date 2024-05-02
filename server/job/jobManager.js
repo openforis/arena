@@ -5,6 +5,8 @@ import ThreadManager from '@server/threads/threadManager'
 
 import { jobThreadMessageTypes } from './jobUtils'
 
+const threadCleanupDelay = 20000
+
 // USER JOB WORKERS
 
 const userJobThreads = new ThreadsCache()
@@ -27,15 +29,25 @@ const _notifyJobUpdate = (jobSerialized) => {
     userJobThreads.removeThread(userUuid)
   }
 
-  // Delay thread termination by 1 second (give time to print debug info to the console)
-  setTimeout(cleanupThread, 1000)
+  // Delay thread termination by 20 seconds (give time to print debug info to the console)
+  setTimeout(cleanupThread, threadCleanupDelay)
 }
 
 // ====== READ
 
-export const getActiveJobSummary = (userUuid) => {
+export const getActiveJobSummary = async (userUuid) => {
   const jobThread = userJobThreads.getThread(userUuid)
-  return jobThread?.jobSummary
+  if (!jobThread) return null
+
+  // post a message to the thread and read the response using a listener
+  return new Promise((resolve) => {
+    const messageListener = ({ msg: jobSummary }) => {
+      jobThread.removeMessageListener(messageListener)
+      resolve(jobSummary)
+    }
+    jobThread.addMessageListener(messageListener)
+    jobThread.postMessage({ type: jobThreadMessageTypes.fetchJob })
+  })
 }
 
 // ====== UPDATE

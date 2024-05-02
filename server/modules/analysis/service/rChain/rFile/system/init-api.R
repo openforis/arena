@@ -73,6 +73,29 @@ arena.delete = function(url, body) {
   return(arena.parseResponse(resp))
 }
 
+arena.waitForJobToComplete = function(job) {
+  if (is.null(job)) {
+    stop("Error: job not started properly")
+  }
+  pb = txtProgressBar(min = 0, max = 100)
+  while (!is.null(job) && !job$ended) {
+    setTxtProgressBar(pb, job$progressPercent)
+    Sys.sleep(15)
+    job <- arena.get('/jobs/active')
+  }
+  close(pb)
+  if (is.null(job)) {
+    stop("Job completed but state is unknown")
+  }
+  if (job$succeeded) {
+    return(TRUE)
+  }
+  if (job$failed) {
+    stop("Error: job failed.")
+  }
+  return(FALSE)
+}
+
 
 arena.login = function(tentative) {
   if (missing(tentative)) {
