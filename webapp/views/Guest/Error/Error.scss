@@ -5,9 +5,16 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: white;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   position: fixed;
   width: 30vw;
   left: 35vw;
-  top: 15vh;
+  top: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .guest-errors {
+    width: 80vw;
+    left: 10vw;
+  }
 }
