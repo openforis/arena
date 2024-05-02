@@ -1,8 +1,8 @@
 import * as JobManager from '@server/job/jobManager'
 
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
-import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
+import DataImportJob from './DataImportJob/DataImportJob'
 
 export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
   const job = new CollectDataImportJob({
@@ -27,6 +27,7 @@ export const startCSVDataImportJob = ({
   insertNewRecords = false,
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
+  includeFiles = false,
   abortOnErrors = true,
 }) => {
   const jobParams = {
@@ -39,6 +40,7 @@ export const startCSVDataImportJob = ({
     insertNewRecords,
     insertMissingNodes,
     updateRecordsInAnalysis,
+    includeFiles,
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)

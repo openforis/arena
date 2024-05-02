@@ -2,14 +2,14 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
-import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
-import { DataImportFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFileReader'
+import CsvDataImportJob from '@server/modules/dataImport/service/DataImportJob/CsvDataImportJob'
+import { DataImportCsvFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportCsvFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import FileZip from '@server/utils/file/fileZip'
 
 import { RecordsProvider } from './RecordsProvider'
 
-export default class PersistResultsJob extends DataImportJob {
+export default class PersistResultsJob extends CsvDataImportJob {
   constructor(params) {
     super(params, PersistResultsJob.type)
   }
@@ -51,7 +51,7 @@ export default class PersistResultsJob extends DataImportJob {
   async createCsvReader() {
     const { cycle, nodeDefUuid, survey } = this.context
 
-    return DataImportFileReader.createReaderFromStream({
+    return DataImportCsvFileReader.createReaderFromStream({
       stream: this.stream,
       survey,
       cycle,

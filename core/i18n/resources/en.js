@@ -642,6 +642,10 @@ $t(common.cantUndoWarning)`,
         - {{updatedRecords}} records updated`,
         importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
+        importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
+        - {{insertedFiles}} files inserted
+        - {{updatedFiles}} files updated
+        - {{deletedFiles}} files deleted`,
         importCompleteWithErrors: `## Import complete (with errors):
         - {{processed}} rows processed`,
       },
@@ -653,6 +657,10 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         - {{updatedValues}} values would be updated
         - {{insertedRecords}} records would be created
         - {{updatedRecords}} records would be updated`,
+        validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
+        - {{insertedFiles}} files would be inserted
+        - {{updatedFiles}} files would be updated
+        - {{deletedFiles}} files would be deleted`,
       },
     },
     options: {
@@ -660,6 +668,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       abortOnErrors: 'Abort on errors',
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
+      includeFiles: 'Include files',
     },
     startImport: 'Start import',
     startImportConfirm: `By pressing 'Ok' you will start the import process.
