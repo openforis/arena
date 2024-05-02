@@ -1,12 +1,13 @@
-import * as Taxonomy from '../../../../core/survey/taxonomy'
-import * as Taxon from '../../../../core/survey/taxon'
-import * as ApiRoutes from '../../../../common/apiRoutes'
+import * as ApiRoutes from '@common/apiRoutes'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
 
-import * as Request from '../../../utils/request'
-import * as Response from '../../../utils/response'
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import * as CategoryService from '../../category/service/categoryService'
-import * as TaxonomyService from '../../taxonomy/service/taxonomyService'
+import * as JobUtils from '@server/job/jobUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
@@ -161,9 +162,16 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        await AnalysisService.persistResults({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath })
+        const job = await AnalysisService.startPersistResultsJob({
+          user,
+          surveyId,
+          cycle,
+          entityDefUuid,
+          chainUuid,
+          filePath,
+        })
 
-        Response.sendOk(res)
+        res.json({ job: JobUtils.jobToJSON(job) })
       } catch (e) {
         next(e)
       }

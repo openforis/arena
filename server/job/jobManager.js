@@ -31,6 +31,13 @@ const _notifyJobUpdate = (jobSerialized) => {
   setTimeout(cleanupThread, 1000)
 }
 
+// ====== READ
+
+export const getActiveJobSummary = (userUuid) => {
+  const jobThread = userJobThreads.getThread(userUuid)
+  return jobThread?.jobSummary
+}
+
 // ====== UPDATE
 
 export const cancelActiveJobByUserUuid = async (userUuid) => {
