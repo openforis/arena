@@ -27,9 +27,9 @@ const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
       arenaPutFile(
         ApiRoutes.rChain.entityData({ surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }),
         fileZip
-      ),
-      arenaWaitForJobToComplete(persistScriptJobVar)
-    )
+      )
+    ),
+    arenaWaitForJobToComplete(persistScriptJobVar)
   )
   return scripts
 }

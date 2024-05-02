@@ -1,3 +1,5 @@
+import ItemsCache from './ItemsCache'
+
 const defaultOptions = {
   itemIdleTimeoutSeconds: 15 * 60, // 15 mins
 }
@@ -7,50 +9,25 @@ const defaultOptions = {
  * When the timeout for an item is reached,
  * the item is automatically removed from the cache to save memory.
  */
-export default class IdleTimeoutCache {
+export default class IdleTimeoutCache extends ItemsCache {
   constructor(options = {}) {
-    const { itemIdleTimeoutSeconds } = { ...defaultOptions, ...options }
-
-    this.itemIdleTimeoutSeconds = itemIdleTimeoutSeconds
-    this._itemsByKey = {}
+    super({ ...defaultOptions, ...options })
     this._itemTimeoutIdByKey = {}
   }
 
   get(key) {
     this._resetItemIdleTimeout(key)
-    return this._itemsByKey[key]
-  }
-
-  has(key) {
-    return !!this.get(key)
-  }
-
-  get keys() {
-    return Object.keys(this._itemsByKey)
-  }
-
-  get size() {
-    return this.keys.length
-  }
-
-  isEmpty() {
-    return this.size === 0
-  }
-
-  findKeys(filterFunction) {
-    return this.keys.filter(filterFunction)
+    return super.get(key)
   }
 
   set(key, item) {
-    this._itemsByKey[key] = item
     this._resetItemIdleTimeout(key)
-    return this
+    return super.set(key, item)
   }
 
   delete(key) {
     this._clearItemIdleTimeout(key)
-    delete this._itemsByKey[key]
-    return this
+    return super.delete(key)
   }
 
   _clearItemIdleTimeout(key) {
@@ -66,6 +43,6 @@ export default class IdleTimeoutCache {
 
     this._itemTimeoutIdByKey[key] = setTimeout(() => {
       this.delete(key)
-    }, this.itemIdleTimeoutSeconds * 1000)
+    }, this.options.itemIdleTimeoutSeconds * 1000)
   }
 }

@@ -5,7 +5,7 @@ import * as JobManager from './jobManager'
 
 export const init = (app) => {
   app.get('/jobs/active', async (req, res) => {
-    const jobSummary = await JobManager.getActiveJobSummary(Request.getUserUuid(req))
+    const jobSummary = JobManager.getActiveJobSummary(Request.getUserUuid(req))
     res.json(jobSummary)
   })
 
