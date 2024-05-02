@@ -160,14 +160,13 @@ export default class RecordCheckJob extends Job {
 
     // 4a. Persist nodes
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
-    const nodesCreatedArray = allUpdatedNodesArray.filter(Node.isCreated)
-    await PromiseUtils.each(nodesCreatedArray, async (node) => {
-      this.nodesBatchInserter.addItem(node, this.tx)
-    })
-    const nodesUpdatedArray = allUpdatedNodesArray.filter((node) => Node.isUpdated(node) && !Node.isCreated(node))
-    await PromiseUtils.each(nodesUpdatedArray, async (node) => {
-      this.nodesBatchUpdater.addItem(node, this.tx)
-    })
+    for await (const node of allUpdatedNodesArray) {
+      if (Node.isCreated(node)) {
+        this.nodesBatchInserter.addItem(node, this.tx)
+      } else if (Node.isUpdated(node)) {
+        this.nodesBatchUpdater.addItem(node, this.tx)
+      }
+    }
 
     // 5. clear record keys validation (record keys validation performed after RDB generation)
     record = _clearRecordKeysValidation(record)

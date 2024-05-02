@@ -132,11 +132,14 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   ).map((nodeReloaded) => {
     // preserve status flags (used in rdb updates)
     const oldNode = nodes[Node.getUuid(nodeReloaded)]
-    return R.pipe(
-      Node.assocCreated(Node.isCreated(oldNode)),
-      Node.assocDeleted(Node.isDeleted(oldNode)),
-      Node.assocUpdated(Node.isUpdated(oldNode))
-    )(nodeReloaded)
+    let result = nodeReloaded
+    if (Node.isCreated(oldNode)) {
+      result = Node.assocCreated(true)(result)
+    }
+    if (Node.isUpdated(oldNode)) {
+      result = Node.assocUpdated(true)(result)
+    }
+    return result
   })
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
