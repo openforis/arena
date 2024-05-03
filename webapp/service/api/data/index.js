@@ -94,13 +94,14 @@ export const downloadExportedDataToCSVUrl = ({ surveyId, cycle, exportUuid }) =>
   return `/api/survey/${surveyId}/data-export/csv/${exportUuid}?${params.toString()}`
 }
 
-export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
+export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, options }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const {
     data: { tempFileName },
   } = await axios.post(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/start`, {
     cycle,
     query,
+    options,
   })
   return tempFileName
 }
