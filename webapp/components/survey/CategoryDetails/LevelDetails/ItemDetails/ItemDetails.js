@@ -157,7 +157,7 @@ const ItemDetails = (props) => {
           <div>
             {'\u00A0'}-{'\u00A0'}
           </div>
-          <div className="ellipsis">{CategoryItem.getLabel(lang)(item)}</div>
+          <div className="ellipsis">{CategoryItem.getLabel(lang, false)(item)}</div>
         </>
       )}
     </div>

@@ -56,7 +56,10 @@ export const {
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')
-export const getLabel = (language) => (item) => ObjectUtils.getLabel(language, getCode(item))(item)
+export const getLabel =
+  (language, defaultToCode = true) =>
+  (item) =>
+    ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
 export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
 
 // ====== READ - Extra Props
