@@ -61,19 +61,11 @@ const _selectFieldsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const { name: alias, names, nameFull, namesFull, nodeDef } = columnNodeDef
+    const { name: alias, names, nameFull, namesFull } = columnNodeDef
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
       return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
-    }
-    if (
-      NodeDef.isCode(nodeDef) &&
-      NodeDef.isMultiple(nodeDef) &&
-      !NodeDef.isMultipleAttribute(viewDataNodeDef.nodeDef)
-    ) {
-      // include code attribute label column only if the view is relative to the multiple attribute
-      return nameFull
     }
     return namesFull
   }
