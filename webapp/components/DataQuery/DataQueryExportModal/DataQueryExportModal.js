@@ -76,6 +76,4 @@ export const DataQueryExportModal = (props) => {
 
 DataQueryExportModal.propTypes = {
   onClose: PropTypes.func.isRequired,
-  recordUuids: PropTypes.array,
-  search: PropTypes.string,
 }
