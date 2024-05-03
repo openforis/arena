@@ -9,36 +9,11 @@ import { Objects } from '@openforis/arena-core'
 import { TestId } from '@webapp/utils/testId'
 
 import { ExportCsvDataActions } from '@webapp/store/ui'
-import { Button, ExpansionPanel, RadioButtonGroup } from '@webapp/components'
-import { Checkbox } from '@webapp/components/form'
-import { useAuthCanUseAnalysis } from '@webapp/store/user'
-import { useSurveyCycleKeys } from '@webapp/store/survey'
+import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
-
-const exportOptions = {
-  includeCategoryItemsLabels: 'includeCategoryItemsLabels',
-  expandCategoryItems: 'expandCategoryItems',
-  includeCategories: 'includeCategories',
-  includeAncestorAttributes: 'includeAncestorAttributes',
-  includeAnalysis: 'includeAnalysis',
-  includeDataFromAllCycles: 'includeDataFromAllCycles',
-  includeFiles: 'includeFiles',
-}
-
-const infoMessageKeyByOption = {
-  expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
-}
-
-const defaultOptionsSelection = {
-  [exportOptions.includeCategoryItemsLabels]: true,
-  [exportOptions.expandCategoryItems]: false,
-  [exportOptions.includeCategories]: false,
-  [exportOptions.includeAncestorAttributes]: false,
-  [exportOptions.includeAnalysis]: false,
-  [exportOptions.includeDataFromAllCycles]: false,
-  [exportOptions.includeFiles]: false,
-}
+import { DataExportOptionsPanel } from './DataExportOptionsPanel'
+import { defaultDataExportOptionsSelection } from './dataExportOptions'
 
 const sources = {
   allRecords: 'allRecords',
@@ -51,16 +26,17 @@ const DataExport = (props) => {
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const canAnalyzeRecords = useAuthCanUseAnalysis()
-  const cycles = useSurveyCycleKeys()
 
-  const [state, setState] = useState({ selectedOptions: defaultOptionsSelection, source: sources.allRecords })
-  const { selectedOptions, source } = state
+  const [state, setState] = useState({
+    selectedOptionsByKey: defaultDataExportOptionsSelection,
+    source: sources.allRecords,
+  })
+  const { selectedOptionsByKey, source } = state
 
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
-      const optionsUpdated = { ...statePrev.selectedOptions, [option]: value }
-      return { ...statePrev, selectedOptions: optionsUpdated }
+      const optionsUpdated = { ...statePrev.selectedOptionsByKey, [option]: value }
+      return { ...statePrev, selectedOptionsByKey: optionsUpdated }
     })
 
   const onSourceChange = (selectedSource) => setState((statePrev) => ({ ...statePrev, source: selectedSource }))
@@ -70,7 +46,7 @@ const DataExport = (props) => {
       ExportCsvDataActions.startCSVExport({
         recordUuids: source === sources.selectedRecords ? recordUuids : null,
         search: source === sources.filteredRecords ? search : null,
-        options: selectedOptions,
+        options: selectedOptionsByKey,
       })
     )
 
@@ -101,25 +77,8 @@ const DataExport = (props) => {
           <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />
         </FormItem>
       )}
-      <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
-        {[
-          exportOptions.includeCategoryItemsLabels,
-          exportOptions.expandCategoryItems,
-          exportOptions.includeCategories,
-          exportOptions.includeAncestorAttributes,
-          ...(canAnalyzeRecords ? [exportOptions.includeAnalysis] : []),
-          ...(cycles.length > 1 ? [exportOptions.includeDataFromAllCycles] : []),
-          exportOptions.includeFiles,
-        ].map((optionKey) => (
-          <Checkbox
-            key={optionKey}
-            checked={selectedOptions[optionKey]}
-            info={infoMessageKeyByOption[optionKey]}
-            label={`dataExportView.options.${optionKey}`}
-            onChange={onOptionChange(optionKey)}
-          />
-        ))}
-      </ExpansionPanel>
+
+      <DataExportOptionsPanel onOptionChange={onOptionChange} selectedOptionsByKey={selectedOptionsByKey} />
 
       <Button
         className="btn-primary"
