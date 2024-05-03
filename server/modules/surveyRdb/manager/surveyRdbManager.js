@@ -193,6 +193,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     expandCategoryItems,
     includeAncestorAttributes,
     includeAnalysis,
+    includeFiles,
     recordOwnerUuid = null,
     recordUuids: recordUuidsParam = null,
     search = null,
@@ -227,10 +228,12 @@ export const fetchEntitiesDataToCsvFiles = async (
     const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
-    const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? getChildAttributes(nodeDefContext)
-      : // Multiple attribute
-        [nodeDefContext]
+    const childDefs = (
+      NodeDef.isEntity(nodeDefContext)
+        ? getChildAttributes(nodeDefContext)
+        : // Multiple attribute
+          [nodeDefContext]
+    ).filter((childDef) => includeFiles || !NodeDef.isFile(childDef))
 
     const ancestorDefs = []
     if (includeAncestorAttributes) {
@@ -246,8 +249,8 @@ export const fetchEntitiesDataToCsvFiles = async (
     }
 
     let query = Query.create({ entityDefUuid })
-    const ancestorAttributeDefUuids = ancestorDefs.concat(childDefs).map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(ancestorAttributeDefUuids)(query)
+    const queryAttributeDefUuids = ancestorDefs.concat(childDefs).map(NodeDef.getUuid)
+    query = Query.assocAttributeDefUuids(queryAttributeDefUuids)(query)
     query = Query.assocFilterRecordUuids(recordUuids)(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
