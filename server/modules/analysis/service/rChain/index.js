@@ -7,13 +7,12 @@ import FileZip from '@server/utils/file/fileZip'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordStep from '@core/record/recordStep'
-import { ValidationUtils } from '@core/validation/validationUtils'
-import i18n from '@core/i18n/i18nFactory'
 
 import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as Chain from '@common/analysis/chain'
 
+import * as JobManager from '@server/job/jobManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -59,14 +58,10 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
 
 // ==== UPDATE
 
-export const persistResults = async ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
-  await job.start()
-  if (job.isFailed()) {
-    const validationError = job.getError()
-    const errorMessage = ValidationUtils.getJointMessage({ i18n })(validationError)
-    throw new Error(`error persisting results: ${errorMessage}`)
-  }
+  JobManager.executeJobThread(job)
+  return job
 }
 
 const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {

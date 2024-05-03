@@ -24,6 +24,9 @@ export default class DataImportJob extends Job {
 
   onEnd() {
     super.onEnd()
+
+    this.errors = this.combineInnerJobsErrors()
+
     const csvDataImportJob = this.innerJobs[0]
     csvDataImportJob?.dataImportFileReader?.close()
   }

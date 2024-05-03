@@ -25,3 +25,5 @@ export const arenaPutFile = (url, filePath, params = {}) =>
   arenaFunction('arena.putFile', quote(url), toBodyArg(params), `filePath = ${quote(filePath)}`)
 
 export const arenaDelete = (url, params = {}) => arenaFunction('arena.delete', quote(url), toBodyArg(params))
+
+export const arenaWaitForJobToComplete = (jobVarName) => arenaFunction('arena.waitForJobToComplete', jobVarName)

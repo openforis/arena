@@ -10,6 +10,10 @@ import FileZip from '@server/utils/file/fileZip'
 import { RecordsProvider } from './RecordsProvider'
 
 export default class PersistResultsJob extends CsvDataImportJob {
+  constructor(params) {
+    super(params, PersistResultsJob.type)
+  }
+
   async onStart() {
     const { surveyId, tx } = this
     const { nodeDefUuid, filePath } = this.context
@@ -87,6 +91,8 @@ export default class PersistResultsJob extends CsvDataImportJob {
 
     // current record could have been changed (e.g. node flags removed etc): update records cache too
     this.recordsProvider.add(this.currentRecord)
+
+    this.incrementProcessedItems()
   }
 
   async onEnd() {
@@ -94,3 +100,5 @@ export default class PersistResultsJob extends CsvDataImportJob {
     this.fileZip?.close()
   }
 }
+
+PersistResultsJob.type = 'PersistResultsJob'

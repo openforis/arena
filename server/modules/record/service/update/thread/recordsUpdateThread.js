@@ -4,6 +4,7 @@ import { WebSocketEvent } from '@openforis/arena-server'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
+import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -14,7 +15,6 @@ import Queue from '@core/queue'
 import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
-import IdleTimeoutCache from './IdleTimeoutCache'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
