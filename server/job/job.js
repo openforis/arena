@@ -44,7 +44,7 @@ export default class Job {
     this.startTime = null
     this.endTime = null
     this.total = 0
-    this.processed = 0
+    this._processed = 0
     this.result = {}
     this.errors = {}
     this.innerJobs = innerJobs
@@ -211,14 +211,16 @@ export default class Job {
     }
   }
 
-  incrementProcessedItems(incrementBy = 1) {
-    this.processed += incrementBy
-
+  notifyProgress() {
     throttle(
       async () => this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
       1000
     )()
+  }
+
+  incrementProcessedItems(incrementBy = 1) {
+    this.processed = this.processed + incrementBy
   }
 
   /**
@@ -315,6 +317,15 @@ export default class Job {
 
   set stopOnInnerJobFailure(value) {
     this._stopOnInnerJobFailure = value
+  }
+
+  get processed() {
+    return this._processed
+  }
+
+  set processed(processedItems) {
+    this._processed = processedItems
+    this.notifyProgress()
   }
 
   getCurrentInnerJob() {

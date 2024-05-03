@@ -7,17 +7,18 @@ import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import { useIsAppSaving } from '@webapp/store/app'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
-import { useButtonBar } from './store'
-import ButtonDownload from './ButtonDownload'
+import { DataQueryExportModal } from '../DataQueryExportModal'
+import { State, useButtonBar } from './store'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
 import ButtonShowQueries from './ButtonShowQueries'
@@ -85,7 +86,8 @@ const ButtonBar = (props) => {
         <div>
           <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
           <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
-          <ButtonDownload disabled={queryChangeDisabled} />
+          <ButtonDownload disabled={queryChangeDisabled} label="common.csvExport" onClick={Actions.togglePanelExport} />
+          {State.isPanelExportShown(state) && <DataQueryExportModal onClose={Actions.togglePanelExport} />}
         </div>
       )}
 

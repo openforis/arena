@@ -10,6 +10,7 @@ export const useButtonBar = () => {
     togglePanelFilter: () => setState(State.togglePanelFilter),
     togglePanelSort: () => setState(State.togglePanelSort),
     togglePanelQueries: () => setState(State.togglePanelQueries),
+    togglePanelExport: () => setState(State.togglePanelExport),
   }
 
   return { state, Actions }
