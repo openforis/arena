@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import { ExpansionPanel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 
@@ -14,23 +16,26 @@ const infoMessageKeyByOption = {
 }
 
 export const DataExportOptionsPanel = (props) => {
-  const { onOptionChange, selectedOptionsByKey } = props
+  const { availableOptions: availableOptionsProp, onOptionChange, selectedOptionsByKey } = props
 
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const cycles = useSurveyCycleKeys()
   const hasMultipleCycles = cycles.length > 1
 
   const availableOptions = useMemo(
-    () => [
-      dataExportOptions.includeCategoryItemsLabels,
-      dataExportOptions.expandCategoryItems,
-      dataExportOptions.includeCategories,
-      dataExportOptions.includeAncestorAttributes,
-      ...(canAnalyzeRecords ? [dataExportOptions.includeAnalysis] : []),
-      ...(hasMultipleCycles ? [dataExportOptions.includeDataFromAllCycles] : []),
-      dataExportOptions.includeFiles,
-    ],
-    [canAnalyzeRecords, hasMultipleCycles]
+    () =>
+      Objects.isEmpty(availableOptionsProp)
+        ? [
+            dataExportOptions.includeCategoryItemsLabels,
+            dataExportOptions.expandCategoryItems,
+            dataExportOptions.includeCategories,
+            dataExportOptions.includeAncestorAttributes,
+            ...(canAnalyzeRecords ? [dataExportOptions.includeAnalysis] : []),
+            ...(hasMultipleCycles ? [dataExportOptions.includeDataFromAllCycles] : []),
+            dataExportOptions.includeFiles,
+          ]
+        : availableOptionsProp,
+    [availableOptionsProp, canAnalyzeRecords, hasMultipleCycles]
   )
 
   return (
@@ -49,6 +54,7 @@ export const DataExportOptionsPanel = (props) => {
 }
 
 DataExportOptionsPanel.propTypes = {
+  availableOptions: PropTypes.array,
   onOptionChange: PropTypes.func.isRequired,
   selectedOptionsByKey: PropTypes.object.isRequired,
 }

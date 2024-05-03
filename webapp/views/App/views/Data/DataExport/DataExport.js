@@ -71,7 +71,7 @@ const DataExport = (props) => {
   }
 
   return (
-    <div className="export">
+    <div className="data-export-container">
       {availableSources.length > 1 && (
         <FormItem className="source-form-item" label={i18n.t('dataView.dataExport.source.label')}>
           <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />

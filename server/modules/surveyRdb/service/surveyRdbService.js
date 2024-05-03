@@ -16,7 +16,14 @@ import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
 
 const _fetchSurvey = async ({ surveyId, cycle }) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
-  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced: true })
+  return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: true,
+    includeBigCategories: false,
+    includeBigTaxonomies: false,
+  })
 }
 
 const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
@@ -50,6 +57,7 @@ export const fetchViewData = async (params) => {
     columnNodeDefs = false,
     streamOutput = null,
     addCycle = false,
+    options = {},
   } = params
 
   let parsedQuery = query
@@ -71,6 +79,7 @@ export const fetchViewData = async (params) => {
         limit,
         streamOutput,
         addCycle,
+        ...options,
       })
 
   return data
@@ -122,12 +131,13 @@ export const exportViewDataToTempFile = async ({
   query,
   columnNodeDefs = false,
   addCycle = false,
+  options = {},
 }) => {
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
   const streamOutput = FileUtils.createWriteStream(tempFilePath)
 
-  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
+  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle, options })
 
   return tempFileName
 }

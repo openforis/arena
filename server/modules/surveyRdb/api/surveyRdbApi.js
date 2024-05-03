@@ -70,7 +70,7 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, query } = Request.getParams(req)
+        const { surveyId, cycle, query, options } = Request.getParams(req)
         const user = Request.getUser(req)
 
         const tempFileName = await SurveyRdbService.exportViewDataToTempFile({
@@ -79,6 +79,7 @@ export const init = (app) => {
           cycle,
           query,
           addCycle: true,
+          options,
         })
 
         res.json({ tempFileName })
