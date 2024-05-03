@@ -13,6 +13,11 @@ export default class ZipCreationJob extends Job {
 
     const tempZipFileName = `${exportUuid}.zip`
     const tempZipFilePath = FileUtils.tempFilePath(tempZipFileName)
-    await ZipUtils.zipDirIntoFile({ dirPath: outputDir, outputFilePath: tempZipFilePath })
+    await ZipUtils.zipDirIntoFile({
+      dirPath: outputDir,
+      outputFilePath: tempZipFilePath,
+      onTotal: (total) => (this.total = total),
+      onProgress: ({ processed }) => (this.processed = processed),
+    })
   }
 }
