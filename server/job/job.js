@@ -251,6 +251,12 @@ export default class Job {
     return results
   }
 
+  combineInnerJobsErrors() {
+    const errors = {}
+    this.innerJobs.forEach((innerJob) => Object.assign(errors, innerJob.errors ?? {}))
+    return errors
+  }
+
   /**
    * Called before onEnd.
    * Used to flush the resources used by the job before it terminates completely.
