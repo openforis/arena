@@ -48,8 +48,11 @@ const ColumnHeader = (props) => {
     nodeDef,
   })
 
+  const entityDefUuid = Query.getEntityDefUuid(query)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang, nodeDefLabelType)
+  // measure is editable only when the node def is not equal to the context entity (e.g. entity count measure is not editable)
+  const canEditMeasure = nodeDefUuid !== entityDefUuid
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
@@ -61,7 +64,7 @@ const ColumnHeader = (props) => {
         ) : (
           <>
             <span className="ellipsis">{nodeDefLabel}</span>
-            {isMeasure && (
+            {isMeasure && canEditMeasure && (
               <ButtonIconGear
                 className="btn btn-s btn-transparent btn-aggregates"
                 onClick={() => setShowAggregateFunctionsPanel(true)}

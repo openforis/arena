@@ -14,6 +14,7 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 import AttributeSelector from './AttributeSelector'
+import { useI18n } from '@webapp/store/system'
 
 const minDefsToShowSelectAll = 5
 
@@ -25,6 +26,7 @@ const AttributesSelector = (props) => {
     filterChainUuids,
     lang,
     ancestorSelector,
+    includeEntityCountSelector,
     nodeDefLabelType,
     nodeDefUuidsToExclude,
     nodeDefUuidEntity,
@@ -39,6 +41,7 @@ const AttributesSelector = (props) => {
     showSiblingsInSingleEntities,
   } = props
 
+  const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const canUseAnalysis = useAuthCanUseAnalysis()
@@ -90,6 +93,21 @@ const AttributesSelector = (props) => {
 
   return (
     <div className={classNames('attributes-selector', { ancestor: ancestorSelector })}>
+      {includeEntityCountSelector && (
+        <AttributeSelector
+          key={NodeDef.getUuid(nodeDefAncestor)}
+          labelFunction={(nodeDef) =>
+            i18n.t('dataView.nodeDefsSelector.nodeDefCount', {
+              nodeDefLabel: NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType }),
+            })
+          }
+          nodeDef={nodeDefContext}
+          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          onToggleAttribute={onToggleAttribute}
+          showNodeDefPath={false}
+          nodeDefLabelType={nodeDefLabelType}
+        />
+      )}
       {visibleChildDefs.length > 0 && (
         <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
           {onAttributesSelection && visibleChildDefs.length > minDefsToShowSelectAll && (
@@ -144,6 +162,7 @@ AttributesSelector.propTypes = {
   filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
+  includeEntityCountSelector: PropTypes.bool,
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
@@ -165,6 +184,7 @@ AttributesSelector.defaultProps = {
   filterFunction: null,
   filterTypes: [],
   filterChainUuids: [],
+  includeEntityCountSelector: false,
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
   nodeDefUuidsToExclude: [],
