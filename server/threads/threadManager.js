@@ -11,11 +11,16 @@ import * as Log from '@server/log/log'
 import Thread from './thread'
 import * as ThreadParams from './threadParams'
 
+const workerEvents = {
+  message: 'message',
+  exit: 'exit',
+}
+
 /**
- * Base class for managing communication between EventLoop and Thread in worker pool
+ * Base class for managing communication between EventLoop and Thread in worker pool.
  */
 export default class ThreadManager {
-  constructor(fileName, data, messageHandler, exitHandler = null) {
+  constructor(fileName, data, messageListener, exitHandler = null) {
     const filePath = path.resolve(ProcessUtils.ENV.arenaDist, fileName)
 
     this.worker = new Worker(filePath, { workerData: data })
@@ -23,9 +28,9 @@ export default class ThreadManager {
     this.threadId = this.worker.threadId
     this.logger = Log.getLogger(`ThreadManager - thread ID: ${this.threadId}`)
 
-    this.worker.on('message', this.messageHandlerWrapper.bind(this)(messageHandler))
+    this.addMessageListener(this.messageHandlerWrapper.bind(this)(messageListener))
 
-    this.worker.on('exit', () => {
+    this.worker.on(workerEvents.exit, () => {
       this.logger.debug('thread ended')
       if (exitHandler) {
         exitHandler()
@@ -33,6 +38,14 @@ export default class ThreadManager {
     })
 
     this.logger.debug('thread created')
+  }
+
+  addMessageListener(listener) {
+    this.worker.on(workerEvents.message, listener)
+  }
+
+  removeMessageListener(listener) {
+    this.worker.removeListener(workerEvents.message, listener)
   }
 
   messageHandlerWrapper(messageHandler) {
@@ -50,7 +63,7 @@ export default class ThreadManager {
   }
 
   /**
-   * Post a message to thread in worker pool
+   * Post a message to thread in worker pool.
    * @param message
    */
   postMessage(message) {

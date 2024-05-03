@@ -10,6 +10,7 @@ import CollectDataImportJob from '@server/modules/collectImport/service/collectI
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import DataExportJob from '@server/modules/dataExport/service/DataExportJob'
+import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
@@ -30,6 +31,7 @@ const jobClasses = [
   DataImportJob,
   DataImportValidationJob,
   DataExportJob,
+  PersistResultsJob,
   RecordsCloneJob,
   SurveyCloneJob,
   SurveyExportJob,
