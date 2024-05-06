@@ -1,4 +1,4 @@
-import * as PromiseUtils from '@core/promiseUtils'
+import { Objects } from '@openforis/arena-core'
 
 import * as RecordFile from '@core/record/recordFile'
 
@@ -12,24 +12,28 @@ export default class FilesExportJob extends Job {
   }
 
   async execute() {
-    const { archive, surveyId } = this.context
+    const { archive, surveyId, recordUuids } = this.context
 
     const filesSummaries = await FileService.fetchFileSummariesBySurveyId(surveyId, this.tx)
-    const filesCount = filesSummaries.length
+    const filesSummariesIncluded = Objects.isEmpty(recordUuids)
+      ? filesSummaries
+      : filesSummaries.filter((fileSummary) => recordUuids.includes(RecordFile.getRecordUuid(fileSummary)))
+
+    const filesCount = filesSummariesIncluded.length
     this.total = filesCount
 
     this.logDebug(`file(s) to export: ${filesCount}`)
 
     if (filesCount > 0) {
-      archive.append(JSON.stringify(filesSummaries, null, 2), { name: ExportFile.filesSummaries })
+      archive.append(JSON.stringify(filesSummariesIncluded, null, 2), { name: ExportFile.filesSummaries })
 
       // write each file content into a separate binary file
-      await PromiseUtils.each(filesSummaries, async (fileSummary) => {
+      for await (const fileSummary of filesSummariesIncluded) {
         const fileUuid = RecordFile.getUuid(fileSummary)
         const fileContentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
         archive.append(fileContentStream, { name: ExportFile.file({ fileUuid }) })
         this.incrementProcessedItems()
-      })
+      }
     }
   }
 }
