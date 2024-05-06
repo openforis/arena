@@ -691,6 +691,11 @@ Are you sure you want to continue?`,
   dataView: {
     dataQuery: {
       deleteConfirmMessage: 'Delete the query "{{name}}"?',
+      displayType: {
+        label: 'Display type',
+        chart: 'Chart',
+        table: 'Table',
+      },
       manageQueries: 'Manage queries',
       mode: {
         label: 'Mode:',

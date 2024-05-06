@@ -26,7 +26,7 @@ export const ButtonGroupDisplayType = () => {
           },
           {
             key: DataExplorerState.displayTypes.chart,
-            iconClassName: 'icon-chart',
+            iconClassName: 'icon-pie-chart',
             label: 'dataView.dataQuery.displayType.chart',
           },
         ]}

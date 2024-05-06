@@ -3,10 +3,11 @@ import PropTypes from 'prop-types'
 
 import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
+import { DataQueryChart } from './DataQueryChart'
 import DataQueryTable from './DataQueryTable'
 
 const components = {
-  [DataExplorerState.displayTypes.chart]: DataQueryTable,
+  [DataExplorerState.displayTypes.chart]: DataQueryChart,
   [DataExplorerState.displayTypes.table]: DataQueryTable,
 }
 
