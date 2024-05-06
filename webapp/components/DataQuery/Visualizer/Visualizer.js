@@ -6,6 +6,7 @@ import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExpl
 import DataQueryTable from './DataQueryTable'
 
 const components = {
+  [DataExplorerState.displayTypes.chart]: DataQueryTable,
   [DataExplorerState.displayTypes.table]: DataQueryTable,
 }
 

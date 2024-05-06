@@ -21,7 +21,8 @@ import { DataQueryExportModal } from '../DataQueryExportModal'
 import { State, useButtonBar } from './store'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
-import ButtonShowQueries from './ButtonShowQueries'
+import ButtonManageQueries from './ButtonManageQueries'
+import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
 
 const ButtonBar = (props) => {
   const { dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
@@ -93,7 +94,9 @@ const ButtonBar = (props) => {
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
 
-      <ButtonShowQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+      <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+
+      <ButtonGroupDisplayType />
     </div>
   )
 }
