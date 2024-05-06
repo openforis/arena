@@ -1,24 +1,22 @@
 import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 
-import { Query } from '@common/model/query'
+import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
-import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
-
-import Table from './Table'
+import DataQueryTable from './DataQueryTable'
 
 const components = {
-  [Query.displayTypes.table]: Table,
+  [DataExplorerState.displayTypes.table]: DataQueryTable,
 }
 
 const Visualizer = (props) => {
   const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
 
-  const query = DataExplorerSelectors.useQuery()
+  const displayType = DataExplorerSelectors.useDisplayType()
 
   return (
     <div className="table__content">
-      {React.createElement(components[Query.getDisplayType(query)], {
+      {React.createElement(components[displayType], {
         data,
         dataEmpty,
         dataLoading,

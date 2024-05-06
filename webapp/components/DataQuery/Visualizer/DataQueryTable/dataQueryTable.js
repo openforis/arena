@@ -1,4 +1,4 @@
-import './table.scss'
+import './dataQueryTable.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
-const Table = (props) => {
+const DataQueryTable = (props) => {
   const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
 
   const i18n = useI18n()
@@ -62,7 +62,7 @@ const Table = (props) => {
   )
 }
 
-Table.propTypes = {
+DataQueryTable.propTypes = {
   data: PropTypes.array,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool,
@@ -72,9 +72,9 @@ Table.propTypes = {
   setData: PropTypes.func.isRequired,
 }
 
-Table.defaultProps = {
+DataQueryTable.defaultProps = {
   dataLoading: false,
   dataLoadingError: false,
 }
 
-export default Table
+export default DataQueryTable

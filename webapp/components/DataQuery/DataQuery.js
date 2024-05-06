@@ -7,19 +7,19 @@ import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
 
-import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
+import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
+import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
-import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
 
 const DataQuery = () => {
+  const displayType = DataExplorerSelectors.useDisplayType()
   const query = DataExplorerSelectors.useQuery()
-  const onChangeQuery = DataExplorerHooks.useSetQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const {
     count,
@@ -62,18 +62,16 @@ const DataQuery = () => {
         <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
-          query={query}
           data={data}
           dataEmpty={dataEmpty}
           dataLoading={dataLoading}
           dataLoadingError={dataLoadingError}
           nodeDefLabelType={nodeDefLabelType}
           offset={offset}
-          onChangeQuery={onChangeQuery}
           setData={setData}
         />
 
-        {dataLoaded && Query.getDisplayType(query) === Query.displayTypes.table && count && (
+        {dataLoaded && displayType === DataExplorerState.displayTypes.table && count && (
           <div className="table__footer">
             <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
           </div>

@@ -5,6 +5,7 @@ import { Query } from '@common/model/query'
 import { DataExplorerState } from './state'
 
 const initialState = {
+  displayType: 'table',
   editMode: false,
   nodeDefsSelectorVisible: true,
   query: Query.create(),
@@ -16,6 +17,8 @@ export const slice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
+
+    setDisplayType: (state, action) => DataExplorerState.assocDisplayType(action.payload)(state),
 
     setEditMode: (state, action) => DataExplorerState.assocEditMode(action.payload)(state),
 
@@ -29,10 +32,11 @@ export const slice = createSlice({
   },
 })
 
-const { reset, setNodeDefsSelectorVisible, setQuery, setSelectedQuerySummaryUuid } = slice.actions
+const { reset, setDisplayType, setNodeDefsSelectorVisible, setQuery, setSelectedQuerySummaryUuid } = slice.actions
 
 export const DataExplorerActions = {
   reset,
+  setDisplayType,
   setNodeDefsSelectorVisible,
   setQuery,
   setSelectedQuerySummaryUuid,
