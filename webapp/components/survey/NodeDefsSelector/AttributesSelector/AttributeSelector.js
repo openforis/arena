@@ -12,14 +12,25 @@ import NodeDefIconKey from '@webapp/components/survey/SurveyForm/nodeDefs/compon
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
-  const { canSelectAttributes, nodeDef, nodeDefUuidsAttributes, onToggleAttribute, showNodeDefPath, nodeDefLabelType } =
-    props
+  const {
+    canSelectAttributes,
+    labelFunction,
+    nodeDef,
+    nodeDefUuidsAttributes,
+    onToggleAttribute,
+    showNodeDefPath,
+    nodeDefLabelType,
+  } = props
 
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const active = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
+
+  const label = labelFunction
+    ? labelFunction(nodeDef)
+    : NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
 
   return (
     <button
@@ -37,7 +48,7 @@ const AttributeSelector = (props) => {
     >
       <span>
         <NodeDefIconKey nodeDef={nodeDef} />
-        {NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })}
+        {label}
       </span>
       {NodeDefUIProps.getIconByNodeDef(nodeDef)}
     </button>
@@ -46,6 +57,7 @@ const AttributeSelector = (props) => {
 
 AttributeSelector.propTypes = {
   canSelectAttributes: PropTypes.bool,
+  labelFunction: PropTypes.func,
   nodeDef: PropTypes.object.isRequired,
   nodeDefUuidsAttributes: PropTypes.array.isRequired,
   onToggleAttribute: PropTypes.func.isRequired,
