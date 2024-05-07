@@ -2,7 +2,7 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
-import { Dates } from '@openforis/arena-core'
+import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { db } from '@server/db/db'
@@ -303,13 +303,17 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
-  client.any(`
+export const fetchRecordsUuidAndCycle = async ({ surveyId, recordUuidsIncluded = null }, client = db) =>
+  client.any(
+    `
     SELECT uuid, cycle 
     FROM ${getSchemaSurvey(surveyId)}.record 
     WHERE preview = FALSE
+    ${Objects.isEmpty(recordUuidsIncluded) ? '' : `AND uuid IN ($/recordUuidsIncluded:csv/)`}
     ORDER BY cycle
-  `)
+  `,
+    { recordUuidsIncluded }
+  )
 
 export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
   client.any(
