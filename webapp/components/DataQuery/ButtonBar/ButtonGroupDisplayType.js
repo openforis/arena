@@ -27,7 +27,7 @@ const iconByChartType = {
 const chartTypeItems = Object.keys(chartTypes).map((chartType) => ({
   key: chartType,
   iconClassName: iconByChartType[chartType],
-  title: `dataView.dataQuery.chartType.${chartType}`,
+  title: `dataView.charts.type.${chartType}`,
 }))
 
 export const ButtonGroupDisplayType = (props) => {

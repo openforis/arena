@@ -689,20 +689,19 @@ Are you sure you want to continue?`,
   },
 
   dataView: {
-    dataQuery: {
-      charts: {
-        warning: {
-          selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
-          tooManyItemsToShowChart: `Too many items to show the chart; expecting maximum {{maxItems}} items`,
-        },
+    charts: {
+      warning: {
+        selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
+        tooManyItemsToShowChart: `Too many items to show the chart; expecting maximum {{maxItems}} items`,
       },
-      chartType: {
+      type: {
         bar: 'Bar chart',
         pie: 'Pie chart',
       },
+    },
+    dataQuery: {
       deleteConfirmMessage: 'Delete the query "{{name}}"?',
       displayType: {
-        label: 'Display type',
         chart: 'Chart',
         table: 'Table',
       },

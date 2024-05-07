@@ -26,7 +26,7 @@ export const DataQueryPieChart = (props) => {
   const firstMeasureNodeDefUuid = Object.keys(dataColumnsByMeasureNodeDefUuid)[0]
 
   if (data.length > maxItems) {
-    return i18n.t('dataView.dataQuery.charts.warning.tooManyItemsToShowChart', { maxItems })
+    return i18n.t('dataView.charts.warning.tooManyItemsToShowChart', { maxItems })
   }
 
   const firstDimensionDataColumn = dataColumnByDimensionNodeDefUuid[firstDimensionNodeDefUuid]
