@@ -36,7 +36,7 @@ export const RecordsByUser = () => {
       <RecordsSummaryPeriodSelector />
 
       {chartData?.length > 0 ? (
-        <BarChart data={chartData} dataKey="count" layout="vertical" showLegend={false} />
+        <BarChart data={chartData} dataKeys={['count']} layout="vertical" showLegend={false} />
       ) : (
         <NoRecordsAddedInSelectedPeriod />
       )}

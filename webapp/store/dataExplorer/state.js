@@ -3,11 +3,16 @@ import * as A from '@core/arena'
 const stateKey = 'dataExplorer'
 
 const keys = {
+  chartType: 'chartType',
   displayType: 'displayType',
   editMode: 'editMode',
   nodeDefsSelectorVisible: 'nodeDefsSelectorVisible',
   query: 'query',
   selectedQuerySummaryUuid: 'selectedQuerySummaryUuid',
+}
+
+const chartTypes = {
+  bar: 'bar',
 }
 
 const displayTypes = {
@@ -19,6 +24,7 @@ const displayTypes = {
 const getDataExplorerState = A.prop(stateKey)
 const getProp = (key) => A.pipe(getDataExplorerState, A.prop(key))
 
+const getChartType = getProp(keys.chartType)
 const getDisplayType = getProp(keys.displayType)
 const isEditMode = (state) => getProp(keys.editMode)(state) === true
 const isNodeDefsSelectorVisible = (state) => getProp(keys.nodeDefsSelectorVisible)(state) === true
@@ -26,6 +32,7 @@ const getQuery = getProp(keys.query)
 const getSelectedQuerySummaryUuid = getProp(keys.selectedQuerySummaryUuid)
 
 // update
+const assocChartType = A.assoc(keys.chartType)
 const assocDisplayType = A.assoc(keys.displayType)
 const assocEditMode = A.assoc(keys.editMode)
 const assocNodeDefsSelectorVisible = A.assoc(keys.nodeDefsSelectorVisible)
@@ -34,14 +41,17 @@ const assocSelectedQuerySummaryUuid = A.assoc(keys.selectedQuerySummaryUuid)
 
 export const DataExplorerState = {
   stateKey,
+  chartTypes,
   displayTypes,
   // read
   isEditMode,
   isNodeDefsSelectorVisible,
-  getQuery,
+  getChartType,
   getDisplayType,
+  getQuery,
   getSelectedQuerySummaryUuid,
   // update
+  assocChartType,
   assocDisplayType,
   assocEditMode,
   assocNodeDefsSelectorVisible,

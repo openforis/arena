@@ -5,7 +5,8 @@ import { Query } from '@common/model/query'
 import { DataExplorerState } from './state'
 
 const initialState = {
-  displayType: 'table',
+  displayType: DataExplorerState.displayTypes.table,
+  chartType: DataExplorerState.chartTypes.bar,
   editMode: false,
   nodeDefsSelectorVisible: true,
   query: Query.create(),
@@ -17,6 +18,8 @@ export const slice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
+
+    setChartType: (state, action) => DataExplorerState.assocChartType(action.payload)(state),
 
     setDisplayType: (state, action) => DataExplorerState.assocDisplayType(action.payload)(state),
 
@@ -32,10 +35,12 @@ export const slice = createSlice({
   },
 })
 
-const { reset, setDisplayType, setNodeDefsSelectorVisible, setQuery, setSelectedQuerySummaryUuid } = slice.actions
+const { reset, setChartType, setDisplayType, setNodeDefsSelectorVisible, setQuery, setSelectedQuerySummaryUuid } =
+  slice.actions
 
 export const DataExplorerActions = {
   reset,
+  setChartType,
   setDisplayType,
   setNodeDefsSelectorVisible,
   setQuery,

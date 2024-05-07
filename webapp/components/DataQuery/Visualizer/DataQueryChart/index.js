@@ -1,1 +1,1 @@
-export { DataQueryChart } from './dataQueryChart'
+export { DataQueryChart } from './DataQueryChart'
