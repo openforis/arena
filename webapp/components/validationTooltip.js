@@ -11,7 +11,7 @@ const ValidationTooltip = (props) => {
 
   const isValid = Validation.isValid(validation)
 
-  const type = Validation.isError(validation) ? 'error' : Validation.isWarning(validation) ? 'warning' : ''
+  const type = Validation.isError(validation) ? 'error' : Validation.isWarning(validation) ? 'warning' : undefined
 
   const content = isValid ? null : React.createElement(ValidationFieldMessages, { validation, showKeys })
 

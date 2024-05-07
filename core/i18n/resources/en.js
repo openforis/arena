@@ -719,6 +719,7 @@ Are you sure you want to continue?`,
     nodeDefsSelector: {
       hide: 'Hide Node Definitions Selector',
       show: 'Show Node Definitions Selector',
+      nodeDefCount: `{{nodeDefLabel}} (count)`,
     },
     records: {
       clone: 'Clone',

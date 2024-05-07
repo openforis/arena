@@ -1,6 +1,7 @@
 @import 'webapp/style/vars';
 
 $appNotificationWidth: 500px;
+$appNotificationWidthSmallScreens: 90vw;
 
 .notification {
   position: fixed;
@@ -20,6 +21,13 @@ $appNotificationWidth: 500px;
 
   .notification-content {
     white-space: pre-wrap;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .notification {
+    width: $appNotificationWidthSmallScreens;
+    transform: translate(calc(50vw - #{$appNotificationWidthSmallScreens / 2}), 15px);
   }
 }
 

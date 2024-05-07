@@ -34,6 +34,7 @@ import * as FileService from './fileService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -124,6 +125,13 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
     'warnings',
   ]
   return CSVWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
+}
+
+// Records export job
+export const startRecordsExportJob = ({ user, surveyId, recordUuids }) => {
+  const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids })
+  JobManager.executeJobThread(job)
+  return job
 }
 
 export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
