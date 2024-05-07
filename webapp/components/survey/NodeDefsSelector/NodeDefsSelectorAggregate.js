@@ -64,7 +64,10 @@ const NodeDefsSelectorAggregate = (props) => {
         const expr = Expression.fromString(StepVariable.getAggregate(variablePrevStep))
         aggregateFn = Expression.toSql(expr)
       } else {
-        aggregateFn = Query.DEFAULT_AGGREGATE_FUNCTIONS.sum
+        aggregateFn =
+          nodeDefUuidEntity === nodeDefUuid
+            ? Query.DEFAULT_AGGREGATE_FUNCTIONS.cnt
+            : Query.DEFAULT_AGGREGATE_FUNCTIONS.sum
       }
       measuresUpdate[nodeDefUuid] = [aggregateFn]
     }
@@ -109,13 +112,14 @@ const NodeDefsSelectorAggregate = (props) => {
 
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
-              onToggleAttribute={onToggleMeasure}
               lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
               filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
+              includeEntityCountSelector={true}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={measuresNodeDefUuids}
+              onToggleAttribute={onToggleMeasure}
               showAncestors={false}
               showMultipleAttributes={false}
               showAnalysisAttributes={showAnalysisAttributes}
