@@ -51,6 +51,7 @@ const DataQuery = () => {
 
         <div className="table__header">
           <ButtonBar
+            dataCount={count}
             dataEmpty={dataEmpty}
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { ButtonGroup } from '@webapp/components/form'
 
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
+import { NotificationActions } from '@webapp/store/ui'
 
 const { displayTypes, chartTypes } = DataExplorerState
 
@@ -30,8 +31,10 @@ const chartTypeItems = Object.keys(chartTypes).map((chartType) => ({
   title: `dataView.charts.type.${chartType}`,
 }))
 
+const chartMaxItems = 5000
+
 export const ButtonGroupDisplayType = (props) => {
-  const { setQueryLimit, setQueryOffset } = props
+  const { dataCount, setQueryLimit, setQueryOffset } = props
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const chartType = DataExplorerSelectors.useChartType()
@@ -42,6 +45,15 @@ export const ButtonGroupDisplayType = (props) => {
         groupName="displayType"
         selectedItemKey={displayType}
         onChange={(type) => {
+          if (type === displayTypes.chart && dataCount > chartMaxItems) {
+            dispatch(
+              NotificationActions.showNotification({
+                key: 'dataView.charts.warning.tooManyItemsToShowChart',
+                params: { maxItems: chartMaxItems },
+              })
+            )
+            return
+          }
           dispatch(DataExplorerActions.setDisplayType(type))
           setQueryOffset(0)
           const limitUpdated = type === displayTypes.chart ? null : 15
@@ -62,6 +74,7 @@ export const ButtonGroupDisplayType = (props) => {
 }
 
 ButtonGroupDisplayType.propTypes = {
+  dataCount: PropTypes.number,
   setQueryLimit: PropTypes.func.isRequired,
   setQueryOffset: PropTypes.func.isRequired,
 }
