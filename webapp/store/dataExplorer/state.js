@@ -13,6 +13,7 @@ const keys = {
 
 const chartTypes = {
   bar: 'bar',
+  pie: 'pie',
 }
 
 const displayTypes = {

@@ -690,6 +690,10 @@ Are you sure you want to continue?`,
 
   dataView: {
     dataQuery: {
+      chartType: {
+        bar: 'Bar chart',
+        pie: 'Pie chart',
+      },
       deleteConfirmMessage: 'Delete the query "{{name}}"?',
       displayType: {
         label: 'Display type',

@@ -4,6 +4,12 @@ import PropTypes from 'prop-types'
 import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
 import { DataQueryBarChart } from './DataQueryBarChart'
+import { DataQueryPieChart } from './DataQueryPieChart'
+
+const componentsByType = {
+  [DataExplorerState.chartTypes.bar]: DataQueryBarChart,
+  [DataExplorerState.chartTypes.pie]: DataQueryPieChart,
+}
 
 export const DataQueryChart = (props) => {
   const { data, dataEmpty, dataLoading, nodeDefLabelType } = props
@@ -13,11 +19,7 @@ export const DataQueryChart = (props) => {
   if (dataEmpty || dataLoading) {
     return null
   }
-
-  if (chartType === DataExplorerState.chartTypes.bar) {
-    return <DataQueryBarChart data={data} nodeDefLabelType={nodeDefLabelType} />
-  }
-  return null
+  return React.createElement(componentsByType[chartType], { data, nodeDefLabelType })
 }
 
 DataQueryChart.propTypes = {
