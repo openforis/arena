@@ -1,58 +1,67 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import { ButtonGroup } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
 
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
-import { useI18n } from '@webapp/store/system'
 
-export const ButtonGroupDisplayType = () => {
+const { displayTypes, chartTypes } = DataExplorerState
+
+const iconByDisplayType = {
+  [displayTypes.chart]: 'icon-pie-chart',
+  [displayTypes.table]: 'icon-table2',
+}
+
+const displayTypeItems = Object.keys(displayTypes).map((displayType) => ({
+  key: displayType,
+  iconClassName: iconByDisplayType[displayType],
+  label: `dataView.dataQuery.displayType.${displayType}`,
+}))
+
+const iconByChartType = {
+  [chartTypes.bar]: 'icon-stats-bars',
+  [chartTypes.pie]: 'icon-pie-chart',
+}
+
+const chartTypeItems = Object.keys(chartTypes).map((chartType) => ({
+  key: chartType,
+  iconClassName: iconByChartType[chartType],
+  title: `dataView.dataQuery.chartType.${chartType}`,
+}))
+
+export const ButtonGroupDisplayType = (props) => {
+  const { setQueryLimit, setQueryOffset } = props
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const displayType = DataExplorerSelectors.useDisplayType()
   const chartType = DataExplorerSelectors.useChartType()
 
   return (
-    <FormItem className="display-type-form-item" label={i18n.t('dataView.dataQuery.displayType.label')}>
-      <div>
+    <div>
+      <ButtonGroup
+        groupName="displayType"
+        selectedItemKey={displayType}
+        onChange={(type) => {
+          dispatch(DataExplorerActions.setDisplayType(type))
+          setQueryOffset(0)
+          const limitUpdated = type === displayTypes.chart ? null : 15
+          setQueryLimit(limitUpdated)
+        }}
+        items={displayTypeItems}
+      />
+      {displayType === displayTypes.chart && (
         <ButtonGroup
-          groupName="displayType"
-          selectedItemKey={displayType}
-          onChange={(type) => dispatch(DataExplorerActions.setDisplayType(type))}
-          items={[
-            {
-              key: DataExplorerState.displayTypes.table,
-              iconClassName: 'icon-table2',
-              label: 'dataView.dataQuery.displayType.table',
-            },
-            {
-              key: DataExplorerState.displayTypes.chart,
-              iconClassName: 'icon-pie-chart',
-              label: 'dataView.dataQuery.displayType.chart',
-            },
-          ]}
+          groupName="chartType"
+          selectedItemKey={chartType}
+          onChange={(type) => dispatch(DataExplorerActions.setChartType(type))}
+          items={chartTypeItems}
         />
-        {displayType === DataExplorerState.displayTypes.chart && (
-          <ButtonGroup
-            groupName="chartType"
-            selectedItemKey={chartType}
-            onChange={(type) => dispatch(DataExplorerActions.setChartType(type))}
-            items={[
-              {
-                key: DataExplorerState.chartTypes.bar,
-                iconClassName: 'icon-stats-bars',
-                title: 'dataView.dataQuery.chartType.bar',
-              },
-              {
-                key: DataExplorerState.chartTypes.pie,
-                iconClassName: 'icon-pie-chart',
-                title: 'dataView.dataQuery.chartType.pie',
-              },
-            ]}
-          />
-        )}
-      </div>
-    </FormItem>
+      )}
+    </div>
   )
+}
+
+ButtonGroupDisplayType.propTypes = {
+  setQueryLimit: PropTypes.func.isRequired,
+  setQueryOffset: PropTypes.func.isRequired,
 }

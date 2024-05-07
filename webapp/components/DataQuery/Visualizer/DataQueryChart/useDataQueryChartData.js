@@ -4,7 +4,7 @@ import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useNodeDefsByUuids, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
-const emptyDimensionValue = '--- NA ---'
+export const emptyValueLabel = '--- NA ---'
 
 export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const query = DataExplorerSelectors.useQuery()
@@ -13,6 +13,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const dimensions = Query.getDimensions(query)
   const firstDimension = dimensions[0]
   const measures = Query.getMeasures(query)
+  const contextEntityDefUuid = Query.getEntityDefUuid(query)
   const measureNodeDefUuids = Object.keys(measures)
   const dataColors = useRandomColors(measureNodeDefUuids.length, { onlyDarkColors: true })
 
@@ -50,7 +51,9 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const nodeDefName = NodeDef.getName(nodeDef)
     const aggFunctions = Query.getMeasureAggregateFunctions(nodeDefUuid)(query)
-    const colNames = aggFunctions.map((aggFunction) => `${nodeDefName}_${aggFunction}`)
+    const colNames = aggFunctions.map((aggFunction) =>
+      nodeDefUuid === contextEntityDefUuid ? `${nodeDefName}_uuid_${aggFunction}` : `${nodeDefName}_${aggFunction}`
+    )
     acc[nodeDefUuid] = colNames
     return acc
   }, {})
@@ -64,7 +67,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const chartData = data.map((dataItem) => {
     const labelCol = dataColumnByDimensionNodeDefUuid[firstDimension]
     return {
-      [labelDataKey]: dataItem[labelCol] ?? emptyDimensionValue,
+      [labelDataKey]: dataItem[labelCol] ?? emptyValueLabel,
       ...measureNodeDefUuids.reduce((acc, measureNodeDefUuid) => {
         const valueColumns = dataColumnsByMeasureNodeDefUuid[measureNodeDefUuid]
         const dataKeys = dataKeysByMeasureNodeDefUuid[measureNodeDefUuid]

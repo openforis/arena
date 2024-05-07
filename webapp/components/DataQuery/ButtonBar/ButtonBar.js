@@ -25,7 +25,15 @@ import ButtonManageQueries from './ButtonManageQueries'
 import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
 
 const ButtonBar = (props) => {
-  const { dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
+  const {
+    dataEmpty,
+    dataLoaded,
+    dataLoading,
+    nodeDefLabelType,
+    onNodeDefLabelTypeChange,
+    setQueryLimit,
+    setQueryOffset,
+  } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -96,7 +104,7 @@ const ButtonBar = (props) => {
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 
-      <ButtonGroupDisplayType />
+      <ButtonGroupDisplayType setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
     </div>
   )
 }
@@ -107,6 +115,8 @@ ButtonBar.propTypes = {
   dataLoading: PropTypes.bool.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
+  setQueryLimit: PropTypes.func.isRequired,
+  setQueryOffset: PropTypes.func.isRequired,
 }
 
 export default ButtonBar

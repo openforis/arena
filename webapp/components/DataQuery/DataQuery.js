@@ -56,6 +56,8 @@ const DataQuery = () => {
             dataLoading={dataLoading}
             nodeDefLabelType={nodeDefLabelType}
             onNodeDefLabelTypeChange={toggleLabelFunction}
+            setQueryLimit={setLimit}
+            setQueryOffset={setOffset}
           />
         </div>
 
