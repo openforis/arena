@@ -13,8 +13,9 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const barFill = '#3885ca'
-const activeBarFill = 'green'
+import { Colors } from '@webapp/utils/colors'
+
+const defaultBarFill = '#3885ca'
 const activeBarStroke = '#3885ca'
 const maxBarSize = 30
 const tickMaxChars = 20
@@ -52,15 +53,19 @@ export const BarChart = (props) => {
         )}
         <Tooltip cursor={{ fill: 'transparent' }} />
         {showLegend && <Legend />}
-        {dataKeys.map((dataKey, index) => (
-          <Bar
-            key={dataKey}
-            dataKey={dataKey}
-            fill={dataColors[index] ?? barFill}
-            maxBarSize={maxBarSize}
-            activeBar={<Rectangle fill={activeBarFill} stroke={activeBarStroke} />}
-          />
-        ))}
+        {dataKeys.map((dataKey, index) => {
+          const barFill = dataColors[index] ?? defaultBarFill
+          const activeBarFill = Colors.lightenColor(barFill, 10)
+          return (
+            <Bar
+              key={dataKey}
+              dataKey={dataKey}
+              fill={barFill}
+              maxBarSize={maxBarSize}
+              activeBar={<Rectangle fill={activeBarFill} stroke={activeBarStroke} />}
+            />
+          )
+        })}
       </ReChartsBarChart>
     </ResponsiveContainer>
   )
