@@ -54,7 +54,7 @@ const ExpansionPanel = (props) => {
 ExpansionPanel.propTypes = {
   buttonLabel: PropTypes.string,
   buttonLabelParams: PropTypes.object,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  children: PropTypes.node,
   className: PropTypes.string,
   open: PropTypes.bool,
   showHeader: PropTypes.bool,
