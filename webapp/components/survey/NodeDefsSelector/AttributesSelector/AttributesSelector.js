@@ -26,7 +26,7 @@ const AttributesSelector = (props) => {
     filterChainUuids,
     lang,
     ancestorSelector,
-    includeEntityCountSelector,
+    includeEntityFrequencySelector,
     nodeDefLabelType,
     nodeDefUuidsToExclude,
     nodeDefUuidEntity,
@@ -93,11 +93,11 @@ const AttributesSelector = (props) => {
 
   return (
     <div className={classNames('attributes-selector', { ancestor: ancestorSelector })}>
-      {includeEntityCountSelector && (
+      {includeEntityFrequencySelector && (
         <AttributeSelector
           key={NodeDef.getUuid(nodeDefAncestor)}
           labelFunction={(nodeDef) =>
-            i18n.t('dataView.nodeDefsSelector.nodeDefCount', {
+            i18n.t('dataView.nodeDefsSelector.nodeDefFrequency', {
               nodeDefLabel: NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType }),
             })
           }
@@ -162,7 +162,7 @@ AttributesSelector.propTypes = {
   filterFunction: PropTypes.func,
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
-  includeEntityCountSelector: PropTypes.bool,
+  includeEntityFrequencySelector: PropTypes.bool,
   lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
@@ -184,7 +184,7 @@ AttributesSelector.defaultProps = {
   filterFunction: null,
   filterTypes: [],
   filterChainUuids: [],
-  includeEntityCountSelector: false,
+  includeEntityFrequencySelector: false,
   nodeDefUuidEntity: null,
   nodeDefUuidsAttributes: [],
   nodeDefUuidsToExclude: [],

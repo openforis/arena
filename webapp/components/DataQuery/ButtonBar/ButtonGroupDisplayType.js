@@ -37,7 +37,7 @@ export const ButtonGroupDisplayType = (props) => {
   const chartType = DataExplorerSelectors.useChartType()
 
   return (
-    <div>
+    <div className="display-type-button-group-wrapper">
       <ButtonGroup
         groupName="displayType"
         selectedItemKey={displayType}

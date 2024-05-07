@@ -1,3 +1,4 @@
+import { Query } from '@common/model/query'
 import * as A from '@core/arena'
 
 const stateKey = 'dataExplorer'
@@ -37,7 +38,13 @@ const assocChartType = A.assoc(keys.chartType)
 const assocDisplayType = A.assoc(keys.displayType)
 const assocEditMode = A.assoc(keys.editMode)
 const assocNodeDefsSelectorVisible = A.assoc(keys.nodeDefsSelectorVisible)
-const assocQuery = A.assoc(keys.query)
+const assocQuery = (queryUpdated) => (state) => {
+  let stateUpdated = A.assoc(keys.query, queryUpdated)(state)
+  if (stateUpdated.displayType === DataExplorerState.displayTypes.chart && !Query.isModeAggregate(queryUpdated)) {
+    stateUpdated = A.pipe(assocDisplayType(displayTypes.table), assocChartType(chartTypes.bar))(stateUpdated)
+  }
+  return stateUpdated
+}
 const assocSelectedQuerySummaryUuid = A.assoc(keys.selectedQuerySummaryUuid)
 
 export const DataExplorerState = {

@@ -115,7 +115,7 @@ const NodeDefsSelectorAggregate = (props) => {
               lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
               filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
-              includeEntityCountSelector={true}
+              includeEntityFrequencySelector
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={measuresNodeDefUuids}

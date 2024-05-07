@@ -690,6 +690,12 @@ Are you sure you want to continue?`,
 
   dataView: {
     dataQuery: {
+      charts: {
+        warning: {
+          selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
+          tooManyItemsToShowChart: `Too many items to show the chart; expecting maximum {{maxItems}} items`,
+        },
+      },
       chartType: {
         bar: 'Bar chart',
         pie: 'Pie chart',
@@ -719,7 +725,7 @@ Are you sure you want to continue?`,
     nodeDefsSelector: {
       hide: 'Hide Node Definitions Selector',
       show: 'Show Node Definitions Selector',
-      nodeDefCount: `{{nodeDefLabel}} (count)`,
+      nodeDefFrequency: `{{nodeDefLabel}} (frequency)`,
     },
     records: {
       clone: 'Clone',

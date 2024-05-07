@@ -1,13 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import { PieChart } from '@webapp/charts/PieChart'
 import { useDataQueryChartData } from './useDataQueryChartData'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
-import { Objects } from '@openforis/arena-core'
+import { useI18n } from '@webapp/store/system'
+
+const maxItems = 20
 
 export const DataQueryPieChart = (props) => {
   const { data, nodeDefLabelType } = props
+
+  const i18n = useI18n()
 
   const { dataColumnByDimensionNodeDefUuid, dataColumnsByMeasureNodeDefUuid } = useDataQueryChartData({
     data,
@@ -17,9 +23,13 @@ export const DataQueryPieChart = (props) => {
   const colors = useRandomColors(data.length, { onlyDarkColors: true })
 
   const firstDimensionNodeDefUuid = Object.keys(dataColumnByDimensionNodeDefUuid)[0]
-  const firstDimensionDataColumn = dataColumnByDimensionNodeDefUuid[firstDimensionNodeDefUuid]
-
   const firstMeasureNodeDefUuid = Object.keys(dataColumnsByMeasureNodeDefUuid)[0]
+
+  if (data.length > maxItems) {
+    return i18n.t('dataView.dataQuery.charts.warning.tooManyItemsToShowChart', { maxItems })
+  }
+
+  const firstDimensionDataColumn = dataColumnByDimensionNodeDefUuid[firstDimensionNodeDefUuid]
   const firstMeasureDataColumn = dataColumnsByMeasureNodeDefUuid[firstMeasureNodeDefUuid][0]
 
   const chartData = data.reduce((acc, dataItem, index) => {
