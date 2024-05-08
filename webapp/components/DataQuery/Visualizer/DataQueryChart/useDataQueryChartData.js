@@ -60,9 +60,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
 
   const labelDataKey = dataKeyByDimensionNodeDefUuid[firstDimension]
 
-  const dataKeys = measureNodeDefUuids.flatMap((measureNodeDefUuid) => {
-    return dataKeysByMeasureNodeDefUuid[measureNodeDefUuid]
-  }, [])
+  const dataKeys = measureNodeDefUuids.flatMap((measureNodeDefUuid) => dataKeysByMeasureNodeDefUuid[measureNodeDefUuid])
 
   const chartData = data.map((dataItem) => {
     const labelCol = dataColumnByDimensionNodeDefUuid[firstDimension]

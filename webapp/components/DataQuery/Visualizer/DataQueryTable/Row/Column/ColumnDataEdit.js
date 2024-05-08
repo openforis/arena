@@ -21,7 +21,7 @@ import { useColumn } from './store'
 const ColumnDataEdit = (props) => {
   const { colWidth, nodeDef, query, row } = props
   const { record, cols } = row
-  const cell = cols && cols[NodeDef.getUuid(nodeDef)]
+  const cell = cols?.[NodeDef.getUuid(nodeDef)]
 
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
@@ -29,7 +29,7 @@ const ColumnDataEdit = (props) => {
   const canEditRecord = useAuthCanEditRecord(record)
   const { widthOuter } = useColumn({ nodeDef, query, colWidth })
 
-  const cellNode = cell && cell.node
+  const cellNode = cell?.node
   const nodeUpdated = useRecordNode({ nodeUuid: cellNode?.uuid })
   const node = nodeUpdated || cellNode
   const recordValidation = Record.getValidation(record)
