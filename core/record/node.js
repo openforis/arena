@@ -41,8 +41,14 @@ export const keys = {
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
   value: 'value',
   meta: NodeMeta.keys.meta,
-  placeholder: 'placeholder',
 
+  // transient keys
+  placeholder: 'placeholder',
+  recordCycle: 'recordCycle',
+  recordStep: 'recordStep',
+  surveyUuid: 'surveyUuid',
+
+  // flags (used to update RDB)
   created: 'created',
   updated: 'updated',
   deleted: 'deleted',

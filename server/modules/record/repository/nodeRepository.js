@@ -35,24 +35,16 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
-const nodeKeyByColumnName = {
-  date_created: Node.keys.dateCreated,
-  date_modified: Node.keys.dateModified,
-  node_def_uuid: Node.keys.nodeDefUuid,
-  parent_uuid: Node.keys.parentUuid,
-  record_uuid: Node.keys.recordUuid,
-  survey_uuid: Node.keys.surveyUuid,
-}
+// cache of camelized keys
+const nodeKeyByColumnName = {}
 
 const dbTransformCallback = (node) => {
-  // camelize keys
-  // avoid using "camelize"; too slow when running on thousands of objects
+  // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
   // (do not camelize meta properties)
-  Object.entries(nodeKeyByColumnName).forEach(([columnName, key]) => {
-    if (Object.hasOwn(node, columnName)) {
-      node[key] = node[columnName]
-      delete node[columnName]
-    }
+  Object.entries(node).forEach(([columnName, value]) => {
+    let nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
+    node[nodeKey] = value
+    delete node[columnName]
   })
   // cast id to Number
   node.id = Number(node.id)
