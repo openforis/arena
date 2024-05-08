@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as A from '@core/arena'
@@ -9,7 +9,7 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 import { NodeDefsActions } from '@webapp/store/survey'
 
 export const useCustomAggregateFunctionsEditor = (props) => {
-  const { nodeDef } = props
+  const { nodeDef, onSelectionChange } = props
 
   const dispatch = useDispatch()
   const [editedUuid, setEditedUuid] = useState(null)
@@ -18,56 +18,79 @@ export const useCustomAggregateFunctionsEditor = (props) => {
   const customAggregateFunctionsArray = Object.values(customAggregateFunctions).sort(
     (fn1, fn2) => fn1.dateCreated - fn2.dateCreated
   )
-  const onNew = () => {
+  const onNew = useCallback(() => {
     const newFn = AggregateFunction.newAggregateFunction()
     setCustomAggregateFunctions({ ...customAggregateFunctions, [newFn.uuid]: newFn })
     setEditedUuid(newFn.uuid)
-  }
+  }, [customAggregateFunctions])
 
-  const onEditCancel = (fn) => {
-    if (fn.placeholder) {
-      setCustomAggregateFunctions(A.dissoc(fn.uuid)(customAggregateFunctions))
-    }
-    setEditedUuid(null)
-  }
+  const onEditCancel = useCallback(
+    (fn) => {
+      if (fn.placeholder) {
+        setCustomAggregateFunctions(A.dissoc(fn.uuid)(customAggregateFunctions))
+      }
+      setEditedUuid(null)
+    },
+    [customAggregateFunctions]
+  )
 
-  const onSave = (fnUpdated) => {
-    const { placeholder, ...fnToSave } = fnUpdated
-    const customAggregateFunctionsUpdated = { ...customAggregateFunctions, [fnToSave.uuid]: fnToSave }
-    setCustomAggregateFunctions(customAggregateFunctionsUpdated)
-    setEditedUuid(null)
+  const onCustomAggregateFunctionsUpdate = useCallback(
+    (customAggregateFunctionsUpdated) => {
+      setCustomAggregateFunctions(customAggregateFunctionsUpdated)
+      setEditedUuid(null)
 
-    const nodeDefUuid = NodeDef.getUuid(nodeDef)
-    const parentUuid = NodeDef.getParentUuid(nodeDef)
+      const nodeDefUuid = NodeDef.getUuid(nodeDef)
+      const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-    const propsAdvancedToUpdate = { [NodeDef.keysPropsAdvanced.aggregateFunctions]: customAggregateFunctionsUpdated }
+      const propsAdvancedToUpdate = { [NodeDef.keysPropsAdvanced.aggregateFunctions]: customAggregateFunctionsUpdated }
 
-    // update node def server side
-    dispatch(
-      NodeDefsActions.putNodeDefProps({
-        nodeDefUuid,
-        parentUuid,
-        propsAdvanced: propsAdvancedToUpdate,
-      })
-    )
+      // update node def server side
+      dispatch(
+        NodeDefsActions.putNodeDefProps({
+          nodeDefUuid,
+          parentUuid,
+          propsAdvanced: propsAdvancedToUpdate,
+        })
+      )
 
-    const nodeDefUpdated = NodeDef.mergePropsAdvanced(propsAdvancedToUpdate)(nodeDef)
+      const nodeDefUpdated = NodeDef.mergePropsAdvanced(propsAdvancedToUpdate)(nodeDef)
 
-    // Update redux store nodeDefs state
-    dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated }))
-  }
+      // Update redux store nodeDefs state
+      dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated }))
+    },
+    [dispatch, nodeDef]
+  )
 
-  const onDelete = (fnToDelete) => {
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'dataExplorerView.customAggregateFunction.confirmDelete',
-        onOk: async () => {
-          setCustomAggregateFunctions(A.dissoc(fnToDelete.uuid)(customAggregateFunctions))
-          setEditedUuid(null)
-        },
-      })
-    )
-  }
+  const onSave = useCallback(
+    (fnUpdated) => {
+      const { placeholder, ...fnToSave } = fnUpdated
+      const customAggregateFunctionsUpdated = { ...customAggregateFunctions, [fnToSave.uuid]: fnToSave }
+      onCustomAggregateFunctionsUpdate(customAggregateFunctionsUpdated)
+    },
+    [customAggregateFunctions, onCustomAggregateFunctionsUpdate]
+  )
+
+  const onDeleteConfirm = useCallback(
+    async (fnToDelete) => {
+      const { uuid } = fnToDelete
+      onSelectionChange({ [uuid]: false })
+      const customAggregateFunctionsUpdated = A.dissoc(uuid)(customAggregateFunctions)
+      onCustomAggregateFunctionsUpdate(customAggregateFunctionsUpdated)
+    },
+    [customAggregateFunctions, onCustomAggregateFunctionsUpdate, onSelectionChange]
+  )
+
+  const onDelete = useCallback(
+    (fnToDelete) => {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'dataExplorerView.customAggregateFunction.confirmDelete',
+          onOk: () => onDeleteConfirm(fnToDelete),
+        })
+      )
+    },
+    [dispatch, onDeleteConfirm]
+  )
 
   return {
     customAggregateFunctionsArray,
