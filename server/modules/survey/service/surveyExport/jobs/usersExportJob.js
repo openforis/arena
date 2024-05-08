@@ -12,9 +12,9 @@ export default class UsersExportJob extends Job {
   }
 
   async execute() {
-    const { archive, surveyId, survey, user } = this.context
+    const { archive, surveyId, survey } = this.context
 
-    const users = await UserService.fetchUsersBySurveyId({ user, surveyId })
+    const users = await UserService.fetchUsersBySurveyId({ surveyId })
     archive.append(JSON.stringify(users, null, 2), { name: ExportFile.users })
 
     this.total = users.length

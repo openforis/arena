@@ -5,6 +5,8 @@ import { join, sep } from 'path'
 import * as ProcessUtils from '../../../core/processUtils'
 import { uuidv4 } from '../../../core/uuid'
 
+const dirSeparator = '/'
+
 // ====== DIR
 
 export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
@@ -50,10 +52,49 @@ export const getFileSize = (path) => {
   return size
 }
 
+export const visitDirFiles = ({ path, visitor }) => {
+  if (!exists(path)) return
+
+  const stack = []
+  const files = fs.readdirSync(path)
+  stack.push(...files.map((file) => path + dirSeparator + file))
+
+  while (stack.length > 0) {
+    const filePath = stack.pop()
+
+    visitor(filePath)
+
+    const stats = fs.statSync(filePath)
+    if (stats.isDirectory()) {
+      const filesPaths = fs.readdirSync(filePath).map((file) => filePath + dirSeparator + file)
+      stack.push(...filesPaths)
+    }
+  }
+}
+
+export const getDirSize = (path) => {
+  let totalSize = 0
+  visitDirFiles({
+    path,
+    visitor: (filePath) => {
+      totalSize = totalSize + getFileSize(filePath)
+    },
+  })
+  return totalSize
+}
+
+const getFileName = (file) => (typeof file === 'string' ? file : file.name)
+
 export const getFileExtension = (file) => {
-  const fileName = typeof file === 'string' ? file : file.name
-  const extension = fileName.split('.').pop()
-  return extension
+  const fileName = getFileName(file)
+  const lastIndexOfDot = fileName.lastIndexOf('.')
+  return lastIndexOfDot > 0 ? fileName.substring(lastIndexOfDot + 1) : fileName
+}
+
+export const getBaseName = (file) => {
+  const fileName = getFileName(file)
+  const lastIndexOfDot = fileName.lastIndexOf('.')
+  return lastIndexOfDot > 0 ? fileName.substring(0, lastIndexOfDot) : fileName
 }
 
 export const deleteFile = (path) => fs.unlinkSync(path)

@@ -1,9 +1,14 @@
 import React from 'react'
+import classNames from 'classnames'
 
 import { Button } from './Button'
 
 export const ButtonNew = (props) => (
-  <Button {...props} className={`btn-primary ${props.className}`} iconClassName="icon-plus icon-12px icon-left" />
+  <Button
+    {...props}
+    className={classNames('btn-primary btn-new', props.className)}
+    iconClassName="icon-plus icon-12px icon-left"
+  />
 )
 
 ButtonNew.propTypes = {
@@ -12,5 +17,5 @@ ButtonNew.propTypes = {
 
 ButtonNew.defaultProps = {
   ...Button.defaultProps,
-  label: "common.new"
+  label: 'common.new',
 }

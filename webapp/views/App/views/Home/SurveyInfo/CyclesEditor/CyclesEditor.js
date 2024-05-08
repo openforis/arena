@@ -28,8 +28,9 @@ const CyclesEditor = (props) => {
       params: { cycle: cycleLabel },
       headerText: 'homeView.surveyInfo.confirmDeleteCycleHeader',
       onOk: () => {
-        delete cycles[cycleKeyToDelete]
-        setCycles(cycles)
+        const cyclesUpdated = { ...cycles }
+        delete cyclesUpdated[cycleKeyToDelete]
+        setCycles(cyclesUpdated)
       },
       strongConfirm: true,
       strongConfirmRequiredText: `delete cycle ${cycleLabel}`,

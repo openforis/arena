@@ -42,6 +42,7 @@ export const type = {
   // record
   recordCreate: 'recordCreate',
   recordDelete: 'recordDelete',
+  recordOwnerUpdate: 'recordOwnerUpdate',
   recordStepUpdate: 'recordStepUpdate',
   recordImport: 'recordImport',
   recordImportFromCollect: 'recordImportFromCollect',

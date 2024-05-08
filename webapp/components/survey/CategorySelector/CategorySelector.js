@@ -110,6 +110,7 @@ export const CategorySelector = (props) => {
         itemValue={Category.keys.uuid}
         itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
+        validationTooltipPosition="top"
         selection={category}
         onChange={onChange}
       />
@@ -140,7 +141,7 @@ export const CategorySelector = (props) => {
         </PanelRight>
       )}
       {categoryToEdit && (
-        <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')}>
+        <PanelRight width="100vw" onClose={onCategoryEditPanelClose} header={i18n.t('categoryEdit.header')} showFooter>
           <CategoryDetails
             categoryUuid={Category.getUuid(categoryToEdit)}
             onCategoryUpdate={onCategoryUpdate}

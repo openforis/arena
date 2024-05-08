@@ -2,11 +2,19 @@ const debounceTimeouts = {}
 const throttleTimeouts = {}
 const throttleLastRan = {}
 
+export const cancelDebounce = (id) => {
+  const timeoutId = debounceTimeouts[id]
+  if (timeoutId) {
+    clearTimeout(debounceTimeouts[id])
+    delete debounceTimeouts[id]
+  }
+}
+
 export const debounce = (func, id, delay = 500, immediate = false) => {
-  return function(...args) {
+  return function (...args) {
     const context = this
 
-    const later = function() {
+    const onTimeout = function () {
       delete debounceTimeouts[id]
       if (!immediate) {
         func.apply(context, args)
@@ -14,8 +22,8 @@ export const debounce = (func, id, delay = 500, immediate = false) => {
     }
 
     const callNow = immediate && !debounceTimeouts[id]
-    clearTimeout(debounceTimeouts[id])
-    debounceTimeouts[id] = setTimeout(later, delay)
+    cancelDebounce(id)
+    debounceTimeouts[id] = setTimeout(onTimeout, delay)
     if (callNow) {
       func.apply(context, args)
     }
@@ -23,7 +31,7 @@ export const debounce = (func, id, delay = 500, immediate = false) => {
 }
 
 export const throttle = (func, id, limit = 500) => {
-  return function(...args) {
+  return function (...args) {
     const context = this
 
     const runFunction = () => {
@@ -37,18 +45,25 @@ export const throttle = (func, id, limit = 500) => {
     if (lastRun) {
       clearTimeout(throttleTimeouts[id])
 
-      throttleTimeouts[id] = setTimeout(() => {
-        if (Date.now() - lastRun >= limit) {
-          runFunction()
-        }
-      }, limit - (Date.now() - lastRun))
+      const timeSinceLastRun = Date.now() - lastRun
+      const nextRunTimeout = limit - timeSinceLastRun
+
+      if (nextRunTimeout > 0) {
+        throttleTimeouts[id] = setTimeout(() => {
+          if (Date.now() - lastRun >= limit) {
+            runFunction()
+          }
+        }, nextRunTimeout)
+      } else {
+        runFunction()
+      }
     } else {
       runFunction()
     }
   }
 }
 
-export const cancelThrottle = id => {
+export const cancelThrottle = (id) => {
   const timeout = throttleTimeouts[id]
   if (timeout) {
     clearTimeout(timeout)

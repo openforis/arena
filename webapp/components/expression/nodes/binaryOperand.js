@@ -17,10 +17,11 @@ BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 const BinaryOperand = (props) => {
   const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, renderNode, variables } = props
 
+  const i18n = useI18n()
+
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
-
-  const i18n = useI18n()
+  const canOperandBeLiteral = !isLeft || !isBoolean || NodeDef.isBoolean(nodeDefCurrent)
 
   return (
     <div className={`binary-${type}`}>
@@ -34,28 +35,26 @@ const BinaryOperand = (props) => {
         {i18n.t('expressionEditor.var')}
       </button>
 
-      <button
-        type="button"
-        className={`btn btn-s btn-switch-operand btn-switch-operand-const${
-          Expression.isLiteral(nodeOperand) ? ' active' : ''
-        }`}
-        aria-disabled={isLeft && isBoolean && !NodeDef.isBoolean(nodeDefCurrent)}
-        onClick={() => {
-          const nodeUpdate =
-            isLeft && !isBoolean
-              ? R.pipe(
-                  R.assoc(type, Expression.newLiteral()),
-                  R.assoc('operator', ''),
-                  R.assoc(BinaryOperandType.right, Expression.newIdentifier())
-                )(node)
-              : R.assoc(type, Expression.newLiteral(), node)
-
-          onChange(nodeUpdate)
-        }}
-      >
-        {i18n.t('expressionEditor.const')}
-      </button>
-
+      {canOperandBeLiteral && (
+        <button
+          type="button"
+          className={`btn btn-s btn-switch-operand btn-switch-operand-const${
+            Expression.isLiteral(nodeOperand) ? ' active' : ''
+          }`}
+          onClick={() => {
+            let nodeUpdate = R.assoc(type, Expression.newLiteral(), node)
+            if (isLeft && !isBoolean) {
+              nodeUpdate = R.pipe(
+                R.assoc('operator', ''),
+                R.assoc(BinaryOperandType.right, Expression.newIdentifier())
+              )(nodeUpdate)
+            }
+            onChange(nodeUpdate)
+          }}
+        >
+          {i18n.t('expressionEditor.const')}
+        </button>
+      )}
       {React.createElement(renderNode, {
         canDelete,
         isBoolean,

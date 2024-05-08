@@ -11,7 +11,7 @@ let socket = null
 const _addSocketIdToEveryRequest = () => {
   axios.interceptors.request.use((config) => {
     // eslint-disable-next-line no-param-reassign
-    config.headers.socketid = socket.id
+    config.headers.socketid = socket?.id
     return config
   })
 }
@@ -34,8 +34,7 @@ export const openSocket = async (throwErrorFn) => {
 
   socket = io(window.location.origin)
 
-  on(WebSocketEvents.connectError, (error) => throwError(error.stack))
-  on(WebSocketEvents.error, throwError)
+  on(WebSocketEvents.connect, _addSocketIdToEveryRequest)
 
-  _addSocketIdToEveryRequest()
+  on(WebSocketEvents.error, throwError)
 }

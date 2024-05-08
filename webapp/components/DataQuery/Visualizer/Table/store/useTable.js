@@ -5,17 +5,21 @@ import { Query } from '@common/model/query'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
+import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useNodeDefsByUuids } from '@webapp/store/survey'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import { useListenOnNodeUpdates } from './hooks/useListenToNodeUpdates'
 
-export const useTable = ({ data, query, nodeDefsSelectorVisible, setData }) => {
+export const useTable = ({ data, setData }) => {
+  const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
+  const query = DataExplorerSelectors.useQuery()
+
   const [colWidth, setColWidth] = useState(null)
 
   const nodeDefColUuids = Query.isModeAggregate(query)
-    ? [...Query.getDimensions(query).values(), ...Query.getMeasures(query).keys()]
+    ? [...Query.getDimensions(query), ...Query.getMeasuresKeys(query)]
     : Query.getAttributeDefUuids(query)
   const nodeDefCols = useNodeDefsByUuids(nodeDefColUuids)
   const columnNames = nodeDefCols.flatMap(ColumnNodeDef.getColumnNames)

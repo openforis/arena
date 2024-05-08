@@ -4,6 +4,8 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
 
+import * as NodeDef from './nodeDef'
+
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
 import * as SurveyInfo from './_survey/surveyInfo'
@@ -117,9 +119,9 @@ export const {
   getDefaultCycleKey,
   getDateCreated,
   getDateModified,
+  getDatePublished,
   isPublished,
   isDraft,
-  isValid,
   isFromCollect,
   isRdbInitialized,
   getCollectUri,
@@ -131,12 +133,15 @@ export const {
   isTemplate,
   getProps,
   getPropsDraft,
+  getFilesStatistics,
+  isValid,
+  canHaveRecords,
 } = SurveyInfo
 
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocFilesStatistics, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
 
 // ====== READ nodeDefs
 export const {
@@ -159,6 +164,7 @@ export const {
   getNodeDefParent,
   getNodeDefSource,
   getNodeDefKeys,
+  getNodeDefKeysSorted,
   isNodeDefRootKey,
   findNodeDef,
   getNodeDefAreaBasedEstimate,
@@ -260,12 +266,24 @@ export const {
 } = SurveyCategories
 
 // ====== Taxonomies
-export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
+export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies, isTaxonomyUnused } =
+  SurveyTaxonomies
 
 // ====== Survey Reference data index
 // Category index
-export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCategoryItemByHierarchicalCodes } =
-  SurveyRefDataIndex
+export const {
+  getCategoryItemUuidAndCodeHierarchy,
+  getCategoryItemByUuid,
+  getCategoryItemByHierarchicalCodes,
+  getCategoryItemsInLevel,
+} = SurveyRefDataIndex
+
+export const getNodeDefCategoryItems = (nodeDef) => (survey) => {
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  return SurveyRefDataIndex.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
+}
+
 // Taxon index
 export const {
   getTaxonByCode,

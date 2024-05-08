@@ -2,6 +2,7 @@ export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
   fetchCategories,
+  fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
   fetchCategoryItems,
@@ -12,8 +13,10 @@ export {
   cleanupCategory,
   convertToReportingDataCategory,
   startExportAllCategoriesJob,
+  startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
+  updateCategoryItemProp,
 } from './categories'
 export { fetchChains, getChainSummaryExportUrl } from './analysis'
 
@@ -33,7 +36,9 @@ export {
   startDataImportFromArenaJob,
   startDataImportFromCsvJob,
   getDataImportFromCsvTemplateUrl,
+  getDataImportFromCsvTemplatesUrl,
   updateRecordsStep,
+  updateRecordOwner,
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordsCountByStep,
@@ -41,8 +46,21 @@ export {
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
 } from './data'
+export {
+  insertDataQuerySummary,
+  fetchDataQuerySummary,
+  fetchDataQuerySummaries,
+  updateDataQuerySummary,
+  deleteDataQuerySummary,
+} from './dataQuery'
 export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
-export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey } from './survey'
+export {
+  fetchSurveyFull,
+  fetchSurveys,
+  fetchSurveyTemplatesPublished,
+  insertSurvey,
+  startImportLabelsJob,
+} from './survey'
 export {
   fetchNodeDef,
   fetchNodeDefs,
@@ -58,6 +76,15 @@ export {
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
 
-export { createAccessRequest, acceptAccessRequest, fetchUser, fetchUserSurveys, changeUserPassword } from './user'
+export {
+  createAccessRequest,
+  acceptAccessRequest,
+  fetchUser,
+  fetchUserResetPasswordUrl,
+  fetchUserName,
+  fetchUsersBySurvey,
+  fetchUserSurveys,
+  changeUserPassword,
+} from './user'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'

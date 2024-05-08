@@ -14,6 +14,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as RecordRepository from '../repository/recordRepository'
+import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
@@ -41,6 +42,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     recordUuid = null,
     includeRootKeyValues = true,
     includePreview = false,
+    includeCounts = false,
   },
   client = db
 ) => {
@@ -71,15 +73,38 @@ export const fetchRecordsSummaryBySurveyId = async (
       sortOrder,
       search,
       step,
-      recordUuid,
+      recordUuids: recordUuid ? [recordUuid] : null,
       includePreview,
     },
     client
   )
 
+  if (!includeCounts) {
+    return {
+      nodeDefKeys,
+      list,
+    }
+  }
+
+  const listWithCounts = []
+  for await (const recordSummary of list) {
+    const recordUuid = Record.getUuid(recordSummary)
+    const { count: filesCount, total: filesSize } = await FileRepository.fetchCountAndTotalFilesSize(
+      { surveyId, recordUuid },
+      client
+    )
+    const filesMissing = await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid }, client)
+
+    listWithCounts.push({
+      ...recordSummary,
+      filesCount,
+      filesSize,
+      filesMissing,
+    })
+  }
   return {
     nodeDefKeys,
-    list,
+    list: listWithCounts,
   }
 }
 
@@ -115,6 +140,9 @@ export {
   fetchRecordsByUuids,
   fetchRecordsUuidAndCycle,
   fetchRecordCreatedCountsByDates,
+  fetchRecordCreatedCountsByDatesAndUser,
+  fetchRecordCreatedCountsByUser,
+  fetchRecordCountsByStep,
   insertRecordsInBatch,
 } from '../repository/recordRepository'
 
@@ -146,13 +174,23 @@ export {
   updateNodesDependents,
 } from './_recordManager/recordUpdateManager'
 
-export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo }, client = db) =>
+export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo, recordUuids }, client = db) =>
   client.tx(async (t) => {
-    const { list: recordsToMove } = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, step: stepFrom }, t)
-    await Promise.all(
-      recordsToMove.map((record) => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t))
+    const recordsSummaryToMove = await RecordRepository.fetchRecordsSummaryBySurveyId(
+      {
+        surveyId,
+        cycle,
+        step: stepFrom,
+        recordUuids,
+      },
+      client
     )
-    return { count: recordsToMove.length }
+    await Promise.all(
+      recordsSummaryToMove.map((record) =>
+        RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
+      )
+    )
+    return { count: recordsSummaryToMove.length }
   })
 
 export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
@@ -172,7 +210,14 @@ export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
     await NodeRepository.updateNodes({ surveyId, nodes }, t)
   })
 
-export { updateRecordDateModified } from '../repository/recordRepository'
+export { updateRecordDateModified, updateRecordsOwner } from '../repository/recordRepository'
+
+export const updateRecordOwner = async ({ user, surveyId, recordUuid, ownerUuid }, client = db) =>
+  client.tx(async (t) => {
+    const logContent = { recordUuid, ownerUuid }
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.recordOwnerUpdate, logContent, false, t)
+    await RecordRepository.updateRecordOwner({ surveyId, recordUuid, ownerUuid }, t)
+  })
 
 // ==== DELETE
 

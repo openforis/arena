@@ -31,8 +31,8 @@ const { plot_id, plot_text } = plot.children
 const { tree_dec_1, tree_dec_2, tree_species } = tree.children
 
 const getCodeAndLabel = (value) => {
-  const code = value.match(new RegExp(/\([0-9]+\)/))[0].replace(/\D/g, '')
-  const label = value.replace(/\([0-9]+\) /, '')
+  const code = value.match(new RegExp(/\([0-9]+\)/))[0].replace(/\D/g, '') // extract code in parenthesis
+  const label = value.replace(/ \([0-9]+\)/, '') // remove " (code)" suffix
   return { code, label }
 }
 export default () =>
@@ -75,13 +75,13 @@ export default () =>
 
       await expect(fs.existsSync(extractedFolderName)).toBeTruthy()
 
-      await expect(fs.existsSync(path.resolve(extractedFolderName, 'cluster.csv'))).toBeTruthy()
-      await expect(fs.existsSync(path.resolve(extractedFolderName, 'plot.csv'))).toBeTruthy()
-      await expect(fs.existsSync(path.resolve(extractedFolderName, 'tree.csv'))).toBeTruthy()
+      await expect(fs.existsSync(path.resolve(extractedFolderName, '01_cluster.csv'))).toBeTruthy()
+      await expect(fs.existsSync(path.resolve(extractedFolderName, '02_plot.csv'))).toBeTruthy()
+      await expect(fs.existsSync(path.resolve(extractedFolderName, '03_tree.csv'))).toBeTruthy()
     })
 
     test(`Check cluster data`, async () => {
-      const clusterFilePath = path.resolve(extractedFolderName, 'cluster.csv')
+      const clusterFilePath = path.resolve(extractedFolderName, '01_cluster.csv')
       await expect(fs.existsSync(clusterFilePath)).toBeTruthy()
 
       const clusterData = await parseCsvAsync(clusterFilePath)
@@ -120,7 +120,7 @@ export default () =>
     })
 
     test(`Check plot data`, async () => {
-      const plotFilePath = path.resolve(extractedFolderName, 'plot.csv')
+      const plotFilePath = path.resolve(extractedFolderName, '02_plot.csv')
       await expect(fs.existsSync(plotFilePath)).toBeTruthy()
 
       const plotData = await parseCsvAsync(plotFilePath)
@@ -144,7 +144,7 @@ export default () =>
     })
 
     test(`Check tree data`, async () => {
-      const treeFilePath = path.resolve(extractedFolderName, 'tree.csv')
+      const treeFilePath = path.resolve(extractedFolderName, '03_tree.csv')
       await expect(fs.existsSync(treeFilePath)).toBeTruthy()
 
       const treeData = await parseCsvAsync(treeFilePath)

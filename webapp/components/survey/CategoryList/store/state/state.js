@@ -2,6 +2,7 @@ import * as A from '@core/arena'
 
 export const keys = {
   canSelect: 'canSelect',
+  categoriesRequestedAt: 'categoriesRequestedAt',
   onCategoryCreated: 'onCategoryCreated',
   onCategoryOpen: 'onCategoryOpen',
   onSelect: 'onSelect',
@@ -15,10 +16,12 @@ export const create = ({ canSelect, onCategoryCreated, onCategoryOpen, onSelect,
   [keys.onCategoryOpen]: onCategoryOpen,
   [keys.onSelect]: onSelect,
   [keys.selectedItemUuid]: selectedItemUuid,
+  [keys.categoriesRequestedAt]: Date.now(),
 })
 
 // ==== READ
 export const getCanSelect = A.prop(keys.canSelect)
+export const getCategoriesRequestedAt = A.prop(keys.categoriesRequestedAt)
 export const getOnCategoryCreated = A.prop(keys.onCategoryCreated)
 export const getOnCategoryOpen = A.prop(keys.onCategoryOpen)
 export const getOnSelect = A.prop(keys.onSelect)

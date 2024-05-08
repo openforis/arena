@@ -1,7 +1,5 @@
 @import 'webapp/style/vars';
 
-$sidebarWidthClosed: 70px;
-$sidebarWidthOpened: 220px;
 //== buttons
 $sidebarBtnMargin: 1px;
 $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
@@ -9,99 +7,116 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 $sidebarPopupMenuBgColor: lighten($blue, 40%);
 
 .sidebar {
-  display: grid;
-  align-content: center;
+  display: flex;
+  flex-direction: column;
   position: relative;
   width: $sidebarWidthClosed;
   min-width: $sidebarWidthClosed;
-}
 
-.sidebar__btn-toggle {
-  padding: 10px;
-  position: absolute;
-  top: 0;
-  left: 12px;
-}
+  .sidebar__header {
+    height: 2rem;
 
-.sidebar__modules {
-  display: grid;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  overflow-x: hidden;
-}
+    .sidebar__btn-open,
+    .sidebar__btn-close {
+      padding: 10px;
+      position: absolute;
+      top: 0;
+    }
+    .sidebar__btn-open {
+      left: 15px;
+    }
+    .sidebar__btn-close {
+      right: 15px;
+    }
+  }
 
-.sidebar.opened {
   .sidebar__modules {
-    max-height: calc(100vh - 140px);
-    margin-bottom: 45px;
-  }
-}
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-.sidebar__module,
-.sidebar__module-placeholder {
-  display: grid;
-  grid-row-gap: 15px;
-  border-right: 1px solid $greyBorder;
-  padding: 25px 15px;
-  cursor: pointer;
-
-  &[aria-disabled='true'] {
-    opacity: 0.4;
+    &.popup-menu-opened {
+      .sidebar__module.over {
+        background: $sidebarPopupMenuBgColor;
+      }
+    }
   }
 
-  &.active {
-    border-right-color: $blue;
-    background: linear-gradient(to left, rgba($blue, 0.1) 0%, rgba($blue, 0.04) 50%, transparent 80%);
+  .sidebar__module,
+  .sidebar__module-placeholder {
+    display: grid;
+    grid-row-gap: 15px;
+    border-right: 1px solid $greyBorder;
+    padding: 25px 15px;
+    cursor: pointer;
+
+    &[aria-disabled='true'] {
+      opacity: 0.4;
+    }
+
+    &.active {
+      border-right-color: $blue;
+      background: linear-gradient(to left, rgba($blue, 0.1) 0%, rgba($blue, 0.04) 50%, transparent 80%);
+
+      &[aria-disabled='true'] {
+        opacity: 1;
+      }
+
+      .icon {
+        color: $blue;
+      }
+    }
+  }
+
+  .sidebar__module-btn {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 0.85rem;
 
     &[aria-disabled='true'] {
       opacity: 1;
     }
 
-    .icon {
+    &:only-child.active {
+      font-weight: bold;
       color: $blue;
     }
   }
-}
 
-.sidebar__module-btn {
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  font-size: 0.85rem;
+  .sidebar__module-child-btn {
+    margin-left: 30px;
+    font-size: 0.8rem;
 
-  &[aria-disabled='true'] {
-    opacity: 1;
+    &.active {
+      font-weight: bold;
+      color: $blue;
+    }
   }
 
-  &:only-child.active {
-    font-weight: bold;
-    color: $blue;
-  }
-}
+  //=== sidebar opened
+  &.opened {
+    width: $sidebarWidthOpened;
+    min-width: $sidebarWidthOpened;
 
-.sidebar__module-child-btn {
-  margin-left: 30px;
-  font-size: 0.8rem;
+    .sidebar__module {
+      cursor: auto;
+      padding: 12px 15px;
+    }
 
-  &.active {
-    font-weight: bold;
-    color: $blue;
-  }
-}
-
-//=== sidebar opened
-.sidebar.opened {
-  width: $sidebarWidthOpened;
-  min-width: $sidebarWidthOpened;
-
-  .sidebar__module {
-    cursor: auto;
-    padding: 12px 15px;
+    .sidebar__module-placeholder {
+      height: 30px;
+      padding: 0;
+    }
   }
 
-  .sidebar__module-placeholder {
-    height: 30px;
-    padding: 0;
+  .version {
+    width: $sidebarWidthOpened;
+    padding: 10px 20px;
+    font-size: 0.75rem;
+    color: lighten($black, 25%);
+    font-weight: 600;
+    text-align: center;
   }
 }
 
@@ -121,22 +136,4 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
   .sidebar__module-child-btn {
     margin: 0;
   }
-}
-
-.sidebar__modules.popup-menu-opened {
-  .sidebar__module.over {
-    background: $sidebarPopupMenuBgColor;
-  }
-}
-
-.version {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: $sidebarWidthOpened;
-  padding: 10px 20px;
-  font-size: 0.75rem;
-  color: lighten($black, 25%);
-  font-weight: 600;
-  text-align: center;
 }

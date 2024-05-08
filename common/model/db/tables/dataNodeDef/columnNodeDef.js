@@ -8,15 +8,19 @@ import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
 
+const columnSuffixCodeLabel = '_label'
+const columnSuffixTaxonScientificName = '_scientific_name'
+const columnSuffixTaxonVernacularName = '_vernacular_name'
+
 const columnNamesSuffixGetterByType = {
-  [nodeDefType.code]: () => ['', '_label'],
+  [nodeDefType.code]: () => ['', columnSuffixCodeLabel],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const suffixes = ['', '_x', '_y', '_srs']
     const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef)
     suffixes.push(...additionalFields.map((field) => `_${toSnakeCase(field)}`))
     return suffixes
   },
-  [nodeDefType.taxon]: () => ['', '_scientific_name'],
+  [nodeDefType.taxon]: () => ['', columnSuffixTaxonScientificName, columnSuffixTaxonVernacularName],
   [nodeDefType.file]: () => ['_file_uuid', '_file_name'],
 }
 
@@ -34,16 +38,13 @@ const colTypesGetterByType = {
   [nodeDefType.entity]: () => [SQL.types.uuid],
   [nodeDefType.file]: () => [SQL.types.uuid, SQL.types.varchar],
   [nodeDefType.integer]: () => [SQL.types.bigint],
-  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar],
+  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar, SQL.types.varchar, SQL.types.varchar],
   [nodeDefType.text]: () => [SQL.types.varchar],
   [nodeDefType.time]: () => [SQL.types.time],
 }
 
-const getColumnNames = (nodeDef, tableNodeDef = null) => {
+const getColumnNames = (nodeDef) => {
   const nodeDefName = NodeDef.getName(nodeDef)
-  if (tableNodeDef && NodeDef.isMultipleAttribute(nodeDef) && !NodeDef.isEqual(nodeDef)(tableNodeDef)) {
-    return [nodeDefName]
-  }
   const colsSuffixGetter = columnNamesSuffixGetterByType[NodeDef.getType(nodeDef)]
   const colsSuffix = colsSuffixGetter?.({ nodeDef })
   if (colsSuffix) {
@@ -56,7 +57,6 @@ const getColumnNames = (nodeDef, tableNodeDef = null) => {
 }
 
 const extractColumnName = ({ nodeDef, columnName }) => {
-  // const nodeDefName = toSnakeCase(NodeDef.getName(nodeDef))
   const nodeDefName = NodeDef.getName(nodeDef)
   const prefix = `${nodeDefName}_`
   // this is because when there is not subfix we should return
@@ -75,7 +75,7 @@ export default class ColumnNodeDef {
   constructor(table, nodeDef) {
     this._table = table
     this._nodeDef = nodeDef
-    this._names = getColumnNames(nodeDef, table.nodeDef)
+    this._names = getColumnNames(nodeDef)
     this._types = colTypesGetterByType[NodeDef.getType(nodeDef)]({ nodeDef })
   }
 
@@ -106,10 +106,22 @@ export default class ColumnNodeDef {
   get types() {
     return this._types
   }
+
+  get codeLabelColumn() {
+    if (!NodeDef.isCode(this.nodeDef)) return null
+    return `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}`
+  }
 }
+
+ColumnNodeDef.columnSuffixCodeLabel = columnSuffixCodeLabel
+ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
+ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
+
+ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
 
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
+
 ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
   const columnName = ColumnNodeDef.getColumnName(nodeDef)
   if (Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)) {

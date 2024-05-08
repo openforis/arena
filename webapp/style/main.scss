@@ -36,6 +36,14 @@ body {
   height: 100vh;
 }
 
+@media screen and (max-width: 768px) {
+  #main {
+    /* 100vh not working properly in mobile devices browsers
+     (see https://bugs.webkit.org/show_bug.cgi?id=141832) */
+    height: 92vh;
+  }
+}
+
 .main__system-error {
   @include full-screen-fixed();
   display: grid;
@@ -46,17 +54,33 @@ body {
 }
 
 .main__system-error-container {
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
-  background-color: $yellow;
   color: black;
   line-height: 3rem;
-  text-align: center;
+  text-align: left;
+
+  .error-message {
+    color: red;
+  }
+
+  .error-message,
+  .error-message__second-line {
+    white-space: pre-line;
+  }
+
+  .error-details-textarea {
+    width: 100%;
+  }
 }
 
 .hidden-transition {
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0.5s, opacity 0.5s linear;
+  transition:
+    visibility 0.5s,
+    opacity 0.5s linear;
 }
 
 .error {

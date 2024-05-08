@@ -1,5 +1,6 @@
 const keywords = [
   'asc',
+  'category',
   'date_created',
   'date_modified',
   'desc',
@@ -17,9 +18,11 @@ const keywords = [
   'record_step',
   'record_uuid',
   'step',
+  'taxonomy',
   'unique',
   'uuid',
   'value',
+  'weight',
 ]
 
 export const isKeyword = (value) => keywords.includes(value)

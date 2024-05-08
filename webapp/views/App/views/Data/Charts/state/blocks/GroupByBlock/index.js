@@ -26,7 +26,7 @@ const _valuesToSpec = ({ value = [], spec = {} }) => {
 const GroupByBlock = ({
   id = 'groupBy',
   title = 'Group by',
-  subtitle = 'Select the dimension to group the data',
+  subtitle = '',
   type = blockTypes.select,
   optionsParams = { filter: ['nominal', 'temporal'] },
   isMulti = true,

@@ -7,6 +7,8 @@
     .cluster-marker__clustered-points-popup {
       .leaflet-popup-content {
         width: 20rem;
+        max-height: 7rem;
+        overflow-y: auto;
 
         li {
           line-height: 1.5rem;

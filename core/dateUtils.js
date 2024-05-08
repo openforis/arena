@@ -13,7 +13,16 @@ import {
 
 import { isBlank } from './stringUtils'
 
-export { parseISO, subDays, addDays, differenceInDays, differenceInHours, subMonths, subYears } from 'date-fns'
+export {
+  parseISO,
+  subDays,
+  addDays,
+  addMinutes,
+  differenceInDays,
+  differenceInHours,
+  subMonths,
+  subYears,
+} from 'date-fns'
 
 export const formats = {
   dateDefault: 'dd/MM/yyyy',
@@ -119,12 +128,19 @@ export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo })
   if (R.isNil(dateStr) || R.isEmpty(dateStr)) {
     return null
   }
-  const dateParsed = parse(dateStr, formatFrom)
+  const dateParsed = typeof dateStr === 'object' ? dateStr : parse(dateStr, formatFrom)
   if (!isValidDateObject(dateParsed)) {
     return null
   }
   return format(dateParsed, formatTo)
 }
+
+export const convertDateFromISOToDisplay = (dateStr) =>
+  convertDate({
+    dateStr,
+    formatFrom: formats.dateISO,
+    formatTo: formats.dateDefault,
+  })
 
 export const convertDateTimeFromISOToDisplay = (dateStr) =>
   convertDate({

@@ -1,4 +1,4 @@
-import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock, MetricBlock } from '../../blocks'
+import { TitleBlock, ShowLegendBlock, MaxHeightBlock, GroupByBlock } from '../../blocks'
 import { valuesToCalculations, valuesToSpec, sliderBlock } from '../../blocks/common'
 
 const bar = {
@@ -16,13 +16,13 @@ const bar = {
     blocks: {
       query: {
         title: 'Query',
-        subtitle: 'Config of the query for the bar chart',
+        subtitle: '',
         type: 'container',
         blocks: {
           groupBy: GroupByBlock({
+            subtitle: 'Select the metric to group the data (X axis)',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const transform = valuesToCalculations(value)
-
               const groupBy = {
                 field_uuid: transform.key,
                 field: transform.as,
@@ -39,17 +39,16 @@ const bar = {
               return newSpec
             },
           }),
-          metric: MetricBlock({
-            valuesToSpec: ({ spec = {}, key, configItemsByPath }) => {
-              const columnValues = configItemsByPath[`${key}.column`]?.value
-              const aggregationValues = configItemsByPath[`${key}.aggregation`]?.value
-              const transform = valuesToCalculations(columnValues, '-')
-              const aggTransform = valuesToCalculations(aggregationValues, '-')
-
+          metric: GroupByBlock({
+            id: 'metric',
+            title: 'Metric',
+            subtitle: 'Select the metric to measure the data (Y axis)',
+            optionsParams: { filter: ['quantitative'] },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
               const metric = {
                 field: transform.as,
                 field_uuid: transform.key,
-                aggregate: aggTransform.as,
                 type: 'quantitative',
               }
 
@@ -63,12 +62,43 @@ const bar = {
               return newSpec
             },
           }),
+          aggregation: GroupByBlock({
+            id: 'aggregation',
+            title: 'Aggregation Method',
+            subtitle: '',
+            isMulti: false,
+            optionsParams: {
+              options: [
+                { value: 'average', label: 'Average', name: 'avg', type: 'aggregation' },
+                { value: 'count', label: 'Count', name: 'count', type: 'aggregation' },
+                { value: 'max', label: 'Maximum', name: 'max', type: 'aggregation' },
+                { value: 'median', label: 'Median', name: 'median', type: 'aggregation' },
+                { value: 'min', label: 'Minimum', name: 'min', type: 'aggregation' },
+                { value: 'sum', label: 'Sum', name: 'sum', type: 'aggregation' },
+              ],
+            },
+            valuesToSpec: ({ spec = {}, value = [] }) => {
+              const transform = valuesToCalculations(value)
+              const aggregation = {
+                type: transform.as,
+              }
+
+              const newSpec = {
+                ...spec,
+                query: {
+                  ...spec.query,
+                  aggregation,
+                },
+              }
+              return newSpec
+            },
+          }),
         },
-        order: ['groupBy', 'metric'],
+        order: ['groupBy', 'metric', 'aggregation'],
       },
       other: {
         title: 'Custom Chart',
-        subtitle: 'Custom configuration of the chart',
+        subtitle: 'Configuration of the Chart',
         type: 'container',
         blocks: {
           'show-title': ShowLegendBlock({
@@ -76,9 +106,10 @@ const bar = {
             title: 'Show Title',
             label: 'Show title',
             valuesToSpec: valuesToSpec('showTitle'),
-            defaultValue: false,
+            defaultValue: true,
           }),
           title: TitleBlock({
+            subtitle: '',
             valuesToSpec: valuesToSpec('title'),
           }),
           'show-legend': ShowLegendBlock({
@@ -91,7 +122,7 @@ const bar = {
           xTitle: TitleBlock({
             id: 'xAxis',
             title: 'Name of the X axis',
-            subtitle: 'Write here the name of the X axis',
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,
@@ -106,7 +137,7 @@ const bar = {
           yTitle: TitleBlock({
             id: 'yAxis',
             title: 'Name of the Y axis',
-            subtitle: 'Write here the name of the Y axis',
+            subtitle: '',
             valuesToSpec: ({ value = [], spec = {} }) => {
               const newSpec = {
                 ...spec,

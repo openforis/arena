@@ -1,3 +1,5 @@
+import * as StringUtils from '@core/stringUtils'
+
 export const types = {
   uuid: 'UUID',
   varchar: 'VARCHAR',
@@ -9,13 +11,25 @@ export const types = {
   geometryPoint: 'geometry(Point)',
 }
 
-// Alias
+/**
+ * Generates an alias from the specified name, splitting it into words
+ * and getting the first letter of each word, to make it more or less human readable,
+ * followed by a short hash of the name, to make it (almost) unique, but still short.
+ *
+ * @param {!string} name - The name used to generate the alias.
+ * @returns {string} - The generated alias.
+ */
 export const createAlias = (name) =>
   // add '_' prefix to avoid collision with reserved words
   `_${name
+    // split in words
     .split('_')
+    // get first letters of each word
     .map((word) => word[0])
-    .join('')}`
+    .join('')}_${
+    // append name hash to avoid collisions
+    StringUtils.hashCode(name)
+  }`
 
 export const addAlias = (alias, ...columnNames) => columnNames.map((columnName) => `${alias}.${columnName}`)
 

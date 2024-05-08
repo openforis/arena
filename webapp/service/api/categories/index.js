@@ -3,6 +3,7 @@ import axios from 'axios'
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
 import { cancelableGetRequest } from '../cancelableRequest'
+import { objectToFormData } from '../utils/apiUtils'
 
 // READ
 export const fetchCategories = async ({ surveyId, draft = true, validate = false, search = '' }) => {
@@ -12,6 +13,13 @@ export const fetchCategories = async ({ surveyId, draft = true, validate = false
     params: { draft, validate, search },
   })
   return categories
+}
+
+export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = true, search = '' }) => {
+  const { data } = await axios.get(`/api/survey/${surveyId}/categories/items-count`, {
+    params: { draft, search },
+  })
+  return data
 }
 
 export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, validate = true }) => {
@@ -26,10 +34,17 @@ export const fetchCategory = async ({ surveyId, categoryUuid, draft = true, vali
   return category
 }
 
-export const fetchCategoryItems = ({ surveyId, categoryUuid, draft = true, parentUuid = null }) =>
+export const fetchCategoryItems = ({
+  surveyId,
+  categoryUuid,
+  draft = true,
+  parentUuid = null,
+  search = null,
+  lang = null,
+}) =>
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-    data: { draft, parentUuid },
+    data: { draft, parentUuid, search, lang },
   })
 
 export const fetchCategoryItemsInLevelRequest = ({ surveyId, categoryUuid, levelIndex, draft = true }) =>
@@ -55,6 +70,14 @@ export const startExportAllCategoriesJob = async ({ surveyId, draft = true }) =>
     data: { job },
   } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft })
 
+  return { job }
+}
+
+export const startCategoriesBatchImportJob = async ({ surveyId, file }) => {
+  const formData = objectToFormData({ file })
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/categories/import`, formData)
   return { job }
 }
 
@@ -91,6 +114,16 @@ export const updateCategoryItemExtraDefItem = async ({
     deleted,
   })
 
+  return category
+}
+
+export const updateCategoryItemProp = async ({ surveyId, categoryUuid, itemUuid, key, value }) => {
+  const {
+    data: { category },
+  } = await axios.put(`/api/survey/${surveyId}/categories/${categoryUuid}/items/${itemUuid}`, {
+    key,
+    value,
+  })
   return category
 }
 

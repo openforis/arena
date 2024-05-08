@@ -26,7 +26,7 @@ export default class RecordCheckJob extends Job {
   }
 
   async execute() {
-    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle(this.surveyId, this.tx)
+    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
 
     this.total = R.length(recordsUuidAndCycle)
 

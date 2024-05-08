@@ -1,40 +1,67 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
+
+import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import { useI18n } from '@webapp/store/system'
 
 import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { RecordState } from '@webapp/store/ui/record'
 
 import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 const SurveyDefsLoader = (props) => {
   const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const surveyInfo = useSurveyInfo()
-  const ready = useSurveyDefsFetched(draft)
-  const surveyUuid = Survey.getUuid(surveyInfo)
   const includeAnalysis = useAuthCanUseAnalysis()
+  const surveyInfo = useSurveyInfo()
+  const surveyId = Survey.getId(surveyInfo)
+  const ready = useSurveyDefsFetched({ draft, includeAnalysis, validate })
+  const recordPreviewUuid = useSelector(RecordState.getRecordUuidPreview)
 
   useEffect(() => {
-    if (surveyUuid && !ready) {
+    if (surveyId && !ready) {
       dispatch(SurveyActions.initSurveyDefs({ draft, validate, includeAnalysis }))
     }
-  }, [surveyUuid, ready])
+  }, [surveyId, ready])
+
+  useEffect(() => {
+    if (surveyId && ready && recordPreviewUuid) {
+      dispatch(SurveyActions.refreshSurveyDefs)
+    }
+  }, [dispatch, ready, recordPreviewUuid, surveyId])
+
+  const onSurveyUpdate = useCallback(
+    ({ surveyId: surveyUpdatedId }) => {
+      if (surveyUpdatedId === surveyId) {
+        dispatch(SurveyActions.resetSurveyDefs())
+      }
+    },
+    [dispatch, surveyId]
+  )
+
+  useEffect(() => {
+    AppWebSocket.on(WebSocketEvents.surveyUpdate, onSurveyUpdate)
+    return () => {
+      AppWebSocket.off(WebSocketEvents.surveyUpdate, onSurveyUpdate)
+    }
+  }, [onSurveyUpdate, surveyId])
 
   useOnSurveyCycleUpdate(() => {
-    if (surveyUuid) {
+    if (surveyId) {
       if (onSurveyCycleUpdate) onSurveyCycleUpdate()
       dispatch(SurveyActions.resetSurveyDefs())
     }
   })
 
-  if (!surveyUuid) {
+  if (!surveyId) {
     return <ActiveSurveyNotSelected />
   }
 

@@ -61,6 +61,24 @@ export const init = (app) => {
   )
 
   app.post(
+    '/survey/:surveyId/categories/import',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const filePath = Request.getFilePath(req)
+
+        const job = CategoryService.createBatchImportJob({ user, surveyId, filePath })
+
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
     '/survey/:surveyId/categories/:categoryUuid/levels',
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
@@ -178,6 +196,21 @@ export const init = (app) => {
     }
   })
 
+  app.get(
+    '/survey/:surveyId/categories/items-count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, draft } = Request.getParams(req)
+
+        const countsByCategoryUuid = await CategoryService.fetchItemsCountIndexedByCategoryUuid({ surveyId, draft })
+        res.json(countsByCategoryUuid)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // Fetch category by uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid',
@@ -246,10 +279,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, parentUuid, draft } = Request.getParams(req)
+        const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
 
         const items = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchItemsByParentUuid(surveyId, categoryUuid, parentUuid, draft)
+          await CategoryService.fetchItemsByParentUuid({ surveyId, categoryUuid, parentUuid, draft, search, lang })
         )
 
         res.json({ items })

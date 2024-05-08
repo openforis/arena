@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
+import * as Languages from '@core/app/languages'
 
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
@@ -31,12 +32,13 @@ export const SurveyTemplateSelect = (props) => {
   return (
     <Dropdown
       items={items}
-      itemDescription={
-        (item) =>
-          [Survey.getDefaultDescription(item), `${i18n.t('common.language_plural')}: ${Survey.getLanguages(item)}`]
-            .filter(Boolean)
-            .join('\n\n') // separate Languages from description only if description is not empty
-      }
+      itemDescription={(item) => {
+        const description = Survey.getDefaultDescription(item)
+        const languages = Survey.getLanguages(item)
+          .map((lang) => Languages.getLanguageLabel(lang))
+          .join(', ')
+        return [description, `${i18n.t('common.language_plural')}: ${languages}`].filter(Boolean).join('\n\n')
+      }}
       itemLabel={(item) => Survey.getDefaultLabel(item) || Survey.getName(item)}
       itemValue={Survey.getUuid}
       onChange={(item) => onChange(Survey.getUuid(item))}

@@ -11,7 +11,8 @@ import * as SurveyState from '../state'
 import { SurveyStatusState } from '../status'
 
 // ==== Survey
-export const useSurveyDefsFetched = (draft) => useSelector(SurveyStatusState.areDefsFetched(draft))
+export const useSurveyDefsFetched = ({ draft, includeAnalysis, validate }) =>
+  useSelector(SurveyStatusState.isFetchedWithSameParams({ draft, includeAnalysis, validate }))
 export const useSurvey = () => useSelector(SurveyState.getSurvey)
 export const useSurveyId = () => useSelector(SurveyState.getSurveyId)
 export const useSurveyInfo = () => useSelector(SurveyState.getSurveyInfo)
@@ -46,4 +47,10 @@ export const useNodeDefValidationByUuid = (uuid) =>
     const survey = SurveyState.getSurvey(state)
     const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
     return Survey.getNodeDefValidation(nodeDef)(survey)
+  })
+export const useSurveyHasFileAttributes = () =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    const fileDefs = Survey.findDescendants({ filterFn: NodeDef.isFile })(survey)
+    return fileDefs.length > 0
   })

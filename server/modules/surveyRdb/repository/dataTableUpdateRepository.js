@@ -16,6 +16,7 @@ const _hasTable = (nodeDef) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nod
 const _getType = (nodeDef, node) => {
   const created = Node.isCreated(node)
   const deleted = Node.isDeleted(node)
+  const updated = Node.isUpdated(node)
   const withTable = _hasTable(nodeDef)
 
   if (withTable) {
@@ -24,6 +25,9 @@ const _getType = (nodeDef, node) => {
     }
     if (deleted) {
       return types.delete
+    }
+    if (updated && NodeDef.isMultipleAttribute(nodeDef)) {
+      return types.update
     }
   } else if (!deleted) {
     return types.update
@@ -34,7 +38,7 @@ const _getType = (nodeDef, node) => {
 const _getColumnNames = ({ nodeDef, type }) =>
   type === types.insert
     ? [
-        DataTable.columnNameUuuid,
+        DataTable.columnNameUuid,
         ...(NodeDef.isRoot(nodeDef)
           ? [
               DataTable.columnNameRecordUuid,
@@ -43,7 +47,7 @@ const _getColumnNames = ({ nodeDef, type }) =>
               DataTable.columnNameRecordOwnerUuid,
             ]
           : []),
-        DataTable.columnNameParentUuuid,
+        DataTable.columnNameParentUuid,
         ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
           ? DataCol.getNames(nodeDef)
           : []),
@@ -129,7 +133,7 @@ const _insert = (update, client) =>
   )
 
 const _delete = (update, client) =>
-  client.one(
+  client.oneOrNone(
     `DELETE FROM ${update.schemaName}.${update.tableName} 
     WHERE uuid = $1
     RETURNING uuid`,

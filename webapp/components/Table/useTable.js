@@ -1,10 +1,13 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
+import { useDispatch } from 'react-redux'
+
+import { ArrayUtils } from '@core/arrayUtils'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
-import { ArrayUtils } from '@core/arrayUtils'
+import { TablesActions, useTableMaxRows, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 export const useTable = ({
   columns,
@@ -14,16 +17,40 @@ export const useTable = ({
   restParams,
   onRowClick: onRowClickProp,
   selectable,
+  selectOnClick,
 }) => {
+  const dispatch = useDispatch()
+
   const [totalCount, setTotalCount] = useState(0)
-  const [visibleColumns, setVisibleColumns] = useState(columns)
+
+  const visibleColumnKeysInStore = useTableVisibleColumns(module)
+  const visibleColumnKeys = useMemo(() => {
+    if (visibleColumnKeysInStore) {
+      return visibleColumnKeysInStore
+    }
+    if (columns) {
+      return columns.reduce((acc, column) => {
+        if (!column.hidden) {
+          acc.push(column.key)
+        }
+        return acc
+      }, [])
+    }
+    return []
+  }, [columns, visibleColumnKeysInStore])
+  const visibleColumns = useMemo(
+    () => columns?.filter((column) => visibleColumnKeys.includes(column.key)) ?? [],
+    [columns, visibleColumnKeys]
+  )
+  const limitInState = useTableMaxRows(module)
+  const limitInLink = getLimit()
+  const limit = limitInState ?? limitInLink
 
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   const offset = getOffset()
-  const limit = getLimit()
   const sort = getSort()
   const search = getSearch()
 
@@ -104,7 +131,7 @@ export const useTable = ({
       if (onRowClickProp) {
         await onRowClickProp(item)
       }
-      if (selectable) {
+      if (selectable && selectOnClick) {
         const key = keyExtractor({ item })
         const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
           item,
@@ -113,14 +140,14 @@ export const useTable = ({
         setSelectedItems(selectedItemsUpdated)
       }
     },
-    [keyExtractor, onRowClickProp, selectable]
+    [keyExtractor, onRowClickProp, selectOnClick, selectable]
   )
 
   const onVisibleColumnsChange = useCallback(
-    (visibleColumnKeys) => {
-      setVisibleColumns(columns.filter((column) => visibleColumnKeys.includes(column.key)))
+    (visibleColumnKeysUpdated) => {
+      dispatch(TablesActions.updateVisibleColumns({ module, visibleColumns: visibleColumnKeysUpdated }))
     },
-    [columns]
+    [module]
   )
 
   return {
@@ -139,6 +166,7 @@ export const useTable = ({
     onRowClick,
     onVisibleColumnsChange,
     selectedItems,
+    visibleColumnKeys,
     visibleColumns,
   }
 }

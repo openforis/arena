@@ -35,8 +35,15 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
       try {
-        await UserService.inviteUser({ user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation })
-        Response.sendOk(res)
+        const { skippedEmails } = await UserService.inviteUsers({
+          user,
+          surveyId,
+          surveyCycleKey,
+          invitation,
+          serverUrl,
+          repeatInvitation,
+        })
+        res.json({ skippedEmails })
       } catch (e) {
         const errorKey = e.key || 'appErrors.generic'
         const errorParams = e.params || { text: e.message }
@@ -91,12 +98,17 @@ export const init = (app) => {
 
   // ==== READ
 
-  const _getUser = async (req, res) => {
+  const _fetchUser = async (req) => {
     const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
     // show private info only if fetching the same user of the request
     const userResult = User.isEqual(Request.getUser(req))(user) ? user : User.dissocPrivateProps(user)
-    res.json(userResult)
+    return userResult
+  }
+
+  const _getUser = async (req, res) => {
+    const user = await _fetchUser(req)
+    res.json(user)
   }
 
   app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
@@ -160,10 +172,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
       const { surveyId } = Request.getParams(req)
 
-      const count = await UserService.countUsersBySurveyId(user, surveyId)
+      const count = await UserService.countUsersBySurveyId(surveyId)
       res.json({ count })
     } catch (error) {
       next(error)
@@ -173,15 +184,51 @@ export const init = (app) => {
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, offset, limit } = Request.getParams(req)
+      const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId({ user, surveyId, offset, limit })
+      const list = await UserService.fetchUsersBySurveyId({
+        user,
+        surveyId,
+        offset,
+        limit,
+        onlyAccepted,
+        includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
+      })
 
       res.json({ list })
     } catch (error) {
       next(error)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/user/:userUuid/resetpasswordurl',
+    AuthMiddleware.requireUserInvitePermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, userUuid } = Request.getParams(req)
+        const serverUrl = Request.getServerUrl(req)
+        const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+        res.json(url)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/user/:userUuid/name',
+    AuthMiddleware.requireUserNameViewPermission,
+    async (req, res, next) => {
+      try {
+        const user = await _fetchUser(req)
+        const name = user ? User.getName(user) : null
+        res.json(name)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {

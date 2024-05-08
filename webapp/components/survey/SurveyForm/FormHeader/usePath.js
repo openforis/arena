@@ -1,29 +1,29 @@
+import { NodeValueFormatter } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Taxon from '@core/survey/taxon'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
-import * as NodeRefData from '@core/record/nodeRefData'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useNodeDefLabelType, useNodeDefPage, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
 import { useRecord } from '@webapp/store/ui/record'
 
-const getNodeValue = (nodeDef, node) => {
-  if (NodeDef.isCode(nodeDef)) {
-    const categoryItem = NodeRefData.getCategoryItem(node)
-    return CategoryItem.getCode(categoryItem)
-  }
-  if (NodeDef.isTaxon(nodeDef)) {
-    const taxon = NodeRefData.getTaxon(node)
-    return Taxon.getCode(taxon)
-  }
-  return Node.getValue(node, null)
-}
+const getNodeValue = ({ survey, cycle, nodeDef, node, lang }) =>
+  NodeValueFormatter.format({
+    survey,
+    cycle,
+    nodeDef,
+    node,
+    value: Node.getValue(node),
+    showLabel: true,
+    quoteLabels: true,
+    lang,
+  })
 
 export const usePath = (entry) => {
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   let nodeDefCurrent = useNodeDefPage()
   const pagesUuidMap = usePagesUuidMap()
   const lang = useSurveyPreferredLang()
@@ -45,10 +45,10 @@ export const usePath = (entry) => {
         : Record.getNodeByUuid(nodeUuidCurrent)(record)
 
       if (nodeCurrent) {
-        const nodeDefKeys = Survey.getNodeDefKeys(nodeDefCurrent)(survey)
+        const nodeDefKeys = Survey.getNodeDefKeysSorted({ nodeDef: nodeDefCurrent, cycle })(survey)
         const keys = nodeDefKeys.map((nodeDefKey) => {
           const nodeKeys = Record.getNodeChildrenByDefUuid(nodeCurrent, NodeDef.getUuid(nodeDefKey))(record)
-          return nodeKeys.map((nodeKey) => getNodeValue(nodeDefKey, nodeKey))
+          return nodeKeys.map((nodeKey) => getNodeValue({ survey, cycle, nodeDef: nodeDefKey, node: nodeKey, lang }))
         })
         label += ` [${keys.flat().join(', ')}]`
       }

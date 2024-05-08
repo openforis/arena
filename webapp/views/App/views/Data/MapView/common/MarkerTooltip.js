@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { Colors } from '@webapp/utils/colors'
 import { Tooltip } from 'react-leaflet'
 
-const tooltipOpacity = 0.6
+const tooltipOpacity = 0.8
 
 export const MarkerTooltip = (props) => {
   const { children, color } = props

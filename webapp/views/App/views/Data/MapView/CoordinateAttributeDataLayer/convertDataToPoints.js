@@ -44,17 +44,19 @@ export const convertDataToPoints = ({ data, attributeDef, nodeDefParent, survey,
       acc.bounds.extend([lat, long])
 
       const recordUuid = item[TableDataNodeDef.columnSet.recordUuid]
+      const recordOwnerUuid = item[TableDataNodeDef.columnSet.recordOwnerUuid]
       const parentUuid = item[parentEntityColumn.name]
       const key = `${recordUuid}-${parentUuid}`
       const ancestorsKeys = ancestorsKeysColumns.map((column) => {
         const ancestorDef = column.nodeDef
         const rawValue = item[column.name]
-        return ValueFormatter.format({ value: rawValue, i18n, nodeDef: ancestorDef })
+        const label = item[`${column.name}_label`]
+        return ValueFormatter.format({ value: rawValue, label, i18n, nodeDef: ancestorDef })
       })
 
       acc.points.push({
         type: 'Feature',
-        properties: { key, cluster: false, point, recordUuid, parentUuid, location, ancestorsKeys },
+        properties: { key, cluster: false, point, recordUuid, recordOwnerUuid, parentUuid, location, ancestorsKeys },
         geometry: {
           type: 'Point',
           coordinates: [long, lat],

@@ -3,6 +3,7 @@ import './CategoryDetails.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
+import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
@@ -16,7 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { Checkbox, UploadButton } from '@webapp/components/form'
+import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import { ExtraPropDefsEditor } from '../ExtraPropDefsEditor'
 import ImportSummary from './ImportSummary'
@@ -70,11 +71,13 @@ const CategoryDetails = (props) => {
           </FormItem>
 
           {!readOnly && (
-            <UploadButton
+            <OpenFileUploadDialogButton
               className="import-btn"
-              label={i18n.t('common.csvImport')}
+              label="common.csvImport"
               accept=".csv"
-              onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
+              onOk={({ files, onUploadProgress }) =>
+                Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+              }
             />
           )}
           <ButtonDownload
@@ -85,6 +88,7 @@ const CategoryDetails = (props) => {
           />
           {!readOnly && (
             <ButtonMenu
+              className="date-import-template-menu-btn"
               label="categoryEdit.templateForDataImport"
               iconClassName="icon-download2 icon-14px"
               items={[
@@ -181,32 +185,35 @@ const CategoryDetails = (props) => {
           />
         )}
 
-        <div className="category__levels">
-          {levels.map((level) => (
-            <LevelDetails
-              key={CategoryLevel.getUuid(level)}
-              level={level}
-              state={state}
-              setState={setState}
-              single={levels.length === 1}
-            />
-          ))}
+        <div className="category__levels-wrapper">
+          <div className={classNames('category__levels', { 'center-aligned': levels.length <= 3 })}>
+            {levels.map((level) => (
+              <LevelDetails
+                key={CategoryLevel.getUuid(level)}
+                level={level}
+                state={state}
+                setState={setState}
+                single={levels.length === 1}
+              />
+            ))}
 
-          {!readOnly && (
-            <Button
-              className="btn-s btn-add-level"
-              testId={TestId.categoryDetails.addLevelBtn}
-              onClick={() => Actions.createLevel({ category })}
-              disabled={levels.length === MAX_LEVELS}
-              iconClassName="icon icon-plus icon-16px icon-left"
-              label="categoryEdit.addLevel"
-            />
-          )}
+            {!readOnly && levels.length < MAX_LEVELS && (
+              <div>
+                <Button
+                  className="btn-s btn-add-level"
+                  testId={TestId.categoryDetails.addLevelBtn}
+                  onClick={() => Actions.createLevel({ category })}
+                  iconClassName="icon icon-plus icon-16px icon-left"
+                  label="categoryEdit.addLevel"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {showClose && (
           <div className="button-bar">
-            <Button onClick={Actions.onDoneClick} label="common.done" />
+            <Button onClick={Actions.onDoneClick} label="common.done" primary />
           </div>
         )}
       </div>

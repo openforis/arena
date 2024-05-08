@@ -67,6 +67,7 @@ const JobMonitor = () => {
               onClick={() => dispatch(JobActions.hideJobMonitor())}
               disabled={!JobSerialized.isEnded(job)}
               label="common.close"
+              primary
             />
           ))}
       </ModalFooter>

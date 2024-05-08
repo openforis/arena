@@ -66,30 +66,46 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefUuids.flatMap((columnNodeDef) => columnNodeDef.namesFull)
   }
 
+  get _multipleAttributeColumns() {
+    const { nodeDef, survey, tableData } = this
+
+    return Survey.getNodeDefDescendantAttributesInSingleEntities({
+      nodeDef,
+      includeAnalysis: true,
+      includeMultipleAttributes: true,
+    })(survey)
+      .filter((nodeDef) => NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef))
+      .map((multAttrDef) => new ColumnNodeDef(tableData, multAttrDef))
+  }
+
+  get _parentViewColumns() {
+    const { nodeDef, viewDataParent } = this
+    return viewDataParent
+      ? viewDataParent.columnNodeDefs
+          .filter(
+            (parentColumnNodeDef) =>
+              !NodeDef.isMultipleAttribute(parentColumnNodeDef.nodeDef) ||
+              (!NodeDef.isEqual(parentColumnNodeDef.nodeDef)(nodeDef) &&
+                NodeDef.canMultipleAttributeBeAggregated(parentColumnNodeDef.nodeDef))
+          )
+          .map((columnNodeDef) => new ColumnNodeDef(viewDataParent, columnNodeDef.nodeDef))
+      : []
+  }
+
   get columnNodeDefs() {
+    const { nodeDef, tableData, viewDataParent, virtual } = this
     const columns = []
     // table entity uuid column - it doesn't exist for virtual entities
-    if (!this.virtual && !NodeDef.isMultipleAttribute(this.nodeDef)) {
-      columns.push(new ColumnNodeDef(this.tableData, this.nodeDef))
+    if (!virtual && !NodeDef.isMultipleAttribute(nodeDef)) {
+      columns.push(new ColumnNodeDef(tableData, nodeDef))
     }
     // attribute columns
-    columns.push(...this.tableData.columnNodeDefs)
+    columns.push(...tableData.columnNodeDefs)
     // multiple attribute columns
-    columns.push(
-      ...Survey.getNodeDefChildren(
-        this.nodeDef,
-        true
-      )(this.survey)
-        .filter((nodeDef) => NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef))
-        .map((multAttrDef) => new ColumnNodeDef(this.tableData, multAttrDef))
-    )
+    columns.push(...this._multipleAttributeColumns)
     // parent view columns
-    if (this.viewDataParent) {
-      columns.unshift(
-        ...this.viewDataParent.columnNodeDefs
-          .filter((parentColumnNodeDef) => !NodeDef.isMultipleAttribute(parentColumnNodeDef.nodeDef))
-          .map((columnNodeDef) => new ColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef))
-      )
+    if (viewDataParent) {
+      columns.unshift(...this._parentViewColumns)
     }
     return columns
   }

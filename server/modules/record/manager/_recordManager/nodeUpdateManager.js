@@ -141,11 +141,15 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
-export const updateNodesDependents = async ({ survey, record, nodes, persistNodes = true, sideEffect = false }, tx) => {
+export const updateNodesDependents = async (
+  { survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
+  tx
+) => {
   const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
     nodes,
+    timezoneOffset,
     logger,
     sideEffect,
   })
@@ -232,7 +236,8 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   nodeDependentUniqueAttributes = Object.values(nodeDependentUniqueAttributes).reduce((nodesAcc, nodeDependent) => {
     const nodeDependentUuid = Node.getUuid(nodeDependent)
     const deleted = !Record.getNodeByUuid(nodeDependentUuid)(recordUpdated)
-    const nodeDependentUpdated = Node.assocDeleted(deleted)(nodeDependent)
+    const nodeDependentUpdated =
+      Node.isDeleted(nodeDependent) !== deleted ? Node.assocDeleted(deleted)(nodeDependent) : nodeDependent
     return { ...nodesAcc, [nodeDependentUuid]: nodeDependentUpdated }
   }, {})
 

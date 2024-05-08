@@ -29,8 +29,29 @@ const AdvancedProps = (props) => {
   const i18n = useI18n()
   const cycle = useSurveyCycleKey()
 
+  const createLayoutPropCheckbox = ({ prop }) => (
+    <Checkbox
+      checked={NodeDefLayout.getPropLayout(cycle, prop, false)(nodeDef)}
+      disabled={readOnly}
+      label={`nodeDefEdit.advancedProps.${prop}`}
+      validation={Validation.getFieldValidation(prop)(validation)}
+      onChange={(value) => Actions.setLayoutProp({ state, key: prop, value })}
+    />
+  )
+
   return (
     <div className="form">
+      {NodeDef.canHaveMobileProps(cycle)(nodeDef) && (
+        <fieldset className="mobile-props-container">
+          <legend>{i18n.t('nodeDefEdit.mobileProps.title')}</legend>
+          <div className="internal-container">
+            {NodeDef.canBeHiddenInMobile(nodeDef) &&
+              createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
+            {NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
+              createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
+          </div>
+        </fieldset>
+      )}
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
@@ -45,6 +66,7 @@ const AdvancedProps = (props) => {
                 <FormItem label={i18n.t('nodeDefEdit.advancedProps.hidden')}>
                   <Checkbox
                     checked={NodeDef.isHidden(nodeDef)}
+                    disabled={readOnly}
                     validation={Validation.getFieldValidation(NodeDef.propKeys.hidden)(validation)}
                     onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.hidden, value })}
                   />
@@ -52,14 +74,7 @@ const AdvancedProps = (props) => {
               )}
             </div>
           </FormItem>
-          <FormItem label={i18n.t('nodeDefEdit.advancedProps.hiddenInMobile')}>
-            <Checkbox
-              checked={NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)}
-              disabled={readOnly}
-              validation={Validation.getFieldValidation(NodeDefLayout.keys.hiddenInMobile)(validation)}
-              onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.hiddenInMobile, value })}
-            />
-          </FormItem>
+
           <NodeDefExpressionsProp
             qualifier={TestId.nodeDefDetails.defaultValues}
             state={state}
@@ -70,6 +85,7 @@ const AdvancedProps = (props) => {
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant
             isBoolean={NodeDef.isBoolean(nodeDef)}
+            excludeCurrentNodeDef
           />
           <div className="form_row without-label">
             <Checkbox
@@ -98,6 +114,7 @@ const AdvancedProps = (props) => {
         multiple={false}
         nodeDefUuidContext={nodeDefUuidContext}
         isContextParent
+        excludeCurrentNodeDef
       />
 
       <div className="form_row without-label">

@@ -10,7 +10,7 @@ import * as API from '@webapp/service/api'
 
 import { useI18n } from '@webapp/store/system'
 
-import { Button } from '@webapp/components'
+import { Button, ButtonBack } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { PasswordInput, PasswordStrengthChecker } from '@webapp/components/form'
 import ValidationTooltip from '@webapp/components/validationTooltip'
@@ -55,6 +55,7 @@ const UserPasswordChange = () => {
               autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
               label={i18n.t(`userPasswordChangeView.${key}`)}
               onChange={setStateProp(key)}
+              value={form[key]}
             />
           </ValidationTooltip>
 
@@ -64,12 +65,16 @@ const UserPasswordChange = () => {
         </div>
       ))}
 
-      <Button
-        className="btn-primary"
-        disabled={Validation.isNotValid(validation) || empty}
-        label="userPasswordChangeView.changePassword"
-        onClick={onChangePasswordClick}
-      />
+      <div className="button-bar">
+        <ButtonBack />
+
+        <Button
+          className="btn-primary"
+          disabled={Validation.isNotValid(validation) || empty}
+          label="userPasswordChangeView.changePassword"
+          onClick={onChangePasswordClick}
+        />
+      </div>
     </div>
   )
 }

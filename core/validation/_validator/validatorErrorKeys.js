@@ -1,4 +1,5 @@
 export const ValidatorErrorKeys = {
+  invalidEmail: 'validationErrors.invalidEmail',
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
   invalidDate: 'validationErrors.invalidDate',
@@ -43,6 +44,7 @@ export const ValidatorErrorKeys = {
     emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
     emptyFile: 'validationErrors.categoryImport.emptyFile',
     invalidParentItemOrder: 'validationErrors.categoryImport.invalidParentItemOrder',
+    nameDuplicate: 'validationErrors.categoryImport.nameDuplicate',
     srsNotDefined: 'validationErrors.categoryImport.srsNotDefined',
   },
 
@@ -50,8 +52,9 @@ export const ValidatorErrorKeys = {
     recordInAnalysisStepCannotBeUpdated: 'validationErrors.dataImport.recordInAnalysisStepCannotBeUpdated',
     emptyFile: 'validationErrors.dataImport.emptyFile',
     errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
+    multipleRecordsMatchingKeys: 'validationErrors.dataImport.multipleRecordsMatchingKeys',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
-    recordKeysMissing: 'validationErrors.dataImport.recordKeysMissing',
+    recordKeyMissing: 'validationErrors.dataImport.recordKeyMissing',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },
 

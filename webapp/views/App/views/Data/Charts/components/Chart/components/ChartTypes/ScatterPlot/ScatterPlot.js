@@ -1,23 +1,23 @@
-import * as d3 from 'd3'
-import PropTypes from 'prop-types'
-import React, { useEffect, useRef } from 'react'
 import './ScatterPlot.css'
+
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
+import * as d3 from 'd3'
+
 import { createLegend } from './utils/legend'
 import { processData } from './utils/processData'
 
-const ScatterPlot = ({ specs, originalData }) => {
+const ScatterPlot = ({ specs, originalData, chartRef }) => {
   const { data, xField, yField } = processData(originalData, specs)
-  const chartRef = useRef()
 
-  // Shape symbols
   const shapeSymbols = [
-    d3.symbolCircle, // Circle
-    d3.symbolCross, // Cross
-    d3.symbolDiamond, // Diamond
-    d3.symbolSquare, // Square
-    d3.symbolStar, // Star
-    d3.symbolTriangle, // Triangle
-    d3.symbolWye, // Wye
+    d3.symbolCircle,
+    d3.symbolCross,
+    d3.symbolDiamond,
+    d3.symbolSquare,
+    d3.symbolStar,
+    d3.symbolTriangle,
+    d3.symbolWye,
   ]
 
   useEffect(() => {
@@ -236,6 +236,7 @@ ScatterPlot.propTypes = {
     }).isRequired,
   }).isRequired,
   originalData: PropTypes.array.isRequired,
+  chartRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
 }
 
 export default React.memo(ScatterPlot)

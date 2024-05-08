@@ -8,12 +8,16 @@ import * as ExpressionVariables from './expressionVariables'
 
 const functionExamples = {
   [Expression.modes.json]: {
-    [Expression.functionNames
-      .categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
+    [Expression.functionNames.categoryItemProp]:
+      `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
     [Expression.functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
+    [Expression.functionNames.first]:
+      'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
     [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
     [Expression.functionNames.index]: `index(node_name), index(this), index($context), index(parent(this))`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
+    [Expression.functionNames.last]:
+      'last(multiple_entity_name).entity_attribute_name, last(multiple_attribute_name), ...',
     [Expression.functionNames.ln]: 'ln(10) = 2.302…',
     [Expression.functionNames.log10]: 'log10(100) = 2',
     [Expression.functionNames.max]: 'max(3,1,2) = 3',
@@ -49,14 +53,14 @@ const getVariableCompletion = ({ group = null, variable, token }) => {
 
   const textParts = []
   if (group) {
-    textParts.push(`${group.label}`)
+    textParts.push(group.label)
   }
   if (label && label !== value) {
     textParts.push(`${label} (${value})`)
   } else {
     textParts.push(value)
   }
-  const text = textParts.join(' / ')
+  const text = textParts.join('.')
   const data = { text, value }
 
   return {

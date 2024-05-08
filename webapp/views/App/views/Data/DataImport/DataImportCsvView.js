@@ -1,28 +1,33 @@
 import './DataImportCsvView.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
+
+import * as JobSerialized from '@common/job/jobSerialized'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
 
+import { FileUtils } from '@webapp/utils/fileUtils'
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 
+import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
-import { ButtonDownload, ButtonIconInfo, Dropzone, Stepper } from '@webapp/components'
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
+import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
 import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 import { ImportStartButton } from './ImportStartButton'
 
 const importTypes = {
@@ -31,8 +36,10 @@ const importTypes = {
 }
 
 const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
+const optionsRecordUpdateSystemAdmin = ['includeFiles']
 
-const fileMaxSize = 20 // 20MB
+const fileMaxSizeDefault = 20 // 20MB
+const fileMaxSizeWithFiles = 100 // 100MB
 
 const allowedLabelTypes = [
   NodeDef.NodeDefLabelTypes.label,
@@ -48,7 +55,11 @@ export const DataImportCsvView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
-
+  const isSystemAdmin = useUserIsSystemAdmin()
+  const allowedOptionsRecordUpdate = useMemo(
+    () => [...optionsRecordUpdate, ...(isSystemAdmin ? optionsRecordUpdateSystemAdmin : [])],
+    [isSystemAdmin]
+  )
   const canSelectCycle = surveyCycleKeys.length > 1
 
   const [state, setState] = useState({
@@ -57,10 +68,11 @@ export const DataImportCsvView = () => {
     file: null,
     jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
-    selectedEntityDefUuid: null,
+    selectedNodeDefUuid: null,
     // options
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
+    includeFiles: false,
   })
 
   const {
@@ -69,11 +81,19 @@ export const DataImportCsvView = () => {
     file,
     jobCompleted,
     nodeDefLabelType,
-    selectedEntityDefUuid,
+    selectedNodeDefUuid,
     // options
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
+    includeFiles,
   } = state
+
+  const fileAccept = useMemo(
+    () => (includeFiles ? FileUtils.acceptByExtension.zip : FileUtils.acceptByExtension.csv),
+    [includeFiles]
+  )
+
+  const fileMaxSize = useMemo(() => (includeFiles ? fileMaxSizeWithFiles : fileMaxSizeDefault), [includeFiles])
 
   const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${RecordCycle.getLabel(cycle)})_ImportError`
 
@@ -81,7 +101,7 @@ export const DataImportCsvView = () => {
 
   const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
-  const onEntitySelect = (entityDef) => setStateProp('selectedEntityDefUuid')(NodeDef.getUuid(entityDef))
+  const onNodeDefSelect = (nodeDef) => setStateProp('selectedNodeDefUuid')(NodeDef.getUuid(nodeDef))
 
   const onNodeDefLabelTypeChange = useCallback(() => {
     const nodeDefLabelTypeNext =
@@ -95,12 +115,12 @@ export const DataImportCsvView = () => {
         const stateNext = { ...statePrev, dataImportType: value }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
-          stateNext.selectedEntityDefUuid = NodeDef.getUuid(nodeDefRoot)
+          stateNext.selectedNodeDefUuid = NodeDef.getUuid(nodeDefRoot)
           stateNext.preventAddingNewEntityData = false
           stateNext.preventUpdatingRecordsInAnalysis = false
         } else {
           stateNext.preventUpdatingRecordsInAnalysis = true
-          stateNext.selectedEntityDefUuid = null
+          stateNext.selectedNodeDefUuid = null
         }
         stateNext.file = null
         return stateNext
@@ -109,9 +129,7 @@ export const DataImportCsvView = () => {
     [survey]
   )
 
-  const onFilesDrop = (files) => {
-    setStateProp('file')(files[0])
-  }
+  const onFilesDrop = useCallback((files) => setStateProp('file')(files[0]), [setStateProp])
 
   const onImportJobStart = useCallback(
     (job) => {
@@ -130,20 +148,33 @@ export const DataImportCsvView = () => {
     [dispatch, errorsExportFileName]
   )
 
+  const onJobCompletedDialogClose = useCallback(() => {
+    if (JobSerialized.isSucceeded(jobCompleted)) {
+      setState((statePrev) => {
+        const stateNext = { ...statePrev, jobCompleted: null }
+        if (JobSerialized.isSucceeded(jobCompleted) && !JobSerialized.getResult(jobCompleted).dryRun) {
+          stateNext.file = null
+        }
+        return stateNext
+      })
+    }
+  }, [jobCompleted])
+
   const importStartParams = {
     surveyId,
     file,
     cycle,
-    entityDefUuid: selectedEntityDefUuid,
+    nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+    includeFiles,
   }
 
   return (
     <div className="main-container">
       <div className="steps-row">
-        <ButtonIconInfo title="dataImportView.importFromCsvStepsInfo" markdown />
+        <ButtonIconInfo title="dataImportView.importFromCsvStepsInfo" isTitleMarkdown />
         <Stepper activeStep={activeStep} steps={steps} />
       </div>
       <div className="internal-container">
@@ -168,12 +199,13 @@ export const DataImportCsvView = () => {
           )}
 
           {dataImportType && (
-            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoEntity')}>
+            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoMultipleEntityOrAttribute')}>
               <>
                 <EntitySelectorTree
                   nodeDefLabelType={nodeDefLabelType}
-                  nodeDefUuidActive={selectedEntityDefUuid}
-                  onSelect={onEntitySelect}
+                  nodeDefUuidActive={selectedNodeDefUuid}
+                  onlyEntities={false}
+                  onSelect={onNodeDefSelect}
                   isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />
                 <NodeDefLabelSwitch
@@ -185,62 +217,70 @@ export const DataImportCsvView = () => {
             </FormItem>
           )}
         </div>
-        {selectedEntityDefUuid && (
-          <div className="buttons-container">
+        <div className="buttons-container">
+          {!Objects.isEmpty(cycle) && (
             <ButtonDownload
-              className="download-template-btn"
-              href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, entityDefUuid: selectedEntityDefUuid })}
-              label="dataImportView.downloadTemplate"
-              disabled={!selectedEntityDefUuid}
+              className="download-templates-btn"
+              href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle })}
+              label="dataImportView.downloadAllTemplates"
             />
+          )}
+          {selectedNodeDefUuid && (
+            <>
+              <ButtonDownload
+                className="download-template-btn"
+                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, nodeDefUuid: selectedNodeDefUuid })}
+                label="dataImportView.downloadTemplate"
+                disabled={!selectedNodeDefUuid}
+              />
 
-            {dataImportType === importTypes.updateExistingRecords && (
-              <fieldset>
-                <legend>{i18n.t('dataImportView.options.header')}</legend>
-                {optionsRecordUpdate.map((optionKey) => (
-                  <Checkbox
-                    key={optionKey}
-                    checked={state[optionKey]}
-                    label={`dataImportView.options.${optionKey}`}
-                    onChange={setStateProp(optionKey)}
-                  />
-                ))}
-              </fieldset>
-            )}
-            <Dropzone
-              maxSize={fileMaxSize}
-              accept={{ 'text/csv': ['.csv'] }}
-              onDrop={onFilesDrop}
-              droppedFiles={file ? [file] : []}
-            />
+              {dataImportType === importTypes.updateExistingRecords && (
+                <ExpansionPanel buttonLabel="dataImportView.options.header" startClosed>
+                  {allowedOptionsRecordUpdate.map((optionKey) => (
+                    <Checkbox
+                      key={optionKey}
+                      checked={state[optionKey]}
+                      label={`dataImportView.options.${optionKey}`}
+                      onChange={setStateProp(optionKey)}
+                    />
+                  ))}
+                </ExpansionPanel>
+              )}
+              <Dropzone
+                maxSize={fileMaxSize}
+                accept={fileAccept}
+                onDrop={onFilesDrop}
+                droppedFiles={file ? [file] : []}
+              />
 
-            <div>
+              <div>
+                <ImportStartButton
+                  className="btn-secondary"
+                  disabled={!file}
+                  label="dataImportView.validateFile"
+                  startFunction={API.startDataImportFromCsvJob}
+                  startFunctionParams={{ ...importStartParams, dryRun: true }}
+                  onUploadComplete={onImportJobStart}
+                />
+                <ButtonIconInfo title="dataImportView.validateFileInfo" />
+              </div>
+
               <ImportStartButton
-                className="btn-secondary"
+                confirmMessageKey="dataImportView.startImportConfirm"
                 disabled={!file}
-                label="dataImportView.validateFile"
+                showConfirm
                 startFunction={API.startDataImportFromCsvJob}
-                startFunctionParams={{ ...importStartParams, dryRun: true }}
+                startFunctionParams={importStartParams}
                 onUploadComplete={onImportJobStart}
               />
-              <ButtonIconInfo title="dataImportView.validateFileInfo" />
-            </div>
-
-            <ImportStartButton
-              confirmMessageKey="dataImportView.startImportConfirm"
-              disabled={!file}
-              showConfirm
-              startFunction={API.startDataImportFromCsvJob}
-              startFunctionParams={importStartParams}
-              onUploadComplete={onImportJobStart}
-            />
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
       {jobCompleted && (
         <DataImportCompleteDialog
           job={jobCompleted}
-          onClose={() => setStateProp('jobCompleted')(null)}
+          onClose={onJobCompletedDialogClose}
           errorsExportFileName={errorsExportFileName}
         />
       )}

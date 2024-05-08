@@ -41,7 +41,7 @@ export const newTaxon = ({ taxonomyUuid, code, family, genus, scientificName, ve
 })
 
 // ====== READ
-export const { getUuid, getProps, getPropsDraft, setProp } = ObjectUtils
+export const { getUuid, getProps, getPropsDraft, getPropsAndPropsDraft, setProp } = ObjectUtils
 export const getTaxonomyUuid = R.prop(keys.taxonomyUuid)
 export const getCode = ObjectUtils.getProp(propKeys.code, '')
 export const getFamily = ObjectUtils.getProp(propKeys.family, '')
@@ -64,6 +64,7 @@ export const getExtraProp = (extraPropKey) => (taxon) => {
 
 export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
 export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
+export const isUnkOrUnlTaxon = (taxon) => isUnlistedTaxon(taxon) || isUnknownTaxon(taxon)
 
 export const { isEqual } = ObjectUtils
 

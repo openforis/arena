@@ -1,6 +1,7 @@
 import './nodeDefFile.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 import { uuidv4 } from '@core/uuid'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,72 +9,10 @@ import * as Node from '@core/record/node'
 
 import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonDownload } from '@webapp/components/buttons'
-import Tooltip from '@webapp/components/tooltip'
-import { LoadingBar } from '@webapp/components'
-import { useOnUpdate } from '@webapp/components/hooks'
-
-import { useI18n } from '@webapp/store/system'
+import { TooltipNew } from '@webapp/components/TooltipNew'
 
 import NodeDeleteButton from '../nodeDeleteButton'
-
-const ImagePreview = ({ path, file = null }) => {
-  const i18n = useI18n()
-
-  const imgRef = useRef(null)
-  const retriesRef = useRef(0)
-  const retryTimeoutRef = useRef(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  // reset retry timeout on unmount
-  useEffect(() => {
-    return () => {
-      clearTimeout(retryTimeoutRef.current)
-    }
-  }, [])
-
-  useOnUpdate(() => {
-    setLoading(true)
-    setError(false)
-    retriesRef.current = 0
-    clearTimeout(retryTimeoutRef.current)
-  }, [path, file])
-
-  // used the file blob if specified, to avoid downloading the file from the path
-  const imgSrc = file ? URL.createObjectURL(file) : path
-
-  const onError = useCallback(() => {
-    // try to load again the image after 1 sec, then after 2 seconds, otherwise show a warning icon
-    const retries = retriesRef.current
-    if (retries <= 2) {
-      retryTimeoutRef.current = setTimeout(() => {
-        retriesRef.current = retries + 1
-        imgRef.current.src = path
-      }, 1000 * (retries + 1))
-    } else {
-      setLoading(false)
-      setError(true)
-    }
-  }, [])
-
-  return (
-    <div className="survey-form__node-def-file__preview-image">
-      {loading && <LoadingBar />}
-      {!error && (
-        <img
-          ref={imgRef}
-          onLoad={() => setLoading(false)}
-          src={imgSrc}
-          style={{ display: loading ? 'none' : 'block' }}
-          onError={onError}
-        />
-      )}
-      {error && (
-        <span className="icon error icon-warning" title={i18n.t('surveyForm.nodeDefFile.errorLoadingPreview')} />
-      )}
-    </div>
-  )
-}
+import { ImagePreview } from './ImagePreview'
 
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
@@ -101,10 +40,11 @@ const FileInput = (props) => {
       updateNode(nodeDef, node, null)
     }
   }
-
   const isImage = NodeDef.getFileType(nodeDef) === NodeDef.fileTypeValues.image
 
-  const downloadButton = <ButtonDownload href={fileUrl} label={fileName} title={fileName} className="btn-s ellipsis" />
+  const downloadButton = (
+    <ButtonDownload href={fileUrl} label={fileName} title={isImage ? undefined : fileName} className="btn-s ellipsis" />
+  )
 
   return (
     <div className="survey-form__node-def-file">
@@ -121,13 +61,12 @@ const FileInput = (props) => {
           {
             // when file is an image, show the image preview in a tooltip
             isImage && (
-              <Tooltip
-                className="survey-form__node-def-file__tooltip-preview"
-                messageComponent={<ImagePreview nodeDef={nodeDef} path={fileUrl} file={fileUploaded} />}
-                type="info"
+              <TooltipNew
+                className="image-preview-tooltip"
+                renderTitle={() => <ImagePreview path={fileUrl} file={fileUploaded} />}
               >
                 {downloadButton}
-              </Tooltip>
+              </TooltipNew>
             )
           }
           {!isImage && downloadButton}
@@ -137,6 +76,17 @@ const FileInput = (props) => {
       )}
     </div>
   )
+}
+
+FileInput.propTypes = {
+  surveyInfo: PropTypes.object.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  node: PropTypes.object,
+  readOnly: PropTypes.bool,
+  edit: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  updateNode: PropTypes.func.isRequired,
+  removeNode: PropTypes.func.isRequired,
 }
 
 const MultipleFileInput = (props) => {
@@ -151,6 +101,14 @@ const MultipleFileInput = (props) => {
   )
 }
 
+MultipleFileInput.propTypes = {
+  nodes: PropTypes.array.isRequired,
+}
+
 const NodeDefFile = (props) => (props.edit ? <FileInput {...props} /> : <MultipleFileInput {...props} />)
+
+NodeDefFile.propTypes = {
+  edit: PropTypes.bool,
+}
 
 export default NodeDefFile

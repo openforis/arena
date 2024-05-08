@@ -10,13 +10,21 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 
+import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
-import { useRandomColors } from './useRandomColor'
 import { RecordEditModal } from './RecordEditModal'
+
+const getSamplingPointDataLevels = (survey) => {
+  const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
+  const samplingPointDataCoordinatesDefined =
+    Category.getItemExtraDefKeys(samplingPointDataCategory).includes('location')
+
+  return samplingPointDataCoordinatesDefined ? Category.getLevelsArray(samplingPointDataCategory) : []
+}
 
 const MapWrapper = () => {
   const survey = useSurvey()
@@ -29,14 +37,8 @@ const MapWrapper = () => {
   })
   const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
 
-  // get sampling point data levels
-  const categories = Survey.getCategoriesArray(survey)
-  const samplingPointDataCategory = categories.find(
-    (category) => Category.getName(category) === Survey.samplingPointDataCategoryName
-  )
-  // get coordinate attributes
   const coordinateAttributeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isCoordinate)
-  const samplingPointDataLevels = Category.getLevelsArray(samplingPointDataCategory)
+  const samplingPointDataLevels = getSamplingPointDataLevels(survey)
 
   const layerColors = useRandomColors(samplingPointDataLevels.length + coordinateAttributeDefs.length)
 

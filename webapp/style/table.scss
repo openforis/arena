@@ -13,7 +13,7 @@ $tableFooterHeight: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: $tableHeaderHeight;
+  min-height: $tableHeaderHeight;
 }
 
 .table__content {
@@ -110,6 +110,7 @@ $tableFooterHeight: 30px;
   background-color: $black;
   color: white;
   font-weight: 600;
+  overflow: hidden;
 }
 
 .table__row-expanded-panel-wrapper {

@@ -29,28 +29,52 @@ export const {
   fetchUserProfilePicture,
   fetchSystemAdministratorsEmail,
   fetchUsersIntoStream,
+  fetchActiveUserUuidsWithPreferredSurveyId,
   updateNamePasswordAndStatus,
   updatePassword,
   resetUsersPrefsSurveyCycle,
   importNewUser,
+  deleteUsersWithExpiredInvitation,
 } = UserRepository
 
-export const { findResetPasswordUserUuidByUuid, deleteUserResetPasswordByUuid, deleteUserResetPasswordExpired } =
-  UserResetPasswordRepository
+export const {
+  fetchResetPasswordUuidByUserUuid,
+  findResetPasswordUserUuidByUuid,
+  deleteUserResetPasswordByUuid,
+  deleteUserResetPasswordExpired,
+} = UserResetPasswordRepository
+
+export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
+const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo }, client = db) => {
+  const groupsToAdd = []
+  if (
+    (AuthGroup.isSurveyManagerGroup(group) || AuthGroup.getName(group) === AuthGroup.groupNames.surveyAdmin) &&
+    !User.isSurveyManager(userToAdd)
+  ) {
+    const surveyManagerGroup = await AuthGroupRepository.fetchGroupByName(
+      { name: AuthGroup.groupNames.surveyManager },
+      client
+    )
+    groupsToAdd.push(surveyManagerGroup)
+  }
+  if (AuthGroup.isSurveyGroup(group)) {
+    groupsToAdd.push(group)
+  } else if (AuthGroup.isSystemAdminGroup(group) && User.isSystemAdmin(user) && !User.isSystemAdmin(userToAdd)) {
+    groupsToAdd.push(User.getSystemAdminGroup(user))
+  } else if (AuthGroup.isSurveyManagerGroup(group)) {
+    // accepting user access request
+    // when adding user to survey manager group, make him survey admin of the specified survey
+    groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
+  }
+  return groupsToAdd
+}
 
 export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-    const groupsToAdd = []
-    if (!AuthGroup.isSurveyManagerGroup(group) || !User.isSurveyManager(userToAdd)) {
-      groupsToAdd.push(group)
-    }
-    if (AuthGroup.isSurveyManagerGroup(group)) {
-      // when adding user to survey manager group, make him survey admin of the specified survey
-      groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
-    }
+    const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)
     await PromiseUtils.each(groupsToAdd, async (groupToAdd) => {
       const groupUuid = groupToAdd.uuid
       await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
@@ -134,17 +158,19 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 
 // ==== READ
 
-const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
+const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [], t }) => {
   // Assoc auth groups
 
-  const _userGroups = R.isEmpty(userGroups) ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user)) : userGroups
+  const _userGroups = R.isEmpty(userGroups)
+    ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
+    : userGroups
   let userUpdated = User.assocAuthGroups(_userGroups)(user)
 
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
     const invitation = invitationsByUserUuid[userUuid]
     const invitationValid =
-      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
+      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid, t))
     userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
@@ -152,6 +178,8 @@ const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUui
 }
 
 const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
+  if (users.length === 0) return users
+
   const usersUuids = users.map(User.getUuid)
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
@@ -162,6 +190,7 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
         user,
         invitationsByUserUuid,
         userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+        t,
       })
     )
   )
@@ -189,24 +218,22 @@ export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = 
   })
 
 export const fetchUsersBySurveyId = async (
-  { surveyId, offset = 0, limit = null, isSystemAdmin = false },
+  { surveyId, offset = 0, limit = null, onlyAccepted = false, includeSystemAdmins = false },
   client = db
 ) =>
   client.tx(async (t) => {
-    const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)).map(
+    const users = (await UserRepository.fetchUsersBySurveyId({ surveyId, offset, limit, includeSystemAdmins }, t)).map(
       User.dissocPrivateProps
     )
-    const usersUuids = users.map(User.getUuid)
-    const invitations = await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t)
-    const invitationsByUserUuid = invitations.reduce(
-      (_invitationsByUserUuid, invitation) => ({
-        ..._invitationsByUserUuid,
-        [invitation.user_uuid]: invitation.result,
-      }),
-      {}
-    )
-
-    return _attachAuthGroupsAndInvitationToUsers({ users, invitationsByUserUuid, t })
+    const usersFiltered = users.filter((user) => !onlyAccepted || User.hasAccepted(user))
+    const usersUuids = usersFiltered.map(User.getUuid)
+    const invitations =
+      usersUuids.length > 0 ? await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t) : []
+    const invitationsByUserUuid = invitations.reduce((acc, invitation) => {
+      acc[invitation.user_uuid] = invitation.result
+      return acc
+    }, {})
+    return _attachAuthGroupsAndInvitationToUsers({ users: usersFiltered, invitationsByUserUuid, t })
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
@@ -223,6 +250,8 @@ export {
   fetchUserAccessRequests,
   fetchUserAccessRequestByUuid,
   fetchUserAccessRequestByEmail,
+  deleteUserAccessRequestsByEmail,
+  deleteExpiredUserAccessRequests,
 } from '../repository/userAccessRequestRepository'
 
 export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
@@ -317,9 +346,13 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     }
 
     // update user props and picture
-    const name = User.getName(userToUpdate)
-    const email = User.getEmail(userToUpdate)
-    const props = User.getProps(userToUpdate)
+    const userToUpdateModified = User.isSystemAdmin(user)
+      ? userToUpdate
+      : // restricted props can be updated only by system admins
+        User.dissocRestrictedProps(userToUpdate)
+    const name = User.getName(userToUpdateModified)
+    const email = User.getEmail(userToUpdateModified)
+    const props = User.getProps(userToUpdateModified)
 
     return UserRepository.updateUser(
       {
@@ -335,8 +368,10 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUserPrefs = async (user) => ({
-  ...(await UserRepository.updateUserPrefs(user)),
+export const updateUserPrefs = async (user) => UserRepository.updateUserPrefs(user)
+
+export const updateUserPrefsAndFetchGroups = async (user) => ({
+  ...(await updateUserPrefs(user)),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
 

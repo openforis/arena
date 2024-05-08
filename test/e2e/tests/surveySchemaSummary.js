@@ -47,6 +47,9 @@ export default () =>
     test('export schema summary', async () => {
       const [download] = await Promise.all([
         page.waitForEvent('download'),
+
+        page.click(getSelector(TestId.surveyForm.advancedFunctionBtn, 'button')),
+
         page.click(getSelector(TestId.surveyForm.schemaSummary, 'button')),
       ])
 
@@ -72,23 +75,35 @@ export default () =>
         const nodeDefData = data[index]
         await expect(Object.keys(nodeDefData)).toEqual([
           'uuid',
+          'name',
           'path',
-          'type',
+          'parentEntity',
           'label_en',
           'label_fr',
+          'type',
           'key',
           'categoryName',
+          'parentCode',
+          'enumerator',
           'taxonomyName',
           'multiple',
           'readOnly',
+          'fileType',
+          'maxFileSize',
+          'hiddenInForm',
           'hiddenInMobile',
+          'includedInMultipleEntitySummary',
+          'allowOnlyDeviceCoordinate',
           'relevantIf',
           'hiddenWhenNotRelevant',
+          'itemsFilter',
           'defaultValue',
           'defaultValueApplyIf',
           'defaultValueEvaluateOnce',
           'required',
           'unique',
+          'minCount',
+          'maxCount',
           'validations',
           'cycle',
         ])

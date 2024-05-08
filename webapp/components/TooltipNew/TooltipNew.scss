@@ -1,0 +1,22 @@
+@import '~@webapp/style/vars';
+
+.arena-tooltip.MuiTooltip-popper {
+  &[data-popper-placement*='top'] .MuiTooltip-tooltip {
+    margin-bottom: 6px;
+  }
+
+  &[data-popper-placement*='bottom'] .MuiTooltip-tooltip {
+    margin-top: 6px;
+  }
+
+  .MuiTooltip-tooltip {
+    font-size: medium;
+    color: $colorTextPrimary;
+    background-color: $tooltipBg;
+    border: 1px solid $tooltipBg;
+
+    .MuiTooltip-arrow {
+      color: $tooltipBg;
+    }
+  }
+}

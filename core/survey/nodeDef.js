@@ -6,12 +6,14 @@ import { uuidv4 } from '@core/uuid'
 import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import { ArrayUtils } from '@core/arrayUtils'
 
 import * as TextUtils from '@webapp/utils/textUtils'
 
 import { nodeDefType } from './nodeDefType'
 import * as NodeDefLayout from './nodeDefLayout'
 import * as NodeDefValidations from './nodeDefValidations'
+import * as NodeDefExpression from './nodeDefExpression'
 import { valuePropsTaxon } from './nodeValueProps'
 
 // ======== NODE DEF PROPERTIES
@@ -159,6 +161,7 @@ export const {
   getProp,
   getProps,
   getPropsDraft,
+  getPropsAndPropsDraft,
   getUuid,
   getId,
   isEqual,
@@ -253,8 +256,8 @@ export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
-export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
-  let firstPart = null
+export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true) => {
+  let firstPart = ''
   const name = getName(nodeDef)
 
   if (type === NodeDefLabelTypes.name) {
@@ -265,13 +268,13 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label) => {
     if (!StringUtils.isBlank(label)) {
       if (type === NodeDefLabelTypes.label) {
         firstPart = label
-      } else if (type === NodeDefLabelTypes.labelAndName && !StringUtils.isBlank(label)) {
+      } else if (type === NodeDefLabelTypes.labelAndName) {
         firstPart = `${label} [${name}]`
       }
     }
   }
   // default to name
-  if (StringUtils.isBlank(firstPart)) {
+  if (StringUtils.isBlank(firstPart) && defaultToName) {
     firstPart = name
   }
 
@@ -311,6 +314,20 @@ export const getPropOrDraftAdvanced =
   (nodeDef) =>
     getPropAdvancedDraft(prop, getPropAdvanced(prop, defaultTo)(nodeDef))(nodeDef)
 
+export const getAllPropsAndAllPropsDraft =
+  ({ backup = false }) =>
+  (nodeDef) => {
+    const { props, propsDraft } = ObjectUtils.getPropsAndPropsDraft({ backup })(nodeDef)
+    const propsAdvanced = getPropsAdvanced(nodeDef)
+    const propsAdvancedDraft = getPropsAdvancedDraft(nodeDef)
+    return {
+      props,
+      propsDraft,
+      propsAdvanced: backup ? propsAdvanced : {},
+      propsAdvancedDraft: backup ? propsAdvancedDraft : { ...propsAdvanced, ...propsAdvancedDraft },
+    }
+  }
+
 export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
 export const hasAdvancedPropsApplicableDraft = (nodeDef) => R.prop(keys.draftAdvancedApplicable, nodeDef) === true
 export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
@@ -325,6 +342,21 @@ export const getValidations = getPropAdvanced(keysPropsAdvanced.validations, {})
 export const getValidationExpressions = R.pipe(getValidations, NodeDefValidations.getExpressions)
 
 export const getApplicable = getPropAdvanced(keysPropsAdvanced.applicable, [])
+
+export const getAllExpressions = (nodeDef) => {
+  const nodeDefExpressions = [
+    ...getDefaultValues(nodeDef),
+    ...getValidationExpressions(nodeDef),
+    ...getApplicable(nodeDef),
+  ]
+  const expressions = nodeDefExpressions.reduce((acc, nodeDefExpression) => {
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getExpression(nodeDefExpression))(acc)
+    ArrayUtils.addIfNotEmpty(NodeDefExpression.getApplyIf(nodeDefExpression))(acc)
+    return acc
+  }, [])
+  ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  return expressions
+}
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
@@ -402,6 +434,14 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
+export const assocLabels = (labels) => assocProp({ key: propKeys.labels, value: labels })
+export const assocLabel =
+  ({ label, lang }) =>
+  (nodeDef) =>
+    assocLabels({ ...getLabels(nodeDef), [lang]: label })(nodeDef)
+
+export const assocDescriptions = (descriptions) => assocProp({ key: propKeys.descriptions, value: descriptions })
+
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
 export const cloneIntoEntityDef =
   ({ nodeDefParent, clonedNodeDefName }) =>
@@ -437,6 +477,9 @@ export const updateLayout = (updateFn) => (nodeDef) => {
   const layoutUpdated = updateFn(layout)
   return assocLayout(layoutUpdated)(nodeDef)
 }
+
+export const updateLayoutProp = ({ cycle, prop, value }) =>
+  updateLayout(NodeDefLayout.assocLayoutProp(cycle, prop, value))
 
 export const copyLayout =
   ({ cycleFrom, cyclesTo }) =>
@@ -522,3 +565,40 @@ export const isDisplayInEnabled = isEntityAndNotRoot
 
 export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
+
+export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
+export const canBeHiddenInMobile = (nodeDef) =>
+  !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
+
+export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
+  !isKey(nodeDef) &&
+  !isMultiple(nodeDef) &&
+  !isFile(nodeDef) &&
+  NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+export const clearNotApplicableProps = (cycle) => (nodeDef) => {
+  let nodeDefUpdated = nodeDef
+  // clear hidden in mobile if not applicable
+  if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
+    nodeDefUpdated = updateLayoutProp({
+      cycle,
+      prop: NodeDefLayout.keys.hiddenInMobile,
+      value: false,
+    })(nodeDefUpdated)
+  }
+  // clear inclulde in multiple entity summary if not applicable
+  if (
+    !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
+    NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDefUpdated))
+  ) {
+    nodeDefUpdated = updateLayoutProp({
+      cycle,
+      prop: NodeDefLayout.keys.includedInMultipleEntitySummary,
+      value: false,
+    })(nodeDefUpdated)
+  }
+  return nodeDefUpdated
+}
+
+export const canHaveMobileProps = (cycle) => (nodeDef) =>
+  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)

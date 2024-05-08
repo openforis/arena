@@ -1,3 +1,4 @@
+import pgPromise from 'pg-promise'
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import { db } from '@server/db/db'
@@ -19,14 +20,14 @@ import { JobEvent } from './jobEvent'
  * - (end)
  * -- succeed
  * -- failed
- * -- canceled
+ * -- canceled.
  *
  * Methods that can be overwritten by subclasses:
  * - onStart (in tx)
  * - execute (in tx)
  * - beforeSuccess (in tx)
  * - beforeEnd (in tx)
- * - onEnd (out of tx)
+ * - onEnd (out of tx).
  */
 export default class Job {
   constructor(type, params = {}, innerJobs = []) {
@@ -43,7 +44,7 @@ export default class Job {
     this.startTime = null
     this.endTime = null
     this.total = 0
-    this.processed = 0
+    this._processed = 0
     this.result = {}
     this.errors = {}
     this.innerJobs = innerJobs
@@ -64,6 +65,7 @@ export default class Job {
    * otherwise the "execute' method will be invoked.
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
+   * @param {pgPromise.IDatabase} [client=db] - The database client.
    */
   async start(client = db) {
     this.logDebug('start')
@@ -157,7 +159,7 @@ export default class Job {
   }
 
   /**
-   * Abstract method to be extended by subclasses
+   * Abstract method to be extended by subclasses.
    */
   async execute() {
     // to be extended by subclasses
@@ -209,19 +211,21 @@ export default class Job {
     }
   }
 
-  incrementProcessedItems(incrementBy = 1) {
-    this.processed += incrementBy
-
+  notifyProgress() {
     throttle(
-      async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
+      async () => this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
       1000
     )()
   }
 
+  incrementProcessedItems(incrementBy = 1) {
+    this.processed = this.processed + incrementBy
+  }
+
   /**
    * Called when the job just has been started
-   * (it runs INSIDE the current db transaction)
+   * (it runs INSIDE the current db transaction).
    */
   async onStart() {
     this.startTime = new Date()
@@ -231,7 +235,7 @@ export default class Job {
   /**
    * Called before onEnd only if the status will change to 'success'.
    * Prepares the result
-   * (it runs INSIDE the current db transaction)
+   * (it runs INSIDE the current db transaction).
    */
   async beforeSuccess() {
     this.setResult(this.generateResult())
@@ -241,10 +245,22 @@ export default class Job {
     return {}
   }
 
+  combineInnerJobsResults() {
+    const results = {}
+    this.innerJobs.forEach((innerJob) => Object.assign(results, innerJob.result ?? {}))
+    return results
+  }
+
+  combineInnerJobsErrors() {
+    const errors = {}
+    this.innerJobs.forEach((innerJob) => Object.assign(errors, innerJob.errors ?? {}))
+    return errors
+  }
+
   /**
    * Called before onEnd.
    * Used to flush the resources used by the job before it terminates completely.
-   * (it runs INSIDE the current db transaction)
+   * (it runs INSIDE the current db transaction).
    */
   async beforeEnd() {
     // To be extended by subclasses
@@ -252,7 +268,7 @@ export default class Job {
 
   /**
    * Called when the job status changes to success, failed or canceled
-   * (it runs OUTSIDE of the current db transaction)
+   * (it runs OUTSIDE of the current db transaction).
    */
   async onEnd() {
     this.endTime = new Date()
@@ -301,6 +317,15 @@ export default class Job {
 
   set stopOnInnerJobFailure(value) {
     this._stopOnInnerJobFailure = value
+  }
+
+  get processed() {
+    return this._processed
+  }
+
+  set processed(processedItems) {
+    this._processed = processedItems
+    this.notifyProgress()
   }
 
   getCurrentInnerJob() {
@@ -419,6 +444,10 @@ export default class Job {
 
   logInfo(...msgs) {
     this._logger.info(...msgs)
+  }
+
+  logWarn(...msgs) {
+    this._logger.warn(...msgs)
   }
 
   logError(...msgs) {

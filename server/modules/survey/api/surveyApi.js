@@ -14,8 +14,10 @@ import * as User from '../../../../core/user/user'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
+import * as FileService from '../../record/service/fileService'
 import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { Authorizer } from '@openforis/arena-core'
 
 export const init = (app) => {
   // ==== CREATE
@@ -124,6 +126,15 @@ export const init = (app) => {
     }
   })
 
+  const _sendSurvey = async ({ survey, user, res }) => {
+    let surveyUpdated = survey
+    if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
+      const surveyId = Survey.getId(survey)
+      surveyUpdated = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+    }
+    res.json({ survey: surveyUpdated })
+  }
+
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
@@ -134,7 +145,31 @@ export const init = (app) => {
         UserService.updateUserPrefs(user),
       ])
 
-      res.json({ survey })
+      await _sendSurvey({ survey, user, res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/survey/:surveyId/full', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, draft, advanced, includeAnalysis, validate } = Request.getParams(req)
+      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+
+      const [survey] = await Promise.all([
+        SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+          surveyId,
+          cycle,
+          draft,
+          advanced,
+          includeAnalysis,
+          includeBigCategories: false,
+          includeBigTaxonomies: false,
+          validate,
+        }),
+        UserService.updateUserPrefs(user),
+      ])
+      await _sendSurvey({ survey, user, res })
     } catch (error) {
       next(error)
     }
@@ -181,6 +216,20 @@ export const init = (app) => {
     }
   })
 
+  app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
+      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels' })
+      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+
+      await SurveyService.exportLabels({ surveyId, outputStream: res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== UPDATE
 
   app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -214,6 +263,20 @@ export const init = (app) => {
     const job = SurveyService.startUnpublishJob(user, surveyId)
 
     res.json({ job: JobUtils.jobToJSON(job) })
+  })
+
+  app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const filePath = Request.getFilePath(req)
+      const { surveyId } = Request.getParams(req)
+
+      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath })
+
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
   })
 
   // ==== DELETE

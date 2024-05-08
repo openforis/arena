@@ -33,7 +33,7 @@ const ResetPassword = () => {
   const hasAlreadyAccepted = User.hasAccepted(initialUser)
 
   return (
-    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+    <form onSubmit={(event) => event.preventDefault()} className="guest__form reset-password">
       <div className="title">
         {i18n.t(
           hasAlreadyAccepted

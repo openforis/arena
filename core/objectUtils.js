@@ -105,13 +105,41 @@ export const setInPath =
 export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
 // ====== UTILS / uuid
-export const toIndexedObj = (array, propName) =>
+const _getProp = (propNameOrExtractor) => (item) =>
+  typeof propNameOrExtractor === 'string' ? R.path(propNameOrExtractor.split('.'))(item) : propNameOrExtractor(item)
+
+export const toIndexedObj = (array, propNameOrExtractor) =>
   array.reduce((acc, item) => {
-    const prop = R.path(propName.split('.'), item)
+    const prop = _getProp(propNameOrExtractor)(item)
     acc[prop] = item
     return acc
   }, {})
 
 export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
+export const groupByProp = (propNameOrExtractor) => (items) =>
+  items.reduce((acc, item) => {
+    const prop = _getProp(propNameOrExtractor)(item)
+    let itemsByProp = acc[prop]
+    if (!itemsByProp) {
+      itemsByProp = []
+      acc[prop] = itemsByProp
+    }
+    itemsByProp.push(item)
+    return acc
+  }, {})
+
 export const clone = (obj) => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
+
+export const getPropsAndPropsDraft =
+  ({ backup = false } = {}) =>
+  (obj) => {
+    // if not backup, keep published props empty (consider only )
+    // if backup, keep both props and propsDraft
+    const props = getProps(obj)
+    const propsDraft = getPropsDraft(obj)
+    return {
+      props: backup ? props : {},
+      propsDraft: backup ? propsDraft : { ...props, propsDraft },
+    }
+  }

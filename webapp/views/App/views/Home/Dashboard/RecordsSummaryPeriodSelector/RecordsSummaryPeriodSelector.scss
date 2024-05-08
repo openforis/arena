@@ -1,0 +1,12 @@
+@import 'webapp/style/vars';
+
+.home-dashboard__records-period-selector {
+  display: flex;
+  align-items: center;
+
+  .time-range {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+  }
+}

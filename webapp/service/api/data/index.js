@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-import * as A from '@core/arena'
 import { Query } from '@common/model/query'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import { objectToFormData } from '../utils/apiUtils'
@@ -22,7 +21,7 @@ export const startCollectRecordsImportJob = async ({
 } = {}) => {
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcollect`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -30,26 +29,28 @@ export const startCollectRecordsImportJob = async ({
 export const startDataImportFromCsvJob = async ({
   surveyId,
   cycle,
-  entityDefUuid,
+  nodeDefUuid,
   file,
   dryRun = false,
   insertNewRecords = false,
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
+  includeFiles = false,
   abortOnErrors = true,
   onUploadProgress,
 }) => {
   const formData = objectToFormData({
     cycle,
-    entityDefUuid,
+    nodeDefUuid,
     file,
     dryRun,
     insertNewRecords,
     insertMissingNodes,
     updateRecordsInAnalysis,
+    includeFiles,
     abortOnErrors,
   })
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/importfromcsv`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/csv`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -66,17 +67,24 @@ export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, onUpl
   return job
 }
 
-export const getDataImportFromCsvTemplateUrl = ({ surveyId, entityDefUuid, cycle }) => {
-  const params = new URLSearchParams({
-    entityDefUuid,
-    cycle,
-  })
-  return `/api/survey/${surveyId}/record/importfromcsv/template?${params.toString()}`
+export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle }) => {
+  const params = new URLSearchParams({ nodeDefUuid, cycle })
+  return `/api/survey/${surveyId}/data-import/csv/template?${params.toString()}`
+}
+
+export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle }) => {
+  const params = new URLSearchParams({ cycle })
+  return `/api/survey/${surveyId}/data-import/csv/templates?${params.toString()}`
 }
 
 // ==== DATA EXPORT
-export const startExportDataToCSVJob = async ({ surveyId, cycle, options }) => {
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-export/csv`, { cycle, ...options })
+export const startExportDataToCSVJob = async ({ surveyId, cycle, recordUuids, search, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-export/csv`, {
+    cycle,
+    recordUuids,
+    search,
+    ...options,
+  })
   const { job } = data
   return job
 }
@@ -86,13 +94,14 @@ export const downloadExportedDataToCSVUrl = ({ surveyId, cycle, exportUuid }) =>
   return `/api/survey/${surveyId}/data-export/csv/${exportUuid}?${params.toString()}`
 }
 
-export const exportDataQueryToTempFile = async ({ surveyId, cycle, query }) => {
+export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, options }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const {
     data: { tempFileName },
   } = await axios.post(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/start`, {
     cycle,
-    query: A.stringify(query),
+    query,
+    options,
   })
   return tempFileName
 }
@@ -109,11 +118,16 @@ export const fetchRecordsCountByStep = async ({ surveyId, cycle }) => {
 }
 
 // ==== UPDATE
-export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo }) => {
+export const updateRecordsStep = async ({ surveyId, cycle, stepFrom, stepTo, recordUuids }) => {
   const {
     data: { count },
-  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo })
+  } = await axios.post(`/api/survey/${surveyId}/records/step`, { cycle, stepFrom, stepTo, recordUuids })
   return { count }
+}
+
+export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/owner`, { ownerUuid })
+  return data
 }
 
 // ==== RECORDS CLONE

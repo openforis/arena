@@ -6,4 +6,6 @@ export const RecordsUpdateThreadMessageTypes = {
   recordReload: 'recordReload',
   nodePersist: 'nodePersist',
   nodeDelete: 'nodeDelete',
+  recordClear: 'recordClear',
+  surveyClear: 'surveyClear',
 }

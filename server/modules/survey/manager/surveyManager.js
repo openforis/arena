@@ -24,6 +24,7 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as FileManager from '@server/modules/record/manager/fileManager'
 import * as SchemaRdbRepository from '@server/modules/surveyRdb/repository/schemaRdbRepository'
@@ -256,15 +257,29 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
 }
 
 export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
-  { surveyId, cycle = null, draft = false, advanced = false, validate = false, includeDeleted = false, backup = false },
+  {
+    surveyId,
+    cycle = null,
+    draft = false,
+    advanced = false,
+    validate = false,
+    includeDeleted = false,
+    includeAnalysis = true,
+    backup = false,
+    includeBigCategories = true,
+    includeBigTaxonomies = true,
+  },
   client = db
 ) => {
   const survey = await fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, cycle, draft, advanced, validate, includeDeleted, backup },
+    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup },
     client
   )
-  const categoryItemsRefData = await CategoryRepository.fetchIndex(surveyId, draft, client)
-  const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, draft }, client)
+  const categoryItemsRefData = await CategoryRepository.fetchIndex({ surveyId, draft, includeBigCategories }, client)
+  const taxaIndexRefData = await TaxonomyRepository.fetchTaxaWithVernacularNames(
+    { surveyId, draft, includeBigTaxonomies },
+    client
+  )
 
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
@@ -302,14 +317,17 @@ export const fetchUserSurveysInfo = async (
     return Promise.all(
       surveys.map(async (survey) => {
         const surveyId = Survey.getId(survey)
+        const canHaveData = Survey.canHaveData(survey)
+        const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
         return {
           ...survey,
           nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
-          recordsCount: Survey.canHaveData(survey)
-            ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx)
-            : 0,
+          recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
+          recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
           chainsCount: await ChainRepository.countChains({ surveyId }, tx),
-          filesSize: await FileManager.fetchTotalFilesSize({ surveyId }, tx),
+          filesCount,
+          filesSize,
+          filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
         }
       })
     )

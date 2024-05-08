@@ -13,7 +13,8 @@ const dir = {
 export const ExportFile = {
   activityLog: ({ index }) => [dir.activityLog, `activityLog_${index}.json`].join(separator),
   categories: [dir.categories, 'categories.json'].join(separator),
-  categoryItems: ({ categoryUuid }) => [dir.categories, `${categoryUuid}.json`].join(separator),
+  categoryItemsSingleFile: ({ categoryUuid }) => [dir.categories, `${categoryUuid}.json`].join(separator),
+  categoryItemsPart: ({ categoryUuid, index }) => [dir.categories, `${categoryUuid}_${index}.json`].join(separator),
   chains: [dir.chains, 'chains.json'].join(separator),
   chain: ({ chainUuid }) => [dir.chains, `${chainUuid}.json`].join(separator),
   filesDir: dir.files,
@@ -24,6 +25,7 @@ export const ExportFile = {
   survey: 'survey.json',
   taxonomies: [dir.taxonomies, 'taxonomies.json'].join(separator),
   taxa: ({ taxonomyUuid }) => [dir.taxonomies, `${taxonomyUuid}.json`].join(separator),
+  taxaPart: ({ taxonomyUuid, index }) => [dir.taxonomies, `${taxonomyUuid}_${index}.json`].join(separator),
   users: [dir.users, 'users.json'].join(separator),
   userInvitations: [dir.users, 'userInvitations.json'].join(separator),
   userProfilePicture: ({ userUuid }) => [dir.userProfilePictures, userUuid].join(separator),

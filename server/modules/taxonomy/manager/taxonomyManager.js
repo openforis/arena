@@ -90,7 +90,7 @@ export const fetchTaxonomiesBySurveyId = async (
     : taxonomies
 }
 
-export const { countTaxonomiesBySurveyId, countTaxaByTaxonomyUuid } = TaxonomyRepository
+export const { countTaxonomiesBySurveyId, countTaxaBySurveyId, countTaxaByTaxonomyUuid } = TaxonomyRepository
 
 const validateTaxonomy = async (surveyId, taxonomies, taxonomy, draft, client = db) => {
   const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(
@@ -319,10 +319,11 @@ export const updateTaxonomyExtraPropDef = async (
     // - remove unnecessary information (uuid, name)
     // - index stored object by extra def name
     const extraPropDefsToStore = extraPropDefsArrayUpdated.reduce(
-      (acc, item) => ({
+      (acc, item, index) => ({
         ...acc,
         [ExtraPropDef.getName(item)]: ExtraPropDef.newItem({
           dataType: ExtraPropDef.getDataType(item),
+          index,
         }),
       }),
       {}

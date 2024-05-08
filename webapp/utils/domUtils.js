@@ -36,11 +36,12 @@ export const dispatchWindowResize = () => {
   window.dispatchEvent(new Event('resize'))
 }
 
-export const copyToClipboard = (text) => {
-  const input = document.body.appendChild(document.createElement('textarea'))
-  input.value = text
-  input.focus()
-  input.select()
-  document.execCommand('copy')
-  input.remove()
+export const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (error) {
+    // ignore it
+    return false
+  }
 }

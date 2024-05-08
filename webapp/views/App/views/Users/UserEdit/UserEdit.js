@@ -1,7 +1,7 @@
 import './UserEdit.scss'
 
 import React from 'react'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -11,7 +11,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import { useI18n } from '@webapp/store/system'
 
 import ProfilePicture from '@webapp/components/profilePicture'
-import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
@@ -24,6 +24,7 @@ import DropdownUserGroup from '../DropdownUserGroup'
 import ProfilePictureEditor from './ProfilePictureEditor'
 
 import { useEditUser } from './store'
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -40,6 +41,7 @@ const UserEdit = () => {
     canRemove,
     canSave,
     canViewEmail,
+    canEditMaxSurveys,
     canEditSystemAdmin,
     canEditSurveyManager,
     hideSurveyGroup,
@@ -54,6 +56,7 @@ const UserEdit = () => {
     onInviteRepeat,
   } = useEditUser({ userUuid })
 
+  const navigate = useNavigate()
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -133,6 +136,17 @@ const UserEdit = () => {
           <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
         </FormItem>
       )}
+      {canEditMaxSurveys && !systemAdmin && surveyManager && (
+        <FormItem label={i18n.t('userView.maxSurveysUserCanCreate')}>
+          <Input
+            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
+            type="number"
+            value={User.getMaxSurveys(userToUpdate)}
+            validation={Validation.getFieldValidation(User.keysProps.maxSurveys)(validation)}
+            onChange={(value) => onUpdate(User.assocMaxSurveys(value)(userToUpdate))}
+          />
+        </FormItem>
+      )}
       {!hideSurveyGroup && !systemAdmin && (
         <FormItem label={i18n.t('usersView.roleInCurrentSurvey')}>
           <DropdownUserGroup
@@ -168,20 +182,27 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
+
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
+          <Button
+            iconClassName="icon-pencil"
+            label="userPasswordChangeView.changePassword"
+            onClick={() => navigate(appModuleUri(userModules.userPasswordChange))}
+          />
+
+          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
+
+          {!hideSurveyGroup && invitationExpired && (
+            <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
+          )}
+
           {!hideSurveyGroup && canRemove && (
             <ButtonDelete
               onClick={onRemove}
               className="btn-s btn-danger btn-remove-user"
               label={i18n.t('userView.removeFromSurvey')}
             />
-          )}
-
-          {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
-
-          {!hideSurveyGroup && invitationExpired && (
-            <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
           )}
         </div>
       )}

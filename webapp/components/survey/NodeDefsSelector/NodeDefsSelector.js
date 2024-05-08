@@ -1,9 +1,10 @@
 import './NodeDefsSelector.scss'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
+import { ArrayUtils } from '@core/arrayUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -42,12 +43,25 @@ const NodeDefsSelector = (props) => {
 
   const [showFilter, setShowFilter] = useState(false)
 
-  const onToggleAttribute = (nodeDefUuid) => {
-    const attributeDefUuidsUpdated = nodeDefUuidsAttributes.includes(nodeDefUuid)
-      ? nodeDefUuidsAttributes.filter((_nodeDefUuid) => _nodeDefUuid !== nodeDefUuid)
-      : [...nodeDefUuidsAttributes, nodeDefUuid]
-    onChangeAttributes(attributeDefUuidsUpdated)
-  }
+  const onAttributesSelection = useCallback(
+    ({ attributeDefUuids, selected }) => {
+      const attributeDefUuidsUpdated = selected
+        ? ArrayUtils.addItems({ items: attributeDefUuids })(nodeDefUuidsAttributes)
+        : ArrayUtils.removeItems({ items: attributeDefUuids })(nodeDefUuidsAttributes)
+      onChangeAttributes(attributeDefUuidsUpdated)
+    },
+    [nodeDefUuidsAttributes, onChangeAttributes]
+  )
+
+  const onToggleAttribute = useCallback(
+    (nodeDefUuid) => {
+      onAttributesSelection({
+        attributeDefUuids: [nodeDefUuid],
+        selected: !nodeDefUuidsAttributes.includes(nodeDefUuid),
+      })
+    },
+    [nodeDefUuidsAttributes, onAttributesSelection]
+  )
 
   return (
     <div className="node-defs-selector">
@@ -99,6 +113,7 @@ const NodeDefsSelector = (props) => {
           lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          onAttributesSelection={onAttributesSelection}
           onToggleAttribute={onToggleAttribute}
           filterTypes={filterTypes}
           filterChainUuids={filterChainUuids}
@@ -106,7 +121,7 @@ const NodeDefsSelector = (props) => {
           showAnalysisAttributes={showAnalysisAttributes}
           showAncestors={showAncestors}
           showMultipleAttributes={showMultipleAttributes}
-          showSiblingsInSingleEntities={true}
+          showSiblingsInSingleEntities
           nodeDefLabelType={nodeDefLabelType}
         />
       )}

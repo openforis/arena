@@ -4,6 +4,8 @@ import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
 
+import { quote } from '@core/stringUtils'
+
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
@@ -55,7 +57,7 @@ const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${alias}`],
 }
 
-const _selectsByNodeDefType =
+const _selectFieldsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
@@ -77,23 +79,26 @@ const _prepareSelectFields = ({
   streamMode,
   includeFileAttributeDefs = true,
 }) => {
+  const alwaysIncludedFields = [
+    viewDataNodeDef.columnRecordUuid,
+    viewDataNodeDef.columnRecordOwnerUuid,
+    `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`,
+  ]
   if (columnNodeDefs) {
     queryBuilder.select(
-      viewDataNodeDef.columnRecordUuid,
+      ...alwaysIncludedFields,
       ...viewDataNodeDef.columnNodeDefs
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
-        .flatMap((columnNodeDef) => _selectsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef)),
-      `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`
+        .flatMap((columnNodeDef) => _selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
     )
   } else if (R.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
     queryBuilder.select(
-      viewDataNodeDef.columnRecordUuid,
-      `${viewDataNodeDef.columnRecordCycle}::integer + 1 AS ${ViewDataNodeDef.columnSet.recordCycle}`,
+      ...alwaysIncludedFields,
       viewDataNodeDef.columnUuid,
       // selected node def columns
-      ...nodeDefCols.flatMap(_selectsByNodeDefType({ viewDataNodeDef, streamMode })),
+      ...nodeDefCols.flatMap(_selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })),
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
@@ -230,6 +235,11 @@ export const fetchViewData = async (params, client = db) => {
     if (recordUuid) {
       queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
       queryBuilder.addParams({ recordUuid })
+    }
+    const recordUuids = Query.getFilterRecordUuids(query)
+    if (recordUuids?.length > 0) {
+      queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} IN ($/recordUuids:csv/)`)
+      queryBuilder.addParams({ recordUuids })
     }
   }
 
@@ -413,7 +423,7 @@ export const fetchRecordsCountByRootNodesValue = async (
       ON ${filterColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
       ON n.record_uuid = r.record_uuid
-      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
+      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => quote(NodeDef.getUuid(nodeDefKey))).join(', ')})
     WHERE
       ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $/cycle/
       AND ${filterCondition}

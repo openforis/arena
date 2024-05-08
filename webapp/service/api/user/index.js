@@ -24,6 +24,24 @@ export const fetchUser = async ({ userUuid, surveyId = null }) => {
   return user
 }
 
+export const fetchUserResetPasswordUrl = async ({ userUuid, surveyId }) => {
+  const { data: url } = await axios.get(`/api/survey/${surveyId}/user/${userUuid}/resetpasswordurl`)
+  return url
+}
+
+export const fetchUserName = async ({ userUuid, surveyId }) => {
+  const { data: name } = await axios.get(`/api/survey/${surveyId}/user/${userUuid}/name`)
+  return name
+}
+
+export const fetchUsersBySurvey = async ({ surveyId, onlyAccepted = false, includeSystemAdmins = false }) => {
+  const params = { onlyAccepted, includeSystemAdmins }
+  const {
+    data: { list: users },
+  } = await axios.get(`/api/survey/${surveyId}/users`, { params })
+  return users
+}
+
 export const fetchUserSurveys = async ({ userUuid }) => {
   const {
     data: { surveys },

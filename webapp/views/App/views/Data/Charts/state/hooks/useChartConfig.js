@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect, useMemo } from 'react'
 
 const defaultConfig = {
-  type: 'pie',
+  type: 'bar',
   table: null,
   items: [],
 }

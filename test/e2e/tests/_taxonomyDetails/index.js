@@ -19,7 +19,8 @@ export const editTaxonomyDetails = (taxonomy) => {
     const fileInput = await getFileInput()
     const fileName = getFileName(`${taxonomy.name}_invalid.csv`)
     await fileInput.setInputFiles(fileName)
-    await page.waitForTimeout(2000)
+    // wait for job to complete
+    await page.waitForTimeout(3000)
     await expect(page).toHaveText('Duplicate code')
     await page.click(TestId.modal.close)
   })
@@ -28,7 +29,8 @@ export const editTaxonomyDetails = (taxonomy) => {
     const fileInput = await getFileInput()
     const fileName = getFileName(`${taxonomy.name}.csv`)
     await fileInput.setInputFiles(fileName)
-    await page.waitForTimeout(2000)
+    // wait for job to complete
+    await page.waitForTimeout(3000)
     await page.click(TestId.modal.close)
   })
 }

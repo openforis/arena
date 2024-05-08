@@ -9,11 +9,14 @@ import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
 import { ExtraPropDef } from './extraPropDef'
 
+export const maxCategoryItemsInIndex = 1000
+
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
   levels: 'levels',
   props: ObjectUtils.keys.props,
   items: 'items',
+  itemsCount: 'itemsCount', // available only in data entry
   published: ObjectUtils.keys.published,
   levelsCount: 'levelsCount', // populated only on fetch
 }
@@ -35,14 +38,20 @@ const samplingUnitsPlanCategoryName = 'sampling_units_plan'
 // ========
 
 // ====== READ
-export const { getProps, getPropsDraft, getUuid, isPublished } = ObjectUtils
+export const { getProps, getPropsDraft, getPropsAndPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
 
 const getLevels = R.propOr({}, keys.levels)
 export const getLevelsArray = R.pipe(getLevels, R.values, R.sortBy(R.prop('index')))
-export const getLevelByUuid = (uuid) => R.pipe(getLevelsArray, R.find(R.propEq('uuid', uuid)))
+export const getLevelByUuid = (uuid) =>
+  R.pipe(
+    getLevels,
+    R.values,
+    R.find((level) => CategoryLevel.getUuid(level) === uuid)
+  )
+export const getLevelsSize = R.pipe(getLevels, R.values, R.length)
 export const getLevelByIndex = (idx) => R.path([keys.levels, idx])
 
 const getLevelsCount = (category) => Math.max(getLevelsArray(category).length, R.propOr(0, keys.levelsCount)(category))
@@ -51,6 +60,8 @@ export const isHierarchical = (category) => !isFlat(category)
 
 export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
+
+export const getItemsCount = R.propOr(-1, keys.itemsCount)
 
 // ====== UPDATE
 export const assocProp =
@@ -87,11 +98,13 @@ export const assocLevel =
 // ITEMS
 // ========
 
-export const getItemLevelIndex = (item) => (category) =>
-  R.pipe(CategoryItem.getLevelUuid, (levelUuid) => getLevelByUuid(levelUuid)(category), CategoryLevel.getIndex)(item)
+export const getItemLevelIndex = (item) => (category) => {
+  const levelUuid = CategoryItem.getLevelUuid(item)
+  const level = getLevelByUuid(levelUuid)(category)
+  return CategoryLevel.getIndex(level)
+}
 
-export const isItemLeaf = (item) => (category) =>
-  getItemLevelIndex(item)(category) === getLevelsArray(category).length - 1
+export const isItemLeaf = (item) => (category) => getItemLevelIndex(item)(category) === getLevelsSize(category) - 1
 
 export const getItemValidation = (item) =>
   R.pipe(
@@ -108,11 +121,14 @@ export const getItemExtraDefKeys = (category) => {
 }
 export const getItemExtraDefsArray = (category) =>
   // add uuid and name to each extra def item definition and put them in a array
-  Object.entries(getItemExtraDef(category)).map(([name, item]) => ({
-    ...item,
-    uuid: uuidv4(),
-    name,
-  }))
+  Object.entries(getItemExtraDef(category))
+    .map(([name, item], index) => ({
+      ...item,
+      uuid: uuidv4(),
+      name,
+      index: ExtraPropDef.getIndex(item) ?? index,
+    }))
+    .sort((itemA, itemB) => ExtraPropDef.getIndex(itemA) - ExtraPropDef.getIndex(itemB))
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
@@ -130,6 +146,11 @@ export const newCategory = (props = {}, levels = null) => {
     ...category,
     [keys.levels]: levels || [newLevel(category)],
   }
+}
+
+export const assocItemsCount = (count) => R.assoc(keys.itemsCount, count)
+export const setItemsCount = (count) => (category) => {
+  category[keys.itemsCount] = count
 }
 
 // UTILS

@@ -40,6 +40,33 @@ export const checkFilesStorage = async () => {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
+const getSurveyFilesTotalSpace = async ({ surveyId }) => {
+  return 10 * Math.pow(1024, 3) // TODO make it configurable, fixed to 10 GB per survey now
+}
+
+export const fetchFilesStatistics = async ({ surveyId }) => {
+  const totalSpace = await getSurveyFilesTotalSpace({ surveyId })
+  const { total: usedSpace } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+  const availableSpace = Math.max(0, totalSpace - usedSpace)
+
+  return {
+    availableSpace,
+    totalSpace,
+    usedSpace,
+  }
+}
+
+export const cleanupAllSurveysFilesProps = async () => {
+  const surveyIds = await SurveyManager.fetchAllSurveyIds()
+  let count = 0
+  for await (const surveyId of surveyIds) {
+    const cleanedFiles = await FileManager.cleanupSurveyFilesProps({ surveyId })
+    count += cleanedFiles
+  }
+  return count
+}
+
 export const {
   // CREATE
   insertFile,
@@ -47,4 +74,8 @@ export const {
   fetchFileContentAsStream,
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
+  // UPDATE
+  updateFileProps,
+  // DELETE
+  deleteFileByUuid,
 } = FileManager

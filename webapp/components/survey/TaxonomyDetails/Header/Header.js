@@ -71,7 +71,7 @@ const Header = (props) => {
         {canEdit && (
           <UploadButton
             inputFieldId="taxonomy-upload-input"
-            label={i18n.t('common.csvImport')}
+            label="common.csvImport"
             accept=".csv"
             onChange={([file]) => Actions.upload({ state, file })}
           />

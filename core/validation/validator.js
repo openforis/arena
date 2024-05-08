@@ -50,5 +50,7 @@ export const {
   validateNumber,
   validatePositiveNumber,
   validateEmail,
+  validateEmails,
+  isEmailValueValid,
   isKeyword,
 } = ValidatorFunctions

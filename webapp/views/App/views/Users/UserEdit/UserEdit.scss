@@ -36,9 +36,13 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  gap: 3rem;
 
-  .btn-remove-user {
-    position: absolute;
-    right: 0;
+  .btn-back {
+    align-self: flex-start;
+  }
+
+  .btn-save {
+    align-self: center;
   }
 }

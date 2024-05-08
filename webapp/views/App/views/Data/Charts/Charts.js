@@ -1,5 +1,5 @@
 import './Charts.scss'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Query } from '@common/model/query'
 import { Button } from '@webapp/components/buttons'
 import Chart from './components/Chart'
@@ -17,6 +17,7 @@ const Charts = () => {
   const [fullScreen, setFullScreen] = useState(false)
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const { dimensions, entityDefUuid, setEntityDefUuid } = useGetDimensionsFromArena(nodeDefLabelType)
+  const chartRef = useRef(null)
 
   const { config, configItemsByPath, configActions, spec, updateSpec, draft, chartData, renderChart } = useChart(
     entityDefUuid ? Query.create({ entityDefUuid }) : null,
@@ -28,7 +29,11 @@ const Charts = () => {
     if (D3_CHART_TYPES.includes(spec.chartType) && !chartData) {
       renderChart()
     }
-  }, [spec, chartData]) // this effect runs whenever spec or chartData changes
+  }, [spec, chartData])
+
+  useEffect(() => {
+    updateSpec(JSON.stringify({ ...spec, query: {}, chart: {} }))
+  }, [spec.chartType])
 
   return (
     <div className={classNames('charts', { 'full-screen': fullScreen })}>
@@ -57,7 +62,14 @@ const Charts = () => {
           dimensions={dimensions}
         />
 
-        <Chart specs={spec} draft={draft} renderChart={renderChart} data={chartData} fullScreen={fullScreen} />
+        <Chart
+          specs={spec}
+          draft={draft}
+          renderChart={renderChart}
+          data={chartData}
+          fullScreen={fullScreen}
+          chartRef={chartRef}
+        />
       </Split>
     </div>
   )

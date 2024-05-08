@@ -18,11 +18,13 @@ import * as AuthManager from '@server/modules/auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 
+export const getResetPasswordUrl = ({ serverUrl, uuid }) => `${serverUrl}/guest/resetPassword/${uuid}`
+
 const _getPrettyFormatUserName = ({ user, i18n }) => {
   const parts = []
-  const title = User.getTitle(user)
-  if (title) {
-    parts.push(i18n.t(`user.titleValues.${title}`))
+  const titleKey = User.getTitle(user)
+  if (titleKey && titleKey !== User.titleKeys.preferNotToSay) {
+    parts.push(i18n.t(`user.titleValues.${titleKey}`))
   }
   parts.push(User.getName(user))
   return parts.join(' ')
@@ -35,7 +37,7 @@ const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, 
   // Add reset password url to message params
   const msgParams = {
     ...emailParams,
-    urlResetPassword: `${serverUrl}/guest/resetPassword/${uuid}`,
+    urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
   await Mailer.sendEmail({ to: email, msgKey: 'emails.userInvite', msgParams, i18n })
@@ -111,44 +113,37 @@ const _repeatInvitation = async ({ user, survey, userToInvite, email, emailParam
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
 }
 
-export const inviteUser = async (
-  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
+const _inviteUser = async (
+  { user, i18n, email, survey, invitation, group, repeatInvitation, surveyCycleKey, serverUrl },
   client = db
-) => {
-  const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
-  const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
-  const groupName = AuthGroup.getName(group)
+) =>
+  client.tx(async (t) => {
+    const lang = User.getLang(user)
 
-  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, client)
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyUuid = Survey.getUuid(surveyInfo)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const surveyUuid = Survey.getUuid(surveyInfo)
 
-  _checkCanInviteToGroup({ user, group, surveyInfo })
+    const message = UserGroupInvitation.getMessage(invitation)
+    const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
+    const invitingUserName = _getPrettyFormatUserName({ user, i18n })
 
-  const lang = User.getLang(user)
-  const i18n = await i18nFactory.createI18nAsync(lang)
-  const email = UserGroupInvitation.getEmail(invitation)
-  const userToInvite = await UserManager.fetchUserByEmail(email)
-  const message = UserGroupInvitation.getMessage(invitation)
-  const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
-  const invitingUserName = _getPrettyFormatUserName({ user, i18n })
+    const groupName = AuthGroup.getName(group)
 
-  const emailParams = {
-    invitingUserName,
-    serverUrl,
-    surveyName: Survey.getName(surveyInfo),
-    surveyLabel: Survey.getLabel(surveyInfo, lang),
-    groupLabel: `$t(authGroups.${groupName}.label)`,
-    groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
-    message: messageParam,
-  }
+    const emailParams = {
+      invitingUserName,
+      serverUrl,
+      surveyName: Survey.getName(surveyInfo),
+      surveyLabel: Survey.getLabel(surveyInfo, lang),
+      groupLabel: `$t(authGroups.${groupName}.label)`,
+      groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
+      message: messageParam,
+    }
 
-  return client.tx(async (t) => {
+    const userToInvite = await UserManager.fetchUserByEmail(email, t)
     if (userToInvite) {
       const userToInviteUuid = User.getUuid(userToInvite)
 
       // User to invite already exists
-
       if (User.hasAccepted(userToInvite)) {
         // User has already accepted an invitation previously
         // Check can be invited
@@ -176,7 +171,7 @@ export const inviteUser = async (
           await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
         }
       }
-      return { userInvited: userToInvite }
+      return userToInvite
     } else {
       // User to invite does not exist, he has never been invited
       // Check if he can be invited
@@ -184,7 +179,53 @@ export const inviteUser = async (
         { user, email, group, survey, surveyCycleKey, emailParams, i18n },
         t
       )
-      return { userInvited }
+      return userInvited
     }
   })
+
+export const inviteUsers = async (
+  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
+  client = db
+) => {
+  const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
+  const group = await AuthManager.fetchGroupByUuid(groupUuid, client)
+
+  const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, client)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
+  _checkCanInviteToGroup({ user, group, surveyInfo })
+
+  const lang = User.getLang(user)
+  const i18n = await i18nFactory.createI18nAsync(lang)
+  const emails = UserGroupInvitation.getEmails(invitation)
+
+  const invitedUsers = []
+  const skippedEmails = []
+  for await (const email of emails) {
+    try {
+      const invitedUser = await _inviteUser(
+        {
+          user,
+          i18n,
+          email,
+          survey,
+          invitation,
+          group,
+          repeatInvitation,
+          surveyCycleKey,
+          serverUrl,
+        },
+        client
+      )
+      invitedUsers.push(invitedUser)
+    } catch (e) {
+      if (emails.length === 1) {
+        throw e
+      }
+      // when inviting multiple users, do not insert them in a single transaction; just skip that emails
+      // (emails to invited users could be sent but data won't be in the DB if transaction is rolled back)
+      skippedEmails.push(email)
+    }
+  }
+  return { invitedUsers, skippedEmails }
 }

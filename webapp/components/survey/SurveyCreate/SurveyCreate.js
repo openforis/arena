@@ -27,6 +27,10 @@ import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/compone
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
+
+const fileMaxSizeDefault = 1000 // 1GB
+const fileMaxSizeSystemAdmin = 2000 // 2GB
 
 const SurveyCreate = (props) => {
   const { showImport, submitButtonLabel, template } = props
@@ -34,6 +38,7 @@ const SurveyCreate = (props) => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
     useCreateSurvey({
@@ -58,6 +63,8 @@ const SurveyCreate = (props) => {
   useOnUpdate(() => {
     navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
+
+  const fileMaxSize = isSystemAdmin ? fileMaxSizeSystemAdmin : fileMaxSizeDefault
 
   return (
     <div className="home-survey-create">
@@ -134,11 +141,13 @@ const SurveyCreate = (props) => {
           {cloneFrom?.cycles?.length > 1 && (
             <FormItem label={i18n.t('common.cycle')}>
               <Dropdown
+                className="cycle-dropdown"
                 items={cloneFrom.cycles}
                 itemValue={(cycleKey) => cycleKey}
                 itemLabel={RecordCycle.getLabel}
                 onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
                 selection={cloneFromCycle}
+                validation={Validation.getFieldValidation('cloneFromCycle')(validation)}
               />
             </FormItem>
           )}
@@ -199,7 +208,7 @@ const SurveyCreate = (props) => {
                       ? { [contentTypes.zip]: ['.zip'] }
                       : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
                   }
-                  maxSize={1000}
+                  maxSize={fileMaxSize}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />

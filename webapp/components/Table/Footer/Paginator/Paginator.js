@@ -7,9 +7,7 @@ import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
 import Dropdown from '@webapp/components/form/Dropdown'
-
-const itemsPerPageValues = [15, 30, 50]
-const itemsPerPageDefault = 15
+import { TableConstants } from '../../constants'
 
 const Paginator = (props) => {
   const { count, limit, offset, setLimit, setOffset } = props
@@ -26,16 +24,15 @@ const Paginator = (props) => {
         <div className="label">{i18n.t('common.paginator.itemsPerPage')}:</div>
         <Dropdown
           clearable={false}
-          items={itemsPerPageValues}
+          items={TableConstants.itemsPerPageValues}
           itemValue={A.identity}
           itemLabel={A.identity}
           selection={limit}
           onChange={(limitUpdated) => {
-            if (itemsPerPageValues.includes(Number(limitUpdated))) {
-              setLimit(limitUpdated)
-            } else {
-              setLimit(itemsPerPageDefault)
-            }
+            const limitNext = TableConstants.itemsPerPageValues.includes(Number(limitUpdated))
+              ? limitUpdated
+              : TableConstants.itemsPerPageDefault
+            setLimit(limitNext)
           }}
         />
       </div>

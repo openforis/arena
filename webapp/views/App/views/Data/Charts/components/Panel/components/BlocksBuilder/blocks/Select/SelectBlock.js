@@ -1,27 +1,28 @@
 import React, { useCallback, useMemo } from 'react'
+import PropTypes from 'prop-types'
 
 import { uuidv4 } from '@core/uuid'
 
 import { Dropdown } from '@webapp/components/form'
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
+import { NodeDefType } from '@openforis/arena-core'
 
 const icons = {
-  quantitative: <span className="icon-left node_def__icon">1.23</span>,
-  nominal: (
-    <span className="icon-left display-flex">
-      {[0, 1, 2].map((i) => (
-        <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
-      ))}
-    </span>
-  ),
-  temporal: <span className="icon icon-clock icon-left" />,
+  quantitative: NodeDefUIProps.getIconByType(NodeDefType.decimal),
+  nominal: NodeDefUIProps.getIconByType(NodeDefType.text),
+  temporal: NodeDefUIProps.getIconByType(NodeDefType.time),
 }
 
 const useOptionsAndDefaultValues = ({ block, dimensions }) => {
   const { optionsParams = {} } = block
-  const { filter = [] } = optionsParams
+  const { filter = [], options: predefinedOptions = [] } = optionsParams
 
   const options = useMemo(() => {
     const _filter = (option) => (filter.length > 0 && option.type ? filter.includes(option.type) : true)
+
+    if (predefinedOptions.length > 0) {
+      return predefinedOptions
+    }
 
     if (block.options) {
       return block.options.filter(_filter)
@@ -32,10 +33,14 @@ const useOptionsAndDefaultValues = ({ block, dimensions }) => {
         options: (dimension.options || []).filter(_filter),
       })
     )
-  }, [dimensions, block, filter])
+  }, [dimensions, block, filter, predefinedOptions])
 
-  const flatOptions = useMemo(() => block.options || options.flatMap((d) => d.options), [options, block])
-
+  const flatOptions = useMemo(() => {
+    if (predefinedOptions.length > 0) {
+      return predefinedOptions
+    }
+    return block.options || options.flatMap((d) => d.options)
+  }, [options, block, predefinedOptions])
   return { options, flatOptions }
 }
 
@@ -98,9 +103,18 @@ const SelectBlock = ({ configItemsByPath, configActions, blockPath, dimensions, 
           defaultSelection={defaultValues}
         />
       )}
-      <span className="block__number-options">{flatOptions.length} Option(s)</span>
     </div>
   )
+}
+
+SelectBlock.propTypes = {
+  configItemsByPath: PropTypes.object.isRequired,
+  configActions: PropTypes.object.isRequired,
+  blockPath: PropTypes.string.isRequired,
+  dimensions: PropTypes.array.isRequired,
+  block: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  values: PropTypes.object,
 }
 
 export default SelectBlock

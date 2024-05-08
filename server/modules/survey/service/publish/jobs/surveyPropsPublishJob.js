@@ -29,7 +29,7 @@ export default class SurveyPropsPublishJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    this.total = 7
+    this.total = 6
 
     const langsDeleted = await findDeletedLanguages(surveyId, tx)
     this.incrementProcessedItems()

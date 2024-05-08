@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
+import { Objects } from '@openforis/arena-core'
+import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {
   const {
@@ -11,9 +13,12 @@ export const Button = forwardRef((props, ref) => {
     disabled,
     iconClassName,
     id,
+    isTitleMarkdown,
     label: labelProp,
     labelParams,
     onClick,
+    primary,
+    secondary,
     showLabel,
     size,
     testId,
@@ -28,10 +33,10 @@ export const Button = forwardRef((props, ref) => {
   const title = titleProp
     ? i18n.t(titleProp, titleParams)
     : !showLabel && labelProp
-    ? i18n.t(labelProp, labelParams)
-    : null
+      ? i18n.t(labelProp, labelParams)
+      : null
 
-  return (
+  const btn = (
     <button
       ref={ref}
       id={id}
@@ -39,15 +44,26 @@ export const Button = forwardRef((props, ref) => {
       disabled={disabled ? disabled : undefined}
       aria-disabled={disabled ? disabled : undefined}
       type="button"
-      className={classNames('btn', className, { 'btn-s': size === 'small' })}
+      className={classNames('btn', className, {
+        'btn-s': size === 'small',
+        'btn-primary': primary,
+        'btn-secondary': secondary,
+      })}
       onClick={onClick}
-      title={title}
       {...otherProps}
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {label}
       {children}
     </button>
+  )
+  if (Objects.isEmpty(title) || disabled) {
+    return btn
+  }
+  return (
+    <TooltipNew title={title} isTitleMarkdown={isTitleMarkdown}>
+      {btn}
+    </TooltipNew>
   )
 })
 
@@ -57,9 +73,12 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
+  isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
   labelParams: PropTypes.object,
   onClick: PropTypes.func,
+  primary: PropTypes.bool,
+  secondary: PropTypes.bool,
   showLabel: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,
@@ -73,6 +92,7 @@ Button.defaultProps = {
   disabled: false,
   iconClassName: null,
   id: null,
+  isTitleMarkdown: false,
   label: null,
   labelParams: null,
   onClick: null,

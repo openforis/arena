@@ -4,6 +4,7 @@ import { WebSocketEvent } from '@openforis/arena-server'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
+import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -22,15 +23,22 @@ class RecordsUpdateThread extends Thread {
     super(paramsObj)
 
     this.queue = new Queue()
-    this.survey = null
-    this.record = null
+    this.surveysDataCache = new IdleTimeoutCache()
     this.processing = false
+
+    this.messageProcessorByType = {
+      [RecordsUpdateThreadMessageTypes.recordInit]: this.processRecordInitMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.recordReload]: this.processRecordReloadMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.nodePersist]: this.processRecordNodePersistMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.nodeDelete]: this.processRecordNodeDeleteMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.recordClear]: this.processRecordClearMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.surveyClear]: this.processSurveyClearMsg.bind(this),
+      [RecordsUpdateThreadMessageTypes.threadKill]: this.postMessage.bind(this),
+    }
   }
 
-  sendThreadInitMsg() {
-    ;(async () => {
-      await this.messageHandler({ type: RecordsUpdateThreadMessageTypes.threadInit })
-    })()
+  init() {
+    // do nothing
   }
 
   async handleNodesUpdated({ record, updatedNodes }) {
@@ -92,8 +100,20 @@ class RecordsUpdateThread extends Thread {
     }
   }
 
-  async init() {
-    const { surveyId, cycle, draft } = this.params
+  getSurveyDataKey(msg) {
+    const { surveyId, cycle, draft } = msg
+    return `${surveyId}_${cycle}_${draft}`
+  }
+
+  async getOrFetchSurveyData(msg) {
+    const { surveyId, cycle, draft } = msg
+
+    const key = this.getSurveyDataKey(msg)
+
+    let data = this.surveysDataCache.get(key)
+    if (data) {
+      return data
+    }
 
     const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
       surveyId,
@@ -107,47 +127,38 @@ class RecordsUpdateThread extends Thread {
       ? Survey.buildDependencyGraph(surveyDb)
       : await SurveyManager.fetchDependencies(surveyId)
 
-    this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
+    const survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
 
-    this.recordsByUuid = {}
+    data = {
+      survey,
+      recordsCache: new IdleTimeoutCache(),
+    }
+    this.surveysDataCache.set(key, data)
+
+    return data
   }
 
   async processMessage(msg) {
     const { type } = msg
     Logger.debug('processing message', type)
 
-    switch (type) {
-      case RecordsUpdateThreadMessageTypes.threadInit:
-        await this.init()
-        break
-      case RecordsUpdateThreadMessageTypes.recordInit:
-        await this.processRecordInitMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.recordReload:
-        await this.processRecordReloadMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.nodePersist:
-        await this.processRecordNodePersistMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.nodeDelete:
-        await this.processRecordNodeDeleteMsg(msg)
-        break
-      case RecordsUpdateThreadMessageTypes.threadKill:
-        this.postMessage(msg)
-        break
-      default:
-        Logger.debug(`Skipping unknown message type: ${type}`)
-    }
+    const messageProcessor = this.messageProcessorByType[type]
+    if (messageProcessor) {
+      await messageProcessor(msg)
 
-    if ([RecordsUpdateThreadMessageTypes.nodePersist, RecordsUpdateThreadMessageTypes.nodeDelete].includes(type)) {
-      const recordUuid = msg.recordUuid || msg.node?.recordUuid
-      this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted, content: { recordUuid } })
+      if ([RecordsUpdateThreadMessageTypes.nodePersist, RecordsUpdateThreadMessageTypes.nodeDelete].includes(type)) {
+        const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
+        this.postMessage({ type: WebSocketEvent.nodesUpdateCompleted, content: { recordUuid } })
+      }
+    } else {
+      Logger.debug(`Skipping unknown message type: ${type}`)
     }
   }
 
   async processRecordInitMsg(msg) {
-    const { survey, surveyId } = this
-    const { recordUuid, user } = msg
+    const { surveyId, recordUuid, user, timezoneOffset } = msg
+
+    const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
 
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
@@ -155,64 +166,104 @@ class RecordsUpdateThread extends Thread {
       user,
       survey,
       record,
+      timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated.bind(this)({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated.bind(this)({ record, validations }),
     })
-    this.recordsByUuid[recordUuid] = record
+    recordsCache.set(recordUuid, record)
   }
 
   async processRecordReloadMsg(msg) {
-    const { surveyId } = this
-    const { recordUuid } = msg
+    const { surveyId, recordUuid } = msg
 
-    if (this.recordsByUuid[recordUuid]) {
+    const { recordsCache } = await this.getOrFetchSurveyData(msg)
+
+    if (recordsCache.has(recordUuid)) {
       const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
-      this.recordsByUuid[recordUuid] = record
+      recordsCache.set(recordUuid, record)
     }
   }
 
   async processRecordNodePersistMsg(msg) {
-    const { survey } = this
-    const { node, user } = msg
+    const { node, user, timezoneOffset } = msg
+
+    const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
+
     const recordUuid = Node.getRecordUuid(node)
-    let record = await this.getOrFetchRecord({ recordUuid })
+    let record = await this.getOrFetchRecord({ msg, recordUuid })
+
     record = await RecordManager.persistNode({
       user,
       survey,
       record,
       node,
+      timezoneOffset,
       nodesUpdateListener: (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       nodesValidationListener: (validations) => this.handleNodesValidationUpdated({ record, validations }),
     })
-    this.recordsByUuid[recordUuid] = record
+    recordsCache.set(recordUuid, record)
   }
 
   async processRecordNodeDeleteMsg(msg) {
-    const { survey } = this
-    const { nodeUuid, recordUuid, user } = msg
+    const { nodeUuid, recordUuid, user, timezoneOffset } = msg
 
-    let record = await this.getOrFetchRecord({ recordUuid })
+    const { survey, recordsCache } = await this.getOrFetchSurveyData(msg)
+
+    let record = await this.getOrFetchRecord({ msg, recordUuid })
     record = await RecordManager.deleteNode(
       user,
       survey,
       record,
       nodeUuid,
+      timezoneOffset,
       (updatedNodes) => this.handleNodesUpdated({ record, updatedNodes }),
       (validations) => this.handleNodesValidationUpdated({ record, validations })
     )
-    this.recordsByUuid[recordUuid] = record
+    recordsCache.set(recordUuid, record)
   }
 
-  async getOrFetchRecord({ recordUuid }) {
-    const { surveyId, recordsByUuid } = this
-    let record = recordsByUuid[recordUuid]
+  async processRecordClearMsg(msg) {
+    const { recordUuid } = msg
+
+    const { recordsCache } = await this.getOrFetchSurveyData(msg)
+    recordsCache.delete(recordUuid)
+
+    if (recordsCache.isEmpty()) {
+      await this.processSurveyClearMsg(msg)
+    }
+  }
+
+  async processSurveyClearMsg(msg) {
+    const { surveyId, cycle } = msg
+
+    let keysToDelete = []
+
+    if (!Objects.isNil(cycle)) {
+      const key = this.getSurveyDataKey(msg)
+      keysToDelete.push(key)
+    } else {
+      const keyPrefix = `${surveyId}_`
+      keysToDelete.push(...this.surveysDataCache.findKeys((key) => key.startsWith(keyPrefix)))
+    }
+    keysToDelete.forEach((key) => {
+      this.surveysDataCache.delete(key)
+    })
+  }
+
+  async getOrFetchRecord({ msg, recordUuid }) {
+    const { surveyId } = msg
+
+    const { recordsCache } = await this.getOrFetchSurveyData(msg)
+
+    let record = recordsCache.get(recordUuid)
+
     if (!record) {
       record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
-      recordsByUuid[recordUuid] = record
+      recordsCache.set(recordUuid, record)
     }
     return record
   }
 }
 
 const thread = new RecordsUpdateThread()
-thread.sendThreadInitMsg()
+thread.init()

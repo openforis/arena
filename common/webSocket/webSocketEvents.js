@@ -1,5 +1,6 @@
 export const WebSocketEvents = {
   // Websocket events
+  connect: 'connect', // successful connection
   connection: 'connection',
   disconnect: 'disconnect',
   connectError: 'connect_error',
@@ -11,6 +12,8 @@ export const WebSocketEvents = {
   nodesUpdateCompleted: 'nodesUpdateCompleted',
   nodeValidationsUpdate: 'nodeValidationsUpdate',
   recordDelete: 'recordDelete',
+  surveyUpdate: 'surveyUpdate',
+
   error: 'threadError',
   recordSessionExpired: 'recordSessionExpired',
   applicationError: 'applicationError',

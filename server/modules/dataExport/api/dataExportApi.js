@@ -8,10 +8,9 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as DataExportService from '../service/dataExportService'
 
 export const init = (app) => {
-  // export-csv-data
-  // generate zip with CSV
   app.post(
     '/survey/:surveyId/data-export/csv',
     AuthMiddleware.requireRecordsExportPermission,
@@ -20,8 +19,12 @@ export const init = (app) => {
         const {
           surveyId,
           cycle,
+          recordUuids,
+          search,
           includeCategories,
           includeCategoryItemsLabels,
+          expandCategoryItems,
+          includeAncestorAttributes,
           includeAnalysis,
           includeDataFromAllCycles,
           includeFiles,
@@ -29,12 +32,16 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        const job = SurveyService.startExportCsvDataJob({
+        const job = DataExportService.startCsvDataExportJob({
+          user,
           surveyId,
           cycle,
-          user,
+          recordUuids,
+          search,
           includeCategories,
           includeCategoryItemsLabels,
+          expandCategoryItems,
+          includeAncestorAttributes,
           includeAnalysis,
           includeDataFromAllCycles,
           includeFiles,

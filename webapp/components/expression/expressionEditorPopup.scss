@@ -92,11 +92,20 @@
     .binary-left,
     .binary-right {
       display: flex;
+      flex: 1;
 
       .identifier,
       .dropdown-literal {
-        width: 30rem;
+        width: 100%;
         max-width: 40rem;
+      }
+    }
+
+    .binary-left {
+      justify-content: end;
+
+      &:only-child {
+        justify-content: center;
       }
     }
 
@@ -109,6 +118,7 @@
       margin: 0 0.1rem;
       height: 32px;
       align-self: flex-end;
+      text-wrap: nowrap;
     }
 
     .operator {
@@ -119,6 +129,17 @@
       justify-content: space-between;
       width: 8rem;
       margin-left: 2rem;
+    }
+  }
+
+  .literal {
+    width: 100%;
+    max-width: 40rem;
+
+    .form-input {
+      margin-left: 0.5rem;
+      padding: 0.3rem;
+      text-align: left;
     }
   }
 

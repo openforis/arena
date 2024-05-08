@@ -9,9 +9,11 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 import * as DateTimeUtils from '@core/dateUtils'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
+import { ColumnNodeDef } from '@common/model/db'
 
 const { nodeDefType } = NodeDef
 
@@ -22,6 +24,20 @@ const getValueFromItem = (nodeDefCol, columnName, item = {}, isInProps = false) 
   const prop = camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
 
   return isInProps ? NodeDef.getProp(prop)(item) : A.propOr(null, prop, item)
+}
+
+const _extractCategoryItem = ({ survey, node }) => {
+  let item = NodeRefData.getCategoryItem(node)
+  if (item) return item
+
+  const itemUuid = Node.getCategoryItemUuid(node)
+  return itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
+}
+
+const _extractTaxon = ({ survey, node }) => {
+  const taxonUuid = Node.getTaxonUuid(node)
+  if (!taxonUuid) return null
+  return NodeRefData.getTaxon(node) ?? Survey.getTaxonByUuid(taxonUuid)(survey)
 }
 
 const nodeValuePropProcessor =
@@ -76,9 +92,7 @@ const props = {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const defaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-      const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
-
+      const item = _extractCategoryItem({ survey, node: nodeCol })
       return (_node, columnName) => {
         if (!item) return null
 
@@ -91,21 +105,31 @@ const props = {
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: ({ survey, nodeDefCol, nodeCol }) => {
-      const taxonUuid = Node.getTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
+      const taxon = _extractTaxon({ survey, node: nodeCol })
 
       return (node, columnName) => {
+        if (Objects.isEmpty(Node.getValue(node))) return null
+
         if (NodeDef.getName(nodeDefCol) === columnName) {
           // Code
           return Taxon.getCode(taxon)
         }
-        // Scientific_name
-        if (Taxon.isUnlistedTaxon(taxon)) {
-          // Scientific name from node value
-          return Node.getScientificName(node)
+        if (columnName.endsWith(ColumnNodeDef.columnSuffixTaxonScientificName)) {
+          // Scientific_name
+          if (Taxon.isUnkOrUnlTaxon(taxon)) {
+            // Scientific name from node value
+            return Node.getScientificName(node)
+          }
+          // Scientific name from taxon item
+          return Taxon.getScientificName(taxon)
         }
-        // Scientific name from taxon item
-        return Taxon.getScientificName(taxon)
+        if (Node.getVernacularNameUuid(node) && columnName.endsWith(ColumnNodeDef.columnSuffixTaxonVernacularName)) {
+          // Vernacular name
+          const vernacularName = Taxon.getVernacularName(taxon)
+          const vernacularLang = Taxon.getVernacularLanguage(taxon)
+          return `${vernacularName} (${vernacularLang})`
+        }
+        return null
       }
     },
   },

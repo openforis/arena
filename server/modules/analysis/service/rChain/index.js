@@ -3,7 +3,6 @@ import * as PromiseUtils from '@core/promiseUtils'
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
-import * as CSVReader from '@server/utils/file/csvReader'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -13,15 +12,19 @@ import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as Chain from '@common/analysis/chain'
 
+import * as JobManager from '@server/job/jobManager'
+import * as UserService from '@server/modules/user/service/userService'
+
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
+import PersistResultsJob from './PersistResultsJob'
 
-export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
-  new RChain(surveyId, cycle, chainUuid, serverUrl).init()
+export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
+  new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
 export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
@@ -48,51 +51,17 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
     columnNodeDefs: true,
     includeFileAttributeDefs: false,
     addCycle: true,
+    nullsToEmpty: true,
     streamOutput: res,
   })
 }
 
 // ==== UPDATE
 
-export const persistResults = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, advanced: true, draft: true })
-
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-
-  const chain = await AnalysisManager.fetchChain({
-    surveyId,
-    chainUuid,
-  })
-
-  const analysisNodeDefs = Survey.getAnalysisNodeDefs({
-    chain,
-    entityDefUuid,
-    showSamplingNodeDefs: true,
-    hideAreaBasedEstimate: false,
-  })(survey)
-  if (analysisNodeDefs.length === 0) return
-
-  const fileZip = new FileZip(filePath)
-  await fileZip.init()
-  const stream = await fileZip.getEntryStream(`${NodeDef.getName(entityDef)}.csv`)
-  await db.tx(async (tx) => {
-    // Reset node results
-    await SurveyRdbManager.deleteNodeResultsByChainUuid({ survey, entity: entityDef, chain, cycle, chainUuid }, tx)
-
-    // Insert node results
-    const massiveUpdateData = new SurveyRdbManager.MassiveUpdateData({ survey, entityDef, analysisNodeDefs }, tx)
-    const massiveUpdateNodes = new SurveyRdbManager.MassiveUpdateNodes({ survey, analysisNodeDefs }, tx)
-
-    await CSVReader.createReaderFromStream(stream, null, async (row) => {
-      await massiveUpdateData.push(row)
-      await massiveUpdateNodes.push(row)
-    }).start()
-
-    await massiveUpdateData.flush()
-    await massiveUpdateNodes.flush()
-  })
-
-  fileZip.close()
+export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+  const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
+  JobManager.executeJobThread(job)
+  return job
 }
 
 const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {
@@ -159,11 +128,12 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const script = getZipEntryAsText(scriptEntryName)
 
           await NodeDefManager.updateNodeDefProps(
-            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
+            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
             tx
           )
         })
       }
     })
   })
+  await UserService.notifyActiveUsersAboutSurveyUpdate({ surveyId })
 }

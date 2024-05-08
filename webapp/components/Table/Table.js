@@ -12,6 +12,7 @@ import { useTable } from './useTable'
 
 const Table = (props) => {
   const {
+    cellProps,
     cellTestIdExtractor,
     className,
     columns,
@@ -34,6 +35,9 @@ const Table = (props) => {
     headerProps,
     rowProps,
     selectable,
+    selectOnClick,
+    showFooter,
+    showHeader,
     visibleColumnsSelectionEnabled,
   } = props
 
@@ -51,8 +55,10 @@ const Table = (props) => {
     totalCount,
     initData,
     onRowClick,
+    onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
+    visibleColumnKeys,
     visibleColumns,
   } = useTable({
     columns,
@@ -62,6 +68,7 @@ const Table = (props) => {
     onRowClick: onRowClickProp,
     restParams,
     selectable,
+    selectOnClick,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -70,23 +77,27 @@ const Table = (props) => {
 
   return (
     <div className={`table ${className}`}>
-      <Header
-        columns={columns}
-        offset={offset}
-        list={list}
-        limit={limit}
-        count={count}
-        totalCount={totalCount}
-        search={search}
-        headerLeftComponent={headerLeftComponent}
-        headerProps={headerProps}
-        handleSearch={handleSearch}
-        onVisibleColumnsChange={onVisibleColumnsChange}
-        selectedItems={selectedItems}
-        visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
-      />
+      {showHeader && (
+        <Header
+          columns={columns}
+          offset={offset}
+          list={list}
+          limit={limit}
+          count={count}
+          totalCount={totalCount}
+          search={search}
+          headerLeftComponent={headerLeftComponent}
+          headerProps={headerProps}
+          handleSearch={handleSearch}
+          onVisibleColumnsChange={onVisibleColumnsChange}
+          selectedItems={selectedItems}
+          visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
+          visibleColumnKeys={visibleColumnKeys}
+        />
+      )}
 
       <Content
+        cellProps={cellProps}
         cellTestIdExtractor={cellTestIdExtractor}
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
@@ -103,6 +114,7 @@ const Table = (props) => {
         offset={offset}
         onRowClick={onRowClick}
         onRowDoubleClick={onRowDoubleClick}
+        onRowsScroll={onRowsScroll}
         rowComponent={rowComponent}
         rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}
@@ -114,7 +126,7 @@ const Table = (props) => {
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
       />
-      <Footer offset={offset} list={list} limit={limit} count={count} />
+      {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
     </div>
   )
 }
@@ -122,6 +134,7 @@ const Table = (props) => {
 const DummyComponent = () => <div />
 
 Table.propTypes = {
+  cellProps: PropTypes.object,
   cellTestIdExtractor: PropTypes.func,
   className: PropTypes.string,
   columns: PropTypes.array,
@@ -144,10 +157,14 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
+  selectOnClick: PropTypes.bool,
+  showFooter: PropTypes.bool,
+  showHeader: PropTypes.bool,
   visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
 }
 
 Table.defaultProps = {
+  cellProps: {},
   cellTestIdExtractor: null,
   className: '',
   columns: null,
@@ -169,6 +186,9 @@ Table.defaultProps = {
   rowExpandedComponent: DummyComponent,
   rowProps: {},
   selectable: true,
+  selectOnClick: true,
+  showFooter: true,
+  showHeader: true,
   visibleColumnsSelectionEnabled: false,
 }
 

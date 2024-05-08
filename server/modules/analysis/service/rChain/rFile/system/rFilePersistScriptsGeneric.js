@@ -16,7 +16,7 @@ export default class RFilePersistScriptsGeneric extends RFileSystem {
     await this.logInfo(`'Persisting ${zipName} started'`)
     await this.appendContent(
       zipr(zipFile, dirName),
-      arenaPutFile(ApiRoutes.rChain.chainUserScripts(surveyId, chainUuid), zipFile)
+      arenaPutFile(ApiRoutes.rChain.chainUserScripts({ surveyId, chainUuid }), zipFile)
     )
     await this.logInfo(`'Persisting ${zipName} completed'`)
   }
@@ -26,7 +26,7 @@ export default class RFilePersistScriptsGeneric extends RFileSystem {
   }
 
   getHeaderScript() {
-    return `if(checkGlobalErrors("${this.fileName} cannot be executed.")) {`
+    return `if (checkGlobalErrors("${this.fileName} cannot be executed.")) {`
   }
 
   getFooterScript() {

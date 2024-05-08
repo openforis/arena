@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
@@ -30,8 +31,9 @@ const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
 
 const getColLabelKey = ({ columnName, nodeDef }) => {
   const field = getFieldByViewColumnName({ columnName, nodeDef })
+  const fieldCamelized = A.camelize(field)
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
-  return `surveyForm.${nodeDefTypePrefix}.${field}`
+  return `surveyForm.${nodeDefTypePrefix}.${fieldCamelized}`
 }
 
 const ColumnHeader = (props) => {
@@ -46,8 +48,11 @@ const ColumnHeader = (props) => {
     nodeDef,
   })
 
+  const entityDefUuid = Query.getEntityDefUuid(query)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang, nodeDefLabelType)
+  // measure is editable only when the node def is not equal to the context entity (e.g. entity count measure is not editable)
+  const canEditMeasure = nodeDefUuid !== entityDefUuid
 
   const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
@@ -59,7 +64,7 @@ const ColumnHeader = (props) => {
         ) : (
           <>
             <span className="ellipsis">{nodeDefLabel}</span>
-            {isMeasure && (
+            {isMeasure && canEditMeasure && (
               <ButtonIconGear
                 className="btn btn-s btn-transparent btn-aggregates"
                 onClick={() => setShowAggregateFunctionsPanel(true)}

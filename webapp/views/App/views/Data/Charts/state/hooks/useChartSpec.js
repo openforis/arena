@@ -9,12 +9,8 @@ export const configToSpec = ({ config, configItemsByPath }) => {
   const builderBlocks = chartsConfig?.[config.type]?.builderBlocks
   let _spec = chartsConfig?.[config.type]?.baseSpec
   _spec = Object.entries(configItemsByPath).reduce((newSpec, [key, entry]) => {
-    const block = key.split('.').reduce((_block, _key) => {
-      return _block.blocks[_key]
-    }, builderBlocks)
-    if (block.valuesToSpec) {
-      // maybe is better return items like [transforms, encondigs] and the join here using a forEach instead a reduce and build the spec after the execution of the loop
-      // but there is some functions that can transform some things like the innerRadios or outerRadious in mark
+    const block = key.split('.').reduce((_block, _key) => _block?.blocks[_key], builderBlocks)
+    if (block?.valuesToSpec) {
       return block.valuesToSpec({ value: entry.value, spec: newSpec, key, configItemsByPath })
     }
     return newSpec

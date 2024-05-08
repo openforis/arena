@@ -1,23 +1,15 @@
-import { BaseProtocol, Schemata } from '@openforis/arena-server'
+import { BaseProtocol } from '@openforis/arena-server'
 
-import * as DB from '../../../../db'
-
-import * as ObjectUtils from '../../../../../core/objectUtils'
-import { TableChain } from '../../../../../common/model/db'
+import { TableChain } from '@common/model/db'
 import * as Chain from '@common/analysis/chain'
+
+import * as A from '@core/arena'
+
+import * as DB from '@server/db'
 
 export const transformCallback = (row) => {
   if (!row) return {}
-  /* eslint-disable-next-line camelcase */
-  const { date_created, date_modified, ...rest } = DB.mergeProps()(row)
-
-  return {
-    /* eslint-disable-next-line camelcase */
-    ...(date_created ? { [ObjectUtils.keys.dateCreated]: date_created } : {}),
-    /* eslint-disable-next-line camelcase */
-    ...(date_modified ? { [ObjectUtils.keys.dateModified]: date_modified } : {}),
-    ...rest,
-  }
+  return A.pipe(DB.mergeProps(), A.camelizePartial({ limitToLevel: 1 }))(row)
 }
 
 /**
@@ -70,25 +62,15 @@ export const fetchChains = async (params, client = DB.client) => {
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
  * @param {!string} params.chainUuid - The processing chain uuid.
+ * @param {boolean} params.includeScript - Whether to include script columns.
  * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<Chain|null>} - The result promise.
  */
 export const fetchChain = async (params, client = DB.client) => {
-  const { surveyId, chainUuid } = params
-  const schema = Schemata.getSchemaSurvey(surveyId)
-  const chainColumns = TableChain.columnSet
+  const { surveyId, chainUuid, includeScript = false } = params
 
-  return client.oneOrNone(
-    ` SELECT
-  ${Object.values(chainColumns)
-    .map((columnName) => `_c.${columnName}`)
-    .join(',')}
-  FROM
-    ${schema}.${TableChain.tableName} AS _c
-  WHERE _c.uuid = $1
-  GROUP BY _c.uuid`,
-    [chainUuid],
-    transformCallback
-  )
+  const tableChain = new TableChain(surveyId)
+
+  return client.oneOrNone(tableChain.getSelect({ chainUuid, includeScript }), [chainUuid], transformCallback)
 }

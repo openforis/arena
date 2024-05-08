@@ -10,15 +10,15 @@ import * as Response from '@server/utils/response'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import { CategoryImportTemplateGenerator } from '@server/modules/category/manager/categoryImportTemplateGenerator'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
 import CategoriesExportJob from './CategoriesExportJob'
-import * as CategoryManager from '../manager/categoryManager'
-import { CategoryImportTemplateGenerator } from '../manager/categoryImportTemplateGenerator'
-import { CategoryItemsSummaryBuilder } from './categoryItemsSummaryBuilder'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
+import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
 export const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
@@ -33,7 +33,24 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
   return job
 }
 
-export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => {
+export const createBatchImportJob = ({ user, surveyId, filePath }) => {
+  const job = new CategoriesBatchImportJob({ user, surveyId, filePath })
+  JobManager.executeJobThread(job)
+  return job
+}
+
+export const exportCategory = async ({
+  surveyId,
+  categoryUuid,
+  draft,
+  language = null,
+  includeUuid = false,
+  includeSingleCode = false,
+  includeCodeJoint = false,
+  includeLevelPosition = false,
+  includeReportingDataCumulativeArea = false,
+  res,
+}) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const fileName = ExportFileNameGenerator.generate({
@@ -43,7 +60,18 @@ export const exportCategory = async ({ surveyId, categoryUuid, draft, res }) => 
   })
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
-  await CategoryManager.exportCategoryToStream({ survey, categoryUuid, draft, outputStream: res })
+  await CategoryManager.exportCategoryToStream({
+    survey,
+    categoryUuid,
+    draft,
+    language,
+    includeUuid,
+    includeSingleCode,
+    includeCodeJoint,
+    includeLevelPosition,
+    includeReportingDataCumulativeArea,
+    outputStream: res,
+  })
 }
 
 export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {
@@ -122,30 +150,26 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
 
-  const samplingPointData = items.map((item) => {
+  const samplingPointData = items.reduce((acc, item) => {
     const location = CategoryItem.getExtraProp('location')(item)
+    if (!location) return acc
+
     const codes = CategoryItem.getCodesHierarchy(item)
     const point = Points.parse(location)
     const pointLatLong = Points.toLatLong(point, srsIndex)
 
     const record = recordFinder?.(item)
 
-    return {
+    acc.push({
       uuid: CategoryItem.getUuid(item),
       codes,
       latLng: [pointLatLong.y, pointLatLong.x],
       location,
       ...(record ? { recordUuid: Record.getUuid(record) } : {}),
-    }
-  })
+    })
+    return acc
+  }, [])
   return samplingPointData
-}
-
-export const fetchCategoryItemsSummary = async ({ surveyId, categoryUuid, language, draft = false }) => {
-  const category = await fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
-  const items = await fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft })
-
-  return CategoryItemsSummaryBuilder.toItemsSummary({ category, items, language })
 }
 
 export const {
@@ -164,8 +188,10 @@ export const {
   fetchCategoryAndLevelsByUuid,
   fetchItemsByParentUuid,
   fetchItemsByCategoryUuid,
+  countItemsBySurveyId,
   countItemsByLevelIndex,
   fetchItemsByLevelIndex,
+  fetchItemsCountIndexedByCategoryUuid,
 
   updateCategoryProp,
   updateCategoryItemExtraDefItem,

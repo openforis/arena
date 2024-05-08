@@ -10,5 +10,3 @@ export const keys = {
 // ===== READ
 export const { getUuid, isEqual } = ObjectUtils
 export const getAggregate = A.prop(keys.aggregate)
-
-

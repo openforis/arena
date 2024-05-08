@@ -25,6 +25,7 @@ const EntitySelectorTreeNode = (props) => {
     nodeDefLabelType: nodeDefLabelTypeProp,
     nodeDefUuidActive,
     onlyPages,
+    onlyEntities,
     onSelect,
   } = props
 
@@ -66,7 +67,10 @@ const EntitySelectorTreeNode = (props) => {
 
   const childrenPageDefs = onlyPages
     ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
-    : Survey.getNodeDefDescendantsInSingleEntities({ nodeDef, filterFn: NodeDef.isMultipleEntity })(survey)
+    : Survey.getNodeDefDescendantsInSingleEntities({
+        nodeDef,
+        filterFn: onlyEntities ? NodeDef.isMultipleEntity : NodeDef.isMultiple,
+      })(survey)
 
   const visibleChildren = pageNode
     ? childrenPageDefs.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
@@ -112,6 +116,7 @@ const EntitySelectorTreeNode = (props) => {
             nodeDef={nodeDefChild}
             nodeDefLabelType={nodeDefLabelType}
             nodeDefUuidActive={nodeDefUuidActive}
+            onlyEntities={onlyEntities}
             onlyPages={onlyPages}
             onSelect={onSelect}
           />
@@ -127,6 +132,7 @@ EntitySelectorTreeNode.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidActive: PropTypes.string,
+  onlyEntities: PropTypes.bool,
   onlyPages: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
 }
@@ -134,6 +140,7 @@ EntitySelectorTreeNode.propTypes = {
 EntitySelectorTreeNode.defaultProps = {
   nodeDefLabelType: null,
   nodeDefUuidActive: null,
+  onlyEntities: true,
 }
 
 export { EntitySelectorTreeNode }

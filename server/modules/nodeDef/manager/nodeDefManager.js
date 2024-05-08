@@ -13,6 +13,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
+import { Objects } from '@openforis/arena-core'
 
 export {
   addNodeDefsCycles,
@@ -123,6 +124,32 @@ export const insertNodeDef = async (
 
 export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 
+const _fixMetaHierarchy = ({ nodeDefsByUuid, nodeDef }) => {
+  const h = []
+  let currentNodeDef = nodeDef
+  while (currentNodeDef) {
+    const parentUuid = NodeDef.getParentUuid(currentNodeDef)
+    if (parentUuid) {
+      h.unshift(parentUuid)
+    }
+    currentNodeDef = nodeDefsByUuid[parentUuid]
+  }
+  nodeDefsByUuid[NodeDef.getUuid(nodeDef)] = NodeDef.assocMetaHierarchy(h)(nodeDef)
+}
+
+const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
+  Object.entries(nodeDefsByUuid).forEach(([nodeDefUuid, nodeDef]) => {
+    const parentUuid = NodeDef.getParentUuid(nodeDef)
+    // invalid parent UUID
+    if (parentUuid && !nodeDefsByUuid[parentUuid]) {
+      delete nodeDefsByUuid[nodeDefUuid]
+    } else if (parentUuid && NodeDef.getMetaHierarchy(nodeDef).length === 0) {
+      _fixMetaHierarchy({ nodeDefsByUuid, nodeDef })
+    }
+  })
+  return nodeDefsByUuid
+}
+
 export const fetchNodeDefsBySurveyId = async (
   {
     surveyId,
@@ -139,7 +166,9 @@ export const fetchNodeDefsBySurveyId = async (
     { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
     client
   )
-  return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+  const nodeDefsByUuid = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+
+  return _filterOutInvalidNodeDefs(nodeDefsByUuid)
 }
 
 // ======= UPDATE
@@ -153,7 +182,7 @@ const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
   ]).length > 0
 
 export const updateNodeDefProps = async (
-  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
+  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
   client = db
 ) =>
   client.tx(async (t) => {
@@ -251,9 +280,13 @@ export const updateNodeDefProps = async (
           await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
         _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
       } else {
-        // node def name changed => update node def area based estimate generated name
-        const nameUpdated = NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)
-        if (nameUpdated) {
+        // node def name or label changed => update node def area based estimate generated name or label
+        const nameOrLabelChanged =
+          (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
+          (NodeDef.propKeys.labels in props &&
+            !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef)))
+
+        if (nameOrLabelChanged) {
           const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
             { survey, nodeDef },
             t
@@ -273,7 +306,7 @@ export const updateNodeDefProps = async (
       ...Object.values(nodeDefsUpdated).map((nodeDefToUpdate) =>
         _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
       ),
-      markSurveyDraft(surveyId, t),
+      ...(markSurveyAsDraft ? [markSurveyDraft(surveyId, t)] : []),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
 

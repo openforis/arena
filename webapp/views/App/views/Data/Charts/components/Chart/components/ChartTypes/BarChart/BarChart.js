@@ -1,38 +1,35 @@
-import React, { useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
-import { renderBarChart } from './utils/render'
 import './BarChart.css'
 
-const BarChart = ({ specs, originalData }) => {
-  const chartRef = useRef()
+import React, { useEffect } from 'react'
+import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
+import { renderBarChart } from './utils/render'
+
+const BarChart = ({ specs, originalData, chartRef }) => {
   useEffect(() => {
-    if (!specs?.query?.metric || !specs?.query?.groupBy) return
+    const { query = {} } = specs ?? {}
+    const metricField = query.metric?.field
+    const groupByField = query.groupBy?.field
+    const aggregationType = query.aggregation?.type
 
-    const groupByField = specs.query.groupBy.field
+    if (Objects.isEmpty(metricField) || Objects.isEmpty(groupByField) || Objects.isEmpty(aggregationType)) return
 
     if (groupByField) {
       let data
       if (originalData?.chartResult) {
         data = originalData.chartResult.map((item) => ({
           groupBy: item[groupByField],
-          [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]: parseFloat(
-            item[`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`]
-          ),
+          [`${metricField}_${aggregationType}`]: parseFloat(item[`${metricField}_${aggregationType}`]),
         }))
       } else {
         data = []
       }
 
-      renderBarChart(
-        data,
-        specs,
-        [`${specs.query.metric.field}_${specs.query.metric.aggregate || 'sum'}`],
-        groupByField,
-        chartRef
-      )
+      renderBarChart(data, specs, [`${metricField}_${aggregationType}`], groupByField, chartRef)
     }
-  }, [specs, originalData])
+  }, [specs, originalData, chartRef])
 
   return <div className="chart-container" ref={chartRef}></div>
 }
@@ -42,10 +39,12 @@ BarChart.propTypes = {
     query: PropTypes.shape({
       metric: PropTypes.shape({
         field: PropTypes.string.isRequired,
-        aggregate: PropTypes.string,
       }).isRequired,
       groupBy: PropTypes.shape({
         field: PropTypes.string.isRequired,
+      }).isRequired,
+      aggregation: PropTypes.shape({
+        type: PropTypes.string.isRequired,
       }).isRequired,
     }).isRequired,
   }).isRequired,
@@ -56,6 +55,7 @@ BarChart.propTypes = {
       })
     ),
   }),
+  chartRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
 }
 
 export default React.memo(BarChart)

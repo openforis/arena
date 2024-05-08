@@ -1,5 +1,5 @@
 import './formHeader.scss'
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -7,8 +7,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
+import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -18,12 +19,17 @@ import {
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
+import * as API from '@webapp/service/api'
+
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import FormEntryActions from '../components/formEntryActions'
 import FormEditActions from '../components/formEditActions'
 import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
+import { FileUploadDialogActions } from '@webapp/store/ui'
 
 const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef, analysis } = props
@@ -32,12 +38,29 @@ const FormHeader = (props) => {
   const navigate = useNavigate()
   const i18n = useI18n()
 
+  const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
   const showPageNavigation = useShowPageNavigation()
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
+
+  const onLabelsImportFileSelected = useCallback(
+    async (file) => {
+      const job = await API.startImportLabelsJob({ surveyId, file })
+      dispatch(
+        JobActions.showJobMonitor({
+          job,
+          onComplete: () => {
+            dispatch(FileUploadDialogActions.close())
+            dispatch(SurveyActions.resetSurveyDefs())
+          },
+        })
+      )
+    },
+    [dispatch, surveyId]
+  )
 
   return (
     <div className="survey-form-header">
@@ -82,8 +105,35 @@ const FormHeader = (props) => {
       </div>
 
       <div className="survey-form-header__options">
-        {edit && canEditSurvey && <SurveySchemaSummaryDownloadButton />}
-
+        {edit && canEditSurvey && (
+          <ButtonMenu
+            className="btn-s btn-transparent btn-menu-advanced"
+            iconClassName="icon-cog icon-14px"
+            label="common.advancedFunctions"
+            items={[
+              {
+                key: 'schema-summary',
+                content: <SurveySchemaSummaryDownloadButton className="btn-transparent" />,
+              },
+              {
+                key: 'labels-export',
+                content: <ButtonDownload href={`/api/survey/${surveyId}/labels`} label="surveyForm.exportLabels" />,
+              },
+              {
+                key: 'labels-import',
+                content: (
+                  <OpenFileUploadDialogButton
+                    className="btn-transparent"
+                    label="surveyForm.importLabels"
+                    accept=".csv"
+                    onOk={({ files }) => onLabelsImportFileSelected(files[0])}
+                  />
+                ),
+              },
+            ]}
+            testId={TestId.surveyForm.advancedFunctionBtn}
+          />
+        )}
         <NodeDefLabelSwitch
           className="btn-s btn-transparent"
           labelType={nodeDefLabelType}

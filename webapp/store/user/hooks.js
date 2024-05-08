@@ -9,7 +9,8 @@ import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import * as API from '@webapp/service/api'
 
 import * as UserState from './state'
 
@@ -59,6 +60,7 @@ export const useAuthCanDemoteRecord = (record) => {
 export const useAuthCanDeleteAllRecords = () => useAuthCanEditSurvey()
 export const useAuthCanUpdateRecordsStep = () => Authorizer.canUpdateRecordsStep(useUser(), useSurveyInfo())
 export const useAuthCanExportRecordsList = () => Authorizer.canExportRecordsList(useUser(), useSurveyInfo())
+export const useAuthCanExportRecords = () => Authorizer.canExportRecords(useUser(), useSurveyInfo())
 
 // ====== Auth / Map
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
@@ -66,6 +68,8 @@ export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyI
 // ====== Auth / Users
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
+export const useAuthCanViewOtherUsersName = () =>
+  Authorizer.canViewOtherUsersNameInSameSurvey(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersEmail = () =>
   Authorizer.canViewOtherUsersEmail({ user: useUser(), surveyInfo: useSurveyInfo() })
 export const useAuthCanViewUsersAccessRequests = () => Authorizer.canViewUsersAccessRequests(useUser())
@@ -75,12 +79,15 @@ export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser()
 export const useProfilePicture = (userUuid, forceUpdateKey) => {
   const [profilePicture, setProfilePicture] = useState(null)
 
-  const { data = null, dispatch } = useAsyncGetRequest(`/api/user/${userUuid}/profilePicture`, {
-    responseType: 'blob',
-  })
+  const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
+    `/api/user/${userUuid}/profilePicture`,
+    {
+      responseType: 'blob',
+    }
+  )
 
   useEffect(() => {
-    dispatch()
+    fetchUserProfilePicture()
   }, [userUuid, forceUpdateKey])
 
   useEffect(() => {
@@ -90,4 +97,21 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
   }, [data])
 
   return profilePicture
+}
+
+export const useUserName = ({ userUuid, active = true }) => {
+  const [userName, setUserName] = useState(null)
+
+  const canViewUsersName = useAuthCanViewOtherUsersName()
+  const surveyId = useSurveyId()
+
+  useEffect(() => {
+    if (canViewUsersName && userUuid && active) {
+      API.fetchUserName({ userUuid, surveyId }).then((name) => {
+        setUserName(name)
+      })
+    }
+  }, [active, canViewUsersName, surveyId, userUuid])
+
+  return userName
 }

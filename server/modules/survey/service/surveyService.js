@@ -4,16 +4,17 @@ import * as SurveyManager from '../manager/surveyManager'
 
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 
-import ExportCsvDataJob from './export/exportCsvDataJob'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
 import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
 import { SchemaSummary } from './schemaSummary'
+import SurveyLabelsImportJob from './surveyLabelsImportJob'
+import { SurveyLabelsExport } from './surveyLabelsExport'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
-  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyPublishJob({ user, surveyId })
 
@@ -23,7 +24,7 @@ export const startPublishJob = (user, surveyId) => {
 }
 
 export const startUnpublishJob = (user, surveyId) => {
-  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
+  RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyUnpublishJob({ user, surveyId })
 
@@ -47,39 +48,28 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
   return JobUtils.jobToJSON(job)
 }
 
-export const startExportCsvDataJob = ({
-  surveyId,
-  cycle,
-  user,
-  includeCategories,
-  includeCategoryItemsLabels,
-  includeAnalysis,
-  includeDataFromAllCycles,
-  includeFiles,
-}) => {
-  const job = new ExportCsvDataJob({
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>
+  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream })
+
+export const exportLabels = async ({ surveyId, outputStream }) =>
+  SurveyLabelsExport.exportLabels({ surveyId, outputStream })
+
+export const deleteSurvey = async (surveyId) => {
+  RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
+
+  await SurveyManager.deleteSurvey(surveyId)
+}
+
+export const startLabelsImportJob = ({ user, surveyId, filePath }) => {
+  const job = new SurveyLabelsImportJob({
     user,
     surveyId,
-    cycle,
-    includeCategories,
-    includeCategoryItemsLabels,
-    includeAnalysis,
-    includeDataFromAllCycles,
-    includeFiles,
+    filePath,
   })
 
   JobManager.executeJobThread(job)
 
   return job
-}
-
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>
-  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream })
-
-export const deleteSurvey = async (surveyId) => {
-  RecordsUpdateThreadService.killSurveyThreads({ surveyId })
-
-  await SurveyManager.deleteSurvey(surveyId)
 }
 
 export const {

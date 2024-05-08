@@ -111,6 +111,11 @@ export const moveFilesToNewStorageIfNecessary = async ({ surveyId }, client = db
   return true
 }
 
+export const deleteFileByUuid = async ({ surveyId, fileUuid }, client = db) => {
+  await FileRepository.deleteFileByUuid(surveyId, fileUuid, client)
+  // do not delete content if not in DB: deletion out of transaction
+}
+
 export const deleteFilesByRecordUuids = async (surveyId, recordUuids, client = db) => {
   const storageType = getFileContentStorageType()
   const deleteFn = contentDeleteFunctionByStorageType[storageType]
@@ -134,8 +139,9 @@ export const {
   fetchFileSummariesBySurveyId,
   fetchFileSummaryByUuid,
   fetchFileUuidsBySurveyId,
-  fetchTotalFilesSize,
+  fetchCountAndTotalFilesSize,
   // UPDATE
   markRecordFilesAsDeleted,
   updateFileProps,
+  cleanupSurveyFilesProps,
 } = FileRepository

@@ -1,6 +1,6 @@
 import { db } from '@server/db/db'
 
-import * as camelize from 'camelize'
+import camelize from 'camelize'
 
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -8,10 +8,24 @@ import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
+import { DbOrder } from '@server/db'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
 
+const userSortBy = {
+  email: 'email',
+  name: 'name',
+  lastLoginTime: 'last_login_time',
+  status: 'status',
+}
+
+const orderByFieldBySortBy = {
+  [userSortBy.email]: 'email',
+  [userSortBy.name]: 'name',
+  [userSortBy.lastLoginTime]: 'status, last_login_time', // 'status' is used to group users that have accepted invitation, otherwise they have never logged in
+  [userSortBy.status]: 'status',
+}
 // In sql queries, user table must be surrounded by "" e.g. "user"
 
 // CREATE
@@ -74,23 +88,13 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     ON gu.user_uuid = u.uuid
     JOIN auth_group g
     ON g.uuid = gu.group_uuid
-    AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))`,
+    AND g.survey_uuid = s.uuid 
+    AND g.name <> '${AuthGroup.groupNames.systemAdmin}'`,
     [surveyId, countSystemAdmins],
     (row) => Number(row.count)
   )
 
-const _usersSelectQuery = ({ selectFields, sortBy = 'email', sortOrder = 'ASC', includeSurveys = false }) => {
-  // check sort by parameters
-  const orderByFieldBySortBy = {
-    email: 'email',
-    name: 'name',
-    last_login_time: 'status, last_login_time', // 'status' is used to group users that have accepted invitation, otherwise they have never logged in
-    status: 'status',
-  }
-  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
-  const orderByDirection = sortOrder && sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
-
-  const surveysSelect = `SELECT 
+const _userSurveysSelect = `SELECT 
   gu.user_uuid AS user_uuid,
   STRING_AGG(
       (s.props || s.props_draft) ->> 'name' || ' (' || g.name || ')', 
@@ -104,21 +108,37 @@ FROM survey s
   LEFT JOIN user_invitation ui ON ui.survey_uuid = s.uuid AND ui.user_uuid = gu.user_uuid
 GROUP BY gu.user_uuid`
 
-  return `
-    WITH us AS (
-      SELECT DISTINCT ON (us.sess #>> '{passport,user}')
-        (us.sess #>> '{passport,user}')::uuid AS user_uuid,
-        (us.expire - interval '30 days') AS last_login_time
-      FROM user_sessions us
-      WHERE us.sess #>> '{passport,user}' IS NOT NULL
-      ORDER BY us.sess #>> '{passport,user}', expire DESC
-    )
-    ${includeSurveys ? `, user_surveys AS (${surveysSelect})` : ''}
+const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
+  WITH us AS (
+    SELECT DISTINCT ON (us.sess #>> '{passport,user}')
+      (us.sess #>> '{passport,user}')::uuid AS user_uuid,
+      (us.expire - interval '30 days') AS last_login_time
+    FROM user_sessions us
+    WHERE us.sess #>> '{passport,user}' IS NOT NULL
+    ORDER BY us.sess #>> '{passport,user}', expire DESC
+  )
+  ${includeSurveys ? `, user_surveys AS (${_userSurveysSelect})` : ''}
+  `
+
+const _usersSelectQuery = ({
+  selectFields,
+  sortBy = userSortBy.email,
+  sortOrder = DbOrder.asc,
+  includeSurveys = false,
+  whereConditions = [],
+}) => {
+  // check sort by parameters
+  const orderBy = orderByFieldBySortBy[sortBy] ?? 'email'
+  const orderByDirection = DbOrder.normalize(sortOrder)
+
+  const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+
+  return `${getUsersSelectQueryPrefix({ includeSurveys })}
     SELECT ${selectFields.join(', ')}, ${
-    includeSurveys
-      ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
-      : ''
-  }
+      includeSurveys
+        ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
+        : ''
+    }
       ${DbUtils.selectDate('us.last_login_time', 'last_login_time')},
       EXISTS (
         SELECT * 
@@ -136,7 +156,8 @@ GROUP BY gu.user_uuid`
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
-    ORDER BY ${orderBy} ${orderByDirection}`
+    ${whereClause}
+    ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
 
 export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
@@ -144,7 +165,7 @@ export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', s
     `${_usersSelectQuery({ selectFields, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    { sortBy, sortOrder },
+    [],
     camelize
   )
 
@@ -157,30 +178,54 @@ export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
   await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
 
-export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, isSystemAdmin = false, client = db) =>
+export const fetchUsersBySurveyId = async (
+  { surveyId, offset = 0, limit = null, includeSystemAdmins = false },
+  client = db
+) =>
   client.map(
-    `
+    `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
         ${columnsCommaSeparated},
         (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
-        ui.invited_date
+        ui.invited_date,
+        ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
     FROM "user" u
     JOIN survey s ON s.id = $1
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-      AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroup.groupNames.systemAdmin}'))
+      AND (g.survey_uuid = s.uuid AND g.name <> '${AuthGroup.groupNames.systemAdmin}'
+      ${includeSystemAdmins ? `OR g.name = '${AuthGroup.groupNames.systemAdmin}'` : ''})
     LEFT OUTER JOIN user_invitation ui
       ON u.uuid = ui.user_uuid
       AND s.uuid = ui.survey_uuid
       AND ui.removed_date is null
-    GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date
+    LEFT OUTER JOIN us
+      ON us.user_uuid = u.uuid
+    GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date, us.last_login_time
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [surveyId, isSystemAdmin],
+    [surveyId],
     camelize
   )
+
+export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, client = db) => {
+  const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.current}}'`
+
+  return client.map(
+    `SELECT uuid 
+    FROM "user" u 
+      JOIN user_sessions us
+      ON (us.sess #>> '{passport,user}')::uuid = u.uuid
+    WHERE prefs #>> ${surveyCurrentJsonbPath} = $1 
+      -- fetch users with active sessions (interactions in the last hour)
+      AND (us.expire - INTERVAL '30 days - 1 hour') > NOW() at time zone 'utc'
+    GROUP BY uuid`,
+    [surveyId],
+    (row) => row.uuid
+  )
+}
 
 export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   client.one(
@@ -193,7 +238,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   )
 
 export const fetchUserByUuid = async (uuid, client = db) =>
-  client.one(
+  client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
@@ -230,6 +275,31 @@ export const fetchUserProfilePicture = async (uuid, client = db) =>
     WHERE uuid = $1`,
     [uuid],
     (row) => row.profile_picture
+  )
+
+export const expiredInvitationWhereCondition = `
+  u.password IS NULL 
+  AND u.status = '${User.userStatus.INVITED}'
+  AND NOT EXISTS (
+    SELECT * 
+    FROM user_invitation ui
+    WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
+  )
+  AND NOT EXISTS (
+    SELECT * 
+    FROM user_access_request uar
+    WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 MONTH'
+  )`
+
+export const fetchUsersWithExpiredInvitation = (client = db) =>
+  client.map(
+    `
+    SELECT ${columnsCommaSeparated}
+    FROM "user" u
+    WHERE ${expiredInvitationWhereCondition}
+    RETURNING ${columnsCommaSeparated}`,
+    [],
+    camelize
   )
 
 export const fetchSystemAdministratorsEmail = async (client = db) =>
@@ -348,3 +418,13 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
     [cycleKeysDeleted]
   )
 }
+
+export const deleteUsersWithExpiredInvitation = (client = db) =>
+  client.any(
+    `
+    DELETE FROM "user" u
+    WHERE ${expiredInvitationWhereCondition}
+    RETURNING ${columnsCommaSeparated}`,
+    [],
+    camelize
+  )

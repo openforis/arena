@@ -11,6 +11,14 @@ import * as Validation from '@core/validation/validation'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
+const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
+  const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
+  if (emptyRootKeyValueIndex >= 0) {
+    const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
+    throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissing, { keyName })
+  }
+}
+
 const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx }) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
 
@@ -25,12 +33,9 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
     })
   )
 
-  // check root keys are not empty
-  if (rootKeyValuesFormatted.some(Objects.isEmpty)) {
-    throw new SystemError(Validation.messageKeys.dataImport.recordKeysMissing)
-  }
+  checkRootKeysSpecified({ rootKeyDefs, rootKeyValuesFormatted })
 
-  const recordSummary = recordsSummary.find((record) =>
+  const recordSummariesMatchingKeys = recordsSummary.filter((record) =>
     rootKeyDefs.every((rootKeyDef) => {
       const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
       const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
@@ -44,18 +49,18 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
     })
   )
 
-  const keyNameValuesPairs = rootKeyDefs
+  const keyNameValuePairs = rootKeyDefs
     .map((keyDef, index) => {
       const name = NodeDef.getName(keyDef)
       const value = rootKeyValuesFormatted[index]
       return `${name}=${value}`
     })
-    .join(',')
+    .join(', ')
 
   if (insertNewRecords) {
     // check if record with the same key values already exists
-    if (recordSummary) {
-      throw new SystemError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues: keyNameValuesPairs })
+    if (recordSummariesMatchingKeys.length === 1) {
+      throw new SystemError(Validation.messageKeys.dataImport.recordAlreadyExisting, { keyValues: keyNameValuePairs })
     }
     const recordToInsert = Record.newRecord(user, cycle)
     let record = null
@@ -79,13 +84,19 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
 
   // insertNewRecords === false : updating existing record
 
+  if (recordSummariesMatchingKeys.length > 1) {
+    throw new SystemError(Validation.messageKeys.dataImport.multipleRecordsMatchingKeys, {
+      keyValues: keyNameValuePairs,
+    })
+  }
+  const recordSummary = recordSummariesMatchingKeys[0]
   if (!recordSummary) {
-    throw new SystemError(Validation.messageKeys.dataImport.recordNotFound, { keyValues: keyNameValuesPairs })
+    throw new SystemError(Validation.messageKeys.dataImport.recordNotFound, { keyValues: keyNameValuePairs })
   }
 
   if (!updateRecordsInAnalysis && Record.isInAnalysisStep(recordSummary)) {
     throw new SystemError(Validation.messageKeys.dataImport.recordInAnalysisStepCannotBeUpdated, {
-      keyValues: keyNameValuesPairs,
+      keyValues: keyNameValuePairs,
     })
   }
 

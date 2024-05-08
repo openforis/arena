@@ -58,9 +58,11 @@ export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity
 }
 
 export const insertNode = async (
-  { user, survey, record, node, system, persistNodes = true, createMultipleEntities = true },
+  { user, survey, record, node, system, timezoneOffset, persistNodes = true, createMultipleEntities = true },
   t
 ) => {
+  node[Node.keys.created] = true // mark node as created (flag used by RDB manager to update data tables)
+
   const surveyId = Survey.getId(survey)
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -85,6 +87,7 @@ export const insertNode = async (
       record,
       parentNode: node,
       nodeDef,
+      timezoneOffset,
       createMultipleEntities,
     })
     Object.assign(nodesCreated, descendantsCreateResult.nodes)

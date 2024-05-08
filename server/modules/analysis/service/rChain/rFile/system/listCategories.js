@@ -1,8 +1,9 @@
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+
 import * as ApiRoutes from '@common/apiRoutes'
 
-import { arenaGet, dfVar, setVar } from '../../rFunctions'
+import { arenaGetCSV, dfVar, setVar } from '../../rFunctions'
 
 export default class ListCategories {
   constructor(rChain) {
@@ -31,15 +32,13 @@ export default class ListCategories {
   }
 
   initCategory(category) {
-    const { survey } = this.rChain
-    const language = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+    const { chainUuid, surveyId } = this.rChain
+
     const categoryUuid = Category.getUuid(category)
 
     // get category items
     const dfCategoryItems = this.getDfCategoryItems(category)
-    const getCategoryItems = arenaGet(ApiRoutes.rChain.categoryItemsData(Survey.getId(survey), categoryUuid), {
-      language: `'${language}'`,
-    })
+    const getCategoryItems = arenaGetCSV(ApiRoutes.rChain.categoryItemsCsv({ surveyId, chainUuid, categoryUuid }))
 
     this.scripts.push(setVar(dfCategoryItems, getCategoryItems))
   }

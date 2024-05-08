@@ -19,9 +19,10 @@ import * as CategoryManager from '../manager/categoryManager'
 import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
+import { CategoryValidationJob } from './CategoryValidationJob'
 
-export default class CategoryImportJob extends Job {
-  constructor(params, type = CategoryImportJob.type) {
+export class CategoryImportInternalJob extends Job {
+  constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)
 
     this.survey = null
@@ -36,7 +37,8 @@ export default class CategoryImportJob extends Job {
   async onStart() {
     await super.onStart()
 
-    this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
+    this.survey =
+      this.contextSurvey ?? (await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx))
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
@@ -88,16 +90,8 @@ export default class CategoryImportJob extends Job {
 
   async beforeSuccess() {
     await super.beforeSuccess()
-
-    // Validate category
-    this.logDebug('category validation start')
-    this.category = await CategoryManager.validateCategory(
-      { survey: this.survey, categoryUuid: Category.getUuid(this.category) },
-      this.tx
-    )
-    this.logDebug('category validation end')
-
-    this.setResult({
+    this.setContext({
+      survey: this.survey,
       category: this.category,
     })
   }
@@ -119,6 +113,7 @@ export default class CategoryImportJob extends Job {
         const itemKey = CategoryImportSummary.getItemKey(item)
         accExtraDef[itemKey] = ExtraPropDef.newItem({
           dataType: CategoryImportSummary.getItemDataType(item),
+          index: Object.values(accExtraDef).length,
         })
       }
       return accExtraDef
@@ -132,23 +127,23 @@ export default class CategoryImportJob extends Job {
   // End of methods that can be overridden by subclasses
 
   async _fetchOrCreateCategory() {
+    const { surveyId, user, tx } = this
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
       return CategoryManager.fetchCategoryAndLevelsByUuid(
         {
-          surveyId: this.surveyId,
+          surveyId,
           categoryUuid,
           draft: true,
           includeValidation: false,
         },
-        this.tx
+        tx
       )
     }
-
     const category = Category.newCategory({
       [Category.keysProps.name]: CategoryImportJobParams.getCategoryName(this.params),
     })
-    return CategoryManager.insertCategory({ user: this.user, surveyId: this.surveyId, category, system: true }, this.tx)
+    return CategoryManager.insertCategory({ user, surveyId, category, system: true }, tx)
   }
 
   async _importLevels() {
@@ -279,7 +274,6 @@ export default class CategoryImportJob extends Job {
           reader.cancel()
           return
         }
-
         await this._onRow(itemRow)
       },
       onTotalChange: (total) => {
@@ -320,7 +314,6 @@ export default class CategoryImportJob extends Job {
         }
       }
     }
-
     this.incrementProcessedItems()
   }
 
@@ -367,6 +360,21 @@ export default class CategoryImportJob extends Job {
     this.addError({
       error: Validation.newInstance(false, {}, [{ key, params }]),
     })
+  }
+}
+
+export default class CategoryImportJob extends Job {
+  constructor(params, type = CategoryImportJob.type, internalJobConstructor = CategoryImportInternalJob) {
+    super(type, params, [new internalJobConstructor(params), new CategoryValidationJob(params)])
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    const { category } = this.context
+    return {
+      ...result,
+      category,
+    }
   }
 }
 

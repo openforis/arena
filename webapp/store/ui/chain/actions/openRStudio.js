@@ -59,7 +59,7 @@ const _getRStudioCode = ({
   `
 }
 
-const _copyRStudioCode = ({ rStudioCode }) => copyToClipboard(rStudioCode)
+const _copyRStudioCode = async ({ rStudioCode }) => copyToClipboard(rStudioCode)
 
 const isInstanceRunning = async () => {
   const currentInstance = await API.getCurrentInstance()
@@ -104,7 +104,7 @@ export const openRStudio =
 
     const hadInstance = !isLocal && (await isInstanceRunning())
 
-    const { data } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
+    const { data } = await axios.post(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
 
     const { token, serverUrl } = data
 
@@ -117,8 +117,8 @@ export const openRStudio =
       DialogConfirmActions.showDialogConfirm({
         key: isLocal ? 'chainView.copyRStudioCodeLocal' : 'chainView.copyRStudioCode',
         params: { rStudioCode },
-        onOk: () => {
-          _copyRStudioCode({ rStudioCode })
+        onOk: async () => {
+          await _copyRStudioCode({ rStudioCode })
           if (!isLocal) {
             window.open(rStudioUrl, 'rstudio')
           }

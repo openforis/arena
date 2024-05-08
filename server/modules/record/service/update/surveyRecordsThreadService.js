@@ -1,7 +1,6 @@
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import ThreadManager from '@server/threads/threadManager'
-import * as ThreadParams from '@server/threads/threadParams'
 
 import { RecordsUpdateThreadMessageTypes } from './thread/recordsThreadMessageTypes'
 import { SurveyRecordsThreadMap } from './surveyRecordsThreadMap'
@@ -18,13 +17,9 @@ const threadTimeouts = {}
 // ======
 
 // ====== CREATE
-const _createThread = ({ surveyId, cycle, draft }) => {
-  const threadData = {
-    [ThreadParams.keys.surveyId]: surveyId,
-    [ThreadParams.keys.draft]: draft,
-    [ThreadParams.keys.cycle]: cycle,
-  }
-  const threadKey = getThreadKey({ surveyId, cycle, draft })
+const _createThread = () => {
+  const threadData = {}
+  const threadKey = getThreadKey()
 
   const handleMessageFromThread = (msg) => {
     const { type, content } = msg
@@ -61,14 +56,19 @@ const _killThreadByKey = (threadKey) => {
   }
 }
 
-const killThread = ({ surveyId, cycle, draft }) => {
-  const threadKey = getThreadKey({ surveyId, cycle, draft })
+const killThread = () => {
+  const threadKey = getThreadKey()
   _killThreadByKey(threadKey)
 }
 
-const killSurveyThreads = ({ surveyId }) => {
-  const threadKeys = SurveyRecordsThreadMap.getThreadsKeysBySurveyId({ surveyId })
-  threadKeys.forEach(_killThreadByKey)
+const clearSurveyDataFromThread = ({ surveyId, cycle = null, draft = false }) => {
+  const thread = getThread()
+  thread?.postMessage({ type: RecordsUpdateThreadMessageTypes.surveyClear, surveyId, cycle, draft })
+}
+
+const clearRecordDataFromThread = ({ surveyId, cycle, draft, recordUuid }) => {
+  const thread = getThread()
+  thread?.postMessage({ type: RecordsUpdateThreadMessageTypes.recordClear, surveyId, cycle, draft, recordUuid })
 }
 
 // ====== READ
@@ -80,8 +80,8 @@ const _resetThreadInactivityTimeout = (threadKey) => {
   threadTimeouts[threadKey] = setTimeout(_killThreadByKey.bind(null, threadKey), inactivityPeriod)
 }
 
-const getThread = ({ surveyId, cycle, draft = false }) => {
-  const threadKey = getThreadKey({ surveyId, cycle, draft })
+const getThread = () => {
+  const threadKey = getThreadKey()
   if (SurveyRecordsThreadMap.isZombie(threadKey)) {
     SurveyRecordsThreadMap.reviveZombie(threadKey)
   }
@@ -92,11 +92,11 @@ const getThread = ({ surveyId, cycle, draft = false }) => {
   return thread
 }
 
-const getOrCreatedThread = ({ surveyId, cycle, draft = false }) => {
-  let thread = getThread({ surveyId, cycle, draft })
+const getOrCreatedThread = () => {
+  let thread = getThread()
   if (!thread) {
-    thread = _createThread({ surveyId, cycle, draft })
-    const threadKey = getThreadKey({ surveyId, cycle, draft })
+    thread = _createThread()
+    const threadKey = getThreadKey()
     _resetThreadInactivityTimeout(threadKey)
   }
   return thread
@@ -134,7 +134,8 @@ export const RecordsUpdateThreadService = {
   getOrCreatedThread,
   getThread,
   killThread,
-  killSurveyThreads,
+  clearSurveyDataFromThread,
+  clearRecordDataFromThread,
   // sockets
   assocSocket,
   notifyRecordDeleteToSockets,

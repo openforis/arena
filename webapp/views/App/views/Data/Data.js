@@ -19,7 +19,7 @@ import ValidationReport from './ValidationReport'
 import Records from './Records'
 import Explorer from './Explorer'
 import Charts from './Charts'
-import ExportData from './ExportData'
+import DataExport from './DataExport'
 import DataImport from './DataImport'
 import { MapView } from './MapView'
 
@@ -83,7 +83,7 @@ const Data = () => {
           ...(Authorizer.canExportRecords(user, surveyInfo)
             ? [
                 {
-                  component: ExportData,
+                  component: DataExport,
                   path: dataModules.export.path,
                 },
               ]

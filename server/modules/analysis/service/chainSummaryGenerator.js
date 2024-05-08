@@ -11,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ChainManager from '../manager'
 import { Objects } from '@openforis/arena-core'
+import { ArrayUtils } from '@core/arrayUtils'
 
 const getCycleLabel = (cycleKey) => `${Number(cycleKey) + 1}`
 
@@ -96,16 +97,20 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
     return codeAttributeAncestorNames
   }
 
+  const categoryAttributeAncestors = codeAttributes2ndLevel.map((nodeDef) => ({
+    attribute: NodeDef.getName(nodeDef),
+    categoryName: getCategoryNameByUuid({
+      survey,
+      categoryUuid: NodeDef.getCategoryUuid(nodeDef),
+    }),
+    categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
+    ancestors: getCodeAttributeAncestorNames(nodeDef),
+  }))
+
+  ArrayUtils.sortByProps(['categoryName', 'categoryLevel'])(categoryAttributeAncestors)
+
   return {
-    categoryAttributeAncestors: codeAttributes2ndLevel.map((nodeDef) => ({
-      attribute: NodeDef.getName(nodeDef),
-      categoryName: getCategoryNameByUuid({
-        survey,
-        categoryUuid: NodeDef.getCategoryUuid(nodeDef),
-      }),
-      categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
-      ancestors: getCodeAttributeAncestorNames(nodeDef),
-    })),
+    categoryAttributeAncestors,
   }
 }
 
@@ -141,6 +146,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   // const postStratificationAttributeDef = getNodeDefByUuid(
   //   ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
   // )
+  const firstPhaseCommonAttributeDef = getNodeDefByUuid(
+    ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(chainSamplingDesign)
+  )
   const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
@@ -160,6 +168,7 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   return {
     ...surveySummary,
     label: Chain.getLabel(lang, defaultLang)(chain),
+    selectedLanguage: lang,
     selectedCycle: getCycleLabel(cycle),
     cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.hasSamplingDesign(chain),
@@ -168,6 +177,17 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
       ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
+      : {}),
+    ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
+      ? {
+          phase1Category: getCategoryNameByUuid({
+            survey,
+            categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
+          }),
+        }
+      : {}),
+    ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
       ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank

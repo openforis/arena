@@ -104,4 +104,16 @@ export const {
 } = UserPrefs
 
 // PROPS
-export const { getTitle, getMapApiKey, assocTitle, assocMapApiKey, titleKeys, newProps, dissocPrivateProps } = UserProps
+export const {
+  getTitle,
+  getMapApiKey,
+  getMaxSurveys,
+  assocTitle,
+  assocMapApiKey,
+  assocMaxSurveys,
+  titleKeys,
+  titleKeysArray,
+  newProps,
+  dissocPrivateProps,
+  dissocRestrictedProps,
+} = UserProps

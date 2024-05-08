@@ -18,9 +18,15 @@
     font-size: 11px !important;
   }
 
-  .node_def__icon {
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0;
+  .node-def__icon-wrapper {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+
+    .node_def__icon {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
   }
 }

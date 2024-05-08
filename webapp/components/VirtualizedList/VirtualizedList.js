@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { debounce } from '@core/functionsDefer'
+import { uuidv4 } from '@core/uuid'
 
 import { LoadingBar } from '@webapp/components'
 
@@ -145,7 +146,11 @@ VirtualizedList.propTypes = {
 VirtualizedList.defaultProps = {
   className: null,
   overscanRowCount: 10,
-  placeholderRenderer: () => <div className="item-placeholder">...</div>,
+  placeholderRenderer: () => (
+    <div key={uuidv4()} className="item-placeholder">
+      ...
+    </div>
+  ),
   showScrollingPlaceholders: true,
   virtualizationThreshold: 300,
 }

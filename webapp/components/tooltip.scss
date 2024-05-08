@@ -1,4 +1,4 @@
-@import "~@webapp/style/vars";
+@import '~@webapp/style/vars';
 
 .tooltip {
   &:hover {
@@ -12,9 +12,9 @@
 .tooltip__message {
   background-color: $yellow;
   padding: 1rem;
-  opacity: .97;
+  opacity: 0.97;
   font-weight: 600;
-  font-size: .85rem;
+  font-size: 0.85rem;
   color: black;
   visibility: visible;
   position: fixed;
@@ -24,13 +24,25 @@
   z-index: $zIndex20Dropdown;
 
   &:after {
-    content: "";
+    content: '';
     position: absolute;
-    bottom: 100%;
     left: 1rem;
-    margin-left: -.5rem;
-    border: .5rem solid;
-    border-color: transparent transparent $yellow transparent;
+    margin-left: -0.5rem;
+    border: 0.5rem solid;
+  }
+
+  &.bottom {
+    &:after {
+      bottom: 100%;
+      border-color: transparent transparent $yellow transparent;
+    }
+  }
+
+  &.top {
+    &:after {
+      top: 100%;
+      border-color: $yellow transparent transparent transparent;
+    }
   }
 }
 
@@ -38,13 +50,16 @@
   @extend .tooltip;
 
   .form-input {
-    border-bottom: 2px solid rgba($red, .6);
+    border-bottom: 2px solid rgba($red, 0.6);
   }
 
   .btn-checkbox .icon {
     border: 2px solid rgba($red, 0.6);
   }
 
+  .MuiTextField-root fieldset {
+    border: 1px solid red;
+  }
 }
 
 .tooltip__message-error,
@@ -54,7 +69,7 @@
 
   color: white;
   border: 1px solid;
-  opacity: .97;
+  opacity: 0.97;
 
   &:after {
     border-color: transparent;
@@ -65,8 +80,11 @@
   background-color: $red;
   border-color: $red;
 
-  &:after {
+  &.bottom:after {
     border-bottom-color: $red;
+  }
+  &.top:after {
+    border-top-color: $red;
   }
 }
 
@@ -74,8 +92,11 @@
   background-color: $orange;
   border-color: $orange;
 
-  &:after {
+  &.bottom:after {
     border-bottom-color: $orange;
+  }
+  &.top:after {
+    border-top-color: $orange;
   }
 }
 
@@ -83,7 +104,10 @@
   background-color: $greyAppBg;
   border-color: $greyAppBg;
 
-  &:after {
+  &.bottom:after {
     border-bottom-color: $greyAppBg;
+  }
+  &.top:after {
+    border-top-color: $greyAppBg;
   }
 }
