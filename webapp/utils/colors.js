@@ -15,7 +15,11 @@ const getHighContrastTextColor = (hexColor) => {
 }
 
 const lightenColor = (hexColor, percent) => {
-  const limitFrom0To255 = (value) => (value < 255 ? (value < 1 ? 0 : value) : 255)
+  const limitFrom0To255 = (value) => {
+    if (value >= 255) return 255
+    if (value < 1) return 0
+    return value
+  }
 
   const num = parseInt(Strings.removePrefix('#')(hexColor), 16)
   const amt = Math.round(2.55 * percent)
