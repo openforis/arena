@@ -35,9 +35,25 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
+const nodeKeyByColumnName = {
+  date_created: Node.keys.dateCreated,
+  date_modified: Node.keys.dateModified,
+  node_def_uuid: Node.keys.nodeDefUuid,
+  parent_uuid: Node.keys.parentUuid,
+  record_uuid: Node.keys.recordUuid,
+  survey_uuid: Node.keys.surveyUuid,
+}
+
 const dbTransformCallback = (node) => {
-  // do not camelize meta properties
-  A.camelizePartial({ skip: [Node.keys.meta], sideEffect: true })(node)
+  // camelize keys
+  // avoid using "camelize"; too slow when running on thousands of objects
+  // (do not camelize meta properties)
+  Object.entries(nodeKeyByColumnName).forEach(([columnName, key]) => {
+    if (Object.hasOwn(node, columnName)) {
+      node[key] = node[columnName]
+      delete node[columnName]
+    }
+  })
   // cast id to Number
   node.id = Number(node.id)
   return node
