@@ -342,7 +342,7 @@ const _getSearchQueryParam = ({ searchValue }) =>
   `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
 export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null },
+  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = 5000 },
   client = db
 ) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
@@ -356,8 +356,8 @@ export const fetchItemsByParentUuid = async (
       AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
       ${searchValueCondition}
     ORDER BY i.id
-    LIMIT 1000`,
-    { categoryUuid, search },
+    LIMIT $/limit/`,
+    { categoryUuid, search, limit },
     (def) => dbTransformCallback(def, draft, true)
   )
 
