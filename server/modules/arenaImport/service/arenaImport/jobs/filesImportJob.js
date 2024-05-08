@@ -139,6 +139,9 @@ export default class FilesImportJob extends Job {
   async deleteOrphanFiles() {
     const { context, tx } = this
     const { dryRun, filesToDeleteByUuid, updatedFilesByUuid, surveyId } = context
+
+    if (Objects.isEmpty(filesToDeleteByUuid)) return
+
     const filesToDeleteArray = Object.values(filesToDeleteByUuid)
     for await (const file of filesToDeleteArray) {
       const fileUuid = RecordFile.getUuid(file)
