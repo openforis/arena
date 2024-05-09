@@ -35,9 +35,19 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
+// cache of camelized keys
+const nodeKeyByColumnName = {}
+
 const dbTransformCallback = (node) => {
-  // do not camelize meta properties
-  A.camelizePartial({ skip: [Node.keys.meta], sideEffect: true })(node)
+  // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
+  // (do not camelize meta properties)
+  Object.entries(node).forEach(([columnName, value]) => {
+    const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
+    if (nodeKey !== columnName) {
+      node[nodeKey] = value
+      delete node[columnName]
+    }
+  })
   // cast id to Number
   node.id = Number(node.id)
   return node
