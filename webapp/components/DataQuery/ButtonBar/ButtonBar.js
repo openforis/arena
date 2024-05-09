@@ -44,7 +44,6 @@ const ButtonBar = (props) => {
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
-  const modeAggregate = Query.isModeAggregate(query)
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
@@ -106,9 +105,7 @@ const ButtonBar = (props) => {
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 
-      {modeAggregate && (
-        <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
-      )}
+      <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
     </div>
   )
 }

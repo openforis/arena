@@ -692,11 +692,16 @@ Are you sure you want to continue?`,
     charts: {
       warning: {
         selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
-        tooManyItemsToShowChart: `Too many items to show the chart; expecting maximum {{maxItems}} items`,
+        selectAtLeast2NumericAttributes: 'Please select 2 numeric attributes to show the chart',
+        tooManyItemsToShowChart: `Too many items to show the chart;
+expecting maximum {{maxItems}} items.
+Please refine your query (e.g. adding a filter) to reduce the number of items.
+`,
       },
       type: {
         bar: 'Bar chart',
         pie: 'Pie chart',
+        scatter: 'Scatter chart',
       },
     },
     dataQuery: {

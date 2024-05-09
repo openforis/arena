@@ -6,10 +6,12 @@ import { useI18n } from '@webapp/store/system'
 
 import { DataQueryBarChart } from './DataQueryBarChart'
 import { DataQueryPieChart } from './DataQueryPieChart'
+import { DataQueryScatterChart } from './DataQueryScatterChart'
 
 const componentsByType = {
   [DataExplorerState.chartTypes.bar]: DataQueryBarChart,
   [DataExplorerState.chartTypes.pie]: DataQueryPieChart,
+  [DataExplorerState.chartTypes.scatter]: DataQueryScatterChart,
 }
 
 export const DataQueryChart = (props) => {
