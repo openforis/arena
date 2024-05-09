@@ -68,7 +68,9 @@ const EntitySelectorTreeNode = (props) => {
   const childrenPageDefs = onlyPages
     ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
     : Survey.getNodeDefDescendantsInSingleEntities({
+        cycle,
         nodeDef,
+        sorted: true,
         filterFn: onlyEntities ? NodeDef.isMultipleEntity : NodeDef.isMultiple,
       })(survey)
 
