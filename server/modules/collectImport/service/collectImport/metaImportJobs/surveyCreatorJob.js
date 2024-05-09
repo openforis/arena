@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as StringUtils from '@core/stringUtils'
 import * as Survey from '../../../../../../core/survey/survey'
 import * as Srs from '../../../../../../core/geo/srs'
 import * as User from '../../../../../../core/user/user'
@@ -80,7 +81,9 @@ export default class SurveyCreatorJob extends Job {
     )
     const srsCodes = srsElements.map((srsEl) => {
       const srsId = CollectSurvey.getAttribute('srid')(srsEl)
-      return srsId.startsWith(SRS_ID_PREFIX) ? srsId.substring(SRS_ID_PREFIX.length) : srsId
+      const srsIdCleaned = StringUtils.removePrefix(SRS_ID_PREFIX)(srsId)
+      // fix old lat long SRS code used in Collect (EPSG:WGS84 instead of EPSG:4326)
+      return srsIdCleaned === 'WGS84' ? '4326' : srsIdCleaned
     })
     const srss = await SrsManager.fetchSRSsByCodes({ srsCodes }, this.tx)
     return srss.map(R.omit([Srs.keys.wkt]))
