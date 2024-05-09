@@ -134,7 +134,7 @@ export const getIconByType = getPropByType('icon')
 
 export const getIconByNodeDef = (nodeDef) => (
   <div className="node-def__icon-wrapper">
-    {NodeDef.isMultiple(nodeDef) && <span title="Multiple">M</span>}
+    {NodeDef.isMultipleAttribute(nodeDef) && <span title="Multiple">M</span>}
     {getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )

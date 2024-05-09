@@ -8,7 +8,7 @@ import { useColumn } from './store'
 import { Objects } from '@openforis/arena-core'
 
 const getColValue = ({ nodeDef, col, row, i18n }) => {
-  const value = Object.prototype.hasOwnProperty.call(row, col) ? row[col] : null
+  const value = Object.hasOwn(row, col) ? row[col] : null
   if (Objects.isEmpty(value)) return ''
   const values = Array.isArray(value) ? value : [value]
   return values

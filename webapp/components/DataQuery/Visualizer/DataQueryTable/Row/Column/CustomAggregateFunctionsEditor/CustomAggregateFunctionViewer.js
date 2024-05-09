@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import Checkbox from '@webapp/components/form/checkbox'
 import { ButtonIconEdit } from '@webapp/components'
@@ -15,4 +16,11 @@ export const CustomAggregateFunctionViewer = (props) => {
       <ButtonIconEdit onClick={() => setEditedUuid(uuid)} />
     </>
   )
+}
+
+CustomAggregateFunctionViewer.propTypes = {
+  fn: PropTypes.object.isRequired,
+  selected: PropTypes.bool.isRequired,
+  onSelectionChange: PropTypes.func.isRequired,
+  setEditedUuid: PropTypes.func.isRequired,
 }

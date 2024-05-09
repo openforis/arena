@@ -4,6 +4,7 @@ const lightColors = {
   aqua: '#00ffff',
   azure: '#f0ffff',
   beige: '#f5f5dc',
+  gold: '#ffd700',
   khaki: '#f0e68c',
   lightblue: '#add8e6',
   lightcyan: '#e0ffff',
@@ -11,7 +12,9 @@ const lightColors = {
   lightgrey: '#d3d3d3',
   lightpink: '#ffb6c1',
   lightyellow: '#ffffe0',
+  silver: '#c0c0c0',
   white: '#ffffff',
+  yellow: '#ffff00',
 }
 
 const darkColors = {
@@ -31,7 +34,6 @@ const darkColors = {
   darksalmon: '#e9967a',
   darkviolet: '#9400d3',
   fuchsia: '#ff00ff',
-  gold: '#ffd700',
   green: '#008000',
   indigo: '#4b0082',
   lime: '#00ff00',
@@ -42,8 +44,6 @@ const darkColors = {
   pink: '#ffc0cb',
   purple: '#800080',
   red: '#ff0000',
-  silver: '#c0c0c0',
-  yellow: '#ffff00',
 }
 
 const possibleColors = {

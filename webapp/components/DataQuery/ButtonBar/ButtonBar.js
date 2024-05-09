@@ -21,10 +21,20 @@ import { DataQueryExportModal } from '../DataQueryExportModal'
 import { State, useButtonBar } from './store'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
-import ButtonShowQueries from './ButtonShowQueries'
+import ButtonManageQueries from './ButtonManageQueries'
+import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
 
 const ButtonBar = (props) => {
-  const { dataEmpty, dataLoaded, dataLoading, nodeDefLabelType, onNodeDefLabelTypeChange } = props
+  const {
+    dataCount,
+    dataEmpty,
+    dataLoaded,
+    dataLoading,
+    nodeDefLabelType,
+    onNodeDefLabelTypeChange,
+    setQueryLimit,
+    setQueryOffset,
+  } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -34,6 +44,7 @@ const ButtonBar = (props) => {
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
+  const modeAggregate = Query.isModeAggregate(query)
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
@@ -93,17 +104,24 @@ const ButtonBar = (props) => {
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
 
-      <ButtonShowQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+      <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+
+      {modeAggregate && (
+        <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
+      )}
     </div>
   )
 }
 
 ButtonBar.propTypes = {
+  dataCount: PropTypes.number,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
+  setQueryLimit: PropTypes.func.isRequired,
+  setQueryOffset: PropTypes.func.isRequired,
 }
 
 export default ButtonBar

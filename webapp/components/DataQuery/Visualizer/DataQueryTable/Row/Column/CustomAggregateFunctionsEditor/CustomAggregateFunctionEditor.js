@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import { AggregateFunction } from '@core/survey/aggregateFunction'
 import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
@@ -86,4 +87,13 @@ export const CustomAggregateFunctionEditor = (props) => {
       </div>
     </div>
   )
+}
+
+CustomAggregateFunctionEditor.propTypes = {
+  aggregateFunction: PropTypes.object.isRequired,
+  entityDef: PropTypes.object.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
 }

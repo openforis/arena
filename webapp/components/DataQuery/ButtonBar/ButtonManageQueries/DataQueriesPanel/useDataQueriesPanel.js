@@ -75,19 +75,22 @@ export const useDataQueriesPanel = () => {
   }, [selectedQuerySummaryUuid, surveyId])
 
   const fetchAndSetEditedQuerySummary = useCallback(
-    async ({ querySummaryUuid }) => {
+    async ({ querySummaryUuid, updateQuery = false }) => {
       const querySummaryFetched = await API.fetchDataQuerySummary({ surveyId, querySummaryUuid })
       setState((statePrev) => ({
         ...statePrev,
         fetchedQuerySummary: querySummaryFetched,
         editedQuerySummary: querySummaryFetched,
       }))
-      const fetchedQuery = DataQuerySummaries.getContent(querySummaryFetched)
-      onChangeQuery(fetchedQuery)
+      if (updateQuery) {
+        const fetchedQuery = DataQuerySummaries.getContent(querySummaryFetched)
+        onChangeQuery(fetchedQuery)
+      }
     },
     [onChangeQuery, surveyId]
   )
 
+  // on load, fetch queries and set selected query in form (if any)
   useEffect(() => {
     if (selectedQuerySummaryUuid) {
       fetchAndSetEditedQuerySummary({ querySummaryUuid: selectedQuerySummaryUuid })
@@ -160,7 +163,7 @@ export const useDataQueriesPanel = () => {
     async (selectedQuerySummary) => {
       const querySummaryUuid = DataQuerySummaries.getUuid(selectedQuerySummary)
       dispatch(DataExplorerActions.setSelectedQuerySummaryUuid(querySummaryUuid))
-      await fetchAndSetEditedQuerySummary({ querySummaryUuid })
+      await fetchAndSetEditedQuerySummary({ querySummaryUuid, updateQuery: true })
     },
     [dispatch, fetchAndSetEditedQuerySummary]
   )

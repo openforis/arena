@@ -28,6 +28,7 @@ const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, di
             onChange(value)
           }}
           label={item.label}
+          title={item.title}
           testId={groupName ? `${groupName}_${item.key}` : null}
         />
       )

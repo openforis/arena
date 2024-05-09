@@ -50,7 +50,7 @@ export const useListenOnNodeUpdates = ({ data, query, setData }) => {
   const modeEdit = Query.isModeRawEdit(query)
 
   // listening to websocket events when data is loaded in edit mode and rows have record property
-  const listeningToWebSocket = modeEdit && data?.length > 0 && Object.prototype.hasOwnProperty.call(data[0], 'record')
+  const listeningToWebSocket = modeEdit && data?.length > 0 && Object.hasOwn(data[0], 'record')
 
   const onNodesUpdate = useCallback(({ updatedNodes }) => {
     dataClone.current = updateValues({ data: dataClone.current, nodes: updatedNodes })

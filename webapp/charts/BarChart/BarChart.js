@@ -13,15 +13,16 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-const barFill = '#3885ca'
-const activeBarFill = 'green'
+import { Colors } from '@webapp/utils/colors'
+
+const defaultBarFill = '#3885ca'
 const activeBarStroke = '#3885ca'
 const maxBarSize = 30
 const tickMaxChars = 20
 const verticalLayoutYAxisWidth = 150
 
 export const BarChart = (props) => {
-  const { data, dataKey, labelDataKey, layout, showLegend } = props
+  const { data, dataColors, dataKeys, labelDataKey, layout, showLegend } = props
 
   const tickFormatter = useCallback((value) => {
     if (value.length < tickMaxChars) return value
@@ -52,13 +53,19 @@ export const BarChart = (props) => {
         )}
         <Tooltip cursor={{ fill: 'transparent' }} />
         {showLegend && <Legend />}
-        <Bar
-          dataKey={dataKey}
-          fill={barFill}
-          maxBarSize={maxBarSize}
-          stackId="a"
-          activeBar={<Rectangle fill={activeBarFill} stroke={activeBarStroke} />}
-        />
+        {dataKeys.map((dataKey, index) => {
+          const barFill = dataColors[index] ?? defaultBarFill
+          const activeBarFill = Colors.lightenColor(barFill, 10)
+          return (
+            <Bar
+              key={dataKey}
+              dataKey={dataKey}
+              fill={barFill}
+              maxBarSize={maxBarSize}
+              activeBar={<Rectangle fill={activeBarFill} stroke={activeBarStroke} />}
+            />
+          )
+        })}
       </ReChartsBarChart>
     </ResponsiveContainer>
   )
@@ -66,13 +73,15 @@ export const BarChart = (props) => {
 
 BarChart.propTypes = {
   data: PropTypes.array.isRequired,
-  dataKey: PropTypes.string.isRequired,
+  dataColors: PropTypes.array,
+  dataKeys: PropTypes.array.isRequired,
   labelDataKey: PropTypes.string,
   layout: PropTypes.oneOf(['horizontal', 'vertical', 'centric', 'radial']),
   showLegend: PropTypes.bool,
 }
 
 BarChart.defaultProps = {
+  dataColors: [],
   labelDataKey: 'name',
   layout: 'horizontal',
   showLegend: true,

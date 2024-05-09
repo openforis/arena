@@ -18,4 +18,9 @@
       background-color: $yellowHighlight;
     }
   }
+
+  .display-type-button-group-wrapper {
+    display: flex;
+    gap: 1rem;
+  }
 }
