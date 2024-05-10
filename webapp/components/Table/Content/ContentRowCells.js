@@ -60,7 +60,7 @@ ContentRowCells.propTypes = {
   isRowExpandable: PropTypes.func.isRequired,
   item: PropTypes.object.isRequired,
   itemPosition: PropTypes.number.isRequired,
-  itemSelected: PropTypes.object,
+  itemSelected: PropTypes.bool,
   onRowExpandToggle: PropTypes.func.isRequired,
   rowExpanded: PropTypes.bool,
 }

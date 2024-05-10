@@ -1,0 +1,16 @@
+.data-query-chart-custom-tooltip {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid lightgrey;
+  background-color: white;
+
+  .tooltip-form-item {
+    display: flex;
+    align-items: center;
+
+    .tooltip-form-label {
+      text-wrap: nowrap;
+      padding: 0.4rem;
+    }
+  }
+}

@@ -25,7 +25,7 @@ const defaultXAxisProps = { dataKey: 'x', name: 'x', type: 'number' }
 const defaultYAxisProps = { dataKey: 'y', name: 'y', type: 'number' }
 
 export const ScatterChart = (props) => {
-  const { dataSet, xAxisProps, yAxisProps } = props
+  const { dataSet, renderTooltip, xAxisProps, yAxisProps } = props
   const { name: xAxisName, dataKey: xAxisDataKey, type: xAxisType } = { ...defaultXAxisProps, ...xAxisProps }
   const { name: yAxisName, dataKey: yAxisDataKey, type: yAxisType } = { ...defaultYAxisProps, ...yAxisProps }
 
@@ -41,7 +41,7 @@ export const ScatterChart = (props) => {
         <YAxis dataKey={yAxisDataKey} name={yAxisName} type={yAxisType}>
           <Label dx={-20} value={yAxisName} angle={-90} />
         </YAxis>
-        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+        <Tooltip cursor={{ strokeDasharray: '3 3' }} content={renderTooltip} />
         {dataSet.length > 1 && <Legend />}
         {dataSet.map(({ name, data, fill = defaultFill }) => (
           <Scatter key={name} name={name} data={data} fill={fill} />
@@ -64,6 +64,7 @@ ScatterChart.propTypes = {
       data: PropTypes.array.isRequired,
     })
   ).isRequired,
+  renderTooltip: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   xAxisProps: AxisProps,
   yAxisProps: AxisProps,
 }

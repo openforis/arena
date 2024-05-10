@@ -7,7 +7,9 @@ import * as Record from '@core/record/record'
 import * as DateUtils from '@core/dateUtils'
 
 const valueFormattersByType = {
-  [NodeDef.nodeDefType.code]: ({ cycle, nodeDef, value: code, categoryItemsByCodeDefUuid, lang }) => {
+  [NodeDef.nodeDefType.code]: ({ cycle, nodeDef, value: code, categoryItemsByCodeDefUuid = null, lang = null }) => {
+    if (!categoryItemsByCodeDefUuid) return code
+
     const item = categoryItemsByCodeDefUuid[NodeDef.getUuid(nodeDef)]?.find(
       (item) => CategoryItem.getCode(item) === code
     )
@@ -33,9 +35,13 @@ const valueFormattersByType = {
     }),
 }
 
-const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid, lang }) => {
+const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid = null, lang = null }) => {
   const name = NodeDef.getName(nodeDef)
-  const value = record[A.camelize(name)]
+  let keyField = name
+  if (NodeDef.isCode(nodeDef) && !categoryItemsByCodeDefUuid) {
+    keyField = `${keyField}_label`
+  }
+  const value = record[A.camelize(keyField)]
   const cycle = Record.getCycle(record)
   const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
   return value && formatter ? formatter({ cycle, nodeDef, value, categoryItemsByCodeDefUuid, lang }) : value

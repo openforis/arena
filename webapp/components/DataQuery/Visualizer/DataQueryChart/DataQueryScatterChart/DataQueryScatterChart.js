@@ -7,11 +7,12 @@ import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { ScatterChart } from '@webapp/charts/ScatterChart'
-import { useNodeDefsByUuids, useSurvey } from '@webapp/store/survey'
+import { useNodeDefsByUuids, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import { useDataQueryChartData } from './useDataQueryChartData'
+import { useDataQueryChartData } from '../useDataQueryChartData'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
+import { DataQueryScatterChartTooltip } from './DataQueryScatterChartTooltip'
 
 const maxItems = 5000
 
@@ -20,6 +21,7 @@ export const DataQueryScatterChart = (props) => {
 
   const i18n = useI18n()
   const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
 
   const { dataColumnByAttributeDefUuid, dataKeyByAttributeDefUuid } = useDataQueryChartData({
     data,
@@ -48,28 +50,31 @@ export const DataQueryScatterChart = (props) => {
   if (!xAxisAttributeDefUuid || !yAxisAttributeDefUuid) {
     return i18n.t('dataView.charts.warning.selectAtLeast2NumericAttributes')
   }
-  const codeAttributeDefColumnName = codeAttributeDef
+  const codeAttributeDefField = codeAttributeDef
     ? nodeDefLabelType === NodeDef.NodeDefLabelTypes.name
       ? NodeDef.getName(codeAttributeDef)
       : `${NodeDef.getName(codeAttributeDef)}_label`
     : null
+  const codeAttributeDefName = codeAttributeDef
+    ? NodeDef.getLabelWithType({ nodeDef: codeAttributeDef, lang, type: nodeDefLabelType })
+    : null
 
-  const xAxisDataColumn = dataColumnByAttributeDefUuid[xAxisAttributeDefUuid]
+  const xAxisDataKey = dataColumnByAttributeDefUuid[xAxisAttributeDefUuid]
   const xAxisName = dataKeyByAttributeDefUuid[xAxisAttributeDefUuid]
-  const yAxisDataColumn = dataColumnByAttributeDefUuid[yAxisAttributeDefUuid]
+  const yAxisDataKey = dataColumnByAttributeDefUuid[yAxisAttributeDefUuid]
   const yAxisName = dataKeyByAttributeDefUuid[yAxisAttributeDefUuid]
 
   const chartData = data.reduce((acc, dataItem) => {
     acc.push({
       ...dataItem,
-      [xAxisDataColumn]: Number(dataItem[xAxisDataColumn]),
-      [yAxisDataColumn]: Number(dataItem[yAxisDataColumn]),
+      [xAxisDataKey]: Number(dataItem[xAxisDataKey]),
+      [yAxisDataKey]: Number(dataItem[yAxisDataKey]),
     })
     return acc
   }, [])
 
-  const chartDataGrouped = codeAttributeDefColumnName
-    ? ObjectUtils.groupByProp(codeAttributeDefColumnName)(chartData)
+  const chartDataGrouped = codeAttributeDefField
+    ? ObjectUtils.groupByProp(codeAttributeDefField)(chartData)
     : { chartData }
 
   const dataSet = Object.entries(chartDataGrouped).map(([name, data], index) => ({ name, data, fill: colors[index] }))
@@ -77,8 +82,18 @@ export const DataQueryScatterChart = (props) => {
   return (
     <ScatterChart
       dataSet={dataSet}
-      xAxisProps={{ name: xAxisName, dataKey: xAxisDataColumn }}
-      yAxisProps={{ name: yAxisName, dataKey: yAxisDataColumn }}
+      renderTooltip={
+        <DataQueryScatterChartTooltip
+          codeAttributeDefField={codeAttributeDefField}
+          codeAttributeDefName={codeAttributeDefName}
+          xAxisDataKey={xAxisDataKey}
+          xAxisName={xAxisName}
+          yAxisDataKey={yAxisDataKey}
+          yAxisName={yAxisName}
+        />
+      }
+      xAxisProps={{ name: xAxisName, dataKey: xAxisDataKey }}
+      yAxisProps={{ name: yAxisName, dataKey: yAxisDataKey }}
     />
   )
 }
