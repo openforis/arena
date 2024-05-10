@@ -693,6 +693,7 @@ Are you sure you want to continue?`,
 
   dataView: {
     charts: {
+      downloadToPng: 'Download chart to PNG',
       warning: {
         selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
         selectAtLeast2NumericAttributes: 'Please select 2 numeric attributes to show the chart',
