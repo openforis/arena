@@ -10,6 +10,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const query = DataExplorerSelectors.useQuery()
   const lang = useSurveyPreferredLang()
 
+  const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
   const firstDimension = dimensions[0]
   const measures = Query.getMeasures(query)
@@ -17,24 +18,33 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const measureNodeDefUuids = Object.keys(measures)
   const dataColors = useRandomColors(measureNodeDefUuids.length, { onlyDarkColors: true })
 
+  const attributeDefs = useNodeDefsByUuids(attributeDefUuids)
   const dimensionNodeDefs = useNodeDefsByUuids(dimensions)
   const measuresNodeDefs = useNodeDefsByUuids(measureNodeDefUuids)
 
-  const dataKeyByDimensionNodeDefUuid = dimensionNodeDefs.reduce((acc, nodeDef) => {
-    const key = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
-    acc[NodeDef.getUuid(nodeDef)] = key
-    return acc
-  }, {})
+  const getDataKeysIndexedByNodeDefUuids = (nodeDefs) =>
+    nodeDefs.reduce((acc, nodeDef) => {
+      const key = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
+      acc[NodeDef.getUuid(nodeDef)] = key
+      return acc
+    }, {})
 
-  const dataColumnByDimensionNodeDefUuid = dimensionNodeDefs.reduce((acc, nodeDef) => {
-    const nodeDefName = NodeDef.getName(nodeDef)
-    const colName =
-      NodeDef.isCode(nodeDef) && nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
-        ? `${nodeDefName}_label`
-        : nodeDefName
-    acc[NodeDef.getUuid(nodeDef)] = colName
-    return acc
-  }, {})
+  const dataKeyByAttributeDefUuid = getDataKeysIndexedByNodeDefUuids(attributeDefs)
+  const dataKeyByDimensionNodeDefUuid = getDataKeysIndexedByNodeDefUuids(dimensionNodeDefs)
+
+  const getDataColumnsIndexedByNodeDefUuids = (nodeDefs) =>
+    nodeDefs.reduce((acc, nodeDef) => {
+      const nodeDefName = NodeDef.getName(nodeDef)
+      const colName =
+        NodeDef.isCode(nodeDef) && nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
+          ? `${nodeDefName}_label`
+          : nodeDefName
+      acc[NodeDef.getUuid(nodeDef)] = colName
+      return acc
+    }, {})
+
+  const dataColumnByAttributeDefUuid = getDataColumnsIndexedByNodeDefUuids(attributeDefs)
+  const dataColumnByDimensionNodeDefUuid = getDataColumnsIndexedByNodeDefUuids(dimensionNodeDefs)
 
   const dataKeysByMeasureNodeDefUuid = measuresNodeDefs.reduce((acc, nodeDef) => {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -81,8 +91,10 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   return {
     chartData,
     dataColors,
+    dataColumnByAttributeDefUuid,
     dataColumnByDimensionNodeDefUuid,
     dataColumnsByMeasureNodeDefUuid,
+    dataKeyByAttributeDefUuid,
     dataKeyByDimensionNodeDefUuid,
     dataKeysByMeasureNodeDefUuid,
     dataKeys,

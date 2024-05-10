@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
-import { ButtonGroup } from '@webapp/components/form'
+import { Query } from '@common/model/query'
 
+import { ButtonGroup } from '@webapp/components/form'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 import { NotificationActions } from '@webapp/store/ui'
 
-const { displayTypes, chartTypes } = DataExplorerState
+const { displayTypes, chartTypes, isChartTypeAvailable } = DataExplorerState
 
 const iconByDisplayType = {
   [displayTypes.chart]: 'icon-pie-chart',
@@ -23,13 +24,14 @@ const displayTypeItems = Object.keys(displayTypes).map((displayType) => ({
 const iconByChartType = {
   [chartTypes.bar]: 'icon-stats-bars',
   [chartTypes.pie]: 'icon-pie-chart',
+  [chartTypes.scatter]: 'icon-stats-dots',
 }
 
-const chartTypeItems = Object.keys(chartTypes).map((chartType) => ({
+const getChartTypeItemByKey = (chartType) => ({
   key: chartType,
   iconClassName: iconByChartType[chartType],
   title: `dataView.charts.type.${chartType}`,
-}))
+})
 
 const chartMaxItems = 5000
 
@@ -38,6 +40,13 @@ export const ButtonGroupDisplayType = (props) => {
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const chartType = DataExplorerSelectors.useChartType()
+  const query = DataExplorerSelectors.useQuery()
+  const queryMode = Query.getMode(query)
+
+  const chartTypeItems = useMemo(() => {
+    const availableTypes = Object.keys(chartTypes).filter(isChartTypeAvailable({ queryMode }))
+    return availableTypes.map(getChartTypeItemByKey)
+  }, [queryMode])
 
   return (
     <div className="display-type-button-group-wrapper">
