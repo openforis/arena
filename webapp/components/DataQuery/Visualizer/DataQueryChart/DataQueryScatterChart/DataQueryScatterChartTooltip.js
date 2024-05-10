@@ -79,7 +79,7 @@ export const DataQueryScatterChartTooltip = (props) => {
 }
 
 DataQueryScatterChartTooltip.propTypes = {
-  active: PropTypes.bool.isRequired,
+  active: PropTypes.bool,
   codeAttributeDefField: PropTypes.string,
   codeAttributeDefName: PropTypes.string,
   payload: PropTypes.array,
