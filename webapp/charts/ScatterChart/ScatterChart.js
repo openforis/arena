@@ -25,7 +25,7 @@ const defaultXAxisProps = { dataKey: 'x', name: 'x', type: 'number' }
 const defaultYAxisProps = { dataKey: 'y', name: 'y', type: 'number' }
 
 export const ScatterChart = (props) => {
-  const { dataSet, renderTooltip, xAxisProps, yAxisProps } = props
+  const { dataSet, onClick, renderTooltip, xAxisProps, yAxisProps } = props
   const { name: xAxisName, dataKey: xAxisDataKey, type: xAxisType } = { ...defaultXAxisProps, ...xAxisProps }
   const { name: yAxisName, dataKey: yAxisDataKey, type: yAxisType } = { ...defaultYAxisProps, ...yAxisProps }
 
@@ -44,7 +44,7 @@ export const ScatterChart = (props) => {
         <Tooltip cursor={{ strokeDasharray: '3 3' }} content={renderTooltip} />
         {dataSet.length > 1 && <Legend />}
         {dataSet.map(({ name, data, fill = defaultFill }) => (
-          <Scatter key={name} name={name} data={data} fill={fill} />
+          <Scatter key={name} name={name} data={data} fill={fill} onClick={onClick} />
         ))}
       </ReChartsScatterChart>
     </ResponsiveContainer>
@@ -64,6 +64,7 @@ ScatterChart.propTypes = {
       data: PropTypes.array.isRequired,
     })
   ).isRequired,
+  onClick: PropTypes.func,
   renderTooltip: PropTypes.oneOfType([PropTypes.element, PropTypes.func]),
   xAxisProps: AxisProps,
   yAxisProps: AxisProps,

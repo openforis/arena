@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import { debounce } from '@core/functionsDefer'
 import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
 
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
@@ -23,7 +24,7 @@ FormItem.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-const RecordKeysFormItem = ({ recordUuid }) => {
+const RecordInfoFormItems = ({ recordUuid }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
@@ -31,26 +32,34 @@ const RecordKeysFormItem = ({ recordUuid }) => {
   const [state, setState] = useState({
     loading: true,
     recordKeys: [],
+    recordOwner: null,
   })
 
-  const { loading, recordKeys } = state
+  const { loading, recordKeys, recordOwner } = state
 
-  const fetchRecordKeys = useCallback(async () => {
+  const fetchRecordInfo = useCallback(async () => {
     const surveyId = Survey.getId(survey)
     const record = await API.fetchRecordSummary({ surveyId, cycle, recordUuid })
     const recordKeys = RecordKeyValuesExtractor.extractKeyValues({ survey, record })
-    setState({ loading: false, recordKeys })
+    const recordOwner = Record.getOwnerName(record)
+
+    setState({ loading: false, recordKeys, recordOwner })
   }, [cycle, recordUuid, survey])
 
   useEffect(() => {
     // fetch record keys on component mount with some delay to avoid sending too many requests to the server
-    debounce(fetchRecordKeys, 'data_query_chart_record_fetch', 500)()
-  }, [fetchRecordKeys])
+    debounce(fetchRecordInfo, 'data_query_chart_record_fetch', 500)()
+  }, [fetchRecordInfo])
 
-  return <FormItem label={i18n.t('common.record')}>{loading ? '...' : recordKeys}</FormItem>
+  return (
+    <>
+      <FormItem label={i18n.t('common.record')}>{loading ? '...' : recordKeys}</FormItem>
+      <FormItem label={i18n.t('common.owner')}>{loading ? '...' : recordOwner}</FormItem>
+    </>
+  )
 }
 
-RecordKeysFormItem.propTypes = {
+RecordInfoFormItems.propTypes = {
   recordUuid: PropTypes.string.isRequired,
 }
 
@@ -70,7 +79,7 @@ export const DataQueryScatterChartTooltip = (props) => {
   const { payload: dataItem } = payload[0]
   return (
     <div className="data-query-chart-custom-tooltip">
-      <RecordKeysFormItem recordUuid={dataItem['record_uuid']} />
+      <RecordInfoFormItems recordUuid={dataItem['record_uuid']} />
       {codeAttributeDefName && <FormItem label={codeAttributeDefName}>{dataItem[codeAttributeDefField]}</FormItem>}
       <FormItem label={xAxisName}>{dataItem[xAxisDataKey]}</FormItem>
       <FormItem label={yAxisName}>{dataItem[yAxisDataKey]}</FormItem>

@@ -1,13 +1,14 @@
 import './dataQuery.scss'
 
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
 
-import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
@@ -16,11 +17,15 @@ import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
 import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
+import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
 
 const DataQuery = () => {
+  const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
+  const recordEditModalProps = DataExplorerSelectors.useRecordEditModalProps()
+
   const {
     count,
     data,
@@ -80,6 +85,14 @@ const DataQuery = () => {
           </div>
         )}
       </div>
+
+      {recordEditModalProps && (
+        <RecordEditModal
+          onRequestClose={() => dispatch(DataExplorerActions.closeRecordEditModal())}
+          recordUuid={recordEditModalProps.recordUuid}
+          parentNodeUuid={recordEditModalProps.parentNodeUuid}
+        />
+      )}
     </div>
   )
 }

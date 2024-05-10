@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -60,7 +61,7 @@ const RecordEditModalTitle = () => {
     })
   })
 
-  const title = i18n.t('mapView.recordEditModalTitle', { keyValues })
+  const title = i18n.t('recordView.recordEditModalTitle', { keyValues })
 
   return <span>{title}</span>
 }
@@ -70,13 +71,13 @@ export const RecordEditModal = (props) => {
 
   const onDetach = useCallback(() => {
     const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}`
-    WindowUtils.openPopup(recordEditUrl, 'arena-map-record-editor')
-    onRequestClose()
+    WindowUtils.openPopup(recordEditUrl, 'arena-record-edit-modal')
+    onRequestClose?.()
   }, [onRequestClose, recordUuid])
 
   const onModalClose = useCallback(
     ({ modalState }) => {
-      onClose({ modalState })
+      onClose?.({ modalState })
     },
     [onClose]
   )
@@ -85,7 +86,7 @@ export const RecordEditModal = (props) => {
 
   return (
     <ResizableModal
-      className="map-record-edit-modal"
+      className="record-edit-modal"
       header={<RecordEditModalTitle />}
       initWidth={initialWidth}
       initHeight={initialHeight}
@@ -98,4 +99,12 @@ export const RecordEditModal = (props) => {
       <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
     </ResizableModal>
   )
+}
+
+RecordEditModal.propTypes = {
+  initialState: PropTypes.object,
+  onClose: PropTypes.func,
+  onRequestClose: PropTypes.func,
+  parentNodeUuid: PropTypes.string,
+  recordUuid: PropTypes.string.isRequired,
 }

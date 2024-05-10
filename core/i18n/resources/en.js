@@ -566,6 +566,7 @@ $t(common.cantUndoWarning)`,
     justDeleted: 'This record has just been deleted',
     sessionExpired: 'Record session has expired',
     errorLoadingRecord: 'Error loading record: {{details}}',
+    recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
   },
 
@@ -809,7 +810,6 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    recordEditModalTitle: 'Record: {{keyValues}}',
     altitude: 'Altitude (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
