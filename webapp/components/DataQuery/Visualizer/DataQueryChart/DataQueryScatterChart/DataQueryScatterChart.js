@@ -70,12 +70,13 @@ export const DataQueryScatterChart = (props) => {
   if (!xAxisAttributeDefUuid || !yAxisAttributeDefUuid) {
     return i18n.t('dataView.charts.warning.selectAtLeast2NumericAttributes')
   }
+  const codeAttributeDefName = codeAttributeDef ? NodeDef.getName(codeAttributeDef) : null
   const codeAttributeDefField = codeAttributeDef
     ? nodeDefLabelType === NodeDef.NodeDefLabelTypes.name
-      ? NodeDef.getName(codeAttributeDef)
-      : `${NodeDef.getName(codeAttributeDef)}_label`
+      ? codeAttributeDefName
+      : `${codeAttributeDefName}_label`
     : null
-  const codeAttributeDefName = codeAttributeDef
+  const codeAttributeDefLabel = codeAttributeDef
     ? NodeDef.getLabelWithType({ nodeDef: codeAttributeDef, lang, type: nodeDefLabelType })
     : null
 
@@ -106,7 +107,7 @@ export const DataQueryScatterChart = (props) => {
       renderTooltip={
         <DataQueryScatterChartTooltip
           codeAttributeDefField={codeAttributeDefField}
-          codeAttributeDefName={codeAttributeDefName}
+          codeAttributeDefName={codeAttributeDefLabel}
           xAxisDataKey={xAxisDataKey}
           xAxisName={xAxisName}
           yAxisDataKey={yAxisDataKey}
