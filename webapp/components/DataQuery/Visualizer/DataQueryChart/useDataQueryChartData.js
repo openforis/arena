@@ -99,5 +99,6 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     dataKeysByMeasureNodeDefUuid,
     dataKeys,
     labelDataKey,
+    query,
   }
 }

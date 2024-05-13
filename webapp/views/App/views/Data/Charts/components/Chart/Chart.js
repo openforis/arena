@@ -1,11 +1,15 @@
+import './Chart.scss'
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import Split from 'react-split'
+
+import { downloadSvgToPng } from '@webapp/utils/domUtils'
+
 import Data from './components/Data'
 import ScatterPlot from './components/ChartTypes/ScatterPlot/'
 import BarChart from './components/ChartTypes/BarChart/'
 import PieChart from './components/ChartTypes/PieChart/'
-import './Chart.scss'
 
 const Chart = ({ data, specs, fullScreen, chartRef }) => {
   const chartType = specs?.chartType
@@ -31,35 +35,7 @@ const Chart = ({ data, specs, fullScreen, chartRef }) => {
     if (chart) {
       const svgElement = chart.querySelector('svg')
       if (svgElement) {
-        // Serialize SVG
-        const serializer = new XMLSerializer()
-        const svgString = serializer.serializeToString(svgElement)
-        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
-        const url = URL.createObjectURL(svgBlob)
-
-        // Create an Image element
-        const img = new Image()
-        img.src = url
-        img.onload = () => {
-          // Create a canvas element
-          const canvas = document.createElement('canvas')
-          canvas.width = svgElement.clientWidth
-          canvas.height = svgElement.clientHeight
-          const ctx = canvas.getContext('2d')
-
-          // Draw the image onto the canvas
-          ctx.drawImage(img, 0, 0)
-
-          // Create a download link for the canvas image
-          const pngUrl = canvas.toDataURL('image/png')
-          const downloadLink = document.createElement('a')
-          downloadLink.href = pngUrl
-          downloadLink.download = 'chart.png'
-          document.body.appendChild(downloadLink)
-          downloadLink.click()
-          document.body.removeChild(downloadLink)
-          URL.revokeObjectURL(url)
-        }
+        downloadSvgToPng(svgElement)
       } else {
         console.error('No SVG element found inside the chart container.')
       }
