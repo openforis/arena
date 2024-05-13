@@ -39,7 +39,7 @@ const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecor
 const optionsRecordUpdateSystemAdmin = ['includeFiles']
 
 const fileMaxSizeDefault = 20 // 20MB
-const fileMaxSizeWithFiles = 100 // 100MB
+const fileMaxSizeWithFiles = 1024 // 1GB
 
 const allowedLabelTypes = [
   NodeDef.NodeDefLabelTypes.label,
