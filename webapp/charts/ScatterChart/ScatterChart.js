@@ -7,16 +7,17 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Label,
   Legend,
 } from 'recharts'
 import { Objects } from '@openforis/arena-core'
 
+import { ChartWrapper } from '../common'
+
 const margin = {
   top: 20,
   right: 20,
-  bottom: 20,
+  bottom: 0,
   left: 20,
 }
 const defaultFill = '#8884d8'
@@ -32,11 +33,11 @@ export const ScatterChart = (props) => {
   if (Objects.isEmpty(dataSet)) return null
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ChartWrapper>
       <ReChartsScatterChart margin={margin}>
         <CartesianGrid />
         <XAxis dataKey={xAxisDataKey} name={xAxisName} type={xAxisType}>
-          <Label dy={14} value={xAxisName} />
+          <Label dy={18} value={xAxisName} />
         </XAxis>
         <YAxis dataKey={yAxisDataKey} name={yAxisName} type={yAxisType}>
           <Label dx={-20} value={yAxisName} angle={-90} />
@@ -47,7 +48,7 @@ export const ScatterChart = (props) => {
           <Scatter key={name} name={name} data={data} fill={fill} onClick={onClick} />
         ))}
       </ReChartsScatterChart>
-    </ResponsiveContainer>
+    </ChartWrapper>
   )
 }
 

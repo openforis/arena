@@ -66,8 +66,8 @@ RecordInfoFormItems.propTypes = {
 export const DataQueryScatterChartTooltip = (props) => {
   const {
     active,
-    codeAttributeDefField,
-    codeAttributeDefName,
+    categoricalAttributeDefField,
+    categoricalAttributeDefName,
     payload,
     xAxisName,
     xAxisDataKey,
@@ -80,7 +80,9 @@ export const DataQueryScatterChartTooltip = (props) => {
   return (
     <div className="data-query-chart-custom-tooltip">
       <RecordInfoFormItems recordUuid={dataItem['record_uuid']} />
-      {codeAttributeDefName && <FormItem label={codeAttributeDefName}>{dataItem[codeAttributeDefField]}</FormItem>}
+      {categoricalAttributeDefName && (
+        <FormItem label={categoricalAttributeDefName}>{dataItem[categoricalAttributeDefField]}</FormItem>
+      )}
       <FormItem label={xAxisName}>{dataItem[xAxisDataKey]}</FormItem>
       <FormItem label={yAxisName}>{dataItem[yAxisDataKey]}</FormItem>
     </div>
@@ -89,8 +91,8 @@ export const DataQueryScatterChartTooltip = (props) => {
 
 DataQueryScatterChartTooltip.propTypes = {
   active: PropTypes.bool,
-  codeAttributeDefField: PropTypes.string,
-  codeAttributeDefName: PropTypes.string,
+  categoricalAttributeDefField: PropTypes.string,
+  categoricalAttributeDefName: PropTypes.string,
   payload: PropTypes.array,
   xAxisName: PropTypes.string.isRequired,
   xAxisDataKey: PropTypes.string.isRequired,

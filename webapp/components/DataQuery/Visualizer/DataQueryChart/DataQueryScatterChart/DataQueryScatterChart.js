@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { ScatterChart } from '@webapp/charts/ScatterChart'
@@ -18,6 +19,29 @@ import { useDispatch } from 'react-redux'
 import { DataExplorerActions } from '@webapp/store/dataExplorer'
 
 const maxItems = 5000
+
+const categoricalAttributeDefTypes = [NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]
+
+const getCategoricalVariableColumnName = ({ categoricalAttributeDef, nodeDefLabelType }) => {
+  if (!categoricalAttributeDef) return null
+  const nodeDefName = NodeDef.getName(categoricalAttributeDef)
+  if (nodeDefLabelType === NodeDef.NodeDefLabelTypes.name) return nodeDefName
+  if (NodeDef.isCode(categoricalAttributeDef)) return `${nodeDefName}_label`
+  if (NodeDef.isTaxon(categoricalAttributeDef)) return `${nodeDefName}_scientific_name`
+  return null
+}
+
+const countDistinctValues = ({ data, columnName }) => {
+  if (!columnName) return 0
+  const valuesFound = {}
+  data.forEach((item) => {
+    const value = item[columnName]
+    if (!Objects.isEmpty(value)) {
+      valuesFound[value] = true
+    }
+  })
+  return Object.keys(valuesFound).length
+}
 
 export const DataQueryScatterChart = (props) => {
   const { data, nodeDefLabelType } = props
@@ -38,11 +62,6 @@ export const DataQueryScatterChart = (props) => {
   const attributeDefUuids = Object.keys(dataColumnByAttributeDefUuid)
   const attributeDefs = Survey.getNodeDefsByUuids(attributeDefUuids)(survey)
 
-  const codeAttributeDef = attributeDefs.find(NodeDef.isCode)
-  const category = codeAttributeDef ? Survey.getCategoryByUuid(NodeDef.getCategoryUuid(codeAttributeDef))(survey) : null
-  const categoryItemsSize = category ? Category.getItemsCount(category) : 0
-  const colors = useRandomColors(categoryItemsSize, { onlyDarkColors: true })
-
   const onClick = useCallback(
     (e) => {
       const { payload } = e
@@ -55,6 +74,20 @@ export const DataQueryScatterChart = (props) => {
     },
     [dispatch, queryEntityDefName]
   )
+
+  const categoricalAttributeDef = attributeDefs.find((nodeDef) =>
+    categoricalAttributeDefTypes.includes(NodeDef.getType(nodeDef))
+  )
+  const categoricalAttributeDefColumnName = getCategoricalVariableColumnName({
+    categoricalAttributeDef,
+    nodeDefLabelType,
+  })
+  const categoricalAttributeDistinctValuesCount = countDistinctValues({
+    data,
+    columnName: categoricalAttributeDefColumnName,
+  })
+
+  const colors = useRandomColors(categoricalAttributeDistinctValuesCount, { onlyDarkColors: true })
 
   if (data.length > maxItems) {
     return i18n.t('dataView.charts.warning.tooManyItemsToShowChart', { maxItems })
@@ -70,14 +103,9 @@ export const DataQueryScatterChart = (props) => {
   if (!xAxisAttributeDefUuid || !yAxisAttributeDefUuid) {
     return i18n.t('dataView.charts.warning.selectAtLeast2NumericAttributes')
   }
-  const codeAttributeDefName = codeAttributeDef ? NodeDef.getName(codeAttributeDef) : null
-  const codeAttributeDefField = codeAttributeDef
-    ? nodeDefLabelType === NodeDef.NodeDefLabelTypes.name
-      ? codeAttributeDefName
-      : `${codeAttributeDefName}_label`
-    : null
-  const codeAttributeDefLabel = codeAttributeDef
-    ? NodeDef.getLabelWithType({ nodeDef: codeAttributeDef, lang, type: nodeDefLabelType })
+
+  const categoricalAttributeDefLabel = categoricalAttributeDef
+    ? NodeDef.getLabelWithType({ nodeDef: categoricalAttributeDef, lang, type: nodeDefLabelType })
     : null
 
   const xAxisDataKey = dataColumnByAttributeDefUuid[xAxisAttributeDefUuid]
@@ -94,8 +122,8 @@ export const DataQueryScatterChart = (props) => {
     return acc
   }, [])
 
-  const chartDataGrouped = codeAttributeDefField
-    ? ObjectUtils.groupByProp(codeAttributeDefField)(chartData)
+  const chartDataGrouped = categoricalAttributeDefColumnName
+    ? ObjectUtils.groupByProp(categoricalAttributeDefColumnName)(chartData)
     : { chartData }
 
   const dataSet = Object.entries(chartDataGrouped).map(([name, data], index) => ({ name, data, fill: colors[index] }))
@@ -106,8 +134,8 @@ export const DataQueryScatterChart = (props) => {
       onClick={onClick}
       renderTooltip={
         <DataQueryScatterChartTooltip
-          codeAttributeDefField={codeAttributeDefField}
-          codeAttributeDefName={codeAttributeDefLabel}
+          categoricalAttributeDefField={categoricalAttributeDefColumnName}
+          categoricalAttributeDefName={categoricalAttributeDefLabel}
           xAxisDataKey={xAxisDataKey}
           xAxisName={xAxisName}
           yAxisDataKey={yAxisDataKey}
