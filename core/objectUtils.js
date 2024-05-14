@@ -143,3 +143,34 @@ export const getPropsAndPropsDraft =
       propsDraft: backup ? propsDraft : { ...props, propsDraft },
     }
   }
+
+const sizeExtractorByType = {
+  boolean: () => 4,
+  string: ({ value }) => value.length * 2,
+  number: () => 8,
+}
+
+export const getSize = (object) => {
+  const objectList = []
+  const stack = [object]
+  let totalBytes = 0
+
+  while (stack.length) {
+    const value = stack.pop()
+    const type = typeof value
+    const valueSizeExtractor = sizeExtractorByType[type]
+    if (valueSizeExtractor) {
+      totalBytes += valueSizeExtractor({ value })
+    } else if (type === 'object') {
+      if (!objectList.includes(value)) {
+        objectList.push(value)
+        for (const prop in value) {
+          if (Object.hasOwn(value, prop)) {
+            stack.push(value[prop])
+          }
+        }
+      }
+    }
+  }
+  return totalBytes
+}

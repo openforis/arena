@@ -144,6 +144,7 @@ export {
   fetchRecordCreatedCountsByUser,
   fetchRecordCountsByStep,
   insertRecordsInBatch,
+  updateRecordDateModifiedFromValues,
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (
