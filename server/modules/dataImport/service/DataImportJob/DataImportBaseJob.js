@@ -11,6 +11,7 @@ import { NodesDeleteBatchPersister } from '@server/modules/record/manager/NodesD
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
 import { Dates } from '@openforis/arena-core'
+import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
 
 export default class DataImportBaseJob extends Job {
   constructor(type, params) {
@@ -27,6 +28,7 @@ export default class DataImportBaseJob extends Job {
     this.nodesUpdateBatchPersister = null
     this.recordsDateModifiedBatchPersister = null
     this.recordsValidationBatchPersister = null
+    this.rdbUpdatesBatchPersister = null
   }
 
   async onStart() {
@@ -39,6 +41,7 @@ export default class DataImportBaseJob extends Job {
     this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
     this.recordsDateModifiedBatchPersister = new RecordsDateModifiedBatchPersister({ surveyId, tx })
     this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
+    this.rdbUpdatesBatchPersister = new RdbUpdatesBatchPersister({ user, surveyId, tx })
   }
 
   async persistUpdatedNodes({ nodesUpdated, dateModified = new Date() }) {
@@ -67,7 +70,10 @@ export default class DataImportBaseJob extends Job {
       }
     }
 
-    this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
+    const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray }, tx)
+    await this.rdbUpdatesBatchPersister.addItem(rdbUpdates)
+
+    this.currentRecord = recordUpdated
   }
 
   async beforeSuccess() {
@@ -76,6 +82,7 @@ export default class DataImportBaseJob extends Job {
     await this.nodesUpdateBatchPersister.flush()
     await this.recordsDateModifiedBatchPersister.flush()
     await this.recordsValidationBatchPersister.flush()
+    await this.rdbUpdatesBatchPersister.flush()
 
     await super.beforeSuccess()
   }

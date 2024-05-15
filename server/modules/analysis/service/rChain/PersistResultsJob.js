@@ -89,10 +89,16 @@ export default class PersistResultsJob extends CsvDataImportJob {
 
     await this.persistUpdatedNodes({ nodesUpdated })
 
-    // current record could have been changed (e.g. node flags removed etc): update records cache too
-    this.recordsProvider.add(this.currentRecord)
+    // // current record could have been changed (e.g. node flags removed etc): update records cache too
+    this.currentRecord = recordUpdated
+    this.recordsProvider.add(recordUpdated)
 
     this.incrementProcessedItems()
+  }
+
+  async beforeEnd() {
+    await super.beforeEnd()
+    throw new Error('TEST')
   }
 
   async onEnd() {

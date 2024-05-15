@@ -6,8 +6,11 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as DataTable from '../schemaRdb/dataTable'
 import * as DataCol from '../schemaRdb/dataCol'
+import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
+import MassiveUpdate from '@server/db/massiveUpdate'
+import { Objects } from '@openforis/arena-core'
 
-const types = { insert: 'insert', update: 'update', delete: 'delete' }
+const types = RdbUpdateTypes
 
 // ==== parsing
 
@@ -82,7 +85,7 @@ const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
 const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
   _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
 
-const _toUpdates = ({ survey, record, nodes }) => {
+export const generateRdbUpdates = ({ survey, record, nodes }) => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
   const nodesArray = Object.values(nodes).sort(
     (nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
@@ -98,43 +101,44 @@ const _toUpdates = ({ survey, record, nodes }) => {
       const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
       const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
       const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
-      updatesAcc.push({
+      const update = {
         type,
-        schemaName: SchemaRdb.getName(Survey.getId(survey)),
-        tableName: DataTable.getName(nodeDef, ancestorDef),
+        schema: SchemaRdb.getName(Survey.getId(survey)),
+        table: DataTable.getName(nodeDef, ancestorDef),
         columnNames: _getColumnNames({ nodeDef, type }),
-        colValues: _getColValues({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
+        columnValues: _getColValues({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
         rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
-      })
+      }
+      updatesAcc.addUpdate(update)
     }
     return updatesAcc
-  }, [])
+  }, new RdbUpdates())
 }
 
 // ==== execution
 
 const _update = (update, client) =>
   client.one(
-    `UPDATE ${update.schemaName}.${update.tableName}
+    `UPDATE ${update.schema}.${update.table}
       SET ${update.columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
       WHERE uuid = $1
       RETURNING uuid`,
-    [update.rowUuid, ...update.colValues]
+    [update.rowUuid, ...update.columnValues]
   )
 
 const _insert = (update, client) =>
   client.one(
-    `INSERT INTO ${update.schemaName}.${update.tableName}
+    `INSERT INTO ${update.schema}.${update.table}
       (${update.columnNames.join(',')})
       VALUES 
       (${update.columnNames.map((_col, i) => `$${i + 1}`).join(',')})
       RETURNING uuid`,
-    update.colValues
+    update.columnValues
   )
 
 const _delete = (update, client) =>
   client.oneOrNone(
-    `DELETE FROM ${update.schemaName}.${update.tableName} 
+    `DELETE FROM ${update.schema}.${update.table} 
     WHERE uuid = $1
     RETURNING uuid`,
     update.rowUuid
@@ -146,9 +150,41 @@ const queryByType = {
   [types.update]: _update,
 }
 
+export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
+  const updatesToRunInBatch = []
+  for await (const key of rdbUpdates.keys) {
+    const tableUpdates = rdbUpdates.getByKey(key)
+    const { schema, table, type } = RdbUpdates.expandKey(key)
+    const tableUpdatesItems = tableUpdates.getAll()
+    if (type === types.update) {
+      let prevColumnNames = null
+      let massiveUpdate = null
+      for await (const update of tableUpdatesItems) {
+        const { columnNames, columnValues, rowUuid } = update
+        if (!prevColumnNames || !Objects.isEqual(columnNames, prevColumnNames)) {
+          if (massiveUpdate) {
+            await massiveUpdate.flush()
+          }
+          const colsForUpdate = [...columnNames, `?uuid`]
+          massiveUpdate = new MassiveUpdate({ schema, table, cols: colsForUpdate }, client)
+        }
+        massiveUpdate.push(...columnValues, rowUuid)
+        prevColumnNames = columnNames
+      }
+      await massiveUpdate?.flush()
+    } else {
+      updatesToRunInBatch.push(...tableUpdatesItems.map((update) => queryByType[update.type](update, client)))
+    }
+  }
+
+  if (updatesToRunInBatch.length > 0) {
+    await client.batch(updatesToRunInBatch)
+  }
+}
+
 export const updateTables = async ({ survey, record, nodes }, client) => {
-  const updates = _toUpdates({ survey, record, nodes })
-  await client.batch(updates.map((update) => queryByType[update.type](update, client)))
+  const rdbUpdates = generateRdbUpdates({ survey, record, nodes })
+  await updateTablesFromUpdates({ rdbUpdates }, client)
 }
 
 export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef }, client) => {
