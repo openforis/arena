@@ -142,6 +142,8 @@ Do you want to proceed?`,
 
 **Are you sure you want to continue?**`,
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
+    record: 'Record',
+    record_other: 'Records',
     required: 'Required',
     requiredField: 'required field',
     reset: 'Reset',
@@ -265,8 +267,8 @@ Do you want to proceed?`,
     taxonomies: 'Taxonomies',
 
     data: 'Data',
-    record: 'Record',
-    records: 'Records',
+    record: '$t(common.record)',
+    records: '$t(common.record_other)',
     recordValidationReport: 'Record validation report',
     explorer: 'Explorer',
     map: 'Map',
@@ -564,6 +566,7 @@ $t(common.cantUndoWarning)`,
     justDeleted: 'This record has just been deleted',
     sessionExpired: 'Record session has expired',
     errorLoadingRecord: 'Error loading record: {{details}}',
+    recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
   },
 
@@ -690,6 +693,7 @@ Are you sure you want to continue?`,
 
   dataView: {
     charts: {
+      downloadToPng: 'Download chart to PNG',
       warning: {
         selectOneDimensionAndOneMeasure: 'Please select one dimension and one measure to show the chart',
         selectAtLeast2NumericAttributes: 'Please select 2 numeric attributes to show the chart',
@@ -807,7 +811,6 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    recordEditModalTitle: 'Record: {{keyValues}}',
     altitude: 'Altitude (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
