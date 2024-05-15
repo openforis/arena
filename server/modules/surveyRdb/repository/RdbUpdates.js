@@ -82,15 +82,6 @@ export class RdbUpdatesForTable {
   }
 
   _mergeUpdates(oldUpdate, newUpdate) {
-    newUpdate.columnNames.forEach((colName, index) => {
-      const value = newUpdate.columnValues[index]
-      const oldColumnNameIndex = oldUpdate.columnNames.indexOf(colName)
-      if (oldColumnNameIndex >= 0) {
-        oldUpdate.columnValues[oldColumnNameIndex] = value
-      } else {
-        oldUpdate.columnNames.push(colName)
-        oldUpdate.columnValues.push(value)
-      }
-    })
+    Object.assign(oldUpdate.valuesByColumnName, newUpdate.valuesByColumnName)
   }
 }

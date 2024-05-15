@@ -94,6 +94,10 @@ export default class PersistResultsJob extends CsvDataImportJob {
     this.recordsProvider.add(recordUpdated)
 
     this.incrementProcessedItems()
+
+    if (this.processed % 1000 === 0) {
+      this.logDebug(`${this.processed} items processed`)
+    }
   }
 
   async beforeEnd() {

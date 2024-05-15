@@ -9,6 +9,7 @@ import * as DataCol from '../schemaRdb/dataCol'
 import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
 import MassiveUpdate from '@server/db/massiveUpdate'
 import { Objects } from '@openforis/arena-core'
+import MassiveInsert from '@server/db/massiveInsert'
 
 const types = RdbUpdateTypes
 
@@ -38,40 +39,36 @@ const _getType = (nodeDef, node) => {
   return null
 }
 
-const _getColumnNames = ({ nodeDef, type }) =>
-  type === types.insert
-    ? [
-        DataTable.columnNameUuid,
-        ...(NodeDef.isRoot(nodeDef)
-          ? [
-              DataTable.columnNameRecordUuid,
-              DataTable.columnNameRecordCycle,
-              DataTable.columnNameRecordStep,
-              DataTable.columnNameRecordOwnerUuid,
-            ]
-          : []),
-        DataTable.columnNameParentUuid,
-        ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
-          ? DataCol.getNames(nodeDef)
-          : []),
-      ]
-    : DataCol.getNames(nodeDef)
+const _getValuesByColumnNameDefault = ({ survey, nodeDef, node }) => {
+  const columnNames = DataCol.getNames(nodeDef)
+  const columnValues = DataCol.getValues(survey, nodeDef, node)
+  return columnNames.reduce((acc, columnName, index) => {
+    acc[columnName] = columnValues[index]
+    return acc
+  }, {})
+}
 
-const _getColValues = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
+const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
   if (type !== types.insert) {
-    return DataCol.getValues(survey, nodeDef, node)
+    return _getValuesByColumnNameDefault({ survey, nodeDef, node })
+  } else {
+    const result = {
+      [DataTable.columnNameUuid]: Node.getUuid(node),
+      [DataTable.columnNameParentUuid]: Node.getUuid(ancestorMultipleEntity),
+    }
+    if (NodeDef.isRoot(nodeDef)) {
+      Object.assign(result, {
+        [DataTable.columnNameRecordUuid]: Node.getRecordUuid(node),
+        [DataTable.columnNameRecordCycle]: Record.getCycle(record),
+        [DataTable.columnNameRecordStep]: Record.getStep(record),
+        [DataTable.columnNameRecordOwnerUuid]: Record.getOwnerUuid(record),
+      })
+    }
+    if (NodeDef.isMultipleAttribute(nodeDef)) {
+      Object.assign(result, _getValuesByColumnNameDefault({ survey, nodeDef, node }))
+    }
+    return result
   }
-  const colValues = [Node.getUuid(node)]
-  if (NodeDef.isRoot(nodeDef)) {
-    colValues.push(
-      ...[Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record), Record.getOwnerUuid(record)]
-    )
-  }
-  colValues.push(Node.getUuid(ancestorMultipleEntity))
-  if (NodeDef.isMultipleAttribute(nodeDef)) {
-    colValues.push(...DataCol.getValues(survey, nodeDef, node))
-  }
-  return colValues
 }
 
 const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
@@ -105,8 +102,7 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
         type,
         schema: SchemaRdb.getName(Survey.getId(survey)),
         table: DataTable.getName(nodeDef, ancestorDef),
-        columnNames: _getColumnNames({ nodeDef, type }),
-        columnValues: _getColValues({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
+        valuesByColumnName: _getValuesByColumnName({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
         rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
       }
       updatesAcc.addUpdate(update)
@@ -117,32 +113,42 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
 
 // ==== execution
 
-const _update = (update, client) =>
-  client.one(
-    `UPDATE ${update.schema}.${update.table}
-      SET ${update.columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
+const _update = (update, client) => {
+  const { schema, table, valuesByColumnName, rowUuid } = update
+  const columnNames = Object.keys(valuesByColumnName)
+  const values = Object.values(valuesByColumnName)
+  return client.one(
+    `UPDATE ${schema}.${table}
+      SET ${columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
       WHERE uuid = $1
       RETURNING uuid`,
-    [update.rowUuid, ...update.columnValues]
+    [rowUuid, ...values]
   )
+}
 
-const _insert = (update, client) =>
-  client.one(
-    `INSERT INTO ${update.schema}.${update.table}
-      (${update.columnNames.join(',')})
+const _insert = (update, client) => {
+  const { schema, table, valuesByColumnName } = update
+  const columnNames = Object.keys(valuesByColumnName)
+  const values = Object.values(valuesByColumnName)
+  return client.one(
+    `INSERT INTO ${schema}.${table}
+      (${columnNames.join(',')})
       VALUES 
-      (${update.columnNames.map((_col, i) => `$${i + 1}`).join(',')})
+      (${columnNames.map((_col, i) => `$${i + 1}`).join(',')})
       RETURNING uuid`,
-    update.columnValues
+    values
   )
+}
 
-const _delete = (update, client) =>
-  client.oneOrNone(
-    `DELETE FROM ${update.schema}.${update.table} 
+const _delete = (update, client) => {
+  const { schema, table, rowUuid } = update
+  return client.oneOrNone(
+    `DELETE FROM ${schema}.${table} 
     WHERE uuid = $1
     RETURNING uuid`,
-    update.rowUuid
+    rowUuid
   )
+}
 
 const queryByType = {
   [types.delete]: _delete,
@@ -156,19 +162,23 @@ export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
     const tableUpdates = rdbUpdates.getByKey(key)
     const { schema, table, type } = RdbUpdates.expandKey(key)
     const tableUpdatesItems = tableUpdates.getAll()
-    if (type === types.update) {
+    if (type === types.update || type === types.insert) {
       let prevColumnNames = null
       let massiveUpdate = null
       for await (const update of tableUpdatesItems) {
-        const { columnNames, columnValues, rowUuid } = update
+        const { valuesByColumnName, rowUuid } = update
+        const columnNames = Object.keys(valuesByColumnName).sort()
         if (!prevColumnNames || !Objects.isEqual(columnNames, prevColumnNames)) {
           if (massiveUpdate) {
             await massiveUpdate.flush()
           }
-          const colsForUpdate = [...columnNames, `?uuid`]
-          massiveUpdate = new MassiveUpdate({ schema, table, cols: colsForUpdate }, client)
+          const colsForUpdate = [...columnNames, type === types.update ? '?uuid' : 'uuid']
+          massiveUpdate =
+            type === types.update
+              ? new MassiveUpdate({ schema, table, cols: colsForUpdate }, client)
+              : new MassiveInsert(schema, table, colsForUpdate, client)
         }
-        massiveUpdate.push(...columnValues, rowUuid)
+        massiveUpdate.push({ ...valuesByColumnName, uuid: rowUuid })
         prevColumnNames = columnNames
       }
       await massiveUpdate?.flush()

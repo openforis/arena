@@ -2,7 +2,7 @@ import BatchPersister from '@server/db/batchPersister'
 import { RdbUpdates } from '@server/modules/surveyRdb/repository/RdbUpdates'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 
-const BATCH_SIZE = 100
+const BATCH_SIZE = 1000
 
 export class RdbUpdatesBatchPersister extends BatchPersister {
   constructor({ user, surveyId, tx }) {
@@ -14,7 +14,7 @@ export class RdbUpdatesBatchPersister extends BatchPersister {
 
   async addItem(rdbUpdates) {
     this.rdbUpdates.merge(rdbUpdates)
-    if (this.rdbUpdates.size > BATCH_SIZE) {
+    if (this.rdbUpdates.size >= BATCH_SIZE) {
       await this.flush()
     }
   }
