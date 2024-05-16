@@ -7,9 +7,6 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as DataTable from '../schemaRdb/dataTable'
 import * as DataCol from '../schemaRdb/dataCol'
 import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
-import MassiveUpdate from '@server/db/massiveUpdate'
-import { Objects } from '@openforis/arena-core'
-import MassiveInsert from '@server/db/massiveInsert'
 
 const types = RdbUpdateTypes
 
@@ -157,35 +154,7 @@ const queryByType = {
 }
 
 export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
-  const updatesToRunInBatch = []
-  for await (const key of rdbUpdates.keys) {
-    const tableUpdates = rdbUpdates.getByKey(key)
-    const { schema, table, type } = RdbUpdates.expandKey(key)
-    const tableUpdatesItems = tableUpdates.getAll()
-    if (type === types.update || type === types.insert) {
-      let prevColumnNames = null
-      let massiveUpdate = null
-      for await (const update of tableUpdatesItems) {
-        const { valuesByColumnName, rowUuid } = update
-        const columnNames = Object.keys(valuesByColumnName).sort()
-        if (!prevColumnNames || !Objects.isEqual(columnNames, prevColumnNames)) {
-          if (massiveUpdate) {
-            await massiveUpdate.flush()
-          }
-          const colsForUpdate = [...columnNames, type === types.update ? '?uuid' : 'uuid']
-          massiveUpdate =
-            type === types.update
-              ? new MassiveUpdate({ schema, table, cols: colsForUpdate }, client)
-              : new MassiveInsert(schema, table, colsForUpdate, client)
-        }
-        massiveUpdate.push({ ...valuesByColumnName, uuid: rowUuid })
-        prevColumnNames = columnNames
-      }
-      await massiveUpdate?.flush()
-    } else {
-      updatesToRunInBatch.push(...tableUpdatesItems.map((update) => queryByType[update.type](update, client)))
-    }
-  }
+  const updatesToRunInBatch = [...rdbUpdates.getAll().map((update) => queryByType[update.type](update, client))]
 
   if (updatesToRunInBatch.length > 0) {
     await client.batch(updatesToRunInBatch)

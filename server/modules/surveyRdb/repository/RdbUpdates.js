@@ -23,6 +23,10 @@ export class RdbUpdates {
     return Object.keys(this.updatesBySchemaTableAndType)
   }
 
+  get entries() {
+    return Object.entries(this.updatesBySchemaTableAndType)
+  }
+
   getByKey(key) {
     return this.updatesBySchemaTableAndType[key]
   }

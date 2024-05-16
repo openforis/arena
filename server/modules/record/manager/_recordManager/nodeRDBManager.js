@@ -18,7 +18,7 @@ const generateRdbUpates = ({ survey, record, nodesArray }) => {
   })
   // Merge updated nodes with existing ones (remove created/updated flags nodes)
   const nodes = ObjectUtils.toUuidIndexedObj(nodesArray)
-  const recordUpdated = Record.mergeNodes(nodes, true)(record)
+  const recordUpdated = Record.mergeNodes(nodes, { removeFlags: true, sideEffect: true })(record)
   return {
     record: recordUpdated,
     rdbUpdates,
