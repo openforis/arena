@@ -1,3 +1,5 @@
+import { Dates } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
@@ -10,7 +12,6 @@ import { RecordsValidationBatchPersister } from '@server/modules/record/manager/
 import { NodesDeleteBatchPersister } from '@server/modules/record/manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
-import { Dates } from '@openforis/arena-core'
 import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
 
 export default class DataImportBaseJob extends Job {
