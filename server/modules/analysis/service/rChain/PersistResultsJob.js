@@ -100,11 +100,6 @@ export default class PersistResultsJob extends CsvDataImportJob {
     }
   }
 
-  async beforeEnd() {
-    await super.beforeEnd()
-    throw new Error('TEST')
-  }
-
   async onEnd() {
     await super.onEnd()
     this.fileZip?.close()
