@@ -13,7 +13,7 @@ export default class MassiveUpdate {
    * @param {pgPromise.IDatabase} [client=db] - The database client.
    * @param {number} [bufferSize=100000] - The size of the buffer.
    */
-  constructor({ schema, table, cols, where }, client = db, bufferSize = 100000) {
+  constructor({ schema, table, cols, where = null }, client = db, bufferSize = 100000) {
     this.columnSet = new pgp.helpers.ColumnSet(cols, { table: { schema, table } })
     this.client = client
     this.where = where
@@ -31,7 +31,7 @@ export default class MassiveUpdate {
 
   async flush() {
     if (this.values.length > 0) {
-      const query = pgp.helpers.update(this.values, this.columnSet) + this.where
+      const query = pgp.helpers.update(this.values, this.columnSet) + (this.where ? this.where : '')
       await this.client.none(query)
       this.values.length = 0
     }
