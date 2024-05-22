@@ -43,7 +43,13 @@ export const exportSurvey = ({ surveyId, user, includeData = false, includeActiv
 }
 
 export const exportSurveysList = async ({ user, draft, template, outputStream }) => {
-  const items = await fetchUserSurveysInfo({ user, draft, template, includeCounts: true })
+  const items = await fetchUserSurveysInfo({
+    user,
+    draft,
+    template,
+    includeCounts: true,
+    includeOwnerEmailAddress: true,
+  })
   const fields = [
     'id',
     'uuid',
@@ -54,6 +60,7 @@ export const exportSurveysList = async ({ user, draft, template, outputStream })
     'dateModified',
     'datePublished',
     'ownerName',
+    'ownerEmail',
     'nodeDefsCount',
     'recordsCount',
     'chainsCount',

@@ -285,7 +285,19 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
 }
 
 export const fetchUserSurveysInfo = async (
-  { user, draft = true, template = false, offset, limit, lang, search, sortBy, sortOrder, includeCounts = false },
+  {
+    user,
+    draft = true,
+    template = false,
+    offset,
+    limit,
+    lang,
+    search,
+    sortBy,
+    sortOrder,
+    includeCounts = false,
+    includeOwnerEmailAddress = false,
+  },
   client = db
 ) => {
   // check sortBy is valid
@@ -308,6 +320,7 @@ export const fetchUserSurveysInfo = async (
         search,
         sortBy,
         sortOrder,
+        includeOwnerEmailAddress,
       })
     ).map(assocSurveyInfo)
 
