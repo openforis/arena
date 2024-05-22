@@ -110,6 +110,14 @@ export const init = (app) => {
     }
   })
 
+  app.get('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/surveyTemplates', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
