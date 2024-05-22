@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import { Authorizer } from '@openforis/arena-core'
 import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
@@ -17,7 +18,6 @@ import * as SurveyService from '../service/surveyService'
 import * as FileService from '../../record/service/fileService'
 import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
-import { Authorizer } from '@openforis/arena-core'
 
 export const init = (app) => {
   // ==== CREATE
