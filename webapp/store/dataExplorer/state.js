@@ -89,7 +89,7 @@ const dissocRecordEditModalProps = A.dissoc(keys.recordEditModalProps)
 const isChartTypeAvailable =
   ({ queryMode }) =>
   (chartType) =>
-    availableChartTypeByMode[queryMode].includes(chartType)
+    availableChartTypeByMode[queryMode]?.includes(chartType)
 
 export const DataExplorerState = {
   stateKey,

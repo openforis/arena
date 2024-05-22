@@ -12,6 +12,12 @@ const stdlib2sql = {
   count: 'count',
   sum: 'sum',
   avg: 'avg',
+  isEmpty: (param) => `coalesce(${param}, '') = ''`,
+  '!': (param) => `NOT (${param})`,
+}
+
+const operatorToSql = {
+  '!': (param) => `NOT(${param})`,
 }
 
 const logicalOrTemplate = `CASE
@@ -57,9 +63,12 @@ export const sequence = (node, params) => {
 }
 
 export const unary = (node, params) => {
-  const { clause, params: paramsUnary } = _toSql(node.argument, params)
+  const { clause: clauseArguments, params: paramsUnary } = _toSql(node.argument, params)
+  const { operator } = node
+  const sqlOperator = operatorToSql[operator] ?? operator
+  const clause = typeof sqlOperator === 'string' ? `${sqlOperator} ${clauseArguments}` : sqlOperator(clauseArguments)
   return {
-    clause: `${node.operator} ${clause}`,
+    clause,
     params: paramsUnary,
   }
 }
@@ -74,10 +83,10 @@ const _isQuotedString = (value) =>
   typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"'
 
 /**
- * Expression node value could have been "stringified" (e.g. code/taxon/text attributes)
+ * Expression node value could have been "stringified" (e.g. Code/taxon/text attributes)
  * so it needs to be parsed.
  * When the value is a string, it will be quoted by pg-promise itself, so there is no need to double quote it
- * and if it's already quoted, remove the double quotes.
+ * and if it's already quoted, remove the double quotes..
  *
  * @param {!string} value - The value to parse.
  * @returns {object} - The result of the parsing.
@@ -86,7 +95,9 @@ const _getLiteralParamValue = (value) => {
   if (_isQuotedString(value)) {
     try {
       return JSON.parse(value)
-    } catch (e) {}
+    } catch (e) {
+      // ignore it
+    }
   }
   return value
 }
@@ -119,8 +130,8 @@ export const identifier = (node, params) => {
 export const call = (node, params) => {
   const { callee, arguments: argumentsNode } = node
   const { name } = callee
-  const sqlFnName = stdlib2sql[name]
-  if (!sqlFnName) {
+  const sqlFnNameOrFn = stdlib2sql[name]
+  if (!sqlFnNameOrFn) {
     throw new SystemError('undefinedFunction', { name })
   }
 
@@ -135,8 +146,11 @@ export const call = (node, params) => {
     { clause: '', params }
   )
 
+  const clause =
+    typeof sqlFnNameOrFn === 'string' ? `${sqlFnNameOrFn}(${clauseArguments})` : sqlFnNameOrFn(clauseArguments)
+
   return {
-    clause: `${sqlFnName}(${clauseArguments})`,
+    clause,
     params: paramsArguments,
   }
 }

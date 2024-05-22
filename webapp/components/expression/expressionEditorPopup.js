@@ -33,6 +33,7 @@ const ExpressionEditorPopup = (props) => {
     onClose,
     query,
     header,
+    includeAnalysis,
   } = props
 
   const {
@@ -57,6 +58,7 @@ const ExpressionEditorPopup = (props) => {
     nodeDefUuidCurrent,
     onChange,
     query,
+    includeAnalysis,
   })
 
   const i18n = useI18n()
@@ -78,6 +80,7 @@ const ExpressionEditorPopup = (props) => {
           <AdvancedExpressionEditorPopup
             nodeDefCurrent={nodeDefCurrent}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
+            includeAnalysis={includeAnalysis}
             isContextParent={isContextParent}
             query={queryDraft}
             updateDraftQuery={updateDraftQuery}
@@ -128,6 +131,7 @@ ExpressionEditorPopup.propTypes = {
   excludeCurrentNodeDef: PropTypes.bool,
   expr: PropTypes.object, // AST expression
   header: PropTypes.node,
+  includeAnalysis: PropTypes.bool,
   isBoolean: PropTypes.bool, // True if expression returns a boolean condition
   isContextParent: PropTypes.bool, // True if the context node def is the parent of the current node def
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
@@ -145,6 +149,7 @@ ExpressionEditorPopup.defaultProps = {
   excludeCurrentNodeDef: true,
   expr: null,
   header: '',
+  includeAnalysis: false,
   isBoolean: true,
   isContextParent: false,
   mode: Expression.modes.json,
