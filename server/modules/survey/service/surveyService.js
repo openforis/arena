@@ -1,3 +1,5 @@
+import * as DateUtils from '@core/dateUtils'
+
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
@@ -68,7 +70,26 @@ export const exportSurveysList = async ({ user, draft, template, outputStream })
     'filesSize',
     'filesMissing',
   ]
-  await CSVWriter.writeItemsToStream({ outputStream, items, fields, options: { removeNewLines: false } })
+
+  const objectTransformer = (surveySummary) =>
+    Object.entries(surveySummary).reduce((acc, [key, value]) => {
+      const valueTransformed = key.startsWith('date')
+        ? DateUtils.convertDate({
+            dateStr: value,
+            formatFrom: DateUtils.formats.datetimeISO,
+            formatTo: DateUtils.formats.datetimeExport,
+          })
+        : value
+      acc[key] = valueTransformed
+      return acc
+    }, {})
+
+  await CSVWriter.writeItemsToStream({
+    outputStream,
+    items,
+    fields,
+    options: { objectTransformer, removeNewLines: false },
+  })
 }
 
 export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
