@@ -1,9 +1,9 @@
+import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
+import * as CSVWriter from '@server/utils/file/csvWriter'
+
 import * as SurveyManager from '../manager/surveyManager'
-
-import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
-
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
@@ -40,6 +40,28 @@ export const exportSurvey = ({ surveyId, user, includeData = false, includeActiv
   JobManager.executeJobThread(job)
 
   return { job: JobUtils.jobToJSON(job), outputFileName }
+}
+
+export const exportSurveysList = async ({ user, draft, template, outputStream }) => {
+  const items = await fetchUserSurveysInfo({ user, draft, template, includeCounts: true })
+  const fields = [
+    'id',
+    'uuid',
+    'name',
+    'label',
+    'status',
+    'dateCreated',
+    'dateModified',
+    'datePublished',
+    'ownerName',
+    'nodeDefsCount',
+    'recordsCount',
+    'chainsCount',
+    'filesCount',
+    'filesSize',
+    'filesMissing',
+  ]
+  await CSVWriter.writeItemsToStream({ outputStream, items, fields, options: { removeNewLines: false } })
 }
 
 export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {

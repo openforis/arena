@@ -113,6 +113,11 @@ export const init = (app) => {
   app.get('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
+      const { draft = true, template = false } = Request.getParams(req)
+      const fileName = ExportFileNameGenerator.generate({ fileType: 'surveysList' })
+      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+
+      await SurveyService.exportSurveysList({ user, draft, template, outputStream: res })
     } catch (error) {
       next(error)
     }
