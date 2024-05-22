@@ -1,19 +1,11 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import {
-  BarChart as ReChartsBarChart,
-  Bar,
-  Rectangle,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts'
+import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 
 import { Colors } from '@webapp/utils/colors'
+
+import { ChartWrapper } from '../common'
 
 const defaultBarFill = '#3885ca'
 const activeBarStroke = '#3885ca'
@@ -31,7 +23,7 @@ export const BarChart = (props) => {
   }, [])
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ChartWrapper>
       <ReChartsBarChart data={data} layout={layout}>
         <CartesianGrid strokeDasharray="3 3" />
         {layout === 'horizontal' && (
@@ -67,7 +59,7 @@ export const BarChart = (props) => {
           )
         })}
       </ReChartsBarChart>
-    </ResponsiveContainer>
+    </ChartWrapper>
   )
 }
 

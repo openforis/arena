@@ -3,11 +3,11 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 const BATCH_SIZE = 1000
 
-export class RecordsValidationBatchPersister extends UniqueItemsBatchPersister {
+export class RecordsDateModifiedBatchPersister extends UniqueItemsBatchPersister {
   constructor({ surveyId, tx }) {
     super(
-      async (recordUuidsAndValidations) =>
-        RecordManager.updateRecordValidationsFromValues(this.surveyId, recordUuidsAndValidations, this.tx),
+      async (recordUuidsAndDateModified) =>
+        RecordManager.updateRecordDateModifiedFromValues(surveyId, recordUuidsAndDateModified, this.tx),
       BATCH_SIZE,
       tx
     )
