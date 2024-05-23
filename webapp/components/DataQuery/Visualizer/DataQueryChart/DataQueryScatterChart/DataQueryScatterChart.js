@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -8,15 +9,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as ObjectUtils from '@core/objectUtils'
 
+import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { ScatterChart } from '@webapp/charts/ScatterChart'
+import { DataExplorerActions } from '@webapp/store/dataExplorer'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useDataQueryChartData } from '../useDataQueryChartData'
-import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { DataQueryScatterChartTooltip } from './DataQueryScatterChartTooltip'
-import { useDispatch } from 'react-redux'
-import { DataExplorerActions } from '@webapp/store/dataExplorer'
 
 const maxItems = 5000
 
