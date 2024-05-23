@@ -83,10 +83,10 @@ const _isQuotedString = (value) =>
   typeof value === 'string' && value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"'
 
 /**
- * Expression node value could have been "stringified" (e.g. Code/taxon/text attributes)
+ * Expression node value could have been "stringified" (e.g. Attributes of type code/taxon/text)
  * so it needs to be parsed.
  * When the value is a string, it will be quoted by pg-promise itself, so there is no need to double quote it
- * and if it's already quoted, remove the double quotes..
+ * and if it's already quoted, remove the double quotes.
  *
  * @param {!string} value - The value to parse.
  * @returns {object} - The result of the parsing.
