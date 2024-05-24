@@ -7,6 +7,11 @@ import { Colors } from '@webapp/utils/colors'
 
 import { ChartWrapper } from '../common'
 
+const layouts = {
+  horizontal: 'horizontal',
+  vertical: 'vertical',
+}
+
 const defaultBarFill = '#3885ca'
 const activeBarStroke = '#3885ca'
 const maxBarSize = 30
@@ -31,15 +36,15 @@ export const BarChart = (props) => {
 
   return (
     <ChartWrapper>
-      <ReChartsBarChart data={data} layout={layout} margin={margin}>
+      <ReChartsBarChart data={data} layout={layout} margin={layout === layouts.horizontal ? margin : undefined}>
         <CartesianGrid strokeDasharray="3 3" />
-        {layout === 'horizontal' && (
+        {layout === layouts.horizontal && (
           <>
             <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} tickFormatter={tickFormatter} />
             <YAxis />
           </>
         )}
-        {layout === 'vertical' && (
+        {layout === layouts.vertical && (
           <>
             <XAxis type="number" />
             <YAxis

@@ -7,7 +7,7 @@ import { ChartWrapper } from '../common'
 const margin = {
   top: 0,
   right: 20,
-  bottom: 70,
+  bottom: 60,
   left: 0,
 }
 
@@ -20,7 +20,7 @@ export const LineChart = (props) => {
     <ChartWrapper>
       <ReChartsLineChart data={data} margin={margin}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey={labelDataKey} angle={-30} dy={40} />
+        <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} />
         <YAxis allowDecimals={allowDecimals} />
         {showLegend && <Legend verticalAlign="top" />}
         <Tooltip />
