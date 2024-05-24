@@ -22,6 +22,19 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const dimensionNodeDefs = useNodeDefsByUuids(dimensions)
   const measuresNodeDefs = useNodeDefsByUuids(measureNodeDefUuids)
 
+  const getDataColumnName = ({ nodeDef, nodeDefLabelType }) => {
+    const nodeDefName = NodeDef.getName(nodeDef)
+    if (nodeDefLabelType === NodeDef.NodeDefLabelTypes.label) {
+      if (NodeDef.isCode(nodeDef)) {
+        return `${nodeDefName}_label`
+      }
+      if (NodeDef.isTaxon(nodeDef)) {
+        return `${nodeDefName}_scientific_name`
+      }
+    }
+    return nodeDefName
+  }
+
   const getDataKeysIndexedByNodeDefUuids = (nodeDefs) =>
     nodeDefs.reduce((acc, nodeDef) => {
       const key = NodeDef.getLabelWithType({ nodeDef, lang, type: nodeDefLabelType })
@@ -34,11 +47,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
 
   const getDataColumnsIndexedByNodeDefUuids = (nodeDefs) =>
     nodeDefs.reduce((acc, nodeDef) => {
-      const nodeDefName = NodeDef.getName(nodeDef)
-      const colName =
-        NodeDef.isCode(nodeDef) && nodeDefLabelType === NodeDef.NodeDefLabelTypes.label
-          ? `${nodeDefName}_label`
-          : nodeDefName
+      const colName = getDataColumnName({ nodeDef, nodeDefLabelType })
       acc[NodeDef.getUuid(nodeDef)] = colName
       return acc
     }, {})
