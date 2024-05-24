@@ -20,9 +20,9 @@ import * as RecordReader from './recordReader'
  * @returns {object} - The updated record.
  */
 export const mergeNodes =
-  (nodes, removeFlags = false) =>
+  (nodes, { removeFlags = false, sideEffect = false } = {}) =>
   (record) => {
-    let recordUpdated = { ...record }
+    let recordUpdated = sideEffect ? record : { ...record }
     if (!(keys.nodes in recordUpdated)) {
       recordUpdated[keys.nodes] = {}
     }
@@ -30,7 +30,7 @@ export const mergeNodes =
     Object.entries(nodes).forEach(([nodeUuid, n]) => {
       // Remove deleted node
       if (Node.isDeleted(n)) {
-        recordUpdated = deleteNode(n)(recordUpdated)
+        recordUpdated = deleteNode(n, { sideEffect })(recordUpdated)
       } else {
         const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(recordUpdated)
         // Exclude dirty nodes currently being edited by the user
@@ -43,12 +43,11 @@ export const mergeNodes =
 
         if (toBeAdded) {
           // Remove "updated" and "created" flags (used by Survey RDB generation)
-          const nodeUpdated = removeFlags ? R.omit([Node.keys.updated, Node.keys.created], n) : n
-          recordUpdated = Records.addNode(nodeUpdated)(recordUpdated)
+          const nodeUpdated = removeFlags ? Node.removeFlags({ sideEffect })(n) : n
+          recordUpdated = Records.addNode(nodeUpdated, { sideEffect })(recordUpdated)
         }
       }
     })
-
     return recordUpdated
   }
 
@@ -91,8 +90,10 @@ export const assocDateModified = (dateModified) => (record) => {
 
 // ====== DELETE
 
-export const deleteNode = (node) => (record) => {
-  const nodeUuid = Node.getUuid(node)
-  const { record: recordUpdated } = Records.deleteNode(nodeUuid)(record)
-  return recordUpdated
-}
+export const deleteNode =
+  (node, { sideEffect = false } = {}) =>
+  (record) => {
+    const nodeUuid = Node.getUuid(node)
+    const { record: recordUpdated } = Records.deleteNode(nodeUuid, { sideEffect })(record)
+    return recordUpdated
+  }

@@ -32,11 +32,23 @@ export const slice = createSlice({
 
     setSelectedQuerySummaryUuid: (state, action) =>
       DataExplorerState.assocSelectedQuerySummaryUuid(action.payload)(state),
+
+    openRecordEditModal: (state, action) => DataExplorerState.assocRecordEditModalProps(action.payload)(state),
+
+    closeRecordEditModal: (state) => DataExplorerState.dissocRecordEditModalProps(state),
   },
 })
 
-const { reset, setChartType, setDisplayType, setNodeDefsSelectorVisible, setQuery, setSelectedQuerySummaryUuid } =
-  slice.actions
+const {
+  reset,
+  setChartType,
+  setDisplayType,
+  setNodeDefsSelectorVisible,
+  setQuery,
+  setSelectedQuerySummaryUuid,
+  openRecordEditModal,
+  closeRecordEditModal,
+} = slice.actions
 
 export const DataExplorerActions = {
   reset,
@@ -45,6 +57,8 @@ export const DataExplorerActions = {
   setNodeDefsSelectorVisible,
   setQuery,
   setSelectedQuerySummaryUuid,
+  openRecordEditModal,
+  closeRecordEditModal,
 }
 
 export const { reducer: DataExplorerReducer } = slice

@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as Record from '@core/record/record'
@@ -110,7 +111,7 @@ export const RecordOwnerColumn = (props) => {
 
   return (
     <div
-      className="width100"
+      className={classNames('record-owner-col', { editing })}
       onClick={onContainerClick}
       onFocus={onContainerFocus}
       onKeyDown={onContainerKeyDown}

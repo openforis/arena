@@ -25,7 +25,7 @@ export { insertRecord, createRecordFromSamplingPointDataItem } from './_recordMa
 export { insertNodesInBatch, insertNodesInBulk } from './_recordManager/nodeCreationManager'
 
 export const { insertNode } = RecordUpdateManager
-export const { persistNodesToRDB } = NodeRdbManager
+export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
 
 // ==== READ
 
@@ -144,6 +144,7 @@ export {
   fetchRecordCreatedCountsByUser,
   fetchRecordCountsByStep,
   insertRecordsInBatch,
+  updateRecordDateModifiedFromValues,
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (

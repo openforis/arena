@@ -22,5 +22,12 @@
       justify-content: flex-end;
       gap: 0.2rem;
     }
+    .record-owner-col {
+      width: fit-content;
+      margin: auto;
+      &.editing {
+        width: 100%;
+      }
+    }
   }
 }

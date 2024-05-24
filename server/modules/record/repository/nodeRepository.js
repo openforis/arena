@@ -215,17 +215,11 @@ export const fetchNodesByRecordUuid = async (
   client = db
 ) =>
   client.map(
-    `
-    ${getNodeSelectQuery({ surveyId, includeRefData, draft, excludeRecordUuid: true })}
+    `${getNodeSelectQuery({ surveyId, includeRefData, draft })}
     WHERE n.record_uuid = $1
-    order by n.date_created
-    `,
+    ORDER BY n.date_created`,
     [recordUuid],
-    (row) => {
-      const rowTransformed = dbTransformCallback(row)
-      rowTransformed.recordUuid = recordUuid
-      return rowTransformed
-    }
+    dbTransformCallback
   )
 
 export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
