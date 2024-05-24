@@ -15,6 +15,7 @@ const keys = {
 
 const chartTypes = {
   bar: 'bar',
+  line: 'line',
   pie: 'pie',
   scatter: 'scatter',
 }
@@ -25,7 +26,7 @@ const displayTypes = {
 }
 
 const availableChartTypeByMode = {
-  [Query.modes.aggregate]: [chartTypes.bar, chartTypes.pie],
+  [Query.modes.aggregate]: [chartTypes.bar, chartTypes.line, chartTypes.pie],
   [Query.modes.raw]: [chartTypes.scatter],
 }
 

@@ -74,14 +74,16 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
 
   const chartData = data.map((dataItem) => {
     const labelCol = dataColumnByDimensionNodeDefUuid[firstDimension]
+    const labelValue = dataItem[labelCol]
     return {
-      [labelDataKey]: dataItem[labelCol] ?? emptyValueLabel,
+      [labelDataKey]: labelValue ?? emptyValueLabel,
       ...measureNodeDefUuids.reduce((acc, measureNodeDefUuid) => {
         const valueColumns = dataColumnsByMeasureNodeDefUuid[measureNodeDefUuid]
         const dataKeys = dataKeysByMeasureNodeDefUuid[measureNodeDefUuid]
         dataKeys.forEach((dataKey, index) => {
           const valueColumn = valueColumns[index]
-          acc[dataKey] = dataItem[valueColumn]
+          const value = dataItem[valueColumn]
+          acc[dataKey] = Number(value)
         }, {})
         return acc
       }, {}),

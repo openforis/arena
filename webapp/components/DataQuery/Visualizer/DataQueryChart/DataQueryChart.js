@@ -11,10 +11,12 @@ import { downloadSvgToPng } from '@webapp/utils/domUtils'
 
 import { DataQueryBarChart } from './DataQueryBarChart'
 import { DataQueryPieChart } from './DataQueryPieChart'
+import { DataQueryLineChart } from './DataQueryLineChart'
 import { DataQueryScatterChart } from './DataQueryScatterChart'
 
 const componentsByType = {
   [DataExplorerState.chartTypes.bar]: DataQueryBarChart,
+  [DataExplorerState.chartTypes.line]: DataQueryLineChart,
   [DataExplorerState.chartTypes.pie]: DataQueryPieChart,
   [DataExplorerState.chartTypes.scatter]: DataQueryScatterChart,
 }
