@@ -22,6 +22,7 @@ const displayTypeItems = Object.keys(displayTypes).map((displayType) => ({
 }))
 
 const iconByChartType = {
+  [chartTypes.area]: 'icon-stats-dots',
   [chartTypes.bar]: 'icon-stats-bars',
   [chartTypes.line]: 'icon-stats-bars2',
   [chartTypes.pie]: 'icon-pie-chart',
