@@ -78,12 +78,13 @@ const valueConverterByNodeDefType = {
   },
   [NodeDef.nodeDefType.decimal]: numericValueConverter,
   [NodeDef.nodeDefType.file]: ({ value, headers }) => {
-    const { fileName } = value
+    const { fileName, fileUuid: fileUuidInValue } = value
     if (Objects.isEmpty(fileName)) {
       throw new SystemError('validationErrors.dataImport.emptyFileName', { headers, fileName })
     }
+    const fileUuid = fileUuidInValue ?? uuidv4()
     return {
-      [Node.valuePropsFile.fileUuid]: uuidv4(),
+      [Node.valuePropsFile.fileUuid]: fileUuid,
       [Node.valuePropsFile.fileName]: fileName,
     }
   },
