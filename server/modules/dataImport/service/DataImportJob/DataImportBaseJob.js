@@ -57,7 +57,9 @@ export default class DataImportBaseJob extends Job {
 
     const recordUuid = Record.getUuid(record)
     await this.recordsValidationBatchPersister.addItem(recordUuid, Record.getValidation(record))
-    await this.recordsDateModifiedBatchPersister.addItem(recordUuid, dateModified, tx)
+    if (dateModified) {
+      await this.recordsDateModifiedBatchPersister.addItem(recordUuid, dateModified, tx)
+    }
 
     if (nodesArray.length === 0) return
 
