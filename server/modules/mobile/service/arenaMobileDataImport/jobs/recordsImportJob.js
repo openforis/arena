@@ -85,7 +85,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       const emptyMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)
 
       if (missingParentUuid || emptyMultipleAttribute) {
-        const messagePrefix = `node with uuid ${Node.getUuid(node)}`
+        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)}`
         const messageContent = missingParentUuid
           ? `has missing or invalid parent_uuid`
           : `is multiple and has an empty value`
@@ -180,6 +180,9 @@ export default class RecordsImportJob extends DataImportBaseJob {
     nodesArray.sort((nodeA, nodeB) => nodeA.id - nodeB.id)
     const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
 
+    if (!Record.getDateModified(record)) {
+      this.logDebug(`Empty date modified for record ${Record.getUuid(record)}`)
+    }
     await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid, dateModified: Record.getDateModified(record) })
 
     this.insertedRecordsUuids.add(recordUuid)
