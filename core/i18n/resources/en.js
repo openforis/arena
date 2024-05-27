@@ -703,7 +703,9 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
 `,
       },
       type: {
+        area: 'Area chart',
         bar: 'Bar chart',
+        line: 'Line chart',
         pie: 'Pie chart',
         scatter: 'Scatter chart',
       },
