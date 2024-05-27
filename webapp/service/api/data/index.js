@@ -9,6 +9,18 @@ export const createRecordFromSamplingPointDataItem = async ({ surveyId, itemUuid
   const { data: recordUuid } = await axios.post(`/api/survey/${surveyId}/record/fromspditem`, { itemUuid })
   return recordUuid
 }
+export const fetchRecordsCountByStep = async ({ surveyId, cycle }) => {
+  const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/count/by-step`, { params: { cycle } })
+  return countsByStep
+}
+export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
+  const {
+    data: { list },
+  } = await axios.get(`/api/survey/${surveyId}/records/summary`, {
+    params: { cycle, recordUuid },
+  })
+  return list?.[0]
+}
 
 // ==== DATA IMPORT
 export const startCollectRecordsImportJob = async ({
@@ -109,12 +121,6 @@ export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, option
 export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, tempFileName }) => {
   const params = new URLSearchParams({ cycle, tempFileName }).toString()
   window.open(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?${params}`, 'data-query-export')
-}
-
-// ==== READ
-export const fetchRecordsCountByStep = async ({ surveyId, cycle }) => {
-  const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/count/by-step`, { params: { cycle } })
-  return countsByStep
 }
 
 // ==== UPDATE

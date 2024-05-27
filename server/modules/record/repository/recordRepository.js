@@ -439,6 +439,7 @@ export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid 
     WHERE owner_uuid = $2`,
     [toOwnerUuid, fromOwnerUuid]
   )
+
 export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
   client.none(
     DbUtils.updateAllQuery(
@@ -447,6 +448,17 @@ export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndV
       { name: 'uuid', cast: 'uuid' },
       [{ name: 'validation', cast: 'jsonb' }],
       recordUuidAndValidationValues
+    )
+  )
+
+export const updateRecordDateModifiedFromValues = async (surveyId, recordUuidAndDateModifiedValues, client = db) =>
+  client.none(
+    DbUtils.updateAllQuery(
+      getSchemaSurvey(surveyId),
+      'record',
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'date_modified', cast: 'timestamp' }],
+      recordUuidAndDateModifiedValues
     )
   )
 

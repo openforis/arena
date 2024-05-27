@@ -1,6 +1,8 @@
 import React from 'react'
-import { PieChart as ReChartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { PieChart as ReChartsPieChart, Pie, Cell, Tooltip, Legend } from 'recharts'
 import PropTypes from 'prop-types'
+
+import { ChartWrapper } from '../common'
 
 const fill = '#8884d8'
 
@@ -22,7 +24,7 @@ export const PieChart = (props) => {
   } = props
 
   return (
-    <ResponsiveContainer width={width} height={height}>
+    <ChartWrapper width={width} height={height}>
       <ReChartsPieChart>
         <Pie
           data={data}
@@ -42,7 +44,7 @@ export const PieChart = (props) => {
         {showLegend && <Legend />}
         {children}
       </ReChartsPieChart>
-    </ResponsiveContainer>
+    </ChartWrapper>
   )
 }
 

@@ -81,6 +81,7 @@ const _getSurveysSelectQuery = ({
   limit = null,
   sortBy = Survey.sortableKeys.dateModified,
   sortOrder = 'DESC',
+  includeOwnerEmailAddress = false,
 }) => {
   const checkAccess = (!template || draft) && !User.isSystemAdmin(user)
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -120,6 +121,7 @@ const _getSurveysSelectQuery = ({
             NULL
         END AS status,
         u.name AS owner_name
+        ${includeOwnerEmailAddress ? `, u.email AS owner_email` : ''}
         ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
       FROM survey s
         JOIN "user" u 
@@ -143,6 +145,7 @@ const _getSurveysSelectQuery = ({
       , s.status
       , ${labelCol} AS label
       , s.owner_name
+      ${includeOwnerEmailAddress ? `, s.owner_email AS owner_email` : ''}
       ${checkAccess ? ', s.auth_groups' : ''}
     FROM survey_view s
     WHERE 
@@ -166,13 +169,25 @@ export const fetchUserSurveys = async (
     search: searchParam = null,
     sortBy = Survey.sortableKeys.dateModified,
     sortOrder = 'DESC',
+    includeOwnerEmailAddress = false,
   },
   client = db
 ) => {
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
   return client.map(
-    _getSurveysSelectQuery({ user, draft, template, offset, limit, lang, search, sortBy, sortOrder }),
+    _getSurveysSelectQuery({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeOwnerEmailAddress,
+    }),
     { userUuid: User.getUuid(user), template, search },
     (def) => DB.transformCallback(def, true)
   )

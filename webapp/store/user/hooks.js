@@ -25,6 +25,7 @@ export const useAuthCanExportSurvey = () => Authorizer.canExportSurvey(useUser()
 export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
 export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUser())
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
+export const useAuthCanExportSurveysList = () => Authorizer.canExportSurveysList(useUser())
 
 // ====== Auth / Analysis
 export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(), useSurveyInfo())

@@ -1,17 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {
-  Area,
-  AreaChart as ReChartsAreaChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
+import { Area, AreaChart as ReChartsAreaChart, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
+
+import { ChartWrapper } from '../common'
 
 const fillOpacity = '70'
 
@@ -22,7 +16,7 @@ export const AreaChart = (props) => {
   const colors = colorsProp ?? randomColors
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ChartWrapper>
       <ReChartsAreaChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={labelDataKey} />
@@ -33,7 +27,7 @@ export const AreaChart = (props) => {
           return <Area key={dataKey} dataKey={dataKey} fill={color} stackId="1" stroke={color} type="monotone" />
         })}
       </ReChartsAreaChart>
-    </ResponsiveContainer>
+    </ChartWrapper>
   )
 }
 

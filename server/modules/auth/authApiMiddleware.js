@@ -103,6 +103,7 @@ export const requireSurveyViewPermission = requireSurveyPermission(Authorizer.ca
 export const requireSurveyEditPermission = requireSurveyPermission(Authorizer.canEditSurvey)
 export const requireRecordCleansePermission = requireSurveyPermission(Authorizer.canCleanseRecords)
 export const requireSurveyRdbRefreshPermission = requirePermission(Authorizer.canRefreshAllSurveyRdbs)
+export const requireCanExportSurveysList = requirePermission(Authorizer.canExportSurveysList)
 
 // Record
 export const requireRecordListViewPermission = requireSurveyPermission(Authorizer.canViewSurvey)
