@@ -29,9 +29,19 @@ export class DataImportFileReader {
     return FileUtils.createReadStream(this.filePath)
   }
 
-  async getFile({ fileName }) {
-    const entryName = [directories.files, fileName].join(pathSeparator)
-    return this.fileZip.getEntryData(entryName)
+  async getFile({ fileName: fileNameParam, fileUuid }) {
+    const possibleFileNames = [fileNameParam]
+    if (fileUuid) {
+      const extension = FileUtils.getFileExtension(fileNameParam)
+      possibleFileNames.push(`${fileUuid}.bin`, `${fileUuid}.${extension}`)
+    }
+    for await (const fileName of possibleFileNames) {
+      const entryName = [directories.files, fileName].join(pathSeparator)
+      if (this.fileZip.hasEntry(entryName)) {
+        return this.fileZip.getEntryData(entryName)
+      }
+    }
+    return null
   }
 
   close() {
