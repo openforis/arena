@@ -1,5 +1,11 @@
 export const RdbUpdateTypes = { insert: 'insert', update: 'update', delete: 'delete' }
 
+const executionOrderByType = {
+  [RdbUpdateTypes.delete]: 1,
+  [RdbUpdateTypes.insert]: 2,
+  [RdbUpdateTypes.update]: 3,
+}
+
 export class RdbUpdates {
   constructor() {
     this.updatesBySchemaTableAndType = {}
@@ -32,7 +38,17 @@ export class RdbUpdates {
   }
 
   getAll() {
-    return Object.values(this.updatesBySchemaTableAndType).flatMap((updates) => updates.getAll())
+    return (
+      Object.entries(this.updatesBySchemaTableAndType)
+        .sort(([keyA], [keyB]) => {
+          // execute updates in order, according to the type: delete, insert, update
+          const { type: typeA } = RdbUpdates.expandKey(keyA)
+          const { type: typeB } = RdbUpdates.expandKey(keyB)
+          return executionOrderByType[typeA] - executionOrderByType[typeB]
+        })
+        // eslint-disable-next-line no-unused-vars
+        .flatMap(([_key, updates]) => updates.getAll())
+    )
   }
 
   merge(updates) {

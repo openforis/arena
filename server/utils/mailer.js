@@ -4,14 +4,16 @@ import * as nodemailer from 'nodemailer'
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 
-sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
-
 const emailServices = {
   sendgrid: 'sendgrid',
   office365: 'office365',
 }
 
 const emailService = ProcessUtils.ENV.emailService
+
+if (emailService === emailServices.sendgrid) {
+  sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
+}
 
 const authUser = ProcessUtils.ENV.emailAuthUser
 const authPass = ProcessUtils.ENV.emailAuthPassword

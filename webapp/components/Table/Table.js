@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -76,7 +77,7 @@ const Table = (props) => {
   }
 
   return (
-    <div className={`table ${className}`}>
+    <div className={classNames('table', className, { 'with-footer': showFooter })}>
       {showHeader && (
         <Header
           columns={columns}

@@ -7,11 +7,23 @@ import { Colors } from '@webapp/utils/colors'
 
 import { ChartWrapper } from '../common'
 
+const layouts = {
+  horizontal: 'horizontal',
+  vertical: 'vertical',
+}
+
 const defaultBarFill = '#3885ca'
 const activeBarStroke = '#3885ca'
 const maxBarSize = 30
 const tickMaxChars = 20
 const verticalLayoutYAxisWidth = 150
+
+const margin = {
+  top: 0,
+  right: 0,
+  bottom: 60,
+  left: 0,
+}
 
 export const BarChart = (props) => {
   const { data, dataColors, dataKeys, labelDataKey, layout, showLegend } = props
@@ -24,15 +36,15 @@ export const BarChart = (props) => {
 
   return (
     <ChartWrapper>
-      <ReChartsBarChart data={data} layout={layout}>
+      <ReChartsBarChart data={data} layout={layout} margin={layout === layouts.horizontal ? margin : undefined}>
         <CartesianGrid strokeDasharray="3 3" />
-        {layout === 'horizontal' && (
+        {layout === layouts.horizontal && (
           <>
-            <XAxis dataKey={labelDataKey} tickFormatter={tickFormatter} />
+            <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} tickFormatter={tickFormatter} />
             <YAxis />
           </>
         )}
-        {layout === 'vertical' && (
+        {layout === layouts.vertical && (
           <>
             <XAxis type="number" />
             <YAxis
@@ -43,8 +55,10 @@ export const BarChart = (props) => {
             />
           </>
         )}
+
+        {showLegend && <Legend verticalAlign="top" />}
+
         <Tooltip cursor={{ fill: 'transparent' }} />
-        {showLegend && <Legend />}
         {dataKeys.map((dataKey, index) => {
           const barFill = dataColors[index] ?? defaultBarFill
           const activeBarFill = Colors.lightenColor(barFill, 10)
