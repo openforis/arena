@@ -7,145 +7,151 @@ $tableFooterHeight: 30px;
   overflow: hidden;
   position: relative;
   display: initial;
-}
 
-.table__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: $tableHeaderHeight;
-}
-
-.table__content {
-  position: relative;
-  padding: 10px;
-  background-color: $white;
-  height: calc(100% - #{$tableHeaderHeight} - #{$tableFooterHeight});
-  border: $tableRowBorder;
-}
-
-.table__footer {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.table__empty-rows {
-  font-style: italic;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.table__rows {
-  position: absolute;
-  overflow-y: auto;
-  height: calc(100% - 50px);
-  right: 10px;
-  left: 10px;
-}
-
-.table__row {
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  border-bottom: $tableRowBorder;
-  height: $tableRowHeight;
-  min-height: $tableRowHeight;
-  position: relative;
-  font-size: 0.9rem;
-
-  &:last-child {
-    border-bottom: none;
+  .table__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: $tableHeaderHeight;
   }
 
-  > div {
-    //width: calc(100% / 6);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+  .table__content {
+    position: relative;
+    padding: 10px;
+    background-color: $white;
+    height: calc(100% - #{$tableHeaderHeight});
+    border: $tableRowBorder;
   }
 
-  .btn {
-    font-size: 0.7rem;
+  .table__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
 
-    &.active {
-      background-color: $orangeLight;
+  .table__empty-rows {
+    font-style: italic;
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  .table__rows {
+    position: absolute;
+    overflow-y: auto;
+    height: calc(100% - 50px);
+    right: 10px;
+    left: 10px;
+  }
+
+  .table__row {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    border-bottom: $tableRowBorder;
+    height: $tableRowHeight;
+    min-height: $tableRowHeight;
+    position: relative;
+    font-size: 0.9rem;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    > div {
+      //width: calc(100% / 6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .btn {
+      font-size: 0.7rem;
+
+      &.active {
+        background-color: $orangeLight;
+      }
     }
   }
-}
 
-.table__row.hoverable {
-  cursor: pointer;
-  transition: 0.2s all;
-
-  .icon-action {
+  .table__row.hoverable {
+    cursor: pointer;
     transition: 0.2s all;
+
+    .icon-action {
+      transition: 0.2s all;
+    }
+
+    &:hover {
+      background-color: rgba($blueLight, 0.3);
+
+      .icon-action {
+        color: $orange;
+      }
+    }
   }
 
-  &:hover {
-    background-color: rgba($blueLight, 0.3);
+  .table__row.active {
+    background-color: $yellowHighlight;
+    pointer-events: none;
 
     .icon-action {
       color: $orange;
     }
   }
-}
 
-.table__row.active {
-  background-color: $yellowHighlight;
-  pointer-events: none;
-
-  .icon-action {
-    color: $orange;
-  }
-}
-
-.table__row.expanded {
-  align-items: baseline;
-}
-
-.table__row-header {
-  @extend .table__row;
-  border-bottom: none;
-  background-color: $black;
-  color: white;
-  font-weight: 600;
-  overflow: hidden;
-}
-
-.table__row-expanded-panel-wrapper {
-  position: absolute;
-  top: 35px;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-}
-
-.table__paginator {
-  align-self: flex-end;
-  display: flex;
-
-  button {
-    padding: 0.3rem;
-    margin: 0 0.2rem;
-    border: none;
-    background-color: inherit;
-
-    &:hover {
-      background-color: inherit;
-    }
-
-    &:disabled {
-      opacity: 0.2;
-    }
+  .table__row.expanded {
+    align-items: baseline;
   }
 
-  .counts {
-    font-size: 0.8rem;
-    align-self: center;
-    min-width: 100px;
-    text-align: center;
+  .table__row-header {
+    @extend .table__row;
+    border-bottom: none;
+    background-color: $black;
+    color: white;
     font-weight: 600;
-    color: rgba($black, 0.8);
+    overflow: hidden;
+  }
+
+  .table__row-expanded-panel-wrapper {
+    position: absolute;
+    top: 35px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .table__paginator {
+    align-self: flex-end;
+    display: flex;
+
+    button {
+      padding: 0.3rem;
+      margin: 0 0.2rem;
+      border: none;
+      background-color: inherit;
+
+      &:hover {
+        background-color: inherit;
+      }
+
+      &:disabled {
+        opacity: 0.2;
+      }
+    }
+
+    .counts {
+      font-size: 0.8rem;
+      align-self: center;
+      min-width: 100px;
+      text-align: center;
+      font-weight: 600;
+      color: rgba($black, 0.8);
+    }
+  }
+
+  &.with-footer {
+    .table__content {
+      height: calc(100% - #{$tableHeaderHeight} - #{$tableFooterHeight});
+    }
   }
 }

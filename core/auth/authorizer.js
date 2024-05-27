@@ -166,7 +166,7 @@ export const canEditUser = (user, surveyInfo, userToUpdate) =>
   User.hasAccepted(userToUpdate) &&
   (User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate))
 
-export const canEditUserEmail = _hasUserEditAccess
+export const canEditUserEmail = (user) => User.isSystemAdmin(user)
 
 export const canEditUserGroup = (user, surveyInfo, userToUpdate) =>
   !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)
