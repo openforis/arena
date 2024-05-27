@@ -195,6 +195,7 @@ export const getVariables = ({
   editorType,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,
+  includeAnalysis = false,
 }) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
@@ -207,6 +208,7 @@ export const getVariables = ({
     lang,
     editorType,
     excludeCurrentNodeDef,
+    includeAnalysis,
   })
 
   _sortVariables({ nodeDefCurrent, variables })
@@ -224,11 +226,12 @@ export const getVariablesChildren = ({
   lang,
   groupByParent,
   excludeCurrentNodeDef,
+  includeAnalysis = false,
 }) => {
   if (!NodeDef.isEntity(nodeDefContext)) {
     return []
   }
-  const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext)(survey)
+  const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext, includeAnalysis)(survey)
 
   const variables = nodeDefChildren.reduce((variablesAcc, childDef) => {
     variablesAcc.push(...getChildDefVariables({ survey, childDef, mode, lang, nodeDefCurrent, excludeCurrentNodeDef }))

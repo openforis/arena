@@ -31,6 +31,7 @@ export const useExpressionEditorPopupState = (props) => {
     onChange,
     query,
     groupByParent = true,
+    includeAnalysis = false,
   } = props
 
   const survey = useSurvey()
@@ -139,6 +140,7 @@ export const useExpressionEditorPopupState = (props) => {
     groupByParent,
     editorType,
     excludeCurrentNodeDef,
+    includeAnalysis,
   })
 
   return {
