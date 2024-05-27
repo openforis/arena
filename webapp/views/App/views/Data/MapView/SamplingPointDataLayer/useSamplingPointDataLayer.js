@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 
@@ -12,6 +13,7 @@ import * as API from '@webapp/service/api'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { LoaderActions } from '@webapp/store/ui'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 
@@ -84,6 +86,7 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
 export const useSamplingPointDataLayer = (props) => {
   const { levelIndex, markersColor } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const isMountedRef = useIsMountedRef()
   const map = useMap()
@@ -108,22 +111,28 @@ export const useSamplingPointDataLayer = (props) => {
   // add icon close to name
   const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
 
+  const fetchItemsAndConvertIntoPoints = useCallback(async () => {
+    dispatch(LoaderActions.showLoader())
+    try {
+      const items = await _fetchItems({ surveyId, levelIndex, fetchCancelRef, isMountedRef })
+      const { points, bounds } = _convertItemsToPoints(items)
+
+      // pan map into layer bounds center
+      if (map.getZoom() < 5 && points.length > 0) {
+        map.panTo(bounds.getCenter())
+      }
+      setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points, items }))
+    } finally {
+      dispatch(LoaderActions.hideLoader())
+    }
+  }, [dispatch, isMountedRef, levelIndex, map, surveyId])
+
   useMapLayerAdd({
     layerName: overlayName,
     callback: () => {
       const shouldLoadItems = !loaded && !loading
       if (shouldLoadItems) {
-        ;(async () => {
-          const items = await _fetchItems({ surveyId, levelIndex, fetchCancelRef, isMountedRef })
-          const { points, bounds } = _convertItemsToPoints(items)
-
-          // pan map into layer bounds center
-          if (map.getZoom() < 5 && points.length > 0) {
-            map.panTo(bounds.getCenter())
-          }
-
-          setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points, items }))
-        })()
+        fetchItemsAndConvertIntoPoints()
       }
       setState((statePrev) => ({ ...statePrev, loading: shouldLoadItems }))
     },
