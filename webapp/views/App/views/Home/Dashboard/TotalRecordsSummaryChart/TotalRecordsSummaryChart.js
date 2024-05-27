@@ -31,7 +31,7 @@ const TotalRecordsSummaryChart = (props) => {
       <RecordsSummaryPeriodSelector />
 
       {chartData.length > 0 ? (
-        <LineChart allowDecimals={false} data={chartData} dataKey="count" labelDataKey="date" />
+        <LineChart allowDecimals={false} data={chartData} dataKeys={['count']} labelDataKey="date" />
       ) : (
         <NoRecordsAddedInSelectedPeriod />
       )}
