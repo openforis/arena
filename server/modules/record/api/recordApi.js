@@ -206,7 +206,8 @@ export const init = (app) => {
   // records export (only specified uuids)
   app.post('/survey/:surveyId/records/export', requireRecordsExportPermission, async (req, res, next) => {
     try {
-      const { surveyId, recordUuids } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
+      const recordUuids = Request.getJsonParam(req, 'recordUuids')
       const user = Request.getUser(req)
 
       if (Objects.isEmpty(recordUuids)) {

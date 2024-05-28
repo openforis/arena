@@ -80,7 +80,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
   const fileZip = new FileZip(filePath)
   await fileZip.init()
 
-  const entryNames = fileZip.getEntryNames()
+  const entryNames = fileZip.getEntryNames({ onlyFirstLevel: false })
 
   const findEntry = ({ folderNames = [RChain.dirNames.user, RChain.dirNames.sampling], name }) =>
     entryNames.find((entryName) =>
