@@ -62,7 +62,7 @@ export default class FileZip {
       : null
   }
 
-  getEntryNames({ path = '', excludeHiddenFiles = true, excludeDirectories = true } = {}) {
+  getEntryNames({ path = '', excludeHiddenFiles = true, excludeDirectories = true, onlyFirstLevel = true } = {}) {
     const entries = this.streamZip.entries()
     return Object.values(entries).reduce((acc, entry) => {
       const { name, isDirectory } = entry
@@ -76,7 +76,7 @@ export default class FileZip {
         if (name.startsWith(path)) {
           acc.push(name.slice(path.length))
         }
-      } else {
+      } else if (!onlyFirstLevel || name.split('/').length === 1) {
         acc.push(name)
       }
       return acc
