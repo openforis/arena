@@ -20,6 +20,19 @@ const getCategoricalItems = ({ survey, nodeDef }) => {
   return []
 }
 
+const getDataColumnName = ({ nodeDef, nodeDefLabelType }) => {
+  const nodeDefName = NodeDef.getName(nodeDef)
+  if (nodeDefLabelType === NodeDef.NodeDefLabelTypes.label) {
+    if (NodeDef.isCode(nodeDef)) {
+      return `${nodeDefName}_label`
+    }
+    if (NodeDef.isTaxon(nodeDef)) {
+      return `${nodeDefName}_scientific_name`
+    }
+  }
+  return nodeDefName
+}
+
 export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const query = DataExplorerSelectors.useQuery()
   const lang = useSurveyPreferredLang()
@@ -41,19 +54,6 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     acc[measureNodeDefUuid] = maxDecimalDigits
     return acc
   }, {})
-
-  const getDataColumnName = ({ nodeDef, nodeDefLabelType }) => {
-    const nodeDefName = NodeDef.getName(nodeDef)
-    if (nodeDefLabelType === NodeDef.NodeDefLabelTypes.label) {
-      if (NodeDef.isCode(nodeDef)) {
-        return `${nodeDefName}_label`
-      }
-      if (NodeDef.isTaxon(nodeDef)) {
-        return `${nodeDefName}_scientific_name`
-      }
-    }
-    return nodeDefName
-  }
 
   const getDataKeysIndexedByNodeDefUuids = (nodeDefs) =>
     nodeDefs.reduce((acc, nodeDef) => {
