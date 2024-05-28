@@ -91,7 +91,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
           : `is multiple and has an empty value`
         const messageSuffix = `: skipping it`
         this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
+
         delete nodes[nodeUuid]
+      } else {
+        Node.removeFlags({ sideEffect: true })(node)
       }
     })
     // assoc nodes and build index from scratch
@@ -166,18 +169,26 @@ export default class RecordsImportJob extends DataImportBaseJob {
     // insert nodes (add them to batch persister)
     const nodesArray = []
 
-    Record.getNodesArray(record).forEach((node) => {
-      // check that the node definition associated to the node has not been deleted from the survey
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      if (nodeDef) {
-        node[Node.keys.created] = true // do side effect to avoid creating new objects
-        nodesArray.push(node)
-        if (NodeDef.isFile(nodeDef)) {
-          this.trackFileUuid({ node })
+    Record.getNodesArray(record)
+      .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
+      .forEach((node) => {
+        // check that the node definition associated to the node has not been deleted from the survey
+        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+        if (nodeDef) {
+          node[Node.keys.created] = true // do side effect to avoid creating new objects
+          nodesArray.push(node)
+          if (NodeDef.isFile(nodeDef)) {
+            this.trackFileUuid({ node })
+          }
+        } else {
+          this.logDebug(
+            `Record ${Node.getRecordUuid(node)}: missing node def with uuid ${Node.getNodeDefUuid(node)} in node ${Node.getUuid(node)}; skipping it`
+          )
         }
-      }
-    })
-    nodesArray.sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+      })
+
+    // nodesArray.sort((nodeA, nodeB) => nodeA.id - nodeB.id)
+
     const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
 
     if (!Record.getDateModified(record)) {
