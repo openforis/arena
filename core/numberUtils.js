@@ -1,5 +1,7 @@
-import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
+
+import * as A from '@core/arena'
+import { Objects } from '@openforis/arena-core'
 
 BigNumber.config({
   ERRORS: false,
@@ -10,11 +12,11 @@ BigNumber.config({
   },
 })
 
-export const toNumber = (num) => (R.isNil(num) || R.isEmpty(num) ? NaN : Number(num))
+export const toNumber = (num) => (Objects.isEmpty(num) ? NaN : Number(num))
 
-export const isInteger = R.pipe(toNumber, Number.isInteger)
+export const isInteger = A.pipe(toNumber, Number.isInteger)
 
-export const isFloat = R.pipe(toNumber, Number.isFinite)
+export const isFloat = A.pipe(toNumber, Number.isFinite)
 
 /**
  * Formats the given value to the specified fixed dicimal digits.
@@ -32,6 +34,14 @@ export const formatDecimal = (value, decimalDigits = NaN) => {
     return num.toFormat(decimalDigits)
   }
   return num.toFormat()
+}
+
+export const roundToPrecision = (value, precision = NaN) => {
+  const num = toNumber(value)
+  if (Number.isNaN(num)) return NaN
+  if (Number.isNaN(precision)) return num
+  const exp = Math.pow(10, precision)
+  return Math.round(num * exp) / exp
 }
 
 /**

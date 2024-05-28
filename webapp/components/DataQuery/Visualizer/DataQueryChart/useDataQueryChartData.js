@@ -1,7 +1,11 @@
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NumberUtils from '@core/numberUtils'
+
 import { Query } from '@common/model/query'
+
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useNodeDefsByUuids, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNodeDefsByUuids, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
 export const emptyValueLabel = '--- NA ---'
@@ -9,6 +13,7 @@ export const emptyValueLabel = '--- NA ---'
 export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const query = DataExplorerSelectors.useQuery()
   const lang = useSurveyPreferredLang()
+  const survey = useSurvey()
 
   const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
@@ -21,6 +26,12 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const attributeDefs = useNodeDefsByUuids(attributeDefUuids)
   const dimensionNodeDefs = useNodeDefsByUuids(dimensions)
   const measuresNodeDefs = useNodeDefsByUuids(measureNodeDefUuids)
+  const maxDecimalDigitsByMeasureNodeDefUuid = measuresNodeDefs.reduce((acc, measureNodeDef) => {
+    const measureNodeDefUuid = NodeDef.getUuid(measureNodeDef)
+    const maxDecimalDigits = Survey.getNodeDefMaxDecimalDigits(measureNodeDef)(survey)
+    acc[measureNodeDefUuid] = maxDecimalDigits
+    return acc
+  }, {})
 
   const getDataColumnName = ({ nodeDef, nodeDefLabelType }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
@@ -87,12 +98,13 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     return {
       [labelDataKey]: labelValue ?? emptyValueLabel,
       ...measureNodeDefUuids.reduce((acc, measureNodeDefUuid) => {
+        const maxDecimalDigits = maxDecimalDigitsByMeasureNodeDefUuid[measureNodeDefUuid]
         const valueColumns = dataColumnsByMeasureNodeDefUuid[measureNodeDefUuid]
         const dataKeys = dataKeysByMeasureNodeDefUuid[measureNodeDefUuid]
         dataKeys.forEach((dataKey, index) => {
           const valueColumn = valueColumns[index]
           const value = dataItem[valueColumn]
-          acc[dataKey] = Number(value)
+          acc[dataKey] = NumberUtils.roundToPrecision(value, maxDecimalDigits)
         }, {})
         return acc
       }, {}),
@@ -110,6 +122,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     dataKeysByMeasureNodeDefUuid,
     dataKeys,
     labelDataKey,
+    maxDecimalDigitsByMeasureNodeDefUuid,
     query,
   }
 }
