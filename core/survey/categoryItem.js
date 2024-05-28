@@ -61,6 +61,7 @@ export const getLabel =
   (item) =>
     ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
 export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
+export const getIndex = ObjectUtils.getProp(keysProps.index)
 
 // ====== READ - Extra Props
 export const getExtra = ObjectUtils.getProp(keysProps.extra)
