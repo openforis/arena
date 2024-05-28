@@ -58,7 +58,7 @@ PieChart.propTypes = {
   endAngle: PropTypes.number,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   innerRadius: PropTypes.number,
-  label: PropTypes.bool,
+  label: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
   outerRadius: PropTypes.number,
   showLabelLine: PropTypes.bool,
   showLegend: PropTypes.bool,
