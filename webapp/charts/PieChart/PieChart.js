@@ -18,6 +18,7 @@ export const PieChart = (props) => {
     label,
     outerRadius,
     startAngle,
+    showLabelLine,
     showLegend,
     showTooltip,
     width,
@@ -34,6 +35,7 @@ export const PieChart = (props) => {
           innerRadius={innerRadius}
           label={label}
           outerRadius={outerRadius}
+          labelLine={showLabelLine}
           startAngle={startAngle}
         >
           {data.map((item) => (
@@ -58,9 +60,10 @@ PieChart.propTypes = {
   innerRadius: PropTypes.number,
   label: PropTypes.bool,
   outerRadius: PropTypes.number,
-  startAngle: PropTypes.number,
+  showLabelLine: PropTypes.bool,
   showLegend: PropTypes.bool,
   showTooltip: PropTypes.bool,
+  startAngle: PropTypes.number,
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
@@ -68,6 +71,7 @@ PieChart.defaultProps = {
   colorKey: 'color',
   dataKey: 'value',
   label: true,
+  showLabelLine: true,
   showLegend: true,
   showTooltip: true,
   width: '100%',

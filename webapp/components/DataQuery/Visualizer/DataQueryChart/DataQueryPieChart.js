@@ -12,6 +12,8 @@ import { useI18n } from '@webapp/store/system'
 import { useDataQueryChartData } from './useDataQueryChartData'
 
 const maxItems = 20
+const RADIAN = Math.PI / 180
+const labelFill = 'white'
 
 export const DataQueryPieChart = (props) => {
   const { data, nodeDefLabelType } = props
@@ -39,15 +41,27 @@ export const DataQueryPieChart = (props) => {
 
   const chartData = data.reduce((acc, dataItem, index) => {
     const name = dataItem[firstDimensionDataColumn]
-    const val = dataItem[firstMeasureDataColumn]
-    const value = NumberUtils.roundToPrecision(val, maxDecimalDigits)
+    const dataItemValue = dataItem[firstMeasureDataColumn]
+    const value = NumberUtils.roundToPrecision(dataItemValue, maxDecimalDigits)
     if (!Objects.isEmpty(name) && !Number.isNaN(value)) {
       acc.push({ name, value, color: colors[index] })
     }
     return acc
   }, [])
 
-  return <PieChart data={chartData} />
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+    const x = cx + radius * Math.cos(-midAngle * RADIAN)
+    const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+    return (
+      <text x={x} y={y} fill={labelFill} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    )
+  }
+
+  return <PieChart data={chartData} label={renderLabel} showLabelLine={false} />
 }
 
 DataQueryPieChart.propTypes = {
