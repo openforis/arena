@@ -5,21 +5,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
 
-const findMaxNumberDecimalDigits = ({ survey, nodeDef }) => {
-  if (survey && NodeDef.isAreaBasedEstimatedOf(nodeDef)) {
-    const areaBasedEstimatedOfNodeDef = Survey.getAreaBasedEstimatedOfNodeDef(nodeDef)(survey)
-    return NodeDef.getMaxNumberDecimalDigits(areaBasedEstimatedOfNodeDef)
-  }
-  return NodeDef.getMaxNumberDecimalDigits(nodeDef)
-}
-
 const formatters = {
   [NodeDef.nodeDefType.boolean]: ({ value, i18n, nodeDef }) =>
     i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
   [NodeDef.nodeDefType.code]: ({ value, label }) => label ?? value,
   [NodeDef.nodeDefType.date]: ({ value }) => DateUtils.format(DateUtils.parseISO(value), DateUtils.formats.dateDefault),
   [NodeDef.nodeDefType.decimal]: ({ survey, nodeDef, value }) => {
-    const maxNumberDecimalDigits = findMaxNumberDecimalDigits({ survey, nodeDef })
+    const maxNumberDecimalDigits = Survey.getNodeDefMaxDecimalDigits(nodeDef)(survey)
     return NumberUtils.formatDecimal(value, maxNumberDecimalDigits)
   },
 

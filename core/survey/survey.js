@@ -169,6 +169,7 @@ export const {
   findNodeDef,
   getNodeDefAreaBasedEstimate,
   getAreaBasedEstimatedOfNodeDef,
+  getNodeDefMaxDecimalDigits,
 } = SurveyNodeDefs
 
 // Hierarchy
