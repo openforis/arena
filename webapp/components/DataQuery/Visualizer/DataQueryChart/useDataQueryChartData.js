@@ -1,18 +1,45 @@
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NumberUtils from '@core/numberUtils'
+
 import { Query } from '@common/model/query'
+
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useNodeDefsByUuids, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNodeDefsByUuids, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
 export const emptyValueLabel = '--- NA ---'
 
+const getCategoricalItems = ({ survey, nodeDef }) => {
+  if (NodeDef.isCode(nodeDef)) {
+    const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    return Survey.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
+  }
+  return []
+}
+
+const getDataColumnName = ({ nodeDef, nodeDefLabelType }) => {
+  const nodeDefName = NodeDef.getName(nodeDef)
+  if (nodeDefLabelType === NodeDef.NodeDefLabelTypes.label) {
+    if (NodeDef.isCode(nodeDef)) {
+      return `${nodeDefName}_label`
+    }
+    if (NodeDef.isTaxon(nodeDef)) {
+      return `${nodeDefName}_scientific_name`
+    }
+  }
+  return nodeDefName
+}
+
 export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const query = DataExplorerSelectors.useQuery()
   const lang = useSurveyPreferredLang()
+  const survey = useSurvey()
 
   const attributeDefUuids = Query.getAttributeDefUuids(query)
   const dimensions = Query.getDimensions(query)
-  const firstDimension = dimensions[0]
   const measures = Query.getMeasures(query)
   const contextEntityDefUuid = Query.getEntityDefUuid(query)
   const measureNodeDefUuids = Object.keys(measures)
@@ -21,19 +48,12 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
   const attributeDefs = useNodeDefsByUuids(attributeDefUuids)
   const dimensionNodeDefs = useNodeDefsByUuids(dimensions)
   const measuresNodeDefs = useNodeDefsByUuids(measureNodeDefUuids)
-
-  const getDataColumnName = ({ nodeDef, nodeDefLabelType }) => {
-    const nodeDefName = NodeDef.getName(nodeDef)
-    if (nodeDefLabelType === NodeDef.NodeDefLabelTypes.label) {
-      if (NodeDef.isCode(nodeDef)) {
-        return `${nodeDefName}_label`
-      }
-      if (NodeDef.isTaxon(nodeDef)) {
-        return `${nodeDefName}_scientific_name`
-      }
-    }
-    return nodeDefName
-  }
+  const maxDecimalDigitsByMeasureNodeDefUuid = measuresNodeDefs.reduce((acc, measureNodeDef) => {
+    const measureNodeDefUuid = NodeDef.getUuid(measureNodeDef)
+    const maxDecimalDigits = Survey.getNodeDefMaxDecimalDigits(measureNodeDef)(survey)
+    acc[measureNodeDefUuid] = maxDecimalDigits
+    return acc
+  }, {})
 
   const getDataKeysIndexedByNodeDefUuids = (nodeDefs) =>
     nodeDefs.reduce((acc, nodeDef) => {
@@ -77,22 +97,41 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     return acc
   }, {})
 
-  const labelDataKey = dataKeyByDimensionNodeDefUuid[firstDimension]
+  const firstDimension = dimensions[0]
+  const firstDimensionNodeDef = dimensionNodeDefs[0]
+  const firstDimensionItems = getCategoricalItems({ survey, nodeDef: firstDimensionNodeDef })
+  const firstDimensionValueColumn = getDataColumnName({
+    nodeDef: firstDimensionNodeDef,
+    nodeDefLabelType: NodeDef.NodeDefLabelTypes.name,
+  })
 
   const dataKeys = measureNodeDefUuids.flatMap((measureNodeDefUuid) => dataKeysByMeasureNodeDefUuid[measureNodeDefUuid])
 
-  const chartData = data.map((dataItem) => {
-    const labelCol = dataColumnByDimensionNodeDefUuid[firstDimension]
-    const labelValue = dataItem[labelCol]
+  const sortedData =
+    firstDimensionItems.length > 0
+      ? [...data].sort((dataItemA, dataItemB) => {
+          const codeA = dataItemA[firstDimensionValueColumn]
+          const codeB = dataItemB[firstDimensionValueColumn]
+          const categoryItemA = firstDimensionItems.find((item) => CategoryItem.getCode(item) === codeA)
+          const categoryItemB = firstDimensionItems.find((item) => CategoryItem.getCode(item) === codeB)
+          return CategoryItem.getIndex(categoryItemA) - CategoryItem.getIndex(categoryItemB)
+        })
+      : data
+
+  const labelDataKey = dataColumnByDimensionNodeDefUuid[firstDimension]
+
+  const chartData = sortedData.map((dataItem) => {
+    const labelValue = dataItem[labelDataKey]
     return {
       [labelDataKey]: labelValue ?? emptyValueLabel,
       ...measureNodeDefUuids.reduce((acc, measureNodeDefUuid) => {
+        const maxDecimalDigits = maxDecimalDigitsByMeasureNodeDefUuid[measureNodeDefUuid]
         const valueColumns = dataColumnsByMeasureNodeDefUuid[measureNodeDefUuid]
         const dataKeys = dataKeysByMeasureNodeDefUuid[measureNodeDefUuid]
         dataKeys.forEach((dataKey, index) => {
           const valueColumn = valueColumns[index]
           const value = dataItem[valueColumn]
-          acc[dataKey] = Number(value)
+          acc[dataKey] = NumberUtils.roundToPrecision(value, maxDecimalDigits)
         }, {})
         return acc
       }, {}),
@@ -110,6 +149,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
     dataKeysByMeasureNodeDefUuid,
     dataKeys,
     labelDataKey,
+    maxDecimalDigitsByMeasureNodeDefUuid,
     query,
   }
 }
