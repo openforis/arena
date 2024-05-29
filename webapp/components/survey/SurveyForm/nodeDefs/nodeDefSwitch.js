@@ -97,6 +97,7 @@ const NodeDefSwitch = (props) => {
 
   const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
+  const handleMouseEvents = edit && canEditDef && !renderAsForm
 
   const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [])
   const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [])
@@ -169,9 +170,9 @@ const NodeDefSwitch = (props) => {
       className={className}
       data-testid={TestId.surveyForm.nodeDefWrapper(NodeDef.getName(nodeDef))}
       ref={elementRef}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseEnter}
+      onMouseEnter={handleMouseEvents ? onMouseEnter : undefined}
+      onMouseLeave={handleMouseEvents ? onMouseLeave : undefined}
+      onMouseMove={handleMouseEvents ? onMouseEnter : undefined}
     >
       {editButtonsVisible && (
         <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />
