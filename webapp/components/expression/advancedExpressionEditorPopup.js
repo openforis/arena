@@ -9,7 +9,7 @@ import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValid
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
@@ -21,6 +21,7 @@ const AdvancedExpressionEditorPopup = (props) => {
   const inputRef = useRef()
   const i18n = useI18n()
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
 
   const [errorMessage, setErrorMessage] = useState(null)
   const editorRef = useRef(null)
@@ -67,7 +68,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
       hintOptions: {
-        hint: arenaExpressionHint({ mode, i18n, survey, nodeDefCurrent, isContextParent, includeAnalysis }),
+        hint: arenaExpressionHint({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis }),
       },
     })
     editor.setSize('100%', 'auto')
