@@ -108,18 +108,19 @@ const NodeDefSwitch = (props) => {
   const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
   const { canAddNode, nodes } = entryProps
 
-  const className = classNames(
-    'survey-form__node-def-page' + (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'),
-    {
-      'not-applicable': !applicable,
-      hidden:
-        !applicable &&
-        NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
-        renderType !== NodeDefLayout.renderType.tableBody &&
-        empty,
-      'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
-    }
-  )
+  const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
+  const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
+
+  const className = classNames(mainClassName, {
+    'not-applicable': !applicable,
+    hidden:
+      !applicable &&
+      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
+      renderType !== NodeDefLayout.renderType.tableBody &&
+      empty,
+    'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
+    'auto-resize': entry,
+  })
 
   const checkNodePlaceholder = useCallback(() => {
     if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
