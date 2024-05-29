@@ -55,7 +55,7 @@ export const DataQueryPieChart = (props) => {
     const y = cy + radius * Math.sin(-midAngle * RADIAN)
 
     return (
-      <text x={x} y={y} fill={labelFill} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      <text x={x} y={y} fill={labelFill} textAnchor="middle" dominantBaseline="central">
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     )
