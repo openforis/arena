@@ -18,8 +18,18 @@
   }
 }
 
-.survey-form__node-def-entity-form-grid {
-  position: relative;
-  height: 100% !important;
-  width: 100%;
+.survey-form__node-def-entity-wrapper {
+  .survey-form__node-def-entity-form-grid {
+    position: relative;
+    height: 100% !important;
+    width: 100%;
+  }
+
+  .survey-form__node-def-entity-form-grid-entry {
+    display: grid;
+
+    .grid-item {
+      padding: 0.2rem;
+    }
+  }
 }

@@ -99,7 +99,7 @@ const NodeDefEntityFormGrid = (props) => {
     const nodeDefUuid = NodeDef.getUuid(childDef)
     const style = styleByNodeDefUuid[nodeDefUuid]
     return (
-      <div key={nodeDefUuid} style={style}>
+      <div key={nodeDefUuid} className="grid-item" style={style}>
         <NodeDefSwitch
           edit={edit}
           entry={entry}
@@ -143,7 +143,12 @@ const NodeDefEntityFormGrid = (props) => {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)` }}>{visibleNodeDefsComponents}</div>
+    <div
+      className="survey-form__node-def-entity-form-grid-entry"
+      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+    >
+      {visibleNodeDefsComponents}
+    </div>
   )
 }
 
