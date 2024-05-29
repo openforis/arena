@@ -84,7 +84,6 @@ const NodeDefEntityFormGrid = (props) => {
         const minHeight = `${Math.max(minH, h) * 5}rem`
 
         acc[i] = {
-          display: 'grid',
           gridColumnStart: x + 1,
           gridColumnEnd: x + 1 + w,
           gridRowStart: y + 1,
