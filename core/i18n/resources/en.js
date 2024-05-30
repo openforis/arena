@@ -724,6 +724,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
         rawEdit: 'Raw edit',
       },
       replaceQueryConfirmMessage: 'Replace current query with the selected one?',
+      showCodes: 'Show codes',
     },
     editSelectedRecord: 'Edit selected record',
     filterAttributeTypes: 'Filter attribute types',
