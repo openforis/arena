@@ -36,7 +36,7 @@ export const DataQuerySelectedAttributes = (props) => {
   return (
     <DataQuerySortableItems
       attributeDefUuids={attributeDefUuids}
-      label="dataView.selectedAttributes"
+      label="common.attribute_other"
       nodeDefLabelType={nodeDefLabelType}
       onItemDelete={onAttributeDelete}
       onItemsSort={onAttributeDefsSort}

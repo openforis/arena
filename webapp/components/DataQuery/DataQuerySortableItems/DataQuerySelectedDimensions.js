@@ -40,7 +40,7 @@ export const DataQuerySelectedDimensions = (props) => {
   return (
     <DataQuerySortableItems
       attributeDefUuids={dimensionsDefUuids}
-      label="dataView.selectedDimensions"
+      label="common.dimension_other"
       nodeDefLabelType={nodeDefLabelType}
       onItemDelete={onDimensionDelete}
       onItemsSort={onDimensionsSort}

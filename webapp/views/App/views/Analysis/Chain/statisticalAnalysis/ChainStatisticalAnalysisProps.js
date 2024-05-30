@@ -144,7 +144,7 @@ export const ChainStatisticalAnalysisProps = () => {
         </div>
       </FormItem>
 
-      <FormItem label={i18n.t('common.dimension_plural')}>
+      <FormItem label={i18n.t('common.dimension_other')}>
         <DimensionsSelector
           chainUuid={chainUuid}
           entityDefUuid={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
