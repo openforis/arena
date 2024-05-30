@@ -22,8 +22,8 @@ export const DataQuerySortableItems = (props) => {
 
   useSortable({
     containerRef,
-    draggableClassName: '.data-query__selected-attribute-chip',
-    handleClassName: '.data-query__selected-attribute-chip .MuiChip-label',
+    draggableClassName: '.data-query__sortable-item-chip',
+    handleClassName: '.data-query__sortable-item-chip .MuiChip-label',
     items: nodeDefs,
     onItemsSort,
   })

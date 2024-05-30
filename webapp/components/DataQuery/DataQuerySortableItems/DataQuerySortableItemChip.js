@@ -28,7 +28,7 @@ export const DataQuerySortableItemChip = (props) => {
   return (
     <Chip
       key={NodeDef.getUuid(nodeDefDef)}
-      className="data-query__selected-attribute-chip"
+      className="data-query__sortable-item-chip"
       onDelete={onDelete}
       label={label}
       variant="outlined"
