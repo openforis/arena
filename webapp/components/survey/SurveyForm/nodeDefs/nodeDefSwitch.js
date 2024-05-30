@@ -119,7 +119,6 @@ const NodeDefSwitch = (props) => {
       renderType !== NodeDefLayout.renderType.tableBody &&
       empty,
     'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
-    'auto-resize': entry,
   })
 
   const checkNodePlaceholder = useCallback(() => {

@@ -103,6 +103,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  max-height: 40vh;
+  overflow-y: auto;
 
   > *:first-child {
     // position: absolute;
@@ -115,6 +117,8 @@
 
   &.auto-resize {
     height: auto;
+    max-height: unset;
+    overflow-y: unset;
 
     > *:first-child {
       height: auto;
