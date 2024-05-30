@@ -787,10 +787,9 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     },
     recordsUpdated: '{{count}} records updated successfully!',
     rowNum: 'Row #',
-    selectedAttributes: {
-      info: 'Drag&Drop to sort them',
-      label: 'Selected attributes:',
-    },
+    selectedAttributes: 'Selected attributes:',
+    selectedDimensions: 'Selected dimensions',
+    sortableItemsInfo: 'Drag&Drop to sort them',
     showValidationReport: 'Show validation report',
     sort: 'Sort',
     dataExport: {

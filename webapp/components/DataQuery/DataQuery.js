@@ -18,7 +18,8 @@ import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
-import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
+import { DataQuerySelectedAttributes } from './DataQuerySortableItems'
+import { DataQuerySelectedDimensions } from './DataQuerySortableItems'
 
 const DataQuery = () => {
   const dispatch = useDispatch()
@@ -69,6 +70,7 @@ const DataQuery = () => {
         </div>
 
         <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
           data={data}
