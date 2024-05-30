@@ -17,6 +17,8 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
+const rowMinHeight = 5 // in "rem" unit
+
 const NodeDefEntityFormGrid = (props) => {
   const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
 
@@ -81,7 +83,7 @@ const NodeDefEntityFormGrid = (props) => {
   const styleByNodeDefUuid = entry
     ? rdgLayout.reduce((acc, layoutItem) => {
         const { h, i, minH = 1, x, y, w } = layoutItem
-        const minHeight = `${Math.max(minH, h) * 5}rem`
+        const minHeight = `${Math.max(minH, h) * rowMinHeight}rem`
 
         acc[i] = {
           gridColumnStart: x + 1,
@@ -124,10 +126,10 @@ const NodeDefEntityFormGrid = (props) => {
         rowHeight={70}
         cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
         layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
-        containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
+        containerPadding={canEditDef ? [15, 40] : [15, 15]}
         margin={[5, 5]}
-        isDraggable={edit && canEditDef}
-        isResizable={edit && canEditDef}
+        isDraggable={canEditDef}
+        isResizable={canEditDef}
         compactType={null}
         preventCollision
         className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
