@@ -47,9 +47,9 @@ export const DataQuerySelectedMeasures = (props) => {
 
   return (
     <DataQuerySortableItems
-      attributeDefUuids={measuresDefUuids}
       label="common.measure_other"
       nodeDefLabelType={nodeDefLabelType}
+      nodeDefUuids={measuresDefUuids}
       onItemDelete={onMeasureDelete}
       onItemsSort={onMeasuresSort}
     />
