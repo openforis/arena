@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react'
+import { Button as MuiButton } from '@mui/material'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -24,6 +25,7 @@ export const Button = forwardRef((props, ref) => {
     testId,
     title: titleProp,
     titleParams,
+    variant,
     ...otherProps
   } = props
 
@@ -37,25 +39,24 @@ export const Button = forwardRef((props, ref) => {
       : null
 
   const btn = (
-    <button
+    <MuiButton
       ref={ref}
       id={id}
       data-testid={testId}
       disabled={disabled ? disabled : undefined}
-      aria-disabled={disabled ? disabled : undefined}
-      type="button"
       className={classNames('btn', className, {
         'btn-s': size === 'small',
         'btn-primary': primary,
         'btn-secondary': secondary,
       })}
       onClick={onClick}
+      variant={variant}
       {...otherProps}
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {label}
       {children}
-    </button>
+    </MuiButton>
   )
   if (Objects.isEmpty(title) || disabled) {
     return btn
@@ -84,6 +85,7 @@ Button.propTypes = {
   testId: PropTypes.string,
   title: PropTypes.string,
   titleParams: PropTypes.object,
+  variant: PropTypes.string,
 }
 
 Button.defaultProps = {
@@ -101,4 +103,5 @@ Button.defaultProps = {
   testId: null,
   title: null,
   titleParams: null,
+  variant: 'contained',
 }

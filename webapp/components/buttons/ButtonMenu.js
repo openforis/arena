@@ -32,7 +32,12 @@ export const ButtonMenu = (props) => {
 
   return (
     <>
-      <Button {...otherProps} className={classNames('button-menu__button', className)} onClick={onButtonClick}>
+      <Button
+        {...otherProps}
+        className={classNames('button-menu__button', className)}
+        onClick={onButtonClick}
+        variant="text"
+      >
         {/* show small arrow down icon on the right */}
         <span className="icon icon-ctrl button-menu__button-icon" />
       </Button>
@@ -48,6 +53,7 @@ export const ButtonMenu = (props) => {
                 testId={item.testId}
                 iconClassName={item.iconClassName}
                 label={item.label}
+                variant="text"
               />
             )}
           </MenuItem>

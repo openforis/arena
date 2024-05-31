@@ -55,6 +55,7 @@ export const RecordDeleteButton = (props) => {
       title="dataView.records.deleteRecord"
       showLabel={false}
       onClick={onDeleteButtonClick}
+      variant="text"
     />
   )
 }

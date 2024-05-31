@@ -64,13 +64,13 @@ const SurveyInfo = (props) => {
     <>
       <div className="home-dashboard__survey-info">
         <Header>
-          <Link
+          <Button
             data-testid={TestId.dashboard.surveyInfoBtnHeader}
-            to={appModuleUri(homeModules.surveyInfo)}
-            className="btn-s btn-transparent"
+            onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            variant="text"
           >
             <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
-          </Link>
+          </Button>
 
           <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
             ({Survey.getStatus(surveyInfo)})
@@ -78,18 +78,15 @@ const SurveyInfo = (props) => {
         </Header>
 
         <div>
-          <Link
+          <Button
             data-testid={TestId.dashboard.surveyInfoBtn}
-            to={appModuleUri(homeModules.surveyInfo)}
-            className="btn-s btn-transparent"
-          >
-            <span className={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`} />
-            {i18n.t(canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
-          </Link>
+            label={canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo'}
+            iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
+            onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            variant="text"
+          />
 
-          {!firstTime && canEditSurvey && (
-            <ButtonPublishSurvey className="btn-transparent" disabled={!Survey.isDraft(surveyInfo)} />
-          )}
+          {!firstTime && canEditSurvey && <ButtonPublishSurvey disabled={!Survey.isDraft(surveyInfo)} variant="text" />}
 
           {!firstTime && canExportSurvey && (
             <ButtonMenu
@@ -145,6 +142,7 @@ const SurveyInfo = (props) => {
                             onClick={onUnpublishClick}
                             iconClassName="icon-eye-blocked icon-12px icon-left"
                             label="homeView.surveyInfo.unpublish"
+                            variant="text"
                           />
                         ),
                       },
@@ -159,6 +157,7 @@ const SurveyInfo = (props) => {
                       onClick={onDeleteClick}
                       iconClassName="icon-bin icon-12px icon-left"
                       label="common.delete"
+                      variant="text"
                     />
                   ),
                 },
