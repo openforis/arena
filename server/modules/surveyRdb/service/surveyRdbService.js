@@ -154,6 +154,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
   includeAnalysis,
   includeDataFromAllCycles,
   includeFiles,
+  recordsModifiedAfter,
   outputDir,
   callback,
 }) => {
@@ -173,6 +174,7 @@ export const fetchEntitiesDataToCsvFiles = async ({
     includeAnalysis,
     includeFiles,
     recordOwnerUuid,
+    recordsModifiedAfter,
     callback,
   })
 }
