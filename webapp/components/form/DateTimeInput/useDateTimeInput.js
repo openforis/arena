@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { useCallback, useRef } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
@@ -5,7 +6,7 @@ import * as DateUtils from '@core/dateUtils'
 export const useDateTimeInput = ({ format, onChange: onChangeProp, value }) => {
   const errorRef = useRef(false)
 
-  const dateValue = value ? DateUtils.parse(value, format) : null
+  const dateValue = value ? moment(DateUtils.parse(value, format)) : null
 
   const applyChange = useCallback(
     (dateFormatted) => {

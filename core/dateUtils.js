@@ -1,44 +1,39 @@
 import * as R from 'ramda'
 
-import {
-  parse as dateFnsParse,
-  differenceInMonths,
-  differenceInWeeks,
-  differenceInDays,
-  differenceInHours,
-  differenceInMinutes,
-  format as dateFnsFormat,
-  isValid as fnsIsValid,
-} from 'date-fns'
+import { DateFormats, Dates } from '@openforis/arena-core'
+
+const {
+  add,
+  addMinutes,
+  diffInMinutes,
+  diffInHours,
+  diffInDays,
+  diffInMonths,
+  diffInWeeks,
+  sub,
+  subDays,
+  subMonths,
+  subYears,
+} = Dates
+
+export { add, addMinutes, diffInHours, sub, subDays, subMonths, subYears }
 
 import { isBlank } from './stringUtils'
 
-export {
-  parseISO,
-  subDays,
-  addDays,
-  addMinutes,
-  differenceInDays,
-  differenceInHours,
-  subMonths,
-  subYears,
-} from 'date-fns'
-
 export const formats = {
-  dateDefault: 'dd/MM/yyyy',
-  dateISO: 'yyyy-MM-dd',
-  datetimeDefault: 'yyyy-MM-dd_HH-mm-ss',
-  datetimeExport: 'yyyy-MM-dd HH:mm:ss',
-  datetimeDisplay: 'dd/MM/yyyy HH:mm:ss',
-  datetimeISO: `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`,
-  timeStorage: 'HH:mm',
+  dateDefault: DateFormats.dateDisplay,
+  dateISO: DateFormats.dateStorage,
+  datetimeDefault: DateFormats.datetimeDefault,
+  datetimeExport: 'YYYY-MM-DD HH:mm:ss',
+  datetimeDisplay: DateFormats.datetimeDisplay,
+  datetimeISO: DateFormats.datetimeStorage,
+  timeStorage: DateFormats.timeStorage,
 }
 
 const normalizeDateTimeValue = (length) => (value) =>
   R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val) => val.padStart(length, '0'))(value)
 
-export const format = (date, format = formats.dateDefault, options = null) =>
-  date ? dateFnsFormat(date, format, options) : null
+export const format = Dates.format
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
@@ -47,35 +42,37 @@ export const getRelativeDate = (i18n, date) => {
 
   const now = new Date()
 
-  const formatDiff = (fn, unit) => {
-    const count = fn(now, date)
-    return i18n.t('common.date.timeDiff', { count, unit })
+  const formatDiff = (count, unit) => i18n.t('common.date.timeDiff', { count, unit })
+
+  const months = diffInMonths(now, date)
+  if (months > 0) {
+    return format(date, 'DD MMM YYYY')
   }
 
-  if (differenceInMonths(now, date) > 0) {
-    return format(date, 'dd MMM yyyy')
+  const weeks = diffInWeeks(now, date)
+  if (weeks > 0) {
+    return formatDiff(weeks, 'week')
   }
 
-  if (differenceInWeeks(now, date) > 0) {
-    return formatDiff(differenceInWeeks, 'week')
+  const days = diffInDays(now, date)
+  if (days > 0) {
+    return formatDiff(days, 'day')
   }
 
-  if (differenceInDays(now, date) > 0) {
-    return formatDiff(differenceInDays, 'day')
+  const hours = diffInHours(now, date)
+  if (hours > 0) {
+    return formatDiff(hours, 'hour')
   }
 
-  if (differenceInHours(now, date) > 0) {
-    return formatDiff(differenceInHours, 'hour')
-  }
-
-  if (differenceInMinutes(now, date) > 10) {
-    return formatDiff(differenceInMinutes, 'minute')
+  const minutes = diffInMinutes(now, date)
+  if (minutes > 10) {
+    return formatDiff(minutes, 'minute')
   }
 
   return i18n.t('common.date.aMomentAgo')
 }
 
-export const isValidDateObject = fnsIsValid
+export const isValidDateObject = Dates.isValidDate
 
 /**.
  * Checks if the date is valid. Takes into account leap years
@@ -122,18 +119,10 @@ export const formatDateTimeExport = (date) => format(date, formats.datetimeExpor
 
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
-export const parse = (dateStr, format) => dateFnsParse(dateStr, format, new Date())
+export const parse = Dates.parse
 export const parseDateISO = (dateStr) => parse(dateStr, formats.dateISO)
-export const convertDate = ({ dateStr, formatFrom = formats.dateISO, formatTo }) => {
-  if (R.isNil(dateStr) || R.isEmpty(dateStr)) {
-    return null
-  }
-  const dateParsed = typeof dateStr === 'object' ? dateStr : parse(dateStr, formatFrom)
-  if (!isValidDateObject(dateParsed)) {
-    return null
-  }
-  return format(dateParsed, formatTo)
-}
+export const parseISO = Dates.parseISO
+export const convertDate = Dates.convertDate
 
 export const convertDateFromISOToDisplay = (dateStr) =>
   convertDate({

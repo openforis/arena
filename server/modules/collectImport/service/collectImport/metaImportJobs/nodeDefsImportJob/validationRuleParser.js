@@ -25,7 +25,7 @@ const collectCheckType = {
   unique: 'unique',
 }
 
-const collectConstantDateValueRegExp = /(\d{4})(\d{2})(\d{2})/ // date in yyyyMMdd format
+const collectConstantDateValueRegExp = /(\d{4})(\d{2})(\d{2})/ // date in YYYYMMDD format
 const collectConstantTimeValueRegExp = /(\d{2})(\d{2})/ // time in mmss format
 
 const operandConverterByNodeDefType = {
