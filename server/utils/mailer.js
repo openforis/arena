@@ -23,7 +23,7 @@ const authUser = ProcessUtils.ENV.emailAuthUser
 const authPass = ProcessUtils.ENV.emailAuthPassword
 const from = ProcessUtils.ENV.adminEmail || authUser
 
-const defaultTransportOptions = {
+const defaultOffice365TransportOptions = {
   host: 'smtp.office365.com',
   port: '587',
   auth: { user: authUser, pass: authPass },
@@ -31,11 +31,11 @@ const defaultTransportOptions = {
   tls: { ciphers: 'SSLv3' },
 }
 
-let transportOptions = null
+let office365TransportOptions = null
 {
   const optionsType = ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default'
   logger.debug(`using ${optionsType} email transport options`)
-  transportOptions = ProcessUtils.ENV.emailTransportOptions ?? defaultTransportOptions
+  office365TransportOptions = ProcessUtils.ENV.emailTransportOptions ?? defaultOffice365TransportOptions
 }
 
 const sendEmailSendgrid = async ({ to, subject, html }) => {
@@ -47,7 +47,7 @@ const sendEmailSendgrid = async ({ to, subject, html }) => {
 }
 
 const sendEmailMSOffice365 = async ({ to, subject, html, text = null }) => {
-  const mailTransport = nodemailer.createTransport(transportOptions)
+  const mailTransport = nodemailer.createTransport(office365TransportOptions)
 
   await mailTransport.sendMail({
     from,
