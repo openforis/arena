@@ -4,6 +4,10 @@ import * as nodemailer from 'nodemailer'
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 
+import * as Log from '@server/log/log'
+
+const logger = Log.getLogger('Mailer')
+
 const emailServices = {
   sendgrid: 'sendgrid',
   office365: 'office365',
@@ -19,12 +23,19 @@ const authUser = ProcessUtils.ENV.emailAuthUser
 const authPass = ProcessUtils.ENV.emailAuthPassword
 const from = ProcessUtils.ENV.adminEmail || authUser
 
-const office365TransportOptions = {
+const defaultTransportOptions = {
   host: 'smtp.office365.com',
   port: '587',
   auth: { user: authUser, pass: authPass },
   secure: true,
   tls: { ciphers: 'SSLv3' },
+}
+
+let transportOptions = null
+{
+  const optionsType = ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default'
+  logger.debug(`using ${optionsType} email transport options`)
+  transportOptions = ProcessUtils.ENV.emailTransportOptions ?? defaultTransportOptions
 }
 
 const sendEmailSendgrid = async ({ to, subject, html }) => {
@@ -36,7 +47,7 @@ const sendEmailSendgrid = async ({ to, subject, html }) => {
 }
 
 const sendEmailMSOffice365 = async ({ to, subject, html, text = null }) => {
-  const mailTransport = nodemailer.createTransport(office365TransportOptions)
+  const mailTransport = nodemailer.createTransport(transportOptions)
 
   await mailTransport.sendMail({
     from,
