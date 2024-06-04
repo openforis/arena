@@ -22,7 +22,6 @@ const ButtonPublishSurvey = (props) => {
     <Button
       className={`btn btn-s btn-publish ${className || ''}`}
       disabled={disabled}
-      data-testid={TestId.header.surveyPublishBtn}
       iconClassName="icon-warning icon-left icon-10px"
       label="common.publish"
       onClick={() =>
@@ -34,6 +33,7 @@ const ButtonPublishSurvey = (props) => {
           })
         )
       }
+      testId={TestId.header.surveyPublishBtn}
       variant={variant}
     />
   )

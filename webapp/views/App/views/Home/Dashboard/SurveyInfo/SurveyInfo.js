@@ -65,8 +65,8 @@ const SurveyInfo = (props) => {
       <div className="home-dashboard__survey-info">
         <Header>
           <Button
-            data-testid={TestId.dashboard.surveyInfoBtnHeader}
             onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            testId={TestId.dashboard.surveyInfoBtnHeader}
             variant="text"
           >
             <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
@@ -79,10 +79,10 @@ const SurveyInfo = (props) => {
 
         <div>
           <Button
-            data-testid={TestId.dashboard.surveyInfoBtn}
-            label={canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo'}
             iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
+            label={canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo'}
             onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            testId={TestId.dashboard.surveyInfoBtn}
             variant="text"
           />
 
