@@ -46,7 +46,7 @@ const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, 
 const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
   if (!User.hasAccepted(userToInvite)) {
     throw new SystemError(
-      'appErrors.userHasPendingInvitation',
+      'appErrors:userHasPendingInvitation',
       { email: User.getEmail(userToInvite) },
       StatusCodes.CONFLICT
     )
@@ -55,10 +55,10 @@ const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
   const hasRoleInSurvey = Boolean(authGroups.some((g) => AuthGroup.getSurveyUuid(g) === surveyUuid))
 
   if (hasRoleInSurvey) {
-    throw new SystemError('appErrors.userHasRole')
+    throw new SystemError('appErrors:userHasRole')
   }
   if (User.isSystemAdmin(userToInvite)) {
-    throw new SystemError('appErrors.userIsAdmin')
+    throw new SystemError('appErrors:userIsAdmin')
   }
 }
 
@@ -163,7 +163,7 @@ const _inviteUser = async (
           userUuid: userToInviteUuid,
         })
         if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
-          throw new SystemError('appErrors.userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
+          throw new SystemError('appErrors:userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
         } else {
           // Add user to group
           await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
