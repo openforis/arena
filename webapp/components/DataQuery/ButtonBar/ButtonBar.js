@@ -8,12 +8,17 @@ import classNames from 'classnames'
 import { Query } from '@common/model/query'
 
 import { Button, ButtonDownload } from '@webapp/components/buttons'
-import { ButtonGroup } from '@webapp/components/form'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
+import {
+  DataExplorerActions,
+  DataExplorerHooks,
+  DataExplorerSelectors,
+  DataExplorerState,
+} from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -40,8 +45,10 @@ const ButtonBar = (props) => {
   const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
+  const displayType = DataExplorerSelectors.useDisplayType()
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
+  const codesVisible = DataExplorerSelectors.useCodesVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
   const modeEdit = Query.isModeRawEdit(query)
@@ -101,6 +108,14 @@ const ButtonBar = (props) => {
       )}
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
+
+      {displayType === DataExplorerState.displayTypes.table && (
+        <Checkbox
+          checked={codesVisible}
+          onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
+          label="dataView.dataQuery.showCodes"
+        />
+      )}
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 

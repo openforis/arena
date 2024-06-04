@@ -20,11 +20,11 @@ const getColValue = ({ survey, nodeDef, col, row, i18n }) => {
 }
 
 const ColumnData = (props) => {
-  const { colWidth, nodeDef, query, row } = props
+  const { codesVisible, colWidth, nodeDef, query, row } = props
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const { columnNames, widthInner, widthOuter } = useColumn({ nodeDef, query, colWidth })
+  const { columnNames, widthInner, widthOuter } = useColumn({ codesVisible, nodeDef, query, colWidth })
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
@@ -40,6 +40,7 @@ const ColumnData = (props) => {
 }
 
 ColumnData.propTypes = {
+  codesVisible: PropTypes.bool.isRequired,
   colWidth: PropTypes.number.isRequired,
   nodeDef: PropTypes.object.isRequired,
   query: PropTypes.object.isRequired,
