@@ -77,6 +77,9 @@ EMAIL_SERVICE=sendgrid
 SENDGRID_API_KEY= # get it from https://sendgrid.com/
 # EMAIL_AUTH_USER=
 # EMAIL_AUTH_PASSWORD=
+# Optional: custom email transport options could be specified.
+# EMAIL_TRANSPORT_OPTIONS=
+# e.g. (for MS office365 service) EMAIL_TRANSPORT_OPTIONS={"host":"smtp.office365.com","port":"587","auth":{"user":"testuser@mydomain.org","pass":"yoursecretpassword"},"secure":true,"tls":{"ciphers":"SSLv3"}}
 
 # Analysis
 ANALYSIS_OUTPUT_DIR=/home/your_user/openforis/arena/analysis

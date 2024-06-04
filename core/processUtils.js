@@ -1,4 +1,12 @@
 const isTrue = (val) => String(val).toLocaleLowerCase() === 'true' || String(val) === '1'
+const getJson = (val) => {
+  if (!val) return undefined
+  try {
+    return JSON.parse(val)
+  } catch (error) {
+    return undefined
+  }
+}
 
 const environments = {
   development: 'development',
@@ -34,6 +42,7 @@ const ENV = {
   emailService: process.env.EMAIL_SERVICE || 'sendgrid',
   emailAuthUser: process.env.EMAIL_AUTH_USER,
   emailAuthPassword: process.env.EMAIL_AUTH_PASSWORD,
+  emailTransportOptions: getJson(process.env.EMAIL_TRANSPORT_OPTIONS),
   sendGridApiKey: process.env.SENDGRID_API_KEY,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
