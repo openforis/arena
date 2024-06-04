@@ -145,6 +145,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: 'action-buttons',
+        className: 'action-buttons-col',
         renderItem: ({ item: record, itemPosition }) => {
           const canEdit = Authorizer.canEditRecord(user, record)
           const canDelete = Authorizer.canDeleteRecord(user, record)
