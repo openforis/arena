@@ -63,8 +63,24 @@ const assocDisplayType = (displayType) => (state) => {
 }
 const assocEditMode = A.assoc(keys.editMode)
 const assocNodeDefsSelectorVisible = A.assoc(keys.nodeDefsSelectorVisible)
-const assocQuery = (queryUpdated) => (state) => {
+const assocQuery = (queryParam) => (state) => {
+  let queryUpdated = queryParam
+
+  const entityNotSelected = !Query.getEntityDefUuid(queryUpdated)
+
+  if (entityNotSelected) {
+    const queryPrev = A.prop(keys.query)(state)
+    if (Query.getEntityDefUuid(queryPrev)) {
+      // entity has been reset: set mode to "raw"
+      queryUpdated = Query.assocMode(Query.modes.raw)(queryUpdated)
+    }
+  }
   let stateUpdated = A.assoc(keys.query, queryUpdated)(state)
+
+  if (entityNotSelected) {
+    // allow only table display type when entity is not selected
+    stateUpdated = assocDisplayType(displayTypes.table)(stateUpdated)
+  }
   const displayType = A.prop(keys.displayType)(stateUpdated)
   if (displayType === displayTypes.chart) {
     // query mode could have changed;
