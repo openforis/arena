@@ -11,6 +11,7 @@ export const Button = forwardRef((props, ref) => {
   const {
     children,
     className,
+    color,
     disabled,
     iconClassName,
     id,
@@ -42,13 +43,14 @@ export const Button = forwardRef((props, ref) => {
     <MuiButton
       ref={ref}
       id={id}
-      data-testid={testId}
-      disabled={disabled ? disabled : undefined}
       className={classNames('btn', className, {
         'btn-s': size === 'small',
         'btn-primary': primary,
         'btn-secondary': secondary,
       })}
+      color={color}
+      data-testid={testId}
+      disabled={disabled ? disabled : undefined}
       onClick={onClick}
       variant={variant}
       {...otherProps}
@@ -71,6 +73,7 @@ export const Button = forwardRef((props, ref) => {
 Button.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
+  color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
