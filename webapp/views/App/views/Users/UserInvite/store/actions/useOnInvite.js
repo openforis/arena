@@ -63,7 +63,7 @@ const _performInvite =
         dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
       } else if (invitedEmails.length === 0) {
         dispatch(
-          NotificationActions.notifyError({ key: 'appErrors.userHasRole', params: { count: skippedEmails.length } })
+          NotificationActions.notifyError({ key: 'appErrors:userHasRole', params: { count: skippedEmails.length } })
         )
       } else {
         _showInvitationSuccessfulMessage({ dispatch, userInvite, skippedEmails })

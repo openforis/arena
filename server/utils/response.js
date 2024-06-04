@@ -33,7 +33,7 @@ export const sendErr = (res, err) => {
   } else {
     res.status(err.statusCode).json(
       _getErr({
-        key: 'appErrors.generic',
+        key: 'appErrors:generic',
         params: { text: `Could not serve: ${err.toString()}` },
       })
     )

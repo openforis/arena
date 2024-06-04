@@ -14,7 +14,7 @@ const _extractValidHeaders = (row) => {
 
     if (StringUtils.isBlank(header)) {
       if (nonEmptyHeaderFound) {
-        throw new SystemError('appErrors.csv.emptyHeaderFound', { columnPosition: index + 1 })
+        throw new SystemError('appErrors:csv.emptyHeaderFound', { columnPosition: index + 1 })
       }
     } else {
       nonEmptyHeaderFound = true
@@ -22,7 +22,7 @@ const _extractValidHeaders = (row) => {
     }
   }
   if (!nonEmptyHeaderFound) {
-    throw new SystemError('appErrors.csv.emptyHeadersFound')
+    throw new SystemError('appErrors:csv.emptyHeadersFound')
   }
   return headers
 }

@@ -27,7 +27,7 @@ export const init = (app) => {
         const validation = await UserValidator.validateInvitation(invitation)
 
         if (!Validation.isValid(validation)) {
-          res.json({ errorKey: 'appErrors.userInvalid' })
+          res.json({ errorKey: 'appErrors:userInvalid' })
           return
         }
       }
@@ -45,7 +45,7 @@ export const init = (app) => {
         })
         res.json({ skippedEmails })
       } catch (e) {
-        const errorKey = e.key || 'appErrors.generic'
+        const errorKey = e.key || 'appErrors:generic'
         const errorParams = e.params || { text: e.message }
         res.json({ errorKey, errorParams })
       }
@@ -86,7 +86,7 @@ export const init = (app) => {
           })
           res.json({ survey, userInvited, validation })
         } catch (e) {
-          const errorKey = e.key || 'appErrors.generic'
+          const errorKey = e.key || 'appErrors:generic'
           const errorParams = e.params || { text: e.message }
           res.json({ errorKey, errorParams })
         }
@@ -307,7 +307,7 @@ export const init = (app) => {
     const validation = await UserValidator.validateUser(userToUpdate)
 
     if (!Validation.isValid(validation)) {
-      throw new SystemError('appErrors.userInvalid')
+      throw new SystemError('appErrors:userInvalid')
     }
 
     const { surveyId } = Request.getParams(req)

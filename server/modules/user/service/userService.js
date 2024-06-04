@@ -265,7 +265,7 @@ export const fetchResetPasswordUrl = async ({ serverUrl, surveyId, userUuid }) =
     userUuid,
   })
   if (!invitation) {
-    throw new SystemError('appErrors.userNotInvitedToSurvey')
+    throw new SystemError('appErrors:userNotInvitedToSurvey')
   }
   const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })

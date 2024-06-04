@@ -22,7 +22,7 @@ const InnerJob = ({ isCurrentJob, innerJob, index }) => {
     <>
       <div className="job" ref={elementRef}>
         <div className="name">
-          {index + 1}. {i18n.t(`jobs.${JobSerialized.getType(innerJob)}`)}
+          {index + 1}. {i18n.t(`jobs:${JobSerialized.getType(innerJob)}`)}
         </div>
         {(isCurrentJob || JobSerialized.isEnded(innerJob)) && (
           <JobProgress isCurrentJob={isCurrentJob} job={innerJob} />
