@@ -188,4 +188,9 @@ button:disabled,
     background-color: $red;
     border-color: rgba($red, 0.5) !important;
   }
+
+  &.btn-s {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
 }
