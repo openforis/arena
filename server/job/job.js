@@ -86,7 +86,7 @@ export default class Job {
         // Error found, change status only if not changed already
         this.logError(`${error.stack || error}`)
         const isSystemError = error instanceof SystemError || error instanceof CoreSystemError
-        const errorKey = `appErrors.${isSystemError ? error.key : 'generic'}`
+        const errorKey = `appErrors:${isSystemError ? error.key : 'generic'}`
         const errorParams = isSystemError ? error.params : { text: error.toString() }
         this.addError({
           error: {

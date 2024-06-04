@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-export const enTranslation = {
+export default {
   common: {
     active: 'Active',
     add: 'Add',
@@ -590,6 +590,7 @@ $t(common.cantUndoWarning)`,
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',
       includeFiles: 'Include files',
+      recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {
       expandCategoryItems: 'add one boolean column for every category item',
@@ -1763,122 +1764,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       confirmPasswordRequired: 'Confirm password is required',
       confirmedPasswordNotMatching: 'New password and confirm password do not match',
     },
-  },
-
-  // ====== Jobs
-  jobs: {
-    ActivityLogImportJob: 'Activity Log Import',
-    ArenaMobileDataImportJob: 'Arena Mobile Data Import',
-    CategoriesImportJob: 'Categories Import',
-    CategoriesValidationJob: 'Categories Validation',
-    CategoriesBatchImportJob: 'Categories Import',
-    CategoryImportJob: 'Category Import',
-    CategoryImportInternalJob: '$t(jobs.CategoryImportJob)',
-    CategoryBatchImportJob: '$t(jobs.CategoryImportJob)',
-    CategoryValidationJob: 'Category Validation',
-    ChainsSamplingNodeDefsCheckJob: 'Processing Chains Sampling Node Definitions Creation',
-    ChainsValidationJob: 'Processing Chains Validation',
-    ChainsImportJob: 'Chains Import',
-    CollectDataImportJob: 'Collect Data Import',
-    CollectImportJob: 'Collect Import',
-    CollectSurveyReaderJob: 'Collect Survey Reader',
-    CyclesDeletedCheckJob: 'Deleted Cycles Check',
-    DataDeleteJob: 'Data delete',
-    DataImportJob: 'Data Import',
-    DataImportValidationJob: 'Data Import File Validation',
-    FilesImportJob: 'Files Import',
-    NodeDefsImportJob: 'Node Definitions Import',
-    NodeDefsValidationJob: 'Node Definitions Validation',
-    chainsCyclesCheckJob: `Chains Cycles Check`,
-    RecordCheckJob: 'Record Check',
-    RecordsCloneJob: 'Records Clone',
-    RecordsImportJob: 'Records Import',
-    RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
-    SamplingPointDataImportJob: 'Sampling Point Data Import',
-    SurveyCreatorJob: 'Survey Create',
-    SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
-    SurveyExportJob: 'Survey Export',
-    SurveyIndexGeneratorJob: 'Survey Index Generator',
-    SurveyInfoValidationJob: 'Survey Info Validation',
-    SurveyLabelsImportJob: 'Survey Labels Import',
-    SurveyPropsPublishJob: 'Survey Props Publish',
-    SurveyPublishJob: 'Survey Publish',
-    SurveyPublishPerformJob: 'Survey Publish Perform',
-    SurveyRdbCreationJob: 'Survey RDB Creation',
-    SurveyUnpublishJob: 'Survey Unpublish',
-    SurveyPropsUnpublishJob: 'Survey props upublish',
-    TaxonomiesImportJob: 'Taxonomies Import',
-    TaxonomiesValidationJob: 'Taxonomies Validation',
-    TaxonomyImportJob: 'Taxonomy Import',
-    // export csv data
-    DataExportJob: 'Export CSV data',
-    ZipCreationJob: 'ZIP file Creation',
-    CSVDataExtraction: 'Data Export',
-    // import arena survey
-    ArenaImportJob: 'Arena import',
-    ArenaSurveyReaderJob: 'Arena Survey Reader',
-    CreateRdbJob: 'Survey RDB Creation',
-    UsersImportJob: 'Users Import',
-    // clone survey
-    SurveyCloneJob: 'Clone survey',
-    CloneSurveyJob: 'Clone survey',
-    // survey backup
-    SurveyInfoExportJob: 'Survey Info Export',
-    CategoriesExportJob: 'Categories Export',
-    TaxonomiesExportJob: 'Taxonomies Export',
-    RecordsExportJob: 'Records Export',
-    FilesExportJob: 'Files Export',
-    ChainExportJob: 'Chain Export',
-    UsersExportJob: 'Users Export',
-    ActivityLogExportJob: 'Activity Log Export',
-  },
-
-  // ====== App Errors
-
-  appErrors: {
-    cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
-    cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
-    cantUpdateStep: `Can't update step`,
-    csv: {
-      emptyHeaderFound: 'Empty header found at column {{columnPosition}}',
-      emptyHeaders: 'Empty headers found',
-    },
-    entryDataNotFound: 'Entry data not found: {{entryName}}',
-    expression: {
-      undefinedFunction: '$t(expression.undefinedFunction)',
-    },
-    generic: 'Unexpected error: {{text}}',
-    importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
-    invalidType: 'Invalid type {{type}}',
-    jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
-    paramIsRequired: 'Param {{param}} is required',
-    chainCannotBeSaved: 'Chain is invalid and cannot be saved',
-    unableToFindParent: 'Unable to find parent of {{name}}',
-    unableToFindNode: 'Unable to find node with name {{name}}',
-    unableToFindSibling: 'Unable to find sibling with name {{name}}',
-    undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
-    invalidSyntax: 'Expression syntax is invalid',
-    unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
-    record: {
-      entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
-    },
-    cannotInsertFileExceedingQuota: 'Cannot insert file: files storage quota would be exceeded',
-    cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
-    userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
-    userHasRole: 'The given user has already a role in this survey',
-    userHasRole_other: 'The given users have already a role in this survey',
-    userInvalid: 'Invalid user',
-    userIsAdmin: 'The given user is already a system administrator',
-    userNotAllowedToChangePref: 'User not allowed to change pref',
-    userNotAuthorized: 'User {{userName}} is not authorized',
-  },
-
-  systemErrors: {
-    networkError: 'Error communicating with the server',
-    sessionExpiredRefreshPage: `Session could have expired.
-Try to refresh the page.`,
   },
 
   record: {

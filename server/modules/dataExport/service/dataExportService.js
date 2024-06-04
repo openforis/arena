@@ -14,6 +14,7 @@ export const startCsvDataExportJob = ({
   includeAnalysis,
   includeDataFromAllCycles,
   includeFiles,
+  recordsModifiedAfter,
 }) => {
   const job = new DataExportJob({
     user,
@@ -28,6 +29,7 @@ export const startCsvDataExportJob = ({
     includeAnalysis,
     includeDataFromAllCycles,
     includeFiles,
+    recordsModifiedAfter,
   })
 
   JobManager.executeJobThread(job)

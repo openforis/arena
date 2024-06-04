@@ -32,7 +32,7 @@ const JobMonitor = () => {
   const jobEnded = JobSerialized.isEnded(job)
 
   return (
-    <Modal className="app-job-monitor" closeOnEsc={false} title={`jobs.${JobSerialized.getType(job)}`}>
+    <Modal className="app-job-monitor" closeOnEsc={false} title={`jobs:${JobSerialized.getType(job)}`}>
       <ModalBody>
         <JobProgress job={job} />
         <JobErrors

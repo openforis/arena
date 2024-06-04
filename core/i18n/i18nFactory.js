@@ -2,7 +2,7 @@ import i18next from 'i18next'
 import { initReactI18next, Trans as i18nTrans } from 'react-i18next'
 import * as ProcessUtils from '@core/processUtils'
 
-import { enTranslation } from './resources/en'
+import enTranslation from './resources/en'
 
 export const Trans = i18nTrans
 
@@ -18,10 +18,10 @@ const createParams = (lang) => ({
     nsMode: 'default', // Set it to fallback to let passed namespaces to translated hoc act as fallbacks
   },
   lng: lang,
+  ns: ['common', 'appErrors', 'jobs'],
+  defaultNS: 'common',
   resources: {
-    en: {
-      translation: enTranslation,
-    },
+    en: enTranslation,
   },
 })
 
