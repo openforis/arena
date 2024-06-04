@@ -177,7 +177,7 @@ const _getOrCreateEntityByKeys =
           return `${keyDefName}=${keyValue}`
         })
         .join(',')
-      throw new SystemError('appErrors.record.entityNotFound', {
+      throw new SystemError('appErrors:record.entityNotFound', {
         entityName: NodeDef.getName(entityDef),
         keyValues: keyValuePairs,
       })

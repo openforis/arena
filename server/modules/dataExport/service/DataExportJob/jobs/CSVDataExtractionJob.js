@@ -19,6 +19,7 @@ export default class CSVDataExtractionJob extends Job {
       includeAnalysis,
       includeDataFromAllCycles,
       includeFiles,
+      recordsModifiedAfter,
       outputDir,
     } = this.context
 
@@ -35,6 +36,7 @@ export default class CSVDataExtractionJob extends Job {
         includeAnalysis,
         includeDataFromAllCycles,
         includeFiles,
+        recordsModifiedAfter,
         outputDir,
         callback: ({ total }) => {
           this.total = total
