@@ -136,7 +136,7 @@ const CategoryList = (props) => {
   columns.push({
     key: 'details',
     renderItem: ({ item: category }) => (
-      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} />
+      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} size="small" />
     ),
     width: '75px',
   })

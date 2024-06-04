@@ -45,9 +45,7 @@ export const ButtonMenu = (props) => {
       <Menu anchorEl={anchorEl} className={menuClassName} open={open} onClose={closeMenu}>
         {items.map((item) => (
           <MenuItem key={item.key} className="button-menu__item" onClick={onItemClick(item)}>
-            {item.content ? (
-              item.content
-            ) : (
+            {item.content ?? (
               <Button
                 className={classNames('btn-transparent', item.className)}
                 testId={item.testId}
