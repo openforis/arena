@@ -9,8 +9,9 @@ const keys = {
   editMode: 'editMode',
   nodeDefsSelectorVisible: 'nodeDefsSelectorVisible',
   query: 'query',
-  selectedQuerySummaryUuid: 'selectedQuerySummaryUuid',
   recordEditModalProps: 'recordEditModalProps',
+  selectedQuerySummaryUuid: 'selectedQuerySummaryUuid',
+  codesVisible: 'codesVisible',
 }
 
 const chartTypes = {
@@ -40,8 +41,9 @@ const getDisplayType = getProp(keys.displayType)
 const isEditMode = (state) => getProp(keys.editMode)(state) === true
 const isNodeDefsSelectorVisible = (state) => getProp(keys.nodeDefsSelectorVisible)(state) === true
 const getQuery = getProp(keys.query)
-const getSelectedQuerySummaryUuid = getProp(keys.selectedQuerySummaryUuid)
 const getRecordEditModalProps = getProp(keys.recordEditModalProps)
+const getSelectedQuerySummaryUuid = getProp(keys.selectedQuerySummaryUuid)
+const codesVisible = (state) => getProp(keys.codesVisible)(state) === true
 
 // update (context data explorer state)
 const assocChartType = A.assoc(keys.chartType)
@@ -103,6 +105,8 @@ const assocRecordEditModalProps = A.assoc(keys.recordEditModalProps)
 
 const dissocRecordEditModalProps = A.dissoc(keys.recordEditModalProps)
 
+const assocCodesVisible = A.assoc(keys.codesVisible)
+
 // utils
 const isChartTypeAvailable =
   ({ queryMode }) =>
@@ -111,6 +115,7 @@ const isChartTypeAvailable =
 
 export const DataExplorerState = {
   stateKey,
+  keys,
   chartTypes,
   displayTypes,
   // read
@@ -121,6 +126,7 @@ export const DataExplorerState = {
   getQuery,
   getSelectedQuerySummaryUuid,
   getRecordEditModalProps,
+  codesVisible,
   // update
   assocChartType,
   assocDisplayType,
@@ -130,6 +136,7 @@ export const DataExplorerState = {
   assocSelectedQuerySummaryUuid,
   assocRecordEditModalProps,
   dissocRecordEditModalProps,
+  assocCodesVisible,
 
   // utils
   isChartTypeAvailable,
