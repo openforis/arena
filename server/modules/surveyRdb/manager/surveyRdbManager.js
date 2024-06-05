@@ -1,6 +1,6 @@
 import pgPromise from 'pg-promise'
 
-import { Objects } from '@openforis/arena-core'
+import { Dates, Objects, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -166,23 +166,27 @@ export const fetchViewDataAgg = async (params) => {
   return result
 }
 
-const _determineRecordUuidsFilter = async ({ survey, cycle, recordUuidsParam, search }) => {
+const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuidsParam, search }) => {
   if (recordUuidsParam) return recordUuidsParam
 
-  if (!Objects.isEmpty(search)) {
-    const surveyId = Survey.getId(survey)
-    const nodeDefRoot = Survey.getNodeDefRoot(survey)
-    const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
-    const recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
-      surveyId,
-      nodeDefRoot,
-      nodeDefKeys,
-      cycle,
-      search,
-    })
-    return recordsSummaries.length > 0 ? recordsSummaries.map(Record.getUuid) : null
+  if (Objects.isEmpty(search) && !recordsModifiedAfter) return null
+
+  const surveyId = Survey.getId(survey)
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  let recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
+    surveyId,
+    nodeDefRoot,
+    nodeDefKeys,
+    cycle,
+    search,
+  })
+  if (recordsModifiedAfter) {
+    recordsSummaries = recordsSummaries.filter((recordSummary) =>
+      Dates.isAfter(Record.getDateModified(recordSummary), recordsModifiedAfter)
+    )
   }
-  return null
+  return recordsSummaries.map(Record.getUuid)
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
@@ -196,6 +200,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeFiles,
     recordOwnerUuid = null,
     recordUuids: recordUuidsParam = null,
+    recordsModifiedAfter,
     search = null,
     outputDir,
     callback,
@@ -208,7 +213,17 @@ export const fetchEntitiesDataToCsvFiles = async (
     filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
   })(survey)
 
-  const recordUuids = await _determineRecordUuidsFilter({ survey, cycle, recordUuidsParam, search })
+  const recordUuids = await _determineRecordUuidsFilter({
+    survey,
+    cycle,
+    recordsModifiedAfter,
+    recordUuidsParam,
+    search,
+  })
+
+  if (recordUuids?.length === 0) {
+    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
+  }
 
   callback?.({ total: nodeDefs.length })
 

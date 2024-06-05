@@ -8,7 +8,7 @@ import { ColumnData, ColumnDataEdit } from './Column'
 import LinkRecord from './LinkRecord'
 
 const RowData = (props) => {
-  const { colIndexWidth, colWidth, nodeDefCols, query, row, rowNo } = props
+  const { codesVisible, colIndexWidth, colWidth, nodeDefCols, query, row, rowNo } = props
 
   return (
     <div key={rowNo} className="table__row">
@@ -26,7 +26,14 @@ const RowData = (props) => {
             row={row}
           />
         ) : (
-          <ColumnData key={NodeDef.getUuid(nodeDef)} query={query} colWidth={colWidth} nodeDef={nodeDef} row={row} />
+          <ColumnData
+            key={NodeDef.getUuid(nodeDef)}
+            codesVisible={codesVisible}
+            query={query}
+            colWidth={colWidth}
+            nodeDef={nodeDef}
+            row={row}
+          />
         )
       )}
     </div>
@@ -34,6 +41,7 @@ const RowData = (props) => {
 }
 
 RowData.propTypes = {
+  codesVisible: PropTypes.bool.isRequired,
   colIndexWidth: PropTypes.number.isRequired,
   colWidth: PropTypes.number.isRequired,
   nodeDefCols: PropTypes.arrayOf(Object).isRequired,

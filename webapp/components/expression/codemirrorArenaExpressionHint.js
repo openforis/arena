@@ -145,6 +145,7 @@ const _extractVariables = ({
   mode,
   i18n,
   survey,
+  cycle,
   nodeDefCurrent,
   nodeDefContextPath,
   isContextParent,
@@ -169,6 +170,7 @@ const _extractVariables = ({
     return nodeDefContext
       ? ExpressionVariables.getVariablesChildren({
           survey,
+          cycle,
           nodeDefContext,
           nodeDefCurrent,
           mode,
@@ -181,6 +183,7 @@ const _extractVariables = ({
   // get variables from context node and its ancestors
   return ExpressionVariables.getVariables({
     survey,
+    cycle,
     nodeDefContext,
     nodeDefCurrent,
     mode,
@@ -191,7 +194,7 @@ const _extractVariables = ({
 }
 
 export const arenaExpressionHint =
-  ({ mode, i18n, survey, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) =>
+  ({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) =>
   (editor) => {
     const cur = editor.getCursor()
     const token = editor.getTokenAt(cur)
@@ -210,6 +213,7 @@ export const arenaExpressionHint =
       mode,
       i18n,
       survey,
+      cycle,
       nodeDefCurrent,
       nodeDefContextPath,
       isContextParent,

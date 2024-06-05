@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useLang } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'
@@ -35,6 +35,7 @@ export const useExpressionEditorPopupState = (props) => {
   } = props
 
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   const lang = useLang()
   const editorType = type.length === 1 ? type[0] : null
 
@@ -133,6 +134,7 @@ export const useExpressionEditorPopupState = (props) => {
 
   const variables = ExpressionVariables.getVariables({
     survey,
+    cycle,
     nodeDefContext,
     nodeDefCurrent,
     mode,

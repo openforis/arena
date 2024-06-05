@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
-import { Objects } from '@openforis/arena-core'
+import { DateFormats, Objects } from '@openforis/arena-core'
 
 import { ExpansionPanel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+import { DateInput } from '@webapp/components/form/DateTimeInput'
 
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import { dataExportOptions } from './dataExportOptions'
 
@@ -18,6 +21,7 @@ const infoMessageKeyByOption = {
 export const DataExportOptionsPanel = (props) => {
   const { availableOptions: availableOptionsProp, onOptionChange, selectedOptionsByKey } = props
 
+  const i18n = useI18n()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const cycles = useSurveyCycleKeys()
   const hasMultipleCycles = cycles.length > 1
@@ -49,6 +53,13 @@ export const DataExportOptionsPanel = (props) => {
           onChange={onOptionChange(optionKey)}
         />
       ))}
+      <FormItem label={i18n.t(`dataExportView.options.${dataExportOptions.recordsModifiedAfter}`)}>
+        <DateInput
+          onChange={onOptionChange(dataExportOptions.recordsModifiedAfter)}
+          value={selectedOptionsByKey[dataExportOptions.recordsModifiedAfter]}
+          valueFormat={DateFormats.dateStorage}
+        />
+      </FormItem>
     </ExpansionPanel>
   )
 }
