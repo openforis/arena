@@ -78,6 +78,7 @@ const NodeDefsSelector = (props) => {
         disabled={A.isEmpty(nodeDefUuidEntity)}
         onClick={() => setShowFilter(!showFilter)}
         title="dataView.filterAttributeTypes"
+        variant="outlined"
       />
 
       {showFilter && (
