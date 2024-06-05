@@ -2,13 +2,10 @@ import React from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/store/system'
 import { Button, ButtonDelete } from '@webapp/components/buttons'
 
 const EditButtons = (props) => {
   const { node, onChange, canDelete = false, onDelete } = props
-
-  const i18n = useI18n()
 
   const addLogicalExpr = (operator) =>
     onChange({
