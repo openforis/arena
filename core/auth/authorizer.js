@@ -90,7 +90,7 @@ export const canEditRecord = (user, record) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
-export const canDeleteRecord = canEditRecord
+export const canDeleteRecord = (user, record) => canEditRecord(user, record) && !Record.isInAnalysisStep(record)
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
