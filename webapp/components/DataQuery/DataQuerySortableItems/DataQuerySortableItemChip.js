@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import Chip from '@mui/material/Chip'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import Chip from '@webapp/components/form/chip'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
@@ -31,7 +31,6 @@ export const DataQuerySortableItemChip = (props) => {
       className="data-query__sortable-item-chip"
       onDelete={onDelete}
       label={label}
-      variant="outlined"
     />
   )
 }
