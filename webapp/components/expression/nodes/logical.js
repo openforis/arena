@@ -4,14 +4,12 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/store/system'
+import { Button } from '@webapp/components/buttons'
 
 const Logical = (props) => {
   const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, renderNode, variables } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators
-
-  const i18n = useI18n()
 
   const createElementNode = (type, nodeEl, nodeElOther, canDeleteEl) =>
     React.createElement(renderNode, {
@@ -31,34 +29,28 @@ const Logical = (props) => {
 
       <div className="btns">
         <div className="btns__add">
-          <button
-            type="button"
-            className={`btn btn-s${operator === logical.or.value ? ' active' : ''}`}
-            onClick={() => onChange(R.assoc('operator', logical.or.value, node))}
-          >
-            {i18n.t('expressionEditor.or')}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-s${operator === logical.and.value ? ' active' : ''}`}
-            onClick={() => onChange(R.assoc('operator', logical.and.value, node))}
-          >
-            {i18n.t('expressionEditor.and')}
-          </button>
+          {Object.entries(logical).map(([logicalOperatorKey, logicalOperator]) => (
+            <Button
+              key={logicalOperatorKey}
+              label={`expressionEditor.${logicalOperatorKey}`}
+              onClick={() => onChange(R.assoc('operator', logicalOperator.value, node))}
+              size="small"
+              variant={operator === logicalOperator.value ? 'contained' : 'outlined'}
+            />
+          ))}
         </div>
 
-        <button
-          type="button"
-          className="btn btn-s btns__last"
+        <Button
+          label="expressionEditor.group"
           onClick={() =>
             onChange({
               type: Expression.types.SequenceExpression,
               expression: node,
             })
           }
-        >
-          {i18n.t('expressionEditor.group')} ()
-        </button>
+          size="small"
+          variant="outlined"
+        />
       </div>
 
       {createElementNode('right', right, left, true)}

@@ -28,20 +28,16 @@ const EditButtons = (props) => {
   return (
     <div className="btns">
       <div className="btns__add">
-        <Button
-          iconClassName="icon-plus icon-8px"
-          label="expressionEditor.or"
-          onClick={() => addLogicalExpr(logical.or.value)}
-          size="small"
-          variant="outlined"
-        />
-        <Button
-          iconClassName="icon-plus icon-8px"
-          label="expressionEditor.and"
-          onClick={() => addLogicalExpr(logical.and.value)}
-          size="small"
-          variant="outlined"
-        />
+        {Object.entries(logical).map(([logicalOperatorKey, logicalOperator]) => (
+          <Button
+            key={logicalOperatorKey}
+            iconClassName="icon-plus icon-8px"
+            label={`expressionEditor.${logicalOperatorKey}`}
+            onClick={() => addLogicalExpr(logicalOperator.value)}
+            size="small"
+            variant="outlined"
+          />
+        ))}
       </div>
 
       {canDelete && <ButtonDelete className="btns__delete" onClick={onDelete} showLabel={false} size="small" />}

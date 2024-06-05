@@ -1795,7 +1795,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   expressionEditor: {
     and: 'AND',
     or: 'OR',
-    group: 'Group',
+    group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
 
