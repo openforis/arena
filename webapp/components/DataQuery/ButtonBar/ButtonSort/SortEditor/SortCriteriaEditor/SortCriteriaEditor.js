@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import { SortCriteria } from '@common/model/query'
 
 import Dropdown from '@webapp/components/form/Dropdown'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonIconClose } from '@webapp/components/buttons'
 
 const titleKeyByOrder = {
   [SortCriteria.orders.asc]: 'common.ascending',
@@ -41,9 +41,7 @@ const SortCriteriaEditor = (props) => {
         ))}
       </div>
 
-      <button type="button" className="btn btn-xs btn-transparent" onClick={onDelete} aria-disabled={placeholder}>
-        <span className="icon icon-cross icon-10px" />
-      </button>
+      <ButtonIconClose disabled={placeholder} onClick={onDelete} />
     </div>
   )
 }

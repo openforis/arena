@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
+import { Button } from '@webapp/components/buttons'
 
 export const BinaryOperandType = {
   left: 'left',
@@ -17,30 +17,24 @@ BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
 const BinaryOperand = (props) => {
   const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, renderNode, variables } = props
 
-  const i18n = useI18n()
-
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
   const canOperandBeLiteral = !isLeft || !isBoolean || NodeDef.isBoolean(nodeDefCurrent)
 
   return (
     <div className={`binary-${type}`}>
-      <button
-        type="button"
-        className={`btn btn-s btn-switch-operand btn-switch-operand-var${
-          !Expression.isLiteral(nodeOperand) ? ' active' : ''
-        }`}
+      <Button
+        className="btn-switch-operand btn-switch-operand-var"
+        label="expressionEditor.var"
         onClick={() => onChange(R.assoc(type, Expression.newIdentifier(), node))}
-      >
-        {i18n.t('expressionEditor.var')}
-      </button>
+        size="small"
+        variant={!Expression.isLiteral(nodeOperand) ? 'contained' : 'outlined'}
+      />
 
       {canOperandBeLiteral && (
-        <button
-          type="button"
-          className={`btn btn-s btn-switch-operand btn-switch-operand-const${
-            Expression.isLiteral(nodeOperand) ? ' active' : ''
-          }`}
+        <Button
+          className="btn-switch-operand btn-switch-operand-const"
+          label="expressionEditor.const"
           onClick={() => {
             let nodeUpdate = R.assoc(type, Expression.newLiteral(), node)
             if (isLeft && !isBoolean) {
@@ -51,9 +45,9 @@ const BinaryOperand = (props) => {
             }
             onChange(nodeUpdate)
           }}
-        >
-          {i18n.t('expressionEditor.const')}
-        </button>
+          size="small"
+          variant={Expression.isLiteral(nodeOperand) ? 'contained' : 'outlined'}
+        />
       )}
       {React.createElement(renderNode, {
         canDelete,

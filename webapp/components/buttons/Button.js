@@ -88,7 +88,7 @@ Button.propTypes = {
   testId: PropTypes.string,
   title: PropTypes.string,
   titleParams: PropTypes.object,
-  variant: PropTypes.string,
+  variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
 
 Button.defaultProps = {

@@ -2,12 +2,12 @@ import './AggregateFunctionsPanel.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { Query } from '@common/model/query'
 
+import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
 
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -42,16 +42,13 @@ export const AggregateFunctionsPanel = (props) => {
     >
       <div>
         {Object.keys(Query.DEFAULT_AGGREGATE_FUNCTIONS).map((aggregateFn) => (
-          <button
+          <Button
             key={aggregateFn}
-            type="button"
-            className={classNames('btn btn-aggregate-fn deselectable', {
-              active: aggregateFunctions.indexOf(aggregateFn) >= 0,
-            })}
+            className="btn-aggregate-fn deselectable"
+            label={`common.${aggregateFn}`}
             onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}
-          >
-            {i18n.t(`common.${aggregateFn}`)}
-          </button>
+            variant={aggregateFunctions.indexOf(aggregateFn) >= 0 ? 'contained' : 'outlined'}
+          />
         ))}
       </div>
       <CustomAggregateFunctionsEditor
