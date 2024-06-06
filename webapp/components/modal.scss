@@ -33,15 +33,11 @@ $borderRadius: 2px;
   text-align: center;
 }
 
-.modal-close {
+.MuiButtonBase-root.MuiButton-root.modal-close {
   position: absolute;
   top: 0;
   right: 0;
   padding: 10px;
-
-  &:hover {
-    cursor: pointer;
-  }
 }
 
 .modal-body {

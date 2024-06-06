@@ -7,11 +7,10 @@ import Fade from '@mui/material/Fade'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
+import { Button } from './buttons'
 
-export const ModalClose = ({ _children, onClose }) => (
-  <div className="modal-close" onClick={() => onClose()}>
-    <span className="icon icon-cross icon-20px" />
-  </div>
+export const ModalClose = ({ onClose }) => (
+  <Button className="modal-close" iconClassName="icon-cross icon-20px" onClick={onClose} variant="text" />
 )
 
 export const ModalHeader = ({ children }) => <div className="modal-header">{children}</div>
