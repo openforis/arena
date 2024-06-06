@@ -182,6 +182,7 @@ button:disabled,
 
 .MuiButtonBase-root.MuiButton-root {
   min-width: 0;
+  text-transform: unset;
 
   &.btn-danger {
     color: $white;
