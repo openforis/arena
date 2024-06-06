@@ -8,7 +8,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
 import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
@@ -22,7 +21,7 @@ import { TestId } from '@webapp/utils/testId'
 import * as API from '@webapp/service/api'
 
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import FormEntryActions from '../components/formEntryActions'
@@ -36,7 +35,6 @@ const FormHeader = (props) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const i18n = useI18n()
 
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
@@ -65,21 +63,20 @@ const FormHeader = (props) => {
   return (
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
-        <button
-          type="button"
-          className="btn-s btn-transparent"
+        <Button
+          iconClassName="icon-stack icon-12px"
           onClick={() => dispatch(SurveyFormActions.toggleFormPageNavigation())}
-          title={i18n.t(`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`)}
+          size="small"
+          title={`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`}
+          variant="text"
         >
-          <span className="icon icon-stack icon-12px icon-left" />
           <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
-        </button>
+        </Button>
 
         {edit && canEditDef && (
-          <button
-            type="button"
-            className="btn-s btn-transparent"
-            data-testid={TestId.surveyForm.addSubPageBtn}
+          <Button
+            iconClassName="icon-plus icon-12px"
+            label="surveyForm.subPage"
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
@@ -90,10 +87,10 @@ const FormHeader = (props) => {
               }
               dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, navigate))
             }}
-          >
-            <span className="icon icon-plus icon-12px icon-left" />
-            {i18n.t('surveyForm.subPage')}
-          </button>
+            size="small"
+            testId={TestId.surveyForm.addSubPageBtn}
+            variant="text"
+          />
         )}
 
         <div
