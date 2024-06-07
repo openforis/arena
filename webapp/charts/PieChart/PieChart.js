@@ -70,10 +70,12 @@ PieChart.propTypes = {
 PieChart.defaultProps = {
   colorKey: 'color',
   dataKey: 'value',
+  endAngle: -270,
   label: true,
   showLabelLine: true,
   showLegend: true,
   showTooltip: true,
+  startAngle: 90,
   width: '100%',
   height: '100%',
 }

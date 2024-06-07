@@ -206,15 +206,17 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
     includeRootKeyValues: false,
     includePreview: true,
   })
-  const cycle = Record.getCycle(recordSummary)
+  if (recordSummary) {
+    const cycle = Record.getCycle(recordSummary)
 
-  if (Record.isPreview(recordSummary)) {
-    RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId, cycle, draft: true })
-    await RecordManager.deleteRecordPreview(surveyId, recordUuid)
-  } else {
-    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
-    if (Record.isEmpty(record)) {
-      await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
+    if (Record.isPreview(recordSummary)) {
+      RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId, cycle, draft: true })
+      await RecordManager.deleteRecordPreview(surveyId, recordUuid)
+    } else {
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
+      if (Record.isEmpty(record)) {
+        await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
+      }
     }
   }
   RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })

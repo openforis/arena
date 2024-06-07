@@ -2,10 +2,10 @@ import { useCallback, useRef } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
-export const useDateTimeInput = ({ format, onChange: onChangeProp, value }) => {
+export const useDateTimeInput = ({ onChange: onChangeProp, value, valueFormat }) => {
   const errorRef = useRef(false)
 
-  const dateValue = value ? DateUtils.parse(value, format) : null
+  const dateValue = value ? DateUtils.parse(value, valueFormat) : null
 
   const applyChange = useCallback(
     (dateFormatted) => {
@@ -23,10 +23,10 @@ export const useDateTimeInput = ({ format, onChange: onChangeProp, value }) => {
       } else if (validationError) {
         errorRef.current = true
       } else {
-        applyChange(DateUtils.format(date, format))
+        applyChange(DateUtils.format(date, valueFormat))
       }
     },
-    [applyChange, format]
+    [applyChange, valueFormat]
   )
 
   return { dateValue, onInputChange, errorRef }

@@ -15,6 +15,7 @@ const DataQueryTable = (props) => {
 
   const i18n = useI18n()
   const query = DataExplorerSelectors.useQuery()
+  const codesVisible = DataExplorerSelectors.useCodesVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData })
 
@@ -30,6 +31,7 @@ const DataQueryTable = (props) => {
   return (
     <div className="table__rows">
       <RowHeader
+        codesVisible={codesVisible}
         colWidth={colWidth}
         colIndexWidth={colIndexWidth}
         nodeDefCols={nodeDefCols}
@@ -46,6 +48,7 @@ const DataQueryTable = (props) => {
           return (
             <RowData
               key={rowNo}
+              codesVisible={codesVisible}
               colIndexWidth={colIndexWidth}
               colWidth={colWidth}
               nodeDefCols={nodeDefCols}

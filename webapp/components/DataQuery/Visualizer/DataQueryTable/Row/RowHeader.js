@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import { ColumnHeader } from './Column'
 
 const RowHeader = (props) => {
-  const { colIndexWidth, colWidth, nodeDefCols, nodeDefLabelType, onChangeQuery, query } = props
+  const { codesVisible, colIndexWidth, colWidth, nodeDefCols, nodeDefLabelType, onChangeQuery, query } = props
 
   const i18n = useI18n()
 
@@ -19,6 +19,7 @@ const RowHeader = (props) => {
       {nodeDefCols.map((nodeDef) => (
         <ColumnHeader
           key={NodeDef.getUuid(nodeDef)}
+          codesVisible={codesVisible}
           colWidth={colWidth}
           nodeDef={nodeDef}
           nodeDefLabelType={nodeDefLabelType}
@@ -31,6 +32,7 @@ const RowHeader = (props) => {
 }
 
 RowHeader.propTypes = {
+  codesVisible: PropTypes.bool.isRequired,
   colIndexWidth: PropTypes.number.isRequired,
   colWidth: PropTypes.number.isRequired,
   nodeDefCols: PropTypes.arrayOf(Object).isRequired,
