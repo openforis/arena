@@ -13,11 +13,27 @@ export const ModalClose = ({ onClose }) => (
   <Button className="modal-close" iconClassName="icon-cross icon-20px" onClick={onClose} variant="text" />
 )
 
+ModalClose.propTypes = {
+  onClose: PropTypes.func.isRequired,
+}
+
 export const ModalHeader = ({ children }) => <div className="modal-header">{children}</div>
+
+ModalHeader.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 export const ModalBody = ({ children }) => <div className="modal-body">{children}</div>
 
+ModalBody.propTypes = {
+  children: PropTypes.node.isRequired,
+}
+
 export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
+
+ModalFooter.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 export const Modal = (props) => {
   const { children, className, closeOnEsc, onClose: onCloseProp, showCloseButton, title, titleParams } = props
