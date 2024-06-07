@@ -11,8 +11,8 @@ import {
 import * as DateUtils from '../../../../core/dateUtils'
 
 const verifyBoolean = async (nodeDef, value, parentSelector) => {
-  const span = await page.$(`${getBooleanSelector(nodeDef, parentSelector, value)} span`)
-  await expect(await span.getAttribute('class')).toContain('icon-radio-checked2')
+  const booleanRadioButton = await page.$(`${getBooleanSelector(nodeDef, parentSelector, value)}`)
+  await expect(await booleanRadioButton.getAttribute('class')).toContain('Mui-checked')
 }
 
 const verifyCode = async (nodeDef, value, parentSelector) =>

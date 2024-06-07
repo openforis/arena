@@ -18,7 +18,6 @@ const Checkbox = (props) => {
   const {
     className,
     id,
-    validation,
     checked,
     indeterminate,
     info,
@@ -27,6 +26,8 @@ const Checkbox = (props) => {
     disabled,
     radio,
     size,
+    value,
+    validation,
   } = props
 
   const i18n = useI18n()
@@ -40,11 +41,19 @@ const Checkbox = (props) => {
   )
 
   const control = radio ? (
-    <MuiRadio checked={checked} data-testid={id} disabled={disabled} onClick={onChange} size={size} />
+    <MuiRadio
+      checked={checked}
+      data-testid={id}
+      data-value={value}
+      disabled={disabled}
+      onClick={onChange}
+      size={size}
+    />
   ) : (
     <MuiCheckbox
       checked={checked}
       data-testid={id}
+      data-value={value}
       disabled={disabled}
       indeterminate={indeterminate}
       onClick={onChange}
@@ -77,6 +86,7 @@ Checkbox.propTypes = {
   radio: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium']),
   validation: PropTypes.object,
+  value: PropTypes.string,
 }
 
 Checkbox.defaultProps = {

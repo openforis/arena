@@ -23,11 +23,11 @@ const NodeDefBoolean = (props) => {
           <Radiobox
             key={value}
             checked={checked}
-            data-value={value}
             disabled={edit || !canEditRecord || readOnly}
             label={`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`}
             onChange={() => updateNode(nodeDef, node, checked ? null : value)}
             size="small"
+            value={value}
           />
         )
       })}
