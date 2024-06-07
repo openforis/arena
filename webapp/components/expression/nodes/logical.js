@@ -32,10 +32,11 @@ const Logical = (props) => {
           {Object.entries(logical).map(([logicalOperatorKey, logicalOperator]) => (
             <Button
               key={logicalOperatorKey}
+              active={operator === logicalOperator.value}
               label={`expressionEditor.${logicalOperatorKey}`}
               onClick={() => onChange(R.assoc('operator', logicalOperator.value, node))}
               size="small"
-              variant={operator === logicalOperator.value ? 'contained' : 'outlined'}
+              variant="outlined"
             />
           ))}
         </div>

@@ -33,6 +33,7 @@ const BinaryOperand = (props) => {
 
       {canOperandBeLiteral && (
         <Button
+          active={Expression.isLiteral(nodeOperand)}
           className="btn-switch-operand btn-switch-operand-const"
           label="expressionEditor.const"
           onClick={() => {
@@ -46,7 +47,7 @@ const BinaryOperand = (props) => {
             onChange(nodeUpdate)
           }}
           size="small"
-          variant={Expression.isLiteral(nodeOperand) ? 'contained' : 'outlined'}
+          variant="outlined"
         />
       )}
       {React.createElement(renderNode, {

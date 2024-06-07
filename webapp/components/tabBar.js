@@ -10,12 +10,13 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
     {tabs.map((tab, i) => (
       <Button
         key={String(i)}
+        active={i === selection}
         disabled={Boolean(tab.disabled)}
         iconClassName={tab.icon ? `${tab.icon} icon-12px` : undefined}
         label={tab.label}
         onClick={() => onClick(i)}
         testId={tab.id ? TestId.tabBar.tabBarBtn(tab.id) : null}
-        variant={i === selection ? 'contained' : 'outlined'}
+        variant="outlined"
       />
     ))}
   </div>

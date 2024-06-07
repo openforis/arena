@@ -9,6 +9,7 @@ import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {
   const {
+    active,
     children,
     className,
     color,
@@ -26,7 +27,7 @@ export const Button = forwardRef((props, ref) => {
     testId,
     title: titleProp,
     titleParams,
-    variant,
+    variant: variantProp,
     ...otherProps
   } = props
 
@@ -38,6 +39,8 @@ export const Button = forwardRef((props, ref) => {
     : !showLabel && labelProp
       ? i18n.t(labelProp, labelParams)
       : null
+
+  const variant = active ? 'contained' : variantProp
 
   const btn = (
     <MuiButton
@@ -71,6 +74,7 @@ export const Button = forwardRef((props, ref) => {
 })
 
 Button.propTypes = {
+  active: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
   color: PropTypes.string,

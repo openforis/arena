@@ -37,6 +37,7 @@ const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
           return (
             <Button
               key={Chain.getUuid(chain)}
+              active={active}
               className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable')}
               label={Chain.getLabel(lang)(chain)}
               onClick={() => {
@@ -45,7 +46,7 @@ const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
                   : [...filterChainUuids, Chain.getUuid(chain)]
                 setFilterChainUuids(filterChainUuidsUpdated)
               }}
-              variant={active ? 'contained' : 'outlined'}
+              variant="outlined"
             />
           )
         })}
