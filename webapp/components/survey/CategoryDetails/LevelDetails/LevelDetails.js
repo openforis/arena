@@ -10,7 +10,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { Button } from '@webapp/components'
+import { Button, ButtonIconDelete } from '@webapp/components'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -54,11 +54,10 @@ const LevelDetails = (props) => {
           <div className="category__level-header">
             <h4 className="label">{i18n.t('categoryEdit.level.title', { levelPosition: levelIndex + 1 })}</h4>
             {!readOnly && canBeDeleted && (
-              <Button
+              <ButtonIconDelete
+                onClick={() => Actions.deleteLevel({ category, level })}
                 size="small"
                 testId={TestId.categoryDetails.levelDeleteBtn(levelIndex)}
-                onClick={() => Actions.deleteLevel({ category, level })}
-                iconClassName="icon-bin2 icon-12px"
               />
             )}
           </div>
