@@ -5,6 +5,7 @@ export {
   ButtonCancel,
   ButtonDownload,
   ButtonDelete,
+  ButtonIconAdd,
   ButtonIconDelete,
   ButtonIconEdit,
   ButtonIconEditOrView,
