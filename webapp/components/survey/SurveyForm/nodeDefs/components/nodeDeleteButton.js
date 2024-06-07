@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
 import { RecordActions } from '@webapp/store/ui/record'
+import { ButtonIconDelete } from '@webapp/components/buttons'
 
 const NodeDeleteButton = (props) => {
   const { nodeDef, node, disabled, showConfirm, removeNode } = props
@@ -12,14 +13,8 @@ const NodeDeleteButton = (props) => {
   const dispatch = useDispatch()
 
   return (
-    <button
-      type="button"
-      className="btn btn-s btn-transparent"
-      style={{
-        alignSelf: 'center',
-        justifySelf: 'center',
-      }}
-      aria-disabled={disabled}
+    <ButtonIconDelete
+      disabled={disabled}
       onClick={() => {
         const performDelete = () => dispatch(RecordActions.removeNode(nodeDef, node))
         const _removeNode = () => (removeNode ? removeNode(nodeDef, node) : null)
@@ -35,9 +30,8 @@ const NodeDeleteButton = (props) => {
           handleDelete()
         }
       }}
-    >
-      <span className="icon icon-bin icon-12px" />
-    </button>
+      size="small"
+    />
   )
 }
 
@@ -45,6 +39,7 @@ NodeDeleteButton.propTypes = {
   nodeDef: PropTypes.any.isRequired,
   node: PropTypes.any.isRequired,
   disabled: PropTypes.bool,
+  removeNode: PropTypes.func,
   showConfirm: PropTypes.bool,
 }
 
