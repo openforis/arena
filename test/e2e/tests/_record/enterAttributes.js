@@ -18,7 +18,7 @@ const enterBoolean = async (nodeDef, value, parentSelector) => {
   // If the boolean is already checked, due to a default value with the same value we dont need to click
   const booleanRadioButton = await page.$(`${getBooleanSelector(nodeDef, parentSelector, value)}`)
   const currentClass = await booleanRadioButton.getAttribute('class')
-  if (!currentClass.included('Mui-checked')) {
+  if (!currentClass.includes('Mui-checked')) {
     await page.click(getBooleanSelector(nodeDef, parentSelector, value))
   }
 }
