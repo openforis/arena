@@ -154,7 +154,7 @@ const queryByType = {
 }
 
 export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
-  const updatesToRunInBatch = [...rdbUpdates.getAll().map((update) => queryByType[update.type](update, client))]
+  const updatesToRunInBatch = rdbUpdates.getAll().map((update) => queryByType[update.type](update, client))
 
   if (updatesToRunInBatch.length > 0) {
     await client.batch(updatesToRunInBatch)

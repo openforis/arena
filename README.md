@@ -1,24 +1,22 @@
 # Quick reference
 
--	**Maintained by**:  
-	[Open Foris Initiative](https://openforis.org)
+- **Maintained by**:  
+  [Open Foris Initiative](https://openforis.org)
 
--   **Documentation**:  
-    [Open Foris Arena Website](https://openforis.org/tools/arena/)
+- **Documentation**:  
+  [Open Foris Arena Website](https://openforis.org/tools/arena/)
 
--   **Online platform**:  
-    [Open Foris Arena](https://www.openforis-arena.org)
+- **Online platform**:  
+  [Open Foris Arena](https://www.openforis-arena.org)
 
--	**Where to get help**:  
-	[Open Foris Support Forum](https://openforis.support)
-
+- **Where to get help**:  
+  [Open Foris Support Forum](https://openforis.support)
 
 # What is Arena?
 
 Arena is a cloud-based platform for storing and processing data collected in field inventories or questionnaires. It provides a fast and flexible way to set up a survey and start entering data for a team. It offers tools for data quality assurance with the help of data validation and reporting methods. Arena also offers multilingual data entry forms, multi-cycle data management, and computing of new result attributes and running statistical analysis with integrated connection to RStudio Server or local installation of RStudio.
 
 Arena also offers a map with access to very-high resolution satellite images. The Arena Map can be used, for example, for verifying locations of collected data, and for conducting sample-based image interpretation.
-
 
 ![logo](https://openforis.org/wp-content/uploads/2021/03/of-arena-picto-260px.png)
 
@@ -33,6 +31,7 @@ Arena also offers a map with access to very-high resolution satellite images. Th
 ```console
 $ docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:12-3.0
 ```
+
 You can also use an already existing PostgreSQL database installed in a different way and configure Arena to connect to it.
 
 ## Prepare a file with the parameters to pass to Arena
@@ -47,7 +46,7 @@ ARENA_PORT=9090
 ## specify the connection parameters as a URL in the format
 ## postgres://user:password@host:port/database
 # DATABASE_URL=postgres://arena:arena@localhost:5444/arena
-## or one by one
+## or parameter by parameter
 PGHOST=localhost
 PGPORT=5444
 PGDATABASE=arena
@@ -65,39 +64,50 @@ TEMP_FOLDER=/home/your_user/openforis/arena/upload
 FILE_STORAGE_PATH=
 
 ## FILES STORAGE (AWS S3 Bucket)
-FILE_STORAGE_AWS_S3_BUCKET_NAME=
-FILE_STORAGE_AWS_S3_BUCKET_REGION=
-FILE_STORAGE_AWS_ACCESS_KEY=
-FILE_STORAGE_AWS_SECRET_ACCESS_KEY=
+# FILE_STORAGE_AWS_S3_BUCKET_NAME=
+# FILE_STORAGE_AWS_S3_BUCKET_REGION=
+# FILE_STORAGE_AWS_ACCESS_KEY=
+# FILE_STORAGE_AWS_SECRET_ACCESS_KEY=
 
-# Email service (Arena uses Sendgrid to send emails)
+# Email
+# email service; allowed values: sendgrid / office365
+# - sendgrid service, only SENDGRID_API_KEY is required
+# - office365 service: EMAIL_AUTH_USER and EMAIL_AUTH_PASSWORD are required
+EMAIL_SERVICE=sendgrid
 SENDGRID_API_KEY= # get it from https://sendgrid.com/
+# EMAIL_AUTH_USER=
+# EMAIL_AUTH_PASSWORD=
+# Optional: custom email transport options could be specified.
+# EMAIL_TRANSPORT_OPTIONS=
+# e.g. (for MS office365 service) EMAIL_TRANSPORT_OPTIONS={"host":"smtp.office365.com","port":"587","auth":{"user":"testuser@mydomain.org","pass":"yoursecretpassword"},"secure":true,"tls":{"ciphers":"SSLv3"}}
 
 # Analysis
 ANALYSIS_OUTPUT_DIR=/home/your_user/openforis/arena/analysis
 
 # Server
 ## HTTP Session
-## Secret used to sign the session ID cookie 
+## Secret used to sign the session ID cookie
 SESSION_ID_COOKIE_SECRET=my-cookie-secret-key
 
 ## Set to true if http requests must be forwarded to https
 USE_HTTPS=false
 
-# RStudio Server
-RSTUDIO_DOWNLOAD_SERVER_URL=
-RSTUDIO_SERVER_URL=
-RSTUDIO_PROXY_SERVER_URL=
-RSTUDIO_POOL_SERVER_URL=
-RSTUDIO_POOL_SERVICE_KEY=
+# RStudio Server (not mandatory)
+# RSTUDIO_DOWNLOAD_SERVER_URL=
+# RSTUDIO_SERVER_URL=
+# RSTUDIO_PROXY_SERVER_URL=
+# RSTUDIO_POOL_SERVER_URL=
+# RSTUDIO_POOL_SERVICE_KEY=
 
-# reCAPTCHA v2 keys (get it from https://www.google.com/recaptcha/about/)
-RECAPTCHA_SITE_KEY=
-RECAPTCHA_SECRET_KEY=
+# reCAPTCHA
+RECAPTCHA_ENABLED=false
+# reCAPTCHA v2 keys; to be specified if reCAPTCHA is enabled (get it from https://www.google.com/recaptcha/about/)
+# RECAPTCHA_SITE_KEY=
+# RECAPTCHA_SECRET_KEY=
 
 # MAP
 ## Planet Lab Maps API key (get it from https://www.planet.com/markets/mapping/)
-MAP_API_KEY_PLANET=
+# MAP_API_KEY_PLANET=
 
 # System Admin user email address
 # used to create default system admin user when DB is empty
@@ -111,9 +121,11 @@ ADMIN_PASSWORD=
 ## Install and run Arena
 
 Running the following command from command line will install Arena as a Docker container:
+
 ```console
-$ docker run --env-file ./arena.env openforis/arena:latest
+$ docker run --env-file ./arena.env --network="host" openforis/arena:latest
 ```
+
 You can run this command in the same folder where you have defined the arena.env file or specify its path in the command, in the '--env-file' parameter.
 Arena will start on the port specified in the arena.env file (9090 by default).
 You can use the same command to start up Arena again once you stop it.

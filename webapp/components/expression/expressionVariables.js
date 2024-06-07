@@ -77,6 +77,7 @@ const getChildDefVariables = ({
 
 const getVariablesFromAncestors = ({
   survey,
+  cycle,
   nodeDefContext,
   mode,
   lang,
@@ -110,7 +111,7 @@ const getVariablesFromAncestors = ({
       visitNext(source)
     } else {
       // get variables from every child def
-      const nodeDefChildren = Survey.getNodeDefChildren(nodeDef, includeAnalysis)(survey)
+      const nodeDefChildren = Survey.getNodeDefChildrenSorted({ nodeDef, includeAnalysis, cycle })(survey)
       nodeDefChildren.forEach((childDef) => {
         variables.push(
           ...getChildDefVariables({ survey, childDef, mode, lang, editorType, nodeDefCurrent, excludeCurrentNodeDef })
@@ -160,9 +161,11 @@ const getVariablesGroupedByParentUuid = ({
         label: NodeDef.getName(parentNodeDef),
         options: variablesParent,
         root: NodeDef.isRoot(parentNodeDef),
+        hierarchyLevel: NodeDef.getMetaHierarchy(parentNodeDef).length,
       }
     })
-    .sort((groupA, groupB) => (groupA.label > groupB.label ? 1 : -1))
+    // sort groups by hierarchy level, in descending order
+    .sort((groupA, groupB) => groupB.hierarchyLevel - groupA.hierarchyLevel)
 
   if (!nodeDefCurrent || excludeCurrentNodeDef) {
     return groups
@@ -182,12 +185,14 @@ const _sortVariables = ({ nodeDefCurrent, variables }) => {
     if (varB.uuid === nodeDefCurrentUuid) {
       return 1
     }
-    return varA.label.localeCompare(varB.label)
+    // keep order of variables as in the form
+    return 0
   })
 }
 
 export const getVariables = ({
   survey: surveyParam,
+  cycle,
   nodeDefContext,
   mode,
   lang: langPreferred,
@@ -195,18 +200,21 @@ export const getVariables = ({
   editorType,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,
+  includeAnalysis = false,
 }) => {
   const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
   const variables = getVariablesFromAncestors({
     survey,
+    cycle,
     nodeDefContext,
     nodeDefCurrent,
     mode,
     lang,
     editorType,
     excludeCurrentNodeDef,
+    includeAnalysis,
   })
 
   _sortVariables({ nodeDefCurrent, variables })
@@ -218,17 +226,19 @@ export const getVariables = ({
 
 export const getVariablesChildren = ({
   survey,
+  cycle,
   nodeDefContext,
   nodeDefCurrent,
   mode,
   lang,
   groupByParent,
   excludeCurrentNodeDef,
+  includeAnalysis = false,
 }) => {
   if (!NodeDef.isEntity(nodeDefContext)) {
     return []
   }
-  const nodeDefChildren = Survey.getNodeDefChildren(nodeDefContext)(survey)
+  const nodeDefChildren = Survey.getNodeDefChildrenSorted({ nodeDef: nodeDefContext, includeAnalysis, cycle })(survey)
 
   const variables = nodeDefChildren.reduce((variablesAcc, childDef) => {
     variablesAcc.push(...getChildDefVariables({ survey, childDef, mode, lang, nodeDefCurrent, excludeCurrentNodeDef }))

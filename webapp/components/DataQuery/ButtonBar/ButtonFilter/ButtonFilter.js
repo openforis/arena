@@ -6,7 +6,6 @@ import { Query } from '@common/model/query'
 
 import { ButtonIconFilter } from '@webapp/components/buttons'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
-import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
 
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useI18n } from '@webapp/store/system'
@@ -36,9 +35,12 @@ const ButtonFilter = (props) => {
       {State.isPanelFilterShown(state) && (
         <ExpressionEditorPopup
           nodeDefUuidContext={entityDefUuid}
+          nodeDefUuidCurrent={entityDefUuid}
+          includeAnalysis
+          isContextParent={false}
+          excludeCurrentNodeDef={false}
           query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
-          types={[ExpressionEditorType.basic]}
           header={i18n.t('dataView.filterRecords.expressionEditorHeader')}
           onChange={({ expr }) => {
             onChangeQuery(Query.assocFilter(expr)(query))

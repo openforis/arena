@@ -9,12 +9,15 @@ const keys = {
   editMode: 'editMode',
   nodeDefsSelectorVisible: 'nodeDefsSelectorVisible',
   query: 'query',
-  selectedQuerySummaryUuid: 'selectedQuerySummaryUuid',
   recordEditModalProps: 'recordEditModalProps',
+  selectedQuerySummaryUuid: 'selectedQuerySummaryUuid',
+  codesVisible: 'codesVisible',
 }
 
 const chartTypes = {
   bar: 'bar',
+  line: 'line',
+  area: 'area',
   pie: 'pie',
   scatter: 'scatter',
 }
@@ -25,7 +28,7 @@ const displayTypes = {
 }
 
 const availableChartTypeByMode = {
-  [Query.modes.aggregate]: [chartTypes.bar, chartTypes.pie],
+  [Query.modes.aggregate]: [chartTypes.bar, chartTypes.line, chartTypes.area, chartTypes.pie],
   [Query.modes.raw]: [chartTypes.scatter],
 }
 
@@ -38,8 +41,9 @@ const getDisplayType = getProp(keys.displayType)
 const isEditMode = (state) => getProp(keys.editMode)(state) === true
 const isNodeDefsSelectorVisible = (state) => getProp(keys.nodeDefsSelectorVisible)(state) === true
 const getQuery = getProp(keys.query)
-const getSelectedQuerySummaryUuid = getProp(keys.selectedQuerySummaryUuid)
 const getRecordEditModalProps = getProp(keys.recordEditModalProps)
+const getSelectedQuerySummaryUuid = getProp(keys.selectedQuerySummaryUuid)
+const codesVisible = (state) => getProp(keys.codesVisible)(state) === true
 
 // update (context data explorer state)
 const assocChartType = A.assoc(keys.chartType)
@@ -61,8 +65,24 @@ const assocDisplayType = (displayType) => (state) => {
 }
 const assocEditMode = A.assoc(keys.editMode)
 const assocNodeDefsSelectorVisible = A.assoc(keys.nodeDefsSelectorVisible)
-const assocQuery = (queryUpdated) => (state) => {
+const assocQuery = (queryParam) => (state) => {
+  let queryUpdated = queryParam
+
+  const entityNotSelected = !Query.getEntityDefUuid(queryUpdated)
+
+  if (entityNotSelected) {
+    const queryPrev = A.prop(keys.query)(state)
+    if (Query.getEntityDefUuid(queryPrev)) {
+      // entity has been reset: set mode to "raw"
+      queryUpdated = Query.assocMode(Query.modes.raw)(queryUpdated)
+    }
+  }
   let stateUpdated = A.assoc(keys.query, queryUpdated)(state)
+
+  if (entityNotSelected) {
+    // allow only table display type when entity is not selected
+    stateUpdated = assocDisplayType(displayTypes.table)(stateUpdated)
+  }
   const displayType = A.prop(keys.displayType)(stateUpdated)
   if (displayType === displayTypes.chart) {
     // query mode could have changed;
@@ -85,14 +105,17 @@ const assocRecordEditModalProps = A.assoc(keys.recordEditModalProps)
 
 const dissocRecordEditModalProps = A.dissoc(keys.recordEditModalProps)
 
+const assocCodesVisible = A.assoc(keys.codesVisible)
+
 // utils
 const isChartTypeAvailable =
   ({ queryMode }) =>
   (chartType) =>
-    availableChartTypeByMode[queryMode].includes(chartType)
+    availableChartTypeByMode[queryMode]?.includes(chartType)
 
 export const DataExplorerState = {
   stateKey,
+  keys,
   chartTypes,
   displayTypes,
   // read
@@ -103,6 +126,7 @@ export const DataExplorerState = {
   getQuery,
   getSelectedQuerySummaryUuid,
   getRecordEditModalProps,
+  codesVisible,
   // update
   assocChartType,
   assocDisplayType,
@@ -112,6 +136,7 @@ export const DataExplorerState = {
   assocSelectedQuerySummaryUuid,
   assocRecordEditModalProps,
   dissocRecordEditModalProps,
+  assocCodesVisible,
 
   // utils
   isChartTypeAvailable,

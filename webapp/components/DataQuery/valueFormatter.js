@@ -1,5 +1,6 @@
 import * as A from '@core/arena'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
@@ -9,17 +10,24 @@ const formatters = {
     i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
   [NodeDef.nodeDefType.code]: ({ value, label }) => label ?? value,
   [NodeDef.nodeDefType.date]: ({ value }) => DateUtils.format(DateUtils.parseISO(value), DateUtils.formats.dateDefault),
-  [NodeDef.nodeDefType.decimal]: ({ value, nodeDef }) =>
-    NumberUtils.formatDecimal(value, NodeDef.getMaxNumberDecimalDigits(nodeDef)),
+  [NodeDef.nodeDefType.decimal]: ({ survey, nodeDef, value }) => {
+    const maxNumberDecimalDigits = Survey.getNodeDefMaxDecimalDigits(nodeDef)(survey)
+    return NumberUtils.formatDecimal(value, maxNumberDecimalDigits)
+  },
+
+  [NodeDef.nodeDefType.entity]: ({ value }) => {
+    // value is an integer (entity items count)
+    return NumberUtils.formatInteger(value)
+  },
   [NodeDef.nodeDefType.integer]: ({ value }) => NumberUtils.formatInteger(value),
 }
 
-const format = ({ value, label, i18n, nodeDef }) => {
+const format = ({ i18n, survey, nodeDef, value, label }) => {
   if (A.isNull(value)) {
     return ''
   }
   const formatter = formatters[NodeDef.getType(nodeDef)]
-  const formatValue = (v) => (formatter ? formatter({ value: v, label, i18n, nodeDef }) : value)
+  const formatValue = (v) => (formatter ? formatter({ i18n, survey, nodeDef, value: v, label }) : value)
 
   return NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value.map(formatValue).join(', ') : formatValue(value)
 }

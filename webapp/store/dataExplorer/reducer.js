@@ -5,12 +5,13 @@ import { Query } from '@common/model/query'
 import { DataExplorerState } from './state'
 
 const initialState = {
-  displayType: DataExplorerState.displayTypes.table,
-  chartType: DataExplorerState.chartTypes.bar,
-  editMode: false,
-  nodeDefsSelectorVisible: true,
-  query: Query.create(),
-  selectedQuerySummaryUuid: null,
+  [DataExplorerState.keys.displayType]: DataExplorerState.displayTypes.table,
+  [DataExplorerState.keys.chartType]: DataExplorerState.chartTypes.bar,
+  [DataExplorerState.keys.editMode]: false,
+  [DataExplorerState.keys.nodeDefsSelectorVisible]: true,
+  [DataExplorerState.keys.query]: Query.create(),
+  [DataExplorerState.keys.selectedQuerySummaryUuid]: null,
+  [DataExplorerState.keys.codesVisible]: false,
 }
 
 export const slice = createSlice({
@@ -33,6 +34,8 @@ export const slice = createSlice({
     setSelectedQuerySummaryUuid: (state, action) =>
       DataExplorerState.assocSelectedQuerySummaryUuid(action.payload)(state),
 
+    setCodesVisible: (state, action) => DataExplorerState.assocCodesVisible(action.payload)(state),
+
     openRecordEditModal: (state, action) => DataExplorerState.assocRecordEditModalProps(action.payload)(state),
 
     closeRecordEditModal: (state) => DataExplorerState.dissocRecordEditModalProps(state),
@@ -46,6 +49,7 @@ const {
   setNodeDefsSelectorVisible,
   setQuery,
   setSelectedQuerySummaryUuid,
+  setCodesVisible,
   openRecordEditModal,
   closeRecordEditModal,
 } = slice.actions
@@ -57,6 +61,7 @@ export const DataExplorerActions = {
   setNodeDefsSelectorVisible,
   setQuery,
   setSelectedQuerySummaryUuid,
+  setCodesVisible,
   openRecordEditModal,
   closeRecordEditModal,
 }

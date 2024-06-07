@@ -17,7 +17,7 @@ import { ChartWrapper } from '../common'
 const margin = {
   top: 20,
   right: 20,
-  bottom: 0,
+  bottom: 20,
   left: 20,
 }
 const defaultFill = '#8884d8'

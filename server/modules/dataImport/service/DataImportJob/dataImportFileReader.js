@@ -21,17 +21,31 @@ export class DataImportFileReader {
     }
   }
 
-  async getCsvFileStream({ nodeDefName }) {
+  async getCsvFileStream() {
     if (this.includeFiles) {
-      const entryName = `${nodeDefName}.csv`
-      return this.fileZip.getEntryStream(entryName)
+      const entryNames = this.fileZip.getEntryNames()
+      const csvFileEntryName = entryNames.find((entryName) => /^.+\.csv$/.test(entryName))
+      if (!csvFileEntryName) {
+        throw new Error('Cannot find CSV file inside ZIP')
+      }
+      return this.fileZip.getEntryStream(csvFileEntryName)
     }
     return FileUtils.createReadStream(this.filePath)
   }
 
-  async getFile({ fileName }) {
-    const entryName = [directories.files, fileName].join(pathSeparator)
-    return this.fileZip.getEntryData(entryName)
+  async getFile({ fileName: fileNameParam, fileUuid }) {
+    const possibleFileNames = [fileNameParam]
+    if (fileUuid) {
+      const extension = FileUtils.getFileExtension(fileNameParam)
+      possibleFileNames.push(`${fileUuid}.bin`, `${fileUuid}.${extension}`)
+    }
+    for await (const fileName of possibleFileNames) {
+      const entryName = [directories.files, fileName].join(pathSeparator)
+      if (this.fileZip.hasEntry(entryName)) {
+        return this.fileZip.getEntryData(entryName)
+      }
+    }
+    return null
   }
 
   close() {

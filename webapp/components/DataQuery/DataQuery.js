@@ -10,14 +10,19 @@ import { Paginator } from '@webapp/components/Table'
 
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
+import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
+
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
-import { DataQuerySelectedAttributes } from './DataQuerySelectedAttributes'
-import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
+import {
+  DataQuerySelectedAttributes,
+  DataQuerySelectedDimensions,
+  DataQuerySelectedMeasures,
+} from './DataQuerySortableItems'
 
 const DataQuery = () => {
   const dispatch = useDispatch()
@@ -68,6 +73,8 @@ const DataQuery = () => {
         </div>
 
         <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedMeasures nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
           data={data}
