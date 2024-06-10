@@ -72,6 +72,7 @@ export const {
   insertFile,
   // READ
   fetchFileContentAsStream,
+  fetchFileContentAsBuffer,
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
   // UPDATE
