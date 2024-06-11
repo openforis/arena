@@ -37,12 +37,13 @@ const getColLabelKey = ({ columnName, nodeDef }) => {
 }
 
 const ColumnHeader = (props) => {
-  const { colWidth, nodeDef, nodeDefLabelType, onChangeQuery, query } = props
+  const { codesVisible, colWidth, nodeDef, nodeDefLabelType, onChangeQuery, query } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
 
   const { modeEdit, columnNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
+    codesVisible,
     query,
     colWidth,
     nodeDef,
@@ -117,6 +118,7 @@ const ColumnHeader = (props) => {
 }
 
 ColumnHeader.propTypes = {
+  codesVisible: PropTypes.bool.isRequired,
   colWidth: PropTypes.number.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,

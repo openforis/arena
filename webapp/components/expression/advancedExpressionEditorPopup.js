@@ -9,17 +9,19 @@ import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValid
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
 const AdvancedExpressionEditorPopup = (props) => {
-  const { query, mode, nodeDefCurrent, excludeCurrentNodeDef, isContextParent, updateDraftQuery } = props
+  const { query, mode, nodeDefCurrent, excludeCurrentNodeDef, includeAnalysis, isContextParent, updateDraftQuery } =
+    props
 
   const inputRef = useRef()
   const i18n = useI18n()
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
 
   const [errorMessage, setErrorMessage] = useState(null)
   const editorRef = useRef(null)
@@ -35,6 +37,7 @@ const AdvancedExpressionEditorPopup = (props) => {
               exprString: value,
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
+              includeAnalysis,
             })
       setErrorMessage(newErrorMessage)
       const valid = !newErrorMessage
@@ -64,7 +67,9 @@ const AdvancedExpressionEditorPopup = (props) => {
       autofocus: true,
       extraKeys: { 'Ctrl-Space': 'autocomplete' },
       mode: { name: 'arena-expression' },
-      hintOptions: { hint: arenaExpressionHint({ mode, i18n, survey, nodeDefCurrent }) },
+      hintOptions: {
+        hint: arenaExpressionHint({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis }),
+      },
     })
     editor.setSize('100%', 'auto')
 
@@ -107,6 +112,7 @@ const AdvancedExpressionEditorPopup = (props) => {
 
 AdvancedExpressionEditorPopup.propTypes = {
   excludeCurrentNodeDef: PropTypes.bool,
+  includeAnalysis: PropTypes.bool,
   isContextParent: PropTypes.bool,
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
@@ -116,6 +122,7 @@ AdvancedExpressionEditorPopup.propTypes = {
 
 AdvancedExpressionEditorPopup.defaultProps = {
   excludeCurrentNodeDef: true,
+  includeAnalysis: false,
   isContextParent: false,
   mode: Expression.modes.json,
   nodeDefCurrent: null,

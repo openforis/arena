@@ -1,20 +1,22 @@
-import * as R from 'ramda'
 import BigNumber from 'bignumber.js'
+
+import * as A from '@core/arena'
+import { Objects } from '@openforis/arena-core'
 
 BigNumber.config({
   ERRORS: false,
   FORMAT: {
     decimalSeparator: '.',
-    groupSeparator: ' ',
+    groupSeparator: ',',
     groupSize: 3,
   },
 })
 
-export const toNumber = (num) => (R.isNil(num) || R.isEmpty(num) ? NaN : Number(num))
+export const toNumber = (num) => (Objects.isEmpty(num) ? NaN : Number(num))
 
-export const isInteger = R.pipe(toNumber, Number.isInteger)
+export const isInteger = A.pipe(toNumber, Number.isInteger)
 
-export const isFloat = R.pipe(toNumber, Number.isFinite)
+export const isFloat = A.pipe(toNumber, Number.isFinite)
 
 /**
  * Formats the given value to the specified fixed dicimal digits.
@@ -27,15 +29,19 @@ export const formatDecimal = (value, decimalDigits = NaN) => {
   if (Number.isNaN(value) || value === null) return null
   const num = new BigNumber(value)
 
-  if (decimalDigits > 0) {
+  if (decimalDigits >= 0) {
     // round to fixed number of decimal digits
     return num.toFormat(decimalDigits)
   }
-  if (decimalDigits === 0) {
-    // format as integer
-    return num.toFormat(0, { groupSeparator: '' })
-  }
-  return num.toString()
+  return num.toFormat()
+}
+
+export const roundToPrecision = (value, precision = NaN) => {
+  const num = toNumber(value)
+  if (Number.isNaN(num)) return NaN
+  if (Number.isNaN(precision)) return num
+  const exp = Math.pow(10, precision)
+  return Math.round(num * exp) / exp
 }
 
 /**

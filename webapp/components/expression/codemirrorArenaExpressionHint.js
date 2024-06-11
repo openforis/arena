@@ -141,8 +141,17 @@ const _prepareTokenForCompletion = ({ token, cursorPosition, cursorLine }) => {
   }
 }
 
-const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath }) => {
-  const nodeDefContextParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
+const _extractVariables = ({
+  mode,
+  i18n,
+  survey,
+  cycle,
+  nodeDefCurrent,
+  nodeDefContextPath,
+  isContextParent,
+  includeAnalysis = false,
+}) => {
+  const nodeDefContextParent = isContextParent ? Survey.getNodeDefParent(nodeDefCurrent)(survey) : nodeDefCurrent
   let nodeDefContext = nodeDefContextParent
 
   const { lang } = i18n
@@ -161,27 +170,31 @@ const _extractVariables = ({ mode, i18n, survey, nodeDefCurrent, nodeDefContextP
     return nodeDefContext
       ? ExpressionVariables.getVariablesChildren({
           survey,
+          cycle,
           nodeDefContext,
           nodeDefCurrent,
           mode,
           lang,
           groupByParent,
+          includeAnalysis,
         })
       : []
   }
   // get variables from context node and its ancestors
   return ExpressionVariables.getVariables({
     survey,
+    cycle,
     nodeDefContext,
     nodeDefCurrent,
     mode,
     lang,
     groupByParent,
+    includeAnalysis,
   })
 }
 
 export const arenaExpressionHint =
-  ({ mode, i18n, survey, nodeDefCurrent }) =>
+  ({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) =>
   (editor) => {
     const cur = editor.getCursor()
     const token = editor.getTokenAt(cur)
@@ -196,7 +209,16 @@ export const arenaExpressionHint =
 
     const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
 
-    const variablesGroupedByParentEntity = _extractVariables({ mode, i18n, survey, nodeDefCurrent, nodeDefContextPath })
+    const variablesGroupedByParentEntity = _extractVariables({
+      mode,
+      i18n,
+      survey,
+      cycle,
+      nodeDefCurrent,
+      nodeDefContextPath,
+      isContextParent,
+      includeAnalysis,
+    })
 
     return {
       list: getCompletions({ mode, i18n, token, variablesGroupedByParentEntity }),

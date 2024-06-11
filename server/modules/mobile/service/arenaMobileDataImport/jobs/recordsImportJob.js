@@ -7,13 +7,19 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
-import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
+
+const getErrorMessageContent = ({ missingParentUuid, emptyMultipleAttribute, invalidHierarchy }) => {
+  if (missingParentUuid) return `has missing or invalid parent_uuid`
+  if (emptyMultipleAttribute) return `is multiple and has an empty value`
+  if (invalidHierarchy) return `has an invalid meta hierarchy`
+  return null
+}
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -79,19 +85,24 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const nodes = Record.getNodes(record)
 
     Object.entries(nodes).forEach(([nodeUuid, node]) => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      const nodeDefUuid = Node.getNodeDefUuid(node)
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const parentUuid = Node.getParentUuid(node)
       const missingParentUuid = (!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])
       const emptyMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)
-
-      if (missingParentUuid || emptyMultipleAttribute) {
-        const messagePrefix = `node with uuid ${Node.getUuid(node)}`
-        const messageContent = missingParentUuid
-          ? `has missing or invalid parent_uuid`
-          : `is multiple and has an empty value`
+      const invalidHierarchy = Node.getHierarchy(node).length !== NodeDef.getMetaHierarchy(nodeDef)?.length
+      const errorMessageContent = getErrorMessageContent({
+        missingParentUuid,
+        emptyMultipleAttribute,
+        invalidHierarchy,
+      })
+      if (errorMessageContent) {
+        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def uuid ${nodeDefUuid}`
         const messageSuffix = `: skipping it`
-        this.logWarn(`${messagePrefix} ${messageContent} ${messageSuffix}`)
+        this.logWarn(`${messagePrefix} ${errorMessageContent} ${messageSuffix}`)
         delete nodes[nodeUuid]
+      } else {
+        Node.removeFlags({ sideEffect: true })(node)
       }
     })
     // assoc nodes and build index from scratch
@@ -164,27 +175,35 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await RecordManager.insertRecord(user, surveyId, record, true, tx)
 
     // insert nodes (add them to batch persister)
-    const nodesArray = []
-
-    Record.getNodesArray(record).forEach((node) => {
-      // check that the node definition associated to the node has not been deleted from the survey
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      if (nodeDef) {
-        node[Node.keys.created] = true // do side effect to avoid creating new objects
-        nodesArray.push(node)
-        if (NodeDef.isFile(nodeDef)) {
-          this.trackFileUuid({ node })
+    const nodesIndexedByUuid = Record.getNodesArray(record)
+      .sort((nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length)
+      .reduce((acc, node) => {
+        const nodeUuid = Node.getUuid(node)
+        const nodeDefUuid = Node.getNodeDefUuid(node)
+        // check that the node definition associated to the node has not been deleted from the survey
+        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+        if (nodeDef) {
+          node[Node.keys.created] = true // do side effect to avoid creating new objects
+          acc[nodeUuid] = node
+          if (NodeDef.isFile(nodeDef)) {
+            this.trackFileUuid({ node })
+          }
+        } else {
+          this.logDebug(
+            `Record ${recordUuid}: missing node def with uuid ${nodeDefUuid} in node ${nodeUuid}; skipping it`
+          )
         }
-      }
-    })
-    nodesArray.sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-    const nodesIndexedByUuid = ObjectUtils.toUuidIndexedObj(nodesArray)
+        return acc
+      }, {})
 
+    if (!Record.getDateModified(record)) {
+      this.logDebug(`Empty date modified for record ${Record.getUuid(record)}`)
+    }
     await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid, dateModified: Record.getDateModified(record) })
 
     this.insertedRecordsUuids.add(recordUuid)
 
-    this.logDebug(`record insert complete (${nodesArray.length} nodes inserted)`)
+    this.logDebug(`record insert complete (${Object.values(nodesIndexedByUuid).length} nodes inserted)`)
   }
 
   async beforeSuccess() {

@@ -118,10 +118,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
   async createCsvReader() {
     const { cycle, nodeDefUuid, survey, includeFiles } = this.context
 
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const nodeDefName = NodeDef.getName(nodeDef)
-
-    const stream = await this.dataImportFileReader.getCsvFileStream({ nodeDefName })
+    const stream = await this.dataImportFileReader.getCsvFileStream()
 
     return DataImportCsvFileReader.createReaderFromStream({
       stream,

@@ -4,7 +4,9 @@ import * as nodemailer from 'nodemailer'
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
 
-sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
+import * as Log from '@server/log/log'
+
+const logger = Log.getLogger('Mailer')
 
 const emailServices = {
   sendgrid: 'sendgrid',
@@ -13,16 +15,27 @@ const emailServices = {
 
 const emailService = ProcessUtils.ENV.emailService
 
+if (emailService === emailServices.sendgrid) {
+  sgMail.setApiKey(ProcessUtils.ENV.sendGridApiKey)
+}
+
 const authUser = ProcessUtils.ENV.emailAuthUser
 const authPass = ProcessUtils.ENV.emailAuthPassword
 const from = ProcessUtils.ENV.adminEmail || authUser
 
-const office365TransportOptions = {
+const defaultOffice365TransportOptions = {
   host: 'smtp.office365.com',
   port: '587',
   auth: { user: authUser, pass: authPass },
   secure: true,
   tls: { ciphers: 'SSLv3' },
+}
+
+let office365TransportOptions = null
+{
+  const optionsType = ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default'
+  logger.debug(`using ${optionsType} email transport options`)
+  office365TransportOptions = ProcessUtils.ENV.emailTransportOptions ?? defaultOffice365TransportOptions
 }
 
 const sendEmailSendgrid = async ({ to, subject, html }) => {
