@@ -1,6 +1,6 @@
 import * as camelize from 'camelize'
 
-import { Objects, PointFactory, Points } from '@openforis/arena-core'
+import { Objects, PointFactory, Points, Strings } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as NumberUtils from '@core/numberUtils'
@@ -115,13 +115,15 @@ const props = {
           return Taxon.getCode(taxon)
         }
         if (columnName.endsWith(ColumnNodeDef.columnSuffixTaxonScientificName)) {
+          const taxonScientificName = Taxon.getScientificName(taxon)
           // Scientific_name
           if (Taxon.isUnkOrUnlTaxon(taxon)) {
             // Scientific name from node value
-            return Node.getScientificName(node)
+            const nodeScientificName = Node.getScientificName(node)
+            return Strings.defaultIfEmpty(taxonScientificName)(nodeScientificName)
           }
           // Scientific name from taxon item
-          return Taxon.getScientificName(taxon)
+          return taxonScientificName
         }
         if (Node.getVernacularNameUuid(node) && columnName.endsWith(ColumnNodeDef.columnSuffixTaxonVernacularName)) {
           // Vernacular name
