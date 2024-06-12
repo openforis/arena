@@ -30,7 +30,7 @@ const numericValueConverter = ({ value, headers }) => {
   const val = singlePropValueConverter({ value })
   const numericVal = Number(val)
   if (Number.isNaN(numericVal)) {
-    throw new SystemError('validationErrors.dataImport.invalidNumber', { value: val, headers })
+    throw new SystemError('validationErrors:dataImport.invalidNumber', { value: val, headers })
   }
   return numericVal
 }
@@ -39,7 +39,7 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
     if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
-      throw new SystemError('validationErrors.dataImport.invalidBoolean', { value: val, headers })
+      throw new SystemError('validationErrors:dataImport.invalidBoolean', { value: val, headers })
     }
     return String(['true', '1'].includes(String(val).toLocaleLowerCase()))
   },
@@ -51,7 +51,7 @@ const valueConverterByNodeDefType = {
       const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
       if (!itemUuid) {
         const attributeName = NodeDef.getName(nodeDef)
-        throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
+        throw new SystemError('validationErrors:dataImport.invalidCode', { code, attributeName })
       }
       return Node.newNodeValueCode({ itemUuid })
     }
@@ -72,7 +72,7 @@ const valueConverterByNodeDefType = {
       return DateUtils.isValidDateObject(dateParsed)
     })
     if (!DateUtils.isValidDateObject(dateParsed)) {
-      throw new SystemError('validationErrors.dataImport.invalidDate', { headers, value: val })
+      throw new SystemError('validationErrors:dataImport.invalidDate', { headers, value: val })
     }
     return DateUtils.formatDateISO(dateParsed)
   },
@@ -80,7 +80,7 @@ const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.file]: ({ value, headers }) => {
     const { fileName, fileUuid: fileUuidInValue } = value
     if (Objects.isEmpty(fileName)) {
-      throw new SystemError('validationErrors.dataImport.emptyFileName', { headers, fileName })
+      throw new SystemError('validationErrors:dataImport.emptyFileName', { headers, fileName })
     }
     const fileUuid = fileUuidInValue ?? uuidv4()
     return {
@@ -96,7 +96,7 @@ const valueConverterByNodeDefType = {
     if (taxon) {
       return Node.newNodeValueTaxon({ taxonUuid: taxon.uuid })
     }
-    throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
+    throw new SystemError('validationErrors:dataImport.invalidTaxonCode', { value, headers })
   },
   [NodeDef.nodeDefType.text]: singlePropValueConverter,
   [NodeDef.nodeDefType.time]: singlePropValueConverter,
@@ -108,7 +108,7 @@ const checkAllHeadersAreValid =
     const dataExportModelHeaders = csvDataExportModel.columns.map((col) => col.header)
     const invalidHeaders = headers.filter((header) => !dataExportModelHeaders.includes(header))
     if (invalidHeaders.length > 0) {
-      throw new SystemError('validationErrors.dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
+      throw new SystemError('validationErrors:dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
     }
   }
 
@@ -118,7 +118,7 @@ const checkRequiredHeadersNotMissing =
     const requiredHeaders = csvDataExportModel.columns.filter((col) => col.key).map((col) => col.header)
     const missingRequiredHeaders = requiredHeaders.filter((header) => !headers.includes(header))
     if (missingRequiredHeaders.length > 0) {
-      throw new SystemError('validationErrors.dataImport.missingRequiredHeaders', { missingRequiredHeaders })
+      throw new SystemError('validationErrors:dataImport.missingRequiredHeaders', { missingRequiredHeaders })
     }
   }
 

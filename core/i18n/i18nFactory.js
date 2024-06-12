@@ -18,7 +18,7 @@ const createParams = (lang) => ({
     nsMode: 'default', // Set it to fallback to let passed namespaces to translated hoc act as fallbacks
   },
   lng: lang,
-  ns: ['common', 'appErrors', 'jobs'],
+  ns: ['common', 'appErrors', 'jobs', 'validationErrors'],
   defaultNS: 'common',
   resources: {
     en: enTranslation,

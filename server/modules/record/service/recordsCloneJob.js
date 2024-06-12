@@ -53,7 +53,7 @@ export default class RecordsCloneJob extends Job {
     )
 
     if (!Objects.isEqual(nodeDefKeysCycleFrom, nodeDefKeysCycleTo)) {
-      throw new SystemError('validationErrors.recordClone.differentKeyAttributes')
+      throw new SystemError('validationErrors:recordClone.differentKeyAttributes')
     }
 
     const keys = nodeDefKeysCycleFrom.map((nodeDefKey) => A.camelize(NodeDef.getName(nodeDefKey)))

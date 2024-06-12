@@ -100,8 +100,8 @@ arena.login = function(tentative) {
   respParsed <- arena.parseResponse(resp)
   
   if ("message" %in% names(respParsed) && (
-    (respParsed$message == 'validationErrors.user.userNotFound') || 
-    (respParsed$message == 'validationErrors.user.emailInvalid') || 
+    (respParsed$message == 'validationErrors:user.userNotFound') || 
+    (respParsed$message == 'validationErrors:user.emailInvalid') || 
     (respParsed$message == 'Missing credentials')
     )) 
   {

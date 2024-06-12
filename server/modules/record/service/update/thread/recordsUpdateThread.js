@@ -80,6 +80,7 @@ class RecordsUpdateThread extends Thread {
       try {
         await this.processMessage(msg)
       } catch (error) {
+        Logger.error('error processing message', error, error.stack)
         // SystemError is an expected error type, e.g. when there's a problem with expressions.
         if (error instanceof SystemError) {
           this.postMessage({

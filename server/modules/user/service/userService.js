@@ -98,23 +98,23 @@ const _checkUserAccessRequest = async ({ userAccessRequest }) => {
   const { reCaptchaToken } = userAccessRequest
   const reCaptchaVerified = await ReCaptchaUtils.verifyReCaptcha({ token: reCaptchaToken })
   if (!reCaptchaVerified) {
-    return { error: 'validationErrors.userAccessRequest.invalidReCaptcha' }
+    return { error: 'validationErrors:userAccessRequest.invalidReCaptcha' }
   }
   // validate request
   const validation = await UserAccessRequestValidator.validateUserAccessRequest(userAccessRequest)
   if (!Validation.isValid(validation)) {
-    return { error: 'validationErrors.userAccessRequest.invalidRequest', validation }
+    return { error: 'validationErrors:userAccessRequest.invalidRequest', validation }
   }
   // verify user not already existing
   const { email } = userAccessRequest
   const existingUser = await UserManager.fetchUserByEmail(email)
   if (existingUser) {
-    return { error: 'validationErrors.userAccessRequest.userAlreadyExisting', errorParams: { email } }
+    return { error: 'validationErrors:userAccessRequest.userAlreadyExisting', errorParams: { email } }
   }
   // verify request not already existing
   const existingRequest = await UserManager.fetchUserAccessRequestByEmail({ email })
   if (existingRequest) {
-    return { error: 'validationErrors.userAccessRequest.requestAlreadySent', errorParams: { email } }
+    return { error: 'validationErrors:userAccessRequest.requestAlreadySent', errorParams: { email } }
   }
   return { ok: true }
 }

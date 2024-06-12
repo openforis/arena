@@ -40,7 +40,7 @@ const _valueAdapterByType = {
     })(survey)
     if (!itemUuid) {
       const attributeName = NodeDef.getName(attributeDef)
-      throw new SystemError('validationErrors.dataImport.invalidCode', { attributeName, code })
+      throw new SystemError('validationErrors:dataImport.invalidCode', { attributeName, code })
     }
     return Node.newNodeValueCode({ itemUuid })
   },
@@ -128,7 +128,7 @@ const _addEntityAndKeyValues =
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
 
       if (Objects.isEmpty(keyValue)) {
-        throw new SystemError('validationErrors.record.entityKeyValueNotSpecified', {
+        throw new SystemError('validationErrors:record.entityKeyValueNotSpecified', {
           keyDefName: NodeDef.getName(keyDef),
         })
       }
@@ -194,7 +194,7 @@ const _getOrCreateEntityByKeys =
         })(record)
 
     if (!entityParent) {
-      throw new SystemError('validationErrors.record.missingAncestorForEntity', {
+      throw new SystemError('validationErrors:record.missingAncestorForEntity', {
         entityName: NodeDef.getName(entityDef),
         ancestorName: NodeDef.getName(entityParentDef),
       })

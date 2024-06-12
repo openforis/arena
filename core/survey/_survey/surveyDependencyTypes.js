@@ -4,6 +4,8 @@ export const dependencyTypes = {
   validations: 'validations',
   formula: 'formula',
   itemsFilter: 'itemsFilter',
+  maxCount: 'maxCount',
+  minCount: 'minCount',
 }
 
 export const isContextParentByDependencyType = {
@@ -12,6 +14,8 @@ export const isContextParentByDependencyType = {
   [dependencyTypes.validations]: false,
   [dependencyTypes.formula]: false,
   [dependencyTypes.itemsFilter]: true,
+  [dependencyTypes.maxCount]: true,
+  [dependencyTypes.minCount]: true,
 }
 
 export const selfReferenceAllowedByDependencyType = {
@@ -20,4 +24,6 @@ export const selfReferenceAllowedByDependencyType = {
   [dependencyTypes.validations]: true,
   [dependencyTypes.formula]: false,
   [dependencyTypes.itemsFilter]: false,
+  [dependencyTypes.maxCount]: false,
+  [dependencyTypes.minCount]: false,
 }
