@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
@@ -6,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKeys } from '@webapp/store/survey'
 import { useChain } from '@webapp/store/ui/chain'
 import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
 
@@ -24,6 +25,7 @@ export const ChainBasicProps = (props) => {
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
+  const cycleKeys = useSurveyCycleKeys()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
 
@@ -42,6 +44,7 @@ export const ChainBasicProps = (props) => {
 
   const validation = Chain.getValidation(chain)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+  const { props: chainProps } = chain
 
   const samplingDesignDisabled =
     existsAnotherChainWithSamplingDesign || (Chain.hasSamplingDesign(chain) && Boolean(baseUnitNodeDef))
@@ -49,21 +52,26 @@ export const ChainBasicProps = (props) => {
   return (
     <div className="chain-basic-props">
       <LabelsEditor
-        labels={chain.props?.labels}
+        labels={chainProps.labels}
         formLabelKey="chainView.formLabel"
         readOnly={false}
         validation={Validation.getFieldValidation(Chain.keysProps.labels)(validation)}
-        onChange={(labels) => updateChain({ ...chain, props: { ...chain.props, labels } })}
+        onChange={(labels) => updateChain({ ...chain, props: { ...chainProps, labels } })}
       />
       <LabelsEditor
         formLabelKey="common.description"
-        labels={chain.props.descriptions}
-        onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
+        labels={chainProps.descriptions}
+        onChange={(descriptions) => updateChain({ ...chain, props: { ...chainProps, descriptions } })}
       />
-      <CyclesSelector
-        cyclesKeysSelected={chain.props.cycles}
-        onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
-      />
+      {
+        // show cycles selector only when not all cycles are selected (for backwards compatibility)
+        cycleKeys.length > chainProps.cycles.length && (
+          <CyclesSelector
+            cyclesKeysSelected={chainProps.cycles}
+            onChange={(cycles) => updateChain({ ...chain, props: { ...chainProps, cycles } })}
+          />
+        )
+      }
       <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
         <Checkbox
           checked={Chain.hasSamplingDesign(chain)}
@@ -91,4 +99,8 @@ export const ChainBasicProps = (props) => {
       <ChainRStudioFieldset updateChain={updateChain} />
     </div>
   )
+}
+
+ChainBasicProps.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }
