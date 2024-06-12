@@ -6,7 +6,7 @@ import { arenaInfo, sourceWithTryCatch, source } from '../rFunctions'
 const _contentSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
 
 const pathsWithErrorThrown = ['system/init', 'system/close']
-const pathsWithErrorsIgnored = ['system/statistical-analysis']
+const pathsWithErrorsIgnored = ['system/login', 'system/statistical-analysis']
 
 export const padStart = StringUtils.padStart(3, '0')
 
