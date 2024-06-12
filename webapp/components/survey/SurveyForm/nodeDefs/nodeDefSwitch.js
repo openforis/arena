@@ -6,11 +6,10 @@ import * as R from 'ramda'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
-import { Objects } from '@openforis/arena-core'
+import { Nodes, Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -42,8 +41,8 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   )
 }
 
-const _maxCountReached = ({ nodeDef, nodes }) => {
-  const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
+const _maxCountReached = ({ parentNode, nodeDef, nodes }) => {
+  const maxCount = parentNode ? Nodes.getChildrenMaxCount({ parentNode, nodeDef }) : NaN
 
   if (Objects.isEmpty(maxCount)) return false
 
@@ -69,7 +68,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
       parentNode &&
       NodeDef.isMultiple(nodeDef) &&
       !NodeDef.isEnumerate(nodeDef) &&
-      !_maxCountReached({ nodeDef, nodes }) &&
+      !_maxCountReached({ parentNode, nodeDef, nodes }) &&
       !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 
     const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
