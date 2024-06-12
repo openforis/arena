@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import * as NumberUtils from '@core/numberUtils'
-
 export const keys = {
   count: 'count',
   expressions: 'expressions',
@@ -20,13 +18,7 @@ export const getMinCount = getCountProp(keys.min)
 
 export const getMaxCount = getCountProp(keys.max)
 
-export const hasMinOrMaxCount = (validations) => {
-  const minCount = NumberUtils.toNumber(getMinCount(validations))
-  const maxCount = NumberUtils.toNumber(getMaxCount(validations))
-  return !Number.isNaN(minCount) || !Number.isNaN(maxCount)
-}
-
-const assocCountProp = (key) => (value) =>
+export const assocCountProp = (key) => (value) =>
   R.pipe(
     R.ifElse(R.always(R.isEmpty(value)), R.dissocPath([keys.count, key]), R.assocPath([keys.count, key], value)),
     // If validations count obj is empty, it gets removed from validations

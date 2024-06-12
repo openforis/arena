@@ -4,10 +4,11 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import * as R from 'ramda'
 
+import { Nodes } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
@@ -34,8 +35,7 @@ const NodeDefEntityTableRows = (props) => {
 
   const survey = useSelector(SurveyState.getSurvey)
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
-  const nodeDefValidations = NodeDef.getValidations(nodeDef)
-  const minCount = NodeDefValidations.getMinCount(nodeDefValidations)
+  const minCount = parentNode ? Nodes.getChildrenMinCount({ parentNode, nodeDef }) : NaN
   const canDeleteRows = !NodeDef.isEnumerate(nodeDef) && (!minCount || nodes.length > minCount)
 
   const nodeDefColumns = R.reduce(

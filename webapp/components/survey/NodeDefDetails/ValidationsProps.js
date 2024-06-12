@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import { NodeDefCountType, NodeDefs } from '@openforis/arena-core/dist/nodeDef'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
@@ -12,10 +14,17 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { FormItem } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import ExpressionsProp from './ExpressionsProp'
 import { State } from './store'
+import ExpressionEditor from '@webapp/components/expression/expressionEditor'
+import ValidationTooltip from '@webapp/components/validationTooltip'
+
+const nodeDefValidationPropKeyByCountType = {
+  [NodeDefCountType.max]: NodeDefValidations.keys.max,
+  [NodeDefCountType.min]: NodeDefValidations.keys.min,
+}
 
 const ValidationsProps = (props) => {
   const { state, Actions } = props
@@ -38,30 +47,32 @@ const ValidationsProps = (props) => {
     <div className="form">
       {NodeDef.isMultiple(nodeDef) && (
         <>
-          <FormItem label={i18n.t('nodeDefEdit.validationsProps.minCount')}>
-            <Input
-              value={NodeDefValidations.getMinCount(nodeDefValidations)}
-              disabled={readOnly}
-              validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.min)
-              )(validation)}
-              numberFormat={NumberFormats.integer()}
-              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
-            />
-          </FormItem>
-          <FormItem label={i18n.t('nodeDefEdit.validationsProps.maxCount')}>
-            <Input
-              value={NodeDefValidations.getMaxCount(nodeDefValidations)}
-              disabled={readOnly}
-              validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.max)
-              )(validation)}
-              numberFormat={NumberFormats.integer()}
-              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
-            />
-          </FormItem>
+          {[NodeDefCountType.min, NodeDefCountType.max].map((countType) => {
+            const propKey = nodeDefValidationPropKeyByCountType[countType]
+            const label = i18n.t(`nodeDefEdit.validationsProps.${propKey}Count`)
+            const countValidation = R.pipe(
+              Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
+              Validation.getFieldValidation(propKey)
+            )(validation)
+            return (
+              <FormItem key={countType} label={label}>
+                <ValidationTooltip validation={countValidation} showKeys={false}>
+                  <ExpressionEditor
+                    canBeConstant
+                    excludeCurrentNodeDef
+                    nodeDefUuidContext={nodeDefUuidContext}
+                    nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
+                    onChange={({ query, callback }) => {
+                      onValidationsUpdate(NodeDefValidations.assocCountProp(propKey)(query)(nodeDefValidations))
+                      callback()
+                    }}
+                    query={NodeDefs.getCount(nodeDef, countType)}
+                    qualifier={propKey}
+                  />
+                </ValidationTooltip>
+              </FormItem>
+            )
+          })}
         </>
       )}
       {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (

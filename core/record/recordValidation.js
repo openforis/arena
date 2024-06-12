@@ -9,12 +9,11 @@ export const keys = {
   entityKeys: 'entityKeys',
 }
 
-export const prefixValidationFieldChildrenCount = 'childrenCount_'
+export const prefixValidationFieldChildrenCount = RecordValidations.prefixValidationFieldChildrenCount
 
 // ===== UTILS
 export const getValidationChildrenCountKey = (nodeParentUuid, nodeDefChildUuid) =>
   RecordValidations.getValidationChildrenCountKey({ nodeParentUuid, nodeDefChildUuid })
-export const isValidationFieldKeyChildrenCount = R.startsWith(prefixValidationFieldChildrenCount)
 export const isValidationResultErrorCount = (validationResult) =>
   ValidationResult.getKey(validationResult).startsWith('record.nodes.count.')
 export const getValidationCountNodeDefUuid = (field) => R.pipe(R.split('_'), R.last)(field)

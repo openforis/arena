@@ -1,5 +1,9 @@
 import * as R from 'ramda'
 
+import { NodeDefs, Objects } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
+
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,15 +13,31 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDefExpressionValidator from '../nodeDefExpressionValidator'
 import * as SurveyDependencyTypes from '../_survey/surveyDependencyTypes'
 
+const singleExpressionToNodeDefExpressions = (expr) => {
+  if (Objects.isEmpty(expr)) return []
+  return [NodeDefExpression.createExpression({ expression: expr })]
+}
+
 const expressionsByDependencyTypeFns = {
   [SurveyDependencyTypes.dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
   [SurveyDependencyTypes.dependencyTypes.applicable]: NodeDef.getApplicable,
-  [SurveyDependencyTypes.dependencyTypes.validations]: R.pipe(
+  [SurveyDependencyTypes.dependencyTypes.validations]: A.pipe(
     NodeDef.getValidations,
     NodeDefValidations.getExpressions
   ),
   [SurveyDependencyTypes.dependencyTypes.formula]: NodeDef.getFormula,
-  [SurveyDependencyTypes.dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
+  [SurveyDependencyTypes.dependencyTypes.itemsFilter]: A.pipe(
+    NodeDef.getItemsFilter,
+    singleExpressionToNodeDefExpressions
+  ),
+  [SurveyDependencyTypes.dependencyTypes.maxCount]: A.pipe(NodeDefs.getMaxCount, singleExpressionToNodeDefExpressions),
+  [SurveyDependencyTypes.dependencyTypes.minCount]: A.pipe(NodeDefs.getMinCount, singleExpressionToNodeDefExpressions),
+}
+
+const isSingleExpressionByDependencyType = {
+  [SurveyDependencyTypes.dependencyTypes.itemsFilter]: true,
+  [SurveyDependencyTypes.dependencyTypes.maxCount]: true,
+  [SurveyDependencyTypes.dependencyTypes.minCount]: true,
 }
 
 const applyIfUniquenessByDependencyType = {
@@ -32,6 +52,8 @@ const errorKeyByDependencyType = {
   [SurveyDependencyTypes.dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
   [SurveyDependencyTypes.dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
   [SurveyDependencyTypes.dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
+  [SurveyDependencyTypes.dependencyTypes.maxCount]: Validation.messageKeys.nodeDefEdit.maxCountInvalid,
+  [SurveyDependencyTypes.dependencyTypes.minCount]: Validation.messageKeys.nodeDefEdit.minCountInvalid,
 }
 
 const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
@@ -39,15 +61,15 @@ const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (prop
   const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[dependencyType]
   const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
 
-  return exprString
-    ? NodeDefExpressionValidator.validate({
-        survey,
-        nodeDefCurrent: nodeDef,
-        exprString,
-        isContextParent,
-        selfReferenceAllowed,
-      })
-    : null
+  if (!exprString) return null
+
+  return NodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    exprString,
+    isContextParent,
+    selfReferenceAllowed,
+  })
 }
 
 const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName, nodeDefExpression) => {
@@ -103,9 +125,8 @@ const _validateExpression = async ({
 }
 
 export const validate = async (survey, nodeDef, dependencyType) => {
-  const result = Validation.newInstance()
-
   const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](nodeDef)
+  const isSingleExpression = !!isSingleExpressionByDependencyType[dependencyType]
   const errorKey = errorKeyByDependencyType[dependencyType]
 
   const validations = await Promise.all(
@@ -114,16 +135,38 @@ export const validate = async (survey, nodeDef, dependencyType) => {
     )
   )
 
+  if (isSingleExpression) {
+    return validations[0]
+  }
+  const result = Validation.newInstance()
   validations.forEach((validation, index) => {
     Validation.setField(String(index), validation)(result)
     if (!Validation.isValid(validation)) {
       Validation.setValid(false)(result)
     }
   })
-
   if (!Validation.isValid(result)) {
     Validation.setErrors([{ key: errorKey }])(result)
   }
-
   return result
+}
+
+export const validateSingleExpressionInternal = async ({ survey, nodeDef, dependencyType }) => {
+  const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](nodeDef)
+  const nodeDefExpression = nodeDefExpressions[0]
+  if (!nodeDefExpression) return null
+
+  const validation = await _validateExpression({
+    survey,
+    nodeDef,
+    dependencyType,
+    nodeDefExpressions,
+    nodeDefExpression,
+    index: 0,
+  })
+
+  if (Validation.isValid(validation)) return null
+
+  const expressionValidation = Validation.getFieldValidation(NodeDefExpression.keys.expression)(validation)
+  return Validation.getErrors(expressionValidation)[0]
 }
