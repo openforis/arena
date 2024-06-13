@@ -70,27 +70,29 @@ export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
 
 // UPDATE
 export const canEditRecord = (user, record) => {
-  if (!(user && record)) {
+  if (
+    !user ||
+    !record ||
+    // records in analysis cannot be edited
+    Record.isInAnalysisStep(record)
+  ) {
     return false
   }
-
+  // system admin does not have an auth group associated to the survey, but he can always edit records;
   if (User.isSystemAdmin(user)) {
     return true
   }
-
-  const recordDataStep = Record.getStep(record)
-
+  // if user doesn't have an auth group associated to the survey, he cannot edit records
   const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Record.getSurveyUuid(record) })(user)
   if (!userAuthGroup) return false
 
-  // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
+  // Level = 'all' or 'own'. If 'own', user can only edit records assigned to him
   // If 'all', he can edit all survey's records
-  const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
-
+  const level = AuthGroup.getRecordEditLevel(Record.getStep(record))(userAuthGroup)
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
-export const canDeleteRecord = (user, record) => canEditRecord(user, record) && !Record.isInAnalysisStep(record)
+export const canDeleteRecord = canEditRecord
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
