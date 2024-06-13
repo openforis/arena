@@ -3,16 +3,7 @@ import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { cluster, plot, tree } from '../mock/nodeDefs'
 import { gotoFormPage } from './_formDesigner'
 import { gotoFormDesigner, gotoHome } from './_navigation'
-import {
-  enterCluster,
-  enterPlot,
-  enterTrees,
-  formatTime,
-  verifyAttribute,
-  verifyCluster,
-  verifyPlot,
-  verifyTrees,
-} from './_record'
+import { enterCluster, enterPlot, enterTrees, verifyAttribute, verifyCluster, verifyPlot, verifyTrees } from './_record'
 import { recordPreview } from '../mock/recordPreview'
 
 /* eslint-disable camelcase */
@@ -61,12 +52,7 @@ export default () =>
         const startTimeDate = new Date(startTime)
         const startTimePlus1Minute = DateUtils.addMinutes(startTimeDate, 1)
         const possibleDateValues = [new Date(startTime), startTimePlus1Minute]
-        const expectedPossibleValues = possibleDateValues.map((possibleDateValue) => {
-          const timezoneOffsetDiff = startTimeDate.getTimezoneOffset() + 60 // browser timezone=Europe/Rome
-          const dateWithTimezoneOffset = DateUtils.addMinutes(possibleDateValue, timezoneOffsetDiff)
-          return formatTime(dateWithTimezoneOffset)
-        })
-        return `(${expectedPossibleValues.join('|')})`
+        return `(${possibleDateValues.join('|')})`
       })
       verifyAttribute(cluster_date, () => startTime)
 

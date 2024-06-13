@@ -33,7 +33,7 @@ export const formats = {
 const normalizeDateTimeValue = (length) => (value) =>
   R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val) => val.padStart(length, '0'))(value)
 
-export const format = Dates.format
+export const format = (date, format = formats.dateDefault) => Dates.format(date, format)
 
 export const getRelativeDate = (i18n, date) => {
   if (R.isNil(date)) {
@@ -110,6 +110,8 @@ export const isValidDateInFormat = (dateStr, format) => {
 }
 
 export const formatDateISO = (date) => format(date, formats.dateISO)
+
+export const formatDateDisplay = (date) => format(date, formats.dateDefault)
 
 export const formatDateTimeDefault = (date) => format(date, formats.datetimeDefault)
 
