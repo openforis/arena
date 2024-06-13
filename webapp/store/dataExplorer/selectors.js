@@ -9,4 +9,5 @@ export const DataExplorerSelectors = {
   useQuery: () => useSelector(DataExplorerState.getQuery),
   useSelectedQuerySummaryUuid: () => useSelector(DataExplorerState.getSelectedQuerySummaryUuid),
   useRecordEditModalProps: () => useSelector(DataExplorerState.getRecordEditModalProps),
+  useCodesVisible: () => useSelector(DataExplorerState.codesVisible),
 }

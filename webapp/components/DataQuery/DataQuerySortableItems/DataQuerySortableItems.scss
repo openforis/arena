@@ -1,6 +1,6 @@
 @import 'webapp/style/partials';
 
-.data-query__selected-attributes-form-item {
+.data-query__sortable-items-form-item {
   display: flex;
   height: auto;
   flex: 1;
@@ -10,7 +10,7 @@
   }
 }
 
-.data-query__selected-attributes-wrapper {
+.data-query__sortable-items-wrapper {
   flex: 1;
   display: flex;
   flex-flow: wrap;
@@ -19,7 +19,7 @@
   overflow-y: auto;
 }
 
-.data-query__selected-attribute-chip.MuiChip-root {
+.data-query__sortable-item-chip.MuiChip-root {
   background-color: white;
 
   &.draggable-mirror {

@@ -28,6 +28,7 @@ export const init = (app) => {
           includeAnalysis,
           includeDataFromAllCycles,
           includeFiles,
+          recordsModifiedAfter,
         } = Request.getParams(req)
 
         const user = Request.getUser(req)
@@ -45,6 +46,7 @@ export const init = (app) => {
           includeAnalysis,
           includeDataFromAllCycles,
           includeFiles,
+          recordsModifiedAfter,
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
