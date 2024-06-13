@@ -61,7 +61,12 @@ export default () =>
         const startTimeDate = new Date(startTime)
         const startTimePlus1Minute = DateUtils.addMinutes(startTimeDate, 1)
         const possibleDateValues = [new Date(startTime), startTimePlus1Minute]
-        return `(${possibleDateValues.map(formatTime).join('|')})`
+        const expectedPossibleValues = possibleDateValues.map((possibleDateValue) => {
+          const timezoneOffsetDiff = startTimeDate.getTimezoneOffset() + 60 // browser timezone=Europe/Rome
+          const dateWithTimezoneOffset = DateUtils.addMinutes(possibleDateValue, timezoneOffsetDiff)
+          return formatTime(dateWithTimezoneOffset)
+        })
+        return `(${expectedPossibleValues.join('|')})`
       })
       verifyAttribute(cluster_date, () => startTime)
 
