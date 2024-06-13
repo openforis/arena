@@ -72,7 +72,7 @@ export const getRelativeDate = (i18n, date) => {
   return i18n.t('common.date.aMomentAgo')
 }
 
-export const isValidDateObject = Dates.isValidDate
+export const isValidDateObject = Dates.isValidDateObject
 
 /**.
  * Checks if the date is valid. Takes into account leap years

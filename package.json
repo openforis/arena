@@ -105,7 +105,7 @@
     "@mui/material": "^5.15.11",
     "@mui/x-data-grid": "^6.19.5",
     "@mui/x-date-pickers": "^6.19.5",
-    "@openforis/arena-core": "^0.0.195",
+    "@openforis/arena-core": "^0.0.196",
     "@openforis/arena-server": "^0.1.33",
     "@reduxjs/toolkit": "^2.2.1",
     "@sendgrid/mail": "^8.1.1",
