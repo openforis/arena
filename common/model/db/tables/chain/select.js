@@ -1,5 +1,3 @@
-import * as Chain from '@common/analysis/chain'
-
 function _getSelectFields({ count, includeScript }) {
   if (count) {
     return ['count(*)']
@@ -22,7 +20,7 @@ function _getSelectFields({ count, includeScript }) {
  * @returns {string} - The select query.
  */
 export function getSelect(params) {
-  const { cycle = null, chainUuid = null, count = false, includeScript = false } = params
+  const { chainUuid = null, count = false, includeScript = false } = params
 
   this.getSelectFields = _getSelectFields.bind(this)
 
@@ -31,7 +29,6 @@ export function getSelect(params) {
     FROM 
         ${this.nameAliased}
     
-    ${cycle ? `WHERE (${this.columnProps})->'${Chain.keysProps.cycles}' @> '"${cycle}"'` : ''}
     ${chainUuid ? `WHERE ${this.columnUuid} = '${chainUuid}'` : ''}
     `
 }

@@ -24,7 +24,6 @@ export const keys = {
 export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
-  cycles: ObjectUtils.keysProps.cycles,
   hasSamplingDesign: 'hasSamplingDesign',
   samplingDesign: 'samplingDesign',
   analysisNodeDefs: 'analysisNodeDefs',

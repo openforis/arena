@@ -14,10 +14,10 @@ export const init = (app) => {
 
   app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
-      const { cycle, surveyId } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const chain = await AnalysisService.create({ user, surveyId, cycle })
+      const chain = await AnalysisService.create({ user, surveyId })
 
       res.json(chain)
     } catch (error) {

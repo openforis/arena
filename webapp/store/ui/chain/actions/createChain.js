@@ -8,9 +8,8 @@ export const createChain =
   async (_dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
-    const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { data: chain } = await axios.post(`/api/survey/${surveyId}/chain`, { cycle })
+    const { data: chain } = await axios.post(`/api/survey/${surveyId}/chain`)
 
     navigate(`${appModuleUri(analysisModules.chain)}${chain.uuid}/`)
   }

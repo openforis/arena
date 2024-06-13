@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKeys } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 import { useChain } from '@webapp/store/ui/chain'
 import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
 
@@ -15,7 +15,6 @@ import * as API from '@webapp/service/api'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioFieldset } from './ChainRStudioFieldset'
 
@@ -25,7 +24,6 @@ export const ChainBasicProps = (props) => {
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
-  const cycleKeys = useSurveyCycleKeys()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
 
@@ -63,15 +61,6 @@ export const ChainBasicProps = (props) => {
         labels={chainProps.descriptions}
         onChange={(descriptions) => updateChain({ ...chain, props: { ...chainProps, descriptions } })}
       />
-      {
-        // show cycles selector only when not all cycles are selected (for backwards compatibility)
-        cycleKeys.length > chainProps.cycles.length && (
-          <CyclesSelector
-            cyclesKeysSelected={chainProps.cycles}
-            onChange={(cycles) => updateChain({ ...chain, props: { ...chainProps, cycles } })}
-          />
-        )
-      }
       <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
         <Checkbox
           checked={Chain.hasSamplingDesign(chain)}
