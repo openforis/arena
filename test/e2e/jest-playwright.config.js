@@ -18,7 +18,7 @@ module.exports = {
       longitude: 12.492348,
     },
     locale: 'en-GB',
-    timezoneId: 'GMT',
+    timezoneId: 'Europe/London',
     viewport: {
       width: 1366,
       height: 768,
