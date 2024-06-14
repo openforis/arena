@@ -5,7 +5,7 @@ import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, Tooltip, Le
 
 import { Colors } from '@webapp/utils/colors'
 
-import { CartesianGrid, ChartWrapper } from '../common'
+import { CartesianGrid, ChartWrapper, CustomAxisTick } from '../common'
 
 const layouts = {
   horizontal: 'horizontal',
@@ -40,7 +40,7 @@ export const BarChart = (props) => {
         <CartesianGrid />
         {layout === layouts.horizontal && (
           <>
-            <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} tickFormatter={tickFormatter} />
+            <XAxis dataKey={labelDataKey} dx={-20} dy={40} tick={<CustomAxisTick labelRotation={-30} />} />
             <YAxis />
           </>
         )}

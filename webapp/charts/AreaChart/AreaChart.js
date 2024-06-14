@@ -5,7 +5,7 @@ import { Area, AreaChart as ReChartsAreaChart, XAxis, YAxis, CartesianGrid, Tool
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 
-import { ChartWrapper } from '../common'
+import { ChartWrapper, CustomAxisTick } from '../common'
 
 const fillOpacity = '70'
 
@@ -27,7 +27,7 @@ export const AreaChart = (props) => {
       <ReChartsAreaChart data={data} margin={margin}>
         <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} />
+        <XAxis dataKey={labelDataKey} dx={-20} dy={40} tick={<CustomAxisTick labelRotation={-30} />} />
         <YAxis allowDecimals={allowDecimals} />
 
         <Tooltip />

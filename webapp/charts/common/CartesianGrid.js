@@ -1,4 +1,4 @@
 import React from 'react'
-import { CartesianGrid as RechartsCartesianGrid } from 'recharts'
+import { CartesianGrid as ReChartsCartesianGrid } from 'recharts'
 
-export const CartesianGrid = () => <RechartsCartesianGrid strokeDasharray="3 3" />
+export const CartesianGrid = () => <ReChartsCartesianGrid strokeDasharray="3 3" />
