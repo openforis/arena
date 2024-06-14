@@ -1,16 +1,26 @@
 import './expressionEditorPopup.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import * as Expression from '@core/expressionParser/expression'
+
+import { ButtonGroup, Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
+
+const expressionTypes = {
+  predefinedFunction: 'predefinedFunction',
+  logicalExpression: 'logicalExpression',
+}
 
 const BasicExpressionEditorPopup = (props) => {
   const { nodeDefCurrent, isBoolean, variables, updateDraftExpr, queryDraft, exprDraft, exprDraftValid } = props
 
   const i18n = useI18n()
+
+  const [selectedExpressionType, setSelectedExpressionType] = useState('predefinedFunction')
 
   return (
     <>
@@ -21,6 +31,23 @@ const BasicExpressionEditorPopup = (props) => {
       </div>
 
       <div className="expression-editor-popup__expr-container">
+        {!exprDraft && (
+          <>
+            <ButtonGroup
+              items={Object.keys(expressionTypes).map((key) => ({ key, label: key }))}
+              onChange={setSelectedExpressionType}
+              selectedItemKey={selectedExpressionType}
+            />
+            {selectedExpressionType === expressionTypes.predefinedFunction && (
+              <Dropdown
+                items={[{ value: 'now', label: 'functions.now' }]}
+                onChange={(item) => {
+                  updateDraftExpr(Expression.newCall({ callee: item.value }))
+                }}
+              />
+            )}
+          </>
+        )}
         {exprDraft && (
           <ExpressionNode
             isBoolean={isBoolean}

@@ -14,6 +14,7 @@ const Binary = (props) => {
   const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
 
   const showOperator = !isLeftLiteral
+  const binaryOperator = showOperator ? Expression.operators.findBinary(node.operator) : null
 
   const createOperand = (type) => (
     <BinaryOperand
@@ -39,8 +40,8 @@ const Binary = (props) => {
           <Dropdown
             className="operator"
             items={Expression.operators.binaryValues}
-            selection={Expression.operators.findBinary(node.operator)}
-            onChange={(item) => onChange(R.assoc('operator', R.propOr('', 'value', item), node))}
+            selection={binaryOperator}
+            onChange={(item) => onChange(R.assoc('operator', item?.value ?? '', node))}
           />
 
           {createOperand(BinaryOperandType.right)}

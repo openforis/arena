@@ -64,7 +64,7 @@ export const isThis = isType(types.ThisExpression)
 export const newLiteral = (value = null) => ({
   type: types.Literal,
   value,
-  raw: value || '',
+  raw: value ?? '',
 })
 
 export const newIdentifier = (value = '') => ({
@@ -77,4 +77,10 @@ export const newBinary = ({ left, right, operator = '' }) => ({
   operator,
   left,
   right,
+})
+
+export const newCall = ({ callee, params = [] }) => ({
+  type: types.CallExpression,
+  callee: newLiteral(callee),
+  arguments: params,
 })

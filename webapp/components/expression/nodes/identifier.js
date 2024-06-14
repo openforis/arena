@@ -40,7 +40,7 @@ const Identifier = ({ node, variables, onChange }) => {
       className="identifier"
       items={variablesFiltered}
       onChange={(item) => {
-        const name = item.value || ''
+        const name = item?.value ?? ''
         const expressionNodeUpdated = { ...node, name }
         onChange(expressionNodeUpdated)
       }}
