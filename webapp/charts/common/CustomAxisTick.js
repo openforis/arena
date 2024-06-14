@@ -21,6 +21,8 @@ export const CustomAxisTick = (props) => {
   )
 }
 
+export const RotatedCustomAxisTick = (props) => <CustomAxisTick {...props} labelRotation={-30} />
+
 CustomAxisTick.propTypes = {
   labelRotation: PropTypes.number,
   payload: PropTypes.object.isRequired,
