@@ -20,7 +20,7 @@ export const LineChart = (props) => {
     <ChartWrapper>
       <ReChartsLineChart data={data} margin={margin}>
         <CartesianGrid />
-        <XAxis dataKey={labelDataKey} dx={-20} dy={40} tick={RotatedCustomAxisTick} />
+        <XAxis dataKey={labelDataKey} tick={RotatedCustomAxisTick} />
         <YAxis allowDecimals={allowDecimals} />
         {showLegend && <Legend verticalAlign="top" />}
         <Tooltip />

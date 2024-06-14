@@ -13,7 +13,7 @@ export const CustomAxisTick = (props) => {
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={16} textAnchor="end" fill={labelTextFill} transform={`rotate(${labelRotation})`}>
+      <text dy={16} textAnchor="end" fill={labelTextFill} transform={`rotate(${labelRotation})`}>
         {ellipsed && <title>{value}</title>}
         {valueDisplay}
       </text>

@@ -40,7 +40,7 @@ export const BarChart = (props) => {
         <CartesianGrid />
         {layout === layouts.horizontal && (
           <>
-            <XAxis dataKey={labelDataKey} dx={-20} dy={40} tick={RotatedCustomAxisTick} />
+            <XAxis dataKey={labelDataKey} tick={RotatedCustomAxisTick} />
             <YAxis />
           </>
         )}

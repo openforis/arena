@@ -27,7 +27,7 @@ export const AreaChart = (props) => {
       <ReChartsAreaChart data={data} margin={margin}>
         <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey={labelDataKey} dx={-20} dy={40} tick={RotatedCustomAxisTick} />
+        <XAxis dataKey={labelDataKey} tick={RotatedCustomAxisTick} />
         <YAxis allowDecimals={allowDecimals} />
 
         <Tooltip />
