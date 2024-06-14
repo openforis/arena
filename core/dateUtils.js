@@ -5,18 +5,21 @@ import { DateFormats, Dates } from '@openforis/arena-core'
 const {
   add,
   addMinutes,
+  convertDate,
   diffInMinutes,
   diffInHours,
   diffInDays,
   diffInMonths,
   diffInWeeks,
+  parse,
+  parseISO,
   sub,
   subDays,
   subMonths,
   subYears,
 } = Dates
 
-export { add, addMinutes, diffInHours, sub, subDays, subMonths, subYears }
+export { add, addMinutes, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
 
 import { isBlank } from './stringUtils'
 
@@ -121,10 +124,7 @@ export const formatDateTimeExport = (date) => format(date, formats.datetimeExpor
 
 export const formatTime = (hour, minute) => `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
 
-export const parse = Dates.parse
 export const parseDateISO = (dateStr) => parse(dateStr, formats.dateISO)
-export const parseISO = Dates.parseISO
-export const convertDate = Dates.convertDate
 
 export const convertDateFromISOToDisplay = (dateStr) =>
   convertDate({
