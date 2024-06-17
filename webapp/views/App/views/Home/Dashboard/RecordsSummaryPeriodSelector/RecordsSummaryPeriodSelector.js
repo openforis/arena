@@ -11,7 +11,7 @@ import Dropdown from '@webapp/components/form/Dropdown'
 import { useTimeRanges } from './store'
 import { RecordsSummaryContext } from '../RecordsSummaryContext'
 
-const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : '')
+const formatDate = (dateStr) => (dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'DD MMMM YYYY') : '')
 
 const RecordsSummaryPeriodSelector = () => {
   const i18n = useI18n()
