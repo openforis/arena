@@ -159,3 +159,4 @@ export const isLevelDeleteAllowed = (level) => (category) =>
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
 export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
   isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area
+export const hasExtraDefs = (category) => getItemExtraDefKeys(category).length > 0

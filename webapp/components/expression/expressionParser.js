@@ -2,25 +2,16 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 
-import { isBlank, isNotBlank } from '@core/stringUtils'
+import { isNotBlank } from '@core/stringUtils'
 
 export const parseQuery = (query, mode, canBeConstant) => {
-  if (isBlank(query)) return null
-
   const exprQuery = Expression.fromString(query, mode)
-  const isCompound = Expression.isCompound(exprQuery)
   const isBinary = Expression.isBinary(exprQuery)
   const isSequence = Expression.isSequence(exprQuery)
 
-  const expr =
-    isBinary || isSequence
-      ? exprQuery
-      : Expression.newBinary({
-          left:
-            isCompound && canBeConstant ? Expression.newLiteral() : isCompound ? Expression.newIdentifier() : exprQuery,
-          right: Expression.newLiteral(),
-        })
-  return expr
+  if (isBinary || isSequence) return exprQuery
+
+  return Expression.newBinaryEmpty({ canBeConstant, exprQuery })
 }
 
 export const isExprValid = (expr, canBeConstant) => {

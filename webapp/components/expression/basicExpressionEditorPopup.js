@@ -1,18 +1,18 @@
 import './expressionEditorPopup.scss'
 
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
 import * as R from 'ramda'
+import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
-import * as Expression from '@core/expressionParser/expression'
-
-import { ButtonGroup, Dropdown } from '@webapp/components/form'
+import { ButtonGroup } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
+import Call from './nodes/call'
 
 const expressionTypes = {
-  predefinedFunction: 'predefinedFunction',
   logicalExpression: 'logicalExpression',
+  functionCall: 'functionCall',
 }
 
 const BasicExpressionEditorPopup = (props) => {
@@ -20,12 +20,12 @@ const BasicExpressionEditorPopup = (props) => {
 
   const i18n = useI18n()
 
-  const [selectedExpressionType, setSelectedExpressionType] = useState('predefinedFunction')
+  const [selectedExpressionType, setSelectedExpressionType] = useState(expressionTypes.logicalExpression)
 
   return (
     <>
       <div className="expression-editor__query-container">
-        <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
+        <div className={classNames('query', { invalid: !exprDraftValid })}>
           {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
         </div>
       </div>
@@ -38,13 +38,8 @@ const BasicExpressionEditorPopup = (props) => {
               onChange={setSelectedExpressionType}
               selectedItemKey={selectedExpressionType}
             />
-            {selectedExpressionType === expressionTypes.predefinedFunction && (
-              <Dropdown
-                items={[{ value: 'now', label: 'functions.now' }]}
-                onChange={(item) => {
-                  updateDraftExpr(Expression.newCall({ callee: item.value }))
-                }}
-              />
+            {selectedExpressionType === expressionTypes.functionCall && (
+              <Call node={exprDraft} variables={variables} onChange={updateDraftExpr} />
             )}
           </>
         )}

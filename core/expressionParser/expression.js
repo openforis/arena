@@ -79,6 +79,16 @@ export const newBinary = ({ left, right, operator = '' }) => ({
   right,
 })
 
+export const newBinaryEmpty = ({ canBeConstant, exprQuery = null }) => {
+  let left = null
+  if (isCompound(exprQuery)) {
+    left = canBeConstant ? newLiteral() : newIdentifier()
+  } else {
+    left = exprQuery
+  }
+  return newBinary({ left, right: newLiteral() })
+}
+
 export const newCall = ({ callee, params = [] }) => ({
   type: types.CallExpression,
   callee: newLiteral(callee),

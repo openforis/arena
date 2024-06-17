@@ -1,17 +1,61 @@
-import React from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import Identifier from './identifier'
+import { Dropdown } from '@webapp/components/form'
+import { useI18n } from '@webapp/store/system'
+import { CallCategoryItemProp } from './callCategoryItemProp'
+
+const functions = {
+  [Expression.functionNames.now]: {
+    label: 'now()',
+  },
+  [Expression.functionNames.categoryItemProp]: {
+    label: 'categoryItemProp(...)',
+  },
+}
+const emptyItem = { value: null, label: 'common.notSpecified' }
+
+const dropdownItems = [
+  emptyItem,
+  ...Object.entries(functions).map(([funcKey, func]) => ({ value: funcKey, label: func.label })),
+]
 
 const Call = ({ node, variables, onChange }) => {
-  const nodeIdentifier = {
-    type: Expression.types.Identifier,
-    name: Expression.toString(node),
-  }
+  const i18n = useI18n()
 
-  return <Identifier node={nodeIdentifier} variables={variables} onChange={onChange} />
+  const [state, setState] = useState({
+    selectedFunctionKey: node?.callee?.raw,
+  })
+
+  const { selectedFunctionKey } = state
+
+  const selectedItem = dropdownItems.find((item) => item.value === selectedFunctionKey)
+
+  const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
+
+  return (
+    <div>
+      <Dropdown
+        items={dropdownItems}
+        onChange={(item) => {
+          setState((statePrev) => ({
+            ...statePrev,
+            selectedFunctionKey: item?.value,
+            categoryUuid: null,
+            extraPropKey: null,
+            attributeUuidsByLevelUuid: {},
+          }))
+        }}
+        placeholder={i18n.t('common.function')}
+        selection={selectedItem}
+      />
+      {selectedFunctionKey === Expression.functionNames.categoryItemProp && (
+        <CallCategoryItemProp onConfirm={onConfirm} variables={variables} />
+      )}
+    </div>
+  )
 }
 
 Call.propTypes = {
@@ -19,11 +63,7 @@ Call.propTypes = {
   node: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
   // Identifier / Member / Call
-  variables: PropTypes.array,
-}
-
-Call.defaultProps = {
-  variables: null,
+  variables: PropTypes.array.isRequired,
 }
 
 export default Call
