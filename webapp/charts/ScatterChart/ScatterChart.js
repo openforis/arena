@@ -1,18 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  ScatterChart as ReChartsScatterChart,
-  Scatter,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Label,
-  Legend,
-} from 'recharts'
+import { Label, Legend, ScatterChart as ReChartsScatterChart, Scatter, Tooltip, XAxis, YAxis } from 'recharts'
 import { Objects } from '@openforis/arena-core'
 
-import { ChartWrapper } from '../common'
+import { CartesianGrid, ChartWrapper } from '../common'
 
 const margin = {
   top: 20,
