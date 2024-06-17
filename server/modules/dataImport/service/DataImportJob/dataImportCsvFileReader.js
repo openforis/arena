@@ -16,11 +16,11 @@ const VALUE_PROP_DEFAULT = 'value'
 
 const allowedDateFormats = [
   DateUtils.formats.dateISO,
-  'yyyy.MM.dd',
-  'yyyy/MM/dd',
+  'YYYY.MM.DD',
+  'YYYY/MM/DD',
   DateUtils.formats.dateDefault,
-  'dd-MM-yyyy',
-  'dd.MM.yyyy',
+  'DD-MM-YYYY',
+  'DD.MM.YYYY',
 ]
 const allowedBooleanValues = ['true', 'false', '1', '0']
 
