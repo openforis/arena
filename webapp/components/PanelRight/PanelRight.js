@@ -24,7 +24,7 @@ const PanelRight = (props) => {
       <div className="panel-right__content">{React.Children.toArray(children)}</div>
       {showFooter && (
         <div className="panel-right__footer">
-          <Button className="btn-close-footer" label="common.close" onClick={onClose} />
+          <Button className="btn-close-footer" label="common.close" onClick={onClose} primary />
         </div>
       )}
     </div>,
