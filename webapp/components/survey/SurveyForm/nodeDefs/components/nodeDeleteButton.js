@@ -30,7 +30,6 @@ const NodeDeleteButton = (props) => {
           handleDelete()
         }
       }}
-      size="small"
     />
   )
 }

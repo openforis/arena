@@ -56,7 +56,6 @@ const ExpressionProp = (props) => {
             disabled={readOnly}
             id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             onClick={() => onDelete(expression)}
-            size="small"
             testId={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
           />
         )}

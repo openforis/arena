@@ -17,7 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import Header from '@webapp/components/header'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
-import { Button, ButtonMenu } from '@webapp/components'
+import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 const SurveyInfo = (props) => {
   const { firstTime } = props
@@ -147,13 +147,7 @@ const SurveyInfo = (props) => {
                 {
                   key: 'survey-info-delete',
                   content: (
-                    <Button
-                      iconClassName="icon-bin icon-12px icon-left"
-                      label="common.delete"
-                      onClick={onDeleteClick}
-                      testId={TestId.dashboard.surveyDeleteBtn}
-                      variant="text"
-                    />
+                    <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />
                   ),
                 },
               ]}

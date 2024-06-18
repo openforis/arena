@@ -1,17 +1,13 @@
 import React from 'react'
 
 import { Button } from './Button'
+import { ButtonDelete } from './ButtonDelete'
 
-export const ButtonIconDelete = (props) => <Button {...props} iconClassName="icon-bin2 icon-12px" />
+export const ButtonIconDelete = (props) => {
+  const { showLabel = false, size = 'small', variant = 'text' } = props
+  return <ButtonDelete {...props} showLabel={showLabel} size={size} variant={variant} />
+}
 
 ButtonIconDelete.propTypes = {
   ...Button.propTypes,
-}
-
-ButtonIconDelete.defaultProps = {
-  ...Button.defaultProps,
-  className: 'btn-delete',
-  label: 'common.delete',
-  showLabel: false,
-  variant: 'text',
 }
