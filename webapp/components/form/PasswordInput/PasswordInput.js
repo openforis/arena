@@ -25,11 +25,7 @@ export const PasswordInput = (props) => {
       className={classNames('input-password', className)}
       type={passwordShown ? 'text' : 'password'}
       endAdornment={
-        <Button
-          className="btn-transparent"
-          onClick={onClickPasswordVisibility}
-          onMouseDown={onMouseDownPasswordVisibility}
-        >
+        <Button onClick={onClickPasswordVisibility} onMouseDown={onMouseDownPasswordVisibility} variant="text">
           <span className={classNames('icon', iconClassName)} />
         </Button>
       }

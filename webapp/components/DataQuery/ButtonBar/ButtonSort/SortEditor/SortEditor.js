@@ -2,6 +2,7 @@ import './sortEditor.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
 import { useI18n } from '@webapp/store/system'
 import { Sort, SortCriteria } from '@common/model/query'
@@ -42,25 +43,21 @@ const SortEditor = (props) => {
         )}
 
         <div className="button-bar">
-          <button
-            type="button"
-            className="btn btn-s"
+          <Button
+            disabled={Sort.isEmpty(sort)}
+            iconClassName="icon-undo2 icon-12px"
+            label="common.reset"
             onClick={() => onChange(Sort.create())}
-            aria-disabled={Sort.isEmpty(sort)}
-          >
-            <span className="icon icon-undo2 icon-12px icon-left" />
-            {i18n.t('common.reset')}
-          </button>
+            size="small"
+          />
 
-          <button
-            type="button"
+          <Button
             className="btn btn-s btn-primary"
             onClick={() => onChange(sortDraft)}
-            aria-disabled={!draft}
-          >
-            <span className="icon icon-checkmark icon-12px icon-left" />
-            {i18n.t('common.apply')}
-          </button>
+            disabled={!draft}
+            iconClassName="icon-checkmark icon-12px"
+            label="common.apply"
+          />
         </div>
       </div>
     </PanelRight>

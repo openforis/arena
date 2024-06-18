@@ -156,16 +156,13 @@ const SurveyCreate = (props) => {
 
       {createType !== createTypes.import && (
         <div className="row">
-          <button
-            data-testid={TestId.surveyCreate.submitBtn}
-            type="button"
-            className="btn"
-            onClick={onCreate}
+          <Button
             disabled={createType === createTypes.clone && !cloneFrom}
-          >
-            <span className="icon icon-plus icon-left icon-12px" />
-            {i18n.t(submitButtonLabel)}
-          </button>
+            iconClassName="icon-plus icon-12px"
+            label={submitButtonLabel}
+            onClick={onCreate}
+            testId={TestId.surveyCreate.submitBtn}
+          />
         </div>
       )}
 

@@ -30,9 +30,10 @@
     font-family: inherit;
   }
 }
-.expression-editor-popup__toggle-advanced {
+.MuiButton-root.expression-editor-popup__toggle-advanced {
   position: absolute;
   right: 20px;
+  width: 10rem;
 }
 
 .expression-editor__variables-search {
@@ -63,18 +64,10 @@
 
   //common
   .btns {
-    display: grid;
-    grid-template-columns: 2rem auto 1fr auto;
+    display: flex;
     align-items: center;
     width: 100%;
-
-    .btns__add {
-      grid-column: 2;
-    }
-
-    .btns__last {
-      grid-column: 4;
-    }
+    gap: 0.5rem;
   }
 
   input {
@@ -110,7 +103,7 @@
     }
 
     .btns {
-      width: 200px;
+      width: 160px;
     }
 
     .btn-switch-operand {
@@ -119,6 +112,13 @@
       height: 32px;
       align-self: flex-end;
       text-wrap: nowrap;
+
+      &.btn-switch-operand-const {
+        width: 12rem;
+      }
+      &.btn-switch-operand-var {
+        width: 7rem;
+      }
     }
 
     .operator {

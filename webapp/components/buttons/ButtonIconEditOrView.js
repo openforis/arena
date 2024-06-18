@@ -22,4 +22,5 @@ ButtonIconEditOrView.propTypes = {
 ButtonIconEditOrView.defaultProps = {
   ...Button.defaultProps,
   showLabel: true,
+  variant: 'outlined',
 }

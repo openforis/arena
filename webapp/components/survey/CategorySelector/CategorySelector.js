@@ -115,7 +115,9 @@ export const CategorySelector = (props) => {
         onChange={onChange}
       />
 
-      {showEdit && category && <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel />}
+      {showEdit && category && (
+        <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel variant="outlined" />
+      )}
 
       {showAdd && !disabled && (
         <ButtonMetaItemAdd

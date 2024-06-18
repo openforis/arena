@@ -8,7 +8,7 @@ import { useI18n, useLang } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { Button, ButtonIconEditOrView } from '@webapp/components/buttons'
+import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import WarningBadge from '@webapp/components/warningBadge'
 
@@ -50,14 +50,7 @@ const Row = (props) => {
 
       <ButtonIconEditOrView onClick={() => Actions.edit({ state })} canEdit={canEdit} />
 
-      {canEdit && (
-        <Button
-          iconClassName="icon-bin2 icon-12px"
-          label="common.delete"
-          onClick={() => Actions.delete({ state })}
-          size="small"
-        />
-      )}
+      {canEdit && <ButtonIconDelete onClick={() => Actions.delete({ state })} />}
     </>
   )
 }

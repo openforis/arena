@@ -16,7 +16,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { Button, ButtonDelete, ButtonIconEditOrView } from '@webapp/components'
+import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components'
 
 import TableHeaderLeft from './TableHeaderLeft'
 
@@ -136,7 +136,7 @@ const CategoryList = (props) => {
   columns.push({
     key: 'details',
     renderItem: ({ item: category }) => (
-      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} />
+      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} size="small" />
     ),
     width: '75px',
   })
@@ -147,7 +147,7 @@ const CategoryList = (props) => {
       {
         key: 'delete',
         renderItem: ({ initData, item: category }) => (
-          <ButtonDelete size="small" onClick={() => Actions.delete({ category, initData })} showLabel={false} />
+          <ButtonIconDelete onClick={() => Actions.delete({ category, initData })} />
         ),
         width: '30px',
       }

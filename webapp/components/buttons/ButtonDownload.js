@@ -16,7 +16,7 @@ export const ButtonDownload = forwardRef((props, ref) => {
     }
   }, [href, onClickProp, requestParams])
 
-  return <Button ref={ref} {...otherProps} onClick={onClick} />
+  return <Button ref={ref} onClick={onClick} {...otherProps} />
 })
 
 ButtonDownload.propTypes = {
@@ -31,4 +31,5 @@ ButtonDownload.defaultProps = {
   href: null,
   iconClassName: 'icon-download2 icon-14px',
   label: 'common.download',
+  variant: 'outlined',
 }

@@ -2,9 +2,11 @@ import './ButtonRStudio.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { Button } from '../buttons'
+
 const ButtonRStudio = ({ disabled, onClick, isLocal }) => {
   return (
-    <button type="button" className="btn btn-s btn-rstudio" onClick={onClick} aria-disabled={disabled}>
+    <Button className="btn btn-s btn-rstudio" onClick={onClick} disabled={disabled} variant="outlined">
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1784.1 625.9">
         <g id="Gray_Logo" />
         <g id="Black_Letters" />
@@ -85,7 +87,7 @@ const ButtonRStudio = ({ disabled, onClick, isLocal }) => {
         <g id="R_Ball" />
       </svg>
       <span>-{isLocal ? 'Local' : 'Remote'}</span>
-    </button>
+    </Button>
   )
 }
 

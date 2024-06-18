@@ -40,16 +40,16 @@ export const editNodeDefDetails = (nodeDef) => {
     await page.fill(getSelector(TestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
     await page.fill(getSelector(TestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
     if (nodeDef.key) {
-      await page.click(getSelector(TestId.nodeDefDetails.nodeDefKey, 'button'))
+      await page.click(getSelector(TestId.nodeDefDetails.nodeDefKey))
     }
     if (nodeDef.multiple) {
-      await page.click(getSelector(TestId.nodeDefDetails.nodeDefMultiple, 'button'))
+      await page.click(getSelector(TestId.nodeDefDetails.nodeDefMultiple))
     }
     if (nodeDef.unique) {
       // go to Validations tab
       await page.click(getSelector(TestId.tabBar.tabBarBtn(TestId.nodeDefDetails.validations), 'button'))
       // select unique
-      await page.click(getSelector(TestId.nodeDefDetails.nodeDefUnique, 'button'))
+      await page.click(getSelector(TestId.nodeDefDetails.nodeDefUnique))
       // go back to Basic tab
       await page.click(getSelector(TestId.tabBar.tabBarBtn(TestId.nodeDefDetails.basic), 'button'))
     }

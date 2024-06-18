@@ -64,7 +64,7 @@ export const editNodeDef = (formName, nodeDef, editDetails = true) => {
   test(`${nodeDef.label} edit`, async () => {
     await makeEditButtonsVisible({ nodeDefName: formName })
 
-    const editBtnSelector = getSelector(TestId.surveyForm.nodeDefEditBtn(formName), 'a')
+    const editBtnSelector = getSelector(TestId.surveyForm.nodeDefEditBtn(formName), 'button')
     await page.waitForSelector(editBtnSelector)
 
     await Promise.all([page.waitForNavigation(), page.click(editBtnSelector)])

@@ -10,7 +10,7 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 import { TextInput } from '../TextInput'
 
 import { useLocalState, State } from './store'
-import Chip from './Chip'
+import Chip from '../chip'
 
 const InputChipsText = (props) => {
   const {
@@ -46,11 +46,9 @@ const InputChipsText = (props) => {
         {selection.map((item) => (
           <Chip
             key={item}
-            item={item}
-            itemLabel={State.getItemLabel(state)(item)}
-            onDelete={Actions.removeItem({ selection, state })}
-            canBeRemoved={selection.length > requiredItems}
-            readOnly={readOnly}
+            label={State.getItemLabel(state)(item)}
+            onDelete={() => Actions.removeItem({ selection, state })(item)}
+            readOnly={readOnly || selection.length <= requiredItems}
           />
         ))}
       </div>

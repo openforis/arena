@@ -133,7 +133,7 @@ const SurveyInfo = () => {
           </div>
         </FormItem>
 
-        {!readOnly && <ButtonSave className="btn-save" testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
+        {!readOnly && <ButtonSave testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>
     </div>
   )

@@ -13,4 +13,5 @@ ButtonIconClose.defaultProps = {
   className: 'close-btn btn-s',
   label: 'common.close',
   showLabel: false,
+  variant: 'text',
 }

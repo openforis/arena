@@ -6,17 +6,15 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import PanelRight from '@webapp/components/PanelRight'
 
+import { Button } from '../buttons'
 import { useExpressionEditorPopupState } from './expressionEditorPopupState'
-
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
-import { Button } from '../buttons'
 
 const ExpressionEditorPopup = (props) => {
   const {
@@ -61,20 +59,17 @@ const ExpressionEditorPopup = (props) => {
     includeAnalysis,
   })
 
-  const i18n = useI18n()
-
   return (
     <PanelRight onClose={onClose} width="100vw" header={header}>
       <div className="expression-editor-popup">
         {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
-          <button
-            data-testid={TestId.expressionEditor.toggleModeBtn}
-            type="button"
-            className="expression-editor-popup__toggle-advanced btn-s"
+          <Button
+            className="expression-editor-popup__toggle-advanced"
+            label={advanced ? 'nodeDefEdit.basic' : 'nodeDefEdit.advanced'}
             onClick={onToggleAdvancedEditor}
-          >
-            {advanced ? i18n.t('nodeDefEdit.basic') : i18n.t('nodeDefEdit.advanced')}
-          </button>
+            size="small"
+            testId={TestId.expressionEditor.toggleModeBtn}
+          />
         )}
         {advanced ? (
           <AdvancedExpressionEditorPopup

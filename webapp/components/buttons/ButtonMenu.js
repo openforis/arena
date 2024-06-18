@@ -32,7 +32,12 @@ export const ButtonMenu = (props) => {
 
   return (
     <>
-      <Button {...otherProps} className={classNames('button-menu__button', className)} onClick={onButtonClick}>
+      <Button
+        {...otherProps}
+        className={classNames('button-menu__button', className)}
+        onClick={onButtonClick}
+        variant="text"
+      >
         {/* show small arrow down icon on the right */}
         <span className="icon icon-ctrl button-menu__button-icon" />
       </Button>
@@ -40,14 +45,13 @@ export const ButtonMenu = (props) => {
       <Menu anchorEl={anchorEl} className={menuClassName} open={open} onClose={closeMenu}>
         {items.map((item) => (
           <MenuItem key={item.key} className="button-menu__item" onClick={onItemClick(item)}>
-            {item.content ? (
-              item.content
-            ) : (
+            {item.content ?? (
               <Button
-                className={classNames('btn-transparent', item.className)}
+                className={classNames(item.className)}
                 testId={item.testId}
                 iconClassName={item.iconClassName}
                 label={item.label}
+                variant="text"
               />
             )}
           </MenuItem>

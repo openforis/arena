@@ -6,7 +6,8 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
-import { Button } from '../buttons'
+
+import { Button, ButtonIconClose } from '../buttons'
 
 const PanelRight = (props) => {
   const { children, className, header, onClose, showFooter, width } = props
@@ -17,14 +18,7 @@ const PanelRight = (props) => {
       style={{ width: `min(${width}, 100vw)` }}
     >
       <div className="panel-right__header">
-        <button
-          data-testid={TestId.panelRight.closeBtn}
-          type="button"
-          className="btn btn-transparent btn-close"
-          onClick={onClose}
-        >
-          <span className="icon icon-cross icon-12px" />
-        </button>
+        <ButtonIconClose className="btn-close" onClick={onClose} testId={TestId.panelRight.closeBtn} />
         <div>{header}</div>
       </div>
       <div className="panel-right__content">{React.Children.toArray(children)}</div>

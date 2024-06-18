@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react'
+import { Button as MuiButton } from '@mui/material'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -8,8 +9,10 @@ import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {
   const {
+    active,
     children,
     className,
+    color,
     disabled,
     iconClassName,
     id,
@@ -24,6 +27,7 @@ export const Button = forwardRef((props, ref) => {
     testId,
     title: titleProp,
     titleParams,
+    variant: variantProp,
     ...otherProps
   } = props
 
@@ -36,26 +40,28 @@ export const Button = forwardRef((props, ref) => {
       ? i18n.t(labelProp, labelParams)
       : null
 
+  const variant = active ? 'contained' : variantProp
+
   const btn = (
-    <button
+    <MuiButton
       ref={ref}
       id={id}
-      data-testid={testId}
-      disabled={disabled ? disabled : undefined}
-      aria-disabled={disabled ? disabled : undefined}
-      type="button"
       className={classNames('btn', className, {
         'btn-s': size === 'small',
         'btn-primary': primary,
         'btn-secondary': secondary,
       })}
+      color={color}
+      data-testid={testId}
+      disabled={disabled ? disabled : undefined}
       onClick={onClick}
+      variant={variant}
       {...otherProps}
     >
       {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
       {label}
       {children}
-    </button>
+    </MuiButton>
   )
   if (Objects.isEmpty(title) || disabled) {
     return btn
@@ -68,8 +74,10 @@ export const Button = forwardRef((props, ref) => {
 })
 
 Button.propTypes = {
+  active: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
+  color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
@@ -84,6 +92,7 @@ Button.propTypes = {
   testId: PropTypes.string,
   title: PropTypes.string,
   titleParams: PropTypes.object,
+  variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
 
 Button.defaultProps = {
@@ -101,4 +110,5 @@ Button.defaultProps = {
   testId: null,
   title: null,
   titleParams: null,
+  variant: 'contained',
 }

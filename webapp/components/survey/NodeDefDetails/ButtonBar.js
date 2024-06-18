@@ -7,7 +7,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonDelete } from '@webapp/components/buttons'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -79,12 +79,9 @@ const ButtonBar = (props) => {
         />
       )}
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
-        <Button
+        <ButtonDelete
           testId={TestId.nodeDefDetails.deleteBtn}
-          className="btn-danger btn-delete"
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, navigate))}
-          iconClassName="icon-bin2 icon-12px"
-          label="common.delete"
         />
       )}
     </div>
