@@ -6,7 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
 import { FormItem } from '@webapp/components/form/Input'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonDelete } from '@webapp/components/buttons'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
@@ -74,9 +74,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
           </FormItem>
 
           {canEditRecord && (
-            <Button
-              size="small"
-              style={{ marginLeft: '50px' }}
+            <ButtonDelete
               disabled={!selectedNode}
               onClick={() => {
                 dispatch(
@@ -89,8 +87,8 @@ const NodeDefEntityFormNodeSelect = (props) => {
                   })
                 )
               }}
-              iconClassName="icon-bin icon-10px icon-left"
-              label="common.delete"
+              size="small"
+              style={{ marginLeft: '50px' }}
             />
           )}
         </>

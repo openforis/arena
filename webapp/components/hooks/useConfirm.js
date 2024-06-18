@@ -63,7 +63,7 @@ export const useConfirmDelete = () => {
         strongConfirmRequiredText,
         okButtonLabel: 'common.delete',
         okButtonClass: 'btn-danger btn-delete',
-        okButtonIconClass: 'icon-bin icon-12px',
+        okButtonIconClass: 'icon-bin2 icon-12px',
       })
     },
     [confirm]
