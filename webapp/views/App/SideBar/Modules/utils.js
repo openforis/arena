@@ -61,7 +61,6 @@ export const getModulesHierarchy = (user, surveyInfo) => {
         dataModules.records,
         ...(Authorizer.canUseExplorer(user, surveyInfo) ? [dataModules.explorer] : []),
         ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
-        ...(Authorizer.canUseCharts(user, surveyInfo) ? [dataModules.charts] : []),
         ...(canExportRecords ? [dataModules.export] : []),
         ...(canImportRecords ? [dataModules.import] : []),
         ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
