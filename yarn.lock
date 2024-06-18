@@ -2002,18 +2002,6 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@date-io/core@^2.17.0":
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-2.17.0.tgz#360a4d0641f069776ed22e457876e8a8a58c205e"
-  integrity sha512-+EQE8xZhRM/hsY0CDTVyayMDDY5ihc4MqXCrPxooKw19yAzUIC6uUqsZeaOFNL9YKTNxYKrJP5DFgE8o5xRCOw==
-
-"@date-io/date-fns@^2.16.0":
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-2.17.0.tgz#1d9d0a02e0137524331819c9576a4e8e19a6142b"
-  integrity sha512-L0hWZ/mTpy3Gx/xXJ5tq5CzHo0L7ry6KEO9/w/JWiFWFLZgiNVo3ex92gOl3zmzjHqY/3Ev+5sehAr8UnGLEng==
-  dependencies:
-    "@date-io/core" "^2.17.0"
-
 "@discoveryjs/json-ext@0.5.7", "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -2781,21 +2769,21 @@
     proj4 "^2.11.0"
     uuid "^9.0.1"
 
-"@openforis/arena-core@^0.0.189":
-  version "0.0.189"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.189/8522dc727bb8a07d603781b73eca1f20190d2304#8522dc727bb8a07d603781b73eca1f20190d2304"
-  integrity sha512-5Wene8X8KIyl0xebTizC235Pc0EtwVBw5/P/9hdG6DVkSPamQkMKMa0r6ihjmc5iKsDaXf3QgpnKWfqP6pi0dw==
+"@openforis/arena-core@^0.0.196":
+  version "0.0.196"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.196/a00d117a64d0958b05f8e635c8b9a0338e2c4e12#a00d117a64d0958b05f8e635c8b9a0338e2c4e12"
+  integrity sha512-da0p91RjOFzYwMbMsmsGzK3mzlUV/tmNsUugsPMaAtB6W/HHYNuuekkRCiptwdixbg4Aun9pjrbCKC+84KJ/Yw==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.2"
-    date-fns "^2.30.0"
     jsep "^1.3.8"
     lodash.differencewith "^4.5.0"
     lodash.frompairs "^4.0.1"
     lodash.isequal "^4.5.0"
     lodash.topairs "^4.3.0"
+    moment "^2.30.1"
     proj4 "^2.11.0"
-    uuid "^9.0.1"
+    uuid "^10.0.0"
 
 "@openforis/arena-server@^0.1.33":
   version "0.1.33"
@@ -10538,6 +10526,11 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
+moment@^2.30.1:
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
+  integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
+
 "mongodb-uri@>= 0.9.7":
   version "0.9.7"
   resolved "https://registry.yarnpkg.com/mongodb-uri/-/mongodb-uri-0.9.7.tgz#0f771ad16f483ae65f4287969428e9fbc4aa6181"
@@ -14572,6 +14565,11 @@ utils-merge@1.0.1, utils-merge@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
+
+uuid@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
+  integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
 uuid@^8.3.0, uuid@^8.3.2:
   version "8.3.2"

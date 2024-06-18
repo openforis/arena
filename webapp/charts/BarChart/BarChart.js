@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
+import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, Tooltip, Legend } from 'recharts'
 
 import { Colors } from '@webapp/utils/colors'
 
-import { ChartWrapper } from '../common'
+import { CartesianGrid, ChartWrapper, RotatedCustomAxisTick } from '../common'
 
 const layouts = {
   horizontal: 'horizontal',
@@ -37,10 +37,10 @@ export const BarChart = (props) => {
   return (
     <ChartWrapper>
       <ReChartsBarChart data={data} layout={layout} margin={layout === layouts.horizontal ? margin : undefined}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid />
         {layout === layouts.horizontal && (
           <>
-            <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} tickFormatter={tickFormatter} />
+            <XAxis dataKey={labelDataKey} tick={RotatedCustomAxisTick} />
             <YAxis />
           </>
         )}

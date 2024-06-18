@@ -70,13 +70,16 @@ export const useSaveEdits = ({ setState }) => {
       })
     )
 
-    dispatch(LoaderActions.hideLoader())
-
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved', timeout: 3000 }))
 
     if (goBackOnEnd) {
       // workaround: navigate one page back only when local state is updated
-      setTimeout(() => navigate(-1), 500)
+      setTimeout(() => {
+        dispatch(LoaderActions.hideLoader())
+        navigate(-1)
+      }, 500)
+    } else {
+      dispatch(LoaderActions.hideLoader())
     }
   }, [])
 }
