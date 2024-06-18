@@ -6,11 +6,13 @@ import { isNotBlank } from '@core/stringUtils'
 
 export const parseQuery = (query, mode, canBeConstant) => {
   const exprQuery = Expression.fromString(query, mode)
-  const isBinary = Expression.isBinary(exprQuery)
-  const isSequence = Expression.isSequence(exprQuery)
-
-  if (isBinary || isSequence) return exprQuery
-
+  if (
+    [Expression.types.BinaryExpression, Expression.types.CallExpression, Expression.types.SequenceExpression].includes(
+      Expression.getType(exprQuery)
+    )
+  ) {
+    return exprQuery
+  }
   return Expression.newBinaryEmpty({ canBeConstant, exprQuery })
 }
 

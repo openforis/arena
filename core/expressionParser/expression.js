@@ -47,6 +47,7 @@ export const { isValid } = ExpressionUtils
 
 // ====== Type checking
 
+export const getType = R.prop('type')
 const isType = (type) => R.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise

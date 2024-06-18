@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
+import * as Expression from '@core/expressionParser/expression'
 import { ButtonGroup } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
@@ -20,7 +21,12 @@ const BasicExpressionEditorPopup = (props) => {
 
   const i18n = useI18n()
 
-  const [selectedExpressionType, setSelectedExpressionType] = useState(expressionTypes.logicalExpression)
+  const exprDraftType = exprDraft?.type
+
+  const initialExpressionType =
+    exprDraftType === Expression.types.CallExpression ? expressionTypes.functionCall : expressionTypes.logicalExpression
+
+  const [selectedExpressionType, setSelectedExpressionType] = useState(initialExpressionType)
 
   return (
     <>
@@ -31,19 +37,17 @@ const BasicExpressionEditorPopup = (props) => {
       </div>
 
       <div className="expression-editor-popup__expr-container">
-        {!exprDraft && (
-          <>
-            <ButtonGroup
-              items={Object.keys(expressionTypes).map((key) => ({ key, label: key }))}
-              onChange={setSelectedExpressionType}
-              selectedItemKey={selectedExpressionType}
-            />
-            {selectedExpressionType === expressionTypes.functionCall && (
-              <Call node={exprDraft} variables={variables} onChange={updateDraftExpr} />
-            )}
-          </>
-        )}
-        {exprDraft && (
+        <>
+          <ButtonGroup
+            items={Object.keys(expressionTypes).map((key) => ({ key, label: key }))}
+            onChange={setSelectedExpressionType}
+            selectedItemKey={selectedExpressionType}
+          />
+          {selectedExpressionType === expressionTypes.functionCall && (
+            <Call node={exprDraft} variables={variables} onChange={updateDraftExpr} />
+          )}
+        </>
+        {selectedExpressionType === expressionTypes.logicalExpression && exprDraft && (
           <ExpressionNode
             isBoolean={isBoolean}
             node={exprDraft}
