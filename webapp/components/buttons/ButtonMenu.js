@@ -47,7 +47,7 @@ export const ButtonMenu = (props) => {
           <MenuItem key={item.key} className="button-menu__item" onClick={onItemClick(item)}>
             {item.content ?? (
               <Button
-                className={classNames('btn-transparent', item.className)}
+                className={classNames(item.className)}
                 testId={item.testId}
                 iconClassName={item.iconClassName}
                 label={item.label}

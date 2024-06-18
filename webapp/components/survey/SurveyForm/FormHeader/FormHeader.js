@@ -104,39 +104,46 @@ const FormHeader = (props) => {
       <div className="survey-form-header__options">
         {edit && canEditSurvey && (
           <ButtonMenu
-            className="btn-s btn-transparent btn-menu-advanced"
+            className="btn-menu-advanced"
             iconClassName="icon-cog icon-14px"
             label="common.advancedFunctions"
             items={[
               {
                 key: 'schema-summary',
-                content: <SurveySchemaSummaryDownloadButton className="btn-transparent" />,
+                content: <SurveySchemaSummaryDownloadButton />,
               },
               {
                 key: 'labels-export',
-                content: <ButtonDownload href={`/api/survey/${surveyId}/labels`} label="surveyForm.exportLabels" />,
+                content: (
+                  <ButtonDownload
+                    href={`/api/survey/${surveyId}/labels`}
+                    label="surveyForm.exportLabels"
+                    variant="text"
+                  />
+                ),
               },
               {
                 key: 'labels-import',
                 content: (
                   <OpenFileUploadDialogButton
-                    className="btn-transparent"
                     label="surveyForm.importLabels"
                     accept=".csv"
                     onOk={({ files }) => onLabelsImportFileSelected(files[0])}
+                    variant="text"
                   />
                 ),
               },
             ]}
+            size="small"
             testId={TestId.surveyForm.advancedFunctionBtn}
           />
         )}
         <NodeDefLabelSwitch
-          className="btn-s btn-transparent"
           labelType={nodeDefLabelType}
           onChange={() => {
             dispatch(SurveyFormActions.updateNodeDefLabelType())
           }}
+          size="small"
         />
         <div> | </div>
       </div>

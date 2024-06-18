@@ -31,7 +31,7 @@ const NodeDefLabelSwitch = (props) => {
   const labelTypeNext = allowedTypeValues[(allowedTypeValues.indexOf(labelType) + 1) % allowedTypeValues.length]
   const label = buttonLabelKeysByType[labelTypeNext]
 
-  return <Button className={className} onClick={onChange} label={label} variant="text" />
+  return <Button className={className} onClick={onChange} label={label} size="small" variant="text" />
 }
 
 NodeDefLabelSwitch.propTypes = {

@@ -82,6 +82,7 @@ const SurveyInfo = (props) => {
             iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
             label={canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo'}
             onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
+            size="small"
             testId={TestId.dashboard.surveyInfoBtn}
             variant="text"
           />
@@ -90,14 +91,10 @@ const SurveyInfo = (props) => {
 
           {!firstTime && canExportSurvey && (
             <ButtonMenu
-              className="btn-s btn-transparent btn-menu-export"
-              iconClassName="icon-download2 icon-14px"
-              label="common.export"
-              testId={TestId.dashboard.surveyExportBtn}
+              className="btn-menu-export"
               items={[
                 {
                   key: 'survey-export',
-                  className: 'btn-transparent',
                   label: 'common.export',
                   onClick: () => dispatch(SurveyActions.exportSurvey()),
                   testId: TestId.dashboard.surveyExportOnlySurveyBtn,
@@ -106,14 +103,12 @@ const SurveyInfo = (props) => {
                   ? [
                       {
                         key: 'survey-export-with-data',
-                        className: 'btn-transparent',
                         label: 'homeView.dashboard.exportWithData',
                         onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
                         testId: TestId.dashboard.surveyExportWithDataBtn,
                       },
                       {
                         key: 'survey-export-without-data',
-                        className: 'btn-transparent',
                         label: 'homeView.dashboard.exportWithDataNoActivityLog',
                         onClick: () =>
                           dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
@@ -122,14 +117,16 @@ const SurveyInfo = (props) => {
                     ]
                   : []),
               ]}
+              iconClassName="icon-download2 icon-14px"
+              label="common.export"
+              size="small"
+              testId={TestId.dashboard.surveyExportBtn}
             />
           )}
           {canEditSurvey && (
             <ButtonMenu
-              className="btn-s btn-transparent btn-menu-advanced"
+              className="btn-menu-advanced"
               iconClassName="icon-cog icon-14px"
-              label="common.advancedFunctions"
-              testId={TestId.dashboard.advancedFunctionsBtn}
               items={[
                 ...(Survey.isPublished(surveyInfo)
                   ? [
@@ -137,12 +134,11 @@ const SurveyInfo = (props) => {
                         key: 'survey-info-unpublish',
                         content: (
                           <Button
-                            className="btn-s btn-transparent"
-                            testId={TestId.dashboard.surveyUnpublishBtn}
-                            onClick={onUnpublishClick}
                             iconClassName="icon-eye-blocked icon-12px icon-left"
                             label="homeView.surveyInfo.unpublish"
+                            onClick={onUnpublishClick}
                             variant="text"
+                            testId={TestId.dashboard.surveyUnpublishBtn}
                           />
                         ),
                       },
@@ -152,16 +148,18 @@ const SurveyInfo = (props) => {
                   key: 'survey-info-delete',
                   content: (
                     <Button
-                      className="btn-s btn-transparent"
-                      testId={TestId.dashboard.surveyDeleteBtn}
-                      onClick={onDeleteClick}
                       iconClassName="icon-bin icon-12px icon-left"
                       label="common.delete"
+                      onClick={onDeleteClick}
+                      testId={TestId.dashboard.surveyDeleteBtn}
                       variant="text"
                     />
                   ),
                 },
               ]}
+              label="common.advancedFunctions"
+              size="small"
+              testId={TestId.dashboard.advancedFunctionsBtn}
             />
           )}
           {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
