@@ -17,6 +17,8 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
+const rowMinHeight = 5 // in "rem" unit
+
 const NodeDefEntityFormGrid = (props) => {
   const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
 
@@ -78,43 +80,76 @@ const NodeDefEntityFormGrid = (props) => {
 
   if (nodeDefsInnerPage.length === 0) return null
 
+  const styleByNodeDefUuid = entry
+    ? rdgLayout.reduce((acc, layoutItem) => {
+        const { h, i, minH = 1, x, y, w } = layoutItem
+        const minHeight = `${Math.max(minH, h) * rowMinHeight}rem`
+
+        acc[i] = {
+          gridColumnStart: x + 1,
+          gridColumnEnd: x + 1 + w,
+          gridRowStart: y + 1,
+          gridRowEnd: y + 1 + h,
+          minHeight,
+        }
+        return acc
+      }, {})
+    : {}
+
+  const visibleNodeDefsComponents = visibleNodeDefsInnerPage.map((childDef) => {
+    const nodeDefUuid = NodeDef.getUuid(childDef)
+    const style = styleByNodeDefUuid[nodeDefUuid]
+    return (
+      <div key={nodeDefUuid} className="grid-item" style={style}>
+        <NodeDefSwitch
+          edit={edit}
+          entry={entry}
+          preview={preview}
+          recordUuid={recordUuid}
+          surveyInfo={surveyInfo}
+          surveyCycleKey={cycle}
+          nodeDef={childDef}
+          parentNode={node}
+          canEditDef={canEditDef}
+          canEditRecord={canEditRecord}
+          canAddNode={canAddNode}
+        />
+      </div>
+    )
+  })
+
+  if (edit) {
+    return (
+      <ResponsiveGridLayout
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        autoSize={entry}
+        rowHeight={70}
+        cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
+        layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
+        containerPadding={canEditDef ? [15, 40] : [15, 15]}
+        margin={[5, 5]}
+        isDraggable={canEditDef}
+        isResizable={canEditDef}
+        compactType={null}
+        preventCollision
+        className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
+        onDragStop={onChangeLayout}
+        onResizeStop={onChangeLayout}
+        ref={gridRef}
+        useCSSTransforms={false}
+      >
+        {visibleNodeDefsComponents}
+      </ResponsiveGridLayout>
+    )
+  }
+
   return (
-    <ResponsiveGridLayout
-      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      autoSize={entry}
-      rowHeight={70}
-      cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
-      layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
-      containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
-      margin={[5, 5]}
-      isDraggable={edit && canEditDef}
-      isResizable={edit && canEditDef}
-      compactType={null}
-      preventCollision
-      className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
-      onDragStop={onChangeLayout}
-      onResizeStop={onChangeLayout}
-      ref={gridRef}
-      useCSSTransforms={false}
+    <div
+      className="survey-form__node-def-entity-form-grid-entry"
+      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      {visibleNodeDefsInnerPage.map((childDef) => (
-        <div key={NodeDef.getUuid(childDef)}>
-          <NodeDefSwitch
-            edit={edit}
-            entry={entry}
-            preview={preview}
-            recordUuid={recordUuid}
-            surveyInfo={surveyInfo}
-            surveyCycleKey={cycle}
-            nodeDef={childDef}
-            parentNode={node}
-            canEditDef={canEditDef}
-            canEditRecord={canEditRecord}
-            canAddNode={canAddNode}
-          />
-        </div>
-      ))}
-    </ResponsiveGridLayout>
+      {visibleNodeDefsComponents}
+    </div>
   )
 }
 
