@@ -13,7 +13,6 @@ import * as recordApi from '@server/modules/record/api/recordApi'
 import * as dataExportApi from '@server/modules/dataExport/api/dataExportApi'
 import * as dataImportApi from '@server/modules/dataImport/api/dataImportApi'
 import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
-import * as reportingApi from '@server/modules/reporting/api'
 import * as analysisApi from '@server/modules/analysis/api'
 import * as jobApi from '@server/job/jobApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
@@ -41,7 +40,6 @@ dataExportApi.init(router)
 dataImportApi.init(router)
 
 surveyRdbApi.init(router)
-reportingApi.init(router)
 
 analysisApi.init(router)
 
