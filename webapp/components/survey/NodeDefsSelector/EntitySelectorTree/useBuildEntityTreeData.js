@@ -7,6 +7,7 @@ import * as Node from '@core/record/node'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'
 import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
+import { TestId } from '@webapp/utils/testId'
 
 const getPageNode = ({ record, pagesUuidMap, nodeDefUuid }) => {
   const nodeUuid = pagesUuidMap[nodeDefUuid]
@@ -84,6 +85,7 @@ export const useBuildTreeData = ({
     return {
       key: NodeDef.getUuid(nodeDef),
       label: `${nodeDefLabel}${suffix}`,
+      testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
     }
   }
 

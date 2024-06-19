@@ -4,7 +4,30 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
-import { TreeItem } from '@mui/x-tree-view/TreeItem'
+import { TreeItem as MuiTreeItem } from '@mui/x-tree-view/TreeItem'
+
+const TreeItemPropTypes = PropTypes.shape({
+  key: PropTypes.string.isRequired,
+  items: PropTypes.array,
+  label: PropTypes.string.isRequired,
+  testId: PropTypes.string,
+})
+
+const TreeItemView = (props) => {
+  const { item } = props
+  const { key, label, items, testId } = item
+  return (
+    <MuiTreeItem key={key} itemId={key} label={label} data-testid={testId}>
+      {items?.map((childItem) => (
+        <TreeItemView key={childItem.key} item={childItem} />
+      ))}
+    </MuiTreeItem>
+  )
+}
+
+TreeItemView.propTypes = {
+  item: TreeItemPropTypes,
+}
 
 export const TreeView = (props) => {
   const {
@@ -14,15 +37,6 @@ export const TreeView = (props) => {
     selectedItemKeys = undefined,
     onSelectedItemKeysChange = undefined,
   } = props
-
-  const toTreeItem = (item) => {
-    const { key, label, items } = item
-    return (
-      <TreeItem key={key} itemId={key} label={label}>
-        {items?.map((childItem) => toTreeItem(childItem))}
-      </TreeItem>
-    )
-  }
 
   const onExpandedItemsChange = useCallback(
     (event, itemIds) => {
@@ -52,15 +66,16 @@ export const TreeView = (props) => {
       onSelectedItemsChange={onSelectedItemsChange}
       selectedItems={selectedItemKeys}
     >
-      {items.map(toTreeItem)}
+      {items.map((childItem) => (
+        <TreeItemView key={childItem.key} item={childItem} />
+      ))}
     </SimpleTreeView>
   )
 }
 
 TreeView.propTypes = {
   expadedItemKeys: PropTypes.array,
-  items: PropTypes.arrayOf(PropTypes.shape({ key: PropTypes.string.isRequired, label: PropTypes.string.isRequired }))
-    .isRequired,
+  items: PropTypes.arrayOf(TreeItemPropTypes).isRequired,
   onExpandedItemKeysChange: PropTypes.func,
   onSelectedItemKeysChange: PropTypes.func,
   selectedItemKeys: PropTypes.array,
