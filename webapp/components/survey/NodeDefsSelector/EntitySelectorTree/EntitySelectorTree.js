@@ -1,52 +1,55 @@
 import './EntitySelectorTree.scss'
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import * as Survey from '@core/survey/survey'
-import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
-
-import { EntitySelectorTreeNode } from './EntitySelectorTreeNode'
+import { Button } from '@webapp/components/buttons'
+import { TreeView } from '@webapp/components/TreeView'
+import { useEntitySelectorTree } from './useEntitySelectorTree'
 
 const EntitySelectorTree = (props) => {
   const { getLabelSuffix, isDisabled, nodeDefLabelType, nodeDefUuidActive, onlyEntities, onlyPages, onSelect } = props
-  const survey = useSurvey()
-  const i18n = useI18n()
 
-  const [expanded, setExpanded] = useState(true)
-  const toggleExpanded = () => setExpanded((prevState) => !prevState)
-  const nodeDefRoot = Survey.getNodeDefRoot(survey)
+  const {
+    expanded,
+    expandedNodeDefUuids,
+    onSelectedTreeItemKeyChange,
+    selectedTreeItemKeys,
+    setExpandedNodeDefUuids,
+    toggleExpanded,
+    treeItems,
+  } = useEntitySelectorTree({
+    getLabelSuffix,
+    isDisabled,
+    nodeDefLabelType,
+    nodeDefUuidActive,
+    onlyEntities,
+    onlyPages,
+    onSelect,
+  })
 
   return (
     <div className="entity-selector-tree">
       <div className="display-flex">
-        <button
-          type="button"
-          className="btn-xs btn-toggle btn-expand"
+        <Button
+          className="btn-toggle btn-expand"
+          iconClassName={classNames('icon icon-12px', {
+            'icon-shrink2': expanded,
+            'icon-enlarge2': !expanded,
+          })}
           onClick={toggleExpanded}
-          title={i18n.t(expanded ? 'common.collapse' : 'common.expand')}
-        >
-          <span
-            className={classNames('icon icon-12px', {
-              'icon-shrink2': expanded,
-              'icon-enlarge2': !expanded,
-            })}
-          />
-        </button>
+          size="small"
+          title={expanded ? 'common.collapse' : 'common.expand'}
+          variant="text"
+        />
       </div>
 
-      <EntitySelectorTreeNode
-        expanded={expanded}
-        getLabelSuffix={getLabelSuffix}
-        isDisabled={isDisabled}
-        nodeDef={nodeDefRoot}
-        nodeDefLabelType={nodeDefLabelType}
-        nodeDefUuidActive={nodeDefUuidActive}
-        onlyEntities={onlyEntities}
-        onlyPages={onlyPages}
-        onSelect={onSelect}
-        setExpanded={setExpanded}
+      <TreeView
+        expadedItemKeys={expandedNodeDefUuids}
+        items={treeItems}
+        onExpandedItemKeysChange={setExpandedNodeDefUuids}
+        onSelectedItemKeysChange={onSelectedTreeItemKeyChange}
+        selectedItemKeys={selectedTreeItemKeys}
       />
     </div>
   )
