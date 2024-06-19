@@ -6,16 +6,6 @@
   align-items: flex-end;
   row-gap: 0.2rem;
 
-  .form-input {
-    padding: 0;
-
-    &:first-child {
-      .form-input-chip-item {
-        font-weight: 600;
-      }
-    }
-  }
-
   .dropdown {
     align-self: stretch;
     width: 10rem;
@@ -29,41 +19,5 @@
   .chips-wrapper {
     display: flex;
     flex-flow: wrap;
-
-    .form-input-chip-item {
-      font-size: 1rem;
-    }
-
-    .form-input {
-      padding: 0;
-      border: none;
-    }
-  }
-
-  .input-field-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    input {
-      width: 30rem;
-      padding: 0.5rem;
-    }
-  }
-}
-
-.form-input-chip-item {
-  display: flex;
-  height: 17px;
-  align-items: center;
-  margin: 0.25rem 0.3rem;
-  font-size: 0.7rem;
-  padding: 0.95rem 0.5rem;
-  border: 1px solid $greyBorder;
-
-  .btn-remove {
-    padding: 0.2rem 0.5rem;
-    margin-left: 0.3rem;
-    border: none;
   }
 }

@@ -7,12 +7,10 @@ import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
 
-import { useI18n } from '@webapp/store/system'
+import { Button, ButtonIconClose } from '../buttons'
 
 const PanelRight = (props) => {
   const { children, className, header, onClose, showFooter, width } = props
-
-  const i18n = useI18n()
 
   return ReactDOM.createPortal(
     <div
@@ -20,22 +18,13 @@ const PanelRight = (props) => {
       style={{ width: `min(${width}, 100vw)` }}
     >
       <div className="panel-right__header">
-        <button
-          data-testid={TestId.panelRight.closeBtn}
-          type="button"
-          className="btn btn-transparent btn-close"
-          onClick={onClose}
-        >
-          <span className="icon icon-cross icon-12px" />
-        </button>
+        <ButtonIconClose className="btn-close" onClick={onClose} testId={TestId.panelRight.closeBtn} />
         <div>{header}</div>
       </div>
       <div className="panel-right__content">{React.Children.toArray(children)}</div>
       {showFooter && (
         <div className="panel-right__footer">
-          <button type="button" className="btn btn-close-footer" onClick={onClose}>
-            {i18n.t('common.close')}
-          </button>
+          <Button className="btn-close-footer" label="common.close" onClick={onClose} primary />
         </div>
       )}
     </div>,

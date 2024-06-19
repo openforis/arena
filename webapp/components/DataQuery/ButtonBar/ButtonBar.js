@@ -7,7 +7,7 @@ import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
-import { ButtonDownload } from '@webapp/components/buttons'
+import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
@@ -59,14 +59,13 @@ const ButtonBar = (props) => {
 
   return (
     <div className="data-query-button-bar">
-      <button
-        type="button"
-        title={i18n.t(nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show')}
-        className={classNames('btn', 'btn-s', { highlight: nodeDefsSelectorVisible })}
+      <Button
+        className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
+        iconClassName="icon-tab icon-14px"
         onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
-      >
-        <span className="icon icon-tab icon-14px" />
-      </button>
+        title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
+        variant="outlined"
+      />
 
       <FormItem className="mode-form-item" label={i18n.t('dataView.dataQuery.mode.label')}>
         <ButtonGroup

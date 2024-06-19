@@ -134,12 +134,13 @@ export const CoordinateAttributePopUp = (props) => {
               label="mapView.editRecord"
               showLabel
               onClick={() => onRecordEditClick({ recordUuid, parentUuid })}
+              variant="contained"
             />
 
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <Button className="earth-map-btn" size="small" onClick={onEarthMapButtonClick}>
+            <Button className="earth-map-btn" size="small" onClick={onEarthMapButtonClick} variant="outlined">
               <img src="/img/of_earth_map_icon_small.png" alt="Earth Map" />
               {i18n.t('mapView.openInEarthMap')}
             </Button>

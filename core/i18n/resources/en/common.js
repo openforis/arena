@@ -178,13 +178,13 @@ Do you want to proceed?`,
     date: {
       aMomentAgo: 'A moment ago',
       hour: 'hour',
-      hour_plural: 'hours',
+      hour_other: 'hours',
       day: 'day',
-      day_plural: 'days',
+      day_other: 'days',
       minute: 'minute',
-      minute_plural: 'minutes',
+      minute_other: 'minutes',
       week: 'week',
-      week_plural: 'weeks',
+      week_other: 'weeks',
       timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
     },
     paginator: {
@@ -1616,7 +1616,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
       invalidDate:
-        'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as yyyy-MM-dd or dd/MM/yyyy. E.g. 2023-01-15 or 15/01/2023',
+        'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as YYYY-MM-DD or DD/MM/YYYY. E.g. 2023-01-15 or 15/01/2023',
       invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
       invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
@@ -1795,7 +1795,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   expressionEditor: {
     and: 'AND',
     or: 'OR',
-    group: 'Group',
+    group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
 

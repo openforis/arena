@@ -47,6 +47,7 @@ const plugins = [
   ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
     filename: 'styles-[fullhash].css',
+    ignoreOrder: true,
   }),
   new HtmlWebpackPlugin({
     template: './web-resources/index.html',

@@ -2,31 +2,22 @@ import './checkbox.scss'
 
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
+import MuiFormControlLabel from '@mui/material/FormControlLabel'
+import MuiCheckbox from '@mui/material/Checkbox'
+import MuiRadio from '@mui/material/Radio'
 
 import { Objects } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 
+import { ButtonIconInfo } from '../buttons/ButtonIconInfo'
 import ValidationTooltip from '../validationTooltip'
-import { LabelWithTooltip } from './LabelWithTooltip'
-import { ButtonIconInfo } from '../buttons'
-
-const determineIconClassName = ({ radio, checked, indeterminate }) => {
-  if (radio) {
-    return checked ? 'icon-radio-checked' : 'icon-radio-unchecked'
-  }
-  if (indeterminate) {
-    return 'icon-stop2'
-  }
-  return checked ? 'icon-checkbox-checked' : 'icon-checkbox-unchecked'
-}
+import classNames from 'classnames'
 
 const Checkbox = (props) => {
   const {
     className,
     id,
-    validation,
     checked,
     indeterminate,
     info,
@@ -34,6 +25,9 @@ const Checkbox = (props) => {
     onChange: onChangeProp,
     disabled,
     radio,
+    size,
+    value,
+    validation,
   } = props
 
   const i18n = useI18n()
@@ -46,24 +40,35 @@ const Checkbox = (props) => {
     [onChangeProp, checked]
   )
 
-  const hasLabel = !Objects.isEmpty(label)
-  const iconClassName = determineIconClassName({ radio, checked, indeterminate })
-  const iconContainerClassName = classNames(`icon icon-18px ${iconClassName}`, { ['icon-left']: hasLabel })
-
+  const control = radio ? (
+    <MuiRadio
+      checked={checked}
+      data-testid={id}
+      data-value={value}
+      disabled={disabled}
+      onClick={onChange}
+      size={size}
+    />
+  ) : (
+    <MuiCheckbox
+      checked={checked}
+      data-testid={id}
+      data-value={value}
+      disabled={disabled}
+      indeterminate={indeterminate}
+      onClick={onChange}
+      size={size}
+    />
+  )
   return (
-    <div className={className} style={{ justifySelf: 'start' }}>
+    <div className={classNames(className, 'btn-checkbox')} style={{ justifySelf: 'start' }}>
       <ValidationTooltip validation={validation}>
-        <button
-          type="button"
-          data-testid={id}
-          className="btn btn-s btn-transparent btn-checkbox"
-          onClick={onChange}
-          aria-disabled={disabled}
-        >
-          <span className={iconContainerClassName} />
-          <LabelWithTooltip label={i18n.t(label)} />
-          {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
-        </button>
+        {Objects.isEmpty(label) ? (
+          control
+        ) : (
+          <MuiFormControlLabel className="full-width" control={control} label={i18n.t(label)} />
+        )}
+        {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
       </ValidationTooltip>
     </div>
   )
@@ -79,7 +84,9 @@ Checkbox.propTypes = {
   label: PropTypes.string,
   onChange: PropTypes.func,
   radio: PropTypes.bool,
+  size: PropTypes.oneOf(['small', 'medium']),
   validation: PropTypes.object,
+  value: PropTypes.string,
 }
 
 Checkbox.defaultProps = {
@@ -90,6 +97,7 @@ Checkbox.defaultProps = {
   label: null,
   onChange: null,
   radio: false,
+  size: 'medium',
   validation: {},
 }
 

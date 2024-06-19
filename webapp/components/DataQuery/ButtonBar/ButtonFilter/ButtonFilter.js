@@ -30,6 +30,7 @@ const ButtonFilter = (props) => {
         onClick={Actions.togglePanelFilter}
         label="dataView.filterRecords.buttonTitle"
         title={filter ? Expression.toString(filter, Expression.modes.sql) : undefined}
+        variant="outlined"
       />
 
       {State.isPanelFilterShown(state) && (

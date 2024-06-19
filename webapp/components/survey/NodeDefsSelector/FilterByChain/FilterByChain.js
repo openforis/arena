@@ -5,10 +5,11 @@ import classNames from 'classnames'
 
 import * as Chain from '@common/analysis/chain'
 
+import * as API from '@webapp/service/api'
+
+import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
-
-import * as API from '@webapp/service/api'
 
 const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
   const surveyId = useSurveyId()
@@ -31,23 +32,24 @@ const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
     <div className="node-defs-selector__chains">
       <p>{i18n.t('common.chain')}</p>
       <div className="node-defs-selector__chains_filter">
-        {chains.map((chain) => (
-          <button
-            type="button"
-            key={Chain.getUuid(chain)}
-            className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable', {
-              active: filterChainUuids.includes(Chain.getUuid(chain)),
-            })}
-            onClick={() => {
-              const filterChainUuidsUpdated = filterChainUuids.includes(Chain.getUuid(chain))
-                ? filterChainUuids.filter((_uuid) => _uuid !== Chain.getUuid(chain))
-                : [...filterChainUuids, Chain.getUuid(chain)]
-              setFilterChainUuids(filterChainUuidsUpdated)
-            }}
-          >
-            <span>{Chain.getLabel(lang)(chain)}</span>
-          </button>
-        ))}
+        {chains.map((chain) => {
+          const active = filterChainUuids.includes(Chain.getUuid(chain))
+          return (
+            <Button
+              key={Chain.getUuid(chain)}
+              active={active}
+              className={classNames('btn', 'btn-s', 'btn-node-def-type', 'deselectable')}
+              label={Chain.getLabel(lang)(chain)}
+              onClick={() => {
+                const filterChainUuidsUpdated = active
+                  ? filterChainUuids.filter((_uuid) => _uuid !== Chain.getUuid(chain))
+                  : [...filterChainUuids, Chain.getUuid(chain)]
+                setFilterChainUuids(filterChainUuidsUpdated)
+              }}
+              variant="outlined"
+            />
+          )
+        })}
       </div>
     </div>
   )

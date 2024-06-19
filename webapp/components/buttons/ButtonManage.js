@@ -11,4 +11,5 @@ ButtonManage.propTypes = {
 ButtonManage.defaultProps = {
   ...Button.defaultProps,
   label: 'common.manage',
+  variant: 'outlined',
 }

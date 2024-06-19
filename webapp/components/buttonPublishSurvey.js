@@ -4,27 +4,26 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/store/system'
 import { SurveyActions, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
+import { Button } from './buttons'
 
 const ButtonPublishSurvey = (props) => {
-  const { className, disabled } = props
+  const { className, disabled = false, variant = 'outlined' } = props
 
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
-  const i18n = useI18n()
   const lang = useSurveyPreferredLang()
 
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
 
   return (
-    <button
-      type="button"
-      aria-disabled={disabled}
-      className={`btn btn-s btn-publish ${className || ''}`}
-      data-testid={TestId.header.surveyPublishBtn}
+    <Button
+      className={className}
+      disabled={disabled}
+      iconClassName="icon-warning icon-left icon-10px"
+      label="common.publish"
       onClick={() =>
         dispatch(
           DialogConfirmActions.showDialogConfirm({
@@ -34,21 +33,17 @@ const ButtonPublishSurvey = (props) => {
           })
         )
       }
-    >
-      <span className="icon icon-warning icon-left icon-10px" />
-      {i18n.t('common.publish')}
-    </button>
+      size="small"
+      testId={TestId.header.surveyPublishBtn}
+      variant={variant}
+    />
   )
 }
 
 ButtonPublishSurvey.propTypes = {
   className: PropTypes.string,
   disabled: PropTypes.bool,
-}
-
-ButtonPublishSurvey.defaultProps = {
-  className: null,
-  disabled: false,
+  variant: PropTypes.string,
 }
 
 export default ButtonPublishSurvey

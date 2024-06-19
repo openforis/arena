@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { CartesianGrid, Legend, Line, LineChart as ReChartsLineChart, Tooltip, XAxis, YAxis } from 'recharts'
+import { Legend, Line, LineChart as ReChartsLineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
-import { ChartWrapper } from '../common'
+import { CartesianGrid, ChartWrapper, RotatedCustomAxisTick } from '../common'
 
 const margin = {
   top: 0,
@@ -19,8 +19,8 @@ export const LineChart = (props) => {
   return (
     <ChartWrapper>
       <ReChartsLineChart data={data} margin={margin}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey={labelDataKey} angle={-30} dx={-20} dy={40} />
+        <CartesianGrid />
+        <XAxis dataKey={labelDataKey} tick={RotatedCustomAxisTick} />
         <YAxis allowDecimals={allowDecimals} />
         {showLegend && <Legend verticalAlign="top" />}
         <Tooltip />

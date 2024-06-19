@@ -2,20 +2,18 @@ import './uploadButton.scss'
 
 import React, { useRef } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
-import { useI18n } from '@webapp/store/system'
+
+import { Button } from '../buttons/Button'
 
 const checkFilesSize = (files, maxSizeMB) =>
-  R.find((file) => file.size > maxSizeMB * 1024 * 1024, files)
+  Array.from(files).find((file) => file.size > maxSizeMB * 1024 * 1024)
     ? alert(`File exceeds maximum size (${maxSizeMB}MB)`)
     : true
 
 const UploadButton = (props) => {
-  const { inputFieldId, label: labelProp, disabled, showLabel, showIcon, maxSize, accept, onChange, className } = props
+  const { inputFieldId, label, disabled, showLabel, showIcon, maxSize, accept, onChange, className } = props
 
-  const i18n = useI18n()
   const fileInput = useRef(null)
-  const label = i18n.t(labelProp)
 
   return (
     <>
@@ -34,19 +32,20 @@ const UploadButton = (props) => {
         }}
       />
 
-      <button
+      <Button
         type="button"
         className={className}
-        aria-disabled={disabled}
+        disabled={disabled}
+        iconClassName="icon-upload2 icon-14px"
+        label={label}
         onClick={() => {
           // First reset current value, then trigger click event
           fileInput.current.value = ''
           fileInput.current.dispatchEvent(new MouseEvent('click'))
         }}
-      >
-        {showIcon && <span className={`icon icon-upload2 icon-14px${showLabel ? ' icon-left' : ''}`} />}
-        {showLabel && label}
-      </button>
+        showLabel={showLabel}
+        showIcon={showIcon}
+      />
     </>
   )
 }

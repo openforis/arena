@@ -11,4 +11,5 @@ ButtonCancel.propTypes = {
 ButtonCancel.defaultProps = {
   ...Button.defaultProps,
   label: 'common.cancel',
+  variant: 'text',
 }
