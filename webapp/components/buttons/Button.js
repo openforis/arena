@@ -13,21 +13,22 @@ export const Button = forwardRef((props, ref) => {
     children,
     className,
     color,
-    disabled,
+    disabled = false,
     iconClassName,
     id,
-    isTitleMarkdown,
+    isTitleMarkdown = false,
     label: labelProp,
     labelParams,
     onClick,
     primary,
     secondary,
-    showLabel,
-    size,
+    showIcon = true,
+    showLabel = true,
+    size = 'medium',
     testId,
     title: titleProp,
     titleParams,
-    variant: variantProp,
+    variant: variantProp = 'contained',
     ...otherProps
   } = props
 
@@ -58,7 +59,9 @@ export const Button = forwardRef((props, ref) => {
       variant={variant}
       {...otherProps}
     >
-      {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
+      {showIcon && iconClassName && (
+        <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />
+      )}
       {label}
       {children}
     </MuiButton>
@@ -87,6 +90,7 @@ Button.propTypes = {
   onClick: PropTypes.func,
   primary: PropTypes.bool,
   secondary: PropTypes.bool,
+  showIcon: PropTypes.bool,
   showLabel: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,
@@ -96,19 +100,9 @@ Button.propTypes = {
 }
 
 Button.defaultProps = {
-  children: null,
-  className: null,
   disabled: false,
-  iconClassName: null,
-  id: null,
   isTitleMarkdown: false,
-  label: null,
-  labelParams: null,
-  onClick: null,
   showLabel: true,
   size: 'medium',
-  testId: null,
-  title: null,
-  titleParams: null,
   variant: 'contained',
 }
