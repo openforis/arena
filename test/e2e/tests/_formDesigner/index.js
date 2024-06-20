@@ -76,7 +76,8 @@ export const editNodeDef = (formName, nodeDef, editDetails = true) => {
 // ==== form navigation
 export const gotoFormPage = (nodeDef) => {
   test(`Goto form page ${nodeDef.name}`, async () => {
-    await page.click(getSelector(TestId.surveyForm.pageLinkBtn(nodeDef.name)))
+    const treeItemSelector = `${getSelector(TestId.surveyForm.pageLinkBtn(nodeDef.name))} .MuiTreeItem-label`
+    await page.click(treeItemSelector)
   })
 }
 
