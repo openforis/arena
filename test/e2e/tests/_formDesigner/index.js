@@ -76,7 +76,7 @@ export const editNodeDef = (formName, nodeDef, editDetails = true) => {
 // ==== form navigation
 export const gotoFormPage = (nodeDef) => {
   test(`Goto form page ${nodeDef.name}`, async () => {
-    await page.click(getSelector(TestId.surveyForm.pageLinkBtn(nodeDef.name), 'button'))
+    await page.click(getSelector(TestId.surveyForm.pageLinkBtn(nodeDef.name)))
   })
 }
 
