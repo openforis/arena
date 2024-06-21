@@ -3,6 +3,7 @@
 .labels-editor {
   display: grid;
   grid-column-gap: 0.5rem;
+  padding: 0.4rem;
 
   &.with-label {
     grid-template-columns: 0.2fr 0.65fr;
