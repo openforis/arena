@@ -12,6 +12,8 @@ import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
 
+const textAreaRows = 3
+
 export const Input = React.forwardRef((props, ref) => {
   const {
     className: classNameProp,
@@ -68,7 +70,7 @@ export const Input = React.forwardRef((props, ref) => {
   }, [value])
 
   const className = classNames('form-input', classNameProp)
-  const rows = inputType === 'textarea' ? 4 : undefined
+  const rows = inputType === 'textarea' ? textAreaRows : undefined
 
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
