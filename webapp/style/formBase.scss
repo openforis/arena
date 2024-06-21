@@ -32,23 +32,6 @@ select {
   padding: 0.5rem;
 }
 
-textarea {
-  border: 1px solid #d1d1dd;
-}
-
-input {
-  padding: 20px 5px;
-  background-color: transparent;
-
-  &:not([readonly]):focus {
-    background-color: $blueLightFocus;
-  }
-
-  &[readonly] {
-    cursor: default;
-  }
-}
-
 a {
   text-decoration: none;
   cursor: pointer;
@@ -177,6 +160,20 @@ button:disabled,
   .btn-delete {
     position: absolute;
     right: 0;
+  }
+}
+
+.MuiTextField-root {
+  background-color: $inputBackgroundColor;
+
+  input,
+  textarea {
+    padding: 0.4rem 0.6rem;
+    background-color: $inputBackgroundColor;
+  }
+
+  .MuiInputBase-multiline {
+    padding: 0;
   }
 }
 
