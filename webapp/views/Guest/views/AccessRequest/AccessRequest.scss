@@ -1,11 +1,12 @@
 .access-request {
   z-index: 2;
-  height: 100%;
+  flex: 1;
   max-width: 60rem;
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
   margin: 1rem auto;
+  overflow: hidden;
 
   .title {
     font-size: 1.5rem;
@@ -13,7 +14,7 @@
   }
 
   .content {
-    height: calc(100% - 14rem);
+    flex: 1;
     overflow: auto;
 
     .introduction,

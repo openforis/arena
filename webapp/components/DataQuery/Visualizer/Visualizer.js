@@ -1,40 +1,30 @@
 import React, { memo } from 'react'
 import PropTypes from 'prop-types'
 
-import { Query } from '@common/model/query'
+import { DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
-import Table from './Table'
+import { DataQueryChart } from './DataQueryChart'
+import DataQueryTable from './DataQueryTable'
 
 const components = {
-  [Query.displayTypes.table]: Table,
+  [DataExplorerState.displayTypes.chart]: DataQueryChart,
+  [DataExplorerState.displayTypes.table]: DataQueryTable,
 }
 
 const Visualizer = (props) => {
-  const {
-    query,
-    data,
-    dataEmpty,
-    dataLoading,
-    dataLoadingError,
-    nodeDefLabelType,
-    nodeDefsSelectorVisible,
-    offset,
-    onChangeQuery,
-    setData,
-  } = props
+  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
+
+  const displayType = DataExplorerSelectors.useDisplayType()
 
   return (
     <div className="table__content">
-      {React.createElement(components[Query.getDisplayType(query)], {
-        query,
+      {React.createElement(components[displayType], {
         data,
         dataEmpty,
         dataLoading,
         dataLoadingError,
         nodeDefLabelType,
-        nodeDefsSelectorVisible,
         offset,
-        onChangeQuery,
         setData,
       })}
     </div>
@@ -47,10 +37,7 @@ Visualizer.propTypes = {
   dataLoading: PropTypes.bool.isRequired,
   dataLoadingError: PropTypes.bool,
   nodeDefLabelType: PropTypes.string.isRequired,
-  nodeDefsSelectorVisible: PropTypes.bool.isRequired,
   offset: PropTypes.number.isRequired,
-  onChangeQuery: PropTypes.func.isRequired,
-  query: PropTypes.object.isRequired,
   setData: PropTypes.func.isRequired,
 }
 

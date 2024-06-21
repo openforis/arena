@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
+import { DbOrder } from '@server/db'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
@@ -122,13 +123,13 @@ const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
 const _usersSelectQuery = ({
   selectFields,
   sortBy = userSortBy.email,
-  sortOrder = 'ASC',
+  sortOrder = DbOrder.asc,
   includeSurveys = false,
   whereConditions = [],
 }) => {
   // check sort by parameters
-  const orderBy = orderByFieldBySortBy[sortBy] || 'email'
-  const orderByDirection = sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
+  const orderBy = orderByFieldBySortBy[sortBy] ?? 'email'
+  const orderByDirection = DbOrder.normalize(sortOrder)
 
   const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
 
@@ -156,7 +157,7 @@ const _usersSelectQuery = ({
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
     ${whereClause}
-    ORDER BY ${orderBy} ${orderByDirection}`
+    ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
 
 export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
@@ -177,7 +178,10 @@ export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
   await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
 }
 
-export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
+export const fetchUsersBySurveyId = async (
+  { surveyId, offset = 0, limit = null, includeSystemAdmins = false },
+  client = db
+) =>
   client.map(
     `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
@@ -190,7 +194,8 @@ export const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, c
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
-      AND (g.survey_uuid = s.uuid AND g.name <> '${AuthGroup.groupNames.systemAdmin}')
+      AND (g.survey_uuid = s.uuid AND g.name <> '${AuthGroup.groupNames.systemAdmin}'
+      ${includeSystemAdmins ? `OR g.name = '${AuthGroup.groupNames.systemAdmin}'` : ''})
     LEFT OUTER JOIN user_invitation ui
       ON u.uuid = ui.user_uuid
       AND s.uuid = ui.survey_uuid

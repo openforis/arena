@@ -48,9 +48,9 @@ const AccessRequest = () => {
             />
           ))}
           <div className="form-label required-field-label">{`* = ${i18n.t('common.requiredField')}`}</div>
-          <div className="recaptcha-wrapper">
-            <ReCaptcha ref={reCaptchaRef} />
-          </div>
+
+          <ReCaptcha ref={reCaptchaRef} />
+
           <div className="guest__buttons">
             <button type="submit" className="btn" onClick={onSubmit}>
               {i18n.t('accessRequestView.sendRequest')}

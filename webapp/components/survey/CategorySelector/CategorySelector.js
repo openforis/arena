@@ -110,11 +110,14 @@ export const CategorySelector = (props) => {
         itemValue={Category.keys.uuid}
         itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
+        validationTooltipPosition="top"
         selection={category}
         onChange={onChange}
       />
 
-      {showEdit && category && <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel />}
+      {showEdit && category && (
+        <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel variant="outlined" />
+      )}
 
       {showAdd && !disabled && (
         <ButtonMetaItemAdd

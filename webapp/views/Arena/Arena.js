@@ -26,9 +26,9 @@ const Arena = () => {
         <div className="main__system-error-container">
           <span className="error-message">
             <span className="icon icon-warning icon-24px icon-left" />
-            {i18n.t('systemErrors.networkError')}
+            {i18n.t('appErrors:networkError')}
           </span>
-          <span className="error-message__second-line">{i18n.t('systemErrors.sessionExpiredRefreshPage')}</span>
+          <span className="error-message__second-line">{i18n.t('appErrors.sessionExpiredRefreshPage')}</span>
           <ExpansionPanel className="error-details-panel" buttonLabel="common.details" startClosed>
             <textarea className="error-details-textarea" rows={10} defaultValue={systemError} readOnly />
           </ExpansionPanel>

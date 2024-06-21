@@ -27,7 +27,7 @@ export const init = (app) => {
         const validation = await UserValidator.validateInvitation(invitation)
 
         if (!Validation.isValid(validation)) {
-          res.json({ errorKey: 'appErrors.userInvalid' })
+          res.json({ errorKey: 'appErrors:userInvalid' })
           return
         }
       }
@@ -45,7 +45,7 @@ export const init = (app) => {
         })
         res.json({ skippedEmails })
       } catch (e) {
-        const errorKey = e.key || 'appErrors.generic'
+        const errorKey = e.key || 'appErrors:generic'
         const errorParams = e.params || { text: e.message }
         res.json({ errorKey, errorParams })
       }
@@ -86,7 +86,7 @@ export const init = (app) => {
           })
           res.json({ survey, userInvited, validation })
         } catch (e) {
-          const errorKey = e.key || 'appErrors.generic'
+          const errorKey = e.key || 'appErrors:generic'
           const errorParams = e.params || { text: e.message }
           res.json({ errorKey, errorParams })
         }
@@ -184,9 +184,16 @@ export const init = (app) => {
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, offset, limit } = Request.getParams(req)
+      const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId({ user, surveyId, offset, limit })
+      const list = await UserService.fetchUsersBySurveyId({
+        user,
+        surveyId,
+        offset,
+        limit,
+        onlyAccepted,
+        includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
+      })
 
       res.json({ list })
     } catch (error) {
@@ -300,7 +307,7 @@ export const init = (app) => {
     const validation = await UserValidator.validateUser(userToUpdate)
 
     if (!Validation.isValid(validation)) {
-      throw new SystemError('appErrors.userInvalid')
+      throw new SystemError('appErrors:userInvalid')
     }
 
     const { surveyId } = Request.getParams(req)

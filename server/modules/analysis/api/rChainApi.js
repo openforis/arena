@@ -1,12 +1,13 @@
-import * as Taxonomy from '../../../../core/survey/taxonomy'
-import * as Taxon from '../../../../core/survey/taxon'
-import * as ApiRoutes from '../../../../common/apiRoutes'
+import * as ApiRoutes from '@common/apiRoutes'
+import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
 
-import * as Request from '../../../utils/request'
-import * as Response from '../../../utils/response'
-import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import * as CategoryService from '../../category/service/categoryService'
-import * as TaxonomyService from '../../taxonomy/service/taxonomyService'
+import * as JobUtils from '@server/job/jobUtils'
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as AnalysisService from '../service'
 
 export const init = (app) => {
@@ -21,7 +22,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
+        const { token, surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
 
         Response.setContentTypeFile({ res, fileName: 'data.csv', contentType: Response.contentTypes.csv })
 
@@ -50,7 +53,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, chainUuid, attributeDefUuid } = Request.getParams(req)
+        const { token, surveyId, cycle, chainUuid, attributeDefUuid } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
 
         Response.setContentTypeFile({ res, fileName: 'data.csv', contentType: Response.contentTypes.csv })
 
@@ -70,11 +75,17 @@ export const init = (app) => {
 
   // ====== READ - Category items
   app.get(
-    ApiRoutes.rChain.categoryItemsCsv(':surveyId', ':categoryUuid'),
+    ApiRoutes.rChain.categoryItemsCsv({
+      surveyId: ':surveyId',
+      chainUuid: ':chainUuid',
+      categoryUuid: ':categoryUuid',
+    }),
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, language, draft } = Request.getParams(req)
+        const { surveyId, chainUuid, categoryUuid, language, draft, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
 
         await CategoryService.exportCategory({
           surveyId,
@@ -96,11 +107,17 @@ export const init = (app) => {
 
   // ====== READ - Taxonomy items
   app.get(
-    ApiRoutes.rChain.taxonomyItemsData(':surveyId', ':taxonomyUuid'),
+    ApiRoutes.rChain.taxonomyItemsData({
+      surveyId: ':surveyId',
+      chainUuid: ':chainUuid',
+      taxonomyUuid: ':taxonomyUuid',
+    }),
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, taxonomyUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, taxonomyUuid, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
 
         const taxonomy = await TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid)
         const extraPropKeys = Taxonomy.getExtraPropKeys(taxonomy)
@@ -139,12 +156,22 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const filePath = Request.getFilePath(req)
-        const { surveyId, cycle, chainUuid, entityDefUuid } = Request.getParams(req)
+        const { surveyId, cycle, chainUuid, entityDefUuid, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
+
         const user = Request.getUser(req)
 
-        await AnalysisService.persistResults({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath })
+        const job = AnalysisService.startPersistResultsJob({
+          user,
+          surveyId,
+          cycle,
+          entityDefUuid,
+          chainUuid,
+          filePath,
+        })
 
-        Response.sendOk(res)
+        res.json(JobUtils.jobToJSON(job))
       } catch (e) {
         next(e)
       }
@@ -153,11 +180,14 @@ export const init = (app) => {
 
   // ====== UPDATE - Chain
   app.put(
-    ApiRoutes.rChain.chainStatusExec(':surveyId', ':chainUuid'),
+    ApiRoutes.rChain.chainStatusExec({ surveyId: ':surveyId', chainUuid: ':chainUuid' }),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
+
         const { statusExec } = Request.getBody(req)
         const user = Request.getUser(req)
         await AnalysisService.updateChainStatusExec({ user, surveyId, chainUuid, statusExec })
@@ -170,11 +200,14 @@ export const init = (app) => {
   )
 
   app.put(
-    ApiRoutes.rChain.chainUserScripts(':surveyId', ':chainUuid'),
+    ApiRoutes.rChain.chainUserScripts({ surveyId: ':surveyId', chainUuid: ':chainUuid' }),
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, chainUuid } = Request.getParams(req)
+        const { surveyId, chainUuid, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
+
         const filePath = Request.getFilePath(req)
         const user = Request.getUser(req)
 

@@ -1,25 +1,14 @@
 .dashboard-sampling-point-data-summary {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
   .internal-container {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 2rem;
     gap: 2rem;
-  }
-  .legend {
-    display: flex;
-    flex-direction: column;
-
-    .row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-
-      .square {
-        width: 10px;
-        height: 10px;
-        border: 1px solid black;
-      }
-    }
   }
 }

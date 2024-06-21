@@ -22,9 +22,6 @@ import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
 import * as JobManager from '@server/job/jobManager'
-import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
-import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
-import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -37,6 +34,7 @@ import * as FileService from './fileService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import RecordsCloneJob from './recordsCloneJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -70,6 +68,7 @@ export const {
   fetchRecordCreatedCountsByUser,
   fetchRecordCountsByStep,
   updateRecordsStep,
+  updateRecordOwner,
 } = RecordManager
 
 export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
@@ -126,6 +125,13 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
     'warnings',
   ]
   return CSVWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
+}
+
+// Records export job
+export const startRecordsExportJob = ({ user, surveyId, recordUuids }) => {
+  const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids })
+  JobManager.executeJobThread(job)
+  return job
 }
 
 export const updateRecordStep = async (user, surveyId, recordUuid, stepId) => {
@@ -200,15 +206,17 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
     includeRootKeyValues: false,
     includePreview: true,
   })
-  const cycle = Record.getCycle(recordSummary)
+  if (recordSummary) {
+    const cycle = Record.getCycle(recordSummary)
 
-  if (Record.isPreview(recordSummary)) {
-    RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId, cycle, draft: true })
-    await RecordManager.deleteRecordPreview(surveyId, recordUuid)
-  } else {
-    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
-    if (Record.isEmpty(record)) {
-      await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
+    if (Record.isPreview(recordSummary)) {
+      RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId, cycle, draft: true })
+      await RecordManager.deleteRecordPreview(surveyId, recordUuid)
+    } else {
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
+      if (Record.isEmpty(record)) {
+        await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
+      }
     }
   }
   RecordsUpdateThreadService.dissocSocket({ recordUuid, socketId })
@@ -226,7 +234,13 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
   const objectTransformer = (item) => {
+    const nodeDef = RecordValidationReportItem.getNodeDef(survey)(item)
+    const name = NodeDef.getName(nodeDef)
+    const label = NodeDef.getLabel(nodeDef, lang)
     const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
+    const pathLabels = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.label })(
+      item
+    )
     const validation = RecordValidationReportItem.getValidation(item)
 
     const errors = ValidationUtils.getJointMessage({
@@ -245,6 +259,9 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
 
     return {
       path,
+      path_labels: pathLabels,
+      name,
+      label,
       errors,
       warnings,
       record_step: RecordValidationReportItem.getRecordStep(item),
@@ -256,6 +273,9 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   }
   const headers = [
     'path',
+    'path_labels',
+    'name',
+    'label',
     'errors',
     'warnings',
     'record_step',
@@ -268,49 +288,6 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   streamTransformer.pipe(res)
 
   await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
-}
-
-// DATA IMPORT
-export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
-  const job = new CollectDataImportJob({
-    user,
-    surveyId,
-    filePath,
-    deleteAllRecords,
-    cycle,
-    forceImport,
-  })
-  JobManager.executeJobThread(job)
-  return job
-}
-
-export const startCSVDataImportJob = ({
-  user,
-  surveyId,
-  filePath,
-  cycle,
-  nodeDefUuid,
-  dryRun = false,
-  insertNewRecords = false,
-  insertMissingNodes = false,
-  updateRecordsInAnalysis = false,
-  abortOnErrors = true,
-}) => {
-  const jobParams = {
-    user,
-    surveyId,
-    filePath,
-    cycle,
-    nodeDefUuid,
-    dryRun,
-    insertNewRecords,
-    insertMissingNodes,
-    updateRecordsInAnalysis,
-    abortOnErrors,
-  }
-  const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
-  JobManager.executeJobThread(job)
-  return job
 }
 
 // RECORDS CLONE
@@ -348,14 +325,14 @@ export const persistNode = async ({
       throw new SystemError('cannotInsertFileExceedingQuota') // do not provide details about available quota to the user
     }
     // Save file to "file" table and set fileUuid and fileName into node value
-    const fileObj = RecordFile.createFile(
-      Node.getFileUuid(node),
-      file.name,
-      file.size,
-      fs.readFileSync(file.tempFilePath),
+    const fileObj = RecordFile.createFile({
+      uuid: Node.getFileUuid(node),
+      name: file.name,
+      size: file.size,
+      content: fs.readFileSync(file.tempFilePath),
       recordUuid,
-      Node.getUuid(node)
-    )
+      nodeUuid: Node.getUuid(node),
+    })
     await FileService.insertFile(surveyId, fileObj)
   }
 

@@ -31,6 +31,15 @@ export {
   valuePropsTime,
 }
 
+const flagKeys = {
+  created: 'created',
+  updated: 'updated',
+  deleted: 'deleted',
+  dirty: 'dirty', // Modified by the user but not persisted yet
+}
+
+const flagKeysArray = Object.keys(flagKeys)
+
 export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
@@ -41,12 +50,15 @@ export const keys = {
   nodeDefUuid: ObjectUtils.keys.nodeDefUuid,
   value: 'value',
   meta: NodeMeta.keys.meta,
-  placeholder: 'placeholder',
 
-  created: 'created',
-  updated: 'updated',
-  deleted: 'deleted',
-  dirty: 'dirty', // Modified by the user but not persisted yet
+  // transient keys
+  placeholder: 'placeholder',
+  recordCycle: 'recordCycle',
+  recordStep: 'recordStep',
+  surveyUuid: 'surveyUuid',
+
+  // flags (used to update RDB)
+  ...flagKeys,
 }
 
 export const isValueProp = ({ nodeDef, prop }) => Boolean(R.path([NodeDef.getType(nodeDef), prop])(valuePropsByType))
@@ -148,6 +160,18 @@ export const { assocMeta, mergeMeta, assocChildApplicability, assocIsDefaultValu
 export const assocCreated = R.assoc(keys.created)
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
+export const removeFlags =
+  ({ sideEffect = false } = {}) =>
+  (node) => {
+    if (sideEffect) {
+      flagKeysArray.forEach((key) => {
+        delete node[key]
+      })
+      return node
+    } else {
+      return R.omit(flagKeysArray)(node)
+    }
+  }
 
 export const assocDateModified = R.assoc(keys.dateModified)
 

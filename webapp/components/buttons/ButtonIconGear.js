@@ -10,4 +10,5 @@ ButtonIconGear.propTypes = {
 
 ButtonIconGear.defaultProps = {
   ...Button.defaultProps,
+  variant: 'text',
 }

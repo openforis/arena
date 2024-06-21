@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import * as DbUtils from '@server/db/dbUtils'
 import * as NodeDef from '@core/survey/nodeDef'
-import { DB, BaseProtocol, TableNodeDef } from '@openforis/arena-server'
+import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-server'
 import { Objects } from '@openforis/arena-core'
 import {
   getSurveyDBSchema,
@@ -72,7 +72,8 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
   )
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
+
   return client.none(
     DbUtils.insertAllQuery(
       schema,
@@ -89,18 +90,23 @@ export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }
         'analysis',
         'virtual',
       ],
-      nodeDefs.map((nodeDef) => [
-        NodeDef.getParentUuid(nodeDef),
-        nodeDef.uuid,
-        NodeDef.getType(nodeDef),
-        backup ? NodeDef.getProps(nodeDef) : {},
-        backup ? NodeDef.getPropsDraft(nodeDef) : NodeDef.getProps(nodeDef),
-        backup ? NodeDef.getPropsAdvanced(nodeDef) : {},
-        backup ? NodeDef.getPropsAdvancedDraft(nodeDef) : NodeDef.getPropsAdvanced(nodeDef),
-        NodeDef.getMeta(nodeDef),
-        NodeDef.isAnalysis(nodeDef),
-        NodeDef.isVirtual(nodeDef),
-      ])
+      nodeDefs.map((nodeDef) => {
+        const { props, propsDraft, propsAdvanced, propsAdvancedDraft } = NodeDef.getAllPropsAndAllPropsDraft({
+          backup,
+        })(nodeDef)
+        return [
+          NodeDef.getParentUuid(nodeDef),
+          nodeDef.uuid,
+          NodeDef.getType(nodeDef),
+          props,
+          propsDraft,
+          propsAdvanced,
+          propsAdvancedDraft,
+          NodeDef.getMeta(nodeDef),
+          NodeDef.isAnalysis(nodeDef),
+          NodeDef.isVirtual(nodeDef),
+        ]
+      })
     )
   )
 }

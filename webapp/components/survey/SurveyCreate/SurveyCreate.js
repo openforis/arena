@@ -27,6 +27,10 @@ import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/compone
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
+
+const fileMaxSizeDefault = 1000 // 1GB
+const fileMaxSizeSystemAdmin = 2000 // 2GB
 
 const SurveyCreate = (props) => {
   const { showImport, submitButtonLabel, template } = props
@@ -34,6 +38,7 @@ const SurveyCreate = (props) => {
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
     useCreateSurvey({
@@ -58,6 +63,8 @@ const SurveyCreate = (props) => {
   useOnUpdate(() => {
     navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
+
+  const fileMaxSize = isSystemAdmin ? fileMaxSizeSystemAdmin : fileMaxSizeDefault
 
   return (
     <div className="home-survey-create">
@@ -149,16 +156,13 @@ const SurveyCreate = (props) => {
 
       {createType !== createTypes.import && (
         <div className="row">
-          <button
-            data-testid={TestId.surveyCreate.submitBtn}
-            type="button"
-            className="btn"
-            onClick={onCreate}
+          <Button
             disabled={createType === createTypes.clone && !cloneFrom}
-          >
-            <span className="icon icon-plus icon-left icon-12px" />
-            {i18n.t(submitButtonLabel)}
-          </button>
+            iconClassName="icon-plus icon-12px"
+            label={submitButtonLabel}
+            onClick={onCreate}
+            testId={TestId.surveyCreate.submitBtn}
+          />
         </div>
       )}
 
@@ -201,7 +205,7 @@ const SurveyCreate = (props) => {
                       ? { [contentTypes.zip]: ['.zip'] }
                       : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
                   }
-                  maxSize={1000}
+                  maxSize={fileMaxSize}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />

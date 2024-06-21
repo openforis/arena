@@ -2,7 +2,7 @@ import * as R from 'ramda'
 import * as camelize from 'camelize'
 import * as toSnakeCase from 'to-snake-case'
 
-import { Dates } from '@openforis/arena-core'
+import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { db } from '@server/db/db'
@@ -127,7 +127,7 @@ export const countRecordsBySurveyId = async (
 export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, client = db) => {
   const counts = await client.any(
     `
-        SELECT info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}' AS created_with, count(*)
+        SELECT COALESCE(info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}', '${AppInfo.arenaAppId}') AS created_with, count(*)
         FROM ${getSchemaSurvey(surveyId)}.record 
         WHERE preview = FALSE 
           ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
@@ -224,6 +224,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       ${DbUtils.selectDate('r.date_created', 'date_created')}, 
       ${DbUtils.selectDate('r.date_modified', 'date_modified')},
       r.validation,
+      r.info,
       s.uuid AS survey_uuid,
       u.name as owner_name
       ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
@@ -302,13 +303,17 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const fetchRecordsUuidAndCycle = async (surveyId, client = db) =>
-  client.any(`
+export const fetchRecordsUuidAndCycle = async ({ surveyId, recordUuidsIncluded = null }, client = db) =>
+  client.any(
+    `
     SELECT uuid, cycle 
     FROM ${getSchemaSurvey(surveyId)}.record 
     WHERE preview = FALSE
+    ${Objects.isEmpty(recordUuidsIncluded) ? '' : `AND uuid IN ($/recordUuidsIncluded:csv/)`}
     ORDER BY cycle
-  `)
+  `,
+    { recordUuidsIncluded }
+  )
 
 export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
   client.any(
@@ -417,12 +422,21 @@ export const updateRecordStep = async (surveyId, recordUuid, step, client = db) 
     [step, recordUuid]
   )
 
-export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid }, client = db) =>
+export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }, client = db) =>
   client.none(
     `
       UPDATE ${getSchemaSurvey(surveyId)}.record
-      SET owner_uuid = $1
-      WHERE owner_uuid = $2`,
+      SET owner_uuid = $/ownerUuid/
+      WHERE uuid = $/recordUuid/`,
+    { recordUuid, ownerUuid }
+  )
+
+export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid }, client = db) =>
+  client.none(
+    `
+    UPDATE ${getSchemaSurvey(surveyId)}.record
+    SET owner_uuid = $1
+    WHERE owner_uuid = $2`,
     [toOwnerUuid, fromOwnerUuid]
   )
 
@@ -434,6 +448,17 @@ export const updateRecordValidationsFromValues = async (surveyId, recordUuidAndV
       { name: 'uuid', cast: 'uuid' },
       [{ name: 'validation', cast: 'jsonb' }],
       recordUuidAndValidationValues
+    )
+  )
+
+export const updateRecordDateModifiedFromValues = async (surveyId, recordUuidAndDateModifiedValues, client = db) =>
+  client.none(
+    DbUtils.updateAllQuery(
+      getSchemaSurvey(surveyId),
+      'record',
+      { name: 'uuid', cast: 'uuid' },
+      [{ name: 'date_modified', cast: 'timestamp' }],
+      recordUuidAndDateModifiedValues
     )
   )
 

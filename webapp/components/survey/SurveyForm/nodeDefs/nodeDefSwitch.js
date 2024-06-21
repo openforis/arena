@@ -97,6 +97,7 @@ const NodeDefSwitch = (props) => {
 
   const renderAsForm = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
   const editButtonsVisible = edit && canEditDef && (renderAsForm || isHovering)
+  const handleMouseEvents = edit && canEditDef && !renderAsForm
 
   const updateNode = useCallback((...params) => dispatch(RecordActions.updateNode(...params)), [])
   const removeNode = useCallback((...params) => dispatch(RecordActions.removeNode(...params)), [])
@@ -107,18 +108,18 @@ const NodeDefSwitch = (props) => {
   const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
   const { canAddNode, nodes } = entryProps
 
-  const className = classNames(
-    'survey-form__node-def-page' + (NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'),
-    {
-      'not-applicable': !applicable,
-      hidden:
-        !applicable &&
-        NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
-        renderType !== NodeDefLayout.renderType.tableBody &&
-        empty,
-      'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
-    }
-  )
+  const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
+  const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
+
+  const className = classNames(mainClassName, {
+    'not-applicable': !applicable,
+    hidden:
+      !applicable &&
+      NodeDefLayout.isHiddenWhenNotRelevant(surveyCycleKey)(nodeDef) &&
+      renderType !== NodeDefLayout.renderType.tableBody &&
+      empty,
+    'read-only': NodeDef.isReadOnly(nodeDef) && renderType !== NodeDefLayout.renderType.tableHeader,
+  })
 
   const checkNodePlaceholder = useCallback(() => {
     if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
@@ -159,6 +160,7 @@ const NodeDefSwitch = (props) => {
     readOnly,
     label,
     lang,
+    createNodePlaceholder,
     updateNode,
     removeNode,
   }
@@ -168,9 +170,9 @@ const NodeDefSwitch = (props) => {
       className={className}
       data-testid={TestId.surveyForm.nodeDefWrapper(NodeDef.getName(nodeDef))}
       ref={elementRef}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseEnter}
+      onMouseEnter={handleMouseEvents ? onMouseEnter : undefined}
+      onMouseLeave={handleMouseEvents ? onMouseLeave : undefined}
+      onMouseMove={handleMouseEvents ? onMouseEnter : undefined}
     >
       {editButtonsVisible && (
         <NodeDefEditButtons surveyCycleKey={surveyCycleKey} nodeDef={nodeDef} edit={edit} canEditDef={canEditDef} />

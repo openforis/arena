@@ -48,6 +48,7 @@ export const getMaxSurveysUserCanCreate = (user) => {
 export const canViewSurvey = (user, surveyInfo) =>
   User.isSystemAdmin(user) || _hasAuthGroupForSurvey({ user, surveyInfo })
 export const canExportSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canExportSurveysList = (user) => User.isSystemAdmin(user)
 export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
@@ -69,23 +70,25 @@ export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
 
 // UPDATE
 export const canEditRecord = (user, record) => {
-  if (!(user && record)) {
+  if (
+    !user ||
+    !record ||
+    // records in analysis cannot be edited
+    Record.isInAnalysisStep(record)
+  ) {
     return false
   }
-
+  // system admin does not have an auth group associated to the survey, but he can always edit records;
   if (User.isSystemAdmin(user)) {
     return true
   }
-
-  const recordDataStep = Record.getStep(record)
-
+  // if user doesn't have an auth group associated to the survey, he cannot edit records
   const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Record.getSurveyUuid(record) })(user)
   if (!userAuthGroup) return false
 
-  // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
+  // Level = 'all' or 'own'. If 'own', user can only edit records assigned to him
   // If 'all', he can edit all survey's records
-  const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
-
+  const level = AuthGroup.getRecordEditLevel(Record.getStep(record))(userAuthGroup)
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
@@ -113,12 +116,6 @@ export const canUseExplorer = canCleanseRecords
 // ======
 
 export const canUseMap = canAnalyzeRecords
-
-// ======
-// ====== Charts
-// ======
-
-export const canUseCharts = (user, _surveyInfo) => User.isSystemAdmin(user)
 
 // ======
 // ====== Users
@@ -165,7 +162,7 @@ export const canEditUser = (user, surveyInfo, userToUpdate) =>
   User.hasAccepted(userToUpdate) &&
   (User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate))
 
-export const canEditUserEmail = _hasUserEditAccess
+export const canEditUserEmail = (user) => User.isSystemAdmin(user)
 
 export const canEditUserGroup = (user, surveyInfo, userToUpdate) =>
   !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)

@@ -16,6 +16,7 @@ export {
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
+  updateCategoryItemProp,
 } from './categories'
 export { fetchChains, getChainSummaryExportUrl } from './analysis'
 
@@ -37,13 +38,22 @@ export {
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
   updateRecordsStep,
+  updateRecordOwner,
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordsCountByStep,
+  fetchRecordSummary,
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
 } from './data'
+export {
+  insertDataQuerySummary,
+  fetchDataQuerySummary,
+  fetchDataQuerySummaries,
+  updateDataQuerySummary,
+  deleteDataQuerySummary,
+} from './dataQuery'
 export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export {
   fetchSurveyFull,
@@ -71,8 +81,9 @@ export {
   createAccessRequest,
   acceptAccessRequest,
   fetchUser,
-  fetchUserName,
   fetchUserResetPasswordUrl,
+  fetchUserName,
+  fetchUsersBySurvey,
   fetchUserSurveys,
   changeUserPassword,
 } from './user'

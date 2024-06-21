@@ -1,3 +1,5 @@
+import { Surveys } from '@openforis/arena-core'
+
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 import * as Survey from '@core/survey/survey'
@@ -6,6 +8,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -73,7 +76,22 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     if (!NodeDef.isCode(nodeDef)) return ''
 
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-    return Category.getName(category) || ''
+    if (!category) return ''
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+    let levelNameSuffix = ''
+    if (levelIndex > 0) {
+      const level = Category.getLevelByIndex(levelIndex)(category)
+      const levelName = CategoryLevel.getName(level)
+      levelNameSuffix = `[${levelName}]`
+    }
+    const categoryName = Category.getName(category)
+    return `${categoryName}${levelNameSuffix}`
+  }
+
+  const getParentCodeAttribute = (nodeDef) => {
+    if (!NodeDef.isCode(nodeDef)) return ''
+    const parentCodeAttribute = Survey.getNodeDefParentCode(nodeDef)(survey)
+    return parentCodeAttribute ? NodeDef.getName(parentCodeAttribute) : ''
   }
 
   const getTaxonomyName = (nodeDef) => {
@@ -91,6 +109,8 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     const relevantExpressions = NodeDef.getApplicable(nodeDef)
     const relevantIf = relevantExpressions.length > 0 ? NodeDefExpression.getExpression(relevantExpressions[0]) : ''
 
+    const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
+
     return {
       uuid,
       name: NodeDef.getName(nodeDef),
@@ -104,11 +124,16 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       type,
       key: String(NodeDef.isKey(nodeDef)),
       categoryName: getCategoryName(nodeDef),
+      parentCode: getParentCodeAttribute(nodeDef),
+      enumerator,
       taxonomyName: getTaxonomyName(nodeDef),
       multiple: String(NodeDef.isMultiple(nodeDef)),
       readOnly: String(NodeDef.isReadOnly(nodeDef)),
-      hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+      fileType: NodeDef.isFile(nodeDef) ? NodeDef.getFileType(nodeDef) : '',
+      maxFileSize: NodeDef.isFile(nodeDef) ? String(NodeDef.getMaxFileSize(nodeDef)) : '',
       hiddenInForm: String(NodeDef.isHidden(nodeDef)),
+      hiddenInMobile: String(NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)),
+      includedInMultipleEntitySummary: String(NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef)),
       allowOnlyDeviceCoordinate: String(NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)),
       relevantIf,
       hiddenWhenNotRelevant: String(NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef)),
@@ -118,6 +143,8 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
+      minCount: String(NodeDefValidations.getMinCount(NodeDef.getValidations(nodeDef))),
+      maxCount: String(NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }

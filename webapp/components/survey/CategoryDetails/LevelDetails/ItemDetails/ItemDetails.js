@@ -1,6 +1,6 @@
 import './itemDetails.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -24,7 +24,7 @@ import classNames from 'classnames'
 import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
 
 const ItemDetails = (props) => {
-  const { level, index, item, state, setState } = props
+  const { level, index, item: itemProp, state, setState } = props
 
   const elemRef = useRef(null)
   const isInitialMount = useRef(true)
@@ -32,6 +32,8 @@ const ItemDetails = (props) => {
   const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
   const lang = useSurveyPreferredLang()
+
+  const [item, setItem] = useState(itemProp)
 
   const category = State.getCategory(state)
   const categoryUuid = Category.getUuid(category)
@@ -54,7 +56,13 @@ const ItemDetails = (props) => {
 
   const setActive = () => (active ? null : Actions.setItemActive({ categoryUuid, levelIndex, itemUuid }))
 
-  const updateProp = ({ key, value }) => Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
+  const updateProp = useCallback(
+    ({ key, value }) => {
+      setItem(CategoryItem.assocProp({ key, value }))
+      Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
+    },
+    [Actions, categoryUuid, itemUuid, levelIndex]
+  )
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -149,7 +157,7 @@ const ItemDetails = (props) => {
           <div>
             {'\u00A0'}-{'\u00A0'}
           </div>
-          <div className="ellipsis">{CategoryItem.getLabel(lang)(item)}</div>
+          <div className="ellipsis">{CategoryItem.getLabel(lang, false)(item)}</div>
         </>
       )}
     </div>

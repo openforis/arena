@@ -17,10 +17,10 @@ import * as RecordUniquenessValidator from './recordUniquenessValidator'
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
 
-export const mergeAndPersistValidation = async (survey, record, nodesValidation, tx) => {
+export const mergeAndPersistValidation = async ({ survey, record, nodesValidation }, tx) => {
   const recordValidationUpdated = R.pipe(
     Record.getValidation,
-    Validation.mergeValidation(nodesValidation),
+    Validation.mergeValidation(nodesValidation, true),
     Validation.updateCounts
   )(record)
 
@@ -47,9 +47,10 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
   const nodesValueValidation = await RecordValidator.validateNodes({ survey, record, nodes })
   const nodesValueValidationsByUuid = Validation.getFieldValidations(nodesValueValidation)
   // 1.a. workaraound: always define value field validation even when validation is valid to allow cleaning up errors later
-  Object.values(nodesValueValidationsByUuid).forEach((nodeValueValidation) => {
+  Object.entries(nodesValueValidationsByUuid).forEach(([nodeUuid, nodeValueValidation]) => {
     if (Validation.isValid(nodeValueValidation)) {
-      Validation.setField('value', Validation.newInstance())(nodeValueValidation)
+      const nodeValueValidationUpdated = Validation.setField('value', Validation.newInstance())(nodeValueValidation)
+      nodesValueValidationsByUuid[nodeUuid] = nodeValueValidationUpdated
     }
   })
 
@@ -73,8 +74,8 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
 
   // 5. merge unique nodes validation with nodes values validation
   const uniqueNodesValidationWithValueValidationByUuid = Validation.mergeFieldValidations(
-    uniqueNodesValidationMergedByUuid,
-    nodesValueValidationsByUuid
+    nodesValueValidationsByUuid,
+    uniqueNodesValidationMergedByUuid
   )
 
   // 6. generate full validation object
@@ -82,12 +83,12 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
     ...nodesValueValidationsByUuid,
     ...uniqueNodesValidationWithValueValidationByUuid,
   }
-  const validation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
+  const nodesValidation = Validation.recalculateValidity(Validation.newInstance(true, fullNodesValidationByUuid))
 
   // 7. persist validation
-  await mergeAndPersistValidation(survey, record, validation, tx)
+  await mergeAndPersistValidation({ survey, record, nodesValidation }, tx)
 
-  return validation
+  return nodesValidation
 }
 
 export const validateRecordsUniquenessAndPersistValidation = async (
@@ -106,13 +107,10 @@ export const validateRecordsUniquenessAndPersistValidation = async (
     },
     t
   )
-
-  await Promise.all(
-    Object.entries(validationByRecord).map(async ([recordUuid, nodesValidation]) => {
-      const recordToUpdate = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
-      await mergeAndPersistValidation(survey, recordToUpdate, nodesValidation, t)
-    })
-  )
+  for await (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
+    const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
+    await mergeAndPersistValidation({ survey, record, nodesValidation }, t)
+  }
 }
 
 export const validateRecordKeysUniquenessAndPersistValidation = async (

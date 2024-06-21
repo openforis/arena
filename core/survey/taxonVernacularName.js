@@ -23,7 +23,7 @@ export const newTaxonVernacularName = (lang, name) => ({
 })
 
 // ===== READ
-export const { getProps, getPropsDraft, getUuid } = ObjectUtils
+export const { getProps, getPropsDraft, getPropsAndPropsDraft, getUuid } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name)
 export const getLang = ObjectUtils.getProp(keysProps.lang)
 

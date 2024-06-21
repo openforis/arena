@@ -44,6 +44,11 @@ export const getCycle = R.prop(keys.cycle)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
 export const getInfo = R.propOr({}, keys.info)
+export const getCreatedWithAppId = (record) => {
+  const info = getInfo(record)
+  const createdWith = info[infoKeys.createdWith]
+  return AppInfo.getAppId(createdWith)
+}
 
 export const { getNodes, getNodesArray, getNodeByUuid, getRootNode, getNodesByDefUuid } = RecordReader
 

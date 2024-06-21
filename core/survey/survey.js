@@ -122,7 +122,6 @@ export const {
   getDatePublished,
   isPublished,
   isDraft,
-  isValid,
   isFromCollect,
   isRdbInitialized,
   getCollectUri,
@@ -135,6 +134,8 @@ export const {
   getProps,
   getPropsDraft,
   getFilesStatistics,
+  isValid,
+  canHaveRecords,
 } = SurveyInfo
 
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
@@ -168,6 +169,7 @@ export const {
   findNodeDef,
   getNodeDefAreaBasedEstimate,
   getAreaBasedEstimatedOfNodeDef,
+  getNodeDefMaxDecimalDigits,
 } = SurveyNodeDefs
 
 // Hierarchy
@@ -265,7 +267,8 @@ export const {
 } = SurveyCategories
 
 // ====== Taxonomies
-export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
+export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies, isTaxonomyUnused } =
+  SurveyTaxonomies
 
 // ====== Survey Reference data index
 // Category index

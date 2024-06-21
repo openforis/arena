@@ -7,13 +7,12 @@ import FileZip from '@server/utils/file/fileZip'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordStep from '@core/record/recordStep'
-import { ValidationUtils } from '@core/validation/validationUtils'
-import i18n from '@core/i18n/i18nFactory'
 
 import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as Chain from '@common/analysis/chain'
 
+import * as JobManager from '@server/job/jobManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -24,8 +23,8 @@ import * as AnalysisManager from '../../manager'
 import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
 
-export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl }) =>
-  new RChain(surveyId, cycle, chainUuid, serverUrl).init()
+export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
+  new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
 export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
@@ -52,20 +51,17 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
     columnNodeDefs: true,
     includeFileAttributeDefs: false,
     addCycle: true,
+    nullsToEmpty: true,
     streamOutput: res,
   })
 }
 
 // ==== UPDATE
 
-export const persistResults = async ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
-  await job.start()
-  if (job.isFailed()) {
-    const validationError = job.getError()
-    const errorMessage = ValidationUtils.getJointMessage({ i18n })(validationError)
-    throw new Error(`error persisting results: ${errorMessage}`)
-  }
+  JobManager.executeJobThread(job)
+  return job
 }
 
 const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {
@@ -84,7 +80,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
   const fileZip = new FileZip(filePath)
   await fileZip.init()
 
-  const entryNames = fileZip.getEntryNames()
+  const entryNames = fileZip.getEntryNames({ onlyFirstLevel: false })
 
   const findEntry = ({ folderNames = [RChain.dirNames.user, RChain.dirNames.sampling], name }) =>
     entryNames.find((entryName) =>
@@ -132,7 +128,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
           const script = getZipEntryAsText(scriptEntryName)
 
           await NodeDefManager.updateNodeDefProps(
-            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script } },
+            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
             tx
           )
         })

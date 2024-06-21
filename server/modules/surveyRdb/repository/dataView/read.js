@@ -4,6 +4,8 @@ import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
 
+import { quote } from '@core/stringUtils'
+
 import { db } from '../../../../db/db'
 import * as dbUtils from '../../../../db/dbUtils'
 
@@ -59,19 +61,11 @@ const _selectFieldsByNodeDefType =
   ({ viewDataNodeDef, streamMode }) =>
   (nodeDefCol) => {
     const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const { name: alias, names, nameFull, namesFull, nodeDef } = columnNodeDef
+    const { name: alias, names, nameFull, namesFull } = columnNodeDef
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
       return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
-    }
-    if (
-      NodeDef.isCode(nodeDef) &&
-      NodeDef.isMultiple(nodeDef) &&
-      !NodeDef.isMultipleAttribute(viewDataNodeDef.nodeDef)
-    ) {
-      // include code attribute label column only if the view is relative to the multiple attribute
-      return nameFull
     }
     return namesFull
   }
@@ -429,7 +423,7 @@ export const fetchRecordsCountByRootNodesValue = async (
       ON ${filterColumns.map((keyCol) => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
     JOIN ${schema}.node n
       ON n.record_uuid = r.record_uuid
-      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
+      AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => quote(NodeDef.getUuid(nodeDefKey))).join(', ')})
     WHERE
       ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $/cycle/
       AND ${filterCondition}

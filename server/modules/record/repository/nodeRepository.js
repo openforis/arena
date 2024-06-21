@@ -2,16 +2,17 @@ import * as R from 'ramda'
 
 import { Dates } from '@openforis/arena-core'
 
+import { Schemata } from '@common/model/db'
+
 import * as A from '@core/arena'
-
-import { db } from '@server/db/db'
-import * as DbUtils from '@server/db/dbUtils'
-
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
+
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
 
@@ -34,9 +35,19 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 
 // ============== UTILS
 
+// cache of camelized keys
+const nodeKeyByColumnName = {}
+
 const dbTransformCallback = (node) => {
-  // do not camelize meta properties
-  A.camelizePartial({ skip: [Node.keys.meta], sideEffect: true })(node)
+  // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
+  // (do not camelize meta properties)
+  Object.entries(node).forEach(([columnName, value]) => {
+    const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
+    if (nodeKey !== columnName) {
+      node[nodeKey] = value
+      delete node[columnName]
+    }
+  })
   // cast id to Number
   node.id = Number(node.id)
   return node
@@ -118,6 +129,28 @@ export const getNodeSelectQuery = ({
   return `SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
 }
 
+export const countNodesWithMissingFile = async ({ surveyId, recordUuid = null }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const whereConditions = [
+    `n.value IS NOT NULL`,
+    `(n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
+  ]
+  if (recordUuid) {
+    whereConditions.push(`n.record_uuid = $/recordUuid/`)
+  }
+  const whereClause = DbUtils.getWhereClause(...whereConditions)
+  return client.one(
+    `SELECT COUNT(n.*) 
+    FROM ${schema}.node n 
+      JOIN ${schema}.node_def nd 
+        ON n.node_def_uuid = nd.uuid 
+        AND nd.type = '${NodeDef.nodeDefType.file}'
+    ${whereClause}`,
+    { recordUuid },
+    (row) => Number(row.count)
+  )
+}
+
 // ============== CREATE
 
 export const insertNode = async (surveyId, node, draft, client = db) => {
@@ -182,17 +215,11 @@ export const fetchNodesByRecordUuid = async (
   client = db
 ) =>
   client.map(
-    `
-    ${getNodeSelectQuery({ surveyId, includeRefData, draft, excludeRecordUuid: true })}
+    `${getNodeSelectQuery({ surveyId, includeRefData, draft })}
     WHERE n.record_uuid = $1
-    order by n.date_created
-    `,
+    ORDER BY n.date_created`,
     [recordUuid],
-    (row) => {
-      const rowTransformed = dbTransformCallback(row)
-      rowTransformed.recordUuid = recordUuid
-      return rowTransformed
-    }
+    dbTransformCallback
   )
 
 export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>

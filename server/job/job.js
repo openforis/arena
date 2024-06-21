@@ -1,3 +1,4 @@
+import pgPromise from 'pg-promise'
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import { db } from '@server/db/db'
@@ -43,7 +44,7 @@ export default class Job {
     this.startTime = null
     this.endTime = null
     this.total = 0
-    this.processed = 0
+    this._processed = 0
     this.result = {}
     this.errors = {}
     this.innerJobs = innerJobs
@@ -64,7 +65,7 @@ export default class Job {
    * otherwise the "execute' method will be invoked.
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
-   * @param client
+   * @param {pgPromise.IDatabase} [client=db] - The database client.
    */
   async start(client = db) {
     this.logDebug('start')
@@ -85,7 +86,7 @@ export default class Job {
         // Error found, change status only if not changed already
         this.logError(`${error.stack || error}`)
         const isSystemError = error instanceof SystemError || error instanceof CoreSystemError
-        const errorKey = `appErrors.${isSystemError ? error.key : 'generic'}`
+        const errorKey = `appErrors:${isSystemError ? error.key : 'generic'}`
         const errorParams = isSystemError ? error.params : { text: error.toString() }
         this.addError({
           error: {
@@ -210,14 +211,16 @@ export default class Job {
     }
   }
 
-  incrementProcessedItems(incrementBy = 1) {
-    this.processed += incrementBy
-
+  notifyProgress() {
     throttle(
       async () => this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId(),
       1000
     )()
+  }
+
+  incrementProcessedItems(incrementBy = 1) {
+    this.processed = this.processed + incrementBy
   }
 
   /**
@@ -240,6 +243,18 @@ export default class Job {
 
   generateResult() {
     return {}
+  }
+
+  combineInnerJobsResults() {
+    const results = {}
+    this.innerJobs.forEach((innerJob) => Object.assign(results, innerJob.result ?? {}))
+    return results
+  }
+
+  combineInnerJobsErrors() {
+    const errors = {}
+    this.innerJobs.forEach((innerJob) => Object.assign(errors, innerJob.errors ?? {}))
+    return errors
   }
 
   /**
@@ -302,6 +317,15 @@ export default class Job {
 
   set stopOnInnerJobFailure(value) {
     this._stopOnInnerJobFailure = value
+  }
+
+  get processed() {
+    return this._processed
+  }
+
+  set processed(processedItems) {
+    this._processed = processedItems
+    this.notifyProgress()
   }
 
   getCurrentInnerJob() {

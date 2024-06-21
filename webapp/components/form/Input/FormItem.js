@@ -1,14 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { ButtonIconInfo } from '@webapp/components/buttons'
+
 export const FormItem = (props) => {
-  const { children, className, label, required } = props
+  const { children, className, info, label, required } = props
 
   return (
     <div className={`form-item ${className}`}>
       <div className="form-label">
-        {label}
-        {required ? ' *' : ''}
+        <div className="form-label-wrapper">
+          {label}
+          {required ? ' *' : ''}
+          {info && <ButtonIconInfo title={info} />}
+        </div>
       </div>
       {children}
     </div>
@@ -18,12 +23,14 @@ export const FormItem = (props) => {
 FormItem.propTypes = {
   className: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  info: PropTypes.string,
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   required: PropTypes.bool,
 }
 
 FormItem.defaultProps = {
   className: '',
+  info: null,
   label: null,
   required: false,
 }

@@ -1,10 +1,11 @@
-import * as JobManager from '@server/job/jobManager'
-import * as JobUtils from '@server/job/jobUtils'
-import * as SurveyManager from '../manager/surveyManager'
+import * as DateUtils from '@core/dateUtils'
 
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import * as JobManager from '@server/job/jobManager'
+import * as JobUtils from '@server/job/jobUtils'
+import * as CSVWriter from '@server/utils/file/csvWriter'
 
-import ExportCsvDataJob from './export/exportCsvDataJob'
+import * as SurveyManager from '../manager/surveyManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
@@ -43,44 +44,58 @@ export const exportSurvey = ({ surveyId, user, includeData = false, includeActiv
   return { job: JobUtils.jobToJSON(job), outputFileName }
 }
 
+export const exportSurveysList = async ({ user, draft, template, outputStream }) => {
+  const items = await fetchUserSurveysInfo({
+    user,
+    draft,
+    template,
+    includeCounts: true,
+    includeOwnerEmailAddress: true,
+  })
+  const fields = [
+    'id',
+    'uuid',
+    'name',
+    'label',
+    'status',
+    'dateCreated',
+    'dateModified',
+    'datePublished',
+    'ownerName',
+    'ownerEmail',
+    'nodeDefsCount',
+    'recordsCount',
+    'chainsCount',
+    'filesCount',
+    'filesSize',
+    'filesMissing',
+  ]
+
+  const objectTransformer = (surveySummary) =>
+    Object.entries(surveySummary).reduce((acc, [key, value]) => {
+      const valueTransformed = key.startsWith('date')
+        ? DateUtils.convertDate({
+            dateStr: value,
+            formatFrom: DateUtils.formats.datetimeISO,
+            formatTo: DateUtils.formats.datetimeExport,
+          })
+        : value
+      acc[key] = valueTransformed
+      return acc
+    }, {})
+
+  await CSVWriter.writeItemsToStream({
+    outputStream,
+    items,
+    fields,
+    options: { objectTransformer, removeNewLines: false },
+  })
+}
+
 export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget, cycle })
   JobManager.executeJobThread(job)
   return JobUtils.jobToJSON(job)
-}
-
-export const startExportCsvDataJob = ({
-  user,
-  surveyId,
-  cycle,
-  recordUuids,
-  search,
-  includeCategories,
-  includeCategoryItemsLabels,
-  expandCategoryItems,
-  includeAncestorAttributes,
-  includeAnalysis,
-  includeDataFromAllCycles,
-  includeFiles,
-}) => {
-  const job = new ExportCsvDataJob({
-    user,
-    surveyId,
-    cycle,
-    recordUuids,
-    search,
-    includeCategories,
-    includeCategoryItemsLabels,
-    expandCategoryItems,
-    includeAncestorAttributes,
-    includeAnalysis,
-    includeDataFromAllCycles,
-    includeFiles,
-  })
-
-  JobManager.executeJobThread(job)
-
-  return job
 }
 
 export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>

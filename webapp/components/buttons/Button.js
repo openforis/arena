@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react'
+import { Button as MuiButton } from '@mui/material'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -8,20 +9,26 @@ import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {
   const {
+    active,
     children,
     className,
-    disabled,
+    color,
+    disabled = false,
     iconClassName,
     id,
-    isTitleMarkdown,
+    isTitleMarkdown = false,
     label: labelProp,
     labelParams,
     onClick,
-    showLabel,
-    size,
+    primary,
+    secondary,
+    showIcon = true,
+    showLabel = true,
+    size = 'medium',
     testId,
     title: titleProp,
     titleParams,
+    variant: variantProp = 'contained',
     ...otherProps
   } = props
 
@@ -34,24 +41,32 @@ export const Button = forwardRef((props, ref) => {
       ? i18n.t(labelProp, labelParams)
       : null
 
+  const variant = active ? 'contained' : variantProp
+
   const btn = (
-    <button
+    <MuiButton
       ref={ref}
       id={id}
+      className={classNames('btn', className, {
+        'btn-s': size === 'small',
+        'btn-primary': primary,
+        'btn-secondary': secondary,
+      })}
+      color={color}
       data-testid={testId}
       disabled={disabled ? disabled : undefined}
-      aria-disabled={disabled ? disabled : undefined}
-      type="button"
-      className={classNames('btn', className, { 'btn-s': size === 'small' })}
       onClick={onClick}
+      variant={variant}
       {...otherProps}
     >
-      {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
+      {showIcon && iconClassName && (
+        <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />
+      )}
       {label}
       {children}
-    </button>
+    </MuiButton>
   )
-  if (Objects.isEmpty(title)) {
+  if (Objects.isEmpty(title) || disabled) {
     return btn
   }
   return (
@@ -62,8 +77,10 @@ export const Button = forwardRef((props, ref) => {
 })
 
 Button.propTypes = {
+  active: PropTypes.bool,
   children: PropTypes.node,
   className: PropTypes.string,
+  color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
   iconClassName: PropTypes.string,
@@ -71,26 +88,21 @@ Button.propTypes = {
   label: PropTypes.string,
   labelParams: PropTypes.object,
   onClick: PropTypes.func,
+  primary: PropTypes.bool,
+  secondary: PropTypes.bool,
+  showIcon: PropTypes.bool,
   showLabel: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   testId: PropTypes.string,
   title: PropTypes.string,
   titleParams: PropTypes.object,
+  variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
 
 Button.defaultProps = {
-  children: null,
-  className: null,
   disabled: false,
-  iconClassName: null,
-  id: null,
   isTitleMarkdown: false,
-  label: null,
-  labelParams: null,
-  onClick: null,
   showLabel: true,
   size: 'medium',
-  testId: null,
-  title: null,
-  titleParams: null,
+  variant: 'contained',
 }

@@ -47,6 +47,7 @@ const plugins = [
   ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
     filename: 'styles-[fullhash].css',
+    ignoreOrder: true,
   }),
   new HtmlWebpackPlugin({
     template: './web-resources/index.html',
@@ -60,6 +61,7 @@ const plugins = [
         APPLICATION_VERSION: gitRevisionPlugin
           ? JSON.stringify(gitRevisionPlugin.version())
           : JSON.stringify(process.env.APP_VERSION),
+        RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
       },
     },

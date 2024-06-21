@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -12,6 +13,7 @@ import { useTable } from './useTable'
 
 const Table = (props) => {
   const {
+    cellProps,
     cellTestIdExtractor,
     className,
     columns,
@@ -34,6 +36,7 @@ const Table = (props) => {
     headerProps,
     rowProps,
     selectable,
+    selectOnClick,
     showFooter,
     showHeader,
     visibleColumnsSelectionEnabled,
@@ -53,6 +56,7 @@ const Table = (props) => {
     totalCount,
     initData,
     onRowClick,
+    onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
     visibleColumnKeys,
@@ -65,6 +69,7 @@ const Table = (props) => {
     onRowClick: onRowClickProp,
     restParams,
     selectable,
+    selectOnClick,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -72,7 +77,7 @@ const Table = (props) => {
   }
 
   return (
-    <div className={`table ${className}`}>
+    <div className={classNames('table', className, { 'with-footer': showFooter })}>
       {showHeader && (
         <Header
           columns={columns}
@@ -93,6 +98,7 @@ const Table = (props) => {
       )}
 
       <Content
+        cellProps={cellProps}
         cellTestIdExtractor={cellTestIdExtractor}
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
@@ -109,6 +115,7 @@ const Table = (props) => {
         offset={offset}
         onRowClick={onRowClick}
         onRowDoubleClick={onRowDoubleClick}
+        onRowsScroll={onRowsScroll}
         rowComponent={rowComponent}
         rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}
@@ -128,6 +135,7 @@ const Table = (props) => {
 const DummyComponent = () => <div />
 
 Table.propTypes = {
+  cellProps: PropTypes.object,
   cellTestIdExtractor: PropTypes.func,
   className: PropTypes.string,
   columns: PropTypes.array,
@@ -150,12 +158,14 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
+  selectOnClick: PropTypes.bool,
   showFooter: PropTypes.bool,
   showHeader: PropTypes.bool,
   visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
 }
 
 Table.defaultProps = {
+  cellProps: {},
   cellTestIdExtractor: null,
   className: '',
   columns: null,
@@ -177,6 +187,7 @@ Table.defaultProps = {
   rowExpandedComponent: DummyComponent,
   rowProps: {},
   selectable: true,
+  selectOnClick: true,
   showFooter: true,
   showHeader: true,
   visibleColumnsSelectionEnabled: false,

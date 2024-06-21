@@ -7,5 +7,31 @@
       pointer-events: none;
       top: 0.5rem;
     }
+    .date-created-col {
+      display: flex;
+      align-items: center;
+
+      .app-icon {
+        margin: 2px;
+      }
+    }
+    .files-col {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.2rem;
+    }
+    .record-owner-col {
+      width: fit-content;
+      margin: auto;
+      &.editing {
+        width: 100%;
+      }
+    }
+    .action-buttons-col {
+      display: flex;
+      width: 100%;
+    }
   }
 }

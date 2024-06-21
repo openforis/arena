@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -16,9 +17,12 @@ const NodeDefFormItem = (props) => {
     return nodeDefComponent
   }
 
+  const autoResize = NodeDef.isCode(nodeDef)
+  const containerClassName = classNames('survey-form__node-def-multiple-container', { 'auto-resize': autoResize })
+
   const formItemContent =
     entry && NodeDef.isMultiple(nodeDef) ? (
-      <div className="survey-form__node-def-multiple-container">{nodeDefComponent}</div>
+      <div className={containerClassName}>{nodeDefComponent}</div>
     ) : (
       nodeDefComponent
     )

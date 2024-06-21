@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
 import Table from '@webapp/components/Table'
@@ -15,12 +16,17 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { Button, ButtonDelete, ButtonIconEditOrView } from '@webapp/components'
+import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components'
 
 import TableHeaderLeft from './TableHeaderLeft'
 
 import { State, useActions, useLocalState } from './store'
 
+const getType = ({ category }) => {
+  if (Category.isReportingData(category)) return 'reportingData'
+  if (Category.isHierarchical(category)) return 'hierarchical'
+  return 'flat'
+}
 const CategoryList = (props) => {
   const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
 
@@ -55,11 +61,7 @@ const CategoryList = (props) => {
       key: 'type',
       header: 'common.type',
       renderItem: ({ item: category }) => {
-        const type = Category.isReportingData(category)
-          ? 'reportingData'
-          : Category.isHierarchical(category)
-          ? 'hierarchical'
-          : 'flat'
+        const type = getType({ category })
         return i18n.t(`categoryList.types.${type}`)
       },
       width: '10rem',
@@ -71,6 +73,16 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) =>
         Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
       width: '8rem',
+    },
+    // Items count
+    {
+      key: 'itemsCount',
+      header: 'categoryList.itemsCount',
+      renderItem: ({ item: category }) => {
+        const levels = Category.getLevelsArray(category)
+        return levels.map((level) => CategoryLevel.getItemsCount(level)).join(' / ')
+      },
+      width: '10rem',
     },
   ]
 
@@ -124,7 +136,7 @@ const CategoryList = (props) => {
   columns.push({
     key: 'details',
     renderItem: ({ item: category }) => (
-      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} />
+      <ButtonIconEditOrView onClick={() => Actions.edit({ category })} canEdit={canEdit} size="small" />
     ),
     width: '75px',
   })
@@ -135,7 +147,7 @@ const CategoryList = (props) => {
       {
         key: 'delete',
         renderItem: ({ initData, item: category }) => (
-          <ButtonDelete size="small" onClick={() => Actions.delete({ category, initData })} showLabel={false} />
+          <ButtonIconDelete onClick={() => Actions.delete({ category, initData })} />
         ),
         width: '30px',
       }

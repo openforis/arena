@@ -1,23 +1,36 @@
 import './dataQuery.scss'
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+
+import React from 'react'
+import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
 import { Paginator } from '@webapp/components/Table'
 
+import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
+
+import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
+
+import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
 import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import LoadingBar from '../LoadingBar'
 import Visualizer from './Visualizer'
-import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
+import {
+  DataQuerySelectedAttributes,
+  DataQuerySelectedDimensions,
+  DataQuerySelectedMeasures,
+} from './DataQuerySortableItems'
 
-const DataQuery = (props) => {
-  const { query, onChangeQuery } = props
+const DataQuery = () => {
+  const dispatch = useDispatch()
+  const displayType = DataExplorerSelectors.useDisplayType()
+  const query = DataExplorerSelectors.useQuery()
+  const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
+  const recordEditModalProps = DataExplorerSelectors.useRecordEditModalProps()
 
-  const [nodeDefsSelectorVisible, setNodeDefsSelectorVisible] = useState(true)
   const {
     count,
     data,
@@ -36,7 +49,7 @@ const DataQuery = (props) => {
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} query={query} onChangeQuery={onChangeQuery} />
+      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} />
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -48,46 +61,47 @@ const DataQuery = (props) => {
 
         <div className="table__header">
           <ButtonBar
+            dataCount={count}
             dataEmpty={dataEmpty}
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}
-            query={query}
             nodeDefLabelType={nodeDefLabelType}
-            nodeDefsSelectorVisible={nodeDefsSelectorVisible}
-            onChangeQuery={onChangeQuery}
             onNodeDefLabelTypeChange={toggleLabelFunction}
-            setNodeDefsSelectorVisible={setNodeDefsSelectorVisible}
+            setQueryLimit={setLimit}
+            setQueryOffset={setOffset}
           />
-
-          {dataLoaded && Query.getDisplayType(query) === Query.displayTypes.table && count && (
-            <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
-          )}
         </div>
 
+        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedMeasures nodeDefLabelType={nodeDefLabelType} />
+
         <Visualizer
-          query={query}
           data={data}
           dataEmpty={dataEmpty}
           dataLoading={dataLoading}
           dataLoadingError={dataLoadingError}
           nodeDefLabelType={nodeDefLabelType}
-          nodeDefsSelectorVisible={nodeDefsSelectorVisible}
           offset={offset}
-          onChangeQuery={onChangeQuery}
           setData={setData}
         />
+
+        {dataLoaded && displayType === DataExplorerState.displayTypes.table && count && (
+          <div className="table__footer">
+            <Paginator count={count} limit={limit} offset={offset} setLimit={setLimit} setOffset={setOffset} />
+          </div>
+        )}
       </div>
+
+      {recordEditModalProps && (
+        <RecordEditModal
+          onRequestClose={() => dispatch(DataExplorerActions.closeRecordEditModal())}
+          recordUuid={recordEditModalProps.recordUuid}
+          parentNodeUuid={recordEditModalProps.parentNodeUuid}
+        />
+      )}
     </div>
   )
-}
-
-DataQuery.propTypes = {
-  query: PropTypes.object.isRequired,
-  onChangeQuery: PropTypes.func,
-}
-
-DataQuery.defaultProps = {
-  onChangeQuery: () => {},
 }
 
 export default DataQuery

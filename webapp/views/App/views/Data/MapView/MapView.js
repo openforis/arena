@@ -10,13 +10,13 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 
+import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { Map } from '@webapp/components/Map'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
-import { useRandomColors } from './useRandomColor'
-import { RecordEditModal } from './RecordEditModal'
+import { RecordEditModal } from '../common/RecordEditModal'
 
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as ObjectUtils from '@core/objectUtils'
+import * as ProcessUtils from '@core/processUtils'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as Validation from '@core/validation/validation'
 
@@ -17,6 +18,8 @@ export const useAccessRequest = () => {
   const [requestSentSuccessfully, setRequestSentSuccessfully] = useState(false)
   const [validation, setValidation] = useState(null)
   const reCaptchaRef = useRef(null)
+
+  const getRecaptchaToken = () => reCaptchaRef.current?.getValue()
 
   const validate = async () => setValidation(await UserAccessRequestValidator.validateUserAccessRequest(request))
 
@@ -34,17 +37,18 @@ export const useAccessRequest = () => {
       return false
     }
 
-    const reCaptchaToken = reCaptchaRef.current?.getValue()
-    if (!reCaptchaToken) {
-      dispatch(NotificationActions.notifyWarning({ key: 'accessRequestView.reCaptchaNotAnswered' }))
-      return false
+    if (ProcessUtils.ENV.reCaptchaEnabled) {
+      if (!getRecaptchaToken()) {
+        dispatch(NotificationActions.notifyWarning({ key: 'accessRequestView.reCaptchaNotAnswered' }))
+        return false
+      }
     }
     return true
   }
 
   const onSubmit = async () => {
     const onSubmitConfirm = async () => {
-      const reCaptchaToken = reCaptchaRef.current?.getValue()
+      const reCaptchaToken = getRecaptchaToken()
 
       const {
         error,

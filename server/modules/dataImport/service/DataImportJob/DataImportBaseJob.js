@@ -1,3 +1,5 @@
+import { Dates } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
@@ -5,11 +7,12 @@ import * as Validation from '@core/validation/validation'
 import Job from '@server/job/job'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
+import { RecordsDateModifiedBatchPersister } from '@server/modules/record/manager/RecordsDateModifiedBatchPersister'
 import { RecordsValidationBatchPersister } from '@server/modules/record/manager/RecordsValidationBatchPersister'
 import { NodesDeleteBatchPersister } from '@server/modules/record/manager/NodesDeleteBatchPersister'
 import { NodesInsertBatchPersister } from '@server/modules/record/manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '@server/modules/record/manager/NodesUpdateBatchPersister'
-import { Dates } from '@openforis/arena-core'
+import { RdbUpdatesBatchPersister } from '@server/modules/record/manager/RdbUpdatesBatchPersister'
 
 export default class DataImportBaseJob extends Job {
   constructor(type, params) {
@@ -24,7 +27,9 @@ export default class DataImportBaseJob extends Job {
     this.nodesDeleteBatchPersister = null
     this.nodesInsertBatchPersister = null
     this.nodesUpdateBatchPersister = null
+    this.recordsDateModifiedBatchPersister = null
     this.recordsValidationBatchPersister = null
+    this.rdbUpdatesBatchPersister = null
   }
 
   async onStart() {
@@ -35,12 +40,14 @@ export default class DataImportBaseJob extends Job {
     this.nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
     this.nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
+    this.recordsDateModifiedBatchPersister = new RecordsDateModifiedBatchPersister({ surveyId, tx })
     this.recordsValidationBatchPersister = new RecordsValidationBatchPersister({ surveyId, tx })
+    this.rdbUpdatesBatchPersister = new RdbUpdatesBatchPersister({ user, surveyId, tx })
   }
 
   async persistUpdatedNodes({ nodesUpdated, dateModified = new Date() }) {
     const { context, currentRecord: record, tx } = this
-    const { dryRun, survey, surveyId } = context
+    const { dryRun, survey } = context
 
     const nodesArray = Object.values(nodesUpdated)
 
@@ -48,24 +55,37 @@ export default class DataImportBaseJob extends Job {
 
     if (dryRun) return
 
-    await this.recordsValidationBatchPersister.addItem([Record.getUuid(record), Record.getValidation(record)])
     const recordUuid = Record.getUuid(record)
-    await RecordManager.updateRecordDateModified({ surveyId, recordUuid, dateModified }, tx)
+    await this.recordsValidationBatchPersister.addItem(recordUuid, Record.getValidation(record))
+    if (dateModified) {
+      await this.recordsDateModifiedBatchPersister.addItem(recordUuid, dateModified, tx)
+    }
 
     if (nodesArray.length === 0) return
 
-    await this.nodesDeleteBatchPersister.addItems(nodesArray.filter(Node.isDeleted))
-    await this.nodesInsertBatchPersister.addItems(nodesArray.filter(Node.isCreated))
-    await this.nodesUpdateBatchPersister.addItems(nodesArray.filter(Node.isUpdated))
+    for await (const node of nodesArray) {
+      if (Node.isDeleted(node)) {
+        await this.nodesDeleteBatchPersister.addItem(node)
+      } else if (Node.isCreated(node)) {
+        await this.nodesInsertBatchPersister.addItem(node)
+      } else if (Node.isUpdated(node)) {
+        await this.nodesUpdateBatchPersister.addItem(node)
+      }
+    }
 
-    this.currentRecord = await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
+    const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray }, tx)
+    await this.rdbUpdatesBatchPersister.addItem(rdbUpdates)
+
+    this.currentRecord = recordUpdated
   }
 
   async beforeSuccess() {
     await this.nodesDeleteBatchPersister.flush()
     await this.nodesInsertBatchPersister.flush()
     await this.nodesUpdateBatchPersister.flush()
+    await this.recordsDateModifiedBatchPersister.flush()
     await this.recordsValidationBatchPersister.flush()
+    await this.rdbUpdatesBatchPersister.flush()
 
     await super.beforeSuccess()
   }

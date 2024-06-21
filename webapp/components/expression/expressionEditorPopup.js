@@ -6,17 +6,15 @@ import * as R from 'ramda'
 
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import PanelRight from '@webapp/components/PanelRight'
 
+import { Button } from '../buttons'
 import { useExpressionEditorPopupState } from './expressionEditorPopupState'
-
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
 import BasicExpressionEditorPopup from './basicExpressionEditorPopup'
 import { ExpressionEditorType } from './expressionEditorType'
-import { Button } from '../buttons'
 
 const ExpressionEditorPopup = (props) => {
   const {
@@ -33,6 +31,7 @@ const ExpressionEditorPopup = (props) => {
     onClose,
     query,
     header,
+    includeAnalysis,
   } = props
 
   const {
@@ -57,27 +56,26 @@ const ExpressionEditorPopup = (props) => {
     nodeDefUuidCurrent,
     onChange,
     query,
+    includeAnalysis,
   })
-
-  const i18n = useI18n()
 
   return (
     <PanelRight onClose={onClose} width="100vw" header={header}>
       <div className="expression-editor-popup">
         {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
-          <button
-            data-testid={TestId.expressionEditor.toggleModeBtn}
-            type="button"
-            className="expression-editor-popup__toggle-advanced btn-s"
+          <Button
+            className="expression-editor-popup__toggle-advanced"
+            label={advanced ? 'nodeDefEdit.basic' : 'nodeDefEdit.advanced'}
             onClick={onToggleAdvancedEditor}
-          >
-            {advanced ? i18n.t('nodeDefEdit.basic') : i18n.t('nodeDefEdit.advanced')}
-          </button>
+            size="small"
+            testId={TestId.expressionEditor.toggleModeBtn}
+          />
         )}
         {advanced ? (
           <AdvancedExpressionEditorPopup
             nodeDefCurrent={nodeDefCurrent}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
+            includeAnalysis={includeAnalysis}
             isContextParent={isContextParent}
             query={queryDraft}
             updateDraftQuery={updateDraftQuery}
@@ -128,6 +126,7 @@ ExpressionEditorPopup.propTypes = {
   excludeCurrentNodeDef: PropTypes.bool,
   expr: PropTypes.object, // AST expression
   header: PropTypes.node,
+  includeAnalysis: PropTypes.bool,
   isBoolean: PropTypes.bool, // True if expression returns a boolean condition
   isContextParent: PropTypes.bool, // True if the context node def is the parent of the current node def
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
@@ -145,6 +144,7 @@ ExpressionEditorPopup.defaultProps = {
   excludeCurrentNodeDef: true,
   expr: null,
   header: '',
+  includeAnalysis: false,
   isBoolean: true,
   isContextParent: false,
   mode: Expression.modes.json,

@@ -1,9 +1,9 @@
-import BatchPersister from '@server/db/batchPersister'
+import UniqueItemsBatchPersister from '@server/db/uniqueItemsBatchPersister'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
 const BATCH_SIZE = 1000
 
-export class RecordsValidationBatchPersister extends BatchPersister {
+export class RecordsValidationBatchPersister extends UniqueItemsBatchPersister {
   constructor({ surveyId, tx }) {
     super(
       async (recordUuidsAndValidations) =>

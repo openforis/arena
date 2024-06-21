@@ -1,5 +1,3 @@
-import * as A from '../../../../core/arena'
-
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 import * as FileUtils from '../../../utils/file/fileUtils'
@@ -23,9 +21,8 @@ export const init = (app) => {
 
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, query: queryParam, offset, limit } = Request.getParams(req)
+      const { surveyId, cycle, query, offset, limit } = Request.getParams(req)
       const user = Request.getUser(req)
-      const query = A.parse(queryParam)
 
       const rows = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, offset, limit })
 
@@ -40,10 +37,8 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, query: queryParam } = Request.getParams(req)
+        const { surveyId, cycle, query } = Request.getParams(req)
         const user = Request.getUser(req)
-
-        const query = A.parse(queryParam)
 
         const count = await SurveyRdbService.countTable({ user, surveyId, cycle, query })
 
@@ -75,9 +70,8 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, query: queryParam } = Request.getParams(req)
+        const { surveyId, cycle, query, options } = Request.getParams(req)
         const user = Request.getUser(req)
-        const query = A.parse(queryParam)
 
         const tempFileName = await SurveyRdbService.exportViewDataToTempFile({
           user,
@@ -85,6 +79,7 @@ export const init = (app) => {
           cycle,
           query,
           addCycle: true,
+          options,
         })
 
         res.json({ tempFileName })

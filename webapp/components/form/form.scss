@@ -22,6 +22,15 @@
   text-align: end;
   padding-left: 2px;
   letter-spacing: 0.5px;
+
+  .form-label-wrapper {
+    display: flex;
+    align-items: center;
+
+    .btn-info {
+      padding: 0 0 0 0.4rem;
+    }
+  }
 }
 
 .form-input-container {

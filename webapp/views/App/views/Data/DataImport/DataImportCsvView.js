@@ -1,6 +1,6 @@
 import './DataImportCsvView.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'
@@ -11,11 +11,13 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { RecordCycle } from '@core/record/recordCycle'
 
+import { FileUtils } from '@webapp/utils/fileUtils'
 import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
@@ -34,8 +36,10 @@ const importTypes = {
 }
 
 const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
+const optionsRecordUpdateSystemAdmin = ['includeFiles']
 
-const fileMaxSize = 20 // 20MB
+const fileMaxSizeDefault = 20 // 20MB
+const fileMaxSizeWithFiles = 1024 // 1GB
 
 const allowedLabelTypes = [
   NodeDef.NodeDefLabelTypes.label,
@@ -51,7 +55,11 @@ export const DataImportCsvView = () => {
   const surveyCycle = useSurveyCycleKey()
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
-
+  const isSystemAdmin = useUserIsSystemAdmin()
+  const allowedOptionsRecordUpdate = useMemo(
+    () => [...optionsRecordUpdate, ...(isSystemAdmin ? optionsRecordUpdateSystemAdmin : [])],
+    [isSystemAdmin]
+  )
   const canSelectCycle = surveyCycleKeys.length > 1
 
   const [state, setState] = useState({
@@ -64,6 +72,7 @@ export const DataImportCsvView = () => {
     // options
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
+    includeFiles: false,
   })
 
   const {
@@ -76,7 +85,15 @@ export const DataImportCsvView = () => {
     // options
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
+    includeFiles,
   } = state
+
+  const fileAccept = useMemo(
+    () => (includeFiles ? FileUtils.acceptByExtension.zip : FileUtils.acceptByExtension.csv),
+    [includeFiles]
+  )
+
+  const fileMaxSize = useMemo(() => (includeFiles ? fileMaxSizeWithFiles : fileMaxSizeDefault), [includeFiles])
 
   const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${RecordCycle.getLabel(cycle)})_ImportError`
 
@@ -151,6 +168,7 @@ export const DataImportCsvView = () => {
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
+    includeFiles,
   }
 
   return (
@@ -218,7 +236,7 @@ export const DataImportCsvView = () => {
 
               {dataImportType === importTypes.updateExistingRecords && (
                 <ExpansionPanel buttonLabel="dataImportView.options.header" startClosed>
-                  {optionsRecordUpdate.map((optionKey) => (
+                  {allowedOptionsRecordUpdate.map((optionKey) => (
                     <Checkbox
                       key={optionKey}
                       checked={state[optionKey]}
@@ -230,7 +248,7 @@ export const DataImportCsvView = () => {
               )}
               <Dropzone
                 maxSize={fileMaxSize}
-                accept={{ 'text/csv': ['.csv'] }}
+                accept={fileAccept}
                 onDrop={onFilesDrop}
                 droppedFiles={file ? [file] : []}
               />

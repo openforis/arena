@@ -54,22 +54,32 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       stopIfFunction
     )
     // create views
-    await PromiseUtils.each(descendantMultipleDefs, async (nodeDef) => {
-      const nodeDefName = NodeDef.getName(nodeDef)
-      this.logDebug(`create view for ${nodeDefName} - start`)
-      await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
-      this.logDebug(`create view for ${nodeDefName} - end`)
-    })
+    await PromiseUtils.each(
+      descendantMultipleDefs,
+      async (nodeDef) => {
+        const nodeDefName = NodeDef.getName(nodeDef)
+        this.logDebug(`create view for ${nodeDefName} - start`)
+        await SurveyRdbManager.createDataView({ survey, nodeDef }, tx)
+        this.logDebug(`create view for ${nodeDefName} - end`)
+      },
+      stopIfFunction
+    )
+
+    if (this.isCanceled()) return
 
     this.logDebug('create node keys view - start')
     await SurveyRdbManager.createNodeKeysView(survey, tx)
     this.incrementProcessedItems()
     this.logDebug('create node keys view - end')
 
+    if (this.isCanceled()) return
+
     this.logDebug('create node hierarchy disaggregated view - start')
     await SurveyRdbManager.createNodeHierarchyDisaggregatedView(survey, tx)
     this.incrementProcessedItems()
     this.logDebug('create node hierarchy disaggregated view - end')
+
+    if (this.isCanceled()) return
 
     this.logDebug('create node keys hierarchy view - start')
     await SurveyRdbManager.createNodeKeysHierarchyView(survey, tx)

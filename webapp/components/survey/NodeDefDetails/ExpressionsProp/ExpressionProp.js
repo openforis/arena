@@ -10,6 +10,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import ExpressionEditor from '@webapp/components/expression/expressionEditor'
 import { ExpressionEditorType } from '@webapp/components/expression/expressionEditorType'
+import { ButtonIconDelete } from '@webapp/components/buttons'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/validationTooltip'
@@ -38,16 +39,10 @@ const ExpressionProp = (props) => {
 
   const i18n = useI18n()
 
-  const severityItems = [
-    {
-      key: ValidationResult.severity.error,
-      label: i18n.t('common.error'),
-    },
-    {
-      key: ValidationResult.severity.warning,
-      label: i18n.t('common.warning'),
-    },
-  ]
+  const severityItems = Object.keys(ValidationResult.severity).map((severity) => ({
+    key: severity,
+    label: i18n.t(`common.${severity}`),
+  }))
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
 
@@ -57,16 +52,12 @@ const ExpressionProp = (props) => {
     <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
         {!isPlaceholder && (
-          <button
-            data-testid={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
+          <ButtonIconDelete
+            disabled={readOnly}
             id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
-            type="button"
-            className="btn btn-s btn-transparent btn-delete"
-            aria-disabled={readOnly}
             onClick={() => onDelete(expression)}
-          >
-            <span className="icon icon-bin2 icon-12px" />
-          </button>
+            testId={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
+          />
         )}
 
         <div className="expression-item">

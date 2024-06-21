@@ -1,1 +1,1 @@
-export { NoHeaderView } from './NoHeaderView'
+export { default } from './NoHeaderView'

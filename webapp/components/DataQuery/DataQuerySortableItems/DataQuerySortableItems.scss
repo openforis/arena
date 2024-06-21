@@ -1,0 +1,33 @@
+@import 'webapp/style/partials';
+
+.data-query__sortable-items-form-item {
+  display: flex;
+  height: auto;
+  flex: 1;
+
+  .form-label {
+    text-wrap: nowrap;
+  }
+}
+
+.data-query__sortable-items-wrapper {
+  flex: 1;
+  display: flex;
+  flex-flow: wrap;
+  gap: 0.3rem;
+  max-height: 7rem;
+  overflow-y: auto;
+}
+
+.data-query__sortable-item-chip.MuiChip-root {
+  background-color: white;
+
+  &.draggable-mirror {
+    background-color: lighten($orangeLight, 10%);
+    border: 1px dashed $blue;
+  }
+  &.draggable-source--is-dragging {
+    color: transparent;
+    background-color: transparent;
+  }
+}

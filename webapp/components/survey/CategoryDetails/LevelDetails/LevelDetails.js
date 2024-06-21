@@ -10,7 +10,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { Button } from '@webapp/components'
+import { Button, ButtonIconDelete } from '@webapp/components'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -31,8 +31,8 @@ const LevelDetails = (props) => {
   const levelIndex = CategoryLevel.getIndex(level)
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
   const parentItem = State.getItemActive({ levelIndex: levelIndex - 1 })(state)
-  const canAddItem = levelIndex === 0 || parentItem
-  const items = canAddItem ? State.getItemsArray({ levelIndex })(state) : []
+  const canShowItems = levelIndex === 0 || parentItem
+  const items = canShowItems ? State.getItemsArray({ levelIndex })(state) : []
   const validation = Category.getLevelValidation(levelIndex)(category)
 
   const nameReadOnly = readOnly || Category.isReportingData(category)
@@ -52,15 +52,12 @@ const LevelDetails = (props) => {
       {!single && (
         <>
           <div className="category__level-header">
-            <h4 className="label">
-              {i18n.t('categoryEdit.level')} {levelIndex + 1}
-            </h4>
+            <h4 className="label">{i18n.t('categoryEdit.level.title', { levelPosition: levelIndex + 1 })}</h4>
             {!readOnly && canBeDeleted && (
-              <Button
+              <ButtonIconDelete
+                onClick={() => Actions.deleteLevel({ category, level })}
                 size="small"
                 testId={TestId.categoryDetails.levelDeleteBtn(levelIndex)}
-                onClick={() => Actions.deleteLevel({ category, level })}
-                iconClassName="icon-bin2 icon-12px"
               />
             )}
           </div>
@@ -81,20 +78,25 @@ const LevelDetails = (props) => {
 
       <div className="category__level-items-header">
         <h5 className="label">{i18n.t('common.item_plural')}</h5>
-        {!readOnly && (
+        {!readOnly && canShowItems && (
           <Button
             id={`category-level-${levelIndex}-btn-item-add`}
             testId={TestId.categoryDetails.levelAddItemBtn(levelIndex)}
-            className="btn-s btn-add-item"
-            disabled={!canAddItem}
+            className="btn-add-item"
             onClick={() => Actions.createItem({ category, level, parentItemUuid: CategoryItem.getUuid(parentItem) })}
             iconClassName="icon-plus icon-12px"
             label="common.add"
+            primary
+            size="small"
           />
         )}
       </div>
 
-      <ItemsList items={items} level={level} state={state} setState={setState} />
+      {levelIndex > 0 && !canShowItems && (
+        <div className="category__level-items-message">{i18n.t('categoryEdit.level.selectItemFromPreviousLevel')}</div>
+      )}
+
+      {canShowItems && <ItemsList items={items} level={level} state={state} setState={setState} />}
     </div>
   )
 }

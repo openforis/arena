@@ -8,11 +8,21 @@
     }
   }
 
-  .records-count {
-    width: 5rem;
+  .records-count,
+  .files {
     display: flex;
     align-items: center;
     justify-content: end;
     gap: 0.2rem;
+  }
+
+  .records-count {
+    width: 5rem;
+
+    .app-icons-wrapper {
+      position: relative;
+      width: 30px;
+      height: 20px;
+    }
   }
 }

@@ -45,3 +45,34 @@ export const copyToClipboard = async (text) => {
     return false
   }
 }
+
+export const downloadSvgToPng = (svgElement) => {
+  const serializer = new XMLSerializer()
+  const svgString = serializer.serializeToString(svgElement)
+  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+  const url = URL.createObjectURL(svgBlob)
+
+  // Create an Image element
+  const img = new Image()
+  img.src = url
+  img.onload = () => {
+    // Create a canvas element
+    const canvas = document.createElement('canvas')
+    canvas.width = svgElement.clientWidth
+    canvas.height = svgElement.clientHeight
+    const ctx = canvas.getContext('2d')
+
+    // Draw the image onto the canvas
+    ctx.drawImage(img, 0, 0)
+
+    // Create a download link for the canvas image
+    const pngUrl = canvas.toDataURL('image/png')
+    const downloadLink = document.createElement('a')
+    downloadLink.href = pngUrl
+    downloadLink.download = 'chart.png'
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+    document.body.removeChild(downloadLink)
+    URL.revokeObjectURL(url)
+  }
+}

@@ -1,8 +1,12 @@
-@import 'webapp/style/vars';
-
-.export {
+.data-export-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+
+  .form-item {
+    .form-label {
+      text-wrap: nowrap;
+    }
+  }
 }

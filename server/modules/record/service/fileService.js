@@ -47,7 +47,7 @@ const getSurveyFilesTotalSpace = async ({ surveyId }) => {
 
 export const fetchFilesStatistics = async ({ surveyId }) => {
   const totalSpace = await getSurveyFilesTotalSpace({ surveyId })
-  const usedSpace = await FileManager.fetchTotalFilesSize({ surveyId })
+  const { total: usedSpace } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
   const availableSpace = Math.max(0, totalSpace - usedSpace)
 
   return {
@@ -57,11 +57,22 @@ export const fetchFilesStatistics = async ({ surveyId }) => {
   }
 }
 
+export const cleanupAllSurveysFilesProps = async () => {
+  const surveyIds = await SurveyManager.fetchAllSurveyIds()
+  let count = 0
+  for await (const surveyId of surveyIds) {
+    const cleanedFiles = await FileManager.cleanupSurveyFilesProps({ surveyId })
+    count += cleanedFiles
+  }
+  return count
+}
+
 export const {
   // CREATE
   insertFile,
   // READ
   fetchFileContentAsStream,
+  fetchFileContentAsBuffer,
   fetchFileSummaryByUuid,
   fetchFileSummariesBySurveyId,
   // UPDATE

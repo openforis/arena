@@ -1,3 +1,11 @@
+arena.prepareQueryParams = function(query) {
+  actualQuery <- list(language = arena.preferredLanguage, token = arena.token)
+  if (!is.null(query)) {
+    actualQuery <- c(actualQuery, query)
+  }
+  return(actualQuery)
+}
+
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
@@ -24,12 +32,12 @@ arena.getApiUrl = function(url) {
 }
 
 arena.get = function(url, query = NULL) {
-  resp <- httr::GET(arena.getApiUrl(url), query = query)
+  resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query))
   return(arena.parseResponse(resp))
 }
 
 arena.getToFile = function (url, query = NULL, file) {
-  httr::GET(arena.getApiUrl(url), query = query, write_disk(file))
+  httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), write_disk(file))
 }
 
 arena.getCSV = function (url, query = NULL) {
@@ -45,12 +53,12 @@ arena.getCSV = function (url, query = NULL) {
 }
 
 arena.post = function(url, body) {
-  resp <- httr::POST(arena.getApiUrl(url), body = body)
+  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
   return(arena.parseResponse(resp))
 }
 
 arena.put = function(url, body) {
-  resp <- httr::PUT(arena.getApiUrl(url), body = body)
+  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
   return(arena.parseResponse(resp))
 }
 
@@ -61,10 +69,9 @@ arena.putFile = function(url, filePath) {
 }
 
 arena.delete = function(url, body) {
-  resp <- httr::DELETE(arena.getApiUrl(url), body = body)
+  resp <- httr::DELETE(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
   return(arena.parseResponse(resp))
 }
-
 
 arena.login = function(tentative) {
   if (missing(tentative)) {
@@ -109,4 +116,27 @@ arena.login = function(tentative) {
     print(paste('*** User', user, 'successfully logged in', sep = ' '))
     return(TRUE)
   }
+}
+
+arena.waitForJobToComplete = function(job) {
+  if (is.null(job)) {
+    stop("Error: job not started properly")
+  }
+  pb <- txtProgressBar(min = 0, max = 100)
+  while (!is.null(job) && !job$ended) {
+    setTxtProgressBar(pb, job$progressPercent)
+    Sys.sleep(15)
+    job <- arena.get('/jobs/active')
+  }
+  if (!is.null(job) && job$ended) {
+    setTxtProgressBar(pb, 100)
+  }
+  close(pb)
+  if (is.null(job)) {
+    stop("Job complete but state is unknown")
+  }
+  if (job$succeeded) {
+    return(TRUE)
+  }
+  stop("Error: job failed or canceled")
 }

@@ -1,0 +1,55 @@
+.data-queries-panel {
+  display: flex;
+  flex-direction: column;
+
+  .panel-right__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+
+    .data-query-form,
+    .data-queries-table {
+      width: 100%;
+    }
+
+    .data-query-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .form-item {
+        height: auto;
+      }
+
+      .form-item,
+      .labels-editor.with-label {
+        grid-template-columns: 0.3fr 0.7fr;
+        width: 100%;
+      }
+
+      .button-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+
+        .btn-new {
+          justify-self: start;
+        }
+
+        .btn-save {
+          justify-self: center;
+        }
+
+        .btn-delete {
+          position: inherit;
+          justify-self: end;
+        }
+      }
+    }
+
+    .data-queries-table {
+      flex: 1;
+    }
+  }
+}

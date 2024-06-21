@@ -73,6 +73,9 @@ const EntitySelector = (props) => {
     filterFn,
   })
   const selection = nodeDefUuidEntity ? dropdownItems.find((item) => item.value === nodeDefUuidEntity) : emptySelection
+  if (!!nodeDefUuidEntity && !selection) {
+    onChange(null)
+  }
 
   return (
     <Dropdown

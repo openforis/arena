@@ -6,8 +6,9 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as DataTable from '../schemaRdb/dataTable'
 import * as DataCol from '../schemaRdb/dataCol'
+import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
 
-const types = { insert: 'insert', update: 'update', delete: 'delete' }
+const types = RdbUpdateTypes
 
 // ==== parsing
 
@@ -16,6 +17,7 @@ const _hasTable = (nodeDef) => NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nod
 const _getType = (nodeDef, node) => {
   const created = Node.isCreated(node)
   const deleted = Node.isDeleted(node)
+  const updated = Node.isUpdated(node)
   const withTable = _hasTable(nodeDef)
 
   if (withTable) {
@@ -25,46 +27,45 @@ const _getType = (nodeDef, node) => {
     if (deleted) {
       return types.delete
     }
+    if (updated && NodeDef.isMultipleAttribute(nodeDef)) {
+      return types.update
+    }
   } else if (!deleted) {
     return types.update
   }
   return null
 }
 
-const _getColumnNames = ({ nodeDef, type }) =>
-  type === types.insert
-    ? [
-        DataTable.columnNameUuid,
-        ...(NodeDef.isRoot(nodeDef)
-          ? [
-              DataTable.columnNameRecordUuid,
-              DataTable.columnNameRecordCycle,
-              DataTable.columnNameRecordStep,
-              DataTable.columnNameRecordOwnerUuid,
-            ]
-          : []),
-        DataTable.columnNameParentUuid,
-        ...(NodeDef.isMultipleAttribute(nodeDef) // Entity
-          ? DataCol.getNames(nodeDef)
-          : []),
-      ]
-    : DataCol.getNames(nodeDef)
+const _getValuesByColumnNameDefault = ({ survey, nodeDef, node }) => {
+  const columnNames = DataCol.getNames(nodeDef)
+  const columnValues = DataCol.getValues(survey, nodeDef, node)
+  return columnNames.reduce((acc, columnName, index) => {
+    acc[columnName] = columnValues[index]
+    return acc
+  }, {})
+}
 
-const _getColValues = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
+const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
   if (type !== types.insert) {
-    return DataCol.getValues(survey, nodeDef, node)
+    return _getValuesByColumnNameDefault({ survey, nodeDef, node })
+  } else {
+    const result = {
+      [DataTable.columnNameUuid]: Node.getUuid(node),
+      [DataTable.columnNameParentUuid]: Node.getUuid(ancestorMultipleEntity),
+    }
+    if (NodeDef.isRoot(nodeDef)) {
+      Object.assign(result, {
+        [DataTable.columnNameRecordUuid]: Node.getRecordUuid(node),
+        [DataTable.columnNameRecordCycle]: Record.getCycle(record),
+        [DataTable.columnNameRecordStep]: Record.getStep(record),
+        [DataTable.columnNameRecordOwnerUuid]: Record.getOwnerUuid(record),
+      })
+    }
+    if (NodeDef.isMultipleAttribute(nodeDef)) {
+      Object.assign(result, _getValuesByColumnNameDefault({ survey, nodeDef, node }))
+    }
+    return result
   }
-  const colValues = [Node.getUuid(node)]
-  if (NodeDef.isRoot(nodeDef)) {
-    colValues.push(
-      ...[Node.getRecordUuid(node), Record.getCycle(record), Record.getStep(record), Record.getOwnerUuid(record)]
-    )
-  }
-  colValues.push(Node.getUuid(ancestorMultipleEntity))
-  if (NodeDef.isMultipleAttribute(nodeDef)) {
-    colValues.push(...DataCol.getValues(survey, nodeDef, node))
-  }
-  return colValues
 }
 
 const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
@@ -78,7 +79,7 @@ const _findAncestor = ({ ancestorDefUuid, node, nodes }) => {
 const _getRowUuid = ({ nodeDef, ancestorMultipleEntity, node }) =>
   _hasTable(nodeDef) ? Node.getUuid(node) : Node.getUuid(ancestorMultipleEntity)
 
-const _toUpdates = ({ survey, record, nodes }) => {
+export const generateRdbUpdates = ({ survey, record, nodes }) => {
   // visit nodes with BFS algorithm to avoid FK constraints violations (sort nodes by hierarchy depth)
   const nodesArray = Object.values(nodes).sort(
     (nodeA, nodeB) => Node.getHierarchy(nodeA).length - Node.getHierarchy(nodeB).length
@@ -94,47 +95,57 @@ const _toUpdates = ({ survey, record, nodes }) => {
       const ancestorDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
       const ancestorDefUuid = NodeDef.getUuid(ancestorDef)
       const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
-      updatesAcc.push({
+      const update = {
         type,
-        schemaName: SchemaRdb.getName(Survey.getId(survey)),
-        tableName: DataTable.getName(nodeDef, ancestorDef),
-        columnNames: _getColumnNames({ nodeDef, type }),
-        colValues: _getColValues({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
+        schema: SchemaRdb.getName(Survey.getId(survey)),
+        table: DataTable.getName(nodeDef, ancestorDef),
+        valuesByColumnName: _getValuesByColumnName({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
         rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
-      })
+      }
+      updatesAcc.addUpdate(update)
     }
     return updatesAcc
-  }, [])
+  }, new RdbUpdates())
 }
 
 // ==== execution
 
-const _update = (update, client) =>
-  client.one(
-    `UPDATE ${update.schemaName}.${update.tableName}
-      SET ${update.columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
+const _update = (update, client) => {
+  const { schema, table, valuesByColumnName, rowUuid } = update
+  const columnNames = Object.keys(valuesByColumnName)
+  const values = Object.values(valuesByColumnName)
+  return client.one(
+    `UPDATE ${schema}.${table}
+      SET ${columnNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
       WHERE uuid = $1
       RETURNING uuid`,
-    [update.rowUuid, ...update.colValues]
+    [rowUuid, ...values]
   )
+}
 
-const _insert = (update, client) =>
-  client.one(
-    `INSERT INTO ${update.schemaName}.${update.tableName}
-      (${update.columnNames.join(',')})
+const _insert = (update, client) => {
+  const { schema, table, valuesByColumnName } = update
+  const columnNames = Object.keys(valuesByColumnName)
+  const values = Object.values(valuesByColumnName)
+  return client.one(
+    `INSERT INTO ${schema}.${table}
+      (${columnNames.join(',')})
       VALUES 
-      (${update.columnNames.map((_col, i) => `$${i + 1}`).join(',')})
+      (${columnNames.map((_col, i) => `$${i + 1}`).join(',')})
       RETURNING uuid`,
-    update.colValues
+    values
   )
+}
 
-const _delete = (update, client) =>
-  client.oneOrNone(
-    `DELETE FROM ${update.schemaName}.${update.tableName} 
+const _delete = (update, client) => {
+  const { schema, table, rowUuid } = update
+  return client.oneOrNone(
+    `DELETE FROM ${schema}.${table} 
     WHERE uuid = $1
     RETURNING uuid`,
-    update.rowUuid
+    rowUuid
   )
+}
 
 const queryByType = {
   [types.delete]: _delete,
@@ -142,9 +153,17 @@ const queryByType = {
   [types.update]: _update,
 }
 
+export const updateTablesFromUpdates = async ({ rdbUpdates }, client) => {
+  const updatesToRunInBatch = rdbUpdates.getAll().map((update) => queryByType[update.type](update, client))
+
+  if (updatesToRunInBatch.length > 0) {
+    await client.batch(updatesToRunInBatch)
+  }
+}
+
 export const updateTables = async ({ survey, record, nodes }, client) => {
-  const updates = _toUpdates({ survey, record, nodes })
-  await client.batch(updates.map((update) => queryByType[update.type](update, client)))
+  const rdbUpdates = generateRdbUpdates({ survey, record, nodes })
+  await updateTablesFromUpdates({ rdbUpdates }, client)
 }
 
 export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef }, client) => {

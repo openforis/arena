@@ -66,12 +66,10 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
       </div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
-      <div>
-        {NodeDef.isDecimal(nodeDef)
-          ? NodeDef.hasAreaBasedEstimated(nodeDef)
-            ? i18n.t('common.true')
-            : i18n.t('common.false')
-          : '-'}
+      <div className="analysis-node-def__area-based">
+        {NodeDef.isDecimal(nodeDef) && NodeDef.hasAreaBasedEstimated(nodeDef) && (
+          <span className="icon icon-checkmark" />
+        )}
       </div>
       <div className="analysis-node-def__type">
         {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}

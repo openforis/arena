@@ -6,4 +6,5 @@ export const stateKey = 'categories'
 
 export const dissocCategory = (categoryUuid) => A.dissoc(categoryUuid)
 
+export const assocCategories = (categories) => () => categories
 export const assocCategory = (category) => A.assoc(Category.getUuid(category), category)

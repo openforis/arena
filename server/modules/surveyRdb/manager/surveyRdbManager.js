@@ -1,11 +1,12 @@
 import pgPromise from 'pg-promise'
 
-import { Objects } from '@openforis/arena-core'
+import { Dates, Objects, SystemError } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
@@ -76,6 +77,7 @@ export const fetchViewData = async (params, client = db) => {
     addCycle = false,
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
+    nullsToEmpty = false,
   } = params
 
   // Fetch data
@@ -109,7 +111,12 @@ export const fetchViewData = async (params, client = db) => {
       const csvTransform = CSVWriter.transformJsonToCsv({
         fields,
         options: {
-          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({ survey, query, expandCategoryItems }),
+          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({
+            survey,
+            query,
+            expandCategoryItems,
+            nullsToEmpty,
+          }),
         },
       })
       dbStream.pipe(csvTransform).pipe(streamOutput)
@@ -159,23 +166,27 @@ export const fetchViewDataAgg = async (params) => {
   return result
 }
 
-const _determineRecordUuidsFilter = async ({ survey, cycle, recordUuidsParam, search }) => {
+const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuidsParam, search }) => {
   if (recordUuidsParam) return recordUuidsParam
 
-  if (!Objects.isEmpty(search)) {
-    const surveyId = Survey.getId(survey)
-    const nodeDefRoot = Survey.getNodeDefRoot(survey)
-    const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
-    const recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
-      surveyId,
-      nodeDefRoot,
-      nodeDefKeys,
-      cycle,
-      search,
-    })
-    return recordsSummaries.length > 0 ? recordsSummaries.map(Record.getUuid) : null
+  if (Objects.isEmpty(search) && !recordsModifiedAfter) return null
+
+  const surveyId = Survey.getId(survey)
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  let recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
+    surveyId,
+    nodeDefRoot,
+    nodeDefKeys,
+    cycle,
+    search,
+  })
+  if (recordsModifiedAfter) {
+    recordsSummaries = recordsSummaries.filter((recordSummary) =>
+      Dates.isAfter(Record.getDateModified(recordSummary), recordsModifiedAfter)
+    )
   }
-  return null
+  return recordsSummaries.map(Record.getUuid)
 }
 
 export const fetchEntitiesDataToCsvFiles = async (
@@ -186,8 +197,10 @@ export const fetchEntitiesDataToCsvFiles = async (
     expandCategoryItems,
     includeAncestorAttributes,
     includeAnalysis,
+    includeFiles,
     recordOwnerUuid = null,
     recordUuids: recordUuidsParam = null,
+    recordsModifiedAfter,
     search = null,
     outputDir,
     callback,
@@ -196,11 +209,21 @@ export const fetchEntitiesDataToCsvFiles = async (
 ) => {
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
-    (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
-  )
+  const nodeDefs = Survey.findDescendants({
+    filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+  })(survey)
 
-  const recordUuids = await _determineRecordUuidsFilter({ survey, cycle, recordUuidsParam, search })
+  const recordUuids = await _determineRecordUuidsFilter({
+    survey,
+    cycle,
+    recordsModifiedAfter,
+    recordUuidsParam,
+    search,
+  })
+
+  if (recordUuids?.length === 0) {
+    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
+  }
 
   callback?.({ total: nodeDefs.length })
 
@@ -215,13 +238,17 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const outputFilePath = FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`)
+    const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
+    const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.csv`
+    const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
-    const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? getChildAttributes(nodeDefContext)
-      : // Multiple attribute
-        [nodeDefContext]
+    const childDefs = (
+      NodeDef.isEntity(nodeDefContext)
+        ? getChildAttributes(nodeDefContext)
+        : // Multiple attribute
+          [nodeDefContext]
+    ).filter((childDef) => includeFiles || !NodeDef.isFile(childDef))
 
     const ancestorDefs = []
     if (includeAncestorAttributes) {
@@ -237,8 +264,8 @@ export const fetchEntitiesDataToCsvFiles = async (
     }
 
     let query = Query.create({ entityDefUuid })
-    const ancestorAttributeDefUuids = ancestorDefs.concat(childDefs).map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(ancestorAttributeDefUuids)(query)
+    const queryAttributeDefUuids = ancestorDefs.concat(childDefs).map(NodeDef.getUuid)
+    query = Query.assocAttributeDefUuids(queryAttributeDefUuids)(query)
     query = Query.assocFilterRecordUuids(recordUuids)(query)
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
@@ -259,7 +286,10 @@ export const fetchEntitiesDataToCsvFiles = async (
   })
 }
 
-export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwnerUuid = null }, client = db) => {
+export const fetchEntitiesFileUuidsByCycle = async (
+  { survey, cycle, recordOwnerUuid = null, filterRecordUuids = null },
+  client = db
+) => {
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
@@ -279,9 +309,11 @@ export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwner
     }
 
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    let query = Query.create({ entityDefUuid })
-    const queryAttributeDefsUuids = childrenFileDefs.map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+    const query = Query.create({
+      entityDefUuid,
+      attributeDefUuids: childrenFileDefs.map(NodeDef.getUuid),
+      filterRecordUuids,
+    })
 
     const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)

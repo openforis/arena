@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as R from 'ramda'
@@ -27,6 +27,7 @@ LoadingRows.propTypes = {
 
 const Content = (props) => {
   const {
+    cellProps,
     columns,
     expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
@@ -53,6 +54,13 @@ const Content = (props) => {
   const i18n = useI18n()
 
   const tableRef = useRef(null)
+  const headerRef = useRef(null)
+
+  const onRowsScroll = useCallback((event) => {
+    const header = headerRef.current
+    if (!header) return
+    header.scrollLeft = event?.target?.scrollLeft
+  }, [])
 
   useEffect(() => {
     if (tableRef.current) {
@@ -70,7 +78,7 @@ const Content = (props) => {
 
   const hasColumns = columns?.length > 0
   const rowComponent = hasColumns
-    ? (_props) => <ContentRowCells {..._props} columns={columns} itemSelected={_props.selected} />
+    ? (_props) => <ContentRowCells {..._props} cellProps={cellProps} columns={columns} itemSelected={_props.selected} />
     : rowComponentParam
 
   const rowHeaderComponent = hasColumns
@@ -83,7 +91,7 @@ const Content = (props) => {
 
   return (
     <div className="table__content">
-      <div className="table__row-header" style={{ gridTemplateColumns }}>
+      <div className="table__row-header" ref={headerRef} style={{ gridTemplateColumns }}>
         {/* TODO check why props is passed in this way*/}
         {React.createElement(rowHeaderComponent, { props, sort, handleSortBy, ...rowProps })}
       </div>
@@ -91,7 +99,7 @@ const Content = (props) => {
       {loading ? (
         <LoadingRows rows={maxRows} />
       ) : (
-        <div className="table__rows" data-testid={TestId.table.rows(module)} ref={tableRef}>
+        <div className="table__rows" data-testid={TestId.table.rows(module)} onScroll={onRowsScroll} ref={tableRef}>
           {list.map((item, index) => {
             const key = keyExtractor({ item })
             return React.createElement(ContentRow, {
@@ -116,6 +124,7 @@ const Content = (props) => {
 }
 
 Content.propTypes = {
+  cellProps: PropTypes.object,
   columns: PropTypes.array,
   expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
 
@@ -10,6 +10,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { RecordState } from '@webapp/store/ui/record'
 
 import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
@@ -19,16 +20,23 @@ const SurveyDefsLoader = (props) => {
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const surveyInfo = useSurveyInfo()
-  const ready = useSurveyDefsFetched(draft)
-  const surveyId = Survey.getId(surveyInfo)
   const includeAnalysis = useAuthCanUseAnalysis()
+  const surveyInfo = useSurveyInfo()
+  const surveyId = Survey.getId(surveyInfo)
+  const ready = useSurveyDefsFetched({ draft, includeAnalysis, validate })
+  const recordPreviewUuid = useSelector(RecordState.getRecordUuidPreview)
 
   useEffect(() => {
     if (surveyId && !ready) {
       dispatch(SurveyActions.initSurveyDefs({ draft, validate, includeAnalysis }))
     }
   }, [surveyId, ready])
+
+  useEffect(() => {
+    if (surveyId && ready && recordPreviewUuid) {
+      dispatch(SurveyActions.refreshSurveyDefs)
+    }
+  }, [dispatch, ready, recordPreviewUuid, surveyId])
 
   const onSurveyUpdate = useCallback(
     ({ surveyId: surveyUpdatedId }) => {

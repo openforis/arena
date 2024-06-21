@@ -9,7 +9,7 @@ import * as CategoryLevel from './categoryLevel'
 import * as CategoryItem from './categoryItem'
 import { ExtraPropDef } from './extraPropDef'
 
-export const maxCategoryItemsInIndex = 10000
+export const maxCategoryItemsInIndex = 1000
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -38,7 +38,7 @@ const samplingUnitsPlanCategoryName = 'sampling_units_plan'
 // ========
 
 // ====== READ
-export const { getProps, getPropsDraft, getUuid, isPublished } = ObjectUtils
+export const { getProps, getPropsDraft, getPropsAndPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
 export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
