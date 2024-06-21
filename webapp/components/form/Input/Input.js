@@ -116,26 +116,6 @@ export const Input = React.forwardRef((props, ref) => {
           type={type}
           value={value}
         />
-        // React.createElement(inputType, {
-        //   ref: inputRef,
-        //   'aria-disabled': disabled,
-        //   autoComplete: 'off',
-        //   className,
-        //   'data-testid': id,
-        //   disabled,
-        //   id,
-        //   maxLength,
-        //   name,
-        //   onBlur,
-        //   onChange: onChangeEvent,
-        //   onFocus,
-        //   placeholder,
-        //   readOnly,
-        //   rows: inputType === 'textarea' ? 4 : null,
-        //   title,
-        //   type,
-        //   value,
-        // })
       )}
     </ValidationTooltip>
   )
