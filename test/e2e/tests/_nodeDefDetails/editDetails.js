@@ -37,8 +37,8 @@ export const persistNodeDefChanges = (nodeDef) =>
 
 export const editNodeDefDetails = (nodeDef) => {
   test(`${nodeDef.label} edit details`, async () => {
-    await page.fill(getSelector(TestId.nodeDefDetails.nodeDefName, 'input'), nodeDef.name)
-    await page.fill(getSelector(TestId.nodeDefDetails.nodeDefLabels(), 'input'), nodeDef.label)
+    await FormUtils.fillInput(TestId.nodeDefDetails.nodeDefName, nodeDef.name)
+    await FormUtils.fillInput(TestId.nodeDefDetails.nodeDefLabels(), nodeDef.label)
     if (nodeDef.key) {
       await page.click(getSelector(TestId.nodeDefDetails.nodeDefKey))
     }
