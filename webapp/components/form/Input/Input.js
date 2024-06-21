@@ -1,14 +1,16 @@
 import '../form.scss'
 
 import React, { useCallback, useRef } from 'react'
-import PropTypes from 'prop-types'
 import { NumericFormat } from 'react-number-format'
 import classNames from 'classnames'
+import { TextField } from '@mui/material'
+import PropTypes from 'prop-types'
+
+import { Strings } from '@openforis/arena-core'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
-import { TextInput } from '../TextInput'
-import { TextField } from '@mui/material'
+import { SimpleTextInput } from '../SimpleTextInput'
 
 export const Input = React.forwardRef((props, ref) => {
   const {
@@ -33,12 +35,12 @@ export const Input = React.forwardRef((props, ref) => {
 
   // workaround for inputRef: useRef(ref) does not work as expected
   const inputRefInternal = useRef(null)
-  const inputRef = ref || inputRefInternal
+  const inputRef = ref ?? inputRefInternal
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
-  const valueText = value === null || Number.isNaN(value) ? '' : String(value)
-  const title = titleProp || valueText
+  const valueText = Strings.defaultIfEmpty('')(value)
+  const title = titleProp ?? valueText
 
   const handleValueChange = useCallback(
     (newValue) => {
@@ -66,6 +68,7 @@ export const Input = React.forwardRef((props, ref) => {
   }, [value])
 
   const className = classNames('form-input', classNameProp)
+  const rows = inputType === 'textarea' ? 4 : undefined
 
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
@@ -92,7 +95,7 @@ export const Input = React.forwardRef((props, ref) => {
           {...numberFormat}
         />
       ) : (
-        <TextInput
+        <SimpleTextInput
           ref={inputRef}
           autoComplete="off"
           className={className}
@@ -105,7 +108,7 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus={onFocus}
           placeholder={placeholder}
           readOnly={readOnly}
-          rows={inputType === 'textarea' ? 4 : null}
+          rows={rows}
           testId={id}
           title={title}
           type={type}

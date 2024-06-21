@@ -20,4 +20,4 @@ export {
 
 export { PasswordInput } from './PasswordInput'
 export { PasswordStrengthChecker } from './PasswordStrengthChecker'
-export { TextInput } from './TextInput'
+export { SimpleTextInput as TextInput } from './SimpleTextInput'

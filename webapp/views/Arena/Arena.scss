@@ -1,5 +1,10 @@
 .MuiTextField-root {
-  input {
-    padding: 0.3rem 0.4rem;
+  input,
+  textarea {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .MuiInputBase-multiline {
+    padding: 0;
   }
 }

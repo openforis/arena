@@ -5,7 +5,7 @@ import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
-export const TextInput = forwardRef((props, ref) => {
+export const SimpleTextInput = forwardRef((props, ref) => {
   const {
     autoComplete,
     className,
@@ -46,6 +46,7 @@ export const TextInput = forwardRef((props, ref) => {
 
   const label = labelProp ? i18n.t(labelProp) : labelProp
   const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
+  const multiline = rows > 1
 
   return (
     <MuiTextField
@@ -61,6 +62,7 @@ export const TextInput = forwardRef((props, ref) => {
         endAdornment,
       }}
       margin="none"
+      multiline={multiline}
       name={name}
       onBlur={onBlur}
       onChange={onChange}
@@ -75,7 +77,7 @@ export const TextInput = forwardRef((props, ref) => {
   )
 })
 
-TextInput.propTypes = {
+SimpleTextInput.propTypes = {
   autoComplete: PropTypes.string,
   className: PropTypes.string,
   defaultValue: PropTypes.string,
@@ -99,6 +101,6 @@ TextInput.propTypes = {
   value: PropTypes.string,
 }
 
-TextInput.defaultProps = {
+SimpleTextInput.defaultProps = {
   autoComplete: 'off',
 }
