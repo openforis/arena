@@ -53,10 +53,11 @@ const isType = (type) => R.propEq('type', type)
 // Return true if the nodeDef can be used in expressions and false otherwise
 export const isValidExpressionType = (nodeDef) => !NodeDef.isFile(nodeDef)
 
-export const isLiteral = isType(types.Literal)
-export const isCompound = isType(types.Compound)
 export const isBinary = isType(types.BinaryExpression)
+export const isCall = isType(types.CallExpression)
+export const isCompound = isType(types.Compound)
 export const isIdentifier = isType(types.Identifier)
+export const isLiteral = isType(types.Literal)
 export const isSequence = isType(types.SequenceExpression)
 export const isThis = isType(types.ThisExpression)
 

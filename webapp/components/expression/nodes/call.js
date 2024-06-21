@@ -38,6 +38,7 @@ const Call = ({ node, variables, onChange }) => {
   return (
     <div>
       <Dropdown
+        searchable={false}
         items={dropdownItems}
         onChange={(item) => {
           setState((statePrev) => ({

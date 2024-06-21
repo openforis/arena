@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -20,15 +20,27 @@ const BinaryOperand = (props) => {
   const nodeOperand = R.prop(type, node)
   const isLeft = BinaryOperandType.isLeft(type)
   const canOperandBeLiteral = !isLeft || !isBoolean || NodeDef.isBoolean(nodeDefCurrent)
+  const canOperandBeFunctionCall = canOperandBeLiteral
+
+  const onOperandChange = useCallback(
+    (nodeUpdate) => {
+      if (isLeft && !isBoolean) {
+        return R.pipe(R.assoc('operator', ''), R.assoc(BinaryOperandType.right, Expression.newIdentifier()))(nodeUpdate)
+      }
+      return nodeUpdate
+    },
+    [isBoolean, isLeft]
+  )
 
   return (
     <div className={`binary-${type}`}>
       <Button
+        active={Expression.isIdentifier(nodeOperand)}
         className="btn-switch-operand btn-switch-operand-var"
         label="expressionEditor.var"
         onClick={() => onChange(R.assoc(type, Expression.newIdentifier(), node))}
         size="small"
-        variant={!Expression.isLiteral(nodeOperand) ? 'contained' : 'outlined'}
+        variant="outlined"
       />
 
       {canOperandBeLiteral && (
@@ -38,12 +50,21 @@ const BinaryOperand = (props) => {
           label="expressionEditor.const"
           onClick={() => {
             let nodeUpdate = R.assoc(type, Expression.newLiteral(), node)
-            if (isLeft && !isBoolean) {
-              nodeUpdate = R.pipe(
-                R.assoc('operator', ''),
-                R.assoc(BinaryOperandType.right, Expression.newIdentifier())
-              )(nodeUpdate)
-            }
+            nodeUpdate = onOperandChange(nodeUpdate)
+            onChange(nodeUpdate)
+          }}
+          size="small"
+          variant="outlined"
+        />
+      )}
+      {canOperandBeFunctionCall && (
+        <Button
+          active={Expression.isCall(nodeOperand)}
+          className="btn-switch-operand btn-switch-operand-call"
+          label="expressionEditor.call"
+          onClick={() => {
+            let nodeUpdate = R.assoc(type, Expression.newCall({ callee: Expression.functionNames.now }), node)
+            nodeUpdate = onOperandChange(nodeUpdate)
             onChange(nodeUpdate)
           }}
           size="small"
