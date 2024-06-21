@@ -44,10 +44,6 @@
 }
 
 .form-input {
-  // padding: 0.5rem 1rem;
-  // border-bottom: 1px solid $greyBorder;
-  //width: 100%;
-
   &[readonly] {
     border-bottom: 1px solid rgba($greyBorder, 0.5);
   }
