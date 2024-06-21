@@ -10,15 +10,15 @@
   }
 
   .labels-editor-label {
-    text-align: end;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 
-.labels-editor__btn-toggle {
-  padding: 0.4rem;
-  margin-left: 0.5rem;
+.MuiButtonBase-root.MuiButton-root.btn-s.labels-editor__btn-toggle {
+  padding: 0.2rem;
+  margin-left: 0.2rem;
   height: 30px;
-  justify-self: end;
 }
 
 .labels-editor__labels {

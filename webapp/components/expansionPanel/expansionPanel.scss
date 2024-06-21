@@ -26,6 +26,8 @@
 }
 
 .expansion-panel__content {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
 }
