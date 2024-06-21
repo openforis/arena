@@ -155,6 +155,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
                 iconClassName={`icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}
                 title={`dataView.records.${canEdit ? 'editRecord' : 'viewRecord'}`}
                 onClick={onRecordEditButtonClick(record)}
+                variant="text"
               />
               {canDelete && (
                 <RecordDeleteButton

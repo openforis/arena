@@ -7,18 +7,33 @@ import Fade from '@mui/material/Fade'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
+import { Button } from './buttons'
 
-export const ModalClose = ({ _children, onClose }) => (
-  <div className="modal-close" onClick={() => onClose()}>
-    <span className="icon icon-cross icon-20px" />
-  </div>
+export const ModalClose = ({ onClose }) => (
+  <Button className="modal-close" iconClassName="icon-cross icon-20px" onClick={onClose} variant="text" />
 )
+
+ModalClose.propTypes = {
+  onClose: PropTypes.func.isRequired,
+}
 
 export const ModalHeader = ({ children }) => <div className="modal-header">{children}</div>
 
+ModalHeader.propTypes = {
+  children: PropTypes.node.isRequired,
+}
+
 export const ModalBody = ({ children }) => <div className="modal-body">{children}</div>
 
+ModalBody.propTypes = {
+  children: PropTypes.node.isRequired,
+}
+
 export const ModalFooter = ({ children }) => <div className="modal-footer">{children}</div>
+
+ModalFooter.propTypes = {
+  children: PropTypes.node.isRequired,
+}
 
 export const Modal = (props) => {
   const { children, className, closeOnEsc, onClose: onCloseProp, showCloseButton, title, titleParams } = props

@@ -155,10 +155,11 @@ const NodeDefCoordinate = (props) => {
   const mapTriggerButton = canShowMap ? (
     <Button
       className="map-trigger-btn btn-transparent"
-      title="surveyForm.nodeDefCoordinate.showOnMap"
+      disabled={edit}
       iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
-      disabled={edit}
+      title="surveyForm.nodeDefCoordinate.showOnMap"
+      variant="text"
     />
   ) : null
 

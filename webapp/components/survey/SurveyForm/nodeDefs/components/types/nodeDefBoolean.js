@@ -6,50 +6,31 @@ import PropTypes from 'prop-types'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
+import { Radiobox } from '@webapp/components/form'
 
 const NodeDefBoolean = (props) => {
   const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
-
-  const i18n = useI18n()
 
   const node = entry ? nodes[0] : null
 
   const nodeValue = Node.getValue(node, '')
 
-  const Button = ({ disabled, label, value }) => {
-    const checked = nodeValue === value
-
-    return (
-      <button
-        type="button"
-        className="btn btn-s btn-transparent flex-center"
-        data-value={value}
-        aria-disabled={disabled || !canEditRecord || readOnly}
-        onClick={() => updateNode(nodeDef, node, checked ? null : value)}
-      >
-        <span className={`icon icon-12px icon-radio-${checked ? 'checked2' : 'unchecked'} icon-left`} />
-        {label}
-      </button>
-    )
-  }
-
-  Button.propTypes = {
-    disabled: PropTypes.bool.isRequired,
-    label: PropTypes.string.isRequired,
-    value: PropTypes.string.isRequired,
-  }
-
   return (
     <div className="survey-form__node-def-boolean">
-      {['true', 'false'].map((value) => (
-        <Button
-          key={value}
-          disabled={edit}
-          label={i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`)}
-          value={value}
-        />
-      ))}
+      {['true', 'false'].map((value) => {
+        const checked = nodeValue == value
+        return (
+          <Radiobox
+            key={value}
+            checked={checked}
+            disabled={edit || !canEditRecord || readOnly}
+            label={`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`}
+            onChange={() => updateNode(nodeDef, node, checked ? null : value)}
+            size="small"
+            value={value}
+          />
+        )
+      })}
     </div>
   )
 }

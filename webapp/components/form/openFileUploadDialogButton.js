@@ -10,10 +10,10 @@ import { FileUploadDialogActions } from '@webapp/store/ui'
 import { Button } from '../buttons'
 
 const OpenFileUploadDialogButton = (props) => {
+  const { label: labelProp, disabled, showLabel, showIcon, maxSize, accept, onOk, className, variant } = props
+
   const dispatch = useDispatch()
   const i18n = useI18n()
-
-  const { label: labelProp, disabled, showLabel, showIcon, maxSize, accept, onOk, className } = props
 
   const label = i18n.t(labelProp)
 
@@ -28,6 +28,7 @@ const OpenFileUploadDialogButton = (props) => {
       onClick={onClick}
       iconClassName={showIcon ? 'icon-upload2' : null}
       label={showLabel ? label : null}
+      variant={variant}
     />
   )
 }
@@ -41,6 +42,7 @@ OpenFileUploadDialogButton.propTypes = {
   onOk: PropTypes.func.isRequired,
   showIcon: PropTypes.bool,
   showLabel: PropTypes.bool,
+  variant: PropTypes.string,
 }
 
 OpenFileUploadDialogButton.defaultProps = {

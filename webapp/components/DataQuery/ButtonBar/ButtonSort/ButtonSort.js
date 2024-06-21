@@ -36,6 +36,7 @@ const ButtonSort = (props) => {
         label="dataView.sort"
         onClick={Actions.togglePanelSort}
         title={tooltipMessages.length > 0 ? tooltipMessages.join('\n') : undefined}
+        variant="outlined"
       />
 
       {State.isPanelSortShow(state) && (

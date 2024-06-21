@@ -1,29 +1,11 @@
-@import 'webapp/style/vars';
-
 .entity-selector-tree {
   position: relative;
   overflow-y: auto;
-
-  button {
-    border: none;
-    background-color: transparent;
-    text-align: left;
-
-    &:hover {
-      color: $orange;
-      background-color: transparent;
-    }
-
-    &.active {
-      font-weight: bold;
-      background-color: transparent;
-    }
-  }
 
   .btn-expand {
     position: absolute;
     right: 4px;
     top: 4px;
-    color: $blueDark;
+    z-index: 2;
   }
 }

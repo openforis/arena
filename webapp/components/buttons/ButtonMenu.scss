@@ -8,12 +8,17 @@
   }
 }
 
-.MuiMenuItem-root.button-menu__item {
-  padding: 0;
+.MuiMenu-paper {
+  padding: 0.2rem;
 
-  button {
-    width: 100%;
-    text-align: left;
-    padding: 16px 24px;
+  .MuiMenuItem-root.button-menu__item {
+    padding: 0 0.4rem;
+
+    button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 16px 24px;
+    }
   }
 }

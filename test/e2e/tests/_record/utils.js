@@ -10,7 +10,7 @@ export const getNodeDefSelector = (nodeDef, parentSelector = '') =>
   `${parentSelector} ${getSelector(TestId.surveyForm.nodeDefWrapper(nodeDef.name))}`.trim()
 
 export const getBooleanSelector = (nodeDef, parentSelector, value) =>
-  `${getNodeDefSelector(nodeDef, parentSelector)} button[data-value="${value}"]`
+  `${getNodeDefSelector(nodeDef, parentSelector)} .MuiButtonBase-root[data-value="${value}"]`
 
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)

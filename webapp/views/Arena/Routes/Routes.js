@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Route, Routes as RouterRoutes } from 'react-router-dom'
 
 import * as User from '@core/user/user'
@@ -6,9 +6,9 @@ import { app, guest, noHeader } from '@webapp/app/appModules'
 
 import { useUser } from '@webapp/store/user'
 
-import Guest from '@webapp/views/Guest'
-import { NoHeaderView } from '@webapp/views/NoHeader'
 const AppView = React.lazy(() => import('../../App'))
+const Guest = React.lazy(() => import('../../Guest'))
+const NoHeaderView = React.lazy(() => import('../../NoHeader'))
 
 import { useOpenWebSocket } from './useOpenWebSocket'
 import Loader from './Loader'
@@ -22,19 +22,40 @@ const Routes = () => {
   return (
     <>
       <RouterRoutes>
-        <Route path={`/${guest}/*`} element={<Guest />} />
-        <Route path={`/${noHeader}/*`} element={<NoHeaderView />} />
+        <Route
+          path={`/${guest}/*`}
+          element={
+            <Suspense fallback={<>...</>}>
+              <Guest />
+            </Suspense>
+          }
+        />
+        <Route
+          path={`/${noHeader}/*`}
+          element={
+            <Suspense fallback={<>...</>}>
+              <NoHeaderView />
+            </Suspense>
+          }
+        />
         {user && User.hasAccepted(user) ? (
           <Route
             path={`/${app}/*`}
             element={
-              <React.Suspense fallback={<>...</>}>
+              <Suspense fallback={<>...</>}>
                 <AppView />
-              </React.Suspense>
+              </Suspense>
             }
           />
         ) : (
-          <Route path="*" element={<Guest />} />
+          <Route
+            path="*"
+            element={
+              <Suspense fallback={<>...</>}>
+                <Guest />{' '}
+              </Suspense>
+            }
+          />
         )}
       </RouterRoutes>
 

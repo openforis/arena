@@ -3,10 +3,13 @@
 .data-query-button-bar {
   display: flex;
   flex-flow: wrap;
-  gap: 15px;
+  column-gap: 10px;
+  row-gap: 4px;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
 
   .mode-form-item {
     display: flex;

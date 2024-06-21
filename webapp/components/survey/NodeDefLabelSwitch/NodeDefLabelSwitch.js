@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
+import { Button } from '@webapp/components/buttons'
 
 export const useNodeDefLabelSwitch = () => {
   const [nodeDefLabelType, setNodeDefLabelType] = useState(NodeDef.NodeDefLabelTypes.label)
@@ -27,17 +26,12 @@ const buttonLabelKeysByType = {
 
 const NodeDefLabelSwitch = (props) => {
   const { allowedLabelTypes, className, onChange, labelType } = props
-  const i18n = useI18n()
 
   const allowedTypeValues = Object.values(allowedLabelTypes)
   const labelTypeNext = allowedTypeValues[(allowedTypeValues.indexOf(labelType) + 1) % allowedTypeValues.length]
   const label = buttonLabelKeysByType[labelTypeNext]
 
-  return (
-    <button type="button" className={classNames('btn-transparent', className)} onClick={onChange}>
-      {i18n.t(label)}
-    </button>
-  )
+  return <Button className={className} onClick={onChange} label={label} size="small" variant="text" />
 }
 
 NodeDefLabelSwitch.propTypes = {

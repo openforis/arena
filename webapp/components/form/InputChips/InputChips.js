@@ -7,7 +7,7 @@ import classNames from 'classnames'
 import Dropdown from '../Dropdown'
 
 import { useLocalState, State } from './store'
-import Chip from './Chip'
+import Chip from '../chip'
 
 const InputChips = (props) => {
   const {
@@ -41,11 +41,9 @@ const InputChips = (props) => {
       {selection.map((item) => (
         <Chip
           key={State.getItemKey(state)(item)}
-          item={item}
-          itemLabel={State.getItemLabel(state)(item)}
-          onDelete={Actions.removeItem({ selection, state })}
-          canBeRemoved={selection.length > requiredItems}
-          readOnly={readOnly}
+          label={State.getItemLabel(state)(item)}
+          onDelete={() => Actions.removeItem({ selection, state })(item)}
+          readOnly={readOnly || selection.length <= requiredItems}
         />
       ))}
 

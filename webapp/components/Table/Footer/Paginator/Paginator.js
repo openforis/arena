@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 
 import { useI18n } from '@webapp/store/system'
+import { Button } from '@webapp/components/buttons'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { TableConstants } from '../../constants'
 
@@ -36,48 +37,42 @@ const Paginator = (props) => {
           }}
         />
       </div>
-      <button
-        type="button"
-        className="btn btn-transparent"
+      <Button
         disabled={count < limit || isFirstPage}
+        iconClassName="icon-backward2 icon-14px"
         onClick={() => setOffset(0)}
-        title={i18n.t('common.paginator.firstPage')}
-      >
-        <span className="icon icon-backward2 icon-14px" />
-      </button>
-      <button
-        type="button"
-        className="btn btn-transparent"
+        title="common.paginator.firstPage"
+        variant="text"
+      />
+
+      <Button
         disabled={isFirstPage}
+        iconClassName="icon-play3 icon-14px"
         onClick={() => setOffset(offset - limit)}
         style={{ transform: 'scaleX(-1)' }}
-        title={i18n.t('common.paginator.previousPage')}
-      >
-        <span className="icon icon-play3 icon-14px" />
-      </button>
+        title="common.paginator.previousPage"
+        variant="text"
+      />
 
       <span className="counts">
         {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')} {count}
       </span>
 
-      <button
-        type="button"
-        className="btn btn-transparent"
+      <Button
         disabled={isLastPage}
+        iconClassName="icon-play3 icon-14px"
         onClick={() => setOffset(offset + limit)}
-        title={i18n.t('common.paginator.nextPage')}
-      >
-        <span className="icon icon-play3 icon-14px" />
-      </button>
-      <button
-        type="button"
-        className="btn btn-transparent"
+        title="common.paginator.nextPage"
+        variant="text"
+      />
+
+      <Button
         disabled={isLastPage}
+        iconClassName="icon-forward3 icon-14px"
         onClick={() => setOffset((totalNoPages - 1) * limit)}
-        title={i18n.t('common.paginator.lastPage')}
-      >
-        <span className="icon icon-forward3 icon-14px" />
-      </button>
+        title="common.paginator.lastPage"
+        variant="text"
+      />
     </div>
   )
 }

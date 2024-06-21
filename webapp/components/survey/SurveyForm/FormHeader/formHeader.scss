@@ -11,17 +11,7 @@
 .survey-form-header__label-container {
   display: flex;
   align-items: center;
-
-  button {
-    border: 1px solid $greyBorder;
-    padding: 0.4rem 0.5rem;
-    display: flex;
-    align-items: center;
-
-    &:not(:first-of-type) {
-      border-left: unset;
-    }
-  }
+  gap: 0.5rem;
 }
 
 .survey-form-header__path {

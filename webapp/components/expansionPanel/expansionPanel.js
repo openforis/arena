@@ -39,7 +39,7 @@ const ExpansionPanel = (props) => {
     <div className={className} ref={panelRef}>
       {showHeader && (
         <div className="expansion-panel__header" onClick={toggleCloseState}>
-          <Button className="btn-xs btn-transparent btn-toggle" iconClassName="icon-play3 icon-10px" />
+          <Button className="btn-xs btn-transparent btn-toggle" iconClassName="icon-play3 icon-10px" variant="text" />
           {i18n.t(buttonLabel, buttonLabelParams)}
         </div>
       )}

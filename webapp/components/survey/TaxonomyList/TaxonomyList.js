@@ -23,7 +23,7 @@ const TaxonomyList = (props) => {
 
   if (canEdit) {
     // delete button
-    gridTemplateColumns += ' 6rem'
+    gridTemplateColumns += ' 2rem'
   }
 
   return (

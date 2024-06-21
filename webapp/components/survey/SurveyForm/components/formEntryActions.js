@@ -52,7 +52,7 @@ const RecordEntryButtons = () => {
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (
           <Button
-            className="btn-s btn-transparent"
+            iconClassName="icon-reply icon-12px"
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
@@ -62,9 +62,10 @@ const RecordEntryButtons = () => {
                 })
               )
             }
+            size="small"
             title="surveyForm.formEntryActions.demoteTo"
             titleParams={{ stepPrev: getStepLabel(stepPrev) }}
-            iconClassName="icon-reply icon-12px"
+            variant="text"
           />
         )}
 
@@ -100,21 +101,19 @@ const RecordEntryButtons = () => {
 const FormEntryActions = (props) => {
   const { preview, entry } = props
 
-  const i18n = useI18n()
   const dispatch = useDispatch()
 
   return (
     <div className="survey-form-header__actions">
       {preview ? (
-        <button
-          className="btn-s btn-transparent"
-          data-testid={TestId.surveyForm.previewCloseBtn}
+        <Button
+          iconClassName="icon-eye-blocked icon-12px"
+          label="surveyForm.formEntryActions.closePreview"
           onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
-          type="button"
-        >
-          <span className="icon icon-eye-blocked icon-12px icon-left" />
-          {i18n.t('surveyForm.formEntryActions.closePreview')}
-        </button>
+          size="small"
+          testId={TestId.surveyForm.previewCloseBtn}
+          variant="text"
+        />
       ) : (
         entry && <RecordEntryButtons />
       )}

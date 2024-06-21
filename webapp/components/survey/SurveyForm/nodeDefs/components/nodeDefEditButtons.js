@@ -3,7 +3,7 @@ import './nodeDefEditButtons.scss'
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -23,6 +23,7 @@ const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef } = props
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const elementRef = useRef(null)
   const [style, setStyle] = useState({})
@@ -75,37 +76,41 @@ const NodeDefEditButtons = (props) => {
         </div>
       )}
 
-      <Link
-        data-testid={TestId.surveyForm.nodeDefEditBtn(nodeDefName)}
-        className="btn btn-s btn-transparent survey-form__node-def-edit-button"
-        to={`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`}
-        title={i18n.t('surveyForm.edit', { nodeDefLabel })}
-      >
-        <span className="icon icon-pencil2 icon-16px" />
-      </Link>
+      <Button
+        className="survey-form__node-def-edit-button"
+        iconClassName="icon-pencil2 icon-16px"
+        onClick={() => navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
+        size="small"
+        testId={TestId.surveyForm.nodeDefEditBtn(nodeDefName)}
+        title="surveyForm.edit"
+        titleParams={{ nodeDefLabel }}
+        variant="text"
+      />
 
       <NodeDefEditButtonsMenu nodeDef={nodeDef} />
 
       {NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef) && (
         <Button
-          className="btn-s btn-transparent"
+          iconClassName="icon-stack"
           onClick={() => dispatch(NodeDefsActions.compressFormItems(nodeDef))}
           onMouseDown={(e) => e.stopPropagation()}
-          iconClassName="icon-stack"
+          size="small"
           title="surveyForm.compressFormItems"
           titleParams={{ nodeDefLabel }}
+          variant="text"
         />
       )}
 
       {NodeDef.isEntity(nodeDef) && (
         <Button
-          testId={TestId.surveyForm.nodeDefAddChildToBtn(nodeDefName)}
-          className="btn-s btn-transparent"
+          iconClassName="icon-plus icon-12px"
           onClick={() => dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))}
           onMouseDown={(e) => e.stopPropagation()}
-          iconClassName="icon-plus icon-12px"
+          size="small"
+          testId={TestId.surveyForm.nodeDefAddChildToBtn(nodeDefName)}
           title="surveyForm.addChildToTitle"
           titleParams={{ nodeDefLabel }}
+          variant="text"
         />
       )}
     </div>

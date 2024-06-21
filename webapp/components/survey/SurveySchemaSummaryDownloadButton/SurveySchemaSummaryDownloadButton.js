@@ -19,6 +19,7 @@ const SurveySchemaSummaryDownloadButton = (props) => {
       requestParams={{ cycle: surveyCycleKey }}
       label="surveyForm.schemaSummary"
       title="surveyForm.schemaSummaryTitle"
+      variant="text"
     />
   )
 }
