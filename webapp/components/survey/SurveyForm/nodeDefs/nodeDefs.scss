@@ -70,6 +70,7 @@
 .survey-form__node-def-form-item {
   grid-template-columns: 1fr !important;
   grid-template-rows: 30px 1fr;
+  padding: 0;
 
   > :nth-child(1).form-label {
     align-self: end;
@@ -93,7 +94,6 @@
   .form-input {
     text-overflow: ellipsis;
     text-align: left;
-    border: $formBorder;
   }
 }
 

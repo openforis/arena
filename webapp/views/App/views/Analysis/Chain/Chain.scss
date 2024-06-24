@@ -45,10 +45,12 @@
     }
 
     .chain-basic-props,
-    .chain-sampling-design {
+    .chain-sampling-design,
+    .statistical-analysis {
       display: flex;
       flex-direction: column;
       justify-self: center;
+      gap: 0.5rem;
     }
 
     .chain-basic-props {
@@ -56,7 +58,6 @@
     }
 
     .chain-sampling-design {
-      gap: 1rem;
       width: 50rem;
 
       .form-item {

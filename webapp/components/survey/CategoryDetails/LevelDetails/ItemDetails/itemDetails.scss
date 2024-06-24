@@ -1,11 +1,63 @@
+@import '~@webapp/style/vars';
+
+$borderColor: $greyBorder;
+
 .category__item {
+  position: relative;
+  border-bottom: 1px dotted $borderColor;
+  display: grid;
+  align-content: center;
+  grid-template-columns: 80px auto 1fr;
+  column-gap: 10px;
+  min-height: 35px;
+  grid-row-gap: 0.2rem;
+  font-size: 0.9rem;
+
+  &.not-valid {
+    grid-template-columns: 26px 44px auto 1fr;
+
+    .badge {
+      position: relative;
+    }
+  }
+
+  &.active {
+    grid-template-columns: 1fr;
+    border: 2px dashed $borderColor;
+    background-color: rgba($grey, 0.4);
+    padding: 1.5rem 0;
+
+    .badge {
+      position: absolute;
+    }
+  }
+
+  &:not(.active):hover {
+    background-color: rgba($greenLight, 0.6);
+    cursor: pointer;
+  }
+
+  .btn-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .btn-delete {
+    justify-self: center;
+  }
+
   .form-item {
-    grid-template-columns: 0.3fr 0.65fr;
     width: 100%;
 
     input {
       width: 100%;
     }
+  }
+
+  .form-item,
+  .labels-editor.with-label {
+    grid-template-columns: 0.3fr 0.6fr;
   }
 
   .extra-props {

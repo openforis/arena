@@ -77,6 +77,7 @@ const BasicProps = (props) => {
         inputFieldIdPrefix={TestId.nodeDefDetails.nodeDefDescriptions('')}
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(descriptions) => Actions.setProp({ state, key: NodeDef.propKeys.descriptions, value: descriptions })}
+        inputType="textarea"
       />
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (

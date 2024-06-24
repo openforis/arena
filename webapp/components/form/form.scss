@@ -14,6 +14,11 @@
   grid-column-gap: 0.5rem;
   height: 100%;
   align-items: center;
+  padding: 0.4rem;
+
+  &.display-flex {
+    display: flex;
+  }
 }
 
 .form-label {
@@ -36,7 +41,6 @@
 .form-input-container {
   display: grid;
   width: 100%;
-  height: 100%;
 
   &:focus-within {
     background-color: $blueLightFocus;
@@ -44,10 +48,6 @@
 }
 
 .form-input {
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid $greyBorder;
-  //width: 100%;
-
   &[readonly] {
     border-bottom: 1px solid rgba($greyBorder, 0.5);
   }

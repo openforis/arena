@@ -8,7 +8,7 @@ export const createSurvey = (surveyToAdd) => {
   test(`Create Survey ${surveyToAdd.name}`, async () => {
     const { cloneFrom, cloneFromLabel, label, name } = surveyToAdd
 
-    await page.fill(getSelector(TestId.surveyCreate.surveyName, 'input'), name)
+    await FormUtils.fillInput(TestId.surveyCreate.surveyName, name)
 
     if (cloneFrom) {
       // select create type "clone"
@@ -30,7 +30,7 @@ export const createSurvey = (surveyToAdd) => {
         page.click(TestId.modal.close),
       ])
     } else {
-      await page.fill(getSelector(TestId.surveyCreate.surveyLabel, 'input'), label)
+      await FormUtils.fillInput(TestId.surveyCreate.surveyLabel, label)
 
       // press "Create survey" and wait for the navigation to the survey dashboard
       await Promise.all([

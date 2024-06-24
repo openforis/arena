@@ -1,6 +1,7 @@
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import * as DateUtils from '../../../../core/dateUtils'
 import { tree } from '../../mock/nodeDefs'
+import { FormUtils } from '../utils/formUtils'
 
 // ==== value parser
 export const parseValue = (value) => (typeof value === 'function' ? value() : value)
@@ -14,8 +15,8 @@ export const getBooleanSelector = (nodeDef, parentSelector, value) =>
 
 export const getCoordinateSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
-  const xSelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateX(nodeDef.name), 'input')}`
-  const ySelector = `${nodeDefSelector} ${getSelector(TestId.surveyForm.coordinateY(nodeDef.name), 'input')}`
+  const xSelector = `${nodeDefSelector} ${FormUtils.getInputSelector(TestId.surveyForm.coordinateX(nodeDef.name))}`
+  const ySelector = `${nodeDefSelector} ${FormUtils.getInputSelector(TestId.surveyForm.coordinateY(nodeDef.name))}`
   const srsTestId = TestId.surveyForm.coordinateSRS(nodeDef.name)
 
   return { xSelector, ySelector, srsTestId }
@@ -30,7 +31,7 @@ export const getDateTimeCalendarBtnSelector = (nodeDef, parentSelector) =>
 export const getTaxonSelector = (nodeDef, parentSelector) => {
   const nodeDefSelector = getNodeDefSelector(nodeDef, parentSelector)
   const _selector = (field) =>
-    `${nodeDefSelector} ${getSelector(TestId.surveyForm.taxonField(nodeDef.name, field), 'input')}`
+    `${nodeDefSelector} ${FormUtils.getInputSelector(TestId.surveyForm.taxonField(nodeDef.name, field))}`
   const codeSelector = _selector('code')
   const scientificNameSelector = _selector('scientificName')
   const vernacularNameSelector = _selector('vernacularName')
