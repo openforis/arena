@@ -79,7 +79,7 @@ const Header = () => {
               }}
             />
             <SurveyPreferredLanguageSelector />
-            {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-secondary" />}
+            {canEditSurvey && Survey.isDraft(surveyInfo) && <ButtonPublishSurvey className="btn-publish" />}
             <div className="header__loader-wrapper">{appSaving && <Spinner size={25} />}</div>
           </>
         )}
