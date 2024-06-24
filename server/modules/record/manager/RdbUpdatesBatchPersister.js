@@ -2,7 +2,7 @@ import BatchPersister from '@server/db/batchPersister'
 import { RdbUpdates } from '@server/modules/surveyRdb/repository/RdbUpdates'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
 
-const BATCH_SIZE = 10000
+const BATCH_SIZE = 100
 
 export class RdbUpdatesBatchPersister extends BatchPersister {
   constructor({ user, surveyId, tx }) {
