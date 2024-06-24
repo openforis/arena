@@ -68,7 +68,7 @@ export const DataImportArenaView = () => {
             <legend>{i18n.t('dataImportView.options.header')}</legend>
 
             {
-              <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
+              <FormItem className="display-flex" label={i18n.t('dataImportView.importIntoCycle')}>
                 <CycleSelector selectedCycle={cycle} onChange={setCycle} />
               </FormItem>
             }
