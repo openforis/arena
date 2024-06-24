@@ -3,14 +3,14 @@
 
 .survey-form__node-def-integer,
 .survey-form__node-def-decimal {
-  .form-input {
+  .form-input input {
     text-align: right;
   }
 }
 
 .survey-form__node-def-date,
 .survey-form__node-def-time {
-  .form-input {
+  .form-input input {
     text-align: center;
   }
 }

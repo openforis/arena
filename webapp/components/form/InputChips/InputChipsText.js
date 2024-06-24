@@ -7,7 +7,7 @@ import classNames from 'classnames'
 import { ButtonAdd } from '@webapp/components/buttons'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
-import { TextInput } from '../TextInput'
+import { SimpleTextInput } from '../SimpleTextInput'
 
 import { useLocalState, State } from './store'
 import Chip from '../chip'
@@ -55,7 +55,7 @@ const InputChipsText = (props) => {
       {!readOnly && (
         <div className="input-field-row">
           <ValidationTooltip validation={validation}>
-            <TextInput
+            <SimpleTextInput
               id={idInput}
               onChange={Actions.onInputFieldChange({ selection })}
               onBlur={() => {

@@ -2,6 +2,14 @@ import { Objects } from '@openforis/arena-core'
 
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
 
+const getInputSelector = (id) => `${getSelector(id)} input`
+const getTextAreaSelector = (id) => `${getSelector(id)} textarea`
+
+const fillInput = async (id, value) => {
+  const selector = `${getSelector(id)} input`
+  await page.fill(selector, value)
+}
+
 const getDropdownSelector = ({ testId = null, parentSelector = '' }) =>
   `${parentSelector} ${testId ? getSelector(testId, '.dropdown-wrapper') : '.dropdown-wrapper'} .dropdown`
 
@@ -64,6 +72,9 @@ const waitForHeaderLoaderToDisappear = async () =>
   page.waitForSelector('.header__loader-wrapper', { state: 'hidden', timeout: 5000 })
 
 export const FormUtils = {
+  getInputSelector,
+  getTextAreaSelector,
+  fillInput,
   selectDropdownItem,
   expectDropdownToBeDisabled,
   expectDropdownValue,

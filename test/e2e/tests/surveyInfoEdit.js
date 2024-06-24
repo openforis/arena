@@ -1,9 +1,10 @@
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 import { gotoHome, gotoSurveyInfo } from './_navigation'
+import { FormUtils } from './utils/formUtils'
 
-const surveyName = getSelector(TestId.surveyInfo.surveyName, 'input')
-const surveyLabel = getSelector(TestId.surveyInfo.surveyLabel(), 'input')
-const surveyDescription = getSelector(TestId.surveyInfo.surveyDescription(), 'textarea')
+const surveyName = FormUtils.getInputSelector(TestId.surveyInfo.surveyName)
+const surveyLabel = FormUtils.getInputSelector(TestId.surveyInfo.surveyLabel())
+const surveyDescription = FormUtils.getTextAreaSelector(TestId.surveyInfo.surveyDescription())
 const surveyLanguage = getSelector(TestId.surveyInfo.surveyLanguage, 'input')
 const saveBtn = getSelector(TestId.surveyInfo.saveBtn, 'button')
 

@@ -8,7 +8,7 @@ export const createTemplate = (template) => {
   const { cloneFrom, cloneFromLabel, label, name } = template
 
   test(`Create Template ${name}`, async () => {
-    await page.fill(getSelector(TestId.surveyCreate.surveyName, 'input'), name)
+    await FormUtils.fillInput(TestId.surveyCreate.surveyName, name)
 
     if (cloneFrom) {
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' })))
@@ -22,7 +22,7 @@ export const createTemplate = (template) => {
         page.click(TestId.modal.close),
       ])
     } else {
-      await page.fill(getSelector(TestId.surveyCreate.surveyLabel, 'input'), label)
+      await FormUtils.fillInput(TestId.surveyCreate.surveyLabel, label)
 
       await Promise.all([
         page.waitForNavigation(/* { url: `{BASE_URL}/app/home/dashboard/` } */),

@@ -4,6 +4,14 @@
   .form-input {
     padding: 20px 5px;
   }
+
+  .MuiTextField-root {
+    margin: 1rem;
+
+    input {
+      padding: 1rem;
+    }
+  }
 }
 
 .guest-login__btn-request-access,

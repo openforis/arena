@@ -2,13 +2,14 @@ import fs from 'fs'
 import path from 'path'
 import { downloadsPath } from '../../paths'
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 
 const waitForApi = async (action) => Promise.all([page.waitForResponse('**/categories/**'), action])
 const getItemCode = (codePrefix, itemIdx) => `${codePrefix}${itemIdx}`
 
 export const editCategoryProps = (category) =>
   test(`Edit category ${category.label} props`, async () => {
-    await waitForApi(page.fill(getSelector(TestId.categoryDetails.categoryName, 'input'), category.name))
+    await waitForApi(FormUtils.fillInput(TestId.categoryDetails.categoryName, category.name))
   })
 
 export const addLevels = (category) => {
@@ -25,7 +26,7 @@ export const addLevels = (category) => {
   if (category.levels.length > 1) {
     category.levels.forEach((level, idx) =>
       test(`Set level name for level ${idx}`, async () => {
-        await waitForApi(page.fill(getSelector(TestId.categoryDetails.levelName(idx), 'input'), level.name))
+        await waitForApi(FormUtils.fillInput(TestId.categoryDetails.levelName(idx), level.name))
       })
     )
   }
@@ -39,8 +40,8 @@ const addItem = (level, levelIdx, itemIdx, codePrefix) => {
     // add item
     await waitForApi(page.click(getSelector(TestId.categoryDetails.levelAddItemBtn(levelIdx), 'button')))
 
-    const itemCodeSelector = getSelector(TestId.categoryDetails.itemCode(levelIdx, itemIdx), 'input')
-    const itemLabelSelector = getSelector(TestId.categoryDetails.itemLabel(levelIdx, itemIdx)(), 'input')
+    const itemCodeSelector = FormUtils.getInputSelector(TestId.categoryDetails.itemCode(levelIdx, itemIdx))
+    const itemLabelSelector = FormUtils.getInputSelector(TestId.categoryDetails.itemLabel(levelIdx, itemIdx)())
     // fill code and label
     await waitForApi(page.fill(itemCodeSelector, itemCode))
     await waitForApi(page.fill(itemLabelSelector, itemLabel))
