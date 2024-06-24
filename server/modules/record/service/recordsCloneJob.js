@@ -1,4 +1,4 @@
-import { Objects, Promises, RecordUuidsUpdater, SystemError } from '@openforis/arena-core'
+import { Objects, Promises, RecordCloner, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -26,6 +26,10 @@ export default class RecordsCloneJob extends Job {
 
     const { context, user, tx } = this
     const { surveyId } = context
+
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, tx)
+    this.setContext({ survey })
+
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
   }
 
@@ -73,26 +77,28 @@ export default class RecordsCloneJob extends Job {
 
   async cloneRecord({ recordSummary }) {
     const { context, tx, user } = this
-    const { surveyId, cycleTo } = context
+    const { surveyId, survey, cycleTo } = context
 
-    let record = await RecordManager.fetchRecordAndNodesByUuid({
+    const record = await RecordManager.fetchRecordAndNodesByUuid({
       surveyId,
       recordUuid: recordSummary.uuid,
       fetchForUpdate: false,
     })
-    record.cycle = cycleTo
-
     // assign new UUIDs with side effect on record and nodes, faster when record is big
-    const { newNodeUuidsByOldUuid, newFileUuidsByOldUuid } = RecordUuidsUpdater.assignNewUuids(record)
+    const {
+      record: recordCloned,
+      newNodeUuidsByOldUuid,
+      newFileUuidsByOldUuid,
+    } = RecordCloner.cloneRecord({ survey, record, cycleTo })
 
-    const newRecordUuid = Record.getUuid(record)
-    const nodesArray = Record.getNodesArray(record)
+    const newRecordUuid = Record.getUuid(recordCloned)
+    const nodes = Record.getNodes(recordCloned)
+    const nodesArray = Object.values(nodes)
 
     // insert record
-    await RecordManager.insertRecord(user, surveyId, record, true, tx)
+    await RecordManager.insertRecord(user, surveyId, recordCloned, true, tx)
 
     // insert nodes (add them to batch persister)
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, tx)
 
     await Promises.each(nodesArray, async (node) => {
       // check that the node definition associated to the node has not been deleted from the survey
@@ -102,7 +108,7 @@ export default class RecordsCloneJob extends Job {
     })
 
     // update RDB
-    await DataTableUpdateRepository.updateTables({ survey, record, nodes: Record.getNodes(record) }, tx)
+    await DataTableUpdateRepository.updateTables({ survey, record: recordCloned, nodes }, tx)
 
     await this.cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid })
 
