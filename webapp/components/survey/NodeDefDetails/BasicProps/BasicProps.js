@@ -188,12 +188,10 @@ const BasicProps = (props) => {
         onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
       >
         <Checkbox
-          checked={NodeDef.isIncludedWhenCloningBetweenCycles(nodeDef)}
-          disabled={NodeDef.isAlwaysIncludedWhenCloningBetweenCycles(nodeDef)}
+          checked={!NodeDef.isExcludedInClone(nodeDef)}
+          disabled={!NodeDef.canBeExcludedInClone(nodeDef)}
           label="nodeDefEdit.basicProps.includedWhenCloningBetweenCycles"
-          onChange={(value) =>
-            Actions.setProp({ state, key: NodeDef.propKeys.includedWhenCloningBetweenCycles, value })
-          }
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.excludedInClone, value: !value })}
         />
       </CyclesSelector>
 

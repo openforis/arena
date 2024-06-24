@@ -35,10 +35,7 @@ export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
 export const isKeyTrue = (key) => (obj) => !!R.propOr(false, key)(obj)
-export const isPropTrue =
-  (prop, defaultTo = undefined) =>
-  (obj) =>
-    !!getProp(prop, defaultTo)(obj)
+export const isPropTrue = (prop) => (obj) => !!getProp(prop)(obj)
 
 export const getParentUuid = R.propOr(null, keys.parentUuid)
 
