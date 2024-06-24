@@ -55,12 +55,13 @@ export const useBasicProps = (props) => {
     displayInParentPageDisabled,
     keyEditDisabled,
     multipleEditDisabled,
-    cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
     displayIn,
-    cyclesNodeDef,
     nodeDefParentLabel,
     enumerator,
+    cyclesNodeDef,
+    cyclesKeysParent,
+    cyclesKeysSurvey,
   }
 }

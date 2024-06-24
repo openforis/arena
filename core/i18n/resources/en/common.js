@@ -1241,6 +1241,7 @@ $t(common.appNameFull)
       },
       form: 'Form',
       formula: 'Formula',
+      includedWhenCloningBetweenCycles: 'Included when cloning between cycles',
       key: 'Key',
       multiple: 'Multiple',
       ownPage: 'Its own page',

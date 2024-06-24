@@ -49,6 +49,7 @@ export const NodeDefLabelTypes = {
 
 export const propKeys = {
   cycles: 'cycles',
+  includedWhenCloningBetweenCycles: 'includedWhenCloningBetweenCycles',
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
   key: 'key',
@@ -173,6 +174,10 @@ export const {
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
 export const getCycles = getProp(propKeys.cycles, [])
+export const isIncludedWhenCloningBetweenCycles = ObjectUtils.isPropTrue(
+  propKeys.includedWhenCloningBetweenCycles,
+  true
+)
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
@@ -434,6 +439,8 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
+export const assocIncludedWhenCloningBetweenCycles = (value) =>
+  assocProp({ key: propKeys.includedWhenCloningBetweenCycles, value })
 export const assocLabels = (labels) => assocProp({ key: propKeys.labels, value: labels })
 export const assocLabel =
   ({ label, lang }) =>
@@ -558,6 +565,7 @@ export const canHaveDefaultValue = (nodeDef) =>
   ])
 
 export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
+export const isAlwaysIncludedWhenCloningBetweenCycles = (nodeDef) => isRoot(nodeDef) || isKey(nodeDef)
 
 const isEntityAndNotRoot = (nodeDef) => isEntity(nodeDef) && !isRoot(nodeDef)
 export const isDisplayAsEnabled = isEntityAndNotRoot
@@ -596,6 +604,9 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
       prop: NodeDefLayout.keys.includedInMultipleEntitySummary,
       value: false,
     })(nodeDefUpdated)
+  }
+  if (isAlwaysIncludedWhenCloningBetweenCycles(nodeDefUpdated) && !isIncludedWhenCloningBetweenCycles(nodeDefUpdated)) {
+    nodeDefUpdated = assocIncludedWhenCloningBetweenCycles(true)(nodeDefUpdated)
   }
   return nodeDefUpdated
 }
