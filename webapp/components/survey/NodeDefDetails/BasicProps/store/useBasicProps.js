@@ -30,6 +30,9 @@ export const useBasicProps = (props) => {
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
+  const hasAncestorExcludedInClone = !!Survey.findAncestor({ nodeDef, predicate: NodeDef.isExcludedInClone })(survey)
+  const includedInClone = !hasAncestorExcludedInClone && !NodeDef.isExcludedInClone(nodeDef)
+  const includeInCloneDisabled = !NodeDef.canBeExcludedInClone(nodeDef) || hasAncestorExcludedInClone
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -64,5 +67,7 @@ export const useBasicProps = (props) => {
     cyclesNodeDef,
     cyclesKeysParent,
     cyclesKeysSurvey,
+    includedInClone,
+    includeInCloneDisabled,
   }
 }

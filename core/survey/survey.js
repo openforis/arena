@@ -175,6 +175,8 @@ export const {
 // Hierarchy
 export const {
   isNodeDefAncestor,
+  findAncestor,
+  findAncestors,
   visitAncestorsAndSelf,
   visitAncestors,
   getNodeDefPath,
