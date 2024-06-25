@@ -79,11 +79,9 @@ export default class RecordsCloneJob extends Job {
     const { context, tx, user } = this
     const { surveyId, survey, cycleTo } = context
 
-    const record = await RecordManager.fetchRecordAndNodesByUuid({
-      surveyId,
-      recordUuid: recordSummary.uuid,
-      fetchForUpdate: false,
-    })
+    const recordUuid = recordSummary.uuid
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
+
     // assign new UUIDs with side effect on record and nodes, faster when record is big
     const {
       record: recordCloned,
