@@ -78,7 +78,7 @@ const RecordEntryButtons = () => {
 
         {canPromote && (
           <Button
-            className="btn-s btn-transparent"
+            iconClassName="icon-redo2 icon-12px"
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
@@ -88,9 +88,10 @@ const RecordEntryButtons = () => {
                 })
               )
             }
+            size="small"
             title="surveyForm.formEntryActions.promoteTo"
             titleParams={{ stepNext: getStepLabel(stepNext) }}
-            iconClassName="icon-redo2 icon-12px"
+            variant="text"
           />
         )}
       </div>
