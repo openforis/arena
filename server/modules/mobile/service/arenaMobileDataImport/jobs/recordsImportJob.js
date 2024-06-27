@@ -1,7 +1,8 @@
-import { Dates } from '@openforis/arena-core'
+import { Dates, Objects, Records, Surveys } from '@openforis/arena-core'
 
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -26,6 +27,21 @@ export default class RecordsImportJob extends DataImportBaseJob {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
+  }
+
+  async onStart() {
+    await super.onStart()
+    const { context, tx } = this
+    const { surveyId } = context
+    const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId(
+      {
+        surveyId,
+        offset: 0,
+        limit: null,
+      },
+      tx
+    )
+    this.setContext({ existingRecordsSummary: recordsSummary.list })
   }
 
   async execute() {
@@ -109,19 +125,54 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
   }
 
+  findExistingRecordSummaryWithSameKeys() {
+    const { context, currentRecord: record } = this
+    const { survey, existingRecordsSummary } = context
+    const recordUuid = Record.getUuid(record)
+    const rootDef = Surveys.getNodeDefRoot({ survey })
+    const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
+    const recordRootEntity = Records.getRoot(record)
+    const recordKeyValues = Records.getEntityKeyValues({ survey, record, entity: recordRootEntity })
+    const recordSummaryKeyProps = keyDefs.map((keyDef) => A.camelize(NodeDef.getName(keyDef)))
+
+    const recordSummariesWithSameKeys = existingRecordsSummary.filter((recordSummary) => {
+      const recordSummaryKeyValues = recordSummaryKeyProps.map((key) => recordSummary[key])
+      return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
+    })
+    const recordSummarySameUuid = recordSummariesWithSameKeys.find(
+      (recordSummary) => Record.getUuid(recordSummary) === recordUuid
+    )
+
+    return recordSummarySameUuid ?? recordSummariesWithSameKeys[0]
+  }
+
+  findExistingRecordSummary() {
+    const { context, currentRecord: record } = this
+    const { existingRecordsSummary, conflictResolutionStrategy } = context
+
+    if (ConflictResolutionStrategy.merge === conflictResolutionStrategy) {
+      return this.findExistingRecordSummaryWithSameKeys()
+    } else {
+      const recordUuid = Record.getUuid(record)
+      return existingRecordsSummary.find((recordSummary) => Record.getUuid(recordSummary) === recordUuid)
+    }
+  }
+
   async insertOrSkipRecord() {
-    const { context, currentRecord: record, tx } = this
-    const { surveyId, conflictResolutionStrategy } = context
+    const { context, currentRecord: record } = this
+    const { conflictResolutionStrategy } = context
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecordSummary = await RecordManager.fetchRecordSummary({ surveyId, recordUuid }, tx)
+    const existingRecordSummary = this.findExistingRecordSummary()
 
     if (existingRecordSummary) {
       if (conflictResolutionStrategy === ConflictResolutionStrategy.skipExisting) {
         // skip record
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
+      } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
+        await this.mergeWithExistingRecord(Record.getUuid(existingRecordSummary))
       } else if (
         conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
         Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
@@ -133,6 +184,35 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
   }
 
+  async mergeWithExistingRecord(targetRecordUuid) {
+    const { context, currentRecord: record, tx } = this
+    const { survey, surveyId } = context
+
+    const recordUuid = Record.getUuid(record)
+
+    this.logDebug(`merging record ${recordUuid} into existing record ${targetRecordUuid}`)
+
+    const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
+      { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
+      tx
+    )
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.replaceUpdatedNodes({
+      survey,
+      recordSource: record,
+      sideEffect: true,
+      mergeNodes: true,
+    })(recordTarget)
+    this.currentRecord = recordTargetUpdated
+
+    this.trackFileUuids({ nodes: nodesUpdated })
+
+    const dateModified = Record.getDateModified(record) // TODO get max between modified dates
+    await this.persistUpdatedNodes({ nodesUpdated, dateModified })
+
+    this.updatedRecordsUuids.add(targetRecordUuid)
+    this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
+  }
+
   async updateExistingRecord() {
     const { context, currentRecord: record, tx } = this
     const { survey, surveyId } = context
@@ -142,12 +222,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.logDebug(`updating record ${recordUuid}`)
 
     const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
-      {
-        surveyId,
-        recordUuid,
-        draft: false,
-        fetchForUpdate: true,
-      },
+      { surveyId, recordUuid, fetchForUpdate: true },
       tx
     )
     const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.replaceUpdatedNodes({

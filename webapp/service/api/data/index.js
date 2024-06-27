@@ -72,7 +72,7 @@ export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, onUpl
     file,
     cycle,
     dryRun,
-    conflictResolutionStrategy: ConflictResolutionStrategy.overwriteIfUpdated,
+    conflictResolutionStrategy: ConflictResolutionStrategy.merge,
   })
   const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
   const { job } = data
