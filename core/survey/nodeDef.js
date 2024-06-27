@@ -49,7 +49,6 @@ export const NodeDefLabelTypes = {
 
 export const propKeys = {
   cycles: 'cycles',
-  excludedInClone: 'excludedInClone',
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
   key: 'key',
@@ -124,6 +123,7 @@ export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
   defaultValueEvaluatedOneTime: 'defaultValueEvaluatedOneTime',
+  excludedInClone: 'excludedInClone',
   validations: 'validations',
   formula: 'formula',
 
@@ -174,7 +174,6 @@ export const {
 export const getType = R.prop(keys.type)
 export const getName = getProp(propKeys.name, '')
 export const getCycles = getProp(propKeys.cycles, [])
-export const isExcludedInClone = ObjectUtils.isPropTrue(propKeys.excludedInClone)
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
@@ -360,6 +359,8 @@ export const getAllExpressions = (nodeDef) => {
   return expressions
 }
 
+export const isExcludedInClone = getPropAdvanced(propKeys.excludedInClone, false)
+
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
 
@@ -436,7 +437,7 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
-export const assocExcludedInClone = (value) => assocProp({ key: propKeys.excludedInClone, value })
+export const assocExcludedInClone = (value) => assocProp({ key: keysPropsAdvanced.excludedInClone, value })
 export const assocLabels = (labels) => assocProp({ key: propKeys.labels, value: labels })
 export const assocLabel =
   ({ label, lang }) =>

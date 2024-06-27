@@ -192,8 +192,10 @@ const BasicProps = (props) => {
         <Checkbox
           checked={includedInClone}
           disabled={includeInCloneDisabled}
-          label="nodeDefEdit.basicProps.includedWhenCloningBetweenCycles"
-          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.excludedInClone, value: !value })}
+          label="nodeDefEdit.basicProps.includedInClone"
+          onChange={(value) =>
+            Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
+          }
         />
       </CyclesSelector>
 
