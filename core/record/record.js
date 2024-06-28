@@ -88,6 +88,7 @@ export const {
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
   replaceUpdatedNodes,
+  mergeRecords,
   deleteNodesInEntityByNodeDefUuid,
 } = RecordNodesUpdater
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)

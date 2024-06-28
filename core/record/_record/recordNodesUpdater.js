@@ -370,6 +370,33 @@ const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
   nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
 
+const _replaceAttributeValueIfModifiedAfter = ({
+  survey,
+  attrDef,
+  recordTarget,
+  entityTarget,
+  attrSource,
+  attrTarget,
+  sideEffect,
+}) => {
+  const sourceDateModified = Node.getDateModified(attrSource)
+  const targetDateModified = Node.getDateModified(attrTarget)
+  if (Dates.isAfter(sourceDateModified, targetDateModified)) {
+    const attributeUpdateResult = _updateAttributeValue({
+      survey,
+      record: recordTarget,
+      entity: entityTarget,
+      attributeDef: attrDef,
+      attribute: attrTarget,
+      value: Node.getValue(attrSource),
+      dateModified: sourceDateModified,
+      sideEffect,
+    })
+    return attributeUpdateResult
+  }
+  return null
+}
+
 const _replaceUpdatedNodesInEntities = ({
   survey,
   recordSource,
@@ -426,22 +453,17 @@ const _replaceUpdatedNodesInEntities = ({
     _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
       const childTargetToUpdate = _findNodeWithSameUuid(childSource, childrenTarget)
       if (NodeDef.isAttribute(childDef)) {
-        const sourceDateModified = Node.getDateModified(childSource)
-        const targetDateModified = Node.getDateModified(childTargetToUpdate)
-        if (Dates.isAfter(sourceDateModified, targetDateModified)) {
-          const attributeUpdateResult = _updateAttributeValue({
-            survey,
-            record: updateResult.record,
-            entity: entityTarget,
-            attributeDef: childDef,
-            attribute: childTargetToUpdate,
-            value: Node.getValue(childSource),
-            dateModified: sourceDateModified,
-            sideEffect,
-          })
-          if (attributeUpdateResult) {
-            updateResult.merge(attributeUpdateResult)
-          }
+        const attrUpdateResult = _replaceAttributeValueIfModifiedAfter({
+          survey,
+          attrDef: childDef,
+          recordTarget: updateResult.record,
+          entityTarget,
+          attrSource: childSource,
+          attrTarget: childTargetToUpdate,
+          sideEffect,
+        })
+        if (attrUpdateResult) {
+          updateResult.merge(attrUpdateResult)
         }
       } else {
         const childEntityUpdateResult = _replaceUpdatedNodesInEntities({
@@ -484,103 +506,18 @@ const replaceUpdatedNodes =
     })
   }
 
-const _mergeEntitiesByKeys = ({
-  survey,
-  recordSource,
-  recordTarget,
-  entitySource,
-  entityTarget,
-  sideEffect = false,
-}) => {
-  const includeAnalysis = false
-  const updateResult = new RecordUpdateResult({ record: recordTarget })
-
-  const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entitySource))(survey)
-
-  // const metaSource = Node.getMeta(entitySource)
-  // const metaTarget = Node.getMeta(entityTarget)
-  // if (!Objects.isEqual(metaSource, metaTarget)) {
-  //   const entityTargetUpdated = A.pipe(Node.assocMeta(metaSource), Node.assocUpdated(true))(entityTarget)
-  //   updateResult.addNode(entityTargetUpdated)
-  // }
-
-  Survey.getNodeDefChildren(
-    entityDef,
-    includeAnalysis
-  )(survey).forEach((childDef) => {
-    const childDefUuid = NodeDef.getUuid(childDef)
-
-    const childrenSource = Records.findEntityByKeyValues({ survey, record, entityDefUuid })
-    const childrenTarget = RecordReader.getNodeChildrenByDefUuidUnsorted(
-      entityTarget,
-      childDefUuid
-    )(updateResult.record)
-
-    // delete nodes that are not in source record
-    const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
-    if (childrenTargetToDelete.length > 0) {
-      const childrenTargetToDeleteUuids = childrenTargetToDelete.map(Node.getUuid)
-      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
-        updateResult.record
-      )
-      updateResult.merge(nodesDeleteUpdateResult)
-    }
-
-    // add new nodes (in source record but not in target record) to updateResult (and record)
-    _getNodesArrayDifference(childrenSource, childrenTarget).forEach((childSourceToAdd) => {
-      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
-        const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
-        newNodeToAdd[Node.keys.id] = null // clear internal id
-        updateResult.addNode(newNodeToAdd)
-      })(recordSource)
-    })
-
-    // update existing nodes (nodes in both source and target records)
-
-    _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
-      const childTargetToUpdate = _findNodeWithSameUuid(childSource, childrenTarget)
-      if (NodeDef.isAttribute(childDef)) {
-        const sourceDateModified = Node.getDateModified(childSource)
-        const targetDateModified = Node.getDateModified(childTargetToUpdate)
-        if (Dates.isAfter(sourceDateModified, targetDateModified)) {
-          const attributeUpdateResult = _updateAttributeValue({
-            survey,
-            record: updateResult.record,
-            entity: entityTarget,
-            attributeDef: childDef,
-            attribute: childTargetToUpdate,
-            value: Node.getValue(childSource),
-            dateModified: sourceDateModified,
-            sideEffect,
-          })
-          if (attributeUpdateResult) {
-            updateResult.merge(attributeUpdateResult)
-          }
-        }
-      } else {
-        const childEntityUpdateResult = _replaceUpdatedNodesInEntities({
-          survey,
-          recordSource,
-          recordTarget: updateResult.record,
-          entitySource: childSource,
-          entityTarget: childTargetToUpdate,
-        })
-        updateResult.merge(childEntityUpdateResult)
-      }
-    })
-  })
-  return updateResult
-}
-
-const findEntityByUuidOrKeys = ({ survey, record, uuid, keyValues }) => {
+const findEntityByUuidOrKeys = ({ survey, record, entityDefUuid, parentEntity, uuid, keyValuesByDefUuid }) => {
   const entityWithSameUuid = Records.getNodeByUuid(uuid)(record)
-  if (entityWithSameUuid) return entityWithSameUuid
-  Records.getc
+  return (
+    entityWithSameUuid ??
+    Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
+  )
 }
 
 const mergeRecords =
   ({ survey, recordSource, timezoneOffset, sideEffect = false }) =>
   async (recordTarget) => {
+    const { cycle } = recordTarget
     const rootSource = RecordReader.getRootNode(recordSource)
     const rootTarget = RecordReader.getRootNode(recordTarget)
 
@@ -588,32 +525,65 @@ const mergeRecords =
     const stack = [{ entitySource: rootSource, entityTarget: rootTarget }]
     while (stack.length > 0) {
       const { entitySource, entityTarget } = stack.pop()
-      const entityDef = Surveys.getNodeDefByUuid({survey, uuid: Node.getNodeDefUuid(entitySource)})
-      
-      // const keyValues = Records.getEntityKeyValues({ survey, record: recordSource, entity })
-      // const entityTarget = findEntityByUuidOrKeys({
-      //   survey,
-      //   record: recordTarget,
-      //   uuid: Node.getUuid(entity),
-      //   keyValues,
-      // })
+      const entityDef = Surveys.getNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(entitySource) })
+      const childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef: entityDef, cycle })
+      childDefs.forEach((childDef) => {
+        const childDefUuid = NodeDef.getUuid(childDef)
+        if (NodeDef.isSingle(childDef)) {
+          const childSource = Records.getChild(entitySource, childDefUuid)(recordSource)
+          const childTarget = Records.getChild(entityTarget, childDefUuid)(recordTarget)
+          if (childSource && childTarget) {
+            if (NodeDef.isAttribute(childDef)) {
+              const attrUpdateResult = _replaceAttributeValueIfModifiedAfter({
+                survey,
+                attrDef: childDef,
+                recordTarget: updateResult.record,
+                entityTarget,
+                attrSource: childSource,
+                attrTarget: childTarget,
+                sideEffect,
+              })
+              if (attrUpdateResult) {
+                updateResult.merge(attrUpdateResult)
+              }
+            } else {
+              stack.push({ entitySource: childSource, entityTarget: childTarget })
+            }
+          }
+        } else if (NodeDef.isEntity(childDef)) {
+          const childrenSource = Records.getChildren(entitySource, childDefUuid)(recordSource)
+          childrenSource.forEach((childSource) => {
+            const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
+              survey,
+              record: recordSource,
+              entity: entitySource,
+            })
+            const childTarget = findEntityByUuidOrKeys({
+              survey,
+              record: recordTarget,
+              entityDefUuid: childDefUuid,
+              parentEntity: entityTarget,
+              uuid: Node.getUuid(childSource),
+              keyValuesByDefUuid,
+            })
+            if (childTarget) {
+              stack.push({ entitySource: childSource, entityTarget: childTarget })
+            } else {
+              // TODO add childSource entity and descendants to targetRecord
+            }
+          })
+        } else {
+          // TODO support multiple attributes merge
+        }
+      })
     }
-
-    // const updateResult = _mergeEntitiesByKeys({
-    //   survey,
-    //   recordSource,
-    //   recordTarget,
-    //   entitySource: rootSource,
-    //   entityTarget: rootTarget,
-    //   sideEffect,
-    // })
-    // return _afterNodesUpdate({
-    //   survey,
-    //   record: updateResult.record,
-    //   nodes: updateResult.nodes,
-    //   timezoneOffset,
-    //   sideEffect,
-    // })
+    return _afterNodesUpdate({
+      survey,
+      record: updateResult.record,
+      nodes: updateResult.nodes,
+      timezoneOffset,
+      sideEffect,
+    })
   }
 
 const deleteNodesInEntityByNodeDefUuid =
@@ -639,5 +609,6 @@ export const RecordNodesUpdater = {
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
   replaceUpdatedNodes,
+  mergeRecords,
   deleteNodesInEntityByNodeDefUuid,
 }

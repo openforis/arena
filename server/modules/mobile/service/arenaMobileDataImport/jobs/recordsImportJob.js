@@ -184,11 +184,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
   }
 
-  async mergeWithExistingRecord(targetRecordUuid) {
+  async mergeWithExistingRecord({
+    conflictResolutionStrategy = ConflictResolutionStrategy.overwriteIfUpdated,
+    targetRecordUuid: targetRecordUuidParam = null,
+  }) {
     const { context, currentRecord: record, tx } = this
     const { survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
+    const targetRecordUuid = targetRecordUuidParam ?? recordUuid
 
     this.logDebug(`merging record ${recordUuid} into existing record ${targetRecordUuid}`)
 
@@ -196,12 +200,18 @@ export default class RecordsImportJob extends DataImportBaseJob {
       { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
       tx
     )
-    const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.replaceUpdatedNodes({
-      survey,
-      recordSource: record,
-      sideEffect: true,
-      mergeNodes: true,
-    })(recordTarget)
+    const { record: recordTargetUpdated, nodes: nodesUpdated } =
+      conflictResolutionStrategy === ConflictResolutionStrategy.merge
+        ? await Record.mergeRecords({
+            survey,
+            recordSource: record,
+            sideEffect: true,
+          })(recordTarget)
+        : await Record.replaceUpdatedNodes({
+            survey,
+            recordSource: record,
+            sideEffect: true,
+          })(recordTarget)
     this.currentRecord = recordTargetUpdated
 
     this.trackFileUuids({ nodes: nodesUpdated })
