@@ -27,7 +27,7 @@ export default class RecordsCloneJob extends Job {
     const { context, user, tx } = this
     const { surveyId } = context
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, advanced: true }, tx)
     this.setContext({ survey })
 
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })

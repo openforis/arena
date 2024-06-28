@@ -31,8 +31,12 @@ export const useBasicProps = (props) => {
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const hasAncestorExcludedInClone = !!Survey.findAncestor({ nodeDef, predicate: NodeDef.isExcludedInClone })(survey)
-  const includedInClone = !hasAncestorExcludedInClone && !NodeDef.isExcludedInClone(nodeDef)
-  const includeInCloneDisabled = !NodeDef.canBeExcludedInClone(nodeDef) || hasAncestorExcludedInClone
+  const ancestorCodeDefs = NodeDef.isCode(nodeDef) ? Survey.getNodeDefAncestorCodes(nodeDef)(survey) : []
+  const hasAncestorCodeDefsExcludedInClone = ancestorCodeDefs.find(NodeDef.isExcludedInClone)
+  const includedInClone =
+    !hasAncestorExcludedInClone && !hasAncestorCodeDefsExcludedInClone && !NodeDef.isExcludedInClone(nodeDef)
+  const includeInCloneDisabled =
+    !NodeDef.canBeExcludedInClone(nodeDef) || hasAncestorExcludedInClone || hasAncestorCodeDefsExcludedInClone
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

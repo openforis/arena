@@ -359,7 +359,7 @@ export const getAllExpressions = (nodeDef) => {
   return expressions
 }
 
-export const isExcludedInClone = getPropAdvanced(propKeys.excludedInClone, false)
+export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')

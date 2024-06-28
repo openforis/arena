@@ -398,6 +398,8 @@ export const getDescendantsAndSelf =
 // ====== NODE DEFS CODE UTILS
 export const getNodeDefParentCode = (nodeDef) => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))
 
+export const getNodeDefAncestorCodes = (nodeDef) => (survey) => Surveys.getNodeDefAncestorCodes({ survey, nodeDef })
+
 export const isNodeDefParentCode = (nodeDef) =>
   R.pipe(
     getNodeDefsArray,
