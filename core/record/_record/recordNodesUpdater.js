@@ -514,14 +514,6 @@ const findEntityByUuidOrKeys = ({ survey, record, entityDefUuid, parentEntity, u
   )
 }
 
-const _findNodeChildren = (entity, childDefUuid) => (record) => {
-  try {
-    return RecordReader.getNodeChildren(entity, childDefUuid)(record)
-  } catch (error) {
-    return []
-  }
-}
-
 const mergeRecords =
   ({ survey, recordSource, timezoneOffset, sideEffect = false }) =>
   async (recordTarget) => {
@@ -537,8 +529,8 @@ const mergeRecords =
       const childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef: entityDef, cycle })
       childDefs.forEach((childDef) => {
         const childDefUuid = NodeDef.getUuid(childDef)
-        const childrenSource = _findNodeChildren(entitySource, childDefUuid)(recordSource)
-        const childrenTarget = _findNodeChildren(entityTarget, childDefUuid)(recordTarget)
+        const childrenSource = RecordReader.findNodeChildren(entitySource, childDefUuid)(recordSource)
+        const childrenTarget = RecordReader.findNodeChildren(entityTarget, childDefUuid)(recordTarget)
         if (NodeDef.isSingle(childDef)) {
           const childSource = childrenSource[0]
           const childTarget = childrenTarget[0]
@@ -565,7 +557,7 @@ const mergeRecords =
             const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
               survey,
               record: recordSource,
-              entity: entitySource,
+              entity: childSource,
             })
             const childTarget = findEntityByUuidOrKeys({
               survey,

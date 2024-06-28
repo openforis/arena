@@ -9,6 +9,7 @@ import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
 
 import { getContextUser } from '../../integration/config/context'
+import { RecordPrettyPrinter } from '@openforis/arena-core'
 
 let survey = {}
 let record = {}
@@ -91,7 +92,7 @@ describe('Records merge Test', () => {
 
     const rootNode = Record.getRootNode(recordUpdated)
 
-    expect(Object.values(nodesUpdated).length).toBe(29)
+    expect(Object.values(nodesUpdated).length).toBe(28)
 
     const plotNodes = Record.getNodeChildrenByDefUuid(rootNode, plotDef.uuid)(recordUpdated)
     expect(plotNodes.length).toEqual(3)
