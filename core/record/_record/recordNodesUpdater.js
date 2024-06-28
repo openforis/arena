@@ -443,7 +443,7 @@ const _replaceUpdatedNodesInEntities = ({
     _getNodesArrayDifference(childrenSource, childrenTarget).forEach((childSourceToAdd) => {
       RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
         const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
-        newNodeToAdd[Node.keys.id] = null // clear internal id
+        delete newNodeToAdd[Node.keys.id] // clear internal id
         updateResult.addNode(newNodeToAdd)
       })(recordSource)
     })
@@ -570,6 +570,15 @@ const mergeRecords =
               stack.push({ entitySource: childSource, entityTarget: childTarget })
             } else {
               // TODO add childSource entity and descendants to targetRecord
+              RecordReader.visitDescendantsAndSelf(childSource, (visitedChildSource) => {
+                const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
+                delete newNodeToAdd[Node.keys.id] // clear internal id
+                newNodeToAdd[Node.keys.recordUuid] = recordTarget.uuid
+                if (visitedChildSource === childSource) {
+                  visitedChildSource[Node.keys.parentUuid] = Node.getUuid(entityTarget)
+                }
+                updateResult.addNode(newNodeToAdd)
+              })(recordSource)
             }
           })
         } else {

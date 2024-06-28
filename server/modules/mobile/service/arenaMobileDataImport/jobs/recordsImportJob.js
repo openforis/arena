@@ -172,29 +172,30 @@ export default class RecordsImportJob extends DataImportBaseJob {
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
-        await this.mergeWithExistingRecord(Record.getUuid(existingRecordSummary))
+        await this.mergeWithExistingRecord({ targetRecordUuid: Record.getUuid(existingRecordSummary) })
       } else if (
         conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
         Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
       ) {
-        await this.updateExistingRecord()
+        await this.mergeWithExistingRecord()
       }
     } else {
       await this.insertNewRecord()
     }
   }
 
-  async mergeWithExistingRecord({
-    conflictResolutionStrategy = ConflictResolutionStrategy.overwriteIfUpdated,
-    targetRecordUuid: targetRecordUuidParam = null,
-  }) {
+  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null }) {
     const { context, currentRecord: record, tx } = this
-    const { survey, surveyId } = context
+    const { conflictResolutionStrategy, survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
     const targetRecordUuid = targetRecordUuidParam ?? recordUuid
 
-    this.logDebug(`merging record ${recordUuid} into existing record ${targetRecordUuid}`)
+    this.logDebug(
+      conflictResolutionStrategy === ConflictResolutionStrategy.merge
+        ? `merging record ${recordUuid} into existing record ${targetRecordUuid}`
+        : `updating record ${recordUuid}`
+    )
 
     const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
       { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
@@ -220,33 +221,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await this.persistUpdatedNodes({ nodesUpdated, dateModified })
 
     this.updatedRecordsUuids.add(targetRecordUuid)
-    this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
-  }
-
-  async updateExistingRecord() {
-    const { context, currentRecord: record, tx } = this
-    const { survey, surveyId } = context
-
-    const recordUuid = Record.getUuid(record)
-
-    this.logDebug(`updating record ${recordUuid}`)
-
-    const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
-      { surveyId, recordUuid, fetchForUpdate: true },
-      tx
-    )
-    const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.replaceUpdatedNodes({
-      survey,
-      recordSource: record,
-      sideEffect: true,
-    })(recordTarget)
-    this.currentRecord = recordTargetUpdated
-
-    this.trackFileUuids({ nodes: nodesUpdated })
-
-    await this.persistUpdatedNodes({ nodesUpdated, dateModified: Record.getDateModified(record) })
-
-    this.updatedRecordsUuids.add(recordUuid)
     this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
   }
 
