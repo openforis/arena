@@ -69,12 +69,12 @@ export const canViewAllRecords = _hasSurveyPermission(permissions.recordCleanse)
 export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
 
 // UPDATE
-export const canEditRecord = (user, record) => {
+export const canEditRecord = (user, record, ignoreRecordStep = false) => {
   if (
     !user ||
     !record ||
     // records in analysis cannot be edited
-    Record.isInAnalysisStep(record)
+    (!ignoreRecordStep && Record.isInAnalysisStep(record))
   ) {
     return false
   }
@@ -93,6 +93,8 @@ export const canEditRecord = (user, record) => {
 }
 
 export const canDeleteRecord = canEditRecord
+
+export const canDemoteRecord = (user, record) => canEditRecord(user, record, true)
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
