@@ -1241,6 +1241,7 @@ $t(common.appNameFull)
       },
       form: 'Form',
       formula: 'Formula',
+      includedInClone: 'Included in clone',
       key: 'Key',
       multiple: 'Multiple',
       ownPage: 'Its own page',
