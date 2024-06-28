@@ -575,7 +575,7 @@ const mergeRecords =
                 delete newNodeToAdd[Node.keys.id] // clear internal id
                 newNodeToAdd[Node.keys.recordUuid] = recordTarget.uuid
                 if (visitedChildSource === childSource) {
-                  visitedChildSource[Node.keys.parentUuid] = Node.getUuid(entityTarget)
+                  newNodeToAdd[Node.keys.parentUuid] = Node.getUuid(entityTarget)
                 }
                 updateResult.addNode(newNodeToAdd)
               })(recordSource)
