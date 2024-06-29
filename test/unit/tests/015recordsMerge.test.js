@@ -1,16 +1,14 @@
 import * as Record from '@core/record/record'
 
-import * as RecordUtils from '../../utils/recordUtils'
-import * as SurveyUtils from '../../utils/surveyUtils'
 import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
-
-import { getContextUser } from '../../integration/config/context'
 import { TestUtils } from '../../utils/testUtils'
 
-let survey = {}
+import { getContextUser } from '../../integration/config/context'
 
-const getNodeDef = (path) => SurveyUtils.getNodeDefByPath({ survey, path })
+const { expectChildrenLengthToBe, expectValueToBe } = TestUtils
+
+let survey = {}
 
 describe('Records merge Test', () => {
   beforeAll(async () => {
@@ -75,27 +73,26 @@ describe('Records merge Test', () => {
         )
       )
     ).build()
-    const plotDef = getNodeDef('cluster/plot')
-    const treeDef = getNodeDef('cluster/plot/tree')
 
     const { record: recordUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
       survey,
       recordSource: record2,
     })(record1)
 
-    const rootNode = Record.getRootNode(recordUpdated)
-
     expect(Object.values(nodesUpdated).length).toBe(28)
 
-    const plotNodes = Record.getNodeChildrenByDefUuid(rootNode, plotDef.uuid)(recordUpdated)
-    expect(plotNodes.length).toEqual(3)
+    expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 3 })
 
-    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[0].plot_id', expectedValue: 1 })
-    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[1]/plot_id', expectedValue: 2 })
-    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[2]/plot_id', expectedValue: 3 })
+    expectValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[0].plot_id', expectedValue: 1 })
+    expectValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[1].plot_id', expectedValue: 2 })
+    expectValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[2].plot_id', expectedValue: 3 })
 
-    const plot1Node = RecordUtils.findNodeByPath('cluster/plot[0]')(survey, recordUpdated)
-    const plot1TreeNodes = Record.getNodeChildrenByDefUuid(plot1Node, treeDef.uuid)(recordUpdated)
-    expect(plot1TreeNodes.length).toEqual(4)
+    expectChildrenLengthToBe({
+      survey,
+      record: recordUpdated,
+      path: 'cluster.plot[0]',
+      childName: 'tree',
+      expectedLength: 4,
+    })
   })
 })

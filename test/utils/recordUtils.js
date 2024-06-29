@@ -41,7 +41,7 @@ export const getNodePath = (node) => (survey, record) => {
 }
 
 export const findNodeByPath = (path) => (survey, record) => {
-  const parts = R.ifElse(R.is(Array), R.identity, R.split('/'))(path)
+  const parts = R.ifElse(R.is(Array), R.identity, R.split(/[\\/|.]/))(path)
 
   let currentNodeDef = null
   let currentNode = null
