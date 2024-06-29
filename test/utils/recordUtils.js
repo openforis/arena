@@ -81,6 +81,8 @@ export const findNodeByPath = (path) => (survey, record) => {
   return currentNode
 }
 
+export const findNodeValueByPath = (path) => (survey, record) => Node.getValue(findNodeByPath(path)(survey, record))
+
 export const getValidationChildrenCount = (parentNode, childDef) =>
   R.pipe(
     Validation.getValidation,

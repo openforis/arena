@@ -1,7 +1,4 @@
-import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as Srs from '@core/geo/srs'
 
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -9,10 +6,9 @@ import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
 
 import { getContextUser } from '../../integration/config/context'
-import { RecordPrettyPrinter } from '@openforis/arena-core'
+import { TestUtils } from '../../utils/testUtils'
 
 let survey = {}
-let record = {}
 
 const getNodeDef = (path) => SurveyUtils.getNodeDefByPath({ survey, path })
 
@@ -80,10 +76,7 @@ describe('Records merge Test', () => {
       )
     ).build()
     const plotDef = getNodeDef('cluster/plot')
-    const plotIdDef = getNodeDef('cluster/plot/plot_id')
     const treeDef = getNodeDef('cluster/plot/tree')
-    const treeIdDef = getNodeDef('cluster/plot/tree/tree_id')
-    const treeDbhDef = getNodeDef('cluster/plot/tree/dbh')
 
     const { record: recordUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
       survey,
@@ -97,9 +90,11 @@ describe('Records merge Test', () => {
     const plotNodes = Record.getNodeChildrenByDefUuid(rootNode, plotDef.uuid)(recordUpdated)
     expect(plotNodes.length).toEqual(3)
 
+    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[0]/plot_id', expectedValue: 1 })
+    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[1]/plot_id', expectedValue: 2 })
+    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[2]/plot_id', expectedValue: 3 })
+
     const plot1Node = RecordUtils.findNodeByPath('cluster/plot[0]')(survey, recordUpdated)
-    const plot1PlotIdNode = RecordUtils.findNodeByPath('cluster/plot[0]/plot_id')(survey, recordUpdated)
-    expect(Node.getValue(plot1PlotIdNode)).toBe(1)
     const plot1TreeNodes = Record.getNodeChildrenByDefUuid(plot1Node, treeDef.uuid)(recordUpdated)
     expect(plot1TreeNodes.length).toEqual(4)
   })
