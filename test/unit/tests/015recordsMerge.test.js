@@ -90,7 +90,7 @@ describe('Records merge Test', () => {
     const plotNodes = Record.getNodeChildrenByDefUuid(rootNode, plotDef.uuid)(recordUpdated)
     expect(plotNodes.length).toEqual(3)
 
-    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[0]/plot_id', expectedValue: 1 })
+    TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[0].plot_id', expectedValue: 1 })
     TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[1]/plot_id', expectedValue: 2 })
     TestUtils.expectNodeValueToBe({ survey, record: recordUpdated, path: 'cluster/plot[2]/plot_id', expectedValue: 3 })
 
