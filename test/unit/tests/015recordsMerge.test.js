@@ -9,18 +9,16 @@ import { getContextUser } from '../../integration/config/context'
 const { expectChildrenLengthToBe, expectValueToBe } = TestUtils
 
 let survey = {}
+let record1 = null
+let record2 = null
 
 describe('Records merge Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
 
     survey = DataTest.createTestSurvey({ user })
-  }, 10000)
 
-  it('New entities added', async () => {
-    const user = getContextUser()
-
-    const record1 = RB.record(
+    record1 = RB.record(
       user,
       survey,
       RB.entity(
@@ -48,7 +46,7 @@ describe('Records merge Test', () => {
       )
     ).build()
 
-    const record2 = RB.record(
+    record2 = RB.record(
       user,
       survey,
       RB.entity(
@@ -66,6 +64,13 @@ describe('Records merge Test', () => {
         ),
         RB.entity(
           'plot',
+          RB.attribute('plot_id', 2),
+          RB.attribute('plot_multiple_number', 30),
+          RB.attribute('plot_multiple_number', 40),
+          RB.attribute('plot_multiple_number', 50)
+        ),
+        RB.entity(
+          'plot',
           RB.attribute('plot_id', 3),
           RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 13), RB.attribute('dbh', 5)),
           RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 14), RB.attribute('dbh', 6)),
@@ -73,13 +78,15 @@ describe('Records merge Test', () => {
         )
       )
     ).build()
+  }, 10000)
 
+  it('New entities added', async () => {
     const { record: recordUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
       survey,
       recordSource: record2,
     })(record1)
 
-    expect(Object.values(nodesUpdated).length).toBe(28)
+    expect(Object.values(nodesUpdated).length).toBe(32)
 
     expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 3 })
 
@@ -93,6 +100,52 @@ describe('Records merge Test', () => {
       path: 'cluster.plot[0]',
       childName: 'tree',
       expectedLength: 4,
+    })
+  })
+
+  it('Multiple attributes not deleted', async () => {
+    const { record: recordUpdated } = await Record.mergeRecords({
+      survey,
+      recordSource: record2,
+    })(record1)
+
+    expectValueToBe({
+      survey,
+      record: recordUpdated,
+      path: 'cluster.plot[0].plot_multiple_number[0]',
+      expectedValue: 10,
+    })
+    expectValueToBe({
+      survey,
+      record: recordUpdated,
+      path: 'cluster.plot[0].plot_multiple_number[1]',
+      expectedValue: 20,
+    })
+  })
+
+  it('Multiple attributes replaced', async () => {
+    const { record: recordUpdated } = await Record.mergeRecords({
+      survey,
+      recordSource: record2,
+    })(record1)
+
+    expectValueToBe({
+      survey,
+      record: recordUpdated,
+      path: 'cluster.plot[1].plot_multiple_number[0]',
+      expectedValue: 30,
+    })
+    expectValueToBe({
+      survey,
+      record: recordUpdated,
+      path: 'cluster.plot[1].plot_multiple_number[1]',
+      expectedValue: 40,
+    })
+    expectValueToBe({
+      survey,
+      record: recordUpdated,
+      path: 'cluster.plot[1].plot_multiple_number[2]',
+      expectedValue: 50,
     })
   })
 })

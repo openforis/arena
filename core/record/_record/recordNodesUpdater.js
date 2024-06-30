@@ -522,9 +522,21 @@ const mergeRecords =
     const rootTarget = RecordReader.getRootNode(recordTarget)
 
     const updateResult = new RecordUpdateResult({ record: recordTarget })
+
+    const addNode = ({ node, parentUuid = undefined }) => {
+      const newNodeToAdd = Node.assocCreated(true)(node)
+      delete newNodeToAdd[Node.keys.id] // clear internal id
+      newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
+      if (parentUuid) {
+        newNodeToAdd[Node.keys.parentUuid] = parentUuid
+      }
+      updateResult.addNode(newNodeToAdd)
+    }
+
     const stack = [{ entitySource: rootSource, entityTarget: rootTarget }]
     while (stack.length > 0) {
       const { entitySource, entityTarget } = stack.pop()
+
       const entityDef = Surveys.getNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(entitySource) })
       const childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef: entityDef, cycle })
       childDefs.forEach((childDef) => {
@@ -570,20 +582,40 @@ const mergeRecords =
             if (childTarget) {
               stack.push({ entitySource: childSource, entityTarget: childTarget })
             } else {
-              // TODO add childSource entity and descendants to targetRecord
               RecordReader.visitDescendantsAndSelf(childSource, (visitedChildSource) => {
-                const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
-                delete newNodeToAdd[Node.keys.id] // clear internal id
-                newNodeToAdd[Node.keys.recordUuid] = recordTarget.uuid
-                if (visitedChildSource === childSource) {
-                  newNodeToAdd[Node.keys.parentUuid] = Node.getUuid(entityTarget)
-                }
-                updateResult.addNode(newNodeToAdd)
+                const parentUuid = visitedChildSource === childSource ? Node.getUuid(entityTarget) : undefined
+                addNode({ node: visitedChildSource, parentUuid })
               })(recordSource)
             }
           })
         } else {
-          // TODO support multiple attributes merge
+          // multiple attributes merge
+          const sourceValues = childrenSource.map(Node.getValue)
+          const targetValues = childrenTarget.map(Node.getValue)
+          if (
+            (sourceValues.length > 0 && sourceValues.length !== targetValues.length) ||
+            sourceValues.some((sourceValue, index) => {
+              const targetValue = childrenTarget[index]
+              return !NodeValues.isValueEqual({
+                survey,
+                nodeDef: childDef,
+                value: sourceValue,
+                valueSearch: targetValue,
+                record: updateResult.record,
+                parentNode: entityTarget,
+              })
+            })
+          ) {
+            // different values, replace all nodes
+            const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
+            const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
+              updateResult.record
+            )
+            updateResult.merge(nodesDeleteUpdateResult)
+            childrenSource.forEach((childSource) => {
+              addNode({ node: childSource, parentUuid: Node.getUuid(entityTarget) })
+            })
+          }
         }
       })
     }
