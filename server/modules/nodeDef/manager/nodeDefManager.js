@@ -150,6 +150,17 @@ const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
   return nodeDefsByUuid
 }
 
+const _calculateNodeDefHierarchy = ({ nodeDef, nodeDefsByUuid }) => {
+  const hiearchy = []
+  let currentParentUuid = NodeDef.getParentUuid(nodeDef)
+  while (currentParentUuid) {
+    hiearchy.unshift(currentParentUuid)
+    const currentParentNode = nodeDefsByUuid[currentParentUuid]
+    currentParentUuid = NodeDef.getParentUuid(currentParentNode)
+  }
+  return hiearchy
+}
+
 export const fetchNodeDefsBySurveyId = async (
   {
     surveyId,
@@ -167,6 +178,12 @@ export const fetchNodeDefsBySurveyId = async (
     client
   )
   const nodeDefsByUuid = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+
+  // re-calculate node defs hierarchy (it could be wrong)
+  nodeDefsDb.forEach((nodeDef) => {
+    const hierarchy = _calculateNodeDefHierarchy({ nodeDef, nodeDefsByUuid })
+    Objects.setInPath({ obj: nodeDef, path: [NodeDef.keys.meta, NodeDef.metaKeys.h], value: hierarchy })
+  })
 
   return _filterOutInvalidNodeDefs(nodeDefsByUuid)
 }
