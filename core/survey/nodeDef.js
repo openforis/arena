@@ -142,7 +142,7 @@ export const keysPropsAdvanced = {
   itemsFilter: 'itemsFilter',
 }
 
-const metaKeys = {
+export const metaKeys = {
   h: 'h',
 }
 

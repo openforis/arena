@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import { db } from '@server/db/db'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -13,7 +15,6 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
-import { Objects } from '@openforis/arena-core'
 
 export {
   addNodeDefsCycles,
@@ -150,6 +151,17 @@ const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
   return nodeDefsByUuid
 }
 
+const _calculateNodeDefHierarchy = ({ nodeDef, nodeDefsByUuid }) => {
+  const hiearchy = []
+  let currentParentUuid = NodeDef.getParentUuid(nodeDef)
+  while (currentParentUuid) {
+    hiearchy.unshift(currentParentUuid)
+    const currentParentNode = nodeDefsByUuid[currentParentUuid]
+    currentParentUuid = NodeDef.getParentUuid(currentParentNode)
+  }
+  return hiearchy
+}
+
 export const fetchNodeDefsBySurveyId = async (
   {
     surveyId,
@@ -167,6 +179,12 @@ export const fetchNodeDefsBySurveyId = async (
     client
   )
   const nodeDefsByUuid = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+
+  // re-calculate node defs hierarchy (it could be wrong)
+  nodeDefsDb.forEach((nodeDef) => {
+    const hierarchy = _calculateNodeDefHierarchy({ nodeDef, nodeDefsByUuid })
+    Objects.setInPath({ obj: nodeDef, path: [NodeDef.keys.meta, NodeDef.metaKeys.h], value: hierarchy })
+  })
 
   return _filterOutInvalidNodeDefs(nodeDefsByUuid)
 }
