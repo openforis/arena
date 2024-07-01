@@ -88,10 +88,9 @@ export const {
   updateNodesDependents,
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
-  replaceUpdatedNodes,
-  mergeRecords,
   deleteNodesInEntityByNodeDefUuid,
 } = RecordNodesUpdater
+export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
 // ====== DELETE
