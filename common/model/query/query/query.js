@@ -73,7 +73,7 @@ const cleanup = (query) => {
   return query
 }
 
-export const assocMode = (mode) => A.pipe(A.assoc(keys.mode, mode), cleanup)
+export const assocMode = (mode) => A.pipe(A.assoc(keys.mode, mode), A.dissoc(keys.filter), A.dissoc(keys.sort), cleanup)
 
 export const toggleMeasureAggregateFunction =
   ({ nodeDefUuid, aggregateFn }) =>
