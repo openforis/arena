@@ -63,11 +63,10 @@ export const Input = React.forwardRef((props, ref) => {
   )
 
   useOnUpdate(() => {
-    if (selectionAllowed) {
-      const input = inputRef.current
-      ;[input.selectionStart, input.selectionEnd] = selectionRef.current
-    }
-  }, [value])
+    if (!selectionAllowed) return
+    const input = inputRef.current
+    ;[input.selectionStart, input.selectionEnd] = selectionRef.current
+  }, [selectionAllowed, value])
 
   const className = classNames('form-input', classNameProp)
   const rows = inputType === 'textarea' ? textAreaRows : undefined
@@ -98,11 +97,11 @@ export const Input = React.forwardRef((props, ref) => {
         />
       ) : (
         <SimpleTextInput
-          ref={inputRef}
           autoComplete="off"
           className={className}
           disabled={disabled}
           id={id}
+          inputRef={inputRef}
           maxLength={maxLength}
           name={name}
           onBlur={onBlur}
