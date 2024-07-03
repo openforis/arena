@@ -13,6 +13,7 @@ export const SimpleTextInput = forwardRef((props, ref) => {
     disabled,
     endAdornment,
     id,
+    inputRef,
     label: labelProp,
     maxLength,
     name,
@@ -56,6 +57,7 @@ export const SimpleTextInput = forwardRef((props, ref) => {
       disabled={disabled || readOnly}
       label={label}
       id={id}
+      inputRef={inputRef}
       InputProps={{
         'data-testid': testId,
         startAdornment,
@@ -84,6 +86,7 @@ SimpleTextInput.propTypes = {
   disabled: PropTypes.bool,
   endAdornment: PropTypes.any,
   id: PropTypes.string,
+  inputRef: PropTypes.any,
   label: PropTypes.string,
   maxLength: PropTypes.number,
   name: PropTypes.string,
