@@ -222,15 +222,33 @@ export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUui
 
 // ====== HIERARCHY
 
-export const visitAncestors =
-  (nodeDef, visitorFn, includeSelf = true) =>
+export const findAncestors =
+  ({ nodeDef, predicate, visitorFn, includeSelf = true, stopAtFirstFound = false }) =>
   (survey) => {
+    const result = []
     let nodeDefToVisit = includeSelf ? nodeDef : getNodeDefParent(nodeDef)(survey)
     while (nodeDefToVisit) {
-      visitorFn(nodeDefToVisit)
+      visitorFn?.(nodeDefToVisit)
+      if (predicate?.(nodeDefToVisit)) {
+        result.push(nodeDefToVisit)
+        if (stopAtFirstFound) {
+          return result
+        }
+      }
       nodeDefToVisit = getNodeDefParent(nodeDefToVisit)(survey)
     }
+    return result
   }
+
+export const findAncestor =
+  ({ nodeDef, predicate }) =>
+  (survey) =>
+    findAncestors({ nodeDef, predicate, includeSelf: false, stopAtFirstFound: true })(survey)[0]
+
+export const visitAncestors =
+  (nodeDef, visitorFn, includeSelf = true) =>
+  (survey) =>
+    findAncestors({ nodeDef, visitorFn, includeSelf })(survey)
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => visitAncestors(nodeDef, visitorFn, true)
 
@@ -379,6 +397,8 @@ export const getDescendantsAndSelf =
 
 // ====== NODE DEFS CODE UTILS
 export const getNodeDefParentCode = (nodeDef) => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))
+
+export const getNodeDefAncestorCodes = (nodeDef) => (survey) => Surveys.getNodeDefAncestorCodes({ survey, nodeDef })
 
 export const isNodeDefParentCode = (nodeDef) =>
   R.pipe(

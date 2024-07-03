@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Surveys } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -10,7 +12,6 @@ import { useIsKeyEditDisabled } from './useIsKeyEditDisabled'
 import { useIsMultipleEditDisabled } from './useIsMultipleEditDisabled'
 
 import { State } from '../../store'
-import { Surveys } from '@openforis/arena-core'
 
 export const useBasicProps = (props) => {
   const { state } = props
@@ -29,6 +30,13 @@ export const useBasicProps = (props) => {
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
+  const hasAncestorExcludedInClone = !!Survey.findAncestor({ nodeDef, predicate: NodeDef.isExcludedInClone })(survey)
+  const ancestorCodeDefs = NodeDef.isCode(nodeDef) ? Survey.getNodeDefAncestorCodes(nodeDef)(survey) : []
+  const hasAncestorCodeDefsExcludedInClone = ancestorCodeDefs.find(NodeDef.isExcludedInClone)
+  const includedInClone =
+    !hasAncestorExcludedInClone && !hasAncestorCodeDefsExcludedInClone && !NodeDef.isExcludedInClone(nodeDef)
+  const includeInCloneDisabled =
+    !NodeDef.canBeExcludedInClone(nodeDef) || hasAncestorExcludedInClone || hasAncestorCodeDefsExcludedInClone
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -55,12 +63,15 @@ export const useBasicProps = (props) => {
     displayInParentPageDisabled,
     keyEditDisabled,
     multipleEditDisabled,
-    cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
     displayIn,
-    cyclesNodeDef,
     nodeDefParentLabel,
     enumerator,
+    cyclesNodeDef,
+    cyclesKeysParent,
+    cyclesKeysSurvey,
+    includedInClone,
+    includeInCloneDisabled,
   }
 }
