@@ -48,10 +48,9 @@ const NodeDefDetails = () => {
             id={TestId.nodeDefDetails.nodeDefName}
             value={NodeDef.getName(nodeDef)}
             validation={Validation.getFieldValidation(NodeDef.propKeys.name)(validation)}
-            onChange={(value) =>
-              Actions.setProp({ state, key: NodeDef.propKeys.name, value: StringUtils.normalizeName(value) })
-            }
+            onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.name, value })}
             readOnly={!NodeDef.canNameBeEdited(nodeDef)}
+            textTransformFunction={StringUtils.normalizeName}
           />
           <div className="attribute-selector">
             {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}

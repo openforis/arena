@@ -175,6 +175,8 @@ export const {
 // Hierarchy
 export const {
   isNodeDefAncestor,
+  findAncestor,
+  findAncestors,
   visitAncestorsAndSelf,
   visitAncestors,
   getNodeDefPath,
@@ -248,7 +250,12 @@ export const { addNodeDefToIndex, deleteNodeDefIndex, initNodeDefsIndex, initAnd
 export const { getNodeDefsValidation, assocNodeDefsValidation, getNodeDefValidation } = SurveyNodeDefsValidation
 
 // ====== NodeDef Code
-export const { getNodeDefCategoryLevelIndex, getNodeDefParentCode, getNodeDefCodeCandidateParents } = SurveyNodeDefs
+export const {
+  getNodeDefCategoryLevelIndex,
+  getNodeDefParentCode,
+  getNodeDefAncestorCodes,
+  getNodeDefCodeCandidateParents,
+} = SurveyNodeDefs
 
 // TODO check where used
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs

@@ -55,13 +55,15 @@ const BasicProps = (props) => {
     displayInParentPageDisabled,
     keyEditDisabled,
     multipleEditDisabled,
-    cyclesKeysParent,
     entitySourceHierarchy,
     renderType,
     displayIn,
-    cyclesNodeDef,
     nodeDefParentLabel,
     enumerator,
+    cyclesNodeDef,
+    cyclesKeysParent,
+    includedInClone,
+    includeInCloneDisabled,
   } = useBasicProps(props)
 
   return (
@@ -186,7 +188,16 @@ const BasicProps = (props) => {
         cyclesKeysSelected={cyclesNodeDef}
         disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner || cyclesKeysParent.length <= 1}
         onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
-      />
+      >
+        <Checkbox
+          checked={includedInClone}
+          disabled={includeInCloneDisabled}
+          label="nodeDefEdit.basicProps.includedInClone"
+          onChange={(value) =>
+            Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
+          }
+        />
+      </CyclesSelector>
 
       {NodeDef.isVirtual(nodeDef) && (
         <>
