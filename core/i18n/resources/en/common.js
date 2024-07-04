@@ -603,6 +603,13 @@ $t(common.cantUndoWarning)`,
   dataImportView: {
     confirmDeleteAllRecords: 'Delete all records before import?',
     confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
+    conflictResolutionStrategy: {
+      label: 'Conflict resolution strategy',
+      info: 'What to do in case a record with the same key attributes is found',
+      skipExisting: 'Skip if already existing',
+      overwriteIfUpdated: 'Overwrite if updated',
+      merge: 'Merge records',
+    },
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadAllTemplates: 'Download all templates',
     downloadTemplate: 'Download template',
