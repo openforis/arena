@@ -27,6 +27,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
+    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of the record in which it has been merged
   }
 
   async onStart() {
@@ -191,28 +192,27 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const recordUuid = Record.getUuid(record)
     const targetRecordUuid = targetRecordUuidParam ?? recordUuid
 
+    const merge = conflictResolutionStrategy === ConflictResolutionStrategy.merge
+
     this.logDebug(
-      conflictResolutionStrategy === ConflictResolutionStrategy.merge
-        ? `merging record ${recordUuid} into existing record ${targetRecordUuid}`
-        : `updating record ${recordUuid}`
+      merge ? `merging record ${recordUuid} into existing record ${targetRecordUuid}` : `updating record ${recordUuid}`
     )
 
     const recordTarget = await RecordManager.fetchRecordAndNodesByUuid(
       { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
       tx
     )
-    const { record: recordTargetUpdated, nodes: nodesUpdated } =
-      conflictResolutionStrategy === ConflictResolutionStrategy.merge
-        ? await Record.mergeRecords({
-            survey,
-            recordSource: record,
-            sideEffect: true,
-          })(recordTarget)
-        : await Record.replaceUpdatedNodes({
-            survey,
-            recordSource: record,
-            sideEffect: true,
-          })(recordTarget)
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = merge
+      ? await Record.mergeRecords({
+          survey,
+          recordSource: record,
+          sideEffect: true,
+        })(recordTarget)
+      : await Record.replaceUpdatedNodes({
+          survey,
+          recordSource: record,
+          sideEffect: true,
+        })(recordTarget)
     this.currentRecord = recordTargetUpdated
 
     this.trackFileUuids({ nodes: nodesUpdated })
@@ -221,6 +221,9 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await this.persistUpdatedNodes({ nodesUpdated, dateModified })
 
     this.updatedRecordsUuids.add(targetRecordUuid)
+    if (merge) {
+      this.mergedRecordsMap[recordUuid] = targetRecordUuid
+    }
     this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
   }
 
