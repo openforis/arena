@@ -15,6 +15,11 @@ import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
 
+const resultKeys = {
+  updatedRecordsUuids: 'updatedRecordsUuids',
+  mergedRecordsMap: 'mergedRecordsMap',
+}
+
 const getErrorMessageContent = ({ missingParentUuid, emptyMultipleAttribute, invalidHierarchy }) => {
   if (missingParentUuid) return `has missing or invalid parent_uuid`
   if (emptyMultipleAttribute) return `is multiple and has an empty value`
@@ -151,12 +156,16 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const { context, currentRecord: record } = this
     const { existingRecordsSummary, conflictResolutionStrategy } = context
 
+    const recordUuid = Record.getUuid(record)
+    const existingRecordWithSameUuid = existingRecordsSummary.find(
+      (recordSummary) => Record.getUuid(recordSummary) === recordUuid
+    )
+    if (existingRecordWithSameUuid) return existingRecordWithSameUuid
+
     if (ConflictResolutionStrategy.merge === conflictResolutionStrategy) {
       return this.findExistingRecordSummaryWithSameKeys()
-    } else {
-      const recordUuid = Record.getUuid(record)
-      return existingRecordsSummary.find((recordSummary) => Record.getUuid(recordSummary) === recordUuid)
     }
+    return null
   }
 
   async insertOrSkipRecord() {
@@ -168,15 +177,17 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const existingRecordSummary = this.findExistingRecordSummary()
 
     if (existingRecordSummary) {
+      const existingRecordUuid = Record.getUuid(existingRecordSummary)
       if (conflictResolutionStrategy === ConflictResolutionStrategy.skipExisting) {
         // skip record
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
-        await this.mergeWithExistingRecord({ targetRecordUuid: Record.getUuid(existingRecordSummary) })
+        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
       } else if (
-        conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
-        Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
+        (conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
+          Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))) ||
+        (conflictResolutionStrategy === ConflictResolutionStrategy.merge && recordUuid === existingRecordUuid)
       ) {
         await this.mergeWithExistingRecord()
       }
@@ -185,7 +196,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
   }
 
-  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null }) {
+  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null } = {}) {
     const { context, currentRecord: record, tx } = this
     const { conflictResolutionStrategy, survey, surveyId } = context
 
@@ -280,7 +291,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   generateResult() {
     const result = super.generateResult()
-    result['updatedRecordsUuids'] = Array.from(this.updatedRecordsUuids) // it will be used to refresh records in update threads
+    result[resultKeys.updatedRecordsUuids] = Array.from(this.updatedRecordsUuids) // it will be used to refresh records in update threads
+    result[resultKeys.mergedRecordsMap] = this.mergedRecordsMap
     return result
   }
 }
