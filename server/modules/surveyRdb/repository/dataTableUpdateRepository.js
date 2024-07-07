@@ -99,6 +99,8 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
         type,
         schema: SchemaRdb.getName(Survey.getId(survey)),
         table: DataTable.getName(nodeDef, ancestorDef),
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        nodeDefHierarchyLevel: NodeDef.getMetaHierarchy(nodeDef).length,
         valuesByColumnName: _getValuesByColumnName({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
         rowUuid: _getRowUuid({ nodeDef, ancestorMultipleEntity, node }),
       }

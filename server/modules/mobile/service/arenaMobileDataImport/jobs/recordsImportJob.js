@@ -14,11 +14,25 @@ import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
 
-const getErrorMessageContent = ({ missingParentUuid, emptyMultipleAttribute, invalidHierarchy }) => {
-  if (missingParentUuid) return `has missing or invalid parent_uuid`
-  if (emptyMultipleAttribute) return `is multiple and has an empty value`
-  if (invalidHierarchy) return `has an invalid meta hierarchy`
-  return null
+const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
+  if (!nodeDef) {
+    return { valid: false, error: 'Missing node def' }
+  }
+  const parentUuid = Node.getParentUuid(node)
+  if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
+    return { valid: false, error: `has missing or invalid parent_uuid` }
+  }
+  if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
+    return { valid: false, error: `is multiple and has an empty value` }
+  }
+  const nodeHierarchy = Node.getHierarchy(node)
+  if (
+    nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
+    nodeHierarchy.some((ancestorUuid) => !nodes[ancestorUuid])
+  ) {
+    return { valid: false, error: `has an invalid meta hierarchy` }
+  }
+  return { valid: true }
 }
 
 export default class RecordsImportJob extends DataImportBaseJob {
@@ -87,22 +101,14 @@ export default class RecordsImportJob extends DataImportBaseJob {
     Object.entries(nodes).forEach(([nodeUuid, node]) => {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const parentUuid = Node.getParentUuid(node)
-      const missingParentUuid = (!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])
-      const emptyMultipleAttribute = NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)
-      const invalidHierarchy = Node.getHierarchy(node).length !== NodeDef.getMetaHierarchy(nodeDef)?.length
-      const errorMessageContent = getErrorMessageContent({
-        missingParentUuid,
-        emptyMultipleAttribute,
-        invalidHierarchy,
-      })
-      if (errorMessageContent) {
-        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def uuid ${nodeDefUuid}`
-        const messageSuffix = `: skipping it`
-        this.logWarn(`${messagePrefix} ${errorMessageContent} ${messageSuffix}`)
-        delete nodes[nodeUuid]
-      } else {
+      const { valid, error } = checkNodeIsValid({ nodes, node, nodeDef })
+      if (valid) {
         Node.removeFlags({ sideEffect: true })(node)
+      } else {
+        const messagePrefix = `record ${Record.getUuid(record)}: node with uuid ${Node.getUuid(node)} and node def ${NodeDef.getName(nodeDef)} (uuid ${nodeDefUuid})`
+        const messageSuffix = `: skipping it`
+        this.logWarn(`${messagePrefix} ${error} ${messageSuffix}`)
+        delete nodes[nodeUuid]
       }
     })
     // assoc nodes and build index from scratch
