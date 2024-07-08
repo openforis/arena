@@ -34,9 +34,9 @@ export const init = (app) => {
         const { surveyId } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        const summary = await CategoryService.createImportSummary({ surveyId, filePath })
+        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath })
 
-        res.json(summary)
+        res.json({ summary, error })
       } catch (error) {
         next(error)
       }
