@@ -160,8 +160,9 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const existingRecordWithSameUuid = existingRecordsSummary.find(
       (recordSummary) => Record.getUuid(recordSummary) === recordUuid
     )
-    if (existingRecordWithSameUuid) return existingRecordWithSameUuid
-
+    if (existingRecordWithSameUuid) {
+      return existingRecordWithSameUuid
+    }
     if (ConflictResolutionStrategy.merge === conflictResolutionStrategy) {
       return this.findExistingRecordSummaryWithSameKeys()
     }
@@ -182,14 +183,14 @@ export default class RecordsImportJob extends DataImportBaseJob {
         // skip record
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
-      } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
-        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
       } else if (
-        (conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated &&
-          Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))) ||
-        (conflictResolutionStrategy === ConflictResolutionStrategy.merge && recordUuid === existingRecordUuid)
+        (conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated ||
+          (conflictResolutionStrategy === ConflictResolutionStrategy.merge && recordUuid === existingRecordUuid)) &&
+        Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
       ) {
         await this.mergeWithExistingRecord()
+      } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
+        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
       }
     } else {
       await this.insertNewRecord()
@@ -198,12 +199,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null } = {}) {
     const { context, currentRecord: record, tx } = this
-    const { conflictResolutionStrategy, survey, surveyId } = context
+    const { survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
     const targetRecordUuid = targetRecordUuidParam ?? recordUuid
 
-    const merge = conflictResolutionStrategy === ConflictResolutionStrategy.merge
+    const merge = targetRecordUuid !== recordUuid
 
     this.logDebug(
       merge ? `merging record ${recordUuid} into existing record ${targetRecordUuid}` : `updating record ${recordUuid}`
