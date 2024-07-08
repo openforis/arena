@@ -12,10 +12,11 @@ export class RdbUpdates {
   }
 
   addUpdate(update) {
+    const { nodeDefUuid, nodeDefHierarchyLevel } = update
     const key = RdbUpdates.extractKey(update)
     let tableUpdates = this.updatesBySchemaTableAndType[key]
     if (!tableUpdates) {
-      tableUpdates = new RdbUpdatesForTable()
+      tableUpdates = new RdbUpdatesForTable({ nodeDefUuid, nodeDefHierarchyLevel })
       this.updatesBySchemaTableAndType[key] = tableUpdates
     }
     tableUpdates.addUpdate(update)
@@ -40,11 +41,15 @@ export class RdbUpdates {
   getAll() {
     return (
       Object.entries(this.updatesBySchemaTableAndType)
-        .sort(([keyA], [keyB]) => {
-          // execute updates in order, according to the type: delete, insert, update
+        .sort(([keyA, tableUpdatesA], [keyB, tableUpdatesB]) => {
+          // execute updates in order, according to the type (1. delete, 2. insert, 3. update) and hierarchy level
           const { type: typeA } = RdbUpdates.expandKey(keyA)
+          const { nodeDefHierarchyLevel: nodeDefHierarchyLevelA } = tableUpdatesA
           const { type: typeB } = RdbUpdates.expandKey(keyB)
-          return executionOrderByType[typeA] - executionOrderByType[typeB]
+          const { nodeDefHierarchyLevel: nodeDefHierarchyLevelB } = tableUpdatesB
+          return (
+            executionOrderByType[typeA] - executionOrderByType[typeB] || nodeDefHierarchyLevelA - nodeDefHierarchyLevelB
+          )
         })
         // eslint-disable-next-line no-unused-vars
         .flatMap(([_key, updates]) => updates.getAll())
@@ -74,7 +79,9 @@ RdbUpdates.expandKey = (key) => {
 }
 
 export class RdbUpdatesForTable {
-  constructor() {
+  constructor({ nodeDefUuid, nodeDefHierarchyLevel }) {
+    this.nodeDefUuid = nodeDefUuid
+    this.nodeDefHierarchyLevel = nodeDefHierarchyLevel
     this.updatesByRowUuid = {}
   }
 
