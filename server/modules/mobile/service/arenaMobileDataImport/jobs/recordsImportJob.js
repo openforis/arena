@@ -16,7 +16,6 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 const resultKeys = {
-  updatedRecordsUuids: 'updatedRecordsUuids',
   mergedRecordsMap: 'mergedRecordsMap',
 }
 
@@ -292,7 +291,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
   generateResult() {
     const result = super.generateResult()
-    result[resultKeys.updatedRecordsUuids] = Array.from(this.updatedRecordsUuids) // it will be used to refresh records in update threads
     result[resultKeys.mergedRecordsMap] = this.mergedRecordsMap
     return result
   }
