@@ -64,16 +64,23 @@ export const assocFilterRecordUuid = A.assoc(keys.filterRecordUuid)
 export const assocFilterRecordUuids = A.assoc(keys.filterRecordUuids)
 export const assocSort = A.assoc(keys.sort)
 
-const cleanup = (query) => {
+const resetNotApplicableProps = (query) => {
   if (isModeAggregate(query)) {
     return assocAttributeDefUuids([])(query)
-  } else if (isModeRaw(query)) {
+  }
+  if (isModeRaw(query)) {
     return A.pipe(assocDimensions(defaults[keys.dimensions]), assocMeasures(defaults[keys.measures]))(query)
   }
   return query
 }
 
-export const assocMode = (mode) => A.pipe(A.assoc(keys.mode, mode), A.dissoc(keys.filter), A.dissoc(keys.sort), cleanup)
+export const assocMode = (mode) =>
+  A.pipe(
+    A.assoc(keys.mode, mode),
+    assocFilter(defaults[keys.filter]),
+    assocSort(defaults[keys.sort]),
+    resetNotApplicableProps
+  )
 
 export const toggleMeasureAggregateFunction =
   ({ nodeDefUuid, aggregateFn }) =>

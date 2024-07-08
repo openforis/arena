@@ -62,6 +62,7 @@ export const {
   getNodeChildrenByDefUuidUnsorted,
   getNodeChildByDefUuid,
   getNodeChildIndex,
+  findNodeChildren,
   visitAncestorsAndSelf,
   visitDescendantsAndSelf,
 } = RecordReader
@@ -87,9 +88,9 @@ export const {
   updateNodesDependents,
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
-  replaceUpdatedNodes,
   deleteNodesInEntityByNodeDefUuid,
 } = RecordNodesUpdater
+export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'
 export const assocOwnerUuid = R.assoc(keys.ownerUuid)
 
 // ====== DELETE

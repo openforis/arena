@@ -96,9 +96,12 @@ export default class DataImportBaseJob extends Job {
     return {
       errorsCount: Object.keys(errors).length,
       insertedRecords: insertedRecordsUuids.size,
+      insertedRecordsUuids: Array.from(insertedRecordsUuids),
       processed,
       skippedRecords: skippedRecordsUuids.size,
+      skippedRecordsUuids: Array.from(skippedRecordsUuids),
       updatedRecords: updatedRecordsUuids.size,
+      updatedRecordsUuids: Array.from(updatedRecordsUuids),
       updatedValues,
     }
   }
