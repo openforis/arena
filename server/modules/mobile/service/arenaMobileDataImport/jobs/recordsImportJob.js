@@ -16,7 +16,7 @@ import * as UserService from '@server/modules/user/service/userService'
 
 const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   if (!nodeDef) {
-    return { valid: false, error: 'Missing node def' }
+    return { valid: false, error: 'refers a missing node definition' }
   }
   const parentUuid = Node.getParentUuid(node)
   if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
