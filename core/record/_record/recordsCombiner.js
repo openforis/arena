@@ -173,6 +173,101 @@ const _addNodeToUpdateResult = ({ updateResult, node, parentUuid = undefined }) 
   updateResult.addNode(newNodeToAdd)
 }
 
+const _mergeRecordsNodes = ({
+  survey,
+  childDef,
+  recordSource,
+  recordTarget,
+  entitySource,
+  entityTarget,
+  updateResult,
+  stack,
+  sideEffect,
+}) => {
+  const childDefUuid = NodeDef.getUuid(childDef)
+  const childrenSource = RecordReader.findNodeChildren(entitySource, childDefUuid)(recordSource)
+  const childrenTarget = RecordReader.findNodeChildren(entityTarget, childDefUuid)(recordTarget)
+  if (NodeDef.isSingle(childDef)) {
+    const childSource = childrenSource[0]
+    const childTarget = childrenTarget[0]
+    if (childSource && childTarget) {
+      if (NodeDef.isAttribute(childDef)) {
+        // single attribute
+        const attrUpdateResult = _replaceAttributeValueIfModifiedAfter({
+          survey,
+          attrDef: childDef,
+          recordTarget: updateResult.record,
+          entityTarget,
+          attrSource: childSource,
+          attrTarget: childTarget,
+          sideEffect,
+        })
+        if (attrUpdateResult) {
+          updateResult.merge(attrUpdateResult)
+        }
+      } else {
+        // single entity
+        stack.push({ entitySource: childSource, entityTarget: childTarget })
+      }
+    }
+  } else if (NodeDef.isEntity(childDef)) {
+    // multiple entity
+    childrenSource.forEach((childSource) => {
+      const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
+        survey,
+        record: recordSource,
+        entity: childSource,
+      })
+      const childTarget = findEntityByUuidOrKeys({
+        survey,
+        record: recordTarget,
+        entityDefUuid: childDefUuid,
+        parentEntity: entityTarget,
+        uuid: Node.getUuid(childSource),
+        keyValuesByDefUuid,
+      })
+      if (childTarget) {
+        // entity found: nested nodes will be merged
+        stack.push({ entitySource: childSource, entityTarget: childTarget })
+      } else {
+        // add new enities
+        RecordReader.visitDescendantsAndSelf(childSource, (visitedChildSource) => {
+          const parentUuid = visitedChildSource === childSource ? Node.getUuid(entityTarget) : undefined
+          _addNodeToUpdateResult({ updateResult, node: visitedChildSource, parentUuid })
+        })(recordSource)
+      }
+    })
+  } else {
+    // multiple attributes merge
+    const sourceValues = childrenSource.map(Node.getValue)
+    const targetValues = childrenTarget.map(Node.getValue)
+    if (
+      (sourceValues.length > 0 && sourceValues.length !== targetValues.length) ||
+      sourceValues.some((sourceValue, index) => {
+        const targetValue = childrenTarget[index]
+        return !NodeValues.isValueEqual({
+          survey,
+          nodeDef: childDef,
+          value: sourceValue,
+          valueSearch: targetValue,
+          record: updateResult.record,
+          parentNode: entityTarget,
+        })
+      })
+    ) {
+      // different values, replace all nodes
+      const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
+      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
+        updateResult.record
+      )
+      updateResult.merge(nodesDeleteUpdateResult)
+      childrenSource.forEach((childSource) => {
+        _addNodeToUpdateResult({ updateResult, node: childSource, parentUuid: Node.getUuid(entityTarget) })
+      })
+    }
+  }
+}
+
 export const mergeRecords =
   ({ survey, recordSource, timezoneOffset, sideEffect = false }) =>
   async (recordTarget) => {
@@ -189,88 +284,17 @@ export const mergeRecords =
       const entityDef = Surveys.getNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(entitySource) })
       const childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef: entityDef, cycle })
       childDefs.forEach((childDef) => {
-        const childDefUuid = NodeDef.getUuid(childDef)
-        const childrenSource = RecordReader.findNodeChildren(entitySource, childDefUuid)(recordSource)
-        const childrenTarget = RecordReader.findNodeChildren(entityTarget, childDefUuid)(recordTarget)
-        if (NodeDef.isSingle(childDef)) {
-          const childSource = childrenSource[0]
-          const childTarget = childrenTarget[0]
-          if (childSource && childTarget) {
-            if (NodeDef.isAttribute(childDef)) {
-              // single attribute
-              const attrUpdateResult = _replaceAttributeValueIfModifiedAfter({
-                survey,
-                attrDef: childDef,
-                recordTarget: updateResult.record,
-                entityTarget,
-                attrSource: childSource,
-                attrTarget: childTarget,
-                sideEffect,
-              })
-              if (attrUpdateResult) {
-                updateResult.merge(attrUpdateResult)
-              }
-            } else {
-              // single entity
-              stack.push({ entitySource: childSource, entityTarget: childTarget })
-            }
-          }
-        } else if (NodeDef.isEntity(childDef)) {
-          // multiple entity
-          childrenSource.forEach((childSource) => {
-            const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
-              survey,
-              record: recordSource,
-              entity: childSource,
-            })
-            const childTarget = findEntityByUuidOrKeys({
-              survey,
-              record: recordTarget,
-              entityDefUuid: childDefUuid,
-              parentEntity: entityTarget,
-              uuid: Node.getUuid(childSource),
-              keyValuesByDefUuid,
-            })
-            if (childTarget) {
-              // entity found: nested nodes will be merged
-              stack.push({ entitySource: childSource, entityTarget: childTarget })
-            } else {
-              // add new enities
-              RecordReader.visitDescendantsAndSelf(childSource, (visitedChildSource) => {
-                const parentUuid = visitedChildSource === childSource ? Node.getUuid(entityTarget) : undefined
-                _addNodeToUpdateResult({ updateResult, node: visitedChildSource, parentUuid })
-              })(recordSource)
-            }
-          })
-        } else {
-          // multiple attributes merge
-          const sourceValues = childrenSource.map(Node.getValue)
-          const targetValues = childrenTarget.map(Node.getValue)
-          if (
-            (sourceValues.length > 0 && sourceValues.length !== targetValues.length) ||
-            sourceValues.some((sourceValue, index) => {
-              const targetValue = childrenTarget[index]
-              return !NodeValues.isValueEqual({
-                survey,
-                nodeDef: childDef,
-                value: sourceValue,
-                valueSearch: targetValue,
-                record: updateResult.record,
-                parentNode: entityTarget,
-              })
-            })
-          ) {
-            // different values, replace all nodes
-            const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
-            const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
-              updateResult.record
-            )
-            updateResult.merge(nodesDeleteUpdateResult)
-            childrenSource.forEach((childSource) => {
-              _addNodeToUpdateResult({ updateResult, node: childSource, parentUuid: Node.getUuid(entityTarget) })
-            })
-          }
-        }
+        _mergeRecordsNodes({
+          survey,
+          childDef,
+          recordSource,
+          recordTarget,
+          entitySource,
+          entityTarget,
+          stack,
+          updateResult,
+          sideEffect,
+        })
       })
     }
     return afterNodesUpdate({
