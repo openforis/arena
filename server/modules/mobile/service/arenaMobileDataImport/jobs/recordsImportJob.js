@@ -234,7 +234,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     this.trackFileUuids({ nodes: nodesUpdated })
 
-    const dateModified = Record.getDateModified(record) // TODO get max between modified dates
+    const recordSourceDateModified = Record.getDateModified(record)
+    const recordTargetDateModified = Record.getDateCreated(recordTarget)
+    const dateModified =
+      merge && Dates.isAfter(recordTargetDateModified, recordSourceDateModified)
+        ? recordTargetDateModified
+        : recordSourceDateModified
     await this.persistUpdatedNodes({ nodesUpdated, dateModified })
 
     this.updatedRecordsUuids.add(targetRecordUuid)
