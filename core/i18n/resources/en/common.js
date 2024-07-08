@@ -605,7 +605,7 @@ $t(common.cantUndoWarning)`,
     confirmDeleteAllRecordsInCycle: 'Delete all records in the cycle {{cycle}} before import?',
     conflictResolutionStrategy: {
       label: 'Conflict resolution strategy',
-      info: 'What to do in case a record with the same key attributes is found',
+      info: 'What to do in case the same record (or a record with the same key attributes) is found',
       skipExisting: 'Skip if already existing',
       overwriteIfUpdated: 'Overwrite if updated',
       merge: 'Merge records',
