@@ -86,17 +86,6 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
       !!NodeDef.getParentCodeDefUuid(nodeDef)
   )
 
-  const getCodeAttributeAncestorNames = (nodeDef) => {
-    const codeAttributeAncestorNames = []
-
-    let currentParentCode = Survey.getNodeDefParentCode(nodeDef)(survey)
-    while (currentParentCode) {
-      codeAttributeAncestorNames.unshift(NodeDef.getName(currentParentCode))
-      currentParentCode = Survey.getNodeDefParentCode(currentParentCode)(survey)
-    }
-    return codeAttributeAncestorNames
-  }
-
   const categoryAttributeAncestors = codeAttributes2ndLevel.map((nodeDef) => ({
     attribute: NodeDef.getName(nodeDef),
     categoryName: getCategoryNameByUuid({
@@ -104,7 +93,7 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
       categoryUuid: NodeDef.getCategoryUuid(nodeDef),
     }),
     categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
-    ancestors: getCodeAttributeAncestorNames(nodeDef),
+    ancestors: Survey.getNodeDefAncestorCodes(nodeDef)(survey).map(NodeDef.getName),
   }))
 
   ArrayUtils.sortByProps(['categoryName', 'categoryLevel'])(categoryAttributeAncestors)

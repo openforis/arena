@@ -6,7 +6,7 @@ $appNotificationWidthSmallScreens: 90vw;
 .notification {
   position: fixed;
   top: 10px;
-  z-index: $zIndex80AppNotification;
+  z-index: $zIndexAppNotification;
   width: $appNotificationWidth;
   padding: 10px;
 

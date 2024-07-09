@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
@@ -12,7 +13,7 @@ import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from '@webapp/
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'
 
 export const ExtraPropDefEditor = (props) => {
-  const { index, readOnly, onItemDelete } = props
+  const { index, readOnly = false, onItemDelete } = props
   const {
     dirty,
     editing,
@@ -66,14 +67,15 @@ export const ExtraPropDefEditor = (props) => {
             disabled={Validation.isNotValid(validation) || !dirty}
             onClick={onSaveClick}
           />
-          <ButtonCancel
-            className="btn-cancel"
-            iconClassName="icon-cross icon-12px"
-            showLabel={false}
-            onClick={onCancelClick}
-          />
+          <ButtonCancel showLabel={false} onClick={onCancelClick} />
         </>
       )}
     </FormItem>
   )
+}
+
+ExtraPropDefEditor.propTypes = {
+  index: PropTypes.number.isRequired,
+  readOnly: PropTypes.bool,
+  onItemDelete: PropTypes.func.isRequired,
 }

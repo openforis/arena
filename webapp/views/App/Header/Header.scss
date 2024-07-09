@@ -25,6 +25,7 @@
 .header__survey {
   display: flex;
   align-items: center;
+  gap: 1rem;
   font-size: 0.9rem;
   font-weight: 600;
   color: lighten($black, 20%);
@@ -44,7 +45,7 @@
   }
 
   .btn-publish {
-    margin-left: 15px;
+    height: 2rem;
   }
 }
 

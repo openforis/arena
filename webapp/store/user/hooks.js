@@ -55,8 +55,8 @@ export const useAuthCanDemoteRecord = (record) => {
   // when record doesn't have a previous step, it cannot be demoted
   if (!RecordStep.getPreviousStep(Record.getStep(record))) return false
 
-  const canEdit = Authorizer.canEditRecord(user, record)
-  return canEdit && Survey.isPublished(surveyInfo)
+  const canDemote = Authorizer.canDemoteRecord(user, record)
+  return canDemote && Survey.isPublished(surveyInfo)
 }
 export const useAuthCanDeleteAllRecords = () => useAuthCanEditSurvey()
 export const useAuthCanUpdateRecordsStep = () => Authorizer.canUpdateRecordsStep(useUser(), useSurveyInfo())

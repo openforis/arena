@@ -55,7 +55,6 @@ const DialogConfirm = () => {
       <ModalFooter>
         <ButtonCancel
           className="btn-secondary btn-cancel modal-footer-item"
-          iconClassName="icon-cross icon-12px"
           onClick={() => dispatch(DialogConfirmActions.onDialogConfirmCancel())}
         />
 

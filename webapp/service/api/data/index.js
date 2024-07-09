@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { Query } from '@common/model/query'
-import { ConflictResolutionStrategy } from '@common/dataImport'
+
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD
@@ -67,12 +67,19 @@ export const startDataImportFromCsvJob = async ({
   return job
 }
 
-export const startDataImportFromArenaJob = async ({ surveyId, cycle, file, onUploadProgress, dryRun = false }) => {
+export const startDataImportFromArenaJob = async ({
+  surveyId,
+  cycle,
+  conflictResolutionStrategy,
+  file,
+  onUploadProgress,
+  dryRun = false,
+}) => {
   const formData = objectToFormData({
     file,
     cycle,
     dryRun,
-    conflictResolutionStrategy: ConflictResolutionStrategy.overwriteIfUpdated,
+    conflictResolutionStrategy,
   })
   const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
   const { job } = data

@@ -123,6 +123,7 @@ export const keysPropsAdvanced = {
   applicable: 'applicable',
   defaultValues: 'defaultValues',
   defaultValueEvaluatedOneTime: 'defaultValueEvaluatedOneTime',
+  excludedInClone: 'excludedInClone',
   validations: 'validations',
   formula: 'formula',
 
@@ -142,7 +143,7 @@ export const keysPropsAdvanced = {
   itemsFilter: 'itemsFilter',
 }
 
-const metaKeys = {
+export const metaKeys = {
   h: 'h',
 }
 
@@ -358,6 +359,8 @@ export const getAllExpressions = (nodeDef) => {
   return expressions
 }
 
+export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClone, false)
+
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
 
@@ -434,6 +437,7 @@ export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
   isPropAdvanced(key) ? mergePropsAdvanced({ [key]: value }) : mergeProps({ [key]: value })
 export const assocCycles = (cycles) => assocProp({ key: propKeys.cycles, value: cycles })
+export const assocExcludedInClone = (value) => assocProp({ key: keysPropsAdvanced.excludedInClone, value })
 export const assocLabels = (labels) => assocProp({ key: propKeys.labels, value: labels })
 export const assocLabel =
   ({ label, lang }) =>
@@ -558,6 +562,7 @@ export const canHaveDefaultValue = (nodeDef) =>
   ])
 
 export const belongsToAllCycles = (cycles) => (nodeDef) => R.isEmpty(R.difference(cycles, getCycles(nodeDef)))
+export const canBeExcludedInClone = (nodeDef) => !isRoot(nodeDef) && !isKey(nodeDef)
 
 const isEntityAndNotRoot = (nodeDef) => isEntity(nodeDef) && !isRoot(nodeDef)
 export const isDisplayAsEnabled = isEntityAndNotRoot
@@ -596,6 +601,9 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
       prop: NodeDefLayout.keys.includedInMultipleEntitySummary,
       value: false,
     })(nodeDefUpdated)
+  }
+  if (!canBeExcludedInClone(nodeDefUpdated) && isExcludedInClone(nodeDefUpdated)) {
+    nodeDefUpdated = assocExcludedInClone(false)(nodeDefUpdated)
   }
   return nodeDefUpdated
 }
