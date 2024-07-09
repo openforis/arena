@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -14,7 +14,7 @@ const expressionTypeAcronymByType = {
 }
 
 const expressionGeneratorByType = {
-  [Expression.types.CallExpression]: () => Expression.newCall({ callee: Expression.functionNames.now }),
+  [Expression.types.CallExpression]: () => Expression.newCall(),
   [Expression.types.Identifier]: () => Expression.newIdentifier(),
   [Expression.types.Literal]: () => Expression.newLiteral(),
 }
@@ -70,6 +70,14 @@ const BinaryOperand = (props) => {
     [currentNodeDefIsBoolean, isBoolean, isLeft]
   )
 
+  const availableOperandExpressionTypes = useMemo(
+    () =>
+      [Expression.types.Identifier, Expression.types.Literal, Expression.types.CallExpression].filter(
+        canOperandExpressionBeOfType
+      ),
+    [canOperandExpressionBeOfType]
+  )
+
   const onOperatorTypeClick = (newType) => () => {
     const newOperatorExpression = expressionGeneratorByType[newType]()
     let nodeUpdated = { ...node, [type]: newOperatorExpression }
@@ -85,16 +93,14 @@ const BinaryOperand = (props) => {
 
   return (
     <div className={`binary-${type}`}>
-      {[Expression.types.Identifier, Expression.types.Literal, Expression.types.CallExpression]
-        .filter((expressionType) => canOperandExpressionBeOfType(expressionType))
-        .map((expressionType) => (
-          <BinaryOperandExpressionTypeButton
-            key={expressionType}
-            active={operandExpressionType === expressionType}
-            expressionType={expressionType}
-            onClick={onOperatorTypeClick(expressionType)}
-          />
-        ))}
+      {availableOperandExpressionTypes.map((expressionType) => (
+        <BinaryOperandExpressionTypeButton
+          key={expressionType}
+          active={operandExpressionType === expressionType}
+          expressionType={expressionType}
+          onClick={onOperatorTypeClick(expressionType)}
+        />
+      ))}
       {React.createElement(renderNode, {
         canDelete,
         isBoolean,

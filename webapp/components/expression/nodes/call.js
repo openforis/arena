@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -8,26 +8,32 @@ import { useI18n } from '@webapp/store/system'
 import { CallCategoryItemProp } from './callCategoryItemProp'
 
 const functions = {
+  [Expression.functionNames.isEmpty]: {
+    label: 'isEmpty(...)',
+  },
   [Expression.functionNames.now]: {
     label: 'now()',
   },
   [Expression.functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
   },
+  [Expression.functionNames.includes]: {
+    label: 'includes(...)',
+  },
 }
-const emptyItem = { value: null, label: 'common.notSpecified' }
-
-const dropdownItems = [
-  emptyItem,
-  ...Object.entries(functions).map(([funcKey, func]) => ({ value: funcKey, label: func.label })),
-]
-
 const Call = ({ node, variables, onChange }) => {
   const i18n = useI18n()
 
   const [state, setState] = useState({
     selectedFunctionKey: node?.callee?.raw,
   })
+
+  const emptyItem = useMemo(() => ({ value: null, label: i18n.t('common.notSpecified') }), [i18n])
+
+  const dropdownItems = useMemo(
+    () => [emptyItem, ...Object.entries(functions).map(([funcKey, func]) => ({ value: funcKey, label: func.label }))],
+    [emptyItem]
+  )
 
   const { selectedFunctionKey } = state
 
@@ -38,7 +44,6 @@ const Call = ({ node, variables, onChange }) => {
   return (
     <div>
       <Dropdown
-        searchable={false}
         items={dropdownItems}
         onChange={(item) => {
           setState((statePrev) => ({
@@ -49,7 +54,8 @@ const Call = ({ node, variables, onChange }) => {
             attributeUuidsByLevelUuid: {},
           }))
         }}
-        placeholder={i18n.t('common.function')}
+        placeholder={i18n.t('common.selectOne')}
+        searchable={false}
         selection={selectedItem}
       />
       {selectedFunctionKey === Expression.functionNames.categoryItemProp && (

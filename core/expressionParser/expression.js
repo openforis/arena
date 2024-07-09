@@ -91,7 +91,7 @@ export const newBinaryEmpty = ({ canBeConstant, exprQuery = null }) => {
   return newBinary({ left, right: newLiteral() })
 }
 
-export const newCall = ({ callee, params = [] }) => ({
+export const newCall = ({ callee, params = [] } = {}) => ({
   type: types.CallExpression,
   callee: newLiteral(callee),
   arguments: params,
