@@ -7,6 +7,27 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { Button } from '@webapp/components/buttons'
 
+const expressionTypeAcronymByType = {
+  [Expression.types.CallExpression]: 'call',
+  [Expression.types.Identifier]: 'var',
+  [Expression.types.Literal]: 'const',
+}
+
+const BinaryOperandExpressionTypeButton = (props) => {
+  const { active, expressionType, onClick } = props
+  const acronym = expressionTypeAcronymByType[expressionType]
+  return (
+    <Button
+      active={active}
+      className={`btn-switch-operand btn-switch-operand-${acronym}`}
+      label={`expressionEditor.${acronym}`}
+      onClick={onClick}
+      size="small"
+      variant="outlined"
+    />
+  )
+}
+
 export const BinaryOperandType = {
   left: 'left',
   right: 'right',
@@ -22,53 +43,38 @@ const BinaryOperand = (props) => {
   const canOperandBeLiteral = !isLeft || !isBoolean || NodeDef.isBoolean(nodeDefCurrent)
   const canOperandBeFunctionCall = canOperandBeLiteral
 
-  const onOperandChange = useCallback(
-    (nodeUpdate) => {
-      if (isLeft && !isBoolean) {
-        return R.pipe(R.assoc('operator', ''), R.assoc(BinaryOperandType.right, Expression.newIdentifier()))(nodeUpdate)
-      }
-      return nodeUpdate
-    },
-    [isBoolean, isLeft]
-  )
+  const onOperatorTypeClick = (newType) => () => {
+    let nodeUpdated = R.assoc(type, newType, node)
+    if (isLeft && !isBoolean) {
+      // clear operator and right operand
+      nodeUpdated = R.pipe(
+        R.assoc('operator', ''),
+        R.assoc(BinaryOperandType.right, Expression.newIdentifier())
+      )(nodeUpdated)
+    }
+    onChange(nodeUpdated)
+  }
 
   return (
     <div className={`binary-${type}`}>
-      <Button
+      <BinaryOperandExpressionTypeButton
         active={Expression.isIdentifier(nodeOperand)}
-        className="btn-switch-operand btn-switch-operand-var"
-        label="expressionEditor.var"
-        onClick={() => onChange(R.assoc(type, Expression.newIdentifier(), node))}
-        size="small"
-        variant="outlined"
+        expressionType={Expression.types.Identifier}
+        onClick={onOperatorTypeClick(Expression.newIdentifier())}
       />
 
       {canOperandBeLiteral && (
-        <Button
+        <BinaryOperandExpressionTypeButton
           active={Expression.isLiteral(nodeOperand)}
-          className="btn-switch-operand btn-switch-operand-const"
-          label="expressionEditor.const"
-          onClick={() => {
-            let nodeUpdate = R.assoc(type, Expression.newLiteral(), node)
-            nodeUpdate = onOperandChange(nodeUpdate)
-            onChange(nodeUpdate)
-          }}
-          size="small"
-          variant="outlined"
+          expressionType={Expression.types.Literal}
+          onClick={onOperatorTypeClick(Expression.newLiteral())}
         />
       )}
       {canOperandBeFunctionCall && (
-        <Button
+        <BinaryOperandExpressionTypeButton
           active={Expression.isCall(nodeOperand)}
-          className="btn-switch-operand btn-switch-operand-call"
-          label="expressionEditor.call"
-          onClick={() => {
-            let nodeUpdate = R.assoc(type, Expression.newCall({ callee: Expression.functionNames.now }), node)
-            nodeUpdate = onOperandChange(nodeUpdate)
-            onChange(nodeUpdate)
-          }}
-          size="small"
-          variant="outlined"
+          expressionType={Expression.types.CallExpression}
+          onClick={onOperatorTypeClick(Expression.newCall({ callee: Expression.functionNames.now }))}
         />
       )}
       {React.createElement(renderNode, {

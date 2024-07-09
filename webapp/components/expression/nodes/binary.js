@@ -11,9 +11,10 @@ import EditButtons from './editButtons'
 const Binary = (props) => {
   const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, variables } = props
 
-  const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
+  const leftOperand = R.prop(BinaryOperandType.left)(node)
+  const leftOperandType = Expression.getType(leftOperand)
 
-  const showOperator = !isLeftLiteral
+  const showOperator = ![Expression.types.Literal, Expression.types.CallExpression].includes(leftOperandType)
   const binaryOperator = showOperator ? Expression.operators.findBinary(node.operator) : null
 
   const createOperand = (type) => (
