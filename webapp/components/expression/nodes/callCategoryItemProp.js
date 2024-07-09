@@ -110,8 +110,8 @@ export const CallCategoryItemProp = (props) => {
               }))
             }}
             showAdd={false}
-            showEdit
-            showManage
+            showEdit={false}
+            showManage={false}
           />
         </FormItem>
         {categoryUuid && (
