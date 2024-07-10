@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -41,23 +41,31 @@ const CodeProps = (props) => {
   const [category, setCategory] = useState(null)
 
   const nodeDef = State.getNodeDef(state)
+  const nodeDefCategoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const validation = State.getValidation(state)
   const canUpdateCategory = Survey.canUpdateCategory(nodeDef)(survey)
   const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents({ nodeDef, category })(survey)
   const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
 
-  const setCategoryProp = (categorySelected) =>
-    Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(categorySelected) })
+  const onCategoryChange = useCallback(
+    (selectedCategory) => {
+      const selectedCategoryUuid = Category.getUuid(selectedCategory)
+      if (canUpdateCategory && selectedCategoryUuid !== nodeDefCategoryUuid) {
+        Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: selectedCategoryUuid })
+      }
+    },
+    [Actions, canUpdateCategory, nodeDefCategoryUuid, state]
+  )
 
   return (
     <>
       <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
         <CategorySelector
           disabled={!canUpdateCategory}
-          categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
+          categoryUuid={nodeDefCategoryUuid}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
           editingNodeDef
-          onChange={setCategoryProp}
+          onChange={onCategoryChange}
           onCategoryLoad={setCategory}
         />
       </FormItem>
