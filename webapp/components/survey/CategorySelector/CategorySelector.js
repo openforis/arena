@@ -81,7 +81,7 @@ export const CategorySelector = (props) => {
       return false
     }
     return true
-  }, [surveyId, categoryToEdit, notifyWarning])
+  }, [categoryToEdit, notifyWarning])
 
   const onCategoryEditPanelClose = useCallback(async () => {
     const categoryEditedUuid = Category.getUuid(categoryToEdit)
