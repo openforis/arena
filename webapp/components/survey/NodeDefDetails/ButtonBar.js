@@ -51,6 +51,7 @@ const ButtonBar = (props) => {
         testId={TestId.nodeDefDetails.backBtn}
         onClick={() => Actions.cancelEdits({ state })}
         label={dirty ? 'common.cancel' : 'common.back'}
+        variant={dirty ? 'outlined' : 'contained'}
       />
       <Button
         className="btn-primary"
