@@ -5,7 +5,9 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
+
 import { CallCategoryItemProp } from './callCategoryItemProp'
+import { CallIsEmpty } from './callIsEmpty'
 
 const functions = {
   [Expression.functionNames.isEmpty]: {
@@ -13,6 +15,7 @@ const functions = {
   },
   [Expression.functionNames.now]: {
     label: 'now()',
+    callee: 'now',
   },
   [Expression.functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
@@ -21,6 +24,13 @@ const functions = {
     label: 'includes(...)',
   },
 }
+
+const componentsByFunction = {
+  [Expression.functionNames.isEmpty]: CallIsEmpty,
+  [Expression.functionNames.categoryItemProp]: CallCategoryItemProp,
+  [Expression.functionNames.includes]: null,
+}
+
 const Call = ({ node, variables, onChange }) => {
   const i18n = useI18n()
 
@@ -41,26 +51,38 @@ const Call = ({ node, variables, onChange }) => {
 
   const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
 
+  const selectedFunctionComponent = selectedFunctionKey && componentsByFunction[selectedFunctionKey]
+
+  const onFunctionChange = useCallback(
+    (item) => {
+      const nextFunctionKey = item?.value
+
+      setState((statePrev) => ({
+        ...statePrev,
+        selectedFunctionKey: nextFunctionKey,
+        categoryUuid: null,
+        extraPropKey: null,
+        attributeUuidsByLevelUuid: {},
+      }))
+
+      const callee = functions[nextFunctionKey]?.callee
+      const newCallParams = callee && !componentsByFunction[nextFunctionKey] ? { callee } : undefined
+      onChange(Expression.newCall(newCallParams))
+    },
+    [onChange]
+  )
+
   return (
-    <div>
+    <div className="call">
       <Dropdown
+        className="function-dropdown"
         items={dropdownItems}
-        onChange={(item) => {
-          setState((statePrev) => ({
-            ...statePrev,
-            selectedFunctionKey: item?.value,
-            categoryUuid: null,
-            extraPropKey: null,
-            attributeUuidsByLevelUuid: {},
-          }))
-        }}
+        onChange={onFunctionChange}
         placeholder={i18n.t('common.selectOne')}
         searchable={false}
         selection={selectedItem}
       />
-      {selectedFunctionKey === Expression.functionNames.categoryItemProp && (
-        <CallCategoryItemProp onConfirm={onConfirm} variables={variables} />
-      )}
+      {selectedFunctionComponent && React.createElement(selectedFunctionComponent, { onConfirm, variables })}
     </div>
   )
 }

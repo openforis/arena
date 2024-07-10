@@ -113,10 +113,13 @@
       text-wrap: nowrap;
 
       &.btn-switch-operand-const {
-        width: 12rem;
+        width: 7rem;
       }
       &.btn-switch-operand-var {
-        width: 7rem;
+        width: 5rem;
+      }
+      &.btn-switch-operand-call {
+        width: 5rem;
       }
     }
 
@@ -126,6 +129,15 @@
 
     .literal-btn-group-boolean {
       margin-left: 2rem;
+    }
+  }
+
+  .call {
+    display: flex;
+    gap: 0.5rem;
+
+    .function-dropdown {
+      width: 14rem;
     }
   }
 

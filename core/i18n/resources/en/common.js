@@ -1812,6 +1812,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
+    call: 'Function',
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
