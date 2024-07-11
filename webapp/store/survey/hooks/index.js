@@ -39,6 +39,18 @@ export const useNodeDefRootKeys = () => {
   return Survey.getNodeDefKeysSorted({ nodeDef: root, cycle })(survey)
 }
 
+export const useTaxonomies = () =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getTaxonomiesArray(survey)
+  }, Objects.isEqual)
+
+export const useTaxonomyByUuid = (uuid) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getTaxonomyByUuid(uuid)(survey)
+  })
+
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) =>
   useSelector((state) => {

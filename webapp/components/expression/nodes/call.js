@@ -10,10 +10,12 @@ import { useI18n } from '@webapp/store/system'
 
 import { CallCategoryItemProp } from './callCategoryItemProp'
 import { CallIsEmpty } from './callIsEmpty'
+import { CallTaxonProp } from './callTaxonProp'
 
 const functions = {
   [Expression.functionNames.isEmpty]: {
     label: 'isEmpty(...)',
+    component: CallIsEmpty,
   },
   [Expression.functionNames.now]: {
     label: 'now()',
@@ -21,16 +23,15 @@ const functions = {
   },
   [Expression.functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
+    component: CallCategoryItemProp,
   },
-  [Expression.functionNames.includes]: {
-    label: 'includes(...)',
+  // [Expression.functionNames.includes]: {
+  //   label: 'includes(...)',
+  // },
+  [Expression.functionNames.taxonProp]: {
+    label: 'taxonProp(...)',
+    component: CallTaxonProp,
   },
-}
-
-const componentsByFunction = {
-  [Expression.functionNames.isEmpty]: CallIsEmpty,
-  [Expression.functionNames.categoryItemProp]: CallCategoryItemProp,
-  [Expression.functionNames.includes]: null,
 }
 
 const Call = ({ node, variables, onChange }) => {
@@ -60,7 +61,7 @@ const Call = ({ node, variables, onChange }) => {
 
   const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
 
-  const selectedFunctionComponent = selectedFunctionKey && componentsByFunction[selectedFunctionKey]
+  const selectedFunctionComponent = functions[selectedFunctionKey]?.component
 
   const onFunctionChange = useCallback(
     (item) => {
@@ -75,7 +76,8 @@ const Call = ({ node, variables, onChange }) => {
       }))
 
       const callee = functions[nextFunctionKey]?.callee
-      const newCallParams = callee && !componentsByFunction[nextFunctionKey] ? { callee } : undefined
+      const component = functions[nextFunctionKey]?.component
+      const newCallParams = callee && !component ? { callee } : undefined
       onChange(Expression.newCall(newCallParams))
     },
     [onChange]
