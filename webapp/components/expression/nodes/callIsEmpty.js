@@ -18,10 +18,7 @@ export const CallIsEmpty = (props) => {
   const { dirty, identifier } = state
 
   const buildFunctionCall = useCallback(() => {
-    const params = []
-    if (identifier) {
-      params.push(identifier)
-    }
+    const params = [identifier]
     return Expression.newCall({ callee: Expression.functionNames.isEmpty, params })
   }, [identifier])
 
@@ -34,14 +31,14 @@ export const CallIsEmpty = (props) => {
     setState((statePrev) => ({
       ...statePrev,
       dirty: true,
-      identifier: { type: Expression.types.Identifier, ...identifierUpdated },
+      identifier: identifierUpdated?.name ? { type: Expression.types.Identifier, ...identifierUpdated } : null,
     }))
   }, [])
 
   return (
     <>
       <Identifier node={identifier} onChange={onIdentifierChange} variables={variables} />
-      <Button disabled={!dirty} label="common.apply" onClick={onConfirm} />
+      <Button disabled={!dirty || !identifier} label="common.apply" onClick={onConfirm} />
     </>
   )
 }

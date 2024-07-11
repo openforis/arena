@@ -91,6 +91,11 @@
         width: 100%;
         max-width: 40rem;
       }
+      .call {
+        .identifier {
+          width: 20rem;
+        }
+      }
     }
 
     .binary-left {
@@ -129,15 +134,6 @@
 
     .literal-btn-group-boolean {
       margin-left: 2rem;
-    }
-  }
-
-  .call {
-    display: flex;
-    gap: 0.5rem;
-
-    .function-dropdown {
-      width: 14rem;
     }
   }
 

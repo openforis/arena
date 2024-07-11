@@ -1,0 +1,27 @@
+.expression-editor-popup__expr-container {
+  .call {
+    display: flex;
+    gap: 0.5rem;
+
+    .function-dropdown {
+      width: 14rem;
+    }
+    .call-category-item-prop {
+      width: 30rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .form-item {
+        display: flex;
+
+        .form-label {
+          width: 10rem;
+        }
+        .dropdown-wrapper {
+          width: 20rem;
+        }
+      }
+    }
+  }
+}

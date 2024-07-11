@@ -1,3 +1,5 @@
+import './call.scss'
+
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
@@ -41,8 +43,15 @@ const Call = ({ node, variables, onChange }) => {
   const emptyItem = useMemo(() => ({ value: null, label: i18n.t('common.notSpecified') }), [i18n])
 
   const dropdownItems = useMemo(
-    () => [emptyItem, ...Object.entries(functions).map(([funcKey, func]) => ({ value: funcKey, label: func.label }))],
-    [emptyItem]
+    () => [
+      emptyItem,
+      ...Object.entries(functions).map(([funcKey, func]) => ({
+        value: funcKey,
+        label: func.label,
+        description: i18n.t(`nodeDefEdit.functionDescriptions.${funcKey}`),
+      })),
+    ],
+    [emptyItem, i18n]
   )
 
   const { selectedFunctionKey } = state

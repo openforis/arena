@@ -1353,7 +1353,7 @@ E.g. this.region = region_attribute_name
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
     nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
     filterVariable: 'Variable to filter items',
-    filterVariableForLevel: 'Variable for level {{levelName}}',
+    filterVariableForLevel: 'Variable for {{levelName}}',
   },
 
   languagesEditor: {
@@ -1813,6 +1813,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     var: 'Variable',
     const: 'Constant value',
     call: 'Function',
+
+    error: {
+      selectOneVariable: 'Please select one variable',
+    },
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',

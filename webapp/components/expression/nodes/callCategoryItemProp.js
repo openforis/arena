@@ -1,6 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects, Strings } from '@openforis/arena-core'
+
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,7 +17,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 const CategoryLevelVariable = (props) => {
-  const { hierarchicalCategory, level, onChange, selectedAttributeUuid, variables } = props
+  const { disabled, hierarchicalCategory, level, onChange, selectedAttributeUuid, variables } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -45,6 +47,7 @@ const CategoryLevelVariable = (props) => {
     >
       <Dropdown
         className="identifier"
+        disabled={disabled}
         items={variablesForLevel}
         onChange={(item) => onChange(item?.uuid)}
         selection={selectedVariable}
@@ -54,6 +57,7 @@ const CategoryLevelVariable = (props) => {
 }
 
 CategoryLevelVariable.propTypes = {
+  disabled: PropTypes.bool,
   hierarchicalCategory: PropTypes.bool,
   level: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
@@ -79,83 +83,83 @@ export const CallCategoryItemProp = (props) => {
   const categoryLevels = useMemo(() => Category.getLevelsArray(category), [category])
 
   const buildCategoryItemPropCall = useCallback(() => {
-    const params = []
-    if (category) {
-      params.push(Expression.newLiteral(Category.getName(category)))
-      if (extraPropKey) {
-        params.push(Expression.newLiteral(extraPropKey))
-      }
-    }
+    const params = [
+      Expression.newLiteral(Strings.quote(Category.getName(category))),
+      Expression.newLiteral(Strings.quote(extraPropKey)),
+    ]
+    const attributeUuids = Object.values(attributeUuidsByLevelUuid)
+    const attributes = Survey.getNodeDefsByUuids(attributeUuids)(survey)
+    params.push(...attributes.map((attrDef) => Expression.newIdentifier(NodeDef.getName(attrDef))))
     return Expression.newCall({ callee: Expression.functionNames.categoryItemProp, params })
-  }, [category, extraPropKey])
+  }, [attributeUuidsByLevelUuid, category, extraPropKey, survey])
 
   const onConfirm = useCallback(
     () => onConfirmProp(buildCategoryItemPropCall()),
     [buildCategoryItemPropCall, onConfirmProp]
   )
 
+  const applyButtonDisabled = !category || !extraPropKey || Objects.isEmpty(attributeUuidsByLevelUuid)
+
   return (
-    <div>
-      <div>
-        <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
-          <CategorySelector
-            categoryUuid={categoryUuid}
-            filterFunction={Category.hasExtraDefs}
-            onChange={(item) => {
+    <div className="call-category-item-prop">
+      <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
+        <CategorySelector
+          categoryUuid={categoryUuid}
+          filterFunction={Category.hasExtraDefs}
+          onChange={(item) => {
+            setState((statePrev) => ({
+              ...statePrev,
+              categoryUuid: Category.getUuid(item),
+              extraPropKey: null,
+              attributeUuidsByLevelUuid: {},
+            }))
+          }}
+          showAdd={false}
+          showEdit={false}
+          showManage={false}
+        />
+      </FormItem>
+      <FormItem label={i18n.t('extraProp.label')}>
+        <Dropdown
+          disabled={!categoryUuid}
+          items={Category.getItemExtraDefKeys(category)}
+          itemLabel={(item) => item}
+          itemValue={(item) => item}
+          onChange={(item) => {
+            setState((statePrev) => ({
+              ...statePrev,
+              extraPropKey: item,
+            }))
+          }}
+          selection={extraPropKey}
+        />
+      </FormItem>
+      {categoryLevels.map((level, index) => {
+        const levelUuid = CategoryLevel.getUuid(level)
+        const selectedAttributeUuid = attributeUuidsByLevelUuid[levelUuid]
+        const previousLevelUuid = index > 0 ? CategoryLevel.getUuid(categoryLevels[index - 1]) : null
+        const previousLevelSelectedAttributeUuid = attributeUuidsByLevelUuid[previousLevelUuid]
+        return (
+          <CategoryLevelVariable
+            key={levelUuid}
+            disabled={!extraPropKey || (index > 0 && !previousLevelSelectedAttributeUuid)}
+            hierarchicalCategory={categoryLevels.length > 1}
+            level={level}
+            onChange={(attributeDefUuid) => {
               setState((statePrev) => ({
                 ...statePrev,
-                categoryUuid: Category.getUuid(item),
-                extraPropKey: null,
-                attributeUuidsByLevelUuid: {},
+                attributeUuidsByLevelUuid: {
+                  ...attributeUuidsByLevelUuid,
+                  [levelUuid]: attributeDefUuid,
+                },
               }))
             }}
-            showAdd={false}
-            showEdit={false}
-            showManage={false}
+            selectedAttributeUuid={selectedAttributeUuid}
+            variables={variables}
           />
-        </FormItem>
-        {categoryUuid && (
-          <FormItem label={i18n.t('extraProp.label')}>
-            <Dropdown
-              items={Category.getItemExtraDefKeys(category)}
-              itemLabel={(item) => item}
-              itemValue={(item) => item}
-              onChange={(item) => {
-                setState((statePrev) => ({
-                  ...statePrev,
-                  extraPropKey: item,
-                }))
-              }}
-              placeholder={i18n.t('extraProp.label')}
-              selection={extraPropKey}
-            />
-          </FormItem>
-        )}
-        {extraPropKey &&
-          categoryLevels.map((level) => {
-            const levelUuid = CategoryLevel.getUuid(level)
-            const selectedAttributeUuid = attributeUuidsByLevelUuid[levelUuid]
-            return (
-              <CategoryLevelVariable
-                key={levelUuid}
-                hierarchicalCategory={categoryLevels.length > 1}
-                level={level}
-                onChange={(attributeDefUuid) => {
-                  setState((statePrev) => ({
-                    ...statePrev,
-                    attributeUuidsByLevelUuid: {
-                      ...attributeUuidsByLevelUuid,
-                      [levelUuid]: attributeDefUuid,
-                    },
-                  }))
-                }}
-                selectedAttributeUuid={selectedAttributeUuid}
-                variables={variables}
-              />
-            )
-          })}
-      </div>
-      <Button label="common.ok" onClick={onConfirm} primary />
+        )
+      })}
+      <Button disabled={applyButtonDisabled} label="common.apply" onClick={onConfirm} />
     </div>
   )
 }

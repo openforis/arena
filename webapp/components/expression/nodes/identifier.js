@@ -32,7 +32,7 @@ const filterVariablesOrGroups = ({ variables }) => {
   }, [])
 }
 
-const Identifier = ({ node, variables, onChange }) => {
+const Identifier = ({ node, onChange, variables = [] }) => {
   // exclude entities from basic expression editor identifiers
   const variablesFiltered = filterVariablesOrGroups({ variables })
 
@@ -56,10 +56,6 @@ Identifier.propTypes = {
   onChange: PropTypes.func.isRequired,
   // Identifier / Member / Call
   variables: PropTypes.array,
-}
-
-Identifier.defaultProps = {
-  variables: null,
 }
 
 export default Identifier
