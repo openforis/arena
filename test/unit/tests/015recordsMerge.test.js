@@ -86,7 +86,7 @@ describe('Records merge Test', () => {
       recordSource: record2,
     })(record1)
 
-    expect(Object.values(nodesUpdated).length).toBe(32)
+    expect(Object.values(nodesUpdated).length).toBe(26)
 
     expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 3 })
 
