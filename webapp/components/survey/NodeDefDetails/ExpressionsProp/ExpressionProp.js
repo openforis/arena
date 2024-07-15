@@ -29,6 +29,7 @@ const ExpressionProp = (props) => {
     showLabels,
     readOnly,
     isContextParent,
+    canBeCall,
     canBeConstant,
     isBoolean,
     hideAdvanced,
@@ -73,6 +74,7 @@ const ExpressionProp = (props) => {
             query={NodeDefExpression.getExpression(expression)}
             onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocExpression(query)(expression), callback)}
             isContextParent={isContextParent}
+            canBeCall={canBeCall}
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
             types={expressionEditorTypes}
@@ -94,6 +96,7 @@ const ExpressionProp = (props) => {
               query={NodeDefExpression.getApplyIf(expression)}
               onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
               isContextParent={isContextParent}
+              canBeCall
               canBeConstant={false}
               types={expressionEditorTypes}
             />
@@ -140,6 +143,7 @@ ExpressionProp.propTypes = {
   readOnly: PropTypes.bool,
 
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
@@ -161,6 +165,7 @@ ExpressionProp.defaultProps = {
   readOnly: false,
 
   isContextParent: false,
+  canBeCall: true,
   canBeConstant: false,
   isBoolean: true,
   hideAdvanced: false,

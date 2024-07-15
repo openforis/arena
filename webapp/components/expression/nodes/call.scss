@@ -4,13 +4,13 @@
     gap: 0.5rem;
 
     .function-dropdown {
-      width: 14rem;
+      width: 18rem;
     }
-    .call-category-item-prop {
-      width: 30rem;
+    .function-editor {
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 30rem;
 
       .form-item {
         display: flex;
@@ -21,6 +21,10 @@
         .dropdown-wrapper {
           width: 20rem;
         }
+      }
+
+      .literal {
+        width: auto;
       }
     }
   }

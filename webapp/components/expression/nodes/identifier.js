@@ -20,7 +20,7 @@ const getSelectedVariable = ({ variables, node }) => {
 
 const excludeEntityVariables = (variables) => variables.filter((variable) => !variable.entity)
 
-const filterVariablesOrGroups = ({ variables }) => {
+const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
   const variablesUpdated = excludeEntityVariables(variables)
 
   return variablesUpdated.reduce((groupsAcc, group) => {
@@ -32,9 +32,9 @@ const filterVariablesOrGroups = ({ variables }) => {
   }, [])
 }
 
-const Identifier = ({ node, onChange, variables = [] }) => {
+const Identifier = ({ node, onChange, variables = [], variablesFilterFn = null }) => {
   // exclude entities from basic expression editor identifiers
-  const variablesFiltered = filterVariablesOrGroups({ variables })
+  const variablesFiltered = filterVariablesOrGroups({ variables, variablesFilterFn })
 
   return (
     <Dropdown

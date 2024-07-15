@@ -101,7 +101,7 @@ export const CallCategoryItemProp = (props) => {
   const applyButtonDisabled = !category || !extraPropKey || Objects.isEmpty(attributeUuidsByLevelUuid)
 
   return (
-    <div className="call-category-item-prop">
+    <div className="function-editor">
       <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
         <CategorySelector
           categoryUuid={categoryUuid}

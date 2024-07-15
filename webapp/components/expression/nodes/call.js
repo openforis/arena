@@ -1,6 +1,6 @@
 import './call.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -9,6 +9,7 @@ import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
 import { CallCategoryItemProp } from './callCategoryItemProp'
+import { CallIncludes } from './callIncludes'
 import { CallIsEmpty } from './callIsEmpty'
 import { CallTaxonProp } from './callTaxonProp'
 
@@ -25,9 +26,10 @@ const functions = {
     label: 'categoryItemProp(...)',
     component: CallCategoryItemProp,
   },
-  // [Expression.functionNames.includes]: {
-  //   label: 'includes(...)',
-  // },
+  [Expression.functionNames.includes]: {
+    label: 'includes(...)',
+    component: CallIncludes,
+  },
   [Expression.functionNames.taxonProp]: {
     label: 'taxonProp(...)',
     component: CallTaxonProp,
@@ -37,9 +39,17 @@ const functions = {
 const Call = ({ node, variables, onChange }) => {
   const i18n = useI18n()
 
+  const nodeCallee = node?.callee?.name
+
   const [state, setState] = useState({
-    selectedFunctionKey: node?.callee?.raw,
+    selectedFunctionKey: nodeCallee,
   })
+
+  const { selectedFunctionKey } = state
+
+  useEffect(() => {
+    setState((statePrev) => ({ ...statePrev, selectedFunctionKey: nodeCallee }))
+  }, [nodeCallee])
 
   const emptyItem = useMemo(() => ({ value: null, label: i18n.t('common.notSpecified') }), [i18n])
 
@@ -55,8 +65,6 @@ const Call = ({ node, variables, onChange }) => {
     [emptyItem, i18n]
   )
 
-  const { selectedFunctionKey } = state
-
   const selectedItem = dropdownItems.find((item) => item.value === selectedFunctionKey)
 
   const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
@@ -70,9 +78,6 @@ const Call = ({ node, variables, onChange }) => {
       setState((statePrev) => ({
         ...statePrev,
         selectedFunctionKey: nextFunctionKey,
-        categoryUuid: null,
-        extraPropKey: null,
-        attributeUuidsByLevelUuid: {},
       }))
 
       const callee = functions[nextFunctionKey]?.callee
@@ -93,7 +98,8 @@ const Call = ({ node, variables, onChange }) => {
         searchable={false}
         selection={selectedItem}
       />
-      {selectedFunctionComponent && React.createElement(selectedFunctionComponent, { onConfirm, variables })}
+      {selectedFunctionComponent &&
+        React.createElement(selectedFunctionComponent, { expressionNode: node, onConfirm, variables })}
     </div>
   )
 }

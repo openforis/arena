@@ -59,9 +59,9 @@ const BinaryOperand = (props) => {
     (expressionType) => {
       switch (expressionType) {
         case Expression.types.Identifier:
+        case Expression.types.CallExpression:
           return true
         case Expression.types.Literal:
-        case Expression.types.CallExpression:
           return !isLeft || !isBoolean || currentNodeDefIsBoolean
         default:
           false
@@ -78,7 +78,7 @@ const BinaryOperand = (props) => {
     [canOperandExpressionBeOfType]
   )
 
-  const onOperatorTypeClick = (newType) => () => {
+  const onOperandTypeClick = (newType) => () => {
     const newOperatorExpression = expressionGeneratorByType[newType]()
     let nodeUpdated = { ...node, [type]: newOperatorExpression }
     if (isLeft && !isBoolean) {
@@ -98,7 +98,7 @@ const BinaryOperand = (props) => {
           key={expressionType}
           active={operandExpressionType === expressionType}
           expressionType={expressionType}
-          onClick={onOperatorTypeClick(expressionType)}
+          onClick={onOperandTypeClick(expressionType)}
         />
       ))}
       {React.createElement(renderNode, {

@@ -44,7 +44,7 @@ const loadItems = async (params) => {
 }
 
 const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
-  if (BinaryOperandType.isLeft(type)) {
+  if (!type || BinaryOperandType.isLeft(type)) {
     return nodeDefCurrent
   }
   if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {

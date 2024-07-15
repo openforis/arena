@@ -54,8 +54,15 @@ export const useTaxonomyByUuid = (uuid) =>
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) =>
   useSelector((state) => {
+    if (!uuid) return null
     const survey = SurveyState.getSurvey(state)
     return Survey.getNodeDefByUuid(uuid)(survey)
+  })
+export const useNodeDefByName = (name) =>
+  useSelector((state) => {
+    if (!name) return null
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getNodeDefByName(name)(survey)
   })
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
