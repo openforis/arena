@@ -35,6 +35,15 @@ export default (props) => {
           NodeDef.getUuid(nodeDef)
         )(recordValidation)
       }
+      if (NodeDef.isCode(nodeDef)) {
+        const firstNodeValidation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
+        const allNodesValidationsEqual = nodes.every((node) =>
+          Objects.isEqual(RecordValidation.getNodeValidation(node)(recordValidation), firstNodeValidation)
+        )
+        if (allNodesValidationsEqual) {
+          return firstNodeValidation
+        }
+      }
       if (
         nodes.some((node) => {
           const nodeValidation = RecordValidation.getNodeValidation(node)(recordValidation)
