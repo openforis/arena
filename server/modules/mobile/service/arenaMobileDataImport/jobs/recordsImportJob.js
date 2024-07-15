@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as User from '@core/user/user'
 import * as PromiseUtils from '@core/promiseUtils'
 
@@ -38,6 +39,17 @@ const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
     return { valid: false, error: `has an invalid meta hierarchy` }
   }
   return { valid: true }
+}
+
+const getRecordFormattedKeyValues = ({ survey, record }) => {
+  const rootDef = Surveys.getNodeDefRoot({ survey })
+  const recordRootEntity = Records.getRoot(record)
+  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({ survey, record, entity: recordRootEntity })
+  const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
+  return keyDefs.map((keyDef) => {
+    const value = recordKeyValuesByDefUuid[NodeDef.getUuid(keyDef)]
+    return NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
+  })
 }
 
 export default class RecordsImportJob extends DataImportBaseJob {
@@ -139,22 +151,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
   findExistingRecordSummaryWithSameKeys() {
     const { context, currentRecord: record } = this
     const { survey, existingRecordsSummary } = context
-    const recordUuid = Record.getUuid(record)
     const rootDef = Surveys.getNodeDefRoot({ survey })
     const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
-    const recordRootEntity = Records.getRoot(record)
-    const recordKeyValues = Records.getEntityKeyValues({ survey, record, entity: recordRootEntity })
     const recordSummaryKeyProps = keyDefs.map((keyDef) => A.camelize(NodeDef.getName(keyDef)))
-
+    const recordKeyValues = getRecordFormattedKeyValues({ survey, record })
     const recordSummariesWithSameKeys = existingRecordsSummary.filter((recordSummary) => {
       const recordSummaryKeyValues = recordSummaryKeyProps.map((key) => recordSummary[key])
       return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
     })
-    const recordSummarySameUuid = recordSummariesWithSameKeys.find(
-      (recordSummary) => Record.getUuid(recordSummary) === recordUuid
-    )
-
-    return recordSummarySameUuid ?? recordSummariesWithSameKeys[0]
+    return recordSummariesWithSameKeys[0]
   }
 
   findExistingRecordSummary() {
