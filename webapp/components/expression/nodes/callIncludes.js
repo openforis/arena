@@ -17,8 +17,8 @@ export const CallIncludes = (props) => {
 
   const i18n = useI18n()
 
-  const { arguments = [] } = expressionNode ?? {}
-  const [expressionFirstArg, expressionSecondArg] = arguments
+  const { arguments: expressionNodeArgs = [] } = expressionNode ?? {}
+  const [expressionFirstArg, expressionSecondArg] = expressionNodeArgs
 
   const [state, setState] = useState({
     dirty: !expressionFirstArg || !expressionSecondArg,
