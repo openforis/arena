@@ -228,10 +228,11 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   },
   client = db
 ) => {
-  const [surveyDb, nodeDefs, dependencies, categories, taxonomies] = await Promise.all([
-    fetchSurveyById({ surveyId, draft, validate, backup }, client),
+  const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup }, client)
+  const surveyCycles = Survey.getCycleKeys(surveyDb)
+  const [nodeDefs, dependencies, categories, taxonomies] = await Promise.all([
     NodeDefManager.fetchNodeDefsBySurveyId(
-      { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
+      { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
       client
     ),
     fetchDependencies(surveyId, client),
