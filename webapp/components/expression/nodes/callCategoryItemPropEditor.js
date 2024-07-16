@@ -17,6 +17,8 @@ import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useCategoryByName, useNodeDefsByNames } from '@webapp/store/survey/hooks'
 
+import { CallEditorPropTypes } from './callEditorPropTypes'
+
 const CategoryLevelVariable = (props) => {
   const { disabled, hierarchicalCategory, level, onChange, selectedAttributeUuid, variables } = props
 
@@ -182,8 +184,4 @@ export const CallCategoryItemPropEditor = (props) => {
   )
 }
 
-CallCategoryItemPropEditor.propTypes = {
-  expressionNode: PropTypes.object,
-  onConfirm: PropTypes.func.isRequired,
-  variables: PropTypes.array.isRequired,
-}
+CallCategoryItemPropEditor.propTypes = CallEditorPropTypes

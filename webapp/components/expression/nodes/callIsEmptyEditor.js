@@ -1,9 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
 import { CallSingleParameterEditor } from './callSingleParameterEditor'
+import { CallEditorPropTypes } from './callEditorPropTypes'
 
 const isEmptyCallCreator = (identifier) => {
   const params = [identifier]
@@ -22,8 +22,4 @@ export const CallIsEmptyEditor = (props) => {
   )
 }
 
-CallIsEmptyEditor.propTypes = {
-  expressionNode: PropTypes.object,
-  onConfirm: PropTypes.func.isRequired,
-  variables: PropTypes.array.isRequired,
-}
+CallIsEmptyEditor.propTypes = CallEditorPropTypes

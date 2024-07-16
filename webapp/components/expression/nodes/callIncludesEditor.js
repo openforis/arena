@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
@@ -12,6 +11,7 @@ import { useI18n } from '@webapp/store/system'
 
 import Identifier from './identifier'
 import Literal from './literal'
+import { CallEditorPropTypes } from './callEditorPropTypes'
 
 export const CallIncludesEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
@@ -83,8 +83,4 @@ export const CallIncludesEditor = (props) => {
   )
 }
 
-CallIncludesEditor.propTypes = {
-  expressionNode: PropTypes.object,
-  onConfirm: PropTypes.func.isRequired,
-  variables: PropTypes.array.isRequired,
-}
+CallIncludesEditor.propTypes = CallEditorPropTypes

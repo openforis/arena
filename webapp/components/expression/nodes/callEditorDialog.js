@@ -4,7 +4,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { Modal, ModalBody } from '@webapp/components/modal'
 
-export const CallBuilderDialog = (props) => {
+export const CallEditorDialog = (props) => {
   const { children, functionName, nodeDef, onClose } = props
 
   return (

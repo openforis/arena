@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
 import Identifier from './identifier'
+import { CallEditorPropTypes } from './callEditorPropTypes'
 
 export const CallSingleParameterEditor = (props) => {
   const { functionCallCreator, expressionNode, onConfirm: onConfirmProp, variables } = props
@@ -31,9 +31,4 @@ export const CallSingleParameterEditor = (props) => {
   return <Identifier node={identifier} onChange={onIdentifierChange} variables={variables} />
 }
 
-CallSingleParameterEditor.propTypes = {
-  expressionNode: PropTypes.object,
-  functionCallCreator: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  variables: PropTypes.array.isRequired,
-}
+CallSingleParameterEditor.propTypes = CallEditorPropTypes

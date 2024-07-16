@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
 
 import { Strings } from '@openforis/arena-core'
 
@@ -14,6 +13,7 @@ import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
 import Identifier from './identifier'
+import { CallEditorPropTypes } from './callEditorPropTypes'
 
 const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdentifierName }) => {
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
@@ -104,8 +104,4 @@ export const CallTaxonPropEditor = (props) => {
   )
 }
 
-CallTaxonPropEditor.propTypes = {
-  expressionNode: PropTypes.object,
-  onConfirm: PropTypes.func.isRequired,
-  variables: PropTypes.array.isRequired,
-}
+CallTaxonPropEditor.propTypes = CallEditorPropTypes

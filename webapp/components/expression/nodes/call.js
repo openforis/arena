@@ -40,10 +40,10 @@ const functions = {
   },
 }
 
-const Call = ({ node, variables, onChange }) => {
+const Call = ({ node: expressionNode, variables, onChange }) => {
   const i18n = useI18n()
 
-  const nodeCallee = node?.callee?.name
+  const nodeCallee = expressionNode?.callee?.name
 
   const [state, setState] = useState({
     selectedFunctionKey: nodeCallee,
@@ -98,7 +98,7 @@ const Call = ({ node, variables, onChange }) => {
         selection={selectedItem}
       />
       {selectedFunctionComponent &&
-        React.createElement(selectedFunctionComponent, { expressionNode: node, onConfirm, variables })}
+        React.createElement(selectedFunctionComponent, { expressionNode, onConfirm, variables })}
     </div>
   )
 }
