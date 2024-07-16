@@ -64,7 +64,7 @@ const BinaryOperand = (props) => {
         case Expression.types.Literal:
           return !isLeft || !isBoolean || currentNodeDefIsBoolean
         default:
-          false
+          return false
       }
     },
     [currentNodeDefIsBoolean, isBoolean, isLeft]
