@@ -166,7 +166,7 @@ Literal.propTypes = {
   node: PropTypes.any.isRequired,
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
-  type: PropTypes.string.isRequired,
+  type: PropTypes.string,
 }
 
 export default Literal
