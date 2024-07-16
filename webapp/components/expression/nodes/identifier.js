@@ -35,13 +35,14 @@ const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
   }, [])
 }
 
-const Identifier = ({ node, onChange, variables = [], variablesFilterFn = null }) => {
+const Identifier = ({ disabled, node, onChange, variables = [], variablesFilterFn = null }) => {
   // exclude entities from basic expression editor identifiers
   const variablesFiltered = filterVariablesOrGroups({ variables, variablesFilterFn })
 
   return (
     <Dropdown
       className="identifier"
+      disabled={disabled}
       items={variablesFiltered}
       onChange={(item) => {
         const name = item?.value ?? ''
@@ -54,6 +55,7 @@ const Identifier = ({ node, onChange, variables = [], variablesFilterFn = null }
 }
 
 Identifier.propTypes = {
+  disabled: PropTypes.bool,
   // Common props
   node: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,

@@ -11,19 +11,32 @@ import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
+import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
+
 import Identifier from './identifier'
-import { useTaxonomyByUuid } from '@webapp/store/survey/hooks'
+
+const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdentifierName }) => {
+  const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
+  return {
+    taxonomyUuid: Taxonomy.getUuid(initialTaxonomy),
+    extraPropKey: initialExtraPropKey,
+    identifier: initialIdentifier,
+  }
+}
 
 export const CallTaxonPropEditor = (props) => {
-  const { onConfirm: onConfirmProp, variables } = props
+  const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const i18n = useI18n()
 
-  const [state, setState] = useState({
-    taxonomyUuid: null,
-    extraPropKey: null,
-    identifier: null,
-  })
+  const expressionArgumentsValues = expressionNode?.arguments?.map((arg) => arg.value ?? arg.name) ?? []
+  const [initialTaxonomyName, initialExtraPropKey, initialIdentifierName] = expressionArgumentsValues
+
+  const initialTaxonomy = useTaxonomyByName(initialTaxonomyName)
+
+  const initialState = createInitialState({ initialTaxonomy, initialExtraPropKey, initialIdentifierName })
+
+  const [state, setState] = useState(initialState)
 
   const { taxonomyUuid, extraPropKey, identifier } = state
 
@@ -51,7 +64,7 @@ export const CallTaxonPropEditor = (props) => {
   const applyButtonDisabled = !taxonomy || !extraPropKey || !identifier
 
   return (
-    <div className="call-category-item-prop">
+    <div className="function-editor">
       <FormItem label={i18n.t('taxonomy.header')}>
         <TaxonomySelector
           filterFunction={Taxonomy.hasExtraDefs}
@@ -60,6 +73,7 @@ export const CallTaxonPropEditor = (props) => {
               ...statePrev,
               taxonomyUuid: Taxonomy.getUuid(item),
               extraPropKey: null,
+              identifier: null,
             }))
           }}
           selectedTaxonomyUuid={taxonomyUuid}
@@ -82,7 +96,7 @@ export const CallTaxonPropEditor = (props) => {
       </FormItem>
 
       <FormItem label={i18n.t('expressionEditor.var')}>
-        <Identifier node={identifier} onChange={onIdentifierChange} variables={variables} />
+        <Identifier disabled={!taxonomyUuid} node={identifier} onChange={onIdentifierChange} variables={variables} />
       </FormItem>
 
       <Button disabled={applyButtonDisabled} label="common.apply" onClick={onConfirm} />
@@ -91,6 +105,7 @@ export const CallTaxonPropEditor = (props) => {
 }
 
 CallTaxonPropEditor.propTypes = {
+  expressionNode: PropTypes.object,
   onConfirm: PropTypes.func.isRequired,
   variables: PropTypes.array.isRequired,
 }

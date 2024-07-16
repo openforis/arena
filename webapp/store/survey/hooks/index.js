@@ -58,6 +58,13 @@ export const useTaxonomyByUuid = (uuid) =>
     return Survey.getTaxonomyByUuid(uuid)(survey)
   })
 
+export const useTaxonomyByName = (name) =>
+  useSelector((state) => {
+    if (!name) return null
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getTaxonomyByName(name)(survey)
+  })
+
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) =>
   useSelector((state) => {
