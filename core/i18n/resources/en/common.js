@@ -876,12 +876,14 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
   },
 
   surveysView: {
+    chains: 'Chains',
+    cycles: 'Cycles',
     datePublished: 'Date published',
     filter: 'Filter',
     filterPlaceholder: 'Filter by name, label or owner',
-    noSurveysMatchingFilter: 'No surveys matching the specified filter',
+    languages: 'Languages',
     nodes: 'Nodes',
-    chains: 'Chains',
+    noSurveysMatchingFilter: 'No surveys matching the specified filter',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
   },

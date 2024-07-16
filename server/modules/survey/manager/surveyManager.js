@@ -334,6 +334,8 @@ export const fetchUserSurveysInfo = async (
         const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
         return {
           ...survey,
+          cycles: Survey.getCycleKeys(survey).length,
+          languages: Survey.getLanguages(survey).join('|'),
           nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
           recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
           recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
