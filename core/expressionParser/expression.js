@@ -82,11 +82,9 @@ export const newBinary = ({ left, right, operator = '' }) => ({
 })
 
 export const newBinaryEmpty = ({ canBeConstant, exprQuery = null }) => {
-  let left = null
+  let left = exprQuery
   if (isCompound(exprQuery)) {
     left = canBeConstant ? newLiteral() : newIdentifier()
-  } else {
-    left = exprQuery
   }
   return newBinary({ left, right: newLiteral() })
 }
