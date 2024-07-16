@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 
 import { Button } from '@webapp/components/buttons'
@@ -17,13 +18,12 @@ export const CallIncludes = (props) => {
 
   const i18n = useI18n()
 
-  const { arguments: expressionNodeArgs = [] } = expressionNode ?? {}
-  const [expressionFirstArg, expressionSecondArg] = expressionNodeArgs
+  const [expressionNodeArg1, expressionNodeArg2] = expressionNode?.arguments ?? []
 
   const [state, setState] = useState({
-    dirty: !expressionFirstArg || !expressionSecondArg,
-    identifierParam: expressionFirstArg,
-    literalParam: expressionSecondArg,
+    dirty: !expressionNodeArg1 || !expressionNodeArg2,
+    identifierParam: expressionNodeArg1,
+    literalParam: expressionNodeArg2,
   })
 
   const { dirty, identifierParam, literalParam } = state
@@ -64,10 +64,12 @@ export const CallIncludes = (props) => {
     <div className="function-editor">
       <FormItem label={i18n.t('expressionEditor.var')}>
         <Identifier
-          variablesFilterFn={() => true}
           node={identifierParam}
           onChange={onIdentifierParamChange}
           variables={variables}
+          variablesFilterFn={(variable) =>
+            variable.root || (variable.multiple && variable.nodeDefType !== NodeDef.nodeDefType.entity)
+          }
         />
       </FormItem>
       {identifierNodeDef && (
@@ -82,6 +84,7 @@ export const CallIncludes = (props) => {
 }
 
 CallIncludes.propTypes = {
+  expressionNode: PropTypes.object,
   onConfirm: PropTypes.func.isRequired,
   variables: PropTypes.array.isRequired,
 }

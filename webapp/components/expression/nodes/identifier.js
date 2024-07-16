@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { Dropdown } from '@webapp/components/form'
 
@@ -18,15 +19,17 @@ const getSelectedVariable = ({ variables, node }) => {
   return findVariableByValue({ variables: options, value: node.name })
 }
 
-const excludeEntityVariables = (variables) => variables.filter((variable) => !variable.entity)
+const defaultVariablesFilterFunction = (variable) => variable.nodeDefType !== NodeDef.nodeDefType.entity
 
 const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
-  const variablesUpdated = excludeEntityVariables(variables)
+  const filterVariables = (variables) => variables.filter(variablesFilterFn ?? defaultVariablesFilterFunction)
+
+  const variablesUpdated = filterVariables(variables)
 
   return variablesUpdated.reduce((groupsAcc, group) => {
     const groupUpdated = { ...group }
     if (group.options) {
-      groupUpdated.options = excludeEntityVariables(group.options)
+      groupUpdated.options = filterVariables(group.options)
     }
     return [...groupsAcc, groupUpdated]
   }, [])
@@ -56,6 +59,7 @@ Identifier.propTypes = {
   onChange: PropTypes.func.isRequired,
   // Identifier / Member / Call
   variables: PropTypes.array,
+  variablesFilterFn: PropTypes.func,
 }
 
 export default Identifier
