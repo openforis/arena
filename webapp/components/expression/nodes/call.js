@@ -34,6 +34,10 @@ const functions = {
     label: 'taxonProp(...)',
     component: CallTaxonPropEditor,
   },
+  [Expression.functionNames.uuid]: {
+    label: 'uuid()',
+    callee: 'uuid',
+  },
 }
 
 const Call = ({ node, variables, onChange }) => {
