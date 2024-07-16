@@ -13,7 +13,7 @@ import { useI18n } from '@webapp/store/system'
 import Identifier from './identifier'
 import Literal from './literal'
 
-export const CallIncludes = (props) => {
+export const CallIncludesEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const i18n = useI18n()
@@ -83,7 +83,7 @@ export const CallIncludes = (props) => {
   )
 }
 
-CallIncludes.propTypes = {
+CallIncludesEditor.propTypes = {
   expressionNode: PropTypes.object,
   onConfirm: PropTypes.func.isRequired,
   variables: PropTypes.array.isRequired,

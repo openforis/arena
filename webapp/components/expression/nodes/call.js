@@ -1,6 +1,6 @@
 import './call.scss'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
@@ -8,15 +8,15 @@ import * as Expression from '@core/expressionParser/expression'
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
-import { CallCategoryItemProp } from './callCategoryItemProp'
-import { CallIncludes } from './callIncludes'
-import { CallIsEmpty } from './callIsEmpty'
-import { CallTaxonProp } from './callTaxonProp'
+import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
+import { CallIncludesEditor } from './callIncludesEditor'
+import { CallIsEmptyEditor } from './callIsEmptyEditor'
+import { CallTaxonPropEditor } from './callTaxonPropEditor'
 
 const functions = {
   [Expression.functionNames.isEmpty]: {
     label: 'isEmpty(...)',
-    component: CallIsEmpty,
+    component: CallIsEmptyEditor,
   },
   [Expression.functionNames.now]: {
     label: 'now()',
@@ -24,15 +24,15 @@ const functions = {
   },
   [Expression.functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
-    component: CallCategoryItemProp,
+    component: CallCategoryItemPropEditor,
   },
   [Expression.functionNames.includes]: {
     label: 'includes(...)',
-    component: CallIncludes,
+    component: CallIncludesEditor,
   },
   [Expression.functionNames.taxonProp]: {
     label: 'taxonProp(...)',
-    component: CallTaxonProp,
+    component: CallTaxonPropEditor,
   },
 }
 
@@ -46,10 +46,6 @@ const Call = ({ node, variables, onChange }) => {
   })
 
   const { selectedFunctionKey } = state
-
-  useEffect(() => {
-    setState((statePrev) => ({ ...statePrev, selectedFunctionKey: nodeCallee }))
-  }, [nodeCallee])
 
   const emptyItem = useMemo(() => ({ value: null, label: i18n.t('common.notSpecified') }), [i18n])
 
@@ -65,11 +61,7 @@ const Call = ({ node, variables, onChange }) => {
     [emptyItem, i18n]
   )
 
-  const selectedItem = dropdownItems.find((item) => item.value === selectedFunctionKey)
-
   const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
-
-  const selectedFunctionComponent = functions[selectedFunctionKey]?.component
 
   const onFunctionChange = useCallback(
     (item) => {
@@ -87,6 +79,9 @@ const Call = ({ node, variables, onChange }) => {
     },
     [onChange]
   )
+
+  const selectedItem = dropdownItems.find((item) => item.value === selectedFunctionKey)
+  const selectedFunctionComponent = functions[selectedFunctionKey]?.component
 
   return (
     <div className="call">

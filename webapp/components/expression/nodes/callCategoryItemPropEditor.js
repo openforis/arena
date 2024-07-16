@@ -15,6 +15,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { useCategoryByName, useNodeDefsByNames } from '@webapp/store/survey/hooks'
 
 const CategoryLevelVariable = (props) => {
   const { disabled, hierarchicalCategory, level, onChange, selectedAttributeUuid, variables } = props
@@ -65,17 +66,34 @@ CategoryLevelVariable.propTypes = {
   variables: PropTypes.array.isRequired,
 }
 
-export const CallCategoryItemProp = (props) => {
-  const { onConfirm: onConfirmProp, variables } = props
+const createInitialState = ({ initialCategory, initialCategoryPropKey, initialAttributeDefs }) => {
+  const initialAttributeUuidsByLevelUuid = Category.getLevelsArray(initialCategory).reduce((acc, level, index) => {
+    const attributeDef = initialAttributeDefs[index]
+    acc[CategoryLevel.getUuid(level)] = NodeDef.getUuid(attributeDef)
+    return acc
+  }, {})
+
+  return {
+    categoryUuid: Category.getUuid(initialCategory),
+    extraPropKey: initialCategoryPropKey,
+    attributeUuidsByLevelUuid: initialAttributeUuidsByLevelUuid,
+  }
+}
+
+export const CallCategoryItemPropEditor = (props) => {
+  const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const [state, setState] = useState({
-    categoryUuid: null,
-    extraPropKey: null,
-    attributeUuidsByLevelUuid: {},
-  })
+  const expressionArgumentsValues = expressionNode?.arguments?.map((arg) => arg.value ?? arg.name) ?? []
+  const [initialCategoryName, initialCategoryPropKey, ...initialAttributeNames] = expressionArgumentsValues
+
+  const initialCategory = useCategoryByName(initialCategoryName)
+  const initialAttributeDefs = useNodeDefsByNames(initialAttributeNames)
+
+  const initialState = createInitialState({ initialCategory, initialCategoryPropKey, initialAttributeDefs })
+  const [state, setState] = useState(initialState)
 
   const { categoryUuid, extraPropKey, attributeUuidsByLevelUuid } = state
 
@@ -164,7 +182,8 @@ export const CallCategoryItemProp = (props) => {
   )
 }
 
-CallCategoryItemProp.propTypes = {
+CallCategoryItemPropEditor.propTypes = {
+  expressionNode: PropTypes.object,
   onConfirm: PropTypes.func.isRequired,
   variables: PropTypes.array.isRequired,
 }

@@ -14,7 +14,7 @@ import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import Identifier from './identifier'
 import { useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
-export const CallTaxonProp = (props) => {
+export const CallTaxonPropEditor = (props) => {
   const { onConfirm: onConfirmProp, variables } = props
 
   const i18n = useI18n()
@@ -90,7 +90,7 @@ export const CallTaxonProp = (props) => {
   )
 }
 
-CallTaxonProp.propTypes = {
+CallTaxonPropEditor.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   variables: PropTypes.array.isRequired,
 }

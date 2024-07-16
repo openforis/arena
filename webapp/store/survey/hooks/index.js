@@ -39,6 +39,13 @@ export const useNodeDefRootKeys = () => {
   return Survey.getNodeDefKeysSorted({ nodeDef: root, cycle })(survey)
 }
 
+export const useCategoryByName = (name) =>
+  useSelector((state) => {
+    if (!name) return null
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getCategoryByName(name)(survey)
+  })
+
 export const useTaxonomies = () =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
@@ -65,6 +72,13 @@ export const useNodeDefByName = (name) =>
     return Survey.getNodeDefByName(name)(survey)
   })
 export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
+export const useNodeDefsByNames = (names) =>
+  useSelector((state) => {
+    if (!names?.length) return null
+    const survey = SurveyState.getSurvey(state)
+    return names.map((name) => Survey.getNodeDefByName(name)(survey))
+  })
+
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
 export const useNodeDefValidationByUuid = (uuid) =>
   useSelector((state) => {
