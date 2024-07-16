@@ -21,6 +21,7 @@ import { RecordsSummaryContext } from './RecordsSummaryContext'
 import { RecordsByUser } from './UserSummary/RecordsByUser'
 import DailyRecordsByUser from './UserSummary/DailyRecordsByUser'
 import TotalRecordsSummaryChart from './TotalRecordsSummaryChart'
+import ActivityLog from './ActivityLog'
 
 const Dashboard = () => {
   const showFirstTimeHelp = useShouldShowFirstTimeHelp({ useFetchMessages, helperTypes })
@@ -67,6 +68,11 @@ const Dashboard = () => {
           renderContent: () => <SamplingPointDataSummary />,
         })
       }
+      tabItems.push({
+        key: 'activityLog',
+        label: 'homeView.dashboard.activityLog.title',
+        renderContent: () => <ActivityLog />,
+      })
     }
   }
 
