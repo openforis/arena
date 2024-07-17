@@ -4,4 +4,5 @@ export const CallEditorPropTypes = {
   expressionNode: PropTypes.object,
   onConfirm: PropTypes.func.isRequired,
   variables: PropTypes.array.isRequired,
+  variablesFilterFn: PropTypes.func,
 }

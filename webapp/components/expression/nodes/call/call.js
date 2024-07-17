@@ -9,6 +9,7 @@ import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
 import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
+import { CallCountEditor } from './callCountEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
@@ -22,6 +23,10 @@ const functions = {
   [Expression.functionNames.isNotEmpty]: {
     label: 'isNotEmpty(...)',
     component: CallIsNotEmptyEditor,
+  },
+  [Expression.functionNames.count]: {
+    label: 'count(...)',
+    component: CallCountEditor,
   },
   [Expression.functionNames.includes]: {
     label: 'includes(...)',

@@ -9,8 +9,8 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useNodeDefByName } from '@webapp/store/survey/hooks'
 import { useI18n } from '@webapp/store/system'
 
-import Identifier from './identifier'
-import Literal from './literal'
+import Identifier from '../identifier'
+import Literal from '../literal'
 import { CallEditorPropTypes } from './callEditorPropTypes'
 
 export const CallIncludesEditor = (props) => {

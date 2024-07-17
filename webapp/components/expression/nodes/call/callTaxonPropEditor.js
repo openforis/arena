@@ -12,7 +12,7 @@ import { useI18n } from '@webapp/store/system'
 import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
-import Identifier from './identifier'
+import Identifier from '../identifier'
 import { CallEditorPropTypes } from './callEditorPropTypes'
 
 const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdentifierName }) => {
