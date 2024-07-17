@@ -61,6 +61,8 @@ export const exportSurveysList = async ({ user, draft, template, outputStream })
     'dateCreated',
     'dateModified',
     'datePublished',
+    'cycles',
+    'languages',
     'ownerName',
     'ownerEmail',
     'nodeDefsCount',
