@@ -1223,6 +1223,7 @@ $t(common.appNameFull)
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
+      isNotEmpty: 'Returns true if the argument has some value specified',
       last: 'Returns the last value or node of the specified multiple attribute or entity',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',

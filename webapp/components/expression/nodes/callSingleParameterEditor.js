@@ -8,7 +8,7 @@ import { CallEditorPropTypes } from './callEditorPropTypes'
 export const CallSingleParameterEditor = (props) => {
   const { functionCallCreator, expressionNode, onConfirm: onConfirmProp, variables } = props
 
-  const initialIdentifierName = expressionNode?.arguments?.[0]?.value
+  const initialIdentifierName = expressionNode?.arguments?.[0]?.name
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
 
   const [state, setState] = useState({

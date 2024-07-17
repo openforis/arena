@@ -7,6 +7,7 @@ export const functionNames = {
   includes: 'includes',
   index: 'index',
   isEmpty: 'isEmpty',
+  isNotEmpty: 'isNotEmpty',
   last: 'last',
   ln: 'ln',
   log10: 'log10',

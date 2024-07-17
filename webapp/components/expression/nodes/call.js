@@ -11,12 +11,21 @@ import { useI18n } from '@webapp/store/system'
 import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
+import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
 import { CallTaxonPropEditor } from './callTaxonPropEditor'
 
 const functions = {
   [Expression.functionNames.isEmpty]: {
     label: 'isEmpty(...)',
     component: CallIsEmptyEditor,
+  },
+  [Expression.functionNames.isNotEmpty]: {
+    label: 'isNotEmpty(...)',
+    component: CallIsNotEmptyEditor,
+  },
+  [Expression.functionNames.includes]: {
+    label: 'includes(...)',
+    component: CallIncludesEditor,
   },
   [Expression.functionNames.now]: {
     label: 'now()',
@@ -25,10 +34,6 @@ const functions = {
   [Expression.functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
     component: CallCategoryItemPropEditor,
-  },
-  [Expression.functionNames.includes]: {
-    label: 'includes(...)',
-    component: CallIncludesEditor,
   },
   [Expression.functionNames.taxonProp]: {
     label: 'taxonProp(...)',
@@ -40,7 +45,9 @@ const functions = {
   },
 }
 
-const Call = ({ node: expressionNode, variables, onChange }) => {
+const Call = (props) => {
+  const { node: expressionNode, variables, onChange } = props
+
   const i18n = useI18n()
 
   const nodeCallee = expressionNode?.callee?.name
