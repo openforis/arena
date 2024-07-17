@@ -229,7 +229,9 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   client = db
 ) => {
   const surveyDb = await fetchSurveyById({ surveyId, draft, validate, backup }, client)
-  const surveyCycles = Survey.getCycleKeys(surveyDb)
+  const surveyCycles = Survey.getCycleKeys(
+    backup ? { ...surveyDb, props: ObjectUtils.getPropsAndPropsDraftCombined(surveyDb) } : surveyDb
+  )
   const [nodeDefs, dependencies, categories, taxonomies] = await Promise.all([
     NodeDefManager.fetchNodeDefsBySurveyId(
       { surveyId, surveyCycles, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
