@@ -2801,10 +2801,10 @@
     proj4 "^2.11.0"
     uuid "^9.0.1"
 
-"@openforis/arena-core@^0.0.198":
-  version "0.0.198"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.198/ef5b8b2bae34ff35a6df95c51d1d3ae4531dfbd1#ef5b8b2bae34ff35a6df95c51d1d3ae4531dfbd1"
-  integrity sha512-lwLOyvzgPQi2+NHO0CnO5HLafbqMlXDusvViurBBKZBr0ywWIQkfuWe6DSBElUYeWPIvlD8zIFIVZ6y77pQSuQ==
+"@openforis/arena-core@^0.0.200":
+  version "0.0.200"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.200/fb82b977b54a5a6dd9c304f980c8e482302129d7#fb82b977b54a5a6dd9c304f980c8e482302129d7"
+  integrity sha512-kX/N8ldOhDIgLt8BJszLkDVusLYRvjdm4SjqajLncnHdl3p2xpMcA8MRjNkUsXv9tYDRPTgtVyrLd5637V8JvA==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.2"
