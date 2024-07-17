@@ -1232,12 +1232,16 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Raise a number X to the power P',
+      rowIndex: 'Gives the current row index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
+    },
+    functionName: {
+      rowIndex: 'Row index',
     },
     basicProps: {
       analysis: 'Analysis',

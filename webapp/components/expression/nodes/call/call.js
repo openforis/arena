@@ -15,6 +15,21 @@ import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
 import { CallTaxonPropEditor } from './callTaxonPropEditor'
 
+const complexFunctions = {
+  rowIndex: {
+    labelKey: 'nodeDefEdit.functionName.rowIndex',
+    exprString: 'index($context)',
+  },
+}
+
+const getComplextFunctionNameByExpression = (exprString) => {
+  if (!exprString) return null
+  return Object.keys(complexFunctions).find((key) => {
+    const funcObj = complexFunctions[key]
+    return funcObj.exprString === exprString
+  })
+}
+
 const functions = {
   [Expression.functionNames.isEmpty]: {
     label: 'isEmpty(...)',
@@ -34,7 +49,7 @@ const functions = {
   },
   [Expression.functionNames.now]: {
     label: 'now()',
-    callee: 'now',
+    callee: Expression.functionNames.now,
   },
   [Expression.functionNames.categoryItemProp]: {
     label: 'categoryItemProp(...)',
@@ -46,8 +61,9 @@ const functions = {
   },
   [Expression.functionNames.uuid]: {
     label: 'uuid()',
-    callee: 'uuid',
+    callee: Expression.functionNames.uuid,
   },
+  ...complexFunctions,
 }
 
 const Call = (props) => {
@@ -56,25 +72,23 @@ const Call = (props) => {
   const i18n = useI18n()
 
   const nodeCallee = expressionNode?.callee?.name
+  const exprString = expressionNode ? Expression.toString(expressionNode) : null
+  const complexFunctionName = getComplextFunctionNameByExpression(exprString)
 
   const [state, setState] = useState({
-    selectedFunctionKey: nodeCallee,
+    selectedFunctionKey: complexFunctionName ?? nodeCallee,
   })
 
   const { selectedFunctionKey } = state
 
-  const emptyItem = useMemo(() => ({ value: null, label: i18n.t('common.notSpecified') }), [i18n])
-
   const dropdownItems = useMemo(
-    () => [
-      emptyItem,
-      ...Object.entries(functions).map(([funcKey, func]) => ({
+    () =>
+      Object.entries(functions).map(([funcKey, func]) => ({
         value: funcKey,
-        label: func.label,
+        label: func.label ?? i18n.t(func.labelKey),
         description: i18n.t(`nodeDefEdit.functionDescriptions.${funcKey}`),
       })),
-    ],
-    [emptyItem, i18n]
+    [i18n]
   )
 
   const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
@@ -88,10 +102,15 @@ const Call = (props) => {
         selectedFunctionKey: nextFunctionKey,
       }))
 
-      const callee = functions[nextFunctionKey]?.callee
-      const component = functions[nextFunctionKey]?.component
-      const newCallParams = callee && !component ? { callee } : undefined
-      onChange(Expression.newCall(newCallParams))
+      const { callee, component, exprString } = functions[nextFunctionKey] ?? {}
+      let expressionNext = null
+      if (exprString) {
+        expressionNext = Expression.fromString(exprString)
+      } else {
+        const newCallParams = callee && !component ? { callee } : undefined
+        expressionNext = Expression.newCall(newCallParams)
+      }
+      onChange(expressionNext)
     },
     [onChange]
   )
