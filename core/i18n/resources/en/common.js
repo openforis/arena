@@ -380,6 +380,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activeSurveyNotSelected: `<title>Active survey not selected</title>
       <p><label>Please select one from the</label><linkToSurveys>List of Surveys</linkToSurveys> or <linkToNewSurvey>Create a new one</linkToNewSurvey></p>`,
       activeUsers: 'Active users',
+      activityLog: {
+        title: 'Activity log',
+      },
       exportWithData: 'Export with data',
       exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
       surveyPropUpdate: {
@@ -507,7 +510,6 @@ $t(common.cantUndoWarning)`,
   },
 
   activityLogView: {
-    recentActivity: 'Recent activity',
     messages: {
       // Survey
       [ActivityLog.type.surveyCreate]: 'created the survey',
@@ -1687,6 +1689,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       entityKeyDuplicate: 'Duplicate key',
       entityKeyValueNotSpecified: 'Entity key value for entity "{{entityName}}" not specified',
       missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
+      oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
       valueRequired: 'Required value',

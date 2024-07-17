@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import { db } from '@server/db/db'
 
-import { Objects } from '@openforis/arena-core'
+import { NodeDefsFixer, Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,11 +10,14 @@ import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
 
 import * as ObjectUtils from '@core/objectUtils'
 
+import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
+
+const logger = Log.getLogger('NodeDefManager')
 
 export {
   addNodeDefsCycles,
@@ -125,46 +128,10 @@ export const insertNodeDef = async (
 
 export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 
-const _fixMetaHierarchy = ({ nodeDefsByUuid, nodeDef }) => {
-  const h = []
-  let currentNodeDef = nodeDef
-  while (currentNodeDef) {
-    const parentUuid = NodeDef.getParentUuid(currentNodeDef)
-    if (parentUuid) {
-      h.unshift(parentUuid)
-    }
-    currentNodeDef = nodeDefsByUuid[parentUuid]
-  }
-  nodeDefsByUuid[NodeDef.getUuid(nodeDef)] = NodeDef.assocMetaHierarchy(h)(nodeDef)
-}
-
-const _filterOutInvalidNodeDefs = (nodeDefsByUuid) => {
-  Object.entries(nodeDefsByUuid).forEach(([nodeDefUuid, nodeDef]) => {
-    const parentUuid = NodeDef.getParentUuid(nodeDef)
-    // invalid parent UUID
-    if (parentUuid && !nodeDefsByUuid[parentUuid]) {
-      delete nodeDefsByUuid[nodeDefUuid]
-    } else if (parentUuid && NodeDef.getMetaHierarchy(nodeDef).length === 0) {
-      _fixMetaHierarchy({ nodeDefsByUuid, nodeDef })
-    }
-  })
-  return nodeDefsByUuid
-}
-
-const _calculateNodeDefHierarchy = ({ nodeDef, nodeDefsByUuid }) => {
-  const hiearchy = []
-  let currentParentUuid = NodeDef.getParentUuid(nodeDef)
-  while (currentParentUuid) {
-    hiearchy.unshift(currentParentUuid)
-    const currentParentNode = nodeDefsByUuid[currentParentUuid]
-    currentParentUuid = NodeDef.getParentUuid(currentParentNode)
-  }
-  return hiearchy
-}
-
 export const fetchNodeDefsBySurveyId = async (
   {
     surveyId,
+    surveyCycles,
     cycle = null,
     draft = false,
     advanced = false,
@@ -178,15 +145,19 @@ export const fetchNodeDefsBySurveyId = async (
     { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
     client
   )
-  const nodeDefsByUuid = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+  const nodeDefs = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
 
-  // re-calculate node defs hierarchy (it could be wrong)
-  nodeDefsDb.forEach((nodeDef) => {
-    const hierarchy = _calculateNodeDefHierarchy({ nodeDef, nodeDefsByUuid })
-    Objects.setInPath({ obj: nodeDef, path: [NodeDef.keys.meta, NodeDef.metaKeys.h], value: hierarchy })
+  const { nodeDefs: nodeDefsFixed, updatedNodeDefs } = NodeDefsFixer.fixNodeDefs({
+    nodeDefs,
+    cycles: surveyCycles,
+    sideEffect: true,
   })
+  const updatedNodeDefsCount = Object.values(updatedNodeDefs).length
+  if (updatedNodeDefsCount) {
+    logger.debug(`Survey ${surveyId} has broken node defs (${updatedNodeDefsCount} has been fixed)`)
+  }
 
-  return _filterOutInvalidNodeDefs(nodeDefsByUuid)
+  return nodeDefsFixed
 }
 
 // ======= UPDATE

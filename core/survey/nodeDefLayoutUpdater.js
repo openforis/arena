@@ -58,15 +58,26 @@ const _onEntityRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) =>
     return layoutUpdated
   })(nodeDef)
 
+const _removeChildFromLayoutChildren = ({ surveyCycleKey, nodeDef, childDefUuid }) => {
+  const layoutChildrenPrev = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
+  const layoutChildrenUpdated = layoutChildrenPrev.filter((layoutChildrenItem) => layoutChildrenItem.i !== childDefUuid)
+  return NodeDef.updateLayoutProp({
+    cycle: surveyCycleKey,
+    prop: NodeDefLayout.keys.layoutChildren,
+    value: layoutChildrenUpdated,
+  })(nodeDef)
+}
+
 export const updateLayoutProp =
   ({ surveyCycleKey, nodeDef, nodeDefPrev = null, key, value }) =>
   (survey) => {
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
     const renderTypePrev = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDefPrev || nodeDef)
 
     let nodeDefUpdated = NodeDef.updateLayoutProp({ cycle: surveyCycleKey, prop: key, value })(nodeDef)
     nodeDefUpdated = NodeDef.clearNotApplicableProps(surveyCycleKey)(nodeDefUpdated)
 
-    const nodeDefsUpdated = { [nodeDef.uuid]: nodeDefUpdated }
+    const nodeDefsUpdated = { [nodeDefUuid]: nodeDefUpdated }
     let surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(survey)
 
     if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef) && value !== renderTypePrev) {
@@ -77,16 +88,23 @@ export const updateLayoutProp =
         nodeDef: nodeDefUpdated,
       })
     }
-    nodeDefsUpdated[nodeDef.uuid] = nodeDefUpdated
+    nodeDefsUpdated[nodeDefUuid] = nodeDefUpdated
 
     if (!NodeDef.isRoot(nodeDef)) {
       surveyUpdated = SurveyNodeDefs.mergeNodeDefs(nodeDefsUpdated)(surveyUpdated)
       // update parent layout (children forms index)
-      const nodeDefParentUpdated = _updateParentLayoutChildrenIndex({
+      let nodeDefParentUpdated = _updateParentLayoutChildrenIndex({
         survey: surveyUpdated,
         surveyCycleKey,
         nodeDef: nodeDefUpdated,
       })
+      if (key === NodeDefLayout.keys.pageUuid && value) {
+        nodeDefParentUpdated = _removeChildFromLayoutChildren({
+          surveyCycleKey,
+          nodeDef: nodeDefParentUpdated,
+          childDefUuid: nodeDefUuid,
+        })
+      }
       nodeDefsUpdated[nodeDefParentUpdated.uuid] = nodeDefParentUpdated
     }
     return nodeDefsUpdated
