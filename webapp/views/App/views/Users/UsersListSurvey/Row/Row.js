@@ -55,7 +55,7 @@ const Row = (props) => {
       <div data-testid={TestId.userList.invitedDate} data-value={invitedDate}>
         {invitedDateFormatted}
       </div>
-      <div>
+      <div className="accepted-cell">
         {User.hasAccepted(userListItem) && <span className="icon icon-user-check icon-16px" />}
         {User.isInvited(userListItem) && User.isInvitationExpired(userListItem) && (
           <Button
@@ -64,11 +64,17 @@ const Row = (props) => {
             label="usersView.invitationExpiredClickToSendAgainTheInvitation"
             onClick={handleResendInvitation}
             showLabel={false}
+            variant="text"
           />
         )}
         {User.isInvited(userListItem) && (
           <>
-            <ButtonInvite className="icon-invitation-retry" onClick={handleResendInvitation} showLabel={false} />
+            <ButtonInvite
+              className="icon-invitation-retry"
+              onClick={handleResendInvitation}
+              showLabel={false}
+              variant="text"
+            />
             <CopyInvitationLinkButton email={email} userUuid={userUuid} />
           </>
         )}
