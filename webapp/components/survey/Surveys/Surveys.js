@@ -123,6 +123,20 @@ const Surveys = (props) => {
         renderItem: ({ item }) => item.nodeDefsCount,
         width: '5rem',
       },
+      {
+        key: 'cycles',
+        header: 'surveysView.cycles',
+        hidden: true,
+        renderItem: ({ item }) => Survey.getCycleKeys(item).length,
+        width: '5rem',
+      },
+      {
+        key: 'languages',
+        header: 'surveysView.languages',
+        hidden: true,
+        renderItem: ({ item }) => Survey.getLanguages(item).join('|'),
+        width: '6rem',
+      },
     ]
     if (!template) {
       cols.push(
