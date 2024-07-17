@@ -143,3 +143,5 @@ export const getPropsAndPropsDraft =
       propsDraft: backup ? propsDraft : { ...props, propsDraft },
     }
   }
+
+export const getPropsAndPropsDraftCombined = (obj) => ({ ...getProps(obj), ...getPropsDraft(obj) })
