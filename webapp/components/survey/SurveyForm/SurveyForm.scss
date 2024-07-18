@@ -77,19 +77,18 @@
     height: 100%;
     position: relative;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 
     .nodedef-tree-select {
-      position: absolute;
-      height: 100%;
-      width: 100%;
+      flex: 1;
       border: $formBorder;
       background-color: $white;
     }
 
-    .survey-form__page-edit-buttons {
-      position: absolute;
-      bottom: 0;
-      right: 18px;
+    .sidebar-bottom-bar {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 

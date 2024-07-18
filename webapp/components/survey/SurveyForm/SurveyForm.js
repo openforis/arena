@@ -1,8 +1,9 @@
 import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, useDispatch } from 'react-redux'
+import classNames from 'classnames'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -26,11 +27,22 @@ import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import FormHeader from './FormHeader'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
+import { ButtonGroup } from '@webapp/components/form'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
   Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>
     NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
   ).length > 0
+
+const treeSelectViewModes = {
+  onlyPages: 'onlyPages',
+  allNodeDefs: 'allNodeDefs',
+}
+
+const treeSelectViewModeItems = Object.keys(treeSelectViewModes).map((mode) => ({
+  key: mode,
+  label: `surveyForm.nodeDefsTreeSelectMode.${mode}`,
+}))
 
 const SurveyForm = (props) => {
   const {
@@ -55,12 +67,15 @@ const SurveyForm = (props) => {
 
   const isSideBarOpened = useIsSidebarOpened()
   const survey = useSurvey()
+  const [treeSelectViewMode, setTreeSelectViewMode] = useState(treeSelectViewModes.onlyPages)
   const editAllowed = edit && canEditDef
 
-  let className = editAllowed ? ' edit' : ''
-  className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
-  className += showPageNavigation ? '' : ' page-navigation-off'
-  className += preview ? ' form-preview' : ''
+  const className = classNames('survey-form', {
+    edit: editAllowed,
+    'form-actions-off': !hasNodeDefAddChildTo,
+    'page-navigation-off': !showPageNavigation,
+    'form-preview': preview,
+  })
 
   // If showPageNavigation, addNodeDefAddChildTo or sideBar change, trigger window resize to re-render react-grid-layout form
   useOnUpdate(() => {
@@ -139,7 +154,7 @@ const SurveyForm = (props) => {
     <div className="survey-form-wrapper">
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
-      <div className={`survey-form${className}`} data-testid={TestId.surveyForm.surveyForm}>
+      <div className={className} data-testid={TestId.surveyForm.surveyForm}>
         {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
         {showPageNavigation && (
           <Split sizes={[20, 80]} minSize={[0, 300]}>
@@ -147,9 +162,9 @@ const SurveyForm = (props) => {
               <NodeDefTreeSelect
                 isDisabled={(nodeDefArg) => notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))}
                 nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
-                onlyPages={false}
-                includeMultipleAttributes
-                includeSingleAttributes
+                onlyPages={treeSelectViewMode === treeSelectViewModes.onlyPages}
+                includeMultipleAttributes={treeSelectViewMode === treeSelectViewModes.allNodeDefs}
+                includeSingleAttributes={treeSelectViewMode === treeSelectViewModes.allNodeDefs}
                 onSelect={(nodeDefToSelect) => {
                   const showAddChildTo =
                     NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&
@@ -157,8 +172,14 @@ const SurveyForm = (props) => {
                   dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
                 }}
               />
-
-              {edit && canEditDef && <FormPagesEditButtons />}
+              <div className="display-flex sidebar-bottom-bar">
+                <ButtonGroup
+                  items={treeSelectViewModeItems}
+                  onChange={setTreeSelectViewMode}
+                  selectedItemKey={treeSelectViewMode}
+                />
+                {edit && canEditDef && <FormPagesEditButtons />}
+              </div>
             </div>
             {internalContainer}
           </Split>
