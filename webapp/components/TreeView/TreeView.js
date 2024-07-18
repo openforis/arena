@@ -5,6 +5,10 @@ import PropTypes from 'prop-types'
 
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem as MuiTreeItem } from '@mui/x-tree-view/TreeItem'
+import { Objects } from '@openforis/arena-core'
+
+import { ArrayUtils } from '@core/arrayUtils'
+
 import { LabelWithTooltip } from '../form/LabelWithTooltip'
 
 const TreeItemPropTypes = PropTypes.shape({
@@ -67,9 +71,11 @@ export const TreeView = (props) => {
 
   const onSelectedItemsChange = useCallback(
     (_event, itemIds) => {
-      onSelectedItemKeysChange(itemIds)
+      if (!Objects.isEqual(selectedItemKeys, ArrayUtils.toArray(itemIds))) {
+        onSelectedItemKeysChange(itemIds)
+      }
     },
-    [onSelectedItemKeysChange]
+    [onSelectedItemKeysChange, selectedItemKeys]
   )
 
   return (
