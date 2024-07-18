@@ -23,7 +23,7 @@ const TreeItemView = (props) => {
       key={key}
       itemId={key}
       label={
-        <div className="display-flex">
+        <div className="tree-item-label display-flex">
           {icon}
           <LabelWithTooltip label={label} />
         </div>
@@ -55,7 +55,8 @@ export const TreeView = (props) => {
       const treeItemKeysBeingCollapsed = expadedItemKeys.filter(
         (oldExpandedItemId) => !itemIds.includes(oldExpandedItemId)
       )
-      if (treeItemKeysBeingCollapsed.length > 0 && event?.target?.className === 'MuiTreeItem-label') {
+      const targetClass = event?.target?.className ?? ''
+      if (treeItemKeysBeingCollapsed.length > 0 && targetClass.includes('label')) {
         // do not collapse item if it is expanded and label is clicked; handle only selection;
         return false
       }
