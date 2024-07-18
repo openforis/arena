@@ -12,8 +12,13 @@ import * as Record from '@core/record/record'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
-import { SurveyFormActions, SurveyFormState, useNotAvailableEntityPageUuids } from '@webapp/store/ui/surveyForm'
-import { useActiveNodeDefUuid, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm/hooks'
+import {
+  SurveyFormActions,
+  SurveyFormState,
+  useActiveNodeDefUuid,
+  useNotAvailableEntityPageUuids,
+  useTreeSelectViewMode,
+} from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'

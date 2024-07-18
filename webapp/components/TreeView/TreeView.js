@@ -59,7 +59,7 @@ export const TreeView = (props) => {
       const treeItemKeysBeingCollapsed = expadedItemKeys.filter(
         (oldExpandedItemId) => !itemIds.includes(oldExpandedItemId)
       )
-      const targetClass = event?.target?.className ?? ''
+      const targetClass = String(event?.target?.className)
       if (treeItemKeysBeingCollapsed.length > 0 && targetClass.includes('label')) {
         // do not collapse item if it is expanded and label is clicked; handle only selection;
         return false

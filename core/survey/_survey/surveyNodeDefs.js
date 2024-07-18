@@ -377,7 +377,7 @@ export const findDescendants =
   }
 
 export const getDescendantsAndSelf =
-  ({ nodeDef = null }) =>
+  ({ nodeDef = null } = {}) =>
   (survey) => {
     const descendants = []
     const queue = new Queue()

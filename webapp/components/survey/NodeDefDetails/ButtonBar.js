@@ -9,6 +9,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { Button, ButtonDelete } from '@webapp/components/buttons'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { useIsEditingNodeDefInFullScreen } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
@@ -22,6 +23,7 @@ const ButtonBar = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
+  const editingNodeDefInFullScreen = useIsEditingNodeDefInFullScreen()
 
   const previousDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: -1 })
   const nextDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: 1 })
@@ -46,21 +48,25 @@ const ButtonBar = (props) => {
           disabled={!previousDefUuid}
         />
       )}
-      <Button
-        className="btn-cancel"
-        testId={TestId.nodeDefDetails.backBtn}
-        onClick={() => Actions.cancelEdits({ state })}
-        label={dirty ? 'common.cancel' : 'common.back'}
-        variant={dirty ? 'outlined' : 'contained'}
-      />
-      <Button
-        className="btn-primary"
-        testId={TestId.nodeDefDetails.saveAndBackBtn}
-        onClick={() => Actions.saveEdits({ state, goBackOnEnd: true })}
-        disabled={saveDisabled}
-        iconClassName="icon-floppy-disk icon-12px"
-        label="common.saveAndBack"
-      />
+      {editingNodeDefInFullScreen && (
+        <>
+          <Button
+            className="btn-cancel"
+            testId={TestId.nodeDefDetails.backBtn}
+            onClick={() => Actions.cancelEdits({ state })}
+            label={dirty ? 'common.cancel' : 'common.back'}
+            variant={dirty ? 'outlined' : 'contained'}
+          />
+          <Button
+            className="btn-primary"
+            testId={TestId.nodeDefDetails.saveAndBackBtn}
+            onClick={() => Actions.saveEdits({ state, goBackOnEnd: true })}
+            disabled={saveDisabled}
+            iconClassName="icon-floppy-disk icon-12px"
+            label="common.saveAndBack"
+          />
+        </>
+      )}
       <Button
         className="btn-primary"
         testId={TestId.nodeDefDetails.saveBtn}

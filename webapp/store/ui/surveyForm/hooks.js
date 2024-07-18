@@ -12,6 +12,8 @@ export const useNodeDefLabelType = () => useSelector(SurveyFormState.getNodeDefL
 
 export const useTreeSelectViewMode = () => useSelector(SurveyFormState.getTreeSelectViewMode)
 
+export const useIsEditingNodeDefInFullScreen = () => useTreeSelectViewMode() === 'onlyPages'
+
 export const useActiveNodeDefUuid = () => useSelector(SurveyFormState.getFormActiveNodeDefUuid)
 
 export const useNodeDefPage = () => useSelector(SurveyFormState.getFormActivePageNodeDef)

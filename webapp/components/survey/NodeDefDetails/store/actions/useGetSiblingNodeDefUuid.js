@@ -7,10 +7,12 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { State } from '../state'
+import { useIsEditingNodeDefInFullScreen } from '@webapp/store/ui/surveyForm'
 
 export const useGetSiblingNodeDefUuid = () => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
+  const editingNodeDefInFullScreen = useIsEditingNodeDefInFullScreen()
 
   const getSinglingNodeDefUuids = useCallback(
     ({ nodeDef }) => {
@@ -33,14 +35,21 @@ export const useGetSiblingNodeDefUuid = () => {
     [survey, cycle]
   )
 
+  const getAllSurveyNodeDefUuids = useCallback(
+    () => Survey.getDescendantsAndSelf()(survey).map(NodeDef.getUuid),
+    [survey]
+  )
+
   return useCallback(
     ({ state, offset }) => {
       const nodeDef = State.getNodeDef(state)
-      const siblingUuids = getSinglingNodeDefUuids({ nodeDef })
+      const siblingUuids = editingNodeDefInFullScreen
+        ? getSinglingNodeDefUuids({ nodeDef })
+        : getAllSurveyNodeDefUuids()
 
       const nodeDefIndex = siblingUuids.indexOf(NodeDef.getUuid(nodeDef))
       return siblingUuids[nodeDefIndex + offset]
     },
-    [getSinglingNodeDefUuids]
+    [editingNodeDefInFullScreen, getAllSurveyNodeDefUuids, getSinglingNodeDefUuids]
   )
 }
