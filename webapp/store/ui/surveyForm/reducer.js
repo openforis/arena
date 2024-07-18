@@ -23,6 +23,12 @@ const actionHandlers = {
   [SurveyFormActions.formReset]: () => ({}),
 
   // Form actions
+  [SurveyFormActions.treeSelectViewModeUpdate]: (state, { mode }) =>
+    SurveyFormState.assocTreeSelectViewMode(mode)(state),
+
+  [SurveyFormActions.formActiveNodeDefUpdate]: (state, { nodeDefUuid }) =>
+    SurveyFormState.assocFormActiveNodeDefUuid(nodeDefUuid)(state),
+
   [SurveyFormActions.formNodeDefAddChildToUpdate]: (state, { nodeDef }) =>
     SurveyFormState.assocNodeDefAddChildTo(nodeDef)(state),
 

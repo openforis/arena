@@ -10,6 +10,10 @@ import { Objects } from '@openforis/arena-core'
 
 export const useNodeDefLabelType = () => useSelector(SurveyFormState.getNodeDefLabelType)
 
+export const useTreeSelectViewMode = () => useSelector(SurveyFormState.getTreeSelectViewMode)
+
+export const useActiveNodeDefUuid = () => useSelector(SurveyFormState.getFormActiveNodeDefUuid)
+
 export const useNodeDefPage = () => useSelector(SurveyFormState.getFormActivePageNodeDef)
 
 export const useShowPageNavigation = () => useSelector(SurveyFormState.showPageNavigation)

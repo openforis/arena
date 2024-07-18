@@ -1,6 +1,7 @@
 import './NodeDefDetails.scss'
 
 import React from 'react'
+import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -21,10 +22,12 @@ import AnalysisEntitySelector from './AnalysisEntitySelector'
 
 import { State, useNodeDefDetails } from './store'
 
-const NodeDefDetails = () => {
+const NodeDefDetails = (props) => {
+  const { nodeDefUuid } = props
+
   const i18n = useI18n()
 
-  const { state, Actions, editingFromDesigner } = useNodeDefDetails()
+  const { state, Actions, editingFromDesigner } = useNodeDefDetails({ nodeDefUuid })
 
   const nodeDef = State.getNodeDef(state)
   if (!nodeDef) return null
@@ -32,8 +35,10 @@ const NodeDefDetails = () => {
   const validation = State.getValidation(state)
   const nodeDefType = NodeDef.getType(nodeDef)
 
+  const className = classNames('node-def-edit', { 'full-screen': !nodeDefUuid })
+
   return (
-    <div className="node-def-edit">
+    <div className={className}>
       <div className="node-def-edit__container">
         {NodeDef.isAnalysis(nodeDef) && (
           <AnalysisEntitySelector
