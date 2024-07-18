@@ -19,7 +19,7 @@ import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 import { useOnUpdate, useLocationPathMatcher } from '@webapp/components/hooks'
 
-import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 
 import { Split } from '@webapp/components'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
@@ -144,10 +144,12 @@ const SurveyForm = (props) => {
         {showPageNavigation && (
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
-              <EntitySelectorTree
+              <NodeDefTreeSelect
                 isDisabled={(nodeDefArg) => notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))}
                 nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
-                onlyPages
+                onlyPages={false}
+                includeMultipleAttributes
+                includeSingleAttributes
                 onSelect={(nodeDefToSelect) => {
                   const showAddChildTo =
                     NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&

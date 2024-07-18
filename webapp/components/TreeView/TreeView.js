@@ -5,9 +5,11 @@ import PropTypes from 'prop-types'
 
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem as MuiTreeItem } from '@mui/x-tree-view/TreeItem'
+import { LabelWithTooltip } from '../form/LabelWithTooltip'
 
 const TreeItemPropTypes = PropTypes.shape({
   key: PropTypes.string.isRequired,
+  icon: PropTypes.any,
   items: PropTypes.array,
   label: PropTypes.string.isRequired,
   testId: PropTypes.string,
@@ -15,9 +17,19 @@ const TreeItemPropTypes = PropTypes.shape({
 
 const TreeItemView = (props) => {
   const { item } = props
-  const { key, label, items, testId } = item
+  const { key, icon, label, items, testId } = item
   return (
-    <MuiTreeItem key={key} itemId={key} label={label} data-testid={testId}>
+    <MuiTreeItem
+      key={key}
+      itemId={key}
+      label={
+        <div className="display-flex">
+          {icon}
+          <LabelWithTooltip label={label} />
+        </div>
+      }
+      data-testid={testId}
+    >
       {items?.map((childItem) => (
         <TreeItemView key={childItem.key} item={childItem} />
       ))}

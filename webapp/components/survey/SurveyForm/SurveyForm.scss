@@ -71,14 +71,14 @@
   }
 }
 
-// entity-selector-tree
+// nodedef-tree-select
 .survey-form {
   .survey-form__sidebar {
     height: 100%;
     position: relative;
     overflow-y: auto;
 
-    .entity-selector-tree {
+    .nodedef-tree-select {
       position: absolute;
       height: 100%;
       width: 100%;
@@ -94,7 +94,7 @@
   }
 
   &.edit {
-    .entity-selector-tree {
+    .nodedef-tree-select {
       border: $formBorderEdit;
     }
   }

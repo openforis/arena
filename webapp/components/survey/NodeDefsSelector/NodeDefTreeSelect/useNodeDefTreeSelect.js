@@ -5,15 +5,25 @@ import * as Survey from '@core/survey/survey'
 import { useSurvey } from '@webapp/store/survey'
 import { useBuildTreeData } from './useBuildEntityTreeData'
 
-export const useEntitySelectorTree = (props) => {
-  const { getLabelSuffix, isDisabled, nodeDefLabelType, nodeDefUuidActive, onlyEntities, onlyPages, onSelect } = props
+export const useNodeDefTreeSelect = (props) => {
+  const {
+    getLabelSuffix,
+    isDisabled,
+    nodeDefLabelType,
+    nodeDefUuidActive,
+    includeMultipleAttributes,
+    includeSingleAttributes,
+    onlyPages,
+    onSelect,
+  } = props
   const survey = useSurvey()
 
   const { treeItems, treeItemKeys } = useBuildTreeData({
     nodeDefLabelType,
     getLabelSuffix,
     onlyPages,
-    onlyEntities,
+    includeMultipleAttributes,
+    includeSingleAttributes,
     isDisabled,
   })
 

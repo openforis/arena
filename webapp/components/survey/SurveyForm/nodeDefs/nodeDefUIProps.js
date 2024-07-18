@@ -33,13 +33,7 @@ const propsUI = {
   },
 
   [text]: {
-    icon: (
-      <span className="icon-left display-flex">
-        {R.range(0, 3).map((i) => (
-          <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
-        ))}
-      </span>
-    ),
+    icon: <span className="icon-left node_def__icon">ABC</span>,
     defaultValue: '',
   },
 
@@ -132,8 +126,9 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
-export const getIconByNodeDef = (nodeDef) => (
+export const getIconByNodeDef = (nodeDef, includeKey = false) => (
   <div className="node-def__icon-wrapper">
+    {includeKey && NodeDef.isKey(nodeDef) && <span className="icon icon-key icon-left" />}
     {NodeDef.isMultipleAttribute(nodeDef) && <span title="Multiple">M</span>}
     {getIconByType(NodeDef.getType(nodeDef))}
   </div>

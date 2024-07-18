@@ -4,6 +4,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'
 import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
@@ -31,7 +32,8 @@ const getNodeDefAvailableChildren = ({
   nodeDef,
   record,
   onlyPages,
-  onlyEntities,
+  includeMultipleAttributes,
+  includeSingleAttributes,
   isDisabled,
 }) => {
   const pageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getUuid(nodeDef) })
@@ -49,7 +51,14 @@ const getNodeDefAvailableChildren = ({
         cycle,
         nodeDef,
         sorted: true,
-        filterFn: onlyEntities ? NodeDef.isMultipleEntity : NodeDef.isMultiple,
+        filterFn: (nodeDef) => {
+          const multiple = NodeDef.isMultiple(nodeDef)
+          if (multiple) {
+            return NodeDef.isEntity(nodeDef) || includeMultipleAttributes
+          } else {
+            return includeSingleAttributes && NodeDef.isAttribute(nodeDef)
+          }
+        },
       })(survey)
 
   const visibleChildren = pageNode
@@ -63,7 +72,8 @@ export const useBuildTreeData = ({
   nodeDefLabelType: nodeDefLabelTypeProp,
   getLabelSuffix,
   onlyPages,
-  onlyEntities,
+  includeMultipleAttributes,
+  includeSingleAttributes,
   isDisabled,
 }) => {
   const survey = useSurvey()
@@ -73,6 +83,7 @@ export const useBuildTreeData = ({
   const pagesUuidMap = usePagesUuidMap()
   const nodeDefLabelTypeInStore = useNodeDefLabelType()
   const nodeDefLabelType = nodeDefLabelTypeProp ?? nodeDefLabelTypeInStore
+  const showIcons = includeSingleAttributes
 
   const stack = []
 
@@ -84,6 +95,7 @@ export const useBuildTreeData = ({
     const suffix = getLabelSuffix(nodeDef)
     return {
       key: NodeDef.getUuid(nodeDef),
+      icon: showIcons ? NodeDefUIProps.getIconByNodeDef(nodeDef, true) : undefined,
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
     }
@@ -113,7 +125,8 @@ export const useBuildTreeData = ({
       nodeDef,
       record,
       onlyPages,
-      onlyEntities,
+      includeMultipleAttributes,
+      includeSingleAttributes,
       isDisabled,
     })
     if (children.length > 0) {
