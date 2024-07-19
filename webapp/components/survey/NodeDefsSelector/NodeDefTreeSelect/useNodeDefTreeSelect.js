@@ -28,6 +28,7 @@ export const useNodeDefTreeSelect = (props) => {
     includeSingleEntities,
     isDisabled,
   })
+  const rootItemKey = treeItems[0]?.key
 
   const [expanded, setExpanded] = useState(true)
   const [expandedNodeDefUuids, setExpandedNodeDefUuids] = useState(treeItemKeys)
@@ -36,12 +37,9 @@ export const useNodeDefTreeSelect = (props) => {
   const toggleExpanded = useCallback(() => {
     const expandedNext = !expanded
     setExpanded(expandedNext)
-    if (expandedNext) {
-      setExpandedNodeDefUuids(treeItemKeys)
-    } else {
-      setExpandedNodeDefUuids([])
-    }
-  }, [expanded, treeItemKeys])
+    const itemKeysToExpand = expandedNext ? treeItemKeys : [rootItemKey]
+    setExpandedNodeDefUuids(itemKeysToExpand)
+  }, [expanded, rootItemKey, treeItemKeys])
 
   const onSelectedTreeItemKeyChange = useCallback(
     (selectedNodeDefUuid) => {
