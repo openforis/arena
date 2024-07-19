@@ -27,7 +27,10 @@ const keys = {
   nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
 }
 
-export const getTreeSelectViewMode = getStateProp(keys.treeSelectViewMode, TreeSelectViewMode.onlyPages)
+// context state is global state
+export const getGlobalStateTreeSelectViewMode = getStateProp(keys.treeSelectViewMode, TreeSelectViewMode.onlyPages)
+// context state is SurveyFormState
+export const getTreeSelectViewMode = R.propOr(TreeSelectViewMode.onlyPages, keys.treeSelectViewMode)
 export const assocTreeSelectViewMode = R.assoc(keys.treeSelectViewMode)
 
 export const getFormActiveNodeDefUuid = (state) =>

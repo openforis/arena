@@ -5,6 +5,7 @@ import { exportReducer } from '@webapp/utils/reduxUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { SystemActions } from '@webapp/store/system'
 import { SurveyActions, NodeDefsActions } from '@webapp/store/survey'
 import * as RecordActions from '../record/actions'
@@ -59,7 +60,14 @@ const actionHandlers = {
       const activePageNodeDef = displayInParentPage ? nodeDefParent : nodeDef
       return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
     }
+    return state
+  },
 
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, isNodeDefNew }) => {
+    const viewMode = SurveyFormState.getTreeSelectViewMode(state)
+    if (isNodeDefNew && viewMode === TreeSelectViewMode.allNodeDefs) {
+      return SurveyFormState.assocFormActiveNodeDefUuid(NodeDef.getParentUuid(nodeDef))(state)
+    }
     return state
   },
 

@@ -12,7 +12,7 @@ import * as SurveyFormState from './state'
 
 export const useNodeDefLabelType = () => useSelector(SurveyFormState.getNodeDefLabelType)
 
-export const useTreeSelectViewMode = () => useSelector(SurveyFormState.getTreeSelectViewMode)
+export const useTreeSelectViewMode = () => useSelector(SurveyFormState.getGlobalStateTreeSelectViewMode)
 
 export const useIsEditingNodeDefInFullScreen = () => useTreeSelectViewMode() === TreeSelectViewMode.onlyPages
 
