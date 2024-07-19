@@ -188,7 +188,7 @@ const SurveyForm = (props) => {
                 onlyPages={viewOnlyPages}
                 includeMultipleAttributes={!viewOnlyPages}
                 includeSingleAttributes={!viewOnlyPages}
-                includeSingleEntities={!viewOnlyPages}
+                includeSingleEntities
                 onSelect={onNodeDefTreeSelect}
               />
               <div className="display-flex sidebar-bottom-bar">
