@@ -30,6 +30,7 @@ import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 
 import { Split } from '@webapp/components'
 import { ButtonGroup } from '@webapp/components/form'
+import { TreeSelectViewMode } from '@webapp/model'
 
 import NodeDefDetails from '../NodeDefDetails'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
@@ -42,12 +43,7 @@ const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
     NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
   ).length > 0
 
-const treeSelectViewModes = {
-  onlyPages: 'onlyPages',
-  allNodeDefs: 'allNodeDefs',
-}
-
-const treeSelectViewModeItems = Object.keys(treeSelectViewModes).map((mode) => ({
+const treeSelectViewModeItems = Object.keys(TreeSelectViewMode).map((mode) => ({
   key: mode,
   label: `surveyForm.nodeDefsTreeSelectMode.${mode}`,
 }))
@@ -85,7 +81,7 @@ const SurveyForm = (props) => {
   const isSideBarOpened = useIsSidebarOpened()
   const survey = useSurvey()
   const treeSelectViewMode = useTreeSelectViewMode()
-  const viewOnlyPages = treeSelectViewMode === treeSelectViewModes.onlyPages
+  const viewOnlyPages = treeSelectViewMode === TreeSelectViewMode.onlyPages
   const selectedNodeDefUuid = useActiveNodeDefUuid()
 
   const editAllowed = edit && canEditDef
@@ -201,6 +197,7 @@ const SurveyForm = (props) => {
                 onlyPages={viewOnlyPages}
                 includeMultipleAttributes={!viewOnlyPages}
                 includeSingleAttributes={!viewOnlyPages}
+                includeSingleEntities={!viewOnlyPages}
                 onSelect={onNodeDefTreeSelect}
               />
               <div className="display-flex sidebar-bottom-bar">

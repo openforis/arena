@@ -1,5 +1,7 @@
 import { useCallback } from 'react'
 
+import { TraverseMethod } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -36,8 +38,9 @@ export const useGetSiblingNodeDefUuid = () => {
   )
 
   const getAllSurveyNodeDefUuids = useCallback(
-    () => Survey.getDescendantsAndSelf()(survey).map(NodeDef.getUuid),
-    [survey]
+    () =>
+      Survey.getNodeDefDescendantsAndSelf({ cycle, traverseMethod: TraverseMethod.dfs })(survey).map(NodeDef.getUuid),
+    [cycle, survey]
   )
 
   return useCallback(

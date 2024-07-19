@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
@@ -26,7 +27,7 @@ const keys = {
   nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
 }
 
-export const getTreeSelectViewMode = getStateProp(keys.treeSelectViewMode, 'onlyPages')
+export const getTreeSelectViewMode = getStateProp(keys.treeSelectViewMode, TreeSelectViewMode.onlyPages)
 export const assocTreeSelectViewMode = R.assoc(keys.treeSelectViewMode)
 
 export const getFormActiveNodeDefUuid = (state) =>

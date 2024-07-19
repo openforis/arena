@@ -9,10 +9,11 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { Button, ButtonDelete } from '@webapp/components/buttons'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
-import { useIsEditingNodeDefInFullScreen } from '@webapp/store/ui/surveyForm'
+import { useIsEditingNodeDefInFullScreen, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
+import { TreeSelectViewMode } from '@webapp/model'
 
 const ButtonBar = (props) => {
   const { state, Actions } = props
@@ -24,6 +25,8 @@ const ButtonBar = (props) => {
   const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
   const editingNodeDefInFullScreen = useIsEditingNodeDefInFullScreen()
+  const treeSelectViewMode = useTreeSelectViewMode()
+  const viewModeAllNodeDefs = treeSelectViewMode === TreeSelectViewMode.allNodeDefs
 
   const previousDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: -1 })
   const nextDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: 1 })
@@ -31,10 +34,10 @@ const ButtonBar = (props) => {
   const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
   const canNavigateNodeDefs =
-    !NodeDef.isRoot(nodeDef) &&
+    (!NodeDef.isRoot(nodeDef) || viewModeAllNodeDefs) &&
     !NodeDef.isTemporary(nodeDef) &&
     !NodeDef.isAnalysis(nodeDef) &&
-    !(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef))
+    (!(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef)) || viewModeAllNodeDefs)
 
   return (
     <div className="button-bar">

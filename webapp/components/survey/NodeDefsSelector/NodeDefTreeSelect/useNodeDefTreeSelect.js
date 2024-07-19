@@ -13,6 +13,7 @@ export const useNodeDefTreeSelect = (props) => {
     nodeDefUuidActive,
     includeMultipleAttributes,
     includeSingleAttributes,
+    includeSingleEntities,
     onlyPages,
     onSelect,
   } = props
@@ -24,6 +25,7 @@ export const useNodeDefTreeSelect = (props) => {
     onlyPages,
     includeMultipleAttributes,
     includeSingleAttributes,
+    includeSingleEntities,
     isDisabled,
   })
 

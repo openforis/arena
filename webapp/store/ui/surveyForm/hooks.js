@@ -1,18 +1,20 @@
 import { useSelector } from 'react-redux'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { SurveyState } from '@webapp/store/survey'
 
 import * as SurveyFormState from './state'
-import { Objects } from '@openforis/arena-core'
 
 export const useNodeDefLabelType = () => useSelector(SurveyFormState.getNodeDefLabelType)
 
 export const useTreeSelectViewMode = () => useSelector(SurveyFormState.getTreeSelectViewMode)
 
-export const useIsEditingNodeDefInFullScreen = () => useTreeSelectViewMode() === 'onlyPages'
+export const useIsEditingNodeDefInFullScreen = () => useTreeSelectViewMode() === TreeSelectViewMode.onlyPages
 
 export const useActiveNodeDefUuid = () => useSelector(SurveyFormState.getFormActiveNodeDefUuid)
 

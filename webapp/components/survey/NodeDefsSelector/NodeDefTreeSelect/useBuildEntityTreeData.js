@@ -34,6 +34,7 @@ const getNodeDefAvailableChildren = ({
   onlyPages,
   includeMultipleAttributes,
   includeSingleAttributes,
+  includeSingleEntities,
   isDisabled,
 }) => {
   const pageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getUuid(nodeDef) })
@@ -45,25 +46,33 @@ const getNodeDefAvailableChildren = ({
     parentPageNode &&
     !isPageVisible({ cycle, record, pageNodeDef: nodeDef, parentNode: parentPageNode })
 
-  const childrenPageDefs = onlyPages
-    ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
-    : Survey.getNodeDefDescendantsInSingleEntities({
-        cycle,
-        nodeDef,
-        sorted: true,
-        filterFn: (nodeDef) => {
-          const multiple = NodeDef.isMultiple(nodeDef)
-          if (multiple) {
-            return NodeDef.isEntity(nodeDef) || includeMultipleAttributes
-          } else {
-            return includeSingleAttributes && NodeDef.isAttribute(nodeDef)
-          }
-        },
-      })(survey)
+  let children = null
+  if (onlyPages) {
+    children = Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
+  } else if (includeSingleEntities) {
+    children = Survey.getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
+  } else {
+    children = Survey.getNodeDefDescendantsInSingleEntities({
+      cycle,
+      nodeDef,
+      sorted: true,
+    })(survey)
+  }
+  const childrenFiltered = children.filter((nodeDef) => {
+    const multiple = NodeDef.isMultiple(nodeDef)
+    if (multiple) {
+      return NodeDef.isEntity(nodeDef) || includeMultipleAttributes
+    } else {
+      return (
+        (includeSingleEntities && NodeDef.isEntity(nodeDef)) ||
+        (includeSingleAttributes && NodeDef.isAttribute(nodeDef))
+      )
+    }
+  })
 
   const visibleChildren = pageNode
-    ? childrenPageDefs.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
-    : childrenPageDefs
+    ? childrenFiltered.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
+    : childrenFiltered
 
   return visibleChildren.filter((childDef) => !isDisabled(childDef) && !hidden)
 }
@@ -74,6 +83,7 @@ export const useBuildTreeData = ({
   onlyPages,
   includeMultipleAttributes,
   includeSingleAttributes,
+  includeSingleEntities,
   isDisabled,
 }) => {
   const survey = useSurvey()
@@ -127,6 +137,7 @@ export const useBuildTreeData = ({
       onlyPages,
       includeMultipleAttributes,
       includeSingleAttributes,
+      includeSingleEntities,
       isDisabled,
     })
     if (children.length > 0) {

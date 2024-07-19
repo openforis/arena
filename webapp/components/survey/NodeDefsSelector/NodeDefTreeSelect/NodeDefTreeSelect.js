@@ -14,8 +14,9 @@ const NodeDefTreeSelect = (props) => {
     isDisabled = () => false,
     nodeDefLabelType = null,
     nodeDefUuidActive = null,
-    includeSingleAttributes = false,
     includeMultipleAttributes = false,
+    includeSingleAttributes = false,
+    includeSingleEntities = false,
     onlyPages = false,
     onSelect,
   } = props
@@ -33,8 +34,9 @@ const NodeDefTreeSelect = (props) => {
     isDisabled,
     nodeDefLabelType,
     nodeDefUuidActive,
-    includeSingleAttributes,
     includeMultipleAttributes,
+    includeSingleAttributes,
+    includeSingleEntities,
     onlyPages,
     onSelect,
   })
@@ -73,6 +75,7 @@ NodeDefTreeSelect.propTypes = {
   nodeDefUuidActive: PropTypes.string,
   includeMultipleAttributes: PropTypes.bool,
   includeSingleAttributes: PropTypes.bool,
+  includeSingleEntities: PropTypes.bool,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
 }
