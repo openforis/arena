@@ -214,7 +214,7 @@ const SurveyForm = (props) => {
                     selectedItemKey={treeSelectViewMode}
                   />
                 )}
-                {edit && canEditDef && <FormPagesEditButtons />}
+                {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
               </div>
             </div>
             {internalContainer}
