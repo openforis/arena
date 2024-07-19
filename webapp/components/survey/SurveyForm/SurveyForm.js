@@ -4,7 +4,6 @@ import './react-grid-layout.scss'
 import React, { useCallback, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import classNames from 'classnames'
-import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -48,20 +47,6 @@ const treeSelectViewModeItems = Object.keys(TreeSelectViewMode).map((mode) => ({
   key: mode,
   label: `surveyForm.nodeDefsTreeSelectMode.${mode}`,
 }))
-
-const InternalContainerWrapper = ({ splitContent = true, children }) =>
-  splitContent ? (
-    <Split sizes={[20, 80]} minSize={[0, 300]}>
-      {children}
-    </Split>
-  ) : (
-    <div className="display-flex width100">{children}</div>
-  )
-
-InternalContainerWrapper.propTypes = {
-  splitContent: PropTypes.bool,
-  children: PropTypes.node,
-}
 
 const SurveyForm = (props) => {
   const {
@@ -195,7 +180,7 @@ const SurveyForm = (props) => {
       <div className={className} data-testid={TestId.surveyForm.surveyForm}>
         {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
         {showPageNavigation && (
-          <InternalContainerWrapper splitContent={viewOnlyPages}>
+          <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
               <NodeDefTreeSelect
                 isDisabled={(nodeDefArg) => notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))}
@@ -217,8 +202,8 @@ const SurveyForm = (props) => {
                 {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
               </div>
             </div>
-            {internalContainer}
-          </InternalContainerWrapper>
+            <div className="survey-form__internal-container-wrapper width100 height100">{internalContainer}</div>
+          </Split>
         )}
         {!showPageNavigation && internalContainer}
         {editAllowed && hasNodeDefAddChildTo && <AddNodeDefPanel />}
