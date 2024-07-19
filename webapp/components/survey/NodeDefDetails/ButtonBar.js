@@ -70,6 +70,15 @@ const ButtonBar = (props) => {
           />
         </>
       )}
+      {!editingNodeDefInFullScreen && dirty && (
+        <Button
+          className="btn-cancel"
+          testId={TestId.nodeDefDetails.backBtn}
+          onClick={() => Actions.cancelEdits({ state })}
+          label="common.cancel"
+          variant="outlined"
+        />
+      )}
       <Button
         className="btn-primary"
         testId={TestId.nodeDefDetails.saveBtn}

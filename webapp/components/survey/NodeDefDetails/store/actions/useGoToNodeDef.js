@@ -17,21 +17,24 @@ export const useGoToNodeDef = ({ setState }) => {
 
   const getSiblingNodeDefUuid = useGetSiblingNodeDefUuid()
 
-  return useCallback(async ({ state, offset }) => {
-    cancelEdits({
-      state,
-      offset,
-      onCancel: ({ state }) => {
-        const nodeDefUuidSibling = getSiblingNodeDefUuid({ state, offset })
-        if (editingNodeDefInFullScreen) {
-          // wait for local state to reset and navigate to the next node def
-          setTimeout(() => {
-            navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuidSibling}/`, { replace: true })
-          }, 100)
-        } else {
-          dispatch(SurveyFormActions.setFormActiveNodeDefUuid(nodeDefUuidSibling))
-        }
-      },
-    })
-  }, [])
+  return useCallback(
+    async ({ state, offset }) => {
+      cancelEdits({
+        state,
+        offset,
+        onCancel: ({ state }) => {
+          const nodeDefUuidSibling = getSiblingNodeDefUuid({ state, offset })
+          if (editingNodeDefInFullScreen) {
+            // wait for local state to reset and navigate to the next node def
+            setTimeout(() => {
+              navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuidSibling}/`, { replace: true })
+            }, 100)
+          } else {
+            dispatch(SurveyFormActions.setFormActiveNodeDefUuid(nodeDefUuidSibling))
+          }
+        },
+      })
+    },
+    [editingNodeDefInFullScreen]
+  )
 }
