@@ -4,6 +4,7 @@ import './react-grid-layout.scss'
 import React, { useCallback, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -56,6 +57,11 @@ const InternalContainerWrapper = ({ splitContent = true, children }) =>
   ) : (
     <div className="display-flex width100">{children}</div>
   )
+
+InternalContainerWrapper.propTypes = {
+  splitContent: PropTypes.bool,
+  children: PropTypes.node,
+}
 
 const SurveyForm = (props) => {
   const {
