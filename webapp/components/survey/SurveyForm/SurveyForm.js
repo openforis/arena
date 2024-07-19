@@ -54,7 +54,7 @@ const InternalContainerWrapper = ({ splitContent = true, children }) =>
       {children}
     </Split>
   ) : (
-    <div className="full-width display-flex">{children}</div>
+    <div className="display-flex width100">{children}</div>
   )
 
 const SurveyForm = (props) => {
