@@ -361,6 +361,22 @@ export const init = (app) => {
     }
   })
 
+  app.post('/survey/:surveyId/records/merge/preview', requireRecordViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+
+      const { record } = await RecordService.mergeRecords({
+        surveyId,
+        sourceRecordUuid,
+        targetRecordUuid,
+        dryRun: true,
+      })
+      res.json({ record })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
   app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res, next) => {
     try {

@@ -414,3 +414,26 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
+
+export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUuid, dryRun = false }) => {
+  const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid })
+  const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid })
+
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    advanced: true,
+    includeBigCategories: false,
+    includeBigTaxonomies: false,
+  })
+
+  const { record: recordTargetUpdated } = await Record.mergeRecords({
+    survey,
+    recordSource,
+    sideEffect: true,
+  })(recordTarget)
+
+  if (!dryRun) {
+    // TODO store merged record
+  }
+  return { record: recordTargetUpdated }
+}
