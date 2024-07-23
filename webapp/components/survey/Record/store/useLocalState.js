@@ -14,6 +14,7 @@ import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/h
 
 export const useLocalState = (props) => {
   const {
+    recordProp,
     recordUuid: recordUuidProp,
     pageNodeUuid: pageNodeUuidProp,
     pageNodeDefUuid: pageNodeDefUuidProp,
@@ -79,12 +80,14 @@ export const useLocalState = (props) => {
   }
 
   const onComponentLoad = () => {
-    // Check in record
-    // when previewing a survey or when the survey has been imported from Collect and not published,
-    // record must be checked in as draft
-    const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }))
-
+    if (recordProp) {
+    } else {
+      // Check in record
+      // when previewing a survey or when the survey has been imported from Collect and not published,
+      // record must be checked in as draft
+      const draft = preview || !Survey.isPublished(surveyInfo)
+      dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }))
+    }
     // Add beforeunload event listener
     window.addEventListener('beforeunload', onComponentUnload)
   }

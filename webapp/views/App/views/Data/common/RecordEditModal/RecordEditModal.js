@@ -67,7 +67,15 @@ const RecordEditModalTitle = () => {
 }
 
 export const RecordEditModal = (props) => {
-  const { initialState: initialStateProp, onClose, onRequestClose, parentNodeUuid, recordUuid } = props
+  const {
+    detachable = true,
+    initialState: initialStateProp,
+    onClose,
+    onRequestClose,
+    parentNodeUuid,
+    record,
+    recordUuid,
+  } = props
 
   const onDetach = useCallback(() => {
     const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}`
@@ -93,15 +101,16 @@ export const RecordEditModal = (props) => {
       left={initialLeft}
       onClose={onModalClose}
       onRequestClose={onRequestClose}
-      onDetach={onDetach}
+      onDetach={detachable ? onDetach : undefined}
       top={initialTop}
     >
-      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
+      <RecordEditor record={record} recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
     </ResizableModal>
   )
 }
 
 RecordEditModal.propTypes = {
+  detachable: PropTypes.bool,
   initialState: PropTypes.object,
   onClose: PropTypes.func,
   onRequestClose: PropTypes.func,

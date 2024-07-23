@@ -40,6 +40,45 @@ export const useConfirm = () => {
   )
 }
 
+export const useConfirmAsync = () => {
+  const dispatch = useDispatch()
+  return useCallback(
+    ({
+      key,
+      params = {},
+      okButtonLabel = undefined,
+      okButtonClass = undefined,
+      okButtonIconClass = undefined,
+      headerText = undefined,
+      strongConfirm = false,
+      strongConfirmInputLabel = undefined,
+      strongConfirmRequiredText = undefined,
+    }) =>
+      new Promise((resolve, reject) => {
+        try {
+          dispatch(
+            DialogConfirmActions.showDialogConfirm({
+              key,
+              params,
+              okButtonLabel,
+              okButtonClass,
+              okButtonIconClass,
+              headerText,
+              strongConfirm,
+              strongConfirmInputLabel,
+              strongConfirmRequiredText,
+              onOk: () => resolve(true),
+              onCancel: () => resolve(false),
+            })
+          )
+        } catch (error) {
+          reject(error)
+        }
+      }),
+    [dispatch]
+  )
+}
+
 export const useConfirmDelete = () => {
   const confirm = useConfirm()
 

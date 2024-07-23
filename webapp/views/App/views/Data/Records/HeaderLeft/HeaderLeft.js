@@ -5,10 +5,11 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
+import * as Record from '@core/record/record'
 import * as StringUtils from '@core/stringUtils'
 
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
-import { RecordActions } from '@webapp/store/ui/record'
+import { RecordActions, useRecord } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
 
@@ -20,12 +21,13 @@ import {
   useAuthCanUpdateRecordsStep,
   useAuthCanUseAnalysis,
 } from '@webapp/store/user/hooks'
-import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordsDataExportModal } from './RecordsDataExportModal'
+import { useConfirmAsync } from '@webapp/components/hooks'
+import { RecordEditModal } from '../../common/RecordEditModal'
 
 const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
   const dispatch = useDispatch()
@@ -34,6 +36,8 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const surveyInfo = useSurveyInfo()
   const cycle = useSurveyCycleKey()
   const cycles = useSurveyCycleKeys()
+  const confirm = useConfirmAsync()
+  const record = useRecord()
 
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
@@ -49,8 +53,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const selectedItemsCount = selectedItems.length
   const selectedRecordsUuids = selectedItems.map((selectedItem) => selectedItem.uuid)
 
-  const [state, setState] = useState({ recordsCloneModalOpen: false, recordsDataExportModalOpen: false })
-  const { recordsCloneModalOpen, recordsDataExportModalOpen } = state
+  const [state, setState] = useState({
+    recordsCloneModalOpen: false,
+    recordsDataExportModalOpen: false,
+    recordsMergePreviewModalOpen: false,
+  })
+  const { recordsCloneModalOpen, recordsDataExportModalOpen, recordsMergePreviewModalOpen } = state
 
   const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
 
@@ -67,17 +75,27 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
     [dispatch, onRecordsUpdate, selectedItems]
   )
 
-  const onDeleteButtonClick = useCallback(
-    () =>
-      dispatch(
-        DialogConfirmActions.showDialogConfirm({
-          key: 'dataView.records.confirmDeleteSelectedRecord',
-          params: { count: selectedItemsCount },
-          onOk: onDeleteConfirm,
-        })
-      ),
-    [dispatch, selectedItemsCount, onDeleteConfirm]
-  )
+  const onDeleteButtonClick = useCallback(async () => {
+    if (await confirm({ key: 'dataView.records.confirmDeleteSelectedRecord', params: { count: selectedItemsCount } })) {
+      onDeleteConfirm()
+    }
+  }, [confirm, selectedItemsCount, onDeleteConfirm])
+
+  const onMergeConfirm = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: true }))
+    const [sourceRecordUuid, targetRecordUuid] = selectedItems.map()
+    dispatch(RecordActions.previewRecordsMerge({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }))
+  }, [dispatch, onRecordsUpdate, selectedItems])
+
+  const mergeSelectedRecords = useCallback(async () => {
+    if (await confirm({ key: 'dataView.records.confirmMergeSelectedRecords', params: { count: selectedItemsCount } })) {
+      onMergeConfirm()
+    }
+  }, [confirm, onMergeConfirm, selectedItemsCount])
+
+  const closeMergePreviewModal = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: false }))
+  }, [])
 
   return (
     <div className="records__header-left">
@@ -113,6 +131,9 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
           )}
+          {selectedItemsCount === 2 && canDeleteSelectedRecords && (
+            <Button label="dataView.records.merge" onClick={mergeSelectedRecords} />
+          )}
           {
             // Edit selected record
             selectedItemsCount === 1 && (
@@ -138,6 +159,9 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           recordUuids={selectedRecordsUuids}
           search={search}
         />
+      )}
+      {recordsMergePreviewModalOpen && (
+        <RecordEditModal onClose={() => {}} onRequestClose={closeMergePreviewModal} record={record} />
       )}
     </div>
   )
