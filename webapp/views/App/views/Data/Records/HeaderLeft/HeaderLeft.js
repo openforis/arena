@@ -83,7 +83,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const onMergeConfirm = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: true }))
-    const [sourceRecordUuid, targetRecordUuid] = selectedItems.map()
+    const [sourceRecordUuid, targetRecordUuid] = selectedItems.map(Record.getUuid)
     dispatch(RecordActions.previewRecordsMerge({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }))
   }, [dispatch, onRecordsUpdate, selectedItems])
 
@@ -160,7 +160,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           search={search}
         />
       )}
-      {recordsMergePreviewModalOpen && (
+      {recordsMergePreviewModalOpen && record && (
         <RecordEditModal onClose={() => {}} onRequestClose={closeMergePreviewModal} record={record} />
       )}
     </div>
