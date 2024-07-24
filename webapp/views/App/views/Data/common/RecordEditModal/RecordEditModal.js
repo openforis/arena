@@ -1,9 +1,6 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
 import { ResizableModal } from '@webapp/components'
@@ -48,18 +45,7 @@ const RecordEditModalTitle = () => {
 
   if (!record) return null
 
-  const root = Record.getRootNode(record)
-  const keyNodes = Record.getEntityKeyNodes(survey, root)(record)
-  const keyValues = keyNodes.map((keyNode) => {
-    const keyNodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(keyNode))(survey)
-    return NodeValueFormatter.format({
-      survey,
-      nodeDef: keyNodeDef,
-      value: Node.getValue(keyNode),
-      showLabel: true,
-      lang,
-    })
-  })
+  const keyValues = NodeValueFormatter.getFormattedRecordKeys({ survey, record, lang })
 
   const title = i18n.t('recordView.recordEditModalTitle', { keyValues })
 
@@ -73,7 +59,6 @@ export const RecordEditModal = (props) => {
     onClose,
     onRequestClose,
     parentNodeUuid,
-    record,
     recordUuid,
   } = props
 
@@ -100,11 +85,11 @@ export const RecordEditModal = (props) => {
       initHeight={initialHeight}
       left={initialLeft}
       onClose={onModalClose}
-      onRequestClose={onRequestClose}
       onDetach={detachable ? onDetach : undefined}
+      onRequestClose={onRequestClose}
       top={initialTop}
     >
-      <RecordEditor record={record} recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
+      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
     </ResizableModal>
   )
 }

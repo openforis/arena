@@ -14,6 +14,7 @@ import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/h
 
 export const useLocalState = (props) => {
   const {
+    editableProp,
     recordProp,
     recordUuid: recordUuidProp,
     pageNodeUuid: pageNodeUuidProp,
@@ -44,7 +45,7 @@ export const useLocalState = (props) => {
 
   const record = useSelector(RecordState.getRecord)
   const recordLoadError = useSelector(RecordState.getRecordLoadError)
-  const editable = useAuthCanEditRecord(record)
+  const editable = useAuthCanEditRecord(record) && editableProp
 
   // Add websocket event listeners
   useOnWebSocketEvent({
@@ -80,8 +81,7 @@ export const useLocalState = (props) => {
   }
 
   const onComponentLoad = () => {
-    if (recordProp) {
-    } else {
+    if (!recordProp) {
       // Check in record
       // when previewing a survey or when the survey has been imported from Collect and not published,
       // record must be checked in as draft
