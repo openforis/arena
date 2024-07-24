@@ -23,9 +23,12 @@ export const mergeRecords =
   ({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
+
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
     await API.mergeRecords({ surveyId, sourceRecordUuid, targetRecordUuid, preview: true })
+
     onRecordsUpdate()
+
     dispatch(LoaderActions.hideLoader())
   }
