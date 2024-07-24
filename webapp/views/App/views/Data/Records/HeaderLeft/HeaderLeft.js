@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
+import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyInfo } from '@webapp/store/survey'
@@ -14,6 +15,7 @@ import { RecordActions, useRecord } from '@webapp/store/ui/record'
 import { TestId } from '@webapp/utils/testId'
 
 import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit } from '@webapp/components'
+import { useConfirmAsync } from '@webapp/components/hooks'
 import {
   useAuthCanDeleteRecords,
   useAuthCanExportRecords,
@@ -24,10 +26,9 @@ import {
 import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
-import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordsDataExportModal } from './RecordsDataExportModal'
-import { useConfirmAsync } from '@webapp/components/hooks'
-import { RecordEditModal } from '../../common/RecordEditModal'
+import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
+import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 
 const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
   const dispatch = useDispatch()
@@ -83,7 +84,15 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const onMergeConfirm = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: true }))
-    const [sourceRecordUuid, targetRecordUuid] = selectedItems.map(Record.getUuid)
+    // sort selected records by date modified; source record will be the newest one
+    const sortedRecords = [...selectedItems].sort((summaryA, summaryB) => {
+      const dateModifiedAString = Record.getDateModified(summaryA)
+      const dateModifiedA = DateUtils.parseDateISO(dateModifiedAString)
+      const dateModifiedBString = Record.getDateModified(summaryB)
+      const dateModifiedB = DateUtils.parseDateISO(dateModifiedBString)
+      return dateModifiedB.getTime() - dateModifiedA.getTime()
+    })
+    const [sourceRecordUuid, targetRecordUuid] = sortedRecords.map(Record.getUuid)
     dispatch(RecordActions.previewRecordsMerge({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }))
   }, [dispatch, onRecordsUpdate, selectedItems])
 
@@ -132,7 +141,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
           )}
           {selectedItemsCount === 2 && canDeleteSelectedRecords && (
-            <Button label="dataView.records.merge" onClick={mergeSelectedRecords} />
+            <Button label="dataView.records.merge.label" onClick={mergeSelectedRecords} variant="outlined" />
           )}
           {
             // Edit selected record
@@ -160,9 +169,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           search={search}
         />
       )}
-      {recordsMergePreviewModalOpen && record && (
-        <RecordEditModal onClose={() => {}} onRequestClose={closeMergePreviewModal} record={record} />
-      )}
+      {recordsMergePreviewModalOpen && record && <RecordMergePreviewModal onRequestClose={closeMergePreviewModal} />}
     </div>
   )
 }

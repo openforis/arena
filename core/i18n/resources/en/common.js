@@ -757,6 +757,11 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       confirmDeleteRecord: `Delete the record "{{keyValues}}"?`,
       confirmDeleteSelectedRecord_one: `Delete the selected record?`,
       confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
+      confirmMergeSelectedRecords: `### Merge the selected records into one?
+
+- the newest one will be merged into the oldest one;
+
+- a preview of the result will be shown before merging is performed;`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
       deleteRecord: 'Delete record',
@@ -766,15 +771,20 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       exportList: 'Export list',
       exportData: 'Export data',
       filterPlaceholder: 'Filter by keys or owner',
-      viewRecord: 'View record',
-      owner: 'Owner',
-      step: 'Step',
+      merge: {
+        label: 'Merge',
+        confirmLabel: 'Confirm merge',
+        previewTitle: 'Merging preview (record {{keyValues}})',
+      },
       noRecordsAdded: 'No records added',
       noRecordsAddedForThisSearch: 'No records found',
       noSelectedRecordsInStep: 'No selected records in step {{step}}',
+      owner: 'Owner',
       promoteAllRecordsToAnalysis: 'Cleansing -> Analysis',
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
+      step: 'Step',
       updateRecordsStep: 'Update records step',
+      viewRecord: 'View record',
     },
     recordsClone: {
       title: 'Records clone',
