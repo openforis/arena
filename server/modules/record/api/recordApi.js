@@ -361,15 +361,15 @@ export const init = (app) => {
     }
   })
 
-  app.post('/survey/:surveyId/records/merge/preview', requireRecordViewPermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/records/merge', requireRecordViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+      const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
 
       const { record } = await RecordService.mergeRecords({
         surveyId,
         sourceRecordUuid,
         targetRecordUuid,
-        dryRun: true,
+        dryRun,
       })
       res.json({ record })
     } catch (error) {

@@ -153,9 +153,9 @@ export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recor
 
 // ==== RECORDS MERGE
 export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUuid, preview = false }) => {
-  const uri = `/api/survey/${surveyId}/records/merge${preview ? '/preview' : ''}`
+  const uri = `/api/survey/${surveyId}/records/merge`
   const {
     data: { record },
-  } = await axios.post(uri, { surveyId, sourceRecordUuid, targetRecordUuid })
+  } = await axios.post(uri, { dryRun: preview, surveyId, sourceRecordUuid, targetRecordUuid })
   return record
 }
