@@ -46,7 +46,7 @@ export {
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
-  previewRecordsMerge,
+  mergeRecords,
 } from './data'
 export {
   insertDataQuerySummary,

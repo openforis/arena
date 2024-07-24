@@ -30,7 +30,7 @@ const ModalTitle = () => {
 }
 
 export const RecordMergePreviewModal = (props) => {
-  const { onRequestClose } = props
+  const { onConfirmClick, onRequestClose } = props
 
   const record = useRecord()
 
@@ -47,7 +47,7 @@ export const RecordMergePreviewModal = (props) => {
         <Button className="btn-cancel" onClick={onRequestClose} label="common.cancel" variant="outlined" />
         <Button
           className="btn-primary"
-          onClick={() => {}}
+          onClick={onConfirmClick}
           iconClassName="icon-floppy-disk icon-12px"
           label="dataView.records.merge.confirmLabel"
         />
@@ -57,5 +57,6 @@ export const RecordMergePreviewModal = (props) => {
 }
 
 RecordMergePreviewModal.propTypes = {
-  onRequestClose: PropTypes.func,
+  onConfirmClick: PropTypes.func.isRequired,
+  onRequestClose: PropTypes.func.isRequired,
 }

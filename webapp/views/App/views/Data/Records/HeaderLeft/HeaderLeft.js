@@ -30,6 +30,19 @@ import { RecordsDataExportModal } from './RecordsDataExportModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 
+const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }) => {
+  // sort selected records by date modified; source record will be the newest one
+  const sortedRecords = [...selectedItems].sort((summaryA, summaryB) => {
+    const dateModifiedAString = Record.getDateModified(summaryA)
+    const dateModifiedA = DateUtils.parseDateISO(dateModifiedAString)
+    const dateModifiedBString = Record.getDateModified(summaryB)
+    const dateModifiedB = DateUtils.parseDateISO(dateModifiedBString)
+    return dateModifiedB.getTime() - dateModifiedA.getTime()
+  })
+  const [sourceRecordUuid, targetRecordUuid] = sortedRecords.map(Record.getUuid)
+  return { sourceRecordUuid, targetRecordUuid }
+}
+
 const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -82,29 +95,31 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
     }
   }, [confirm, selectedItemsCount, onDeleteConfirm])
 
-  const onMergeConfirm = useCallback(() => {
+  const onMergePreviewConfirm = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: true }))
-    // sort selected records by date modified; source record will be the newest one
-    const sortedRecords = [...selectedItems].sort((summaryA, summaryB) => {
-      const dateModifiedAString = Record.getDateModified(summaryA)
-      const dateModifiedA = DateUtils.parseDateISO(dateModifiedAString)
-      const dateModifiedBString = Record.getDateModified(summaryB)
-      const dateModifiedB = DateUtils.parseDateISO(dateModifiedBString)
-      return dateModifiedB.getTime() - dateModifiedA.getTime()
+    const { sourceRecordUuid, targetRecordUuid } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
+      selectedItems,
     })
-    const [sourceRecordUuid, targetRecordUuid] = sortedRecords.map(Record.getUuid)
-    dispatch(RecordActions.previewRecordsMerge({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }))
-  }, [dispatch, onRecordsUpdate, selectedItems])
+    dispatch(RecordActions.previewRecordsMerge({ sourceRecordUuid, targetRecordUuid }))
+  }, [dispatch, selectedItems])
 
   const mergeSelectedRecords = useCallback(async () => {
     if (await confirm({ key: 'dataView.records.confirmMergeSelectedRecords', params: { count: selectedItemsCount } })) {
-      onMergeConfirm()
+      onMergePreviewConfirm()
     }
-  }, [confirm, onMergeConfirm, selectedItemsCount])
+  }, [confirm, onMergePreviewConfirm, selectedItemsCount])
 
   const closeMergePreviewModal = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsMergePreviewModalOpen: false }))
   }, [])
+
+  const onMergeConfirm = useCallback(() => {
+    closeMergePreviewModal()
+    const { sourceRecordUuid, targetRecordUuid } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
+      selectedItems,
+    })
+    dispatch(RecordActions.mergeRecords({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }))
+  }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
 
   return (
     <div className="records__header-left">
@@ -169,7 +184,9 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           search={search}
         />
       )}
-      {recordsMergePreviewModalOpen && record && <RecordMergePreviewModal onRequestClose={closeMergePreviewModal} />}
+      {recordsMergePreviewModalOpen && record && (
+        <RecordMergePreviewModal onConfirmClick={onMergeConfirm} onRequestClose={closeMergePreviewModal} />
+      )}
     </div>
   )
 }
