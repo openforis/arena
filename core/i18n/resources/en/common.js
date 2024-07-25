@@ -668,6 +668,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       },
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
+        - {{processed}} rows processed
+        - {{insertedFiles}} files would be inserted
+        - {{updatedFiles}} files would be updated
+        - {{deletedFiles}} files would be deleted`,
+        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)
         - {{processed}} rows processed`,
         validationCompleteSuccessfully: `## Validation complete without errors
         - {{processed}} rows processed
