@@ -4,6 +4,7 @@ import { CsvDataExportModel } from '@common/model/csvExport'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
@@ -15,6 +16,13 @@ import { ZipArchiver } from '@server/utils/file/zipArchiver'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
+let templateFileValue = null
+{
+  const fileUuid = uuidv4()
+  const fileName = `${fileUuid}.bin`
+  templateFileValue = Node.newNodeValueFile({ fileUuid, fileName })
+}
+
 const valuesByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: () => true,
   [NodeDef.nodeDefType.code]: () => 'CATEGORY_CODE',
@@ -24,7 +32,7 @@ const valuesByNodeDefType = {
   },
   [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(new Date()),
   [NodeDef.nodeDefType.decimal]: () => 123.45,
-  [NodeDef.nodeDefType.file]: () => uuidv4(),
+  [NodeDef.nodeDefType.file]: ({ valueProp }) => templateFileValue[valueProp],
   [NodeDef.nodeDefType.integer]: () => 123,
   [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
   [NodeDef.nodeDefType.text]: () => 'Text',
