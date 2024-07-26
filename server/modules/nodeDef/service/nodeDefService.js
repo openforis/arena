@@ -87,7 +87,7 @@ const afterNodeDefUpdate = async (
   })
 
   return {
-    nodeDefsUpdated,
+    nodeDefsUpdated: allUpdatedNodeDefs,
     nodeDefsValidation,
   }
 }
@@ -182,9 +182,9 @@ export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, cl
 
     const nodeDefsDependentsUuids = Survey.getNodeDefDependentsUuids(nodeDefUuid)(survey)
 
-    const nodeDefsUpdated = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
+    const nodeDef = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
 
-    return afterNodeDefUpdate({ survey, nodeDefsDependentsUuids, nodeDefsUpdated }, t)
+    return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids }, t)
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {

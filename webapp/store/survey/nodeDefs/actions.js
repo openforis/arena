@@ -313,7 +313,7 @@ export const removeNodeDef =
   }
 
 export const convertNodeDef =
-  ({ nodeDef, toType }) =>
+  ({ nodeDef, toType, navigate }) =>
   async (dispatch, getState) => {
     const state = getState()
     const survey = SurveyState.getSurvey(state)
@@ -329,11 +329,11 @@ export const convertNodeDef =
         okButtonLabel: 'common.convert',
         onOk: async () => {
           const surveyId = Survey.getId(survey)
-          const {
-            data: { nodeDefsUpdated, nodeDefsValidation },
-          } = await API.convertNodeDef({ surveyId, nodeDefUuid, toType })
+          const { nodeDefsUpdated, nodeDefsValidation } = await API.convertNodeDef({ surveyId, nodeDefUuid, toType })
 
-          dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+          await dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+
+          navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
         },
       })
     )

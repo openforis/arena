@@ -256,8 +256,8 @@ export const updateNodeDefTypeAndProps = async (
       UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
       SET 
           type = $1,
-          props_draft = props_draft || $2::jsonb,
-          props_advanced_draft = props_advanced_draft || $3::jsonb,
+          props_draft = $2::jsonb,
+          props_advanced_draft = $3::jsonb,
           date_modified = ${DbUtils.now}
       WHERE uuid = $4
       RETURNING ${nodeDefSelectFields}

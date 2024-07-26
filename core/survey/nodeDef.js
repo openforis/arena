@@ -90,15 +90,15 @@ export const propKeys = {
 }
 
 const commonAttributePropsKeys = [
-  keys.cycles,
-  keys.descriptions,
-  keys.key,
-  keys.labels,
-  keys.multiple,
-  keys.name,
-  keys.readOnly,
-  keys.layout,
-  keys.hidden,
+  propKeys.cycles,
+  propKeys.descriptions,
+  propKeys.hidden,
+  propKeys.key,
+  propKeys.labels,
+  propKeys.layout,
+  propKeys.multiple,
+  propKeys.name,
+  propKeys.readOnly,
 ]
 
 export const textInputTypes = {
@@ -497,17 +497,22 @@ export const changeParentEntity =
 export const convertToType =
   ({ toType }) =>
   (nodeDef) => {
-    const nodeDefUpdated = { ...nodeDef, [keys.type]: toType }
+    const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
+    const propsAdvancedUpdated = R.pick(commonAttributePropsAdvancedKeys)(getPropsAdvanced(nodeDef))
 
-    const keepOnlyProps = ({ obj, keysToKeep }) => {
-      Object.keys(obj).forEach((prop) => {
-        if (!keysToKeep.includes(prop)) {
-          delete obj[prop]
-        }
-      })
+    const layout = getLayout(nodeDef)
+    const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
+      acc[cycleKey] = R.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
+      return acc
+    }, {})
+    propsUpdated[propKeys.layout] = layoutUpdated
+
+    const nodeDefUpdated = {
+      ...nodeDef,
+      [keys.type]: toType,
+      [keys.props]: propsUpdated,
+      [keys.propsAdvanced]: propsAdvancedUpdated,
     }
-    keepOnlyProps({ obj: getProps(nodeDefUpdated), keysToKeep: commonAttributePropsKeys })
-    keepOnlyProps({ obj: getPropsAdvanced(nodeDefUpdated), keysToKeep: commonAttributePropsAdvancedKeys })
     return nodeDefUpdated
   }
 
