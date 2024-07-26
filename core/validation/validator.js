@@ -49,6 +49,7 @@ export const {
   validateName,
   validateNumber,
   validatePositiveNumber,
+  validatePositiveOrZeroNumber,
   validateEmail,
   validateEmails,
   isEmailValueValid,
