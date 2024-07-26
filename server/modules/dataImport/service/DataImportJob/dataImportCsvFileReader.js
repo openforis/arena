@@ -105,8 +105,8 @@ const valueConverterByNodeDefType = {
 const checkAllHeadersAreValid =
   ({ csvDataExportModel }) =>
   (headers) => {
-    const dataExportModelHeaders = csvDataExportModel.columns.map((col) => col.header)
-    const invalidHeaders = headers.filter((header) => !dataExportModelHeaders.includes(header))
+    const { headers: possibleHeaders } = csvDataExportModel
+    const invalidHeaders = headers.filter((header) => !possibleHeaders.includes(header))
     if (invalidHeaders.length > 0) {
       throw new SystemError('validationErrors.dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
     }
