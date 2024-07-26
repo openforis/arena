@@ -53,7 +53,7 @@ export const NodeDefConversionDialog = (props) => {
         <Button
           className="modal-footer__item"
           disabled={confirmButtonDisabled}
-          label="nodeDefEdit.conversion.confirmButtonLabel"
+          label="common.convert"
           onClick={onConfirm}
         />
       </ModalFooter>

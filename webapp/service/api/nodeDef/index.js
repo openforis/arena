@@ -67,3 +67,12 @@ export const moveNodeDef = async ({ surveyId, nodeDefUuid, targetParentNodeDefUu
   })
   return { nodeDefsValidation, nodeDefsUpdated }
 }
+
+export const convertNodeDef = async ({ surveyId, nodeDefUuid, toType }) => {
+  const {
+    data: { nodeDefsValidation, nodeDefsUpdated },
+  } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/convert`, {
+    toType,
+  })
+  return { nodeDefsValidation, nodeDefsUpdated }
+}

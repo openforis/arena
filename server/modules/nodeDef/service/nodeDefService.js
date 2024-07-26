@@ -176,6 +176,17 @@ export const moveNodeDef = async ({ user, surveyId, nodeDefUuid, targetParentNod
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsDependentsUuids, nodeDefsUpdated }, t)
   })
 
+export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId }, t)
+
+    const nodeDefsDependentsUuids = Survey.getNodeDefDependentsUuids(nodeDefUuid)(survey)
+
+    const nodeDefsUpdated = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
+
+    return afterNodeDefUpdate({ survey, nodeDefsDependentsUuids, nodeDefsUpdated }, t)
+  })
+
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {
   const survey = await fetchSurvey({ surveyId, cycle }, client)
 

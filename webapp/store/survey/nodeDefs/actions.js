@@ -311,3 +311,30 @@ export const removeNodeDef =
       )
     }
   }
+
+export const convertNodeDef =
+  ({ nodeDef, toType }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+    const toTypeLabel = toType
+
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'surveyForm.nodeDefEditFormActions.confirmConvert',
+        params: { name: NodeDef.getName(nodeDef), toType: toTypeLabel },
+        okButtonLabel: 'common.convert',
+        onOk: async () => {
+          const surveyId = Survey.getId(survey)
+          const {
+            data: { nodeDefsUpdated, nodeDefsValidation },
+          } = await API.convertNodeDef({ surveyId, nodeDefUuid, toType })
+
+          dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+        },
+      })
+    )
+  }

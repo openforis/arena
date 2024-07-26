@@ -34,6 +34,7 @@ Do you want to ignore them?`,
     cnt: 'Count',
     code: 'Code',
     collapse: 'Collapse',
+    convert: 'Convert',
     copy: 'Copy',
     createdWithApp: `Created with {{app}}`,
     csvExport: 'CSV Export',
@@ -1354,7 +1355,6 @@ E.g. this.region = region_attribute_name
     },
     conversion: {
       dialogTitle: 'Convert {{nodeDefName}} into another type',
-      confirmButtonLabel: 'Convert',
       fromType: 'From type',
       toType: 'To type',
     },
@@ -1417,6 +1417,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
+      confirmConvert: 'Convert the attribute "{{name}}" into "{{toType}}"?',
       confirmDelete:
         'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },

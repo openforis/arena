@@ -89,6 +89,18 @@ export const propKeys = {
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 }
 
+const commonAttributePropsKeys = [
+  keys.cycles,
+  keys.descriptions,
+  keys.key,
+  keys.labels,
+  keys.multiple,
+  keys.name,
+  keys.readOnly,
+  keys.layout,
+  keys.hidden,
+]
+
 export const textInputTypes = {
   singleLine: 'singleLine',
   multiLine: 'multiLine',
@@ -142,6 +154,15 @@ export const keysPropsAdvanced = {
   // code and taxon
   itemsFilter: 'itemsFilter',
 }
+
+const commonAttributePropsAdvancedKeys = [
+  keysPropsAdvanced.applicable,
+  keysPropsAdvanced.defaultValues,
+  keysPropsAdvanced.defaultValueEvaluatedOneTime,
+  keysPropsAdvanced.excludedInClone,
+  keysPropsAdvanced.validations,
+  keysPropsAdvanced.formula,
+]
 
 export const metaKeys = {
   h: 'h',
@@ -471,6 +492,23 @@ export const changeParentEntity =
         [metaKeys.h]: [...getMetaHierarchy(targetParentNodeDef), targetParentNodeDefUuid],
       },
     }
+  }
+
+export const convertToType =
+  ({ toType }) =>
+  (nodeDef) => {
+    const nodeDefUpdated = { ...nodeDef, [keys.type]: toType }
+
+    const keepOnlyProps = ({ obj, keysToKeep }) => {
+      Object.keys(obj).forEach((prop) => {
+        if (!keysToKeep.includes(prop)) {
+          delete obj[prop]
+        }
+      })
+    }
+    keepOnlyProps({ obj: getProps(nodeDefUpdated), keysToKeep: commonAttributePropsKeys })
+    keepOnlyProps({ obj: getPropsAdvanced(nodeDefUpdated), keysToKeep: commonAttributePropsAdvancedKeys })
+    return nodeDefUpdated
   }
 
 // layout
