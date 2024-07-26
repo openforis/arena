@@ -1352,6 +1352,12 @@ E.g. this.region = region_attribute_name
       title: 'Cloning node definition "{{nodeDefName}}"',
       entitySelectLabel: 'Entity to clone into:',
     },
+    conversion: {
+      dialogTitle: 'Convert {{nodeDefName}} into another type',
+      confirmButtonLabel: 'Convert',
+      fromType: 'From type',
+      toType: 'To type',
+    },
     moveDialog: {
       confirmButtonLabel: 'Move',
       title: 'Moving node definition "{{nodeDefName}}"',
@@ -1384,6 +1390,7 @@ E.g. this.region = region_attribute_name
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+    convert: `Convert '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
     schemaSummary: 'Schema summary',
