@@ -55,7 +55,10 @@ const afterNodeDefUpdate = async (
   { survey, nodeDef = null, nodeDefsDependentsUuids = [], nodeDefsUpdated = {} },
   client = db
 ) => {
-  const allUpdatedNodeDefs = { ...(nodeDef ? { [nodeDef.uuid]: nodeDef } : nodeDefsUpdated) }
+  const allUpdatedNodeDefs = { ...nodeDefsUpdated }
+  if (nodeDef && !allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)]) {
+    allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)] = nodeDef
+  }
   const updatedNodeDefsNotDeleted = ObjectUtils.toUuidIndexedObj(
     Object.values(allUpdatedNodeDefs).filter((def) => !NodeDef.isDeleted(def))
   )

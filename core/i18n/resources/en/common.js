@@ -1651,7 +1651,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
-      recordKeyMissing: 'Missing value for key attribute "{{keyName}}"',
+      recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 
