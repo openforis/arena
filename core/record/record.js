@@ -99,3 +99,8 @@ export const { deleteNode } = RecordUpdater
 // ====== VALIDATION
 export const { mergeNodeValidations } = RecordUpdater
 export const { getValidation } = Validation
+
+// ====== RECORD SUMMARY
+export const getFilesCount = R.prop(keys.filesCount)
+export const getFilesSize = R.prop(keys.filesSize)
+export const getFilesMissing = R.prop(keys.filesMissing)
