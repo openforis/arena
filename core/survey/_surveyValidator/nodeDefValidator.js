@@ -181,7 +181,7 @@ const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.layout}.${NodeDefLayout.keys.columnWidth}`]: [validateColumnWidth({ survey })],
   // Decimal
   [`${keys.props}.${propKeys.maxNumberDecimalDigits}`]: [
-    Validator.validatePositiveNumber(Validation.messageKeys.invalidNumber),
+    Validator.validatePositiveOrZeroNumber(Validation.messageKeys.invalidNumber),
   ],
   // Code
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
