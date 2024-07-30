@@ -141,11 +141,40 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   return ObjectUtils.toUuidIndexedObj(nodesReloadedArray)
 }
 
+const _groupNodesByFlags = (nodesArray) =>
+  nodesArray.reduce(
+    (acc, node) => {
+      if (Node.isCreated(node) && !Node.getId(node)) {
+        acc.nodesInserted.push(node)
+      } else if (Node.isDeleted(node)) {
+        acc.nodesDeleted.push(node)
+      } else {
+        acc.nodesUpdated.push(node)
+      }
+      return acc
+    },
+    { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
+  )
+
+const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
+  const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
+
+  if (nodesInserted.length) {
+    await NodeRepository.insertNodesInBatch({ surveyId, nodes: nodesInserted }, tx)
+  }
+  if (nodesUpdated.length) {
+    await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
+  }
+  if (nodesDeleted.length) {
+    await NodeRepository.deleteNodesByUuids(surveyId, nodesDeleted.map(Node.getUuid), tx)
+  }
+}
+
 export const updateNodesDependents = async (
   { survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
   tx
 ) => {
-  const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
+  const { record: recordUpdatedDependents, nodes: allNodesUpdated } = Record.updateNodesDependents({
     survey,
     record,
     nodes,
@@ -157,20 +186,22 @@ export const updateNodesDependents = async (
   let recordUpdated = recordUpdatedDependents
 
   // persist updates in batch
-  if (persistNodes && !R.isEmpty(nodesUpdated)) {
-    const nodesArray = Object.values(nodesUpdated)
+  if (persistNodes && !R.isEmpty(allNodesUpdated)) {
+    const nodesArray = Object.values(allNodesUpdated)
     const surveyId = Survey.getId(survey)
-    await NodeRepository.updateNodes({ surveyId, nodes: nodesArray }, tx)
+
+    await _persistNodes({ surveyId, nodesArray }, tx)
 
     // reload nodes to get nodes ref data
-    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: nodesUpdated }, tx)
-    Object.assign(nodesUpdated, nodesReloaded)
+    const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: allNodesUpdated }, tx)
+
+    Object.assign(allNodesUpdated, nodesReloaded)
     recordUpdated = Record.mergeNodes(nodesReloaded)(recordUpdated)
   }
 
   return {
     record: recordUpdated,
-    nodes: nodesUpdated,
+    nodes: allNodesUpdated,
   }
 }
 
