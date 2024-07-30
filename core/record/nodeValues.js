@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { CategoryItems, DateFormats, Dates, Objects } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
@@ -75,7 +73,11 @@ const valueComparatorByNodeDefType = {
     })
     return itemUuidSearch && itemUuid && itemUuidSearch === itemUuid
   },
-  [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
+  [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => {
+    const { x: xA, y: yA, srs: srsA } = value
+    const { x: xB, y: yB, srs: srsB } = valueSearch
+    return Number(xA) === Number(xB) && Number(yA) === Number(yB) && srsA === srsB
+  },
   [NodeDef.nodeDefType.date]: dateTimeComparator({
     formatsSource: [DateFormats.dateDisplay, DateFormats.dateStorage],
     formatTo: DateFormats.dateStorage,

@@ -21,6 +21,8 @@ const valueFormattersByType = {
     }
     return code
   },
+  [NodeDef.nodeDefType.coordinate]: ({ value }) => [value.x, value.y, value.srs].join(', '),
+
   [NodeDef.nodeDefType.date]: ({ value }) =>
     DateUtils.convertDate({
       dateStr: value,
