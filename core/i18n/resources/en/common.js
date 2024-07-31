@@ -575,6 +575,8 @@ $t(common.cantUndoWarning)`,
     errorLoadingRecord: 'Error loading record: {{details}}',
     recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
+    lockEdit: 'Lock edit',
+    unlockEdit: 'Unlock edit',
   },
 
   dataExplorerView: {
