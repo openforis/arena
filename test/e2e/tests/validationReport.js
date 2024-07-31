@@ -5,7 +5,7 @@ import { records } from '../mock/records'
 import { gotoFormPage, selectForm } from './_formDesigner'
 import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
-import { gotoRecord, unlockRecordEdit } from './_records'
+import { gotoRecord } from './_records'
 import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
@@ -67,8 +67,7 @@ const expectMessages = (messages) => {
 
 const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecords()
-  gotoRecord(record)
-  unlockRecordEdit()
+  gotoRecord({ record, unlock: true })
   enterAttribute(attribute, value)
   // eslint-disable-next-line no-param-reassign
   record[attribute.name] = value
@@ -121,7 +120,7 @@ export default () =>
 
     describe(`Invalidate record ${cluster_id.name} ${record1[cluster_id.name]}`, () => {
       gotoRecords()
-      gotoRecord(record1)
+      gotoRecord({ record: record1, unlock: true })
       enterAttribute(cluster_id, '')
       gotoFormPage(plot)
       selectForm({ nodeDef: plot, keyNodeDef: plot_id, keyValue: record1[plot_id.name] })
@@ -176,7 +175,7 @@ export default () =>
 
     describe(`Verify non relevant nodes validation is cleared`, () => {
       gotoRecords()
-      gotoRecord(record1)
+      gotoRecord({ record: record1, unlock: true })
       enterAttribute(cluster_id, '')
       waitThread()
 

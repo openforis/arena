@@ -43,7 +43,7 @@ const RecordEntryButtons = () => {
       {canEdit && (
         <Button
           iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
-          label={`recordView.${recordEditLocked ? 'unlockEdit' : 'lockEdit'}`}
+          label={`recordView.${recordEditLocked ? 'unlock' : 'lock'}`}
           onClick={() => dispatch(RecordActions.toggleEditLock)}
           testId={TestId.record.editLockToggleBtn}
           variant="text"
