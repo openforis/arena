@@ -20,3 +20,9 @@ export const gotoRecord = (record) => {
     ])
   })
 }
+
+export const unlockRecordEdit = () => {
+  test('Unlock record edit', async () => {
+    await page.click(getSelector(TestId.record.editLockToggleBtn))
+  })
+}

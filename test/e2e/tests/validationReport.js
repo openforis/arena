@@ -5,7 +5,7 @@ import { records } from '../mock/records'
 import { gotoFormPage, selectForm } from './_formDesigner'
 import { gotoHome, gotoRecords, gotoValidationReport } from './_navigation'
 import { enterAttribute, getTreeSelector } from './_record'
-import { gotoRecord } from './_records'
+import { gotoRecord, unlockRecordEdit } from './_records'
 import { expectNoItems } from './_tables'
 
 const DUPLICATE_VALUE = 'Duplicate value'
@@ -68,6 +68,7 @@ const expectMessages = (messages) => {
 const gotoRecordAndEnterValue = (record, attribute, value) => {
   gotoRecords()
   gotoRecord(record)
+  unlockRecordEdit()
   enterAttribute(attribute, value)
   // eslint-disable-next-line no-param-reassign
   record[attribute.name] = value

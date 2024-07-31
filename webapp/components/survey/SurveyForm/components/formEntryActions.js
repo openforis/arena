@@ -45,6 +45,7 @@ const RecordEntryButtons = () => {
           iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
           label={`recordView.${recordEditLocked ? 'unlockEdit' : 'lockEdit'}`}
           onClick={() => dispatch(RecordActions.toggleEditLock)}
+          testId={TestId.record.editLockToggleBtn}
           variant="text"
         />
       )}
