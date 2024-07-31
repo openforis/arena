@@ -27,5 +27,5 @@ Record.propTypes = {
   locked: PropTypes.bool,
   noHeader: PropTypes.bool,
   pageNodeUuid: PropTypes.string,
-  recordUuid: PropTypes.string.isRequired,
+  recordUuid: PropTypes.string,
 }
