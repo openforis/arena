@@ -87,7 +87,3 @@ NodeDefEntitySelectorDialog.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
 }
-
-NodeDefEntitySelectorDialog.defaultProps = {
-  canSelectCurrentEntity: true,
-}
