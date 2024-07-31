@@ -1,11 +1,13 @@
 import * as R from 'ramda'
 
-import * as DbUtils from '@server/db/dbUtils'
-import * as NodeDef from '@core/survey/nodeDef'
-import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-server'
 import { Objects } from '@openforis/arena-core'
+import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-server'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as ServerDB from '@server/db'
+import * as DbUtils from '@server/db/dbUtils'
+
+const { getSchemaSurvey } = Schemata
 
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
@@ -52,7 +54,7 @@ const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, vir
 export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
   client.one(
     `
-    INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    INSERT INTO ${getSchemaSurvey(surveyId)}.node_def 
       (parent_uuid, uuid, type, props_draft, props_advanced_draft, meta, analysis, virtual)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`,
@@ -70,7 +72,7 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
   )
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
-  const schema = Schemata.getSchemaSurvey(surveyId)
+  const schema = getSchemaSurvey(surveyId)
 
   return client.none(
     DbUtils.insertAllQuery(
@@ -115,7 +117,7 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
   client.one(
     `
     SELECT COUNT(*)
-    FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    FROM ${getSchemaSurvey(surveyId)}.node_def
     WHERE TRUE
     ${!draft ? " AND props <> '{}'::jsonb" : ''}`,
     {},
@@ -129,7 +131,7 @@ export const fetchNodeDefsBySurveyId = async (
   client.map(
     `
     SELECT ${nodeDefSelectFields}
-    FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    FROM ${getSchemaSurvey(surveyId)}.node_def 
     WHERE TRUE
       ${
         cycle
@@ -148,7 +150,7 @@ export const fetchNodeDefsBySurveyId = async (
 export const fetchRootNodeDef = async (surveyId, draft, client = DB) =>
   client.one(
     `SELECT ${nodeDefSelectFields}
-     FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+     FROM ${getSchemaSurvey(surveyId)}.node_def 
      WHERE parent_uuid IS NULL`,
     [],
     (row) => dbTransformCallback({ row, draft })
@@ -157,7 +159,7 @@ export const fetchRootNodeDef = async (surveyId, draft, client = DB) =>
 export const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = DB) =>
   client.one(
     `SELECT ${nodeDefSelectFields}
-     FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+     FROM ${getSchemaSurvey(surveyId)}.node_def 
      WHERE uuid = $1`,
     [nodeDefUuid],
     (row) => dbTransformCallback({ row, draft, advanced })
@@ -167,7 +169,7 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = D
   client.map(
     `
     SELECT ${nodeDefSelectFields}
-    FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    FROM ${getSchemaSurvey(surveyId)}.node_def 
     WHERE parent_uuid = $1
     AND deleted IS NOT TRUE
     ORDER BY id`,
@@ -179,7 +181,7 @@ const fetchAreaBasedEstimateNodeDefsOf = async (surveyId, nodeDefUuid, draft, cl
   client.map(
     `
     SELECT ${nodeDefSelectFields}
-    FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    FROM ${getSchemaSurvey(surveyId)}.node_def 
     WHERE 
     (props_advanced || props_advanced_draft) ->> '${NodeDef.keysPropsAdvanced.areaBasedEstimatedOf}' = $1
     AND deleted IS NOT TRUE`,
@@ -191,7 +193,7 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
   client.map(
     `
     SELECT ${nodeDefSelectFields}
-    FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    FROM ${getSchemaSurvey(surveyId)}.node_def 
     WHERE deleted IS NOT TRUE
     AND parent_uuid = $1
     AND ${DbUtils.getPropColCombined('key', draft)} = $2
@@ -208,7 +210,7 @@ export const updateNodeDefProps = async (
 ) =>
   client.one(
     `
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
         props_advanced_draft = props_advanced_draft || $2::jsonb,
         parent_uuid = $3,
@@ -223,7 +225,7 @@ export const updateNodeDefProps = async (
 
 export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
   client.tx(async (tx) => {
-    const schema = Schemata.getSchemaSurvey(surveyId)
+    const schema = getSchemaSurvey(surveyId)
     const nodedefsUpdated = await tx.batch(
       nodeDefs.map(async (nodeDef) => {
         const { nodeDefUuid, props = {}, propsAdvanced = {} } = nodeDef
@@ -251,7 +253,7 @@ export const updateNodeDefTypeAndProps = async (
 ) =>
   client.one(
     `
-      UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+      UPDATE ${getSchemaSurvey(surveyId)}.node_def 
       SET 
           type = $1,
           props_draft = $2::jsonb,
@@ -270,7 +272,7 @@ const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycle
   const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
   await client.query(
     `
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || jsonb_build_object(${cycles
       .map((c) => `'${c}', ${layoutCycleStartPath}`)
       .join(', ')}), TRUE)
@@ -285,7 +287,7 @@ export const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = D
   // Add cycle to prop cycles
   await client.query(
     `
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{cycles}', (props || props_draft)->'cycles' || $1)
     WHERE (props || props_draft)->'cycles' @> $2
   `,
@@ -298,7 +300,7 @@ export const addNodeDefsCycles = async (surveyId, cycleStart, cycles, client = D
 export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, client = DB) =>
   client.query(
     `
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') ${cycles
       .map((c) => `- '${c}'`)
       .join(' ')})
@@ -311,7 +313,7 @@ export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, 
 export const deleteNodeDefsCycles = async (surveyId, cycles, client = DB) => {
   // Delete cycles from props
   await client.query(`
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{cycles}', ((props || props_draft)->'cycles') ${cycles
       .map((c) => `- '${c}'`)
       .join(' ')})
@@ -323,7 +325,7 @@ export const deleteNodeDefsCycles = async (surveyId, cycles, client = DB) => {
 export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = DB) =>
   client.query(
     `
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
     SET props_draft = jsonb_set(props_draft, '{cycles}', jsonb_build_array($1:csv))
     WHERE analysis
   `,
@@ -334,7 +336,7 @@ export const updateNodeDefAnalysisCycles = async (surveyId, cycleKeys, client = 
 export const publishNodeDefsProps = async (surveyId, client = DB) =>
   client.query(`
     UPDATE
-      ${Schemata.getSchemaSurvey(surveyId)}.node_def
+      ${getSchemaSurvey(surveyId)}.node_def
     SET
       props = props || props_draft,
       props_draft = '{}'::jsonb,
@@ -346,7 +348,7 @@ export const publishNodeDefsProps = async (surveyId, client = DB) =>
 export const unpublishNodeDefsProps = async (surveyId, client = DB) =>
   client.query(`
   UPDATE
-    ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    ${getSchemaSurvey(surveyId)}.node_def
   SET
     props_draft = props || props_draft,
     props = '{}'::jsonb,
@@ -359,7 +361,7 @@ export const unpublishNodeDefsProps = async (surveyId, client = DB) =>
 export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => {
   const nodeDef = await client.one(
     `
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def 
     SET deleted = true
     WHERE uuid = $1
     RETURNING ${nodeDefSelectFields}
@@ -388,7 +390,7 @@ export const permanentlyDeleteNodeDefs = async (surveyId, client = DB) =>
   client.query(`
         DELETE
         FROM
-          ${Schemata.getSchemaSurvey(surveyId)}.node_def
+          ${getSchemaSurvey(surveyId)}.node_def
         WHERE
           deleted = true
     `)
@@ -397,7 +399,7 @@ export const deleteOrphaneNodeDefs = async (surveyId, client = DB) =>
   client.query(`
         DELETE
         FROM
-          ${Schemata.getSchemaSurvey(surveyId)}.node_def
+          ${getSchemaSurvey(surveyId)}.node_def
         WHERE
           analysis = true AND (
             parent_uuid IS NULL 
@@ -405,14 +407,14 @@ export const deleteOrphaneNodeDefs = async (surveyId, client = DB) =>
             ((props_advanced || props_advanced_draft) ->> '${
               NodeDef.keysPropsAdvanced.areaBasedEstimatedOf
             }')::uuid NOT IN (
-              SELECT uuid FROM ${Schemata.getSchemaSurvey(surveyId)}.node_def
+              SELECT uuid FROM ${getSchemaSurvey(surveyId)}.node_def
             )
           )
       `)
 
 export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
   client.query(`
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
     SET deleted = true
     WHERE
       jsonb_array_length(${DbUtils.getPropColCombined(NodeDef.propKeys.cycles, true, '', false)}) = 0
@@ -420,7 +422,7 @@ export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
 
 const _deleteNodeDefsProp = async (surveyId, deletePath, client = DB) =>
   client.none(`
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.node_def 
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def 
     SET props = props #- '{${deletePath.join(',')}}'
   `)
 
@@ -431,7 +433,7 @@ export const deleteNodeDefsDescriptions = async (surveyId, langCode, client = DB
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
 export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = DB) => {
-  const schema = Schemata.getSchemaSurvey(surveyId)
+  const schema = getSchemaSurvey(surveyId)
 
   await client.query(`
     WITH
