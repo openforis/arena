@@ -21,6 +21,7 @@ import {
   requireRecordEditPermission,
   requireRecordListExportPermission,
   requireRecordListViewPermission,
+  requireRecordStepEditPermission,
   requireRecordViewPermission,
   requireRecordsEditPermission,
   requireRecordsExportPermission,
@@ -292,7 +293,7 @@ export const init = (app) => {
   // ==== UPDATE
 
   // RECORD promote / demote
-  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordStepEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, step } = Request.getParams(req)
       const user = Request.getUser(req)
