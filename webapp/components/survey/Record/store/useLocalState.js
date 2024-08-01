@@ -9,6 +9,7 @@ import * as Survey from '@core/survey/survey'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/hooks'
 
@@ -21,6 +22,7 @@ export const useLocalState = (props) => {
   } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const i18n = useI18n()
 
   const { recordUuid: recordUuidUrlParam } = useParams()
 
@@ -68,7 +70,12 @@ export const useLocalState = (props) => {
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.applicationError,
-    eventHandler: useCallback(({ key, params }) => dispatch(RecordActions.applicationError(navigate, key, params)), []),
+    eventHandler: useCallback(
+      ({ key, params }) => {
+        dispatch(RecordActions.applicationError({ i18n, navigate, key, params }))
+      },
+      [dispatch, i18n, navigate]
+    ),
   })
 
   const onComponentUnload = () => {
