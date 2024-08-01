@@ -68,7 +68,7 @@ export const CoordinateAttributePopUp = (props) => {
   const lang = useSurveyPreferredLang()
 
   const [open, setOpen] = useState(false)
-  const [whishDataLoading, setWhispDataLoading] = useState(false)
+  const [whispDataLoading, setWhispDataLoading] = useState(false)
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
   // fetch altitude and record owner name only when popup is open
@@ -173,7 +173,7 @@ export const CoordinateAttributePopUp = (props) => {
             />
             <Button
               className="whisp-btn"
-              disabled={whishDataLoading}
+              disabled={whispDataLoading}
               label="mapView.whisp"
               iconAlt="Whisp"
               iconHeight={25}
