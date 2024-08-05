@@ -5,6 +5,7 @@ import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import circleToPolygon from 'circle-to-polygon'
 import L from 'leaflet'
+import axios from 'axios'
 
 import { Objects, PointFactory } from '@openforis/arena-core'
 
@@ -17,7 +18,7 @@ import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
-import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang, useSurveyInfo, useSurveyId } from '@webapp/store/survey'
 import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
@@ -48,6 +49,10 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   return pathParts.join(' -> ')
 }
 
+const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
+
+const getWhispDataDownloadUrl = (token) => `https://whisp.openforis.org/api/download-csv/${token}`
+
 export const CoordinateAttributePopUp = (props) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
 
@@ -59,9 +64,11 @@ export const CoordinateAttributePopUp = (props) => {
   const surveyInfo = useSurveyInfo()
 
   const survey = useSurvey()
+  const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
 
   const [open, setOpen] = useState(false)
+  const [whispDataLoading, setWhispDataLoading] = useState(false)
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
   // fetch altitude and record owner name only when popup is open
@@ -87,26 +94,41 @@ export const CoordinateAttributePopUp = (props) => {
     () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
     [ancestorsKeys, attributeDef, lang, survey]
   )
-  const onEarthMapButtonClick = useCallback(() => {
-    let geojson
+
+  const getGeoJson = useCallback(() => {
     if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
       const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
       if (isCircle) {
         const radius = SamplingPolygon.getRadius(surveyInfo)
-        geojson = circleToPolygon([longitude, latitude], radius)
+        return circleToPolygon([longitude, latitude], radius)
       } else {
         const bounds = SamplingPolygon.getBounds(surveyInfo, latitude, longitude)
-        geojson = L.rectangle(bounds).toGeoJSON()
+        return L.rectangle(bounds).toGeoJSON()
       }
     } else {
       // default 100mx100m square
       const bounds = SamplingPolygon.generateBounds({ latitude, longitude })
-      geojson = L.rectangle(bounds).toGeoJSON()
+      return L.rectangle(bounds).toGeoJSON()
     }
+  }, [latitude, longitude, surveyInfo])
+
+  const onEarthMapButtonClick = useCallback(() => {
+    const geojson = getGeoJson()
     Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
-    const earthMapUrl = 'https://earthmap.org/?aoi=global&polygon=' + JSON.stringify(geojson)
+    const earthMapUrl = getEarthMapUrl(geojson)
     window.open(earthMapUrl, 'EarthMap')
-  }, [latitude, longitude, path, surveyInfo])
+  }, [getGeoJson, path])
+
+  const onWhispButtonClick = useCallback(async () => {
+    setWhispDataLoading(true)
+    const geojson = getGeoJson()
+    const url = `/api/survey/${surveyId}/geo/whisp/geojson/csv`
+    axios.post(url, geojson).then(({ data: token }) => {
+      const csvDownloadUrl = getWhispDataDownloadUrl(token)
+      setWhispDataLoading(false)
+      window.open(csvDownloadUrl, 'Whisp')
+    })
+  }, [getGeoJson, surveyId])
 
   const content = `**${path}**
 * **X**: ${point.x}
@@ -140,10 +162,27 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <Button className="earth-map-btn" size="small" onClick={onEarthMapButtonClick} variant="outlined">
-              <img src="/img/of_earth_map_icon_small.png" alt="Earth Map" />
-              {i18n.t('mapView.openInEarthMap')}
-            </Button>
+            <Button
+              className="earth-map-btn"
+              iconAlt="Earth Map"
+              iconSrc="/img/of_earth_map_icon_small.png"
+              label="mapView.earthMap"
+              size="small"
+              onClick={onEarthMapButtonClick}
+              variant="outlined"
+            />
+            <Button
+              className="whisp-btn"
+              disabled={whispDataLoading}
+              label="mapView.whisp"
+              iconAlt="Whisp"
+              iconHeight={25}
+              iconSrc="/img/of_whisp_icon.svg"
+              iconWidth={25}
+              onClick={onWhispButtonClick}
+              size="small"
+              variant="outlined"
+            />
           </div>
         </div>
       </div>
