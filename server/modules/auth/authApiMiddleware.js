@@ -110,10 +110,9 @@ export const requireRecordListViewPermission = requireSurveyPermission(Authorize
 export const requireRecordListExportPermission = requireSurveyPermission(Authorizer.canExportRecordsList)
 export const requireRecordCreatePermission = requireSurveyPermission(Authorizer.canCreateRecord)
 export const requireRecordEditPermission = requireRecordPermission(Authorizer.canEditRecord)
+export const requireRecordOwnerChangePermission = requireRecordPermission(Authorizer.canChangeRecordOwner)
+export const requireRecordStepEditPermission = requireRecordPermission(Authorizer.canChangeRecordStep)
 export const requireRecordsEditPermission = requireRecordsPermission(Authorizer.canEditRecord)
-export const requireRecordStepEditPermission = requireRecordPermission((user, record) =>
-  Authorizer.canEditRecord(user, record, true)
-)
 export const requireRecordViewPermission = requireSurveyPermission(Authorizer.canViewRecord)
 export const requireRecordAnalysisPermission = requireSurveyPermission(Authorizer.canAnalyzeRecords)
 export const requireRecordsExportPermission = requireSurveyPermission(Authorizer.canExportRecords)
