@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import * as A from '@core/arena'
 
 import * as Node from '@core/record/node'
 import * as Survey from '@core/survey/survey'
@@ -21,6 +20,9 @@ import TaxonomyList from '@webapp/components/survey/TaxonomyList'
 import TaxonomyDetails from '@webapp/components/survey/TaxonomyDetails'
 import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/ButtonMetaItemAdd'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { useTaxonomyByUuid } from '@webapp/store/survey/hooks'
+
+import { TaxonomySelector } from '../TaxonomySelector'
 
 import { State } from './store'
 
@@ -44,8 +46,7 @@ const TaxonProps = (props) => {
   const validation = State.getValidation(state)
   const canUpdateTaxonomy = !NodeDef.isPublished(nodeDef) || Survey.isTemplate(surveyInfo)
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-
-  const [taxonomy, setTaxonomy] = useState({})
+  const taxonomy = useTaxonomyByUuid(taxonomyUuid)
   const [showTaxonomiesPanel, setShowTaxonomiesPanel] = useState(false)
   const [taxonomyToEdit, setTaxonomyToEdit] = useState(null)
 
@@ -54,19 +55,6 @@ const TaxonProps = (props) => {
       Actions.setProp({ state, key: NodeDef.propKeys.taxonomyUuid, value: Taxonomy.getUuid(taxonomySelected) }),
     [Actions, state]
   )
-
-  const itemsLookupFunction = async (value) => API.fetchTaxonomies({ surveyId, search: value })
-
-  useEffect(() => {
-    ;(async () => {
-      if (!A.isEmpty(taxonomyUuid)) {
-        const taxonomySelected = await API.fetchTaxonomy({ surveyId, taxonomyUuid })
-        setTaxonomy(taxonomySelected)
-      } else {
-        setTaxonomy(null)
-      }
-    })()
-  }, [taxonomyUuid, showTaxonomiesPanel, surveyId])
 
   const onTaxonomyEditPanelClose = useCallback(async () => {
     const taxonomyEditedUuid = taxonomyToEdit.uuid
@@ -91,22 +79,22 @@ const TaxonProps = (props) => {
     <>
       <FormItem label={i18n.t('taxonomy.header')}>
         <div className="taxonomy-selector">
-          <Dropdown
-            items={itemsLookupFunction}
-            itemValue="uuid"
-            itemLabel={Taxonomy.getName}
-            validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
-            selection={taxonomy}
+          <TaxonomySelector
             disabled={!canUpdateTaxonomy}
             onChange={onTaxonomySelect}
+            selectedTaxonomyUuid={taxonomyUuid}
             testId={TestId.nodeDefDetails.taxonomySelector}
+            validation={Validation.getFieldValidation(NodeDef.propKeys.taxonomyUuid)(validation)}
           />
-          {taxonomy && <ButtonIconEdit onClick={() => setTaxonomyToEdit(taxonomy)} size="small" showLabel />}
+          {taxonomy && (
+            <ButtonIconEdit onClick={() => setTaxonomyToEdit(taxonomy)} size="small" showLabel variant="outlined" />
+          )}
 
           <ButtonMetaItemAdd
             id={TestId.nodeDefDetails.taxonomySelectorAddBtn}
             onAdd={setTaxonomyToEdit}
             metaItemType={metaItemTypes.taxonomy}
+            variant="outlined"
           />
           <ButtonManage size="small" onClick={() => setShowTaxonomiesPanel(true)} />
         </div>

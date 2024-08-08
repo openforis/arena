@@ -41,6 +41,7 @@ const ExpressionNode = (props) => {
     node.type === Expression.types.ThisExpression
       ? { type: Expression.types.Identifier, name: Expression.thisVariable }
       : node
+
   const componentFn = componentFns[componentNode.type]
   const component = componentFn(componentNode)
 

@@ -83,6 +83,7 @@ Please check also the Spam/Junk mail folder.`,
     formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
+    function: 'Function',
     goToHomePage: 'Go to Home Page',
     group: 'Group',
     help: 'Help',
@@ -159,6 +160,7 @@ Do you want to proceed?`,
     samplingPolygon: 'Sampling Polygon',
     show: 'Show',
     select: 'Select',
+    selectOne: 'Select one...',
     selectAll: 'Select all',
     selected: 'Selected',
     showLabels: 'Show labels',
@@ -174,6 +176,7 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
+    value: 'Value',
     view: 'View',
     warning: 'Warning',
     warning_plural: 'Warnings',
@@ -1231,6 +1234,7 @@ $t(common.appNameFull)
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
+      isNotEmpty: 'Returns true if the argument has some value specified',
       last: 'Returns the last value or node of the specified multiple attribute or entity',
       ln: 'Take the natural logarithm of x',
       log10: 'Take the base 10 logarithm of x',
@@ -1239,12 +1243,16 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Raise a number X to the power P',
+      rowIndex: 'Gives the current row index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
+    },
+    functionName: {
+      rowIndex: 'Row index',
     },
     basicProps: {
       analysis: 'Analysis',
@@ -1368,6 +1376,8 @@ E.g. this.region = region_attribute_name
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
     nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
+    filterVariable: 'Variable to filter items',
+    filterVariableForLevel: 'Variable for {{levelName}}',
   },
 
   languagesEditor: {
@@ -1829,9 +1839,15 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
+    call: 'Function',
+
+    error: {
+      selectOneVariable: 'Please select one variable',
+    },
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
+      editingFunctionForNodeDefinition: 'Editing function "{{functionName}}" for "{{nodeDef}}"',
     },
 
     qualifier: {

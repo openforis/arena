@@ -11,9 +11,12 @@ import EditButtons from './editButtons'
 const Binary = (props) => {
   const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, variables } = props
 
-  const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
+  const leftOperand = R.prop(BinaryOperandType.left)(node)
+  const leftOperandType = Expression.getType(leftOperand)
 
-  const showOperator = !isLeftLiteral
+  const showOperator = node.operator || ![Expression.types.Literal].includes(leftOperandType)
+
+  const binaryOperator = showOperator ? Expression.operators.findBinary(node.operator) : null
 
   const createOperand = (type) => (
     <BinaryOperand
@@ -39,8 +42,8 @@ const Binary = (props) => {
           <Dropdown
             className="operator"
             items={Expression.operators.binaryValues}
-            selection={Expression.operators.findBinary(node.operator)}
-            onChange={(item) => onChange(R.assoc('operator', R.propOr('', 'value', item), node))}
+            selection={binaryOperator}
+            onChange={(item) => onChange(R.assoc('operator', item?.value ?? '', node))}
           />
 
           {createOperand(BinaryOperandType.right)}

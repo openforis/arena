@@ -54,3 +54,4 @@ export const assocExtraPropsDefs = (extraPropsDefs) => (taxonomy) =>
 // UTILS
 export const isEmpty = (taxonomy) =>
   StringUtils.isBlank(Taxonomy.getName(taxonomy)) && R.isEmpty(Taxonomy.getDescriptions(taxonomy))
+export const hasExtraDefs = (taxonomy) => getExtraPropKeys(taxonomy).length > 0

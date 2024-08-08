@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { Objects } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 export const useDropdown = ({
@@ -100,15 +101,17 @@ export const useDropdown = ({
   )
 
   const onChange = useCallback(
-    async (selection) => {
-      const options = multiple ? selection : [selection]
-      const items = options.map(getItemFromOption)
-      const paramToPass = multiple ? items : items[0]
-      if (!onBeforeChange || (await onBeforeChange(paramToPass))) {
-        onChangeProp(paramToPass)
+    async (dropdownSelection) => {
+      const selectedOptions = multiple ? dropdownSelection : [dropdownSelection]
+      const selectedItems = selectedOptions.map(getItemFromOption)
+      const selectionNext = multiple ? selectedItems : selectedItems[0]
+      if (Objects.isEqual(selection, selectionNext)) return
+
+      if (!onBeforeChange || (await onBeforeChange(selectionNext))) {
+        onChangeProp(selectionNext)
       }
     },
-    [getItemFromOption, multiple, onBeforeChange, onChangeProp]
+    [getItemFromOption, multiple, onBeforeChange, onChangeProp, selection]
   )
 
   const onInputChange = useCallback(

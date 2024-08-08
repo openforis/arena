@@ -16,6 +16,7 @@ const functionExamples = {
     [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
     [Expression.functionNames.index]: `index(node_name), index(this), index($context), index(parent(this))`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
+    [Expression.functionNames.isNotEmpty]: `isNotEmpty(attribute_name) = true/false`,
     [Expression.functionNames.last]:
       'last(multiple_entity_name).entity_attribute_name, last(multiple_attribute_name), ...',
     [Expression.functionNames.ln]: 'ln(10) = 2.302…',

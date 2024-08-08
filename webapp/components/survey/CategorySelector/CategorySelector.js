@@ -124,6 +124,7 @@ export const CategorySelector = (props) => {
           id={TestId.categorySelector.addCategoryBtn}
           onAdd={setCategoryToEdit}
           metaItemType={metaItemTypes.category}
+          variant="outlined"
         />
       )}
       {showManage && <ButtonManage size="small" onClick={() => setShowCategoriesPanel(true)} />}

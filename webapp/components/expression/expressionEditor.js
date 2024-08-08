@@ -25,6 +25,7 @@ const ExpressionEditor = (props) => {
     excludeCurrentNodeDef,
     mode,
     isContextParent,
+    canBeCall,
     canBeConstant,
     isBoolean,
     onChange,
@@ -70,6 +71,7 @@ const ExpressionEditor = (props) => {
           excludeCurrentNodeDef={excludeCurrentNodeDef}
           mode={mode}
           isContextParent={isContextParent}
+          canBeCall={canBeCall}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
           onClose={onClose}
@@ -108,6 +110,7 @@ ExpressionEditor.propTypes = {
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
@@ -123,6 +126,7 @@ ExpressionEditor.defaultProps = {
   mode: Expression.modes.json,
   types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   isContextParent: false,
+  canBeCall: false,
   canBeConstant: false,
   isBoolean: true,
 

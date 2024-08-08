@@ -47,15 +47,17 @@ export const { isValid } = ExpressionUtils
 
 // ====== Type checking
 
+export const getType = R.prop('type')
 const isType = (type) => R.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
 export const isValidExpressionType = (nodeDef) => !NodeDef.isFile(nodeDef)
 
-export const isLiteral = isType(types.Literal)
-export const isCompound = isType(types.Compound)
 export const isBinary = isType(types.BinaryExpression)
+export const isCall = isType(types.CallExpression)
+export const isCompound = isType(types.Compound)
 export const isIdentifier = isType(types.Identifier)
+export const isLiteral = isType(types.Literal)
 export const isSequence = isType(types.SequenceExpression)
 export const isThis = isType(types.ThisExpression)
 
@@ -64,7 +66,7 @@ export const isThis = isType(types.ThisExpression)
 export const newLiteral = (value = null) => ({
   type: types.Literal,
   value,
-  raw: value || '',
+  raw: value ?? '',
 })
 
 export const newIdentifier = (value = '') => ({
@@ -77,4 +79,18 @@ export const newBinary = ({ left, right, operator = '' }) => ({
   operator,
   left,
   right,
+})
+
+export const newBinaryEmpty = ({ canBeConstant, exprQuery = null }) => {
+  let left = exprQuery
+  if (isCompound(exprQuery)) {
+    left = canBeConstant ? newLiteral() : newIdentifier()
+  }
+  return newBinary({ left, right: newLiteral() })
+}
+
+export const newCall = ({ callee, params = [] } = {}) => ({
+  type: types.CallExpression,
+  callee: newLiteral(callee),
+  arguments: params,
 })
