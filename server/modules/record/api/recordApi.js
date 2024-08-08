@@ -21,6 +21,7 @@ import {
   requireRecordEditPermission,
   requireRecordListExportPermission,
   requireRecordListViewPermission,
+  requireRecordOwnerChangePermission,
   requireRecordStepEditPermission,
   requireRecordViewPermission,
   requireRecordsEditPermission,
@@ -349,7 +350,7 @@ export const init = (app) => {
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordEditPermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordOwnerChangePermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, ownerUuid } = Request.getParams(req)
       const user = Request.getUser(req)
