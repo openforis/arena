@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
 import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -15,6 +16,7 @@ import {
   useNodeDefLabelType,
   useNodeDefPage,
   useShowPageNavigation,
+  useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
@@ -43,6 +45,7 @@ const FormHeader = (props) => {
   const showPageNavigation = useShowPageNavigation()
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
+  const treeViewMode = useTreeSelectViewMode()
 
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
@@ -73,7 +76,7 @@ const FormHeader = (props) => {
           <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
         </Button>
 
-        {edit && canEditDef && (
+        {edit && canEditDef && treeViewMode === TreeSelectViewMode.onlyPages && (
           <Button
             iconClassName="icon-plus icon-12px"
             label="surveyForm.subPage"

@@ -1,4 +1,4 @@
-import './EntitySelectorTree.scss'
+import './NodeDefTreeSelect.scss'
 
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -6,10 +6,20 @@ import classNames from 'classnames'
 
 import { Button } from '@webapp/components/buttons'
 import { TreeView } from '@webapp/components/TreeView'
-import { useEntitySelectorTree } from './useEntitySelectorTree'
+import { useNodeDefTreeSelect } from './useNodeDefTreeSelect'
 
-const EntitySelectorTree = (props) => {
-  const { getLabelSuffix, isDisabled, nodeDefLabelType, nodeDefUuidActive, onlyEntities, onlyPages, onSelect } = props
+const NodeDefTreeSelect = (props) => {
+  const {
+    getLabelSuffix = () => '',
+    isDisabled = () => false,
+    nodeDefLabelType = null,
+    nodeDefUuidActive = null,
+    includeMultipleAttributes = false,
+    includeSingleAttributes = false,
+    includeSingleEntities = false,
+    onlyPages = false,
+    onSelect,
+  } = props
 
   const {
     expanded,
@@ -19,18 +29,20 @@ const EntitySelectorTree = (props) => {
     setExpandedNodeDefUuids,
     toggleExpanded,
     treeItems,
-  } = useEntitySelectorTree({
+  } = useNodeDefTreeSelect({
     getLabelSuffix,
     isDisabled,
     nodeDefLabelType,
     nodeDefUuidActive,
-    onlyEntities,
+    includeMultipleAttributes,
+    includeSingleAttributes,
+    includeSingleEntities,
     onlyPages,
     onSelect,
   })
 
   return (
-    <div className="entity-selector-tree">
+    <div className="nodedef-tree-select">
       <div className="display-flex">
         <Button
           className="btn-toggle btn-expand"
@@ -56,23 +68,16 @@ const EntitySelectorTree = (props) => {
   )
 }
 
-EntitySelectorTree.propTypes = {
+NodeDefTreeSelect.propTypes = {
   getLabelSuffix: PropTypes.func,
   isDisabled: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidActive: PropTypes.string,
-  onlyEntities: PropTypes.bool,
+  includeMultipleAttributes: PropTypes.bool,
+  includeSingleAttributes: PropTypes.bool,
+  includeSingleEntities: PropTypes.bool,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
 }
 
-EntitySelectorTree.defaultProps = {
-  getLabelSuffix: () => '',
-  isDisabled: () => false,
-  nodeDefLabelType: null,
-  nodeDefUuidActive: null,
-  onlyEntities: true,
-  onlyPages: false,
-}
-
-export { EntitySelectorTree }
+export { NodeDefTreeSelect }

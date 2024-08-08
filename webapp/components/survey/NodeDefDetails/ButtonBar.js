@@ -9,9 +9,11 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { Button, ButtonDelete } from '@webapp/components/buttons'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { useIsEditingNodeDefInFullScreen, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 import { State } from './store'
+import { TreeSelectViewMode } from '@webapp/model'
 
 const ButtonBar = (props) => {
   const { state, Actions } = props
@@ -22,6 +24,9 @@ const ButtonBar = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
+  const editingNodeDefInFullScreen = useIsEditingNodeDefInFullScreen()
+  const treeSelectViewMode = useTreeSelectViewMode()
+  const viewModeAllNodeDefs = treeSelectViewMode === TreeSelectViewMode.allNodeDefs
 
   const previousDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: -1 })
   const nextDefUuid = Actions.getSiblingNodeDefUuid({ state, offset: 1 })
@@ -29,10 +34,10 @@ const ButtonBar = (props) => {
   const saveDisabled = !dirty || StringUtils.isBlank(NodeDef.getName(nodeDef))
 
   const canNavigateNodeDefs =
-    !NodeDef.isRoot(nodeDef) &&
+    (!NodeDef.isRoot(nodeDef) || viewModeAllNodeDefs) &&
     !NodeDef.isTemporary(nodeDef) &&
     !NodeDef.isAnalysis(nodeDef) &&
-    !(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef))
+    (!(NodeDef.isEntity(nodeDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(nodeDef)) || viewModeAllNodeDefs)
 
   return (
     <div className="button-bar">
@@ -46,21 +51,34 @@ const ButtonBar = (props) => {
           disabled={!previousDefUuid}
         />
       )}
-      <Button
-        className="btn-cancel"
-        testId={TestId.nodeDefDetails.backBtn}
-        onClick={() => Actions.cancelEdits({ state })}
-        label={dirty ? 'common.cancel' : 'common.back'}
-        variant={dirty ? 'outlined' : 'contained'}
-      />
-      <Button
-        className="btn-primary"
-        testId={TestId.nodeDefDetails.saveAndBackBtn}
-        onClick={() => Actions.saveEdits({ state, goBackOnEnd: true })}
-        disabled={saveDisabled}
-        iconClassName="icon-floppy-disk icon-12px"
-        label="common.saveAndBack"
-      />
+      {editingNodeDefInFullScreen && (
+        <>
+          <Button
+            className="btn-cancel"
+            testId={TestId.nodeDefDetails.backBtn}
+            onClick={() => Actions.cancelEdits({ state })}
+            label={dirty ? 'common.cancel' : 'common.back'}
+            variant={dirty ? 'outlined' : 'contained'}
+          />
+          <Button
+            className="btn-primary"
+            testId={TestId.nodeDefDetails.saveAndBackBtn}
+            onClick={() => Actions.saveEdits({ state, goBackOnEnd: true })}
+            disabled={saveDisabled}
+            iconClassName="icon-floppy-disk icon-12px"
+            label="common.saveAndBack"
+          />
+        </>
+      )}
+      {!editingNodeDefInFullScreen && dirty && (
+        <Button
+          className="btn-cancel"
+          testId={TestId.nodeDefDetails.backBtn}
+          onClick={() => Actions.cancelEdits({ state })}
+          label="common.cancel"
+          variant="outlined"
+        />
+      )}
       <Button
         className="btn-primary"
         testId={TestId.nodeDefDetails.saveBtn}

@@ -23,14 +23,14 @@ const Row = (props) => {
   return (
     <>
       <div>{rowNo}</div>
-      <div className="full-width">{nodeDefPath}</div>
+      <div className="width100">{nodeDefPath}</div>
       <div>
         {typeIcon}
         {typeLabel}
       </div>
-      <div className="full-width">{CollectImportReportItem.getExpression(row)}</div>
-      <div className="full-width">{CollectImportReportItem.getApplyIf(row)}</div>
-      <div className="full-width">
+      <div className="width100">{CollectImportReportItem.getExpression(row)}</div>
+      <div className="width100">{CollectImportReportItem.getApplyIf(row)}</div>
+      <div className="width100">
         <LabelsEditor
           labels={CollectImportReportItem.getMessages(row)}
           readOnly

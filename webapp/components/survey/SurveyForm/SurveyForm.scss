@@ -71,30 +71,29 @@
   }
 }
 
-// entity-selector-tree
+// nodedef-tree-select
 .survey-form {
   .survey-form__sidebar {
     height: 100%;
     position: relative;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 
-    .entity-selector-tree {
-      position: absolute;
-      height: 100%;
-      width: 100%;
+    .nodedef-tree-select {
+      flex: 1;
       border: $formBorder;
       background-color: $white;
     }
 
-    .survey-form__page-edit-buttons {
-      position: absolute;
-      bottom: 0;
-      right: 18px;
+    .sidebar-bottom-bar {
+      width: 100%;
+      justify-content: space-between;
     }
   }
 
   &.edit {
-    .entity-selector-tree {
+    .nodedef-tree-select {
       border: $formBorderEdit;
     }
   }

@@ -4,6 +4,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
+import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecord } from '@webapp/store/ui/record'
 import { useNodeDefLabelType, usePagesUuidMap } from '@webapp/store/ui/surveyForm'
@@ -31,7 +32,9 @@ const getNodeDefAvailableChildren = ({
   nodeDef,
   record,
   onlyPages,
-  onlyEntities,
+  includeMultipleAttributes,
+  includeSingleAttributes,
+  includeSingleEntities,
   isDisabled,
 }) => {
   const pageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getUuid(nodeDef) })
@@ -43,18 +46,33 @@ const getNodeDefAvailableChildren = ({
     parentPageNode &&
     !isPageVisible({ cycle, record, pageNodeDef: nodeDef, parentNode: parentPageNode })
 
-  const childrenPageDefs = onlyPages
-    ? Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
-    : Survey.getNodeDefDescendantsInSingleEntities({
-        cycle,
-        nodeDef,
-        sorted: true,
-        filterFn: onlyEntities ? NodeDef.isMultipleEntity : NodeDef.isMultiple,
-      })(survey)
+  let children = null
+  if (onlyPages) {
+    children = Survey.getNodeDefChildrenInOwnPage({ nodeDef, cycle })(survey)
+  } else if (includeSingleEntities) {
+    children = Survey.getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
+  } else {
+    children = Survey.getNodeDefDescendantsInSingleEntities({
+      cycle,
+      nodeDef,
+      sorted: true,
+    })(survey)
+  }
+  const childrenFiltered = children.filter((nodeDef) => {
+    const multiple = NodeDef.isMultiple(nodeDef)
+    if (multiple) {
+      return NodeDef.isEntity(nodeDef) || includeMultipleAttributes
+    } else {
+      return (
+        (includeSingleEntities && NodeDef.isEntity(nodeDef)) ||
+        (includeSingleAttributes && NodeDef.isAttribute(nodeDef))
+      )
+    }
+  })
 
   const visibleChildren = pageNode
-    ? childrenPageDefs.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
-    : childrenPageDefs
+    ? childrenFiltered.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
+    : childrenFiltered
 
   return visibleChildren.filter((childDef) => !isDisabled(childDef) && !hidden)
 }
@@ -63,7 +81,9 @@ export const useBuildTreeData = ({
   nodeDefLabelType: nodeDefLabelTypeProp,
   getLabelSuffix,
   onlyPages,
-  onlyEntities,
+  includeMultipleAttributes,
+  includeSingleAttributes,
+  includeSingleEntities,
   isDisabled,
 }) => {
   const survey = useSurvey()
@@ -73,6 +93,7 @@ export const useBuildTreeData = ({
   const pagesUuidMap = usePagesUuidMap()
   const nodeDefLabelTypeInStore = useNodeDefLabelType()
   const nodeDefLabelType = nodeDefLabelTypeProp ?? nodeDefLabelTypeInStore
+  const showIcons = includeSingleAttributes
 
   const stack = []
 
@@ -84,6 +105,7 @@ export const useBuildTreeData = ({
     const suffix = getLabelSuffix(nodeDef)
     return {
       key: NodeDef.getUuid(nodeDef),
+      icon: showIcons ? NodeDefUIProps.getIconByNodeDef(nodeDef, true) : undefined,
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
     }
@@ -113,7 +135,9 @@ export const useBuildTreeData = ({
       nodeDef,
       record,
       onlyPages,
-      onlyEntities,
+      includeMultipleAttributes,
+      includeSingleAttributes,
+      includeSingleEntities,
       isDisabled,
     })
     if (children.length > 0) {

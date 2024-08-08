@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { NodeDefsActions } from '@webapp/store/survey'
+import { useIsEditingNodeDefInFullScreen } from '@webapp/store/ui/surveyForm'
 
 import { State } from '../state'
 
 export const useCancelEdits = ({ setState }) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const editingNodeDefInFullScreen = useIsEditingNodeDefInFullScreen()
 
   const cancelEdits =
     ({ state }) =>
@@ -17,7 +19,11 @@ export const useCancelEdits = ({ setState }) => {
       const nodeDef = State.getNodeDef(state)
       const nodeDefOriginal = State.getNodeDefOriginal(state)
 
-      await setState(State.reset)
+      if (editingNodeDefInFullScreen) {
+        await setState(State.reset)
+      } else {
+        setState((statePrev) => State.create({ nodeDef: nodeDefOriginal, validation: State.getValidation(statePrev) }))
+      }
 
       await dispatch(NodeDefsActions.cancelEdit({ nodeDef, nodeDefOriginal }))
     }
@@ -30,7 +36,7 @@ export const useCancelEdits = ({ setState }) => {
             .then(() => {
               if (onCancel) {
                 onCancel({ state })
-              } else {
+              } else if (editingNodeDefInFullScreen) {
                 // go back by default
                 navigate(-1)
               }
@@ -50,6 +56,6 @@ export const useCancelEdits = ({ setState }) => {
           _cancel()
         }
       }),
-    []
+    [editingNodeDefInFullScreen]
   )
 }

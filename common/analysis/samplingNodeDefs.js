@@ -84,8 +84,8 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   const chainUuid = Chain.getUuid(chain)
   const cycleKeys = Survey.getCycleKeys(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const descentants = Survey.getDescendantsAndSelf({ nodeDef: baseUnitNodeDef })(survey)
-  const descendantEntities = descentants.filter(
+  const descendants = Survey.getNodeDefDescendantsAndSelf({ nodeDef: baseUnitNodeDef })(survey)
+  const descendantEntities = descendants.filter(
     (descendantEntity) =>
       NodeDef.isEntity(descendantEntity) && (NodeDef.isMultiple(descendantEntity) || NodeDef.isRoot(descendantEntity))
   )
