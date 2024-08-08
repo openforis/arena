@@ -18,6 +18,7 @@ export const useLocalState = (props) => {
     pageNodeUuid: pageNodeUuidProp,
     pageNodeDefUuid: pageNodeDefUuidProp,
     noHeader: noHeaderProp = false,
+    locked: lockedProp = false,
   } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -28,6 +29,7 @@ export const useLocalState = (props) => {
     pageNodeUuid: pageNodeUuidUrlParam,
     pageNodeDefUuid: pageNodeDefUuidUrlParam,
     noHeader: noHeaderUrlParam,
+    locked: lockedUrlParam,
   } = useQuery()
 
   const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
@@ -42,8 +44,9 @@ export const useLocalState = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
 
   const record = useSelector(RecordState.getRecord)
+  const recordEditLocked = useSelector(RecordState.isRecordEditLocked)
   const recordLoadError = useSelector(RecordState.getRecordLoadError)
-  const editable = useAuthCanEditRecord(record)
+  const editable = useAuthCanEditRecord(record) && !recordEditLocked
 
   // Add websocket event listeners
   useOnWebSocketEvent({
@@ -83,7 +86,16 @@ export const useLocalState = (props) => {
     // when previewing a survey or when the survey has been imported from Collect and not published,
     // record must be checked in as draft
     const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }))
+    dispatch(
+      RecordActions.checkInRecord({
+        recordUuid,
+        draft,
+        pageNodeUuid,
+        pageNodeDefUuid,
+        noHeader,
+        locked: lockedUrlParam || lockedProp,
+      })
+    )
 
     // Add beforeunload event listener
     window.addEventListener('beforeunload', onComponentUnload)
