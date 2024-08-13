@@ -175,6 +175,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     search = null,
     recordUuids = null,
     includePreview = false,
+    includeMerged = false,
   },
   client = db
 ) => {
@@ -203,6 +204,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const recordsSelectWhereConditions = []
   if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
+  if (includeMerged) recordsSelectWhereConditions.push('r.merged_into_record_uuid IS NOT NULL')
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
   if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
@@ -221,6 +223,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       r.cycle,
       r.step, 
       r.preview, 
+      r.merged_into_record_uuid, 
       ${DbUtils.selectDate('r.date_created', 'date_created')}, 
       ${DbUtils.selectDate('r.date_modified', 'date_modified')},
       r.validation,
@@ -409,7 +412,7 @@ export const updateValidation = async (surveyId, recordUuid, validation, client 
     `UPDATE ${getSchemaSurvey(surveyId)}.record 
      SET validation = $1::jsonb
      WHERE uuid = $2
-    RETURNING ${recordSelectFields}`,
+     RETURNING ${recordSelectFields}`,
     [validation, recordUuid]
   )
 
@@ -429,6 +432,16 @@ export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }, cli
       SET owner_uuid = $/ownerUuid/
       WHERE uuid = $/recordUuid/`,
     { recordUuid, ownerUuid }
+  )
+
+export const updateRecordMergedInto = async ({ surveyId, recordUuid, mergedIntoRecordUuid }, client = db) =>
+  client.one(
+    `
+      UPDATE ${getSchemaSurvey(surveyId)}.record
+      SET merged_into_record_uuid = $/mergedIntoRecordUuid/
+      WHERE uuid = $/recordUuid/
+      RETURNING ${recordSelectFields}`,
+    { recordUuid, mergedIntoRecordUuid }
   )
 
 export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid }, client = db) =>

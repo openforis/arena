@@ -774,6 +774,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       merge: {
         label: 'Merge',
         confirmLabel: 'Confirm merge',
+        performedSuccessfullyMessage: 'Records merge performed successfully!',
         previewTitle: 'Merging preview (record {{keyValues}})',
       },
       noRecordsAdded: 'No records added',

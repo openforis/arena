@@ -26,6 +26,7 @@ import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { db } from '@server/db/db'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -35,6 +36,9 @@ import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMe
 import RecordsCloneJob from './recordsCloneJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
+import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
+import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
+import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -414,26 +418,68 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
+const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
+  const surveyId = Survey.getId(survey)
 
-export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUuid, dryRun = false }) => {
-  const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid })
-  const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid })
+  const nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
+  const nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
+  const nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
 
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-    surveyId,
-    advanced: true,
-    includeBigCategories: false,
-    includeBigTaxonomies: false,
-  })
+  if (nodesArray.length === 0) return
 
-  const { record: recordTargetUpdated } = await Record.mergeRecords({
-    survey,
-    recordSource,
-    sideEffect: true,
-  })(recordTarget)
-
-  if (!dryRun) {
-    // TODO store merged record
+  for await (const node of nodesArray) {
+    if (Node.isDeleted(node)) {
+      await nodesDeleteBatchPersister.addItem(node)
+    } else if (Node.isCreated(node)) {
+      await nodesInsertBatchPersister.addItem(node)
+    } else if (Node.isUpdated(node)) {
+      await nodesUpdateBatchPersister.addItem(node)
+    }
   }
-  return { record: recordTargetUpdated }
+  await nodesDeleteBatchPersister.flush()
+  await nodesInsertBatchPersister.flush()
+  await nodesUpdateBatchPersister.flush()
+
+  await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
 }
+
+export const mergeRecords = async (
+  { user, surveyId, sourceRecordUuid, targetRecordUuid, dryRun = false },
+  client = db
+) =>
+  client.tx(async (tx) => {
+    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid }, tx)
+    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid }, tx)
+
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      {
+        surveyId,
+        advanced: true,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+      },
+      tx
+    )
+
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
+      survey,
+      recordSource,
+      sideEffect: true,
+    })(recordTarget)
+
+    if (!dryRun) {
+      const nodesArray = Object.values(nodesUpdated)
+
+      await persistRecordNodes({ user, survey, record: recordTargetUpdated, nodesArray }, tx)
+
+      await RecordManager.updateRecordMergedInto(
+        {
+          surveyId,
+          recordUuid: sourceRecordUuid,
+          mergedIntoRecordUuid: targetRecordUuid,
+        },
+        tx
+      )
+    }
+    return { record: recordTargetUpdated }
+  })

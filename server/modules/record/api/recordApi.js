@@ -364,8 +364,10 @@ export const init = (app) => {
   app.post('/survey/:surveyId/records/merge', requireRecordViewPermission, async (req, res, next) => {
     try {
       const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       const { record } = await RecordService.mergeRecords({
+        user,
         surveyId,
         sourceRecordUuid,
         targetRecordUuid,
