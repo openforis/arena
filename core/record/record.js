@@ -41,6 +41,7 @@ export const isInAnalysisStep = (record) => {
   return RecordStep.getName(step) === RecordStep.stepNames.analysis
 }
 export const getCycle = R.prop(keys.cycle)
+export const getMergedIntoRecordUuid = R.prop(keys.mergedIntoRecordUuid)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
 export const getInfo = R.propOr({}, keys.info)

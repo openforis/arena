@@ -65,9 +65,9 @@ export const insertRecord = async (surveyId, record, client = db) => {
   return client.one(
     `
     INSERT INTO ${getSchemaSurvey(surveyId)}.record 
-    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified, info)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $10)
+    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified, info, merged_into_record_uuid)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $11)
     `,
     [
       Record.getOwnerUuid(record),
@@ -79,6 +79,7 @@ export const insertRecord = async (surveyId, record, client = db) => {
       Dates.formatForStorage(Record.getDateCreated(record) || now),
       Dates.formatForStorage(Record.getDateModified(record) || now),
       Record.getInfo(record),
+      Record.getMergedIntoRecordUuid(record),
       surveyId,
     ],
     dbTransformCallback(surveyId)
