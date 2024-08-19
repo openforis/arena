@@ -21,6 +21,7 @@ import i18n from '@core/i18n/i18nFactory'
 import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as JobManager from '@server/job/jobManager'
 import * as CSVWriter from '@server/utils/file/csvWriter'
 import * as Response from '@server/utils/response'
@@ -480,6 +481,7 @@ export const mergeRecords = async (
         },
         tx
       )
+      await SurveyRdbManager.deleteRowsByRecordUuid({ survey, recordUuid: sourceRecordUuid }, tx)
     }
     return { record: recordTargetUpdated }
   })

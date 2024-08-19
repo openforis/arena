@@ -34,7 +34,7 @@ const tableName = 'record'
 
 const selectFieldDateCreated = DbUtils.selectDate('date_created')
 const selectFieldDateModified = DbUtils.selectDate('date_modified')
-const recordSelectFields = `uuid, owner_uuid, step, cycle, ${selectFieldDateCreated}, ${selectFieldDateModified}, preview, validation`
+const recordSelectFields = `uuid, owner_uuid, step, cycle, ${selectFieldDateCreated}, ${selectFieldDateModified}, merged_into_record_uuid, preview, validation`
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -204,7 +204,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const recordsSelectWhereConditions = []
   if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
-  if (includeMerged) recordsSelectWhereConditions.push('r.merged_into_record_uuid IS NOT NULL')
+  recordsSelectWhereConditions.push(`r.merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
   if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
