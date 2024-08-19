@@ -18,6 +18,12 @@ export const keys = {
   codeShown: 'codeShown', // Boolean: true if the code of the category item should be shown, false otherwise
 }
 
+export const commonAttributeKeys = [
+  keys.hiddenWhenNotRelevant,
+  keys.hiddenInMobile,
+  keys.includedInMultipleEntitySummary,
+]
+
 export const renderType = {
   // Entity
   form: 'form',

@@ -22,7 +22,7 @@ export const FormItem = (props) => {
 
 FormItem.propTypes = {
   className: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   info: PropTypes.string,
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   required: PropTypes.bool,

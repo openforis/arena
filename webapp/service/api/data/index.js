@@ -86,13 +86,13 @@ export const startDataImportFromArenaJob = async ({
   return job
 }
 
-export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle }) => {
-  const params = new URLSearchParams({ nodeDefUuid, cycle })
+export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle, includeFiles }) => {
+  const params = new URLSearchParams({ nodeDefUuid, cycle, includeFiles })
   return `/api/survey/${surveyId}/data-import/csv/template?${params.toString()}`
 }
 
-export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle }) => {
-  const params = new URLSearchParams({ cycle })
+export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle, includeFiles }) => {
+  const params = new URLSearchParams({ cycle, includeFiles })
   return `/api/survey/${surveyId}/data-import/csv/templates?${params.toString()}`
 }
 

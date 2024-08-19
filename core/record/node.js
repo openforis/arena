@@ -247,6 +247,10 @@ export const getDateModified = R.prop(keys.dateModified)
 // File
 export const getFileName = _getValuePropRaw(valuePropsFile.fileName, '')
 export const getFileUuid = _getValuePropRaw(valuePropsFile.fileUuid)
+export const newNodeValueFile = ({ fileUuid, fileName }) => ({
+  [valuePropsFile.fileUuid]: fileUuid,
+  [valuePropsFile.fileName]: fileName,
+})
 
 // Taxon
 export const getTaxonUuid = _getValuePropRaw(valuePropsTaxon.taxonUuid)

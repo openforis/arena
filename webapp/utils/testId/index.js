@@ -131,6 +131,7 @@ export const TestId = {
     closeBtn: 'panel-right-close-btn',
   },
   record: {
+    editLockToggleBtn: 'record-edit-lock-toggle-btn',
     invalidBtn: 'record-invalid-btn',
     deleteBtn: 'record-delete-btn',
   },

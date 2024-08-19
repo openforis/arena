@@ -15,6 +15,7 @@ export const type = {
   nodeDefCreate: 'nodeDefCreate',
   nodeDefUpdate: 'nodeDefUpdate',
   nodeDefMarkDeleted: 'nodeDefMarkDeleted',
+  nodeDefConversion: 'nodeDefConversion',
 
   // Category
   categoryInsert: 'categoryInsert',

@@ -21,11 +21,16 @@ const actionHandlers = {
 
   // Record updates
   [RecordActions.recordCreate]: (state, { record }) => RecordState.assocRecord(record)(state),
-  [RecordActions.recordLoad]: (state, { record, noHeader }) =>
-    A.pipe(RecordState.assocRecord(record), RecordState.assocNoHeader(noHeader))(state),
+  [RecordActions.recordLoad]: (state, { record, noHeader, locked }) =>
+    A.pipe(
+      RecordState.assocRecord(record),
+      RecordState.assocNoHeader(noHeader),
+      RecordState.assocRecordEditLocked(locked)
+    )(state),
   [RecordActions.recordLoadError]: (state, { error }) => RecordState.assocRecordLoadError(error)(state),
   [RecordActions.recordDelete]: (state) => RecordState.assocRecord(null)(state),
   [RecordActions.recordCheckedOut]: RecordState.reset,
+  [RecordActions.recordEditLock]: (state, { locked }) => RecordState.assocRecordEditLocked(locked)(state),
 
   // Node updates
   [RecordActions.nodesUpdate]: (state, { nodes }) => RecordState.mergeRecordNodes(nodes)(state),

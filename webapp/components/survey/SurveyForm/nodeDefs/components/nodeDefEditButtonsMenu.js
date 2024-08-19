@@ -9,25 +9,26 @@ import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
+import { NodeDefConversionDialog } from './nodeDefConversionDialog'
 
-const actions = {
+const actionsWithEntitySelection = {
   clone: 'clone',
   move: 'move',
 }
 
 const iconByAction = {
-  [actions.clone]: 'icon-copy',
-  [actions.move]: 'icon-arrow-up-right2',
+  [actionsWithEntitySelection.clone]: 'icon-copy',
+  [actionsWithEntitySelection.move]: 'icon-arrow-up-right2',
 }
 
 const isEntitySelectableByAction = {
-  [actions.clone]: () => true,
-  [actions.move]: ({ entityDefUuid, nodeDef }) => entityDefUuid !== NodeDef.getParentUuid(nodeDef),
+  [actionsWithEntitySelection.clone]: () => true,
+  [actionsWithEntitySelection.move]: ({ entityDefUuid, nodeDef }) => entityDefUuid !== NodeDef.getParentUuid(nodeDef),
 }
 
 const availabilityByAction = {
-  [actions.clone]: () => true,
-  [actions.move]: ({ nodeDef }) => !NodeDef.isPublished(nodeDef),
+  [actionsWithEntitySelection.clone]: () => true,
+  [actionsWithEntitySelection.move]: ({ nodeDef }) => !NodeDef.isPublished(nodeDef),
 }
 
 export const NodeDefEditButtonsMenu = (props) => {
@@ -38,16 +39,19 @@ export const NodeDefEditButtonsMenu = (props) => {
 
   const lang = useSurveyPreferredLang()
   const [state, setState] = useState({
-    entitySelectDialogOpen: false,
     action: null,
+    entitySelectDialogOpen: false,
+    conversionDialogOpen: false,
   })
 
-  const { entitySelectDialogOpen, action } = state
+  const { entitySelectDialogOpen, conversionDialogOpen, action } = state
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   const openEntitySelectDialog = useCallback(
-    (action) => () => setState((statePrev) => ({ ...statePrev, entitySelectDialogOpen: true, action })),
+    (action) => () => {
+      setState((statePrev) => ({ ...statePrev, entitySelectDialogOpen: true, action }))
+    },
     []
   )
 
@@ -55,11 +59,19 @@ export const NodeDefEditButtonsMenu = (props) => {
     setState((statePrev) => ({ ...statePrev, entitySelectDialogOpen: false, action: null }))
   }, [])
 
+  const openConvertIntoDialog = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, conversionDialogOpen: true }))
+  }, [])
+
+  const closeConversionDialog = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, conversionDialogOpen: false }))
+  }, [])
+
   const entitySelectConfirmByAction = useMemo(
     () => ({
-      [actions.clone]: ({ entityDefUuid }) =>
+      [actionsWithEntitySelection.clone]: ({ entityDefUuid }) =>
         dispatch(NodeDefsActions.cloneNodeDefIntoEntityDef({ nodeDef, nodeDefParentUuid: entityDefUuid, navigate })),
-      [actions.move]: ({ entityDefUuid }) =>
+      [actionsWithEntitySelection.move]: ({ entityDefUuid }) =>
         dispatch(
           NodeDefsActions.moveNodeDef({
             nodeDefUuid: NodeDef.getUuid(nodeDef),
@@ -81,26 +93,43 @@ export const NodeDefEditButtonsMenu = (props) => {
 
   const menuItems = useMemo(() => {
     const _menuItems = []
-    // items with entity selection (clone or move actions)
     if (NodeDef.isAttribute(nodeDef)) {
-      _menuItems.push(
-        ...Object.keys(actions)
-          .filter((action) => availabilityByAction[action]({ nodeDef }))
-          .map((action) => ({
-            key: `node-${action}`,
-            content: (
-              <Button
-                iconClassName={iconByAction[action]}
-                label={`surveyForm.${action}`}
-                labelParams={{ nodeDefLabel }}
-                onClick={openEntitySelectDialog(action)}
-                onMouseDown={(e) => e.stopPropagation()}
-                size="small"
-                variant="text"
-              />
-            ),
-          }))
+      // items with entity selection (clone or move actions)
+      const availableActions = Object.keys(actionsWithEntitySelection).filter((action) =>
+        availabilityByAction[action]({ nodeDef })
       )
+      _menuItems.push(
+        ...availableActions.map((action) => ({
+          key: `node-${action}`,
+          content: (
+            <Button
+              iconClassName={iconByAction[action]}
+              label={`surveyForm.${action}`}
+              labelParams={{ nodeDefLabel }}
+              onClick={openEntitySelectDialog(action)}
+              onMouseDown={(e) => e.stopPropagation()}
+              size="small"
+              variant="text"
+            />
+          ),
+        }))
+      )
+      if (!NodeDef.isPublished(nodeDef)) {
+        _menuItems.push({
+          key: 'node-convert',
+          content: (
+            <Button
+              iconClassName="icon-loop2 icon-12px"
+              label="surveyForm.convert"
+              labelParams={{ nodeDefLabel }}
+              onClick={openConvertIntoDialog}
+              onMouseDown={(e) => e.stopPropagation()}
+              size="small"
+              variant="text"
+            />
+          ),
+        })
+      }
     }
     // delete action
     if (!NodeDef.isRoot(nodeDef)) {
@@ -120,7 +149,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       })
     }
     return _menuItems
-  }, [dispatch, nodeDef, nodeDefLabel, openEntitySelectDialog])
+  }, [dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog])
 
   if (menuItems.length === 0) return null
 
@@ -138,6 +167,7 @@ export const NodeDefEditButtonsMenu = (props) => {
           title={`nodeDefEdit.${action}Dialog.title`}
         />
       )}
+      {conversionDialogOpen && <NodeDefConversionDialog nodeDef={nodeDef} onClose={closeConversionDialog} />}
     </>
   )
 }

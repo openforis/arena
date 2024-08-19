@@ -54,7 +54,7 @@ export const ValidatorErrorKeys = {
     errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
     multipleRecordsMatchingKeys: 'validationErrors.dataImport.multipleRecordsMatchingKeys',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
-    recordKeyMissing: 'validationErrors.dataImport.recordKeyMissing',
+    recordKeyMissingOrInvalid: 'validationErrors.dataImport.recordKeyMissingOrInvalid',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },
 

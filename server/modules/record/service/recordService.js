@@ -77,7 +77,11 @@ export const {
 } = RecordManager
 
 export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
-  const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, cycle })
+  const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
+    surveyId,
+    cycle,
+    includeCounts: true,
+  })
 
   const valueFormattersByType = {
     [NodeDef.nodeDefType.date]: ({ value }) =>
@@ -110,6 +114,8 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
       }, {}),
       data_created: DateUtils.formatDateTimeExport(Record.getDateCreated(recordSummary)),
       date_modified: DateUtils.formatDateTimeExport(Record.getDateModified(recordSummary)),
+      files_count: Record.getFilesCount(recordSummary),
+      files_size: Record.getFilesSize(recordSummary),
       owner_name: Record.getOwnerName(recordSummary),
       errors: Validation.getErrorsCount(validation),
       warnings: Validation.getWarningsCount(validation),
@@ -122,10 +128,12 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
 
   const fields = [
     ...nodeDefKeys.flatMap((nodeDefKey) => NodeDefTable.getColumnNames(nodeDefKey)),
-    'step',
-    'owner_name',
     'data_created',
     'date_modified',
+    'files_count',
+    'files_size',
+    'owner_name',
+    'step',
     'errors',
     'warnings',
   ]

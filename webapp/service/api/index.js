@@ -64,6 +64,7 @@ export {
   startImportLabelsJob,
 } from './survey'
 export {
+  convertNodeDef,
   fetchNodeDef,
   fetchNodeDefs,
   moveNodeDef,

@@ -34,6 +34,7 @@ Do you want to ignore them?`,
     cnt: 'Count',
     code: 'Code',
     collapse: 'Collapse',
+    convert: 'Convert',
     copy: 'Copy',
     createdWithApp: `Created with {{app}}`,
     csvExport: 'CSV Export',
@@ -574,6 +575,8 @@ $t(common.cantUndoWarning)`,
     errorLoadingRecord: 'Error loading record: {{details}}',
     recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
+    lock: 'Lock',
+    unlock: 'Unlock',
   },
 
   dataExplorerView: {
@@ -668,6 +671,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       },
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
+        - {{processed}} rows processed
+        - {{insertedFiles}} files would be inserted
+        - {{updatedFiles}} files would be updated
+        - {{deletedFiles}} files would be deleted`,
+        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)
         - {{processed}} rows processed`,
         validationCompleteSuccessfully: `## Validation complete without errors
         - {{processed}} rows processed
@@ -844,9 +852,9 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     altitude: 'Altitude (m)',
+    earthMap: 'Earth Map',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
-    openInEarthMap: 'Open in Earth Map',
     options: {
       showLocationMarkers: 'Show location markers',
       showMarkersLabels: `Show markers' labels`,
@@ -862,6 +870,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
+    whisp: 'Whisp',
   },
 
   samplingPolygonOptions: {
@@ -1362,6 +1371,11 @@ E.g. this.region = region_attribute_name
       title: 'Cloning node definition "{{nodeDefName}}"',
       entitySelectLabel: 'Entity to clone into:',
     },
+    conversion: {
+      dialogTitle: 'Convert {{nodeDefName}} into another type',
+      fromType: 'From type',
+      toType: 'To type',
+    },
     moveDialog: {
       confirmButtonLabel: 'Move',
       title: 'Moving node definition "{{nodeDefName}}"',
@@ -1394,6 +1408,7 @@ E.g. this.region = region_attribute_name
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+    convert: `Convert '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
     schemaSummary: 'Schema summary',
@@ -1420,6 +1435,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
+      confirmConvert: 'Convert the attribute "{{name}}" into "{{toType}}"?',
       confirmDelete:
         'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },
@@ -1653,7 +1669,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
-      recordKeyMissing: 'Missing value for key attribute "{{keyName}}"',
+      recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 

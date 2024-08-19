@@ -13,6 +13,11 @@ export const keys = {
   step: 'step',
   surveyUuid: 'surveyUuid',
   uuid: ObjectUtils.keys.uuid,
+
+  // record summary
+  filesCount: 'filesCount',
+  filesSize: 'filesSize',
+  filesMissing: 'filesMissing',
 }
 
 export const infoKeys = {
