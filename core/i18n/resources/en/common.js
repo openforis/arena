@@ -759,9 +759,13 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
       confirmMergeSelectedRecords: `### Merge the selected records into one?
 
-- the newest one will be merged into the oldest one;
+- record "source" will be merged into record "target":
+  - source: [{{sourceRecordKeys}}], modified {{sourceRecordModifiedDate}};
+  - target: [{{targetRecordKeys}}], modified {{targetRecordModifiedDate}};
 
-- a preview of the result will be shown before merging is performed;`,
+- a preview of the result will be shown before merging is performed;
+
+- when merging will be confirmed, **the source record WILL BE DELETED**`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
       deleteRecord: 'Delete record',
