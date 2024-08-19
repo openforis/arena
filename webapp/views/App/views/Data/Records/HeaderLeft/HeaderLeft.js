@@ -151,10 +151,16 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const onMergeConfirm = useCallback(() => {
     closeMergePreviewModal()
-    const { sourceRecordUuid, targetRecordUuid } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
+    const { sourceRecord, targetRecord } = extractMergeSourceAndTargetRecordsFromSelectedRecords({
       selectedItems,
     })
-    dispatch(RecordActions.mergeRecords({ sourceRecordUuid, targetRecordUuid, onRecordsUpdate }))
+    dispatch(
+      RecordActions.mergeRecords({
+        sourceRecordUuid: Record.getUuid(sourceRecord),
+        targetRecordUuid: Record.getUuid(targetRecord),
+        onRecordsUpdate,
+      })
+    )
   }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
 
   return (
