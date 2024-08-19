@@ -490,6 +490,8 @@ export const mergeRecords = async (
         tx
       )
       await SurveyRdbManager.deleteRowsByRecordUuid({ survey, recordUuid: sourceRecordUuid }, tx)
+
+      await RecordManager.updateRecordDateModified({ surveyId, recordUuid: targetRecordUuid }, tx)
     }
     return { record: recordTargetUpdated }
   })
