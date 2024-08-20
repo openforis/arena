@@ -32,12 +32,14 @@ const SurveyInfo = () => {
     cycles,
     defaultCycleKey,
     descriptions,
+    fieldManualLinks,
     labels,
     languages,
     name,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     srs,
+    setFieldManualLinks,
     setName,
     setLanguages,
     setSrs,
@@ -83,6 +85,15 @@ const SurveyInfo = () => {
           languages={languages}
           labels={descriptions}
           onChange={setDescriptions}
+        />
+
+        <LabelsEditor
+          inputFieldIdPrefix={TestId.surveyInfo.surveyFieldManualLink()}
+          readOnly={readOnly}
+          formLabelKey="homeView.surveyInfo.fieldManualLink"
+          languages={languages}
+          labels={fieldManualLinks}
+          onChange={setFieldManualLinks}
         />
 
         <LanguagesEditor

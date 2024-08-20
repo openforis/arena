@@ -432,6 +432,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
       cycleForArenaMobile: 'Cycle for Arena Mobile',
+      fieldManualLink: 'Field manual link',
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
