@@ -94,6 +94,8 @@ const SurveyInfo = () => {
           languages={languages}
           labels={fieldManualLinks}
           onChange={setFieldManualLinks}
+          textTransformFunction={(link) => link.replaceAll(' ', '')}
+          validation={getFieldValidation(Survey.infoKeys.fieldManualLinks)}
         />
 
         <LanguagesEditor

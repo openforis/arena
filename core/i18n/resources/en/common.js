@@ -1681,6 +1681,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       cycleDateStartMandatory: 'Cycle start date is mandatory',
       cycleDateEndInvalid: 'Cycle end date is invalid',
       cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
+      fieldManualLinksInvalid: 'Field manual link is invalid',
     },
 
     surveyLabelsImport: {
