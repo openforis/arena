@@ -1,19 +1,20 @@
 import React from 'react'
-
-import * as NodeDef from '@core/survey/nodeDef'
+import PropTypes from 'prop-types'
 
 import { Modal, ModalBody } from '@webapp/components/modal'
 
 export const CallEditorDialog = (props) => {
-  const { children, functionName, nodeDef, onClose } = props
+  const { children, functionName, onClose } = props
 
   return (
-    <Modal
-      onClose={onClose}
-      title="nodeDefEdit.editingFunctionForNodeDefinition"
-      titleParams={{ functionName, nodeDef: NodeDef.getName(nodeDef) }}
-    >
+    <Modal onClose={onClose} showCloseButton title="nodeDefEdit.editingFunction" titleParams={{ functionName }}>
       <ModalBody>{children}</ModalBody>
     </Modal>
   )
+}
+
+CallEditorDialog.propTypes = {
+  children: PropTypes.node,
+  functionName: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
 }

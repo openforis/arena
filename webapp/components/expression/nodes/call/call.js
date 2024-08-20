@@ -14,6 +14,8 @@ import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
 import { CallTaxonPropEditor } from './callTaxonPropEditor'
+import { CallEditorDialog } from './callEditorDialog'
+import { ButtonIconEdit } from '@webapp/components/buttons'
 
 const complexFunctions = {
   rowIndex: {
@@ -22,7 +24,7 @@ const complexFunctions = {
   },
 }
 
-const getComplextFunctionNameByExpression = (exprString) => {
+const getComplexFunctionNameByExpression = (exprString) => {
   if (!exprString) return null
   return Object.keys(complexFunctions).find((key) => {
     const funcObj = complexFunctions[key]
@@ -73,13 +75,14 @@ const Call = (props) => {
 
   const nodeCallee = expressionNode?.callee?.name
   const exprString = expressionNode ? Expression.toString(expressionNode) : null
-  const complexFunctionName = getComplextFunctionNameByExpression(exprString)
+  const complexFunctionName = getComplexFunctionNameByExpression(exprString)
 
   const [state, setState] = useState({
     selectedFunctionKey: complexFunctionName ?? nodeCallee,
+    editDialogOpen: false,
   })
 
-  const { selectedFunctionKey } = state
+  const { selectedFunctionKey, editDialogOpen } = state
 
   const dropdownItems = useMemo(
     () =>
@@ -91,16 +94,20 @@ const Call = (props) => {
     [i18n]
   )
 
-  const onConfirm = useCallback((exprUpdated) => onChange(exprUpdated), [onChange])
+  const openEditDialog = useCallback(() => setState((statePrev) => ({ ...statePrev, editDialogOpen: true })), [])
+  const closeEditDialog = useCallback(() => setState((statePrev) => ({ ...statePrev, editDialogOpen: false })), [])
+
+  const onConfirm = useCallback(
+    (exprUpdated) => {
+      onChange(exprUpdated)
+      closeEditDialog()
+    },
+    [closeEditDialog, onChange]
+  )
 
   const onFunctionChange = useCallback(
     (item) => {
       const nextFunctionKey = item?.value
-
-      setState((statePrev) => ({
-        ...statePrev,
-        selectedFunctionKey: nextFunctionKey,
-      }))
 
       const { callee, component, exprString } = functions[nextFunctionKey] ?? {}
       let expressionNext = null
@@ -111,6 +118,12 @@ const Call = (props) => {
         expressionNext = Expression.newCall(newCallParams)
       }
       onChange(expressionNext)
+
+      setState((statePrev) => ({
+        ...statePrev,
+        selectedFunctionKey: nextFunctionKey,
+        editDialogOpen: !!component,
+      }))
     },
     [onChange]
   )
@@ -124,12 +137,17 @@ const Call = (props) => {
         className="function-dropdown"
         items={dropdownItems}
         onChange={onFunctionChange}
-        placeholder={i18n.t('common.selectOne')}
+        placeholder={i18n.t('expressionEditor.selectAFunction')}
         searchable={false}
         selection={selectedItem}
       />
-      {selectedFunctionComponent &&
-        React.createElement(selectedFunctionComponent, { expressionNode, onConfirm, variables })}
+      {selectedItem && selectedFunctionComponent && <ButtonIconEdit onClick={openEditDialog} />}
+      {editDialogOpen && (
+        <CallEditorDialog functionName={selectedItem.label} onClose={closeEditDialog}>
+          {selectedFunctionComponent &&
+            React.createElement(selectedFunctionComponent, { expressionNode, onConfirm, variables })}
+        </CallEditorDialog>
+      )}
     </div>
   )
 }

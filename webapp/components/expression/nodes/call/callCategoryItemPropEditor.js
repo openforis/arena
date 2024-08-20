@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as StringUtils from '@core/stringUtils'
 
 import { Button } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
@@ -88,7 +89,8 @@ export const CallCategoryItemPropEditor = (props) => {
   const i18n = useI18n()
   const survey = useSurvey()
 
-  const expressionArgumentsValues = expressionNode?.arguments?.map((arg) => arg.value ?? arg.name) ?? []
+  const expressionArgumentsValues =
+    expressionNode?.arguments?.map((arg) => arg.value ?? arg.name).map(StringUtils.unquote) ?? []
   const [initialCategoryName, initialCategoryPropKey, ...initialAttributeNames] = expressionArgumentsValues
 
   const initialCategory = useCategoryByName(initialCategoryName)

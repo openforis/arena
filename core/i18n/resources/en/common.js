@@ -1221,6 +1221,7 @@ $t(common.appNameFull)
     advanced: 'Advanced',
     validations: 'Validations',
     function: 'Function',
+    editingFunction: 'Editing function {{functionName}}',
     editorHelp: {
       json: 'Valid expressions are a subset of Javascript.',
       sql: 'Only valid SQL expressions are allowed.',
@@ -1840,6 +1841,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     var: 'Variable',
     const: 'Constant value',
     call: 'Function',
+    operator: 'Operator',
 
     error: {
       selectOneVariable: 'Please select one variable',
@@ -1857,6 +1859,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
     },
+
+    selectAFunction: 'Select a function',
   },
 
   // ====== Auth

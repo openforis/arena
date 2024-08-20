@@ -7,26 +7,28 @@
     .function-dropdown {
       width: 18rem;
     }
-    .function-editor {
+  }
+}
+
+.modal {
+  .function-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .form-item {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 30rem;
 
-      .form-item {
-        display: flex;
-
-        .form-label {
-          width: 10rem;
-        }
-        .dropdown-wrapper {
-          width: 20rem;
-        }
+      .form-label {
+        width: 10rem;
       }
-
-      .literal {
-        width: auto;
+      .dropdown-wrapper {
+        width: 20rem;
       }
+    }
+
+    .literal {
+      width: auto;
     }
   }
 }

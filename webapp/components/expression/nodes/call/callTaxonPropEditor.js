@@ -4,6 +4,7 @@ import { Strings } from '@openforis/arena-core'
 
 import * as Expression from '@core/expressionParser/expression'
 import * as Taxonomy from '@core/survey/taxonomy'
+import * as StringUtils from '@core/stringUtils'
 
 import { Button } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
@@ -29,7 +30,8 @@ export const CallTaxonPropEditor = (props) => {
 
   const i18n = useI18n()
 
-  const expressionArgumentsValues = expressionNode?.arguments?.map((arg) => arg.value ?? arg.name) ?? []
+  const expressionArgumentsValues =
+    expressionNode?.arguments?.map((arg) => arg.value ?? arg.name).map(StringUtils.unquote) ?? []
   const [initialTaxonomyName, initialExtraPropKey, initialIdentifierName] = expressionArgumentsValues
 
   const initialTaxonomy = useTaxonomyByName(initialTaxonomyName)
