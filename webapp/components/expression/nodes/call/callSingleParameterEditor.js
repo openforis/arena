@@ -2,12 +2,16 @@ import React, { useCallback, useState } from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
 
+import { FormItem } from '@webapp/components/form/Input'
+import { useI18n } from '@webapp/store/system'
+
 import Identifier from '../identifier'
 import { CallEditorPropTypes } from './callEditorPropTypes'
 
 export const CallSingleParameterEditor = (props) => {
   const { callee, expressionNode, onConfirm: onConfirmProp, variables, variablesFilterFn } = props
 
+  const i18n = useI18n()
   const initialIdentifierName = expressionNode?.arguments?.[0]?.name
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
 
@@ -34,12 +38,14 @@ export const CallSingleParameterEditor = (props) => {
   )
 
   return (
-    <Identifier
-      node={identifier}
-      onChange={onIdentifierChange}
-      variables={variables}
-      variablesFilterFn={variablesFilterFn}
-    />
+    <FormItem label={i18n.t('expressionEditor.var')}>
+      <Identifier
+        node={identifier}
+        onChange={onIdentifierChange}
+        variables={variables}
+        variablesFilterFn={variablesFilterFn}
+      />
+    </FormItem>
   )
 }
 
