@@ -575,6 +575,8 @@ $t(common.cantUndoWarning)`,
     errorLoadingRecord: 'Error loading record: {{details}}',
     recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
+    lock: 'Lock',
+    unlock: 'Unlock',
   },
 
   dataExplorerView: {
@@ -835,9 +837,9 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     altitude: 'Altitude (m)',
+    earthMap: 'Earth Map',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
-    openInEarthMap: 'Open in Earth Map',
     options: {
       showLocationMarkers: 'Show location markers',
       showMarkersLabels: `Show markers' labels`,
@@ -853,6 +855,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
+    whisp: 'Whisp',
   },
 
   samplingPolygonOptions: {

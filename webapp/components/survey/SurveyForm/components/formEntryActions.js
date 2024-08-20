@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 
@@ -8,8 +8,8 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
-import { RecordActions, useRecord } from '@webapp/store/ui/record'
+import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
@@ -25,6 +25,7 @@ const RecordEntryButtons = () => {
   const record = useRecord()
   const noHeader = useIsRecordViewWithoutHeader()
 
+  const recordEditLocked = useSelector(RecordState.isRecordEditLocked)
   const stepId = Record.getStep(record)
   const step = RecordStep.getStep(stepId)
   const stepNext = RecordStep.getNextStep(stepId)
@@ -33,11 +34,21 @@ const RecordEntryButtons = () => {
 
   const canPromote = useAuthCanPromoteRecord(record) && !noHeader
   const canDemote = useAuthCanDemoteRecord(record) && !noHeader
+  const canEdit = useAuthCanEditRecord(record)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 
   return (
     <>
+      {canEdit && (
+        <Button
+          iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
+          label={`recordView.${recordEditLocked ? 'unlock' : 'lock'}`}
+          onClick={() => dispatch(RecordActions.toggleEditLock)}
+          testId={TestId.record.editLockToggleBtn}
+          variant="text"
+        />
+      )}
       {!valid && (
         <Link
           data-testid={TestId.record.invalidBtn}

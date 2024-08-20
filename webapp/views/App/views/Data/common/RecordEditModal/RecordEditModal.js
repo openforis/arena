@@ -70,7 +70,7 @@ export const RecordEditModal = (props) => {
   const { initialState: initialStateProp, onClose, onRequestClose, parentNodeUuid, recordUuid } = props
 
   const onDetach = useCallback(() => {
-    const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}`
+    const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}?locked=true`
     WindowUtils.openPopup(recordEditUrl, 'arena-record-edit-modal')
     onRequestClose?.()
   }, [onRequestClose, recordUuid])
@@ -96,7 +96,7 @@ export const RecordEditModal = (props) => {
       onDetach={onDetach}
       top={initialTop}
     >
-      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
+      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader locked />
     </ResizableModal>
   )
 }

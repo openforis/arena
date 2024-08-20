@@ -2,6 +2,7 @@ export {
   nodeDelete,
   nodesUpdate,
   recordCreate,
+  recordEditLock,
   recordDelete,
   recordLoad,
   recordLoadError,
@@ -16,3 +17,4 @@ export { createNodePlaceholder, createRecord } from './create'
 export { nodeValidationsUpdate, nodesUpdateCompleted, updateNode, updateRecordStep } from './update'
 export { checkInRecord, checkOutRecord } from './checkIn'
 export { deleteRecord, deleteRecords, deleteRecordUuidPreview, removeNode, recordDeleted } from './delete'
+export { toggleEditLock } from './editLock'
