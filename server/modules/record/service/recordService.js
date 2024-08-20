@@ -2,6 +2,7 @@ import * as fs from 'fs'
 
 import * as Log from '@server/log/log'
 
+import * as ActivityLog from '@common/activityLog/activityLog'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as A from '@core/arena'
@@ -21,6 +22,7 @@ import i18n from '@core/i18n/i18nFactory'
 import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as JobManager from '@server/job/jobManager'
 import * as CSVWriter from '@server/utils/file/csvWriter'
@@ -477,6 +479,14 @@ export const mergeRecords = async (
     })(recordTarget)
 
     if (!dryRun) {
+      const logContent = {
+        sourceRecordUuid,
+        sourceRecordKeys: NodeValueFormatter.getFormattedRecordKeys({ survey, record: recordSource }),
+        targetRecordUuid,
+        targetRecordKeys: NodeValueFormatter.getFormattedRecordKeys({ survey, record: recordTarget }),
+      }
+      await ActivityLogService.insert(user, surveyId, ActivityLog.type.recordMerge, logContent, false, tx)
+
       const nodesArray = Object.values(nodesUpdated)
 
       await persistRecordNodes({ user, survey, record: recordTargetUpdated, nodesArray }, tx)
