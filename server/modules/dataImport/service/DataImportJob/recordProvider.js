@@ -15,7 +15,7 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
   if (emptyRootKeyValueIndex >= 0) {
     const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
-    throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissing, { keyName })
+    throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissingOrInvalid, { keyName })
   }
 }
 

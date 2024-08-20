@@ -105,8 +105,8 @@ const valueConverterByNodeDefType = {
 const checkAllHeadersAreValid =
   ({ csvDataExportModel }) =>
   (headers) => {
-    const dataExportModelHeaders = csvDataExportModel.columns.map((col) => col.header)
-    const invalidHeaders = headers.filter((header) => !dataExportModelHeaders.includes(header))
+    const { headers: possibleHeaders } = csvDataExportModel
+    const invalidHeaders = headers.filter((header) => !possibleHeaders.includes(header))
     if (invalidHeaders.length > 0) {
       throw new SystemError('validationErrors.dataImport.invalidHeaders', { invalidHeaders: invalidHeaders.join(', ') })
     }
@@ -204,10 +204,13 @@ const createReaderFromStream = ({
         if (Objects.isEmpty(cellValue)) return valuesByDefUuidAcc
 
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
-        const valueTemp = valuesByDefUuidAcc[nodeDefUuid] || {}
-        const valueHeaders = valueTemp.headers || []
+        const valueTemp = valuesByDefUuidAcc[nodeDefUuid] ?? {}
+        let valueHeaders = valueTemp._headers
+        if (!valueHeaders) {
+          valueHeaders = []
+          valueTemp._headers = valueHeaders
+        }
         valueHeaders.push(header)
-        valueTemp._headers = valueHeaders
         valueTemp[valueProp] = cellValue
         valuesByDefUuidAcc[nodeDefUuid] = valueTemp
         return valuesByDefUuidAcc

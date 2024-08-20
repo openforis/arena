@@ -44,6 +44,7 @@ export const CopyInvitationLinkButton = (props) => {
       label="usersView.copyInvitationLink"
       onClick={handleCopyInvitationLink}
       showLabel={false}
+      variant="text"
     />
   )
 }

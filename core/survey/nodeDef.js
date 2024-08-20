@@ -89,6 +89,18 @@ export const propKeys = {
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 }
 
+const commonAttributePropsKeys = [
+  propKeys.cycles,
+  propKeys.descriptions,
+  propKeys.hidden,
+  propKeys.key,
+  propKeys.labels,
+  propKeys.layout,
+  propKeys.multiple,
+  propKeys.name,
+  propKeys.readOnly,
+]
+
 export const textInputTypes = {
   singleLine: 'singleLine',
   multiLine: 'multiLine',
@@ -142,6 +154,15 @@ export const keysPropsAdvanced = {
   // code and taxon
   itemsFilter: 'itemsFilter',
 }
+
+const commonAttributePropsAdvancedKeys = [
+  keysPropsAdvanced.applicable,
+  keysPropsAdvanced.defaultValues,
+  keysPropsAdvanced.defaultValueEvaluatedOneTime,
+  keysPropsAdvanced.excludedInClone,
+  keysPropsAdvanced.validations,
+  keysPropsAdvanced.formula,
+]
 
 export const metaKeys = {
   h: 'h',
@@ -471,6 +492,28 @@ export const changeParentEntity =
         [metaKeys.h]: [...getMetaHierarchy(targetParentNodeDef), targetParentNodeDefUuid],
       },
     }
+  }
+
+export const convertToType =
+  ({ toType }) =>
+  (nodeDef) => {
+    const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
+    const propsAdvancedUpdated = R.pick(commonAttributePropsAdvancedKeys)(getPropsAdvanced(nodeDef))
+
+    const layout = getLayout(nodeDef)
+    const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
+      acc[cycleKey] = R.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
+      return acc
+    }, {})
+    propsUpdated[propKeys.layout] = layoutUpdated
+
+    const nodeDefUpdated = {
+      ...nodeDef,
+      [keys.type]: toType,
+      [keys.props]: propsUpdated,
+      [keys.propsAdvanced]: propsAdvancedUpdated,
+    }
+    return nodeDefUpdated
   }
 
 // layout

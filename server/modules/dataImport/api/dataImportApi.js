@@ -68,9 +68,9 @@ export const init = (app) => {
 
   app.get(`${uriPrefix}/csv/template`, requireRecordCreatePermission, async (req, res, next) => {
     try {
-      const { surveyId, nodeDefUuid, cycle } = Request.getParams(req)
+      const { surveyId, nodeDefUuid, cycle, includeFiles } = Request.getParams(req)
 
-      await DataImportTemplateService.exportDataImportTemplate({ surveyId, cycle, nodeDefUuid, res })
+      await DataImportTemplateService.exportDataImportTemplate({ surveyId, cycle, nodeDefUuid, includeFiles, res })
     } catch (error) {
       next(error)
     }
@@ -78,9 +78,9 @@ export const init = (app) => {
 
   app.get(`${uriPrefix}/csv/templates`, requireRecordCreatePermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, includeFiles } = Request.getParams(req)
 
-      await DataImportTemplateService.exportAllDataImportTemplates({ surveyId, cycle, res })
+      await DataImportTemplateService.exportAllDataImportTemplates({ surveyId, cycle, includeFiles, res })
     } catch (error) {
       next(error)
     }

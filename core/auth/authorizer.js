@@ -92,9 +92,15 @@ export const canEditRecord = (user, record, ignoreRecordStep = false) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
+const canChangeRecordProps = (user, record) => canEditRecord(user, record, true)
+
 export const canDeleteRecord = canEditRecord
 
-export const canDemoteRecord = (user, record) => canEditRecord(user, record, true)
+export const canDemoteRecord = canChangeRecordProps
+
+export const canChangeRecordOwner = canChangeRecordProps
+
+export const canChangeRecordStep = canChangeRecordProps
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 

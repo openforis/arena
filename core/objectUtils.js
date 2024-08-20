@@ -140,7 +140,7 @@ export const getPropsAndPropsDraft =
     const propsDraft = getPropsDraft(obj)
     return {
       props: backup ? props : {},
-      propsDraft: backup ? propsDraft : { ...props, propsDraft },
+      propsDraft: backup ? propsDraft : { ...props, ...propsDraft },
     }
   }
 

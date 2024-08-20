@@ -50,8 +50,11 @@ export const validateNumber =
     return value && isNaN(value) ? { key: errorKey, params: errorParams } : null
   }
 
-export const validatePositiveNumber =
-  (errorKey, errorParams = {}) =>
+export const validatePositiveNumber = (errorKey, errorParams = {}) =>
+  validatePositiveOrZeroNumber(errorKey, errorParams, false)
+
+export const validatePositiveOrZeroNumber =
+  (errorKey, errorParams = {}, allowZero = true) =>
   (propName, item) => {
     const validateNumberResult = validateNumber(errorKey, errorParams)(propName, item)
     if (validateNumberResult) {
@@ -60,7 +63,7 @@ export const validatePositiveNumber =
 
     const value = getProp(propName)(item)
 
-    return value && value <= 0 ? { key: errorKey, params: errorParams } : null
+    return value && (allowZero ? value < 0 : value <= 0) ? { key: errorKey, params: errorParams } : null
   }
 
 export const isEmailValueValid = (email) => Objects.isEmpty(email) || validEmailRegex.test(email)
