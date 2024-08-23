@@ -63,13 +63,13 @@
   }
 
   .expression-item {
-    height: 35px;
+    min-height: 37px;
     @extend .node-def-edit__expression-grid-item;
 
     .expression-editor__query-container {
       .btn-edit {
-        padding: 0.3rem;
         margin-left: 1rem;
+        min-width: 28px;
 
         .icon {
           font-size: 12px !important;
@@ -79,29 +79,25 @@
   }
 
   .expression-item.severity {
-    div:nth-child(2) {
-      display: flex;
-      align-items: center;
-    }
-
-    button {
+    .btn-group {
       margin-left: 1rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
 
-      &:nth-child(1).active {
-        background-color: rgba($red, 0.7);
-      }
-
-      &:nth-child(2).active {
-        background-color: rgba($orange, 0.7);
+      button {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
       }
     }
   }
 
-  .labels-editor {
+  .labels-editor.with-label {
     @extend .node-def-edit__expression-grid-item;
+    .labels-editor-label {
+      justify-content: center;
+    }
+    .labels-editor__labels {
+      margin-left: 0.5rem;
+    }
   }
 
   .btn-delete {

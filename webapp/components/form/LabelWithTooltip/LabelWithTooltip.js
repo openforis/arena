@@ -5,7 +5,7 @@ import classNames from 'classnames'
 const TOLERANCE = 2 // pixels of tolerance when considering text as ellipsed
 
 export const LabelWithTooltip = (props) => {
-  const { className, label, style, children } = props
+  const { className, label, style, testId, children } = props
 
   const labelRef = useRef(null)
 
@@ -24,7 +24,13 @@ export const LabelWithTooltip = (props) => {
   }, [label])
 
   return (
-    <div className={classNames(className, 'label', 'ellipsis')} style={style} title={tooltip} ref={labelRef}>
+    <div
+      className={classNames(className, 'label', 'ellipsis')}
+      data-testid={testId}
+      style={style}
+      title={tooltip}
+      ref={labelRef}
+    >
       {children}
       {label}
     </div>
@@ -32,10 +38,11 @@ export const LabelWithTooltip = (props) => {
 }
 
 LabelWithTooltip.propTypes = {
+  children: PropTypes.node,
   className: PropTypes.string,
   label: PropTypes.string,
   style: PropTypes.object,
-  children: PropTypes.node,
+  testId: PropTypes.string,
 }
 
 LabelWithTooltip.defaultProps = {
