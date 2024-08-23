@@ -7,9 +7,9 @@
 }
 
 .expression-editor-popup {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-row-gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 
   .query {
     background-color: rgba($blueLight, 0.15);
