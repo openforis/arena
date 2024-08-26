@@ -723,6 +723,10 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       merge: {
         label: 'Merge',
         confirmLabel: 'Confirm merge',
+        confirmTooManyDifferencesMessage: `**Too many differences**.  
+It seems like the records are very different each other.  
+Many attributes (~{{nodesUpdated}}) will be updated during merge.  
+Continue with merge preview?`,
         performedSuccessfullyMessage: 'Records merge performed successfully!',
         previewTitle: 'Merging preview (record {{keyValues}})',
       },

@@ -368,14 +368,14 @@ export const init = (app) => {
       const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const { record } = await RecordService.mergeRecords({
+      const { record, nodesCreated, nodesUpdated } = await RecordService.mergeRecords({
         user,
         surveyId,
         sourceRecordUuid,
         targetRecordUuid,
         dryRun,
       })
-      res.json({ record })
+      res.json({ record, nodesCreated, nodesUpdated })
     } catch (error) {
       next(error)
     }

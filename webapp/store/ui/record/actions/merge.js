@@ -1,8 +1,10 @@
 import * as API from '@webapp/service/api'
 import { SurveyState } from '@webapp/store/survey'
-import { LoaderActions, NotificationActions } from '@webapp/store/ui'
+import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import * as ActionTypes from './actionTypes'
+
+const updatedNodesWarnLimit = 10
 
 export const previewRecordsMerge =
   ({ sourceRecordUuid, targetRecordUuid }) =>
@@ -12,11 +14,28 @@ export const previewRecordsMerge =
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
 
-    const record = await API.mergeRecords({ surveyId, sourceRecordUuid, targetRecordUuid, preview: true })
-
-    dispatch({ type: ActionTypes.recordLoad, record, noHeader: true })
+    const { record, nodesUpdated } = await API.mergeRecords({
+      surveyId,
+      sourceRecordUuid,
+      targetRecordUuid,
+      preview: true,
+    })
 
     dispatch(LoaderActions.hideLoader())
+
+    const onMergeConfirmed = () => dispatch({ type: ActionTypes.recordLoad, record, noHeader: true })
+
+    if (nodesUpdated > updatedNodesWarnLimit) {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'dataView.records.merge.confirmTooManyDifferencesMessage',
+          params: { nodesUpdated },
+          onOk: onMergeConfirmed,
+        })
+      )
+    } else {
+      onMergeConfirmed()
+    }
   }
 
 export const mergeRecords =
