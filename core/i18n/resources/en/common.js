@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import * as ActivityLog from '@common/activityLog/activityLog'
 
 export default {
   common: {
@@ -507,64 +506,6 @@ $t(common.cantUndoWarning)`,
     },
   },
 
-  activityLogView: {
-    messages: {
-      // Survey
-      [ActivityLog.type.surveyCreate]: 'created the survey',
-      [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
-      [ActivityLog.type.surveyPublish]: 'published the survey',
-      [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
-
-      // NodeDef
-      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
-      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
-      [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
-
-      // Category
-      [ActivityLog.type.categoryInsert]: 'added category',
-      [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
-      [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
-      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemInsert]: 'added item to level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemDelete]:
-        'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
-
-      // Taxonomy
-      [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
-      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{key}} of taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
-
-      // Record
-      [ActivityLog.type.recordCreate]: 'added record',
-      [ActivityLog.type.recordDelete]: 'deleted record {{keys}}',
-      [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
-
-      // Node
-      [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
-      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} of record {{recordKeys}}',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} from record {{recordKeys}}',
-
-      // User
-      [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
-      [ActivityLog.type.userUpdate]: 'updated user {{name}}',
-      [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
-
-      // Analysis
-      [ActivityLog.type.chainCreate]: 'added processing chain',
-      [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
-      [ActivityLog.type.analysisNodeDefPropUpdate]:
-        'updated {{key}} to {{value}} of calculated node definition {{name}}',
-      [ActivityLog.type.chainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
-      [ActivityLog.type.chainDelete]: 'deleted processing chain {{label}}',
-    },
-  },
-
   designerView: {
     formPreview: 'Form preview',
   },
@@ -761,6 +702,15 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       confirmDeleteRecord: `Delete the record "{{keyValues}}"?`,
       confirmDeleteSelectedRecord_one: `Delete the selected record?`,
       confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
+      confirmMergeSelectedRecords: `### Merge the selected records into one?
+
+- record "source" will be merged into record "target":
+  - source: [{{sourceRecordKeys}}], modified {{sourceRecordModifiedDate}};
+  - target: [{{targetRecordKeys}}], modified {{targetRecordModifiedDate}};
+
+- a preview of the result will be shown before merging is performed;
+
+- when merging will be confirmed, **the source record WILL BE DELETED**`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
       deleteRecord: 'Delete record',
@@ -770,15 +720,21 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       exportList: 'Export list',
       exportData: 'Export data',
       filterPlaceholder: 'Filter by keys or owner',
-      viewRecord: 'View record',
-      owner: 'Owner',
-      step: 'Step',
+      merge: {
+        label: 'Merge',
+        confirmLabel: 'Confirm merge',
+        performedSuccessfullyMessage: 'Records merge performed successfully!',
+        previewTitle: 'Merging preview (record {{keyValues}})',
+      },
       noRecordsAdded: 'No records added',
       noRecordsAddedForThisSearch: 'No records found',
       noSelectedRecordsInStep: 'No selected records in step {{step}}',
+      owner: 'Owner',
       promoteAllRecordsToAnalysis: 'Cleansing -> Analysis',
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
+      step: 'Step',
       updateRecordsStep: 'Update records step',
+      viewRecord: 'View record',
     },
     recordsClone: {
       title: 'Records clone',

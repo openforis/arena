@@ -1,1 +1,1 @@
-export { count, fetch, fetchSimple } from '../manager/activityLogManager'
+export { count, fetch, fetchSimple, insert, insertMany } from '../manager/activityLogManager'

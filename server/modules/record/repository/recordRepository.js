@@ -34,7 +34,7 @@ const tableName = 'record'
 
 const selectFieldDateCreated = DbUtils.selectDate('date_created')
 const selectFieldDateModified = DbUtils.selectDate('date_modified')
-const recordSelectFields = `uuid, owner_uuid, step, cycle, ${selectFieldDateCreated}, ${selectFieldDateModified}, preview, validation`
+const recordSelectFields = `uuid, owner_uuid, step, cycle, ${selectFieldDateCreated}, ${selectFieldDateModified}, merged_into_record_uuid, preview, validation`
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -65,9 +65,9 @@ export const insertRecord = async (surveyId, record, client = db) => {
   return client.one(
     `
     INSERT INTO ${getSchemaSurvey(surveyId)}.record 
-    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified, info)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $10)
+    (owner_uuid, uuid, step, cycle, preview, validation, date_created, date_modified, info, merged_into_record_uuid)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $11)
     `,
     [
       Record.getOwnerUuid(record),
@@ -79,6 +79,7 @@ export const insertRecord = async (surveyId, record, client = db) => {
       Dates.formatForStorage(Record.getDateCreated(record) || now),
       Dates.formatForStorage(Record.getDateModified(record) || now),
       Record.getInfo(record),
+      Record.getMergedIntoRecordUuid(record),
       surveyId,
     ],
     dbTransformCallback(surveyId)
@@ -175,6 +176,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     search = null,
     recordUuids = null,
     includePreview = false,
+    includeMerged = false,
   },
   client = db
 ) => {
@@ -203,6 +205,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const recordsSelectWhereConditions = []
   if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
+  recordsSelectWhereConditions.push(`r.merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
   if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
@@ -221,6 +224,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       r.cycle,
       r.step, 
       r.preview, 
+      r.merged_into_record_uuid, 
       ${DbUtils.selectDate('r.date_created', 'date_created')}, 
       ${DbUtils.selectDate('r.date_modified', 'date_modified')},
       r.validation,
@@ -409,7 +413,7 @@ export const updateValidation = async (surveyId, recordUuid, validation, client 
     `UPDATE ${getSchemaSurvey(surveyId)}.record 
      SET validation = $1::jsonb
      WHERE uuid = $2
-    RETURNING ${recordSelectFields}`,
+     RETURNING ${recordSelectFields}`,
     [validation, recordUuid]
   )
 
@@ -429,6 +433,16 @@ export const updateRecordOwner = async ({ surveyId, recordUuid, ownerUuid }, cli
       SET owner_uuid = $/ownerUuid/
       WHERE uuid = $/recordUuid/`,
     { recordUuid, ownerUuid }
+  )
+
+export const updateRecordMergedInto = async ({ surveyId, recordUuid, mergedIntoRecordUuid }, client = db) =>
+  client.one(
+    `
+      UPDATE ${getSchemaSurvey(surveyId)}.record
+      SET merged_into_record_uuid = $/mergedIntoRecordUuid/
+      WHERE uuid = $/recordUuid/
+      RETURNING ${recordSelectFields}`,
+    { recordUuid, mergedIntoRecordUuid }
   )
 
 export const updateRecordsOwner = async ({ surveyId, fromOwnerUuid, toOwnerUuid }, client = db) =>

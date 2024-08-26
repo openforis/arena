@@ -1,9 +1,10 @@
-import { Dates, Objects, Records, RecordUpdateResult, Surveys } from '@openforis/arena-core'
+import { Dates, Objects, Records, RecordUpdateResult, Surveys, UUIDs } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as ObjectUtils from '@core/objectUtils'
 
 import { NodeValues } from '../nodeValues'
 import * as RecordReader from './recordReader'
@@ -248,6 +249,31 @@ const _mergeMultipleAttributes = ({
   }
 }
 
+const _cloneEntityAndDescendants = async ({ updateResult, recordSource, entitySource, parentEntity }) => {
+  const newNodeUuidByOldUuid = {}
+  RecordReader.visitDescendantsAndSelf(entitySource, (visitedChildSource) => {
+    const oldUuid = Node.getUuid(visitedChildSource)
+    const oldParentUuid = Node.getParentUuid(visitedChildSource)
+    const newUuid = UUIDs.v4()
+    newNodeUuidByOldUuid[oldUuid] = newUuid
+    const newParentEntityUuid =
+      visitedChildSource === entitySource
+        ? Node.getUuid(parentEntity)
+        : newNodeUuidByOldUuid[oldParentUuid] ?? oldParentUuid
+    const hierarchyUpdated = Node.getHierarchy(visitedChildSource).map(
+      (ancestorUuid) => newNodeUuidByOldUuid[ancestorUuid] ?? ancestorUuid
+    )
+    const nodeTarget = ObjectUtils.clone(visitedChildSource)
+    Node.removeFlags({ sideEffect: true })(nodeTarget)
+    nodeTarget[Node.keys.created] = true // consider it as new record, to allow RDB updates
+    nodeTarget[Node.keys.uuid] = newUuid
+    nodeTarget[Node.keys.parentUuid] = newParentEntityUuid
+    nodeTarget[Node.keys.meta][Node.metaKeys.hierarchy] = hierarchyUpdated
+
+    _addNodeToUpdateResult({ updateResult, node: nodeTarget })
+  })(recordSource)
+}
+
 const _mergeMultipleEntities = ({
   updateResult,
   survey,
@@ -277,10 +303,7 @@ const _mergeMultipleEntities = ({
       stack.push({ entitySource: childSource, entityTarget: childTarget })
     } else {
       // add new entity
-      RecordReader.visitDescendantsAndSelf(childSource, (visitedChildSource) => {
-        const parentEntity = visitedChildSource === childSource ? entityTarget : undefined
-        _addNodeToUpdateResult({ updateResult, node: visitedChildSource, parentEntity })
-      })(recordSource)
+      _cloneEntityAndDescendants({ updateResult, recordSource, entitySource: childSource, parentEntity: entityTarget })
     }
   })
 }
