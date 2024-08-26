@@ -117,6 +117,7 @@ export const ValidatorErrorKeys = {
     cycleDateEndInvalid: 'validationErrors.surveyInfoEdit.cycleDateEndInvalid',
     cycleDateEndMandatoryExceptForLastCycle: 'validationErrors.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
     cycleDateStartAfterPrevDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
+    fieldManualLinksInvalid: 'validationErrors.surveyInfoEdit.fieldManualLinksInvalid',
   },
 
   taxonomyEdit: {

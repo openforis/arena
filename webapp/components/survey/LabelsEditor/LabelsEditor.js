@@ -25,17 +25,18 @@ const sortLanguages = ({ languages, preferredLanguage }) =>
 
 const LabelsEditor = (props) => {
   const {
-    labels,
-    showFormLabel,
-    formLabelKey,
-    languages: languagesFromProps,
+    compactLanguage = false,
+    formLabelKey = 'common.label',
+    inputFieldIdPrefix,
+    inputType = 'input',
+    labels = {},
+    languages: languagesFromProps = [],
     onChange,
     placeholder,
-    readOnly,
-    compactLanguage,
+    readOnly = false,
+    showFormLabel = true,
+    textTransformFunction,
     validation,
-    inputFieldIdPrefix,
-    inputType,
   } = props
 
   const i18n = useI18n()
@@ -69,6 +70,7 @@ const LabelsEditor = (props) => {
               readOnly={readOnly}
               showLanguageBadge={showLanguageBadge}
               compactLanguage={compactLanguage}
+              textTransformFunction={textTransformFunction}
             />
           ))}
         </ValidationTooltip>
@@ -89,20 +91,7 @@ LabelsEditor.propTypes = {
   readOnly: PropTypes.bool,
   showFormLabel: PropTypes.bool,
   validation: PropTypes.object,
-}
-
-LabelsEditor.defaultProps = {
-  compactLanguage: false,
-  formLabelKey: 'common.label',
-  inputFieldIdPrefix: null,
-  inputType: 'input',
-  languages: [],
-  labels: {},
-  onChange: null,
-  placeholder: null,
-  readOnly: false,
-  showFormLabel: true,
-  validation: null,
+  textTransformFunction: PropTypes.func,
 }
 
 export default LabelsEditor
