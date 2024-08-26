@@ -613,12 +613,8 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       },
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
-        - {{processed}} rows processed
-        - {{insertedFiles}} files would be inserted
-        - {{updatedFiles}} files would be updated
-        - {{deletedFiles}} files would be deleted`,
-        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)
         - {{processed}} rows processed`,
+        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
         validationCompleteSuccessfully: `## Validation complete without errors
         - {{processed}} rows processed
         - {{updatedValues}} values would be updated
@@ -1657,7 +1653,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
-      entityKeyValueNotSpecified: 'Entity key value for entity "{{entityName}}" not specified',
+      entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
       missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
       oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
