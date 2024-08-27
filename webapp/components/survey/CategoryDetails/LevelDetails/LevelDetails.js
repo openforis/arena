@@ -10,7 +10,7 @@ import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import ErrorBadge from '@webapp/components/errorBadge'
-import { Button, ButtonIconDelete } from '@webapp/components'
+import { Button, ButtonIconDelete, LoadingBar } from '@webapp/components'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -32,6 +32,7 @@ const LevelDetails = (props) => {
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
   const parentItem = State.getItemActive({ levelIndex: levelIndex - 1 })(state)
   const canShowItems = levelIndex === 0 || parentItem
+  const itemsLoading = canShowItems && State.isItemsLoading({ levelIndex })(state)
   const items = canShowItems ? State.getItemsArray({ levelIndex })(state) : []
   const validation = Category.getLevelValidation(levelIndex)(category)
 
@@ -96,7 +97,8 @@ const LevelDetails = (props) => {
         <div className="category__level-items-message">{i18n.t('categoryEdit.level.selectItemFromPreviousLevel')}</div>
       )}
 
-      {canShowItems && <ItemsList items={items} level={level} state={state} setState={setState} />}
+      {canShowItems &&
+        (itemsLoading ? <LoadingBar /> : <ItemsList items={items} level={level} state={state} setState={setState} />)}
     </div>
   )
 }
