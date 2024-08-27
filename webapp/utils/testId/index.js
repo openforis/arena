@@ -187,6 +187,7 @@ export const TestId = {
   surveyInfo: {
     saveBtn: 'survey-info-save-btn',
     surveyDescription: _withLang('survey-description'),
+    surveyFieldManualLink: _withLang('survey-field-manual-link'),
     surveyName: 'survey-name',
     surveyLabel: _withLang('survey-label'),
     surveyLanguage: 'survey-language',

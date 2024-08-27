@@ -45,6 +45,7 @@ export const useSurveyInfoForm = () => {
 
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
   const setDescriptions = (descriptions) => setObjectField(Survey.infoKeys.descriptions, descriptions)
+  const setFieldManualLinks = (links) => setObjectField(Survey.infoKeys.fieldManualLinks, links)
 
   const setSampleBasedImageInterpretationEnabled = (value) =>
     setObjectField(Survey.infoKeys.sampleBasedImageInterpretationEnabled, value)
@@ -62,6 +63,7 @@ export const useSurveyInfoForm = () => {
     setCycles,
     setDefaultCycleKey,
     setDescriptions,
+    setFieldManualLinks,
     setLabels,
     setLanguages,
     setName,
