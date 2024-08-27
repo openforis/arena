@@ -106,7 +106,7 @@ export const init = (app) => {
     }
   })
 
-  app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
+  app.post(`${uriPrefix}whisp/geojson`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
     const geojson = Request.getBody(req)
     const url = `${whispApiUrl}geojson`
     try {

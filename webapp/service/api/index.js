@@ -90,4 +90,6 @@ export {
   changeUserPassword,
 } from './user'
 
+export { sendGeoJsonToWhisp } from './geo'
+
 export { contentTypes, objectToFormData } from './utils/apiUtils'

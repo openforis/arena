@@ -5,7 +5,6 @@ import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import circleToPolygon from 'circle-to-polygon'
 import L from 'leaflet'
-import axios from 'axios'
 
 import { Objects, PointFactory } from '@openforis/arena-core'
 
@@ -21,6 +20,8 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { useSurvey, useSurveyPreferredLang, useSurveyInfo, useSurveyId } from '@webapp/store/survey'
 import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
+
+import * as API from '@webapp/service/api'
 
 import { useAltitude } from '../common/useAltitude'
 
@@ -121,9 +122,8 @@ export const CoordinateAttributePopUp = (props) => {
 
   const onWhispButtonClick = useCallback(async () => {
     setWhispDataLoading(true)
-    const geojson = getGeoJson()
-    const url = `/api/survey/${surveyId}/geo/whisp/geojson/csv`
-    axios.post(url, geojson).then(({ data: token }) => {
+    const geoJSON = getGeoJson()
+    API.sendGeoJsonToWhisp({ surveyId, geoJSON }).then(({ token }) => {
       const csvDownloadUrl = getWhispDataDownloadUrl(token)
       setWhispDataLoading(false)
       window.open(csvDownloadUrl, 'Whisp')
