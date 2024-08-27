@@ -14,7 +14,7 @@ export const previewRecordsMerge =
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
 
-    const { record, nodesUpdated } = await API.mergeRecords({
+    const { record, nodesCreated, nodesUpdated } = await API.mergeRecords({
       surveyId,
       sourceRecordUuid,
       targetRecordUuid,
@@ -25,7 +25,9 @@ export const previewRecordsMerge =
 
     const onMergeConfirmed = () => dispatch({ type: ActionTypes.recordLoad, record, noHeader: true })
 
-    if (nodesUpdated > updatedNodesWarnLimit) {
+    if (nodesUpdated + nodesCreated === 0) {
+      dispatch(NotificationActions.notifyWarning({ key: 'dataView.records.merge.noChangesWillBeApplied' }))
+    } else if (nodesUpdated > updatedNodesWarnLimit) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
           key: 'dataView.records.merge.confirmTooManyDifferencesMessage',
