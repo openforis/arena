@@ -25,7 +25,7 @@ export const useFetchLevelItems = ({ setState }) => {
       const parentUuid = CategoryItem.getUuid(itemActiveLastLevel)
 
       // Reset level items
-      setState(State.assocItemsLoading({ levelIndex })), A.pipe(State.dissocItems({ levelIndex }))
+      setState(A.pipe(State.assocItemsLoading({ levelIndex }), State.dissocItems({ levelIndex })))
 
       const { request } = API.fetchCategoryItems({
         surveyId,
