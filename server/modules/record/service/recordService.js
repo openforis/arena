@@ -478,6 +478,8 @@ export const mergeRecords = async (
       sideEffect: true,
     })(recordTarget)
 
+    const nodesArray = Object.values(nodesUpdated)
+
     if (!dryRun) {
       const logContent = {
         sourceRecordUuid,
@@ -486,8 +488,6 @@ export const mergeRecords = async (
         targetRecordKeys: NodeValueFormatter.getFormattedRecordKeys({ survey, record: recordTarget }),
       }
       await ActivityLogService.insert(user, surveyId, ActivityLog.type.recordMerge, logContent, false, tx)
-
-      const nodesArray = Object.values(nodesUpdated)
 
       await persistRecordNodes({ user, survey, record: recordTargetUpdated, nodesArray }, tx)
 
@@ -503,5 +503,9 @@ export const mergeRecords = async (
 
       await RecordManager.updateRecordDateModified({ surveyId, recordUuid: targetRecordUuid }, tx)
     }
-    return { record: recordTargetUpdated }
+    return {
+      record: recordTargetUpdated,
+      nodesCreated: nodesArray.filter(Node.isCreated).length,
+      nodesUpdated: nodesArray.filter(Node.isUpdated).length,
+    }
   })
