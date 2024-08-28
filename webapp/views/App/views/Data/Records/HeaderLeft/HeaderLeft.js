@@ -70,7 +70,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const selectedItemsCount = selectedItems.length
   const selectedRecordsUuids = selectedItems.map((selectedItem) => selectedItem.uuid)
-  const canEditSelectedItem = useAuthCanEditRecord(selectedItems[0])
+  const canEditSelectedItem = useAuthCanEditRecord(selectedItems[0]) && selectedItems.length === 1
 
   const [state, setState] = useState({
     recordsCloneModalOpen: false,
