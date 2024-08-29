@@ -5,6 +5,11 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
 import { ButtonGroup } from '@webapp/components/form'
 
+const buttonGroupItems = ['true', 'false'].map((value) => ({
+  key: value,
+  label: `samplingPolygonOptions.${value === 'true' ? 'circle' : 'rectangle'}`,
+}))
+
 const SamplingPolygonShapeEditor = (props) => {
   const { readOnly, isCircle, onChange } = props
 
@@ -14,10 +19,7 @@ const SamplingPolygonShapeEditor = (props) => {
     <FormItem label={i18n.t('samplingPolygonOptions.shape')}>
       <ButtonGroup
         disabled={readOnly}
-        items={['true', 'false'].map((value) => ({
-          key: value,
-          label: i18n.t(`samplingPolygonOptions.${value === 'true' ? 'circle' : 'rectangle'}`),
-        }))}
+        items={buttonGroupItems}
         onChange={onChange}
         selectedItemKey={String(isCircle)}
       />
