@@ -5,16 +5,7 @@ import { useI18n } from '@webapp/store/system'
 import { FormItem, Input } from '@webapp/components/form/Input'
 
 export const FormPropertyItem = (props) => {
-  const {
-    objectkey,
-    labelKey,
-    inputType = 'number',
-    onPropertyChange,
-    value,
-    samplingPolygonObject,
-    readOnly,
-    getFieldValidation,
-  } = props
+  const { objectkey, labelKey, onPropertyChange, value, samplingPolygonObject, readOnly, getFieldValidation } = props
   const i18n = useI18n()
   return (
     <FormItem label={i18n.t(`samplingPolygonOptions.${labelKey}`)}>
@@ -23,7 +14,7 @@ export const FormPropertyItem = (props) => {
         id={`sampling-polygon-${labelKey}`}
         onChange={onPropertyChange}
         readOnly={readOnly}
-        type={inputType}
+        type="number"
         validation={getFieldValidation(samplingPolygonObject[objectkey])}
         value={value}
       />
@@ -32,7 +23,6 @@ export const FormPropertyItem = (props) => {
 }
 
 FormPropertyItem.propTypes = {
-  inputType: PropTypes.string,
   readOnly: PropTypes.bool.isRequired,
   onPropertyChange: PropTypes.func,
   samplingPolygonObject: PropTypes.object,
