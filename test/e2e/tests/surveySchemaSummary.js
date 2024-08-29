@@ -61,11 +61,11 @@ export default () =>
       await expect(data.length).toBe(nodeDefs.length)
     })
 
-    nodeDefs.forEach((nodeDefItem, index) => {
+    nodeDefs.forEach((nodeDefItem) => {
       const { nodeDef, path: nodeDefPath } = nodeDefItem
       test(`Check ${nodeDef.name} def`, async () => {
         await expect(data).toBeDefined()
-        const nodeDefData = data[index]
+        const nodeDefData = data.find((dataItem) => dataItem.name === nodeDef.name)
         await expect(Object.keys(nodeDefData)).toEqual([
           'uuid',
           'name',
