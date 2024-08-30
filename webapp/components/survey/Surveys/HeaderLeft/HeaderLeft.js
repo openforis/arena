@@ -1,13 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { TextInput } from '@webapp/components/form'
+import { Checkbox, TextInput } from '@webapp/components/form'
 import { ButtonDownload } from '@webapp/components/buttons'
-import { useAuthCanExportSurveysList } from '@webapp/store/user/hooks'
+import { useAuthCanExportSurveysList, useUserIsSystemAdmin } from '@webapp/store/user/hooks'
 
 const HeaderLeft = (props) => {
-  const { handleSearch, search, totalCount } = props
+  const { handleSearch, onlyOwn = false, search, setOnlyOwn = null, totalCount } = props
 
+  const isSystemAdmin = useUserIsSystemAdmin()
   const canExportSurveys = useAuthCanExportSurveysList()
 
   if (!totalCount) return null
@@ -22,6 +23,9 @@ const HeaderLeft = (props) => {
         }}
         placeholder="surveysView.filterPlaceholder"
       />
+      {isSystemAdmin && setOnlyOwn && (
+        <Checkbox checked={onlyOwn} label="surveysView.onlyOwn" onChange={() => setOnlyOwn(!onlyOwn)} />
+      )}
       {canExportSurveys && <ButtonDownload href="/api/surveys/export" label="common.csvExport" />}
     </>
   )
@@ -29,7 +33,9 @@ const HeaderLeft = (props) => {
 
 HeaderLeft.propTypes = {
   handleSearch: PropTypes.func.isRequired,
+  onlyOwn: PropTypes.bool,
   search: PropTypes.string.isRequired,
+  setOnlyOwn: PropTypes.func,
   totalCount: PropTypes.number.isRequired,
 }
 

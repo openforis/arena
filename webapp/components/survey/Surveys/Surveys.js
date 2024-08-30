@@ -12,7 +12,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/store/user'
+import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 
 import Table from '@webapp/components/Table'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
@@ -29,12 +29,14 @@ const Surveys = (props) => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const lang = useBrowserLanguageCode()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   /**
    * Parameter passed to table rest params
    * (used to reload table data on survey publish).
    */
   const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -174,13 +176,14 @@ const Surveys = (props) => {
       className="surveys"
       columns={columns}
       headerLeftComponent={HeaderLeft}
+      headerProps={{ onlyOwn, setOnlyOwn }}
       isRowActive={isRowActive}
       keyExtractor={({ item }) => Survey.getId(item)}
       module={module}
       moduleApiUri={moduleApiUri}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
       onRowClick={onRowClick}
-      restParams={{ lang, template, requestedAt, includeCounts: true }}
+      restParams={{ lang, template, requestedAt, includeCounts: true, onlyOwn }}
       visibleColumnsSelectionEnabled
     />
   )
