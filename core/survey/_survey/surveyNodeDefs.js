@@ -350,11 +350,12 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
 }
 
 export const visitDescendantsAndSelf =
-  ({ nodeDef = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
+  ({ visitorFn, nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs }) =>
   (survey) => {
     const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
     return Surveys.visitDescendantsAndSelfNodeDef({
       survey,
+      cycle,
       nodeDef: nodeDefToVisit,
       visitor: visitorFn,
       traverseMethod,

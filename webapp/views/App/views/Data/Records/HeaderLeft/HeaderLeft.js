@@ -14,10 +14,11 @@ import { RecordActions, useRecord } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit } from '@webapp/components'
+import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit, ButtonIconView } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import {
   useAuthCanDeleteRecords,
+  useAuthCanEditRecord,
   useAuthCanExportRecords,
   useAuthCanExportRecordsList,
   useAuthCanUpdateRecordsStep,
@@ -56,7 +57,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-  const cycles = Survey.getCycleKeys(survey)
+  const cycles = Survey.getCycleKeys(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
 
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
@@ -69,6 +70,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const selectedItemsCount = selectedItems.length
   const selectedRecordsUuids = selectedItems.map((selectedItem) => selectedItem.uuid)
+  const canEditSelectedItem = useAuthCanEditRecord(selectedItems[0]) && selectedItems.length === 1
 
   const [state, setState] = useState({
     recordsCloneModalOpen: false,
@@ -198,21 +200,42 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
           )}
           {selectedItemsCount === 2 && canDeleteSelectedRecords && (
-            <Button label="dataView.records.merge.label" onClick={mergeSelectedRecords} variant="outlined" />
+            <Button
+              iconClassName="icon-tree"
+              label="dataView.records.merge.label"
+              onClick={mergeSelectedRecords}
+              variant="outlined"
+            />
           )}
           {
-            // Edit selected record
-            selectedItemsCount === 1 && (
-              <ButtonIconEdit onClick={onSelectedRecordClick} title="dataView.editSelectedRecord" />
-            )
+            // View/Edit selected record
+            selectedItemsCount === 1 &&
+              (canEditSelectedItem ? (
+                <ButtonIconEdit
+                  onClick={onSelectedRecordClick}
+                  title="dataView.editSelectedRecord"
+                  variant="contained"
+                />
+              ) : (
+                <ButtonIconView
+                  onClick={onSelectedRecordClick}
+                  title="dataView.viewSelectedRecord"
+                  variant="contained"
+                />
+              ))
           }
+          {canCloneRecords && (
+            <Button
+              iconClassName="icon-copy"
+              label="dataView.records.clone"
+              onClick={toggleRecordsCloneModalOpen}
+              variant="outlined"
+            />
+          )}
           {
             // Delete selected records
             canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
           }
-          {canCloneRecords && (
-            <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
-          )}
         </>
       )}
 

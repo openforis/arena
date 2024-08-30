@@ -12,10 +12,11 @@ export const FormPropertyItem = (props) => {
       <Input
         key={objectkey}
         id={`sampling-polygon-${labelKey}`}
-        value={value}
-        validation={getFieldValidation(samplingPolygonObject[objectkey])}
         onChange={onPropertyChange}
         readOnly={readOnly}
+        type="number"
+        validation={getFieldValidation(samplingPolygonObject[objectkey])}
+        value={value}
       />
     </FormItem>
   )
