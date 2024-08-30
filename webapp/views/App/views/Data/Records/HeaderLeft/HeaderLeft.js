@@ -56,7 +56,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-  const cycles = Survey.getCycleKeys(survey)
+  const cycles = Survey.getCycleKeys(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
 
   const canUpdateRecordsStep = useAuthCanUpdateRecordsStep()
@@ -198,7 +198,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
           )}
           {selectedItemsCount === 2 && canDeleteSelectedRecords && (
-            <Button label="dataView.records.merge.label" onClick={mergeSelectedRecords} variant="outlined" />
+            <Button
+              iconClassName="icon-tree"
+              label="dataView.records.merge.label"
+              onClick={mergeSelectedRecords}
+              variant="outlined"
+            />
           )}
           {
             // Edit selected record
@@ -206,13 +211,18 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
               <ButtonIconEdit onClick={onSelectedRecordClick} title="dataView.editSelectedRecord" />
             )
           }
+          {canCloneRecords && (
+            <Button
+              iconClassName="icon-copy"
+              label="dataView.records.clone"
+              onClick={toggleRecordsCloneModalOpen}
+              variant="outlined"
+            />
+          )}
           {
             // Delete selected records
             canDeleteSelectedRecords && <ButtonDelete showLabel={false} onClick={onDeleteButtonClick} />
           }
-          {canCloneRecords && (
-            <Button iconClassName="icon-copy" label="dataView.records.clone" onClick={toggleRecordsCloneModalOpen} />
-          )}
         </>
       )}
 
