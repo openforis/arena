@@ -1,5 +1,5 @@
-@import '~codemirror/lib/codemirror.css';
-@import '~codemirror/addon/hint/show-hint';
+// @import '~codemirror/lib/codemirror.css';
+// @import '~codemirror/addon/hint/show-hint';
 @import 'webapp/style/vars';
 
 .CodeMirror-hints {
@@ -168,4 +168,8 @@
     margin: 0px 0.3rem;
     font-weight: 600;
   }
+}
+
+.codemirror-arena-autocomplete {
+  height: auto;
 }
