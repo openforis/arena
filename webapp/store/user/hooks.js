@@ -41,7 +41,7 @@ export const useAuthCanEditRecords = (records) => {
   const user = useUser()
   return records.length > 0 && records.every((record) => _canEditRecord({ user, surveyInfo, record }))
 }
-export const useAuthCanEditRecord = (record) => useAuthCanEditRecords([record])
+export const useAuthCanEditRecord = (record) => useAuthCanEditRecords(record ? [record] : [])
 export const useAuthCanDeleteRecords = (records) => useAuthCanEditRecords(records)
 export const useAuthCanDeleteRecord = (record) => useAuthCanDeleteRecords([record])
 export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUser(), useSurveyInfo())
