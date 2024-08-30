@@ -192,7 +192,7 @@ const BasicProps = (props) => {
         <Checkbox
           checked={includedInClone}
           disabled={includeInCloneDisabled}
-          label="nodeDefEdit.basicProps.includedInClone"
+          label="nodeDefEdit.basicProps.includedInClonedData"
           onChange={(value) =>
             Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
           }
