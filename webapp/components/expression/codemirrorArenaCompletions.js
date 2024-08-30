@@ -67,6 +67,7 @@ const getVariableCompletion = ({ group = null, variable }) => {
     label: text,
     apply: value,
     type: 'variable',
+    parentUuid: variable.parentUuid ?? variable[0]?.parentUuid,
   }
 }
 

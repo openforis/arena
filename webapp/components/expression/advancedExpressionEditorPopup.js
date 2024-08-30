@@ -16,13 +16,17 @@ import { codemirrorArenaCompletions } from './codemirrorArenaCompletions'
 
 // import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
-const completionsCompareFn = (completionA, completionB) => {
-  const { apply: applyA, label: labelA, type: typeA } = completionA
-  const { apply: applyB, label: labelB, type: typeB } = completionB
+const completionsCompareFn = (contextUuid) => (completionA, completionB) => {
+  const { apply: applyA, label: labelA, parentUuid: parentUuidA, type: typeA } = completionA
+  const { apply: applyB, label: labelB, parentUuid: parentUuidB, type: typeB } = completionB
   const typeComparison = typeB.localeCompare(typeA)
   if (typeComparison === 0 && typeA === 'variable') {
     if (applyA === Expression.thisVariable) return -1
     if (applyB === Expression.thisVariable) return 1
+    if (parentUuidA !== parentUuidB) {
+      if (parentUuidA === contextUuid) return -1
+      if (parentUuidB === contextUuid) return 1
+    }
   }
   return typeComparison || labelA.localeCompare(labelB)
 }
@@ -40,7 +44,7 @@ const AdvancedExpressionEditorPopup = (props) => {
   const extensions = [
     javascript(),
     autocompletion({
-      compareCompletions: completionsCompareFn,
+      compareCompletions: completionsCompareFn(nodeDefCurrent?.parentUuid),
       override: [
         completeFromList(
           codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })
