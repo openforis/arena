@@ -790,6 +790,7 @@ Merge cannot be performed.`,
       noSelection:
         'Please make your selection using the left side panel or select an existing query from "Manage queries"',
     },
+    viewSelectedRecord: 'View selected record',
   },
 
   mapView: {
