@@ -300,6 +300,7 @@ export const fetchUserSurveysInfo = async (
     sortOrder,
     includeCounts = false,
     includeOwnerEmailAddress = false,
+    onlyOwn = false,
   },
   client = db
 ) => {
@@ -324,6 +325,7 @@ export const fetchUserSurveysInfo = async (
         sortBy,
         sortOrder,
         includeOwnerEmailAddress,
+        onlyOwn,
       })
     ).map(assocSurveyInfo)
 
