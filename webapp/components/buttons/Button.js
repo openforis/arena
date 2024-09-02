@@ -109,11 +109,3 @@ Button.propTypes = {
   titleParams: PropTypes.object,
   variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
-
-Button.defaultProps = {
-  disabled: false,
-  isTitleMarkdown: false,
-  showLabel: true,
-  size: 'medium',
-  variant: 'contained',
-}

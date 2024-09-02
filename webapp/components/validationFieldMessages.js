@@ -10,7 +10,11 @@ import { useI18n } from '@webapp/store/system'
 import Markdown from '@webapp/components/markdown'
 
 const ValidationFieldMessages = (props) => {
-  const { showIcons, showKeys, validation } = props
+  const {
+    validation = null,
+    showKeys = true, // Show the key of the fields' validations
+    showIcons = false, // Show error or warning icon
+  } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -26,13 +30,6 @@ const ValidationFieldMessages = (props) => {
       ))}
     </div>
   )
-}
-
-ValidationFieldMessages.defaultProps = {
-  validation: null,
-  survey: null,
-  showKeys: true, // Show the key of the fields' validations
-  showIcons: false, // Show error or warning icon
 }
 
 export default ValidationFieldMessages

@@ -12,7 +12,14 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 import { Alert } from '../Alert'
 
 const Dropzone = (props) => {
-  const { accept: acceptProp, disabled, droppedFiles, maxSize: maxSizeMB, multiple, onDrop: onDropProp } = props
+  const {
+    accept: acceptProp = {},
+    disabled = false,
+    droppedFiles = [],
+    maxSize: maxSizeMB = 50, // 50MB
+    multiple = false,
+    onDrop: onDropProp,
+  } = props
 
   const i18n = useI18n()
   const [errorMessage, setErrorMessage] = useState(null)
@@ -115,14 +122,6 @@ Dropzone.propTypes = {
   multiple: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
   droppedFiles: PropTypes.array,
-}
-
-Dropzone.defaultProps = {
-  accept: {},
-  disabled: false,
-  maxSize: 50, // 50MB
-  multiple: false,
-  droppedFiles: [],
 }
 
 export default Dropzone

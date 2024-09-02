@@ -3,19 +3,18 @@ import classNames from 'classnames'
 
 import { Button } from './Button'
 
-export const ButtonNew = (props) => (
-  <Button
-    {...props}
-    className={classNames('btn-primary btn-new', props.className)}
-    iconClassName="icon-plus icon-12px icon-left"
-  />
-)
+export const ButtonNew = (props) => {
+  const { label = 'common.new' } = props
+  return (
+    <Button
+      {...props}
+      className={classNames('btn-primary btn-new', props.className)}
+      iconClassName="icon-plus icon-12px icon-left"
+      label={label}
+    />
+  )
+}
 
 ButtonNew.propTypes = {
   ...Button.propTypes,
-}
-
-ButtonNew.defaultProps = {
-  ...Button.defaultProps,
-  label: 'common.new',
 }

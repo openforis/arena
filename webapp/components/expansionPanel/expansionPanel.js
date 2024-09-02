@@ -9,7 +9,15 @@ import { Button } from '../buttons'
 const closeClassName = 'close'
 
 const ExpansionPanel = (props) => {
-  const { buttonLabel, buttonLabelParams, children, className: classNameProp, open, showHeader, startClosed } = props
+  const {
+    buttonLabel = '',
+    buttonLabelParams = undefined,
+    children,
+    className: classNameProp = null,
+    open = undefined,
+    showHeader = true,
+    startClosed = false,
+  } = props
   const i18n = useI18n()
   const panelRef = useRef(null)
   const contentRef = useRef(null)
@@ -59,15 +67,6 @@ ExpansionPanel.propTypes = {
   open: PropTypes.bool,
   showHeader: PropTypes.bool,
   startClosed: PropTypes.bool,
-}
-
-ExpansionPanel.defaultProps = {
-  buttonLabel: '',
-  buttonLabelParams: {},
-  className: null,
-  open: undefined,
-  showHeader: true,
-  startClosed: false,
 }
 
 export default ExpansionPanel

@@ -15,8 +15,15 @@ import { TestId } from '@webapp/utils/testId'
 import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
 
 const AdvancedExpressionEditorPopup = (props) => {
-  const { query, mode, nodeDefCurrent, excludeCurrentNodeDef, includeAnalysis, isContextParent, updateDraftQuery } =
-    props
+  const {
+    excludeCurrentNodeDef = true,
+    includeAnalysis = false,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefCurrent = null,
+    query = '',
+    updateDraftQuery,
+  } = props
 
   const inputRef = useRef()
   const i18n = useI18n()
@@ -43,7 +50,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       const valid = !newErrorMessage
       return valid
     },
-    [excludeCurrentNodeDef, isContextParent, nodeDefCurrent, survey]
+    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey]
   )
 
   const onEditorChange = useCallback(
@@ -118,15 +125,6 @@ AdvancedExpressionEditorPopup.propTypes = {
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
   updateDraftQuery: PropTypes.func.isRequired,
-}
-
-AdvancedExpressionEditorPopup.defaultProps = {
-  excludeCurrentNodeDef: true,
-  includeAnalysis: false,
-  isContextParent: false,
-  mode: Expression.modes.json,
-  nodeDefCurrent: null,
-  query: '',
 }
 
 export default AdvancedExpressionEditorPopup
