@@ -16,19 +16,19 @@ import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
   const {
-    index,
+    canBeConstant = false,
+    excludeCurrentNodeDef = true,
+    index = 0,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = '',
+    nodeDefUuidCurrent = null,
+    onChange = () => {},
+    placeholder = false,
     qualifier,
-    placeholder,
-    query,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    mode,
-    isContextParent,
-    canBeConstant,
-    isBoolean,
-    onChange,
-    types,
+    query = '',
+    types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
   const i18n = useI18n()
@@ -111,22 +111,6 @@ ExpressionEditor.propTypes = {
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
-}
-
-ExpressionEditor.defaultProps = {
-  index: 0,
-  placeholder: false,
-  query: '',
-  nodeDefUuidContext: '',
-  nodeDefUuidCurrent: null,
-  excludeCurrentNodeDef: true,
-  mode: Expression.modes.json,
-  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
-
-  onChange: () => {},
 }
 
 export default ExpressionEditor

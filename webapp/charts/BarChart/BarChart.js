@@ -26,7 +26,7 @@ const margin = {
 }
 
 export const BarChart = (props) => {
-  const { data, dataColors, dataKeys, labelDataKey, layout, showLegend } = props
+  const { data, dataColors = [], dataKeys, labelDataKey = 'name', layout = 'horizontal', showLegend = true } = props
 
   const tickFormatter = useCallback((value) => {
     if (value.length < tickMaxChars) return value
@@ -84,11 +84,4 @@ BarChart.propTypes = {
   labelDataKey: PropTypes.string,
   layout: PropTypes.oneOf(['horizontal', 'vertical', 'centric', 'radial']),
   showLegend: PropTypes.bool,
-}
-
-BarChart.defaultProps = {
-  dataColors: [],
-  labelDataKey: 'name',
-  layout: 'horizontal',
-  showLegend: true,
 }

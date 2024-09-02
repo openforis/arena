@@ -6,7 +6,14 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 export const Split = (props) => {
-  const { className, children, direction, expandToMin, minSize, sizes } = props
+  const {
+    className = undefined,
+    children,
+    direction = 'horizontal',
+    expandToMin = false,
+    minSize = null,
+    sizes = null,
+  } = props
 
   return (
     <ReactSplit
@@ -28,12 +35,4 @@ Split.propTypes = {
   expandToMin: PropTypes.bool,
   minSize: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]),
   sizes: PropTypes.arrayOf(PropTypes.number),
-}
-
-Split.defaultProps = {
-  className: undefined,
-  direction: 'horizontal',
-  expandToMin: false,
-  minSize: null,
-  sizes: null,
 }

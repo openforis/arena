@@ -23,7 +23,7 @@ ProgressBarWithLabel.propTypes = {
 }
 
 const ProgressBar = (props) => {
-  const { color, indeterminate, progress, className: classNameProp, showText } = props
+  const { className: classNameProp, color, indeterminate = true, progress = 0, showText = true } = props
 
   const className = classNames('progress-bar', classNameProp)
 
@@ -42,12 +42,6 @@ ProgressBar.propTypes = {
   indeterminate: PropTypes.bool,
   progress: PropTypes.number,
   showText: PropTypes.bool,
-}
-
-ProgressBar.defaultProps = {
-  indeterminate: true,
-  progress: 0,
-  showText: true,
 }
 
 export default ProgressBar

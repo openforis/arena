@@ -6,7 +6,14 @@ import AlertTitle from '@mui/material/AlertTitle'
 import { useI18n } from '@webapp/store/system'
 
 export const Alert = (props) => {
-  const { autoDismiss, autoDismissInterval, severity, text: textKey, title: titleKey, onDismiss } = props
+  const {
+    autoDismiss = false,
+    autoDismissInterval = 3000,
+    severity = 'info',
+    text: textKey,
+    title: titleKey,
+    onDismiss,
+  } = props
 
   const i18n = useI18n()
   const [show, setShow] = useState(true)
@@ -24,7 +31,7 @@ export const Alert = (props) => {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [autoDismiss, autoDismissInterval])
+  }, [autoDismiss, autoDismissInterval, onDismiss])
 
   if (!show) {
     return null
@@ -47,10 +54,4 @@ Alert.propTypes = {
   text: PropTypes.string.isRequired,
   title: PropTypes.string,
   onDismiss: PropTypes.func,
-}
-
-Alert.defaultProps = {
-  autoDismiss: false,
-  autoDismissInterval: 3000,
-  severity: 'info',
 }

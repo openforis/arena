@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { ButtonIconInfo } from '@webapp/components/buttons'
 
 export const FormItem = (props) => {
-  const { children, className, info, label, required } = props
+  const { children, className = '', info = null, label = null, required = false } = props
 
   return (
     <div className={`form-item ${className}`}>
@@ -26,11 +26,4 @@ FormItem.propTypes = {
   info: PropTypes.string,
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   required: PropTypes.bool,
-}
-
-FormItem.defaultProps = {
-  className: '',
-  info: null,
-  label: null,
-  required: false,
 }
