@@ -172,6 +172,7 @@ export const fetchUserSurveys = async (
     sortBy = Survey.sortableKeys.dateModified,
     sortOrder = 'DESC',
     includeOwnerEmailAddress = false,
+    onlyOwn = false,
   },
   client = db
 ) => {
@@ -189,6 +190,7 @@ export const fetchUserSurveys = async (
       sortBy,
       sortOrder,
       includeOwnerEmailAddress,
+      onlyOwn,
     }),
     { userUuid: User.getUuid(user), template, search },
     (def) => DB.transformCallback(def, true)
