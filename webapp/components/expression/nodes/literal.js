@@ -169,8 +169,4 @@ Literal.propTypes = {
   type: PropTypes.string.isRequired,
 }
 
-Literal.defaultProps = {
-  nodeDefCurrent: null,
-}
-
 export default Literal

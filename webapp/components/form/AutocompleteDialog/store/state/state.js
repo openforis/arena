@@ -32,8 +32,8 @@ const _calculateVerticalPosition = ({ top: elementTop, height: elementHeight }) 
 
   return top + MAX_HEIGHT_AUTOCOMPLETE_DIAOLOG > windowScreenY ? { bottom: windowScreenY - elementTop } : { top }
 }
-export const calculatePosition = (state) => {
-  const { top, left, height, width } = elementOffset(getSourceElement(state) || getInputField(state))
+export const calculatePosition = ({ sourceElement, inputField }) => {
+  const { top, left, height, width } = elementOffset(sourceElement ?? inputField)
   return {
     ..._calculateVerticalPosition({ top, height }),
     left,

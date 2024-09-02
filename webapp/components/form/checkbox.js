@@ -17,17 +17,17 @@ import classNames from 'classnames'
 const Checkbox = (props) => {
   const {
     className,
-    id,
-    checked,
-    indeterminate,
+    checked = false,
+    disabled = false,
+    id = null,
     info,
-    label,
-    onChange: onChangeProp,
-    disabled,
-    radio,
-    size,
+    indeterminate = false,
+    label = null,
+    onChange: onChangeProp = null,
+    radio = false,
+    size = 'medium',
+    validation = {},
     value,
-    validation,
   } = props
 
   const i18n = useI18n()
@@ -87,18 +87,6 @@ Checkbox.propTypes = {
   size: PropTypes.oneOf(['small', 'medium']),
   validation: PropTypes.object,
   value: PropTypes.string,
-}
-
-Checkbox.defaultProps = {
-  id: null,
-  checked: false,
-  disabled: false,
-  indeterminate: false,
-  label: null,
-  onChange: null,
-  radio: false,
-  size: 'medium',
-  validation: {},
 }
 
 export default Checkbox

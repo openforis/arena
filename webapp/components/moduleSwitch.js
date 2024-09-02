@@ -17,7 +17,7 @@ const NotFoundPage = () => {
 const FallbackComponent = <>...</>
 
 const ModuleSwitch = (props) => {
-  const { modules, moduleRoot, moduleDefault } = props
+  const { modules = [], moduleRoot = null, moduleDefault = null } = props
 
   const navigate = useNavigate()
 
@@ -31,7 +31,7 @@ const ModuleSwitch = (props) => {
       if (isInRootModule) {
         navigate(appModuleUri(moduleDefault), { replace: true })
       }
-    }, [isInRootModule])
+    }, [isInRootModule, moduleDefault, navigate])
   }
 
   return (
@@ -56,12 +56,6 @@ ModuleSwitch.propTypes = {
   modules: PropTypes.array.isRequired,
   moduleRoot: PropTypes.object,
   moduleDefault: PropTypes.object,
-}
-
-ModuleSwitch.defaultProps = {
-  modules: [],
-  moduleRoot: null,
-  moduleDefault: null,
 }
 
 export default ModuleSwitch

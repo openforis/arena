@@ -4,7 +4,15 @@ import PropTypes from 'prop-types'
 import { Button } from '@webapp/components/buttons'
 
 export const ButtonDownload = forwardRef((props, ref) => {
-  const { href, onClick: onClickProp, requestParams, ...otherProps } = props
+  const {
+    href = null,
+    iconClassName = 'icon-download2 icon-14px',
+    label = 'common.download',
+    onClick: onClickProp,
+    requestParams,
+    variant = 'outlined',
+    ...otherProps
+  } = props
 
   const onClick = useCallback(async () => {
     if (href) {
@@ -16,7 +24,9 @@ export const ButtonDownload = forwardRef((props, ref) => {
     }
   }, [href, onClickProp, requestParams])
 
-  return <Button ref={ref} onClick={onClick} {...otherProps} />
+  return (
+    <Button iconClassName={iconClassName} label={label} onClick={onClick} ref={ref} variant={variant} {...otherProps} />
+  )
 })
 
 ButtonDownload.propTypes = {
@@ -24,12 +34,4 @@ ButtonDownload.propTypes = {
   href: PropTypes.string, // specify href, onClick or both
   onClick: PropTypes.func, // specify href, onClick or both
   requestParams: PropTypes.object,
-}
-
-ButtonDownload.defaultProps = {
-  ...Button.defaultProps,
-  href: null,
-  iconClassName: 'icon-download2 icon-14px',
-  label: 'common.download',
-  variant: 'outlined',
 }

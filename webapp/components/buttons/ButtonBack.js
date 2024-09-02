@@ -5,12 +5,17 @@ import classNames from 'classnames'
 import { Button } from './Button'
 
 export const ButtonBack = (props) => {
-  const { className, ...otherProps } = props
+  const { className, label = 'common.back', ...otherProps } = props
 
   const navigate = useNavigate()
 
   return (
-    <Button {...otherProps} onClick={() => navigate(-1)} className={classNames('btn-secondary btn-back', className)} />
+    <Button
+      {...otherProps}
+      label={label}
+      onClick={() => navigate(-1)}
+      className={classNames('btn-secondary btn-back', className)}
+    />
   )
 }
 
@@ -20,9 +25,4 @@ const { onClick, ...otherButtonPropTypes } = Button.propTypes
 
 ButtonBack.propTypes = {
   ...otherButtonPropTypes,
-}
-
-ButtonBack.defaultProps = {
-  ...Button.defaultProps,
-  label: 'common.back',
 }

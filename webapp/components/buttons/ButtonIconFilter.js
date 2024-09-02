@@ -7,7 +7,3 @@ export const ButtonIconFilter = (props) => <Button {...props} iconClassName="ico
 ButtonIconFilter.propTypes = {
   ...Button.propTypes,
 }
-
-ButtonIconFilter.defaultProps = {
-  ...Button.defaultProps,
-}

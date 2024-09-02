@@ -16,23 +16,23 @@ const textAreaRows = 3
 
 export const Input = React.forwardRef((props, ref) => {
   const {
-    className: classNameProp,
-    disabled,
-    id,
-    inputType,
-    maxLength,
-    name,
-    onChange,
-    onFocus,
-    onBlur,
-    placeholder,
-    readOnly,
-    title: titleProp,
-    type,
-    validation,
-    value,
-    numberFormat,
-    textTransformFunction,
+    className: classNameProp = null,
+    disabled = false,
+    id = null,
+    inputType = 'input',
+    maxLength = null,
+    name = undefined,
+    numberFormat = null,
+    onChange = null,
+    onFocus = () => {},
+    onBlur = () => {},
+    placeholder = null,
+    readOnly = false,
+    textTransformFunction = (s) => s,
+    title: titleProp = null, // defaults to value
+    type = 'text',
+    validation = null,
+    value = '',
   } = props
 
   // workaround for inputRef: useRef(ref) does not work as expected
@@ -143,24 +143,4 @@ Input.propTypes = {
     placeholder: PropTypes.string,
   }),
   textTransformFunction: PropTypes.func,
-}
-
-Input.defaultProps = {
-  className: null,
-  disabled: false,
-  id: null,
-  inputType: 'input',
-  maxLength: null,
-  name: undefined,
-  onChange: null,
-  onFocus: () => {},
-  onBlur: () => {},
-  placeholder: null,
-  readOnly: false,
-  title: null, // defaults to value
-  type: 'text',
-  validation: null,
-  value: '',
-  numberFormat: null,
-  textTransformFunction: (s) => s,
 }
