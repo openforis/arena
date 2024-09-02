@@ -14,6 +14,12 @@ import { SurveyTemplateSelect } from './SurveyTemplateSelect'
 import { Dropdown, EmailInput, TextInput } from '@webapp/components/form'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
+const AccessRequestInputFieldPropTypes = {
+  field: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.any.isRequired,
+}
+
 const CountryField = (props) => {
   const { field, onChange, value } = props
 
@@ -32,6 +38,8 @@ const CountryField = (props) => {
   )
 }
 
+CountryField.propTypes = AccessRequestInputFieldPropTypes
+
 const TemplateField = (props) => {
   const { field, onChange, value } = props
 
@@ -41,6 +49,8 @@ const TemplateField = (props) => {
 
   return <SurveyTemplateSelect selectedValue={selectedValue} onChange={(value) => onChange({ name, value })} />
 }
+
+TemplateField.propTypes = AccessRequestInputFieldPropTypes
 
 const EmailField = (props) => {
   const { field, onChange, value } = props
@@ -56,6 +66,8 @@ const EmailField = (props) => {
     />
   )
 }
+
+EmailField.propTypes = AccessRequestInputFieldPropTypes
 
 const TextField = (props) => {
   const { field, onChange, value } = props
@@ -73,6 +85,8 @@ const TextField = (props) => {
   )
 }
 
+TextField.propTypes = AccessRequestInputFieldPropTypes
+
 const componentsByFieldName = {
   [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: CountryField,
   [UserAccessRequest.keys.email]: EmailField,
@@ -80,7 +94,7 @@ const componentsByFieldName = {
 }
 
 export const AccessRequestField = (props) => {
-  const { field, request, validation } = props
+  const { field, request, validation = null } = props
 
   const i18n = useI18n()
   const { name, required } = field
@@ -107,8 +121,4 @@ AccessRequestField.propTypes = {
   onChange: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,
   validation: PropTypes.object,
-}
-
-AccessRequestField.defaultProps = {
-  validation: null,
 }

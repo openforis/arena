@@ -22,16 +22,16 @@ import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/Butt
 
 export const CategorySelector = (props) => {
   const {
-    disabled,
-    categoryUuid,
-    validation,
-    onChange,
-    onCategoryLoad,
-    filterFunction,
-    emptySelection,
-    showAdd,
-    showEdit,
-    showManage,
+    categoryUuid = null, // Selected categoryUuid
+    disabled = false,
+    emptySelection = false,
+    filterFunction = null,
+    onCategoryLoad = () => ({}),
+    onChange = () => ({}),
+    showAdd = true,
+    showEdit = true,
+    showManage = true,
+    validation = null,
   } = props
 
   const i18n = useI18n()
@@ -166,17 +166,4 @@ CategorySelector.propTypes = {
   showAdd: PropTypes.bool,
   showEdit: PropTypes.bool,
   showManage: PropTypes.bool,
-}
-
-CategorySelector.defaultProps = {
-  categoryUuid: null, // Selected categoryUuid
-  validation: null,
-  disabled: false,
-  onChange: () => ({}),
-  onCategoryLoad: () => ({}),
-  filterFunction: null,
-  emptySelection: false,
-  showAdd: true,
-  showEdit: true,
-  showManage: true,
 }

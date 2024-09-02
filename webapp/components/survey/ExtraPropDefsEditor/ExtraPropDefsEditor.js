@@ -10,12 +10,12 @@ import { useExtraPropDefsEditor } from './useExtraPropDefsEditor'
 
 export const ExtraPropDefsEditor = (props) => {
   const {
+    canAdd = true,
     extraPropDefs: extraPropDefsProp,
     isExtraPropDefReadOnly,
     onExtraPropDefDelete,
     onExtraPropDefUpdate,
     toggleEditExtraPropsPanel,
-    canAdd = true,
   } = props
 
   const { i18n, extraPropDefs, readOnly, onItemAdd, onItemDelete, onItemUpdate } = useExtraPropDefsEditor({
@@ -62,8 +62,4 @@ ExtraPropDefsEditor.propTypes = {
   onExtraPropDefDelete: PropTypes.func.isRequired,
   onExtraPropDefUpdate: PropTypes.func.isRequired,
   toggleEditExtraPropsPanel: PropTypes.func.isRequired,
-}
-
-ExtraPropDefsEditor.defaultProps = {
-  canAdd: true,
 }

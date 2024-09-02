@@ -16,7 +16,26 @@ import { FormItem } from '@webapp/components/form/Input'
 import ExpressionProp from './ExpressionProp'
 
 const ExpressionsProp = (props) => {
-  const { excludeCurrentNodeDef, label, multiple, onChange, qualifier, validation, values } = props
+  const {
+    applyIf = true,
+    canBeConstant = false,
+    excludeCurrentNodeDef = true,
+    isBoolean = true,
+    isContextParent = false,
+    label = '',
+    mode = Expression.modes.json,
+    multiple = true,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onChange,
+    qualifier,
+    readOnly = false,
+    severity = false,
+    showLabels = false,
+    validation = null,
+    values = [],
+    ...otherProps
+  } = props
 
   const dispatch = useDispatch()
 
@@ -53,27 +72,47 @@ const ExpressionsProp = (props) => {
         {values.map((value, i) => (
           <ExpressionProp
             key={i}
-            {...props}
+            applyIf={applyIf}
+            canBeConstant={canBeConstant}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
-            qualifier={qualifier}
             index={i}
+            isBoolean={isBoolean}
+            isContextParent={isContextParent}
+            mode={mode}
+            qualifier={qualifier}
             expression={value}
-            validation={Validation.getFieldValidation(i)(validation)}
+            nodeDefUuidContext={nodeDefUuidContext}
+            nodeDefUuidCurrent={nodeDefUuidCurrent}
             onDelete={onDelete}
             onUpdate={onUpdate}
+            readOnly={readOnly}
+            severity={severity}
+            showLabels={showLabels}
+            validation={Validation.getFieldValidation(i)(validation)}
+            {...otherProps}
           />
         ))}
 
         {(multiple || R.isEmpty(values)) && (
           <ExpressionProp
-            {...props}
+            applyIf={applyIf}
+            canBeConstant={canBeConstant}
             excludeCurrentNodeDef={excludeCurrentNodeDef}
-            qualifier={qualifier}
-            index={values.length}
             expression={NodeDefExpression.createExpressionPlaceholder()}
-            validation={{}}
+            index={values.length}
+            isBoolean={isBoolean}
+            isContextParent={isContextParent}
+            mode={mode}
+            nodeDefUuidContext={nodeDefUuidContext}
+            nodeDefUuidCurrent={nodeDefUuidCurrent}
             onDelete={onDelete}
             onUpdate={onUpdate}
+            qualifier={qualifier}
+            readOnly={readOnly}
+            severity={severity}
+            showLabels={showLabels}
+            validation={{}}
+            {...otherProps}
           />
         )}
       </div>
@@ -82,33 +121,25 @@ const ExpressionsProp = (props) => {
 }
 
 ExpressionsProp.propTypes = {
-  qualifier: PropTypes.string.isRequired, // used to generate test ids
-  values: PropTypes.array, // Array of expressions
-  label: PropTypes.string,
-  validation: PropTypes.object,
-  multiple: PropTypes.bool,
+  applyIf: PropTypes.bool,
+  canBeConstant: PropTypes.bool,
   excludeCurrentNodeDef: PropTypes.bool,
+  expression: PropTypes.object.isRequired,
+  hideAdvanced: PropTypes.bool,
+  isBoolean: PropTypes.bool,
+  isContextParent: PropTypes.bool,
+  label: PropTypes.string,
+  mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
+  multiple: PropTypes.bool,
+  nodeDefUuidContext: PropTypes.string,
+  nodeDefUuidCurrent: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-}
-
-ExpressionsProp.defaultProps = {
-  label: '',
-  applyIf: true,
-  showLabels: false,
-  severity: false,
-  multiple: true,
-  readOnly: false,
-  mode: Expression.modes.json,
-  nodeDefUuidContext: null,
-  nodeDefUuidCurrent: null,
-  excludeCurrentNodeDef: true,
-  values: [],
-
-  validation: null,
-
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
+  qualifier: PropTypes.string.isRequired, // used to generate test ids
+  readOnly: PropTypes.bool,
+  severity: PropTypes.bool,
+  showLabels: PropTypes.bool,
+  validation: PropTypes.object,
+  values: PropTypes.array, // Array of expressions
 }
 
 export default ExpressionsProp
