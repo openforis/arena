@@ -7,8 +7,9 @@ import circleToPolygon from 'circle-to-polygon'
 import L from 'leaflet'
 import axios from 'axios'
 
-import { Objects, PointFactory } from '@openforis/arena-core'
+import { Objects, PointFactory, DEFAULT_SRS } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
@@ -130,9 +131,11 @@ export const CoordinateAttributePopUp = (props) => {
     })
   }, [getGeoJson, surveyId])
 
+  const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
+
   const content = `**${path}**
-* **X**: ${point.x}
-* **Y**: ${point.y}
+* **X**: ${NumberUtils.roundToPrecision(point.x, coordinateNumericFieldPrecision)}
+* **Y**: ${NumberUtils.roundToPrecision(point.y, coordinateNumericFieldPrecision)}
 * **SRS**: ${point.srs}
 * **${i18n.t('mapView.altitude')}**: ${altitude}
 * **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
