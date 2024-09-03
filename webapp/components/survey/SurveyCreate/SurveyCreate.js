@@ -33,7 +33,7 @@ const fileMaxSizeDefault = 1000 // 1GB
 const fileMaxSizeSystemAdmin = 2000 // 2GB
 
 const SurveyCreate = (props) => {
-  const { showImport, submitButtonLabel, template } = props
+  const { showImport = true, submitButtonLabel = 'homeView.surveyCreate.createSurvey', template = false } = props
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
@@ -231,12 +231,6 @@ SurveyCreate.propTypes = {
   showImport: PropTypes.bool,
   submitButtonLabel: PropTypes.string,
   template: PropTypes.bool,
-}
-
-SurveyCreate.defaultProps = {
-  showImport: true,
-  submitButtonLabel: 'homeView.surveyCreate.createSurvey',
-  template: false,
 }
 
 export { SurveyCreate }
