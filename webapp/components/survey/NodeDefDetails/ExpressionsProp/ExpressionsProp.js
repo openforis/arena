@@ -1,6 +1,6 @@
 import './ExpressionsProp.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
@@ -20,6 +20,7 @@ const ExpressionsProp = (props) => {
     applyIf = true,
     canBeConstant = false,
     excludeCurrentNodeDef = true,
+    hideAdvanced = false,
     isBoolean = true,
     isContextParent = false,
     label = '',
@@ -34,87 +35,105 @@ const ExpressionsProp = (props) => {
     showLabels = false,
     validation = null,
     values = [],
-    ...otherProps
   } = props
 
   const dispatch = useDispatch()
 
-  const getExpressionIndex = (expression) => R.findIndex(NodeDefExpression.isEqual(expression), values)
+  const getExpressionIndex = useCallback(
+    (expression) => R.findIndex(NodeDefExpression.isEqual(expression), values),
+    [values]
+  )
 
-  const onDelete = (expression, callback = null) => {
-    dispatch(
-      DialogConfirmActions.showDialogConfirm({
-        key: 'nodeDefEdit.expressionsProp.confirmDelete',
-        onOk: () => {
-          const index = getExpressionIndex(expression)
-          const newValues = R.remove(index, 1, values)
-          onChange(newValues)
-          callback?.()
-        },
-      })
-    )
-  }
+  const onDelete = useCallback(
+    (expression, callback = null) => {
+      dispatch(
+        DialogConfirmActions.showDialogConfirm({
+          key: 'nodeDefEdit.expressionsProp.confirmDelete',
+          onOk: () => {
+            const index = getExpressionIndex(expression)
+            const newValues = R.remove(index, 1, values)
+            onChange(newValues)
+            callback?.()
+          },
+        })
+      )
+    },
+    [dispatch, getExpressionIndex, onChange, values]
+  )
 
-  const onUpdate = (expression, callback = null) => {
-    if (NodeDefExpression.isEmpty(expression)) {
-      onDelete(expression, callback)
-    } else {
-      const index = getExpressionIndex(expression)
-      const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
-      onChange(newValues)
-      callback?.()
-    }
-  }
+  const onUpdate = useCallback(
+    (expression, callback = null) => {
+      if (NodeDefExpression.isEmpty(expression)) {
+        onDelete(expression, callback)
+      } else {
+        const index = getExpressionIndex(expression)
+        const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
+        onChange(newValues)
+        callback?.()
+      }
+    },
+    [getExpressionIndex, onChange, onDelete, values]
+  )
+
+  const createExpressionProp = useCallback(
+    ({ index, expression, validation }) => (
+      <ExpressionProp
+        key={index}
+        applyIf={applyIf}
+        canBeConstant={canBeConstant}
+        excludeCurrentNodeDef={excludeCurrentNodeDef}
+        expression={expression}
+        hideAdvanced={hideAdvanced}
+        index={index}
+        isBoolean={isBoolean}
+        isContextParent={isContextParent}
+        mode={mode}
+        qualifier={qualifier}
+        nodeDefUuidContext={nodeDefUuidContext}
+        nodeDefUuidCurrent={nodeDefUuidCurrent}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+        readOnly={readOnly}
+        severity={severity}
+        showLabels={showLabels}
+        validation={validation}
+      />
+    ),
+    [
+      applyIf,
+      canBeConstant,
+      excludeCurrentNodeDef,
+      hideAdvanced,
+      isBoolean,
+      isContextParent,
+      mode,
+      nodeDefUuidContext,
+      nodeDefUuidCurrent,
+      onDelete,
+      onUpdate,
+      qualifier,
+      readOnly,
+      severity,
+      showLabels,
+    ]
+  )
 
   return (
     <FormItem label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
       <div className="node-def-edit__expressions">
-        {values.map((value, i) => (
-          <ExpressionProp
-            key={i}
-            applyIf={applyIf}
-            canBeConstant={canBeConstant}
-            excludeCurrentNodeDef={excludeCurrentNodeDef}
-            index={i}
-            isBoolean={isBoolean}
-            isContextParent={isContextParent}
-            mode={mode}
-            qualifier={qualifier}
-            expression={value}
-            nodeDefUuidContext={nodeDefUuidContext}
-            nodeDefUuidCurrent={nodeDefUuidCurrent}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-            readOnly={readOnly}
-            severity={severity}
-            showLabels={showLabels}
-            validation={Validation.getFieldValidation(i)(validation)}
-            {...otherProps}
-          />
-        ))}
-
-        {(multiple || R.isEmpty(values)) && (
-          <ExpressionProp
-            applyIf={applyIf}
-            canBeConstant={canBeConstant}
-            excludeCurrentNodeDef={excludeCurrentNodeDef}
-            expression={NodeDefExpression.createExpressionPlaceholder()}
-            index={values.length}
-            isBoolean={isBoolean}
-            isContextParent={isContextParent}
-            mode={mode}
-            nodeDefUuidContext={nodeDefUuidContext}
-            nodeDefUuidCurrent={nodeDefUuidCurrent}
-            onDelete={onDelete}
-            onUpdate={onUpdate}
-            qualifier={qualifier}
-            readOnly={readOnly}
-            severity={severity}
-            showLabels={showLabels}
-            validation={{}}
-            {...otherProps}
-          />
+        {values.map((value, index) =>
+          createExpressionProp({
+            index,
+            expression: value,
+            validation: Validation.getFieldValidation(index)(validation),
+          })
         )}
+        {(multiple || R.isEmpty(values)) &&
+          createExpressionProp({
+            index: values.length,
+            expression: NodeDefExpression.createExpressionPlaceholder(),
+            validation: {},
+          })}
       </div>
     </FormItem>
   )
@@ -124,7 +143,6 @@ ExpressionsProp.propTypes = {
   applyIf: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   excludeCurrentNodeDef: PropTypes.bool,
-  expression: PropTypes.object.isRequired,
   hideAdvanced: PropTypes.bool,
   isBoolean: PropTypes.bool,
   isContextParent: PropTypes.bool,
