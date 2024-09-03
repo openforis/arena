@@ -10,7 +10,8 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 
 const NodeDefFormItem = (props) => {
-  const { edit, entry, label, lang, nodeDef, nodes, parentNode } = props
+  const { edit, entry, label, lang, nodeDef, nodes = [], parentNode = null } = props
+
   const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
 
   if (NodeDef.isEntity(nodeDef)) {
@@ -54,11 +55,6 @@ NodeDefFormItem.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array,
   parentNode: PropTypes.object,
-}
-
-NodeDefFormItem.defaultProps = {
-  nodes: [],
-  parentNode: null,
 }
 
 export default NodeDefFormItem

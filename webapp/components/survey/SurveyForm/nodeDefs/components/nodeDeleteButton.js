@@ -8,7 +8,7 @@ import { RecordActions } from '@webapp/store/ui/record'
 import { ButtonIconDelete } from '@webapp/components/buttons'
 
 const NodeDeleteButton = (props) => {
-  const { nodeDef, node, disabled, showConfirm, removeNode } = props
+  const { disabled = false, node, nodeDef, removeNode, showConfirm = true } = props
 
   const dispatch = useDispatch()
 
@@ -40,11 +40,6 @@ NodeDeleteButton.propTypes = {
   disabled: PropTypes.bool,
   removeNode: PropTypes.func,
   showConfirm: PropTypes.bool,
-}
-
-NodeDeleteButton.defaultProps = {
-  disabled: false,
-  showConfirm: true,
 }
 
 export default NodeDeleteButton
