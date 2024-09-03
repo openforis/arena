@@ -9,7 +9,15 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import useValidation from './useValidation'
 
 const NodeDefErrorBadge = (props) => {
-  const { children, edit, node, nodeDef, nodes, parentNode, insideTable} = props
+  const {
+    children = null,
+    edit = false,
+    insideTable = false,
+    node = null,
+    nodeDef,
+    nodes = null,
+    parentNode = null,
+  } = props
   const validation = useValidation({ edit, node, nodeDef, nodes, parentNode })
 
   return (
@@ -30,18 +38,11 @@ const NodeDefErrorBadge = (props) => {
 NodeDefErrorBadge.propTypes = {
   children: PropTypes.node,
   edit: PropTypes.bool,
+  insideTable: PropTypes.bool,
   node: PropTypes.object, // Passed when validating a single node of a nodeDef multiple
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array,
   parentNode: PropTypes.object,
-}
-
-NodeDefErrorBadge.defaultProps = {
-  children: null,
-  edit: false,
-  node: null,
-  nodes: null,
-  parentNode: null,
 }
 
 export default NodeDefErrorBadge
