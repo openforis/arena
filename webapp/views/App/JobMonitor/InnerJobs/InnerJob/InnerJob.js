@@ -8,7 +8,7 @@ import { useI18n } from '@webapp/store/system'
 import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
 
-const InnerJob = ({ isCurrentJob, innerJob, index }) => {
+const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
   const i18n = useI18n()
   const elementRef = useRef(null)
 
@@ -37,10 +37,6 @@ InnerJob.propTypes = {
   isCurrentJob: PropTypes.bool,
   innerJob: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
-}
-
-InnerJob.defaultProps = {
-  isCurrentJob: false,
 }
 
 export default InnerJob

@@ -14,17 +14,17 @@ import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 
 const NodeDefEntityTableRow = forwardRef((props, ref) => {
   const {
+    canDelete = true,
     edit,
     entry,
+    i = 'header',
     id,
+    node = null,
     nodeDef,
-    nodeDefColumns,
-    node,
-    canDelete,
+    nodeDefColumns = [],
     canEditRecord,
     canEditDef,
     renderType,
-    i = 'header',
     siblingEntities,
   } = props
 
@@ -183,13 +183,6 @@ NodeDefEntityTableRow.propTypes = {
   renderType: PropTypes.string.isRequired,
   i: PropTypes.any,
   siblingEntities: PropTypes.array,
-}
-
-NodeDefEntityTableRow.defaultProps = {
-  nodeDefColumns: [],
-  node: null,
-  i: 'header',
-  canDelete: true,
 }
 
 export default NodeDefEntityTableRow

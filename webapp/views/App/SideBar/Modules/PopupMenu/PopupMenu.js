@@ -8,7 +8,7 @@ import * as SideBarModule from '../utils'
 import SubModules from '../SubModules'
 
 const PopupMenu = (props) => {
-  const { module, moduleElement, pathname, onClose, overSidebar } = props
+  const { module = null, moduleElement, pathname = '', onClose = null, overSidebar = true } = props
 
   const key = SideBarModule.getKey(module)
 
@@ -78,13 +78,6 @@ const PopupMenu = (props) => {
     </div>,
     document.body
   )
-}
-
-PopupMenu.defaultProps = {
-  module: null,
-  pathname: '',
-  onClose: null,
-  overSidebar: true,
 }
 
 export default PopupMenu

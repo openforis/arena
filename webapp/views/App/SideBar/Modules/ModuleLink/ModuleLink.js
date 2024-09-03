@@ -9,7 +9,7 @@ import { TestId } from '@webapp/utils/testId'
 import * as SideBarModule from '../utils'
 
 const ModuleLink = (props) => {
-  const { module, pathname, showLabel, disabled } = props
+  const { disabled = false, module = null, pathname = '', showLabel = false } = props
 
   const key = SideBarModule.getKey(module)
   const active = SideBarModule.isActive(pathname)(module)
@@ -66,13 +66,6 @@ ModuleLink.propTypes = {
   pathname: PropTypes.string,
   showLabel: PropTypes.bool,
   disabled: PropTypes.bool,
-}
-
-ModuleLink.defaultProps = {
-  module: null,
-  pathname: '',
-  showLabel: false,
-  disabled: false,
 }
 
 export default ModuleLink

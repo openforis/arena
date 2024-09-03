@@ -9,7 +9,14 @@ import ModuleLink from '../ModuleLink'
 import SubModules from '../SubModules'
 
 const Module = forwardRef((props, ref) => {
-  const { surveyInfo, module, pathname, sideBarOpened, isOver, onMouseEnter } = props
+  const {
+    isOver = false,
+    module = null,
+    onMouseEnter = null,
+    pathname = '',
+    sideBarOpened = false,
+    surveyInfo = null,
+  } = props
 
   const isModuleHome = SideBarModule.isHome(module)
   const isSurveySelectionRequired = SideBarModule.isSurveySelectionRequired(module)
@@ -62,15 +69,6 @@ Module.propTypes = {
   sideBarOpened: PropTypes.bool,
   isOver: PropTypes.bool,
   onMouseEnter: PropTypes.func,
-}
-
-Module.defaultProps = {
-  surveyInfo: null,
-  module: null,
-  pathname: '',
-  sideBarOpened: false,
-  isOver: false,
-  onMouseEnter: null,
 }
 
 export default Module

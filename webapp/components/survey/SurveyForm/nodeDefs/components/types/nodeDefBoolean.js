@@ -9,7 +9,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { Radiobox } from '@webapp/components/form'
 
 const NodeDefBoolean = (props) => {
-  const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
+  const {
+    canEditRecord = false,
+    edit = false,
+    entry = false,
+    readOnly = false,
+    nodeDef,
+    nodes = null,
+    updateNode,
+  } = props
 
   const node = entry ? nodes[0] : null
 
@@ -43,14 +51,6 @@ NodeDefBoolean.propTypes = {
   nodes: PropTypes.array,
   readOnly: PropTypes.bool,
   updateNode: PropTypes.func.isRequired,
-}
-
-NodeDefBoolean.defaultProps = {
-  canEditRecord: false,
-  edit: false,
-  entry: false,
-  readOnly: false,
-  nodes: null,
 }
 
 export default NodeDefBoolean

@@ -30,16 +30,16 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
 
 const NodeDefTaxonAutocompleteDialog = (props) => {
   const {
-    nodeDef,
-    parentNode,
-    draft,
+    autocompleteSourceElement = null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
+    draft = false,
     entryDataQuery,
-    inputRef,
-    field,
-    fieldValue,
-    autocompleteSourceElement,
-    onItemSelect,
-    onClose,
+    field = '',
+    fieldValue = '',
+    inputRef = null,
+    nodeDef,
+    onItemSelect = null,
+    onClose = null,
+    parentNode,
   } = props
 
   const taxa = useTaxa({ nodeDef, parentNode, draft, entryDataQuery, field, fieldValue })
@@ -57,19 +57,6 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
     />,
     document.body
   )
-}
-
-NodeDefTaxonAutocompleteDialog.defaultProps = {
-  surveyId: null,
-  taxonomyUuid: null,
-  draft: false,
-
-  inputRef: null,
-  field: '',
-  fieldValue: '',
-  onItemSelect: null,
-  onClose: null,
-  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 NodeDefTaxonAutocompleteItemRenderer.propTypes = {
