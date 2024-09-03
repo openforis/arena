@@ -28,23 +28,17 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
   )
 }
 
-NodeDefTaxonAutocompleteItemRenderer.propTypes = {
-  item: PropTypes.object.isRequired,
-  onKeyDown: PropTypes.func,
-  onMouseDown: PropTypes.func,
-}
-
 const NodeDefTaxonAutocompleteDialog = (props) => {
   const {
     autocompleteSourceElement = null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
     draft = false,
     entryDataQuery,
-    field,
+    field = '',
     fieldValue = '',
-    inputRef,
+    inputRef = null,
     nodeDef,
-    onItemSelect,
-    onClose,
+    onItemSelect = null,
+    onClose = null,
     parentNode,
   } = props
 
@@ -65,17 +59,10 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
   )
 }
 
-NodeDefTaxonAutocompleteDialog.propTypes = {
-  autocompleteSourceElement: PropTypes.node.isRequired, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
-  draft: PropTypes.bool,
-  entryDataQuery: PropTypes.bool,
-  field: PropTypes.string.isRequired,
-  fieldValue: PropTypes.string,
-  inputRef: PropTypes.object.isRequired,
-  nodeDef: PropTypes.object.isRequired,
-  onItemSelect: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-  parentNode: PropTypes.object,
+NodeDefTaxonAutocompleteItemRenderer.propTypes = {
+  item: PropTypes.object.isRequired,
+  onKeyDown: PropTypes.func,
+  onMouseDown: PropTypes.func,
 }
 
 export default NodeDefTaxonAutocompleteDialog
