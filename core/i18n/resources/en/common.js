@@ -208,6 +208,7 @@ Do you want to proceed?`,
   dropzone: {
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
     error: {
+      fileNotValid: 'Selected file is not valid',
       fileTooBig: 'Selected file is too big',
       invalidFileExtension: 'Invalid file extension: {{extension}}',
     },
