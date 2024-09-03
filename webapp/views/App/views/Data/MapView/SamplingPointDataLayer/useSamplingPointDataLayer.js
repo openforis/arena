@@ -84,7 +84,7 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
 }
 
 export const useSamplingPointDataLayer = (props) => {
-  const { levelIndex = 0, markersColor } = props
+  const { levelIndex, markersColor } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()

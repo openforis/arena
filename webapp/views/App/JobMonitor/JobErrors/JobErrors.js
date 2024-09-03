@@ -17,12 +17,7 @@ const validationWrapper = (fields) => ({
   fields,
 })
 
-const JobErrors = ({
-  errorKeyHeaderName = 'common.item',
-  exportFileName: exportFileNameProp,
-  job = {},
-  openPanel = true,
-}) => {
+const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job, openPanel }) => {
   const errors = JobSerialized.getErrors(job)
   const errorsCount = JobSerialized.getErrorsCount(job)
 
@@ -77,6 +72,12 @@ JobErrors.propTypes = {
   exportFileName: PropTypes.string,
   job: PropTypes.object,
   openPanel: PropTypes.bool,
+}
+
+JobErrors.defaultProps = {
+  errorKeyHeaderName: 'common.item',
+  job: {},
+  openPanel: true,
 }
 
 export default JobErrors

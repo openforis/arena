@@ -6,7 +6,7 @@ import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 
 const NodeDefFormItemLabel = (props) => {
-  const { edit, label, lang, nodeDef, nodes = [], parentNode = null } = props
+  const { nodeDef, label, lang, edit, parentNode, nodes } = props
 
   return (
     <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes}>
@@ -24,6 +24,11 @@ NodeDefFormItemLabel.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array,
   parentNode: PropTypes.object,
+}
+
+NodeDefFormItemLabel.defaultProps = {
+  nodes: [],
+  parentNode: null,
 }
 
 export default NodeDefFormItemLabel

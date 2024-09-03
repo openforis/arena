@@ -9,7 +9,7 @@ import MuiTab from '@mui/material/Tab'
 import { useI18n } from '@webapp/store/system'
 
 export const Tabs = (props) => {
-  const { items, orientation = 'horizontal' } = props
+  const { items, orientation } = props
 
   const [selectedIndex, setSelectedIndex] = useState(0)
 
@@ -40,4 +40,8 @@ export const Tabs = (props) => {
 Tabs.propTypes = {
   items: PropTypes.array.isRequired,
   orientation: PropTypes.oneOf(['vertical', 'horizontal']),
+}
+
+Tabs.defaultProps = {
+  orientation: 'horizontal',
 }

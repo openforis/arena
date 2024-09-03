@@ -22,7 +22,7 @@ const sources = {
 }
 
 const DataExport = (props) => {
-  const { recordUuids, search, sourceSelectionAvailable = false } = props
+  const { recordUuids, search, sourceSelectionAvailable } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -94,6 +94,10 @@ DataExport.propTypes = {
   recordUuids: PropTypes.array,
   search: PropTypes.string,
   sourceSelectionAvailable: PropTypes.bool,
+}
+
+DataExport.defaultProps = {
+  sourceSelectionAvailable: false,
 }
 
 export default DataExport

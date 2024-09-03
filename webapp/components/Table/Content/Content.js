@@ -28,27 +28,27 @@ LoadingRows.propTypes = {
 const Content = (props) => {
   const {
     cellProps,
-    columns = null,
-    expandableRows = false,
+    columns,
+    expandableRows,
     gridTemplateColumns: gridTemplateColumnsParam,
-    handleSortBy,
     keyExtractor,
+    handleSortBy,
     list,
-    loading = false,
+    loading,
     maxRows,
     module,
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
-    onRowClick = null,
-    onRowDoubleClick = null,
-    rowComponent: rowComponentParam,
-    rowExpandedComponent = null,
+    onRowClick,
+    onRowDoubleClick,
+    totalCount,
     rowHeaderComponent: rowHeaderComponentParam,
-    rowProps = {},
-    selectedItems = [],
+    rowComponent: rowComponentParam,
+    rowExpandedComponent,
+    rowProps,
+    selectedItems,
     sort,
-    totalCount = undefined,
   } = props
 
   const i18n = useI18n()
@@ -148,6 +148,20 @@ Content.propTypes = {
   selectedItems: PropTypes.array,
   sort: PropTypes.object.isRequired,
   totalCount: PropTypes.number,
+}
+
+Content.defaultProps = {
+  columns: null,
+  expandableRows: false,
+  isRowActive: null,
+  onRowClick: null,
+  onRowDoubleClick: null,
+  initData: null,
+  loading: false,
+  rowExpandedComponent: null,
+  rowProps: {},
+  selectedItems: [],
+  totalCount: undefined,
 }
 
 export default Content

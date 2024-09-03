@@ -7,15 +7,7 @@ import * as Node from '@core/record/node'
 import { TimeInput } from '@webapp/components/form/DateTimeInput'
 
 const NodeDefTime = (props) => {
-  const {
-    canEditRecord = false,
-    edit = false,
-    entry = false,
-    nodeDef,
-    nodes = null,
-    readOnly = false,
-    updateNode,
-  } = props
+  const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
 
   const node = entry ? nodes[0] : null
 
@@ -43,6 +35,14 @@ NodeDefTime.propTypes = {
   nodes: PropTypes.array,
   readOnly: PropTypes.bool,
   updateNode: PropTypes.func.isRequired,
+}
+
+NodeDefTime.defaultProps = {
+  canEditRecord: false,
+  edit: false,
+  entry: false,
+  readOnly: false,
+  nodes: null,
 }
 
 export default NodeDefTime

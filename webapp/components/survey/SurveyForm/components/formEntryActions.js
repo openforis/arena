@@ -111,7 +111,7 @@ const RecordEntryButtons = () => {
 }
 
 const FormEntryActions = (props) => {
-  const { entry = false, preview = false } = props
+  const { preview, entry } = props
 
   const dispatch = useDispatch()
 
@@ -136,6 +136,11 @@ const FormEntryActions = (props) => {
 FormEntryActions.propTypes = {
   preview: PropTypes.bool,
   entry: PropTypes.bool,
+}
+
+FormEntryActions.defaultProps = {
+  preview: false,
+  entry: false,
 }
 
 export default FormEntryActions

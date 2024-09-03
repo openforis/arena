@@ -13,14 +13,7 @@ import NodeDefErrorBadge from './nodeDefErrorBadge'
 import NodeDefMultipleTableCell from './nodeDefMultipleTableCell'
 
 const NodeDefTableCellBody = (props) => {
-  const {
-    edit,
-    entryDataQuery = false, // True when node is being edited in data query
-    nodeDef,
-    nodes,
-    parentNode,
-    surveyCycleKey,
-  } = props
+  const { edit, entryDataQuery, nodeDef, nodes, parentNode, surveyCycleKey } = props
 
   const surveyLanguage = useSurveyPreferredLang()
   const readOnly = NodeDef.isReadOnlyOrAnalysis(nodeDef) || (entryDataQuery && NodeDef.isKey(nodeDef))
@@ -67,6 +60,10 @@ NodeDefTableCellBody.propTypes = {
   removeNode: PropTypes.func.isRequired,
   createNodePlaceholder: PropTypes.func.isRequired,
   updateNode: PropTypes.func.isRequired,
+}
+
+NodeDefTableCellBody.defaultProps = {
+  entryDataQuery: false, // True when node is being edited in data query
 }
 
 export default NodeDefTableCellBody

@@ -29,7 +29,7 @@ import { TestId } from '@webapp/utils/testId'
 const Separator = () => <div className="user-popup-menu__sep" />
 
 const UserPopupMenu = (props) => {
-  const { onClose = () => ({}) } = props
+  const { onClose } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -180,6 +180,10 @@ const UserPopupMenu = (props) => {
 
 UserPopupMenu.propTypes = {
   onClose: PropTypes.func,
+}
+
+UserPopupMenu.defaultProps = {
+  onClose: () => ({}),
 }
 
 export default UserPopupMenu

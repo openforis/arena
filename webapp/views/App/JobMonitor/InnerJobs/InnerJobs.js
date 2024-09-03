@@ -7,7 +7,7 @@ import { ExpansionPanel } from '@webapp/components'
 
 import InnerJob from './InnerJob'
 
-const InnerJobs = ({ currentJobIndex = 0, innerJobs = [], openPanel = undefined, panelStartClosed = true }) => (
+const InnerJobs = ({ currentJobIndex, innerJobs, openPanel, panelStartClosed }) => (
   <ExpansionPanel
     className="app-job-monitor__inner-jobs"
     buttonLabel="common.details"
@@ -30,6 +30,13 @@ InnerJobs.propTypes = {
   innerJobs: PropTypes.array,
   openPanel: PropTypes.bool,
   panelStartClosed: PropTypes.bool,
+}
+
+InnerJobs.defaultProps = {
+  currentJobIndex: 0,
+  innerJobs: [],
+  openPanel: undefined,
+  panelStartClosed: true,
 }
 
 export default InnerJobs

@@ -12,7 +12,7 @@ const colorByJobStatus = {
   [JobSerialized.keys.succeeded]: 'success',
 }
 
-const JobProgress = ({ isCurrentJob = true, job = {} }) => {
+const JobProgress = ({ isCurrentJob, job }) => {
   const color = colorByJobStatus[JobSerialized.getStatus(job)]
   const progressPercent = JobSerialized.getProgressPercent(job)
 
@@ -29,6 +29,11 @@ const JobProgress = ({ isCurrentJob = true, job = {} }) => {
 JobProgress.propTypes = {
   isCurrentJob: PropTypes.bool,
   job: PropTypes.object,
+}
+
+JobProgress.defaultProps = {
+  isCurrentJob: true,
+  job: {},
 }
 
 export default JobProgress

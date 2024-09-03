@@ -13,17 +13,17 @@ import Dropdown from '@webapp/components/form/Dropdown'
 
 const NodeDefCodeDropdown = (props) => {
   const {
-    autocomplete = false,
-    canEditRecord = false,
-    edit = false,
-    entryDataQuery = false,
+    autocomplete,
+    canEditRecord,
+    edit,
+    entryDataQuery,
     itemLabelFunction,
     items,
     nodeDef,
     onItemAdd,
     onItemRemove,
-    readOnly = false,
-    selectedItems = [],
+    readOnly,
+    selectedItems,
   } = props
 
   const i18n = useI18n()
@@ -81,6 +81,15 @@ NodeDefCodeDropdown.propTypes = {
   onItemRemove: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
   selectedItems: PropTypes.arrayOf(PropTypes.object),
+}
+
+NodeDefCodeDropdown.defaultProps = {
+  autocomplete: false,
+  canEditRecord: false,
+  edit: false,
+  entryDataQuery: false,
+  readOnly: false,
+  selectedItems: [],
 }
 
 export default NodeDefCodeDropdown

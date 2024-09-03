@@ -93,3 +93,7 @@ SamplingPointDataLayer.propTypes = {
   createRecordFromSamplingPointDataItem: PropTypes.func.isRequired,
   onRecordEditClick: PropTypes.func.isRequired,
 }
+
+SamplingPointDataLayer.defaultProps = {
+  levelIndex: 0,
+}

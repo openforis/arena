@@ -5,8 +5,7 @@ import * as SideBarModule from '../utils'
 import ModuleLink from '../ModuleLink'
 
 const SubModules = (props) => {
-  const { disabled = false, module = null, pathname = '', sideBarOpened = false } = props
-
+  const { module, pathname, sideBarOpened, disabled } = props
   const children = SideBarModule.getChildren(module)
 
   return children.map((childModule) => (
@@ -18,6 +17,13 @@ const SubModules = (props) => {
       disabled={disabled}
     />
   ))
+}
+
+SubModules.defaultProps = {
+  module: null,
+  pathname: '',
+  sideBarOpened: false,
+  disabled: false,
 }
 
 export default SubModules

@@ -13,12 +13,12 @@ import { Dropdown } from '@webapp/components/form'
 export const DimensionsSelector = (props) => {
   const {
     chainUuid,
-    disabled = false,
-    entityDefUuid = null,
-    labelType = NodeDef.NodeDefLabelTypes.name,
+    entityDefUuid,
+    disabled,
+    labelType,
     onDimensionsChange,
-    selectedDimensionsUuids = [],
-    showAnalysisAttributes = false,
+    selectedDimensionsUuids,
+    showAnalysisAttributes,
   } = props
 
   const cycle = useSurveyCycleKey()
@@ -90,4 +90,12 @@ DimensionsSelector.propTypes = {
   onDimensionsChange: PropTypes.func.isRequired,
   selectedDimensionsUuids: PropTypes.array,
   showAnalysisAttributes: PropTypes.bool,
+}
+
+DimensionsSelector.defaultProps = {
+  disabled: false,
+  entityDefUuid: null,
+  labelType: NodeDef.NodeDefLabelTypes.name,
+  selectedDimensionsUuids: [],
+  showAnalysisAttributes: false,
 }

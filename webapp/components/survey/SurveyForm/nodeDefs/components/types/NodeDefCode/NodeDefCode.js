@@ -22,13 +22,13 @@ import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/h
 
 const NodeDefCode = (props) => {
   const {
-    canEditRecord = false,
-    edit = false,
-    entryDataQuery = false,
+    canEditRecord,
+    edit,
+    entryDataQuery,
     nodeDef,
-    nodes = [],
-    parentNode = null,
-    readOnly: readOnlyProp = false,
+    nodes,
+    parentNode,
+    readOnly: readOnlyProp,
     removeNode,
     updateNode,
   } = props
@@ -132,6 +132,15 @@ NodeDefCode.propTypes = {
   readOnly: PropTypes.bool,
   removeNode: PropTypes.func.isRequired,
   updateNode: PropTypes.func.isRequired,
+}
+
+NodeDefCode.defaultProps = {
+  canEditRecord: false,
+  edit: false,
+  entryDataQuery: false,
+  nodes: [],
+  parentNode: null,
+  readOnly: false,
 }
 
 export default NodeDefCode

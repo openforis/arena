@@ -20,17 +20,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 const rowMinHeight = 5 // in "rem" unit
 
 const NodeDefEntityFormGrid = (props) => {
-  const {
-    canAddNode = false,
-    canEditRecord = false,
-    childDefs = [],
-    edit = false,
-    entry = false,
-    node = null,
-    nodeDef,
-    preview = false,
-    recordUuid = null,
-  } = props
+  const { nodeDef, childDefs, recordUuid, node, edit, entry, preview, canEditRecord, canAddNode } = props
 
   const dispatch = useDispatch()
 
@@ -174,6 +164,17 @@ NodeDefEntityFormGrid.propTypes = {
   preview: PropTypes.bool,
   canEditRecord: PropTypes.bool,
   canAddNode: PropTypes.bool,
+}
+
+NodeDefEntityFormGrid.defaultProps = {
+  childDefs: [],
+  recordUuid: null,
+  node: null,
+  edit: false,
+  entry: false,
+  preview: false,
+  canEditRecord: false,
+  canAddNode: false,
 }
 
 export default NodeDefEntityFormGrid

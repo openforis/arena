@@ -19,15 +19,15 @@ import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
 const NodeDefEntityTableRows = (props) => {
   const {
-    canEditDef = false,
-    canEditRecord = false,
-    entry = false,
-    edit = false,
+    canEditDef,
+    canEditRecord,
+    edit,
+    entry,
     nodeDef,
-    nodes = [],
-    parentNode = null,
-    preview = false,
-    recordUuid = null,
+    nodes,
+    parentNode,
+    preview,
+    recordUuid,
     surveyCycleKey,
     surveyInfo,
   } = props
@@ -191,6 +191,17 @@ NodeDefEntityTableRows.propTypes = {
   recordUuid: PropTypes.string,
   surveyCycleKey: PropTypes.string.isRequired,
   surveyInfo: PropTypes.any.isRequired,
+}
+
+NodeDefEntityTableRows.defaultProps = {
+  canEditDef: false,
+  canEditRecord: false,
+  entry: false,
+  edit: false,
+  nodes: [],
+  parentNode: null,
+  preview: false,
+  recordUuid: null,
 }
 
 export default NodeDefEntityTableRows

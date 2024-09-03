@@ -6,16 +6,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import { useI18n } from '@webapp/store/system'
 
 const NodeDefCodeCheckbox = (props) => {
-  const {
-    canEditRecord = false,
-    edit = false,
-    itemLabelFunction,
-    items = [],
-    onItemAdd,
-    onItemRemove,
-    readOnly = false,
-    selectedItems = [],
-  } = props
+  const { canEditRecord, edit, itemLabelFunction, items, onItemAdd, onItemRemove, readOnly, selectedItems } = props
 
   const i18n = useI18n()
 
@@ -60,6 +51,14 @@ NodeDefCodeCheckbox.propTypes = {
   onItemRemove: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
   selectedItems: PropTypes.arrayOf(PropTypes.object),
+}
+
+NodeDefCodeCheckbox.defaultProps = {
+  canEditRecord: false,
+  edit: false,
+  items: [],
+  readOnly: false,
+  selectedItems: [],
 }
 
 export default NodeDefCodeCheckbox

@@ -13,15 +13,7 @@ const dateFormat = {
 }
 
 const NodeDefDate = (props) => {
-  const {
-    canEditRecord = false,
-    edit = false,
-    entry = false,
-    nodes = null,
-    nodeDef,
-    readOnly = false,
-    updateNode,
-  } = props
+  const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
 
   const node = entry ? nodes[0] : null
 
@@ -62,6 +54,14 @@ NodeDefDate.propTypes = {
   nodes: PropTypes.array,
   readOnly: PropTypes.bool,
   updateNode: PropTypes.func.isRequired,
+}
+
+NodeDefDate.defaultProps = {
+  canEditRecord: false,
+  edit: false,
+  entry: false,
+  readOnly: false,
+  nodes: null,
 }
 
 export default NodeDefDate
