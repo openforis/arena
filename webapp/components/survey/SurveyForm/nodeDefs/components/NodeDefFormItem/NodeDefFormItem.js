@@ -10,9 +10,18 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 import NodeDefFormItemLabel from './NodeDefFormItemLabel'
 
 const NodeDefFormItem = (props) => {
-  const { edit, entry, label, lang, nodeDef, nodes = [], parentNode = null } = props
+  const { edit, entry, label, lang, nodeDef, nodes = [], parentNode = null, ...otherProps } = props
 
-  const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), { ...props })
+  const nodeDefComponent = React.createElement(NodeDefUiProps.getComponent(nodeDef), {
+    edit,
+    entry,
+    label,
+    lang,
+    nodeDef,
+    nodes,
+    parentNode,
+    ...otherProps,
+  })
 
   if (NodeDef.isEntity(nodeDef)) {
     return nodeDefComponent
