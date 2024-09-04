@@ -58,17 +58,16 @@ const NodeDefTaxonInputField = (props) => {
 
       {autocompleteOpened && (
         <NodeDefTaxonAutocompleteDialog
-          surveyId={surveyId}
-          nodeDef={nodeDef}
-          parentNode={parentNode}
+          autocompleteSourceElement={autocompleteSourceElement}
           draft={draft}
           entryDataQuery={entryDataQuery}
-          inputRef={inputRef}
           field={field}
           fieldValue={inputRef.current.value}
+          nodeDef={nodeDef}
+          inputRef={inputRef}
           onItemSelect={onItemSelectAutocomplete}
           onClose={onItemSelectAutocomplete}
-          autocompleteSourceElement={autocompleteSourceElement}
+          parentNode={parentNode}
         />
       )}
     </>
