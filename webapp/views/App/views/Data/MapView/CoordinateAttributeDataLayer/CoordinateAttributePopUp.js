@@ -14,7 +14,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 
-import { Button, ButtonIconEdit } from '@webapp/components'
+import { Button, ButtonIconEdit, ButtonMenu } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
@@ -24,6 +24,10 @@ import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import { useAltitude } from '../common/useAltitude'
+
+const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
+
+const getWhispDataDownloadUrl = (token) => `https://whisp.openforis.org/api/download-csv/${token}`
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -49,10 +53,6 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 
   return pathParts.join(' -> ')
 }
-
-const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
-
-const getWhispDataDownloadUrl = (token) => `https://whisp.openforis.org/api/download-csv/${token}`
 
 export const CoordinateAttributePopUp = (props) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
@@ -120,7 +120,7 @@ export const CoordinateAttributePopUp = (props) => {
     window.open(earthMapUrl, 'EarthMap')
   }, [getGeoJson, path])
 
-  const onWhispButtonClick = useCallback(async () => {
+  const onWhispCsvButtonClick = useCallback(async () => {
     setWhispDataLoading(true)
     const geojson = getGeoJson()
     const url = `/api/survey/${surveyId}/geo/whisp/geojson/csv`
@@ -174,17 +174,31 @@ export const CoordinateAttributePopUp = (props) => {
               onClick={onEarthMapButtonClick}
               variant="outlined"
             />
-            <Button
-              className="whisp-btn"
-              disabled={whispDataLoading}
+            <ButtonMenu
+              className="whisp-menu-btn"
               label="mapView.whisp"
               iconAlt="Whisp"
               iconHeight={25}
               iconSrc="/img/of_whisp_icon.svg"
-              iconWidth={25}
-              onClick={onWhispButtonClick}
-              size="small"
-              variant="outlined"
+              items={[
+                {
+                  key: 'whisp-csv-btn',
+                  content: (
+                    <Button
+                      className="whisp-btn"
+                      disabled={whispDataLoading}
+                      label="mapView.whisp"
+                      iconAlt="Whisp"
+                      iconHeight={25}
+                      iconSrc="/img/of_whisp_icon.svg"
+                      iconWidth={25}
+                      onClick={onWhispCsvButtonClick}
+                      size="small"
+                      variant="outlined"
+                    />
+                  ),
+                },
+              ]}
             />
           </div>
         </div>

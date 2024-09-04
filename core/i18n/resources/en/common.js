@@ -817,6 +817,8 @@ Merge cannot be performed.`,
     },
     selectedPeriod: 'Selected period',
     whisp: 'Whisp',
+    whispEarthMap: 'Whisp Earth Map',
+    whispCsv: 'Whisp CSV',
   },
 
   samplingPolygonOptions: {
