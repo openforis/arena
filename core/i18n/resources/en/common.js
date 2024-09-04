@@ -102,6 +102,7 @@ Please check also the Spam/Junk mail folder.`,
 By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
+    loading: 'Loading...',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',

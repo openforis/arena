@@ -27,6 +27,8 @@ import { useAltitude } from '../common/useAltitude'
 
 const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
 
+const getWhispEarthMapUrl = (geojson) => `https://whisp.earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
+
 const getWhispDataDownloadUrl = (token) => `https://whisp.openforis.org/api/download-csv/${token}`
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
@@ -113,23 +115,49 @@ export const CoordinateAttributePopUp = (props) => {
     }
   }, [latitude, longitude, surveyInfo])
 
-  const onEarthMapButtonClick = useCallback(() => {
+  const getGeoJsonWithName = useCallback(() => {
     const geojson = getGeoJson()
-    Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
-    const earthMapUrl = getEarthMapUrl(geojson)
-    window.open(earthMapUrl, 'EarthMap')
+    return Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
   }, [getGeoJson, path])
+
+  const onEarthMapButtonClick = useCallback(() => {
+    const geojson = getGeoJsonWithName()
+    const url = getEarthMapUrl(geojson)
+    window.open(url, 'EarthMap')
+  }, [getGeoJsonWithName])
 
   const onWhispCsvButtonClick = useCallback(async () => {
     setWhispDataLoading(true)
     const geojson = getGeoJson()
     const url = `/api/survey/${surveyId}/geo/whisp/geojson/csv`
-    axios.post(url, geojson).then(({ data: token }) => {
-      const csvDownloadUrl = getWhispDataDownloadUrl(token)
-      setWhispDataLoading(false)
-      window.open(csvDownloadUrl, 'Whisp')
-    })
+    axios
+      .post(url, geojson)
+      .then(({ data: token }) => {
+        const csvDownloadUrl = getWhispDataDownloadUrl(token)
+        setWhispDataLoading(false)
+        window.open(csvDownloadUrl, 'Whisp')
+      })
+      .catch(() => {
+        setWhispDataLoading(false)
+      })
   }, [getGeoJson, surveyId])
+
+  const onWhispEarthMapButtonClick = useCallback(() => {
+    const geojson = getGeoJsonWithName()
+    const url = getWhispEarthMapUrl(geojson)
+    window.open(url, 'WhispEarthMap')
+  }, [getGeoJsonWithName])
+
+  const whispButtonDefinitions = {
+    earthMap: {
+      label: 'mapView.whispEarthMap',
+      onClick: onWhispEarthMapButtonClick,
+    },
+    csv: {
+      label: 'mapView.whispCsv',
+      onClick: onWhispCsvButtonClick,
+    },
+  }
 
   const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
 
@@ -176,29 +204,27 @@ export const CoordinateAttributePopUp = (props) => {
             />
             <ButtonMenu
               className="whisp-menu-btn"
-              label="mapView.whisp"
+              disabled={whispDataLoading}
+              label={whispDataLoading ? 'common.loading' : 'mapView.whisp'}
               iconAlt="Whisp"
               iconHeight={25}
               iconSrc="/img/of_whisp_icon.svg"
-              items={[
-                {
-                  key: 'whisp-csv-btn',
-                  content: (
-                    <Button
-                      className="whisp-btn"
-                      disabled={whispDataLoading}
-                      label="mapView.whisp"
-                      iconAlt="Whisp"
-                      iconHeight={25}
-                      iconSrc="/img/of_whisp_icon.svg"
-                      iconWidth={25}
-                      onClick={onWhispCsvButtonClick}
-                      size="small"
-                      variant="outlined"
-                    />
-                  ),
-                },
-              ]}
+              items={Object.entries(whispButtonDefinitions).map(([key, { label, onClick }]) => ({
+                key,
+                content: (
+                  <Button
+                    disabled={whispDataLoading}
+                    label={label}
+                    iconHeight={25}
+                    iconSrc="/img/of_whisp_icon.svg"
+                    iconWidth={25}
+                    onClick={onClick}
+                    size="small"
+                    variant="text"
+                  />
+                ),
+              }))}
+              variant="outlined"
             />
           </div>
         </div>
