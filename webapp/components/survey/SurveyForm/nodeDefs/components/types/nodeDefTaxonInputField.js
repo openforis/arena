@@ -9,7 +9,6 @@ import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 const NodeDefTaxonInputField = (props) => {
   const {
     id,
-    surveyId,
     nodeDef,
     parentNode,
     edit,
