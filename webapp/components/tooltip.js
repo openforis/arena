@@ -12,8 +12,18 @@ const messageLineHeight = 20
 const messageComponentHeight = 35
 
 const Tooltip = (props) => {
-  const { children, className, id, insideTable, messages, messageComponent, position, showContent, testId, type } =
-    props
+  const {
+    children,
+    className = null,
+    id = null,
+    insideTable,
+    messageComponent,
+    messages = [],
+    position = 'bottom',
+    showContent = true, // Set to false to prevent showing tooltip on mouse over
+    testId,
+    type,
+  } = props
 
   const [state, setState] = useState({ messageElement: null })
   const containerRef = useRef(null)
@@ -98,14 +108,6 @@ Tooltip.propTypes = {
   showContent: PropTypes.bool,
   testId: PropTypes.string,
   type: PropTypes.oneOf(['info', 'error', 'warning']),
-}
-
-Tooltip.defaultProps = {
-  className: null,
-  id: null,
-  messages: [],
-  position: 'bottom',
-  showContent: true, // Set to false to prevent showing tooltip on mouse over
 }
 
 export default Tooltip

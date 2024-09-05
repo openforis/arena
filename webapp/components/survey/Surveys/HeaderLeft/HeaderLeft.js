@@ -1,36 +1,42 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { TextInput } from '@webapp/components/form'
+import { Checkbox, TextInput } from '@webapp/components/form'
 import { ButtonDownload } from '@webapp/components/buttons'
-import { useAuthCanExportSurveysList } from '@webapp/store/user/hooks'
+import { useAuthCanExportSurveysList, useUserIsSystemAdmin } from '@webapp/store/user/hooks'
 
 const HeaderLeft = (props) => {
-  const { handleSearch, search, totalCount } = props
+  const { count, handleSearch, onlyOwn = false, search, setOnlyOwn = null } = props
 
+  const isSystemAdmin = useUserIsSystemAdmin()
   const canExportSurveys = useAuthCanExportSurveysList()
-
-  if (!totalCount) return null
 
   return (
     <>
-      <TextInput
-        className="surveys__header-left__input-search"
-        defaultValue={search}
-        onChange={(val) => {
-          handleSearch(val)
-        }}
-        placeholder="surveysView.filterPlaceholder"
-      />
-      {canExportSurveys && <ButtonDownload href="/api/surveys/export" label="common.csvExport" />}
+      <div className="filter-container">
+        <TextInput
+          className="surveys__header-left__input-search"
+          defaultValue={search}
+          onChange={(val) => {
+            handleSearch(val)
+          }}
+          placeholder="surveysView.filterPlaceholder"
+        />
+        {isSystemAdmin && setOnlyOwn && (
+          <Checkbox checked={onlyOwn} label="surveysView.onlyOwn" onChange={() => setOnlyOwn(!onlyOwn)} />
+        )}
+      </div>
+      {canExportSurveys && count > 0 && <ButtonDownload href="/api/surveys/export" label="common.csvExport" />}
     </>
   )
 }
 
 HeaderLeft.propTypes = {
+  count: PropTypes.number.isRequired,
   handleSearch: PropTypes.func.isRequired,
+  onlyOwn: PropTypes.bool,
   search: PropTypes.string.isRequired,
-  totalCount: PropTypes.number.isRequired,
+  setOnlyOwn: PropTypes.func,
 }
 
 export default HeaderLeft

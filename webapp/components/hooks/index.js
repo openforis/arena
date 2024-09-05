@@ -31,6 +31,6 @@ export { useQuery } from './useQuery'
 export { useOnWebSocketEvent } from './useOnWebSocketEvent'
 export { useSortable } from './useSortable'
 // confirm dialog
-export { useConfirm, useConfirmDelete } from './useConfirm'
+export { useConfirm, useConfirmAsync, useConfirmDelete } from './useConfirm'
 // notification dialogs
 export { useNotifyInfo, useNotifyError, useNotifyWarning } from './useNotification'

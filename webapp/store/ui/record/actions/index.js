@@ -18,3 +18,4 @@ export { nodeValidationsUpdate, nodesUpdateCompleted, updateNode, updateRecordSt
 export { checkInRecord, checkOutRecord } from './checkIn'
 export { deleteRecord, deleteRecords, deleteRecordUuidPreview, removeNode, recordDeleted } from './delete'
 export { toggleEditLock } from './editLock'
+export { previewRecordsMerge, mergeRecords } from './merge'

@@ -6,7 +6,9 @@ import * as Validation from '@core/validation/validation'
 
 import * as SurveyCyclesValidator from './surveyCyclesValidator'
 
-const validateSurveyNameUniqueness = (surveyInfos) => (propName, survey) =>
+const { infoKeys } = Survey
+
+const validateSurveyNameUniqueness = (surveyInfos) => (_propName, survey) =>
   !R.isEmpty(surveyInfos) && R.find((s) => s.id !== survey.id, surveyInfos)
     ? { key: Validation.messageKeys.nameDuplicate }
     : null
@@ -18,6 +20,13 @@ const getSurveyNameValidations = ({ surveyInfos, required = true }) => [
   Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
   validateSurveyNameUniqueness(surveyInfos),
 ]
+
+const validateFieldManualLinks = (_propName, survey) => {
+  const links = Object.values(Survey.getFieldManualLinks(survey))
+  return links.every((link) => URL.canParse(link))
+    ? null
+    : { key: Validation.messageKeys.surveyInfoEdit.fieldManualLinksInvalid }
+}
 
 export const validateNewSurvey = async ({ newSurvey, surveyInfos }) =>
   Validator.validate(newSurvey, {
@@ -38,9 +47,14 @@ export const validateSurveyImportFromCollect = async ({ newSurvey, surveyInfos }
 
 export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
   const validation = await Validator.validate(surveyInfo, {
-    'props.name': getSurveyNameValidations({ surveyInfos }),
-    'props.languages': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired)],
-    'props.srs': [Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired)],
+    [`${infoKeys.props}.${infoKeys.languages}`]: [
+      Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.langRequired),
+    ],
+    [`${infoKeys.props}.${infoKeys.name}`]: getSurveyNameValidations({ surveyInfos }),
+    [`${infoKeys.props}.${infoKeys.srs}`]: [
+      Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired),
+    ],
+    [`${infoKeys.props}.${infoKeys.fieldManualLinks}`]: [validateFieldManualLinks],
   })
 
   const cyclesValidation = await SurveyCyclesValidator.validateCycles(Survey.getCycles(surveyInfo))

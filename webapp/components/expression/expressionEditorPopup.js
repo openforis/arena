@@ -18,21 +18,21 @@ import { ExpressionEditorType } from './expressionEditorType'
 
 const ExpressionEditorPopup = (props) => {
   const {
-    canBeCall,
-    canBeConstant,
-    expr,
-    types,
-    isBoolean,
-    isContextParent,
-    mode,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    onChange,
-    onClose,
-    query,
-    header,
-    includeAnalysis,
+    canBeCall = false,
+    canBeConstant = false,
+    excludeCurrentNodeDef = true,
+    expr = null,
+    header = '',
+    includeAnalysis = false,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onChange = () => {},
+    onClose = () => {},
+    query = '',
+    types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
   const {
@@ -140,24 +140,6 @@ ExpressionEditorPopup.propTypes = {
   onClose: PropTypes.func,
   query: PropTypes.string, // String representing the expression
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
-}
-
-ExpressionEditorPopup.defaultProps = {
-  canBeCall: false,
-  canBeConstant: false,
-  excludeCurrentNodeDef: true,
-  expr: null,
-  header: '',
-  includeAnalysis: false,
-  isBoolean: true,
-  isContextParent: false,
-  mode: Expression.modes.json,
-  nodeDefUuidContext: null,
-  nodeDefUuidCurrent: null,
-  onChange: () => {},
-  onClose: () => {},
-  query: '',
-  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
 }
 
 export default ExpressionEditorPopup

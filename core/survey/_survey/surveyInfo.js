@@ -26,6 +26,7 @@ export const keys = {
   cycles: 'cycles',
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
+  fieldManualLinks: 'fieldManualLinks',
   filesStatistics: 'filesStatistics',
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
@@ -159,6 +160,8 @@ export const getLanguage = (preferredLang) => (surveyInfo) =>
   R.pipe(getLanguages, R.find(R.equals(preferredLang)), R.defaultTo(getDefaultLanguage(surveyInfo)))(surveyInfo)
 
 export const isTemplate = R.propEq(keys.template, true)
+
+export const getFieldManualLinks = ObjectUtils.getProp(keys.fieldManualLinks, {})
 
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)

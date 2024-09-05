@@ -33,6 +33,7 @@ export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 // Data tables and views
 export const { createDataTable } = DataTableRepository
 export const { createDataView, countViewDataAgg } = DataViewRepository
+export { deleteRowsByRecordUuid } from '../repository/dataTableDeleteRepository'
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'

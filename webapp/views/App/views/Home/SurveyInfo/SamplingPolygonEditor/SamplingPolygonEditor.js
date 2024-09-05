@@ -1,8 +1,10 @@
 import './SamplingPolygonEditor.scss'
 
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import Switch from 'react-switch'
+
+import { Objects } from '@openforis/arena-core'
 
 import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
 
@@ -19,10 +21,7 @@ const SamplingPolygonEditor = (props) => {
 
   const i18n = useI18n()
 
-  const samplingPolygonObject =
-    samplingPolygon === undefined || Object.entries(samplingPolygon).length == 0
-      ? getSamplingPolygonDefaults()
-      : samplingPolygon
+  const samplingPolygonObject = Objects.isEmpty(samplingPolygon) ? getSamplingPolygonDefaults() : samplingPolygon
 
   const [jsonEditorChecked, setJsonEditorChecked] = useState(false)
   const [jsonEditorValue, setJsonEditorValue] = useState(JSON.stringify(samplingPolygonObject, null, 2))
@@ -34,29 +33,28 @@ const SamplingPolygonEditor = (props) => {
     { key: 'controlPointOffsetEast', labelKey: 'controlPointOffsetEast' },
   ]
 
+  const onSamplingPolygonChange = useCallback(
+    (samplingPolygonNext) => {
+      setSamplingPolygon(samplingPolygonNext)
+      setJsonEditorValue(JSON.stringify(samplingPolygonNext, null, 2))
+    },
+    [setSamplingPolygon]
+  )
+
   const onPropertyChange = (key) => (e) => {
-    let value
-    if (e.target) {
-      value = e.target.value
-    } else {
-      value = e
-    }
-    samplingPolygonObject[key] = Number(value)
-    setSamplingPolygon(samplingPolygonObject)
-    setJsonEditorValue(JSON.stringify(samplingPolygonObject, null, 2))
+    const value = e?.target?.value ?? e
+    onSamplingPolygonChange({ ...samplingPolygonObject, [key]: Number(value) })
   }
 
-  const shapeOnChange = (e) => {
-    samplingPolygonObject.isCircle = e.target.value === 'true'
-    setSamplingPolygon(samplingPolygonObject)
-    setJsonEditorValue(JSON.stringify(samplingPolygonObject, null, 2))
+  const onShapeChange = (value) => {
+    onSamplingPolygonChange({ ...samplingPolygonObject, ['isCircle']: value === 'true' })
   }
 
   const jsonEditorOnChange = (event) => {
     const value = event.target.value
     setJsonEditorValue(value)
     try {
-      const json = JSON.parse(event.target.value)
+      const json = JSON.parse(value)
       setSamplingPolygon(json)
     } catch {
       return //dont save invalid json
@@ -79,7 +77,7 @@ const SamplingPolygonEditor = (props) => {
         <div className="props-editor-wrapper">
           <SamplingPolygonShapeEditor
             isCircle={samplingPolygonObject.isCircle}
-            onChange={shapeOnChange}
+            onChange={onShapeChange}
             readOnly={readOnly}
             key={'ShapeEditor'}
           />
@@ -99,11 +97,10 @@ const SamplingPolygonEditor = (props) => {
               readOnly={readOnly}
             />
           )}
-
           {inputPropertiesForAll.map(({ key, labelKey }) => (
             <FormPropertyItem
               key={key}
-              ObjectKey={key}
+              objectKey={key}
               labelKey={labelKey}
               onPropertyChange={onPropertyChange(key)}
               value={samplingPolygonObject[key]}

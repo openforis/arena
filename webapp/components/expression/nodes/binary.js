@@ -10,7 +10,17 @@ import EditButtons from './editButtons'
 import { useI18n } from '@webapp/store/system'
 
 const Binary = (props) => {
-  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, variables } = props
+  const {
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    node,
+    nodeDefCurrent = null,
+    onChange,
+    onDelete = null,
+    renderNode,
+    variables = null,
+  } = props
 
   const i18n = useI18n()
 
@@ -70,15 +80,6 @@ Binary.propTypes = {
   level: PropTypes.number,
   renderNode: PropTypes.func.isRequired,
   variables: PropTypes.array,
-}
-
-Binary.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  nodeDefCurrent: null,
-  onDelete: null,
-  variables: null,
 }
 
 export default Binary

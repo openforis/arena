@@ -11,14 +11,11 @@ export const getCategory = A.prop(keys.category)
 
 export const getImportSummary = A.prop(keys.importSummary)
 
+export const isItemsLoading = ({ levelIndex }) => R.pathOr(false, [keys.itemsLoading, String(levelIndex)])
+
 export const getItems = ({ levelIndex }) => R.pathOr({}, [keys.items, String(levelIndex)])
 
-export const getItemsArray = ({ levelIndex }) =>
-  A.pipe(
-    getItems({ levelIndex }),
-    R.values,
-    R.sort((a, b) => Number(a.id) - Number(b.id))
-  )
+export const getItemsArray = ({ levelIndex }) => R.pathOr([], [keys.itemsArray, String(levelIndex)])
 
 export const getItemActive =
   ({ levelIndex }) =>

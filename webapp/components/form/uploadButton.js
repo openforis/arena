@@ -11,7 +11,17 @@ const checkFilesSize = (files, maxSizeMB) =>
     : true
 
 const UploadButton = (props) => {
-  const { inputFieldId, label, disabled, showLabel, showIcon, maxSize, accept, onChange, className } = props
+  const {
+    accept = null, // E.g. .txt, .xls (null = all type of files are accepted)
+    className = 'btn', // Custom css class
+    disabled = false,
+    inputFieldId = null,
+    label = 'common.upload',
+    maxSize = 10, // Mega bytes
+    onChange = null,
+    showLabel = true,
+    showIcon = true,
+  } = props
 
   const fileInput = useRef(null)
 
@@ -60,18 +70,6 @@ UploadButton.propTypes = {
   onChange: PropTypes.func,
   showIcon: PropTypes.bool,
   showLabel: PropTypes.bool,
-}
-
-UploadButton.defaultProps = {
-  accept: null, // E.g. .txt, .xls (null = all type of files are accepted)
-  className: 'btn', // Custom css class
-  disabled: false,
-  inputFieldId: null,
-  label: 'common.upload',
-  maxSize: 10, // Mega bytes
-  onChange: null,
-  showLabel: true,
-  showIcon: true,
 }
 
 export default UploadButton

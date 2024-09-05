@@ -48,7 +48,18 @@ BinaryOperandType.isLeft = (type) => type === BinaryOperandType.left
 BinaryOperandType.isRight = (type) => type === BinaryOperandType.right
 
 const BinaryOperand = (props) => {
-  const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, renderNode, variables } = props
+  const {
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    node,
+    nodeDefCurrent = null,
+    onChange,
+    onDelete = null,
+    renderNode,
+    type,
+    variables = null,
+  } = props
 
   const nodeOperand = node[type]
   const operandExpressionType = Expression.getType(nodeOperand)
@@ -129,15 +140,6 @@ BinaryOperand.propTypes = {
   level: PropTypes.number,
   onDelete: PropTypes.func,
   variables: PropTypes.array,
-}
-
-BinaryOperand.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  nodeDefCurrent: null,
-  onDelete: null,
-  variables: null,
 }
 
 export default BinaryOperand

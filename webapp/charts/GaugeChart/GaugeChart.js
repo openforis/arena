@@ -57,7 +57,7 @@ const needle = ({ value, height, width, innerRadius, outerRadius }) => {
 }
 
 export const GaugeChart = (props) => {
-  const { value, height, width } = props
+  const { height = 300, width = 300, value } = props
 
   const outerRadius = Math.min(height, width) / 2
   const innerRadius = outerRadius * 0.5
@@ -84,9 +84,4 @@ GaugeChart.propTypes = {
   height: PropTypes.number,
   value: PropTypes.number.isRequired,
   width: PropTypes.number,
-}
-
-GaugeChart.defaultProps = {
-  height: 300,
-  width: 300,
 }

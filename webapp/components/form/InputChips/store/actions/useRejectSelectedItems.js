@@ -10,5 +10,9 @@ export const useRejectSelectedItems = () =>
     if (items.constructor === Array) {
       return items.filter(removeSelectedItems)
     }
-    return async (searchValue) => (await items(searchValue)).filter(removeSelectedItems)
+    return async (searchValue) => {
+      const itemsRes = await items(searchValue)
+      const itemsArray = Object.values(itemsRes?.data?.items ?? {})
+      return itemsArray.filter(removeSelectedItems)
+    }
   }, [])

@@ -82,11 +82,18 @@ class RecordsUpdateThread extends Thread {
       } catch (error) {
         // SystemError is an expected error type, e.g. when there's a problem with expressions.
         if (error instanceof SystemError) {
+          const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
+          const { key, params } = error
+          const nestedError = params.error
+          if (nestedError && nestedError instanceof SystemError) {
+            params.error = { key: nestedError.key, params: nestedError.params }
+          }
           this.postMessage({
             type: WebSocketEvent.applicationError,
             content: {
-              key: error.key,
-              params: error.params,
+              key,
+              params,
+              recordUuid,
             },
           })
           return // Stop processing

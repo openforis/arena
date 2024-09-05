@@ -12,7 +12,7 @@ import { DataExplorerHooks } from '@webapp/store/dataExplorer'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer/selectors'
 
 const QueryNodeDefsSelector = (props) => {
-  const { nodeDefLabelType } = props
+  const { nodeDefLabelType = NodeDef.NodeDefLabelTypes.label } = props
 
   const query = DataExplorerSelectors.useQuery()
   const modeAggregate = Query.isModeAggregate(query)
@@ -60,10 +60,6 @@ const QueryNodeDefsSelector = (props) => {
 
 QueryNodeDefsSelector.propTypes = {
   nodeDefLabelType: PropTypes.string,
-}
-
-QueryNodeDefsSelector.defaultProps = {
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default QueryNodeDefsSelector
