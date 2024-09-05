@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/warningBadge'
 
-const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
+const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
@@ -97,10 +97,6 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
 AnalysisNodeDef.propTypes = {
   nodeDefUuid: PropTypes.string.isRequired,
   dataCount: PropTypes.number,
-}
-
-AnalysisNodeDef.defaultProps = {
-  dataCount: undefined,
 }
 
 export { AnalysisNodeDef }
