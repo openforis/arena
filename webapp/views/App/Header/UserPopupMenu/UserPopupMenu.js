@@ -179,11 +179,7 @@ const UserPopupMenu = (props) => {
 }
 
 UserPopupMenu.propTypes = {
-  onClose: PropTypes.func,
-}
-
-UserPopupMenu.defaultProps = {
-  onClose: () => ({}),
+  onClose: PropTypes.func.isRequired,
 }
 
 export default UserPopupMenu

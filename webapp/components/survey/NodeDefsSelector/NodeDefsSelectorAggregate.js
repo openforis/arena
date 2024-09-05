@@ -37,12 +37,12 @@ const NodeDefsSelectorAggregate = (props) => {
   const {
     dimensions,
     measures,
-    nodeDefLabelType,
-    nodeDefUuidEntity,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
     onChangeEntity,
     onChangeMeasures,
     onChangeDimensions,
-    showAnalysisAttributes,
+    showAnalysisAttributes = false,
   } = props
 
   const survey = useSurvey()
@@ -159,12 +159,6 @@ NodeDefsSelectorAggregate.propTypes = {
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
   showAnalysisAttributes: PropTypes.bool,
-}
-
-NodeDefsSelectorAggregate.defaultProps = {
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
-  nodeDefUuidEntity: null,
-  showAnalysisAttributes: false,
 }
 
 export default NodeDefsSelectorAggregate

@@ -28,8 +28,18 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
 
 const NodeDefCoordinate = (props) => {
-  const { insideTable, surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly, updateNode } =
-    props
+  const {
+    canEditRecord,
+    edit,
+    entry,
+    insideTable = false,
+    nodeDef,
+    nodes,
+    readOnly = false,
+    renderType,
+    surveyInfo,
+    updateNode,
+  } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -211,12 +221,6 @@ NodeDefCoordinate.propTypes = {
   renderType: PropTypes.string,
   surveyInfo: PropTypes.object.isRequired,
   updateNode: PropTypes.func.isRequired,
-}
-
-NodeDefCoordinate.defaultProps = {
-  insideTable: false,
-  readOnly: false,
-  renderType: undefined,
 }
 
 export default NodeDefCoordinate

@@ -51,8 +51,4 @@ SrsEditor.propTypes = {
   setSrs: PropTypes.func.isRequired,
 }
 
-SrsEditor.defaultProps = {
-  validation: {},
-}
-
 export default SrsEditor

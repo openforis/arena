@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 
 const Error = (props) => {
-  const { error } = props
+  const { error = null } = props
   const i18n = useI18n()
   if (!error) return null
 
@@ -14,10 +14,6 @@ const Error = (props) => {
 
 Error.propTypes = {
   error: PropTypes.string,
-}
-
-Error.defaultProps = {
-  error: null,
 }
 
 export default Error

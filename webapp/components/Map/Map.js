@@ -32,7 +32,7 @@ L.Marker.prototype.options.icon = L.icon({
 const INITIAL_ZOOM_LEVEL = 3
 
 export const Map = (props) => {
-  const { editable, layers, markerPoint, markerTitle, showOptions } = props
+  const { editable = false, layers = [], markerPoint, markerTitle, showOptions = true } = props
   const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
     useMap(props)
 
@@ -90,14 +90,4 @@ Map.propTypes = {
   markerTitle: PropTypes.string,
   onMarkerPointChange: PropTypes.func,
   showOptions: PropTypes.bool,
-}
-
-Map.defaultProps = {
-  centerPoint: null,
-  editable: false,
-  layers: [],
-  markerPoint: null,
-  markerTitle: null,
-  onMarkerPointChange: null,
-  showOptions: true,
 }

@@ -13,13 +13,13 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const AttributeSelector = (props) => {
   const {
-    canSelectAttributes,
+    canSelectAttributes = true,
     labelFunction,
     nodeDef,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
     nodeDefUuidsAttributes,
     onToggleAttribute,
-    showNodeDefPath,
-    nodeDefLabelType,
+    showNodeDefPath = false,
   } = props
 
   const survey = useSurvey()
@@ -63,12 +63,6 @@ AttributeSelector.propTypes = {
   onToggleAttribute: PropTypes.func.isRequired,
   showNodeDefPath: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
-}
-
-AttributeSelector.defaultProps = {
-  canSelectAttributes: true,
-  showNodeDefPath: false,
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default AttributeSelector

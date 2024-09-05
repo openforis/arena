@@ -20,7 +20,7 @@ import { State, useActions } from '../store'
 import { ItemsList } from './ItemsList'
 
 const LevelDetails = (props) => {
-  const { level, single, state, setState } = props
+  const { level, single = false, state, setState } = props
 
   const readOnly = !useAuthCanEditSurvey()
   const i18n = useI18n()
@@ -108,10 +108,6 @@ LevelDetails.propTypes = {
   single: PropTypes.bool,
   state: PropTypes.object.isRequired,
   setState: PropTypes.func.isRequired,
-}
-
-LevelDetails.defaultProps = {
-  single: false,
 }
 
 export default LevelDetails

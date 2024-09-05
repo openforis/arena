@@ -47,8 +47,4 @@ ButtonMetaItemAdd.propTypes = {
   metaItemType: PropTypes.string.isRequired,
 }
 
-ButtonMetaItemAdd.defaultProps = {
-  id: null,
-}
-
 export default ButtonMetaItemAdd
