@@ -46,14 +46,6 @@ const Dropzone = (props) => {
 
   const validateFiles = useCallback(
     (files) => {
-      if (!files.length) {
-        // Dropzone component filters out the files exceeding the specified max size
-        return i18n.t('dropzone.error.fileTooBig')
-      }
-      if (acceptProp && typeof acceptProp === 'object') {
-        // 'accept' is specified and files have been accepted successfully
-        return null
-      }
       const invalidExtension = files
         .map(FileUtils.getExtension)
         .find((extension) => !acceptedExtensions.includes(extension))
@@ -63,24 +55,52 @@ const Dropzone = (props) => {
       }
       return null
     },
-    [acceptProp, acceptedExtensions]
+    [acceptedExtensions, i18n]
   )
 
-  const onDrop = useCallback(
+  const onDropAccepted = useCallback(
     (files) => {
       const error = validateFiles(files)
       if (error) {
         setErrorMessage(error)
       } else {
+        setErrorMessage(null)
         onDropProp(files)
       }
     },
     [onDropProp, validateFiles]
   )
 
+  const onDropRejected = useCallback(
+    (fileRejections) => {
+      const errorMessages = fileRejections.map((fileRejection) => {
+        const { errors, file } = fileRejection
+        const errorCodes = errors.map((error) => error.code)
+
+        if (errorCodes.includes('file-invalid-type')) {
+          const extension = FileUtils.getExtension(file.path)
+          return i18n.t('dropzone.error.invalidFileExtension', { extension })
+        } else if (errorCodes.includes('file-too-large')) {
+          return i18n.t('dropzone.error.fileTooBig')
+        } else {
+          return i18n.t('dropzone.error.fileNotValid')
+        }
+      })
+      setErrorMessage(errorMessages.join(', '))
+    },
+    [i18n]
+  )
+
   return (
     <>
-      <ReactDropzone accept={accept} disabled={disabled} maxSize={maxSize} multiple={multiple} onDrop={onDrop}>
+      <ReactDropzone
+        accept={accept}
+        disabled={disabled}
+        maxSize={maxSize}
+        multiple={multiple}
+        onDropAccepted={onDropAccepted}
+        onDropRejected={onDropRejected}
+      >
         {({ getRootProps, getInputProps }) => (
           <div className={classNames('dropzone', { disabled })} {...getRootProps()}>
             <input {...getInputProps()} />
