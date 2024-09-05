@@ -102,6 +102,7 @@ Please check also the Spam/Junk mail folder.`,
 By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
+    loading: 'Loading...',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -817,6 +818,8 @@ Merge cannot be performed.`,
     },
     selectedPeriod: 'Selected period',
     whisp: 'Whisp',
+    whispEarthMap: 'Whisp Earth Map',
+    whispCsv: 'Whisp CSV',
   },
 
   samplingPolygonOptions: {
