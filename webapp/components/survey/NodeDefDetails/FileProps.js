@@ -12,24 +12,11 @@ import * as Validation from '@core/validation/validation'
 
 import { State } from './store'
 
-const fileTypes = ({ i18n }) => [
-  {
-    key: NodeDef.fileTypeValues.image,
-    label: i18n.t('nodeDefEdit.fileProps.fileTypes.image'),
-  },
-  {
-    key: NodeDef.fileTypeValues.video,
-    label: i18n.t('nodeDefEdit.fileProps.fileTypes.video'),
-  },
-  {
-    key: NodeDef.fileTypeValues.audio,
-    label: i18n.t('nodeDefEdit.fileProps.fileTypes.audio'),
-  },
-  {
-    key: NodeDef.fileTypeValues.other,
-    label: i18n.t('nodeDefEdit.fileProps.fileTypes.other'),
-  },
-]
+const fileTypes = ({ i18n }) =>
+  Object.values(NodeDef.fileTypeValues).map((fileType) => ({
+    key: fileType,
+    label: i18n.t(`nodeDefEdit.fileProps.fileTypes.${fileType}`),
+  }))
 
 const FileProps = (props) => {
   const { state, Actions } = props
@@ -60,8 +47,16 @@ const FileProps = (props) => {
         </FormItem>
       )}
 
+      <FormItem label={i18n.t('nodeDefEdit.fileProps.fileType')}>
+        <ButtonGroup
+          selectedItemKey={NodeDef.getFileType(nodeDef)}
+          onChange={selectFileType}
+          items={fileTypes({ i18n })}
+        />
+      </FormItem>
       <FormItem label={i18n.t('nodeDefEdit.fileProps.maxFileSize')}>
         <Input
+          className="max-file-size"
           disabled={false}
           placeholder={i18n.t('nodeDefEdit.fileProps.maxFileSize')}
           value={NodeDef.getMaxFileSize(nodeDef)}
@@ -70,11 +65,11 @@ const FileProps = (props) => {
           validation={Validation.getFieldValidation(NodeDef.propKeys.maxFileSize)(validation)}
         />
       </FormItem>
-      <FormItem label={i18n.t('nodeDefEdit.fileProps.fileType')}>
-        <ButtonGroup
-          selectedItemKey={NodeDef.getFileType(nodeDef)}
-          onChange={selectFileType}
-          items={fileTypes({ i18n })}
+      <FormItem label={i18n.t('nodeDefEdit.fileProps.fileNameExpression')}>
+        <Input
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })}
+          validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
+          value={NodeDef.getFileNameExpression(nodeDef)}
         />
       </FormItem>
     </>

@@ -131,7 +131,7 @@ Input.propTypes = {
   onBlur: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
-  title: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   type: PropTypes.oneOf(['text', 'number', 'password']),
   validation: PropTypes.object,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

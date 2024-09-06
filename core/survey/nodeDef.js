@@ -153,6 +153,8 @@ export const keysPropsAdvanced = {
 
   // code and taxon
   itemsFilter: 'itemsFilter',
+  // file
+  fileNameExpression: 'fileNameExpression',
 }
 
 const commonAttributePropsAdvancedKeys = [
@@ -384,6 +386,8 @@ export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClo
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
+// file
+export const getFileNameExpression = getPropAdvanced(keysPropsAdvanced.fileNameExpression, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])

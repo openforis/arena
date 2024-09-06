@@ -13,7 +13,7 @@ import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
 import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
-const { keys, propKeys } = NodeDef
+const { keys, keysPropsAdvanced, propKeys } = NodeDef
 
 const keysValidationFields = {
   children: 'children',
@@ -104,20 +104,32 @@ const validateVirtualEntityFormula = (survey, nodeDef) =>
     : null
 
 const validateItemsFilterExpression = (survey, nodeDef) => {
-  if (R.isEmpty(NodeDef.getItemsFilter(nodeDef))) return null
+  const expression = NodeDef.getItemsFilter(nodeDef)
+  if (R.isEmpty(expression)) return null
 
   const { validationResult } = nodeDefExpressionValidator.validate({
     survey,
     nodeDefCurrent: nodeDef,
-    expression: NodeDef.getItemsFilter(nodeDef),
+    expression,
     isContextParent: true,
     selfReferenceAllowed: true,
     itemsFilter: true,
   })
-  if (validationResult && !validationResult.valid) {
-    return Validation.newInstance(false, {}, [validationResult])
-  }
-  return null
+  return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
+}
+
+const validateFileNameExpression = (survey, nodeDef) => {
+  const expression = NodeDef.getFileNameExpression(nodeDef)
+  if (R.isEmpty(expression)) return null
+
+  const { validationResult } = nodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    expression,
+    isContextParent: true,
+    selfReferenceAllowed: false,
+  })
+  return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
 const validateColumnWidth =
@@ -192,36 +204,31 @@ const propsValidations = (survey) => ({
 })
 
 const validateAdvancedProps = async (survey, nodeDef) => {
-  const [
-    validationDefaultValues,
-    validationApplicable,
-    validationValidations,
-    validationVirtualEntityFormula,
-    validationItemsFilter,
-  ] = await Promise.all([
-    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.defaultValues),
-    NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.applicable),
-    NodeDefValidationsValidator.validate(survey, nodeDef),
-    validateVirtualEntityFormula(survey, nodeDef),
-    validateItemsFilterExpression(survey, nodeDef),
-  ])
+  const validatorsByProp = {
+    [keysPropsAdvanced.defaultValues]: NodeDefExpressionsValidator.validate(
+      survey,
+      nodeDef,
+      Survey.dependencyTypes.defaultValues
+    ),
+    [keysPropsAdvanced.applicable]: NodeDefExpressionsValidator.validate(
+      survey,
+      nodeDef,
+      Survey.dependencyTypes.applicable
+    ),
+    [keysPropsAdvanced.validations]: NodeDefValidationsValidator.validate(survey, nodeDef),
+    [keysPropsAdvanced.formula]: validateVirtualEntityFormula(survey, nodeDef),
+    [keysPropsAdvanced.itemsFilter]: validateItemsFilterExpression(survey, nodeDef),
+    [keysPropsAdvanced.fileNameExpression]: validateFileNameExpression(survey, nodeDef),
+  }
+  const validationResultsArray = await Promise.all(Object.values(validatorsByProp))
+  const validationResultsByProp = Object.keys(validatorsByProp).reduce((acc, prop, index) => {
+    acc[prop] = validationResultsArray[index]
+    return acc
+  }, {})
+  const valid = R.all(Validation.isValid, validationResultsArray)
+  const notValidValidationsByProp = R.reject(Validation.isValid, validationResultsByProp)
 
-  return Validation.newInstance(
-    R.all(Validation.isValid, [
-      validationDefaultValues,
-      validationApplicable,
-      validationValidations,
-      validationVirtualEntityFormula,
-      validationItemsFilter,
-    ]),
-    R.reject(Validation.isValid, {
-      [NodeDef.keysPropsAdvanced.defaultValues]: validationDefaultValues,
-      [NodeDef.keysPropsAdvanced.applicable]: validationApplicable,
-      [NodeDef.keysPropsAdvanced.validations]: validationValidations,
-      [NodeDef.keysPropsAdvanced.formula]: validationVirtualEntityFormula,
-      [NodeDef.keysPropsAdvanced.itemsFilter]: validationItemsFilter,
-    })
-  )
+  return Validation.newInstance(valid, notValidValidationsByProp)
 }
 
 export const validateNodeDef = async (survey, nodeDef) => {
