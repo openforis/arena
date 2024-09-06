@@ -1,7 +1,9 @@
 import * as R from 'ramda'
 
-import { truncate } from '@core/stringUtils'
+import { FileNames } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
+import { truncate } from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 import * as Node from './node'
 
@@ -45,11 +47,9 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
     content,
   })
 
-const getExtensionFromFileName = (fileName) => R.pipe(R.split('.'), R.tail)(fileName)
-
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
-    const extension = getExtensionFromFileName(fileName)
+    const extension = FileNames.getExtension(fileName)
 
     return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
@@ -65,7 +65,7 @@ export const getSize = ObjectUtils.getProp(propKeys.size)
 export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
 export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = R.prop(keys.content)
-export const getExtension = R.pipe(getName, getExtensionFromFileName)
+export const getExtension = R.pipe(getName, FileNames.getExtension)
 
 // UPDATE
 export const assocContent = R.assoc(keys.content)
