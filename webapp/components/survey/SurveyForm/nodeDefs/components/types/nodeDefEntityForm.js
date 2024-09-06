@@ -17,7 +17,16 @@ import NodeDefEntityFormGrid from './nodeDefEntityFormGrid'
 import NodeDefEntityFormNodeSelect from './nodeDefEntityFormNodeSelect'
 
 const NodeDefEntityForm = (props) => {
-  const { nodeDef, nodes, parentNode, selectedNode, edit, entry, entryMultiple } = props
+  const {
+    edit,
+    nodeDef = null,
+    parentNode,
+    // Entry props
+    entry = false,
+    entryMultiple = false,
+    nodes = null,
+    selectedNode = null,
+  } = props
 
   const dispatch = useDispatch()
 
@@ -46,15 +55,6 @@ const NodeDefEntityForm = (props) => {
       {(edit || (entry && selectedNode)) && <NodeDefEntityFormGrid {...props} node={selectedNode} />}
     </>
   )
-}
-
-NodeDefEntityForm.defaultProps = {
-  nodeDef: null,
-  // Entry props
-  entry: false,
-  entryMultiple: false,
-  nodes: null,
-  selectedNode: null,
 }
 
 const mapStateToProps = (state, props) => {

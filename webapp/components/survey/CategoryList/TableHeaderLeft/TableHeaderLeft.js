@@ -15,7 +15,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useActions, State } from '../store'
 
 const TableHeaderLeft = (props) => {
-  const { headerProps } = props
+  const { headerProps = {} } = props
   const { state, setState } = headerProps
   const navigate = useNavigate()
 
@@ -58,10 +58,6 @@ const TableHeaderLeft = (props) => {
 
 TableHeaderLeft.propTypes = {
   headerProps: PropTypes.object,
-}
-
-TableHeaderLeft.defaultProps = {
-  headerProps: {},
 }
 
 export default TableHeaderLeft

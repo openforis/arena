@@ -17,25 +17,25 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const ExpressionProp = (props) => {
   const {
-    qualifier,
-    index,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    validation,
+    applyIf = true, // Show apply if expression editor
+    canBeConstant = false,
+    canBeCall = true,
+    excludeCurrentNodeDef = true,
     expression,
-    applyIf,
-    severity,
-    showLabels,
-    readOnly,
-    isContextParent,
-    canBeCall,
-    canBeConstant,
-    isBoolean,
-    hideAdvanced,
-    mode,
-    onUpdate,
-    onDelete,
+    hideAdvanced = false,
+    index,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onUpdate = () => {},
+    onDelete = () => {},
+    qualifier,
+    readOnly = false,
+    severity = false, // Show severity (error/warning) button group
+    showLabels = false, // Show error message labels editor
+    validation = null,
   } = props
 
   const i18n = useI18n()
@@ -151,28 +151,6 @@ ExpressionProp.propTypes = {
 
   onUpdate: PropTypes.func,
   onDelete: PropTypes.func,
-}
-
-ExpressionProp.defaultProps = {
-  nodeDefUuidContext: null,
-  nodeDefUuidCurrent: null,
-  excludeCurrentNodeDef: true,
-  validation: null,
-
-  applyIf: true, // Show apply if expression editor
-  severity: false, // Show severity (error/warning) button group
-  showLabels: false, // Show error message labels editor
-  readOnly: false,
-
-  isContextParent: false,
-  canBeCall: true,
-  canBeConstant: false,
-  isBoolean: true,
-  hideAdvanced: false,
-  mode: Expression.modes.json,
-
-  onUpdate: () => {},
-  onDelete: () => {},
 }
 
 export default ExpressionProp

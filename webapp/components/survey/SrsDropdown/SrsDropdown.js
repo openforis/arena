@@ -8,7 +8,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { Dropdown } from '@webapp/components/form'
 
 const SrsDropdown = (props) => {
-  const { disabled, onChange, readOnly, selectedSrsCode, testId } = props
+  const { disabled = false, onChange, readOnly = false, selectedSrsCode = null, testId } = props
 
   const surveyInfo = useSurveyInfo()
   const surveySrs = Survey.getSRS(surveyInfo)
@@ -36,12 +36,6 @@ SrsDropdown.propTypes = {
   readOnly: PropTypes.bool,
   selectedSrsCode: PropTypes.string,
   testId: PropTypes.string,
-}
-
-SrsDropdown.defaultProps = {
-  disabled: false,
-  readOnly: false,
-  selectedSrsCode: null,
 }
 
 export default SrsDropdown

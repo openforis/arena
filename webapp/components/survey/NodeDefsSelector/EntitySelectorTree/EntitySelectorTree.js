@@ -9,7 +9,15 @@ import { TreeView } from '@webapp/components/TreeView'
 import { useEntitySelectorTree } from './useEntitySelectorTree'
 
 const EntitySelectorTree = (props) => {
-  const { getLabelSuffix, isDisabled, nodeDefLabelType, nodeDefUuidActive, onlyEntities, onlyPages, onSelect } = props
+  const {
+    getLabelSuffix = () => '',
+    isDisabled = () => false,
+    nodeDefLabelType = null,
+    nodeDefUuidActive = null,
+    onlyEntities = true,
+    onlyPages = false,
+    onSelect,
+  } = props
 
   const {
     expanded,
@@ -64,15 +72,6 @@ EntitySelectorTree.propTypes = {
   onlyEntities: PropTypes.bool,
   onlyPages: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
-}
-
-EntitySelectorTree.defaultProps = {
-  getLabelSuffix: () => '',
-  isDisabled: () => false,
-  nodeDefLabelType: null,
-  nodeDefUuidActive: null,
-  onlyEntities: true,
-  onlyPages: false,
 }
 
 export { EntitySelectorTree }

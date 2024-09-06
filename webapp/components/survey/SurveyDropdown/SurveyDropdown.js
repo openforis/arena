@@ -10,7 +10,7 @@ import { Dropdown } from '@webapp/components/form'
 import { useSurveyDropdownOptions } from './useSurveyDropdownOptions'
 
 const SurveyDropdown = (props) => {
-  const { selection, onChange } = props
+  const { selection = null, onChange } = props
   const { options } = useSurveyDropdownOptions()
 
   const allOptions = options.reduce((optionsAcc, optionGroup) => [...optionsAcc, ...optionGroup.options], [])
@@ -47,11 +47,6 @@ const SurveyDropdown = (props) => {
 SurveyDropdown.propTypes = {
   selection: PropTypes.string,
   onChange: PropTypes.func,
-}
-
-SurveyDropdown.defaultProps = {
-  selection: null,
-  onChange: () => ({}),
 }
 
 export { SurveyDropdown }

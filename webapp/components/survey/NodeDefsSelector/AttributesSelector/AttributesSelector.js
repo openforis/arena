@@ -20,25 +20,25 @@ const minDefsToShowSelectAll = 5
 
 const AttributesSelector = (props) => {
   const {
-    canSelectAttributes,
-    filterFunction,
-    filterTypes,
-    filterChainUuids,
+    ancestorSelector = false,
+    canSelectAttributes = true,
+    filterFunction = null,
+    filterTypes = [],
+    filterChainUuids = [],
+    includeEntityFrequencySelector = false,
     lang,
-    ancestorSelector,
-    includeEntityFrequencySelector,
-    nodeDefLabelType,
-    nodeDefUuidsToExclude,
-    nodeDefUuidEntity,
-    nodeDefUuidsAttributes,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
+    nodeDefUuidsAttributes = [],
+    nodeDefUuidsToExclude = [],
     onAttributesSelection,
     onToggleAttribute,
-    showAnalysisAttributes,
-    showAncestors,
-    showAncestorsLabel,
-    showLabel,
-    showMultipleAttributes,
-    showSiblingsInSingleEntities,
+    showAnalysisAttributes = false,
+    showAncestors = true,
+    showAncestorsLabel = true,
+    showLabel = false,
+    showMultipleAttributes = true,
+    showSiblingsInSingleEntities = false,
   } = props
 
   const i18n = useI18n()
@@ -176,25 +176,6 @@ AttributesSelector.propTypes = {
   showMultipleAttributes: PropTypes.bool,
   showSiblingsInSingleEntities: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
-}
-
-AttributesSelector.defaultProps = {
-  ancestorSelector: false,
-  canSelectAttributes: true,
-  filterFunction: null,
-  filterTypes: [],
-  filterChainUuids: [],
-  includeEntityFrequencySelector: false,
-  nodeDefUuidEntity: null,
-  nodeDefUuidsAttributes: [],
-  nodeDefUuidsToExclude: [],
-  showAnalysisAttributes: false,
-  showAncestors: true,
-  showAncestorsLabel: true,
-  showLabel: false,
-  showMultipleAttributes: true,
-  showSiblingsInSingleEntities: false,
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default AttributesSelector

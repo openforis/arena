@@ -21,17 +21,17 @@ import FilterByChain from './FilterByChain'
 
 const NodeDefsSelector = (props) => {
   const {
-    nodeDefUuidsAttributes,
-    nodeDefUuidEntity,
-    hierarchy,
-    canSelectAttributes,
-    showAnalysisAttributes,
-    showAncestors,
-    showMultipleAttributes,
-    showSingleEntities,
-    onChangeAttributes,
-    onChangeEntity,
-    nodeDefLabelType,
+    canSelectAttributes = true,
+    hierarchy = null,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
+    nodeDefUuidsAttributes = [],
+    onChangeEntity = () => {},
+    onChangeAttributes = () => {},
+    showAnalysisAttributes = false,
+    showAncestors = true,
+    showMultipleAttributes = true,
+    showSingleEntities = false,
   } = props
 
   const i18n = useI18n()
@@ -142,20 +142,6 @@ NodeDefsSelector.propTypes = {
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
-}
-
-NodeDefsSelector.defaultProps = {
-  nodeDefUuidEntity: null,
-  nodeDefUuidsAttributes: [],
-  hierarchy: null,
-  canSelectAttributes: true,
-  showAnalysisAttributes: false,
-  showAncestors: true,
-  showMultipleAttributes: true,
-  showSingleEntities: false,
-  onChangeEntity: () => {},
-  onChangeAttributes: () => {},
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default NodeDefsSelector

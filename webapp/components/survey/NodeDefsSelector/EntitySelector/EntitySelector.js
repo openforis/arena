@@ -46,16 +46,16 @@ const getDropdownItems = ({
 
 const EntitySelector = (props) => {
   const {
+    allowEmptySelection = false,
+    disabled = false,
+    filterFn = null,
     hierarchy,
-    nodeDefUuidEntity,
-    validation,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
     onChange,
-    nodeDefLabelType,
-    showSingleEntities,
-    disabled,
-    useNameAsLabel,
-    allowEmptySelection,
-    filterFn,
+    showSingleEntities = true,
+    useNameAsLabel = false,
+    validation = null,
   } = props
 
   const i18n = useI18n()
@@ -101,17 +101,6 @@ EntitySelector.propTypes = {
   nodeDefLabelType: PropTypes.string,
   allowEmptySelection: PropTypes.bool,
   filterFn: PropTypes.func,
-}
-
-EntitySelector.defaultProps = {
-  nodeDefUuidEntity: null,
-  showSingleEntities: true,
-  disabled: false,
-  useNameAsLabel: false,
-  validation: null,
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
-  allowEmptySelection: false,
-  filterFn: null,
 }
 
 export default EntitySelector

@@ -36,7 +36,7 @@ const ButtonMetaItemAdd = (props) => {
       dispatch(SurveyActions.metaUpdated())
       onAdd(item)
     }
-  }, [])
+  }, [dispatch, metaItemType, onAdd, surveyId])
 
   return <ButtonAdd testId={id} onClick={add} className={`btn-add-${metaItemType}`} size="small" variant={variant} />
 }

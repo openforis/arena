@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import { getLanguageLabel } from '@core/app/languages'
 
-const Badge = ({ lang, compact }) => (
+const Badge = ({ lang = '', compact = false }) => (
   <div className="badge-of labels-editor__badge" title={compact ? getLanguageLabel(lang) : null}>
     {compact ? lang : getLanguageLabel(lang)}
   </div>
@@ -12,11 +12,6 @@ const Badge = ({ lang, compact }) => (
 Badge.propTypes = {
   lang: PropTypes.string,
   compact: PropTypes.bool,
-}
-
-Badge.defaultProps = {
-  lang: '',
-  compact: false,
 }
 
 export default Badge

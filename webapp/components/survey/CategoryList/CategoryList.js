@@ -28,7 +28,7 @@ const getType = ({ category }) => {
   return 'flat'
 }
 const CategoryList = (props) => {
-  const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
+  const { canSelect = false, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
 
   const i18n = useI18n()
 
@@ -172,14 +172,6 @@ CategoryList.propTypes = {
   onCategoryOpen: PropTypes.func,
   onSelect: PropTypes.func,
   selectedItemUuid: PropTypes.string,
-}
-
-CategoryList.defaultProps = {
-  canSelect: false,
-  onCategoryCreated: null,
-  onCategoryOpen: null,
-  onSelect: null,
-  selectedItemUuid: null,
 }
 
 export default CategoryList

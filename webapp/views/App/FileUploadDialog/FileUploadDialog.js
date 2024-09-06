@@ -48,7 +48,7 @@ export const FileUploadDialog = () => {
       <ModalBody>
         <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={files} />
         {uploading && uploadProgressPercent >= 0 && (
-          <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
+          <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey="common.uploadingFile" />
         )}
       </ModalBody>
       <ModalFooter>

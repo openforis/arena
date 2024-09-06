@@ -4,7 +4,7 @@ import ReactSwitch from 'react-switch'
 import PropTypes from 'prop-types'
 
 const InputSwitch = (props) => {
-  const { checked, disabled, onChange } = props
+  const { checked, disabled = false, onChange } = props
 
   return (
     <ReactSwitch
@@ -33,10 +33,6 @@ InputSwitch.propTypes = {
   checked: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
-}
-
-InputSwitch.defaultProps = {
-  disabled: false,
 }
 
 export default InputSwitch
