@@ -110,8 +110,11 @@ export default class ColumnNodeDef {
   }
 
   get codeLabelColumn() {
-    if (!NodeDef.isCode(this.nodeDef)) return null
-    return `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}`
+    return NodeDef.isCode(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}` : null
+  }
+
+  get fileNameColumn() {
+    return NodeDef.isFile(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixFileName}` : null
   }
 }
 
@@ -122,6 +125,7 @@ ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
 ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
 
 ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
+ColumnNodeDef.getFileNameColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixFileName}`
 
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)

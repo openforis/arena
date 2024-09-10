@@ -1,11 +1,11 @@
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
-import { Query } from '@common/model/query'
 import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
 
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
 
@@ -139,24 +139,46 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformerNullsToEmpty = () => {
+const getCsvObjectTransformerUniqueFileNames = ({ survey, query, fileNameByFileUuid, fileUuidByFileName }) => {
+  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
+  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
   return (obj) => {
-    Object.entries(obj).forEach(([key, value]) => {
-      if (A.isNull(value)) {
-        obj[key] = ''
-      }
+    nodeDefFileCols.forEach((nodeDef) => {
+      const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
+      const fileName = obj[fileNameField]
+      
     })
-    return obj
   }
 }
 
-const getCsvObjectTransformer = ({ survey, query, expandCategoryItems, nullsToEmpty = false }) => {
+const getCsvObjectTransformerNullsToEmpty = () => (obj) => {
+  Object.entries(obj).forEach(([key, value]) => {
+    if (A.isNull(value)) {
+      obj[key] = ''
+    }
+  })
+  return obj
+}
+
+const getCsvObjectTransformer = ({
+  survey,
+  query,
+  expandCategoryItems,
+  nullsToEmpty = false,
+  keepFileNamesUnique = true,
+}) => {
   const transformers = []
   if (expandCategoryItems) {
     transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
   }
   if (nullsToEmpty) {
     transformers.push(getCsvObjectTransformerNullsToEmpty())
+  }
+  const fileNameByFileUuid = {}
+  const fileUuidByFileName = {}
+  if (keepFileNamesUnique) {
+    transformers.push(getCsvObjectTransformerUniqueFileNames({ survey, query, fileNameByFileUuid, fileUuidByFileName }))
   }
   return transformers.length === 0 ? null : A.pipe(...transformers)
 }
