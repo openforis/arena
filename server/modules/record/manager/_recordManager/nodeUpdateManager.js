@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import { Records } from '@openforis/arena-core'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Survey from '@core/survey/survey'
@@ -98,10 +96,6 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
 
   let value = Node.getValue(node)
   if (NodeDef.isFile(nodeDef)) {
-    if (value && NodeDef.getFileNameExpression(nodeDef)) {
-      const fileName = Records.getFileName({ survey, record, node })
-      value = R.assoc(Node.valuePropsFile.fileName, fileName)(value)
-    }
     // mark old file as deleted if changed
     const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
     const fileUuidPrev = Node.getFileUuid(nodePrev)

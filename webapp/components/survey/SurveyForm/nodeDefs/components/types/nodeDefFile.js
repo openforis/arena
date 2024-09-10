@@ -18,8 +18,9 @@ const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode } = props
 
   const [fileUploaded, setFileUploaded] = useState(null)
-  const fileName = Node.getFileName(node)
-  const fileReady = !edit && fileName
+  const originalFileName = Node.getFileName(node)
+  const fileName = Node.getFileNameCalculated(node) ?? originalFileName
+  const fileReady = !edit && originalFileName
   const fileUrl = `/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`
 
   const handleFileChange = (file) => {
