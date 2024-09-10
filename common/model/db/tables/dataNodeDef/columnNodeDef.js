@@ -9,6 +9,8 @@ import * as SQL from '../../sql'
 const { nodeDefType } = NodeDef
 
 const columnSuffixCodeLabel = '_label'
+const columnSuffixFileUuid = '_file_uuid'
+const columnSuffixFileName = '_file_name'
 const columnSuffixTaxonScientificName = '_scientific_name'
 const columnSuffixTaxonVernacularName = '_vernacular_name'
 
@@ -21,7 +23,7 @@ const columnNamesSuffixGetterByType = {
     return suffixes
   },
   [nodeDefType.taxon]: () => ['', columnSuffixTaxonScientificName, columnSuffixTaxonVernacularName],
-  [nodeDefType.file]: () => ['_file_uuid', '_file_name'],
+  [nodeDefType.file]: () => [columnSuffixFileUuid, columnSuffixFileName],
 }
 
 const colTypesGetterByType = {
@@ -114,6 +116,8 @@ export default class ColumnNodeDef {
 }
 
 ColumnNodeDef.columnSuffixCodeLabel = columnSuffixCodeLabel
+ColumnNodeDef.columnSuffixFileUuid = columnSuffixFileUuid
+ColumnNodeDef.columnSuffixFileName = columnSuffixFileName
 ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
 ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
 

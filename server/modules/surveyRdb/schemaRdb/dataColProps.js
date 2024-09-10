@@ -1,30 +1,20 @@
-import * as camelize from 'camelize'
-
 import { Objects, PointFactory, Points, Strings } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
+import * as DateTimeUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
-import * as Survey from '@core/survey/survey'
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
-import * as DateTimeUtils from '@core/dateUtils'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import * as Taxon from '@core/survey/taxon'
 
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import { ColumnNodeDef } from '@common/model/db'
 
 const { nodeDefType } = NodeDef
 
 const colValueProcessor = 'colValueProcessor'
-
-const getValueFromItem = (nodeDefCol, columnName, item = {}, isInProps = false) => {
-  // Remove nodeDefName from col name
-  const prop = camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
-
-  return isInProps ? NodeDef.getProp(prop)(item) : A.propOr(null, prop, item)
-}
 
 const _extractCategoryItem = ({ survey, node }) => {
   let item = NodeRefData.getCategoryItem(node)
@@ -39,13 +29,6 @@ const _extractTaxon = ({ survey, node }) => {
   if (!taxonUuid) return null
   return NodeRefData.getTaxon(node) ?? Survey.getTaxonByUuid(taxonUuid)(survey)
 }
-
-const nodeValuePropProcessor =
-  ({ nodeDefCol }) =>
-  (node, columnName) => {
-    const nodeValue = Node.getValue(node)
-    return getValueFromItem(nodeDefCol, columnName, nodeValue)
-  }
 
 /**
  * Convert an input value to RDB compatible output value.
@@ -163,15 +146,24 @@ const props = {
   },
 
   [nodeDefType.file]: {
-    [colValueProcessor]: nodeValuePropProcessor,
+    [colValueProcessor]: ({ nodeDefCol }) => {
+      const fileNameExpression = NodeDef.getFileNameExpression(nodeDefCol)
+      return (node, columnName) => {
+        if (columnName.endsWith(ColumnNodeDef.columnSuffixFileName)) {
+          return fileNameExpression ? Node.getFileNameCalculated(node) : Node.getFileName(node)
+        }
+        if (columnName.endsWith(ColumnNodeDef.columnSuffixFileUuid)) {
+          return Node.getFileUuid(node)
+        }
+        return null
+      }
+    },
   },
 }
 
 export const getColValueProcessor = (nodeDef) =>
   A.propOr(
-    () => (node) => {
-      return Node.isValueBlank(node) ? null : Node.getValue(node)
-    },
+    () => (node) => (Node.isValueBlank(node) ? null : Node.getValue(node)),
     colValueProcessor,
     props[NodeDef.getType(nodeDef)]
   )
