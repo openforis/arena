@@ -1214,6 +1214,10 @@ $t(common.appNameFull)
     },
     basicProps: {
       analysis: 'Analysis',
+      autoIncrementalKey: {
+        label: 'Auto incremental',
+        info: 'Value will be automatically generated',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',

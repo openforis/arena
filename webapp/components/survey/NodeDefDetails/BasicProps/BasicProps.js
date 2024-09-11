@@ -97,6 +97,17 @@ const BasicProps = (props) => {
                 <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
               </span>
             )}
+            {NodeDef.canHaveAutoIncrementalKey(nodeDef) && (
+              <FormItem
+                info="nodeDefEdit.basicProps.autoIncrementalKey.info"
+                label={i18n.t('nodeDefEdit.basicProps.autoIncrementalKey.label')}
+              >
+                <Checkbox
+                  checked={NodeDef.isAutoIncrementalKey(nodeDef)}
+                  onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.autoIncrementalKey, value })}
+                />
+              </FormItem>
+            )}
           </div>
         </FormItem>
       )}
@@ -113,12 +124,8 @@ const BasicProps = (props) => {
               />
               {NodeDef.isMultipleEntity(nodeDef) && (
                 <FormItem
-                  label={
-                    <span>
-                      {i18n.t('nodeDefEdit.basicProps.enumerate.label')}
-                      <ButtonIconInfo title="nodeDefEdit.basicProps.enumerate.info" />
-                    </span>
-                  }
+                  info="nodeDefEdit.basicProps.enumerate.info"
+                  label={i18n.t('nodeDefEdit.basicProps.enumerate.label')}
                 >
                   <div>
                     <Checkbox
