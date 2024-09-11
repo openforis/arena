@@ -80,7 +80,7 @@ const AdvancedProps = (props) => {
             state={state}
             Actions={Actions}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
-            readOnly={readOnly}
+            readOnly={readOnly || NodeDef.isAutoIncrementalKey(nodeDef)}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant
@@ -90,7 +90,7 @@ const AdvancedProps = (props) => {
           <div className="form_row without-label">
             <Checkbox
               checked={NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)}
-              disabled={readOnly}
+              disabled={readOnly || NodeDef.isAutoIncrementalKey(nodeDef)}
               label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
               validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
                 validation

@@ -128,7 +128,8 @@ const ExpressionsProp = (props) => {
             validation: Validation.getFieldValidation(index)(validation),
           })
         )}
-        {(multiple || R.isEmpty(values)) &&
+        {!readOnly &&
+          (multiple || R.isEmpty(values)) &&
           createExpressionProp({
             index: values.length,
             expression: NodeDefExpression.createExpressionPlaceholder(),

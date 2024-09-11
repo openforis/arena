@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -92,7 +93,10 @@ const _onUpdateAutoIncrementalKey = ({ nodeDef, value }) => {
     })
     defaultValues.push(defaultValueExpression)
   }
-  return NodeDef.assocDefaultValues(defaultValues)(nodeDef)
+  return A.pipe(
+    NodeDef.assocDefaultValues(defaultValues),
+    NodeDef.assocDefaultValueEvaluatedOnlyOneTime(value)
+  )(nodeDef)
 }
 
 const updateFunctionByProp = {

@@ -54,9 +54,8 @@ const ExpressionProp = (props) => {
   return (
     <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
-        {!isPlaceholder && (
+        {!isPlaceholder && !readOnly && (
           <ButtonIconDelete
-            disabled={readOnly}
             id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             onClick={() => onDelete(expression)}
             testId={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
@@ -80,6 +79,7 @@ const ExpressionProp = (props) => {
             isBoolean={isBoolean}
             types={expressionEditorTypes}
             mode={mode}
+            readOnly={readOnly}
           />
         </div>
 
@@ -98,6 +98,7 @@ const ExpressionProp = (props) => {
               onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
               isContextParent={isContextParent}
               canBeConstant={false}
+              readOnly={readOnly}
               types={expressionEditorTypes}
             />
           </div>

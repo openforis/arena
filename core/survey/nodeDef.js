@@ -459,6 +459,8 @@ export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
   )(nodeDef)
 export const assocDefaultValues = (defaultValues) =>
   mergePropsAdvanced({ [keysPropsAdvanced.defaultValues]: defaultValues })
+export const assocDefaultValueEvaluatedOnlyOneTime = (evaluatedOnlyOneTime) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValueEvaluatedOneTime]: evaluatedOnlyOneTime })
 export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
 export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
@@ -660,6 +662,16 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
   canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
+const isDefaultValueAutoIncrementExpression = (defaultValue) => {
+  const expression = NodeDefExpression.getExpression(defaultValue)
+  return (
+    (expression === autoIncrementalKeyExpression ||
+      StringUtils.removeSuffix('\n')(expression).replaceAll(' ', '') ===
+        autoIncrementalKeyExpression.replaceAll(' ', '')) &&
+    Objects.isEmpty(NodeDefExpression.getApplyIf(defaultValue))
+  )
+}
+
 export const canHaveAutoIncrementalKey = (nodeDef) => {
   if ([nodeDefType.decimal, nodeDefType.integer].includes(nodeDef)) return false
 
@@ -668,10 +680,5 @@ export const canHaveAutoIncrementalKey = (nodeDef) => {
   if (defaultValues.length > 1) return false
 
   const defaultValue = defaultValues[0]
-
-  // apply if specified => it cannot be auto incremental expression
-  if (Objects.isNotEmpty(NodeDefExpression.getApplyIf(defaultValue))) return false
-
-  const expression = NodeDefExpression.getExpression(defaultValue)
-  return Objects.isEmpty(expression) || expression === autoIncrementalKeyExpression
+  return NodeDefExpression.isEmpty(defaultValue) || isDefaultValueAutoIncrementExpression(defaultValue)
 }
