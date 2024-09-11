@@ -673,7 +673,7 @@ const isDefaultValueAutoIncrementExpression = (defaultValue) => {
 }
 
 export const canHaveAutoIncrementalKey = (nodeDef) => {
-  if ([nodeDefType.decimal, nodeDefType.integer].includes(nodeDef)) return false
+  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
 
   const defaultValues = getDefaultValues(nodeDef)
   if (defaultValues.length === 0) return true
