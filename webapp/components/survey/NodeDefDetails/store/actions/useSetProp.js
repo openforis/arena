@@ -1,9 +1,11 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
@@ -83,11 +85,26 @@ const _onUpdateName = ({ nodeDef, nodeDefPrev, value: name, lang }) => {
   return nodeDef
 }
 
+const _onUpdateAutoIncrementalKey = ({ nodeDef, value }) => {
+  const defaultValues = []
+  if (value) {
+    const defaultValueExpression = NodeDefExpression.createExpression({
+      expression: NodeDef.autoIncrementalKeyExpression,
+    })
+    defaultValues.push(defaultValueExpression)
+  }
+  return A.pipe(
+    NodeDef.assocDefaultValues(defaultValues),
+    NodeDef.assocDefaultValueEvaluatedOnlyOneTime(value)
+  )(nodeDef)
+}
+
 const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
   [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.readOnly]: _onUpdateReadOnly,
+  [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,
 }
 
 export const useSetProp = ({ setState }) => {

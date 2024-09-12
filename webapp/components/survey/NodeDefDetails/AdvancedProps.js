@@ -25,6 +25,7 @@ const AdvancedProps = (props) => {
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
+  const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
 
   const i18n = useI18n()
   const cycle = useSurveyCycleKey()
@@ -76,11 +77,13 @@ const AdvancedProps = (props) => {
           </FormItem>
 
           <NodeDefExpressionsProp
+            applyIf={!autoIncrementalKey}
             qualifier={TestId.nodeDefDetails.defaultValues}
             state={state}
             Actions={Actions}
+            info={autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null}
             label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
-            readOnly={readOnly}
+            readOnly={readOnly || autoIncrementalKey}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
             nodeDefUuidContext={nodeDefUuidContext}
             canBeConstant
@@ -90,7 +93,7 @@ const AdvancedProps = (props) => {
           <div className="form_row without-label">
             <Checkbox
               checked={NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)}
-              disabled={readOnly}
+              disabled={readOnly || autoIncrementalKey}
               label="nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime"
               validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.defaultValueEvaluatedOneTime)(
                 validation

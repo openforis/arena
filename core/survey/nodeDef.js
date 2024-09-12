@@ -52,6 +52,7 @@ export const propKeys = {
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
   key: 'key',
+  autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
   name: ObjectUtils.keys.name,
@@ -175,6 +176,8 @@ export const visibleFieldsDefaultByType = {
   [nodeDefType.taxon]: [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName],
 }
 
+export const autoIncrementalKeyExpression = 'index($context) + 1'
+
 // ==== READ
 
 export const {
@@ -197,6 +200,7 @@ export const getName = getProp(propKeys.name, '')
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
+export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
 export const isSingle = R.pipe(isMultiple, R.not)
@@ -453,6 +457,10 @@ export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
   R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
     assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
+export const assocDefaultValues = (defaultValues) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValues]: defaultValues })
+export const assocDefaultValueEvaluatedOnlyOneTime = (evaluatedOnlyOneTime) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValueEvaluatedOneTime]: evaluatedOnlyOneTime })
 export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
 export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
@@ -653,3 +661,24 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
 
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
   canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+const isDefaultValueAutoIncrementExpression = (defaultValue) => {
+  const expression = NodeDefExpression.getExpression(defaultValue)
+  return (
+    (expression === autoIncrementalKeyExpression ||
+      StringUtils.removeSuffix('\n')(expression).replaceAll(' ', '') ===
+        autoIncrementalKeyExpression.replaceAll(' ', '')) &&
+    Objects.isEmpty(NodeDefExpression.getApplyIf(defaultValue))
+  )
+}
+
+export const canHaveAutoIncrementalKey = (nodeDef) => {
+  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
+
+  const defaultValues = getDefaultValues(nodeDef)
+  if (defaultValues.length === 0) return true
+  if (defaultValues.length > 1) return false
+
+  const defaultValue = defaultValues[0]
+  return NodeDefExpression.isEmpty(defaultValue) || isDefaultValueAutoIncrementExpression(defaultValue)
+}

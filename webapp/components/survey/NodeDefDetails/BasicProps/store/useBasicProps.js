@@ -53,6 +53,11 @@ export const useBasicProps = (props) => {
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
   const nodeDefParentLabel = NodeDef.getLabel(nodeDefParent, lang)
+  const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  const canHaveAutoIncrementalKey =
+    NodeDef.canHaveAutoIncrementalKey(nodeDef) &&
+    ancestorMultipleEntityDef &&
+    !NodeDef.isRoot(ancestorMultipleEntityDef)
 
   return {
     nodeDef,
@@ -73,5 +78,6 @@ export const useBasicProps = (props) => {
     cyclesKeysSurvey,
     includedInClone,
     includeInCloneDisabled,
+    canHaveAutoIncrementalKey,
   }
 }

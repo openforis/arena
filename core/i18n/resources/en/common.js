@@ -1214,6 +1214,10 @@ $t(common.appNameFull)
     },
     basicProps: {
       analysis: 'Analysis',
+      autoIncrementalKey: {
+        label: 'Auto incremental',
+        info: 'Value will be automatically generated',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
@@ -1238,6 +1242,7 @@ $t(common.appNameFull)
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
