@@ -46,7 +46,8 @@ export const nullToEmpty = (value) => (value === null ? '' : value)
 export const appendIfMissing = (suffix) => (text) => (text.endsWith(suffix) ? text : `${text}${suffix}`)
 export const prependIfMissing = (prefix) => (text) => (text.startsWith(prefix) ? text : `${prefix}${text}`)
 export const removePrefix = (prefix) => (text) => (text.startsWith(prefix) ? text.substring(prefix.length) : text)
-export const removeSuffix = (suffix) => (text) => text.substring(0, text.length - suffix.length)
+export const removeSuffix = (suffix) => (text) =>
+  text.endsWith(suffix) ? text.substring(0, text.length - suffix.length) : text
 
 export const quote = (text) => (isBlank(text) ? '' : `'${text}'`)
 

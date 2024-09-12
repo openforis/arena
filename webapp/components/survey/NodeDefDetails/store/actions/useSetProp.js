@@ -5,7 +5,6 @@ import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 
@@ -75,24 +74,24 @@ const _generateLabelFromName = (name) => {
   return parts.join(' ')
 }
 
-const _onUpdateName = ({ nodeDef, nodeDefPrev, value: name, lang }) => {
+const _onUpdateName = ({ survey, nodeDef, nodeDefPrev, value: name, lang }) => {
+  let nodeDefUpdated = nodeDef
   const prevNameCapitalized = _generateLabelFromName(NodeDef.getName(nodeDefPrev))
   const prevLabel = NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false)
   if (StringUtils.isBlank(prevLabel) || prevNameCapitalized === prevLabel) {
     const nameCapitalized = _generateLabelFromName(name)
-    return NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDef)
+    nodeDefUpdated = NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDefUpdated)
   }
-  return nodeDef
+  if (NodeDef.isAutoIncrementalKey(nodeDefUpdated)) {
+    // re-generate default values; they depend on current node def name
+    nodeDefUpdated = _onUpdateAutoIncrementalKey({ survey, nodeDef, value: true })
+  }
+  return nodeDefUpdated
 }
 
-const _onUpdateAutoIncrementalKey = ({ nodeDef, value }) => {
-  const defaultValues = []
-  if (value) {
-    const defaultValueExpression = NodeDefExpression.createExpression({
-      expression: NodeDef.autoIncrementalKeyExpression,
-    })
-    defaultValues.push(defaultValueExpression)
-  }
+const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const defaultValues = value ? NodeDef.createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent }) : []
   return A.pipe(
     NodeDef.assocDefaultValues(defaultValues),
     NodeDef.assocDefaultValueEvaluatedOnlyOneTime(value)

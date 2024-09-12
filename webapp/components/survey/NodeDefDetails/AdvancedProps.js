@@ -77,7 +77,6 @@ const AdvancedProps = (props) => {
           </FormItem>
 
           <NodeDefExpressionsProp
-            applyIf={!autoIncrementalKey}
             qualifier={TestId.nodeDefDetails.defaultValues}
             state={state}
             Actions={Actions}
