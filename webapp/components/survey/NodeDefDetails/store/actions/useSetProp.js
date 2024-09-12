@@ -74,14 +74,19 @@ const _generateLabelFromName = (name) => {
   return parts.join(' ')
 }
 
-const _onUpdateName = ({ nodeDef, nodeDefPrev, value: name, lang }) => {
+const _onUpdateName = ({ survey, nodeDef, nodeDefPrev, value: name, lang }) => {
+  let nodeDefUpdated = nodeDef
   const prevNameCapitalized = _generateLabelFromName(NodeDef.getName(nodeDefPrev))
   const prevLabel = NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false)
   if (StringUtils.isBlank(prevLabel) || prevNameCapitalized === prevLabel) {
     const nameCapitalized = _generateLabelFromName(name)
-    return NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDef)
+    nodeDefUpdated = NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDefUpdated)
   }
-  return nodeDef
+  if (NodeDef.isAutoIncrementalKey(nodeDefUpdated)) {
+    // re-generate default values; they depend on current node def name
+    nodeDefUpdated = _onUpdateAutoIncrementalKey({ survey, nodeDef, value: true })
+  }
+  return nodeDefUpdated
 }
 
 const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
