@@ -55,9 +55,10 @@ export const useBasicProps = (props) => {
   const nodeDefParentLabel = NodeDef.getLabel(nodeDefParent, lang)
   const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   const canHaveAutoIncrementalKey =
-    NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
-    ancestorMultipleEntityDef &&
-    !NodeDef.isRoot(ancestorMultipleEntityDef)
+    NodeDef.isAutoIncrementalKey(nodeDef) ||
+    (NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
+      ancestorMultipleEntityDef &&
+      !NodeDef.isRoot(ancestorMultipleEntityDef))
 
   return {
     nodeDef,
