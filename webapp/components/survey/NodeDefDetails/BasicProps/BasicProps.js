@@ -64,6 +64,7 @@ const BasicProps = (props) => {
     cyclesKeysParent,
     includedInClone,
     includeInCloneDisabled,
+    canHaveAutoIncrementalKey,
   } = useBasicProps(props)
 
   return (
@@ -97,7 +98,7 @@ const BasicProps = (props) => {
                 <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
               </span>
             )}
-            {NodeDef.canHaveAutoIncrementalKey(nodeDef) && (
+            {canHaveAutoIncrementalKey && (
               <FormItem
                 info="nodeDefEdit.basicProps.autoIncrementalKey.info"
                 label={i18n.t('nodeDefEdit.basicProps.autoIncrementalKey.label')}
