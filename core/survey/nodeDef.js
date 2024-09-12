@@ -515,7 +515,10 @@ export const convertToType =
   ({ toType }) =>
   (nodeDef) => {
     const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
-    const propsAdvancedUpdated = R.pick(commonAttributePropsAdvancedKeys)(getPropsAdvanced(nodeDef))
+    const propsAdvancedToKeep = isAutoIncrementalKey(nodeDef)
+      ? commonAttributePropsAdvancedKeys.filter((prop) => prop !== keysPropsAdvanced.defaultValues)
+      : commonAttributePropsAdvancedKeys
+    const propsAdvancedUpdated = R.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
 
     const layout = getLayout(nodeDef)
     const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
