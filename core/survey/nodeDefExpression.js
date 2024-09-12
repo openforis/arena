@@ -53,9 +53,14 @@ export const isPlaceholder = R.propEq(keys.placeholder, true)
 export const isEmpty = (expression = {}) =>
   StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
 
-export const isEqualTo = (expressionA) => (expressionB) => {
+export const isSimilarTo = (expressionA) => (expressionB) => {
   if (isEmpty(expressionA) && isEmpty(expressionB)) return true
   if (isEmpty(expressionA) || isEmpty(expressionB)) return false
+  const prepareExpr = (expr) => StringUtils.removeSuffix('\n')(expr.replaceAll(' ', ''))
+  return (
+    prepareExpr(getExpression(expressionA)) === prepareExpr(getExpression(expressionB)) &&
+    prepareExpr(getApplyIf(expressionA)) === prepareExpr(getApplyIf(expressionB))
+  )
 }
 
 // ====== UPDATE

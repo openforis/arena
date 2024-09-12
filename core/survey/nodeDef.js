@@ -176,14 +176,13 @@ export const visibleFieldsDefaultByType = {
   [nodeDefType.taxon]: [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName],
 }
 
-export const autoIncrementalKeyExpression = 'index($context) + 1'
-const createAutoIncrementalKeyDefaultValues = ({ nodeDef, nodeDefParent }) => {
+export const createAutoIncrementalKeyDefaultValues = ({ nodeDef, nodeDefParent }) => {
   const nodeDefName = getName(nodeDef)
   const nodeDefParentName = getName(nodeDefParent)
   return [
-    NodeDefExpression.createExpression({ expression: '1', applyIf: 'index($context) === 0' }),
+    NodeDefExpression.createExpression({ expression: '1', applyIf: 'index($context) == 0' }),
     NodeDefExpression.createExpression({
-      expression: `Math.max(parent($context).${nodeDefParentName}.${nodeDefName})`,
+      expression: `Math.max(parent($context).${nodeDefParentName}.${nodeDefName}) + 1`,
     }),
   ]
 }
@@ -672,23 +671,17 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
   canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
-const isDefaultValueAutoIncrementExpression = (defaultValue) => {
-  const expression = NodeDefExpression.getExpression(defaultValue)
-  return (
-    (expression === autoIncrementalKeyExpression ||
-      StringUtils.removeSuffix('\n')(expression).replaceAll(' ', '') ===
-        autoIncrementalKeyExpression.replaceAll(' ', '')) &&
-    Objects.isEmpty(NodeDefExpression.getApplyIf(defaultValue))
-  )
-}
-
-export const canHaveAutoIncrementalKey = (nodeDef) => {
+export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
   if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
 
   const defaultValues = getDefaultValues(nodeDef)
   if (defaultValues.length === 0) return true
-  if (defaultValues.length > 1) return false
 
-  const defaultValue = defaultValues[0]
-  return NodeDefExpression.isEmpty(defaultValue) || isDefaultValueAutoIncrementExpression(defaultValue)
+  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
+  return (
+    defaultValues.length === autoIncrementalDefaultValues.length &&
+    autoIncrementalDefaultValues.every((defaultValue, index) =>
+      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
+    )
+  )
 }
