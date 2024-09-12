@@ -2,6 +2,7 @@ import pgPromise from 'pg-promise'
 
 import { Dates, Objects, SystemError } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -109,15 +110,17 @@ export const fetchViewData = async (params, client = db) => {
           expandCategoryItems,
         })
     await db.stream(result, (dbStream) => {
+      const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
+        survey,
+        query,
+        expandCategoryItems,
+        nullsToEmpty,
+        keepFileNamesUnique: true,
+      })
       const csvTransform = CSVWriter.transformJsonToCsv({
         fields,
         options: {
-          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({
-            survey,
-            query,
-            expandCategoryItems,
-            nullsToEmpty,
-          }),
+          objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
         },
       })
       dbStream.pipe(csvTransform).pipe(streamOutput)

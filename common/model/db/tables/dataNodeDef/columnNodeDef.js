@@ -125,6 +125,7 @@ ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
 ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
 
 ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
+ColumnNodeDef.getFileUuidColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixFileUuid}`
 ColumnNodeDef.getFileNameColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixFileName}`
 
 ColumnNodeDef.getColumnNames = getColumnNames

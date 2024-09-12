@@ -8,6 +8,7 @@ import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 
 import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 
 const maxExpandedCategoryItems = 20
 
@@ -139,17 +140,22 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformerUniqueFileNames = ({ survey, query, fileNameByFileUuid, fileUuidByFileName }) => {
+const getCsvObjectTransformerUniqueFileNames = ({ survey, query }) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
-  return (obj) => {
+  const uniqueFileNamesGenerator = new UniqueFileNamesGenerator()
+  const transformer = (obj) => {
     nodeDefFileCols.forEach((nodeDef) => {
       const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
       const fileName = obj[fileNameField]
-      
+      const fileUuid = obj[ColumnNodeDef.getFileUuidColumnName(nodeDef)]
+      const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
+      obj[fileNameField] = uniqueFileName
     })
+    return obj
   }
+  return { transformer, fileNameByFileUuid: uniqueFileNamesGenerator.fileNameByKey }
 }
 
 const getCsvObjectTransformerNullsToEmpty = () => (obj) => {
@@ -166,7 +172,7 @@ const getCsvObjectTransformer = ({
   query,
   expandCategoryItems,
   nullsToEmpty = false,
-  keepFileNamesUnique = true,
+  keepFileNamesUnique = false,
 }) => {
   const transformers = []
   if (expandCategoryItems) {
@@ -175,12 +181,16 @@ const getCsvObjectTransformer = ({
   if (nullsToEmpty) {
     transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
-  const fileNameByFileUuid = {}
-  const fileUuidByFileName = {}
+  let fileNameByFileUuid = null
   if (keepFileNamesUnique) {
-    transformers.push(getCsvObjectTransformerUniqueFileNames({ survey, query, fileNameByFileUuid, fileUuidByFileName }))
+    const { transformer, fileNameByFileUuid: uniqueFileNameByFileUuid } = getCsvObjectTransformerUniqueFileNames({
+      survey,
+      query,
+    })
+    fileNameByFileUuid = uniqueFileNameByFileUuid
+    transformers.push(transformer)
   }
-  return transformers.length === 0 ? null : A.pipe(...transformers)
+  return { transformers, fileNameByFileUuid }
 }
 
 export const SurveyRdbCsvExport = {
