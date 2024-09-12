@@ -124,9 +124,10 @@ ColumnNodeDef.columnSuffixFileName = columnSuffixFileName
 ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
 ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
 
-ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
-ColumnNodeDef.getFileUuidColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixFileUuid}`
-ColumnNodeDef.getFileNameColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixFileName}`
+const getColumnNameWithSuffix = (suffix) => (nodeDef) => `${NodeDef.getName(nodeDef)}${suffix}`
+ColumnNodeDef.getCodeLabelColumnName = getColumnNameWithSuffix(columnSuffixCodeLabel)
+ColumnNodeDef.getFileNameColumnName = getColumnNameWithSuffix(columnSuffixFileName)
+ColumnNodeDef.getFileUuidColumnName = getColumnNameWithSuffix(columnSuffixFileUuid)
 
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
