@@ -177,6 +177,16 @@ export const visibleFieldsDefaultByType = {
 }
 
 export const autoIncrementalKeyExpression = 'index($context) + 1'
+const createAutoIncrementalKeyDefaultValues = ({ nodeDef, nodeDefParent }) => {
+  const nodeDefName = getName(nodeDef)
+  const nodeDefParentName = getName(nodeDefParent)
+  return [
+    NodeDefExpression.createExpression({ expression: '1', applyIf: 'index($context) === 0' }),
+    NodeDefExpression.createExpression({
+      expression: `Math.max(parent($context).${nodeDefParentName}.${nodeDefName})`,
+    }),
+  ]
+}
 
 // ==== READ
 

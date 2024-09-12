@@ -53,6 +53,11 @@ export const isPlaceholder = R.propEq(keys.placeholder, true)
 export const isEmpty = (expression = {}) =>
   StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
 
+export const isEqualTo = (expressionA) => (expressionB) => {
+  if (isEmpty(expressionA) && isEmpty(expressionB)) return true
+  if (isEmpty(expressionA) || isEmpty(expressionB)) return false
+}
+
 // ====== UPDATE
 
 const assocProp = (propName, value) => R.pipe(R.assoc(propName, value), R.dissoc(keys.placeholder))
