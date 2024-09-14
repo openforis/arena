@@ -155,7 +155,7 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query }) => {
     })
     return obj
   }
-  return { transformer, fileNameByFileUuid: uniqueFileNamesGenerator.fileNameByKey }
+  return { transformer, fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
 }
 
 const getCsvObjectTransformerNullsToEmpty = () => (obj) => {
@@ -181,16 +181,16 @@ const getCsvObjectTransformer = ({
   if (nullsToEmpty) {
     transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
-  let fileNameByFileUuid = null
+  let fileNamesByFileUuid = null
   if (keepFileNamesUnique) {
-    const { transformer, fileNameByFileUuid: uniqueFileNameByFileUuid } = getCsvObjectTransformerUniqueFileNames({
+    const { transformer, fileNamesByFileUuid: uniqueFileNamesByFileUuid } = getCsvObjectTransformerUniqueFileNames({
       survey,
       query,
     })
-    fileNameByFileUuid = uniqueFileNameByFileUuid
+    fileNamesByFileUuid = uniqueFileNamesByFileUuid
     transformers.push(transformer)
   }
-  return { transformers, fileNameByFileUuid }
+  return { transformers, fileNamesByFileUuid }
 }
 
 export const SurveyRdbCsvExport = {

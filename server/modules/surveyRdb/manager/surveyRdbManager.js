@@ -109,14 +109,19 @@ export const fetchViewData = async (params, client = db) => {
           includeCategoryItemsLabels,
           expandCategoryItems,
         })
+
+    let fileNamesByFileUuid = null // calculated or assigned unique file names by file UUID
+
     await db.stream(result, (dbStream) => {
-      const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
-        survey,
-        query,
-        expandCategoryItems,
-        nullsToEmpty,
-        keepFileNamesUnique: true,
-      })
+      const { transformers, fileNamesByFileUuid: fileNamesByFileUuidPart } = SurveyRdbCsvExport.getCsvObjectTransformer(
+        {
+          survey,
+          query,
+          expandCategoryItems,
+          nullsToEmpty,
+          keepFileNamesUnique: true,
+        }
+      )
       const csvTransform = CSVWriter.transformJsonToCsv({
         fields,
         options: {
@@ -124,8 +129,9 @@ export const fetchViewData = async (params, client = db) => {
         },
       })
       dbStream.pipe(csvTransform).pipe(streamOutput)
+      fileNamesByFileUuid = fileNamesByFileUuidPart
     })
-    return null
+    return { fileNamesByFileUuid }
   }
   return result
 }
@@ -240,6 +246,8 @@ export const fetchEntitiesDataToCsvFiles = async (
       cycle,
     })(survey)
 
+  const fileNamesByFileUuid = {}
+
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
     const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
@@ -274,7 +282,7 @@ export const fetchEntitiesDataToCsvFiles = async (
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
-    await fetchViewData(
+    const { fileNamesByFileUuid: fileNamesByFileUuidPart } = await fetchViewData(
       {
         survey,
         cycle,
@@ -287,7 +295,9 @@ export const fetchEntitiesDataToCsvFiles = async (
       },
       client
     )
+    Object.assign(fileNamesByFileUuid, fileNamesByFileUuidPart)
   })
+  return { fileNamesByFileUuid }
 }
 
 export const fetchEntitiesFileUuidsByCycle = async (

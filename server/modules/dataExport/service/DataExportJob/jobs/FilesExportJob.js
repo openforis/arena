@@ -1,13 +1,12 @@
-import * as PromiseUtils from '@core/promiseUtils'
 import * as Survey from '@core/survey/survey'
-import * as RecordFile from '@core/record/recordFile'
 
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import * as FileService from '@server/modules/record/service/fileService'
-import { Objects } from '@openforis/arena-core'
+
+const filesOutputDir = 'files'
 
 export default class FilesExportJob extends Job {
   constructor(params) {
@@ -15,7 +14,7 @@ export default class FilesExportJob extends Job {
   }
 
   async execute() {
-    const { survey, cycle, includeDataFromAllCycles, outputDir, recordUuids } = this.context
+    const { survey, cycle, includeDataFromAllCycles, recordUuids } = this.context
 
     const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle(
       {
@@ -30,16 +29,16 @@ export default class FilesExportJob extends Job {
     this.total = total
 
     // write the files in subfolders by cycle
-    await PromiseUtils.each(Object.entries(fileUuidsByCycle), async ([cycle, fileUuids]) => {
-      await PromiseUtils.each(fileUuids, async (fileUuid) => {
-        await this.writeFile({ fileUuid, outputDir, cycle })
+    for await (const [cycle, fileUuids] of Object.entries(fileUuidsByCycle)) {
+      for await (const fileUuid of fileUuids) {
+        await this.writeFile({ fileUuid, cycle })
         this.incrementProcessedItems()
-      })
-    })
+      }
+    }
   }
 
-  async writeFile({ fileUuid, outputDir, cycle }) {
-    const { survey } = this.context
+  async writeFile({ fileUuid, cycle }) {
+    const { survey, outputDir, fileNamesByFileUuid } = this.context
     const surveyId = Survey.getId(survey)
 
     const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, this.tx)
@@ -52,13 +51,12 @@ export default class FilesExportJob extends Job {
       this.logWarn(`File content for file with UUID ${fileUuid} not found`)
       return false
     }
-    const cycleFilesPath = FileUtils.join(outputDir, 'files', cycle)
-    if (!FileUtils.exists(cycleFilesPath)) {
-      await FileUtils.mkdir(cycleFilesPath)
+    const cycleFilesOutputDirPath = FileUtils.join(outputDir, filesOutputDir, cycle)
+    if (!FileUtils.exists(cycleFilesOutputDirPath)) {
+      await FileUtils.mkdir(cycleFilesOutputDirPath)
     }
-    const extension = RecordFile.getExtension(fileSummary)
-    const exportedFileName = Objects.isEmpty(extension) ? fileUuid : `${fileUuid}.${extension}`
-    const tempFilePath = FileUtils.join(cycleFilesPath, exportedFileName)
+    const exportedFileName = fileNamesByFileUuid[fileUuid]
+    const tempFilePath = FileUtils.join(cycleFilesOutputDirPath, exportedFileName)
     await FileUtils.writeFile(tempFilePath, recordFileContent)
 
     return true
