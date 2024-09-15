@@ -68,25 +68,29 @@ const FileProps = (props) => {
         />
       </FormItem>
       <FormItem label={i18n.t('nodeDefEdit.fileProps.fileNameExpression')}>
-        <ValidationTooltip
-          validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
-          showKeys={false}
-        >
-          <ExpressionEditor
-            canBeConstant
-            excludeCurrentNodeDef
-            isBoolean={false}
-            isContextParent
-            nodeDefUuidContext={NodeDef.getParentUuid(nodeDef)}
-            nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
-            onChange={({ query: value, callback }) => {
-              Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })
-              callback()
-            }}
-            qualifier="fileNameExpression"
-            query={NodeDef.getFileNameExpression(nodeDef)}
-          />
-        </ValidationTooltip>
+        <div className="node-def-edit__expressions">
+          <ValidationTooltip
+            validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
+            showKeys={false}
+          >
+            <div className="node-def-edit__expression">
+              <ExpressionEditor
+                canBeConstant
+                excludeCurrentNodeDef
+                isBoolean={false}
+                isContextParent
+                nodeDefUuidContext={NodeDef.getParentUuid(nodeDef)}
+                nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
+                onChange={({ query: value, callback }) => {
+                  Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })
+                  callback()
+                }}
+                qualifier="fileNameExpression"
+                query={NodeDef.getFileNameExpression(nodeDef)}
+              />
+            </div>
+          </ValidationTooltip>
+        </div>
       </FormItem>
     </>
   )
