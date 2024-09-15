@@ -25,6 +25,7 @@ import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
+import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 
 // ==== DDL
 
@@ -80,6 +81,7 @@ export const fetchViewData = async (params, client = db) => {
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
     nullsToEmpty = false,
+    uniqueFileNamesGenerator = null,
   } = params
 
   // Fetch data
@@ -110,18 +112,15 @@ export const fetchViewData = async (params, client = db) => {
           expandCategoryItems,
         })
 
-    let fileNamesByFileUuid = null // calculated or assigned unique file names by file UUID
-
     await db.stream(result, (dbStream) => {
-      const { transformers, fileNamesByFileUuid: fileNamesByFileUuidPart } = SurveyRdbCsvExport.getCsvObjectTransformer(
-        {
-          survey,
-          query,
-          expandCategoryItems,
-          nullsToEmpty,
-          keepFileNamesUnique: true,
-        }
-      )
+      const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
+        survey,
+        query,
+        expandCategoryItems,
+        nullsToEmpty,
+        keepFileNamesUnique: true,
+        uniqueFileNamesGenerator,
+      })
       const csvTransform = CSVWriter.transformJsonToCsv({
         fields,
         options: {
@@ -129,9 +128,8 @@ export const fetchViewData = async (params, client = db) => {
         },
       })
       dbStream.pipe(csvTransform).pipe(streamOutput)
-      fileNamesByFileUuid = fileNamesByFileUuidPart
     })
-    return { fileNamesByFileUuid }
+    return null
   }
   return result
 }
@@ -246,7 +244,7 @@ export const fetchEntitiesDataToCsvFiles = async (
       cycle,
     })(survey)
 
-  const fileNamesByFileUuid = {}
+  const uniqueFileNamesGenerator = new UniqueFileNamesGenerator()
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
@@ -282,7 +280,7 @@ export const fetchEntitiesDataToCsvFiles = async (
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
-    const { fileNamesByFileUuid: fileNamesByFileUuidPart } = await fetchViewData(
+    await fetchViewData(
       {
         survey,
         cycle,
@@ -292,12 +290,12 @@ export const fetchEntitiesDataToCsvFiles = async (
         addCycle,
         includeCategoryItemsLabels,
         expandCategoryItems,
+        uniqueFileNamesGenerator,
       },
       client
     )
-    Object.assign(fileNamesByFileUuid, fileNamesByFileUuidPart)
   })
-  return { fileNamesByFileUuid }
+  return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
 }
 
 export const fetchEntitiesFileUuidsByCycle = async (

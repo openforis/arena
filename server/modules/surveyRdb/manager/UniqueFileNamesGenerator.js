@@ -4,17 +4,17 @@ const nameWithIndexRegEx = /(.*)\s\((\d+)\)/ // file name like "example (1).txt"
 
 export class UniqueFileNamesGenerator {
   constructor() {
-    this._filesNamesByKey = {}
+    this._fileNamesByKey = {}
     this._keysByFileName = {}
   }
 
   generateUniqueFileName(inputFileName, key) {
-    if (this._filesNamesByKey[key]) {
+    if (this._fileNamesByKey[key]) {
       throw new Error('Cannot generate a unique file name associated to the same key')
     }
     if (!this._keysByFileName[inputFileName]) {
       this._keysByFileName[inputFileName] = key
-      this._filesNamesByKey[key] = inputFileName
+      this._fileNamesByKey[key] = inputFileName
       return inputFileName
     }
     let generatedFileName = this._generateNextFileName(inputFileName)
@@ -22,7 +22,7 @@ export class UniqueFileNamesGenerator {
       generatedFileName = this._generateNextFileName(generatedFileName)
     }
     this._keysByFileName[generatedFileName] = key
-    this._filesNamesByKey[key] = generatedFileName
+    this._fileNamesByKey[key] = generatedFileName
     return generatedFileName
   }
 
