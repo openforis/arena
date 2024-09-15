@@ -2,13 +2,15 @@ import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
-
-import { useI18n } from '@webapp/store/system'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
-
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
+
+import { useI18n } from '@webapp/store/system'
+
+import { FormItem, Input } from '@webapp/components/form/Input'
+import ButtonGroup from '@webapp/components/form/buttonGroup'
+import ExpressionEditor from '@webapp/components/expression/expressionEditor'
+import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import { State } from './store'
 
@@ -66,11 +68,25 @@ const FileProps = (props) => {
         />
       </FormItem>
       <FormItem label={i18n.t('nodeDefEdit.fileProps.fileNameExpression')}>
-        <Input
-          onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })}
+        <ValidationTooltip
           validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
-          value={NodeDef.getFileNameExpression(nodeDef)}
-        />
+          showKeys={false}
+        >
+          <ExpressionEditor
+            canBeConstant
+            excludeCurrentNodeDef
+            isBoolean={false}
+            isContextParent
+            nodeDefUuidContext={NodeDef.getParentUuid(nodeDef)}
+            nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
+            onChange={({ query: value, callback }) => {
+              Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })
+              callback()
+            }}
+            qualifier="fileNameExpression"
+            query={NodeDef.getFileNameExpression(nodeDef)}
+          />
+        </ValidationTooltip>
       </FormItem>
     </>
   )
