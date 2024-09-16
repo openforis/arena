@@ -379,6 +379,7 @@ export const getAllExpressions = (nodeDef) => {
     return acc
   }, [])
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   return expressions
 }
 

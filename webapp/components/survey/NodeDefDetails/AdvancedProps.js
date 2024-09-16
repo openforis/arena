@@ -10,7 +10,6 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { ButtonIconInfo } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
@@ -129,12 +128,8 @@ const AdvancedProps = (props) => {
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
         <FormItem
-          label={
-            <span>
-              {i18n.t('nodeDefEdit.advancedProps.itemsFilter')}
-              <ButtonIconInfo title="nodeDefEdit.advancedProps.itemsFilterInfo" />
-            </span>
-          }
+          label={i18n.t('nodeDefEdit.advancedProps.itemsFilter')}
+          info="nodeDefEdit.advancedProps.itemsFilterInfo"
         >
           <Input
             onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
