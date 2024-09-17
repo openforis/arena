@@ -170,6 +170,8 @@
   }
 }
 
-.codemirror-arena-autocomplete {
-  height: auto;
+.arena-cm-autocomplete {
+  .cm-completionDetail {
+    text-wrap: wrap;
+  }
 }

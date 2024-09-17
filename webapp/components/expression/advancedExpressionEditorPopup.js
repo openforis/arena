@@ -1,6 +1,6 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, createElement } from 'react'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion, completeFromList } from '@codemirror/autocomplete'
 import PropTypes from 'prop-types'
@@ -51,20 +51,31 @@ const AdvancedExpressionEditorPopup = (props) => {
   const extensions = [
     javascript(),
     autocompletion({
+      closeOnBlur: false,
+      addToOptions: [
+        {
+          render: () => {
+            const el = document.createElement('br')
+            return el
+          },
+          position: 60,
+        },
+      ],
       compareCompletions: completionsCompareFn(nodeDefCurrent?.parentUuid),
       override: [
         completeFromList(
           codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })
         ),
       ],
-      tooltipClass: () => 'codemirror-arena-autocomplete',
+      optionClass: () => 'option',
+      tooltipClass: () => 'arena-cm-autocomplete',
     }),
     EditorView.updateListener.of(updateList), // using update listener to check if user has pressed a dot (to explicitly provide completions)
   ]
 
   // update listener to check if user has typed a dot
   function updateList(args) {
-    let change = args?.changes?.inserted[1]?.text[0]
+    let change = args?.changes?.inserted?.[1]?.text?.[0]
     // let changes = args?.changes?.sections[0]
     // console.log({ change, changes })
     if (change == '.') {
@@ -114,7 +125,12 @@ const AdvancedExpressionEditorPopup = (props) => {
       )}
       <div className="expression-editor-popup__expr-container">
         {/*<textarea data-testid={TestId.expressionEditor.advancedQuery} ref={inputRef} />*/}
-        <ReactCodeMirror value={query} extensions={extensions} onChange={onEditorChange} />
+        <ReactCodeMirror
+          basicSetup={{ lineNumbers: false }}
+          extensions={extensions}
+          onChange={onEditorChange}
+          value={query}
+        />
       </div>
       <div className="expression-editor-popup__editor-help">
         <p>{i18n.t(`nodeDefEdit.editorHelp.${mode}`)}</p>

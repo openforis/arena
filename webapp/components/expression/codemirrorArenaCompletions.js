@@ -81,7 +81,6 @@ const getFunctionCompletion = ({ mode, i18n, fnName }) => {
     apply: `${fnName}()`,
     type: 'function',
   }
-
   return completion
 }
 
