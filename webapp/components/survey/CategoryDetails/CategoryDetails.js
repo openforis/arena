@@ -28,7 +28,7 @@ import { State, useActions, useLocalState } from './store'
 const MAX_LEVELS = 5
 
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
+  const { categoryUuid: categoryUuidProp, onCategoryUpdate, showClose = true } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
   const i18n = useI18n()
@@ -227,12 +227,6 @@ CategoryDetails.propTypes = {
   categoryUuid: PropTypes.string,
   onCategoryUpdate: PropTypes.func,
   showClose: PropTypes.bool,
-}
-
-CategoryDetails.defaultProps = {
-  categoryUuid: null,
-  onCategoryUpdate: null,
-  showClose: true,
 }
 
 export default CategoryDetails

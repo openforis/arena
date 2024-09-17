@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 
 const RowHeader = (props) => {
-  const { emailVisible } = props
+  const { emailVisible = false } = props
   const i18n = useI18n()
 
   return (
@@ -23,10 +23,6 @@ const RowHeader = (props) => {
 
 RowHeader.propTypes = {
   emailVisible: PropTypes.bool,
-}
-
-RowHeader.defaultProps = {
-  emailVisible: false,
 }
 
 export default RowHeader

@@ -22,7 +22,7 @@ import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
 
 const Surveys = (props) => {
-  const { module, moduleApiUri, template } = props
+  const { module, moduleApiUri, template = false } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -202,10 +202,6 @@ Surveys.propTypes = {
    * If true, show only survey templates.
    */
   template: PropTypes.bool,
-}
-
-Surveys.defaultProps = {
-  template: false,
 }
 
 export { Surveys }

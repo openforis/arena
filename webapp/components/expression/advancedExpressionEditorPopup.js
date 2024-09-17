@@ -32,8 +32,15 @@ const completionsCompareFn = (contextUuid) => (completionA, completionB) => {
 }
 
 const AdvancedExpressionEditorPopup = (props) => {
-  const { query, mode, nodeDefCurrent, excludeCurrentNodeDef, includeAnalysis, isContextParent, updateDraftQuery } =
-    props
+  const {
+    excludeCurrentNodeDef = true,
+    includeAnalysis = false,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefCurrent = null,
+    query = '',
+    updateDraftQuery,
+  } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
@@ -127,15 +134,6 @@ AdvancedExpressionEditorPopup.propTypes = {
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
   updateDraftQuery: PropTypes.func.isRequired,
-}
-
-AdvancedExpressionEditorPopup.defaultProps = {
-  excludeCurrentNodeDef: true,
-  includeAnalysis: false,
-  isContextParent: false,
-  mode: Expression.modes.json,
-  nodeDefCurrent: null,
-  query: '',
 }
 
 export default AdvancedExpressionEditorPopup

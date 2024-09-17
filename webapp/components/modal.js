@@ -36,7 +36,15 @@ ModalFooter.propTypes = {
 }
 
 export const Modal = (props) => {
-  const { children, className, closeOnEsc, onClose: onCloseProp, showCloseButton, title, titleParams } = props
+  const {
+    children,
+    className = '',
+    closeOnEsc = true,
+    onClose: onCloseProp,
+    showCloseButton = false,
+    title,
+    titleParams,
+  } = props
 
   const i18n = useI18n()
 
@@ -78,10 +86,4 @@ Modal.propTypes = {
   title: PropTypes.string,
   titleParams: PropTypes.object,
   showCloseButton: PropTypes.bool,
-}
-
-Modal.defaultProps = {
-  className: '',
-  closeOnEsc: true,
-  showCloseButton: false,
 }

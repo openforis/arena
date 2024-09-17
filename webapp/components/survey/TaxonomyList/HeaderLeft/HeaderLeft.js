@@ -10,7 +10,7 @@ import { useIsTaxonomiesRoute } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const HeaderLeft = (props) => {
-  const { headerProps } = props
+  const { headerProps = {} } = props
   const { onTaxonomyCreated } = headerProps
 
   const navigate = useNavigate()
@@ -37,10 +37,6 @@ const HeaderLeft = (props) => {
 
 HeaderLeft.propTypes = {
   headerProps: PropTypes.object,
-}
-
-HeaderLeft.defaultProps = {
-  headerProps: {},
 }
 
 export default HeaderLeft

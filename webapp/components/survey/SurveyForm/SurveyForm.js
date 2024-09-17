@@ -34,18 +34,25 @@ const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
 
 const SurveyForm = (props) => {
   const {
-    analysis,
-    surveyInfo,
+    analysis = false,
+    surveyInfo = null,
+    // Current nodeDef page
+    nodeDef = null,
+    // Form in edit mode
+    edit = false,
+    // Form in data entry mode
+    entry = false,
+    // Form in preview mode
+    preview = false,
+    // Can edit the form definition
+    canEditDef = false,
+    // Uuid of current record
+    recordUuid = null,
+
     surveyCycleKey,
-    nodeDef,
-    edit,
-    entry,
-    preview,
     hasNodeDefAddChildTo,
     showPageNavigation,
-    canEditDef,
     canEditRecord,
-    recordUuid,
     parentNode,
   } = props
 
@@ -166,23 +173,6 @@ const SurveyForm = (props) => {
       </div>
     </div>
   )
-}
-
-SurveyForm.defaultProps = {
-  analysis: false,
-  surveyInfo: null,
-  // Current nodeDef page
-  nodeDef: null,
-  // Form in edit mode
-  edit: false,
-  // Form in data entry mode
-  entry: false,
-  // Form in preview mode
-  preview: false,
-  // Can edit the form definition
-  canEditDef: false,
-  // Uuid of current record
-  recordUuid: null,
 }
 
 const mapStateToProps = (state, props) => {

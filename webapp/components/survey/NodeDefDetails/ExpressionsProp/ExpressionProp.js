@@ -17,24 +17,27 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const ExpressionProp = (props) => {
   const {
-    qualifier,
     index,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    validation,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
     expression,
-    applyIf,
-    severity,
-    showLabels,
-    readOnly,
-    isContextParent,
-    canBeConstant,
-    isBoolean,
-    hideAdvanced,
-    mode,
-    onUpdate,
-    onDelete,
+    excludeCurrentNodeDef = true,
+    qualifier,
+    validation = null,
+
+    applyIf = true, // Show apply if expression editor
+    severity = false, // Show severity (error/warning) button group
+    showLabels = false, // Show error message labels editor
+    readOnly = false,
+
+    isContextParent = false,
+    canBeConstant = false,
+    isBoolean = true,
+    hideAdvanced = false,
+    mode = Expression.modes.json,
+
+    onUpdate = () => {},
+    onDelete = () => {},
   } = props
 
   const i18n = useI18n()
@@ -51,9 +54,8 @@ const ExpressionProp = (props) => {
   return (
     <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
-        {!isPlaceholder && (
+        {!isPlaceholder && !readOnly && (
           <ButtonIconDelete
-            disabled={readOnly}
             id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             onClick={() => onDelete(expression)}
             testId={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
@@ -77,6 +79,7 @@ const ExpressionProp = (props) => {
             isBoolean={isBoolean}
             types={expressionEditorTypes}
             mode={mode}
+            readOnly={readOnly}
           />
         </div>
 
@@ -95,6 +98,7 @@ const ExpressionProp = (props) => {
               onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
               isContextParent={isContextParent}
               canBeConstant={false}
+              readOnly={readOnly}
               types={expressionEditorTypes}
             />
           </div>
@@ -147,27 +151,6 @@ ExpressionProp.propTypes = {
 
   onUpdate: PropTypes.func,
   onDelete: PropTypes.func,
-}
-
-ExpressionProp.defaultProps = {
-  nodeDefUuidContext: null,
-  nodeDefUuidCurrent: null,
-  excludeCurrentNodeDef: true,
-  validation: null,
-
-  applyIf: true, // Show apply if expression editor
-  severity: false, // Show severity (error/warning) button group
-  showLabels: false, // Show error message labels editor
-  readOnly: false,
-
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
-  hideAdvanced: false,
-  mode: Expression.modes.json,
-
-  onUpdate: () => {},
-  onDelete: () => {},
 }
 
 export default ExpressionProp

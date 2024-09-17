@@ -27,6 +27,8 @@ export default class RecordsImportJob extends Job {
 
     if (this.total == 0) return
 
+    const userUuid = User.getUuid(this.user)
+
     // use a batch persister to persist nodes in batch
     const nodesBatchPersister = new BatchPersister(
       async (nodes) =>
@@ -51,11 +53,16 @@ export default class RecordsImportJob extends Job {
       // insert record
       let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
 
-      const ownerUuid = includingUsers
-        ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
-          newUserUuidByOldUuid[Record.getOwnerUuid(record)]
-        : // ignore owner in imported file; consider current user as owner
-          User.getUuid(this.user)
+      let ownerUuid = null
+      if (includingUsers) {
+        // user uuid in the db could be different by the one being imported (see UsersImportJob);
+        ownerUuid = newUserUuidByOldUuid[Record.getOwnerUuid(record)]
+      }
+      if (!ownerUuid) {
+        // admin users are not exported (new owner uuid could be null); associate record to current user in that case
+        // ignore owner in imported file; consider current user as owner
+        ownerUuid = userUuid
+      }
       record = Record.assocOwnerUuid(ownerUuid)(record)
 
       await this.insertOrSkipRecord({ record, nodesBatchPersister })

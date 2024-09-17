@@ -7,7 +7,7 @@ import Module from './Module'
 import PopupMenu from './PopupMenu'
 
 const Modules = (props) => {
-  const { user, surveyInfo, pathname, sideBarOpened } = props
+  const { pathname = '', sideBarOpened = false, surveyInfo = null, user = null } = props
 
   const [overSidebar, setOverSidebar] = useState(false)
   const moduleElementsByKeyRef = useRef({})
@@ -81,13 +81,6 @@ Modules.propTypes = {
   surveyInfo: PropTypes.object,
   pathname: PropTypes.string,
   sideBarOpened: PropTypes.bool,
-}
-
-Modules.defaultProps = {
-  user: null,
-  surveyInfo: null,
-  pathname: '',
-  sideBarOpened: false,
 }
 
 export default Modules

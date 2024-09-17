@@ -5,25 +5,24 @@ import classNames from 'classnames'
 
 const FooterWithExport =
   ({ exportFileName }) =>
-  () =>
-    (
-      <GridFooterContainer>
-        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
-        <GridFooter />
-      </GridFooterContainer>
-    )
+  () => (
+    <GridFooterContainer>
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+      <GridFooter />
+    </GridFooterContainer>
+  )
 
 const DataGrid = (props) => {
   const {
-    allowExportToCsv,
-    autoPageSize,
-    autoRowHeight,
-    checkboxSelection,
+    allowExportToCsv = false,
+    autoPageSize = false,
+    autoRowHeight = false,
+    checkboxSelection = false,
     className,
     columns: columnsProp,
-    density,
+    density = 'standard',
     exportFileName,
-    disableSelectionOnClick,
+    disableSelectionOnClick = true,
     getRowClassName,
     getRowId,
     initialState,
@@ -70,15 +69,6 @@ DataGrid.propTypes = {
   getRowId: PropTypes.func,
   initialState: PropTypes.object,
   rows: PropTypes.array.isRequired,
-}
-
-DataGrid.defaultProps = {
-  allowExportToCsv: false,
-  autoPageSize: false,
-  autoRowHeight: false,
-  checkboxSelection: false,
-  density: 'standard',
-  disableSelectionOnClick: true,
 }
 
 export default DataGrid

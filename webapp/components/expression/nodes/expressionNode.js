@@ -24,16 +24,16 @@ const componentFns = {
 
 const ExpressionNode = (props) => {
   const {
-    canDelete,
-    isBoolean,
-    level,
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    expressionNodeParent = null,
     node,
-    expressionNodeParent,
-    nodeDefCurrent,
+    nodeDefCurrent = null,
     onChange,
-    onDelete,
-    type,
-    variables,
+    onDelete = null,
+    type = null,
+    variables = null,
   } = props
 
   // transform a "this" expression into an Identifier expression
@@ -75,17 +75,6 @@ ExpressionNode.propTypes = {
   level: PropTypes.number,
   // Literal
   type: PropTypes.string,
-}
-
-ExpressionNode.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  expressionNodeParent: null,
-  nodeDefCurrent: null,
-  onDelete: null,
-  type: null,
-  variables: null,
 }
 
 export default ExpressionNode

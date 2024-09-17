@@ -9,7 +9,17 @@ import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
 
 const Binary = (props) => {
-  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, variables } = props
+  const {
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    node,
+    nodeDefCurrent = null,
+    onChange,
+    onDelete = null,
+    renderNode,
+    variables = null,
+  } = props
 
   const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
 
@@ -63,15 +73,6 @@ Binary.propTypes = {
   level: PropTypes.number,
   renderNode: PropTypes.func.isRequired,
   variables: PropTypes.array,
-}
-
-Binary.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  nodeDefCurrent: null,
-  onDelete: null,
-  variables: null,
 }
 
 export default Binary

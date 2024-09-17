@@ -5,10 +5,10 @@ import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 import circleToPolygon from 'circle-to-polygon'
 import L from 'leaflet'
-import axios from 'axios'
 
-import { Objects, PointFactory } from '@openforis/arena-core'
+import { Objects, PointFactory, DEFAULT_SRS } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
@@ -18,11 +18,14 @@ import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 
-import { useSurvey, useSurveyPreferredLang, useSurveyInfo, useSurveyId } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import { useAltitude } from '../common/useAltitude'
+import { WhispMenuButton } from './WhispMenuButton'
+
+const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -49,9 +52,19 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   return pathParts.join(' -> ')
 }
 
-const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
+const generateContent = ({ i18n, recordOwnerName, point, path, altitude }) => {
+  const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
+  const xFormatted = NumberUtils.roundToPrecision(point.x, coordinateNumericFieldPrecision)
+  const yFormatted = NumberUtils.roundToPrecision(point.y, coordinateNumericFieldPrecision)
 
-const getWhispDataDownloadUrl = (token) => `https://whisp.openforis.org/api/download-csv/${token}`
+  const content = `**${path}**
+* **X**: ${xFormatted}
+* **Y**: ${yFormatted}
+* **SRS**: ${point.srs}
+* **${i18n.t('mapView.altitude')}**: ${altitude}
+* **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
+  return content
+}
 
 export const CoordinateAttributePopUp = (props) => {
   const { attributeDef, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } = props
@@ -64,11 +77,9 @@ export const CoordinateAttributePopUp = (props) => {
   const surveyInfo = useSurveyInfo()
 
   const survey = useSurvey()
-  const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
 
   const [open, setOpen] = useState(false)
-  const [whispDataLoading, setWhispDataLoading] = useState(false)
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
   // fetch altitude and record owner name only when popup is open
@@ -95,7 +106,7 @@ export const CoordinateAttributePopUp = (props) => {
     [ancestorsKeys, attributeDef, lang, survey]
   )
 
-  const getGeoJson = useCallback(() => {
+  const generateGeoJson = useCallback(() => {
     if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
       const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
       if (isCircle) {
@@ -112,30 +123,21 @@ export const CoordinateAttributePopUp = (props) => {
     }
   }, [latitude, longitude, surveyInfo])
 
+  const generateGeoJsonWithName = useCallback(() => {
+    const geojson = generateGeoJson()
+    return Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
+  }, [generateGeoJson, path])
+
   const onEarthMapButtonClick = useCallback(() => {
-    const geojson = getGeoJson()
-    Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
-    const earthMapUrl = getEarthMapUrl(geojson)
-    window.open(earthMapUrl, 'EarthMap')
-  }, [getGeoJson, path])
+    const geojson = generateGeoJsonWithName()
+    const url = getEarthMapUrl(geojson)
+    window.open(url, 'EarthMap')
+  }, [generateGeoJsonWithName])
 
-  const onWhispButtonClick = useCallback(async () => {
-    setWhispDataLoading(true)
-    const geojson = getGeoJson()
-    const url = `/api/survey/${surveyId}/geo/whisp/geojson/csv`
-    axios.post(url, geojson).then(({ data: token }) => {
-      const csvDownloadUrl = getWhispDataDownloadUrl(token)
-      setWhispDataLoading(false)
-      window.open(csvDownloadUrl, 'Whisp')
-    })
-  }, [getGeoJson, surveyId])
-
-  const content = `**${path}**
-* **X**: ${point.x}
-* **Y**: ${point.y}
-* **SRS**: ${point.srs}
-* **${i18n.t('mapView.altitude')}**: ${altitude}
-* **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
+  const content = useMemo(
+    () => generateContent({ i18n, recordOwnerName, point, path, altitude }),
+    [altitude, i18n, path, point, recordOwnerName]
+  )
 
   return (
     <Popup
@@ -171,18 +173,7 @@ export const CoordinateAttributePopUp = (props) => {
               onClick={onEarthMapButtonClick}
               variant="outlined"
             />
-            <Button
-              className="whisp-btn"
-              disabled={whispDataLoading}
-              label="mapView.whisp"
-              iconAlt="Whisp"
-              iconHeight={25}
-              iconSrc="/img/of_whisp_icon.svg"
-              iconWidth={25}
-              onClick={onWhispButtonClick}
-              size="small"
-              variant="outlined"
-            />
+            <WhispMenuButton geoJsonGenerator={generateGeoJsonWithName} />
           </div>
         </div>
       </div>

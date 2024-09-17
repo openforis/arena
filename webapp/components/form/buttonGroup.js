@@ -8,7 +8,16 @@ import MuiButtonGroup from '@mui/material/ButtonGroup'
 
 import { Button } from '../buttons'
 
-const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => {
+const ButtonGroup = ({
+  className = null,
+  deselectable = false,
+  disabled = false,
+  groupName = null,
+  items = [],
+  multiple = false,
+  onChange = () => {},
+  selectedItemKey = null,
+}) => {
   const onItemClick =
     ({ item, selected }) =>
     () => {
@@ -56,17 +65,6 @@ ButtonGroup.propTypes = {
   multiple: PropTypes.bool,
   deselectable: PropTypes.bool,
   className: PropTypes.string,
-}
-
-ButtonGroup.defaultProps = {
-  items: [],
-  groupName: null,
-  selectedItemKey: null,
-  onChange: () => {},
-  disabled: false,
-  multiple: false,
-  deselectable: false,
-  className: null,
 }
 
 export default ButtonGroup

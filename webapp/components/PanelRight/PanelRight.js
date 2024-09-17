@@ -10,7 +10,7 @@ import { TestId } from '@webapp/utils/testId'
 import { Button, ButtonIconClose } from '../buttons'
 
 const PanelRight = (props) => {
-  const { children, className, header, onClose, showFooter, width } = props
+  const { children, className, header = '', onClose, showFooter = false, width = '500px' } = props
 
   return ReactDOM.createPortal(
     <div
@@ -39,13 +39,6 @@ PanelRight.propTypes = {
   onClose: PropTypes.func.isRequired,
   showFooter: PropTypes.bool,
   width: PropTypes.string, // width of the panel (e.g. '1000px' or '90vw')
-}
-
-PanelRight.defaultProps = {
-  className: null,
-  header: '',
-  showFooter: false,
-  width: '500px',
 }
 
 export default PanelRight
