@@ -28,20 +28,19 @@ export const insertChain = async ({ user, surveyId, chain }, client = DB.client)
     return chainDb
   })
 
-export const create = async ({ user, surveyId, cycle }) => {
-  let newChain = ChainFactory.createInstance({ cycles: [cycle] })
-
+export const create = async ({ user, surveyId }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-  const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-  const validation = await ChainValidator.validateChain({ chain: newChain, defaultLang, survey })
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const cycles = Survey.getCycleKeys(surveyInfo)
+  const defaultLang = Survey.getDefaultLanguage(surveyInfo)
 
-  newChain = Chain.assocValidation(validation)(newChain)
+  let chain = ChainFactory.createInstance({ cycles })
 
-  return insertChain({
-    surveyId,
-    user,
-    chain: newChain,
-  })
+  const validation = await ChainValidator.validateChain({ chain, defaultLang, survey })
+
+  chain = Chain.assocValidation(validation)(chain)
+
+  return insertChain({ surveyId, user, chain })
 }
 
 // ====== READ
