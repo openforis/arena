@@ -1,6 +1,11 @@
+import { useCallback } from 'react'
+
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
+
+import { useI18n } from '@webapp/store/system'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import * as ExpressionVariables from './expressionVariables'
 
@@ -126,7 +131,7 @@ const findNodeDefContext = ({ survey, nodeDefCurrent, nodeDefContextPath }) => {
   return nodeDefContext
 }
 
-const _extractVariables = ({
+const extractVariables = ({
   mode,
   i18n,
   survey,
@@ -170,38 +175,45 @@ const _extractVariables = ({
   })
 }
 
-export const codemirrorArenaCompletions =
-  ({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) =>
-  (context) => {
-    const matchingTokenBefore = context.matchBefore(/\w*/)
+export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) => {
+  const i18n = useI18n()
+  const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
 
-    if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
+  return useCallback(
+    (context) => {
+      const matchingTokenBefore = context.matchBefore(/\w*/)
 
-    const value = context.state?.doc?.text?.[0] ?? ''
-    const token = { ...matchingTokenBefore, value }
-    const cursorPosition = context.pos
+      if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
 
-    const variablePath = value.slice(getVariablePathStart({ value, end: cursorPosition }), cursorPosition)
+      const value = context.state?.doc?.text?.[0] ?? ''
+      const token = { ...matchingTokenBefore, value }
+      const cursorPosition = context.pos
 
-    const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
+      const variablePath = value.slice(getVariablePathStart({ value, end: cursorPosition }), cursorPosition)
 
-    const variablesGroupedByParentEntity = _extractVariables({
-      mode,
-      i18n,
-      survey,
-      cycle,
-      nodeDefCurrent,
-      nodeDefContextPath,
-      isContextParent,
-      includeAnalysis,
-    })
-    const options = getCompletions({
-      mode,
-      i18n,
-      token,
-      variablesGroupedByParentEntity,
-      includeCustomFunctions: !nodeDefContextPath,
-    })
+      const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
 
-    return { from: token.from, options }
-  }
+      const variablesGroupedByParentEntity = extractVariables({
+        mode,
+        i18n,
+        survey,
+        cycle,
+        nodeDefCurrent,
+        nodeDefContextPath,
+        isContextParent,
+        includeAnalysis,
+      })
+      const options = getCompletions({
+        mode,
+        i18n,
+        token,
+        variablesGroupedByParentEntity,
+        includeCustomFunctions: !nodeDefContextPath,
+      })
+
+      return { from: token.from, options }
+    },
+    [cycle, i18n, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+  )
+}

@@ -11,9 +11,9 @@ import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValid
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
-import { codemirrorArenaCompletions } from './codemirrorArenaCompletions'
+import { useAutocompletionSource } from './useAutocompletionSource'
 
 const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
 
@@ -45,18 +45,16 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const cycle = useSurveyCycleKey()
   const nodeDefCurrentParentUuid = NodeDef.getParentUuid(nodeDefCurrent)
 
   const [errorMessage, setErrorMessage] = useState(null)
 
-  const arenaAutocompleteFunction = useCallback(
-    (context) =>
-      codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })(
-        context
-      ),
-    [cycle, i18n, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
-  )
+  const autocompletionSource = useAutocompletionSource({
+    mode,
+    nodeDefCurrent,
+    isContextParent,
+    includeAnalysis,
+  })
 
   const codeMirrorExtensions = useMemo(
     () => [
@@ -71,11 +69,11 @@ const AdvancedExpressionEditorPopup = (props) => {
           },
         ],
         compareCompletions: completionsCompareFn(nodeDefCurrentParentUuid),
-        override: [arenaAutocompleteFunction],
+        override: [autocompletionSource],
         optionClass: (completion) => `cm-completion-option ${completion.type}`,
       }),
     ],
-    [arenaAutocompleteFunction, nodeDefCurrentParentUuid]
+    [autocompletionSource, nodeDefCurrentParentUuid]
   )
 
   const validateEditorValue = useCallback(
