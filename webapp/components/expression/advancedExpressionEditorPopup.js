@@ -6,6 +6,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
 import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -45,6 +46,7 @@ const AdvancedExpressionEditorPopup = (props) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
+  const nodeDefCurrentParentUuid = NodeDef.getParentUuid(nodeDefCurrent)
 
   const [errorMessage, setErrorMessage] = useState(null)
 
@@ -68,12 +70,12 @@ const AdvancedExpressionEditorPopup = (props) => {
             position: 60,
           },
         ],
-        compareCompletions: completionsCompareFn(nodeDefCurrent?.parentUuid),
+        compareCompletions: completionsCompareFn(nodeDefCurrentParentUuid),
         override: [arenaAutocompleteFunction],
         optionClass: (completion) => `cm-completion-option ${completion.type}`,
       }),
     ],
-    [arenaAutocompleteFunction, nodeDefCurrent?.parentUuid]
+    [arenaAutocompleteFunction, nodeDefCurrentParentUuid]
   )
 
   const validateEditorValue = useCallback(
@@ -114,6 +116,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       </div>
       <div className="expression-editor-popup__expr-container">
         <ReactCodeMirror
+          autoFocus
           basicSetup={codeMirrorBasicSetup}
           extensions={codeMirrorExtensions}
           onChange={onEditorChange}
