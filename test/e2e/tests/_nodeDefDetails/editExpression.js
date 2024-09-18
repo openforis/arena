@@ -3,12 +3,14 @@ import { TestId, getSelector } from '../../../../webapp/utils/testId'
 import { FormUtils } from '../utils/formUtils'
 import { persistNodeDefChanges } from './editDetails'
 
+const textEditorSelector = '.cm-editor'
+
 const editAdvanced = async (expressionStr) => {
   await page.click(getSelector(TestId.expressionEditor.toggleModeBtn, 'button'))
   // wait for codemirror to initialize
   await page.waitForTimeout(500)
 
-  const codeMirror = await page.waitForSelector('.CodeMirror')
+  const codeMirror = await page.waitForSelector(textEditorSelector)
   await each(expressionStr, async (char) => {
     await codeMirror.press(char)
   })

@@ -170,8 +170,17 @@
   }
 }
 
-.arena-cm-autocomplete {
+.cm-tooltip-autocomplete {
   .cm-completionDetail {
+    margin-left: 2rem;
     text-wrap: wrap;
+    white-space: pre-wrap;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .cm-completion-option.function {
+    .cm-completionLabel {
+      font-weight: bold;
+    }
   }
 }

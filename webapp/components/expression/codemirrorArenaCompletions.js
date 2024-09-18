@@ -1,5 +1,3 @@
-// import CodeMirror from 'codemirror/lib/codemirror'
-
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
@@ -10,9 +8,8 @@ const functionExamples = {
   [Expression.modes.json]: {
     [Expression.functionNames.categoryItemProp]:
       `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
-    [Expression.functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
-    [Expression.functionNames.first]:
-      'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
+    [Expression.functionNames.distance]: 'distance(coordinate_1, coordinate_2)',
+    [Expression.functionNames.first]: 'first(multiple_attribute), first(multiple_entity).entity_attribute, ...',
     [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
     [Expression.functionNames.index]: `index(node_name), index(this), index($context), index(parent(this))`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
@@ -61,7 +58,6 @@ const getVariableCompletion = ({ group = null, variable }) => {
     textParts.push(value)
   }
   const text = textParts.join('.')
-  // const data = { text, value }
 
   return {
     label: text,
@@ -77,7 +73,7 @@ const getFunctionCompletion = ({ mode, i18n, fnName }) => {
   // const label = `${i18n.t('nodeDefEdit.function')}: ${fnName}: ${exampleUsage}`
   const completion = {
     label: fnName,
-    detail: `${exampleUsage}\n${description}`,
+    detail: `e.g. ${exampleUsage}\n${description}`,
     apply: `${fnName}()`,
     type: 'function',
   }
@@ -191,8 +187,6 @@ export const codemirrorArenaCompletions = ({
   isContextParent = true,
   includeAnalysis = false,
 }) => {
-  // const cur = editor.getCursor()
-  // const token = editor.getTokenAt(cur)
   const cur = 0
   const token = { string: '' }
   const value = token.string
@@ -216,10 +210,4 @@ export const codemirrorArenaCompletions = ({
   })
 
   return getCompletions({ mode, i18n, token, variablesGroupedByParentEntity })
-
-  // return {
-  //   list: getCompletions({ mode, i18n, token, variablesGroupedByParentEntity }),
-  //   from: CodeMirror.Pos(token.line, token.start),
-  //   to: CodeMirror.Pos(token.line, token.end),
-  // }
 }

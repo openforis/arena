@@ -1,6 +1,7 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useCallback, createElement } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
+import ReactCodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion, completeFromList } from '@codemirror/autocomplete'
 import PropTypes from 'prop-types'
@@ -10,11 +11,10 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
-import ReactCodeMirror, { EditorView } from '@uiw/react-codemirror'
+
 import { codemirrorArenaCompletions } from './codemirrorArenaCompletions'
 
-// import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
+const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
 
 const completionsCompareFn = (contextUuid) => (completionA, completionB) => {
   const { apply: applyA, label: labelA, parentUuid: parentUuidA, type: typeA } = completionA
@@ -48,40 +48,29 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const [errorMessage, setErrorMessage] = useState(null)
 
-  const extensions = [
-    javascript(),
-    autocompletion({
-      closeOnBlur: false,
-      addToOptions: [
-        {
-          render: () => {
-            const el = document.createElement('br')
-            return el
+  const codeMirrorExtensions = useMemo(
+    () => [
+      javascript(),
+      autocompletion({
+        closeOnBlur: false,
+        // add a carriage return after the label in the rendered item option
+        addToOptions: [
+          {
+            render: () => document.createElement('br'),
+            position: 60,
           },
-          position: 60,
-        },
-      ],
-      compareCompletions: completionsCompareFn(nodeDefCurrent?.parentUuid),
-      override: [
-        completeFromList(
-          codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })
-        ),
-      ],
-      optionClass: () => 'option',
-      tooltipClass: () => 'arena-cm-autocomplete',
-    }),
-    EditorView.updateListener.of(updateList), // using update listener to check if user has pressed a dot (to explicitly provide completions)
-  ]
-
-  // update listener to check if user has typed a dot
-  function updateList(args) {
-    let change = args?.changes?.inserted?.[1]?.text?.[0]
-    // let changes = args?.changes?.sections[0]
-    // console.log({ change, changes })
-    if (change == '.') {
-      // startCompletion(editor)
-    }
-  }
+        ],
+        compareCompletions: completionsCompareFn(nodeDefCurrent?.parentUuid),
+        override: [
+          completeFromList(
+            codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })
+          ),
+        ],
+        optionClass: (completion) => `cm-completion-option ${completion.type}`,
+      }),
+    ],
+    [cycle, i18n, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+  )
 
   const validateEditorValue = useCallback(
     (value) => {
@@ -116,18 +105,13 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   return (
     <>
-      {errorMessage ? (
-        <div className="expression-editor__query-container">
-          <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>
-        </div>
-      ) : (
-        <div style={{ height: '34px' }} />
-      )}
+      <div className="expression-editor__query-container">
+        {errorMessage && <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>}
+      </div>
       <div className="expression-editor-popup__expr-container">
-        {/*<textarea data-testid={TestId.expressionEditor.advancedQuery} ref={inputRef} />*/}
         <ReactCodeMirror
-          basicSetup={{ lineNumbers: false }}
-          extensions={extensions}
+          basicSetup={codeMirrorBasicSetup}
+          extensions={codeMirrorExtensions}
           onChange={onEditorChange}
           value={query}
         />
