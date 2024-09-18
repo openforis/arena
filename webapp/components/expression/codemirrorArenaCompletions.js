@@ -39,9 +39,6 @@ const _findCharIndex = ({ value, end, matchingRegEx }) => {
   return 0
 }
 
-const nonIdRegex = /[^\w_]/
-const getVariableNameStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: nonIdRegex })
-
 const variablesSeparatorRegex = /[\s\-+*/&|]/
 const getVariablePathStart = ({ value, end }) => _findCharIndex({ value, end, matchingRegEx: variablesSeparatorRegex })
 
@@ -80,13 +77,13 @@ const getFunctionCompletion = ({ mode, i18n, fnName }) => {
   return completion
 }
 
-const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) => {
+const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, includeCustomFunctions = true }) => {
   const completions = []
-  const start = token.string.toLowerCase().slice(token.start, token.end)
+  const tokenText = token.text.toLowerCase()
 
   const includeVariableIfStartsWith = ({ group = null, variable }) => {
     ;[variable.value, variable.label].some((varName) => {
-      if (varName && varName.toLowerCase().startsWith(start)) {
+      if (varName && varName.toLowerCase().startsWith(tokenText)) {
         completions.push(getVariableCompletion({ group, variable }))
         // Either node.value or node.label matches - no need for both
         return true
@@ -100,30 +97,33 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) =
     if (group.value) {
       includeVariableIfStartsWith({ variable: group })
     }
-
     group.options?.forEach((variable) => {
       includeVariableIfStartsWith({ group, variable })
     })
   })
 
-  Object.keys(functionExamples[mode]).forEach((fnName) => {
-    if (fnName && fnName.toLowerCase().startsWith(start)) {
-      completions.push(getFunctionCompletion({ mode, i18n, fnName }))
-    }
-  })
-
+  if (includeCustomFunctions) {
+    Object.keys(functionExamples[mode]).forEach((fnName) => {
+      if (fnName && fnName.toLowerCase().startsWith(tokenText)) {
+        completions.push(getFunctionCompletion({ mode, i18n, fnName }))
+      }
+    })
+  }
   return completions
 }
 
-/* eslint-disable no-param-reassign */
-const _prepareTokenForCompletion = ({ token, cursorPosition, cursorLine }) => {
-  token.start = getVariableNameStart({ value: token.string, end: cursorPosition })
-  token.line = cursorLine
-
-  if (token.end > cursorPosition) {
-    token.end = cursorPosition
-    token.string = token.string.slice(0, cursorPosition - token.start)
+const findNodeDefContext = ({ survey, nodeDefCurrent, nodeDefContextPath }) => {
+  let nodeDefContext = null
+  try {
+    nodeDefContext = NodeDefExpressionValidator.findReferencedNodeDefLast({
+      survey,
+      nodeDef: nodeDefCurrent,
+      exprString: nodeDefContextPath,
+    })
+  } catch (e) {
+    // ignore it
   }
+  return nodeDefContext
 }
 
 const _extractVariables = ({
@@ -137,36 +137,28 @@ const _extractVariables = ({
   includeAnalysis = false,
 }) => {
   const nodeDefContextParent = isContextParent ? Survey.getNodeDefParent(nodeDefCurrent)(survey) : nodeDefCurrent
-  let nodeDefContext = nodeDefContextParent
 
   const { lang } = i18n
   const groupByParent = true
 
-  if (nodeDefContextPath) {
-    try {
-      nodeDefContext = NodeDefExpressionValidator.findReferencedNodeDefLast({
-        survey,
-        nodeDef: nodeDefCurrent,
-        exprString: nodeDefContextPath,
-      })
-    } catch (e) {
-      // ignore it
-    }
-    return nodeDefContext
-      ? ExpressionVariables.getVariablesChildren({
-          survey,
-          cycle,
-          nodeDefContext,
-          nodeDefCurrent,
-          mode,
-          lang,
-          groupByParent,
-          includeAnalysis,
-        })
-      : []
+  if (!nodeDefContextPath) {
+    // get variables from context node and its ancestors
+    return ExpressionVariables.getVariables({
+      survey,
+      cycle,
+      nodeDefContext: nodeDefContextParent,
+      nodeDefCurrent,
+      mode,
+      lang,
+      groupByParent,
+      includeAnalysis,
+    })
   }
-  // get variables from context node and its ancestors
-  return ExpressionVariables.getVariables({
+  const nodeDefContext = findNodeDefContext({ survey, nodeDefCurrent, nodeDefContextPath })
+  if (!nodeDefContext) {
+    return []
+  }
+  return ExpressionVariables.getVariablesChildren({
     survey,
     cycle,
     nodeDefContext,
@@ -178,36 +170,41 @@ const _extractVariables = ({
   })
 }
 
-export const codemirrorArenaCompletions = ({
-  mode,
-  i18n,
-  survey,
-  cycle,
-  nodeDefCurrent,
-  isContextParent = true,
-  includeAnalysis = false,
-}) => {
-  const cur = 0
-  const token = { string: '' }
-  const value = token.string
+export const codemirrorArenaCompletions =
+  ({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) =>
+  (context) => {
+    let matchingTokenBefore = context.matchBefore(/\w*/)
 
-  const { ch: cursorPosition, line: cursorLine } = cur
+    if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
 
-  const variablePath = value.slice(getVariablePathStart({ value, end: cursorPosition }), cursorPosition)
-  _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
+    const value = context?.state?.doc?.text?.[0]
+    const token = { ...matchingTokenBefore, value }
+    const cursorPosition = context.pos
 
-  const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
+    // const { ch: cursorPosition, line: cursorLine } = cur
 
-  const variablesGroupedByParentEntity = _extractVariables({
-    mode,
-    i18n,
-    survey,
-    cycle,
-    nodeDefCurrent,
-    nodeDefContextPath,
-    isContextParent,
-    includeAnalysis,
-  })
+    const variablePath = value.slice(getVariablePathStart({ value, end: cursorPosition }), cursorPosition)
+    // _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
 
-  return getCompletions({ mode, i18n, token, variablesGroupedByParentEntity })
-}
+    const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
+
+    const variablesGroupedByParentEntity = _extractVariables({
+      mode,
+      i18n,
+      survey,
+      cycle,
+      nodeDefCurrent,
+      nodeDefContextPath,
+      isContextParent,
+      includeAnalysis,
+    })
+    const options = getCompletions({
+      mode,
+      i18n,
+      token,
+      variablesGroupedByParentEntity,
+      includeCustomFunctions: !nodeDefContextPath,
+    })
+
+    return { from: token.from, options }
+  }

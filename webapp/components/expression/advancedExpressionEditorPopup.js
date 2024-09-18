@@ -3,7 +3,7 @@ import './expressionEditorPopup.scss'
 import React, { useState, useCallback, useMemo } from 'react'
 import ReactCodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
-import { autocompletion, completeFromList } from '@codemirror/autocomplete'
+import { autocompletion } from '@codemirror/autocomplete'
 import PropTypes from 'prop-types'
 
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
@@ -48,6 +48,14 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const [errorMessage, setErrorMessage] = useState(null)
 
+  const arenaAutocompleteFunction = useCallback(
+    (context) =>
+      codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })(
+        context
+      ),
+    [cycle, i18n, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+  )
+
   const codeMirrorExtensions = useMemo(
     () => [
       javascript(),
@@ -61,15 +69,11 @@ const AdvancedExpressionEditorPopup = (props) => {
           },
         ],
         compareCompletions: completionsCompareFn(nodeDefCurrent?.parentUuid),
-        override: [
-          completeFromList(
-            codemirrorArenaCompletions({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis })
-          ),
-        ],
+        override: [arenaAutocompleteFunction],
         optionClass: (completion) => `cm-completion-option ${completion.type}`,
       }),
     ],
-    [cycle, i18n, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+    [arenaAutocompleteFunction, nodeDefCurrent?.parentUuid]
   )
 
   const validateEditorValue = useCallback(
