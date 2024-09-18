@@ -177,14 +177,11 @@ export const codemirrorArenaCompletions =
 
     if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
 
-    const value = context?.state?.doc?.text?.[0]
+    const value = context.state?.doc?.text?.[0] ?? ''
     const token = { ...matchingTokenBefore, value }
     const cursorPosition = context.pos
 
-    // const { ch: cursorPosition, line: cursorLine } = cur
-
     const variablePath = value.slice(getVariablePathStart({ value, end: cursorPosition }), cursorPosition)
-    // _prepareTokenForCompletion({ token, cursorPosition, cursorLine })
 
     const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
 
