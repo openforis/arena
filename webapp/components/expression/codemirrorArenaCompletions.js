@@ -173,7 +173,7 @@ const _extractVariables = ({
 export const codemirrorArenaCompletions =
   ({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent = true, includeAnalysis = false }) =>
   (context) => {
-    let matchingTokenBefore = context.matchBefore(/\w*/)
+    const matchingTokenBefore = context.matchBefore(/\w*/)
 
     if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
 
