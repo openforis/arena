@@ -1,10 +1,4 @@
-// @import '~codemirror/lib/codemirror.css';
-// @import '~codemirror/addon/hint/show-hint';
 @import 'webapp/style/vars';
-
-.CodeMirror-hints {
-  z-index: $zIndex20Dropdown;
-}
 
 .expression-editor-popup {
   display: flex;

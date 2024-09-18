@@ -83,7 +83,7 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, inc
 
   const includeVariableIfStartsWith = ({ group = null, variable }) => {
     ;[variable.value, variable.label].some((varName) => {
-      if (varName && varName.toLowerCase().startsWith(tokenText)) {
+      if (varName?.toLowerCase().startsWith(tokenText)) {
         completions.push(getVariableCompletion({ group, variable }))
         // Either node.value or node.label matches - no need for both
         return true
@@ -104,7 +104,7 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, inc
 
   if (includeCustomFunctions) {
     Object.keys(functionExamples[mode]).forEach((fnName) => {
-      if (fnName && fnName.toLowerCase().startsWith(tokenText)) {
+      if (fnName?.toLowerCase().startsWith(tokenText)) {
         completions.push(getFunctionCompletion({ mode, i18n, fnName }))
       }
     })
