@@ -17,15 +17,15 @@ import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
-import { convertDataToPoints } from './convertDataToPoints'
+import { convertDataToGeoJsonItems } from './convertDataToGeoJsonItems'
 
-export const useCoordinateAttributeDataLayer = (props) => {
+export const useGeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
 
   const [state, setState] = useState({
     query: Query.create(),
     data: null,
-    points: [],
+    geoJsonData: [],
     pointIndexByDataIndex: [],
     editedRecordQuery: Query.create(),
   })
@@ -43,7 +43,7 @@ export const useCoordinateAttributeDataLayer = (props) => {
     [attributeDef, survey]
   )
 
-  const { query, points, editedRecordQuery } = state
+  const { editedRecordQuery, geoJsonData, query } = state
 
   const layerInnerName = useMemo(
     () =>
@@ -86,20 +86,21 @@ export const useCoordinateAttributeDataLayer = (props) => {
   useEffect(() => {
     if (!dataFetched) return
 
-    const {
-      points: _points,
-      pointIndexByDataIndex: _pointIndexByDataIndex,
-      bounds,
-    } = convertDataToPoints({ data: dataFetched, attributeDef, nodeDefParent, survey, i18n })
+    const { items: _geoJsonData, bounds } = convertDataToGeoJsonItems({
+      data: dataFetched,
+      attributeDef,
+      nodeDefParent,
+      survey,
+      i18n,
+    })
 
     setState((statePrev) => ({
       ...statePrev,
       data: dataFetched,
-      points: _points,
-      pointIndexByDataIndex: _pointIndexByDataIndex,
+      geoJsonData: _geoJsonData,
     }))
 
-    if (_points.length > 0 && map.getZoom() < 5) {
+    if (_geoJsonData.length > 0 && map.getZoom() < 5) {
       // pan map into layer bounds center
       map.panTo(bounds.getCenter())
     }
