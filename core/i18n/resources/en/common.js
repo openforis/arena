@@ -1355,6 +1355,7 @@ E.g. this.region = region_attribute_name
       coordinate: 'Coordinate',
       date: 'Date',
       decimal: 'Decimal',
+      geo: 'Geospatial',
       entity: 'Table or form',
       file: 'File',
       integer: 'Integer',
