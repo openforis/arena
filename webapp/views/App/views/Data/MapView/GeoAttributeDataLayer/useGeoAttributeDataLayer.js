@@ -4,16 +4,13 @@ import { useMap } from 'react-leaflet'
 import { Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 
 import { useDataQuery } from '@webapp/components/DataQuery/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
@@ -106,32 +103,6 @@ export const useGeoAttributeDataLayer = (props) => {
     }
   }, [attributeDef, dataFetched, nodeDefParent, survey])
 
-  // listen to websocket nodesUpdate events to detect edited record updates
-  useOnWebSocketEvent({
-    eventName: WebSocketEvents.nodesUpdate,
-    eventHandler: useCallback(
-      ({ updatedNodes }) => {
-        if (editingRecordUuid) {
-          const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
-          const rootKeyDefsUuids = rootKeyDefs.map(NodeDef.getUuid)
-          const shouldFetchRecordData = Object.values(updatedNodes).some(
-            (nodeUpdated) =>
-              Node.getRecordUuid(nodeUpdated) === editingRecordUuid &&
-              (Node.getNodeDefUuid(nodeUpdated) === NodeDef.getUuid(attributeDef) ||
-                rootKeyDefsUuids.includes(Node.getNodeDefUuid(nodeUpdated)))
-          )
-          if (shouldFetchRecordData) {
-            setState((statePrev) => ({
-              ...statePrev,
-              editedRecordQuery: Query.assocFilterRecordUuid(editingRecordUuid)(statePrev.query),
-            }))
-          }
-        }
-      },
-      [editingRecordUuid, survey, attributeDef]
-    ),
-  })
-
   // fetch record data on edited record query updates
   const { data: dataEditedRecord } = useDataQuery({ query: editedRecordQuery })
 
@@ -155,7 +126,7 @@ export const useGeoAttributeDataLayer = (props) => {
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     getClusterLeaves,
-    totalPoints: points.length,
-    points,
+    totalItems: geoJsonData.length,
+    geoJsonData,
   }
 }
