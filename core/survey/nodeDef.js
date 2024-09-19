@@ -618,6 +618,7 @@ export const canHaveDefaultValue = (nodeDef) =>
     nodeDefType.coordinate,
     nodeDefType.date,
     nodeDefType.decimal,
+    nodeDefType.geo,
     nodeDefType.integer,
     nodeDefType.taxon,
     nodeDefType.text,
