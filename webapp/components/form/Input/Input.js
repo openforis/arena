@@ -46,6 +46,8 @@ export const Input = React.forwardRef((props, ref) => {
 
   const handleValueChange = useCallback(
     (newValue) => {
+      if (disabled) return
+
       const input = inputRef.current
       if (selectionAllowed) {
         selectionRef.current = [input.selectionStart, input.selectionEnd]
@@ -54,7 +56,7 @@ export const Input = React.forwardRef((props, ref) => {
         onChange(textTransformFunction(newValue))
       }
     },
-    [inputRef, onChange, selectionAllowed, textTransformFunction]
+    [disabled, inputRef, onChange, selectionAllowed, textTransformFunction]
   )
 
   const onFormattedValueChange = useCallback(
