@@ -32,7 +32,9 @@ export const NodeDefConversionDialog = (props) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
 
-  const availableToTypes = Object.values(NodeDef.nodeDefType).filter((type) => type != NodeDef.getType(nodeDef))
+  const availableToTypes = Object.values(NodeDef.nodeDefType).filter(
+    (type) => ![NodeDef.nodeDefType.entity, NodeDef.getType(nodeDef)].includes(type)
+  )
   const confirmButtonDisabled = !selectedToType
 
   return (
