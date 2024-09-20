@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import { TextField } from '@mui/material'
 import PropTypes from 'prop-types'
 
-import { Strings } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
@@ -41,11 +41,13 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
-  const valueText = Strings.defaultIfEmpty('')(value)
+  const valueText = Objects.isEmpty(value) ? '' : String(value)
   const title = titleProp ?? valueText
 
   const handleValueChange = useCallback(
     (newValue) => {
+      if (disabled) return
+
       const input = inputRef.current
       if (selectionAllowed) {
         selectionRef.current = [input.selectionStart, input.selectionEnd]
@@ -54,7 +56,7 @@ export const Input = React.forwardRef((props, ref) => {
         onChange(textTransformFunction(newValue))
       }
     },
-    [inputRef, onChange, selectionAllowed, textTransformFunction]
+    [disabled, inputRef, onChange, selectionAllowed, textTransformFunction]
   )
 
   const onFormattedValueChange = useCallback(
