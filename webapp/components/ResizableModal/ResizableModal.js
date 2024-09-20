@@ -39,7 +39,15 @@ export const ResizableModal = (props) => {
 
   return (
     <div className={classNames('resizable-modal', className)}>
-      <ReactModal initHeight={initHeight} initWidth={initWidth} isOpen={isOpen} left={left} ref={modalRef} top={top}>
+      <ReactModal
+        initHeight={initHeight}
+        initWidth={initWidth}
+        isOpen={isOpen}
+        left={left}
+        onRequestClose={onRequestClose}
+        ref={modalRef}
+        top={top}
+      >
         <div className="resizable-modal__header">
           <h3>{header}</h3>
           {onDetach && (
@@ -68,6 +76,6 @@ ResizableModal.propTypes = {
   left: PropTypes.number,
   onClose: PropTypes.func,
   onDetach: PropTypes.func,
-  onRequestClose: PropTypes.func,
+  onRequestClose: PropTypes.func.isRequired,
   top: PropTypes.number,
 }

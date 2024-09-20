@@ -42,7 +42,9 @@ const MapWrapper = () => {
   const geoAttributeDefs = useMemo(() => Survey.getNodeDefsArray(survey).filter(NodeDef.isGeo), [survey])
   const samplingPointDataLevels = useMemo(() => getSamplingPointDataLevels(survey), [survey])
 
-  const layerColors = useRandomColors(samplingPointDataLevels.length + coordinateAttributeDefs.length)
+  const layerColors = useRandomColors(
+    samplingPointDataLevels.length + coordinateAttributeDefs.length + geoAttributeDefs.length
+  )
 
   const onRecordEditClick = useCallback((params) => {
     const { recordUuid, parentUuid } = params || {}
@@ -90,7 +92,7 @@ const MapWrapper = () => {
         <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
-          markersColor={layerColors[samplingPointDataLevels.length + index]}
+          markersColor={layerColors[coordinateAttributeDefs.length + samplingPointDataLevels.length + index]}
           onRecordEditClick={onRecordEditClick}
           editingRecordUuid={editingRecordUuid}
         />
