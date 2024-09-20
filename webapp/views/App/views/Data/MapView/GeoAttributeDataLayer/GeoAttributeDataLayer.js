@@ -3,10 +3,10 @@ import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { ClusterMarker, useFlyToPoint } from '../common'
-import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
-import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
+import { CoordinateAttributeMarker } from '../CoordinateAttributeDataLayer/CoordinateAttributeMarker'
+import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 
-export const CoordinateAttributeDataLayer = (props) => {
+export const GeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
 
   const {
@@ -15,9 +15,9 @@ export const CoordinateAttributeDataLayer = (props) => {
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     getClusterLeaves,
-    totalPoints,
-    points,
-  } = useCoordinateAttributeDataLayer(props)
+    totalItems,
+    items,
+  } = useGeoAttributeDataLayer(props)
 
   const {
     currentPointShown,
@@ -28,7 +28,7 @@ export const CoordinateAttributeDataLayer = (props) => {
     onCurrentPointPopupClose,
     openPopupOfPoint,
     setMarkerByKey,
-  } = useFlyToPoint({ points, onRecordEditClick })
+  } = useFlyToPoint({ points: items, onRecordEditClick })
 
   return (
     <LayersControl.Overlay name={layerName}>
@@ -50,7 +50,7 @@ export const CoordinateAttributeDataLayer = (props) => {
                 openPopupOfPoint={openPopupOfPoint}
                 onRecordEditClick={onRecordEditClick}
                 pointLabelFunction={(point) => point.properties.ancestorsKeys.join(' - ')}
-                totalPoints={totalPoints}
+                totalPoints={totalItems}
               />
             )
           }
@@ -88,7 +88,7 @@ export const CoordinateAttributeDataLayer = (props) => {
   )
 }
 
-CoordinateAttributeDataLayer.propTypes = {
+GeoAttributeDataLayer.propTypes = {
   attributeDef: PropTypes.any,
   markersColor: PropTypes.any,
   onRecordEditClick: PropTypes.func,

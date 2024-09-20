@@ -104,6 +104,14 @@ export const setInPath =
 
 export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
+export const keepNonEmptyProps = (obj) =>
+  Object.entries(obj).reduce((acc, [key, value]) => {
+    if (!isBlank(value)) {
+      acc[key] = value
+    }
+    return acc
+  }, {})
+
 // ====== UTILS / uuid
 const _getProp = (propNameOrExtractor) => (item) =>
   typeof propNameOrExtractor === 'string' ? R.path(propNameOrExtractor.split('.'))(item) : propNameOrExtractor(item)

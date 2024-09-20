@@ -17,6 +17,7 @@ import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
+import { GeoAttributeDataLayer } from './GeoAttributeDataLayer/GeoAttributeDataLayer'
 
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
@@ -86,7 +87,7 @@ const MapWrapper = () => {
         />
       )),
       ...geoAttributeDefs.map((attributeDef, index) => (
-        <CoordinateAttributeDataLayer
+        <GeoAttributeDataLayer
           key={NodeDef.getUuid(attributeDef)}
           attributeDef={attributeDef}
           markersColor={layerColors[samplingPointDataLevels.length + index]}
