@@ -2,6 +2,7 @@ import React from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
@@ -28,7 +29,7 @@ export const GeoAttributeDataLayer = (props) => {
     onCurrentPointPopupClose,
     openPopupOfPoint,
     setMarkerByKey,
-  } = useFlyToPoint({ points, onRecordEditClick })
+  } = useFlyToPoint({ points, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
 
   return (
     <LayersControl.Overlay name={layerName}>

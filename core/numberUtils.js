@@ -51,3 +51,10 @@ export const roundToPrecision = (value, precision = NaN) => {
  * @returns {string} - The formatted value or null if the value was null.
  */
 export const formatInteger = (value) => formatDecimal(value, 0)
+
+/**
+ * Returns the modulus of the specified value. The result will always be a positive number.
+ * @param {!number} modulus - The modulus to apply.
+ * @returns {number} - The result of the modulus (always positive or 0).
+ */
+export const mod = (modulus) => (value) => ((value % modulus) + modulus) % modulus
