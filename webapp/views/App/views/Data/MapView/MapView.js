@@ -12,7 +12,6 @@ import { useSurvey } from '@webapp/store/survey'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { Map } from '@webapp/components/Map'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
@@ -130,8 +129,4 @@ const MapWrapper = () => {
   )
 }
 
-export const MapView = () => (
-  <SurveyDefsLoader draft={false} requirePublish>
-    <MapWrapper />
-  </SurveyDefsLoader>
-)
+export const MapView = () => <MapWrapper />
