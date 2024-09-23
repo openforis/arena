@@ -23,8 +23,8 @@ const centroid = (polygon) => {
     const [x, y] = coordinate
     const [nextX, nextY] = nextCoordinate
     const adj = x * nextY - nextX * y
-    centerY += (x + nextX) * adj
-    centerX += (y + nextY) * adj
+    centerX += (x + nextX) * adj
+    centerY += (y + nextY) * adj
   }
   const a = area(polygon)
   centerX /= a * 6

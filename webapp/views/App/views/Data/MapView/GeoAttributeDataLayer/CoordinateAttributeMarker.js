@@ -5,11 +5,11 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as ObjectUtils from '@core/objectUtils'
 
+import { useSurveyInfo } from '@webapp/store/survey'
+
 import { MarkerTooltip, useLayerMarker } from '../common'
 import { CoordinateAttributePopUp } from './CoordinateAttributePopUp'
 import { CoordinateAttributePolygon } from './CoordinateAttributePolygon'
-
-import { useSurveyInfo } from '@webapp/store/survey'
 
 const markerRadius = 10
 const fillOpacity = 0.5
@@ -82,19 +82,19 @@ export const CoordinateAttributeMarker = (props) => {
       {Survey.isSampleBasedImageInterpretationEnabled(surveyInfo) && (
         <CoordinateAttributePolygon latitude={latitude} longitude={longitude} />
       )}
-      {!innerData && (
-        <CircleMarker
-          center={[latitude, longitude]}
-          color={markersColor}
-          eventHandlers={eventHandlers}
-          fillColor={markersColor}
-          fillOpacity={fillOpacity}
-          radius={markerRadius}
-          ref={setRef}
-        >
-          {content}
-        </CircleMarker>
-      )}
+      {/* {!innerData && ( */}
+      <CircleMarker
+        center={[latitude, longitude]}
+        color={markersColor}
+        eventHandlers={eventHandlers}
+        fillColor={markersColor}
+        fillOpacity={fillOpacity}
+        radius={markerRadius}
+        ref={setRef}
+      >
+        {content}
+      </CircleMarker>
+      {/* )} */}
 
       {innerData && (
         <GeoJSON data={innerData} eventHandlers={eventHandlers} color={markersColor} ref={setRef}>

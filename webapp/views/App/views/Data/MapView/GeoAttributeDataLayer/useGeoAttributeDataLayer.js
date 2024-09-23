@@ -13,8 +13,8 @@ import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
-import { convertDataToGeoJsonItems } from './convertDataToGeoJsonItems'
-import { useOnEditedRecordDataFetched } from '../CoordinateAttributeDataLayer/useOnEditedRecordDataFetched'
+import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
+import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
 export const useGeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
@@ -23,7 +23,7 @@ export const useGeoAttributeDataLayer = (props) => {
     query: Query.create(),
     data: null,
     editedRecordQuery: Query.create(),
-    items: [],
+    points: [],
     pointIndexByDataIndex: [],
   })
   const i18n = useI18n()
@@ -40,7 +40,7 @@ export const useGeoAttributeDataLayer = (props) => {
     [attributeDef, survey]
   )
 
-  const { editedRecordQuery, items, query } = state
+  const { editedRecordQuery, points: points, query } = state
 
   const layerInnerName = useMemo(
     () =>
@@ -83,7 +83,11 @@ export const useGeoAttributeDataLayer = (props) => {
   useEffect(() => {
     if (!dataFetched) return
 
-    const { items: _items, bounds } = convertDataToGeoJsonItems({
+    const {
+      bounds,
+      pointIndexByDataIndex: _pointIndexByDataIndex,
+      points: _points,
+    } = convertDataToGeoJsonPoints({
       data: dataFetched,
       attributeDef,
       nodeDefParent,
@@ -94,14 +98,15 @@ export const useGeoAttributeDataLayer = (props) => {
     setState((statePrev) => ({
       ...statePrev,
       data: dataFetched,
-      items: _items,
+      pointIndexByDataIndex: _pointIndexByDataIndex,
+      points: _points,
     }))
 
-    if (_items.length > 0 && map.getZoom() < 5) {
+    if (_points.length > 0 && map.getZoom() < 5) {
       // pan map into layer bounds center
       map.panTo(bounds.getCenter())
     }
-  }, [attributeDef, dataFetched, nodeDefParent, survey])
+  }, [attributeDef, dataFetched, i18n, map, nodeDefParent, survey])
 
   // fetch record data on edited record query updates
   const { data: dataEditedRecord } = useDataQuery({ query: editedRecordQuery })
@@ -117,7 +122,7 @@ export const useGeoAttributeDataLayer = (props) => {
   })
 
   const { clusters, clusterExpansionZoomExtractor, clusterIconCreator, getClusterLeaves } = useMapClusters({
-    points: items,
+    points,
   })
 
   return {
@@ -126,7 +131,7 @@ export const useGeoAttributeDataLayer = (props) => {
     clusterExpansionZoomExtractor,
     clusterIconCreator,
     getClusterLeaves,
-    totalItems: items.length,
-    items,
+    totalPoints: points.length,
+    points,
   }
 }
