@@ -19,6 +19,7 @@ import { FileUtils } from '@webapp/utils/fileUtils'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
+import { GeoPolygonSummary } from '@webapp/components/geo/GeoPolygonSummary'
 
 const maxFileSize = 1
 
@@ -104,9 +105,14 @@ const NodeDefGeo = (props) => {
   return (
     <div className={classNames('survey-form__node-def-geo', { 'with-map': canUseMap })}>
       {!edit && valueText && (
-        <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
-          <Input disabled inputType="textarea" value={valueText} />
-        </ExpansionPanel>
+        <>
+          <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
+            <Input disabled inputType="textarea" value={valueText} />
+          </ExpansionPanel>
+          <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.summary" startClosed>
+            <GeoPolygonSummary geoJson={value} />
+          </ExpansionPanel>
+        </>
       )}
       {!entryDisabled && (
         <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />

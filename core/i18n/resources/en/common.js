@@ -223,6 +223,12 @@ Do you want to proceed?`,
     pageNotFound: 'Page not found',
   },
 
+  geo: {
+    area: 'Area',
+    vertices: 'Vertices',
+    perimeter: 'Perimeter',
+  },
+
   files: {
     header: 'Files',
     missing: ' Missing files: {{count}}',
@@ -1427,6 +1433,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     nodeDefGeo: {
       geoJSON: 'GeoJSON',
       invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
+      summary: 'Summary',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
