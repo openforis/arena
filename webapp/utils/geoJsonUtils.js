@@ -32,7 +32,21 @@ const centroid = (polygon) => {
   return { x: centerX, y: centerY }
 }
 
+const validateFeature = (geoJson) => geoJson?.type === 'Feature' && !!geoJson.geometry
+
+const parse = (geoJsonText) => {
+  let geoJson = null
+  try {
+    geoJson = JSON.parse(geoJsonText)
+  } catch (_error) {
+    // ignore it
+  }
+  return validateFeature(geoJson) ? geoJson : null
+}
+
 export const GeoJsonUtils = {
   area,
   centroid,
+  validateFeature,
+  parse,
 }

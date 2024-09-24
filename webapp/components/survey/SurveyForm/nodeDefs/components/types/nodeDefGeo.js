@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -9,12 +9,18 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, Map, PanelRight } from '@webapp/components'
+import { Button, ExpansionPanel, Map, PanelRight } from '@webapp/components'
+import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
+import { NotificationActions } from '@webapp/store/ui'
+import { FileUtils } from '@webapp/utils/fileUtils'
+import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
+
+const maxFileSize = 1
 
 const NodeDefGeo = (props) => {
   const {
@@ -29,6 +35,7 @@ const NodeDefGeo = (props) => {
     updateNode,
   } = props
 
+  const dispatch = useDispatch()
   const lang = useSurveyPreferredLang()
   const canUseMap = useAuthCanUseMap()
   const noHeader = useSelector(RecordState.hasNoHeader)
@@ -44,15 +51,21 @@ const NodeDefGeo = (props) => {
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
-  const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap, setShowMap])
+  const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap])
 
-  const textInputField = (
-    <Input
-      disabled={edit || !canEditRecord || readOnly}
-      inputType="textarea"
-      value={valueText}
-      onChange={(value) => updateNode(nodeDef, node, value)}
-    />
+  const onFilesChange = useCallback(
+    async (files) => {
+      const file = files[0]
+      const text = await FileUtils.readAsText(file)
+      const geoJson = GeoJsonUtils.parse(text)
+      if (geoJson) {
+        dispatch(NotificationActions.hideNotification())
+        updateNode(nodeDef, node, geoJson)
+      } else {
+        dispatch(NotificationActions.notifyWarning({ key: 'surveyForm.nodeDefGeo.invalidGeoJsonFileUploaded' }))
+      }
+    },
+    [dispatch, node, nodeDef, updateNode]
   )
 
   const mapPanelRight = showMap ? (
@@ -90,9 +103,20 @@ const NodeDefGeo = (props) => {
 
   return (
     <div className={classNames('survey-form__node-def-geo', { 'with-map': canUseMap })}>
-      {textInputField}
-      {mapTriggerButton}
-      {mapPanelRight}
+      {!edit && valueText && (
+        <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
+          <Input disabled inputType="textarea" value={valueText} />
+        </ExpansionPanel>
+      )}
+      {!entryDisabled && (
+        <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />
+      )}
+      {valueText && (
+        <>
+          {mapTriggerButton}
+          {mapPanelRight}
+        </>
+      )}
     </div>
   )
 }
@@ -106,7 +130,6 @@ NodeDefGeo.propTypes = {
   nodes: PropTypes.array.isRequired,
   readOnly: PropTypes.bool,
   renderType: PropTypes.string,
-  surveyInfo: PropTypes.object.isRequired,
   updateNode: PropTypes.func.isRequired,
 }
 

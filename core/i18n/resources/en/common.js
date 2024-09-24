@@ -1424,6 +1424,10 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       altitude: 'Altitude',
       altitudeAccuracy: 'Altitude accuracy',
     },
+    nodeDefGeo: {
+      geoJSON: 'GeoJSON',
+      invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
+    },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
       confirmDelete: 'Are you sure you want to delete this entity?',
