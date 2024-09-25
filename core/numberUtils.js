@@ -12,9 +12,37 @@ BigNumber.config({
   },
 })
 
-const constants = {
-  ft: 0.3048, // 1 foot (in meters)
-  squareFt: 0.09290304, // 1 square foot (in square meters)
+export const areaUnits = {
+  squareMeter: 'squareMeter',
+  squareFoot: 'squareFoot',
+  acre: 'acre',
+  hectar: 'hectar',
+}
+
+const areaUnitToSquareMetersConversionFactor = {
+  [areaUnits.acre]: 4046.85642199999983859016,
+  [areaUnits.hectar]: 10000,
+  [areaUnits.squareMeter]: 1,
+  [areaUnits.squareFoot]: 0.09290304,
+}
+
+export const lengthUnits = {
+  meter: 'meter',
+  foot: 'foot',
+}
+
+const lengthUnitToMetersConversionFactor = {
+  [lengthUnits.meter]: 1,
+  [lengthUnits.foot]: 0.3048,
+}
+
+export const abbreviationByUnit = {
+  [areaUnits.squareMeter]: 'm²',
+  [areaUnits.squareFoot]: 'ft²',
+  [areaUnits.acre]: 'ac',
+  [areaUnits.hectar]: 'ha',
+  [lengthUnits.meter]: 'm',
+  [lengthUnits.foot]: 'ft',
 }
 
 export const toNumber = (num) => (Objects.isEmpty(num) ? NaN : Number(num))
@@ -64,6 +92,8 @@ export const formatInteger = (value) => formatDecimal(value, 0)
  */
 export const mod = (modulus) => (value) => ((value % modulus) + modulus) % modulus
 
-export const metersToFeet = (value) => (Objects.isNil(value) ? NaN : value / constants.ft)
+export const squareMetersToUnit = (unit) => (value) =>
+  Objects.isNil(value) ? NaN : value / areaUnitToSquareMetersConversionFactor[unit]
 
-export const squareMetersToSquareFeet = (value) => (Objects.isNil(value) ? NaN : value / constants.squareFt)
+export const metersToUnit = (unit) => (value) =>
+  Objects.isNil(value) ? NaN : value / lengthUnitToMetersConversionFactor[unit]
