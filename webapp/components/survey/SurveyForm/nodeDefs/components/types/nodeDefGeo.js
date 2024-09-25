@@ -14,14 +14,16 @@ import { RecordState } from '@webapp/store/ui/record'
 import { Button, ExpansionPanel, Map, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
+import { GeoPolygonSummary } from '@webapp/components/geo/GeoPolygonSummary'
+
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { NotificationActions } from '@webapp/store/ui'
+
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
-import { GeoPolygonSummary } from '@webapp/components/geo/GeoPolygonSummary'
 
 const maxFileSize = 1
 
