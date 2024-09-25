@@ -1,5 +1,6 @@
 import CodeMirror from 'codemirror/lib/codemirror'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
@@ -13,6 +14,8 @@ const functionExamples = {
     [Expression.functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
     [Expression.functionNames.first]:
       'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
+    [Expression.functionNames.geoPolygon]:
+      'geoPolygon(coordinate_attribute_1, coordinate_attribute_2, ...), geoPolygon(multiple_entity_name.coordinate_attribute), ...',
     [Expression.functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
     [Expression.functionNames.index]: `index(node_name), index(this), index($context), index(parent(this))`,
     [Expression.functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
@@ -34,6 +37,21 @@ const functionExamples = {
     [Expression.functionNames.sum]: 'sum(variable_name)',
   },
 }
+
+const experimentalFunctions = [Expression.functionNames.geoPolygon]
+
+const availableFunctionExamples = Object.entries(functionExamples).reduce(
+  (accFunctionsByMode, [mode, functionsInMode]) => {
+    accFunctionsByMode[mode] = Object.entries(functionsInMode).reduce((accFunctionsByName, [functionName, value]) => {
+      if (ProcessUtils.ENV.experimentalFeatures || !experimentalFunctions.includes(functionName)) {
+        accFunctionsByName[functionName] = value
+      }
+      return accFunctionsByName
+    }, {})
+    return accFunctionsByMode
+  },
+  {}
+)
 
 const _findCharIndex = ({ value, end, matchingRegEx }) => {
   for (let i = end; i >= 0; i -= 1) {
@@ -121,7 +139,7 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity }) =
     })
   })
 
-  Object.keys(functionExamples[mode]).forEach((fnName) => {
+  Object.keys(availableFunctionExamples[mode]).forEach((fnName) => {
     if (fnName && fnName.toLowerCase().startsWith(start)) {
       completions.push(getFunctionCompletion({ mode, i18n, fnName, token }))
     }

@@ -1159,8 +1159,8 @@ $t(common.cantUndoWarning)`,
     invalid: 'Invalid expression: {{details}}',
     missingFunctionParameters: 'Missing function parameters',
     undefinedFunction: 'Undefined function: {{name}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
   },
 
   // ====== Help views
