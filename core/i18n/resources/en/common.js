@@ -1431,6 +1431,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       altitudeAccuracy: 'Altitude accuracy',
     },
     nodeDefGeo: {
+      confirmDelete: 'Delete this Geospatial value?',
       geoJSON: 'GeoJSON',
       invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
     },

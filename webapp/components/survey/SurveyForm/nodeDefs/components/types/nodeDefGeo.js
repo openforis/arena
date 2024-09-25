@@ -1,24 +1,25 @@
 import './nodeDefGeo.scss'
 
-import React, { useCallback, useState } from 'react'
-import PropTypes from 'prop-types'
-import { useDispatch, useSelector } from 'react-redux'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
+import React, { useCallback, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, ExpansionPanel, Map, PanelRight } from '@webapp/components'
+import { Button, ButtonIconDelete, ExpansionPanel, Map, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
 import { GeoPolygonSummary } from '@webapp/components/geo/GeoPolygonSummary'
+import { useConfirmAsync } from '@webapp/components/hooks'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { NotificationActions } from '@webapp/store/ui'
+import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
@@ -47,6 +48,7 @@ const NodeDefGeo = (props) => {
   const canShowMap = canUseMap && !noHeader
 
   const [showMap, setShowMap] = useState(false)
+  const confirm = useConfirmAsync()
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -72,6 +74,12 @@ const NodeDefGeo = (props) => {
     },
     [dispatch, node, nodeDef, updateNode]
   )
+
+  const onClearValueClick = useCallback(async () => {
+    if (await confirm({ key: 'surveyForm.nodeDefGeo.confirmDelete' })) {
+      updateNode(nodeDef, node, null)
+    }
+  }, [confirm, node, nodeDef, updateNode])
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
@@ -121,13 +129,16 @@ const NodeDefGeo = (props) => {
         )}
       </div>
       <div className="action-buttons">
-        {!entryDisabled && (
-          <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />
-        )}
         {valueText && (
           <>
             {mapTriggerButton}
             {mapPanelRight}
+          </>
+        )}
+        {!entryDisabled && (
+          <>
+            <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />
+            {valueText && <ButtonIconDelete onClick={onClearValueClick} />}
           </>
         )}
       </div>
