@@ -159,7 +159,6 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
     label: Chain.getLabel(lang, defaultLang)(chain),
     selectedLanguage: lang,
     selectedCycle: getCycleLabel(cycle),
-    cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.hasSamplingDesign(chain),
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     baseUnitEntityKeys,
