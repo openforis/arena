@@ -1433,7 +1433,6 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     nodeDefGeo: {
       geoJSON: 'GeoJSON',
       invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
-      summary: 'Summary',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',

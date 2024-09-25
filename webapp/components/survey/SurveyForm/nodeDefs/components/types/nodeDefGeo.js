@@ -1,3 +1,5 @@
+import './nodeDefGeo.scss'
+
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
@@ -104,25 +106,29 @@ const NodeDefGeo = (props) => {
 
   return (
     <div className={classNames('survey-form__node-def-geo', { 'with-map': canUseMap })}>
-      {!edit && valueText && (
-        <>
-          <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
-            <Input disabled inputType="textarea" value={valueText} />
-          </ExpansionPanel>
-          <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.summary" startClosed>
-            <GeoPolygonSummary geoJson={value} />
-          </ExpansionPanel>
-        </>
-      )}
-      {!entryDisabled && (
-        <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />
-      )}
-      {valueText && (
-        <>
-          {mapTriggerButton}
-          {mapPanelRight}
-        </>
-      )}
+      <div className="info-panel">
+        {!edit && valueText && (
+          <>
+            <ExpansionPanel buttonLabel="common.info" startClosed>
+              <GeoPolygonSummary geoJson={value} />
+            </ExpansionPanel>
+            <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
+              <Input disabled inputType="textarea" value={valueText} />
+            </ExpansionPanel>
+          </>
+        )}
+      </div>
+      <div className="action-buttons">
+        {!entryDisabled && (
+          <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />
+        )}
+        {valueText && (
+          <>
+            {mapTriggerButton}
+            {mapPanelRight}
+          </>
+        )}
+      </div>
     </div>
   )
 }
