@@ -42,8 +42,8 @@ const pointExtractorByNodeDefType = {
   [NodeDef.nodeDefType.geo]: ({ attributeValue }) => {
     const geoJson = JSON.parse(attributeValue)
 
-    const point = GeoJsonUtils.centroid(geoJson.geometry)
-
+    const centroidFeaturePoint = GeoJsonUtils.centroid(geoJson.geometry)
+    const point = GeoJsonUtils.pointFeatureToPoint(centroidFeaturePoint)
     return { point, properties: { data: geoJson } }
   },
 }

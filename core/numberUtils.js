@@ -12,6 +12,11 @@ BigNumber.config({
   },
 })
 
+const constants = {
+  ft: 0.3048, // 1 foot (in meters)
+  squareFt: 0.09290304, // 1 square foot (in square meters)
+}
+
 export const toNumber = (num) => (Objects.isEmpty(num) ? NaN : Number(num))
 
 export const isInteger = A.pipe(toNumber, Number.isInteger)
@@ -58,3 +63,7 @@ export const formatInteger = (value) => formatDecimal(value, 0)
  * @returns {number} - The result of the modulus (always positive or 0).
  */
 export const mod = (modulus) => (value) => ((value % modulus) + modulus) % modulus
+
+export const metersToFeet = (value) => (Objects.isNil(value) ? NaN : value / constants.ft)
+
+export const squareMetersToSquareFeet = (value) => (Objects.isNil(value) ? NaN : value / constants.squareFt)
