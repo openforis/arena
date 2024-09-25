@@ -4,9 +4,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as NumberUtils from '@core/numberUtils'
+
 import { useI18n } from '@webapp/store/system'
-import { FormItem } from '../form/Input'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
+
+import { FormItem } from '../form/Input'
 
 const round = (value, precision = 2) => NumberUtils.roundToPrecision(value, precision)
 
