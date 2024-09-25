@@ -1,0 +1,15 @@
+.survey-form__node-def-geo {
+  display: flex;
+  gap: 1rem;
+
+  .info-panel,
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .info-panel {
+    flex: 1;
+  }
+}

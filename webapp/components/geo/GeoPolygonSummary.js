@@ -15,8 +15,6 @@ const round = (value, precision = 2) => NumberUtils.roundToPrecision(value, prec
 export const GeoPolygonSummary = (props) => {
   const { geoJson } = props
 
-  const polygon = geoJson.geometry
-
   const i18n = useI18n()
 
   const areaInSquareMeters = GeoJsonUtils.area(geoJson)
@@ -26,7 +24,7 @@ export const GeoPolygonSummary = (props) => {
 
   return (
     <div className="geo-polygon-summary">
-      <FormItem label={i18n.t('geo.vertices')}>{GeoJsonUtils.countVertices(polygon)}</FormItem>
+      <FormItem label={i18n.t('geo.vertices')}>{GeoJsonUtils.countVertices(geoJson)}</FormItem>
       <FormItem label={i18n.t('geo.area')}>
         {round(areaInSquareMeters)}m² ({round(areaInSquareFeet)}ft²)
       </FormItem>

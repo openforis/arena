@@ -2,7 +2,10 @@ import area from '@turf/area'
 import centroid from '@turf/centroid'
 import length from '@turf/length'
 
-const countVertices = (polygon) => polygon?.coordinates?.[0]?.length ?? 0
+const countVertices = (geoJson) => {
+  const polygon = geoJson.type === 'Feature' ? geoJson.geometry : geoJson
+  return polygon?.coordinates?.[0]?.length ?? 0
+}
 
 const parse = (geoJsonText) => {
   let geoJson = null
