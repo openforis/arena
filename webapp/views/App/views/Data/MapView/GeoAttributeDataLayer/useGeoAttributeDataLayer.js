@@ -40,7 +40,7 @@ export const useGeoAttributeDataLayer = (props) => {
     [attributeDef, survey]
   )
 
-  const { editedRecordQuery, points: points, query } = state
+  const { editedRecordQuery, points, query } = state
 
   const layerInnerName = useMemo(
     () =>
