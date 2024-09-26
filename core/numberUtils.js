@@ -16,12 +16,12 @@ export const areaUnits = {
   squareMeter: 'squareMeter',
   squareFoot: 'squareFoot',
   acre: 'acre',
-  hectar: 'hectar',
+  hectare: 'hectare',
 }
 
 const areaUnitToSquareMetersConversionFactor = {
   [areaUnits.acre]: 4046.85642199999983859016,
-  [areaUnits.hectar]: 10000,
+  [areaUnits.hectare]: 10000,
   [areaUnits.squareMeter]: 1,
   [areaUnits.squareFoot]: 0.09290304,
 }
@@ -40,7 +40,7 @@ export const abbreviationByUnit = {
   [areaUnits.squareMeter]: 'm²',
   [areaUnits.squareFoot]: 'ft²',
   [areaUnits.acre]: 'ac',
-  [areaUnits.hectar]: 'ha',
+  [areaUnits.hectare]: 'ha',
   [lengthUnits.meter]: 'm',
   [lengthUnits.foot]: 'ft',
 }

@@ -1,4 +1,4 @@
-import './GeoPolygonSummary.scss'
+import './GeoPolygonInfo.scss'
 
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
@@ -11,9 +11,19 @@ import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 import { FormItem } from '../form/Input'
 import { ButtonIconInfo } from '../buttons'
 
-const { abbreviationByUnit, areaUnits, lengthUnits, metersToUnit, roundToPrecision, squareMetersToUnit } = NumberUtils
+const {
+  abbreviationByUnit,
+  areaUnits,
+  formatDecimal,
+  lengthUnits,
+  metersToUnit,
+  roundToPrecision,
+  squareMetersToUnit,
+} = NumberUtils
 
-export const GeoPolygonSummary = (props) => {
+const formatNumber = (value) => formatDecimal(roundToPrecision(value, 2))
+
+export const GeoPolygonInfo = (props) => {
   const { geoJson } = props
 
   const i18n = useI18n()
@@ -22,7 +32,7 @@ export const GeoPolygonSummary = (props) => {
   const perimeterInMeters = GeoJsonUtils.perimeter(geoJson)
 
   const areaInUnit = useCallback(
-    (unit) => `${roundToPrecision(squareMetersToUnit(unit)(areaInSquareMeters), 2)} ${abbreviationByUnit[unit]}`,
+    (unit) => `${formatNumber(squareMetersToUnit(unit)(areaInSquareMeters))} ${abbreviationByUnit[unit]}`,
     [areaInSquareMeters]
   )
 
@@ -32,18 +42,18 @@ export const GeoPolygonSummary = (props) => {
   )
 
   const perimeterInUnit = useCallback(
-    (unit) => `${roundToPrecision(metersToUnit(unit)(perimeterInMeters), 2)} ${abbreviationByUnit[unit]}`,
+    (unit) => `${formatNumber(metersToUnit(unit)(perimeterInMeters))} ${abbreviationByUnit[unit]}`,
     [perimeterInMeters]
   )
 
   const perimeterTooltipContent = useMemo(() => [lengthUnits.foot].map(perimeterInUnit).join('<br>'), [perimeterInUnit])
 
   return (
-    <div className="geo-polygon-summary">
+    <div className="geo-polygon-info">
       <FormItem label={i18n.t('geo.vertices')}>{GeoJsonUtils.countVertices(geoJson)}</FormItem>
       <FormItem label={i18n.t('geo.area')}>
         <div className="row">
-          {areaInUnit(areaUnits.hectar)}
+          {areaInUnit(areaUnits.hectare)}
           <ButtonIconInfo isTitleMarkdown title={areaTooltipContent} />
         </div>
       </FormItem>
@@ -57,6 +67,6 @@ export const GeoPolygonSummary = (props) => {
   )
 }
 
-GeoPolygonSummary.propTypes = {
+GeoPolygonInfo.propTypes = {
   geoJson: PropTypes.object.isRequired,
 }

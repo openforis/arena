@@ -14,7 +14,7 @@ import { RecordState } from '@webapp/store/ui/record'
 import { Button, ButtonIconDelete, ExpansionPanel, Map, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
-import { GeoPolygonSummary } from '@webapp/components/geo/GeoPolygonSummary'
+import { GeoPolygonInfo } from '@webapp/components/geo/GeoPolygonInfo'
 import { useConfirmAsync } from '@webapp/components/hooks'
 
 import { useSurveyPreferredLang } from '@webapp/store/survey'
@@ -120,7 +120,7 @@ const NodeDefGeo = (props) => {
         {!edit && valueText && (
           <>
             <ExpansionPanel buttonLabel="common.info" startClosed>
-              <GeoPolygonSummary geoJson={value} />
+              <GeoPolygonInfo geoJson={value} />
             </ExpansionPanel>
             <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
               <Input disabled inputType="textarea" value={valueText} />
