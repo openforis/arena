@@ -16,8 +16,9 @@ import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefTime from './components/types/nodeDefTime'
+import NodeDefGeo from './components/types/nodeDefGeo'
 
-const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
+const { boolean, code, coordinate, date, decimal, entity, file, geo, integer, taxon, text, time } = NodeDef.nodeDefType
 
 const propsUI = {
   [integer]: {
@@ -77,6 +78,11 @@ const propsUI = {
         labelKey: `surveyForm.nodeDefCoordinate.${field}`,
       })),
     ],
+  },
+
+  [geo]: {
+    component: NodeDefGeo,
+    icon: <span className="icon icon-codepen icon-left" />,
   },
 
   [taxon]: {

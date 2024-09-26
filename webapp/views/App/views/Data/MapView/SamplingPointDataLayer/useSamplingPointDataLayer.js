@@ -141,9 +141,8 @@ export const useSamplingPointDataLayer = (props) => {
   // cancel items fetch (if any) on unmount
   useEffect(() => {
     return () => {
-      if (fetchCancelRef.current) {
-        fetchCancelRef.current()
-      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchCancelRef.current?.()
     }
   }, [])
 
