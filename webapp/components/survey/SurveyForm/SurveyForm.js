@@ -4,6 +4,7 @@ import './react-grid-layout.scss'
 import React, { useCallback, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -240,6 +241,24 @@ const mapStateToProps = (state, props) => {
     analysis: Record.isInAnalysisStep(record),
     ...(props.entry && record ? mapEntryProps() : {}),
   }
+}
+
+SurveyForm.propTypes = {
+  activePageNodeDef: PropTypes.object.isRequired,
+  analysis: PropTypes.bool,
+  canEditDef: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  edit: PropTypes.bool,
+  empty: PropTypes.bool,
+  entry: PropTypes.bool,
+  hasNodeDefAddChildTo: PropTypes.bool,
+  parentNode: PropTypes.object,
+  preview: PropTypes.bool,
+  recordUuid: PropTypes.string,
+  renderType: PropTypes.string,
+  showPageNavigation: PropTypes.bool,
+  surveyInfo: PropTypes.object.isRequired,
+  surveyCycleKey: PropTypes.string.isRequired,
 }
 
 export default connect(mapStateToProps)(SurveyForm)
