@@ -14,7 +14,6 @@ import * as API from '@webapp/service/api'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioFieldset } from './ChainRStudioFieldset'
 
@@ -59,10 +58,6 @@ export const ChainBasicProps = (props) => {
         formLabelKey="common.description"
         labels={chain.props.descriptions}
         onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
-      />
-      <CyclesSelector
-        cyclesKeysSelected={chain.props.cycles}
-        onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
       />
       <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
         <Checkbox
