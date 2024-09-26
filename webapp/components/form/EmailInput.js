@@ -10,8 +10,4 @@ EmailInput.propTypes = {
   ...SimpleTextInput.propTypes,
 }
 
-EmailInput.defaultProps = {
-  ...SimpleTextInput.defaultProps,
-}
-
 export default EmailInput

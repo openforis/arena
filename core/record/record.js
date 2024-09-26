@@ -41,6 +41,7 @@ export const isInAnalysisStep = (record) => {
   return RecordStep.getName(step) === RecordStep.stepNames.analysis
 }
 export const getCycle = R.prop(keys.cycle)
+export const getMergedIntoRecordUuid = R.prop(keys.mergedIntoRecordUuid)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
 export const getInfo = R.propOr({}, keys.info)
@@ -99,3 +100,8 @@ export const { deleteNode } = RecordUpdater
 // ====== VALIDATION
 export const { mergeNodeValidations } = RecordUpdater
 export const { getValidation } = Validation
+
+// ====== RECORD SUMMARY
+export const getFilesCount = R.prop(keys.filesCount)
+export const getFilesSize = R.prop(keys.filesSize)
+export const getFilesMissing = R.prop(keys.filesMissing)

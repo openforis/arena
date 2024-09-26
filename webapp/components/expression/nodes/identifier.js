@@ -57,8 +57,4 @@ Identifier.propTypes = {
   variables: PropTypes.array,
 }
 
-Identifier.defaultProps = {
-  variables: null,
-}
-
 export default Identifier

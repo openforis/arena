@@ -10,7 +10,7 @@ import { useDateTimeInput } from './useDateTimeInput'
 const valueFormat = DateUtils.formats.timeStorage
 
 const TimeInput = (props) => {
-  const { disabled, onChange, value } = props
+  const { disabled = false, onChange, value } = props
 
   const { dateValue, onInputChange, errorRef } = useDateTimeInput({ onChange, value, valueFormat })
 
@@ -29,10 +29,6 @@ TimeInput.propTypes = {
   disabled: PropTypes.bool,
   value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-}
-
-TimeInput.defaultProps = {
-  disabled: false,
 }
 
 export default TimeInput

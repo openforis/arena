@@ -4,7 +4,7 @@ import { FormControlLabel, Radio, RadioGroup } from '@mui/material'
 import { useI18n } from '@webapp/store/system'
 
 export const RadioButtonGroup = (props) => {
-  const { items, onChange: onChangeProp, row, value } = props
+  const { items, onChange: onChangeProp, row = false, value } = props
 
   const i18n = useI18n()
 
@@ -32,8 +32,4 @@ RadioButtonGroup.propTypes = {
   onChange: PropTypes.func.isRequired,
   row: PropTypes.bool,
   value: PropTypes.string,
-}
-
-RadioButtonGroup.defaultProps = {
-  row: false,
 }

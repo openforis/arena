@@ -54,23 +54,18 @@ const getValidationsSummary = ({ nodeDef }) => {
 
 export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
-    (nodeDef) =>
-      // exclude "weight" node def created by the processing chain
-      !(NodeDef.isAnalysis(nodeDef) && SamplingNodeDefs.isWeightNodeDef(nodeDef))
-  )
-  const pathByNodeDefUuid = nodeDefs.reduce(
-    (paths, nodeDef) => ({ ...paths, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
-    {}
-  )
-  // sort node defs by path
-  nodeDefs.sort((nodeDef1, nodeDef2) => {
-    const path1 = pathByNodeDefUuid[nodeDef1.uuid]
-    const path2 = pathByNodeDefUuid[nodeDef2.uuid]
-    if (path1 > path2) return 1
-    if (path2 > path1) return -1
-    return 0
-  })
+  const nodeDefs = []
+  Survey.visitDescendantsAndSelf({
+    cycle,
+    visitorFn: (nodeDef) => {
+      if (
+        // exclude "weight" node def created by the processing chain
+        !(NodeDef.isAnalysis(nodeDef) && SamplingNodeDefs.isWeightNodeDef(nodeDef))
+      ) {
+        nodeDefs.push(nodeDef)
+      }
+    },
+  })(survey)
 
   const getCategoryName = (nodeDef) => {
     if (!NodeDef.isCode(nodeDef)) return ''
@@ -114,7 +109,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     return {
       uuid,
       name: NodeDef.getName(nodeDef),
-      path: pathByNodeDefUuid[uuid],
+      path: getNodeDefPath({ survey, nodeDef }),
       parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
       // labels
       ...languages.reduce(

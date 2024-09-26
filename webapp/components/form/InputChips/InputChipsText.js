@@ -15,19 +15,19 @@ import Chip from '../chip'
 const InputChipsText = (props) => {
   const {
     className,
+    disabled = false,
     idInput,
-    selection,
-    requiredItems,
-    minCharactersToAutocomplete,
-    readOnly,
-    disabled,
-    validation,
+    isInputFieldValueValid = () => true,
+    minCharactersToAutocomplete = 0,
+    onChange = null, // Callback to receive all selection change
+    onItemAdd = null, // Callback to receive added item
+    onItemRemove = null, // Callback to receive removed item
     placeholder,
+    readOnly = false,
+    requiredItems = 0,
+    selection = [],
     textTransformFunction,
-    isInputFieldValueValid,
-    onChange,
-    onItemAdd,
-    onItemRemove,
+    validation = {},
   } = props
 
   const { state, Actions } = useLocalState({
@@ -93,24 +93,6 @@ InputChipsText.propTypes = {
   onChange: PropTypes.func,
   onItemAdd: PropTypes.func,
   onItemRemove: PropTypes.func,
-}
-
-InputChipsText.defaultProps = {
-  className: undefined,
-  idInput: null,
-
-  selection: [],
-  requiredItems: 0,
-  minCharactersToAutocomplete: 0,
-  readOnly: false,
-  disabled: false,
-  validation: {},
-  placeholder: undefined,
-  isInputFieldValueValid: () => true,
-
-  onChange: null, // Callback to receive all selection change
-  onItemAdd: null, // Callback to receive added item
-  onItemRemove: null, // Callback to receive removed item
 }
 
 export default InputChipsText

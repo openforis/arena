@@ -7,7 +7,7 @@ import { gotoFormDesigner } from './_navigation'
 import { cluster } from '../mock/nodeDefs'
 import { parseCsvAsync } from '../../utils/csvUtils'
 
-const getTestNodeDefsOrderedByPath = () => {
+const getTestNodeDefs = () => {
   const items = []
 
   const stack = [{ parentPath: null, nodeDef: cluster }]
@@ -27,14 +27,7 @@ const getTestNodeDefsOrderedByPath = () => {
       )
     }
   }
-  // sort items by path
-  return items.sort((item1, item2) => {
-    const path1 = item1.path
-    const path2 = item2.path
-    if (path1 > path2) return 1
-    if (path2 > path1) return -1
-    return 0
-  })
+  return items
 }
 
 export default () =>
@@ -58,21 +51,21 @@ export default () =>
       await expect(fs.existsSync(filePath)).toBeTruthy()
     })
 
-    const nodeDefsOrderedByPath = getTestNodeDefsOrderedByPath()
+    const nodeDefs = getTestNodeDefs()
 
     test(`Check generated schema summary`, async () => {
       await expect(fs.existsSync(filePath)).toBeTruthy()
 
       data = await parseCsvAsync(filePath)
 
-      await expect(data.length).toBe(nodeDefsOrderedByPath.length)
+      await expect(data.length).toBe(nodeDefs.length)
     })
 
-    nodeDefsOrderedByPath.forEach((nodeDefItem, index) => {
+    nodeDefs.forEach((nodeDefItem) => {
       const { nodeDef, path: nodeDefPath } = nodeDefItem
       test(`Check ${nodeDef.name} def`, async () => {
         await expect(data).toBeDefined()
-        const nodeDefData = data[index]
+        const nodeDefData = data.find((dataItem) => dataItem.name === nodeDef.name)
         await expect(Object.keys(nodeDefData)).toEqual([
           'uuid',
           'name',

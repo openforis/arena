@@ -148,7 +148,6 @@ const FormHeader = (props) => {
           }}
           size="small"
         />
-        <div> | </div>
       </div>
       {analysis && <FormEntryActions analysis={analysis} />}
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}

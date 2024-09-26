@@ -22,8 +22,4 @@ Call.propTypes = {
   variables: PropTypes.array,
 }
 
-Call.defaultProps = {
-  variables: null,
-}
-
 export default Call

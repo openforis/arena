@@ -14,7 +14,11 @@ export const Button = forwardRef((props, ref) => {
     className,
     color,
     disabled = false,
+    iconAlt,
     iconClassName,
+    iconHeight,
+    iconSrc,
+    iconWidth,
     id,
     isTitleMarkdown = false,
     label: labelProp,
@@ -59,8 +63,11 @@ export const Button = forwardRef((props, ref) => {
       variant={variant}
       {...otherProps}
     >
-      {showIcon && iconClassName && (
-        <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />
+      {showIcon && (
+        <>
+          {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
+          {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
+        </>
       )}
       {label}
       {children}
@@ -83,7 +90,11 @@ Button.propTypes = {
   color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
+  iconAlt: PropTypes.string,
   iconClassName: PropTypes.string,
+  iconHeight: PropTypes.number,
+  iconSrc: PropTypes.string,
+  iconWidth: PropTypes.number,
   isTitleMarkdown: PropTypes.bool,
   label: PropTypes.string,
   labelParams: PropTypes.object,
@@ -97,12 +108,4 @@ Button.propTypes = {
   title: PropTypes.string,
   titleParams: PropTypes.object,
   variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
-}
-
-Button.defaultProps = {
-  disabled: false,
-  isTitleMarkdown: false,
-  showLabel: true,
-  size: 'medium',
-  variant: 'contained',
 }

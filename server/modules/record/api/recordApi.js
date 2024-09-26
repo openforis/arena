@@ -21,6 +21,8 @@ import {
   requireRecordEditPermission,
   requireRecordListExportPermission,
   requireRecordListViewPermission,
+  requireRecordOwnerChangePermission,
+  requireRecordStepEditPermission,
   requireRecordViewPermission,
   requireRecordsEditPermission,
   requireRecordsExportPermission,
@@ -292,7 +294,7 @@ export const init = (app) => {
   // ==== UPDATE
 
   // RECORD promote / demote
-  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordStepEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, step } = Request.getParams(req)
       const user = Request.getUser(req)
@@ -348,7 +350,7 @@ export const init = (app) => {
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordEditPermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordOwnerChangePermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, ownerUuid } = Request.getParams(req)
       const user = Request.getUser(req)
@@ -356,6 +358,24 @@ export const init = (app) => {
       await RecordService.updateRecordOwner({ user, surveyId, recordUuid, ownerUuid })
 
       sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/records/merge', requireRecordViewPermission, async (req, res, next) => {
+    try {
+      const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const { record, nodesCreated, nodesUpdated } = await RecordService.mergeRecords({
+        user,
+        surveyId,
+        sourceRecordUuid,
+        targetRecordUuid,
+        dryRun,
+      })
+      res.json({ record, nodesCreated, nodesUpdated })
     } catch (error) {
       next(error)
     }

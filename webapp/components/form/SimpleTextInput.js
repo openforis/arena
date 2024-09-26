@@ -7,7 +7,7 @@ import { useI18n } from '@webapp/store/system'
 
 export const SimpleTextInput = forwardRef((props, ref) => {
   const {
-    autoComplete,
+    autoComplete = 'off',
     className,
     defaultValue,
     disabled,
@@ -99,11 +99,7 @@ SimpleTextInput.propTypes = {
   startAdornment: PropTypes.any,
   testId: PropTypes.string,
   textTransformFunction: PropTypes.func,
-  title: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   type: PropTypes.string,
-  value: PropTypes.string,
-}
-
-SimpleTextInput.defaultProps = {
-  autoComplete: 'off',
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }

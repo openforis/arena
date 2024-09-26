@@ -6,8 +6,9 @@ import PropTypes from 'prop-types'
 import circleToPolygon from 'circle-to-polygon'
 import L from 'leaflet'
 
-import { Objects, PointFactory } from '@openforis/arena-core'
+import { Objects, PointFactory, DEFAULT_SRS } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
@@ -22,6 +23,9 @@ import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import { useAltitude } from '../common/useAltitude'
+import { WhispMenuButton } from './WhispMenuButton'
+
+const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -46,6 +50,20 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   })(survey)
 
   return pathParts.join(' -> ')
+}
+
+const generateContent = ({ i18n, recordOwnerName, point, path, altitude }) => {
+  const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
+  const xFormatted = NumberUtils.roundToPrecision(point.x, coordinateNumericFieldPrecision)
+  const yFormatted = NumberUtils.roundToPrecision(point.y, coordinateNumericFieldPrecision)
+
+  const content = `**${path}**
+* **X**: ${xFormatted}
+* **Y**: ${yFormatted}
+* **SRS**: ${point.srs}
+* **${i18n.t('mapView.altitude')}**: ${altitude}
+* **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
+  return content
 }
 
 export const CoordinateAttributePopUp = (props) => {
@@ -87,33 +105,39 @@ export const CoordinateAttributePopUp = (props) => {
     () => buildPath({ survey, attributeDef, ancestorsKeys, lang }),
     [ancestorsKeys, attributeDef, lang, survey]
   )
-  const onEarthMapButtonClick = useCallback(() => {
-    let geojson
+
+  const generateGeoJson = useCallback(() => {
     if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
       const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
       if (isCircle) {
         const radius = SamplingPolygon.getRadius(surveyInfo)
-        geojson = circleToPolygon([longitude, latitude], radius)
+        return circleToPolygon([longitude, latitude], radius)
       } else {
         const bounds = SamplingPolygon.getBounds(surveyInfo, latitude, longitude)
-        geojson = L.rectangle(bounds).toGeoJSON()
+        return L.rectangle(bounds).toGeoJSON()
       }
     } else {
       // default 100mx100m square
       const bounds = SamplingPolygon.generateBounds({ latitude, longitude })
-      geojson = L.rectangle(bounds).toGeoJSON()
+      return L.rectangle(bounds).toGeoJSON()
     }
-    Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
-    const earthMapUrl = 'https://earthmap.org/?aoi=global&polygon=' + JSON.stringify(geojson)
-    window.open(earthMapUrl, 'EarthMap')
-  }, [latitude, longitude, path, surveyInfo])
+  }, [latitude, longitude, surveyInfo])
 
-  const content = `**${path}**
-* **X**: ${point.x}
-* **Y**: ${point.y}
-* **SRS**: ${point.srs}
-* **${i18n.t('mapView.altitude')}**: ${altitude}
-* **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
+  const generateGeoJsonWithName = useCallback(() => {
+    const geojson = generateGeoJson()
+    return Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
+  }, [generateGeoJson, path])
+
+  const onEarthMapButtonClick = useCallback(() => {
+    const geojson = generateGeoJsonWithName()
+    const url = getEarthMapUrl(geojson)
+    window.open(url, 'EarthMap')
+  }, [generateGeoJsonWithName])
+
+  const content = useMemo(
+    () => generateContent({ i18n, recordOwnerName, point, path, altitude }),
+    [altitude, i18n, path, point, recordOwnerName]
+  )
 
   return (
     <Popup
@@ -140,10 +164,16 @@ export const CoordinateAttributePopUp = (props) => {
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
           <div role="row">
-            <Button className="earth-map-btn" size="small" onClick={onEarthMapButtonClick} variant="outlined">
-              <img src="/img/of_earth_map_icon_small.png" alt="Earth Map" />
-              {i18n.t('mapView.openInEarthMap')}
-            </Button>
+            <Button
+              className="earth-map-btn"
+              iconAlt="Earth Map"
+              iconSrc="/img/of_earth_map_icon_small.png"
+              label="mapView.earthMap"
+              size="small"
+              onClick={onEarthMapButtonClick}
+              variant="outlined"
+            />
+            <WhispMenuButton geoJsonGenerator={generateGeoJsonWithName} />
           </div>
         </div>
       </div>

@@ -82,6 +82,7 @@ const _getSurveysSelectQuery = ({
   sortBy = Survey.sortableKeys.dateModified,
   sortOrder = 'DESC',
   includeOwnerEmailAddress = false,
+  onlyOwn = false,
 }) => {
   const checkAccess = (!template || draft) && !User.isSystemAdmin(user)
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -152,6 +153,7 @@ const _getSurveysSelectQuery = ({
       -- if draft is false, fetch only published surveys
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
       ${_getSelectWhereCondition({ draft, search })}
+      ${onlyOwn ? ' AND s.owner_uuid = $/userUuid/' : ''}
     ORDER BY ${sortByField} ${sortOrder}
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
@@ -170,6 +172,7 @@ export const fetchUserSurveys = async (
     sortBy = Survey.sortableKeys.dateModified,
     sortOrder = 'DESC',
     includeOwnerEmailAddress = false,
+    onlyOwn = false,
   },
   client = db
 ) => {
@@ -187,6 +190,7 @@ export const fetchUserSurveys = async (
       sortBy,
       sortOrder,
       includeOwnerEmailAddress,
+      onlyOwn,
     }),
     { userUuid: User.getUuid(user), template, search },
     (def) => DB.transformCallback(def, true)
@@ -194,7 +198,7 @@ export const fetchUserSurveys = async (
 }
 
 export const countUserSurveys = async (
-  { user, draft = false, template = false, search: searchParam = null, lang = null },
+  { user, draft = false, template = false, search: searchParam = null, lang = null, onlyOwn = false },
   client = db
 ) => {
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
@@ -202,7 +206,7 @@ export const countUserSurveys = async (
   return client.one(
     `
     SELECT COUNT(*)
-    FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search })}) AS s`,
+    FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search, onlyOwn })}) AS s`,
     { search, template, userUuid: User.getUuid(user) },
     (row) => Number(row.count)
   )

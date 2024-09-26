@@ -12,11 +12,11 @@ const NodeDefTreeSelect = (props) => {
   const {
     getLabelSuffix = () => '',
     isDisabled = () => false,
-    nodeDefLabelType = null,
-    nodeDefUuidActive = null,
     includeMultipleAttributes = false,
     includeSingleAttributes = false,
     includeSingleEntities = false,
+    nodeDefLabelType = null,
+    nodeDefUuidActive = null,
     onlyPages = false,
     onSelect,
   } = props
@@ -41,21 +41,25 @@ const NodeDefTreeSelect = (props) => {
     onSelect,
   })
 
+  const collapseButtonVisible = treeItems?.length >= 1 && treeItems[0].items?.length > 0
+
   return (
     <div className="nodedef-tree-select">
-      <div className="display-flex">
-        <Button
-          className="btn-toggle btn-expand"
-          iconClassName={classNames('icon icon-12px', {
-            'icon-shrink2': expanded,
-            'icon-enlarge2': !expanded,
-          })}
-          onClick={toggleExpanded}
-          size="small"
-          title={expanded ? 'common.collapse' : 'common.expand'}
-          variant="text"
-        />
-      </div>
+      {collapseButtonVisible && (
+        <div className="display-flex">
+          <Button
+            className="btn-toggle btn-expand"
+            iconClassName={classNames('icon icon-12px', {
+              'icon-shrink2': expanded,
+              'icon-enlarge2': !expanded,
+            })}
+            onClick={toggleExpanded}
+            size="small"
+            title={expanded ? 'common.collapse' : 'common.expand'}
+            variant="text"
+          />
+        </div>
+      )}
 
       <TreeView
         expadedItemKeys={expandedNodeDefUuids}

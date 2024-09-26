@@ -52,6 +52,7 @@ export const propKeys = {
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
   key: 'key',
+  autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
   name: ObjectUtils.keys.name,
@@ -88,6 +89,18 @@ export const propKeys = {
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
 }
+
+const commonAttributePropsKeys = [
+  propKeys.cycles,
+  propKeys.descriptions,
+  propKeys.hidden,
+  propKeys.key,
+  propKeys.labels,
+  propKeys.layout,
+  propKeys.multiple,
+  propKeys.name,
+  propKeys.readOnly,
+]
 
 export const textInputTypes = {
   singleLine: 'singleLine',
@@ -143,6 +156,15 @@ export const keysPropsAdvanced = {
   itemsFilter: 'itemsFilter',
 }
 
+const commonAttributePropsAdvancedKeys = [
+  keysPropsAdvanced.applicable,
+  keysPropsAdvanced.defaultValues,
+  keysPropsAdvanced.defaultValueEvaluatedOneTime,
+  keysPropsAdvanced.excludedInClone,
+  keysPropsAdvanced.validations,
+  keysPropsAdvanced.formula,
+]
+
 export const metaKeys = {
   h: 'h',
 }
@@ -152,6 +174,17 @@ const MAX_FILE_SIZE_DEFAULT = 10
 
 export const visibleFieldsDefaultByType = {
   [nodeDefType.taxon]: [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName],
+}
+
+export const createAutoIncrementalKeyDefaultValues = ({ nodeDef, nodeDefParent }) => {
+  const nodeDefName = getName(nodeDef)
+  const nodeDefParentName = getName(nodeDefParent)
+  return [
+    NodeDefExpression.createExpression({ expression: '1', applyIf: 'index($context) == 0' }),
+    NodeDefExpression.createExpression({
+      expression: `Math.max(parent($context).${nodeDefParentName}.${nodeDefName}) + 1`,
+    }),
+  ]
 }
 
 // ==== READ
@@ -176,6 +209,7 @@ export const getName = getProp(propKeys.name, '')
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
+export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
 export const isSingle = R.pipe(isMultiple, R.not)
@@ -432,6 +466,10 @@ export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
   R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
     assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
+export const assocDefaultValues = (defaultValues) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValues]: defaultValues })
+export const assocDefaultValueEvaluatedOnlyOneTime = (evaluatedOnlyOneTime) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValueEvaluatedOneTime]: evaluatedOnlyOneTime })
 export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
 export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
@@ -471,6 +509,31 @@ export const changeParentEntity =
         [metaKeys.h]: [...getMetaHierarchy(targetParentNodeDef), targetParentNodeDefUuid],
       },
     }
+  }
+
+export const convertToType =
+  ({ toType }) =>
+  (nodeDef) => {
+    const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
+    const propsAdvancedToKeep = isAutoIncrementalKey(nodeDef)
+      ? commonAttributePropsAdvancedKeys.filter((prop) => prop !== keysPropsAdvanced.defaultValues)
+      : commonAttributePropsAdvancedKeys
+    const propsAdvancedUpdated = R.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
+
+    const layout = getLayout(nodeDef)
+    const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
+      acc[cycleKey] = R.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
+      return acc
+    }, {})
+    propsUpdated[propKeys.layout] = layoutUpdated
+
+    const nodeDefUpdated = {
+      ...nodeDef,
+      [keys.type]: toType,
+      [keys.props]: propsUpdated,
+      [keys.propsAdvanced]: propsAdvancedUpdated,
+    }
+    return nodeDefUpdated
   }
 
 // layout
@@ -610,3 +673,18 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
 
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
   canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
+  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
+
+  const defaultValues = getDefaultValues(nodeDef)
+  if (defaultValues.length === 0) return true
+
+  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
+  return (
+    defaultValues.length === autoIncrementalDefaultValues.length &&
+    autoIncrementalDefaultValues.every((defaultValue, index) =>
+      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
+    )
+  )
+}

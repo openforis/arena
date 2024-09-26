@@ -13,10 +13,11 @@ import { RecordCycle } from '@core/record/recordCycle'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
+import { contentTypes } from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-import { contentTypes } from '@webapp/service/api'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -27,13 +28,12 @@ import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/compone
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
-import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 const fileMaxSizeDefault = 1000 // 1GB
 const fileMaxSizeSystemAdmin = 2000 // 2GB
 
 const SurveyCreate = (props) => {
-  const { showImport, submitButtonLabel, template } = props
+  const { showImport = true, submitButtonLabel = 'homeView.surveyCreate.createSurvey', template = false } = props
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
@@ -170,7 +170,7 @@ const SurveyCreate = (props) => {
         <>
           {uploading && uploadProgressPercent >= 0 ? (
             <div className="row">
-              <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
+              <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey="common.uploadingFile" />
             </div>
           ) : (
             <>
@@ -231,12 +231,6 @@ SurveyCreate.propTypes = {
   showImport: PropTypes.bool,
   submitButtonLabel: PropTypes.string,
   template: PropTypes.bool,
-}
-
-SurveyCreate.defaultProps = {
-  showImport: true,
-  submitButtonLabel: 'homeView.surveyCreate.createSurvey',
-  template: false,
 }
 
 export { SurveyCreate }

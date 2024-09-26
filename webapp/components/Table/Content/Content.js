@@ -29,26 +29,26 @@ const Content = (props) => {
   const {
     cellProps,
     columns,
-    expandableRows,
+    expandableRows = false,
     gridTemplateColumns: gridTemplateColumnsParam,
-    keyExtractor,
     handleSortBy,
+    keyExtractor,
     list,
-    loading,
+    loading = false,
     maxRows,
     module,
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
-    onRowClick,
-    onRowDoubleClick,
-    totalCount,
-    rowHeaderComponent: rowHeaderComponentParam,
+    onRowClick = null,
+    onRowDoubleClick = null,
+    rowExpandedComponent = null,
     rowComponent: rowComponentParam,
-    rowExpandedComponent,
-    rowProps,
-    selectedItems,
+    rowHeaderComponent: rowHeaderComponentParam,
+    rowProps = {},
+    selectedItems = [],
     sort,
+    totalCount = undefined,
   } = props
 
   const i18n = useI18n()
@@ -148,20 +148,6 @@ Content.propTypes = {
   selectedItems: PropTypes.array,
   sort: PropTypes.object.isRequired,
   totalCount: PropTypes.number,
-}
-
-Content.defaultProps = {
-  columns: null,
-  expandableRows: false,
-  isRowActive: null,
-  onRowClick: null,
-  onRowDoubleClick: null,
-  initData: null,
-  loading: false,
-  rowExpandedComponent: null,
-  rowProps: {},
-  selectedItems: [],
-  totalCount: undefined,
 }
 
 export default Content

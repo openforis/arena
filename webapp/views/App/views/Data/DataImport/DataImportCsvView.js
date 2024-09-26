@@ -221,7 +221,7 @@ export const DataImportCsvView = () => {
           {!Objects.isEmpty(cycle) && (
             <ButtonDownload
               className="download-templates-btn"
-              href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle })}
+              href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle, includeFiles })}
               label="dataImportView.downloadAllTemplates"
             />
           )}
@@ -229,7 +229,12 @@ export const DataImportCsvView = () => {
             <>
               <ButtonDownload
                 className="download-template-btn"
-                href={API.getDataImportFromCsvTemplateUrl({ surveyId, cycle, nodeDefUuid: selectedNodeDefUuid })}
+                href={API.getDataImportFromCsvTemplateUrl({
+                  surveyId,
+                  cycle,
+                  nodeDefUuid: selectedNodeDefUuid,
+                  includeFiles,
+                })}
                 label="dataImportView.downloadTemplate"
                 disabled={!selectedNodeDefUuid}
               />

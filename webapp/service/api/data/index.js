@@ -86,13 +86,13 @@ export const startDataImportFromArenaJob = async ({
   return job
 }
 
-export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle }) => {
-  const params = new URLSearchParams({ nodeDefUuid, cycle })
+export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle, includeFiles }) => {
+  const params = new URLSearchParams({ nodeDefUuid, cycle, includeFiles })
   return `/api/survey/${surveyId}/data-import/csv/template?${params.toString()}`
 }
 
-export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle }) => {
-  const params = new URLSearchParams({ cycle })
+export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle, includeFiles }) => {
+  const params = new URLSearchParams({ cycle, includeFiles })
   return `/api/survey/${surveyId}/data-import/csv/templates?${params.toString()}`
 }
 
@@ -149,4 +149,13 @@ export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recor
     data: { job },
   } = await axios.post(`/api/survey/${surveyId}/records/clone`, { surveyId, cycleFrom, cycleTo, recordsUuids })
   return job
+}
+
+// ==== RECORDS MERGE
+export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUuid, preview = false }) => {
+  const uri = `/api/survey/${surveyId}/records/merge`
+  const {
+    data: { record, nodesCreated, nodesUpdated },
+  } = await axios.post(uri, { dryRun: preview, surveyId, sourceRecordUuid, targetRecordUuid })
+  return { record, nodesCreated, nodesUpdated }
 }

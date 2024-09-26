@@ -30,10 +30,16 @@ export default {
   invalidSyntax: 'Expression syntax is invalid',
   networkError: 'Error communicating with the server',
   record: {
+    errorUpdating: 'Error updating record',
     entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
+    updateSelfAndDependentsDefaultValues:
+      '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
   },
   sessionExpiredRefreshPage: `Session could have expired.
 Try to refresh the page.`,
+  survey: {
+    nodeDefNameNotFound: 'Node definition not found: {{name}}',
+  },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
   userHasRole: 'The given user has already a role in this survey',

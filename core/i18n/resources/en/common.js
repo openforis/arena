@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import * as ActivityLog from '@common/activityLog/activityLog'
 
 export default {
   common: {
@@ -34,6 +33,7 @@ Do you want to ignore them?`,
     cnt: 'Count',
     code: 'Code',
     collapse: 'Collapse',
+    convert: 'Convert',
     copy: 'Copy',
     createdWithApp: `Created with {{app}}`,
     csvExport: 'CSV Export',
@@ -102,6 +102,7 @@ Please check also the Spam/Junk mail folder.`,
 By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
+    loading: 'Loading...',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -173,6 +174,7 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
+    uploadingFile: 'Uploading file ({{progressPercent}}%)',
     view: 'View',
     warning: 'Warning',
     warning_plural: 'Warnings',
@@ -208,6 +210,7 @@ Do you want to proceed?`,
   dropzone: {
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
     error: {
+      fileNotValid: 'Selected file is not valid',
       fileTooBig: 'Selected file is too big',
       invalidFileExtension: 'Invalid file extension: {{extension}}',
     },
@@ -432,6 +435,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
       cycleForArenaMobile: 'Cycle for Arena Mobile',
+      fieldManualLink: 'Field manual link',
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
@@ -506,64 +510,6 @@ $t(common.cantUndoWarning)`,
     },
   },
 
-  activityLogView: {
-    messages: {
-      // Survey
-      [ActivityLog.type.surveyCreate]: 'created the survey',
-      [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
-      [ActivityLog.type.surveyPublish]: 'published the survey',
-      [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
-
-      // NodeDef
-      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
-      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
-      [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
-
-      // Category
-      [ActivityLog.type.categoryInsert]: 'added category',
-      [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
-      [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
-      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemInsert]: 'added item to level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemDelete]:
-        'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
-
-      // Taxonomy
-      [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
-      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{key}} of taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
-
-      // Record
-      [ActivityLog.type.recordCreate]: 'added record',
-      [ActivityLog.type.recordDelete]: 'deleted record {{keys}}',
-      [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
-
-      // Node
-      [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
-      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} of record {{recordKeys}}',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} from record {{recordKeys}}',
-
-      // User
-      [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
-      [ActivityLog.type.userUpdate]: 'updated user {{name}}',
-      [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
-
-      // Analysis
-      [ActivityLog.type.chainCreate]: 'added processing chain',
-      [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
-      [ActivityLog.type.analysisNodeDefPropUpdate]:
-        'updated {{key}} to {{value}} of calculated node definition {{name}}',
-      [ActivityLog.type.chainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
-      [ActivityLog.type.chainDelete]: 'deleted processing chain {{label}}',
-    },
-  },
-
   designerView: {
     formPreview: 'Form preview',
   },
@@ -574,6 +520,8 @@ $t(common.cantUndoWarning)`,
     errorLoadingRecord: 'Error loading record: {{details}}',
     recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
+    lock: 'Lock',
+    unlock: 'Unlock',
   },
 
   dataExplorerView: {
@@ -669,6 +617,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
         - {{processed}} rows processed`,
+        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
         validationCompleteSuccessfully: `## Validation complete without errors
         - {{processed}} rows processed
         - {{updatedValues}} values would be updated
@@ -757,6 +706,15 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       confirmDeleteRecord: `Delete the record "{{keyValues}}"?`,
       confirmDeleteSelectedRecord_one: `Delete the selected record?`,
       confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
+      confirmMergeSelectedRecords: `### Merge the selected records into one?
+
+- record "source" will be merged into record "target":
+  - source: [{{sourceRecordKeys}}], modified {{sourceRecordModifiedDate}};
+  - target: [{{targetRecordKeys}}], modified {{targetRecordModifiedDate}};
+
+- a preview of the result will be shown before merging is performed;
+
+- when merging will be confirmed, **the source record WILL BE DELETED**`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
       deleteRecord: 'Delete record',
@@ -766,15 +724,27 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       exportList: 'Export list',
       exportData: 'Export data',
       filterPlaceholder: 'Filter by keys or owner',
-      viewRecord: 'View record',
-      owner: 'Owner',
-      step: 'Step',
+      merge: {
+        label: 'Merge',
+        confirmLabel: 'Confirm merge',
+        confirmTooManyDifferencesMessage: `**Too many differences**.  
+It seems like the records are very different each other.  
+Many attributes (~{{nodesUpdated}}) will be updated during merge.  
+Continue with merge preview?`,
+        noChangesWillBeApplied: `No changes would be applied to target record.  
+Merge cannot be performed.`,
+        performedSuccessfullyMessage: 'Records merge performed successfully!',
+        previewTitle: 'Merging preview (record {{keyValues}})',
+      },
       noRecordsAdded: 'No records added',
       noRecordsAddedForThisSearch: 'No records found',
       noSelectedRecordsInStep: 'No selected records in step {{step}}',
+      owner: 'Owner',
       promoteAllRecordsToAnalysis: 'Cleansing -> Analysis',
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
+      step: 'Step',
       updateRecordsStep: 'Update records step',
+      viewRecord: 'View record',
     },
     recordsClone: {
       title: 'Records clone',
@@ -823,15 +793,16 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       noSelection:
         'Please make your selection using the left side panel or select an existing query from "Manage queries"',
     },
+    viewSelectedRecord: 'View selected record',
   },
 
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
     altitude: 'Altitude (m)',
+    earthMap: 'Earth Map',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
-    openInEarthMap: 'Open in Earth Map',
     options: {
       showLocationMarkers: 'Show location markers',
       showMarkersLabels: `Show markers' labels`,
@@ -847,6 +818,9 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
+    whisp: 'Whisp',
+    whispEarthMap: 'Whisp Earth Map',
+    whispCsv: 'Whisp CSV',
   },
 
   samplingPolygonOptions: {
@@ -886,6 +860,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     languages: 'Languages',
     nodes: 'Nodes',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',
+    onlyOwn: 'Only own surveys',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
   },
@@ -1239,6 +1214,10 @@ $t(common.appNameFull)
     },
     basicProps: {
       analysis: 'Analysis',
+      autoIncrementalKey: {
+        label: 'Auto incremental',
+        info: 'Value will be automatically generated',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
@@ -1252,7 +1231,7 @@ $t(common.appNameFull)
       },
       form: 'Form',
       formula: 'Formula',
-      includedInClone: 'Included in clone',
+      includedInClonedData: 'Included in cloned data',
       key: 'Key',
       multiple: 'Multiple',
       ownPage: 'Its own page',
@@ -1263,6 +1242,7 @@ $t(common.appNameFull)
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
@@ -1347,6 +1327,11 @@ E.g. this.region = region_attribute_name
       title: 'Cloning node definition "{{nodeDefName}}"',
       entitySelectLabel: 'Entity to clone into:',
     },
+    conversion: {
+      dialogTitle: 'Convert {{nodeDefName}} into another type',
+      fromType: 'From type',
+      toType: 'To type',
+    },
     moveDialog: {
       confirmButtonLabel: 'Move',
       title: 'Moving node definition "{{nodeDefName}}"',
@@ -1379,6 +1364,7 @@ E.g. this.region = region_attribute_name
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+    convert: `Convert '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
     schemaSummary: 'Schema summary',
@@ -1405,6 +1391,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
+      confirmConvert: 'Convert the attribute "{{name}}" into "{{toType}}"?',
       confirmDelete:
         'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },
@@ -1642,7 +1629,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
-      recordKeyMissing: 'Missing value for key attribute "{{keyName}}"',
+      recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 
@@ -1688,7 +1675,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     record: {
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
-      entityKeyValueNotSpecified: 'Entity key value for entity "{{entityName}}" not specified',
+      entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
       missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
       oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
@@ -1712,6 +1699,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       cycleDateStartMandatory: 'Cycle start date is mandatory',
       cycleDateEndInvalid: 'Cycle end date is invalid',
       cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
+      fieldManualLinksInvalid: 'Field manual link is invalid',
     },
 
     surveyLabelsImport: {

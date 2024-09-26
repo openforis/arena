@@ -9,18 +9,23 @@ import * as Survey from '@core/survey/survey'
 import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useSurveyInfo, useSurveyCycleKey } from '@webapp/store/survey'
 import { useAuthCanEditRecord } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import { useOnUpdate, useQuery, useOnWebSocketEvent } from '@webapp/components/hooks'
 
 export const useLocalState = (props) => {
   const {
+    editableProp,
+    recordProp,
     recordUuid: recordUuidProp,
     pageNodeUuid: pageNodeUuidProp,
     pageNodeDefUuid: pageNodeDefUuidProp,
     noHeader: noHeaderProp = false,
+    locked: lockedProp = false,
   } = props
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const i18n = useI18n()
 
   const { recordUuid: recordUuidUrlParam } = useParams()
 
@@ -28,6 +33,7 @@ export const useLocalState = (props) => {
     pageNodeUuid: pageNodeUuidUrlParam,
     pageNodeDefUuid: pageNodeDefUuidUrlParam,
     noHeader: noHeaderUrlParam,
+    locked: lockedUrlParam,
   } = useQuery()
 
   const recordUuidPreview = useSelector(RecordState.getRecordUuidPreview)
@@ -42,8 +48,9 @@ export const useLocalState = (props) => {
   const surveyCycleKey = useSurveyCycleKey()
 
   const record = useSelector(RecordState.getRecord)
+  const recordEditLocked = useSelector(RecordState.isRecordEditLocked)
   const recordLoadError = useSelector(RecordState.getRecordLoadError)
-  const editable = useAuthCanEditRecord(record)
+  const editable = useAuthCanEditRecord(record) && editableProp && !recordEditLocked
 
   // Add websocket event listeners
   useOnWebSocketEvent({
@@ -68,7 +75,12 @@ export const useLocalState = (props) => {
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.applicationError,
-    eventHandler: useCallback(({ key, params }) => dispatch(RecordActions.applicationError(navigate, key, params)), []),
+    eventHandler: useCallback(
+      ({ key, params }) => {
+        dispatch(RecordActions.applicationError({ i18n, navigate, key, params }))
+      },
+      [dispatch, i18n, navigate]
+    ),
   })
 
   const onComponentUnload = () => {
@@ -79,12 +91,22 @@ export const useLocalState = (props) => {
   }
 
   const onComponentLoad = () => {
-    // Check in record
-    // when previewing a survey or when the survey has been imported from Collect and not published,
-    // record must be checked in as draft
-    const draft = preview || !Survey.isPublished(surveyInfo)
-    dispatch(RecordActions.checkInRecord({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }))
-
+    if (!recordProp) {
+      // Check in record
+      // when previewing a survey or when the survey has been imported from Collect and not published,
+      // record must be checked in as draft
+      const draft = preview || !Survey.isPublished(surveyInfo)
+      dispatch(
+        RecordActions.checkInRecord({
+          recordUuid,
+          draft,
+          pageNodeUuid,
+          pageNodeDefUuid,
+          noHeader,
+          locked: lockedUrlParam || lockedProp,
+        })
+      )
+    }
     // Add beforeunload event listener
     window.addEventListener('beforeunload', onComponentUnload)
   }

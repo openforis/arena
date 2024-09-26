@@ -107,6 +107,7 @@ export const {
   getDefaultLabel,
   getDescription,
   getDescriptions,
+  getFieldManualLinks,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
   getSRS,

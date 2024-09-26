@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -73,14 +74,28 @@ const _generateLabelFromName = (name) => {
   return parts.join(' ')
 }
 
-const _onUpdateName = ({ nodeDef, nodeDefPrev, value: name, lang }) => {
+const _onUpdateName = ({ survey, nodeDef, nodeDefPrev, value: name, lang }) => {
+  let nodeDefUpdated = nodeDef
   const prevNameCapitalized = _generateLabelFromName(NodeDef.getName(nodeDefPrev))
   const prevLabel = NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false)
   if (StringUtils.isBlank(prevLabel) || prevNameCapitalized === prevLabel) {
     const nameCapitalized = _generateLabelFromName(name)
-    return NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDef)
+    nodeDefUpdated = NodeDef.assocLabel({ label: nameCapitalized, lang })(nodeDefUpdated)
   }
-  return nodeDef
+  if (NodeDef.isAutoIncrementalKey(nodeDefUpdated)) {
+    // re-generate default values; they depend on current node def name
+    nodeDefUpdated = _onUpdateAutoIncrementalKey({ survey, nodeDef, value: true })
+  }
+  return nodeDefUpdated
+}
+
+const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const defaultValues = value ? NodeDef.createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent }) : []
+  return A.pipe(
+    NodeDef.assocDefaultValues(defaultValues),
+    NodeDef.assocDefaultValueEvaluatedOnlyOneTime(value)
+  )(nodeDef)
 }
 
 const updateFunctionByProp = {
@@ -88,6 +103,7 @@ const updateFunctionByProp = {
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
   [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.readOnly]: _onUpdateReadOnly,
+  [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,
 }
 
 export const useSetProp = ({ setState }) => {

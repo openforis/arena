@@ -16,7 +16,7 @@ import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyN
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 const SurveyDefsLoader = (props) => {
-  const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
+  const { children, draft = false, onSurveyCycleUpdate = null, requirePublish = false, validate = false } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -86,13 +86,6 @@ SurveyDefsLoader.propTypes = {
   requirePublish: PropTypes.bool,
   validate: PropTypes.bool,
   onSurveyCycleUpdate: PropTypes.func,
-}
-
-SurveyDefsLoader.defaultProps = {
-  draft: false,
-  validate: false,
-  requirePublish: false,
-  onSurveyCycleUpdate: null,
 }
 
 export default SurveyDefsLoader

@@ -16,7 +16,7 @@ export const RectangleOnlyItems = (props) => {
       {inputPropertiesForRectangle.map(({ key, labelKey }) => (
         <FormPropertyItem
           key={key}
-          ObjectKey={key}
+          objectKey={key}
           labelKey={labelKey}
           onPropertyChange={onPropertyChange(key)}
           value={samplingPolygonObject[key]}

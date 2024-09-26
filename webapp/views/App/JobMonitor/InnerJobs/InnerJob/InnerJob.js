@@ -8,15 +8,17 @@ import { useI18n } from '@webapp/store/system'
 import JobProgress from '../../JobProgress'
 import JobErrors from '../../JobErrors'
 
-const InnerJob = ({ isCurrentJob, innerJob, index }) => {
+const InnerJob = ({ isCurrentJob = false, innerJob, index }) => {
   const i18n = useI18n()
   const elementRef = useRef(null)
 
+  const isRunning = JobSerialized.isRunning(innerJob)
+
   useEffect(() => {
-    if (JobSerialized.isRunning(innerJob) && elementRef.current) {
+    if (isRunning && elementRef.current) {
       elementRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
-  }, [JobSerialized.getStatus(innerJob)])
+  }, [isRunning])
 
   return (
     <>
@@ -37,10 +39,6 @@ InnerJob.propTypes = {
   isCurrentJob: PropTypes.bool,
   innerJob: PropTypes.object.isRequired,
   index: PropTypes.number.isRequired,
-}
-
-InnerJob.defaultProps = {
-  isCurrentJob: false,
 }
 
 export default InnerJob

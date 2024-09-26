@@ -2,9 +2,13 @@
   .table__header {
     column-gap: 5rem;
 
-    input {
-      width: 25rem;
-      padding: 0.5rem;
+    .filter-container {
+      display: flex;
+      gap: 2rem;
+
+      .surveys__header-left__input-search {
+        width: 25rem;
+      }
     }
   }
 

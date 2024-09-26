@@ -23,7 +23,8 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
 )
 
 const TabBar = (props) => {
-  const { tabs, showTabs, selection, className, renderer, onClick } = props
+  const { className = '', onClick = null, renderer = null, selection = 0, showTabs = true, tabs = [] } = props
+
   const [selectionState, setSelectionState] = useState(selection)
 
   const tab = tabs[selectionState]
@@ -48,15 +49,6 @@ const TabBar = (props) => {
         : React.createElement(tab.component, { ...tab.props, ...props })}
     </div>
   )
-}
-
-TabBar.defaultProps = {
-  className: '',
-  selection: 0,
-  tabs: [],
-  showTabs: true,
-  renderer: null,
-  onClick: null,
 }
 
 export default TabBar

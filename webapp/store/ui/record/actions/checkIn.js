@@ -14,7 +14,7 @@ import { LoaderActions } from '@webapp/store/ui'
 import * as ActionTypes from './actionTypes'
 
 export const checkInRecord =
-  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader }) =>
+  ({ recordUuid, draft, pageNodeUuid, pageNodeDefUuid, noHeader, locked = false }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
 
@@ -68,9 +68,10 @@ export const checkInRecord =
         nodeDefActivePage,
         formPageNodeUuidByNodeDefUuid,
         noHeader,
+        locked,
       })
     } else {
-      dispatch({ type: ActionTypes.recordLoad, record, noHeader })
+      dispatch({ type: ActionTypes.recordLoad, record, noHeader, locked })
     }
 
     // Hide app loader on record edit

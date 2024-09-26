@@ -13,22 +13,23 @@ import { State } from '../store'
 
 const NodeDefExpressionsProp = (props) => {
   const {
-    qualifier,
-    state,
     Actions,
-    nodeDefUuidContext,
+    applyIf = true,
+    canBeConstant = false,
+    excludeCurrentNodeDef = false,
+    hideAdvanced = false,
+    info = null,
+    isBoolean = true,
+    isContextParent = false,
+    label = '',
+    mode = Expression.modes.json,
+    multiple = true,
+    nodeDefUuidContext = null,
     propName,
-    label,
-    multiple,
-    applyIf,
-    showLabels,
-    readOnly,
-    isContextParent,
-    canBeConstant,
-    isBoolean,
-    hideAdvanced,
-    excludeCurrentNodeDef,
-    mode,
+    qualifier,
+    readOnly = false,
+    showLabels = false,
+    state,
   } = props
 
   const nodeDef = State.getNodeDef(state)
@@ -42,6 +43,7 @@ const NodeDefExpressionsProp = (props) => {
   return (
     <ExpressionsProp
       qualifier={qualifier}
+      info={info}
       label={label}
       readOnly={readOnly}
       applyIf={applyIf}
@@ -70,6 +72,7 @@ NodeDefExpressionsProp.propTypes = {
 
   nodeDefUuidContext: PropTypes.string,
   propName: PropTypes.string.isRequired,
+  info: PropTypes.string,
   label: PropTypes.string,
   mode: PropTypes.string,
 
@@ -83,23 +86,6 @@ NodeDefExpressionsProp.propTypes = {
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
   excludeCurrentNodeDef: PropTypes.bool,
-}
-
-NodeDefExpressionsProp.defaultProps = {
-  nodeDefUuidContext: null,
-  label: '',
-  mode: Expression.modes.json,
-
-  applyIf: true,
-  showLabels: false,
-  multiple: true,
-  readOnly: false,
-
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
-  hideAdvanced: false,
-  excludeCurrentNodeDef: false,
 }
 
 export default NodeDefExpressionsProp

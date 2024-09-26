@@ -11,7 +11,7 @@ import { useMapContext } from './MapContext'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
-  const { layers } = props
+  const { layers = [] } = props
 
   const user = useUser()
   const surveyId = useSurveyId()
@@ -65,8 +65,4 @@ export const MapLayersControl = (props) => {
 
 MapLayersControl.propTypes = {
   layers: PropTypes.array,
-}
-
-MapLayersControl.defaultProps = {
-  layers: [],
 }

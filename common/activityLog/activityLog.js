@@ -15,6 +15,7 @@ export const type = {
   nodeDefCreate: 'nodeDefCreate',
   nodeDefUpdate: 'nodeDefUpdate',
   nodeDefMarkDeleted: 'nodeDefMarkDeleted',
+  nodeDefConversion: 'nodeDefConversion',
 
   // Category
   categoryInsert: 'categoryInsert',
@@ -39,13 +40,14 @@ export const type = {
   taxonInsert: 'taxonInsert', // System
   taxonUpdate: 'taxonUpdate', // System
 
-  // record
+  // Record
   recordCreate: 'recordCreate',
   recordDelete: 'recordDelete',
   recordOwnerUpdate: 'recordOwnerUpdate',
   recordStepUpdate: 'recordStepUpdate',
   recordImport: 'recordImport',
   recordImportFromCollect: 'recordImportFromCollect',
+  recordMerge: 'recordMerge',
 
   // Node
   nodeCreate: 'nodeCreate',

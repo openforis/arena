@@ -17,7 +17,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
 
 const Row = (props) => {
-  const { row: userListItem, emailVisible } = props
+  const { row: userListItem, emailVisible = false } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const i18n = useI18n()
@@ -92,10 +92,6 @@ const Row = (props) => {
 Row.propTypes = {
   row: PropTypes.object.isRequired,
   emailVisible: PropTypes.bool,
-}
-
-Row.defaultProps = {
-  emailVisible: false,
 }
 
 export default Row

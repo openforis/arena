@@ -83,6 +83,7 @@ ${itemCodes
         )}
         {canCreateRecord && !recordUuid && (
           <ButtonAdd
+            className="new-record-btn"
             label="mapView.createRecord"
             showLabel
             onClick={() => createRecordFromSamplingPointDataItem({ itemUuid, callback: onRecordCreate })}

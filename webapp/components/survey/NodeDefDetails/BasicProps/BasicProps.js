@@ -64,6 +64,7 @@ const BasicProps = (props) => {
     cyclesKeysParent,
     includedInClone,
     includeInCloneDisabled,
+    canHaveAutoIncrementalKey,
   } = useBasicProps(props)
 
   return (
@@ -97,6 +98,17 @@ const BasicProps = (props) => {
                 <ButtonIconInfo title="nodeDefEdit.basicProps.enumerator.info" />
               </span>
             )}
+            {canHaveAutoIncrementalKey && (
+              <FormItem
+                info="nodeDefEdit.basicProps.autoIncrementalKey.info"
+                label={i18n.t('nodeDefEdit.basicProps.autoIncrementalKey.label')}
+              >
+                <Checkbox
+                  checked={NodeDef.isAutoIncrementalKey(nodeDef)}
+                  onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.autoIncrementalKey, value })}
+                />
+              </FormItem>
+            )}
           </div>
         </FormItem>
       )}
@@ -113,12 +125,8 @@ const BasicProps = (props) => {
               />
               {NodeDef.isMultipleEntity(nodeDef) && (
                 <FormItem
-                  label={
-                    <span>
-                      {i18n.t('nodeDefEdit.basicProps.enumerate.label')}
-                      <ButtonIconInfo title="nodeDefEdit.basicProps.enumerate.info" />
-                    </span>
-                  }
+                  info="nodeDefEdit.basicProps.enumerate.info"
+                  label={i18n.t('nodeDefEdit.basicProps.enumerate.label')}
                 >
                   <div>
                     <Checkbox
@@ -192,7 +200,7 @@ const BasicProps = (props) => {
         <Checkbox
           checked={includedInClone}
           disabled={includeInCloneDisabled}
-          label="nodeDefEdit.basicProps.includedInClone"
+          label="nodeDefEdit.basicProps.includedInClonedData"
           onChange={(value) =>
             Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
           }

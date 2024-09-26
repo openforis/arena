@@ -131,6 +131,7 @@ export const TestId = {
     closeBtn: 'panel-right-close-btn',
   },
   record: {
+    editLockToggleBtn: 'record-edit-lock-toggle-btn',
     invalidBtn: 'record-invalid-btn',
     deleteBtn: 'record-delete-btn',
   },
@@ -186,6 +187,7 @@ export const TestId = {
   surveyInfo: {
     saveBtn: 'survey-info-save-btn',
     surveyDescription: _withLang('survey-description'),
+    surveyFieldManualLink: _withLang('survey-field-manual-link'),
     surveyName: 'survey-name',
     surveyLabel: _withLang('survey-label'),
     surveyLanguage: 'survey-language',

@@ -46,6 +46,7 @@ export {
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
+  mergeRecords,
 } from './data'
 export {
   insertDataQuerySummary,
@@ -63,6 +64,7 @@ export {
   startImportLabelsJob,
 } from './survey'
 export {
+  convertNodeDef,
   fetchNodeDef,
   fetchNodeDefs,
   moveNodeDef,

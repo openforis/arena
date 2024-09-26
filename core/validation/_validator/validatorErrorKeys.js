@@ -54,7 +54,7 @@ export const ValidatorErrorKeys = {
     errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
     multipleRecordsMatchingKeys: 'validationErrors.dataImport.multipleRecordsMatchingKeys',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
-    recordKeyMissing: 'validationErrors.dataImport.recordKeyMissing',
+    recordKeyMissingOrInvalid: 'validationErrors.dataImport.recordKeyMissingOrInvalid',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },
 
@@ -117,6 +117,7 @@ export const ValidatorErrorKeys = {
     cycleDateEndInvalid: 'validationErrors.surveyInfoEdit.cycleDateEndInvalid',
     cycleDateEndMandatoryExceptForLastCycle: 'validationErrors.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
     cycleDateStartAfterPrevDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
+    fieldManualLinksInvalid: 'validationErrors.surveyInfoEdit.fieldManualLinksInvalid',
   },
 
   taxonomyEdit: {
