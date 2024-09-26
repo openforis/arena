@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 
+import { Objects } from '@openforis/arena-core'
+
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 
 import { useI18n } from '@webapp/store/system'
 
-import { convertDataToPoints } from './convertDataToPoints'
+import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 
 const _updateDataAndPoints = ({
   editedRecordItem,
@@ -28,7 +30,7 @@ const _updateDataAndPoints = ({
   )
   if (oldDataItemIndex >= 0) {
     dataUpdated[oldDataItemIndex] = editedRecordItem
-    const { points: pointsConverted } = convertDataToPoints({
+    const { points: pointsConverted } = convertDataToGeoJsonPoints({
       data: [editedRecordItem],
       attributeDef,
       nodeDefParent,
@@ -38,7 +40,7 @@ const _updateDataAndPoints = ({
     const pointConverted = pointsConverted.length > 0 ? pointsConverted[0] : null
     if (pointConverted) {
       const pointIndex = pointIndexByDataIndex[oldDataItemIndex]
-      if (pointIndex !== null) {
+      if (Objects.isNotEmpty(pointIndex)) {
         pointsUpdated[pointIndex] = pointConverted
       }
     }

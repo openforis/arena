@@ -2,11 +2,12 @@ import React from 'react'
 import { LayerGroup, LayersControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import { ClusterMarker, useFlyToPoint } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
-import { useCoordinateAttributeDataLayer } from './useCoordinateAttributeDataLayer'
+import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 
-export const CoordinateAttributeDataLayer = (props) => {
+export const GeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, onRecordEditClick } = props
 
   const {
@@ -17,7 +18,7 @@ export const CoordinateAttributeDataLayer = (props) => {
     getClusterLeaves,
     totalPoints,
     points,
-  } = useCoordinateAttributeDataLayer(props)
+  } = useGeoAttributeDataLayer(props)
 
   const {
     currentPointShown,
@@ -28,7 +29,7 @@ export const CoordinateAttributeDataLayer = (props) => {
     onCurrentPointPopupClose,
     openPopupOfPoint,
     setMarkerByKey,
-  } = useFlyToPoint({ points, onRecordEditClick })
+  } = useFlyToPoint({ points, onRecordEditClick, zoomToMaxLevel: NodeDef.isCoordinate(attributeDef) })
 
   return (
     <LayersControl.Overlay name={layerName}>
@@ -60,12 +61,12 @@ export const CoordinateAttributeDataLayer = (props) => {
             <CoordinateAttributeMarker
               key={key}
               attributeDef={attributeDef}
+              data={cluster}
               flyToPoint={flyToPoint}
               flyToNextPoint={flyToNextPoint}
               flyToPreviousPoint={flyToPreviousPoint}
               markersColor={markersColor}
               onRecordEditClick={onRecordEditClick}
-              pointFeature={cluster}
               setMarkerByKey={setMarkerByKey}
             />
           )
@@ -73,12 +74,12 @@ export const CoordinateAttributeDataLayer = (props) => {
         {currentPointShown && (
           <CoordinateAttributeMarker
             attributeDef={attributeDef}
+            data={currentPointShown}
             flyToNextPoint={flyToNextPoint}
             flyToPreviousPoint={flyToPreviousPoint}
             markersColor={markersColor}
             onPopupClose={onCurrentPointPopupClose}
             onRecordEditClick={onRecordEditClick}
-            pointFeature={currentPointShown}
             popupOpen={currentPointPopupOpen}
             setMarkerByKey={setMarkerByKey}
           />
@@ -88,7 +89,7 @@ export const CoordinateAttributeDataLayer = (props) => {
   )
 }
 
-CoordinateAttributeDataLayer.propTypes = {
+GeoAttributeDataLayer.propTypes = {
   attributeDef: PropTypes.any,
   markersColor: PropTypes.any,
   onRecordEditClick: PropTypes.func,
