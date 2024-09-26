@@ -99,7 +99,7 @@ SimpleTextInput.propTypes = {
   startAdornment: PropTypes.any,
   testId: PropTypes.string,
   textTransformFunction: PropTypes.func,
-  title: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   type: PropTypes.string,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }

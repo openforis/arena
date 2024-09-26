@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import { TextField } from '@mui/material'
 import PropTypes from 'prop-types'
 
-import { Strings } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
@@ -41,11 +41,13 @@ export const Input = React.forwardRef((props, ref) => {
   const selectionAllowed = type === 'text'
   const selectionInitial = selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
-  const valueText = Strings.defaultIfEmpty('')(value)
+  const valueText = Objects.isEmpty(value) ? '' : String(value)
   const title = titleProp ?? valueText
 
   const handleValueChange = useCallback(
     (newValue) => {
+      if (disabled) return
+
       const input = inputRef.current
       if (selectionAllowed) {
         selectionRef.current = [input.selectionStart, input.selectionEnd]
@@ -54,7 +56,7 @@ export const Input = React.forwardRef((props, ref) => {
         onChange(textTransformFunction(newValue))
       }
     },
-    [inputRef, onChange, selectionAllowed, textTransformFunction]
+    [disabled, inputRef, onChange, selectionAllowed, textTransformFunction]
   )
 
   const onFormattedValueChange = useCallback(
@@ -126,15 +128,6 @@ Input.propTypes = {
   inputType: PropTypes.oneOf(['input', 'textarea']),
   maxLength: PropTypes.number,
   name: PropTypes.string,
-  onChange: PropTypes.func,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  placeholder: PropTypes.string,
-  readOnly: PropTypes.bool,
-  title: PropTypes.string,
-  type: PropTypes.oneOf(['text', 'number', 'password']),
-  validation: PropTypes.object,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   numberFormat: PropTypes.shape({
     decimalScale: PropTypes.number,
     decimalSeparator: PropTypes.string,
@@ -142,5 +135,14 @@ Input.propTypes = {
     maxLength: PropTypes.number,
     placeholder: PropTypes.string,
   }),
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  placeholder: PropTypes.string,
+  readOnly: PropTypes.bool,
   textTransformFunction: PropTypes.func,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  type: PropTypes.oneOf(['text', 'number', 'password']),
+  validation: PropTypes.object,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }

@@ -60,7 +60,7 @@ const AdvancedExpressionEditorPopup = (props) => {
     () => [
       javascript(),
       autocompletion({
-        closeOnBlur: false,
+        closeOnBlur: true,
         // add a carriage return after the label in the rendered item option
         addToOptions: [
           {

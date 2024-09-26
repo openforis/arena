@@ -6,7 +6,7 @@ import * as Chain from '@common/analysis/chain'
 
 import * as DateUtils from '@core/dateUtils'
 
-import { useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyPreferredLang } from '@webapp/store/survey'
 
 import Table from '@webapp/components/Table'
 import ErrorBadge from '@webapp/components/errorBadge'
@@ -17,7 +17,6 @@ import HeaderLeft from './HeaderLeft'
 
 const ChainsView = () => {
   const navigate = useNavigate()
-  const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
 
   const onRowClick = (chain) => navigate(`${appModuleUri(analysisModules.chain)}${Chain.getUuid(chain)}`)
@@ -28,7 +27,6 @@ const ChainsView = () => {
       headerLeftComponent={HeaderLeft}
       module="processing-chains"
       onRowClick={onRowClick}
-      restParams={{ surveyCycleKey }}
       columns={[
         {
           key: 'validation',

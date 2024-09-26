@@ -311,16 +311,17 @@ export const getNodeDefPath =
   }
 
 export const getHierarchy =
-  (filterFn = NodeDef.isEntity) =>
+  (filterFn = NodeDef.isEntity, cycle = undefined) =>
   (survey) => {
     let length = 1
     const h = (array, nodeDef) => {
-      const childDefs = [
-        ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
-          ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
-          : []),
-      ]
-
+      const childDefs = []
+      if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
+        const childDefsNotFiltered = cycle
+          ? getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
+          : getNodeDefChildren(nodeDef)(survey)
+        childDefs.push(...childDefsNotFiltered.filter(filterFn))
+      }
       length += childDefs.length
       const item = { ...nodeDef, children: childDefs.reduce(h, []) }
       array.push(item)

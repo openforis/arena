@@ -234,6 +234,7 @@ export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
 export const isDate = isType(nodeDefType.date)
 export const isDecimal = isType(nodeDefType.decimal)
+export const isGeo = isType(nodeDefType.geo)
 export const isFile = isType(nodeDefType.file)
 export const isInteger = isType(nodeDefType.integer)
 export const isTaxon = isType(nodeDefType.taxon)
@@ -618,6 +619,7 @@ export const canHaveDefaultValue = (nodeDef) =>
     nodeDefType.coordinate,
     nodeDefType.date,
     nodeDefType.decimal,
+    nodeDefType.geo,
     nodeDefType.integer,
     nodeDefType.taxon,
     nodeDefType.text,

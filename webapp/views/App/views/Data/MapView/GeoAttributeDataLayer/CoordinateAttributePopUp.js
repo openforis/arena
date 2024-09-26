@@ -151,7 +151,7 @@ export const CoordinateAttributePopUp = (props) => {
         <Markdown source={content} />
 
         <div className="button-bar">
-          <div role="row">
+          <div className="row">
             <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
 
             <ButtonIconEdit
@@ -163,7 +163,7 @@ export const CoordinateAttributePopUp = (props) => {
 
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
-          <div role="row">
+          <div className="row">
             <Button
               className="earth-map-btn"
               iconAlt="Earth Map"
