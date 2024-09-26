@@ -3,7 +3,6 @@ import {
   RecordUpdater as CoreRecordUpdater,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordUpdateResult,
-  Promises,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -234,7 +233,7 @@ const updateAttributesInEntityWithValues =
     )
 
     // update attribute values
-    await Promises.each(valuesByDefUuidEntriesInDescendantAttributes, async ([attributeDefUuid, value]) => {
+    for await (const [attributeDefUuid, value] of valuesByDefUuidEntriesInDescendantAttributes) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
 
       const { record: currentRecord } = updateResult
@@ -254,7 +253,7 @@ const updateAttributesInEntityWithValues =
       })(currentRecord)
 
       await updateDependentNodes(attributeUpdateResult)
-    })
+    }
     return updateResult
   }
 
