@@ -40,8 +40,26 @@ const acceptByExtension = {
   zip: { 'application/zip': ['.zip'] },
 }
 
+const readAsText = async (file, ignoreErrors = true) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const text = e.target.result
+      resolve(text)
+    }
+    reader.onerror = (error) => {
+      if (ignoreErrors) {
+        resolve(null)
+      } else {
+        reject(error)
+      }
+    }
+    reader.readAsText(file)
+  })
+
 export const FileUtils = {
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,
+  readAsText,
 }

@@ -1,7 +1,9 @@
 import { useCallback, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
+import * as NumberUtils from '@core/numberUtils'
+
+export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel = true }) => {
   const map = useMap()
 
   const [state, setState] = useState({})
@@ -32,21 +34,16 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
 
   const getPointIndex = useCallback((point) => points.findIndex((p) => getPointKey(p) === getPointKey(point)), [points])
 
-  const getNextPoint = useCallback(
-    (point) => {
+  const getPointByOffset = useCallback(
+    (point, offset) => {
       const index = getPointIndex(point)
-      return points[(index + 1) % points.length]
+      const indexNext = NumberUtils.mod(points.length)(index + offset)
+      return points[indexNext]
     },
     [getPointIndex, points]
   )
-
-  const getPreviousPoint = useCallback(
-    (point) => {
-      const index = getPointIndex(point)
-      return points[index > 0 ? index - 1 : points.length - 1]
-    },
-    [getPointIndex, points]
-  )
+  const getNextPoint = useCallback((point) => getPointByOffset(point, 1), [getPointByOffset])
+  const getPreviousPoint = useCallback((point) => getPointByOffset(point, -1), [getPointByOffset])
 
   const flyToPoint = useCallback(
     (point) => {
@@ -54,10 +51,11 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null }) => {
       onRecordEditClick?.(null)
 
       const [longitude, latitude] = point.geometry.coordinates
-      map.flyTo([latitude, longitude], map.getMaxZoom())
+      const nextZoomLevel = zoomToMaxLevel ? map.getMaxZoom() : undefined
+      map.flyTo([latitude, longitude], nextZoomLevel)
       map.once('zoomend', () => openPopupOfPoint(point))
     },
-    [map, onRecordEditClick, openPopupOfPoint]
+    [map, onRecordEditClick, openPopupOfPoint, zoomToMaxLevel]
   )
 
   const flyToNextPoint = useCallback(

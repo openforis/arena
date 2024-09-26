@@ -223,6 +223,12 @@ Do you want to proceed?`,
     pageNotFound: 'Page not found',
   },
 
+  geo: {
+    area: 'Area',
+    vertices: 'Vertices',
+    perimeter: 'Perimeter',
+  },
+
   files: {
     header: 'Files',
     missing: ' Missing files: {{count}}',
@@ -1153,8 +1159,8 @@ $t(common.cantUndoWarning)`,
     invalid: 'Invalid expression: {{details}}',
     missingFunctionParameters: 'Missing function parameters',
     undefinedFunction: 'Undefined function: {{name}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
   },
 
   // ====== Help views
@@ -1355,6 +1361,7 @@ E.g. this.region = region_attribute_name
       coordinate: 'Coordinate',
       date: 'Date',
       decimal: 'Decimal',
+      geo: 'Geospatial',
       entity: 'Table or form',
       file: 'File',
       integer: 'Integer',
@@ -1422,6 +1429,11 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       accuracy: 'Accuracy',
       altitude: 'Altitude',
       altitudeAccuracy: 'Altitude accuracy',
+    },
+    nodeDefGeo: {
+      confirmDelete: 'Delete this Geospatial value?',
+      geoJSON: 'GeoJSON',
+      invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
     },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',

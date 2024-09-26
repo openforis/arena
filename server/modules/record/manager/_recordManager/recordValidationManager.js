@@ -46,7 +46,7 @@ export const validateNodesAndPersistValidation = async (survey, record, nodes, v
   // 1. validate node values
   const nodesValueValidation = await RecordValidator.validateNodes({ survey, record, nodes })
   const nodesValueValidationsByUuid = Validation.getFieldValidations(nodesValueValidation)
-  // 1.a. workaraound: always define value field validation even when validation is valid to allow cleaning up errors later
+  // 1.a. workaround: always define value field validation even when validation is valid to allow cleaning up errors later
   Object.entries(nodesValueValidationsByUuid).forEach(([nodeUuid, nodeValueValidation]) => {
     if (Validation.isValid(nodeValueValidation)) {
       const nodeValueValidationUpdated = Validation.setField('value', Validation.newInstance())(nodeValueValidation)
