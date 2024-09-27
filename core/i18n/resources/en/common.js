@@ -1452,6 +1452,10 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       fileUuid: 'File uuid',
       fileName: 'File name',
     },
+    nodeDefsTreeSelectMode: {
+      allNodeDefs: 'All nodes',
+      onlyPages: 'Only pages',
+    },
     step: {
       entry: 'Entry',
       cleansing: 'Cleansing',
