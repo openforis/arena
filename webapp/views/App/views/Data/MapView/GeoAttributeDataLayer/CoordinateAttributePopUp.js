@@ -22,7 +22,7 @@ import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/
 import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
-import { useAltitude } from '../common/useAltitude'
+import { useElevation } from '../common/useElevation'
 import { WhispMenuButton } from './WhispMenuButton'
 
 const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
@@ -52,7 +52,7 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
   return pathParts.join(' -> ')
 }
 
-const generateContent = ({ i18n, recordOwnerName, point, path, altitude }) => {
+const generateContent = ({ i18n, recordOwnerName, point, path, elevation }) => {
   const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
   const xFormatted = NumberUtils.roundToPrecision(point.x, coordinateNumericFieldPrecision)
   const yFormatted = NumberUtils.roundToPrecision(point.y, coordinateNumericFieldPrecision)
@@ -61,7 +61,7 @@ const generateContent = ({ i18n, recordOwnerName, point, path, altitude }) => {
 * **X**: ${xFormatted}
 * **Y**: ${yFormatted}
 * **SRS**: ${point.srs}
-* **${i18n.t('mapView.altitude')}**: ${altitude}
+* **${i18n.t('mapView.elevation')}**: ${elevation}
 * **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
   return content
 }
@@ -82,8 +82,8 @@ export const CoordinateAttributePopUp = (props) => {
   const [open, setOpen] = useState(false)
 
   const pointLatLong = PointFactory.createInstance({ x: longitude, y: latitude })
-  // fetch altitude and record owner name only when popup is open
-  const altitude = useAltitude({ survey, point: pointLatLong, active: open })
+  // fetch elevation and record owner name only when popup is open
+  const elevation = useElevation({ survey, point: pointLatLong, active: open })
   const recordOwnerName = useUserName({ userUuid: recordOwnerUuid, active: open })
 
   const onRemove = useCallback(() => {
@@ -135,8 +135,8 @@ export const CoordinateAttributePopUp = (props) => {
   }, [generateGeoJsonWithName])
 
   const content = useMemo(
-    () => generateContent({ i18n, recordOwnerName, point, path, altitude }),
-    [altitude, i18n, path, point, recordOwnerName]
+    () => generateContent({ i18n, recordOwnerName, point, path, elevation }),
+    [elevation, i18n, path, point, recordOwnerName]
   )
 
   return (
@@ -151,7 +151,7 @@ export const CoordinateAttributePopUp = (props) => {
         <Markdown source={content} />
 
         <div className="button-bar">
-          <div role="row">
+          <div className="row">
             <ButtonPrevious className="prev-btn" onClick={onClickPrevious} showLabel={false} />
 
             <ButtonIconEdit
@@ -163,7 +163,7 @@ export const CoordinateAttributePopUp = (props) => {
 
             <ButtonNext className="next-btn" onClick={onClickNext} showLabel={false} />
           </div>
-          <div role="row">
+          <div className="row">
             <Button
               className="earth-map-btn"
               iconAlt="Earth Map"

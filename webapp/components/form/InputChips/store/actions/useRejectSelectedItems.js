@@ -12,7 +12,7 @@ export const useRejectSelectedItems = () =>
     }
     return async (searchValue) => {
       const itemsRes = await items(searchValue)
-      const itemsArray = Object.values(itemsRes?.data?.items ?? {})
+      const itemsArray = Array.isArray(itemsRes) ? itemsRes : Object.values(itemsRes?.data?.items ?? {})
       return itemsArray.filter(removeSelectedItems)
     }
   }, [])

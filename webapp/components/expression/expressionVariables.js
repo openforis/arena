@@ -143,6 +143,7 @@ const getVariablesGroupedByParentUuid = ({
   mode,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,
+  includeThis = true,
 }) => {
   const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
@@ -165,7 +166,7 @@ const getVariablesGroupedByParentUuid = ({
     // sort groups by hierarchy level, in descending order
     .sort((groupA, groupB) => groupB.hierarchyLevel - groupA.hierarchyLevel)
 
-  if (!nodeDefCurrent || excludeCurrentNodeDef) {
+  if (!nodeDefCurrent || excludeCurrentNodeDef || !includeThis) {
     return groups
   }
   // always show current variable at the beginning
@@ -245,5 +246,7 @@ export const getVariablesChildren = ({
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
+  return groupByParent
+    ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, includeThis: false })
+    : variables
 }

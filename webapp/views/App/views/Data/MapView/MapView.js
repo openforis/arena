@@ -1,6 +1,6 @@
 import './MapView.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,11 +12,10 @@ import { useSurvey } from '@webapp/store/survey'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { Map } from '@webapp/components/Map'
-import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
-import { CoordinateAttributeDataLayer } from './CoordinateAttributeDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
+import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 
 const getSamplingPointDataLevels = (survey) => {
   const samplingPointDataCategory = Survey.getSamplingPointDataCategory(survey)
@@ -37,10 +36,13 @@ const MapWrapper = () => {
   })
   const { editingRecordUuid, editingParentNodeUuid, lastRecordEditModalState } = state
 
-  const coordinateAttributeDefs = Survey.getNodeDefsArray(survey).filter(NodeDef.isCoordinate)
-  const samplingPointDataLevels = getSamplingPointDataLevels(survey)
+  const geoAttributeDefs = useMemo(
+    () => Survey.getNodeDefsArray(survey).filter((nodeDef) => NodeDef.isGeo(nodeDef) || NodeDef.isCoordinate(nodeDef)),
+    [survey]
+  )
+  const samplingPointDataLevels = useMemo(() => getSamplingPointDataLevels(survey), [survey])
 
-  const layerColors = useRandomColors(samplingPointDataLevels.length + coordinateAttributeDefs.length)
+  const layerColors = useRandomColors(samplingPointDataLevels.length + geoAttributeDefs.length)
 
   const onRecordEditClick = useCallback((params) => {
     const { recordUuid, parentUuid } = params || {}
@@ -64,35 +66,45 @@ const MapWrapper = () => {
     [surveyId]
   )
 
-  if (samplingPointDataLevels.length + coordinateAttributeDefs.length > 0 && layerColors.length === 0) {
+  const layers = useMemo(
+    () => [
+      ...samplingPointDataLevels.map((level, index) => (
+        <SamplingPointDataLayer
+          key={CategoryLevel.getUuid(level)}
+          levelIndex={CategoryLevel.getIndex(level)}
+          markersColor={layerColors[index]}
+          onRecordEditClick={onRecordEditClick}
+          createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
+        />
+      )),
+      ...geoAttributeDefs.map((attributeDef, index) => (
+        <GeoAttributeDataLayer
+          key={NodeDef.getUuid(attributeDef)}
+          attributeDef={attributeDef}
+          markersColor={layerColors[samplingPointDataLevels.length + index]}
+          onRecordEditClick={onRecordEditClick}
+          editingRecordUuid={editingRecordUuid}
+        />
+      )),
+    ],
+    [
+      createRecordFromSamplingPointDataItem,
+      editingRecordUuid,
+      geoAttributeDefs,
+      layerColors,
+      onRecordEditClick,
+      samplingPointDataLevels,
+    ]
+  )
+
+  if (layers.length > 0 && layerColors.length === 0) {
     // layer colors not generated yet
     return null
   }
 
   return (
     <>
-      <Map
-        layers={[
-          ...samplingPointDataLevels.map((level, index) => (
-            <SamplingPointDataLayer
-              key={CategoryLevel.getUuid(level)}
-              levelIndex={CategoryLevel.getIndex(level)}
-              markersColor={layerColors[index]}
-              onRecordEditClick={onRecordEditClick}
-              createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
-            />
-          )),
-          ...coordinateAttributeDefs.map((attributeDef, index) => (
-            <CoordinateAttributeDataLayer
-              key={NodeDef.getUuid(attributeDef)}
-              attributeDef={attributeDef}
-              markersColor={layerColors[samplingPointDataLevels.length + index]}
-              onRecordEditClick={onRecordEditClick}
-              editingRecordUuid={editingRecordUuid}
-            />
-          )),
-        ]}
-      />
+      <Map layers={layers} />
       {editingRecordUuid && (
         <RecordEditModal
           initialState={lastRecordEditModalState}
@@ -106,8 +118,4 @@ const MapWrapper = () => {
   )
 }
 
-export const MapView = () => (
-  <SurveyDefsLoader draft={false} requirePublish>
-    <MapWrapper />
-  </SurveyDefsLoader>
-)
+export const MapView = () => <MapWrapper />

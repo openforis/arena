@@ -8,6 +8,7 @@
 .expression-editor__query-container {
   display: flex;
   align-items: center;
+  min-height: 3rem;
 
   .query {
     padding: 0.5rem 1rem;

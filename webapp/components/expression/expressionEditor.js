@@ -29,6 +29,7 @@ const ExpressionEditor = (props) => {
     placeholder = false,
     qualifier,
     query = '',
+    readOnly = false,
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
@@ -86,13 +87,15 @@ const ExpressionEditor = (props) => {
               {query}
             </div>
           )}
-          <Button
-            className="btn-s btn-edit"
-            iconClassName="icon-pencil2 icon-14px"
-            id={`${idPrefix}-edit-btn`}
-            onClick={() => setEdit(true)}
-            testId={TestId.expressionEditor.editBtn(qualifier)}
-          />
+          {!readOnly && (
+            <Button
+              className="btn-s btn-edit"
+              iconClassName="icon-pencil2 icon-14px"
+              id={`${idPrefix}-edit-btn`}
+              onClick={() => setEdit(true)}
+              testId={TestId.expressionEditor.editBtn(qualifier)}
+            />
+          )}
         </div>
       )}
     </div>
@@ -114,6 +117,7 @@ ExpressionEditor.propTypes = {
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
+  readOnly: PropTypes.bool,
 }
 
 export default ExpressionEditor

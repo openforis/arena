@@ -32,7 +32,10 @@ export const updateAttributeValue = ({
     const attributeUpdated = A.pipe(
       Node.assocValue(value),
       Node.assocUpdated(true),
-      Node.assocDateModified(dataModifiedParam ?? new Date())
+      Node.assocDateModified(dataModifiedParam ?? new Date()),
+      (nodeUpdated) =>
+        // reset defaultValueApplied meta information
+        Node.isDefaultValueApplied(attribute) ? Node.assocIsDefaultValueApplied(false)(nodeUpdated) : nodeUpdated
     )(attribute)
 
     const updateResult = new RecordUpdateResult({ record })

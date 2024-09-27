@@ -63,6 +63,7 @@ const plugins = [
           : JSON.stringify(process.env.APP_VERSION),
         RECAPTCHA_ENABLED: process.env.RECAPTCHA_ENABLED,
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
+        EXPERIMENTAL_FEATURES: process.env.EXPERIMENTAL_FEATURES,
       },
     },
   }),

@@ -12,7 +12,7 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { useAuthCanCreateRecord } from '@webapp/store/user'
 import { useSurvey } from '@webapp/store/survey'
-import { useAltitude } from '../common/useAltitude'
+import { useElevation } from '../common/useElevation'
 
 export const SamplingPointDataItemPopup = (props) => {
   const { createRecordFromSamplingPointDataItem, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } =
@@ -36,7 +36,7 @@ export const SamplingPointDataItemPopup = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const altitude = useAltitude({ survey, point, active: open })
+  const elevation = useElevation({ survey, point, active: open })
 
   const content = `**${i18n.t('mapView.samplingPointItemPopup.title')}**
 ${itemCodes
@@ -46,7 +46,7 @@ ${itemCodes
   * **X**: ${point.x}
   * **Y**: ${point.y}
   * **SRS**: ${point.srs}
-* **${i18n.t('mapView.altitude')}**: ${altitude}`
+* **${i18n.t('mapView.elevation')}**: ${elevation}`
 
   const onClickNext = () => {
     flyToNextPoint(pointFeature)
@@ -83,6 +83,7 @@ ${itemCodes
         )}
         {canCreateRecord && !recordUuid && (
           <ButtonAdd
+            className="new-record-btn"
             label="mapView.createRecord"
             showLabel
             onClick={() => createRecordFromSamplingPointDataItem({ itemUuid, callback: onRecordCreate })}

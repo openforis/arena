@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
@@ -17,10 +17,11 @@ import Tree from './Tree'
 const SurveyHierarchy = () => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
+  const cycle = useSurveyCycleKey()
   const i18n = useI18n()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
-  const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
+  const hierarchy = Survey.getHierarchy(NodeDef.isEntity, cycle)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
   const [tree, setTree] = useState(null)

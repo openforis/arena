@@ -4,6 +4,7 @@ export const functionNames = {
   count: 'count',
   distance: 'distance',
   first: 'first',
+  geoPolygon: 'geoPolygon',
   includes: 'includes',
   index: 'index',
   isEmpty: 'isEmpty',

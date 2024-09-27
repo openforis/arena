@@ -35,6 +35,7 @@ const colTypesGetterByType = {
   },
   [nodeDefType.date]: () => [SQL.types.date],
   [nodeDefType.decimal]: () => [SQL.types.decimal],
+  [nodeDefType.geo]: () => [SQL.types.varchar],
   [nodeDefType.entity]: () => [SQL.types.uuid],
   [nodeDefType.file]: () => [SQL.types.uuid, SQL.types.varchar],
   [nodeDefType.integer]: () => [SQL.types.bigint],
