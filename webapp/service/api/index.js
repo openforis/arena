@@ -55,7 +55,7 @@ export {
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'
-export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export {
   fetchSurveyFull,
   fetchSurveys,
