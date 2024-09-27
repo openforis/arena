@@ -805,8 +805,8 @@ Merge cannot be performed.`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    altitude: 'Altitude (m)',
     earthMap: 'Earth Map',
+    elevation: 'Elevation (m)',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     options: {
