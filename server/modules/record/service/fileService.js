@@ -6,6 +6,8 @@ import * as FileManager from '../manager/fileManager'
 
 const logger = Log.getLogger('FileService')
 
+const defaultSurveyFilesTotalSpaceMB = 10 * 1024 // in MB (=10 GB)
+
 export const checkFilesStorage = async () => {
   const storageType = FileManager.getFileContentStorageType()
 
@@ -40,9 +42,10 @@ export const checkFilesStorage = async () => {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
 const getSurveyFilesTotalSpace = async ({ surveyId }) => {
-  return 10 * Math.pow(1024, 3) // TODO make it configurable, fixed to 10 GB per survey now
+  const surveyTotalSpaceMB = await SurveyManager.fetchFilesTotalSpace(surveyId)
+  const totalSpaceMB = surveyTotalSpaceMB ?? defaultSurveyFilesTotalSpaceMB
+  return totalSpaceMB * 1024 * 1024 // from MB to bytes
 }
 
 export const fetchFilesStatistics = async ({ surveyId }) => {

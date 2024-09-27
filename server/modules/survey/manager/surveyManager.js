@@ -196,6 +196,7 @@ export const {
   fetchSurveysByName,
   fetchSurveyIdsAndNames,
   fetchDependencies,
+  fetchFilesTotalSpace,
 } = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {

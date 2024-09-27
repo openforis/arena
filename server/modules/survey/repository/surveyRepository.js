@@ -265,6 +265,15 @@ export const fetchDependencies = async (surveyId, client = db) =>
     R.prop('dependencies')
   )
 
+export const fetchFilesTotalSpace = async (surveyId, client = db) =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.filesTotalSpace}}' AS value
+     FROM survey 
+     WHERE id = $1`,
+    [surveyId],
+    R.prop('value')
+  )
+
 export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
   client.map(
     `SELECT id 

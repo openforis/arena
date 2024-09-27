@@ -8,6 +8,7 @@ import * as NodeDef from './nodeDef'
 
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
+import * as SurveyConfig from './_survey/surveyConfig'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -60,6 +61,7 @@ export const newSurvey = ({
   [SurveyInfo.keys.template]: template,
 })
 
+export const { configKeys } = SurveyConfig
 export const { keys: infoKeys, status } = SurveyInfo
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } = SurveyInfo
