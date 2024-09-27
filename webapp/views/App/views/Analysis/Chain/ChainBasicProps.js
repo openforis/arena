@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
@@ -86,4 +87,8 @@ export const ChainBasicProps = (props) => {
       <ChainRStudioFieldset updateChain={updateChain} />
     </div>
   )
+}
+
+ChainBasicProps.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }
