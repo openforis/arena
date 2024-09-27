@@ -6,26 +6,28 @@ import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useAuthCanEditSurvey, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
+import { ButtonSave, ExpansionPanel } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
+import CycleSelector from '@webapp/components/survey/CycleSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
-import { ButtonSave } from '@webapp/components'
 
 import CyclesEditor from './CyclesEditor'
 import SrsEditor from './SrsEditor'
 import LanguagesEditor from './LanguagesEditor'
+import SamplingPolygonEditor from './SamplingPolygonEditor'
+import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
 
 import { useSurveyInfoForm } from './store'
-import SamplingPolygonEditor from './SamplingPolygonEditor'
-import CycleSelector from '@webapp/components/survey/CycleSelector'
 
 const SurveyInfo = () => {
   const surveyInfo = useSurveyInfo()
   const readOnly = !useAuthCanEditSurvey()
   const i18n = useI18n()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   const {
     cycleKeys,
@@ -145,6 +147,12 @@ const SurveyInfo = () => {
             )}
           </div>
         </FormItem>
+
+        {isSystemAdmin && (
+          <ExpansionPanel buttonLabel="homeView.surveyInfo.configuration.title" startClosed>
+            <SurveyConfigurationEditor />
+          </ExpansionPanel>
+        )}
 
         {!readOnly && <ButtonSave testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
       </div>

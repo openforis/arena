@@ -28,16 +28,19 @@ export const useExtraPropDefEditor = (props) => {
     setState(initialState)
   }, [initialState])
 
-  const updateExtraPropDef = useCallback(async ({ extraPropDefUpdated }) => {
-    const validation = await validateExtraPropDef({
-      extraPropDef: extraPropDefUpdated,
-      extraPropDefsArray: extraPropDefs,
-    })
-    setState((statePrev) => ({
-      ...statePrev,
-      extraPropDef: Validation.assocValidation(validation)(extraPropDefUpdated),
-    }))
-  }, [])
+  const updateExtraPropDef = useCallback(
+    async ({ extraPropDefUpdated }) => {
+      const validation = await validateExtraPropDef({
+        extraPropDef: extraPropDefUpdated,
+        extraPropDefsArray: extraPropDefs,
+      })
+      setState((statePrev) => ({
+        ...statePrev,
+        extraPropDef: Validation.assocValidation(validation)(extraPropDefUpdated),
+      }))
+    },
+    [extraPropDefs]
+  )
 
   const onEditClick = () => setState((statePrev) => ({ ...statePrev, editing: true }))
 
@@ -80,7 +83,7 @@ export const useExtraPropDefEditor = (props) => {
         await doSave()
       }
     }
-  }, [extraPropDef, extraPropDefProp, index, onItemUpdate])
+  }, [confirm, extraPropDef, extraPropDefProp, i18n, index, onItemUpdate])
 
   const onCancelClick = () => {
     setState((statePrev) => ({ ...statePrev, extraPropDef: extraPropDefProp, editing: false }))
