@@ -1,3 +1,5 @@
+import './ItemEditButtonBar.scss'
+
 import React from 'react'
 
 import * as Validation from '@core/validation/validation'
@@ -16,7 +18,7 @@ export const ItemEditButtonBar = (props) => {
   } = props
 
   return (
-    <div>
+    <div className="item-edit-button-bar">
       {!editing && !readOnly && (
         <>
           <ButtonIconEdit disabled={readOnly} showLabel={false} onClick={onEdit} />
@@ -25,7 +27,7 @@ export const ItemEditButtonBar = (props) => {
       )}
       {editing && (
         <>
-          <ButtonSave showLabel={false} disabled={Validation.isNotValid(validation) || !dirty} onClick={onSaveClick} />
+          <ButtonSave showLabel={false} disabled={Validation.isNotValid(validation) || !dirty} onClick={onSave} />
           <ButtonCancel showLabel={false} onClick={onCancel} />
         </>
       )}

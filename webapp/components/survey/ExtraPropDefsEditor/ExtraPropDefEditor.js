@@ -8,9 +8,9 @@ import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
+import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'
-import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
 export const ExtraPropDefEditor = (props) => {
   const { index, readOnly = false, onItemDelete } = props
