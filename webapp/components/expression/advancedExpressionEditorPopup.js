@@ -1,18 +1,36 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
+import ReactCodeMirror from '@uiw/react-codemirror'
+import { javascript } from '@codemirror/lang-javascript'
+import { autocompletion } from '@codemirror/autocomplete'
 import PropTypes from 'prop-types'
-import CodeMirror from 'codemirror/lib/codemirror'
-import 'codemirror/addon/hint/show-hint'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
+import { useSurvey } from '@webapp/store/survey'
 
-import { arenaExpressionHint } from './codemirrorArenaExpressionHint'
+import { useAutocompletionSource } from './useAutocompletionSource'
+
+const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
+
+const completionsCompareFn = (contextUuid) => (completionA, completionB) => {
+  const { apply: applyA, label: labelA, parentUuid: parentUuidA, type: typeA } = completionA
+  const { apply: applyB, label: labelB, parentUuid: parentUuidB, type: typeB } = completionB
+  const typeComparison = typeB.localeCompare(typeA)
+  if (typeComparison === 0 && typeA === 'variable') {
+    if (applyA === Expression.thisVariable) return -1
+    if (applyB === Expression.thisVariable) return 1
+    if (parentUuidA !== parentUuidB) {
+      if (parentUuidA === contextUuid) return -1
+      if (parentUuidB === contextUuid) return 1
+    }
+  }
+  return typeComparison || labelA.localeCompare(labelB)
+}
 
 const AdvancedExpressionEditorPopup = (props) => {
   const {
@@ -25,13 +43,38 @@ const AdvancedExpressionEditorPopup = (props) => {
     updateDraftQuery,
   } = props
 
-  const inputRef = useRef()
   const i18n = useI18n()
   const survey = useSurvey()
-  const cycle = useSurveyCycleKey()
+  const nodeDefCurrentParentUuid = NodeDef.getParentUuid(nodeDefCurrent)
 
   const [errorMessage, setErrorMessage] = useState(null)
-  const editorRef = useRef(null)
+
+  const autocompletionSource = useAutocompletionSource({
+    mode,
+    nodeDefCurrent,
+    isContextParent,
+    includeAnalysis,
+  })
+
+  const codeMirrorExtensions = useMemo(
+    () => [
+      javascript(),
+      autocompletion({
+        closeOnBlur: true,
+        // add a carriage return after the label in the rendered item option
+        addToOptions: [
+          {
+            render: () => document.createElement('br'),
+            position: 60,
+          },
+        ],
+        compareCompletions: completionsCompareFn(nodeDefCurrentParentUuid),
+        override: [autocompletionSource],
+        optionClass: (completion) => `cm-completion-option ${completion.type}`,
+      }),
+    ],
+    [autocompletionSource, nodeDefCurrentParentUuid]
+  )
 
   const validateEditorValue = useCallback(
     (value) => {
@@ -54,12 +97,9 @@ const AdvancedExpressionEditorPopup = (props) => {
   )
 
   const onEditorChange = useCallback(
-    (cm) => {
-      const value = cm.getValue()
+    (value) => {
       const valueTrimmed = value.trim()
-
       const valid = validateEditorValue(valueTrimmed)
-
       if (valid && valueTrimmed !== query) {
         updateDraftQuery(valueTrimmed)
       }
@@ -67,45 +107,19 @@ const AdvancedExpressionEditorPopup = (props) => {
     [query, updateDraftQuery, validateEditorValue]
   )
 
-  // initialize CodeMirror text area
-  useEffect(() => {
-    const editor = CodeMirror.fromTextArea(inputRef.current, {
-      lineNumbers: false,
-      autofocus: true,
-      extraKeys: { 'Ctrl-Space': 'autocomplete' },
-      mode: { name: 'arena-expression' },
-      hintOptions: {
-        hint: arenaExpressionHint({ mode, i18n, survey, cycle, nodeDefCurrent, isContextParent, includeAnalysis }),
-      },
-    })
-    editor.setSize('100%', 'auto')
-
-    editor.on('change', onEditorChange)
-
-    editorRef.current = editor
-
-    return () => editor.toTextArea()
-  }, [])
-
-  // handle query prop change
-  useEffect(() => {
-    const editor = editorRef.current
-    if (editor.getValue() !== query) {
-      editor.setValue(query)
-    }
-  }, [query])
-
   return (
     <>
-      {errorMessage ? (
-        <div className="expression-editor__query-container">
-          <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>
-        </div>
-      ) : (
-        <div style={{ height: '34px' }} />
-      )}
+      <div className="expression-editor__query-container">
+        {errorMessage && <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>}
+      </div>
       <div className="expression-editor-popup__expr-container">
-        <textarea data-testid={TestId.expressionEditor.advancedQuery} ref={inputRef} />
+        <ReactCodeMirror
+          autoFocus
+          basicSetup={codeMirrorBasicSetup}
+          extensions={codeMirrorExtensions}
+          onChange={onEditorChange}
+          value={query}
+        />
       </div>
       <div className="expression-editor-popup__editor-help">
         <p>{i18n.t(`nodeDefEdit.editorHelp.${mode}`)}</p>
