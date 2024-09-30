@@ -363,6 +363,17 @@ export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
     [surveyId]
   )
 
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) =>
+  client.none(
+    `UPDATE survey
+    SET config = jsonb_set(coalesce(config, '{}'), '{${key}}', $/value/)
+    WHERE id = $/surveyId/`,
+    { surveyId, value }
+  )
+
+export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
+  client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
+
 // ============== DELETE
 export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 

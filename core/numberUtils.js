@@ -58,3 +58,12 @@ export const formatInteger = (value) => formatDecimal(value, 0)
  * @returns {number} - The result of the modulus (always positive or 0).
  */
 export const mod = (modulus) => (value) => ((value % modulus) + modulus) % modulus
+
+export const limit =
+  ({ minValue = null, maxValue = null }) =>
+  (value) => {
+    let result = Number(value)
+    if (minValue) result = Math.max(minValue, result)
+    if (maxValue) result = Math.min(maxValue, result)
+    return result
+  }

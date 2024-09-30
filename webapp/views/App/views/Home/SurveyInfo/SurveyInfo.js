@@ -58,10 +58,7 @@ const SurveyInfo = () => {
   return (
     <div className="home-survey-info">
       <div className="form">
-        <div className="form-item">
-          <label className="form-label" htmlFor="survey-info-name">
-            {i18n.t('common.name')}
-          </label>
+        <FormItem label={i18n.t('common.name')}>
           <Input
             id={TestId.surveyInfo.surveyName}
             value={name}
@@ -69,7 +66,7 @@ const SurveyInfo = () => {
             onChange={setName}
             readOnly={readOnly}
           />
-        </div>
+        </FormItem>
 
         <LabelsEditor
           inputFieldIdPrefix={TestId.surveyInfo.surveyLabel('')}
@@ -149,7 +146,11 @@ const SurveyInfo = () => {
         </FormItem>
 
         {isSystemAdmin && (
-          <ExpansionPanel buttonLabel="homeView.surveyInfo.configuration.title" startClosed>
+          <ExpansionPanel
+            buttonLabel="homeView.surveyInfo.configuration.title"
+            className="survey-info-configuration"
+            startClosed
+          >
             <SurveyConfigurationEditor />
           </ExpansionPanel>
         )}

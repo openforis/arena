@@ -46,16 +46,21 @@ const dataStorageUnitToBytesConversionFactor = {
 }
 
 const squareMetersToUnit = (unit) => (value) =>
-  Objects.isNil(value) ? NaN : value / areaUnitToSquareMetersConversionFactor[unit]
+  Objects.isNil(value) ? NaN : Number(value) / areaUnitToSquareMetersConversionFactor[unit]
 
 const metersToUnit = (unit) => (value) =>
-  Objects.isNil(value) ? NaN : value / lengthUnitToMetersConversionFactor[unit]
+  Objects.isNil(value) ? NaN : Number(value) / lengthUnitToMetersConversionFactor[unit]
 
 const dataStorageBytesToUnit = (unit) => (bytes) =>
-  Objects.isNil(bytes) ? NaN : bytes / dataStorageUnitToBytesConversionFactor[unit]
+  Objects.isNil(bytes) ? NaN : Number(bytes) / dataStorageUnitToBytesConversionFactor[unit]
 
 const dataStorageValueToBytes = (unit) => (value) =>
-  Objects.isNil(value) ? NaN : value * dataStorageUnitToBytesConversionFactor[unit]
+  Objects.isNil(value) ? NaN : Number(value) * dataStorageUnitToBytesConversionFactor[unit]
+
+const dataStorageValueToUnit = (unitFrom, unitTo) => (value) => {
+  const bytes = dataStorageValueToBytes(unitFrom)(value)
+  return dataStorageBytesToUnit(unitTo)(bytes)
+}
 
 export const NumberConversionUtils = {
   areaUnits,
@@ -66,4 +71,5 @@ export const NumberConversionUtils = {
   dataStorageUnits,
   dataStorageBytesToUnit,
   dataStorageValueToBytes,
+  dataStorageValueToUnit,
 }
