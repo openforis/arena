@@ -23,7 +23,7 @@ import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } fro
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
@@ -201,10 +201,10 @@ export const DataImportCsvView = () => {
           {dataImportType && (
             <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoMultipleEntityOrAttribute')}>
               <>
-                <EntitySelectorTree
+                <NodeDefTreeSelect
                   nodeDefLabelType={nodeDefLabelType}
                   nodeDefUuidActive={selectedNodeDefUuid}
-                  onlyEntities={false}
+                  includeMultipleAttributes
                   onSelect={onNodeDefSelect}
                   isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />

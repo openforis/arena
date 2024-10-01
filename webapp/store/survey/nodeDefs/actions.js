@@ -10,6 +10,7 @@ import * as API from '@webapp/service/api'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
@@ -17,6 +18,7 @@ import { NotificationActions } from '@webapp/store/ui/notification'
 
 import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -29,7 +31,7 @@ export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
 
 // ==== PLAIN ACTIONS
-export const updateNodeDef = ({ nodeDef }) => ({ type: nodeDefUpdate, nodeDef })
+export const updateNodeDef = ({ nodeDef, dirty = false }) => ({ type: nodeDefUpdate, nodeDef, dirty })
 
 export const saveNodeDef = ({ nodeDef, nodeDefParent, surveyCycleKey, nodeDefValidation }) => ({
   type: nodeDefSave,
@@ -51,12 +53,18 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
+  const treeSelectViewMode = SurveyFormState.getGlobalStateTreeSelectViewMode(state)
 
   const nodeDef = NodeDef.newNodeDef(parent, type, [cycle], props)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  if (treeSelectViewMode === TreeSelectViewMode.onlyPages) {
+    navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
+  } else {
+    dispatch(SurveyFormActions.setFormActiveNodeDefUuid(nodeDefUuid))
+  }
 
   return nodeDef
 }
