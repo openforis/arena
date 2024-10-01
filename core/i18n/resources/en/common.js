@@ -1569,6 +1569,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
       },
     },
+    name: 'Property {{position}} name',
+    value: 'Value',
   },
 
   // ===== All validation errors
@@ -1654,6 +1656,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
+    },
+
+    extraPropEdit: {
+      nameInvalid: 'Invalid name',
+      dataTypeRequired: 'Data type required',
     },
 
     nodeDefEdit: {

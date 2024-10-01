@@ -9,6 +9,7 @@ export const keys = {
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
   draft: 'draft',
+  extra: 'extra',
   id: 'id',
   index: 'index',
   name: 'name',
@@ -34,6 +35,8 @@ export const getUuid = R.propOr(null, keys.uuid)
 export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
+export const getExtra = getProp(keys.extra, {})
+export const getExtraProp = (extraPropKey) => R.pipe(getExtra, R.propOr(null, extraPropKey))
 export const isKeyTrue = (key) => (obj) => !!R.propOr(false, key)(obj)
 export const isPropTrue = (prop) => (obj) => !!getProp(prop)(obj)
 

@@ -25,6 +25,7 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 
 import { useEditUser } from './store'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
+import { UserExtraPropsEditor } from './ExtraPropsEditor'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -182,6 +183,8 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
+
+      {<UserExtraPropsEditor user={userToUpdate} />}
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">

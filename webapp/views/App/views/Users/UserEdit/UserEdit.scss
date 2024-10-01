@@ -29,6 +29,13 @@
       grid-template-columns: 0.3fr 0.7fr 5rem;
     }
   }
+
+  .extra-props {
+    .form-item {
+      display: flex;
+      white-space: nowrap;
+    }
+  }
 }
 
 .user-edit__buttons {

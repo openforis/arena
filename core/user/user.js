@@ -18,15 +18,13 @@ export const { keysPrefs, keysSurveyPrefs } = UserPrefs
 export const { keysProps } = UserProps
 
 // ====== READ
-export const { isEqual } = ObjectUtils
-export const { getUuid } = ObjectUtils
+export const { getAuthGroups, getExtra, getExtraProp, getUuid, isEqual } = ObjectUtils
 export const getName = R.propOr('', keys.name)
 export const getEmail = R.prop(keys.email)
 export const getInvitedBy = R.prop(keys.invitedBy)
 export const getInvitedDate = R.prop(keys.invitedDate)
 export const getPassword = R.prop(keys.password)
 export const getLang = R.propOr('en', keys.lang)
-export const { getAuthGroups } = ObjectUtils
 export const getPrefs = R.propOr({}, keys.prefs)
 export const getProps = R.propOr({}, keys.props)
 export const getProfilePicture = R.prop(keys.profilePicture)
