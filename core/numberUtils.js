@@ -12,39 +12,6 @@ BigNumber.config({
   },
 })
 
-export const areaUnits = {
-  squareMeter: 'squareMeter',
-  squareFoot: 'squareFoot',
-  acre: 'acre',
-  hectare: 'hectare',
-}
-
-const areaUnitToSquareMetersConversionFactor = {
-  [areaUnits.acre]: 4046.85642199999983859016,
-  [areaUnits.hectare]: 10000,
-  [areaUnits.squareMeter]: 1,
-  [areaUnits.squareFoot]: 0.09290304,
-}
-
-export const lengthUnits = {
-  meter: 'meter',
-  foot: 'foot',
-}
-
-const lengthUnitToMetersConversionFactor = {
-  [lengthUnits.meter]: 1,
-  [lengthUnits.foot]: 0.3048,
-}
-
-export const abbreviationByUnit = {
-  [areaUnits.squareMeter]: 'm²',
-  [areaUnits.squareFoot]: 'ft²',
-  [areaUnits.acre]: 'ac',
-  [areaUnits.hectare]: 'ha',
-  [lengthUnits.meter]: 'm',
-  [lengthUnits.foot]: 'ft',
-}
-
 export const toNumber = (num) => (Objects.isEmpty(num) ? NaN : Number(num))
 
 export const isInteger = A.pipe(toNumber, Number.isInteger)
@@ -92,8 +59,11 @@ export const formatInteger = (value) => formatDecimal(value, 0)
  */
 export const mod = (modulus) => (value) => ((value % modulus) + modulus) % modulus
 
-export const squareMetersToUnit = (unit) => (value) =>
-  Objects.isNil(value) ? NaN : value / areaUnitToSquareMetersConversionFactor[unit]
-
-export const metersToUnit = (unit) => (value) =>
-  Objects.isNil(value) ? NaN : value / lengthUnitToMetersConversionFactor[unit]
+export const limit =
+  ({ minValue = null, maxValue = null }) =>
+  (value) => {
+    let result = Number(value)
+    if (minValue) result = Math.max(minValue, result)
+    if (maxValue) result = Math.min(maxValue, result)
+    return result
+  }

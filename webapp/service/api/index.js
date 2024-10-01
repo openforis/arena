@@ -62,6 +62,7 @@ export {
   fetchSurveyTemplatesPublished,
   insertSurvey,
   startImportLabelsJob,
+  updateSurveyConfigurationProp,
 } from './survey'
 export {
   convertNodeDef,

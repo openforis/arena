@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NumberUtils from '@core/numberUtils'
+import { NumberConversionUtils } from '@core/numberConversionUtils'
 
 import { useI18n } from '@webapp/store/system'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
@@ -11,15 +12,8 @@ import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 import { FormItem } from '../form/Input'
 import { ButtonIconInfo } from '../buttons'
 
-const {
-  abbreviationByUnit,
-  areaUnits,
-  formatDecimal,
-  lengthUnits,
-  metersToUnit,
-  roundToPrecision,
-  squareMetersToUnit,
-} = NumberUtils
+const { formatDecimal, roundToPrecision } = NumberUtils
+const { areaUnits, lengthUnits, abbreviationByUnit, metersToUnit, squareMetersToUnit } = NumberConversionUtils
 
 const formatNumber = (value) => formatDecimal(roundToPrecision(value, 2))
 

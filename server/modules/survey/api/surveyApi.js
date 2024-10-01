@@ -146,7 +146,8 @@ export const init = (app) => {
     let surveyUpdated = survey
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
       const surveyId = Survey.getId(survey)
-      surveyUpdated = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+      const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+      surveyUpdated = Survey.assocFilesStatistics(filesStatistics)(survey)
     }
     res.json({ survey: surveyUpdated })
   }
@@ -290,6 +291,18 @@ export const init = (app) => {
       const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath })
 
       res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.put('/survey/:surveyId/config', AuthMiddleware.requireSurveyConfigEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { key, value } = Request.getBody(req)
+      const { surveyId } = Request.getParams(req)
+      const survey = await SurveyService.updateSurveyConfigurationProp({ surveyId, key, value })
+      await _sendSurvey({ survey, user, res })
     } catch (error) {
       next(error)
     }

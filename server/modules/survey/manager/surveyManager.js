@@ -10,9 +10,10 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
+import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
-import * as Validation from '@core/validation/validation'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import { db } from '@server/db/db'
@@ -196,6 +197,7 @@ export const {
   fetchSurveysByName,
   fetchSurveyIdsAndNames,
   fetchDependencies,
+  fetchFilesTotalSpace,
 } = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
@@ -416,6 +418,22 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
 
 export const unpublishSurveyProps = async (surveyId, client = db) =>
   SurveyRepository.unpublishSurveyProps(surveyId, client)
+
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) => {
+  if (key !== Survey.configKeys.filesTotalSpace) {
+    throw new Error(`Configuration key update not supported: ${key}`)
+  }
+  const valueLimited = NumberUtils.limit({
+    minValue: FileManager.defaultSurveyFilesTotalSpaceMB,
+    maxValue: FileManager.maxSurveyFilesTotalSpaceMB,
+  })(value)
+  if (valueLimited === FileManager.defaultSurveyFilesTotalSpaceMB) {
+    await SurveyRepository.clearSurveyConfiguration({ surveyId }, client)
+  } else {
+    await SurveyRepository.updateSurveyConfigurationProp({ surveyId, key, value: String(valueLimited) }, client)
+  }
+  return fetchSurveyById({ surveyId, draft: true, validate: true }, client)
+}
 
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
