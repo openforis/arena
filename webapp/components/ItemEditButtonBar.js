@@ -1,6 +1,7 @@
 import './ItemEditButtonBar.scss'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from './buttons'
@@ -33,4 +34,15 @@ export const ItemEditButtonBar = (props) => {
       )}
     </div>
   )
+}
+
+ItemEditButtonBar.propTypes = {
+  dirty: PropTypes.bool,
+  editing: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
+  onEdit: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
+  validation: PropTypes.object,
 }
