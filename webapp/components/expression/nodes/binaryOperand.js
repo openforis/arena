@@ -4,8 +4,15 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ProcessUtils from '@core/processUtils'
 
 import { Button } from '@webapp/components/buttons'
+
+const availableOperandExpressionTypes = [
+  Expression.types.Identifier,
+  Expression.types.Literal,
+  ...(ProcessUtils.ENV.experimentalFeatures ? [Expression.types.CallExpression] : []),
+]
 
 const expressionTypeAcronymByType = {
   [Expression.types.CallExpression]: 'call',
@@ -81,11 +88,8 @@ const BinaryOperand = (props) => {
     [currentNodeDefIsBoolean, isBoolean, isLeft]
   )
 
-  const availableOperandExpressionTypes = useMemo(
-    () =>
-      [Expression.types.Identifier, Expression.types.Literal, Expression.types.CallExpression].filter(
-        canOperandExpressionBeOfType
-      ),
+  const applicableOperandExpressionTypes = useMemo(
+    () => availableOperandExpressionTypes.filter(canOperandExpressionBeOfType),
     [canOperandExpressionBeOfType]
   )
 
@@ -104,7 +108,7 @@ const BinaryOperand = (props) => {
 
   return (
     <div className={`binary-${type}`}>
-      {availableOperandExpressionTypes.map((expressionType) => (
+      {applicableOperandExpressionTypes.map((expressionType) => (
         <BinaryOperandExpressionTypeButton
           key={expressionType}
           active={operandExpressionType === expressionType}
