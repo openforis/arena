@@ -17,10 +17,15 @@ export const useValidate = ({ setState }) => {
     const surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefUpdated })(survey)
 
     // Update local state immediately (see issue #3240)
-    setState(State.assocNodeDef(nodeDefUpdated))
+    let dirty = false
+    setState((statePrev) => {
+      const stateNext = State.assocNodeDef(nodeDefUpdated)(statePrev)
+      dirty = State.isDirty(stateNext)
+      return stateNext
+    })
 
     // // Dispatch update action
-    dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated }))
+    dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated, dirty }))
 
     // // Validate node def
     const validation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDefUpdated)

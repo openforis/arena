@@ -25,7 +25,8 @@ const actionHandlers = {
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
   [NodeDefsActions.nodeDefsDelete]: (state, { nodeDefUuids }) => NodeDefsState.dissocNodeDefs(nodeDefUuids)(state),
 
-  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
+  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef, dirty = false }) =>
+    NodeDefsState.assocNodeDef(nodeDef, dirty)(state),
 
   [NodeDefsActions.nodeDefSave]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 

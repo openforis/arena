@@ -351,7 +351,7 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
 }
 
 export const visitDescendantsAndSelf =
-  ({ visitorFn, nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs }) =>
+  ({ nodeDef = null, cycle = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
   (survey) => {
     const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
     return Surveys.visitDescendantsAndSelfNodeDef({
@@ -378,22 +378,18 @@ export const findDescendants =
     return descendants
   }
 
-export const getDescendantsAndSelf =
-  ({ nodeDef = null }) =>
+export const getNodeDefDescendantsAndSelf =
+  ({ nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs } = {}) =>
   (survey) => {
     const descendants = []
-    const queue = new Queue()
-
-    queue.enqueue(nodeDef || getNodeDefRoot(survey))
-
-    while (!queue.isEmpty()) {
-      const nodeDefCurrent = queue.dequeue()
-
-      descendants.push(nodeDefCurrent)
-
-      const childrenDefs = getNodeDefChildren(nodeDefCurrent)(survey)
-      queue.enqueueItems(childrenDefs)
-    }
+    visitDescendantsAndSelf({
+      nodeDef,
+      cycle,
+      visitorFn: (visitedNodeDef) => {
+        descendants.push(visitedNodeDef)
+      },
+      traverseMethod,
+    })(survey)
     return descendants
   }
 

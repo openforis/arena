@@ -155,6 +155,11 @@ button:disabled,
   }
 }
 
+.node_def__icon {
+  font-size: small;
+  font-family: monospace;
+}
+
 .MuiTextField-root {
   background-color: $inputBackgroundColor;
 
@@ -183,8 +188,4 @@ button:disabled,
     padding: 0.5rem;
     font-size: 0.8rem;
   }
-}
-
-.full-width {
-  width: 100%;
 }

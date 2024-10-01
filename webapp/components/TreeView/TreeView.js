@@ -5,9 +5,15 @@ import PropTypes from 'prop-types'
 
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView'
 import { TreeItem as MuiTreeItem } from '@mui/x-tree-view/TreeItem'
+import { Objects } from '@openforis/arena-core'
+
+import { ArrayUtils } from '@core/arrayUtils'
+
+import { LabelWithTooltip } from '../form/LabelWithTooltip'
 
 const TreeItemPropTypes = PropTypes.shape({
   key: PropTypes.string.isRequired,
+  icon: PropTypes.any,
   items: PropTypes.array,
   label: PropTypes.string.isRequired,
   testId: PropTypes.string,
@@ -15,9 +21,19 @@ const TreeItemPropTypes = PropTypes.shape({
 
 const TreeItemView = (props) => {
   const { item } = props
-  const { key, label, items, testId } = item
+  const { key, icon, label, items, testId } = item
   return (
-    <MuiTreeItem key={key} itemId={key} label={label} data-testid={testId}>
+    <MuiTreeItem
+      key={key}
+      itemId={key}
+      label={
+        <div className="tree-item-label display-flex">
+          {icon}
+          <LabelWithTooltip label={label} />
+        </div>
+      }
+      data-testid={testId}
+    >
       {items?.map((childItem) => (
         <TreeItemView key={childItem.key} item={childItem} />
       ))}
@@ -43,7 +59,8 @@ export const TreeView = (props) => {
       const treeItemKeysBeingCollapsed = expadedItemKeys.filter(
         (oldExpandedItemId) => !itemIds.includes(oldExpandedItemId)
       )
-      if (treeItemKeysBeingCollapsed.length > 0 && event?.target?.className === 'MuiTreeItem-label') {
+      const targetClass = String(event?.target?.className)
+      if (treeItemKeysBeingCollapsed.length > 0 && targetClass.includes('label')) {
         // do not collapse item if it is expanded and label is clicked; handle only selection;
         return false
       }
@@ -54,9 +71,11 @@ export const TreeView = (props) => {
 
   const onSelectedItemsChange = useCallback(
     (_event, itemIds) => {
-      onSelectedItemKeysChange(itemIds)
+      if (!Objects.isEqual(selectedItemKeys, ArrayUtils.toArray(itemIds))) {
+        onSelectedItemKeysChange(itemIds)
+      }
     },
-    [onSelectedItemKeysChange]
+    [onSelectedItemKeysChange, selectedItemKeys]
   )
 
   return (
