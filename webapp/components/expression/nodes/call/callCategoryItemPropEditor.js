@@ -115,6 +115,21 @@ export const CallCategoryItemPropEditor = (props) => {
     return Expression.newCall({ callee: Expression.functionNames.categoryItemProp, params })
   }, [attributeUuidsByLevelUuid, category, extraPropKey, survey])
 
+  const onCategorySelect = useCallback(
+    (item) => {
+      const categoryUuidNext = Category.getUuid(item)
+      if (categoryUuid === categoryUuidNext) return
+
+      setState((statePrev) => ({
+        ...statePrev,
+        categoryUuid: categoryUuidNext,
+        extraPropKey: null,
+        attributeUuidsByLevelUuid: {},
+      }))
+    },
+    [categoryUuid]
+  )
+
   const onConfirm = useCallback(
     () => onConfirmProp(buildCategoryItemPropCall()),
     [buildCategoryItemPropCall, onConfirmProp]
@@ -128,14 +143,7 @@ export const CallCategoryItemPropEditor = (props) => {
         <CategorySelector
           categoryUuid={categoryUuid}
           filterFunction={Category.hasExtraDefs}
-          onChange={(item) => {
-            setState((statePrev) => ({
-              ...statePrev,
-              categoryUuid: Category.getUuid(item),
-              extraPropKey: null,
-              attributeUuidsByLevelUuid: {},
-            }))
-          }}
+          onChange={onCategorySelect}
           showAdd={false}
           showEdit={false}
           showManage={false}

@@ -26,8 +26,8 @@ export const CategorySelector = (props) => {
     disabled = false,
     emptySelection = false,
     filterFunction = null,
-    onCategoryLoad = () => ({}),
-    onChange = () => ({}),
+    onCategoryLoad = A.identity,
+    onChange = A.identity,
     showAdd = true,
     showEdit = true,
     showManage = true,
@@ -56,17 +56,18 @@ export const CategorySelector = (props) => {
     [filterFunction, surveyId, emptySelection, emptyItem, showCategoriesPanel, categoryToEdit]
   )
 
+  const loadCategory = useCallback(async () => {
+    let categorySelected = null
+    if (!A.isEmpty(categoryUuid)) {
+      categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
+      onCategoryLoad(categorySelected)
+    }
+    setCategory(categorySelected)
+  }, [categoryUuid, onCategoryLoad, surveyId])
+
   useEffect(() => {
-    ;(async () => {
-      if (!A.isEmpty(categoryUuid)) {
-        const categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
-        setCategory(categorySelected)
-        onCategoryLoad(categorySelected)
-      } else {
-        setCategory(null)
-      }
-    })()
-  }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
+    loadCategory()
+  }, [loadCategory])
 
   const onCategoryUpdate = useCallback(
     ({ category: categoryUpdated }) => {
