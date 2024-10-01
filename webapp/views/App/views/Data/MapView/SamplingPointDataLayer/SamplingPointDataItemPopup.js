@@ -4,22 +4,34 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
+import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
+import { ButtonNext, ButtonPrevious } from '@webapp/components/buttons'
 import Markdown from '@webapp/components/markdown'
 
-import { useI18n } from '@webapp/store/system'
-import { ButtonAdd, ButtonIconEdit } from '@webapp/components'
-import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
-import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
-import { useAuthCanCreateRecord } from '@webapp/store/user'
 import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useAuthCanCreateRecord } from '@webapp/store/user'
+
 import { useElevation } from '../common/useElevation'
+import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
+
+const generateContent = ({ i18n, itemCodes, locationPoint, elevation }) => {
+  const levelCodesList = itemCodes
+    .map((code, index) => `* **${i18n.t('mapView.samplingPointItemPopup.levelCode', { level: index + 1 })}**: ${code}`)
+    .join('\n')
+  const locationSummary = LocationSummaryGenerator.generateSummary({ i18n, point: locationPoint, elevation })
+
+  return `**${i18n.t('mapView.samplingPointItemPopup.title')}**
+${levelCodesList}
+${locationSummary}`
+}
 
 export const SamplingPointDataItemPopup = (props) => {
   const { createRecordFromSamplingPointDataItem, flyToNextPoint, flyToPreviousPoint, onRecordEditClick, pointFeature } =
     props
 
   const { properties: pointProperties } = pointFeature
-  const { itemUuid, itemCodes, itemPoint: point, recordUuid } = pointProperties
+  const { itemUuid, itemCodes, itemLatLongPoint: point, locationPoint, recordUuid } = pointProperties
 
   const popupRef = useRef(null)
   const i18n = useI18n()
@@ -38,15 +50,7 @@ export const SamplingPointDataItemPopup = (props) => {
 
   const elevation = useElevation({ survey, point, active: open })
 
-  const content = `**${i18n.t('mapView.samplingPointItemPopup.title')}**
-${itemCodes
-  .map((code, index) => `* **${i18n.t('mapView.samplingPointItemPopup.levelCode', { level: index + 1 })}**: ${code}`)
-  .join('\n')}
-* **${i18n.t('mapView.samplingPointItemPopup.location')}**:
-  * **X**: ${point.x}
-  * **Y**: ${point.y}
-  * **SRS**: ${point.srs}
-* **${i18n.t('mapView.elevation')}**: ${elevation}`
+  const content = generateContent({ i18n, itemCodes, locationPoint, elevation })
 
   const onClickNext = () => {
     flyToNextPoint(pointFeature)

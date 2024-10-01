@@ -6,9 +6,8 @@ import PropTypes from 'prop-types'
 import circleToPolygon from 'circle-to-polygon'
 import L from 'leaflet'
 
-import { Objects, PointFactory, DEFAULT_SRS } from '@openforis/arena-core'
+import { Objects, PointFactory } from '@openforis/arena-core'
 
-import * as NumberUtils from '@core/numberUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
@@ -23,6 +22,7 @@ import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import { useElevation } from '../common/useElevation'
+import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
 import { WhispMenuButton } from './WhispMenuButton'
 
 const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
@@ -53,15 +53,9 @@ const buildPath = ({ survey, attributeDef, ancestorsKeys, lang }) => {
 }
 
 const generateContent = ({ i18n, recordOwnerName, point, path, elevation }) => {
-  const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
-  const xFormatted = NumberUtils.roundToPrecision(point.x, coordinateNumericFieldPrecision)
-  const yFormatted = NumberUtils.roundToPrecision(point.y, coordinateNumericFieldPrecision)
-
+  const locationSummary = LocationSummaryGenerator.generateSummary({ i18n, point, elevation })
   const content = `**${path}**
-* **X**: ${xFormatted}
-* **Y**: ${yFormatted}
-* **SRS**: ${point.srs}
-* **${i18n.t('mapView.elevation')}**: ${elevation}
+${locationSummary}
 * **${i18n.t('common.owner')}**: ${recordOwnerName ?? '...'}`
   return content
 }
