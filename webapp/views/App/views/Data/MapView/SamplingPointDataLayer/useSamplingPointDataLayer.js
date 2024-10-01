@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 
-import { PointFactory } from '@openforis/arena-core'
+import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -26,14 +26,25 @@ const _convertItemsToPoints = (items) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
     if (!latLng) return acc
 
+    const locationPoint = Points.parse(location)
+
     const [lat, long] = latLng
-    const itemPoint = PointFactory.createInstance({ x: long, y: lat })
+    const itemLatLongPoint = PointFactory.createInstance({ x: long, y: lat })
 
     bounds.extend([lat, long])
 
     acc.push({
       type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location, recordUuid },
+      properties: {
+        cluster: false,
+        itemUuid,
+        itemCodes,
+        itemLatLongPoint,
+        key: itemUuid,
+        location,
+        locationPoint,
+        recordUuid,
+      },
       geometry: {
         type: 'Point',
         coordinates: [long, lat],
