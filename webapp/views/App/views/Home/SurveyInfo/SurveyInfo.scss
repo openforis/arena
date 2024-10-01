@@ -9,7 +9,7 @@
   }
 
   .form-item {
-    grid-template-columns: 0.2fr 0.7fr;
+    grid-template-columns: 0.2fr 0.65fr;
   }
 
   .lanuages_editor__input_chips {
@@ -24,6 +24,15 @@
 
   .sample-based-image-interpretation-form-item {
     align-items: baseline;
+  }
+
+  .survey-info-configuration {
+    width: 25rem;
+    justify-self: center;
+
+    .form-item {
+      grid-template-columns: 0.5fr 0.5fr;
+    }
   }
 
   .btn-save {

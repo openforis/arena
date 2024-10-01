@@ -5,11 +5,17 @@ import * as RecordFile from '@core/record/recordFile'
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+
 import * as FileRepository from '../repository/fileRepository'
 import * as FileRepositoryFileSystem from '../repository/fileRepositoryFileSystem'
 import * as FileRepositoryS3Bucket from '../repository/fileRepositoryS3Bucket'
+import { NumberConversionUtils } from '@core/numberConversionUtils'
 
 const logger = Log.getLogger('FileManager')
+
+export const defaultSurveyFilesTotalSpaceMB = 10 * 1024 // in MB (=10 GB)
+export const maxSurveyFilesTotalSpaceMB = 100 * 1024 // in MB (=100 GB)
 
 export const fileContentStorageTypes = {
   db: 'db',
@@ -72,6 +78,12 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
 export const fetchFileContentAsBuffer = async ({ surveyId, fileUuid }, client = db) => {
   const contentStream = await fetchFileContentAsStream({ surveyId, fileUuid }, client)
   return streamToBuffer(contentStream)
+}
+
+export const fetchSurveyFilesTotalSpace = async ({ surveyId }) => {
+  const surveyTotalSpaceMB = await SurveyRepository.fetchFilesTotalSpace(surveyId)
+  const totalSpaceMB = surveyTotalSpaceMB ?? defaultSurveyFilesTotalSpaceMB
+  return NumberConversionUtils.dataStorageValueToBytes(NumberConversionUtils.dataStorageUnits.MB)(totalSpaceMB)
 }
 
 export const insertFile = async (surveyId, file, client = db) => {

@@ -437,6 +437,10 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      configuration: {
+        title: 'Configuration',
+        filesTotalSpace: 'Files total space (GB)',
+      },
       confirmDeleteCycleHeader: 'Delete this cycle?',
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
@@ -807,6 +811,7 @@ Merge cannot be performed.`,
     editRecord: 'Edit record',
     earthMap: 'Earth Map',
     elevation: 'Elevation (m)',
+    location: 'Location',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     options: {
@@ -820,7 +825,6 @@ Merge cannot be performed.`,
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
       title: 'Sampling Point Item',
-      location: 'Location',
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
