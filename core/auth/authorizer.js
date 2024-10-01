@@ -53,6 +53,7 @@ export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditSurveyConfig = (user) => User.isSystemAdmin(user)
 export const canEditTemplates = (user) => User.isSystemAdmin(user)
 export const canRefreshAllSurveyRdbs = (user) => User.isSystemAdmin(user)
 

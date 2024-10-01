@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
-import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from '@webapp/components'
+import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'
 
@@ -53,23 +53,16 @@ export const ExtraPropDefEditor = (props) => {
         }
         validation={Validation.getFieldValidation(ExtraPropDef.keys.dataType)(validation)}
       />
-      {!editing && !readOnly && (
-        <>
-          <ButtonIconEdit disabled={readOnly} showLabel={false} onClick={onEditClick} />
-          <ButtonDelete disabled={readOnly} showLabel={false} onClick={() => onItemDelete({ index })} />
-        </>
-      )}
-      {editing && (
-        <>
-          <ButtonSave
-            className="btn-save"
-            showLabel={false}
-            disabled={Validation.isNotValid(validation) || !dirty}
-            onClick={onSaveClick}
-          />
-          <ButtonCancel showLabel={false} onClick={onCancelClick} />
-        </>
-      )}
+      <ItemEditButtonBar
+        dirty={dirty}
+        editing={editing}
+        onCancel={onCancelClick}
+        onDelete={() => onItemDelete({ index })}
+        onEdit={onEditClick}
+        onSave={onSaveClick}
+        readOnly={readOnly}
+        validation={validation}
+      />
     </FormItem>
   )
 }
