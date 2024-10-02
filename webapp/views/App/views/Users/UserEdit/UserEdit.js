@@ -8,23 +8,20 @@ import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import * as AuthGroup from '@core/auth/authGroup'
 
-import { useI18n } from '@webapp/store/system'
-
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
 
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
-import DropdownUserGroup from '../DropdownUserGroup'
-
-import ProfilePictureEditor from './ProfilePictureEditor'
-
 import { useEditUser } from './store'
-import { appModuleUri, userModules } from '@webapp/app/appModules'
+import DropdownUserGroup from '../DropdownUserGroup'
+import ProfilePictureEditor from './ProfilePictureEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 
 const UserEdit = () => {
