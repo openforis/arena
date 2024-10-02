@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { trim, isNotBlank } from '@core/stringUtils'
+import { isBlank, isNotBlank, trim } from '@core/stringUtils'
 import { types } from './types'
 import { thisVariable } from '../expressionConstants'
 
@@ -49,8 +49,10 @@ const typeProps = {
 const getTypeProp = (type, prop) => R.path([type, prop], typeProps)
 
 export const toString = (expr) => {
+  if (isBlank(expr)) return ''
   const toStringFn = getTypeProp(expr.type, 'toString')
-  return trim(toStringFn(expr))
+  const exprStr = toStringFn(expr)
+  return trim(exprStr)
 }
 
 export const isValid = (expr) => getTypeProp(expr.type, 'isValid')(expr)

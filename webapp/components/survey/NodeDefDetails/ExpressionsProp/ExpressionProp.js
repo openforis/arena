@@ -17,27 +17,25 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const ExpressionProp = (props) => {
   const {
+    applyIf = true, // Show apply if expression editor
+    canBeConstant = false,
+    canBeCall = true,
+    excludeCurrentNodeDef = true,
+    expression,
+    hideAdvanced = false,
     index,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
     nodeDefUuidContext = null,
     nodeDefUuidCurrent = null,
-    expression,
-    excludeCurrentNodeDef = true,
-    qualifier,
-    validation = null,
-
-    applyIf = true, // Show apply if expression editor
-    severity = false, // Show severity (error/warning) button group
-    showLabels = false, // Show error message labels editor
-    readOnly = false,
-
-    isContextParent = false,
-    canBeConstant = false,
-    isBoolean = true,
-    hideAdvanced = false,
-    mode = Expression.modes.json,
-
     onUpdate = () => {},
     onDelete = () => {},
+    qualifier,
+    readOnly = false,
+    severity = false, // Show severity (error/warning) button group
+    showLabels = false, // Show error message labels editor
+    validation = null,
   } = props
 
   const i18n = useI18n()
@@ -75,6 +73,7 @@ const ExpressionProp = (props) => {
             query={NodeDefExpression.getExpression(expression)}
             onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocExpression(query)(expression), callback)}
             isContextParent={isContextParent}
+            canBeCall={canBeCall}
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
             types={expressionEditorTypes}
@@ -97,6 +96,7 @@ const ExpressionProp = (props) => {
               query={NodeDefExpression.getApplyIf(expression)}
               onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
               isContextParent={isContextParent}
+              canBeCall
               canBeConstant={false}
               readOnly={readOnly}
               types={expressionEditorTypes}
@@ -144,6 +144,7 @@ ExpressionProp.propTypes = {
   readOnly: PropTypes.bool,
 
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,

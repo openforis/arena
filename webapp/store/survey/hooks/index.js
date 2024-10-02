@@ -39,20 +39,69 @@ export const useNodeDefRootKeys = () => {
   return Survey.getNodeDefKeysSorted({ nodeDef: root, cycle })(survey)
 }
 
+export const useCategoryByName = (name) =>
+  useSelector((state) => {
+    if (!name) return null
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getCategoryByName(name)(survey)
+  })
+
+export const useTaxonomies = () =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getTaxonomiesArray(survey)
+  }, Objects.isEqual)
+
+export const useTaxonomyByUuid = (uuid) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getTaxonomyByUuid(uuid)(survey)
+  })
+
+export const useTaxonomyByName = (name) =>
+  useSelector((state) => {
+    if (!name) return null
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getTaxonomyByName(name)(survey)
+  })
+
 // ==== Node defs
 export const useNodeDefByUuid = (uuid) =>
   useSelector((state) => {
+    if (!uuid) return null
     const survey = SurveyState.getSurvey(state)
     return Survey.getNodeDefByUuid(uuid)(survey)
   })
-export const useNodeDefsByUuids = (uuids) => Survey.getNodeDefsByUuids(uuids)(useSurvey())
+export const useNodeDefByName = (name) =>
+  useSelector((state) => {
+    if (!name) return null
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getNodeDefByName(name)(survey)
+  })
+
+export const useNodeDefsByUuids = (uuids) =>
+  useSelector((state) => {
+    if (!uuids?.length) return []
+    const survey = SurveyState.getSurvey(state)
+    return Survey.getNodeDefsByUuids(uuids)(survey)
+  }, Objects.isEqual)
+
+export const useNodeDefsByNames = (names) =>
+  useSelector((state) => {
+    if (!names?.length) return []
+    const survey = SurveyState.getSurvey(state)
+    return names.map((name) => Survey.getNodeDefByName(name)(survey))
+  }, Objects.isEqual)
+
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
+
 export const useNodeDefValidationByUuid = (uuid) =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
     const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
     return Survey.getNodeDefValidation(nodeDef)(survey)
-  })
+  }, Objects.isEqual)
+
 export const useSurveyHasFileAttributes = () =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)

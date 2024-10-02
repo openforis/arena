@@ -44,7 +44,7 @@ const loadItems = async (params) => {
 }
 
 const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
-  if (BinaryOperandType.isLeft(type)) {
+  if (!type || BinaryOperandType.isLeft(type)) {
     return nodeDefCurrent
   }
   if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
@@ -162,11 +162,11 @@ const Literal = (props) => {
 }
 
 Literal.propTypes = {
-  expressionNodeParent: PropTypes.any.isRequired,
+  expressionNodeParent: PropTypes.any,
   node: PropTypes.any.isRequired,
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
-  type: PropTypes.string.isRequired,
+  type: PropTypes.string,
 }
 
 export default Literal

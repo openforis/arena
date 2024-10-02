@@ -16,6 +16,7 @@ import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
   const {
+    canBeCall = false,
     canBeConstant = false,
     excludeCurrentNodeDef = true,
     index = 0,
@@ -71,6 +72,7 @@ const ExpressionEditor = (props) => {
           excludeCurrentNodeDef={excludeCurrentNodeDef}
           mode={mode}
           isContextParent={isContextParent}
+          canBeCall={canBeCall}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
           onClose={onClose}
@@ -111,6 +113,7 @@ ExpressionEditor.propTypes = {
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,

@@ -82,6 +82,7 @@ Please check also the Spam/Junk mail folder.`,
     formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
+    function: 'Function',
     goToHomePage: 'Go to Home Page',
     group: 'Group',
     help: 'Help',
@@ -159,6 +160,7 @@ Do you want to proceed?`,
     samplingPolygon: 'Sampling Polygon',
     show: 'Show',
     select: 'Select',
+    selectOne: 'Select one...',
     selectAll: 'Select all',
     selected: 'Selected',
     showLabels: 'Show labels',
@@ -174,6 +176,7 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
+    value: 'Value',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     view: 'View',
     warning: 'Warning',
@@ -1194,6 +1197,7 @@ $t(common.appNameFull)
     advanced: 'Advanced',
     validations: 'Validations',
     function: 'Function',
+    editingFunction: 'Editing function {{functionName}}',
     editorHelp: {
       json: 'Valid expressions are a subset of Javascript.',
       sql: 'Only valid SQL expressions are allowed.',
@@ -1207,6 +1211,7 @@ $t(common.appNameFull)
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
+      isNotEmpty: 'Returns true if the argument has some value specified',
       last: 'Returns the last value or node of the specified multiple attribute or entity',
       ln: 'Returns the natural logarithm of X',
       log10: 'Returns the base 10 logarithm of X',
@@ -1215,12 +1220,16 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
+    },
+    functionName: {
+      rowIndex: 'Row index',
     },
     basicProps: {
       analysis: 'Analysis',
@@ -1349,6 +1358,8 @@ E.g. this.region = region_attribute_name
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
     nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
+    filterVariable: 'Variable to filter items',
+    filterVariableForLevel: 'Variable for {{levelName}}',
   },
 
   languagesEditor: {
@@ -1821,9 +1832,16 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
+    call: 'Function',
+    operator: 'Operator',
+
+    error: {
+      selectOneVariable: 'Please select one variable',
+    },
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
+      editingFunctionForNodeDefinition: 'Editing function "{{functionName}}" for "{{nodeDef}}"',
     },
 
     qualifier: {
@@ -1833,6 +1851,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
     },
+
+    selectAFunction: 'Select a function',
   },
 
   // ====== Auth
