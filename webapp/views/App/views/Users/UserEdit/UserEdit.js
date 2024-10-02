@@ -25,7 +25,7 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 
 import { useEditUser } from './store'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
-import { UserExtraPropsEditor } from './ExtraPropsEditor'
+import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 
 const UserEdit = () => {
   const { userUuid } = useParams()

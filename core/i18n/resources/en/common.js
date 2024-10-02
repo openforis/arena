@@ -1664,7 +1664,9 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     extraPropEdit: {
       nameInvalid: 'Invalid name',
+      nameRequired: 'Name required',
       dataTypeRequired: 'Data type required',
+      valueRequired: 'Value required',
     },
 
     nodeDefEdit: {

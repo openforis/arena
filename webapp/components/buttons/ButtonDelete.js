@@ -8,9 +8,10 @@ export const ButtonDelete = (props) => {
   return (
     <Button
       {...props}
-      label={label}
       className={classNames('btn-danger btn-delete', props.className)}
       iconClassName="icon-bin2 icon-12px"
+      label={label}
+      variant="text"
     />
   )
 }
