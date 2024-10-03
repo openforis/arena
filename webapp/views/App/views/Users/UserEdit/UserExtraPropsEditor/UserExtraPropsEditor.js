@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
 
@@ -8,8 +9,17 @@ import { UUIDs } from '@openforis/arena-core'
 
 import { UserExtraPropEditor } from './UserExtraPropEditor'
 
+const extraEntryToItem = ([name, value]) => ({ uuid: UUIDs.v4(), name, value })
+const extraToItems = (extra) => Object.entries(extra).map(extraEntryToItem)
+
+const itemsToExtraProps = (items) =>
+  items.reduce((acc, item) => {
+    acc[item.name] = item.value
+    return acc
+  }, {})
+
 export const UserExtraPropsEditor = (props) => {
-  const { user } = props
+  const { onChange, user } = props
 
   const extra = User.getExtra(user)
 
@@ -17,7 +27,7 @@ export const UserExtraPropsEditor = (props) => {
 
   const [state, setState] = useState({
     editing: false,
-    items: Object.entries(extra).map(([key, value]) => ({ uuid: UUIDs.v4(), name: key, value })),
+    items: extraToItems(extra),
   })
 
   const { editing, items } = state
@@ -27,13 +37,21 @@ export const UserExtraPropsEditor = (props) => {
     setState((statePrev) => ({ ...statePrev, editing: true, items: [...statePrev.items, newItem] }))
   }, [])
 
+  const onItemsUpdate = useCallback(
+    (itemsUpdated) => {
+      setState((statePrev) => ({ ...statePrev, items: itemsUpdated }))
+      onChange(itemsToExtraProps(itemsUpdated))
+    },
+    [onChange]
+  )
+
   const onItemSave = useCallback(
     ({ item, index }) => {
       const itemsUpdated = [...items]
       itemsUpdated[index] = item
-      setState((statePrev) => ({ ...statePrev, items: itemsUpdated }))
+      onItemsUpdate(itemsUpdated)
     },
-    [items]
+    [items, onItemsUpdate]
   )
 
   const onItemDelete = useCallback(
@@ -41,9 +59,9 @@ export const UserExtraPropsEditor = (props) => {
       const itemsUpdated = [...items]
       const itemIndex = items.indexOf((itm) => itm.uuid === item.uuid)
       itemsUpdated.splice(itemIndex, 1)
-      setState((statePrev) => ({ ...statePrev, items: itemsUpdated }))
+      onItemsUpdate(itemsUpdated)
     },
-    [items]
+    [items, onItemsUpdate]
   )
 
   const onItemEditChange = useCallback((editingItem) => {
@@ -72,4 +90,9 @@ export const UserExtraPropsEditor = (props) => {
       <ButtonAdd disabled={editing || items.some((item) => item.newItem)} onClick={onAdd} />
     </fieldset>
   )
+}
+
+UserExtraPropsEditor.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 }

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
@@ -130,4 +131,17 @@ export const UserExtraPropEditor = (props) => {
       />
     </div>
   )
+}
+
+UserExtraPropEditor.propTypes = {
+  editingItems: PropTypes.bool,
+  extraProps: PropTypes.object,
+  index: PropTypes.number.isRequired,
+  name: PropTypes.string,
+  newItem: PropTypes.bool,
+  onDelete: PropTypes.func.isRequired,
+  onEditChange: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  uuid: PropTypes.string,
+  value: PropTypes.string,
 }

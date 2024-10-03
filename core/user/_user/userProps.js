@@ -14,6 +14,8 @@ export const keysProps = {
   mapApiKeyByProvider: 'mapApiKeyByProvider',
   // restricted props (editable only by system admins)
   maxSurveys: 'maxSurveys',
+  // custom extra properties
+  extra: ObjectUtils.keys.extra,
 }
 
 const privateProps = [keysProps.mapApiKeyByProvider]
@@ -55,6 +57,7 @@ export const assocMapApiKey =
     return assocProp(keysProps.mapApiKeyByProvider)(mapApiKeyByProviderUpdated)(user)
   }
 export const assocMaxSurveys = assocProp(keysProps.maxSurveys)
+export const assocExtra = assocProp(keysProps.extra)
 
 const dissocListOfProps = (propsArray) => (user) =>
   propsArray.reduce((acc, propKey) => R.dissocPath([userKeys.props, propKey])(acc), user)

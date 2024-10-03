@@ -96,6 +96,13 @@ export const useEditUser = ({ userUuid }) => {
     }
   }, [])
 
+  const onExtraChange = useCallback(
+    (extra) => {
+      onUpdate(User.assocExtra(extra)(userToUpdate))
+    },
+    [onUpdate, userToUpdate]
+  )
+
   return {
     hideSurveyGroup,
     ready,
@@ -109,6 +116,7 @@ export const useEditUser = ({ userUuid }) => {
     onSave,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
+    onExtraChange,
     onRemove,
     onInviteRepeat,
   }

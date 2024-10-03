@@ -49,6 +49,7 @@ const UserEdit = () => {
     onUpdateProfilePicture,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
+    onExtraChange,
     onSave,
     onRemove,
     onInviteRepeat,
@@ -73,7 +74,7 @@ const UserEdit = () => {
   const editingSameUser = User.isEqual(user)(userToUpdate)
 
   return (
-    <div className="user-edit form" key={userUuid}>
+    <div className="user-edit" key={userUuid}>
       {canEdit ? (
         <ProfilePictureEditor
           userUuid={userUuid}
@@ -181,7 +182,7 @@ const UserEdit = () => {
         </fieldset>
       )}
 
-      {<UserExtraPropsEditor user={userToUpdate} />}
+      {<UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">

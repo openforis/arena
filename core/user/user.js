@@ -10,12 +10,12 @@ import * as UserProps from './_user/userProps'
 import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
+export { keysProps } from './_user/userProps'
 export { userStatus } from './_user/userStatus'
 
 export const nameMaxLength = 128
 
 export const { keysPrefs, keysSurveyPrefs } = UserPrefs
-export const { keysProps } = UserProps
 
 // ====== READ
 export const { getAuthGroups, getExtra, getExtraProp, getUuid, isEqual } = ObjectUtils
@@ -109,6 +109,7 @@ export const {
   assocTitle,
   assocMapApiKey,
   assocMaxSurveys,
+  assocExtra,
   titleKeys,
   titleKeysArray,
   newProps,

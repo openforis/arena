@@ -18,7 +18,6 @@ export const keys = {
   invitedBy: 'invitedBy',
   invitedDate: 'invitedDate',
   lastLoginTime: 'lastLoginTime',
-  extra: ObjectUtils.keys.extra,
 
   // Used only when editing user auth groups
   authGroupsUuids: 'authGroupsUuids',
