@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { UUIDs } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 
-import { ButtonAdd } from '@webapp/components'
-import { useI18n } from '@webapp/store/system'
-import { UUIDs } from '@openforis/arena-core'
+import { ButtonAdd, ExpansionPanel } from '@webapp/components'
 
 import { UserExtraPropEditor } from './UserExtraPropEditor'
 
@@ -22,8 +22,6 @@ export const UserExtraPropsEditor = (props) => {
   const { onChange, user } = props
 
   const extra = User.getExtra(user)
-
-  const i18n = useI18n()
 
   const [state, setState] = useState({
     editing: false,
@@ -69,15 +67,13 @@ export const UserExtraPropsEditor = (props) => {
   }, [])
 
   return (
-    <fieldset className="extra-props">
-      <legend>{i18n.t('extraProp.label_plural')}</legend>
-
+    <ExpansionPanel buttonLabel="extraProp.label_plural" className="extra-props" startClosed={items.length === 0}>
       {items.map(({ name, newItem, uuid, value }, index) => (
         <UserExtraPropEditor
           key={uuid}
           editingItems={editing}
-          extraProps={items}
           index={index}
+          items={items}
           name={name}
           newItem={newItem}
           onDelete={onItemDelete}
@@ -87,8 +83,13 @@ export const UserExtraPropsEditor = (props) => {
           value={value}
         />
       ))}
-      <ButtonAdd disabled={editing || items.some((item) => item.newItem)} onClick={onAdd} />
-    </fieldset>
+      <ButtonAdd
+        className="btn-add"
+        disabled={editing || items.some((item) => item.newItem)}
+        label="extraProp.addExtraProp"
+        onClick={onAdd}
+      />
+    </ExpansionPanel>
   )
 }
 

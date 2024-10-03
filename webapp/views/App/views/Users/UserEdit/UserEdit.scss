@@ -36,6 +36,9 @@
       display: flex;
       white-space: nowrap;
     }
+    .btn-add {
+      justify-self: center;
+    }
   }
 }
 
@@ -45,6 +48,7 @@
   align-items: center;
   position: relative;
   gap: 3rem;
+  margin-top: 1rem;
 
   .btn-back {
     align-self: flex-start;

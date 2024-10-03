@@ -10,15 +10,16 @@ import { useI18n } from '@webapp/store/system'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 import { useConfirmAsync } from '@webapp/components/hooks'
 
-const validateExtraProp = async (extraProp, extraProps) =>
+const validateExtraProp = async (extraProp, items) =>
   Validator.validate(extraProp, {
     name: [
       Validator.validateRequired(Validation.messageKeys.extraPropEdit.nameRequired),
       Validator.validateName(Validation.messageKeys.extraPropEdit.nameInvalid),
       (_, item) => {
-        const { name } = item
+        const { name, uuid } = item
         if (StringUtils.isBlank(name)) return null
-        const isDuplicate = extraProps.map((extraProp) => extraProp.name).includes(name)
+        const isDuplicate = items.some((extraProp) => extraProp.name === name && extraProp.uuid !== uuid)
+
         return isDuplicate ? { key: Validation.messageKeys.nameDuplicate } : null
       },
     ],
@@ -28,7 +29,7 @@ const validateExtraProp = async (extraProp, extraProps) =>
 export const UserExtraPropEditor = (props) => {
   const {
     editingItems,
-    extraProps,
+    items,
     index,
     name: nameProp,
     newItem = false,
@@ -49,14 +50,14 @@ export const UserExtraPropEditor = (props) => {
   const { editing, name, validation, value } = state
 
   const editedItem = useMemo(() => ({ name, uuid, value }), [name, uuid, value])
-  const dirty = useMemo(() => name !== nameProp && value !== valueProp, [name, nameProp, value, valueProp])
+  const dirty = useMemo(() => name !== nameProp || value !== valueProp, [name, nameProp, value, valueProp])
 
   useEffect(() => {
     if (!editing) return
-    validateExtraProp(editedItem, extraProps).then((val) =>
+    validateExtraProp(editedItem, items).then((val) => {
       setState((statePrev) => ({ ...statePrev, validation: val }))
-    )
-  }, [editedItem, editing, extraProps])
+    })
+  }, [editedItem, editing, items])
 
   const toggleEdit = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, editing: !editing }))
@@ -135,7 +136,7 @@ export const UserExtraPropEditor = (props) => {
 
 UserExtraPropEditor.propTypes = {
   editingItems: PropTypes.bool,
-  extraProps: PropTypes.object,
+  items: PropTypes.array.isRequired,
   index: PropTypes.number.isRequired,
   name: PropTypes.string,
   newItem: PropTypes.bool,

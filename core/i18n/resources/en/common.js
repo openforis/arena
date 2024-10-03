@@ -1555,6 +1555,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   extraProp: {
     label: 'Extra property',
     label_plural: 'Extra properties',
+    addExtraProp: 'Add extra property',
     dataTypes: {
       geometryPoint: 'Geometry Point',
       number: 'Number',
