@@ -262,7 +262,15 @@ const _updateNodeAndValidateRecordUniqueness = async (
     let recordUpdated = recordUpdated1
 
     const { record: recordUpdated2, nodes: updatedNodesAndDependents } = await _onNodesUpdate(
-      { survey, record: recordUpdated, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+      {
+        user,
+        survey,
+        record: recordUpdated,
+        nodesUpdated,
+        timezoneOffset,
+        nodesUpdateListener,
+        nodesValidationListener,
+      },
       t
     )
     recordUpdated = recordUpdated2
@@ -316,7 +324,7 @@ const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
 }
 
 const _onNodesUpdate = async (
-  { survey, record, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
+  { user, survey, record, nodesUpdated, timezoneOffset, nodesUpdateListener, nodesValidationListener },
   t
 ) => {
   // 1. update record and notify
@@ -326,7 +334,7 @@ const _onNodesUpdate = async (
 
   // 2. update dependent nodes
   const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } =
-    await NodeUpdateManager.updateNodesDependents({ survey, record, nodes: nodesUpdated, timezoneOffset }, t)
+    await NodeUpdateManager.updateNodesDependents({ user, survey, record, nodes: nodesUpdated, timezoneOffset }, t)
   if (nodesUpdateListener) {
     nodesUpdateListener(updatedDependentNodes)
   }

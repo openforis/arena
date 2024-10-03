@@ -2761,6 +2761,20 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@openforis/arena-core@../arena-core":
+  version "0.0.205"
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.3"
+    bignumber.js "^9.1.2"
+    jsep "^1.3.8"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    moment "^2.30.1"
+    proj4 "^2.11.0"
+    uuid "^10.0.0"
+
 "@openforis/arena-core@^0.0.204":
   version "0.0.204"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.204/aa4aec1004bbd93b778ea3d720f165501f0b4f26#aa4aec1004bbd93b778ea3d720f165501f0b4f26"

@@ -66,6 +66,7 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
     let record = null
     if (dryRun) {
       const { record: recordCreated } = await RecordUpdater.createRootEntity({
+        user,
         survey,
         record: recordToInsert,
         sideEffect: true,
