@@ -37,6 +37,7 @@ export const DataExportOptionsPanel = (props) => {
       dataExportOptions.includeCategories,
       dataExportOptions.includeAncestorAttributes,
       dataExportOptions.includeFiles,
+      dataExportOptions.includeFileAttributeDefs,
     ]
     if (canAnalyzeRecords) {
       options.push(dataExportOptions.includeAnalysis)
@@ -56,6 +57,10 @@ export const DataExportOptionsPanel = (props) => {
         <Checkbox
           key={optionKey}
           checked={selectedOptionsByKey[optionKey]}
+          disabled={
+            optionKey === dataExportOptions.includeFileAttributeDefs &&
+            selectedOptionsByKey[dataExportOptions.includeFiles]
+          }
           info={infoMessageKeyByOption[optionKey]}
           label={`dataExportView.options.${optionKey}`}
           onChange={onOptionChange(optionKey)}

@@ -210,6 +210,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     expandCategoryItems,
     includeAncestorAttributes,
     includeAnalysis,
+    includeFileAttributeDefs,
     includeFiles,
     includeInternalUuids,
     recordsModifiedAfter,
@@ -256,7 +257,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         ? getChildAttributes(nodeDefContext)
         : // Multiple attribute
           [nodeDefContext]
-    ).filter((childDef) => includeFiles || !NodeDef.isFile(childDef))
+    ).filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
 
     const ancestorDefs = []
     if (includeAncestorAttributes) {
