@@ -1216,6 +1216,9 @@ $t(common.appNameFull)
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+      userEmail: 'Returns the email of the logged in user',
+      userName: 'Returns the name of the logged in user',
+      userProp: 'Returns the value of the specified $t(extraProp.label) of the logged in user',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
