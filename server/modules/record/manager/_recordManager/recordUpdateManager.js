@@ -350,12 +350,7 @@ const _onNodesUpdate = async (
   const nodesToValidate = _getDependentNodesToValidate({ survey, record, nodes: updatedNodesAndDependents })
 
   const recordUpdated = await validateNodesAndPersistToRDB(
-    {
-      survey,
-      record,
-      nodes: nodesToValidate,
-      nodesValidationListener,
-    },
+    { user, survey, record, nodes: nodesToValidate, nodesValidationListener },
     t
   )
   return {
@@ -404,17 +399,14 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
   await RecordRepository.updateRecordDateModified({ surveyId, recordUuid }, t)
 }
 
-const validateNodesAndPersistToRDB = async ({ survey, record, nodes, nodesValidationListener = null }, t) => {
+const validateNodesAndPersistToRDB = async ({ user, survey, record, nodes, nodesValidationListener = null }, t) => {
   const nodesArray = Object.values(nodes)
   const nodesToValidate = nodesArray.reduce(
     (nodesAcc, node) => (Node.isDeleted(node) ? nodesAcc : { ...nodesAcc, [Node.getUuid(node)]: node }),
     {}
   )
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(
-    survey,
-    record,
-    nodesToValidate,
-    true,
+    { user, survey, record, nodes: nodesToValidate, validateRecordUniqueness: true },
     t
   )
   if (nodesValidationListener) {

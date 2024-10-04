@@ -109,12 +109,13 @@ export default class RecordCheckJob extends Job {
   }
 
   async _checkRecord(surveyAndNodeDefs, recordUuid) {
+    const { surveyId, user, tx } = this
     const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids } = surveyAndNodeDefs
 
     // this.logDebug(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes
-    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId: this.surveyId, recordUuid }, this.tx)
+    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
 
     // 2. remove deleted nodes
     if (!R.isEmpty(nodeDefDeletedUuids)) {
@@ -123,7 +124,7 @@ export default class RecordCheckJob extends Job {
         this.surveyId,
         nodeDefDeletedUuids,
         record,
-        this.tx
+        tx
       )
       record = recordDeletedNodes || record
     }
@@ -152,7 +153,7 @@ export default class RecordCheckJob extends Job {
         nodeDefAddedOrUpdatedUuids,
         record,
         nodesInsertedByUuid,
-        this.tx
+        tx
       )
       record = recordUpdate || record
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedDefaultValues)
@@ -162,9 +163,9 @@ export default class RecordCheckJob extends Job {
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
     for await (const node of allUpdatedNodesArray) {
       if (Node.isCreated(node)) {
-        this.nodesBatchInserter.addItem(node, this.tx)
+        this.nodesBatchInserter.addItem(node, tx)
       } else if (Node.isUpdated(node)) {
-        this.nodesBatchUpdater.addItem(node, this.tx)
+        this.nodesBatchUpdater.addItem(node, tx)
       }
     }
 
@@ -181,7 +182,7 @@ export default class RecordCheckJob extends Job {
 
     if (nodeDefAddedOrUpdatedUuids.length > 0 || !R.isEmpty(allUpdatedNodesByUuid)) {
       // this.logDebug(`validating record ${recordUuid}`)
-      await _validateNodes(survey, nodeDefAddedOrUpdatedUuids, record, allUpdatedNodesByUuid, this.tx)
+      await _validateNodes({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes: allUpdatedNodesByUuid }, this.tx)
     }
     // this.logDebug('record check complete')
   }
@@ -277,7 +278,7 @@ const _clearRecordKeysValidation = (record) => {
   return record
 }
 
-const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, tx) => {
+const _validateNodes = async ({ user, survey, nodeDefAddedUpdatedUuids, record, nodes }, tx) => {
   const nodesToValidate = {
     ...nodes,
   }
@@ -292,7 +293,7 @@ const _validateNodes = async (survey, nodeDefAddedUpdatedUuids, record, nodes, t
   })
 
   // Record keys uniqueness must be validated after RDB generation
-  await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, false, tx)
+  await RecordManager.validateNodesAndPersistValidation({ user, survey, record, nodes: nodesToValidate }, tx)
 }
 
 RecordCheckJob.type = 'RecordCheckJob'
