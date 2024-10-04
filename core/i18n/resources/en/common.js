@@ -555,6 +555,7 @@ $t(common.cantUndoWarning)`,
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',
       includeFiles: 'Include files',
+      includeInternalUuids: 'Include internal UUIDs',
       recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {

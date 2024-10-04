@@ -48,6 +48,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefUuid.nameFull
   }
 
+  get columnUuidName() {
+    return this.columnNodeDefUuid.name
+  }
+
   get columnIdName() {
     const { nodeDef } = this.tableData
     return `_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`
@@ -116,6 +120,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get columnNodeDefNamesFull() {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
+  }
+
+  get columnParentUuidName() {
+    return this.viewDataParent?.columnUuidName
   }
 
   get tableData() {

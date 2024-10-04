@@ -3,6 +3,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 
+import { ArrayUtils } from '@core/arrayUtils'
 import { Query } from '@common/model/query'
 import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
@@ -66,6 +67,7 @@ const getCsvExportFields = ({
   addCycle = false,
   includeCategoryItemsLabels = true,
   expandCategoryItems = false,
+  includeInternalUuids = false,
 }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
@@ -73,22 +75,32 @@ const getCsvExportFields = ({
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fields = nodeDefCols.flatMap((nodeDefCol) => {
-    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
-    if (fieldsExtractor) {
-      return fieldsExtractor({
-        survey,
-        columnNodeDef,
-        includeCategoryItemsLabels,
-        expandCategoryItems,
-      })
-    } else {
-      return columnNodeDef.names
-    }
-  })
-  // Cycle is 0-based
-  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
+  const fields = []
+  if (includeInternalUuids) {
+    ArrayUtils.addIfNotEmpty(viewDataNodeDef.columnParentUuidName)(fields)
+    fields.push(viewDataNodeDef.columnUuidName)
+  }
+  if (addCycle) {
+    // Cycle is 0-based
+    fields.push(DataTable.columnNameRecordCycle)
+  }
+  fields.push(
+    ...nodeDefCols.flatMap((nodeDefCol) => {
+      const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+      const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
+      if (fieldsExtractor) {
+        return fieldsExtractor({
+          survey,
+          columnNodeDef,
+          includeCategoryItemsLabels,
+          expandCategoryItems,
+        })
+      } else {
+        return columnNodeDef.names
+      }
+    })
+  )
+  return fields
 }
 
 const getCsvExportFieldsAgg = ({ survey, query }) => {

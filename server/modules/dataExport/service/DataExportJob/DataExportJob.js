@@ -45,7 +45,8 @@ export default class DataExportJob extends Job {
   }
 
   async _fetchSurvey() {
-    const { surveyId, cycle, includeAnalysis, includeDataFromAllCycles, expandCategoryItems } = this.context
+    const { surveyId, cycle, options } = this.context
+    const { includeAnalysis, includeDataFromAllCycles, expandCategoryItems } = options
     const cycleToFetch = includeDataFromAllCycles ? undefined : cycle
 
     return expandCategoryItems
