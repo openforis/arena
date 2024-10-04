@@ -18,5 +18,8 @@ export const functionNames = {
   pow: 'pow',
   sum: 'sum',
   taxonProp: 'taxonProp',
+  userEmail: 'userEmail',
+  userName: 'userName',
+  userProp: 'userProp',
   uuid: 'uuid',
 }
