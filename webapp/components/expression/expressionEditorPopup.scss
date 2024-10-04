@@ -71,6 +71,7 @@
   //types
   .binary {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 1rem;
@@ -82,8 +83,14 @@
 
       .identifier,
       .dropdown-literal {
-        width: 100%;
-        max-width: 40rem;
+        flex: 1;
+        min-width: 10rem;
+        max-width: 20rem;
+      }
+      .call {
+        .identifier {
+          width: 20rem;
+        }
       }
     }
 
@@ -107,10 +114,13 @@
       text-wrap: nowrap;
 
       &.btn-switch-operand-const {
-        width: 12rem;
+        width: 7rem;
       }
       &.btn-switch-operand-var {
-        width: 7rem;
+        width: 5rem;
+      }
+      &.btn-switch-operand-call {
+        width: 5rem;
       }
     }
 
@@ -124,8 +134,9 @@
   }
 
   .literal {
-    width: 100%;
-    max-width: 40rem;
+    flex: 1;
+    min-width: 10rem;
+    max-width: 20rem;
 
     .form-input {
       margin-left: 0.5rem;

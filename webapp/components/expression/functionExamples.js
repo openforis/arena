@@ -13,6 +13,7 @@ const functionExamples = {
     [functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
     [functionNames.index]: `index(node_name), index(this), index($context), index(parent(this))`,
     [functionNames.isEmpty]: `isEmpty(attribute_name) = true/false`,
+    [functionNames.isNotEmpty]: `isNotEmpty(attribute_name) = true/false`,
     [functionNames.last]: 'last(multiple_entity_name).entity_attribute_name, last(multiple_attribute_name), ...',
     [functionNames.ln]: 'ln(10) = 2.302…',
     [functionNames.log10]: 'log10(100) = 2',

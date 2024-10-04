@@ -50,6 +50,7 @@ export const removeSuffix = (suffix) => (text) =>
   text.endsWith(suffix) ? text.substring(0, text.length - suffix.length) : text
 
 export const quote = (text) => (isBlank(text) ? '' : `'${text}'`)
+export const unquote = R.pipe(removePrefix(`'`), removeSuffix(`'`))
 
 export const hashCode = (str) => {
   let hash = 0

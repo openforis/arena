@@ -8,6 +8,7 @@ import { ButtonIconView } from './ButtonIconView'
 export const ButtonIconEditOrView = (props) => {
   const {
     canEdit,
+    // eslint-disable-next-line no-unused-vars
     label: _label, // ignore label prop
     variant = 'outlined',
     ...otherProps
