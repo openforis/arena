@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import * as AuthGroup from '@core/auth/authGroup'
+import * as ProcessUtils from '@core/processUtils'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
@@ -182,7 +183,7 @@ const UserEdit = () => {
         </fieldset>
       )}
 
-      {<UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
+      {ProcessUtils.ENV.experimentalFeatures && <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
