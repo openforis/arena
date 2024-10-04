@@ -392,8 +392,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activityLog: {
         title: 'Activity log',
       },
-      exportWithData: 'Export with data',
-      exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
+      exportWithData: 'Export + data (Backup)',
+      exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   
