@@ -9,6 +9,7 @@ export const keys = {
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
   draft: 'draft',
+  extra: 'extra',
   id: 'id',
   index: 'index',
   name: 'name',
@@ -25,6 +26,7 @@ export const keysProps = {
   descriptions: 'descriptions',
   labels: 'labels',
   cycles: 'cycles',
+  extra: 'extra',
 }
 
 // ====== READ
@@ -44,6 +46,9 @@ export const getLabel = (lang, defaultTo = null) => R.pipe(getLabels, R.propOr(d
 
 export const getDescriptions = getProp(keysProps.descriptions, {})
 export const getDescription = (lang, defaultTo = null) => R.pipe(getDescriptions, R.propOr(defaultTo, lang))
+
+export const getExtra = getProp(keysProps.extra, {})
+export const getExtraProp = (extraPropKey) => R.pipe(getExtra, R.propOr(null, extraPropKey))
 
 export const getDate = (prop) => R.pipe(R.propOr(null, prop), R.unless(R.isNil, DateUtils.parseISO))
 export const getDateCreated = getDate(keys.dateCreated)

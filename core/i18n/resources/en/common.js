@@ -1222,6 +1222,9 @@ $t(common.appNameFull)
       pow: 'Returns the value of a base raised to a power',
       rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+      userEmail: 'Returns the email of the logged in user',
+      userName: 'Returns the name of the logged in user',
+      userProp: 'Returns the value of the specified $t(extraProp.label) of the logged in user',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
@@ -1566,6 +1569,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   extraProp: {
     label: 'Extra property',
     label_plural: 'Extra properties',
+    addExtraProp: 'Add extra property',
     dataTypes: {
       geometryPoint: 'Geometry Point',
       number: 'Number',
@@ -1584,6 +1588,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
       },
     },
+    name: 'Property {{position}} name',
+    value: 'Value',
   },
 
   // ===== All validation errors
@@ -1669,6 +1675,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
+    },
+
+    extraPropEdit: {
+      nameInvalid: 'Invalid name',
+      nameRequired: 'Name required',
+      dataTypeRequired: 'Data type required',
+      valueRequired: 'Value required',
     },
 
     nodeDefEdit: {
