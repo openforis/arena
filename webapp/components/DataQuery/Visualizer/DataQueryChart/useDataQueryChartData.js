@@ -1,7 +1,8 @@
+import { Numbers } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as NumberUtils from '@core/numberUtils'
 
 import { Query } from '@common/model/query'
 
@@ -131,7 +132,7 @@ export const useDataQueryChartData = ({ data, nodeDefLabelType }) => {
         dataKeys.forEach((dataKey, index) => {
           const valueColumn = valueColumns[index]
           const value = dataItem[valueColumn]
-          acc[dataKey] = NumberUtils.roundToPrecision(value, maxDecimalDigits)
+          acc[dataKey] = Numbers.roundToPrecision(value, maxDecimalDigits)
         }, {})
         return acc
       }, {}),

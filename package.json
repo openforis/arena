@@ -122,7 +122,6 @@
     "archiver": "^7.0.1",
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
-    "bignumber.js": "^9.1.2",
     "buffer": "^6.0.3",
     "camelize": "^1.0.0",
     "circle-to-polygon": "^2.2.0",
