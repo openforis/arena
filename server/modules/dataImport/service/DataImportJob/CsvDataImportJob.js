@@ -153,7 +153,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
 
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
-    const { survey, nodeDefUuid, includeFiles, insertMissingNodes } = context
+    const { survey, nodeDefUuid, includeFiles, insertMissingNodes, user } = context
 
     if (this.isCanceled()) {
       return
@@ -186,6 +186,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
       const updateResult = new RecordUpdateResult({ record: this.currentRecord })
 
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
+        user,
         survey,
         entityDefUuid,
         valuesByDefUuid,

@@ -24,11 +24,11 @@ export const Input = React.forwardRef((props, ref) => {
     name = undefined,
     numberFormat = null,
     onChange = null,
-    onFocus = () => {},
-    onBlur = () => {},
+    onFocus = undefined,
+    onBlur = undefined,
     placeholder = null,
     readOnly = false,
-    textTransformFunction = (s) => s,
+    textTransformFunction = undefined,
     title: titleProp = null, // defaults to value
     type = 'text',
     validation = null,
@@ -53,7 +53,7 @@ export const Input = React.forwardRef((props, ref) => {
         selectionRef.current = [input.selectionStart, input.selectionEnd]
       }
       if (onChange) {
-        onChange(textTransformFunction(newValue))
+        onChange(textTransformFunction ? textTransformFunction(newValue) : newValue)
       }
     },
     [disabled, inputRef, onChange, selectionAllowed, textTransformFunction]

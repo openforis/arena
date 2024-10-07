@@ -104,10 +104,6 @@ button:disabled,
   color: white;
   background-color: $red;
   border-color: rgba($red, 0.5) !important;
-
-  &:hover {
-    background-color: rgba($red, 0.9) !important;
-  }
 }
 
 .btn-primary,
@@ -179,9 +175,7 @@ button:disabled,
   text-transform: unset;
 
   &.btn-danger {
-    color: $white;
-    background-color: $red;
-    border-color: rgba($red, 0.5) !important;
+    color: $red;
   }
 
   &.btn-s {

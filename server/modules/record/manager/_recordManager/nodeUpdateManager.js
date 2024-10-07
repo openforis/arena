@@ -142,10 +142,11 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
 }
 
 export const updateNodesDependents = async (
-  { survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
+  { user, survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
   tx
 ) => {
   const { record: recordUpdatedDependents, nodes: nodesUpdated } = Record.updateNodesDependents({
+    user,
     survey,
     record,
     nodes,

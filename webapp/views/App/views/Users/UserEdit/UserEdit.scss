@@ -3,7 +3,7 @@
 .user-edit {
   margin: auto;
   padding: 1rem;
-  grid-row-gap: 1.5rem;
+  grid-row-gap: 0;
   width: 50rem;
 
   .profile-picture {
@@ -12,6 +12,7 @@
   }
 
   .form-item {
+    height: auto;
     grid-template-columns: 0.3fr 0.7fr;
 
     .tooltip {
@@ -29,6 +30,16 @@
       grid-template-columns: 0.3fr 0.7fr 5rem;
     }
   }
+
+  .extra-props {
+    .form-item {
+      display: flex;
+      white-space: nowrap;
+    }
+    .btn-add {
+      justify-self: center;
+    }
+  }
 }
 
 .user-edit__buttons {
@@ -37,6 +48,7 @@
   align-items: center;
   position: relative;
   gap: 3rem;
+  margin-top: 1rem;
 
   .btn-back {
     align-self: flex-start;

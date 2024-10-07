@@ -7,8 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import * as AuthGroup from '@core/auth/authGroup'
-
-import { useI18n } from '@webapp/store/system'
+import * as ProcessUtils from '@core/processUtils'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
@@ -16,15 +15,15 @@ import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
 
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
-import DropdownUserGroup from '../DropdownUserGroup'
-
-import ProfilePictureEditor from './ProfilePictureEditor'
-
 import { useEditUser } from './store'
-import { appModuleUri, userModules } from '@webapp/app/appModules'
+import DropdownUserGroup from '../DropdownUserGroup'
+import ProfilePictureEditor from './ProfilePictureEditor'
+import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -51,6 +50,7 @@ const UserEdit = () => {
     onUpdateProfilePicture,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
+    onExtraChange,
     onSave,
     onRemove,
     onInviteRepeat,
@@ -75,7 +75,7 @@ const UserEdit = () => {
   const editingSameUser = User.isEqual(user)(userToUpdate)
 
   return (
-    <div className="user-edit form" key={userUuid}>
+    <div className="user-edit" key={userUuid}>
       {canEdit ? (
         <ProfilePictureEditor
           userUuid={userUuid}
@@ -182,6 +182,8 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
+
+      {ProcessUtils.ENV.experimentalFeatures && <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">

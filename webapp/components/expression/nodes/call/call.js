@@ -5,68 +5,12 @@ import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
+import { ButtonIconEdit } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 
-import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
-import { CallCountEditor } from './callCountEditor'
-import { CallIncludesEditor } from './callIncludesEditor'
-import { CallIsEmptyEditor } from './callIsEmptyEditor'
-import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
-import { CallTaxonPropEditor } from './callTaxonPropEditor'
+import { functions, getComplexFunctionNameByExpression } from './functions'
 import { CallEditorDialog } from './callEditorDialog'
-import { ButtonIconEdit } from '@webapp/components/buttons'
-
-const complexFunctions = {
-  rowIndex: {
-    labelKey: 'nodeDefEdit.functionName.rowIndex',
-    exprString: 'index($context)',
-  },
-}
-
-const getComplexFunctionNameByExpression = (exprString) => {
-  if (!exprString) return null
-  return Object.keys(complexFunctions).find((key) => {
-    const funcObj = complexFunctions[key]
-    return funcObj.exprString === exprString
-  })
-}
-
-const functions = {
-  [Expression.functionNames.isEmpty]: {
-    label: 'isEmpty(...)',
-    component: CallIsEmptyEditor,
-  },
-  [Expression.functionNames.isNotEmpty]: {
-    label: 'isNotEmpty(...)',
-    component: CallIsNotEmptyEditor,
-  },
-  [Expression.functionNames.count]: {
-    label: 'count(...)',
-    component: CallCountEditor,
-  },
-  [Expression.functionNames.includes]: {
-    label: 'includes(...)',
-    component: CallIncludesEditor,
-  },
-  [Expression.functionNames.now]: {
-    label: 'now()',
-    callee: Expression.functionNames.now,
-  },
-  [Expression.functionNames.categoryItemProp]: {
-    label: 'categoryItemProp(...)',
-    component: CallCategoryItemPropEditor,
-  },
-  [Expression.functionNames.taxonProp]: {
-    label: 'taxonProp(...)',
-    component: CallTaxonPropEditor,
-  },
-  [Expression.functionNames.uuid]: {
-    label: 'uuid()',
-    callee: Expression.functionNames.uuid,
-  },
-  ...complexFunctions,
-}
 
 const Call = (props) => {
   const { node: expressionNode, variables, onChange } = props
