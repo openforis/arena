@@ -392,8 +392,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activityLog: {
         title: 'Activity log',
       },
-      exportWithData: 'Export with data',
-      exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
+      exportWithData: 'Export + data (Backup)',
+      exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   
@@ -555,6 +555,8 @@ $t(common.cantUndoWarning)`,
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',
       includeFiles: 'Include files',
+      includeFileAttributeDefs: 'Include file attribute columns',
+      includeInternalUuids: 'Include internal UUIDs',
       recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {

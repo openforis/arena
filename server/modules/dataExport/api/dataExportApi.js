@@ -16,20 +16,7 @@ export const init = (app) => {
     AuthMiddleware.requireRecordsExportPermission,
     async (req, res, next) => {
       try {
-        const {
-          surveyId,
-          cycle,
-          recordUuids,
-          search,
-          includeCategories,
-          includeCategoryItemsLabels,
-          expandCategoryItems,
-          includeAncestorAttributes,
-          includeAnalysis,
-          includeDataFromAllCycles,
-          includeFiles,
-          recordsModifiedAfter,
-        } = Request.getParams(req)
+        const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
 
         const user = Request.getUser(req)
 
@@ -39,14 +26,7 @@ export const init = (app) => {
           cycle,
           recordUuids,
           search,
-          includeCategories,
-          includeCategoryItemsLabels,
-          expandCategoryItems,
-          includeAncestorAttributes,
-          includeAnalysis,
-          includeDataFromAllCycles,
-          includeFiles,
-          recordsModifiedAfter,
+          options,
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {

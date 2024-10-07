@@ -13,7 +13,7 @@ import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import { useI18n } from '@webapp/store/system'
 import { DataExportOptionsPanel } from './DataExportOptionsPanel'
-import { defaultDataExportOptionsSelection } from './dataExportOptions'
+import { dataExportOptions, defaultDataExportOptionsSelection } from './dataExportOptions'
 
 const sources = {
   allRecords: 'allRecords',
@@ -36,6 +36,9 @@ const DataExport = (props) => {
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
       const optionsUpdated = { ...statePrev.selectedOptionsByKey, [option]: value }
+      if (option === dataExportOptions.includeFiles) {
+        optionsUpdated[dataExportOptions.includeFileAttributeDefs] = value
+      }
       return { ...statePrev, selectedOptionsByKey: optionsUpdated }
     })
 

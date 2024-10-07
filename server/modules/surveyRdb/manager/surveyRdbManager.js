@@ -78,6 +78,7 @@ export const fetchViewData = async (params, client = db) => {
     addCycle = false,
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
+    includeInternalUuids = false,
     nullsToEmpty = false,
   } = params
 
@@ -107,6 +108,7 @@ export const fetchViewData = async (params, client = db) => {
           addCycle,
           includeCategoryItemsLabels,
           expandCategoryItems,
+          includeInternalUuids,
         })
     await db.stream(result, (dbStream) => {
       const csvTransform = CSVWriter.transformJsonToCsv({
@@ -167,8 +169,8 @@ export const fetchViewDataAgg = async (params) => {
   return result
 }
 
-const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuidsParam, search }) => {
-  if (recordUuidsParam) return recordUuidsParam
+const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search }) => {
+  if (recordUuids) return recordUuids
 
   if (Objects.isEmpty(search) && !recordsModifiedAfter) return null
 
@@ -194,20 +196,26 @@ export const fetchEntitiesDataToCsvFiles = async (
   {
     survey,
     cycle,
-    includeCategoryItemsLabels,
-    expandCategoryItems,
-    includeAncestorAttributes,
-    includeAnalysis,
-    includeFiles,
+    search = null,
     recordOwnerUuid = null,
     recordUuids: recordUuidsParam = null,
-    recordsModifiedAfter,
-    search = null,
+    options,
     outputDir,
     callback,
   },
   client = db
 ) => {
+  const {
+    includeCategoryItemsLabels,
+    expandCategoryItems,
+    includeAncestorAttributes,
+    includeAnalysis,
+    includeFileAttributeDefs,
+    includeFiles,
+    includeInternalUuids,
+    recordsModifiedAfter,
+  } = options
+
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
   const nodeDefs = Survey.findDescendants({
@@ -218,7 +226,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     survey,
     cycle,
     recordsModifiedAfter,
-    recordUuidsParam,
+    recordUuids: recordUuidsParam,
     search,
   })
 
@@ -249,7 +257,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         ? getChildAttributes(nodeDefContext)
         : // Multiple attribute
           [nodeDefContext]
-    ).filter((childDef) => includeFiles || !NodeDef.isFile(childDef))
+    ).filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
 
     const ancestorDefs = []
     if (includeAncestorAttributes) {
@@ -281,6 +289,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         addCycle,
         includeCategoryItemsLabels,
         expandCategoryItems,
+        includeInternalUuids,
       },
       client
     )
