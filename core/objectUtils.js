@@ -26,6 +26,7 @@ export const keysProps = {
   descriptions: 'descriptions',
   labels: 'labels',
   cycles: 'cycles',
+  extra: 'extra',
 }
 
 // ====== READ
@@ -35,8 +36,6 @@ export const getUuid = R.propOr(null, keys.uuid)
 export const getProps = R.propOr({}, keys.props)
 export const getPropsDraft = R.propOr({}, keys.propsDraft)
 export const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.pathOr(defaultTo, prop.split('.')))
-export const getExtra = getProp(keys.extra, {})
-export const getExtraProp = (extraPropKey) => R.pipe(getExtra, R.propOr(null, extraPropKey))
 export const isKeyTrue = (key) => (obj) => !!R.propOr(false, key)(obj)
 export const isPropTrue = (prop) => (obj) => !!getProp(prop)(obj)
 
@@ -47,6 +46,9 @@ export const getLabel = (lang, defaultTo = null) => R.pipe(getLabels, R.propOr(d
 
 export const getDescriptions = getProp(keysProps.descriptions, {})
 export const getDescription = (lang, defaultTo = null) => R.pipe(getDescriptions, R.propOr(defaultTo, lang))
+
+export const getExtra = getProp(keysProps.extra, {})
+export const getExtraProp = (extraPropKey) => R.pipe(getExtra, R.propOr(null, extraPropKey))
 
 export const getDate = (prop) => R.pipe(R.propOr(null, prop), R.unless(R.isNil, DateUtils.parseISO))
 export const getDateCreated = getDate(keys.dateCreated)

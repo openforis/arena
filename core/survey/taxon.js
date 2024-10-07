@@ -20,6 +20,7 @@ export const propKeys = {
   genus: 'genus',
   scientificName: 'scientificName',
   index: 'index',
+  extra: ObjectUtils.keysProps.extra,
 }
 
 export const unlistedCode = 'UNL'

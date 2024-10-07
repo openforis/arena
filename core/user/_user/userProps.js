@@ -15,7 +15,7 @@ export const keysProps = {
   // restricted props (editable only by system admins)
   maxSurveys: 'maxSurveys',
   // custom extra properties
-  extra: ObjectUtils.keys.extra,
+  extra: ObjectUtils.keysProps.extra,
 }
 
 const privateProps = [keysProps.mapApiKeyByProvider]
