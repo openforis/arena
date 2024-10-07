@@ -26,7 +26,7 @@ const NodeDefDate = (props) => {
   const node = entry ? nodes[0] : null
 
   const dateStr = Node.getValue(node, null)
-  const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display })
+  const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display, keepTimeZone: false })
 
   const handleChangeDateInput = useCallback(
     (newDate) => {

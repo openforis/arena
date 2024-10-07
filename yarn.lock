@@ -2761,10 +2761,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.204":
-  version "0.0.204"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.204/aa4aec1004bbd93b778ea3d720f165501f0b4f26#aa4aec1004bbd93b778ea3d720f165501f0b4f26"
-  integrity sha512-RwcJZD2IU/CBKhktLZZxMb0DzA8afHJSXg6GEzpnJI+VDU6NPhqNyQnNuzWZRotDh8XiU2gctbiLN6Vg0BoIJA==
+"@openforis/arena-core@^0.0.205":
+  version "0.0.205"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.205/7a4a1074ac76b00880789904fc5fd5dc7d1d6382#7a4a1074ac76b00880789904fc5fd5dc7d1d6382"
+  integrity sha512-JISauhuzUbN/UReULxRRe50P7IhCcowkayt6pXAy8gF4m8VypKU1AfJgXLXZ3eSGnvXwyuk2TXzwrxIJ7epw/Q==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.2"
@@ -2777,10 +2777,10 @@
     proj4 "^2.11.0"
     uuid "^10.0.0"
 
-"@openforis/arena-core@^0.0.205":
-  version "0.0.205"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.205/7a4a1074ac76b00880789904fc5fd5dc7d1d6382#7a4a1074ac76b00880789904fc5fd5dc7d1d6382"
-  integrity sha512-JISauhuzUbN/UReULxRRe50P7IhCcowkayt6pXAy8gF4m8VypKU1AfJgXLXZ3eSGnvXwyuk2TXzwrxIJ7epw/Q==
+"@openforis/arena-core@^0.0.206":
+  version "0.0.206"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.206/0d81659dd4b4931eb3d8d8e42d7b2066ebacf75a#0d81659dd4b4931eb3d8d8e42d7b2066ebacf75a"
+  integrity sha512-5nJff0AysFX06qih+Iu3bgr/E8+5GBXNgwzrNIkYSEmNnISGGjWs3wtO84NmFS3TS/ascJQjtW0b5Cg5qbEaKw==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.2"
