@@ -278,13 +278,13 @@ const _clearRecordKeysValidation = (record) => {
   return record
 }
 
-const _validateNodes = async ({ user, survey, nodeDefAddedUpdatedUuids, record, nodes }, tx) => {
+const _validateNodes = async ({ user, survey, nodeDefAddedOrUpdatedUuids, record, nodes }, tx) => {
   const nodesToValidate = {
     ...nodes,
   }
 
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
-  nodeDefAddedUpdatedUuids.forEach((nodeDefUuid) => {
+  nodeDefAddedOrUpdatedUuids.forEach((nodeDefUuid) => {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     parentNodes.forEach((parentNode) => {
