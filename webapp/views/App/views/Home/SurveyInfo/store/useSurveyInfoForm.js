@@ -46,9 +46,9 @@ export const useSurveyInfoForm = () => {
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
   const setDescriptions = (descriptions) => setObjectField(Survey.infoKeys.descriptions, descriptions)
   const setFieldManualLinks = (links) => setObjectField(Survey.infoKeys.fieldManualLinks, links)
-
   const setSampleBasedImageInterpretationEnabled = (value) =>
     setObjectField(Survey.infoKeys.sampleBasedImageInterpretationEnabled, value)
+  const setUserExtraPropDefs = (value) => setObjectField(Survey.infoKeys.userExtraPropDefs, value)
 
   const saveProps = () => {
     enableValidation()
@@ -70,5 +70,6 @@ export const useSurveyInfoForm = () => {
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
     setSrs,
+    setUserExtraPropDefs,
   }
 }

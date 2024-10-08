@@ -3,7 +3,7 @@ import './ExtraPropDefsEditor.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { ButtonAdd, PanelRight } from '@webapp/components'
+import { ButtonAdd } from '@webapp/components'
 
 import { ExtraPropDefEditor } from './ExtraPropDefEditor'
 import { useExtraPropDefsEditor } from './useExtraPropDefsEditor'
@@ -15,22 +15,16 @@ export const ExtraPropDefsEditor = (props) => {
     isExtraPropDefReadOnly,
     onExtraPropDefDelete,
     onExtraPropDefUpdate,
-    toggleEditExtraPropsPanel,
   } = props
 
-  const { i18n, extraPropDefs, readOnly, onItemAdd, onItemDelete, onItemUpdate } = useExtraPropDefsEditor({
+  const { extraPropDefs, readOnly, onItemAdd, onItemDelete, onItemUpdate } = useExtraPropDefsEditor({
     extraPropDefs: extraPropDefsProp,
     onExtraPropDefDelete,
     onExtraPropDefUpdate,
   })
 
   return (
-    <PanelRight
-      className="extra-prop-defs-editor"
-      header={i18n.t('extraProp.label_plural')}
-      width="52rem"
-      onClose={toggleEditExtraPropsPanel}
-    >
+    <div className="extra-prop-defs-editor">
       <div className="items-container">
         {extraPropDefs.map((extraPropDef, index) => (
           <ExtraPropDefEditor
@@ -51,7 +45,7 @@ export const ExtraPropDefsEditor = (props) => {
           onClick={onItemAdd}
         />
       )}
-    </PanelRight>
+    </div>
   )
 }
 

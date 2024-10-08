@@ -26,16 +26,17 @@
     align-items: baseline;
   }
 
+  .survey-user-extra-props,
+  .survey-info-configuration,
+  .btn-save {
+    justify-self: center;
+  }
+
   .survey-info-configuration {
     width: 25rem;
-    justify-self: center;
 
     .form-item {
       grid-template-columns: 0.5fr 0.5fr;
     }
-  }
-
-  .btn-save {
-    justify-self: center;
   }
 }

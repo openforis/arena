@@ -2,6 +2,7 @@ import './SurveyInfo.scss'
 
 import React from 'react'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
@@ -20,6 +21,7 @@ import SrsEditor from './SrsEditor'
 import LanguagesEditor from './LanguagesEditor'
 import SamplingPolygonEditor from './SamplingPolygonEditor'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
+import { SurveyUserExtraPropDefsEditor } from './SurveyUserExtraPropDefsEditor'
 
 import { useSurveyInfoForm } from './store'
 
@@ -41,6 +43,7 @@ const SurveyInfo = () => {
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     srs,
+    userExtraPropDefs,
     setFieldManualLinks,
     setName,
     setLanguages,
@@ -51,6 +54,7 @@ const SurveyInfo = () => {
     setDescriptions,
     setCycles,
     setSampleBasedImageInterpretationEnabled,
+    setUserExtraPropDefs,
     getFieldValidation,
     saveProps,
   } = useSurveyInfoForm()
@@ -144,6 +148,19 @@ const SurveyInfo = () => {
             )}
           </div>
         </FormItem>
+
+        {ProcessUtils.ENV.experimentalFeatures && (
+          <ExpansionPanel
+            buttonLabel="homeView.surveyInfo.userExtraProps.title"
+            className="survey-user-extra-props"
+            startClosed
+          >
+            <SurveyUserExtraPropDefsEditor
+              extraPropDefs={userExtraPropDefs}
+              onExtraPropDefsChange={setUserExtraPropDefs}
+            />
+          </ExpansionPanel>
+        )}
 
         {isSystemAdmin && (
           <ExpansionPanel

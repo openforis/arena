@@ -462,6 +462,9 @@ If there are records associated to this cycle, they will be deleted.`,
   $t(common.cantUndoWarning)`,
         confirmName: 'Enter this survey’s name to confirm:',
       },
+      userExtraProps: {
+        title: 'User extra properties',
+      },
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
