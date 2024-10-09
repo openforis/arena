@@ -33,8 +33,9 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal, setUserToUpdateO
         [User.keys.uuid]: userToUpdateUuid,
         [User.keys.name]: User.getName(userToUpdate),
         [User.keys.email]: User.getEmail(userToUpdate),
-        [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
         [User.keys.props]: User.getProps(userToUpdate),
+        [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
+        [User.keys.authGroupExtraProps]: User.getAuthGroupExtraProps(userToUpdate),
       }
 
       formData.append('user', A.stringify(userData))
