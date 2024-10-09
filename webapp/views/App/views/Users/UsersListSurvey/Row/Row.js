@@ -8,7 +8,7 @@ import * as DateUtils from '@core/dateUtils'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
-import { useAuthCanEditUser } from '@webapp/store/user'
+import { useAuthCanEditUser, useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
 import { Button, ButtonInvite } from '@webapp/components'
@@ -17,11 +17,12 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
 
 const Row = (props) => {
-  const { row: userListItem, emailVisible = false } = props
+  const { row: userListItem } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
+  const emailVisible = useAuthCanViewOtherUsersEmail()
 
   const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(userListItem)
   const authGroupName = AuthGroup.getName(authGroup)
@@ -91,7 +92,6 @@ const Row = (props) => {
 
 Row.propTypes = {
   row: PropTypes.object.isRequired,
-  emailVisible: PropTypes.bool,
 }
 
 export default Row
