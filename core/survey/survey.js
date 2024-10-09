@@ -110,6 +110,8 @@ export const {
   getDescription,
   getDescriptions,
   getFieldManualLinks,
+  getUserExtraPropDefs,
+  getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
   getSRS,

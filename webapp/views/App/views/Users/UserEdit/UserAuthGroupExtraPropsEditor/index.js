@@ -1,0 +1,1 @@
+export { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor'

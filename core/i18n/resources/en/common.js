@@ -903,6 +903,10 @@ you can copy the invitation link to the clipboard and share it with him in other
     
 Copy the invitation link to the clipboard?`,
     invitationLinkCopiedToClipboard: 'Invitation link copied to your clipboard',
+    surveyExtraProp: {
+      label: 'Survey extra property',
+      label_other: 'Survey extra properties',
+    },
   },
 
   usersAccessRequestView: {
