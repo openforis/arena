@@ -1718,7 +1718,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
       entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
-      missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
+      missingAncestorForEntity: 'Cannot find "{{ancestorName}}" with these keys: {{keyValues}}',
       oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
