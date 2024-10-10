@@ -453,6 +453,7 @@ If there are records associated to this cycle, they will be deleted.`,
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
+      sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',
       unpublishSurveyDialog: {

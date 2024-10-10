@@ -52,8 +52,7 @@ export const ExtraPropDefsEditor = (props) => {
 ExtraPropDefsEditor.propTypes = {
   canAdd: PropTypes.bool,
   extraPropDefs: PropTypes.array.isRequired,
-  isExtraPropDefReadOnly: PropTypes.funct,
+  isExtraPropDefReadOnly: PropTypes.func,
   onExtraPropDefDelete: PropTypes.func.isRequired,
   onExtraPropDefUpdate: PropTypes.func.isRequired,
-  toggleEditExtraPropsPanel: PropTypes.func.isRequired,
 }

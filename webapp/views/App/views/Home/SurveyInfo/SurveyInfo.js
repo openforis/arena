@@ -3,177 +3,107 @@ import './SurveyInfo.scss'
 import React from 'react'
 
 import * as ProcessUtils from '@core/processUtils'
-import * as Survey from '@core/survey/survey'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanEditSurvey, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { ButtonSave, ExpansionPanel } from '@webapp/components'
-import { Checkbox } from '@webapp/components/form'
-import { FormItem, Input } from '@webapp/components/form/Input'
-import CycleSelector from '@webapp/components/survey/CycleSelector'
-import LabelsEditor from '@webapp/components/survey/LabelsEditor'
+import { ButtonSave } from '@webapp/components'
+import TabBar from '@webapp/components/tabBar'
 
-import CyclesEditor from './CyclesEditor'
-import SrsEditor from './SrsEditor'
-import LanguagesEditor from './LanguagesEditor'
-import SamplingPolygonEditor from './SamplingPolygonEditor'
+import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
 import { SurveyUserExtraPropDefsEditor } from './SurveyUserExtraPropDefsEditor'
 
 import { useSurveyInfoForm } from './store'
+import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
 
 const SurveyInfo = () => {
-  const surveyInfo = useSurveyInfo()
   const readOnly = !useAuthCanEditSurvey()
   const i18n = useI18n()
   const isSystemAdmin = useUserIsSystemAdmin()
 
   const {
-    cycleKeys,
-    cycles,
-    defaultCycleKey,
-    descriptions,
-    fieldManualLinks,
-    labels,
-    languages,
-    name,
+    userExtraPropDefs,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
-    srs,
-    userExtraPropDefs,
-    setFieldManualLinks,
-    setName,
-    setLanguages,
-    setSrs,
-    setSamplingPolygon,
-    setLabels,
+    setCycles,
     setDefaultCycleKey,
     setDescriptions,
-    setCycles,
+    setFieldManualLinks,
+    setLabels,
+    setLanguages,
+    setName,
+    setSamplingPolygon,
     setSampleBasedImageInterpretationEnabled,
+    setSrs,
     setUserExtraPropDefs,
     getFieldValidation,
     saveProps,
+    ...surveyInfoObject
   } = useSurveyInfoForm()
 
   return (
     <div className="home-survey-info">
-      <div className="form">
-        <FormItem label={i18n.t('common.name')}>
-          <Input
-            id={TestId.surveyInfo.surveyName}
-            value={name}
-            validation={getFieldValidation(Survey.infoKeys.name)}
-            onChange={setName}
-            readOnly={readOnly}
-          />
-        </FormItem>
+      <TabBar
+        tabs={[
+          {
+            key: 'basicInfo',
+            component: SurveyInfoBasicForm,
+            label: i18n.t('homeView.surveyInfo.basic'),
+            props: {
+              getFieldValidation,
+              setCycles,
+              setDefaultCycleKey,
+              setDescriptions,
+              setFieldManualLinks,
+              setLabels,
+              setLanguages,
+              setName,
+              setSrs,
+              surveyInfoObject,
+            },
+          },
+          {
+            key: 'sampleBasedInterpretation',
+            component: SurveyInfoSampleBasedImageInterpretation,
+            label: i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation'),
+            props: {
+              getFieldValidation,
+              sampleBasedImageInterpretationEnabled,
+              samplingPolygon,
+              setSampleBasedImageInterpretationEnabled,
+              setSamplingPolygon,
+            },
+          },
+          ...(ProcessUtils.ENV.experimentalFeatures
+            ? [
+                {
+                  key: 'extraProps',
+                  component: SurveyUserExtraPropDefsEditor,
+                  label: i18n.t('homeView.surveyInfo.userExtraProps.title'),
+                  props: {
+                    extraPropDefs: userExtraPropDefs,
+                    onExtraPropDefsChange: setUserExtraPropDefs,
+                  },
+                },
+              ]
+            : []),
+          ...(isSystemAdmin
+            ? [
+                {
+                  key: 'configuration',
+                  component: SurveyConfigurationEditor,
+                  label: i18n.t('homeView.surveyInfo.configuration.title'),
+                },
+              ]
+            : []),
+        ]}
+      />
 
-        <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyLabel('')}
-          readOnly={readOnly}
-          languages={languages}
-          labels={labels}
-          onChange={setLabels}
-        />
-
-        <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyDescription('')}
-          inputType="textarea"
-          readOnly={readOnly}
-          formLabelKey="common.description"
-          languages={languages}
-          labels={descriptions}
-          onChange={setDescriptions}
-        />
-
-        <LabelsEditor
-          inputFieldIdPrefix={TestId.surveyInfo.surveyFieldManualLink()}
-          readOnly={readOnly}
-          formLabelKey="homeView.surveyInfo.fieldManualLink"
-          languages={languages}
-          labels={fieldManualLinks}
-          onChange={setFieldManualLinks}
-          textTransformFunction={(link) => link.replaceAll(' ', '')}
-          validation={getFieldValidation(Survey.infoKeys.fieldManualLinks)}
-        />
-
-        <LanguagesEditor
-          idInput={TestId.surveyInfo.surveyLanguage}
-          readOnly={readOnly}
-          languages={languages}
-          setLanguages={setLanguages}
-        />
-
-        <FormItem label={i18n.t('common.srs')}>
-          <SrsEditor readOnly={readOnly} srs={srs} setSrs={setSrs} validation={getFieldValidation('srs')} />
-        </FormItem>
-
-        <FormItem label={i18n.t('common.cycle_plural')}>
-          <CyclesEditor
-            readOnly={readOnly}
-            cycles={cycles}
-            setCycles={setCycles}
-            surveyInfo={surveyInfo}
-            validation={getFieldValidation(Survey.infoKeys.cycles)}
-          />
-        </FormItem>
-
-        {cycleKeys.length > 1 && (
-          <FormItem label={i18n.t('homeView.surveyInfo.cycleForArenaMobile')}>
-            <CycleSelector cycleKeys={cycleKeys} selectedCycle={defaultCycleKey} onChange={setDefaultCycleKey} />
-          </FormItem>
-        )}
-
-        <FormItem
-          label={i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation')}
-          className="sample-based-image-interpretation-form-item"
-        >
-          <div>
-            <Checkbox
-              checked={sampleBasedImageInterpretationEnabled}
-              onChange={setSampleBasedImageInterpretationEnabled}
-              validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
-            />
-            {sampleBasedImageInterpretationEnabled && (
-              <SamplingPolygonEditor
-                samplingPolygon={samplingPolygon}
-                setSamplingPolygon={setSamplingPolygon}
-                getFieldValidation={getFieldValidation}
-                readOnly={readOnly}
-              />
-            )}
-          </div>
-        </FormItem>
-
-        {ProcessUtils.ENV.experimentalFeatures && (
-          <ExpansionPanel
-            buttonLabel="homeView.surveyInfo.userExtraProps.title"
-            className="survey-user-extra-props"
-            startClosed
-          >
-            <SurveyUserExtraPropDefsEditor
-              extraPropDefs={userExtraPropDefs}
-              onExtraPropDefsChange={setUserExtraPropDefs}
-            />
-          </ExpansionPanel>
-        )}
-
-        {isSystemAdmin && (
-          <ExpansionPanel
-            buttonLabel="homeView.surveyInfo.configuration.title"
-            className="survey-info-configuration"
-            startClosed
-          >
-            <SurveyConfigurationEditor />
-          </ExpansionPanel>
-        )}
-
-        {!readOnly && <ButtonSave testId={TestId.surveyInfo.saveBtn} onClick={saveProps} />}
-      </div>
+      {!readOnly && (
+        <ButtonSave className="survey-info-save-btn" onClick={saveProps} testId={TestId.surveyInfo.saveBtn} />
+      )}
     </div>
   )
 }
