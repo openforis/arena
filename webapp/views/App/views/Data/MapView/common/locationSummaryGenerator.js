@@ -1,11 +1,9 @@
-import { DEFAULT_SRS } from '@openforis/arena-core'
-
-import * as NumberUtils from '@core/numberUtils'
+import { DEFAULT_SRS, Numbers } from '@openforis/arena-core'
 
 const generateSummary = ({ i18n, point, elevation }) => {
   const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
-  const xFormatted = NumberUtils.roundToPrecision(point.x, coordinateNumericFieldPrecision)
-  const yFormatted = NumberUtils.roundToPrecision(point.y, coordinateNumericFieldPrecision)
+  const xFormatted = Numbers.roundToPrecision(point.x, coordinateNumericFieldPrecision)
+  const yFormatted = Numbers.roundToPrecision(point.y, coordinateNumericFieldPrecision)
 
   return `* **${i18n.t('mapView.location')}**:
   * **X**: ${xFormatted}

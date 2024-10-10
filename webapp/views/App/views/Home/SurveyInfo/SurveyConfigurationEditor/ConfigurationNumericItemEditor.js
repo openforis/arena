@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import * as NumberUtils from '@core/numberUtils'
+import { Numbers } from '@openforis/arena-core'
+
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 import { useI18n } from '@webapp/store/system'
@@ -28,7 +29,7 @@ export const ConfigurationNumericItemEditor = (props) => {
   )
 
   const onSave = useCallback(() => {
-    const valueNext = NumberUtils.limit({ minValue, maxValue })(value)
+    const valueNext = Numbers.limit({ minValue, maxValue })(value)
     setState((statePrev) => ({ ...statePrev, dirty: false, editing: false, value: valueNext }))
     onSaveProp(valueNext)
   }, [maxValue, minValue, onSaveProp, value])

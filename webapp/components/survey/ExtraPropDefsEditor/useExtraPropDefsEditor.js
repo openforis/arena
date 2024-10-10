@@ -38,10 +38,9 @@ export const useExtraPropDefsEditor = (props) => {
       const name = ExtraPropDef.getName(itemExtraDefOld)
       const { newItem } = itemExtraDefOld
       if (newItem) {
-        const itemExtraDefsUpdated = ArrayUtils.removeItemAtIndex({ index })(extraPropDefs).map((item, index) => ({
-          ...item,
-          [ExtraPropDef.keys.index]: index,
-        }))
+        const itemExtraDefsUpdated = ArrayUtils.removeItemAtIndex({ index })(extraPropDefs).map((item, index) =>
+          ExtraPropDef.assocIndex(index)(item)
+        )
         updateExtraPropDefsState(itemExtraDefsUpdated)
       } else {
         confirm({

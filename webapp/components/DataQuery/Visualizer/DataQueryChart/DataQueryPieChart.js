@@ -1,9 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Objects } from '@openforis/arena-core'
-
-import * as NumberUtils from '@core/numberUtils'
+import { Numbers, Objects } from '@openforis/arena-core'
 
 import { PieChart } from '@webapp/charts/PieChart'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
@@ -42,7 +40,7 @@ export const DataQueryPieChart = (props) => {
   const chartData = data.reduce((acc, dataItem, index) => {
     const name = dataItem[firstDimensionDataColumn]
     const dataItemValue = dataItem[firstMeasureDataColumn]
-    const value = NumberUtils.roundToPrecision(dataItemValue, maxDecimalDigits)
+    const value = Numbers.roundToPrecision(dataItemValue, maxDecimalDigits)
     if (!Objects.isEmpty(name) && !Number.isNaN(value)) {
       acc.push({ name, value, color: colors[index] })
     }

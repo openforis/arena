@@ -41,7 +41,7 @@ export const SurveyConfigurationEditor = () => {
   )
 
   return (
-    <div>
+    <div className="survey-configuration">
       <ConfigurationNumericItemEditor
         labelKey="homeView.surveyInfo.configuration.filesTotalSpace"
         maxValue={maxTotalSpaceGB}

@@ -21,4 +21,5 @@ export const keys = {
 
   // Used only when editing user auth groups
   authGroupsUuids: 'authGroupsUuids',
+  authGroupExtraProps: 'authGroupExtraProps',
 }

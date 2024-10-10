@@ -440,6 +440,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      basic: 'Basic info',
       configuration: {
         title: 'Configuration',
         filesTotalSpace: 'Files total space (GB)',
@@ -453,6 +454,7 @@ If there are records associated to this cycle, they will be deleted.`,
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
+      sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',
       unpublishSurveyDialog: {
@@ -461,6 +463,9 @@ If there are records associated to this cycle, they will be deleted.`,
   
   $t(common.cantUndoWarning)`,
         confirmName: 'Enter this survey’s name to confirm:',
+      },
+      userExtraProps: {
+        title: 'User extra properties',
       },
     },
     deleteSurveyDialog: {
@@ -902,6 +907,10 @@ you can copy the invitation link to the clipboard and share it with him in other
     
 Copy the invitation link to the clipboard?`,
     invitationLinkCopiedToClipboard: 'Invitation link copied to your clipboard',
+    surveyExtraProp: {
+      label: 'Survey extra property',
+      label_other: 'Survey extra properties',
+    },
   },
 
   usersAccessRequestView: {

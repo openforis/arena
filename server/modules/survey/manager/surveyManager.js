@@ -1,6 +1,9 @@
 import pgPromise from 'pg-promise'
 import * as R from 'ramda'
 
+import { Numbers } from '@openforis/arena-core'
+import { DBMigrator } from '@openforis/arena-server'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { uuidv4 } from '@core/uuid'
@@ -10,14 +13,12 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
-import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import { db } from '@server/db/db'
-import { DBMigrator } from '@openforis/arena-server'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
@@ -423,7 +424,7 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
   if (key !== Survey.configKeys.filesTotalSpace) {
     throw new Error(`Configuration key update not supported: ${key}`)
   }
-  const valueLimited = NumberUtils.limit({
+  const valueLimited = Numbers.limit({
     minValue: FileManager.defaultSurveyFilesTotalSpaceMB,
     maxValue: FileManager.maxSurveyFilesTotalSpaceMB,
   })(value)
