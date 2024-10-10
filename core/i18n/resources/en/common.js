@@ -440,6 +440,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      basic: 'Basic info',
       configuration: {
         title: 'Configuration',
         filesTotalSpace: 'Files total space (GB)',
