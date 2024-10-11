@@ -2777,10 +2777,10 @@
     proj4 "^2.11.0"
     uuid "^10.0.0"
 
-"@openforis/arena-core@^0.0.207":
-  version "0.0.207"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.207/100b9e6f016691884008082b89ee8ffc55827ef4#100b9e6f016691884008082b89ee8ffc55827ef4"
-  integrity sha512-EKn+e5YB71eF480hZmeGtk1+TFH2w3r52/eVir803aSktHI36hk8UHBZmd4qi6KVrZ1aCqjc3mYo+OGypW9vLQ==
+"@openforis/arena-core@^0.0.209":
+  version "0.0.209"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.209/1d0c8e3bd80e689ec3bac005843d6b55c213aaad#1d0c8e3bd80e689ec3bac005843d6b55c213aaad"
+  integrity sha512-cF0fCHNmqn/DvWXWRYJBrdyd5Tnw8wZ6UbCxmBWFFH1uVy7gQ5kke5BCDv8fnL/VhRGuuIr6QuDTs0zpKq7OKA==
   dependencies:
     "@jsep-plugin/regex" "^1.0.3"
     bignumber.js "^9.1.2"
@@ -2793,30 +2793,10 @@
     proj4 "^2.11.0"
     uuid "^10.0.0"
 
-"@openforis/arena-server@../arena-server":
-  version "0.1.35"
-  dependencies:
-    "@godaddy/terminus" "^4.12.1"
-    "@openforis/arena-core" "^0.0.205"
-    bcryptjs "^2.4.3"
-    compression "^1.7.4"
-    connect-pg-simple "^10.0.0"
-    db-migrate "^0.11.14"
-    db-migrate-pg "^1.5.2"
-    express "^4.18.2"
-    express-fileupload "^1.4.0"
-    express-session "^1.17.2"
-    lodash.throttle "^4.1.1"
-    log4js "^6.9.1"
-    passport "^0.6.0"
-    passport-local "^1.0.0"
-    pg-promise "^11.9.1"
-    socket.io "^4.8.0"
-
-"@openforis/arena-server@^0.1.35":
-  version "0.1.35"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.35/248bbdc007913fc5ad7d914ca6b9a0a11f75ea9e#248bbdc007913fc5ad7d914ca6b9a0a11f75ea9e"
-  integrity sha512-goNOQ735SbgYNrfxYZPzB43tTn/WHmPcqUKkbWenc5yXeCvPHdxuh76/xOftjqVF/a2jnalTKdtqEhVdJRYrwA==
+"@openforis/arena-server@^0.1.36":
+  version "0.1.36"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.36/6a1611be205496a934c5979f1aa7b57cfb4e2553#6a1611be205496a934c5979f1aa7b57cfb4e2553"
+  integrity sha512-OqJsTHdd257XJnPn1qXOXYKtO8f9FiPtbYnvmNc3Vm4J3i+Ium11rjZiHinW3pNz3blaXckxrlJYZ13tW5ef+w==
   dependencies:
     "@godaddy/terminus" "^4.12.1"
     "@openforis/arena-core" "^0.0.205"
