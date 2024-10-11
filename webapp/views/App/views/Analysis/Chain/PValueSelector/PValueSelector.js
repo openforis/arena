@@ -6,14 +6,12 @@ import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnaly
 
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 const pValueToItem = (value) => ({ value, label: String(value) })
 
 export const PValueSelector = () => {
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const chain = useChain()
   const statisticalAnalysis = Chain.getStatisticalAnalysis(chain)
 
@@ -27,7 +25,7 @@ export const PValueSelector = () => {
   }
 
   return (
-    <FormItem label={i18n.t('chainView.pValue')}>
+    <FormItem label="chainView.pValue">
       <Dropdown
         className="p-value-dropdown"
         clearable={false}

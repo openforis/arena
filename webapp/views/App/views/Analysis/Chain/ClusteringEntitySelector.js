@@ -6,7 +6,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
-import { useI18n } from '@webapp/store/system'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
 
@@ -16,7 +15,6 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 export const ClusteringEntitySelector = () => {
   const dispatch = useDispatch()
 
-  const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
 
@@ -36,7 +34,7 @@ export const ClusteringEntitySelector = () => {
   }
 
   return (
-    <FormItem label={i18n.t('chainView.clusteringEntity')}>
+    <FormItem label="chainView.clusteringEntity">
       <EntitySelector
         hierarchy={hierarchy}
         nodeDefUuidEntity={selectedEntityUuid}

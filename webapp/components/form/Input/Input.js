@@ -42,7 +42,7 @@ export const Input = React.forwardRef((props, ref) => {
   const inputRefInternal = useRef(null)
   const inputRef = ref ?? inputRefInternal
   const selectionAllowed = type === 'text'
-  const selectionInitial = selectionAllowed ? [value.length, value.length] : null
+  const selectionInitial = Objects.isNotEmpty(value) && selectionAllowed ? [value.length, value.length] : null
   const selectionRef = useRef(selectionInitial)
   const valueText = Objects.isEmpty(value) ? '' : String(value)
   const title = titleProp ?? valueText
