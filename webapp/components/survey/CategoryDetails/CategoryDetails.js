@@ -18,7 +18,7 @@ import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 
-import { ExtraPropDefsEditor } from '../ExtraPropDefsEditor'
+import { ExtraPropDefsEditorPanel } from '../ExtraPropDefsEditor'
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
@@ -162,7 +162,7 @@ const CategoryDetails = (props) => {
         </div>
 
         {editingItemExtraDefs && (
-          <ExtraPropDefsEditor
+          <ExtraPropDefsEditorPanel
             toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
             extraPropDefs={Category.getItemExtraDefsArray(category)}
             isExtraPropDefReadOnly={(extraPropDef) => Category.isExtraPropDefReadOnly(extraPropDef)(category)}

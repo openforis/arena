@@ -1,6 +1,8 @@
 @import 'webapp/style/vars';
 
 .home-survey-info {
+  display: flex;
+  flex-direction: column;
   padding-top: 2rem;
 
   .form {
@@ -22,20 +24,26 @@
     width: 10rem;
   }
 
-  .sample-based-image-interpretation-form-item {
-    align-items: baseline;
+  .sample-based-image-interpretation,
+  .extra-prop-defs-editor,
+  .survey-configuration {
+    justify-self: center;
   }
 
-  .survey-info-configuration {
+  .sample-based-image-interpretation {
+    width: 80%;
+  }
+
+  .survey-configuration {
     width: 25rem;
-    justify-self: center;
 
     .form-item {
       grid-template-columns: 0.5fr 0.5fr;
     }
   }
 
-  .btn-save {
-    justify-self: center;
+  .survey-info-save-btn {
+    margin-top: 2rem;
+    align-self: center;
   }
 }

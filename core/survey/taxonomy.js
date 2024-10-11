@@ -34,17 +34,8 @@ export const { getDescriptions, getDescription } = ObjectUtils
 export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
 export const getExtraPropsDefs = ObjectUtils.getProp(keysProps.extraPropsDefs, {})
 export const getExtraPropKeys = (taxonomy) => Object.keys(getExtraPropsDefs(taxonomy))
-export const getExtraPropsDefsArray = (taxonomy) =>
-  // add uuid and name to each extra prop definition and put them in a array
-  Object.entries(getExtraPropsDefs(taxonomy))
-    .sort(([, prop1], [, prop2]) => ExtraPropDef.getIndex(prop1) - ExtraPropDef.getIndex(prop2))
-    .map(([name, extraPropDef]) => ({
-      ...extraPropDef,
-      uuid: uuidv4(),
-      dataType: ExtraPropDef.getDataType(extraPropDef),
-      index: ExtraPropDef.getIndex(extraPropDef),
-      name,
-    }))
+export const getExtraPropsDefsArray = R.pipe(getExtraPropsDefs, ExtraPropDef.extraDefsToArray)
+
 export const getTaxaCount = R.prop(keys.taxaCount)
 
 // UPDATE

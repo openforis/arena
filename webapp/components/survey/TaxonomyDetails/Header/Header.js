@@ -15,7 +15,7 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { ExtraPropDefsEditor } from '../../ExtraPropDefsEditor'
+import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 import { useNotifyWarning } from '@webapp/components/hooks'
 
@@ -94,7 +94,7 @@ const Header = (props) => {
       </div>
 
       {State.isEditingExtraPropDefs(state) && (
-        <ExtraPropDefsEditor
+        <ExtraPropDefsEditorPanel
           canAdd={false}
           extraPropDefs={Taxonomy.getExtraPropsDefsArray(taxonomy)}
           onExtraPropDefDelete={({ propName }) =>

@@ -103,6 +103,11 @@ export const useEditUser = ({ userUuid }) => {
     [onUpdate, userToUpdate]
   )
 
+  const onSurveyExtraPropsChange = (extraPropsNew) => {
+    const userUpdated = User.assocAuthGroupExtraProps(extraPropsNew)(userToUpdate)
+    onUpdate(userUpdated)
+  }
+
   return {
     hideSurveyGroup,
     ready,
@@ -117,6 +122,7 @@ export const useEditUser = ({ userUuid }) => {
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
     onExtraChange,
+    onSurveyExtraPropsChange,
     onRemove,
     onInviteRepeat,
   }

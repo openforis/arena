@@ -32,6 +32,8 @@ export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
 export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
+export const getAuthGroupExtraProps = R.propOr({}, keys.authGroupExtraProps)
+export const getAuthGroupExtraProp = (prop) => R.pipe(getAuthGroupExtraProps, R.prop(prop))
 export const getLastLoginTime = R.prop(keys.lastLoginTime)
 
 // ====== UPDATE
@@ -86,6 +88,8 @@ const _updateAuthGroups = (updateFn) => (user) =>
 export const assocAuthGroup = (authGroup) => _updateAuthGroups(R.append(authGroup))
 
 export const dissocAuthGroup = (authGroup) => _updateAuthGroups(R.reject(AuthGroup.isEqual(authGroup)))
+
+export const assocAuthGroupExtraProps = R.assoc(keys.authGroupExtraProps)
 
 // PREFS
 export const {

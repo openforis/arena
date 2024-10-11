@@ -1,10 +1,11 @@
-import * as camelize from 'camelize'
 import { db } from '@server/db/db'
+
+import * as A from '@core/arena'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as UserRepository from '../../user/repository/userRepository'
 
-const dbTransformCallback = camelize
+const dbTransformCallback = A.camelizePartial({ limitToLevel: 1 })
 
 // ==== CREATE
 
@@ -28,13 +29,13 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
 export const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
   Promise.all(surveyGroups.map((authGroup) => insertGroup(authGroup, surveyId, client)))
 
-export const insertUserGroup = async (groupUuid, userUuid, client = db) =>
+export const insertUserGroup = async ({ groupUuid, userUuid, props = null }, client = db) =>
   client.one(
     `
-    INSERT INTO auth_group_user (group_uuid, user_uuid)
-    VALUES ($1, $2)
+    INSERT INTO auth_group_user (group_uuid, user_uuid, props)
+    VALUES ($1, $2, $3)
     RETURNING *`,
-    [groupUuid, userUuid],
+    [groupUuid, userUuid, props],
     dbTransformCallback
   )
 
@@ -88,7 +89,7 @@ export const fetchSurveyGroups = async (surveyId, client = db) =>
 export const fetchUserGroups = async (userUuid, client = db) =>
   client.map(
     `
-    SELECT g.*
+    SELECT g.*, gu.props
     FROM auth_group_user gu
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
@@ -102,7 +103,7 @@ export const fetchUserGroups = async (userUuid, client = db) =>
 export const fetchUsersGroups = async (userUuids, client = db) =>
   client.map(
     `
-    SELECT gu.user_uuid, g.*
+    SELECT gu.user_uuid, gu.props, g.*
     FROM auth_group_user gu
     JOIN auth_group g
       ON g.uuid = gu.group_uuid
@@ -139,22 +140,22 @@ export const fetchSurveyIdsOfExpiredInvitationUsers = async (client = db) =>
 
 // ==== UPDATE
 
-export const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
+export const updateUserGroup = async ({ surveyId, userUuid, groupUuid, props = null }, client = db) => {
   await client.one(
     `
     UPDATE auth_group_user gu
-    SET group_uuid = $1
+    SET group_uuid = $/groupUuid/, props = $/props/
     FROM auth_group g
     JOIN survey s
-    ON s.id = $3
-    WHERE gu.user_uuid = $2
+    ON s.id = $/surveyId/
+    WHERE gu.user_uuid = $/userUuid/
     AND (
       (g.survey_uuid = s.uuid AND g.uuid = gu.group_uuid)
       OR
       (gu.group_uuid = g.uuid AND g.name = '${AuthGroup.groupNames.systemAdmin}')
     ) 
     RETURNING 1`,
-    [groupUuid, userUuid, surveyId],
+    { groupUuid, userUuid, surveyId, props },
     dbTransformCallback
   )
 }
