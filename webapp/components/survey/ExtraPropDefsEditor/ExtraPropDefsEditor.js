@@ -3,6 +3,8 @@ import './ExtraPropDefsEditor.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { ExtraPropDef } from '@core/survey/extraPropDef'
+
 import { ButtonAdd } from '@webapp/components'
 
 import { ExtraPropDefEditor } from './ExtraPropDefEditor'
@@ -10,9 +12,10 @@ import { useExtraPropDefsEditor } from './useExtraPropDefsEditor'
 
 export const ExtraPropDefsEditor = (props) => {
   const {
+    availableDataTypes = Object.keys(ExtraPropDef.dataTypes),
     canAdd = true,
     extraPropDefs: extraPropDefsProp,
-    isExtraPropDefReadOnly,
+    isExtraPropDefReadOnly = null,
     onExtraPropDefDelete,
     onExtraPropDefUpdate,
   } = props
@@ -29,6 +32,7 @@ export const ExtraPropDefsEditor = (props) => {
         {extraPropDefs.map((extraPropDef, index) => (
           <ExtraPropDefEditor
             key={extraPropDef.uuid}
+            availableDataTypes={availableDataTypes}
             extraPropDef={extraPropDef}
             extraPropDefs={extraPropDefs}
             index={index}
@@ -50,6 +54,7 @@ export const ExtraPropDefsEditor = (props) => {
 }
 
 ExtraPropDefsEditor.propTypes = {
+  availableDataTypes: PropTypes.array,
   canAdd: PropTypes.bool,
   extraPropDefs: PropTypes.array.isRequired,
   isExtraPropDefReadOnly: PropTypes.func,

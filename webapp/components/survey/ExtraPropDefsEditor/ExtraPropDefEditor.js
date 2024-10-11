@@ -13,7 +13,7 @@ import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'
 
 export const ExtraPropDefEditor = (props) => {
-  const { index, readOnly = false, onItemDelete } = props
+  const { availableDataTypes = Object.keys(ExtraPropDef.dataTypes), index, readOnly = false, onItemDelete } = props
   const {
     dirty,
     editing,
@@ -42,7 +42,7 @@ export const ExtraPropDefEditor = (props) => {
       />
       <Dropdown
         clearable={false}
-        items={Object.keys(ExtraPropDef.dataTypes)}
+        items={availableDataTypes}
         itemValue={A.identity}
         itemLabel={(item) => i18n.t(`extraProp.dataTypes.${item}`)}
         readOnly={readOnly || !editing}
@@ -68,6 +68,7 @@ export const ExtraPropDefEditor = (props) => {
 }
 
 ExtraPropDefEditor.propTypes = {
+  availableDataTypes: PropTypes.array,
   index: PropTypes.number.isRequired,
   readOnly: PropTypes.bool,
   onItemDelete: PropTypes.func.isRequired,
