@@ -14,7 +14,6 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
@@ -29,7 +28,6 @@ const ItemDetails = (props) => {
   const elemRef = useRef(null)
   const isInitialMount = useRef(true)
 
-  const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
   const lang = useSurveyPreferredLang()
 
@@ -103,7 +101,7 @@ const ItemDetails = (props) => {
             onClick={() => Actions.resetItemActive({ levelIndex })}
           />
 
-          <FormItem label={i18n.t('common.code')}>
+          <FormItem label="common.code">
             <Input
               id={TestId.categoryDetails.itemCode(levelIndex, index)}
               value={CategoryItem.getCode(item)}

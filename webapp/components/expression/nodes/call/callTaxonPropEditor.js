@@ -9,7 +9,6 @@ import * as StringUtils from '@core/stringUtils'
 import { Button } from '@webapp/components/buttons'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
 import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
 
@@ -27,8 +26,6 @@ const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdent
 
 export const CallTaxonPropEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
-
-  const i18n = useI18n()
 
   const expressionArgumentsValues =
     expressionNode?.arguments?.map((arg) => arg.value ?? arg.name).map(StringUtils.unquote) ?? []
@@ -67,7 +64,7 @@ export const CallTaxonPropEditor = (props) => {
 
   return (
     <div className="function-editor">
-      <FormItem label={i18n.t('taxonomy.header')}>
+      <FormItem label="taxonomy.header">
         <TaxonomySelector
           filterFunction={Taxonomy.hasExtraDefs}
           onChange={(item) => {
@@ -81,7 +78,7 @@ export const CallTaxonPropEditor = (props) => {
           selectedTaxonomyUuid={taxonomyUuid}
         />
       </FormItem>
-      <FormItem label={i18n.t('extraProp.label')}>
+      <FormItem label="extraProp.label">
         <Dropdown
           disabled={!taxonomyUuid}
           items={Taxonomy.getExtraPropKeys(taxonomy)}
@@ -97,7 +94,7 @@ export const CallTaxonPropEditor = (props) => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('expressionEditor.var')}>
+      <FormItem label="expressionEditor.var">
         <Identifier disabled={!taxonomyUuid} node={identifier} onChange={onIdentifierChange} variables={variables} />
       </FormItem>
 

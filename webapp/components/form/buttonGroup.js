@@ -46,6 +46,7 @@ const ButtonGroup = ({
             iconClassName={item.iconClassName}
             onClick={onItemClick({ item, selected })}
             label={item.label}
+            labelParams={item.labelParams}
             title={item.title}
             testId={groupName ? `${groupName}_${item.key}` : null}
             variant={variant}

@@ -84,7 +84,7 @@ const BasicProps = (props) => {
       />
 
       {NodeDef.canNodeDefBeKey(nodeDef) && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
+        <FormItem label="nodeDefEdit.basicProps.key">
           <div className="form-item_body">
             <Checkbox
               id={TestId.nodeDefDetails.nodeDefKey}
@@ -101,7 +101,7 @@ const BasicProps = (props) => {
             {canHaveAutoIncrementalKey && (
               <FormItem
                 info="nodeDefEdit.basicProps.autoIncrementalKey.info"
-                label={i18n.t('nodeDefEdit.basicProps.autoIncrementalKey.label')}
+                label="nodeDefEdit.basicProps.autoIncrementalKey.label"
               >
                 <Checkbox
                   checked={NodeDef.isAutoIncrementalKey(nodeDef)}
@@ -115,7 +115,7 @@ const BasicProps = (props) => {
 
       {NodeDef.canNodeDefBeMultiple(nodeDef) && !NodeDef.isVirtual(nodeDef) && (
         <>
-          <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
+          <FormItem label="nodeDefEdit.basicProps.multiple">
             <div className="form-item_body">
               <Checkbox
                 id={TestId.nodeDefDetails.nodeDefMultiple}
@@ -124,10 +124,7 @@ const BasicProps = (props) => {
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
               />
               {NodeDef.isMultipleEntity(nodeDef) && (
-                <FormItem
-                  info="nodeDefEdit.basicProps.enumerate.info"
-                  label={i18n.t('nodeDefEdit.basicProps.enumerate.label')}
-                >
+                <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
                   <div>
                     <Checkbox
                       id={TestId.nodeDefDetails.nodeDefEnumerate}
@@ -146,18 +143,18 @@ const BasicProps = (props) => {
         React.createElement(basicPropsComponentByType[NodeDef.getType(nodeDef)], { Actions, state })}
 
       {displayAsEnabled && editingFromDesigner && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
+        <FormItem label="nodeDefEdit.basicProps.displayAs">
           <ButtonGroup
             selectedItemKey={renderType}
             onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
             items={[
               {
                 key: NodeDefLayout.renderType.form,
-                label: i18n.t('nodeDefEdit.basicProps.form'),
+                label: 'nodeDefEdit.basicProps.form',
               },
               {
                 key: NodeDefLayout.renderType.table,
-                label: i18n.t('nodeDefEdit.basicProps.table'),
+                label: 'nodeDefEdit.basicProps.table',
                 disabled: displayAsTableDisabled,
               },
             ]}
@@ -166,7 +163,7 @@ const BasicProps = (props) => {
       )}
 
       {displayInEnabled && editingFromDesigner && (
-        <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
+        <FormItem label="nodeDefEdit.basicProps.displayIn">
           <ButtonGroup
             selectedItemKey={displayIn}
             onChange={(value) =>
@@ -179,12 +176,13 @@ const BasicProps = (props) => {
             items={[
               {
                 key: NodeDefLayout.displayIn.parentPage,
-                label: i18n.t('nodeDefEdit.basicProps.parentPage', { parentPage: nodeDefParentLabel }),
+                label: 'nodeDefEdit.basicProps.parentPage',
+                labelParams: { parentPage: nodeDefParentLabel },
                 disabled: displayInParentPageDisabled,
               },
               {
                 key: NodeDefLayout.displayIn.ownPage,
-                label: i18n.t('nodeDefEdit.basicProps.ownPage'),
+                label: 'nodeDefEdit.basicProps.ownPage',
               },
             ]}
           />
@@ -209,7 +207,7 @@ const BasicProps = (props) => {
 
       {NodeDef.isVirtual(nodeDef) && (
         <>
-          <FormItem label={i18n.t('nodeDefEdit.basicProps.entitySource')}>
+          <FormItem label="nodeDefEdit.basicProps.entitySource">
             <EntitySelector
               hierarchy={entitySourceHierarchy}
               nodeDefUuidEntity={NodeDef.getParentUuid(nodeDef)}

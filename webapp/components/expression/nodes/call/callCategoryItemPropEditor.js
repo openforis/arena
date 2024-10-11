@@ -15,7 +15,6 @@ import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 import { useCategoryByName, useNodeDefsByNames } from '@webapp/store/survey/hooks'
 
 import { CallEditorPropTypes } from './callEditorPropTypes'
@@ -23,7 +22,6 @@ import { CallEditorPropTypes } from './callEditorPropTypes'
 const CategoryLevelVariable = (props) => {
   const { disabled, hierarchicalCategory, level, onChange, selectedAttributeUuid, variables } = props
 
-  const i18n = useI18n()
   const survey = useSurvey()
 
   const levelUuid = CategoryLevel.getUuid(level)
@@ -45,9 +43,8 @@ const CategoryLevelVariable = (props) => {
   return (
     <FormItem
       key={levelUuid}
-      label={i18n.t(hierarchicalCategory ? 'nodeDefEdit.filterVariableForLevel' : 'nodeDefEdit.filterVariable', {
-        levelName: CategoryLevel.getName(level),
-      })}
+      label={hierarchicalCategory ? 'nodeDefEdit.filterVariableForLevel' : 'nodeDefEdit.filterVariable'}
+      labelParams={{ levelName: CategoryLevel.getName(level) }}
     >
       <Dropdown
         className="identifier"
@@ -86,7 +83,6 @@ const createInitialState = ({ initialCategory, initialCategoryPropKey, initialAt
 export const CallCategoryItemPropEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
 
-  const i18n = useI18n()
   const survey = useSurvey()
 
   const expressionArgumentsValues =
@@ -139,7 +135,7 @@ export const CallCategoryItemPropEditor = (props) => {
 
   return (
     <div className="function-editor">
-      <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
+      <FormItem label="nodeDefEdit.codeProps.category">
         <CategorySelector
           categoryUuid={categoryUuid}
           filterFunction={Category.hasExtraDefs}
@@ -149,7 +145,7 @@ export const CallCategoryItemPropEditor = (props) => {
           showManage={false}
         />
       </FormItem>
-      <FormItem label={i18n.t('extraProp.label')}>
+      <FormItem label="extraProp.label">
         <Dropdown
           disabled={!categoryUuid}
           items={Category.getItemExtraDefKeys(category)}

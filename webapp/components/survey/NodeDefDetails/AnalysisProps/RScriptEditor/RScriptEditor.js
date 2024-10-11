@@ -7,7 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { useI18n, useLang } from '@webapp/store/system'
+import { useLang } from '@webapp/store/system'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
@@ -20,7 +20,6 @@ const RScriptEditor = (props) => {
   const { state, Actions, nodeDef } = props
   const survey = useSurvey()
 
-  const i18n = useI18n()
   const lang = useLang()
 
   const nodeDefItems = Survey.getNodeDefsArray(survey).map((_nodeDef) => {
@@ -96,7 +95,7 @@ const RScriptEditor = (props) => {
   }, [])
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.advancedProps.script')} className="script-form">
+    <FormItem label="nodeDefEdit.advancedProps.script" className="script-form">
       <ScriptEditor
         key={defaultLocalScript}
         name="node_def_analysis_script"

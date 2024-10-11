@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
+import { useI18n } from '@webapp/store/system'
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
@@ -26,7 +27,7 @@ export const Input = React.forwardRef((props, ref) => {
     onChange = null,
     onFocus = undefined,
     onBlur = undefined,
-    placeholder = null,
+    placeholder: placeholderProp = null,
     readOnly = false,
     textTransformFunction = undefined,
     title: titleProp = null, // defaults to value
@@ -34,6 +35,8 @@ export const Input = React.forwardRef((props, ref) => {
     validation = null,
     value = '',
   } = props
+
+  const i18n = useI18n()
 
   // workaround for inputRef: useRef(ref) does not work as expected
   const inputRefInternal = useRef(null)
@@ -72,6 +75,7 @@ export const Input = React.forwardRef((props, ref) => {
 
   const className = classNames('form-input', classNameProp)
   const rows = inputType === 'textarea' ? textAreaRows : undefined
+  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
 
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
@@ -108,7 +112,7 @@ export const Input = React.forwardRef((props, ref) => {
           onBlur={onBlur}
           onChange={handleValueChange}
           onFocus={onFocus}
-          placeholder={placeholder}
+          placeholder={placeholderProp}
           readOnly={readOnly}
           rows={rows}
           testId={id}
