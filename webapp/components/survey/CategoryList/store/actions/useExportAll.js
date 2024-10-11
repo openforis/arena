@@ -28,6 +28,7 @@ export const useExportAll = () => {
               href={`/api/survey/${surveyId}/categories/export/download`}
               requestParams={{ tempFileName, draft }}
               onClick={() => dispatch(JobActions.hideJobMonitor())}
+              variant="contained"
             />
           )
         },

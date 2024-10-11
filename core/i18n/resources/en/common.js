@@ -392,8 +392,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activityLog: {
         title: 'Activity log',
       },
-      exportWithData: 'Export with data',
-      exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
+      exportWithData: 'Export + data (Backup)',
+      exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   
@@ -560,6 +560,8 @@ $t(common.cantUndoWarning)`,
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',
       includeFiles: 'Include files',
+      includeFileAttributeDefs: 'Include file attribute columns',
+      includeInternalUuids: 'Include internal UUIDs',
       recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {
@@ -1725,7 +1727,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
       entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
-      missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
+      missingAncestorForEntity: 'Cannot find "{{ancestorName}}" with these keys: {{keyValues}}',
       oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',

@@ -19,6 +19,19 @@ const { updateNodesDependents } = CoreRecordNodesUpdater
 
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 
+const getKeyValuePairs = ({ survey, entityDef, valuesByDefUuid }) => {
+  const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
+  return keyDefs
+    .map((keyDef) => {
+      const keyDefUuid = NodeDef.getUuid(keyDef)
+      const keyDefName = NodeDef.getName(keyDef)
+      const value = valuesByDefUuid[keyDefUuid]
+      const keyValue = NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
+      return `${keyDefName}=${keyValue}`
+    })
+    .join(',')
+}
+
 const _valueAdapterByType = {
   [NodeDef.nodeDefType.code]: ({ survey, record, parentNode, attributeDef, value }) => {
     if (value[Node.valuePropsCode.itemUuid]) {
@@ -126,16 +139,7 @@ const _getOrCreateEntityByKeys =
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
     if (!insertMissingNodes) {
-      const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
-      const keyValuePairs = keyDefs
-        .map((keyDef) => {
-          const keyDefUuid = NodeDef.getUuid(keyDef)
-          const keyDefName = NodeDef.getName(keyDef)
-          const value = valuesByDefUuid[keyDefUuid]
-          const keyValue = NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
-          return `${keyDefName}=${keyValue}`
-        })
-        .join(',')
+      const keyValuePairs = getKeyValuePairs({ survey, entityDef, valuesByDefUuid })
       throw new SystemError('appErrors:record.entityNotFound', {
         entityName: NodeDef.getName(entityDef),
         keyValues: keyValuePairs,
@@ -153,9 +157,11 @@ const _getOrCreateEntityByKeys =
         })(record)
 
     if (!entityParent) {
+      const keyValuePairs = getKeyValuePairs({ survey, entityDef: entityParentDef, valuesByDefUuid })
       throw new SystemError('validationErrors.record.missingAncestorForEntity', {
         entityName: NodeDef.getName(entityDef),
         ancestorName: NodeDef.getName(entityParentDef),
+        keyValues: keyValuePairs,
       })
     }
     const { entity: entityInserted, updateResult } = _addEntityAndKeyValues({
