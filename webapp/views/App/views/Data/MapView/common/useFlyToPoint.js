@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-import * as NumberUtils from '@core/numberUtils'
+import { Numbers } from '@openforis/arena-core'
 
 export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel = true }) => {
   const map = useMap()
@@ -37,7 +37,7 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
   const getPointByOffset = useCallback(
     (point, offset) => {
       const index = getPointIndex(point)
-      const indexNext = NumberUtils.mod(points.length)(index + offset)
+      const indexNext = Numbers.absMod(points.length)(index + offset)
       return points[indexNext]
     },
     [getPointIndex, points]

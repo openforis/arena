@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import { DEFAULT_SRS, Objects } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
@@ -37,6 +38,7 @@ export const keys = {
   steps: 'steps',
   template: 'template',
   temporary: 'temporary',
+  userExtraPropDefs: 'userExtraPropDefs',
 }
 
 export const collectReportKeys = {
@@ -162,6 +164,10 @@ export const getLanguage = (preferredLang) => (surveyInfo) =>
 export const isTemplate = R.propEq(keys.template, true)
 
 export const getFieldManualLinks = ObjectUtils.getProp(keys.fieldManualLinks, {})
+
+export const getUserExtraPropDefs = ObjectUtils.getProp(keys.userExtraPropDefs, {})
+
+export const getUserExtraPropDefsArray = R.pipe(getUserExtraPropDefs, ExtraPropDef.extraDefsToArray)
 
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)

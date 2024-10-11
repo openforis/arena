@@ -15,6 +15,7 @@ export const useSurveyDefsFetched = ({ draft, includeAnalysis, validate }) =>
   useSelector(SurveyStatusState.isFetchedWithSameParams({ draft, includeAnalysis, validate }))
 export const useSurvey = () => useSelector(SurveyState.getSurvey)
 export const useSurveyId = () => useSelector(SurveyState.getSurveyId)
+export const useSurveyUuid = () => useSelector(SurveyState.getSurveyUuid)
 export const useSurveyInfo = () => useSelector(SurveyState.getSurveyInfo)
 export const useSurveySrsIndex = () =>
   useSelector((state) => {

@@ -1,8 +1,9 @@
+import { Numbers } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
 
 const formatters = {
@@ -12,14 +13,14 @@ const formatters = {
   [NodeDef.nodeDefType.date]: ({ value }) => DateUtils.format(DateUtils.parseISO(value), DateUtils.formats.dateDefault),
   [NodeDef.nodeDefType.decimal]: ({ survey, nodeDef, value }) => {
     const maxNumberDecimalDigits = Survey.getNodeDefMaxDecimalDigits(nodeDef)(survey)
-    return NumberUtils.formatDecimal(value, maxNumberDecimalDigits)
+    return Numbers.formatDecimal(value, maxNumberDecimalDigits)
   },
 
   [NodeDef.nodeDefType.entity]: ({ value }) => {
     // value is an integer (entity items count)
-    return NumberUtils.formatInteger(value)
+    return Numbers.formatInteger(value)
   },
-  [NodeDef.nodeDefType.integer]: ({ value }) => NumberUtils.formatInteger(value),
+  [NodeDef.nodeDefType.integer]: ({ value }) => Numbers.formatInteger(value),
 }
 
 const format = ({ i18n, survey, nodeDef, value, label }) => {

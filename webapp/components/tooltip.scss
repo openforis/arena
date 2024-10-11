@@ -53,8 +53,15 @@
     border: 2px solid rgba($red, 0.6);
   }
 
-  .MuiTextField-root fieldset {
-    border: 1px solid red;
+  .MuiTextField-root fieldset,
+  .MuiTextField-root .Mui-focused fieldset {
+    border-width: 1px;
+    border-style: solid;
+    border-color: red;
+  }
+
+  .MuiTextField-root .Mui-focused fieldset {
+    border-width: 2px;
   }
 }
 

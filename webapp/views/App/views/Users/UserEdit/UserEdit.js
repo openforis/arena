@@ -24,6 +24,7 @@ import { useEditUser } from './store'
 import DropdownUserGroup from '../DropdownUserGroup'
 import ProfilePictureEditor from './ProfilePictureEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
+import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -51,6 +52,7 @@ const UserEdit = () => {
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
     onExtraChange,
+    onSurveyExtraPropsChange,
     onSave,
     onRemove,
     onInviteRepeat,
@@ -117,6 +119,9 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
+
+      {ProcessUtils.ENV.experimentalFeatures && <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
+
       {canEditSystemAdmin && (
         <FormItem label={i18n.t('authGroups.systemAdmin.label')}>
           <Checkbox
@@ -147,17 +152,24 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      {!hideSurveyGroup && !systemAdmin && (
-        <FormItem label={i18n.t('usersView.roleInCurrentSurvey')}>
-          <DropdownUserGroup
-            editingLoggedUser={User.isEqual(user)(userToUpdate)}
-            disabled={!canEditGroup}
-            validation={Validation.getFieldValidation(User.keys.authGroupsUuids)(validation)}
-            groupUuid={AuthGroup.getUuid(groupInCurrentSurvey)}
-            onChange={onSurveyAuthGroupChange}
-            showOnlySurveyGroups
-          />
-        </FormItem>
+      {!hideSurveyGroup && (
+        <>
+          {!systemAdmin && (
+            <FormItem label={i18n.t('usersView.roleInCurrentSurvey')}>
+              <DropdownUserGroup
+                editingLoggedUser={User.isEqual(user)(userToUpdate)}
+                disabled={!canEditGroup}
+                validation={Validation.getFieldValidation(User.keys.authGroupsUuids)(validation)}
+                groupUuid={AuthGroup.getUuid(groupInCurrentSurvey)}
+                onChange={onSurveyAuthGroupChange}
+                showOnlySurveyGroups
+              />
+            </FormItem>
+          )}
+          {ProcessUtils.ENV.experimentalFeatures && (
+            <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
+          )}
+        </>
       )}
       {editingSameUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
@@ -182,8 +194,6 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
-
-      {ProcessUtils.ENV.experimentalFeatures && <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">

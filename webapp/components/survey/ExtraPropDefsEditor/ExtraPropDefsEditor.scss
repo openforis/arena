@@ -1,28 +1,26 @@
 .extra-prop-defs-editor {
-  .panel-right__content {
-    display: grid;
-    grid-template-rows: min-content 2.5rem 2.5rem;
+  display: grid;
+  grid-template-rows: min-content 2.5rem 2.5rem;
 
-    .items-container {
-      .form-item {
-        height: auto;
-        margin: 10px;
-        grid-template-columns: 10rem 20rem 10rem 40px 40px;
-        column-gap: 1rem;
-      }
-
-      .btn-save,
-      .btn-cancel {
-        min-width: auto;
-      }
+  .items-container {
+    .form-item {
+      height: auto;
+      margin: 10px;
+      grid-template-columns: 10rem 20rem 10rem 40px 40px;
+      column-gap: 1rem;
     }
 
-    .item-add-btn {
-      justify-self: left;
+    .btn-save,
+    .btn-cancel {
+      min-width: auto;
     }
+  }
 
-    .save-btn {
-      justify-self: center;
-    }
+  .item-add-btn {
+    justify-self: left;
+  }
+
+  .save-btn {
+    justify-self: center;
   }
 }
