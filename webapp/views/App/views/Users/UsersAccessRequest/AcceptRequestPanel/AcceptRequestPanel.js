@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
@@ -67,4 +68,9 @@ export const AcceptRequestPanel = (props) => {
       </div>
     </div>
   )
+}
+
+AcceptRequestPanel.propTypes = {
+  userAccessRequest: PropTypes.object.isRequired,
+  onRequestAccepted: PropTypes.func.isRequired,
 }
