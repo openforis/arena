@@ -15,7 +15,7 @@ export const AcceptRequestPanel = (props) => {
   const { userAccessRequest, onRequestAccepted } = props
   const { email } = userAccessRequest
 
-  const { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation, templateLabel } =
+  const { roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, validation, templateLabel } =
     useAcceptRequestPanel({
       userAccessRequest,
       onRequestAccepted,
@@ -25,10 +25,10 @@ export const AcceptRequestPanel = (props) => {
 
   return (
     <div className="user-access-request-accept form">
-      <FormItem label={i18n.t('common.email')}>
+      <FormItem label="common.email">
         <Input value={email} disabled />
       </FormItem>
-      <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.surveyName')}>
+      <FormItem label="usersAccessRequestView.acceptRequest.surveyName">
         <Input
           value={surveyName}
           validation={Validation.getFieldValidation(UserAccessRequestAccept.keys.surveyName)(validation)}
@@ -37,17 +37,17 @@ export const AcceptRequestPanel = (props) => {
           }
         />
       </FormItem>
-      <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.surveyLabel')}>
+      <FormItem label="usersAccessRequestView.acceptRequest.surveyLabel">
         <Input
           value={surveyLabel}
           validation={Validation.getFieldValidation(UserAccessRequestAccept.keys.surveyLabel)(validation)}
           onChange={(value) => onUpdate({ field: UserAccessRequestAccept.keys.surveyLabel, value })}
         />
       </FormItem>
-      <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.template')}>
+      <FormItem label="usersAccessRequestView.acceptRequest.template">
         <Input value={templateLabel} disabled />
       </FormItem>
-      <FormItem label={i18n.t('usersAccessRequestView.acceptRequest.role')}>
+      <FormItem label="usersAccessRequestView.acceptRequest.role">
         <Dropdown
           items={UserAccessRequestAccept.requestAcceptRoles}
           itemValue={A.identity}

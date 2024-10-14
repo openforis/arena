@@ -5,12 +5,10 @@ import { Numbers } from '@openforis/arena-core'
 
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
-import { useI18n } from '@webapp/store/system'
 
 export const ConfigurationNumericItemEditor = (props) => {
   const { labelKey, maxValue = undefined, minValue = undefined, onSave: onSaveProp, value: valueProp } = props
 
-  const i18n = useI18n()
   const [state, setState] = useState({
     dirty: false,
     editing: false,
@@ -39,7 +37,7 @@ export const ConfigurationNumericItemEditor = (props) => {
   }, [valueProp])
 
   return (
-    <FormItem label={i18n.t(labelKey)}>
+    <FormItem label={labelKey}>
       <div className="display-flex">
         <Input numberFormat={NumberFormats.integer()} onChange={onChange} readOnly={!editing} value={value} />
         <ItemEditButtonBar dirty={dirty} editing={editing} onCancel={onCancel} onEdit={onEdit} onSave={onSave} />
