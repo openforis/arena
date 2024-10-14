@@ -219,7 +219,7 @@ const BasicProps = (props) => {
             qualifier={TestId.nodeDefDetails.formula}
             state={state}
             Actions={Actions}
-            label={i18n.t('nodeDefEdit.basicProps.formula')}
+            label="nodeDefEdit.basicProps.formula"
             propName={NodeDef.keysPropsAdvanced.formula}
             applyIf={false}
             multiple={false}

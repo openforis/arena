@@ -46,12 +46,12 @@ const Login = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      <EmailInput defaultValue={email} label={i18n.t('loginView.yourEmail')} name="email" onChange={onChangeEmail} />
+      <EmailInput defaultValue={email} label="loginView.yourEmail" name="email" onChange={onChangeEmail} />
 
       <PasswordInput
         defaultValue={formObject.password}
         name="password"
-        label={i18n.t('loginView.yourPassword')}
+        label="loginView.yourPassword"
         onChange={onChangePassword}
       />
 
