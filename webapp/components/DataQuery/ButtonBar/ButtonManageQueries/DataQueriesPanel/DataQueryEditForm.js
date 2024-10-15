@@ -6,7 +6,6 @@ import { DataQuerySummaries } from '@openforis/arena-core'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -16,15 +15,13 @@ import { ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
 export const DataQueryEditForm = (props) => {
   const { draft, querySummary, setQuerySummary, onDelete, onNew, onSave, validating } = props
 
-  const i18n = useI18n()
-
   const validation = Validation.getValidation(querySummary)
 
   const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
 
   return (
     <div className="data-query-form">
-      <FormItem label={i18n.t('common.name')}>
+      <FormItem label="common.name">
         <Input
           onChange={(value) =>
             setQuerySummary(DataQuerySummaries.assocName(StringUtils.normalizeName(value))(querySummary))

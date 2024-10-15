@@ -8,7 +8,6 @@ import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import TabBar from '@webapp/components/tabBar'
@@ -26,8 +25,6 @@ import { State, useNodeDefDetails } from './store'
 const NodeDefDetails = (props) => {
   const { nodeDefUuid = null } = props
 
-  const i18n = useI18n()
-
   const { state, Actions, editingFromDesigner } = useNodeDefDetails({ nodeDefUuid })
 
   const nodeDef = State.getNodeDef(state)
@@ -40,7 +37,7 @@ const NodeDefDetails = (props) => {
     const tabProps = { state, Actions, editingFromDesigner }
     const _tabs = [
       {
-        label: i18n.t('nodeDefEdit.basic'),
+        label: 'nodeDefEdit.basic',
         component: BasicProps,
         id: TestId.nodeDefDetails.basic,
         props: tabProps,
@@ -48,14 +45,14 @@ const NodeDefDetails = (props) => {
     ]
     if (!nodeDefIsRoot) {
       _tabs.push({
-        label: i18n.t('nodeDefEdit.advanced'),
+        label: 'nodeDefEdit.advanced',
         component: AdvancedProps,
         id: TestId.nodeDefDetails.advanced,
         props: tabProps,
       })
       if (NodeDefUIProps.getValidationsEnabledByType(nodeDefType)) {
         _tabs.push({
-          label: i18n.t('nodeDefEdit.validations'),
+          label: 'nodeDefEdit.validations',
           component: ValidationsProps,
           id: TestId.nodeDefDetails.validations,
           props: tabProps,
@@ -63,7 +60,7 @@ const NodeDefDetails = (props) => {
       }
     }
     return _tabs
-  }, [Actions, editingFromDesigner, i18n, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
+  }, [Actions, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
   if (!nodeDef) return null
 
@@ -82,7 +79,7 @@ const NodeDefDetails = (props) => {
           />
         )}
 
-        <FormItem label={i18n.t('common.name')} className="node-def-edit__title">
+        <FormItem label="common.name" className="node-def-edit__title">
           <Input
             id={TestId.nodeDefDetails.nodeDefName}
             value={NodeDef.getName(nodeDef)}

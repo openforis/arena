@@ -77,26 +77,26 @@ const SurveyCreate = (props) => {
           items={[
             {
               key: createTypes.fromScratch,
-              label: i18n.t(
-                template ? 'homeView.surveyCreate.newTemplateFromScratch' : 'homeView.surveyCreate.newSurveyFromScratch'
-              ),
+              label: template
+                ? 'homeView.surveyCreate.newTemplateFromScratch'
+                : 'homeView.surveyCreate.newSurveyFromScratch',
             },
             {
               key: createTypes.clone,
-              label: i18n.t('common.clone'),
+              label: 'common.clone',
             },
             ...(showImport
               ? [
                   {
                     key: createTypes.import,
-                    label: i18n.t('common.import'),
+                    label: 'common.import',
                   },
                 ]
               : []),
           ]}
         />
       </div>
-      <FormItem label={i18n.t('common.name')}>
+      <FormItem label="common.name">
         <Input
           disabled={uploading}
           id={TestId.surveyCreate.surveyName}
@@ -107,7 +107,7 @@ const SurveyCreate = (props) => {
       </FormItem>
       {createType === createTypes.fromScratch && (
         <>
-          <FormItem label={i18n.t('common.label')}>
+          <FormItem label="common.label">
             <Input
               id={TestId.surveyCreate.surveyLabel}
               value={label}
@@ -115,7 +115,7 @@ const SurveyCreate = (props) => {
               onChange={(value) => onUpdate({ name: 'label', value })}
             />
           </FormItem>
-          <FormItem label={i18n.t('common.language')}>
+          <FormItem label="common.language">
             <LanguageDropdown
               selection={lang}
               validation={Validation.getFieldValidation('lang')(validation)}
@@ -128,7 +128,7 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.clone && (
         <>
-          <FormItem label={i18n.t('common.cloneFrom')}>
+          <FormItem label="common.cloneFrom">
             <SurveyDropdown
               selection={cloneFrom?.value}
               onChange={(value) => {
@@ -139,7 +139,7 @@ const SurveyCreate = (props) => {
             />
           </FormItem>
           {cloneFrom?.cycles?.length > 1 && (
-            <FormItem label={i18n.t('common.cycle')}>
+            <FormItem label="common.cycle">
               <Dropdown
                 className="cycle-dropdown"
                 items={cloneFrom.cycles}
@@ -187,7 +187,7 @@ const SurveyCreate = (props) => {
                   </div>
                 </fieldset>
               </div>
-              <FormItem label={i18n.t('homeView.surveyCreate.source.label')}>
+              <FormItem label="homeView.surveyCreate.source.label">
                 <RadioButtonGroup
                   items={Object.values(importSources).map((key) => ({
                     key,

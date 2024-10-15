@@ -9,14 +9,12 @@ import { FormItem } from '@webapp/components/form/Input'
 import { useSortable } from '@webapp/components/hooks'
 
 import { useNodeDefsByUuids } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 import { DataQuerySortableItemChip } from './DataQuerySortableItemChip'
 
 export const DataQuerySortableItems = (props) => {
   const { nodeDefUuids, label, nodeDefLabelType, onItemsSort, onItemDelete } = props
 
-  const i18n = useI18n()
   const containerRef = useRef(null)
   const nodeDefs = useNodeDefsByUuids(nodeDefUuids)
 
@@ -31,7 +29,7 @@ export const DataQuerySortableItems = (props) => {
   if (nodeDefs.length === 0) return null
 
   return (
-    <FormItem className="data-query__sortable-items-form-item" info="dataView.sortableItemsInfo" label={i18n.t(label)}>
+    <FormItem className="data-query__sortable-items-form-item" info="dataView.sortableItemsInfo" label={label}>
       <div className="data-query__sortable-items-wrapper" ref={containerRef}>
         {nodeDefs.map((nodeDef) => (
           <DataQuerySortableItemChip

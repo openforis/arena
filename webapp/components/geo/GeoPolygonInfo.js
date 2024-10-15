@@ -7,7 +7,6 @@ import { Numbers } from '@openforis/arena-core'
 
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 
-import { useI18n } from '@webapp/store/system'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import { FormItem } from '../form/Input'
@@ -19,8 +18,6 @@ const formatNumber = (value) => Numbers.formatDecimal(Numbers.roundToPrecision(v
 
 export const GeoPolygonInfo = (props) => {
   const { geoJson } = props
-
-  const i18n = useI18n()
 
   const areaInSquareMeters = GeoJsonUtils.area(geoJson)
   const perimeterInMeters = GeoJsonUtils.perimeter(geoJson)
@@ -44,14 +41,14 @@ export const GeoPolygonInfo = (props) => {
 
   return (
     <div className="geo-polygon-info">
-      <FormItem label={i18n.t('geo.vertices')}>{GeoJsonUtils.countVertices(geoJson)}</FormItem>
-      <FormItem label={i18n.t('geo.area')}>
+      <FormItem label="geo.vertices">{GeoJsonUtils.countVertices(geoJson)}</FormItem>
+      <FormItem label="geo.area">
         <div className="row">
           {areaInUnit(areaUnits.hectare)}
           <ButtonIconInfo isTitleMarkdown title={areaTooltipContent} />
         </div>
       </FormItem>
-      <FormItem label={i18n.t('geo.perimeter')}>
+      <FormItem label="geo.perimeter">
         <div className="row">
           {perimeterInUnit(lengthUnits.meter)}
           <ButtonIconInfo title={perimeterTooltipContent} />

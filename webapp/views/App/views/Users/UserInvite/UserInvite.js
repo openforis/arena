@@ -13,7 +13,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
-import { Button, ButtonIconInfo, Markdown } from '@webapp/components'
+import { Button, Markdown } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 
@@ -39,18 +39,18 @@ const UserInviteComponent = () => {
 
   return (
     <div className="user-invite form">
-      <FormItem label={i18n.t('common.email', { count: 2 })}>
+      <FormItem label="common.email_other">
         <InputChipsText
           id={TestId.userInvite.email}
           isInputFieldValueValid={Validator.isEmailValueValid}
           onChange={(value) => onUpdate({ name: UserInvite.keys.emails, value })}
-          placeholder={i18n.t('userInviteView.typeEmail')}
+          placeholder="userInviteView.typeEmail"
           selection={emails}
           validation={Validation.getFieldValidation(UserInvite.keys.emails)(validation)}
           textTransformFunction={(value) => value.trim().toLowerCase()}
         />
       </FormItem>
-      <FormItem label={i18n.t('common.group')}>
+      <FormItem label="common.group">
         <DropdownUserGroup
           validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
           groupUuid={selectedGroupUuid}
@@ -66,21 +66,15 @@ const UserInviteComponent = () => {
       )}
 
       {selectedGroupName && (
-        <FormItem label={i18n.t('userInviteView.groupPermissions.label')}>
+        <FormItem label="userInviteView.groupPermissions.label">
           <ul dangerouslySetInnerHTML={{ __html: i18n.t(`userInviteView.groupPermissions.${selectedGroupName}`) }} />
         </FormItem>
       )}
 
       <FormItem
-        label={
-          <div>
-            {i18n.t('userInviteView.messageOptional')}
-            <ButtonIconInfo
-              title="userInviteView.messageInfo"
-              onClick={() => window.open('https://www.markdownguide.org/basic-syntax', 'markdown-guide', 'noopener')}
-            />
-          </div>
-        }
+        info="userInviteView.messageInfo"
+        label="userInviteView.messageOptional"
+        onInfoClick={() => window.open('https://www.markdownguide.org/basic-syntax', 'markdown-guide', 'noopener')}
       >
         <Input
           id={TestId.userInvite.message}

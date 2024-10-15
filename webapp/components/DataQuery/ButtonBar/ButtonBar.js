@@ -20,7 +20,6 @@ import {
   DataExplorerState,
 } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
 
 import { DataQueryExportModal } from '../DataQueryExportModal'
 import { State, useButtonBar } from './store'
@@ -42,7 +41,6 @@ const ButtonBar = (props) => {
   } = props
 
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const displayType = DataExplorerSelectors.useDisplayType()
@@ -67,7 +65,7 @@ const ButtonBar = (props) => {
         variant="outlined"
       />
 
-      <FormItem className="mode-form-item" label={i18n.t('dataView.dataQuery.mode.label')}>
+      <FormItem className="mode-form-item" label="dataView.dataQuery.mode.label">
         <ButtonGroup
           disabled={appSaving || !nodeDefsSelectorVisible}
           groupName="queryMode"

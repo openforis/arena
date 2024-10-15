@@ -53,7 +53,7 @@ const ForgotPassword = () => {
           setObjectField('email', value)
         }}
         name="username"
-        label={i18n.t('loginView.yourEmail')}
+        label="loginView.yourEmail"
       />
 
       <div className="guest__buttons">
