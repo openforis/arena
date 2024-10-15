@@ -92,7 +92,6 @@ $tableFooterHeight: 30px;
 
   .table__row.active {
     background-color: $yellowHighlight;
-    pointer-events: none;
 
     .icon-action {
       color: $orange;

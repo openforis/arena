@@ -70,8 +70,6 @@ export const EditableColumn = (props) => {
       onKeyDown={onContainerKeyDown}
       onMouseOver={onContainerMouseOver}
       onMouseLeave={onContainerMouseLeave}
-      role="button"
-      tabIndex={0}
     >
       {editing && renderItemEditing({ item })}
       {!editing && renderItem({ item })}
