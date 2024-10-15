@@ -3,8 +3,6 @@ import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
-
-import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 
 import * as API from '@webapp/service/api'
@@ -21,7 +19,7 @@ export const SurveyOwnerColumn = (props) => {
 
   const surveyId = Survey.getId(surveyInfo)
   const ownerUuid = Survey.getOwnerUuid(surveyInfo)
-  const ownerName = Survey.getOwnerName(surveyInfo)
+  const surveyName = Survey.getName(surveyInfo)
 
   const canEdit = useAuthCanEditSurveyOwner()
 
@@ -39,26 +37,22 @@ export const SurveyOwnerColumn = (props) => {
       if (selectedOwnerUuid !== ownerUuid) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
-            key: 'dataView.records.confirmUpdateRecordOwner',
-            params: { ownerName: User.getName(selectedOwner) },
+            key: 'surveysView.confirmUpdateSurveyOwner',
+            params: { surveyName, ownerName: User.getName(selectedOwner) },
             onOk: async () => onChangeConfirmed({ selectedOwnerUuid }),
           })
         )
       }
     },
-    [dispatch, onChangeConfirmed, ownerUuid]
+    [dispatch, onChangeConfirmed, ownerUuid, surveyName]
   )
-
-  if (!canEdit) {
-    return ownerName
-  }
 
   return (
     <EditableColumn
       canEdit={canEdit}
       className="owner-col"
       item={surveyInfo}
-      renderItem={({ item }) => Record.getOwnerName(item)}
+      renderItem={({ item }) => Survey.getOwnerName(item)}
       renderItemEditing={() => <SurveyOwnerDropdown selectedUuid={ownerUuid} onChange={onChange} />}
     />
   )

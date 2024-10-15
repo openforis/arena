@@ -8,6 +8,8 @@ import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
+const ownerLabelFunction = (user) => [User.getName(user), User.getEmail(user)].filter(Boolean).join(' - ')
+
 export const SurveyOwnerDropdown = (props) => {
   const { selectedUuid, onChange } = props
 
@@ -37,7 +39,7 @@ export const SurveyOwnerDropdown = (props) => {
       clearable={false}
       items={users}
       itemValue={User.keys.uuid}
-      itemLabel={(user) => User.getName(user) ?? User.getEmail(user)}
+      itemLabel={ownerLabelFunction}
       onChange={onChange}
       placeholder={i18n.t('common.owner')}
       selection={selectedUser}

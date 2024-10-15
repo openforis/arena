@@ -32,16 +32,11 @@ export const EditableColumn = (props) => {
   const onContainerMouseOver = useCallback(() => setHovering(true), [setHovering])
   const onContainerMouseLeave = useCallback(() => setHovering(false), [setHovering])
 
-  const onContainerClick = useCallback(
-    (e) => {
-      // prevent table row selection on click
-      if (editing) {
-        e.stopPropagation()
-        e.preventDefault()
-      }
-    },
-    [editing]
-  )
+  const onContainerClick = useCallback((e) => {
+    // prevent table row selection on click
+    e.stopPropagation()
+    e.preventDefault()
+  }, [])
 
   const onContainerFocus = useCallback(() => setHovering(true), [setHovering])
 

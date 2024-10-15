@@ -31,8 +31,11 @@
   }
 
   .owner-col {
-    .dropdown__menu {
-      width: 25rem;
+    .dropdown-wrapper {
+      width: 16rem;
+      .dropdown__menu {
+        width: 25rem;
+      }
     }
   }
 }
