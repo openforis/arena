@@ -51,3 +51,8 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }) =>
   const { data } = await axios.put(`/api/survey/${surveyId}/config`, formData)
   return data
 }
+
+export const updateSurveyOwner = async ({ surveyId, ownerUuid }) => {
+  const { data } = await axios.put(`/api/survey/${surveyId}/owner`, { ownerUuid })
+  return data
+}
