@@ -56,7 +56,7 @@ export const SurveyOwnerColumn = (props) => {
   return (
     <EditableColumn
       canEdit={canEdit}
-      className="survey-owner-col"
+      className="owner-col"
       item={surveyInfo}
       renderItem={({ item }) => Record.getOwnerName(item)}
       renderItemEditing={() => <SurveyOwnerDropdown selectedUuid={ownerUuid} onChange={onChange} />}
