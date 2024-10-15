@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as User from '@core/user/user'
 
 import { Dropdown } from '@webapp/components/form'
@@ -8,7 +10,7 @@ import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
-const ownerLabelFunction = (user) => [User.getName(user), User.getEmail(user)].filter(Boolean).join(' - ')
+const ownerLabelFunction = (user) => [User.getName(user), User.getEmail(user)].filter(Objects.isNotEmpty).join(' - ')
 
 export const SurveyOwnerDropdown = (props) => {
   const { selectedUuid, onChange } = props
