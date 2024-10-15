@@ -17,13 +17,10 @@ export const CallUserPropEditor = (props) => {
 
   const [value, setValue] = useState(initialValue)
 
-  const createFunctionCall = useCallback(
-    (valueUpdated) =>
-      Expression.newCall({ callee: Expression.functionNames.userProp, params: [Expression.newLiteral(valueUpdated)] }),
-    []
-  )
-
-  const onValueChange = useCallback((valueUpdated) => setValue(valueUpdated), [])
+  const createFunctionCall = useCallback((valueUpdated) => {
+    const param = Expression.newLiteral(StringUtils.quote(valueUpdated))
+    return Expression.newCall({ callee: Expression.functionNames.userProp, params: [param] })
+  }, [])
 
   const onConfirm = useCallback(() => {
     if (Objects.isNotEmpty(value)) {
@@ -34,7 +31,7 @@ export const CallUserPropEditor = (props) => {
   return (
     <div className="function-editor">
       <FormItem label="extraProp.label">
-        <Input onChange={onValueChange} textTransformFunction={StringUtils.normalizeName} value={value} />
+        <Input onChange={setValue} textTransformFunction={StringUtils.normalizeName} value={value} />
       </FormItem>
       <Button disabled={Objects.isEmpty(value)} label="common.ok" onClick={onConfirm} />
     </div>
