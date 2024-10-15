@@ -77,7 +77,7 @@ const TaxonProps = (props) => {
 
   return (
     <>
-      <FormItem label={i18n.t('taxonomy.header')}>
+      <FormItem label="taxonomy.header">
         <div className="taxonomy-selector">
           <TaxonomySelector
             disabled={!canUpdateTaxonomy}
@@ -100,7 +100,7 @@ const TaxonProps = (props) => {
         </div>
       </FormItem>
 
-      <FormItem label={i18n.t('surveyForm.nodeDefTaxon.visibleFields')}>
+      <FormItem label="surveyForm.nodeDefTaxon.visibleFields">
         <Dropdown
           items={visibleFieldsDropdownItems}
           itemLabel={visibleFieldsLabelFunction}

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -31,12 +30,11 @@ export const SurveyInfoBasicForm = (props) => {
   const { cycleKeys, cycles, defaultCycleKey, descriptions, fieldManualLinks, labels, languages, name, srs } =
     surveyInfoObject
 
-  const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
 
   return (
     <div className="form">
-      <FormItem label={i18n.t('common.name')}>
+      <FormItem label="common.name">
         <Input
           id={TestId.surveyInfo.surveyName}
           value={name}
@@ -82,11 +80,11 @@ export const SurveyInfoBasicForm = (props) => {
         setLanguages={setLanguages}
       />
 
-      <FormItem label={i18n.t('common.srs')}>
+      <FormItem label="common.srs">
         <SrsEditor readOnly={readOnly} srs={srs} setSrs={setSrs} validation={getFieldValidation('srs')} />
       </FormItem>
 
-      <FormItem label={i18n.t('common.cycle_plural')}>
+      <FormItem label="common.cycle_plural">
         <CyclesEditor
           cycles={cycles}
           readOnly={readOnly}
@@ -96,7 +94,7 @@ export const SurveyInfoBasicForm = (props) => {
       </FormItem>
 
       {cycleKeys.length > 1 && (
-        <FormItem label={i18n.t('homeView.surveyInfo.cycleForArenaMobile')}>
+        <FormItem label="homeView.surveyInfo.cycleForArenaMobile">
           <CycleSelector cycleKeys={cycleKeys} selectedCycle={defaultCycleKey} onChange={setDefaultCycleKey} />
         </FormItem>
       )}

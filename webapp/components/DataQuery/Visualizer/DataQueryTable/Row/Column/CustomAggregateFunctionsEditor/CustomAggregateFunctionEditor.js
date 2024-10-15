@@ -7,8 +7,6 @@ import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidat
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
-
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { ButtonCancel, ButtonDelete, ButtonSave } from '@webapp/components'
 import { NotificationActions } from '@webapp/store/ui'
@@ -25,7 +23,6 @@ export const CustomAggregateFunctionEditor = (props) => {
   } = props
 
   const dispatch = useDispatch()
-  const i18n = useI18n()
 
   const [aggregateFunction, setAggregateFunction] = useState(aggregateFunctionParam)
 
@@ -58,7 +55,7 @@ export const CustomAggregateFunctionEditor = (props) => {
 
   return (
     <div className="form">
-      <FormItem label={i18n.t('common.name')}>
+      <FormItem label="common.name">
         <Input
           validation={Validation.getFieldValidation(AggregateFunction.keys.name)(validation)}
           value={name}
@@ -67,7 +64,7 @@ export const CustomAggregateFunctionEditor = (props) => {
           }
         />
       </FormItem>
-      <FormItem label={i18n.t('dataExplorerView.customAggregateFunction.sqlExpression')}>
+      <FormItem label="dataExplorerView.customAggregateFunction.sqlExpression">
         <AggregateFunctionExpressionEditor
           entityDef={entityDef}
           nodeDef={nodeDef}

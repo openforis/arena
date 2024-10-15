@@ -88,7 +88,7 @@ const UserEdit = () => {
         <ProfilePicture userUuid={userUuid} />
       )}
 
-      <FormItem label={i18n.t('user.title')}>
+      <FormItem label="user.title">
         <DropdownUserTitle
           disabled={!canEdit}
           user={userToUpdate}
@@ -97,10 +97,10 @@ const UserEdit = () => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('common.name')}>
+      <FormItem label="common.name">
         <Input
           disabled={!canEditName}
-          placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
+          placeholder={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
           value={User.getName(userToUpdate)}
           validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
           maxLength={User.nameMaxLength}
@@ -109,10 +109,10 @@ const UserEdit = () => {
       </FormItem>
 
       {canViewEmail && (
-        <FormItem label={i18n.t('common.email')}>
+        <FormItem label="common.email">
           <Input
             disabled={!canEditEmail}
-            placeholder={i18n.t('common.email')}
+            placeholder="common.email"
             value={User.getEmail(userToUpdate)}
             validation={Validation.getFieldValidation(User.keys.email)(validation)}
             onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
@@ -123,7 +123,7 @@ const UserEdit = () => {
       {ProcessUtils.ENV.experimentalFeatures && <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
 
       {canEditSystemAdmin && (
-        <FormItem label={i18n.t('authGroups.systemAdmin.label')}>
+        <FormItem label="authGroups.systemAdmin.label">
           <Checkbox
             checked={systemAdmin}
             onChange={(value) => {
@@ -137,12 +137,12 @@ const UserEdit = () => {
         </FormItem>
       )}
       {canEditSurveyManager && !systemAdmin && (
-        <FormItem label={i18n.t('authGroups.surveyManager.label')}>
+        <FormItem label="authGroups.surveyManager.label">
           <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
         </FormItem>
       )}
       {canEditMaxSurveys && !systemAdmin && surveyManager && (
-        <FormItem label={i18n.t('userView.maxSurveysUserCanCreate')}>
+        <FormItem label="userView.maxSurveysUserCanCreate">
           <Input
             numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
             type="number"
@@ -155,7 +155,7 @@ const UserEdit = () => {
       {!hideSurveyGroup && (
         <>
           {!systemAdmin && (
-            <FormItem label={i18n.t('usersView.roleInCurrentSurvey')}>
+            <FormItem label="usersView.roleInCurrentSurvey">
               <DropdownUserGroup
                 editingLoggedUser={User.isEqual(user)(userToUpdate)}
                 disabled={!canEditGroup}
@@ -175,7 +175,7 @@ const UserEdit = () => {
         // show map api keys only when editing the current user
         <fieldset className="map-api-keys">
           <legend>{i18n.t('user.mapApiKeys.title')}</legend>
-          <FormItem label={i18n.t('user.mapApiKeys.mapProviders.planet')}>
+          <FormItem label="user.mapApiKeys.mapProviders.planet">
             <Input
               disabled={!canEditEmail}
               value={User.getMapApiKey({ provider: 'planet' })(userToUpdate)}
@@ -213,7 +213,7 @@ const UserEdit = () => {
             <ButtonDelete
               onClick={onRemove}
               className="btn-s btn-danger btn-remove-user"
-              label={i18n.t('userView.removeFromSurvey')}
+              label="userView.removeFromSurvey"
             />
           )}
         </div>

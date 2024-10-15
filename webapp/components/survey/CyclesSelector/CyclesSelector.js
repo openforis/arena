@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 
 import { RecordCycle } from '@core/record/recordCycle'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurveyCycleKeys } from '@webapp/store/survey'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -14,13 +13,12 @@ const CyclesSelector = (props) => {
 
   const cyclesKeysSurvey = useSurveyCycleKeys()
   const cycleKeyCurrent = useSurveyCycleKey()
-  const i18n = useI18n()
 
   if (cyclesKeysSurvey.length === 1) {
     return null
   }
   return (
-    <FormItem label={i18n.t('common.cycle_plural')}>
+    <FormItem label="common.cycle_plural">
       <div className="form-item_body">
         <ButtonGroup
           multiple

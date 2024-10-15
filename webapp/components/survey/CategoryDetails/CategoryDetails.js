@@ -10,7 +10,6 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
@@ -31,7 +30,6 @@ const CategoryDetails = (props) => {
   const { categoryUuid: categoryUuidProp, onCategoryUpdate, showClose = true } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
-  const i18n = useI18n()
   const surveyId = useSurveyId()
 
   const readOnly = !useAuthCanEditSurvey()
@@ -58,7 +56,7 @@ const CategoryDetails = (props) => {
     <>
       <div className="category">
         <div className="category__header">
-          <FormItem label={i18n.t('categoryEdit.categoryName')}>
+          <FormItem label="categoryEdit.categoryName">
             <Input
               id={TestId.categoryDetails.categoryName}
               value={Category.getName(category)}

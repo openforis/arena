@@ -8,7 +8,6 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
 import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -32,13 +31,11 @@ const ValidationsProps = (props) => {
   const onValidationsUpdate = (validations) =>
     Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations })
 
-  const i18n = useI18n()
-
   return (
     <div className="form">
       {NodeDef.isMultiple(nodeDef) && (
         <>
-          <FormItem label={i18n.t('nodeDefEdit.validationsProps.minCount')}>
+          <FormItem label="nodeDefEdit.validationsProps.minCount">
             <Input
               value={NodeDefValidations.getMinCount(nodeDefValidations)}
               disabled={readOnly}
@@ -50,7 +47,7 @@ const ValidationsProps = (props) => {
               onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
             />
           </FormItem>
-          <FormItem label={i18n.t('nodeDefEdit.validationsProps.maxCount')}>
+          <FormItem label="nodeDefEdit.validationsProps.maxCount">
             <Input
               value={NodeDefValidations.getMaxCount(nodeDefValidations)}
               disabled={readOnly}
@@ -65,7 +62,7 @@ const ValidationsProps = (props) => {
         </>
       )}
       {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (
-        <FormItem label={i18n.t('common.required')}>
+        <FormItem label="common.required">
           <Checkbox
             checked={NodeDefValidations.isRequired(nodeDefValidations)}
             disabled={readOnly}
@@ -76,7 +73,7 @@ const ValidationsProps = (props) => {
       {NodeDef.isAttribute(nodeDef) &&
         !NodeDef.isKey(nodeDef) &&
         (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
-          <FormItem label={i18n.t('common.unique')}>
+          <FormItem label="common.unique">
             <Checkbox
               id={TestId.nodeDefDetails.nodeDefUnique}
               checked={NodeDefValidations.isUnique(nodeDefValidations)}
@@ -88,7 +85,7 @@ const ValidationsProps = (props) => {
       {NodeDef.isAttribute(nodeDef) && (
         <ExpressionsProp
           qualifier={TestId.nodeDefDetails.validations}
-          label={i18n.t('nodeDefEdit.validationsProps.expressions')}
+          label="nodeDefEdit.validationsProps.expressions"
           readOnly={readOnly}
           applyIf
           showLabels

@@ -72,7 +72,7 @@ export const DataImportArenaView = () => {
             <legend>{i18n.t('dataImportView.options.header')}</legend>
 
             {
-              <FormItem className="display-flex" label={i18n.t('dataImportView.importIntoCycle')}>
+              <FormItem className="display-flex" label="dataImportView.importIntoCycle">
                 <CycleSelector selectedCycle={cycle} onChange={setCycle} />
               </FormItem>
             }
@@ -82,7 +82,7 @@ export const DataImportArenaView = () => {
         <FormItem
           className="display-flex"
           info="dataImportView.conflictResolutionStrategy.info"
-          label={i18n.t('dataImportView.conflictResolutionStrategy.label')}
+          label="dataImportView.conflictResolutionStrategy.label"
         >
           <Dropdown
             itemLabel={(strategy) => i18n.t(`dataImportView.conflictResolutionStrategy.${strategy}`)}

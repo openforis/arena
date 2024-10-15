@@ -60,7 +60,7 @@ export const ChainBasicProps = (props) => {
         labels={chain.props.descriptions}
         onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
       />
-      <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
+      <FormItem label="chainView.samplingDesign" className="sampling-design-form-item">
         <Checkbox
           checked={Chain.hasSamplingDesign(chain)}
           validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
@@ -68,7 +68,7 @@ export const ChainBasicProps = (props) => {
           disabled={samplingDesignDisabled}
         />
       </FormItem>
-      <FormItem label={i18n.t('chainView.records')}>
+      <FormItem label="chainView.records">
         <div className="records-count-wrapper">
           {RecordStep.steps.map(({ id, name }, index) => (
             <div className="records-count" key={id}>

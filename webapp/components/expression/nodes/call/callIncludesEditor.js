@@ -7,7 +7,6 @@ import { Button } from '@webapp/components/buttons'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { useNodeDefByName } from '@webapp/store/survey/hooks'
-import { useI18n } from '@webapp/store/system'
 
 import Identifier from '../identifier'
 import Literal from '../literal'
@@ -15,8 +14,6 @@ import { CallEditorPropTypes } from './callEditorPropTypes'
 
 export const CallIncludesEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
-
-  const i18n = useI18n()
 
   const [expressionNodeArg1, expressionNodeArg2] = expressionNode?.arguments ?? []
 
@@ -62,7 +59,7 @@ export const CallIncludesEditor = (props) => {
 
   return (
     <div className="function-editor">
-      <FormItem label={i18n.t('expressionEditor.var')}>
+      <FormItem label="expressionEditor.var">
         <Identifier
           node={identifierParam}
           onChange={onIdentifierParamChange}
@@ -73,7 +70,7 @@ export const CallIncludesEditor = (props) => {
         />
       </FormItem>
       {identifierNodeDef && (
-        <FormItem label={i18n.t('common.value')}>
+        <FormItem label="common.value">
           <Literal node={literalParam} nodeDefCurrent={identifierNodeDef} onChange={onLiteralParamChange} />
         </FormItem>
       )}
