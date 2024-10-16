@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux'
 
 import * as Authorizer from '@core/auth/authorizer'
+import { StatusCodes } from '@core/systemError'
 
 import { SurveyActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
@@ -16,16 +17,16 @@ const sendSurveyCreateRequest = async ({ dispatch, newSurvey, user }) => {
 
     return await API.insertSurvey({ newSurvey: { ...newSurvey, cloneFrom: cloneFromSurveyId } })
   } catch (e) {
-    const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
-    const errorKey = Number.isNaN(maxSurveysCount)
-      ? 'homeView.surveyCreate.error'
-      : 'homeView.surveyCreate.errorMaxSurveysCountExceeded'
-    dispatch(
-      NotificationActions.notifyError({
-        key: errorKey,
-        params: { maxSurveysCount },
-      })
-    )
+    let errorKey = null,
+      errorParams = null
+    if (e.status === StatusCodes.UNAUTHORIZED) {
+      const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
+      errorKey = 'homeView.surveyCreate.errorMaxSurveysCountExceeded'
+      errorParams = { maxSurveysCount }
+    } else {
+      errorKey = 'homeView.surveyCreate.error'
+    }
+    dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
     return null
   }
 }
