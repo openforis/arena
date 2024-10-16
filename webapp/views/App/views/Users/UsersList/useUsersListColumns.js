@@ -78,6 +78,18 @@ export const useUsersListColumns = () => {
           <ButtonIconEdit disabled={!User.hasAccepted(item)} onClick={() => goToUserDetails(item)} />
         ),
       },
+      {
+        key: User.keys.surveysCountDraft,
+        header: 'usersView.surveysDraft',
+        hidden: true,
+        renderItem: ({ item }) => User.getSurveysCountDraft(item),
+      },
+      {
+        key: User.keys.surveysCountPublished,
+        header: 'usersView.surveysPublished',
+        hidden: true,
+        renderItem: ({ item }) => User.getSurveysCountPublished(item),
+      },
     ],
     [goToUserDetails, i18n]
   )
