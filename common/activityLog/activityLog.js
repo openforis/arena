@@ -5,6 +5,7 @@ import * as ObjectUtils from '@core/objectUtils'
 export const type = {
   // Survey
   surveyCreate: 'surveyCreate',
+  surveyOwnerUpdate: 'surveyOwnerUpdate',
   surveyPropUpdate: 'surveyPropUpdate',
   surveyPublish: 'surveyPublish',
   surveyUnpublish: 'surveyUnpublish',

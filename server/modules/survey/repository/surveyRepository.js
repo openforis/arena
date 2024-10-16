@@ -302,6 +302,14 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
   )
 }
 
+export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
+  client.none(
+    `UPDATE survey 
+    SET owner_uuid = $/ownerUuid/
+    WHERE id = $/surveyId/`,
+    { surveyId, ownerUuid }
+  )
+
 export const publishSurveyProps = async (surveyId, client = db) =>
   client.none(
     `
