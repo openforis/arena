@@ -1,6 +1,6 @@
 import './Surveys.scss'
 
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -20,6 +20,7 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
+import { SurveyOwnerColumn } from './SurveyOwnerColumn'
 
 const Surveys = (props) => {
   const { module, moduleApiUri, template = false } = props
@@ -55,6 +56,10 @@ const Surveys = (props) => {
 
   const isRowActive = (surveyRow) => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
 
+  const onSurveysUpdate = useCallback(() => {
+    setRequestedAt(Date.now())
+  }, [])
+
   const columns = useMemo(() => {
     const cols = [
       {
@@ -86,8 +91,8 @@ const Surveys = (props) => {
         key: Survey.sortableKeys.ownerName,
         header: 'common.owner',
         hidden: true,
-        renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
-        width: 'minmax(5rem, 12rem)',
+        renderItem: ({ item }) => <SurveyOwnerColumn item={item} onSurveysUpdate={onSurveysUpdate} />,
+        width: '16rem',
         sortable: true,
       },
       {
@@ -166,7 +171,7 @@ const Surveys = (props) => {
       )
     }
     return cols
-  }, [lang, template])
+  }, [lang, onSurveysUpdate, template])
 
   return (
     <Table

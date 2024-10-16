@@ -67,7 +67,7 @@ export const PostStratificationAttributeSelector = () => {
   }
 
   return (
-    <FormItem label={i18n.t('chainView.postStratificationAttribute')}>
+    <FormItem label="chainView.postStratificationAttribute">
       <Dropdown items={items} selection={selectedItem} onChange={onChange} />
     </FormItem>
   )

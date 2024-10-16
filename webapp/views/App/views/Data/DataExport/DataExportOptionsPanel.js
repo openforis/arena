@@ -10,7 +10,6 @@ import { DateInput } from '@webapp/components/form/DateTimeInput'
 
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
 
 import { dataExportOptions } from './dataExportOptions'
 
@@ -21,7 +20,6 @@ const infoMessageKeyByOption = {
 export const DataExportOptionsPanel = (props) => {
   const { availableOptions: availableOptionsProp, onOptionChange, selectedOptionsByKey } = props
 
-  const i18n = useI18n()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const cycles = useSurveyCycleKeys()
@@ -66,7 +64,7 @@ export const DataExportOptionsPanel = (props) => {
           onChange={onOptionChange(optionKey)}
         />
       ))}
-      <FormItem label={i18n.t(`dataExportView.options.${dataExportOptions.recordsModifiedAfter}`)}>
+      <FormItem label={`dataExportView.options.${dataExportOptions.recordsModifiedAfter}`}>
         <DateInput
           onChange={onOptionChange(dataExportOptions.recordsModifiedAfter)}
           value={selectedOptionsByKey[dataExportOptions.recordsModifiedAfter]}

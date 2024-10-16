@@ -29,4 +29,13 @@
       height: 20px;
     }
   }
+
+  .owner-col {
+    .dropdown-wrapper {
+      width: 16rem;
+      .dropdown__menu {
+        width: 25rem;
+      }
+    }
+  }
 }

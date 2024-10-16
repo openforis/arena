@@ -12,12 +12,16 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { RecordKeyValuesExtractor } from '@webapp/views/App/views/Data/Records/recordKeyValuesExtractor'
 
-const FormItem = ({ label, children }) => (
-  <div className="tooltip-form-item">
-    <div className="tooltip-form-label">{label}:</div>
-    <div className="tooltip-form-value">{children}</div>
-  </div>
-)
+const FormItem = ({ label, children }) => {
+  const i18n = useI18n()
+
+  return (
+    <div className="tooltip-form-item">
+      <div className="tooltip-form-label">{i18n.t(label)}:</div>
+      <div className="tooltip-form-value">{children}</div>
+    </div>
+  )
+}
 
 FormItem.propTypes = {
   label: PropTypes.string.isRequired,
@@ -25,7 +29,6 @@ FormItem.propTypes = {
 }
 
 const RecordInfoFormItems = ({ recordUuid }) => {
-  const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
 
@@ -53,8 +56,8 @@ const RecordInfoFormItems = ({ recordUuid }) => {
 
   return (
     <>
-      <FormItem label={i18n.t('common.record')}>{loading ? '...' : recordKeys}</FormItem>
-      <FormItem label={i18n.t('common.owner')}>{loading ? '...' : recordOwner}</FormItem>
+      <FormItem label="common.record">{loading ? '...' : recordKeys}</FormItem>
+      <FormItem label="common.owner">{loading ? '...' : recordOwner}</FormItem>
     </>
   )
 }

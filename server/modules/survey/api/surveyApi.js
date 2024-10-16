@@ -308,6 +308,17 @@ export const init = (app) => {
     }
   })
 
+  app.put('/survey/:surveyId/owner', AuthMiddleware.requireSurveyOwnerEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, ownerUuid } = Request.getParams(req)
+      await SurveyService.updateSurveyOwner({ user, surveyId, ownerUuid })
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // ==== DELETE
 
   app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {

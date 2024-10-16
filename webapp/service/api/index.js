@@ -63,6 +63,7 @@ export {
   insertSurvey,
   startImportLabelsJob,
   updateSurveyConfigurationProp,
+  updateSurveyOwner,
 } from './survey'
 export {
   convertNodeDef,
@@ -88,6 +89,7 @@ export {
   fetchUserName,
   fetchUsersBySurvey,
   fetchUserSurveys,
+  fetchUsers,
   changeUserPassword,
 } from './user'
 

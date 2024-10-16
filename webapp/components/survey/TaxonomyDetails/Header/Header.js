@@ -11,7 +11,6 @@ import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
@@ -22,7 +21,6 @@ import { useNotifyWarning } from '@webapp/components/hooks'
 
 const Header = (props) => {
   const { state, Actions } = props
-  const i18n = useI18n()
   const notifyWarn = useNotifyWarning()
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
@@ -45,7 +43,7 @@ const Header = (props) => {
       </div>
 
       <div>
-        <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
+        <FormItem label="taxonomy.edit.taxonomyListName">
           <Input
             id={TestId.taxonomyDetails.taxonomyName}
             value={Taxonomy.getName(taxonomy)}

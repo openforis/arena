@@ -436,6 +436,20 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
   return fetchSurveyById({ surveyId, draft: true, validate: true }, client)
 }
 
+export const updateSurveyOwner = async ({ user, surveyId, ownerUuid }, client = db) =>
+  client.tx(async (t) => {
+    await SurveyRepository.updateSurveyOwner({ surveyId, ownerUuid }, t)
+    const systemActivity = false
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.surveyOwnerUpdate,
+      { ownerUuid },
+      systemActivity,
+      t
+    )
+  })
+
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
 // ====== DELETE

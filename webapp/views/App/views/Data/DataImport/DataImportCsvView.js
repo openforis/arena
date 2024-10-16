@@ -180,13 +180,13 @@ export const DataImportCsvView = () => {
       <div className="internal-container">
         <div className="form">
           {canSelectCycle && (
-            <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
+            <FormItem label="dataImportView.importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={setStateProp('cycle')} />
             </FormItem>
           )}
 
           {!Objects.isEmpty(cycle) && (
-            <FormItem label={i18n.t('dataImportView.importType.label')}>
+            <FormItem label="dataImportView.importType.label">
               <ButtonGroup
                 selectedItemKey={dataImportType}
                 onChange={onImportTypeChange}
@@ -199,7 +199,7 @@ export const DataImportCsvView = () => {
           )}
 
           {dataImportType && (
-            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoMultipleEntityOrAttribute')}>
+            <FormItem className="entity-form-item" label="dataImportView.importIntoMultipleEntityOrAttribute">
               <>
                 <NodeDefTreeSelect
                   nodeDefLabelType={nodeDefLabelType}

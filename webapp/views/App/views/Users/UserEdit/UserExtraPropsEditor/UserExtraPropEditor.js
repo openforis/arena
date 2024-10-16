@@ -6,7 +6,6 @@ import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
 import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 import { useConfirmAsync } from '@webapp/components/hooks'
 
@@ -40,7 +39,6 @@ export const UserExtraPropEditor = (props) => {
     value: valueProp,
   } = props
 
-  const i18n = useI18n()
   const confirm = useConfirmAsync()
 
   const initialItem = useMemo(() => ({ name: nameProp, value: valueProp, uuid }), [nameProp, uuid, valueProp])
@@ -104,7 +102,7 @@ export const UserExtraPropEditor = (props) => {
 
   return (
     <div className="extra-props display-flex">
-      <FormItem label={i18n.t('extraProp.name', { position: index + 1 })}>
+      <FormItem label="extraProp.name" labelParams={{ position: index + 1 }}>
         <Input
           disabled={!editing}
           onChange={onNameChange}
@@ -113,7 +111,7 @@ export const UserExtraPropEditor = (props) => {
           value={name}
         />
       </FormItem>
-      <FormItem label={i18n.t('extraProp.value')}>
+      <FormItem label="extraProp.value">
         <Input
           disabled={!editing}
           onChange={onValueChange}

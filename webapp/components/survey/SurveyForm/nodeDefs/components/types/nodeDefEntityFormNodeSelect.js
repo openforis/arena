@@ -38,18 +38,16 @@ const NodeDefEntityFormNodeSelect = (props) => {
           }}
           disabled={!canAddNode}
           iconClassName="icon-plus icon-10px icon-left"
-          label={i18n.t('surveyForm.nodeDefEntityForm.addNewEntity', { name: nodeDefName })}
+          label="surveyForm.nodeDefEntityForm.addNewEntity"
+          labelParams={{ name: nodeDefName }}
         />
       )}
       {nodes.length > 0 && (
         <>
           <FormItem
             className="node-select-form-item"
-            label={
-              selectedNode
-                ? i18n.t('surveyForm.nodeDefEntityForm.selectedEntity', { name: nodeDefName })
-                : i18n.t('surveyForm.nodeDefEntityForm.select', { name: nodeDefName })
-            }
+            label={selectedNode ? 'surveyForm.nodeDefEntityForm.selectedEntity' : 'surveyForm.nodeDefEntityForm.select'}
+            labelParams={{ name: nodeDefName }}
           >
             <select
               className="node-select"

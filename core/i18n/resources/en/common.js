@@ -873,6 +873,7 @@ Merge cannot be performed.`,
 
   surveysView: {
     chains: 'Chains',
+    confirmUpdateSurveyOwner: `Change the owner of the survey "{{surveyName}}" into "{{ownerName}}"?`,
     cycles: 'Cycles',
     datePublished: 'Date published',
     filter: 'Filter',

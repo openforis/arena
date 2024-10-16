@@ -46,8 +46,8 @@ export const NodeDefConversionDialog = (props) => {
       titleParams={{ nodeDefName }}
     >
       <ModalBody>
-        <FormItem label={i18n.t('nodeDefEdit.conversion.fromType')}>{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
-        <FormItem label={i18n.t('nodeDefEdit.conversion.toType')}>
+        <FormItem label="nodeDefEdit.conversion.fromType">{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
+        <FormItem label="nodeDefEdit.conversion.toType">
           <Dropdown
             className="to-type-dropdown"
             items={availableToTypes}

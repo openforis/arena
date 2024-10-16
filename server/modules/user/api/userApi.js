@@ -149,9 +149,9 @@ export const init = (app) => {
 
   app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const { offset, limit, sortBy, sortOrder } = Request.getParams(req)
+      const { offset, onlyAccepted, limit, sortBy, sortOrder } = Request.getParams(req)
 
-      const list = await UserService.fetchUsers({ offset, limit, sortBy, sortOrder })
+      const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, sortBy, sortOrder })
 
       res.json({ list })
     } catch (error) {

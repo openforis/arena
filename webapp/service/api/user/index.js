@@ -34,6 +34,14 @@ export const fetchUserName = async ({ userUuid, surveyId }) => {
   return name
 }
 
+export const fetchUsers = async ({ onlyAccepted = false, includeSystemAdmins = false }) => {
+  const params = { onlyAccepted, includeSystemAdmins, sortBy: 'name' }
+  const {
+    data: { list: users },
+  } = await axios.get(`/api/users`, { params })
+  return users
+}
+
 export const fetchUsersBySurvey = async ({ surveyId, onlyAccepted = false, includeSystemAdmins = false }) => {
   const params = { onlyAccepted, includeSystemAdmins }
   const {

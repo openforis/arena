@@ -138,6 +138,7 @@ export const {
   updateSurveyDependencyGraphs,
   updateSurveyProps,
   updateSurveyConfigurationProp,
+  updateSurveyOwner,
   // DELETE
   deleteTemporarySurveys,
   // UTILS

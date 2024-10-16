@@ -10,7 +10,6 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
-import { ButtonIconInfo } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
@@ -55,7 +54,7 @@ const AdvancedProps = (props) => {
       )}
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
-          <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
+          <FormItem label="nodeDefEdit.advancedProps.readOnly">
             <div className="form-item_body">
               <Checkbox
                 checked={NodeDef.isReadOnly(nodeDef)}
@@ -64,7 +63,7 @@ const AdvancedProps = (props) => {
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
               />
               {NodeDef.isReadOnly(nodeDef) && (
-                <FormItem label={i18n.t('nodeDefEdit.advancedProps.hidden')}>
+                <FormItem label="nodeDefEdit.advancedProps.hidden">
                   <Checkbox
                     checked={NodeDef.isHidden(nodeDef)}
                     disabled={readOnly}
@@ -81,7 +80,7 @@ const AdvancedProps = (props) => {
             state={state}
             Actions={Actions}
             info={autoIncrementalKey ? 'nodeDefEdit.advancedProps.defaultValuesNotEditableForAutoIncrementalKey' : null}
-            label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
+            label="nodeDefEdit.advancedProps.defaultValues"
             readOnly={readOnly || autoIncrementalKey}
             propName={NodeDef.keysPropsAdvanced.defaultValues}
             nodeDefUuidContext={nodeDefUuidContext}
@@ -109,7 +108,7 @@ const AdvancedProps = (props) => {
         qualifier={TestId.nodeDefDetails.relevantIf}
         state={state}
         Actions={Actions}
-        label={i18n.t('nodeDefEdit.advancedProps.relevantIf')}
+        label="nodeDefEdit.advancedProps.relevantIf"
         readOnly={readOnly}
         propName={NodeDef.keysPropsAdvanced.applicable}
         applyIf={false}
@@ -130,14 +129,7 @@ const AdvancedProps = (props) => {
       </div>
 
       {(NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)) && (
-        <FormItem
-          label={
-            <span>
-              {i18n.t('nodeDefEdit.advancedProps.itemsFilter')}
-              <ButtonIconInfo title="nodeDefEdit.advancedProps.itemsFilterInfo" />
-            </span>
-          }
-        >
+        <FormItem label="nodeDefEdit.advancedProps.itemsFilter" info="nodeDefEdit.advancedProps.itemsFilterInfo">
           <Input
             onChange={(value) => Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.itemsFilter, value })}
             validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.itemsFilter)(validation)}
