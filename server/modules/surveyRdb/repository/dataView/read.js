@@ -78,6 +78,7 @@ const _prepareSelectFields = ({
   editMode,
   streamMode,
   includeFileAttributeDefs = true,
+  includeDateCreated = false,
 }) => {
   const alwaysIncludedFields = [
     viewDataNodeDef.columnRecordUuid,
@@ -102,6 +103,9 @@ const _prepareSelectFields = ({
       // Add ancestor uuid columns
       ...viewDataNodeDef.columnUuids
     )
+    if (includeDateCreated) {
+      queryBuilder.select(viewDataNodeDef.columnDateCreated)
+    }
     if (editMode) {
       const tableRecord = new TableRecord(viewDataNodeDef.surveyId)
       queryBuilder.select(
@@ -199,6 +203,7 @@ export const fetchViewData = async (params, client = db) => {
     query,
     columnNodeDefs,
     includeFileAttributeDefs = true,
+    includeDateCreated = false,
     recordSteps,
     recordOwnerUuid = null,
     offset = null,
@@ -222,6 +227,7 @@ export const fetchViewData = async (params, client = db) => {
     editMode,
     streamMode: stream,
     includeFileAttributeDefs,
+    includeDateCreated,
   })
 
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })

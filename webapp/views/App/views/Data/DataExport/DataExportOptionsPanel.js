@@ -36,7 +36,7 @@ export const DataExportOptionsPanel = (props) => {
       dataExportOptions.includeAncestorAttributes,
       dataExportOptions.includeFiles,
       dataExportOptions.includeFileAttributeDefs,
-      dataExportOptions.includeCreationDate,
+      dataExportOptions.includeDateCreated,
     ]
     if (canAnalyzeRecords) {
       options.push(dataExportOptions.includeAnalysis)
