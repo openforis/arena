@@ -34,6 +34,14 @@ export const columnNameRecordStep = 'record_step'
  * @deprecated - Use TableDataNodeDef.
  */
 export const columnNameRecordOwnerUuid = 'record_owner_uuid'
+/**
+ * @deprecated - Use TableDataNodeDef.
+ */
+export const columnNameDateCreated = 'date_created'
+/**
+ * @deprecated - Use TableDataNodeDef.
+ */
+export const columnNameDateModified = 'date_modified'
 
 // eslint-disable-next-line
 /**
@@ -61,6 +69,8 @@ export const getName = NodeDefTable.getTableName
 export const getColumnNames = ({ survey, nodeDef, includeAnalysis = false }) => [
   columnNameUuid,
   columnNameParentUuid,
+  columnNameDateCreated,
+  columnNameDateModified,
   ...(NodeDef.isRoot(nodeDef)
     ? [columnNameRecordUuid, columnNameRecordCycle, columnNameRecordStep, columnNameRecordOwnerUuid]
     : []),
@@ -73,19 +83,21 @@ export const getColumnNames = ({ survey, nodeDef, includeAnalysis = false }) => 
 /**
  * @deprecated - Use TableDataNodeDef.
  */
-export const getRowValues = ({ survey, nodeDef, nodeRow, nodeDefColumns }) => {
-  const rowValues = DataRow.getValues({ survey, nodeRow, nodeDefColumns })
-  return [
-    nodeRow[columnNameUuid],
-    nodeRow[columnNameAncestorUuid],
+export const getRowValuesByColumnName = ({ survey, nodeDef, nodeRow, nodeDefColumns }) => {
+  const getRowValuesByColumnName = DataRow.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
+  return {
+    [columnNameUuid]: nodeRow[columnNameUuid],
+    [columnNameParentUuid]: nodeRow[columnNameAncestorUuid],
+    [columnNameDateCreated]: nodeRow[columnNameDateCreated],
+    [columnNameDateModified]: nodeRow[columnNameDateModified],
     ...(NodeDef.isRoot(nodeDef)
-      ? [
-          nodeRow[columnNameRecordUuid],
-          nodeRow[columnNameRecordCycle],
-          nodeRow[columnNameRecordStep],
-          nodeRow[columnNameRecordOwnerUuid],
-        ]
-      : []),
-    ...rowValues,
-  ]
+      ? {
+          [columnNameRecordUuid]: nodeRow[columnNameRecordUuid],
+          [columnNameRecordCycle]: nodeRow[columnNameRecordCycle],
+          [columnNameRecordStep]: nodeRow[columnNameRecordStep],
+          [columnNameRecordOwnerUuid]: nodeRow[columnNameRecordOwnerUuid],
+        }
+      : {}),
+    ...getRowValuesByColumnName,
+  }
 }
