@@ -1,4 +1,4 @@
-import { insertAllQuery } from '@server/db/dbUtils'
+import { insertAllQueryBatch } from '@server/db/dbUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -99,17 +99,15 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
       break
     }
     // 3. convert nodes into values
-    const nodesRowValues = nodes.map((nodeRow) => DataTable.getRowValues({ survey, nodeDef, nodeRow, nodeDefColumns }))
+    const nodesRowValuesByColumnName = nodes.map((nodeRow) =>
+      DataTable.getRowValuesByColumnName({ survey, nodeDef, nodeRow, nodeDefColumns })
+    )
 
     // 4. insert node values
-    await client.none(
-      insertAllQuery(
-        SchemaRdb.getName(surveyId),
-        NodeDefTable.getTableName(nodeDef, nodeDefAncestorMultipleEntity),
-        DataTable.getColumnNames({ survey, nodeDef, includeAnalysis }),
-        nodesRowValues
-      )
-    )
+    const schema = SchemaRdb.getName(surveyId)
+    const tableName = NodeDefTable.getTableName(nodeDef, nodeDefAncestorMultipleEntity)
+    const columnNames = DataTable.getColumnNames({ survey, nodeDef, includeAnalysis })
+    await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
   }
 
   // 5. drop materialized view

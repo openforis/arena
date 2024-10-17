@@ -11,12 +11,10 @@ const getNodeCol = (nodeDefCol, nodeRow) => {
   return nodeDefUuidRow === nodeDefUuidCol ? nodeRow : R.pathOr({}, ['children', nodeDefUuidCol], nodeRow)
 }
 
-export const getValues = ({ survey, nodeRow, nodeDefColumns }) => {
-  const values = nodeDefColumns.map((nodeDefCol) => {
+export const getValuesByColumnName = ({ survey, nodeRow, nodeDefColumns }) =>
+  nodeDefColumns.reduce((acc, nodeDefCol) => {
     const nodeCol = getNodeCol(nodeDefCol, nodeRow)
-    const nodeColValues = DataCol.getValues(survey, nodeDefCol, nodeCol)
-    return nodeColValues
-  })
-
-  return R.flatten(values)
-}
+    const valuesByColumnName = DataCol.getValuesByColumnName({ survey, nodeDefCol, nodeCol })
+    Object.assign(acc, valuesByColumnName)
+    return acc
+  }, {})
