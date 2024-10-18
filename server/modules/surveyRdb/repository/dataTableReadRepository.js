@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { Schemata, TableDataNodeDef } from '@common/model/db'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import { db } from '@server/db/db'
@@ -29,7 +28,8 @@ import { db } from '@server/db/db'
 export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
   const surveyId = Survey.getId(survey)
 
-  const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
+  const tableDef = new TableDataNodeDef(survey, nodeDefEntity)
+  const tableName = tableDef.nameQualified
 
   const aliasA = 'e1'
   const aliasB = 'e2'
@@ -83,21 +83,20 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
   nodeUuid = null,
   client = db
 ) => {
-  const surveyId = Survey.getId(survey)
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
+  const tableDef = new TableDataNodeDef(survey, entityDef)
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
   const keyColumns = R.pipe(R.map(NodeDefTable.getColumnName), R.join(', '))(entityDefKeys)
-  const nodeUuidWhereCondition = NodeDef.isRoot(entityDef) ? '' : `AND ${TableDataNodeDef.columnSet.uuid} = $2`
+  const nodeUuidWhereCondition = NodeDef.isRoot(entityDef) ? '' : `AND ${tableDef.columnUuid} = $2`
 
   return await client.oneOrNone(
     `
     SELECT
       ${keyColumns}
     FROM
-      ${table}
+      ${tableDef.nameAliased}
     WHERE
-      ${TableDataNodeDef.columnSet.recordUuid} = $1
+      ${tableDef.columnRecordUuid} = $1
       ${nodeUuidWhereCondition}`,
     [recordUuid, nodeUuid],
     (row) => (row ? Object.values(row) : [])
