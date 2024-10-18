@@ -6,7 +6,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as Node from '@core/record/node'
 
-import * as SurveySchemaRepository from '../../survey/repository/surveySchemaRepositoryUtils'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
 import * as DataTable from '../schemaRdb/dataTable'
@@ -58,13 +57,13 @@ const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMult
 
 export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, client) => {
   const surveyId = Survey.getId(survey)
-  const surveySchema = SurveySchemaRepository.getSurveyDBSchema(surveyId)
+  const surveySchema = Schemata.getSchemaSurveyRdb(surveyId)
   const includeAnalysis = true
-
+  const tableDef = new TableDataNodeDef(survey, nodeDef)
   const nodeDefAncestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   const nodeDefContext = NodeDef.isEntity(nodeDef) ? nodeDef : nodeDefAncestorMultipleEntity
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const nodeDefColumns = DataTable.getNodeDefColumns({ survey, nodeDef, includeAnalysis })
+  const nodeDefColumns = tableDef.getNodeDefsForColumns({ includeAnalysis })
   const nodeDefColumnsUuids = nodeDefColumns.map(NodeDef.getUuid)
 
   // 1. create materialized view
@@ -98,13 +97,14 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
       break
     }
     // 3. convert nodes into values
+    const tableDef = new TableDataNodeDef(survey, nodeDef)
+
     const nodesRowValuesByColumnName = nodes.map((nodeRow) =>
       DataTable.getRowValuesByColumnName({ survey, nodeDef, nodeRow, nodeDefColumns })
     )
 
     // 4. insert node values
     const schema = Schemata.getSchemaSurveyRdb(surveyId)
-    const tableDef = new TableDataNodeDef(survey, nodeDef)
     const tableName = tableDef.name
     const columnNames = tableDef.getColumnNames({ includeAnalysis })
     await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))

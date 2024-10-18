@@ -88,6 +88,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
   const table = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(entityDef)}`
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
   const keyColumns = R.pipe(R.map(NodeDefTable.getColumnName), R.join(', '))(entityDefKeys)
+  const nodeUuidWhereCondition = NodeDef.isRoot(entityDef) ? '' : `AND ${TableDataNodeDef.columnSet.uuid} = $2`
 
   return await client.oneOrNone(
     `
@@ -97,7 +98,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
       ${table}
     WHERE
       ${TableDataNodeDef.columnSet.recordUuid} = $1
-      ${NodeDef.isRoot(entityDef) ? '' : `AND ${TableDataNodeDef.columnSet.uuid} = $2`}`,
+      ${nodeUuidWhereCondition}`,
     [recordUuid, nodeUuid],
     (row) => (row ? Object.values(row) : [])
   )

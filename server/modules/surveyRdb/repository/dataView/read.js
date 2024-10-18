@@ -27,7 +27,7 @@ import {
 } from '../../../../../common/model/db'
 import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
 
-import * as DataCol from '../../schemaRdb/dataCol'
+import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
 
 const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   const { survey } = viewDataNodeDef
@@ -341,7 +341,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
-      const colValue = DataCol.getValue(survey, nodeDefUnique, nodeUnique)
+      const colValue = TableDataNodeDefColUtils.getValue(survey, nodeDefUnique, nodeUnique)
       const colValueString = R.isNil(colValue) ? null : String(colValue)
       const value = Expression.newLiteral(colValueString)
 
@@ -388,7 +388,7 @@ export const fetchRecordsCountByRootNodesValue = async (
   const rootTableAlias = 'r'
 
   const nodeValues = nodeDefs.map((nodeDef, idx) => {
-    const value = DataCol.getValue(survey, nodeDef, nodes[idx])
+    const value = TableDataNodeDefColUtils.getValue(survey, nodeDef, nodes[idx])
     return Objects.isNil(value) ? null : String(value)
   })
 

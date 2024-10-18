@@ -7,6 +7,7 @@ import Table from '../table'
 import TableSurveyRdb from '../tableSurveyRdb'
 import TableRecord from '../record'
 import ColumnNodeDef from './columnNodeDef'
+import { TableDataNodeDefRowUtils } from './rowUtils'
 
 const columnSet = {
   id: Table.columnSetCommon.id,
@@ -158,6 +159,24 @@ export default class TableDataNodeDef extends TableSurveyRdb {
 
   getConstraintUuidUnique() {
     return `CONSTRAINT ${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1 UNIQUE (${columnSet.uuid})`
+  }
+
+  getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {
+    const { survey, nodeDef } = this
+    const getRowValuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
+    return {
+      [columnSet.uuid]: nodeRow[columnSet.uuid],
+      [columnSet.parentUuid]: nodeRow[columnSet.ancestorUuid],
+      [columnSet.dateCreated]: nodeRow[columnSet.dateCreated],
+      [columnSet.dateModified]: nodeRow[columnSet.dateModified],
+      ...(NodeDef.isRoot(nodeDef)
+        ? rootDefColumnNames.reduce((acc, colName) => {
+            acc[colName] = nodeRow[colName]
+            return acc
+          }, {})
+        : {}),
+      ...getRowValuesByColumnName,
+    }
   }
 }
 
