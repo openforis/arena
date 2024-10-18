@@ -79,6 +79,7 @@ export const fetchViewData = async (params, client = db) => {
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
     includeInternalUuids = false,
+    includeDateCreated = false,
     nullsToEmpty = false,
   } = params
 
@@ -90,6 +91,7 @@ export const fetchViewData = async (params, client = db) => {
       query,
       columnNodeDefs,
       includeFileAttributeDefs,
+      includeDateCreated,
       recordSteps,
       recordOwnerUuid,
       offset,
@@ -109,6 +111,7 @@ export const fetchViewData = async (params, client = db) => {
           includeCategoryItemsLabels,
           expandCategoryItems,
           includeInternalUuids,
+          includeDateCreated,
         })
     await db.stream(result, (dbStream) => {
       const csvTransform = CSVWriter.transformJsonToCsv({
@@ -213,6 +216,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeFileAttributeDefs,
     includeFiles,
     includeInternalUuids,
+    includeDateCreated,
     recordsModifiedAfter,
   } = options
 
@@ -290,6 +294,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         includeCategoryItemsLabels,
         expandCategoryItems,
         includeInternalUuids,
+        includeDateCreated,
       },
       client
     )

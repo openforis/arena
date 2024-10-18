@@ -13,11 +13,11 @@ export const selectDate = (field, fieldAlias = null) =>
 
 export const now = "timezone('UTC', now())"
 
-export const insertAllQueryBatch = (schema, table, cols, itemsValues) => {
+export const insertAllQueryBatch = (schema, table, cols, valuesByColumnName) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, {
     table: { schema, table },
   })
-  return pgp.helpers.insert(itemsValues, columnSet)
+  return pgp.helpers.insert(valuesByColumnName, columnSet)
 }
 
 export const insertAllQuery = (schema, table, cols, itemsValues) => {
@@ -26,7 +26,6 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
     for (const [i, element] of cols.entries()) {
       item[element] = itemValues[i]
     }
-
     return item
   })
 

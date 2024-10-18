@@ -7,6 +7,7 @@ import Table from '../table'
 import TableSurveyRdb from '../tableSurveyRdb'
 import TableRecord from '../record'
 import ColumnNodeDef from './columnNodeDef'
+import { TableDataNodeDefRowUtils } from './rowUtils'
 
 const columnSet = {
   id: Table.columnSetCommon.id,
@@ -14,11 +15,34 @@ const columnSet = {
   dateModified: Table.columnSetCommon.dateModified,
   uuid: Table.columnSetCommon.uuid,
   parentUuid: 'parent_uuid',
+  ancestorUuid: 'ancestor_uuid',
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
   recordStep: 'record_step',
   recordOwnerUuid: 'record_owner_uuid',
 }
+
+const rootDefColumnNames = [
+  columnSet.recordUuid,
+  columnSet.recordCycle,
+  columnSet.recordStep,
+  columnSet.recordOwnerUuid,
+]
+
+const commonColumnNamesAndTypes = [
+  `${columnSet.id}            bigint      NOT NULL GENERATED ALWAYS AS IDENTITY`,
+  `${columnSet.dateCreated}   TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
+  `${columnSet.dateModified}  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
+  `${columnSet.uuid}          uuid        NOT NULL`,
+  `${columnSet.parentUuid}    uuid            NULL`,
+]
+
+const rootDefColumnNamesAndTypes = [
+  `${columnSet.recordUuid}      uuid        NOT NULL`,
+  `${columnSet.recordCycle}     varchar(2)  NOT NULL`,
+  `${columnSet.recordStep}      varchar(63) NOT NULL`,
+  `${columnSet.recordOwnerUuid} uuid        NOT NULL`,
+]
 
 /**
  * @typedef {module:arena.TableSurveyRdb} module:arena.TableDataNodeDef
@@ -69,36 +93,41 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.recordOwnerUuid)
   }
 
-  get columnNodeDefs() {
-    let nodeDefs = null
-    if (NodeDef.isAttribute(this.nodeDef)) {
-      nodeDefs = [this.nodeDef] // Multiple attr table
-    } else {
-      const descendants = Survey.getNodeDefDescendantAttributesInSingleEntities({
-        nodeDef: this.nodeDef,
-        includeAnalysis: true,
-      })(this.survey)
-      nodeDefs = R.sortBy(R.ascend(R.prop('id')))(descendants)
+  getNodeDefsForColumns({ includeAnalysis = true } = {}) {
+    const { nodeDef, survey } = this
+    if (NodeDef.isAttribute(nodeDef)) {
+      // Multiple attr table
+      return [nodeDef]
     }
-    return nodeDefs.map((nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn))
+    return R.pipe(
+      Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef, includeAnalysis }),
+      R.filter(NodeDef.isSingleAttribute),
+      R.sortBy(R.ascend(R.prop('id')))
+    )(survey)
+  }
+
+  get columnNodeDefs() {
+    return this.getNodeDefsForColumns({ includeAnalysis: true }).map(
+      (nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn)
+    )
+  }
+
+  getColumnNames = ({ includeAnalysis = true } = {}) => {
+    const { nodeDef } = this
+    const nodeDefsForColumns = this.getNodeDefsForColumns({ includeAnalysis })
+    const names = [columnSet.uuid, columnSet.parentUuid]
+    if (NodeDef.isRoot(nodeDef)) {
+      names.push(...rootDefColumnNames)
+    }
+    names.push(...nodeDefsForColumns.flatMap((nodeDefCol) => ColumnNodeDef.getColumnNames(nodeDefCol)))
+    return names
   }
 
   getColumnsWithType() {
     const columnsAndType = []
-    columnsAndType.push(
-      `${columnSet.id}            bigint      NOT NULL GENERATED ALWAYS AS IDENTITY`,
-      `${columnSet.dateCreated}   TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
-      `${columnSet.dateModified}  TIMESTAMP   NOT NULL DEFAULT (now() AT TIME ZONE 'UTC')`,
-      `${columnSet.uuid}          uuid        NOT NULL`,
-      `${columnSet.parentUuid}    uuid            NULL`
-    )
+    columnsAndType.push(...commonColumnNamesAndTypes)
     if (NodeDef.isRoot(this.nodeDef)) {
-      columnsAndType.push(
-        `${columnSet.recordUuid}      uuid        NOT NULL`,
-        `${columnSet.recordCycle}     varchar(2)  NOT NULL`,
-        `${columnSet.recordStep}      varchar(63) NOT NULL`,
-        `${columnSet.recordOwnerUuid} uuid        NOT NULL`
-      )
+      columnsAndType.push(...rootDefColumnNamesAndTypes)
     }
     this.columnNodeDefs.forEach((nodeDefColumn) => {
       columnsAndType.push(...nodeDefColumn.names.map((name, i) => `${name} ${nodeDefColumn.types[i]}`))
@@ -131,6 +160,25 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   getConstraintUuidUnique() {
     return `CONSTRAINT ${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1 UNIQUE (${columnSet.uuid})`
   }
+
+  getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {
+    const { survey, nodeDef } = this
+    const getRowValuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
+    return {
+      [columnSet.uuid]: nodeRow[columnSet.uuid],
+      [columnSet.parentUuid]: nodeRow[columnSet.ancestorUuid],
+      [columnSet.dateCreated]: nodeRow[columnSet.dateCreated],
+      [columnSet.dateModified]: nodeRow[columnSet.dateModified],
+      ...(NodeDef.isRoot(nodeDef)
+        ? rootDefColumnNames.reduce((acc, colName) => {
+            acc[colName] = nodeRow[colName]
+            return acc
+          }, {})
+        : {}),
+      ...getRowValuesByColumnName,
+    }
+  }
 }
 
 TableDataNodeDef.columnSet = columnSet
+TableDataNodeDef.rootDefColumnNames = rootDefColumnNames

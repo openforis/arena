@@ -2,10 +2,11 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import { Schemata, TableDataNodeDef } from '@common/model/db'
+import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import * as DataTable from '../schemaRdb/dataTable'
-import * as DataCol from '../schemaRdb/dataCol'
 import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
 
 const types = RdbUpdateTypes
@@ -36,29 +37,24 @@ const _getType = (nodeDef, node) => {
   return null
 }
 
-const _getValuesByColumnNameDefault = ({ survey, nodeDef, node }) => {
-  const columnNames = DataCol.getNames(nodeDef)
-  const columnValues = DataCol.getValues(survey, nodeDef, node)
-  return columnNames.reduce((acc, columnName, index) => {
-    acc[columnName] = columnValues[index]
-    return acc
-  }, {})
-}
+const _getValuesByColumnNameDefault = ({ survey, nodeDef, node }) =>
+  TableDataNodeDefColUtils.getValuesByColumnName({ survey, nodeDefCol: nodeDef, nodeCol: node })
 
 const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipleEntity, type }) => {
   if (type !== types.insert) {
     return _getValuesByColumnNameDefault({ survey, nodeDef, node })
   } else {
+    const { columnSet } = TableDataNodeDef
     const result = {
-      [DataTable.columnNameUuid]: Node.getUuid(node),
-      [DataTable.columnNameParentUuid]: Node.getUuid(ancestorMultipleEntity),
+      [columnSet.uuid]: Node.getUuid(node),
+      [columnSet.parentUuid]: Node.getUuid(ancestorMultipleEntity),
     }
     if (NodeDef.isRoot(nodeDef)) {
       Object.assign(result, {
-        [DataTable.columnNameRecordUuid]: Node.getRecordUuid(node),
-        [DataTable.columnNameRecordCycle]: Record.getCycle(record),
-        [DataTable.columnNameRecordStep]: Record.getStep(record),
-        [DataTable.columnNameRecordOwnerUuid]: Record.getOwnerUuid(record),
+        [columnSet.recordUuid]: Node.getRecordUuid(node),
+        [columnSet.recordCycle]: Record.getCycle(record),
+        [columnSet.recordStep]: Record.getStep(record),
+        [columnSet.recordOwnerUuid]: Record.getOwnerUuid(record),
       })
     }
     if (NodeDef.isMultipleAttribute(nodeDef)) {
@@ -98,7 +94,7 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
       const update = {
         type,
         schema: SchemaRdb.getName(Survey.getId(survey)),
-        table: DataTable.getName(nodeDef, ancestorDef),
+        table: NodeDefTable.getTableName(nodeDef, ancestorDef),
         nodeDefUuid: NodeDef.getUuid(nodeDef),
         nodeDefHierarchyLevel: NodeDef.getMetaHierarchy(nodeDef).length,
         valuesByColumnName: _getValuesByColumnName({ survey, record, nodeDef, node, ancestorMultipleEntity, type }),
@@ -169,12 +165,12 @@ export const updateTables = async ({ survey, record, nodes }, client) => {
 }
 
 export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef }, client) => {
-  const tableName = DataTable.getName(tableDef)
+  const tableName = NodeDefTable.getTableName(tableDef)
 
   return client.one(
-    `UPDATE ${SchemaRdb.getName(surveyId)}.${tableName}
-    SET ${DataTable.columnNameRecordStep} = $/stepId/
-    WHERE ${DataTable.columnNameRecordUuid} = $/recordUuid/
+    `UPDATE ${Schemata.getSchemaSurveyRdb(surveyId)}.${tableName}
+    SET ${TableDataNodeDef.columnSet.recordStep} = $/stepId/
+    WHERE ${TableDataNodeDef.columnSet.recordUuid} = $/recordUuid/
     RETURNING uuid`,
     { recordUuid, stepId }
   )

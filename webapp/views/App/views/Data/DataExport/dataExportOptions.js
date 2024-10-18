@@ -9,6 +9,7 @@ export const dataExportOptions = {
   includeFileAttributeDefs: 'includeFileAttributeDefs',
   recordsModifiedAfter: 'recordsModifiedAfter',
   includeInternalUuids: 'includeInternalUuids',
+  includeDateCreated: 'includeDateCreated',
 }
 
 export const defaultDataExportOptionsSelection = {
@@ -22,4 +23,5 @@ export const defaultDataExportOptionsSelection = {
   [dataExportOptions.includeFileAttributeDefs]: false,
   [dataExportOptions.recordsModifiedAfter]: null,
   [dataExportOptions.includeInternalUuids]: false,
+  [dataExportOptions.includeDateCreated]: false,
 }

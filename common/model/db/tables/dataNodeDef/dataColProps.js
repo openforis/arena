@@ -1,5 +1,3 @@
-import * as camelize from 'camelize'
-
 import { Objects, PointFactory, Points, Strings } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -13,7 +11,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as DateTimeUtils from '@core/dateUtils'
 
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
-import { ColumnNodeDef } from '@common/model/db'
+import ColumnNodeDef from './columnNodeDef'
 
 const { nodeDefType } = NodeDef
 
@@ -21,7 +19,7 @@ const colValueProcessor = 'colValueProcessor'
 
 const getValueFromItem = (nodeDefCol, columnName, item = {}, isInProps = false) => {
   // Remove nodeDefName from col name
-  const prop = camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
+  const prop = A.camelize(NodeDefTable.extractColumnName(nodeDefCol, columnName))
 
   return isInProps ? NodeDef.getProp(prop)(item) : A.propOr(null, prop, item)
 }

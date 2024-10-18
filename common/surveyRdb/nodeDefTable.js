@@ -2,7 +2,7 @@ import * as R from 'ramda'
 import * as toSnakeCase from 'to-snake-case'
 
 import * as NodeDef from '@core/survey/nodeDef'
-import { ColumnNodeDef } from '@common/model/db'
+import ColumnNodeDef from '@common/model/db/tables/dataNodeDef/columnNodeDef'
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'

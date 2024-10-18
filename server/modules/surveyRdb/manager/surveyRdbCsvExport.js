@@ -8,9 +8,16 @@ import { Query } from '@common/model/query'
 import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-
 const maxExpandedCategoryItems = 20
+
+const csvObjectTransformerNullsToEmpty = (obj) => {
+  Object.entries(obj).forEach(([key, value]) => {
+    if (A.isNull(value)) {
+      obj[key] = ''
+    }
+  })
+  return obj
+}
 
 const visitCategoryItems = ({ survey, nodeDef, itemVisitor }) => {
   const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
@@ -68,6 +75,7 @@ const getCsvExportFields = ({
   includeCategoryItemsLabels = true,
   expandCategoryItems = false,
   includeInternalUuids = false,
+  includeDateCreated = false,
 }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
@@ -82,7 +90,10 @@ const getCsvExportFields = ({
   }
   if (addCycle) {
     // Cycle is 0-based
-    fields.push(DataTable.columnNameRecordCycle)
+    fields.push(ViewDataNodeDef.columnSet.recordCycle)
+  }
+  if (includeDateCreated) {
+    fields.push(ViewDataNodeDef.columnSet.dateCreated)
   }
   fields.push(
     ...nodeDefCols.flatMap((nodeDefCol) => {
@@ -151,24 +162,13 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformerNullsToEmpty = () => {
-  return (obj) => {
-    Object.entries(obj).forEach(([key, value]) => {
-      if (A.isNull(value)) {
-        obj[key] = ''
-      }
-    })
-    return obj
-  }
-}
-
 const getCsvObjectTransformer = ({ survey, query, expandCategoryItems, nullsToEmpty = false }) => {
   const transformers = []
   if (expandCategoryItems) {
     transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
   }
   if (nullsToEmpty) {
-    transformers.push(getCsvObjectTransformerNullsToEmpty())
+    transformers.push(csvObjectTransformerNullsToEmpty)
   }
   return transformers.length === 0 ? null : A.pipe(...transformers)
 }
