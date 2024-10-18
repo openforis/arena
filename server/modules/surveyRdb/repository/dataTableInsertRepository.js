@@ -1,9 +1,8 @@
 import { insertAllQueryBatch } from '@server/db/dbUtils'
 
+import { Schemata, TableDataNodeDef } from '@common/model/db'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
-import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as Node from '@core/record/node'
 
@@ -104,9 +103,10 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
     )
 
     // 4. insert node values
-    const schema = SchemaRdb.getName(surveyId)
-    const tableName = NodeDefTable.getTableName(nodeDef, nodeDefAncestorMultipleEntity)
-    const columnNames = DataTable.getColumnNames({ survey, nodeDef, includeAnalysis })
+    const schema = Schemata.getSchemaSurveyRdb(surveyId)
+    const tableDef = new TableDataNodeDef(survey, nodeDef)
+    const tableName = tableDef.name
+    const columnNames = tableDef.getColumnNames({ includeAnalysis })
     await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
   }
 
