@@ -186,6 +186,7 @@ export const {
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
+  countItemsByParentUuid,
   fetchItemsByParentUuid,
   fetchItemsByCategoryUuid,
   countItemsBySurveyId,

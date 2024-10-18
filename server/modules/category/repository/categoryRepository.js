@@ -341,26 +341,38 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 const _getSearchQueryParam = ({ searchValue }) =>
   `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
-export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = NaN },
-  client = db
-) => {
+const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
-  const search = _getSearchQueryParam({ searchValue })
-  const items = await client.map(
-    `SELECT i.* 
-    FROM ${getSurveyDBSchema(surveyId)}.category_item i
-    JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return `SELECT i.* 
+    FROM ${schema}.category_item i
+    JOIN ${schema}.category_level l 
       ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $/categoryUuid/ 
       AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
       ${searchValueCondition}
     ORDER BY i.id
-    ${limit ? 'LIMIT $/limit/' : ''}`,
-    { categoryUuid, search, limit },
-    (def) => dbTransformCallback(def, draft, true)
-  )
+    ${limit ? 'LIMIT $/limit/' : ''}`
+}
 
+export const countItemsByParentUuid = async (
+  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null },
+  client = db
+) => {
+  const search = _getSearchQueryParam({ searchValue })
+  const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang })
+  client.one(`SELECT COUNT(*) FROM (${select})`, { categoryUuid, search }, (r) => Number(r.count))
+}
+
+export const fetchItemsByParentUuid = async (
+  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = NaN },
+  client = db
+) => {
+  const search = _getSearchQueryParam({ searchValue })
+  const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
+  const items = await client.map(select, { categoryUuid, search, limit }, (def) =>
+    dbTransformCallback(def, draft, true)
+  )
   return draft ? items : R.filter((item) => item.published)(items)
 }
 

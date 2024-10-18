@@ -14,11 +14,11 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
-import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
 const NodeDefCode = (props) => {
   const {
