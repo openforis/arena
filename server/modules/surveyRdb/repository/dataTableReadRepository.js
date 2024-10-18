@@ -3,21 +3,28 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { Schemata, TableDataNodeDef } from '@common/model/db'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import { db } from '@server/db/db'
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
-import * as SurveySchemaRepositoryUtils from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Returns a list of items for each record containing duplicate entities.
  * Each item is in the format:
+ * ```
  * {
  *   uuid, //record uuid,
  *   validation: {}, //record validation object,
      node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
+ * ```.
+ * @param {!object} survey - The survey object.
+ * @param {!string} cycle - The survey cycle.
+ * @param {!object} nodeDefEntity - The entity definition.
+ * @param {!Array} nodeDefKeys - The key attribute defs.
+ * @param {!object} client - The DB client.
+ * @returns {Promise<Array>} The list of items.
  */
 export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEntity, nodeDefKeys, client) => {
   const surveyId = Survey.getId(survey)
@@ -39,26 +46,26 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
 
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
     ? ''
-    : `AND ${getColEqualCondition(DataTable.columnNameRecordUuid)}
-         AND ${getColEqualCondition(DataTable.columnNameParentUuid)}`
+    : `AND ${getColEqualCondition(TableDataNodeDef.columnSet.recordUuid)}
+         AND ${getColEqualCondition(TableDataNodeDef.columnSet.parentUuid)}`
 
   return await client.any(
     `
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
-    FROM ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r
+    FROM ${Schemata.getSchemaSurveyRdb(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
-        ON r.uuid = ${aliasA}.${DataTable.columnNameRecordUuid} 
+        ON r.uuid = ${aliasA}.${TableDataNodeDef.columnSet.recordUuid} 
     WHERE
       r.cycle = $1 
       AND EXISTS (
       --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
-      SELECT ${aliasB}.${DataTable.columnNameUuid}
+      SELECT ${aliasB}.${TableDataNodeDef.columnSet.uuid}
       FROM ${tableName} ${aliasB}
       WHERE
         --same cycle
-        ${aliasB}.${DataTable.columnNameRecordCycle} = $1
+        ${aliasB}.${TableDataNodeDef.columnSet.recordCycle} = $1
         --different node uuid 
-        AND ${aliasA}.${DataTable.columnNameUuid} != ${aliasB}.${DataTable.columnNameUuid}
+        AND ${aliasA}.${TableDataNodeDef.columnSet.uuid} != ${aliasB}.${TableDataNodeDef.columnSet.uuid}
         ${recordAndParentEqualCondition}
         --same key node(s) values
         AND (${equalKeysCondition})
@@ -89,8 +96,8 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
     FROM
       ${table}
     WHERE
-      ${DataTable.columnNameRecordUuid} = $1
-      ${NodeDef.isRoot(entityDef) ? '' : `AND ${DataTable.columnNameUuid} = $2`}`,
+      ${TableDataNodeDef.columnSet.recordUuid} = $1
+      ${NodeDef.isRoot(entityDef) ? '' : `AND ${TableDataNodeDef.columnSet.uuid} = $2`}`,
     [recordUuid, nodeUuid],
     (row) => (row ? Object.values(row) : [])
   )

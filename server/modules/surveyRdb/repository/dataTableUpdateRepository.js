@@ -2,6 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import { TableDataNodeDef } from '@common/model/db'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 
 import * as DataTable from '../schemaRdb/dataTable'
@@ -49,16 +50,17 @@ const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipl
   if (type !== types.insert) {
     return _getValuesByColumnNameDefault({ survey, nodeDef, node })
   } else {
+    const { columnSet } = TableDataNodeDef
     const result = {
-      [DataTable.columnNameUuid]: Node.getUuid(node),
-      [DataTable.columnNameParentUuid]: Node.getUuid(ancestorMultipleEntity),
+      [columnSet.uuid]: Node.getUuid(node),
+      [columnSet.parentUuid]: Node.getUuid(ancestorMultipleEntity),
     }
     if (NodeDef.isRoot(nodeDef)) {
       Object.assign(result, {
-        [DataTable.columnNameRecordUuid]: Node.getRecordUuid(node),
-        [DataTable.columnNameRecordCycle]: Record.getCycle(record),
-        [DataTable.columnNameRecordStep]: Record.getStep(record),
-        [DataTable.columnNameRecordOwnerUuid]: Record.getOwnerUuid(record),
+        [columnSet.recordUuid]: Node.getRecordUuid(node),
+        [columnSet.recordCycle]: Record.getCycle(record),
+        [columnSet.recordStep]: Record.getStep(record),
+        [columnSet.recordOwnerUuid]: Record.getOwnerUuid(record),
       })
     }
     if (NodeDef.isMultipleAttribute(nodeDef)) {
@@ -173,8 +175,8 @@ export const updateRecordStep = async ({ surveyId, recordUuid, stepId, tableDef 
 
   return client.one(
     `UPDATE ${SchemaRdb.getName(surveyId)}.${tableName}
-    SET ${DataTable.columnNameRecordStep} = $/stepId/
-    WHERE ${DataTable.columnNameRecordUuid} = $/recordUuid/
+    SET ${TableDataNodeDef.columnSet.recordStep} = $/stepId/
+    WHERE ${TableDataNodeDef.columnSet.recordUuid} = $/recordUuid/
     RETURNING uuid`,
     { recordUuid, stepId }
   )

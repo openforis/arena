@@ -14,6 +14,7 @@ const columnSet = {
   dateModified: Table.columnSetCommon.dateModified,
   uuid: Table.columnSetCommon.uuid,
   parentUuid: 'parent_uuid',
+  ancestorUuid: 'ancestor_uuid',
   recordUuid: 'record_uuid',
   recordCycle: 'record_cycle',
   recordStep: 'record_step',
@@ -161,3 +162,4 @@ export default class TableDataNodeDef extends TableSurveyRdb {
 }
 
 TableDataNodeDef.columnSet = columnSet
+TableDataNodeDef.rootDefColumnNames = rootDefColumnNames

@@ -17,11 +17,17 @@ import * as Expression from '../../../../../core/expressionParser/expression'
 import * as SchemaRdb from '../../../../../common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { Query, Sort } from '../../../../../common/model/query'
-import { ViewDataNodeDef, TableNode, ColumnNodeDef, TableRecord, Schemata } from '../../../../../common/model/db'
+import {
+  ViewDataNodeDef,
+  TableNode,
+  ColumnNodeDef,
+  TableRecord,
+  Schemata,
+  TableDataNodeDef,
+} from '../../../../../common/model/db'
 import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilder'
 
 import * as DataCol from '../../schemaRdb/dataCol'
-import * as DataTable from '../../schemaRdb/dataTable'
 
 const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   const { survey } = viewDataNodeDef
@@ -301,8 +307,8 @@ export const runCount = async ({ surveyId, cycle, tableName, filter = null, reco
     FROM 
         $/schemaName:name/.$/tableName:name/
     WHERE 
-      ${DataTable.columnNameRecordCycle} = $/cycle/
-      ${recordOwnerUuid ? ` AND ${DataTable.columnNameRecordOwnerUuid} = $/recordOwnerUuid/` : ''}
+      ${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
+      ${recordOwnerUuid ? ` AND ${TableDataNodeDef.columnSet.recordOwnerUuid} = $/recordOwnerUuid/` : ''}
       ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
     `,
     {
@@ -325,7 +331,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
   const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
   const recordNotEqualCondition = Expression.newBinary({
-    left: Expression.newIdentifier(DataTable.columnNameRecordUuid),
+    left: Expression.newIdentifier(TableDataNodeDef.columnSet.recordUuid),
     right: Expression.newLiteral(Record.getUuid(record)),
     operator: Expression.operators.comparison.notEq.value,
   })
@@ -408,6 +414,8 @@ export const fetchRecordsCountByRootNodesValue = async (
     return acc
   }, {})
 
+  const rootTableRecordUuidAliasedCol = `${rootTableAlias}.${TableDataNodeDef.columnSet.recordUuid}`
+
   return client.map(
     `
     WITH count_records AS (
@@ -416,13 +424,13 @@ export const fetchRecordsCountByRootNodesValue = async (
       FROM
         ${rootTable}
       WHERE 
-        ${DataTable.columnNameRecordCycle} = $/cycle/
-        ${excludeRecordsFromCount ? ` AND ${DataTable.columnNameRecordUuid} NOT IN ($/recordUuidsExcluded:csv/)` : ''}
+        ${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
+        ${excludeRecordsFromCount ? ` AND ${TableDataNodeDef.columnSet.recordUuid} NOT IN ($/recordUuidsExcluded:csv/)` : ''}
       GROUP BY 
         ${filterColumnsString}
     )
     SELECT
-      ${rootTableAlias}.${DataTable.columnNameRecordUuid}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
+      ${rootTableRecordUuidAliasedCol}, jsonb_agg(n.uuid) as nodes_key_uuids, cr.count
     FROM
         ${rootTable} ${rootTableAlias}
     JOIN count_records cr
@@ -431,10 +439,10 @@ export const fetchRecordsCountByRootNodesValue = async (
       ON n.record_uuid = r.record_uuid
       AND n.node_def_uuid IN (${nodeDefs.map((nodeDefKey) => quote(NodeDef.getUuid(nodeDefKey))).join(', ')})
     WHERE
-      ${rootTableAlias}.${DataTable.columnNameRecordCycle} = $/cycle/
+      ${rootTableAlias}.${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
       AND ${filterCondition}
-      AND ${rootTableAlias}.${DataTable.columnNameRecordUuid} NOT IN ($/recordUuidsExcluded:csv/)
-    GROUP BY ${rootTableAlias}.${DataTable.columnNameRecordUuid}, cr.count
+      AND ${rootTableRecordUuidAliasedCol} NOT IN ($/recordUuidsExcluded:csv/)
+    GROUP BY ${rootTableRecordUuidAliasedCol}, cr.count
   `,
     {
       recordUuidsExcluded,
