@@ -35,6 +35,8 @@ export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
 export const getAuthGroupExtraProps = R.propOr({}, keys.authGroupExtraProps)
 export const getAuthGroupExtraProp = (prop) => R.pipe(getAuthGroupExtraProps, R.prop(prop))
 export const getLastLoginTime = R.prop(keys.lastLoginTime)
+export const getSurveysCountDraft = R.prop(keys.surveysCountDraft)
+export const getSurveysCountPublished = R.prop(keys.surveysCountPublished)
 
 // ====== UPDATE
 export const assocProp = R.assoc

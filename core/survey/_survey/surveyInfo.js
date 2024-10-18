@@ -178,6 +178,8 @@ export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
 
 export const assocRDBInitilized = R.assoc(keys.rdbInitialized)
 
+export const assocOwnerUuid = R.assoc(keys.ownerUuid)
+
 // ====== UTILS
 
 export const isValid = (surveyInfo) => !!surveyInfo?.id

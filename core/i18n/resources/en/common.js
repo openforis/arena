@@ -912,6 +912,8 @@ Copy the invitation link to the clipboard?`,
       label: 'Survey extra property',
       label_other: 'Survey extra properties',
     },
+    surveysDraft: 'Surveys (draft)',
+    surveysPublished: 'Surveys (published)',
   },
 
   usersAccessRequestView: {
