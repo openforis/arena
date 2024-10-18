@@ -8,8 +8,6 @@ import * as Node from '@core/record/node'
 
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
-import * as DataTable from '../schemaRdb/dataTable'
-
 const getSelectQuery = ({ surveyId, nodeDef, nodeDefContext, nodeDefAncestorMultipleEntity, nodeDefColumnsUuids }) => {
   const getNodeSelectQuery = (ancestorDef) =>
     NodeRepository.getNodeSelectQuery({ surveyId, includeRefData: true, includeRecordInfo: true, ancestorDef })
@@ -100,7 +98,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null }, 
     const tableDef = new TableDataNodeDef(survey, nodeDef)
 
     const nodesRowValuesByColumnName = nodes.map((nodeRow) =>
-      DataTable.getRowValuesByColumnName({ survey, nodeDef, nodeRow, nodeDefColumns })
+      tableDef.getRowValuesByColumnName({ nodeRow, nodeDefColumns })
     )
 
     // 4. insert node values
