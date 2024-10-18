@@ -71,7 +71,9 @@ const getNodeDefAvailableChildren = ({
   })
 
   const visibleChildren = pageNode
-    ? childrenFiltered.filter((childDef) => isPageVisible({ pageNodeDef: childDef, parentNode: pageNode }))
+    ? childrenFiltered.filter((childDef) =>
+        isPageVisible({ cycle, record, pageNodeDef: childDef, parentNode: pageNode })
+      )
     : childrenFiltered
 
   return visibleChildren.filter((childDef) => !isDisabled(childDef) && !hidden)
