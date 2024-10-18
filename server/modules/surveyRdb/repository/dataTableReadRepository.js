@@ -52,7 +52,7 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   return await client.any(
     `
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
-    FROM ${Schemata.getSchemaSurveyRdb(surveyId)}.record r
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.record r
       JOIN ${tableName} ${aliasA}
         ON r.uuid = ${aliasA}.${TableDataNodeDef.columnSet.recordUuid} 
     WHERE
