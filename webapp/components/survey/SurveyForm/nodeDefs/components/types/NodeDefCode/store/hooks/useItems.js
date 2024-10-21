@@ -17,41 +17,25 @@ const canHaveItems = ({ edit, levelIndex, parentCategoryItemUuid }) =>
 const hasItemsInSurveyIndex = ({ edit, levelIndex, parentCategoryItemUuid, itemsCount }) =>
   canHaveItems({ edit, levelIndex, parentCategoryItemUuid }) && itemsCount <= Category.maxCategoryItemsInIndex
 
-const getItemsFromSurveyIndex = ({ categoryUuid, edit, itemsCount, levelIndex, parentCategoryItemUuid, survey }) => {
-  if (!hasItemsInSurveyIndex({ edit, levelIndex, parentCategoryItemUuid, itemsCount })) {
+const getItemsFromSurveyIndex = (params) => {
+  if (!hasItemsInSurveyIndex(params)) {
     return []
   }
+  const { categoryUuid, levelIndex, parentCategoryItemUuid, survey } = params
   const itemsInLevel = Survey.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
   return levelIndex > 0
     ? itemsInLevel.filter((item) => parentCategoryItemUuid === CategoryItem.getParentUuid(item))
     : itemsInLevel
 }
 
-const calculateItems = async ({
-  categoryUuid,
-  draft,
-  edit,
-  itemsCount,
-  lang,
-  levelIndex,
-  parentCategoryItemUuid,
-  survey,
-}) => {
-  if (!canHaveItems({ edit, levelIndex, parentCategoryItemUuid })) {
+const calculateItems = async (params) => {
+  if (!canHaveItems(params)) {
     return []
   }
-  if (hasItemsInSurveyIndex({ edit, levelIndex, parentCategoryItemUuid, itemsCount })) {
-    return getItemsFromSurveyIndex({
-      categoryUuid,
-      draft,
-      edit,
-      itemsCount,
-      lang,
-      levelIndex,
-      parentCategoryItemUuid,
-      survey,
-    })
+  if (hasItemsInSurveyIndex(params)) {
+    return getItemsFromSurveyIndex(params)
   }
+  const { categoryUuid, draft, itemsCount, lang, parentCategoryItemUuid, survey } = params
   if (itemsCount > Category.maxCategoryItemsInIndex) {
     // items taken from a lookup function
     const surveyId = Survey.getId(survey)
@@ -78,7 +62,7 @@ export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) =
   const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   const parentCategoryItemUuid = useRecordParentCategoryItemUuid({ nodeDef, parentNode })
 
-  const getItemsParams = useMemo(
+  const itemsGetParams = useMemo(
     () => ({
       categoryUuid,
       draft,
@@ -92,11 +76,11 @@ export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) =
     [categoryUuid, draft, edit, itemsCount, lang, levelIndex, parentCategoryItemUuid, survey]
   )
 
-  const [items, setItems] = useState(getItemsFromSurveyIndex(getItemsParams))
+  const [items, setItems] = useState(getItemsFromSurveyIndex(itemsGetParams))
 
   useEffect(() => {
-    calculateItems(getItemsParams).then((_items) => setItems(_items))
-  }, [getItemsParams])
+    calculateItems(itemsGetParams).then((_items) => setItems(_items))
+  }, [itemsGetParams])
 
   const alwaysIncludeItemFunction = useCallback(
     () => entryDataQuery, // do not filter items when editing records from Data Explorer (entryDataQuery=true; record object is incomplete)
