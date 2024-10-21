@@ -24,6 +24,7 @@ export const UsersList = () => {
       rowExpandedComponent={({ item }) => <UserSurveysTable user={item} />}
       headerLeftComponent={TableHeaderLeft}
       selectable={false}
+      visibleColumnsSelectionEnabled
     />
   )
 }

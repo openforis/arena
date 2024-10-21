@@ -154,7 +154,19 @@ const _usersSelectQuery = ({
         SELECT uar.props ->> '${UserAccessRequest.keysProps.country}'
         FROM user_access_request uar
         WHERE uar.email = u.email
-      ) AS country
+      ) AS country,
+      (
+        SELECT COUNT(*) 
+        FROM survey s
+        WHERE s.owner_uuid = u.uuid
+          AND s.published
+      ) AS surveys_count_published,
+      (
+        SELECT COUNT(*) 
+        FROM survey s
+        WHERE s.owner_uuid = u.uuid
+          AND NOT s.published
+      ) AS surveys_count_draft
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
