@@ -5,6 +5,7 @@ export {
   fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
   countSamplingPointData,

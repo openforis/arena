@@ -47,6 +47,21 @@ export const fetchCategoryItems = ({
     data: { draft, parentUuid, search, lang },
   })
 
+export const countCategoryItems = async ({
+  surveyId,
+  categoryUuid,
+  draft = true,
+  parentUuid = null,
+  search = null,
+}) => {
+  const {
+    data: { count },
+  } = await axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items/count`, {
+    params: { draft, parentUuid, search },
+  })
+  return count
+}
+
 export const fetchCategoryItemsInLevelRequest = ({ surveyId, categoryUuid, levelIndex, draft = true }) =>
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/levels/${levelIndex}/items`,
