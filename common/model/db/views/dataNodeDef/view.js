@@ -3,7 +3,8 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
 import * as Expression from '../../../../../core/expressionParser/expression'
 
-import TableDataNodeDef, { ColumnNodeDef } from '../../tables/dataNodeDef'
+import TableDataNodeDef from '../../tables/dataNodeDef'
+import ColumnNodeDef from '../../tables/dataNodeDef/columnNodeDef'
 
 const columnSet = {
   dateCreated: TableDataNodeDef.columnSetCommon.dateCreated,
