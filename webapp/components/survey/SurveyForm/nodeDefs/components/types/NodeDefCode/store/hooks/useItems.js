@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { useItemsFilter } from '../../../useItemsFilter'
+import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordParentCategoryItemUuid } from '@webapp/store/ui/record/hooks'
-import * as API from '@webapp/service/api'
-import { useMemo } from 'react'
+
+import { useItemsFilter } from '../../../useItemsFilter'
+
+const minItemsForAutocomplete = 100
 
 const canHaveItems = ({ edit, levelIndex, parentCategoryItemUuid }) =>
   !edit && (levelIndex === 0 || parentCategoryItemUuid)
@@ -36,21 +38,21 @@ const calculateItems = async (params) => {
     return getItemsFromSurveyIndex(params)
   }
   const { categoryUuid, draft, itemsCount, lang, parentCategoryItemUuid, survey } = params
-  if (itemsCount > Category.maxCategoryItemsInIndex) {
-    // items taken from a lookup function
-    const surveyId = Survey.getId(survey)
-    return (search) => {
-      return API.fetchCategoryItems({
-        surveyId,
-        categoryUuid,
-        draft,
-        parentUuid: parentCategoryItemUuid,
-        search,
-        lang,
-      }).request
-    }
+  const surveyId = Survey.getId(survey)
+
+  const itemsFetchParams = { categoryUuid, draft, lang, parentUuid: parentCategoryItemUuid, surveyId }
+  const availableItemsCount = await API.countCategoryItems(itemsFetchParams)
+
+  if (availableItemsCount <= minItemsForAutocomplete) {
+    const {
+      data: { items },
+    } = await API.fetchCategoryItems(itemsFetchParams).request
+    return Object.values(items)
   }
-  return []
+  return itemsCount > Category.maxCategoryItemsInIndex
+    ? // items taken with a lookup function
+      (search) => API.fetchCategoryItems({ ...itemsFetchParams, search }).request
+    : []
 }
 
 export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) => {
@@ -79,7 +81,9 @@ export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) =
   const [items, setItems] = useState(getItemsFromSurveyIndex(itemsGetParams))
 
   useEffect(() => {
-    calculateItems(itemsGetParams).then((_items) => setItems(_items))
+    calculateItems(itemsGetParams).then((_items) => {
+      setItems(() => _items) // use a callback to prevent invoking items callback (when it's a function)
+    })
   }, [itemsGetParams])
 
   const alwaysIncludeItemFunction = useCallback(

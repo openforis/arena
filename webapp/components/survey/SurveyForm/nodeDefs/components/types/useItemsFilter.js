@@ -11,14 +11,12 @@ export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFu
   useSelector((state) => {
     const itemsFilter = NodeDef.getItemsFilter(nodeDef)
 
-    if (items.length === 0 || Objects.isEmpty(itemsFilter)) return items
+    if (!Array.isArray(items) || items.length === 0 || Objects.isEmpty(itemsFilter)) return items
 
     const survey = SurveyState.getSurvey(state)
     const record = RecordState.getRecord(state)
 
     const expressionEvaluator = new RecordExpressionEvaluator()
-
-    if (!Array.isArray(items)) return []
 
     return items.filter((item) => {
       if (alwaysIncludeItemFunction?.(item)) return true

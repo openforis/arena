@@ -361,7 +361,7 @@ export const countItemsByParentUuid = async (
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang })
-  client.one(`SELECT COUNT(*) FROM (${select})`, { categoryUuid, search }, (r) => Number(r.count))
+  return client.one(`SELECT COUNT(items.*) FROM (${select}) AS items`, { categoryUuid, search }, (r) => Number(r.count))
 }
 
 export const fetchItemsByParentUuid = async (
