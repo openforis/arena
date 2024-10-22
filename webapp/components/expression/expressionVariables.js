@@ -166,7 +166,7 @@ const getVariablesGroupedByParentUuid = ({
     // sort groups by hierarchy level, in descending order
     .sort((groupA, groupB) => groupB.hierarchyLevel - groupA.hierarchyLevel)
 
-  if (!nodeDefCurrent || excludeCurrentNodeDef || !includeThis) {
+  if (!nodeDefCurrent || excludeCurrentNodeDef || !includeThis || NodeDef.isEntity(nodeDefCurrent)) {
     return groups
   }
   // always show current variable at the beginning
