@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 
+import { SurveyType } from '@webapp/model'
 import * as API from '@webapp/service/api'
-import { useI18n } from '@webapp/store/system'
 
 const toOption = (surveyInfo) => {
   if (!surveyInfo) return null
@@ -29,39 +29,30 @@ const toOption = (surveyInfo) => {
   }
 }
 
-export const useSurveyDropdownOptions = () => {
+export const useSurveyDropdownOptions = ({ type }) => {
+  const [loading, setLoading] = useState(false)
   const [options, setOptions] = useState([])
 
-  const i18n = useI18n()
+  const fetchSurveys = useCallback(async () => {
+    const template = type === SurveyType.template
+    const surveys = await API.fetchSurveys({ draft: false, template })
+
+    // sort surveys and templates by name
+    const sortByNameFn = (a, b) => {
+      if (a.surveyName < b.surveyName) return -1
+      if (a.surveyName > b.surveyName) return 1
+      return 0
+    }
+    const surveyOptions = surveys.map(toOption).sort(sortByNameFn)
+    setOptions(surveyOptions)
+  }, [type])
 
   useEffect(() => {
-    ;(async () => {
-      const [surveys, templates] = await Promise.all([
-        API.fetchSurveys({ draft: false }),
-        API.fetchSurveys({ draft: false, template: true }),
-      ])
+    setLoading(true)
+    fetchSurveys().then(() => {
+      setLoading(false)
+    })
+  }, [fetchSurveys])
 
-      const surveyOptions = surveys.map(toOption)
-      const templateOptions = templates.map(toOption)
-
-      // sort surveys and templates by name
-      const sortByNameFn = (a, b) => {
-        if (a.surveyName < b.surveyName) return -1
-        if (a.surveyName > b.surveyName) return 1
-        return 0
-      }
-      surveyOptions.sort(sortByNameFn)
-      templateOptions.sort(sortByNameFn)
-
-      setOptions([
-        {
-          label: i18n.t('homeView.surveyCreate.template', { count: templateOptions.length }),
-          options: templateOptions,
-        },
-        { label: i18n.t('homeView.surveyCreate.survey', { count: surveyOptions.length }), options: surveyOptions },
-      ])
-    })()
-  }, [])
-
-  return { options }
+  return { loading, options }
 }
