@@ -1997,7 +1997,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              $t(emails.signature)`,
     },
     userDeleted: {
-      subject: `You have been deleted from the survey {{surveyLabel}} in $t(common.appNameFull)`,
+      subject: `You have been removed from the survey {{surveyLabel}} in $t(common.appNameFull)`,
       body: `<p>Hello {{name}},</p>
       <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
       <p>If you want to have access again to that survey, please contact the survey administrator.</p>
