@@ -8,6 +8,9 @@ export const Trans = i18nTrans
 
 const defaultLanguage = 'en'
 
+const namespaces = ['common', 'appErrors', 'jobs', 'surveyCreate']
+const defaultNamespace = 'common'
+
 const createParams = (lang) => ({
   fallbackLng: defaultLanguage,
   debug: ProcessUtils.isEnvDevelopment,
@@ -18,8 +21,8 @@ const createParams = (lang) => ({
     nsMode: 'default', // Set it to fallback to let passed namespaces to translated hoc act as fallbacks
   },
   lng: lang,
-  ns: ['common', 'appErrors', 'jobs'],
-  defaultNS: 'common',
+  ns: namespaces,
+  defaultNS: defaultNamespace,
   resources: {
     en: enTranslation,
   },
