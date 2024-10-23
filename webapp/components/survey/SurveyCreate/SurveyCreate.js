@@ -144,6 +144,7 @@ const SurveyCreate = (props) => {
             <fieldset>
               <legend>{i18n.t('common.cloneFrom')}</legend>
               <RadioButtonGroup
+                className="clone-from-type_btn-group"
                 items={cloneFromTypeButtonGroupItems}
                 onChange={(value) => onUpdate({ name: 'cloneFromType', value })}
                 row

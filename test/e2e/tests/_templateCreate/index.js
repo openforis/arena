@@ -5,12 +5,13 @@ import { gotoTemplateCreate } from '../_navigation'
 export const createTemplate = (template) => {
   gotoTemplateCreate()
 
-  const { cloneFrom, cloneFromLabel, label, name } = template
+  const { cloneFrom, cloneFromType, cloneFromLabel, label, name } = template
 
   test(`Create Template ${name}`, async () => {
     await FormUtils.fillInput(TestId.surveyCreate.surveyName, name)
 
     if (cloneFrom) {
+      await page.click(`.clone-from-type_btn-group .radio-button-group-item[text="${cloneFromType}"]`)
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' })))
       await FormUtils.selectDropdownItem({
         testId: TestId.surveyCreate.surveyCloneFrom,
