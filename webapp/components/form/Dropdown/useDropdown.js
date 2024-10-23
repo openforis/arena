@@ -123,11 +123,11 @@ export const useDropdown = ({
 
   const itemToOption = useCallback(
     (item) => ({
+      ...item,
       description: getOptionDescription(item),
       icon: getOptionIcon(item),
       label: getOptionLabel(item),
       value: getOptionValue(item),
-      ...(item.options ? { options: item.options } : {}),
     }),
     [getOptionDescription, getOptionIcon, getOptionLabel, getOptionValue]
   )

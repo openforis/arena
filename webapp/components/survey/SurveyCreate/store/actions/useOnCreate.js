@@ -21,10 +21,10 @@ const sendSurveyCreateRequest = async ({ dispatch, newSurvey, user }) => {
       errorParams = null
     if (e.status === StatusCodes.UNAUTHORIZED) {
       const maxSurveysCount = Authorizer.getMaxSurveysUserCanCreate(user)
-      errorKey = 'homeView.surveyCreate.errorMaxSurveysCountExceeded'
+      errorKey = 'surveyCreate:errorMaxSurveysCountExceeded'
       errorParams = { maxSurveysCount }
     } else {
-      errorKey = 'homeView.surveyCreate.error'
+      errorKey = 'surveyCreate:error'
     }
     dispatch(NotificationActions.notifyError({ key: errorKey, params: errorParams }))
     return null

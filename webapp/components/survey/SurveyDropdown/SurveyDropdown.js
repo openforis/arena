@@ -7,14 +7,15 @@ import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { Dropdown } from '@webapp/components/form'
+import { SurveyType } from '@webapp/model'
+
 import { useSurveyDropdownOptions } from './useSurveyDropdownOptions'
 
 const SurveyDropdown = (props) => {
-  const { selection = null, onChange } = props
-  const { options } = useSurveyDropdownOptions()
+  const { onChange, selection = null, type = SurveyType.survey } = props
+  const { loading, options } = useSurveyDropdownOptions({ type })
 
-  const allOptions = options.reduce((optionsAcc, optionGroup) => [...optionsAcc, ...optionGroup.options], [])
-  const selectedOption = allOptions.find((option) => option.value === selection)
+  const selectedOption = options.find((option) => option.value === selection)
 
   const i18n = useI18n()
 
@@ -22,9 +23,11 @@ const SurveyDropdown = (props) => {
     <Dropdown
       className="survey-dropdown"
       items={options}
+      loading={loading}
       onChange={(item) => onChange(item)}
       placeholder={i18n.t('common.select')}
-      renderOptionLabel={({ data }) => {
+      renderOptionLabel={(params) => {
+        const { data } = params
         const { surveyName, surveyLabel } = data
         return (
           <div className="dropdown-option__label">
@@ -45,8 +48,9 @@ const SurveyDropdown = (props) => {
 }
 
 SurveyDropdown.propTypes = {
+  onChange: PropTypes.func.isRequired,
   selection: PropTypes.string,
-  onChange: PropTypes.func,
+  type: PropTypes.oneOf(Object.values(SurveyType)),
 }
 
 export { SurveyDropdown }
