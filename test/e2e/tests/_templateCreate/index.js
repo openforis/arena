@@ -11,8 +11,16 @@ export const createTemplate = (template) => {
     await FormUtils.fillInput(TestId.surveyCreate.surveyName, name)
 
     if (cloneFrom) {
-      await page.click(`.clone-from-type_btn-group .radio-button-group-item[text="${cloneFromType}"]`)
+      // select create type "Clone"
       await page.click(getSelector(TestId.surveyCreate.createTypeBtn({ prefix: 'templateCreateType', type: 'clone' })))
+
+      // select clone from type (survey or template)
+      const cloneFromTypeLocator = page.locator(
+        `.clone-from-type_btn-group .radio-button-group-item[text="${cloneFromType}"]`
+      )
+      await cloneFromTypeLocator.waitFor()
+      await cloneFromTypeLocator.click()
+
       await FormUtils.selectDropdownItem({
         testId: TestId.surveyCreate.surveyCloneFrom,
         label: `${cloneFrom} - ${cloneFromLabel}`,
