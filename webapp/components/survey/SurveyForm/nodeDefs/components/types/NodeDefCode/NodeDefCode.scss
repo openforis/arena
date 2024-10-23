@@ -30,6 +30,13 @@
   .dropdown {
     height: 34px;
   }
+
+  .code-checkbox-btn {
+    cursor: pointer;
+    &[aria-disabled='true'] {
+      cursor: default;
+    }
+  }
 }
 
 .survey-form__node-def-multiple-edit-dialog {
