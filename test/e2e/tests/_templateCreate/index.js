@@ -16,7 +16,7 @@ export const createTemplate = (template) => {
 
       // select clone from type (survey or template)
       const cloneFromTypeLocator = page.locator(
-        `.clone-from-type_btn-group .radio-button-group-item[text="${cloneFromType}"]`
+        `.clone-from-type_btn-group .radio-button-group-item >> text="${cloneFromType}"`
       )
       await cloneFromTypeLocator.waitFor()
       await cloneFromTypeLocator.click()
