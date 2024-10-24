@@ -73,7 +73,7 @@ const ValidationsProps = (props) => {
       {NodeDef.isAttribute(nodeDef) &&
         !NodeDef.isKey(nodeDef) &&
         (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
-          <FormItem label="common.unique">
+          <FormItem isInfoMarkdown info="nodeDefEdit.unique.info" label="nodeDefEdit.unique.label">
             <Checkbox
               id={TestId.nodeDefDetails.nodeDefUnique}
               checked={NodeDefValidations.isUnique(nodeDefValidations)}

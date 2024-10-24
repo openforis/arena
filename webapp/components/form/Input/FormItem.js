@@ -12,6 +12,7 @@ export const FormItem = (props) => {
     children,
     className = '',
     info = null,
+    isInfoMarkdown = false,
     label: labelProp = null,
     labelParams = null,
     onInfoClick = null,
@@ -28,7 +29,7 @@ export const FormItem = (props) => {
         <div className="form-label-wrapper">
           {label}
           {required ? ' *' : ''}
-          {info && <ButtonIconInfo onClick={onInfoClick} title={info} />}
+          {info && <ButtonIconInfo onClick={onInfoClick} title={info} isTitleMarkdown={isInfoMarkdown} />}
         </div>
       </div>
       {children}
@@ -40,6 +41,7 @@ FormItem.propTypes = {
   className: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   info: PropTypes.string,
+  isInfoMarkdown: PropTypes.bool,
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   labelParams: PropTypes.object,
   onInfoClick: PropTypes.func,

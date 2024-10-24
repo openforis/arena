@@ -1356,6 +1356,14 @@ E.g. this.region = region_attribute_name
     nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
     filterVariable: 'Variable to filter items',
     filterVariableForLevel: 'Variable for {{levelName}}',
+    unique: {
+      label: 'Unique',
+      info: `When an attribute is marked as **Unique**, its value must be unique inside the closest multiple entity (an error will be shown otherwise).  
+
+---
+
+E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tree_species* marked as **Unique**, you can have only one tree per species inside the same *plot*.`,
+    },
   },
 
   languagesEditor: {
