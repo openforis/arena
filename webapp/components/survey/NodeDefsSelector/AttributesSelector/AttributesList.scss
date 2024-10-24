@@ -1,0 +1,10 @@
+.attribute-selector-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.2rem;
+
+  .attribute-selector-parent-entity-heading {
+    font-style: italic;
+    font-size: small;
+  }
+}
