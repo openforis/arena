@@ -366,12 +366,18 @@ export const updateCategoryItemExtraDefItem = async (
     // validate new item extra def
     let itemExtraDefsArrayUpdated = [...Category.getItemExtraDefsArray(category)]
     // remove old item
-    itemExtraDefsArrayUpdated = itemExtraDefsArrayUpdated.filter((item) => ExtraPropDef.getName(item) !== name)
+    const oldItemIndex = itemExtraDefsArrayUpdated.findIndex((item) => ExtraPropDef.getName(item) === name)
 
-    if (!deleted) {
-      // add new extra def item
-      itemExtraDefsArrayUpdated.push(itemExtraDef)
-
+    if (deleted) {
+      delete itemExtraDefsArrayUpdated[oldItemIndex]
+    } else {
+      if (oldItemIndex < 0) {
+        // add new extra def item
+        itemExtraDefsArrayUpdated.push(itemExtraDef)
+      } else {
+        // update existing item
+        itemExtraDefsArrayUpdated[oldItemIndex] = itemExtraDef
+      }
       const validation = await validateExtraPropDef({
         extraPropDef: itemExtraDef,
         extraPropDefsArray: itemExtraDefsArrayUpdated,
@@ -380,7 +386,6 @@ export const updateCategoryItemExtraDefItem = async (
         throw new Error('Invalid category item extra def')
       }
     }
-
     // update category items
     if (deleted || name !== ExtraPropDef.getName(itemExtraDef)) {
       await _updateCategoryItemsExtraDef({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t)
