@@ -10,7 +10,7 @@ const updateOrDeleteExtraDef = async ({ extraPropDefs, propName, extraPropDef, d
 
   if (deleted) {
     // remove old item
-    delete itemExtraDefsArrayUpdated[oldItemIndex]
+    itemExtraDefsArrayUpdated.splice(oldItemIndex, 1)
   } else {
     if (oldItemIndex < 0) {
       // add new extra def item
