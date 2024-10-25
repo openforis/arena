@@ -467,6 +467,9 @@ If there are records associated to this cycle, they will be deleted.`,
       },
       userExtraProps: {
         title: 'User extra properties',
+        info: `Extra properties that can be assigned to each user associated to the survey.  
+Those properties can be used in default values, validation rules and applicability expressions.  
+E.g.: *userProp('property_name') == 'some_value'*`,
       },
     },
     deleteSurveyDialog: {

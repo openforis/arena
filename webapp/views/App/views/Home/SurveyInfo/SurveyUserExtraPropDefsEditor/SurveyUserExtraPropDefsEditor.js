@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+
 import { ExtraPropDefsEditor } from '@webapp/components/survey/ExtraPropDefsEditor'
 
 export const SurveyUserExtraPropDefsEditor = (props) => {
@@ -33,6 +34,7 @@ export const SurveyUserExtraPropDefsEditor = (props) => {
     <ExtraPropDefsEditor
       availableDataTypes={[ExtraPropDef.dataTypes.number, ExtraPropDef.dataTypes.text]}
       extraPropDefs={userExtraPropDefsArray}
+      infoTextKey="homeView.surveyInfo.userExtraProps.info"
       onExtraPropDefDelete={onExtraPropDefDelete}
       onExtraPropDefUpdate={onExtraPropDefUpdate}
     />
