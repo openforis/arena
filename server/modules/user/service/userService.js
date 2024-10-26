@@ -234,7 +234,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
       t
     )
     const surveyOwnerUuid = User.getUuid(userInvited)
-    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true })
+    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
     survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
     return { survey, userInvited }
   })
