@@ -223,7 +223,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
 
     // 4) invite user to that group and send email
     const surveyId = Survey.getId(survey)
-    const { userInvited } = await UserInviteService.inviteUsers(
+    const { invitedUsers } = await UserInviteService.inviteUsers(
       {
         user,
         surveyId,
@@ -233,9 +233,12 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
       },
       t
     )
+    const userInvited = invitedUsers[0]
     const surveyOwnerUuid = User.getUuid(userInvited)
+
     await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
     survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
+
     return { survey, userInvited }
   })
 
