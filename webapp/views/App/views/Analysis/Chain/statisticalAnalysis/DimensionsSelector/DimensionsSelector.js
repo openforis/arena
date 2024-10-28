@@ -1,6 +1,6 @@
 import './DimensionsSelector.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -25,42 +25,49 @@ export const DimensionsSelector = (props) => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
 
-  const options = []
   const entityDef = entityDefUuid ? Survey.getNodeDefByUuid(entityDefUuid)(survey) : null
 
-  const isDimensionIncluded = (nodeDef) =>
-    NodeDef.isSingleAttribute(nodeDef) &&
-    [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon].includes(
-      NodeDef.getType(nodeDef)
-    ) &&
-    NodeDef.isInCycle(cycle)(nodeDef) &&
-    (!chainUuid || !NodeDef.getChainUuid(nodeDef) || chainUuid === NodeDef.getChainUuid(nodeDef))
+  const isDimensionIncluded = useCallback(
+    (nodeDef) =>
+      NodeDef.isSingleAttribute(nodeDef) &&
+      [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon].includes(
+        NodeDef.getType(nodeDef)
+      ) &&
+      NodeDef.isInCycle(cycle)(nodeDef) &&
+      (!chainUuid || !NodeDef.getChainUuid(nodeDef) || chainUuid === NodeDef.getChainUuid(nodeDef)),
+    [chainUuid, cycle]
+  )
 
-  if (entityDef) {
+  const { options, optionsByDimensionUuid } = useMemo(() => {
+    if (!entityDef) return { options: [], optionsByDimensionUuid: {} }
+    const _options = []
+    const _optionsByDimensionUuid = {}
     Survey.visitAncestorsAndSelf(entityDef, (ancestorDef) => {
       const dimensionsInAncestor = Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef: ancestorDef,
         includeAnalysis: showAnalysisAttributes,
       })(survey).filter(isDimensionIncluded)
 
-      const nestedOptions = dimensionsInAncestor.map((dimension) => ({
-        value: NodeDef.getUuid(dimension),
-        label: NodeDef.getLabel(dimension, lang, labelType),
-        icon: NodeDefUIProps.getIconByType(NodeDef.getType(dimension)),
-      }))
-
-      const option = {
+      const nestedOptions = dimensionsInAncestor.map((dimension) => {
+        const dimensionUuid = NodeDef.getUuid(dimension)
+        const nestedOption = {
+          value: dimensionUuid,
+          label: NodeDef.getLabel(dimension, lang, labelType),
+          icon: NodeDefUIProps.getIconByType(NodeDef.getType(dimension)),
+        }
+        _optionsByDimensionUuid[dimensionUuid] = nestedOption
+        return nestedOption
+      })
+      _options.push({
         value: NodeDef.getUuid(ancestorDef),
         label: NodeDef.getLabel(ancestorDef, lang, labelType),
         options: nestedOptions,
-      }
-      options.push(option)
+      })
     })(survey)
-  }
+    return { options: _options, optionsByDimensionUuid: _optionsByDimensionUuid }
+  }, [entityDef, isDimensionIncluded, labelType, lang, showAnalysisAttributes, survey])
 
-  const selectedOptions = options
-    .flatMap((ancestorDefOption) => ancestorDefOption.options)
-    .filter((option) => selectedDimensionsUuids.includes(option.value))
+  const selectedOptions = selectedDimensionsUuids.map((dimensionUuid) => optionsByDimensionUuid[dimensionUuid])
 
   const onChange = useCallback(
     (_selectedOptions) => {
