@@ -16,6 +16,7 @@ const dataTypes = {
 }
 
 const newItem = ({ dataType, index = 0 }) => ({
+  [keys.uuid]: UUIDs.v4(),
   [keys.dataType]: dataType,
   [keys.index]: index,
 })
@@ -39,6 +40,8 @@ const extraDefsToArray = (extraDefs) =>
       [keys.index]: getIndex(item) ?? index,
     }))
     .sort((itemA, itemB) => getIndex(itemA) - getIndex(itemB))
+    // re-assign indexe to ensure it's unique
+    .map((item, index) => assocIndex(index)(item))
 
 export const ExtraPropDef = {
   keys,

@@ -82,7 +82,6 @@ const Call = (props) => {
         items={dropdownItems}
         onChange={onFunctionChange}
         placeholder={i18n.t('expressionEditor.selectAFunction')}
-        searchable={false}
         selection={selectedItem}
       />
       {selectedItem && selectedFunctionComponent && <ButtonIconEdit onClick={openEditDialog} />}

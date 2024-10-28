@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
-import { ExtraPropDefsEditor } from '@webapp/components/survey/ExtraPropDefsEditor'
+import * as ObjectUtils from '@core/objectUtils'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
+
+import { ExtraPropDefsEditor } from '@webapp/components/survey/ExtraPropDefsEditor'
 
 export const SurveyUserExtraPropDefsEditor = (props) => {
   const { extraPropDefs = {}, onExtraPropDefsChange } = props
@@ -11,16 +13,18 @@ export const SurveyUserExtraPropDefsEditor = (props) => {
 
   const onExtraPropDefUpdate = useCallback(
     ({ extraPropDef }) => {
-      const extraPropDefsUpdated = { ...extraPropDefs, [ExtraPropDef.getName(extraPropDef)]: extraPropDef }
+      let extraPropDefsArrayUpdated = [...userExtraPropDefsArray]
+      extraPropDefsArrayUpdated[extraPropDef.index] = extraPropDef
+      const extraPropDefsUpdated = ObjectUtils.toIndexedObj(extraPropDefsArrayUpdated, ExtraPropDef.keys.name)
       onExtraPropDefsChange(extraPropDefsUpdated)
     },
-    [extraPropDefs, onExtraPropDefsChange]
+    [onExtraPropDefsChange, userExtraPropDefsArray]
   )
 
   const onExtraPropDefDelete = useCallback(
     ({ propName }) => {
       const extraPropDefsUpdated = { ...extraPropDefs }
-      delete extraPropDefs[propName]
+      delete extraPropDefsUpdated[propName]
       onExtraPropDefsChange(extraPropDefsUpdated)
     },
     [extraPropDefs, onExtraPropDefsChange]
@@ -30,6 +34,7 @@ export const SurveyUserExtraPropDefsEditor = (props) => {
     <ExtraPropDefsEditor
       availableDataTypes={[ExtraPropDef.dataTypes.number, ExtraPropDef.dataTypes.text]}
       extraPropDefs={userExtraPropDefsArray}
+      infoTextKey="homeView.surveyInfo.userExtraProps.info"
       onExtraPropDefDelete={onExtraPropDefDelete}
       onExtraPropDefUpdate={onExtraPropDefUpdate}
     />
