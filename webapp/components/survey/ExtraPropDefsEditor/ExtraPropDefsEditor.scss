@@ -1,6 +1,6 @@
 .extra-prop-defs-editor {
-  display: grid;
-  grid-template-rows: min-content 2.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
 
   .items-container {
     .form-item {
@@ -17,7 +17,7 @@
   }
 
   .item-add-btn {
-    justify-self: left;
+    align-self: flex-start;
   }
 
   .save-btn {

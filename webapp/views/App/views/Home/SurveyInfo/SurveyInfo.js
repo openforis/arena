@@ -4,7 +4,6 @@ import React from 'react'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -20,7 +19,6 @@ import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBase
 
 const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
-  const i18n = useI18n()
   const isSystemAdmin = useUserIsSystemAdmin()
 
   const {
@@ -50,7 +48,7 @@ const SurveyInfo = () => {
           {
             key: 'basicInfo',
             component: SurveyInfoBasicForm,
-            label: i18n.t('homeView.surveyInfo.basic'),
+            label: 'homeView.surveyInfo.basic',
             props: {
               getFieldValidation,
               setCycles,
@@ -67,7 +65,7 @@ const SurveyInfo = () => {
           {
             key: 'sampleBasedInterpretation',
             component: SurveyInfoSampleBasedImageInterpretation,
-            label: i18n.t('homeView.surveyInfo.sampleBasedImageInterpretation'),
+            label: 'homeView.surveyInfo.sampleBasedImageInterpretation',
             props: {
               getFieldValidation,
               sampleBasedImageInterpretationEnabled,
@@ -81,7 +79,7 @@ const SurveyInfo = () => {
                 {
                   key: 'extraProps',
                   component: SurveyUserExtraPropDefsEditor,
-                  label: i18n.t('homeView.surveyInfo.userExtraProps.title'),
+                  label: 'homeView.surveyInfo.userExtraProps.title',
                   props: {
                     extraPropDefs: userExtraPropDefs,
                     onExtraPropDefsChange: setUserExtraPropDefs,
@@ -94,7 +92,7 @@ const SurveyInfo = () => {
                 {
                   key: 'configuration',
                   component: SurveyConfigurationEditor,
-                  label: i18n.t('homeView.surveyInfo.configuration.title'),
+                  label: 'homeView.surveyInfo.configuration.title',
                 },
               ]
             : []),
