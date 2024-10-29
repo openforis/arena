@@ -83,7 +83,7 @@ const SurveyInfo = () => {
         label: 'homeView.surveyInfo.userExtraProps.title',
         props: {
           extraPropDefs: userExtraPropDefs,
-          onExtraPropDefsChange: setUserExtraPropDefs,
+          onExtraPropDefsUpdate: setUserExtraPropDefs,
         },
       })
     }

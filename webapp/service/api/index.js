@@ -65,6 +65,7 @@ export {
   startImportLabelsJob,
   updateSurveyConfigurationProp,
   updateSurveyOwner,
+  updateSurveyProps,
 } from './survey'
 export {
   convertNodeDef,

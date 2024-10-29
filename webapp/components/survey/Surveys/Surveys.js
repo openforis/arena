@@ -6,7 +6,6 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as DateUtils from '@core/dateUtils'
-import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
@@ -17,15 +16,13 @@ import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { Button } from '@webapp/components/buttons'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import PanelRight from '@webapp/components/PanelRight'
 import Table from '@webapp/components/Table'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
-
-import { SurveyUserExtraPropDefsEditor } from '@webapp/views/App/views/Home/SurveyInfo/SurveyUserExtraPropDefsEditor'
 
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
 import { SurveyOwnerColumn } from './SurveyOwnerColumn'
+import { SurveyListUserExtraPropsEditor } from './SurveyListUserExtraPropsEditor'
 
 const Surveys = (props) => {
   const { module, moduleApiUri, template = false } = props
@@ -43,7 +40,7 @@ const Surveys = (props) => {
    */
   const [requestedAt, setRequestedAt] = useState(Date.now())
   const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
-  const [userPropsEditorSurvey, setUserPropsEditorSurvey] = useState(null)
+  const [userExtraPropsEditorSurvey, setUserExtraPropsEditorSurvey] = useState(null)
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -69,7 +66,7 @@ const Surveys = (props) => {
   const onEditUserProps = useCallback(({ event, survey }) => {
     event.stopPropagation()
     event.preventDefault()
-    setUserPropsEditorSurvey(survey)
+    setUserExtraPropsEditorSurvey(survey)
   }, [])
 
   const columns = useMemo(() => {
@@ -219,15 +216,11 @@ const Surveys = (props) => {
         restParams={{ lang, template, requestedAt, includeCounts: true, onlyOwn }}
         visibleColumnsSelectionEnabled
       />
-      {userPropsEditorSurvey && (
-        <PanelRight onClose={() => setUserPropsEditorSurvey(null)}>
-          {ProcessUtils.ENV.experimentalFeatures && (
-            <SurveyUserExtraPropDefsEditor
-              extraPropDefs={Survey.getUserExtraPropDefsArray(userPropsEditorSurvey)}
-              onExtraPropDefsChange={() => {}}
-            />
-          )}
-        </PanelRight>
+      {userExtraPropsEditorSurvey && (
+        <SurveyListUserExtraPropsEditor
+          onClose={() => setUserExtraPropsEditorSurvey(null)}
+          survey={userExtraPropsEditorSurvey}
+        />
       )}
     </>
   )
