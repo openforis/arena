@@ -24,6 +24,7 @@ export const SurveyInfoSampleBasedImageInterpretation = (props) => {
     <div className="sample-based-image-interpretation">
       <Checkbox
         checked={sampleBasedImageInterpretationEnabled}
+        disabled={readOnly}
         label="homeView.surveyInfo.sampleBasedImageInterpretationEnabled"
         onChange={setSampleBasedImageInterpretationEnabled}
         validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}

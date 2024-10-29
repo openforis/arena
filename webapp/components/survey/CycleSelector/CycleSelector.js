@@ -9,7 +9,13 @@ import { useSurveyCycleKeys } from '@webapp/store/survey'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const CycleSelector = (props) => {
-  const { cycleKeys: cycleKeysProp, filterFunction = A.identity, onChange = () => ({}), selectedCycle = null } = props
+  const {
+    cycleKeys: cycleKeysProp,
+    filterFunction = A.identity,
+    onChange,
+    readOnly = false,
+    selectedCycle = null,
+  } = props
 
   const i18n = useI18n()
   const cycleKeysInState = useSurveyCycleKeys()
@@ -31,6 +37,7 @@ const CycleSelector = (props) => {
       clearable={false}
       items={cycleItems}
       onChange={(item) => onChange(item?.value)}
+      readOnly={readOnly}
       searchable={false}
       selection={cycleSelection}
     />
@@ -40,8 +47,9 @@ const CycleSelector = (props) => {
 CycleSelector.propTypes = {
   cycleKeys: PropTypes.array,
   filterFunction: PropTypes.func,
+  onChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
   selectedCycle: PropTypes.string,
-  onChange: PropTypes.func,
 }
 
 export default CycleSelector
