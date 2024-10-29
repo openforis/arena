@@ -1,7 +1,7 @@
 import pgPromise from 'pg-promise'
 import * as R from 'ramda'
 
-import { Numbers } from '@openforis/arena-core'
+import { Numbers, Objects } from '@openforis/arena-core'
 import { DBMigrator } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -251,13 +251,14 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
   )(surveyDb)
 
+  if (Objects.isEmpty(dependencies)) {
+    survey = Survey.buildAndAssocDependencyGraph(survey)
+  } else {
+    survey = Survey.assocDependencyGraph(dependencies)(survey)
+  }
   if (validate) {
-    const dependencyGraph = dependencies || Survey.buildDependencyGraph(survey)
-    survey = Survey.assocDependencyGraph(dependencyGraph)(survey)
     const validation = await SurveyValidator.validateNodeDefs(survey)
     survey = Survey.assocNodeDefsValidation(validation)(survey)
-  } else if (dependencies) {
-    survey = Survey.assocDependencyGraph(dependencies)(survey)
   }
   return survey
 }

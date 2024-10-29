@@ -95,7 +95,12 @@ export const SurveyInfoBasicForm = (props) => {
 
       {cycleKeys.length > 1 && (
         <FormItem label="homeView.surveyInfo.cycleForArenaMobile">
-          <CycleSelector cycleKeys={cycleKeys} selectedCycle={defaultCycleKey} onChange={setDefaultCycleKey} />
+          <CycleSelector
+            cycleKeys={cycleKeys}
+            onChange={setDefaultCycleKey}
+            readOnly={readOnly}
+            selectedCycle={defaultCycleKey}
+          />
         </FormItem>
       )}
     </div>
