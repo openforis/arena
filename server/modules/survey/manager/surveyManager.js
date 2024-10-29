@@ -252,7 +252,7 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   )(surveyDb)
 
   if (Objects.isEmpty(dependencies)) {
-    survey = Survey.buildAndAssocDependencyGraph(dependencies)(survey)
+    survey = Survey.buildAndAssocDependencyGraph(survey)
   } else {
     survey = Survey.assocDependencyGraph(dependencies)(survey)
   }
