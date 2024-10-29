@@ -126,6 +126,7 @@ const CategoryDetails = (props) => {
                   ),
                 },
               ]}
+              variant="outlined"
             />
           )}
 
