@@ -66,7 +66,9 @@ const Surveys = (props) => {
     setRequestedAt(Date.now())
   }, [])
 
-  const onEditUserProps = useCallback(({ survey }) => {
+  const onEditUserProps = useCallback(({ event, survey }) => {
+    event.stopPropagation()
+    event.preventDefault()
     setUserPropsEditorSurvey(survey)
   }, [])
 
@@ -188,7 +190,7 @@ const Surveys = (props) => {
           <Button
             iconClassName="icon-cog"
             title="surveysView.editUserProps"
-            onClick={onEditUserProps({ survey: item })}
+            onClick={(event) => onEditUserProps({ event, survey: item })}
             variant="text"
           />
         ),
@@ -218,7 +220,7 @@ const Surveys = (props) => {
         visibleColumnsSelectionEnabled
       />
       {userPropsEditorSurvey && (
-        <PanelRight>
+        <PanelRight onClose={() => setUserPropsEditorSurvey(null)}>
           {ProcessUtils.ENV.experimentalFeatures && (
             <SurveyUserExtraPropDefsEditor
               extraPropDefs={Survey.getUserExtraPropDefsArray(userPropsEditorSurvey)}
