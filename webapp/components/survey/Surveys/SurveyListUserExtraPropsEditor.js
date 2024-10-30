@@ -7,8 +7,8 @@ import * as Survey from '@core/survey/survey'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import PanelRight from '@webapp/components/PanelRight'
+import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
 import * as API from '@webapp/service/api'
-import { SurveyUserExtraPropDefsEditor } from '@webapp/views/App/views/Home/SurveyInfo/SurveyUserExtraPropDefsEditor'
 
 export const SurveyListUserExtraPropsEditor = (props) => {
   const { onClose, onUpdate, surveyInfo } = props

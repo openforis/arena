@@ -9,13 +9,13 @@ import { TestId } from '@webapp/utils/testId'
 
 import { ButtonSave } from '@webapp/components'
 import TabBar from '@webapp/components/tabBar'
+import { SurveyUserExtraPropDefsEditor } from '@webapp/components/survey/SurveyUserExtraPropDefsEditor'
 
 import { SurveyInfoBasicForm } from './SurveyInfoBasicForm'
 import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
-import { SurveyUserExtraPropDefsEditor } from './SurveyUserExtraPropDefsEditor'
+import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
 
 import { useSurveyInfoForm } from './store'
-import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
 
 const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
