@@ -2,7 +2,6 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
@@ -53,13 +52,11 @@ export const SurveyListUserExtraPropsEditor = (props) => {
       onClose={onClose}
       width="55rem"
     >
-      {ProcessUtils.ENV.experimentalFeatures && (
-        <SurveyUserExtraPropDefsEditor
-          extraPropDefs={Survey.getUserExtraPropDefs(surveyInfo)}
-          onExtraPropDefDelete={onSurveyExtraPropDefDelete}
-          onExtraPropDefUpdate={onSurveyExtraPropDefUpdate}
-        />
-      )}
+      <SurveyUserExtraPropDefsEditor
+        extraPropDefs={Survey.getUserExtraPropDefs(surveyInfo)}
+        onExtraPropDefDelete={onSurveyExtraPropDefDelete}
+        onExtraPropDefUpdate={onSurveyExtraPropDefUpdate}
+      />
     </PanelRight>
   )
 }

@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as DateUtils from '@core/dateUtils'
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as Authorizer from '@core/auth/authorizer'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
@@ -179,7 +180,7 @@ const Surveys = (props) => {
         }
       )
     }
-    if (isSystemAdmin) {
+    if (ProcessUtils.ENV.experimentalFeatures && isSystemAdmin) {
       cols.push({
         key: 'edit_user_props',
         header: '',

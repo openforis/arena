@@ -32,9 +32,13 @@
   }
 
   .extra-props {
-    .form-item {
-      display: flex;
-      white-space: nowrap;
+    .form {
+      height: auto;
+      grid-row-gap: 0;
+
+      .form-item {
+        white-space: nowrap;
+      }
     }
     .btn-add {
       justify-self: center;
