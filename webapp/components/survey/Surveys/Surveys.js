@@ -14,13 +14,15 @@ import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
 import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 
+import { Button } from '@webapp/components/buttons'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import Table from '@webapp/components/Table'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
-import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
 import { SurveyOwnerColumn } from './SurveyOwnerColumn'
+import { SurveyListUserExtraPropsEditor } from './SurveyListUserExtraPropsEditor'
 
 const Surveys = (props) => {
   const { module, moduleApiUri, template = false } = props
@@ -38,6 +40,7 @@ const Surveys = (props) => {
    */
   const [requestedAt, setRequestedAt] = useState(Date.now())
   const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
+  const [userExtraPropsEditorSurvey, setUserExtraPropsEditorSurvey] = useState(null)
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -58,6 +61,12 @@ const Surveys = (props) => {
 
   const onSurveysUpdate = useCallback(() => {
     setRequestedAt(Date.now())
+  }, [])
+
+  const onEditUserExtraProps = useCallback(({ event, surveyInfo }) => {
+    event.stopPropagation()
+    event.preventDefault()
+    setUserExtraPropsEditorSurvey(surveyInfo)
   }, [])
 
   const columns = useMemo(() => {
@@ -170,27 +179,51 @@ const Surveys = (props) => {
         }
       )
     }
+    if (isSystemAdmin) {
+      cols.push({
+        key: 'edit_user_props',
+        header: '',
+        renderItem: ({ item: surveyInfo }) => (
+          <Button
+            iconClassName="icon-cog"
+            title="surveysView.editUserExtraProps"
+            onClick={(event) => onEditUserExtraProps({ event, surveyInfo })}
+            variant="text"
+          />
+        ),
+        width: '2rem',
+      })
+    }
     return cols
-  }, [lang, onSurveysUpdate, template])
+  }, [isSystemAdmin, lang, onEditUserExtraProps, onSurveysUpdate, template])
 
   return (
-    <Table
-      cellTestIdExtractor={({ column, item }) =>
-        column.key === 'name' ? Survey.getName(Survey.getSurveyInfo(item)) : null
-      }
-      className="surveys"
-      columns={columns}
-      headerLeftComponent={HeaderLeft}
-      headerProps={{ onlyOwn, setOnlyOwn }}
-      isRowActive={isRowActive}
-      keyExtractor={({ item }) => Survey.getId(item)}
-      module={module}
-      moduleApiUri={moduleApiUri}
-      noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
-      onRowClick={onRowClick}
-      restParams={{ lang, template, requestedAt, includeCounts: true, onlyOwn }}
-      visibleColumnsSelectionEnabled
-    />
+    <>
+      <Table
+        cellTestIdExtractor={({ column, item }) =>
+          column.key === 'name' ? Survey.getName(Survey.getSurveyInfo(item)) : null
+        }
+        className="surveys"
+        columns={columns}
+        headerLeftComponent={HeaderLeft}
+        headerProps={{ onlyOwn, setOnlyOwn }}
+        isRowActive={isRowActive}
+        keyExtractor={({ item }) => Survey.getId(item)}
+        module={module}
+        moduleApiUri={moduleApiUri}
+        noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
+        onRowClick={onRowClick}
+        restParams={{ lang, template, requestedAt, includeCounts: true, onlyOwn }}
+        visibleColumnsSelectionEnabled
+      />
+      {userExtraPropsEditorSurvey && (
+        <SurveyListUserExtraPropsEditor
+          onClose={() => setUserExtraPropsEditorSurvey(null)}
+          onUpdate={onSurveysUpdate}
+          surveyInfo={userExtraPropsEditorSurvey}
+        />
+      )}
+    </>
   )
 }
 
