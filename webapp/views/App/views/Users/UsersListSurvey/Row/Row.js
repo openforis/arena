@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -100,6 +100,7 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
+  onEditSurveyUserExtraProps: PropTypes.func.isRequired,
   row: PropTypes.object.isRequired,
 }
 
