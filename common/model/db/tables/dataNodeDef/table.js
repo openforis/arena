@@ -115,7 +115,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   getColumnNames = ({ includeAnalysis = true } = {}) => {
     const { nodeDef } = this
     const nodeDefsForColumns = this.getNodeDefsForColumns({ includeAnalysis })
-    const names = [columnSet.uuid, columnSet.parentUuid]
+    const names = [columnSet.uuid, columnSet.parentUuid, columnSet.dateCreated, columnSet.dateModified]
     if (NodeDef.isRoot(nodeDef)) {
       names.push(...rootDefColumnNames)
     }
