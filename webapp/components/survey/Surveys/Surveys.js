@@ -63,10 +63,10 @@ const Surveys = (props) => {
     setRequestedAt(Date.now())
   }, [])
 
-  const onEditUserProps = useCallback(({ event, survey }) => {
+  const onEditUserExtraProps = useCallback(({ event, surveyInfo }) => {
     event.stopPropagation()
     event.preventDefault()
-    setUserExtraPropsEditorSurvey(survey)
+    setUserExtraPropsEditorSurvey(surveyInfo)
   }, [])
 
   const columns = useMemo(() => {
@@ -183,11 +183,11 @@ const Surveys = (props) => {
       cols.push({
         key: 'edit_user_props',
         header: '',
-        renderItem: ({ item }) => (
+        renderItem: ({ item: surveyInfo }) => (
           <Button
             iconClassName="icon-cog"
-            title="surveysView.editUserProps"
-            onClick={(event) => onEditUserProps({ event, survey: item })}
+            title="surveysView.editUserExtraProps"
+            onClick={(event) => onEditUserExtraProps({ event, surveyInfo })}
             variant="text"
           />
         ),
@@ -195,7 +195,7 @@ const Surveys = (props) => {
       })
     }
     return cols
-  }, [isSystemAdmin, lang, onEditUserProps, onSurveysUpdate, template])
+  }, [isSystemAdmin, lang, onEditUserExtraProps, onSurveysUpdate, template])
 
   return (
     <>
@@ -219,7 +219,8 @@ const Surveys = (props) => {
       {userExtraPropsEditorSurvey && (
         <SurveyListUserExtraPropsEditor
           onClose={() => setUserExtraPropsEditorSurvey(null)}
-          survey={userExtraPropsEditorSurvey}
+          onUpdate={onSurveysUpdate}
+          surveyInfo={userExtraPropsEditorSurvey}
         />
       )}
     </>

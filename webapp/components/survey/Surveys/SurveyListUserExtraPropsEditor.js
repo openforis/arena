@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as ProcessUtils from '@core/processUtils'
@@ -10,42 +11,61 @@ import * as API from '@webapp/service/api'
 import { SurveyUserExtraPropDefsEditor } from '@webapp/views/App/views/Home/SurveyInfo/SurveyUserExtraPropDefsEditor'
 
 export const SurveyListUserExtraPropsEditor = (props) => {
-  const { onClose, survey } = props
+  const { onClose, onUpdate, surveyInfo } = props
 
-  const onSurveyExtraPropDefsArrayUpdate = useCallback(
-    async (extraPropDefsArrayUpdated) => {
-      const surveyId = Survey.getId(survey)
-      const extraPropDefsUpdated = ObjectUtils.toIndexedObj(extraPropDefsArrayUpdated, ExtraPropDef.keys.name)
-      const propsUpdated = { ...Survey.getProps(survey), [Survey.infoKeys.userExtraPropDefs]: extraPropDefsUpdated }
+  const onSurveyExtraPropDefsUpdate = useCallback(
+    async (extraPropDefsUpdated) => {
+      const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+      const propsUpdated = { ...Survey.getProps(surveyInfo), [Survey.infoKeys.userExtraPropDefs]: extraPropDefsUpdated }
       await API.updateSurveyProps({ surveyId, props: propsUpdated })
+      onUpdate?.()
     },
-    [survey]
+    [onUpdate, surveyInfo]
   )
 
   const onSurveyExtraPropDefUpdate = useCallback(
-    async ({ prevExtraPropDef, extraPropDef }) => {
-      const prevExtraPropDefsArray = Survey.getUserExtraPropDefsArray(survey)
-      const defIndex = prevExtraPropDefsArray.findIndex(
-        (def) => ExtraPropDef.getName(def) === ExtraPropDef.getName(prevExtraPropDef)
-      )
+    async ({ extraPropDef }) => {
+      const prevExtraPropDefsArray = Survey.getUserExtraPropDefsArray(surveyInfo)
+      const defIndex = ExtraPropDef.getIndex(extraPropDef)
       const extraPropDefsArrayUpdated = [...prevExtraPropDefsArray]
       extraPropDefsArrayUpdated[defIndex] = extraPropDef
-      await onSurveyExtraPropDefsArrayUpdate(extraPropDefsArrayUpdated)
+      const extraPropDefsUpdated = ObjectUtils.toIndexedObj(extraPropDefsArrayUpdated, ExtraPropDef.keys.name)
+      await onSurveyExtraPropDefsUpdate(extraPropDefsUpdated)
     },
-    [onSurveyExtraPropDefsArrayUpdate, survey]
+    [onSurveyExtraPropDefsUpdate, surveyInfo]
   )
 
-  const onSurveyExtraPropDefDelete = useCallback((extraPropDef) => {}, [])
+  const onSurveyExtraPropDefDelete = useCallback(
+    async (extraPropDef) => {
+      const prevExtraPropDefs = Survey.getUserExtraPropDefs(surveyInfo)
+      const extraPropDefsUpdated = { ...prevExtraPropDefs }
+      delete extraPropDefsUpdated[ExtraPropDef.getName(extraPropDef)]
+      await onSurveyExtraPropDefsUpdate(extraPropDefsUpdated)
+    },
+    [onSurveyExtraPropDefsUpdate, surveyInfo]
+  )
 
   return (
-    <PanelRight className="surveys-user-extra-props" onClose={onClose} width="55rem">
+    <PanelRight
+      className="surveys-user-extra-props"
+      header="surveysView.editUserExtraPropsForSurvey"
+      headerParams={{ surveyName: Survey.getName(surveyInfo) }}
+      onClose={onClose}
+      width="55rem"
+    >
       {ProcessUtils.ENV.experimentalFeatures && (
         <SurveyUserExtraPropDefsEditor
-          extraPropDefs={Survey.getUserExtraPropDefs(survey)}
+          extraPropDefs={Survey.getUserExtraPropDefs(surveyInfo)}
           onExtraPropDefDelete={onSurveyExtraPropDefDelete}
           onExtraPropDefUpdate={onSurveyExtraPropDefUpdate}
         />
       )}
     </PanelRight>
   )
+}
+
+SurveyListUserExtraPropsEditor.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func,
+  surveyInfo: PropTypes.object.isRequired,
 }
