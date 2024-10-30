@@ -18,6 +18,7 @@ const UsersListSurvey = () => {
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const emailVisible = useAuthCanViewOtherUsersEmail()
+  const [requestedAt, setRequestedAt] = useState(Date.now())
   const [surveyExtraPropsEditorUser, setSurveyExtraPropsEditorUser] = useState(null)
 
   const onRowClick = useCallback(
@@ -36,6 +37,7 @@ const UsersListSurvey = () => {
       <Table
         module="users-survey"
         moduleApiUri={`/api/survey/${surveyId}/users`}
+        restParams={{ requestedAt }}
         className="users-list"
         gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 10rem 50px 30px`}
         headerLeftComponent={HeaderLeft}
@@ -47,6 +49,7 @@ const UsersListSurvey = () => {
       {surveyExtraPropsEditorUser && (
         <SurveyUserExtraPropsEditor
           onClose={() => setSurveyExtraPropsEditorUser(null)}
+          onUserUpdate={() => setRequestedAt(Date.now())}
           userToUpdate={surveyExtraPropsEditorUser}
         />
       )}

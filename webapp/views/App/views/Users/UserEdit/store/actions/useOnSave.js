@@ -20,7 +20,7 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
   const user = useUser()
   const surveyId = useSurveyId()
 
-  const saveUser = async () => {
+  const saveUser = useCallback(async () => {
     const editingSelf = User.isEqual(user)(userToUpdate)
     const userToUpdateUuid = User.getUuid(userToUpdate)
     const profilePicture = User.getProfilePicture(userToUpdate)
@@ -65,7 +65,7 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
     } finally {
       dispatch(LoaderActions.hideLoader())
     }
-  }
+  }, [dispatch, hideSurveyGroup, setUserToUpdateOriginal, surveyId, user, userToUpdate])
 
   return useCallback(async () => {
     const userUpdatedValidated = await validateUserEdit(userToUpdate)
@@ -82,5 +82,5 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
         await saveUser()
       }
     }
-  }, [userToUpdate, userToUpdateOriginal])
+  }, [dispatch, saveUser, userToUpdate, userToUpdateOriginal])
 }
