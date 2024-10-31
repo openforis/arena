@@ -39,7 +39,7 @@ const UsersListSurvey = () => {
         moduleApiUri={`/api/survey/${surveyId}/users`}
         restParams={{ requestedAt }}
         className="users-list"
-        gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 10rem 50px 30px`}
+        gridTemplateColumns={`35px repeat(${emailVisible ? 5 : 4}, 1fr) 10rem 10rem 50px 40px`}
         headerLeftComponent={HeaderLeft}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
