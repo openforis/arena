@@ -898,6 +898,7 @@ Copy the invitation link to the clipboard?`,
     },
     surveysDraft: 'Surveys (draft)',
     surveysPublished: 'Surveys (published)',
+    editSurveyUserExtraPropsForUser: 'Edit survey user extra properties for user "{{userName}}"',
   },
 
   usersAccessRequestView: {

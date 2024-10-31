@@ -3,28 +3,30 @@ import './UserEdit.scss'
 import React from 'react'
 import { useNavigate, useParams } from 'react-router'
 
+import { Objects } from '@openforis/arena-core'
+
+import * as AuthGroup from '@core/auth/authGroup'
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
-import * as AuthGroup from '@core/auth/authGroup'
-import * as ProcessUtils from '@core/processUtils'
 
-import ProfilePicture from '@webapp/components/profilePicture'
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { Button, ButtonDelete, ButtonInvite, ButtonSave, ExpansionPanel } from '@webapp/components'
 import Checkbox from '@webapp/components/form/checkbox'
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
-import { ButtonSave, ButtonDelete, ButtonInvite, Button } from '@webapp/components'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import ProfilePicture from '@webapp/components/profilePicture'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
-import { useEditUser } from './store'
 import DropdownUserGroup from '../DropdownUserGroup'
 import ProfilePictureEditor from './ProfilePictureEditor'
-import { UserExtraPropsEditor } from './UserExtraPropsEditor'
+import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
+import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -167,7 +169,13 @@ const UserEdit = () => {
             </FormItem>
           )}
           {ProcessUtils.ENV.experimentalFeatures && (
-            <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
+            <ExpansionPanel
+              buttonLabel="usersView.surveyExtraProp.label_other"
+              className="extra-props"
+              startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
+            >
+              <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
+            </ExpansionPanel>
           )}
         </>
       )}

@@ -101,7 +101,7 @@ export const UserExtraPropEditor = (props) => {
   }, [initialItem, newItem, onDelete, onEditChange])
 
   return (
-    <div className="extra-props display-flex">
+    <div className="extra-prop display-flex">
       <FormItem label="extraProp.name" labelParams={{ position: index + 1 }}>
         <Input
           disabled={!editing}
