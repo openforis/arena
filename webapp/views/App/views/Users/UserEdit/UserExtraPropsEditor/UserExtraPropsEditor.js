@@ -68,27 +68,29 @@ export const UserExtraPropsEditor = (props) => {
 
   return (
     <ExpansionPanel buttonLabel="extraProp.label_plural" className="extra-props" startClosed={items.length === 0}>
-      {items.map(({ name, newItem, uuid, value }, index) => (
-        <UserExtraPropEditor
-          key={uuid}
-          editingItems={editing}
-          index={index}
-          items={items}
-          name={name}
-          newItem={newItem}
-          onDelete={onItemDelete}
-          onEditChange={onItemEditChange}
-          onSave={onItemSave}
-          uuid={uuid}
-          value={value}
+      <div className="form">
+        {items.map(({ name, newItem, uuid, value }, index) => (
+          <UserExtraPropEditor
+            key={uuid}
+            editingItems={editing}
+            index={index}
+            items={items}
+            name={name}
+            newItem={newItem}
+            onDelete={onItemDelete}
+            onEditChange={onItemEditChange}
+            onSave={onItemSave}
+            uuid={uuid}
+            value={value}
+          />
+        ))}
+        <ButtonAdd
+          className="btn-add"
+          disabled={editing || items.some((item) => item.newItem)}
+          label="extraProp.addExtraProp"
+          onClick={onAdd}
         />
-      ))}
-      <ButtonAdd
-        className="btn-add"
-        disabled={editing || items.some((item) => item.newItem)}
-        label="extraProp.addExtraProp"
-        onClick={onAdd}
-      />
+      </div>
     </ExpansionPanel>
   )
 }

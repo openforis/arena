@@ -90,7 +90,8 @@ const Row = (props) => {
       {canEditUser && ProcessUtils.ENV.experimentalFeatures && (
         <Button
           iconClassName="icon-cog"
-          title="usersView.editUserExtraProps"
+          title="usersView.editSurveyUserExtraPropsForUser"
+          titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
           onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
           variant="text"
         />

@@ -37,7 +37,12 @@
       grid-row-gap: 0;
 
       .form-item {
+        width: 20rem;
         white-space: nowrap;
+
+        .form-input-container {
+          width: 12rem;
+        }
       }
     }
     .btn-add {
@@ -60,11 +65,5 @@
 
   .btn-save {
     align-self: center;
-  }
-}
-
-.panel-right.survey-user-extra-props {
-  .btn-save {
-    justify-self: center;
   }
 }
