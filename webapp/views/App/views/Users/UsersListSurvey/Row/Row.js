@@ -5,6 +5,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
+import * as ProcessUtils from '@core/processUtils'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
@@ -17,12 +18,14 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
 
 const Row = (props) => {
-  const { row: userListItem } = props
+  const { onEditSurveyUserExtraProps, row: userListItem } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const i18n = useI18n()
   const canEditUser = useAuthCanEditUser(userListItem)
   const emailVisible = useAuthCanViewOtherUsersEmail()
+
+  const handleResendInvitation = useOnInviteRepeat({ userToInvite: userListItem, hasToNavigate: false })
 
   const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(userListItem)
   const authGroupName = AuthGroup.getName(authGroup)
@@ -33,8 +36,6 @@ const Row = (props) => {
   const invitedDateFormatted = DateUtils.convertDateTimeFromISOToDisplay(invitedDate) ?? ''
   const lastLoginTime = User.getLastLoginTime(userListItem)
   const lastLoginTimeFormatted = DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime) ?? ''
-
-  const handleResendInvitation = useOnInviteRepeat({ userToInvite: userListItem, hasToNavigate: false })
 
   return (
     <>
@@ -86,11 +87,21 @@ const Row = (props) => {
       <div data-testid={TestId.userList.edit}>
         <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
+      {canEditUser && ProcessUtils.ENV.experimentalFeatures && (
+        <Button
+          iconClassName="icon-cog"
+          title="usersView.editSurveyUserExtraPropsForUser"
+          titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
+          onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
+          variant="text"
+        />
+      )}
     </>
   )
 }
 
 Row.propTypes = {
+  onEditSurveyUserExtraProps: PropTypes.func.isRequired,
   row: PropTypes.object.isRequired,
 }
 
