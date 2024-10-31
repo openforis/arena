@@ -67,7 +67,10 @@ export const DimensionsSelector = (props) => {
     return { options: _options, optionsByDimensionUuid: _optionsByDimensionUuid }
   }, [entityDef, isDimensionIncluded, labelType, lang, showAnalysisAttributes, survey])
 
-  const selectedOptions = selectedDimensionsUuids.map((dimensionUuid) => optionsByDimensionUuid[dimensionUuid])
+  const selectedOptions = useMemo(
+    () => selectedDimensionsUuids.map((dimensionUuid) => optionsByDimensionUuid[dimensionUuid]).filter(Boolean),
+    [optionsByDimensionUuid, selectedDimensionsUuids]
+  )
 
   const onChange = useCallback(
     (_selectedOptions) => {
