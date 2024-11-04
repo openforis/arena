@@ -1,10 +1,9 @@
 import * as R from 'ramda'
-import * as camelize from 'camelize'
-import * as toSnakeCase from 'to-snake-case'
 
 import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
+import * as StringUtils from '@core/stringUtils'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -29,22 +28,24 @@ const tableColumns = [
   'date_modified',
   'validation',
   'info',
+  'merged_into_record_uuid',
 ]
+const dateColumns = ['date_created', 'date_modified']
 const tableName = 'record'
 
-const selectFieldDateCreated = DbUtils.selectDate('date_created')
-const selectFieldDateModified = DbUtils.selectDate('date_modified')
-const recordSelectFields = `uuid, owner_uuid, step, cycle, ${selectFieldDateCreated}, ${selectFieldDateModified}, merged_into_record_uuid, preview, validation`
+const recordSelectFields = [
+  ...tableColumns.filter((col) => !dateColumns.includes(col)),
+  ...dateColumns.map((dateCol) => DbUtils.selectDate(dateCol)),
+].join(', ')
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
   (record) => {
     if (!record) return null
-
     const validation = Record.getValidation(record)
     return R.pipe(
       R.dissoc(Validation.keys.validation),
-      camelize,
+      A.camelizePartial({ limitToLevel: 1 }),
       R.assoc('surveyId', surveyId),
       R.assoc(
         Validation.keys.validation,
@@ -99,6 +100,7 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
         date_modified: Record.getDateModified(record),
         validation: JSON.stringify(Validation.isObjValid(record) ? {} : Record.getValidation(record)),
         info: Record.getInfo(record),
+        merged_into_record_uuid: Record.getMergedIntoRecordUuid(record),
       }))
     )
   )
@@ -214,7 +216,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
-  const sortByColumnName = toSnakeCase(sortBy)
+  const sortByColumnName = StringUtils.toSnakeCase(sortBy)
 
   return client.map(
     `
