@@ -4,7 +4,6 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { Schemata, TableDataNodeDef } from '@common/model/db'
 import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
-import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import { RdbUpdateTypes, RdbUpdates } from './RdbUpdates'
@@ -48,6 +47,8 @@ const _getValuesByColumnName = ({ survey, record, nodeDef, node, ancestorMultipl
     const result = {
       [columnSet.uuid]: Node.getUuid(node),
       [columnSet.parentUuid]: Node.getUuid(ancestorMultipleEntity),
+      [columnSet.dateCreated]: Node.getDateCreated(node),
+      [columnSet.dateModified]: Node.getDateModified(node),
     }
     if (NodeDef.isRoot(nodeDef)) {
       Object.assign(result, {
@@ -93,7 +94,7 @@ export const generateRdbUpdates = ({ survey, record, nodes }) => {
       const ancestorMultipleEntity = _findAncestor({ ancestorDefUuid, node, nodes })
       const update = {
         type,
-        schema: SchemaRdb.getName(Survey.getId(survey)),
+        schema: Schemata.getSchemaSurveyRdb(Survey.getId(survey)),
         table: NodeDefTable.getTableName(nodeDef, ancestorDef),
         nodeDefUuid: NodeDef.getUuid(nodeDef),
         nodeDefHierarchyLevel: NodeDef.getMetaHierarchy(nodeDef).length,
