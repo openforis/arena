@@ -1,5 +1,3 @@
-import { Promises } from '@openforis/arena-core'
-
 import * as Log from '@server/log/log'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 
@@ -23,7 +21,7 @@ export const checkFilesStorage = async () => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
   let allSurveysFilesMoved = false
   let errorsFound = false
-  await Promises.each(surveyIds, async (surveyId) => {
+  for await (const surveyId of surveyIds) {
     try {
       const surveyFilesMoved = await FileManager.moveFilesToNewStorageIfNecessary({ surveyId })
       allSurveysFilesMoved = allSurveysFilesMoved || surveyFilesMoved
@@ -31,7 +29,7 @@ export const checkFilesStorage = async () => {
       errorsFound = true
       logger.error(`Error moving files for survey ${surveyId}`, error)
     }
-  })
+  }
   if (errorsFound) {
     logger.error(`There were errors moving survey files to the new storage`)
   } else if (allSurveysFilesMoved) {

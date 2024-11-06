@@ -2,6 +2,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
+  HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -18,16 +19,21 @@ const s3Client = new S3Client({
   region: ProcessUtils.ENV.fileStorageAwsS3BucketRegion,
 })
 
-const getFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
+const getFileKey = ({ surveyId, fileUuid }) => `surveys/${surveyId}/files/${fileUuid}`
 
-const createCommandParams = ({ surveyId, fileUuid }) => ({
-  Bucket,
-  Key: getFileKey({ surveyId, fileUuid }),
-})
+const createCommandParams = ({ surveyId, fileUuid }) => {
+  const Key = getFileKey({ surveyId, fileUuid })
+  return { Bucket, Key }
+}
+
+const fileExists = async (Key) => {
+  const command = new HeadObjectCommand({ Bucket, Key })
+  const data = await s3Client.send(command)
+  return data.$metadata.httpStatusCode === 200
+}
 
 export const checkCanAccessS3Bucket = async () => {
   const command = new HeadBucketCommand({ Bucket })
-
   try {
     await s3Client.send(command)
     return true
@@ -57,3 +63,21 @@ export const deleteFiles = async ({ surveyId, fileUuids }) =>
       return s3Client.send(command)
     })
   )
+
+const getOldFileKey = ({ surveyId, fileUuid }) => `${surveyId}_${fileUuid}`
+
+const createOldKeyCommandParams = ({ surveyId, fileUuid }) => {
+  const Key = getOldFileKey({ surveyId, fileUuid })
+  return { Bucket, Key }
+}
+
+export const oldKeyFileExists = async ({ surveyId, fileUuid }) => {
+  const Key = getOldFileKey({ surveyId, fileUuid })
+  return fileExists(Key)
+}
+
+export const getOldKeyFileContentAsStream = async ({ surveyId, fileUuid }) => {
+  const command = new GetObjectCommand(createOldKeyCommandParams({ surveyId, fileUuid }))
+  const response = await s3Client.send(command)
+  return response.Body
+}
