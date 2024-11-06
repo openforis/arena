@@ -134,17 +134,14 @@ export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, clien
         FROM ${getSchemaSurvey(surveyId)}.record 
         WHERE preview = FALSE 
           ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
-        GROUP BY info
+        GROUP BY created_with
       `,
     { cycle }
   )
-  return counts.reduce(
-    (acc, { created_with: createdWith, count }) => ({
-      ...acc,
-      [createdWith ?? AppInfo.arenaAppId]: Number(count),
-    }),
-    {}
-  )
+  return counts.reduce((acc, { created_with, count }) => {
+    acc[created_with] = Number(count)
+    return acc
+  }, {})
 }
 
 export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, client = db) => {
