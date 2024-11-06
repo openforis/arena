@@ -21,6 +21,7 @@ import { useSurveyHasFileAttributes } from '@webapp/store/survey/hooks'
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
 import { RecordOwnerColumn } from './RecordOwnerColumn'
+import { Checkbox } from '@webapp/components/form'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()
@@ -43,10 +44,21 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
     return [
       {
         key: 'selected',
+        renderHeader: ({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount }) => (
+          <Checkbox
+            checked={selectedItemsCount === totalCount}
+            indeterminate={selectedItemsCount > 0 && selectedItemsCount < totalCount}
+            onChange={(value) => {
+              if (value) {
+                selectAllItems()
+              } else {
+                deselectAllItems()
+              }
+            }}
+          />
+        ),
         renderItem: ({ itemSelected }) => (
-          <div>
-            <span className={`icon icon-12px icon-action icon-checkbox-${itemSelected ? 'checked' : 'unchecked'}`} />
-          </div>
+          <span className={`icon icon-12px icon-action icon-checkbox-${itemSelected ? 'checked' : 'unchecked'}`} />
         ),
         width: '30px',
       },

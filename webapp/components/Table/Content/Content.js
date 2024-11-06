@@ -47,6 +47,8 @@ const Content = (props) => {
     rowHeaderComponent: rowHeaderComponentParam,
     rowProps = {},
     selectedItems = [],
+    selectAllItems,
+    deselectAllItems,
     sort,
     totalCount = undefined,
   } = props
@@ -76,13 +78,24 @@ const Content = (props) => {
     )
   }
 
+  const selectedItemsCount = selectedItems.length
+
   const hasColumns = columns?.length > 0
   const rowComponent = hasColumns
     ? (_props) => <ContentRowCells {..._props} cellProps={cellProps} columns={columns} itemSelected={_props.selected} />
     : rowComponentParam
 
   const rowHeaderComponent = hasColumns
-    ? (_props) => <ContentHeaders {..._props} columns={columns} />
+    ? (_props) => (
+        <ContentHeaders
+          {..._props}
+          columns={columns}
+          selectAllItems={selectAllItems}
+          deselectAllItems={deselectAllItems}
+          selectedItemsCount={selectedItemsCount}
+          totalCount={totalCount}
+        />
+      )
     : rowHeaderComponentParam
 
   const gridTemplateColumns = hasColumns
