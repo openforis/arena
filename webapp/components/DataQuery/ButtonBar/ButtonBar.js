@@ -87,27 +87,27 @@ const ButtonBar = (props) => {
 
   return (
     <div className="data-query-button-bar">
-      <Button
-        className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-        iconClassName="icon-tab icon-14px"
-        onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
-        title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
-        variant="outlined"
-      />
-
-      <FormItem className="mode-form-item" label="dataView.dataQuery.mode.label">
-        <ButtonGroup
-          disabled={appSaving || !nodeDefsSelectorVisible}
-          groupName="queryMode"
-          selectedItemKey={selectedMode}
-          onChange={(mode) => onChangeQuery(Query.assocMode(mode)(query))}
-          items={modeButtonItems}
+      <div className="display-flex">
+        <Button
+          className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
+          iconClassName="icon-tab icon-14px"
+          onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
+          title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
+          variant="outlined"
         />
-        {canEdit && hasSelection && (
-          <Switch checked={modeEdit} disabled={dataEmpty} label="common.edit" onChange={onEditCheckboxChange} />
-        )}
-      </FormItem>
-
+        <FormItem className="mode-form-item" label="dataView.dataQuery.mode.label">
+          <ButtonGroup
+            disabled={appSaving || !nodeDefsSelectorVisible}
+            groupName="queryMode"
+            selectedItemKey={selectedMode}
+            onChange={(mode) => onChangeQuery(Query.assocMode(mode)(query))}
+            items={modeButtonItems}
+          />
+          {canEdit && hasSelection && selectedMode !== modes.aggregate && (
+            <Switch checked={modeEdit} disabled={dataEmpty} label="common.edit" onChange={onEditCheckboxChange} />
+          )}
+        </FormItem>
+      </div>
       {hasSelection && (
         <div>
           <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
