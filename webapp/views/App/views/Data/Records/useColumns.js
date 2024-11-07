@@ -13,6 +13,7 @@ import { Button } from '@webapp/components'
 import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
+import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
 
 import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
@@ -41,15 +42,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
   return useMemo(() => {
     if (categoryItemsByCodeDefUuid === null) return null
     return [
-      {
-        key: 'selected',
-        renderItem: ({ itemSelected }) => (
-          <div>
-            <span className={`icon icon-12px icon-action icon-checkbox-${itemSelected ? 'checked' : 'unchecked'}`} />
-          </div>
-        ),
-        width: '30px',
-      },
+      TableSelectionColumn(),
       {
         key: 'row-number',
         header: '#',
@@ -152,7 +145,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
           return (
             <>
               <Button
-                iconClassName={`icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}
+                iconClassName={`icon-16px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}
                 title={`dataView.records.${canEdit ? 'editRecord' : 'viewRecord'}`}
                 onClick={onRecordEditButtonClick(record)}
                 variant="text"
