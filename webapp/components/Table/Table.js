@@ -59,8 +59,11 @@ const Table = (props) => {
     onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
+    selectAllItems,
+    deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
+    visibleItemsCount,
   } = useTable({
     columns,
     keyExtractor,
@@ -126,6 +129,9 @@ const Table = (props) => {
         sort={sort}
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
+        selectAllItems={selectAllItems}
+        deselectAllItems={deselectAllItems}
+        visibleItemsCount={visibleItemsCount}
       />
       {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
     </div>
