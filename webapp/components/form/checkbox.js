@@ -1,10 +1,11 @@
 import './checkbox.scss'
 
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
 import MuiCheckbox from '@mui/material/Checkbox'
 import MuiRadio from '@mui/material/Radio'
+import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -12,7 +13,6 @@ import { useI18n } from '@webapp/store/system'
 
 import { ButtonIconInfo } from '../buttons/ButtonIconInfo'
 import ValidationTooltip from '../validationTooltip'
-import classNames from 'classnames'
 
 const Checkbox = (props) => {
   const {
