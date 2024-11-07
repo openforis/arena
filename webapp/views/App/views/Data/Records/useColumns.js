@@ -13,6 +13,7 @@ import { Button } from '@webapp/components'
 import { AppIcon } from '@webapp/components/AppIcon'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
+import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
 
 import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
@@ -21,7 +22,6 @@ import { useSurveyHasFileAttributes } from '@webapp/store/survey/hooks'
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
 import { RecordOwnerColumn } from './RecordOwnerColumn'
-import { Checkbox } from '@webapp/components/form'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()
@@ -42,26 +42,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
   return useMemo(() => {
     if (categoryItemsByCodeDefUuid === null) return null
     return [
-      {
-        key: 'selected',
-        renderHeader: ({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount }) => (
-          <Checkbox
-            checked={selectedItemsCount === totalCount}
-            indeterminate={selectedItemsCount > 0 && selectedItemsCount < totalCount}
-            onChange={(value) => {
-              if (value) {
-                selectAllItems()
-              } else {
-                deselectAllItems()
-              }
-            }}
-          />
-        ),
-        renderItem: ({ itemSelected }) => (
-          <span className={`icon icon-12px icon-action icon-checkbox-${itemSelected ? 'checked' : 'unchecked'}`} />
-        ),
-        width: '30px',
-      },
+      TableSelectionColumn(),
       {
         key: 'row-number',
         header: '#',

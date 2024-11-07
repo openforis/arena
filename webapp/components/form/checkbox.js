@@ -16,8 +16,10 @@ import classNames from 'classnames'
 
 const Checkbox = (props) => {
   const {
+    allowClickEventBubbling = false,
     className,
     checked = false,
+    controlStyle = null,
     disabled = false,
     id = null,
     info,
@@ -34,10 +36,12 @@ const Checkbox = (props) => {
 
   const onChange = useCallback(
     (event) => {
-      event.stopPropagation()
-      onChangeProp?.(!checked)
+      if (!allowClickEventBubbling) {
+        event.stopPropagation()
+      }
+      onChangeProp?.(!checked, event)
     },
-    [onChangeProp, checked]
+    [allowClickEventBubbling, onChangeProp, checked]
   )
 
   const control = radio ? (
@@ -48,6 +52,7 @@ const Checkbox = (props) => {
       disabled={disabled}
       onClick={onChange}
       size={size}
+      style={controlStyle}
     />
   ) : (
     <MuiCheckbox
@@ -58,10 +63,11 @@ const Checkbox = (props) => {
       indeterminate={indeterminate}
       onClick={onChange}
       size={size}
+      style={controlStyle}
     />
   )
   return (
-    <div className={classNames(className, 'btn-checkbox')} style={{ justifySelf: 'start' }}>
+    <div className={classNames('btn-checkbox', className)} style={{ justifySelf: 'start' }}>
       <ValidationTooltip validation={validation}>
         {Objects.isEmpty(label) ? (
           control
@@ -75,9 +81,11 @@ const Checkbox = (props) => {
 }
 
 Checkbox.propTypes = {
+  allowClickEventBubbling: PropTypes.bool,
   className: PropTypes.string,
   id: PropTypes.string,
   checked: PropTypes.bool,
+  controlStyle: PropTypes.object,
   disabled: PropTypes.bool,
   indeterminate: PropTypes.bool,
   info: PropTypes.string,

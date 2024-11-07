@@ -181,5 +181,6 @@ export const useTable = ({
     deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
+    visibleItemsCount: list?.length ?? 0,
   }
 }

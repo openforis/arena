@@ -29,6 +29,7 @@ const Content = (props) => {
   const {
     cellProps,
     columns,
+    deselectAllItems,
     expandableRows = false,
     gridTemplateColumns: gridTemplateColumnsParam,
     handleSortBy,
@@ -48,9 +49,9 @@ const Content = (props) => {
     rowProps = {},
     selectedItems = [],
     selectAllItems,
-    deselectAllItems,
     sort,
     totalCount = undefined,
+    visibleItemsCount,
   } = props
 
   const i18n = useI18n()
@@ -94,6 +95,7 @@ const Content = (props) => {
           deselectAllItems={deselectAllItems}
           selectedItemsCount={selectedItemsCount}
           totalCount={totalCount}
+          visibleItemsCount={visibleItemsCount}
         />
       )
     : rowHeaderComponentParam
@@ -139,6 +141,7 @@ const Content = (props) => {
 Content.propTypes = {
   cellProps: PropTypes.object,
   columns: PropTypes.array,
+  deselectAllItems: PropTypes.func,
   expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,
   handleSortBy: PropTypes.func.isRequired,
@@ -159,8 +162,10 @@ Content.propTypes = {
   rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectedItems: PropTypes.array,
+  selectAllItems: PropTypes.func,
   sort: PropTypes.object.isRequired,
   totalCount: PropTypes.number,
+  visibleItemsCount: PropTypes.number.isRequired,
 }
 
 export default Content
