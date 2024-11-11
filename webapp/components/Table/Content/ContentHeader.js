@@ -22,8 +22,7 @@ export const ContentHeader = (props) => {
   return (
     <div key={key}>
       {sortable && <SortToggle sort={sort} handleSortBy={handleSortBy} field={sortField || key} />}
-      {renderHeader &&
-        renderHeader({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount, visibleItemsCount })}
+      {renderHeader?.({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount, visibleItemsCount })}
       {header ? i18n.t(header) : ''}
     </div>
   )

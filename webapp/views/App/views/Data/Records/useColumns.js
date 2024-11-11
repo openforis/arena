@@ -84,13 +84,15 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         className: 'date-created-col',
         header: 'common.dateCreated',
         sortable: true,
-        renderItem: ({ item: record }) => (
-          <>
-            {DateUtils.formatDateTimeDisplay(Record.getDateCreated(record))}
-            <AppIcon appId={Record.getCreatedWithAppId(record)} />
-          </>
-        ),
-        width: '12rem',
+        renderItem: ({ item: record }) => DateUtils.formatDateTimeDisplay(Record.getDateCreated(record)),
+        width: '11rem',
+      },
+      {
+        key: 'created-with',
+        header: 'common.createdWith',
+        hidden: true,
+        renderItem: ({ item: record }) => <AppIcon appId={Record.getCreatedWithAppId(record)} />,
+        width: '8rem',
       },
       {
         key: Record.keys.dateModified,
