@@ -98,6 +98,8 @@ export default () =>
           'minCount',
           'maxCount',
           'validations',
+          'validation_message_en',
+          'validation_message_fr',
           'cycle',
         ])
         await expect(nodeDefData.uuid).toBeDefined()
