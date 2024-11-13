@@ -37,6 +37,7 @@ $tableFooterHeight: 30px;
   .table__rows {
     position: absolute;
     overflow-y: auto;
+    scrollbar-gutter: stable;
     height: calc(100% - 50px);
     right: 10px;
     left: 10px;
@@ -109,6 +110,7 @@ $tableFooterHeight: 30px;
     color: white;
     font-weight: 600;
     overflow: hidden;
+    padding-right: 16px;
   }
 
   .table__row-expanded-panel-wrapper {
