@@ -52,6 +52,20 @@ const getValidationsSummary = ({ nodeDef }) => {
     .join('\n')
 }
 
+const getValidationMessages = ({ nodeDef, lang }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  const expressions = NodeDefValidations.getExpressions(validations)
+  return expressions
+    .reduce((acc, expression) => {
+      const message = NodeDefExpression.getMessage(lang)(expression)
+      if (message) {
+        acc.push(message)
+      }
+      return acc
+    }, [])
+    .join('\n')
+}
+
 export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = []
@@ -141,6 +155,14 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       minCount: String(NodeDefValidations.getMinCount(NodeDef.getValidations(nodeDef))),
       maxCount: String(NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef))),
       validations: getValidationsSummary({ nodeDef }),
+      // validation messages
+      ...languages.reduce(
+        (acc, lang) => ({
+          ...acc,
+          [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }),
+        }),
+        {}
+      ),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }
   })

@@ -18,12 +18,20 @@
   .table__row {
     height: unset;
     padding: 6px 0;
+    gap: 1rem;
   }
 }
 
+.validation-report__row-num-col {
+  justify-self: right;
+}
+
+.validation-report__path-col,
 .validation-report__message {
   justify-self: left;
+}
 
+.validation-report__message {
   .validation-field_message {
     color: $black;
   }
