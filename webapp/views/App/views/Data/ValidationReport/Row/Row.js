@@ -39,8 +39,8 @@ const Row = (props) => {
 
   return (
     <>
-      <div>{rowNo}</div>
-      <div data-value={path}>
+      <div className="validation-report__row-num-col">{rowNo}</div>
+      <div className="validation-report__path-col" data-value={path}>
         <LabelWithTooltip label={path} />
       </div>
       <div
