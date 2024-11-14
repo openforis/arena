@@ -2,6 +2,8 @@ import area from '@turf/area'
 import centroid from '@turf/centroid'
 import length from '@turf/length'
 
+import { PointFactory } from '@openforis/arena-core'
+
 const countVertices = (geoJson) => {
   const polygon = geoJson.type === 'Feature' ? geoJson.geometry : geoJson
   return polygon?.coordinates?.[0]?.length ?? 0
@@ -20,7 +22,7 @@ const parse = (geoJsonText) => {
 const pointFeatureToPoint = (pointFeature) => {
   if (!pointFeature) return null
   const [x, y] = pointFeature.geometry?.coordinates ?? []
-  return { x, y }
+  return PointFactory.createInstance({ x, y })
 }
 
 const validateFeature = (geoJson) => geoJson?.type === 'Feature' && !!geoJson.geometry
