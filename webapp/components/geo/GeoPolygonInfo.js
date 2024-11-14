@@ -19,8 +19,7 @@ const formatNumber = (value) => Numbers.formatDecimal(Numbers.roundToPrecision(v
 export const GeoPolygonInfo = (props) => {
   const { geoJson } = props
 
-  const areaInSquareMeters = GeoJsonUtils.area(geoJson)
-  const perimeterInMeters = GeoJsonUtils.perimeter(geoJson)
+  const areaInSquareMeters = useMemo(() => GeoJsonUtils.area(geoJson), [geoJson])
 
   const areaInUnit = useCallback(
     (unit) => `${formatNumber(squareMetersToUnit(unit)(areaInSquareMeters))} ${abbreviationByUnit[unit]}`,
@@ -32,6 +31,8 @@ export const GeoPolygonInfo = (props) => {
     [areaInUnit]
   )
 
+  const perimeterInMeters = useMemo(() => GeoJsonUtils.perimeter(geoJson), [geoJson])
+
   const perimeterInUnit = useCallback(
     (unit) => `${formatNumber(metersToUnit(unit)(perimeterInMeters))} ${abbreviationByUnit[unit]}`,
     [perimeterInMeters]
@@ -39,18 +40,22 @@ export const GeoPolygonInfo = (props) => {
 
   const perimeterTooltipContent = useMemo(() => [lengthUnits.foot].map(perimeterInUnit).join('<br>'), [perimeterInUnit])
 
+  const verticesCount = useMemo(() => GeoJsonUtils.countVertices(geoJson), [geoJson])
+  const area = useMemo(() => areaInUnit(areaUnits.hectare), [areaInUnit])
+  const perimeter = useMemo(() => perimeterInUnit(lengthUnits.meter), [perimeterInUnit])
+
   return (
     <div className="geo-polygon-info">
-      <FormItem label="geo.vertices">{GeoJsonUtils.countVertices(geoJson)}</FormItem>
+      {verticesCount ? <FormItem label="geo.vertices">{verticesCount}</FormItem> : null}
       <FormItem label="geo.area">
         <div className="row">
-          {areaInUnit(areaUnits.hectare)}
+          {area}
           <ButtonIconInfo isTitleMarkdown title={areaTooltipContent} />
         </div>
       </FormItem>
       <FormItem label="geo.perimeter">
         <div className="row">
-          {perimeterInUnit(lengthUnits.meter)}
+          {perimeter}
           <ButtonIconInfo title={perimeterTooltipContent} />
         </div>
       </FormItem>
