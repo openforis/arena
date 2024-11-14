@@ -17,6 +17,15 @@ const countVertices = (geoJsonOrGeometry) => {
   return geometry?.coordinates?.[0]?.length ?? 0
 }
 
+const createPointFeature = ({ x, y, properties }) => ({
+  type: Type.Feature,
+  geometry: {
+    type: 'Point',
+    coordinates: [x, y],
+  },
+  properties,
+})
+
 const parse = (geoJsonText) => {
   let geoJson = null
   try {
@@ -51,6 +60,7 @@ export const GeoJsonUtils = {
   centroidFeature,
   centroidPoint,
   countVertices,
+  createPointFeature,
   parse,
   perimeter: length,
   pointFeatureToPoint,

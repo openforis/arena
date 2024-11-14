@@ -81,14 +81,7 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
         ...extraProperties,
       }
 
-      const pointFeature = {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [point.x, point.y],
-        },
-        properties,
-      }
+      const pointFeature = GeoJsonUtils.createPointFeature({ x: point.x, y: point.y, properties })
 
       acc.bounds.extend([point.x, point.y])
       acc.points.push(pointFeature)

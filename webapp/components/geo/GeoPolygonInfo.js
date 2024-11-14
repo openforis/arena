@@ -14,7 +14,7 @@ import { ButtonIconInfo } from '../buttons'
 
 const { areaUnits, lengthUnits, abbreviationByUnit, metersToUnit, squareMetersToUnit } = NumberConversionUtils
 
-const formatNumber = (value) => Numbers.formatDecimal(Numbers.roundToPrecision(value, 2))
+const formatNumber = (value) => Numbers.formatDecimal(value, 2)
 
 export const GeoPolygonInfo = (props) => {
   const { geoJson } = props
