@@ -8,12 +8,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
+import { uuidv4 } from '@core/uuid'
 import * as CSVReader from '@server/utils/file/csvReader'
 import * as FileUtils from '@server/utils/file/fileUtils'
-import { uuidv4 } from '@core/uuid'
 
 const VALUE_PROP_DEFAULT = 'value'
 
+const allowedBooleanValues = ['true', 'false', '1', '0']
 const allowedDateFormats = [
   DateUtils.formats.dateISO,
   'YYYY.MM.DD',
@@ -22,7 +23,7 @@ const allowedDateFormats = [
   'DD-MM-YYYY',
   'DD.MM.YYYY',
 ]
-const allowedBooleanValues = ['true', 'false', '1', '0']
+const allowedTimeFormats = [DateUtils.formats.timeStorage]
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
 
@@ -33,6 +34,19 @@ const numericValueConverter = ({ value, headers }) => {
     throw new SystemError('validationErrors.dataImport.invalidNumber', { value: val, headers })
   }
   return numericVal
+}
+
+const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey }) => {
+  const val = singlePropValueConverter({ value })
+  let dateObj = null
+  const timeFormat = allowedFormats.some((format) => {
+    dateObj = DateUtils.parse(val, format)
+    return DateUtils.isValidDateObject(dateObj)
+  })
+  if (!timeFormat) {
+    throw new SystemError(errorKey, { headers, value: val })
+  }
+  return DateUtils.format(dateObj, formatTo)
 }
 
 const valueConverterByNodeDefType = {
@@ -64,18 +78,14 @@ const valueConverterByNodeDefType = {
     const y = value[Node.valuePropsCoordinate.y]
     return Node.newNodeValueCoordinate({ x, y, srsId })
   },
-  [NodeDef.nodeDefType.date]: ({ value, headers }) => {
-    const val = singlePropValueConverter({ value })
-    let dateParsed = null
-    allowedDateFormats.some((format) => {
-      dateParsed = DateUtils.parse(val, format)
-      return DateUtils.isValidDateObject(dateParsed)
-    })
-    if (!DateUtils.isValidDateObject(dateParsed)) {
-      throw new SystemError('validationErrors.dataImport.invalidDate', { headers, value: val })
-    }
-    return DateUtils.formatDateISO(dateParsed)
-  },
+  [NodeDef.nodeDefType.date]: ({ value, headers }) =>
+    extractDateOrTime({
+      value,
+      allowedFormats: allowedDateFormats,
+      formatTo: DateUtils.formats.dateISO,
+      headers,
+      errorKey: 'validationErrors.dataImport.invalidDate',
+    }),
   [NodeDef.nodeDefType.decimal]: numericValueConverter,
   [NodeDef.nodeDefType.file]: ({ value, headers }) => {
     const { fileName, fileUuid: fileUuidInValue } = value
@@ -99,7 +109,14 @@ const valueConverterByNodeDefType = {
     throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
   },
   [NodeDef.nodeDefType.text]: singlePropValueConverter,
-  [NodeDef.nodeDefType.time]: singlePropValueConverter,
+  [NodeDef.nodeDefType.time]: ({ value, headers }) =>
+    extractDateOrTime({
+      value,
+      allowedFormats: allowedTimeFormats,
+      formatTo: DateUtils.formats.timeStorage,
+      headers,
+      errorKey: 'validationErrors.dataImport.invalidTime',
+    }),
 }
 
 const checkAllHeadersAreValid =
@@ -224,7 +241,9 @@ const createReaderFromStream = ({
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
         const valueConverter = valueConverterByNodeDefType[NodeDef.getType(nodeDef)]
         try {
-          const nodeValue = valueConverter({ survey, nodeDef, value: valueTemp, headers })
+          const nodeValue = Objects.isEmpty(valueTemp)
+            ? null
+            : valueConverter({ survey, nodeDef, value: valueTemp, headers })
           acc[nodeDefUuid] = nodeValue
         } catch (error) {
           errors.push(error)
