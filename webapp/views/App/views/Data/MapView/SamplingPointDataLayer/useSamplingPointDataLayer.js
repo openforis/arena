@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 
-import { PointFactory } from '@openforis/arena-core'
+import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -14,6 +14,7 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
+import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 
@@ -26,19 +27,29 @@ const _convertItemsToPoints = (items) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
     if (!latLng) return acc
 
+    const locationPoint = Points.parse(location)
+
     const [lat, long] = latLng
-    const itemPoint = PointFactory.createInstance({ x: long, y: lat })
+    const itemLatLongPoint = PointFactory.createInstance({ x: long, y: lat })
 
     bounds.extend([lat, long])
 
-    acc.push({
-      type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location, recordUuid },
-      geometry: {
-        type: 'Point',
-        coordinates: [long, lat],
-      },
-    })
+    acc.push(
+      GeoJsonUtils.createPointFeature({
+        x: long,
+        y: lat,
+        properties: {
+          cluster: false,
+          itemUuid,
+          itemCodes,
+          itemLatLongPoint,
+          key: itemUuid,
+          location,
+          locationPoint,
+          recordUuid,
+        },
+      })
+    )
     return acc
   }, [])
 
@@ -141,9 +152,8 @@ export const useSamplingPointDataLayer = (props) => {
   // cancel items fetch (if any) on unmount
   useEffect(() => {
     return () => {
-      if (fetchCancelRef.current) {
-        fetchCancelRef.current()
-      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchCancelRef.current?.()
     }
   }, [])
 

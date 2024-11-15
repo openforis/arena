@@ -148,18 +148,13 @@ export const fetchEntitiesDataToCsvFiles = async ({
   cycle: cycleParam,
   recordUuids,
   search,
-  includeCategoryItemsLabels,
-  expandCategoryItems,
-  includeAncestorAttributes,
-  includeAnalysis,
-  includeDataFromAllCycles,
-  includeFiles,
-  recordsModifiedAfter,
+  options,
   outputDir,
   callback,
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
+  const { includeDataFromAllCycles } = options
   const cycle = includeDataFromAllCycles ? null : cycleParam
 
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
@@ -167,14 +162,9 @@ export const fetchEntitiesDataToCsvFiles = async ({
     cycle,
     outputDir,
     recordUuids,
-    search,
-    includeCategoryItemsLabels,
-    expandCategoryItems,
-    includeAncestorAttributes,
-    includeAnalysis,
-    includeFiles,
     recordOwnerUuid,
-    recordsModifiedAfter,
+    search,
+    options,
     callback,
   })
 }

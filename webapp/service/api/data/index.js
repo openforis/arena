@@ -102,7 +102,7 @@ export const startExportDataToCSVJob = async ({ surveyId, cycle, recordUuids, se
     cycle,
     recordUuids,
     search,
-    ...options,
+    options,
   })
   const { job } = data
   return job

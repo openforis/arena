@@ -16,6 +16,7 @@ import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
   const {
+    canBeCall = false,
     canBeConstant = false,
     excludeCurrentNodeDef = true,
     index = 0,
@@ -28,6 +29,7 @@ const ExpressionEditor = (props) => {
     placeholder = false,
     qualifier,
     query = '',
+    readOnly = false,
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
@@ -70,6 +72,7 @@ const ExpressionEditor = (props) => {
           excludeCurrentNodeDef={excludeCurrentNodeDef}
           mode={mode}
           isContextParent={isContextParent}
+          canBeCall={canBeCall}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
           onClose={onClose}
@@ -84,13 +87,15 @@ const ExpressionEditor = (props) => {
               {query}
             </div>
           )}
-          <Button
-            className="btn-s btn-edit"
-            iconClassName="icon-pencil2 icon-14px"
-            id={`${idPrefix}-edit-btn`}
-            onClick={() => setEdit(true)}
-            testId={TestId.expressionEditor.editBtn(qualifier)}
-          />
+          {!readOnly && (
+            <Button
+              className="btn-s btn-edit"
+              iconClassName="icon-pencil2 icon-14px"
+              id={`${idPrefix}-edit-btn`}
+              onClick={() => setEdit(true)}
+              testId={TestId.expressionEditor.editBtn(qualifier)}
+            />
+          )}
         </div>
       )}
     </div>
@@ -108,9 +113,11 @@ ExpressionEditor.propTypes = {
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
+  readOnly: PropTypes.bool,
 }
 
 export default ExpressionEditor

@@ -42,7 +42,22 @@ export const fetchSurveyTemplatesPublished = async () => {
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {
   const formData = objectToFormData({ file })
-
   const { data: job } = await axios.put(`/api/survey/${surveyId}/labels`, formData)
   return job
+}
+
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }) => {
+  const formData = objectToFormData({ key, value })
+  const { data } = await axios.put(`/api/survey/${surveyId}/config`, formData)
+  return data
+}
+
+export const updateSurveyOwner = async ({ surveyId, ownerUuid }) => {
+  const { data } = await axios.put(`/api/survey/${surveyId}/owner`, { ownerUuid })
+  return data
+}
+
+export const updateSurveyProps = async ({ surveyId, props }) => {
+  const { data } = await axios.put(`/api/survey/${surveyId}/info`, props)
+  return data
 }

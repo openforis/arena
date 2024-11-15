@@ -34,7 +34,7 @@ const NodeDefCodeCheckbox = (props) => {
             <button
               key={CategoryItem.getUuid(item)}
               type="button"
-              className={`btn btn-s deselectable${selected ? ' active' : ''}`}
+              className={`btn btn-s code-checkbox-btn deselectable${selected ? ' active' : ''}`}
               aria-disabled={disabled}
               disabled={disabled}
               onClick={() => {

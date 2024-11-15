@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
-import { Button, ButtonMenu } from '@webapp/components'
+import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
 import { NodeDefConversionDialog } from './nodeDefConversionDialog'
@@ -136,14 +136,12 @@ export const NodeDefEditButtonsMenu = (props) => {
       _menuItems.push({
         key: 'node-delete',
         content: (
-          <Button
-            iconClassName="icon-bin2 icon-12px"
+          <ButtonDelete
             label="surveyForm.delete"
             labelParams={{ nodeDefLabel }}
             onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
             onMouseDown={(e) => e.stopPropagation()}
             size="small"
-            variant="text"
           />
         ),
       })

@@ -9,12 +9,13 @@ import * as Validation from '@core/validation/validation'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
-export const afterNodesUpdate = async ({ survey, record, nodes, timezoneOffset, sideEffect = false }) => {
+export const afterNodesUpdate = async ({ user, survey, record, nodes, timezoneOffset, sideEffect = false }) => {
   // output
   const updateResult = new RecordUpdateResult({ record, nodes })
 
   // 1. update dependent nodes
   const updateResultDependents = updateNodesDependents({
+    user,
     survey,
     record,
     nodes,

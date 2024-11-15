@@ -23,7 +23,7 @@ import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } fro
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
-import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
@@ -180,13 +180,13 @@ export const DataImportCsvView = () => {
       <div className="internal-container">
         <div className="form">
           {canSelectCycle && (
-            <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
+            <FormItem label="dataImportView.importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={setStateProp('cycle')} />
             </FormItem>
           )}
 
           {!Objects.isEmpty(cycle) && (
-            <FormItem label={i18n.t('dataImportView.importType.label')}>
+            <FormItem label="dataImportView.importType.label">
               <ButtonGroup
                 selectedItemKey={dataImportType}
                 onChange={onImportTypeChange}
@@ -199,12 +199,12 @@ export const DataImportCsvView = () => {
           )}
 
           {dataImportType && (
-            <FormItem className="entity-form-item" label={i18n.t('dataImportView.importIntoMultipleEntityOrAttribute')}>
+            <FormItem className="entity-form-item" label="dataImportView.importIntoMultipleEntityOrAttribute">
               <>
-                <EntitySelectorTree
+                <NodeDefTreeSelect
                   nodeDefLabelType={nodeDefLabelType}
                   nodeDefUuidActive={selectedNodeDefUuid}
-                  onlyEntities={false}
+                  includeMultipleAttributes
                   onSelect={onNodeDefSelect}
                   isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />

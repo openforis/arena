@@ -31,7 +31,7 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
 
 const _createRecordAndNodes = async ({ user, survey, cycle }) => {
   const record = Record.newRecord(user, cycle)
-  const { record: recordWithNodes } = await Record.createRootEntity({ survey, record })
+  const { record: recordWithNodes } = await Record.createRootEntity({ user, survey, record })
   return recordWithNodes
 }
 

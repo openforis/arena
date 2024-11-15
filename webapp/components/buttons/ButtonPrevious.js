@@ -4,7 +4,7 @@ import { Button } from './Button'
 
 export const ButtonPrevious = (props) => {
   const { label = 'common.previous' } = props
-  return <Button {...props} iconClassName="icon-arrow-left icon-12px icon-left" label={label} />
+  return <Button {...props} iconClassName="icon-arrow-left icon-12px" label={label} />
 }
 
 ButtonPrevious.propTypes = {

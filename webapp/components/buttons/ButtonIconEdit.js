@@ -5,7 +5,7 @@ import { Button } from './Button'
 export const ButtonIconEdit = (props) => {
   const { label = 'common.edit', showLabel = false, variant = 'text' } = props
   return (
-    <Button {...props} iconClassName="icon-pencil2 icon-14px" label={label} showLabel={showLabel} variant={variant} />
+    <Button {...props} iconClassName="icon-pencil2 icon-16px" label={label} showLabel={showLabel} variant={variant} />
   )
 }
 

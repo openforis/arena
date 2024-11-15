@@ -4,7 +4,7 @@ export { default as NodeDefsSelectorAggregate } from './NodeDefsSelectorAggregat
 
 export { default as EntitySelector } from './EntitySelector'
 
-export { EntitySelectorTree } from './EntitySelectorTree'
+export { NodeDefTreeSelect } from './NodeDefTreeSelect'
 
 export { default as AttributesSelector } from './AttributesSelector'
 export { default as AttributeSelector } from './AttributesSelector/AttributeSelector'

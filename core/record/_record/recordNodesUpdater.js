@@ -3,7 +3,6 @@ import {
   RecordUpdater as CoreRecordUpdater,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordUpdateResult,
-  Promises,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -19,6 +18,19 @@ const { createNodeAndDescendants, createRootEntity, deleteNodes } = CoreRecordUp
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
+
+const getKeyValuePairs = ({ survey, entityDef, valuesByDefUuid }) => {
+  const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
+  return keyDefs
+    .map((keyDef) => {
+      const keyDefUuid = NodeDef.getUuid(keyDef)
+      const keyDefName = NodeDef.getName(keyDef)
+      const value = valuesByDefUuid[keyDefUuid]
+      const keyValue = NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
+      return `${keyDefName}=${keyValue}`
+    })
+    .join(',')
+}
 
 const _valueAdapterByType = {
   [NodeDef.nodeDefType.code]: ({ survey, record, parentNode, attributeDef, value }) => {
@@ -66,10 +78,11 @@ const _addOrUpdateAttribute =
   }
 
 const _addEntityAndKeyValues =
-  ({ survey, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
+  ({ user, survey, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
   (record) => {
     const updateResult = new RecordUpdateResult({ record })
     const updateResultDescendants = CoreRecordNodesUpdater.createNodeAndDescendants({
+      user,
       survey,
       record,
       parentNode,
@@ -108,7 +121,7 @@ const _addEntityAndKeyValues =
   }
 
 const _getOrCreateEntityByKeys =
-  ({ survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false }) =>
+  ({ user, survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false }) =>
   (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
       return { entity: RecordReader.getRootNode(record), updateResult: null }
@@ -126,16 +139,7 @@ const _getOrCreateEntityByKeys =
     const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
 
     if (!insertMissingNodes) {
-      const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
-      const keyValuePairs = keyDefs
-        .map((keyDef) => {
-          const keyDefUuid = NodeDef.getUuid(keyDef)
-          const keyDefName = NodeDef.getName(keyDef)
-          const value = valuesByDefUuid[keyDefUuid]
-          const keyValue = NodeValueFormatter.format({ survey, nodeDef: keyDef, value })
-          return `${keyDefName}=${keyValue}`
-        })
-        .join(',')
+      const keyValuePairs = getKeyValuePairs({ survey, entityDef, valuesByDefUuid })
       throw new SystemError('appErrors:record.entityNotFound', {
         entityName: NodeDef.getName(entityDef),
         keyValues: keyValuePairs,
@@ -153,12 +157,15 @@ const _getOrCreateEntityByKeys =
         })(record)
 
     if (!entityParent) {
+      const keyValuePairs = getKeyValuePairs({ survey, entityDef: entityParentDef, valuesByDefUuid })
       throw new SystemError('validationErrors.record.missingAncestorForEntity', {
         entityName: NodeDef.getName(entityDef),
         ancestorName: NodeDef.getName(entityParentDef),
+        keyValues: keyValuePairs,
       })
     }
     const { entity: entityInserted, updateResult } = _addEntityAndKeyValues({
+      user,
       survey,
       entityDef,
       parentNode: entityParent,
@@ -170,11 +177,12 @@ const _getOrCreateEntityByKeys =
   }
 
 const getOrCreateEntityByKeys =
-  ({ survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  ({ user, survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
     const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
+      user,
       survey,
       entityDefUuid,
       valuesByDefUuid,
@@ -186,6 +194,7 @@ const getOrCreateEntityByKeys =
       updateResult.merge(updateResultEntity)
 
       const dependentsUpdateResult = await afterNodesUpdate({
+        user,
         survey,
         record: updateResultEntity.record,
         nodes: updateResultEntity.nodes,
@@ -198,7 +207,7 @@ const getOrCreateEntityByKeys =
   }
 
 const updateAttributesInEntityWithValues =
-  ({ survey, entity, valuesByDefUuid, timezoneOffset, sideEffect = false }) =>
+  ({ user, survey, entity, valuesByDefUuid, timezoneOffset, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -208,6 +217,7 @@ const updateAttributesInEntityWithValues =
       updateResult.merge(nodeUpdateResult)
 
       const dependentsUpdateResult = await afterNodesUpdate({
+        user,
         survey,
         record: nodeUpdateResult.record,
         nodes: nodeUpdateResult.nodes,
@@ -234,7 +244,7 @@ const updateAttributesInEntityWithValues =
     )
 
     // update attribute values
-    await Promises.each(valuesByDefUuidEntriesInDescendantAttributes, async ([attributeDefUuid, value]) => {
+    for await (const [attributeDefUuid, value] of valuesByDefUuidEntriesInDescendantAttributes) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
 
       const { record: currentRecord } = updateResult
@@ -254,17 +264,18 @@ const updateAttributesInEntityWithValues =
       })(currentRecord)
 
       await updateDependentNodes(attributeUpdateResult)
-    })
+    }
     return updateResult
   }
 
 const updateAttributesWithValues =
-  ({ survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  ({ user, survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
     // 1. get or create context entity
     const { entity, updateResult: updateResultEntity } = await getOrCreateEntityByKeys({
+      user,
       survey,
       entityDefUuid,
       valuesByDefUuid,
@@ -290,7 +301,7 @@ const updateAttributesWithValues =
   }
 
 const deleteNodesInEntityByNodeDefUuid =
-  ({ survey, entity, nodeDefUuids, sideEffect = false }) =>
+  ({ user, survey, entity, nodeDefUuids, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -300,7 +311,13 @@ const deleteNodesInEntityByNodeDefUuid =
       nodeUuidsToDelete.push(...children.map(Node.getUuid))
     })
 
-    const nodesDeleteUpdateResult = await deleteNodes({ survey, record, nodeUuids: nodeUuidsToDelete, sideEffect })
+    const nodesDeleteUpdateResult = await deleteNodes({
+      user,
+      survey,
+      record,
+      nodeUuids: nodeUuidsToDelete,
+      sideEffect,
+    })
     return updateResult.merge(nodesDeleteUpdateResult)
   }
 

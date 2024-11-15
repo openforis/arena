@@ -6,7 +6,7 @@ export const stateKey = 'nodeDefs'
 
 // ====== UPDATE
 
-export const assocNodeDef = (nodeDef) => R.assoc(NodeDef.getUuid(nodeDef), nodeDef)
+export const assocNodeDef = (nodeDef, dirty = false) => R.assoc(NodeDef.getUuid(nodeDef), { ...nodeDef, dirty })
 
 export const mergeNodeDefs = R.mergeLeft
 

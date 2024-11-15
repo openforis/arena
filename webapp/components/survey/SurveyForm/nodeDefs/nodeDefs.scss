@@ -58,7 +58,6 @@
 .survey-form__node-def-page-item {
   &.read-only {
     input,
-    .survey-form__node-def-boolean,
     .survey-form__node-def-code,
     .dropdown__control {
       background-color: rgba($greyBorder, 0.2);

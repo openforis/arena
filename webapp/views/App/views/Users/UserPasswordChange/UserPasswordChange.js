@@ -8,8 +8,6 @@ import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFo
 
 import * as API from '@webapp/service/api'
 
-import { useI18n } from '@webapp/store/system'
-
 import { Button, ButtonBack } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
 import { PasswordInput, PasswordStrengthChecker } from '@webapp/components/form'
@@ -18,7 +16,6 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 const defaultState = { form: UserPasswordChangeForm.newForm(), validation: {} }
 
 const UserPasswordChange = () => {
-  const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
 
   const [state, setState] = useState(defaultState)
@@ -53,7 +50,7 @@ const UserPasswordChange = () => {
           >
             <PasswordInput
               autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
-              label={i18n.t(`userPasswordChangeView.${key}`)}
+              label={`userPasswordChangeView.${key}`}
               onChange={setStateProp(key)}
               value={form[key]}
             />

@@ -77,7 +77,7 @@ export const CollectDataImportView = () => {
           )}
 
           {surveyCycleKeys.length > 1 && (
-            <FormItem className="display-flex" label={i18n.t('dataImportView.importIntoCycle')}>
+            <FormItem className="display-flex" label="dataImportView.importIntoCycle">
               <CycleSelector selectedCycle={cycle} onChange={setCycle} />
             </FormItem>
           )}

@@ -34,7 +34,7 @@ export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActi
   const nodeValues = nodesArray.map((node) => [
     Node.getUuid(node),
     Node.getDateCreated(node),
-    Node.getDateCreated(node),
+    Node.getDateModified(node),
     Node.getRecordUuid(node),
     Node.getParentUuid(node),
     Node.getNodeDefUuid(node),
@@ -83,6 +83,7 @@ export const insertNode = async (
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = RecordNodesUpdater.createDescendants({
+      user,
       survey,
       record,
       parentNode: node,

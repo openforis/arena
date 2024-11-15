@@ -5,7 +5,6 @@ import * as A from '@core/arena'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
-import { useI18n } from '@webapp/store/system'
 
 import { FormPropertyItem } from './FormPropertyItem'
 
@@ -13,11 +12,10 @@ const controlPointsOptions = [0, 4, 5, 10, 12, 21]
 
 export const CircleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
-  const i18n = useI18n()
   const inputPropertiesForCircle = [{ key: 'radius', labelKey: 'radius' }]
   return (
     <>
-      <FormItem label={i18n.t('samplingPolygonOptions.numberOfControlPoints')}>
+      <FormItem label="samplingPolygonOptions.numberOfControlPoints">
         <Dropdown
           items={controlPointsOptions}
           itemLabel={A.identity}

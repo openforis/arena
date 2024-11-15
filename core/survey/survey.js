@@ -8,6 +8,7 @@ import * as NodeDef from './nodeDef'
 
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
+import * as SurveyConfig from './_survey/surveyConfig'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -60,6 +61,7 @@ export const newSurvey = ({
   [SurveyInfo.keys.template]: template,
 })
 
+export const { configKeys } = SurveyConfig
 export const { keys: infoKeys, status } = SurveyInfo
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } = SurveyInfo
@@ -108,6 +110,8 @@ export const {
   getDescription,
   getDescriptions,
   getFieldManualLinks,
+  getUserExtraPropDefs,
+  getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
   getSRS,
@@ -142,7 +146,8 @@ export const {
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocFilesStatistics, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocFilesStatistics, assocOwnerUuid, assocRDBInitilized, assocSrs, markDraft } =
+  SurveyInfo
 
 // ====== READ nodeDefs
 export const {
@@ -184,9 +189,9 @@ export const {
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
-  getDescendantsAndSelf,
   visitDescendantsAndSelf,
   findDescendants,
+  getNodeDefDescendantsAndSelf,
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,
   getNodeDefAncestorMultipleEntity,

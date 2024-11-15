@@ -29,10 +29,6 @@ const DataGrid = (props) => {
     rows,
   } = props
 
-  const components = {
-    ...(allowExportToCsv ? { Footer: FooterWithExport({ exportFileName }) } : {}),
-  }
-
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
 
   const getRowHeight = useMemo(() => (autoRowHeight ? () => 'auto' : undefined), [autoRowHeight])
@@ -43,7 +39,6 @@ const DataGrid = (props) => {
       checkboxSelection={checkboxSelection}
       className={classNames('data-grid', className)}
       columns={columns}
-      components={components}
       density={density}
       disableRowSelectionOnClick={disableSelectionOnClick}
       getRowClassName={getRowClassName}
@@ -51,6 +46,7 @@ const DataGrid = (props) => {
       getRowId={getRowId}
       initialState={initialState}
       rows={rows}
+      slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
   )
 }

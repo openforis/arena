@@ -1,0 +1,1 @@
+export { SurveyUserExtraPropsEditor } from './SurveyUserExtraPropsEditor'

@@ -1,17 +1,26 @@
 import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
+import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
+import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
-import { SurveyFormActions, SurveyFormState, useNotAvailableEntityPageUuids } from '@webapp/store/ui/surveyForm'
+import {
+  SurveyFormActions,
+  SurveyFormState,
+  useActiveNodeDefUuid,
+  useNotAvailableEntityPageUuids,
+  useTreeSelectViewMode,
+} from '@webapp/store/ui/surveyForm'
 import { RecordState } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
@@ -19,25 +28,32 @@ import { TestId } from '@webapp/utils/testId'
 import { dispatchWindowResize } from '@webapp/utils/domUtils'
 import { useOnUpdate, useLocationPathMatcher } from '@webapp/components/hooks'
 
-import { EntitySelectorTree } from '@webapp/components/survey/NodeDefsSelector'
+import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 
 import { Split } from '@webapp/components'
+import { ButtonGroup } from '@webapp/components/form'
+import { TreeSelectViewMode } from '@webapp/model'
+
+import NodeDefDetails from '../NodeDefDetails'
 import { FormPagesEditButtons } from './components/FormPageEditButtons'
-import FormHeader from './FormHeader'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
+import FormHeader from './FormHeader'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
   Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>
     NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
   ).length > 0
 
+const treeSelectViewModeItems = Object.keys(TreeSelectViewMode).map((mode) => ({
+  key: mode,
+  label: `surveyForm.nodeDefsTreeSelectMode.${mode}`,
+}))
+
 const SurveyForm = (props) => {
   const {
     analysis = false,
     surveyInfo = null,
-    // Current nodeDef page
-    nodeDef = null,
     // Form in edit mode
     edit = false,
     // Form in data entry mode
@@ -50,6 +66,7 @@ const SurveyForm = (props) => {
     recordUuid = null,
 
     surveyCycleKey,
+    activePageNodeDef,
     hasNodeDefAddChildTo,
     showPageNavigation,
     canEditRecord,
@@ -62,12 +79,18 @@ const SurveyForm = (props) => {
 
   const isSideBarOpened = useIsSidebarOpened()
   const survey = useSurvey()
+  const treeSelectViewMode = useTreeSelectViewMode()
+  const viewOnlyPages = treeSelectViewMode === TreeSelectViewMode.onlyPages
+  const selectedNodeDefUuid = useActiveNodeDefUuid()
+
   const editAllowed = edit && canEditDef
 
-  let className = editAllowed ? ' edit' : ''
-  className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
-  className += showPageNavigation ? '' : ' page-navigation-off'
-  className += preview ? ' form-preview' : ''
+  const className = classNames('survey-form', {
+    edit: editAllowed,
+    'form-actions-off': !hasNodeDefAddChildTo,
+    'page-navigation-off': !showPageNavigation,
+    'form-preview': preview,
+  })
 
   // If showPageNavigation, addNodeDefAddChildTo or sideBar change, trigger window resize to re-render react-grid-layout form
   useOnUpdate(() => {
@@ -94,10 +117,10 @@ const SurveyForm = (props) => {
     if (
       editAllowed &&
       !hasNodeDefAddChildTo &&
-      NodeDef.isEntity(nodeDef) &&
-      !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef })
+      NodeDef.isEntity(activePageNodeDef) &&
+      !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef: activePageNodeDef })
     ) {
-      dispatch(SurveyFormActions.setFormNodeDefAddChildTo(nodeDef))
+      dispatch(SurveyFormActions.setFormNodeDefAddChildTo(activePageNodeDef))
     }
 
     // OnUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
@@ -123,15 +146,29 @@ const SurveyForm = (props) => {
     }
   }, [])
 
-  if (!nodeDef) {
+  const onNodeDefTreeSelect = useCallback(
+    (nodeDefToSelect) => {
+      if (viewOnlyPages) {
+        const showAddChildTo =
+          NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&
+          !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef: nodeDefToSelect })
+        dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
+      } else {
+        dispatch(SurveyFormActions.setFormActiveNodeDefUuid(NodeDef.getUuid(nodeDefToSelect)))
+      }
+    },
+    [dispatch, survey, surveyCycleKey, viewOnlyPages]
+  )
+
+  if (!activePageNodeDef) {
     return null
   }
 
-  const internalContainer = (
+  const internalContainer = viewOnlyPages ? (
     <NodeDefSwitch
       surveyInfo={surveyInfo}
       surveyCycleKey={surveyCycleKey}
-      nodeDef={nodeDef}
+      nodeDef={activePageNodeDef}
       edit={edit}
       entry={entry}
       preview={preview}
@@ -140,32 +177,40 @@ const SurveyForm = (props) => {
       canEditDef={canEditDef}
       canEditRecord={canEditRecord}
     />
+  ) : (
+    <NodeDefDetails nodeDefUuid={selectedNodeDefUuid} />
   )
 
   return (
     <div className="survey-form-wrapper">
       <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
 
-      <div className={`survey-form${className}`} data-testid={TestId.surveyForm.surveyForm}>
+      <div className={className} data-testid={TestId.surveyForm.surveyForm}>
         {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
         {showPageNavigation && (
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
-              <EntitySelectorTree
+              <NodeDefTreeSelect
                 isDisabled={(nodeDefArg) => notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))}
-                nodeDefUuidActive={NodeDef.getUuid(nodeDef)}
-                onlyPages
-                onSelect={(nodeDefToSelect) => {
-                  const showAddChildTo =
-                    NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDefToSelect) &&
-                    !hasChildrenInSamePage({ survey, surveyCycleKey, nodeDef: nodeDefToSelect })
-                  dispatch(SurveyFormActions.setFormActivePage({ nodeDef: nodeDefToSelect, showAddChildTo }))
-                }}
+                nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
+                onlyPages={viewOnlyPages}
+                includeMultipleAttributes={!viewOnlyPages}
+                includeSingleAttributes={!viewOnlyPages}
+                includeSingleEntities
+                onSelect={onNodeDefTreeSelect}
               />
-
-              {edit && canEditDef && <FormPagesEditButtons />}
+              <div className="display-flex sidebar-bottom-bar">
+                {edit && ProcessUtils.ENV.experimentalFeatures && (
+                  <ButtonGroup
+                    items={treeSelectViewModeItems}
+                    onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
+                    selectedItemKey={treeSelectViewMode}
+                  />
+                )}
+                {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
+              </div>
             </div>
-            {internalContainer}
+            <div className="survey-form__internal-container-wrapper width100 height100">{internalContainer}</div>
           </Split>
         )}
         {!showPageNavigation && internalContainer}
@@ -178,25 +223,41 @@ const SurveyForm = (props) => {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
+  const activePageNodeDef = SurveyFormState.getFormActivePageNodeDef(state)
   const hasNodeDefAddChildTo = Boolean(SurveyFormState.getNodeDefAddChildTo(state))
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
 
   const mapEntryProps = () => ({
-    parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
+    parentNode: activePageNodeDef ? SurveyFormState.getFormPageParentNode(activePageNodeDef)(state) : null,
     recordUuid: Record.getUuid(record),
   })
 
   return {
     surveyInfo,
     surveyCycleKey: SurveyState.getSurveyCycleKey(state),
-    nodeDef,
+    activePageNodeDef,
     hasNodeDefAddChildTo,
     showPageNavigation,
     analysis: Record.isInAnalysisStep(record),
     ...(props.entry && record ? mapEntryProps() : {}),
   }
+}
+
+SurveyForm.propTypes = {
+  activePageNodeDef: PropTypes.object.isRequired,
+  analysis: PropTypes.bool,
+  canEditDef: PropTypes.bool,
+  canEditRecord: PropTypes.bool,
+  edit: PropTypes.bool,
+  entry: PropTypes.bool,
+  hasNodeDefAddChildTo: PropTypes.bool,
+  parentNode: PropTypes.object,
+  preview: PropTypes.bool,
+  recordUuid: PropTypes.string,
+  showPageNavigation: PropTypes.bool,
+  surveyInfo: PropTypes.object.isRequired,
+  surveyCycleKey: PropTypes.string.isRequired,
 }
 
 export default connect(mapStateToProps)(SurveyForm)

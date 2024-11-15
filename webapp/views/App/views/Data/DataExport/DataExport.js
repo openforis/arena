@@ -11,9 +11,8 @@ import { TestId } from '@webapp/utils/testId'
 import { ExportCsvDataActions } from '@webapp/store/ui'
 import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
 import { DataExportOptionsPanel } from './DataExportOptionsPanel'
-import { defaultDataExportOptionsSelection } from './dataExportOptions'
+import { dataExportOptions, defaultDataExportOptionsSelection } from './dataExportOptions'
 
 const sources = {
   allRecords: 'allRecords',
@@ -25,7 +24,6 @@ const DataExport = (props) => {
   const { recordUuids, search, sourceSelectionAvailable = false } = props
 
   const dispatch = useDispatch()
-  const i18n = useI18n()
 
   const [state, setState] = useState({
     selectedOptionsByKey: defaultDataExportOptionsSelection,
@@ -36,6 +34,9 @@ const DataExport = (props) => {
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
       const optionsUpdated = { ...statePrev.selectedOptionsByKey, [option]: value }
+      if (option === dataExportOptions.includeFiles) {
+        optionsUpdated[dataExportOptions.includeFileAttributeDefs] = value
+      }
       return { ...statePrev, selectedOptionsByKey: optionsUpdated }
     })
 
@@ -73,7 +74,7 @@ const DataExport = (props) => {
   return (
     <div className="data-export-container">
       {availableSources.length > 1 && (
-        <FormItem className="source-form-item" label={i18n.t('dataView.dataExport.source.label')}>
+        <FormItem className="source-form-item" label="dataView.dataExport.source.label">
           <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />
         </FormItem>
       )}

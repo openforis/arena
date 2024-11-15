@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { Button, ButtonCancel } from '@webapp/components/buttons'
@@ -24,7 +23,6 @@ export const NodeDefEntitySelectorDialog = (props) => {
     title,
   } = props
 
-  const i18n = useI18n()
   const survey = useSurvey()
 
   const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
@@ -53,7 +51,7 @@ export const NodeDefEntitySelectorDialog = (props) => {
       titleParams={{ nodeDefName: NodeDef.getName(currentNodeDef) }}
     >
       <ModalBody>
-        <FormItem label={i18n.t(entitySelectLabel)}>
+        <FormItem label={entitySelectLabel}>
           <EntitySelector
             hierarchy={Survey.getHierarchy()(survey)}
             nodeDefLabelType={NodeDef.NodeDefLabelTypes.labelAndName}

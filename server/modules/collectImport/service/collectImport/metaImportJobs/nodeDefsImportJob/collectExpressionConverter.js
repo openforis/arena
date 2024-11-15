@@ -109,6 +109,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
     // geo namespace
     // idm:distance is deprecated in Collect
     { pattern: '(geo|idm):distance', replace: 'distance' },
+    { pattern: 'geo:polygon', replace: 'geoPolygon' },
     // math namespace
     { pattern: /math:PI\(\)/, replace: 'Math.PI' },
     // convert directly some functions from math:fnName to Math.fnName

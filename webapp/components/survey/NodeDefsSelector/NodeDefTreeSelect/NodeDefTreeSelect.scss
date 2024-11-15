@@ -1,0 +1,11 @@
+.nodedef-tree-select {
+  position: relative;
+  overflow-y: auto;
+
+  .btn-expand {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    z-index: 2;
+  }
+}

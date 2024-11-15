@@ -55,6 +55,7 @@ const Dropdown = (props) => {
     itemLabel = 'label',
     itemValue = 'value',
     items: itemsProp,
+    loading: loadingProp = false,
     menuPlacement = 'auto',
     menuPosition = 'fixed',
     multiple = false,
@@ -116,7 +117,7 @@ const Dropdown = (props) => {
         inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
-        isLoading={loading}
+        isLoading={loading || loadingProp}
         isMulti={multiple}
         isSearchable={searchable && !readOnly}
         onChange={onChange}
@@ -147,6 +148,7 @@ Dropdown.propTypes = {
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  loading: PropTypes.bool,
   menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
   menuPosition: PropTypes.oneOf(['absolute', 'fixed']),
   multiple: PropTypes.bool,

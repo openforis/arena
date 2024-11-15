@@ -18,6 +18,7 @@ import { ExpressionEditorType } from './expressionEditorType'
 
 const ExpressionEditorPopup = (props) => {
   const {
+    canBeCall = false,
     canBeConstant = false,
     excludeCurrentNodeDef = true,
     expr = null,
@@ -47,6 +48,7 @@ const ExpressionEditorPopup = (props) => {
     updateDraftQuery,
     variables,
   } = useExpressionEditorPopupState({
+    canBeCall,
     canBeConstant,
     excludeCurrentNodeDef,
     expr,
@@ -122,6 +124,7 @@ const ExpressionEditorPopup = (props) => {
 }
 
 ExpressionEditorPopup.propTypes = {
+  canBeCall: PropTypes.bool, // True if expression can be a function call
   canBeConstant: PropTypes.bool, // True if expression can be a constant value like a number or a string
   excludeCurrentNodeDef: PropTypes.bool,
   expr: PropTypes.object, // AST expression

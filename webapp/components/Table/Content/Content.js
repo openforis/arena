@@ -29,6 +29,7 @@ const Content = (props) => {
   const {
     cellProps,
     columns,
+    deselectAllItems,
     expandableRows = false,
     gridTemplateColumns: gridTemplateColumnsParam,
     handleSortBy,
@@ -47,8 +48,10 @@ const Content = (props) => {
     rowHeaderComponent: rowHeaderComponentParam,
     rowProps = {},
     selectedItems = [],
+    selectAllItems,
     sort,
     totalCount = undefined,
+    visibleItemsCount,
   } = props
 
   const i18n = useI18n()
@@ -76,13 +79,25 @@ const Content = (props) => {
     )
   }
 
+  const selectedItemsCount = selectedItems.length
+
   const hasColumns = columns?.length > 0
   const rowComponent = hasColumns
     ? (_props) => <ContentRowCells {..._props} cellProps={cellProps} columns={columns} itemSelected={_props.selected} />
     : rowComponentParam
 
   const rowHeaderComponent = hasColumns
-    ? (_props) => <ContentHeaders {..._props} columns={columns} />
+    ? (_props) => (
+        <ContentHeaders
+          {..._props}
+          columns={columns}
+          selectAllItems={selectAllItems}
+          deselectAllItems={deselectAllItems}
+          selectedItemsCount={selectedItemsCount}
+          totalCount={totalCount}
+          visibleItemsCount={visibleItemsCount}
+        />
+      )
     : rowHeaderComponentParam
 
   const gridTemplateColumns = hasColumns
@@ -126,6 +141,7 @@ const Content = (props) => {
 Content.propTypes = {
   cellProps: PropTypes.object,
   columns: PropTypes.array,
+  deselectAllItems: PropTypes.func,
   expandableRows: PropTypes.bool,
   gridTemplateColumns: PropTypes.string.isRequired,
   handleSortBy: PropTypes.func.isRequired,
@@ -146,8 +162,10 @@ Content.propTypes = {
   rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectedItems: PropTypes.array,
+  selectAllItems: PropTypes.func,
   sort: PropTypes.object.isRequired,
   totalCount: PropTypes.number,
+  visibleItemsCount: PropTypes.number.isRequired,
 }
 
 export default Content

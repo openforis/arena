@@ -99,17 +99,6 @@ button:disabled,
   }
 }
 
-.btn-danger,
-.btn-primary.btn-danger {
-  color: white;
-  background-color: $red;
-  border-color: rgba($red, 0.5) !important;
-
-  &:hover {
-    background-color: rgba($red, 0.9) !important;
-  }
-}
-
 .btn-primary,
 .btn-secondary,
 .btn-cancel {
@@ -155,6 +144,11 @@ button:disabled,
   }
 }
 
+.node_def__icon {
+  font-size: small;
+  font-family: monospace;
+}
+
 .MuiTextField-root {
   background-color: $inputBackgroundColor;
 
@@ -174,17 +168,17 @@ button:disabled,
   text-transform: unset;
 
   &.btn-danger {
-    color: $white;
-    background-color: $red;
-    border-color: rgba($red, 0.5) !important;
+    color: $red;
+
+    &.btn-primary {
+      color: white;
+      background-color: $red;
+      border-color: rgba($red, 0.5) !important;
+    }
   }
 
   &.btn-s {
     padding: 0.5rem;
     font-size: 0.8rem;
   }
-}
-
-.full-width {
-  width: 100%;
 }

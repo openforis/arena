@@ -4,29 +4,28 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { isNotBlank } from '@core/stringUtils'
 
-export const parseQuery = (query, mode, canBeConstant) => {
+export const parseQuery = ({ query, mode, canBeConstant = false }) => {
   const exprQuery = Expression.fromString(query, mode)
-  const isCompound = Expression.isCompound(exprQuery)
-  const isBinary = Expression.isBinary(exprQuery)
-  const isSequence = Expression.isSequence(exprQuery)
-
-  const expr =
-    isBinary || isSequence
-      ? exprQuery
-      : Expression.newBinary({
-          left:
-            isCompound && canBeConstant ? Expression.newLiteral() : isCompound ? Expression.newIdentifier() : exprQuery,
-          right: Expression.newLiteral(),
-        })
-  return expr
+  if (
+    [Expression.types.BinaryExpression, Expression.types.SequenceExpression].includes(Expression.getType(exprQuery))
+  ) {
+    return exprQuery
+  }
+  return Expression.newBinaryEmpty({ canBeConstant, exprQuery })
 }
 
-export const isExprValid = (expr, canBeConstant) => {
+export const isExprValid = ({ expr, canBeConstant = false, canBeCall = false }) => {
   try {
-    const exprString = Expression.toString(expr)
-    const exprToValidate = canBeConstant && isNotBlank(exprString) ? Expression.fromString(exprString) : expr
-
-    return Expression.isValid(exprToValidate)
+    if (canBeConstant || canBeCall) {
+      // expr can be a binary expression with an empty operator and right operand;
+      // formatting and parsing it again allows to consider only the left operand in the evaluation
+      const exprString = Expression.toString(expr)
+      if (isNotBlank(exprString)) {
+        const exprToValidate = Expression.fromString(exprString)
+        return Expression.isValid(exprToValidate)
+      }
+    }
+    return Expression.isValid(expr)
   } catch (error) {
     return false
   }
@@ -45,12 +44,12 @@ export const getLiteralSearchParams = (survey, nodeDef, preferredLang) => {
           lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
         }
       : nodeDef && NodeDef.isTaxon(nodeDef)
-      ? {
-          surveyId,
-          type: NodeDef.nodeDefType.taxon,
-          taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
-        }
-      : null
+        ? {
+            surveyId,
+            type: NodeDef.nodeDefType.taxon,
+            taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
+          }
+        : null
 
   return literalSearchParams
 }

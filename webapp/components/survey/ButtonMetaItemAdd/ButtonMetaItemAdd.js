@@ -23,7 +23,7 @@ const actionsByType = {
 }
 
 const ButtonMetaItemAdd = (props) => {
-  const { id, onAdd, metaItemType } = props
+  const { id, onAdd, metaItemType, variant } = props
 
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
@@ -36,15 +36,16 @@ const ButtonMetaItemAdd = (props) => {
       dispatch(SurveyActions.metaUpdated())
       onAdd(item)
     }
-  }, [])
+  }, [dispatch, metaItemType, onAdd, surveyId])
 
-  return <ButtonAdd testId={id} onClick={add} className={`btn-add-${metaItemType}`} size="small" />
+  return <ButtonAdd testId={id} onClick={add} className={`btn-add-${metaItemType}`} size="small" variant={variant} />
 }
 
 ButtonMetaItemAdd.propTypes = {
   id: PropTypes.string,
   onAdd: PropTypes.func.isRequired,
   metaItemType: PropTypes.string.isRequired,
+  variant: PropTypes.string,
 }
 
 export default ButtonMetaItemAdd

@@ -5,11 +5,20 @@ import { RecordCycle } from '@core/record/recordCycle'
 import * as DateUtils from '@core/dateUtils'
 
 const generate = ({ survey, fileType, cycle, itemName = null, extension = 'csv', includeTimestamp = false }) => {
-  const surveyName = Survey.getName(survey)
-  const cyclePart = Objects.isEmpty(cycle) ? '' : `_${`(cycle-${RecordCycle.getLabel(cycle)})`}`
-  const itemNamePart = itemName ? `_${itemName}` : ''
-  const timestampPart = includeTimestamp ? `_${DateUtils.nowFormatDefault()}` : ''
-  return `${surveyName}${cyclePart}${itemNamePart}_${fileType}${timestampPart}.${extension}`
+  const parts = [Survey.getName(survey)]
+
+  if (Objects.isNotEmpty(cycle)) {
+    parts.push(`(cycle-${RecordCycle.getLabel(cycle)})`)
+  }
+  if (Objects.isNotEmpty(itemName)) {
+    parts.push(encodeURIComponent(itemName))
+  }
+  parts.push(fileType)
+
+  if (includeTimestamp) {
+    parts.push(DateUtils.nowFormatDefault())
+  }
+  return `${parts.join('_')}.${extension}`
 }
 
 export const ExportFileNameGenerator = {

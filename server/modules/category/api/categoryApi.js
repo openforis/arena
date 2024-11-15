@@ -292,6 +292,29 @@ export const init = (app) => {
     }
   )
 
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
+
+        const count = await CategoryService.countItemsByParentUuid({
+          surveyId,
+          categoryUuid,
+          parentUuid,
+          draft,
+          search,
+          lang,
+        })
+
+        res.json({ count })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
   // Fetch items by level uuid
   app.get(
     '/survey/:surveyId/categories/:categoryUuid/levels/:levelIndex/items',

@@ -23,6 +23,7 @@ const ExpressionsProp = (props) => {
     hideAdvanced = false,
     isBoolean = true,
     isContextParent = false,
+    info = null,
     label = '',
     mode = Expression.modes.json,
     multiple = true,
@@ -119,7 +120,7 @@ const ExpressionsProp = (props) => {
   )
 
   return (
-    <FormItem label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
+    <FormItem info={info} label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
       <div className="node-def-edit__expressions">
         {values.map((value, index) =>
           createExpressionProp({
@@ -128,7 +129,8 @@ const ExpressionsProp = (props) => {
             validation: Validation.getFieldValidation(index)(validation),
           })
         )}
-        {(multiple || R.isEmpty(values)) &&
+        {!readOnly &&
+          (multiple || R.isEmpty(values)) &&
           createExpressionProp({
             index: values.length,
             expression: NodeDefExpression.createExpressionPlaceholder(),
@@ -144,6 +146,7 @@ ExpressionsProp.propTypes = {
   canBeConstant: PropTypes.bool,
   excludeCurrentNodeDef: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
+  info: PropTypes.string,
   isBoolean: PropTypes.bool,
   isContextParent: PropTypes.bool,
   label: PropTypes.string,

@@ -1,12 +1,13 @@
 import './buttonBar.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { Query } from '@common/model/query'
 
+import { Switch } from '@webapp/components'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
@@ -20,7 +21,6 @@ import {
   DataExplorerState,
 } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
-import { useI18n } from '@webapp/store/system'
 
 import { DataQueryExportModal } from '../DataQueryExportModal'
 import { State, useButtonBar } from './store'
@@ -28,6 +28,28 @@ import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
 import ButtonManageQueries from './ButtonManageQueries'
 import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
+
+const { modes } = Query
+
+const modeButtonItems = [
+  {
+    key: modes.raw,
+    iconClassName: 'icon-file-text2',
+    label: 'dataView.dataQuery.mode.raw',
+  },
+  {
+    key: modes.aggregate,
+    iconClassName: 'icon-sigma',
+    label: 'dataView.dataQuery.mode.aggregate',
+  },
+]
+
+const uiModeByQueryMode = {
+  [modes.raw]: modes.raw,
+  // raw edit mode shown as "raw" in mode button group
+  [modes.rawEdit]: modes.raw,
+  [modes.aggregate]: modes.aggregate,
+}
 
 const ButtonBar = (props) => {
   const {
@@ -42,7 +64,6 @@ const ButtonBar = (props) => {
   } = props
 
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
   const displayType = DataExplorerSelectors.useDisplayType()
@@ -50,54 +71,43 @@ const ButtonBar = (props) => {
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const codesVisible = DataExplorerSelectors.useCodesVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
-
-  const modeEdit = Query.isModeRawEdit(query)
-  const hasSelection = Query.hasSelection(query)
   const { Actions, state } = useButtonBar()
 
+  const onEditCheckboxChange = useCallback(
+    (value) => {
+      const modeNext = value ? Query.modes.rawEdit : Query.modes.raw
+      onChangeQuery(Query.assocMode(modeNext)(query))
+    },
+    [onChangeQuery, query]
+  )
+  const selectedMode = uiModeByQueryMode[Query.getMode(query)]
+  const modeEdit = Query.isModeRawEdit(query)
+  const hasSelection = Query.hasSelection(query)
   const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
 
   return (
     <div className="data-query-button-bar">
-      <Button
-        className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
-        iconClassName="icon-tab icon-14px"
-        onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
-        title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
-        variant="outlined"
-      />
-
-      <FormItem className="mode-form-item" label={i18n.t('dataView.dataQuery.mode.label')}>
-        <ButtonGroup
-          disabled={appSaving || !nodeDefsSelectorVisible}
-          groupName="queryMode"
-          selectedItemKey={Query.getMode(query)}
-          onChange={(mode) => onChangeQuery(Query.assocMode(mode)(query))}
-          items={[
-            {
-              key: Query.modes.raw,
-              iconClassName: 'icon-file-text2',
-              label: 'dataView.dataQuery.mode.raw',
-            },
-            {
-              key: Query.modes.aggregate,
-              iconClassName: 'icon-sigma',
-              label: 'dataView.dataQuery.mode.aggregate',
-            },
-            ...(canEdit && hasSelection
-              ? [
-                  {
-                    key: Query.modes.rawEdit,
-                    iconClassName: 'icon-pencil2',
-                    label: 'dataView.dataQuery.mode.rawEdit',
-                    disabled: dataEmpty,
-                  },
-                ]
-              : []),
-          ]}
+      <div className="display-flex">
+        <Button
+          className={classNames('btn-toggle-node-defs-selector', 'btn-s', { highlight: nodeDefsSelectorVisible })}
+          iconClassName="icon-tab icon-14px"
+          onClick={() => dispatch(DataExplorerActions.setNodeDefsSelectorVisible(!nodeDefsSelectorVisible))}
+          title={nodeDefsSelectorVisible ? 'dataView.nodeDefsSelector.hide' : 'dataView.nodeDefsSelector.show'}
+          variant="outlined"
         />
-      </FormItem>
-
+        <FormItem className="mode-form-item" label="dataView.dataQuery.mode.label">
+          <ButtonGroup
+            disabled={appSaving || !nodeDefsSelectorVisible}
+            groupName="queryMode"
+            selectedItemKey={selectedMode}
+            onChange={(mode) => onChangeQuery(Query.assocMode(mode)(query))}
+            items={modeButtonItems}
+          />
+          {canEdit && hasSelection && selectedMode !== modes.aggregate && (
+            <Switch checked={modeEdit} disabled={dataEmpty} label="common.edit" onChange={onEditCheckboxChange} />
+          )}
+        </FormItem>
+      </div>
       {hasSelection && (
         <div>
           <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />

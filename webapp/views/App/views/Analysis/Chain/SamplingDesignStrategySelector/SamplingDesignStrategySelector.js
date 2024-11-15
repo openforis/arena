@@ -27,7 +27,7 @@ export const SamplingDesignStrategySelector = (props) => {
   const selectedItem = samplingStrategy ? samplingStrategyCodeToItem(samplingStrategy) : emptyItem
 
   return (
-    <FormItem label={i18n.t('chainView.samplingStrategyLabel')}>
+    <FormItem label="chainView.samplingStrategyLabel">
       <Dropdown
         items={items}
         selection={selectedItem}

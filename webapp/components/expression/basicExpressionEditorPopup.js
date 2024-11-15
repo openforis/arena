@@ -1,8 +1,9 @@
 import './expressionEditorPopup.scss'
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as R from 'ramda'
+import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
@@ -23,7 +24,7 @@ const BasicExpressionEditorPopup = (props) => {
   return (
     <>
       <div className="expression-editor__query-container">
-        <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
+        <div className={classNames('query', { invalid: !exprDraftValid })}>
           {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
         </div>
       </div>

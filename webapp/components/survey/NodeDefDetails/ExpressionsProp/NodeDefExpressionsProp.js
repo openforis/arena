@@ -18,6 +18,7 @@ const NodeDefExpressionsProp = (props) => {
     canBeConstant = false,
     excludeCurrentNodeDef = false,
     hideAdvanced = false,
+    info = null,
     isBoolean = true,
     isContextParent = false,
     label = '',
@@ -42,6 +43,7 @@ const NodeDefExpressionsProp = (props) => {
   return (
     <ExpressionsProp
       qualifier={qualifier}
+      info={info}
       label={label}
       readOnly={readOnly}
       applyIf={applyIf}
@@ -70,6 +72,7 @@ NodeDefExpressionsProp.propTypes = {
 
   nodeDefUuidContext: PropTypes.string,
   propName: PropTypes.string.isRequired,
+  info: PropTypes.string,
   label: PropTypes.string,
   mode: PropTypes.string,
 

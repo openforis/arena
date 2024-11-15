@@ -11,8 +11,8 @@ import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
-const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
-  const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
+  SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     {
       surveyId,
       cycle,
@@ -22,9 +22,6 @@ const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
     },
     client
   )
-  // build dependency graph if empty
-  return Survey.hasDependencyGraph(surveyDb) ? surveyDb : Survey.buildAndAssocDependencyGraph(surveyDb)
-}
 
 const _validateNodeDefs = async ({ survey, nodeDef, updatedNodeDefs, nodeDefsDependentByUuid }) => {
   const nodeDefsToValidateByUuid = {}

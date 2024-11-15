@@ -14,13 +14,13 @@ import { useSurveyId } from '@webapp/store/survey'
 
 import { validateUserEdit } from './validate'
 
-export const useOnSave = ({ userToUpdate, userToUpdateOriginal, setUserToUpdateOriginal }) => {
+export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserToUpdateOriginal = null }) => {
   const dispatch = useDispatch()
   const { hideSurveyGroup } = useQuery()
   const user = useUser()
   const surveyId = useSurveyId()
 
-  const saveUser = async () => {
+  const saveUser = useCallback(async () => {
     const editingSelf = User.isEqual(user)(userToUpdate)
     const userToUpdateUuid = User.getUuid(userToUpdate)
     const profilePicture = User.getProfilePicture(userToUpdate)
@@ -33,8 +33,9 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal, setUserToUpdateO
         [User.keys.uuid]: userToUpdateUuid,
         [User.keys.name]: User.getName(userToUpdate),
         [User.keys.email]: User.getEmail(userToUpdate),
-        [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
         [User.keys.props]: User.getProps(userToUpdate),
+        [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
+        [User.keys.authGroupExtraProps]: User.getAuthGroupExtraProps(userToUpdate),
       }
 
       formData.append('user', A.stringify(userData))
@@ -60,17 +61,17 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal, setUserToUpdateO
           params: { name: User.getName(userToUpdate) },
         })
       )
-      setUserToUpdateOriginal(userToUpdate)
+      setUserToUpdateOriginal?.(userToUpdate)
     } finally {
       dispatch(LoaderActions.hideLoader())
     }
-  }
+  }, [dispatch, hideSurveyGroup, setUserToUpdateOriginal, surveyId, user, userToUpdate])
 
   return useCallback(async () => {
     const userUpdatedValidated = await validateUserEdit(userToUpdate)
 
     if (Validation.isObjValid(userUpdatedValidated)) {
-      if (User.isSystemAdmin(userToUpdate) && !User.isSystemAdmin(userToUpdateOriginal)) {
+      if (userToUpdateOriginal && User.isSystemAdmin(userToUpdate) && !User.isSystemAdmin(userToUpdateOriginal)) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'usersView.confirmUserWillBeSystemAdmin',
@@ -81,5 +82,5 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal, setUserToUpdateO
         await saveUser()
       }
     }
-  }, [userToUpdate, userToUpdateOriginal])
+  }, [dispatch, saveUser, userToUpdate, userToUpdateOriginal])
 }

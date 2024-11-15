@@ -72,7 +72,6 @@ export const TestId = {
     },
   },
   expressionEditor: {
-    advancedQuery: 'expression-advanced-query',
     applyBtn: 'expression-apply-btn',
     editBtn: (id) => `${id}-edit-btn`,
     literalDropdown: 'expression-literal-dropdown',

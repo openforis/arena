@@ -5,7 +5,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 import Checkbox from '@webapp/components/form/checkbox'
 import { FormItem } from '@webapp/components/form/Input'
@@ -15,15 +14,13 @@ const AreaBasedEstimated = (props) => {
 
   const survey = useSurvey()
 
-  const i18n = useI18n()
-
   const [hasAreaBasedEstimateNodeDef, setHasAreaBasedEstimateNodeDef] = useState(
     !!Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
   )
 
   if (NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef)) {
     return (
-      <FormItem label={i18n.t('nodeDefEdit.advancedProps.areaBasedEstimate')} className="">
+      <FormItem label="nodeDefEdit.advancedProps.areaBasedEstimate">
         <Checkbox
           checked={hasAreaBasedEstimateNodeDef}
           onChange={(value) => {

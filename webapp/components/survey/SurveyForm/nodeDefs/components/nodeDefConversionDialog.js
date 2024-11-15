@@ -32,7 +32,9 @@ export const NodeDefConversionDialog = (props) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
 
-  const availableToTypes = Object.values(NodeDef.nodeDefType).filter((type) => type != NodeDef.getType(nodeDef))
+  const availableToTypes = Object.values(NodeDef.nodeDefType).filter(
+    (type) => ![NodeDef.nodeDefType.entity, NodeDef.getType(nodeDef)].includes(type)
+  )
   const confirmButtonDisabled = !selectedToType
 
   return (
@@ -44,8 +46,8 @@ export const NodeDefConversionDialog = (props) => {
       titleParams={{ nodeDefName }}
     >
       <ModalBody>
-        <FormItem label={i18n.t('nodeDefEdit.conversion.fromType')}>{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
-        <FormItem label={i18n.t('nodeDefEdit.conversion.toType')}>
+        <FormItem label="nodeDefEdit.conversion.fromType">{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
+        <FormItem label="nodeDefEdit.conversion.toType">
           <Dropdown
             className="to-type-dropdown"
             items={availableToTypes}

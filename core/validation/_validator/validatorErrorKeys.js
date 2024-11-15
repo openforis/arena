@@ -70,8 +70,10 @@ export const ValidatorErrorKeys = {
   },
 
   extraPropEdit: {
-    nameInvalid: 'validationErrors.extraPropEdit.nameInvalid',
     dataTypeRequired: 'validationErrors.extraPropEdit.dataTypeRequired',
+    nameInvalid: 'validationErrors.extraPropEdit.nameInvalid',
+    nameRequired: 'validationErrors.extraPropEdit.nameRequired',
+    valueRequired: 'validationErrors.extraPropEdit.valueRequired',
   },
   nodeDefEdit: {
     analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',

@@ -416,7 +416,7 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
           const keyValuesFormatted = ancestorKeyDefs.map((keyDef, index) => {
             const keyValue = ancestorKeyValues[index]
             const keyValueFormatted = NodeValueFormatter.format({ survey, nodeDef: keyDef, value: keyValue })
-            return keyValueFormatted
+            return encodeURIComponent(keyValueFormatted)
           })
           fileNameParts.unshift(keyValuesFormatted.join('_'))
         }

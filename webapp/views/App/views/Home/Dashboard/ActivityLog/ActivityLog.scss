@@ -74,23 +74,3 @@
     color: $blueDark;
   }
 }
-
-.btn-expand {
-  position: absolute;
-  right: 4px;
-  top: 4px;
-  border: none;
-  background-color: transparent;
-  text-align: left;
-  color: $white;
-
-  &:hover {
-    color: $orange;
-    background-color: transparent;
-  }
-
-  &.active {
-    font-weight: bold;
-    background-color: transparent;
-  }
-}

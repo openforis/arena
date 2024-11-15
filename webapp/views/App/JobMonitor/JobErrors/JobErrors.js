@@ -4,15 +4,15 @@ import PropTypes from 'prop-types'
 import * as JobSerialized from '@common/job/jobSerialized'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
+import { ExpansionPanel } from '@webapp/components'
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { DataGrid } from '@webapp/components/DataGrid'
-import { useSurvey } from '@webapp/store/survey'
-import { ExpansionPanel } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
-const validationWrapper = (fields) => ({
+const toValidation = (fields) => ({
   valid: false,
   fields,
 })
@@ -49,23 +49,17 @@ const JobErrors = ({
             field: 'error',
             flex: 0.6,
             headerName: i18n.t('common.error', { count: errorsCount }),
-            renderCell: ({ value }) => (
-              <ValidationFieldMessages validation={validationWrapper(value)} showKeys={false} />
-            ),
-            valueFormatter: ({ value }) => {
-              const jointMessages = ValidationUtils.getJointMessages({ i18n, survey, showKeys: false })(
-                validationWrapper(value)
-              )
+            renderCell: ({ value }) => <ValidationFieldMessages validation={toValidation(value)} showKeys={false} />,
+            valueFormatter: (value) => {
+              const validation = toValidation(value)
+              const jointMessages = ValidationUtils.getJointMessages({ i18n, survey, showKeys: false })(validation)
               return jointMessages.map(({ text }) => text).join(', ')
             },
           },
         ]}
         density="compact"
         exportFileName={exportFileName}
-        rows={Object.entries(errors).map(([errorKey, error]) => ({
-          errorKey,
-          error,
-        }))}
+        rows={Object.entries(errors).map(([errorKey, error]) => ({ errorKey, error }))}
         getRowId={(row) => row.errorKey}
       />
     </ExpansionPanel>

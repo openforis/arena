@@ -186,7 +186,7 @@ export class CsvDataExportModel {
 
   _extractAttributeDefsColumns(nodeDefContext) {
     const { cycle, options } = this
-    const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = options
+    const { includeAnalysis, includeFileAttributeDefs, includeFiles, includeReadOnlyAttributes } = options
 
     let descendantDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities({
@@ -199,7 +199,7 @@ export class CsvDataExportModel {
 
     descendantDefs = descendantDefs.filter(
       (nodeDef) =>
-        (includeFiles || !NodeDef.isFile(nodeDef)) &&
+        (includeFileAttributeDefs || includeFiles || !NodeDef.isFile(nodeDef)) &&
         (includeReadOnlyAttributes || !NodeDef.isReadOnly(nodeDef) || NodeDef.isKey(nodeDef))
     )
 

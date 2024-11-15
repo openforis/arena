@@ -42,7 +42,7 @@ const ValidationReport = () => {
         headerProps={{ restParams }}
         module="validationReport"
         restParams={restParams}
-        gridTemplateColumns="70px 1fr 2fr 50px"
+        gridTemplateColumns="50px 1fr 2fr 50px"
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
         onRowClick={onRowClick}

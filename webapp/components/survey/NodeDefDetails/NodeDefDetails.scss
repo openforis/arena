@@ -1,13 +1,17 @@
 @import 'webapp/style/vars';
 
 .node-def-edit {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 100%;
-  top: 0px;
-  left: 0px;
-  z-index: $zIndex10TopOfApp;
   background-color: white;
+
+  &.full-screen {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: $zIndex10TopOfApp;
+  }
 
   .form_row,
   .form-item_body {

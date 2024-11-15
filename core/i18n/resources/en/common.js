@@ -35,7 +35,8 @@ Do you want to ignore them?`,
     collapse: 'Collapse',
     convert: 'Convert',
     copy: 'Copy',
-    createdWithApp: `Created with {{app}}`,
+    createdWith: 'Created with',
+    createdWithApp: `t(common.createdWith) {{app}}`,
     csvExport: 'CSV Export',
     csvImport: 'CSV Import',
     cycle: 'Cycle',
@@ -82,6 +83,7 @@ Please check also the Spam/Junk mail folder.`,
     formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
+    function: 'Function',
     goToHomePage: 'Go to Home Page',
     group: 'Group',
     help: 'Help',
@@ -159,6 +161,7 @@ Do you want to proceed?`,
     samplingPolygon: 'Sampling Polygon',
     show: 'Show',
     select: 'Select',
+    selectOne: 'Select one...',
     selectAll: 'Select all',
     selected: 'Selected',
     showLabels: 'Show labels',
@@ -174,6 +177,7 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
+    value: 'Value',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     view: 'View',
     warning: 'Warning',
@@ -223,6 +227,12 @@ Do you want to proceed?`,
     pageNotFound: 'Page not found',
   },
 
+  geo: {
+    area: 'Area',
+    vertices: 'Vertices',
+    perimeter: 'Perimeter',
+  },
+
   files: {
     header: 'Files',
     missing: ' Missing files: {{count}}',
@@ -246,6 +256,7 @@ Do you want to proceed?`,
     boolean: 'Boolean',
     code: 'Code',
     coordinate: 'Coordinate',
+    geo: 'Geospatial',
     taxon: 'Taxon',
     file: 'File',
     entity: 'Entity',
@@ -383,8 +394,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activityLog: {
         title: 'Activity log',
       },
-      exportWithData: 'Export with data',
-      exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
+      exportWithData: 'Export + data (Backup)',
+      exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   
@@ -431,6 +442,11 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      basic: 'Basic info',
+      configuration: {
+        title: 'Configuration',
+        filesTotalSpace: 'Files total space (GB)',
+      },
       confirmDeleteCycleHeader: 'Delete this cycle?',
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
@@ -440,6 +456,7 @@ If there are records associated to this cycle, they will be deleted.`,
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
+      sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',
       unpublishSurveyDialog: {
@@ -448,6 +465,12 @@ If there are records associated to this cycle, they will be deleted.`,
   
   $t(common.cantUndoWarning)`,
         confirmName: 'Enter this survey’s name to confirm:',
+      },
+      userExtraProps: {
+        title: 'User extra properties',
+        info: `Extra properties that can be assigned to each user associated to the survey.  
+Those properties can be used in default values, validation rules and applicability expressions.  
+E.g.: *userProp('property_name') == 'some_value'*`,
       },
     },
     deleteSurveyDialog: {
@@ -460,29 +483,6 @@ $t(common.cantUndoWarning)`,
     surveyList: {
       active: '$t(common.active)',
       activate: 'Activate',
-    },
-    surveyCreate: {
-      createSurvey: 'Create Survey',
-      createTemplate: 'Create Template',
-      newSurvey: 'New Survey',
-      newSurveyFromScratch: 'New Survey From Scratch',
-      newTemplate: 'New Template',
-      newTemplateFromScratch: 'New Template From Scratch',
-      source: {
-        label: 'Source',
-        arena: 'Arena (.zip)',
-        collect: 'Collect (.collect, .collect-backup, .collect-data)',
-      },
-      startImport: 'Start import',
-      survey: 'Survey',
-      survey_other: 'Surveys',
-      template: 'Template',
-      template_other: 'Templates',
-      error: 'Error creating new survey',
-      errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
-      options: {
-        includeData: 'Include data',
-      },
     },
     collectImportReport: {
       excludeResolvedItems: 'Exclude resolved items',
@@ -541,7 +541,10 @@ $t(common.cantUndoWarning)`,
       includeAncestorAttributes: 'Include ancestor attributes',
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',
+      includeDateCreated: 'Include creation date',
       includeFiles: 'Include files',
+      includeFileAttributeDefs: 'Include file attribute columns',
+      includeInternalUuids: 'Include internal UUIDs',
       recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {
@@ -799,8 +802,9 @@ Merge cannot be performed.`,
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    altitude: 'Altitude (m)',
     earthMap: 'Earth Map',
+    elevation: 'Elevation (m)',
+    location: 'Location',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
     options: {
@@ -814,7 +818,6 @@ Merge cannot be performed.`,
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
       title: 'Sampling Point Item',
-      location: 'Location',
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
@@ -853,8 +856,11 @@ Merge cannot be performed.`,
 
   surveysView: {
     chains: 'Chains',
+    confirmUpdateSurveyOwner: `Change the owner of the survey "{{surveyName}}" into "{{ownerName}}"?`,
     cycles: 'Cycles',
     datePublished: 'Date published',
+    editUserExtraProps: 'Edit user extra properties',
+    editUserExtraPropsForSurvey: 'Edit user extra properties for survey "{{surveyName}}"',
     filter: 'Filter',
     filterPlaceholder: 'Filter by name, label or owner',
     languages: 'Languages',
@@ -887,6 +893,13 @@ you can copy the invitation link to the clipboard and share it with him in other
     
 Copy the invitation link to the clipboard?`,
     invitationLinkCopiedToClipboard: 'Invitation link copied to your clipboard',
+    surveyExtraProp: {
+      label: 'Survey extra property',
+      label_other: 'Survey extra properties',
+    },
+    surveysDraft: 'Surveys (draft)',
+    surveysPublished: 'Surveys (published)',
+    editSurveyUserExtraPropsForUser: 'Edit survey user extra properties for user "{{userName}}"',
   },
 
   usersAccessRequestView: {
@@ -1153,8 +1166,8 @@ $t(common.cantUndoWarning)`,
     invalid: 'Invalid expression: {{details}}',
     missingFunctionParameters: 'Missing function parameters',
     undefinedFunction: 'Undefined function: {{name}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
   },
 
   // ====== Help views
@@ -1184,6 +1197,7 @@ $t(common.appNameFull)
     advanced: 'Advanced',
     validations: 'Validations',
     function: 'Function',
+    editingFunction: 'Editing function {{functionName}}',
     editorHelp: {
       json: 'Valid expressions are a subset of Javascript.',
       sql: 'Only valid SQL expressions are allowed.',
@@ -1197,23 +1211,35 @@ $t(common.appNameFull)
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
+      isNotEmpty: 'Returns true if the argument has some value specified',
       last: 'Returns the last value or node of the specified multiple attribute or entity',
-      ln: 'Take the natural logarithm of x',
-      log10: 'Take the base 10 logarithm of x',
-      max: 'Take the maximum of the arguments',
-      min: 'Take the minimum of the arguments',
+      ln: 'Returns the natural logarithm of X',
+      log10: 'Returns the base 10 logarithm of X',
+      max: 'Returns the maximum of the arguments',
+      min: 'Returns the minimum of the arguments',
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
-      pow: 'Raise a number X to the power P',
+      pow: 'Returns the value of a base raised to a power',
+      rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+      userEmail: 'Returns the email of the logged in user',
+      userName: 'Returns the name of the logged in user',
+      userProp: 'Returns the value of the specified $t(extraProp.label) of the logged in user',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
     },
+    functionName: {
+      rowIndex: 'Row index',
+    },
     basicProps: {
       analysis: 'Analysis',
+      autoIncrementalKey: {
+        label: 'Auto incremental',
+        info: 'Value will be automatically generated',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
@@ -1238,6 +1264,7 @@ $t(common.appNameFull)
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
       hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
@@ -1335,6 +1362,16 @@ E.g. this.region = region_attribute_name
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
     nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
+    filterVariable: 'Variable to filter items',
+    filterVariableForLevel: 'Variable for {{levelName}}',
+    unique: {
+      label: 'Unique',
+      info: `When an attribute is marked as **Unique**, its value must be unique inside the closest multiple entity (an error will be shown otherwise).  
+
+---
+
+E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tree_species* marked as **Unique**, you can have only one tree per species inside the same *plot*.`,
+    },
   },
 
   languagesEditor: {
@@ -1351,6 +1388,7 @@ E.g. this.region = region_attribute_name
       coordinate: 'Coordinate',
       date: 'Date',
       decimal: 'Decimal',
+      geo: 'Geospatial',
       entity: 'Table or form',
       file: 'File',
       integer: 'Integer',
@@ -1419,6 +1457,11 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       altitude: 'Altitude',
       altitudeAccuracy: 'Altitude accuracy',
     },
+    nodeDefGeo: {
+      confirmDelete: 'Delete this Geospatial value?',
+      geoJSON: 'GeoJSON',
+      invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
+    },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
       confirmDelete: 'Are you sure you want to delete this entity?',
@@ -1435,6 +1478,10 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       errorLoadingPreview: 'Error loading preview',
       fileUuid: 'File uuid',
       fileName: 'File name',
+    },
+    nodeDefsTreeSelectMode: {
+      allNodeDefs: 'All nodes',
+      onlyPages: 'Only pages',
     },
     step: {
       entry: 'Entry',
@@ -1531,6 +1578,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   extraProp: {
     label: 'Extra property',
     label_plural: 'Extra properties',
+    addExtraProp: 'Add extra property',
     dataTypes: {
       geometryPoint: 'Geometry Point',
       number: 'Number',
@@ -1549,6 +1597,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
       },
     },
+    name: 'Property {{position}} name',
+    value: 'Value',
   },
 
   // ===== All validation errors
@@ -1636,6 +1686,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
     },
 
+    extraPropEdit: {
+      nameInvalid: 'Invalid name',
+      nameRequired: 'Name required',
+      dataTypeRequired: 'Data type required',
+      valueRequired: 'Value required',
+    },
+
     nodeDefEdit: {
       analysisParentEntityRequired: 'Entity is required',
       applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
@@ -1668,7 +1725,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
       entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
-      missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
+      missingAncestorForEntity: 'Cannot find "{{ancestorName}}" with these keys: {{keyValues}}',
       oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
@@ -1797,9 +1854,16 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
+    call: 'Function',
+    operator: 'Operator',
+
+    error: {
+      selectOneVariable: 'Please select one variable',
+    },
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
+      editingFunctionForNodeDefinition: 'Editing function "{{functionName}}" for "{{nodeDef}}"',
     },
 
     qualifier: {
@@ -1809,6 +1873,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
     },
+
+    selectAFunction: 'Select a function',
   },
 
   // ====== Auth
@@ -1917,7 +1983,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              $t(emails.signature)`,
     },
     userDeleted: {
-      subject: `You have been deleted from the survey {{surveyLabel}} in $t(common.appNameFull)`,
+      subject: `You have been removed from the survey {{surveyLabel}} in $t(common.appNameFull)`,
       body: `<p>Hello {{name}},</p>
       <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
       <p>If you want to have access again to that survey, please contact the survey administrator.</p>

@@ -1,10 +1,4 @@
-@import '~codemirror/lib/codemirror.css';
-@import '~codemirror/addon/hint/show-hint';
 @import 'webapp/style/vars';
-
-.CodeMirror-hints {
-  z-index: $zIndex20Dropdown;
-}
 
 .expression-editor-popup {
   display: flex;
@@ -77,6 +71,7 @@
   //types
   .binary {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 1rem;
@@ -88,8 +83,14 @@
 
       .identifier,
       .dropdown-literal {
-        width: 100%;
-        max-width: 40rem;
+        flex: 1;
+        min-width: 10rem;
+        max-width: 20rem;
+      }
+      .call {
+        .identifier {
+          width: 20rem;
+        }
       }
     }
 
@@ -113,10 +114,13 @@
       text-wrap: nowrap;
 
       &.btn-switch-operand-const {
-        width: 12rem;
+        width: 7rem;
       }
       &.btn-switch-operand-var {
-        width: 7rem;
+        width: 5rem;
+      }
+      &.btn-switch-operand-call {
+        width: 5rem;
       }
     }
 
@@ -130,8 +134,9 @@
   }
 
   .literal {
-    width: 100%;
-    max-width: 40rem;
+    flex: 1;
+    min-width: 10rem;
+    max-width: 20rem;
 
     .form-input {
       margin-left: 0.5rem;
@@ -167,5 +172,20 @@
   > button {
     margin: 0px 0.3rem;
     font-weight: 600;
+  }
+}
+
+.cm-tooltip-autocomplete {
+  .cm-completionDetail {
+    margin-left: 2rem;
+    text-wrap: wrap;
+    white-space: pre-wrap;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .cm-completion-option.function {
+    .cm-completionLabel {
+      font-weight: bold;
+    }
   }
 }

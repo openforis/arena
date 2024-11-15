@@ -63,7 +63,7 @@ const LevelDetails = (props) => {
             )}
           </div>
 
-          <FormItem label={i18n.t('common.name')}>
+          <FormItem label="common.name">
             <Input
               id={TestId.categoryDetails.levelName(levelIndex)}
               value={CategoryLevel.getName(level)}

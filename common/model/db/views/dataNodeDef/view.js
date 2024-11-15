@@ -3,7 +3,8 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
 import * as Expression from '../../../../../core/expressionParser/expression'
 
-import TableDataNodeDef, { ColumnNodeDef } from '../../tables/dataNodeDef'
+import TableDataNodeDef from '../../tables/dataNodeDef'
+import ColumnNodeDef from '../../tables/dataNodeDef/columnNodeDef'
 
 const columnSet = {
   dateCreated: TableDataNodeDef.columnSetCommon.dateCreated,
@@ -46,6 +47,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get columnUuid() {
     return this.columnNodeDefUuid.nameFull
+  }
+
+  get columnUuidName() {
+    return this.columnNodeDefUuid.name
   }
 
   get columnIdName() {
@@ -116,6 +121,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get columnNodeDefNamesFull() {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
+  }
+
+  get columnParentUuidName() {
+    return this.viewDataParent?.columnUuidName
   }
 
   get tableData() {

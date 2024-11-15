@@ -13,27 +13,25 @@ export const transformCallback = (row) => {
 }
 
 /**
- * Count the processing chains by the given survey id and the optional survey cycle.
+ * Count the processing chains by the given survey id.
  *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
- * @param {string} [params.cycle=null] - The survey cycle.
  * @param {BaseProtocol} [client=db] - The database client.
  *
  * @returns {Promise<number>} - The result promise.
  */
 export const countChains = async (params, client = DB.client) => {
-  const { surveyId, cycle = null } = params
+  const { surveyId } = params
   const tableChain = new TableChain(surveyId)
-  return client.one(`${tableChain.getSelect({ surveyId, cycle, count: true })}`, [], (row) => Number(row.count))
+  return client.one(`${tableChain.getSelect({ surveyId, count: true })}`, [], (row) => Number(row.count))
 }
 
 /**
- * Fetches all processing chains by the given survey id and the optional survey cycle.
+ * Fetches all processing chains by the given survey id.
  *
  * @param {!object} params - The query parameters.
  * @param {!string} params.surveyId - The survey id.
- * @param {string} [params.cycle=null] - The survey cycle.
  * @param {number} [params.offset=0] - The select query offset.
  * @param {number} [params.limit=null] - The select query limit.
  * @param {boolean} [params.includeScript=false] - Whether to include the R scripts.
@@ -42,12 +40,12 @@ export const countChains = async (params, client = DB.client) => {
  * @returns {Promise<any[]>} - The result promise.
  */
 export const fetchChains = async (params, client = DB.client) => {
-  const { surveyId, cycle = null, offset = 0, limit = null, includeScript = false } = params
+  const { surveyId, offset = 0, limit = null, includeScript = false } = params
 
   const tableChain = new TableChain(surveyId)
 
   return client.map(
-    `${tableChain.getSelect({ surveyId, cycle, includeScript })}
+    `${tableChain.getSelect({ surveyId, includeScript })}
     ORDER BY ${tableChain.columnDateCreated} DESC
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,

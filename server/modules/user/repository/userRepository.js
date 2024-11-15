@@ -82,14 +82,14 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     `
     SELECT count(*)
     FROM "user" u
-    JOIN survey s
-    ON s.id = $1
-    JOIN auth_group_user gu
-    ON gu.user_uuid = u.uuid
-    JOIN auth_group g
-    ON g.uuid = gu.group_uuid
-    AND g.survey_uuid = s.uuid 
-    AND g.name <> '${AuthGroup.groupNames.systemAdmin}'`,
+      JOIN survey s
+        ON s.id = $1
+      JOIN auth_group_user gu
+        ON gu.user_uuid = u.uuid
+      JOIN auth_group g
+        ON g.uuid = gu.group_uuid
+        AND g.survey_uuid = s.uuid 
+        AND g.name <> '${AuthGroup.groupNames.systemAdmin}'`,
     [surveyId, countSystemAdmins],
     (row) => Number(row.count)
   )
@@ -121,16 +121,19 @@ const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
   `
 
 const _usersSelectQuery = ({
+  onlyAccepted = false,
   selectFields,
   sortBy = userSortBy.email,
   sortOrder = DbOrder.asc,
   includeSurveys = false,
-  whereConditions = [],
 }) => {
   // check sort by parameters
   const orderBy = orderByFieldBySortBy[sortBy] ?? 'email'
   const orderByDirection = DbOrder.normalize(sortOrder)
-
+  const whereConditions = []
+  if (onlyAccepted) {
+    whereConditions.push(`u.status = '${User.userStatus.ACCEPTED}'`)
+  }
   const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
 
   return `${getUsersSelectQueryPrefix({ includeSurveys })}
@@ -151,7 +154,19 @@ const _usersSelectQuery = ({
         SELECT uar.props ->> '${UserAccessRequest.keysProps.country}'
         FROM user_access_request uar
         WHERE uar.email = u.email
-      ) AS country
+      ) AS country,
+      (
+        SELECT COUNT(*) 
+        FROM survey s
+        WHERE s.owner_uuid = u.uuid
+          AND s.published
+      ) AS surveys_count_published,
+      (
+        SELECT COUNT(*) 
+        FROM survey s
+        WHERE s.owner_uuid = u.uuid
+          AND NOT s.published
+      ) AS surveys_count_draft
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
@@ -160,9 +175,12 @@ const _usersSelectQuery = ({
     ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
 
-export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
+export const fetchUsers = async (
+  { offset = 0, onlyAccepted = false, limit = null, sortBy = 'email', sortOrder = 'ASC' },
+  client = db
+) =>
   client.map(
-    `${_usersSelectQuery({ selectFields, sortBy, sortOrder })}
+    `${_usersSelectQuery({ onlyAccepted, selectFields, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [],

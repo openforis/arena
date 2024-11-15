@@ -210,7 +210,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
       languages: ['en'],
     })
 
-    const survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
+    let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
 
     // 3) find group to associate to the user
     let group = null
@@ -222,16 +222,23 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
     }
 
     // 4) invite user to that group and send email
-    const { userInvited } = await UserInviteService.inviteUsers(
+    const surveyId = Survey.getId(survey)
+    const { invitedUsers } = await UserInviteService.inviteUsers(
       {
         user,
-        surveyId: Survey.getId(survey),
+        surveyId,
         surveyCycleKey: Survey.cycleOneKey,
         invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
         serverUrl,
       },
       t
     )
+    const userInvited = invitedUsers[0]
+    const surveyOwnerUuid = User.getUuid(userInvited)
+
+    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
+    survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
+
     return { survey, userInvited }
   })
 

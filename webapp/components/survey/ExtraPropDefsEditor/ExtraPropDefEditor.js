@@ -8,12 +8,12 @@ import * as Validation from '@core/validation/validation'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Dropdown } from '@webapp/components/form'
-import { ButtonCancel, ButtonDelete, ButtonIconEdit, ButtonSave } from '@webapp/components'
+import { ItemEditButtonBar } from '@webapp/components/ItemEditButtonBar'
 
 import { useExtraPropDefEditor } from './useExtraPropDefEditor'
 
 export const ExtraPropDefEditor = (props) => {
-  const { index, readOnly = false, onItemDelete } = props
+  const { availableDataTypes = Object.keys(ExtraPropDef.dataTypes), index, readOnly = false, onItemDelete } = props
   const {
     dirty,
     editing,
@@ -42,7 +42,7 @@ export const ExtraPropDefEditor = (props) => {
       />
       <Dropdown
         clearable={false}
-        items={Object.keys(ExtraPropDef.dataTypes)}
+        items={availableDataTypes}
         itemValue={A.identity}
         itemLabel={(item) => i18n.t(`extraProp.dataTypes.${item}`)}
         readOnly={readOnly || !editing}
@@ -53,28 +53,22 @@ export const ExtraPropDefEditor = (props) => {
         }
         validation={Validation.getFieldValidation(ExtraPropDef.keys.dataType)(validation)}
       />
-      {!editing && !readOnly && (
-        <>
-          <ButtonIconEdit disabled={readOnly} showLabel={false} onClick={onEditClick} />
-          <ButtonDelete disabled={readOnly} showLabel={false} onClick={() => onItemDelete({ index })} />
-        </>
-      )}
-      {editing && (
-        <>
-          <ButtonSave
-            className="btn-save"
-            showLabel={false}
-            disabled={Validation.isNotValid(validation) || !dirty}
-            onClick={onSaveClick}
-          />
-          <ButtonCancel showLabel={false} onClick={onCancelClick} />
-        </>
-      )}
+      <ItemEditButtonBar
+        dirty={dirty}
+        editing={editing}
+        onCancel={onCancelClick}
+        onDelete={() => onItemDelete({ index })}
+        onEdit={onEditClick}
+        onSave={onSaveClick}
+        readOnly={readOnly}
+        validation={validation}
+      />
     </FormItem>
   )
 }
 
 ExtraPropDefEditor.propTypes = {
+  availableDataTypes: PropTypes.array,
   index: PropTypes.number.isRequired,
   readOnly: PropTypes.bool,
   onItemDelete: PropTypes.func.isRequired,

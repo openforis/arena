@@ -13,7 +13,6 @@ import Dropdown from '@webapp/components/form/Dropdown'
 
 const NodeDefCodeDropdown = (props) => {
   const {
-    autocomplete = false,
     canEditRecord = false,
     edit = false,
     entryDataQuery = false,
@@ -28,6 +27,7 @@ const NodeDefCodeDropdown = (props) => {
 
   const i18n = useI18n()
 
+  const autocomplete = typeof items === 'function'
   const entryDisabled = edit || !canEditRecord || readOnly
 
   const disabled = R.isEmpty(items)
@@ -70,7 +70,6 @@ const NodeDefCodeDropdown = (props) => {
 }
 
 NodeDefCodeDropdown.propTypes = {
-  autocomplete: PropTypes.bool,
   canEditRecord: PropTypes.bool,
   edit: PropTypes.bool,
   entryDataQuery: PropTypes.bool,

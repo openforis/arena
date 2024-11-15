@@ -265,6 +265,15 @@ export const fetchDependencies = async (surveyId, client = db) =>
     R.prop('dependencies')
   )
 
+export const fetchFilesTotalSpace = async (surveyId, client = db) =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.filesTotalSpace}}' AS value
+     FROM survey 
+     WHERE id = $1`,
+    [surveyId],
+    R.prop('value')
+  )
+
 export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
   client.map(
     `SELECT id 
@@ -292,6 +301,14 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
     (def) => DB.transformCallback(def, true)
   )
 }
+
+export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
+  client.none(
+    `UPDATE survey 
+    SET owner_uuid = $/ownerUuid/
+    WHERE id = $/surveyId/`,
+    { surveyId, ownerUuid }
+  )
 
 export const publishSurveyProps = async (surveyId, client = db) =>
   client.none(
@@ -353,6 +370,17 @@ export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
     `,
     [surveyId]
   )
+
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) =>
+  client.none(
+    `UPDATE survey
+    SET config = jsonb_set(coalesce(config, '{}'), '{${key}}', $/value/)
+    WHERE id = $/surveyId/`,
+    { surveyId, value }
+  )
+
+export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
+  client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
 
 // ============== DELETE
 export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])

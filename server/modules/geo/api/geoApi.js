@@ -14,8 +14,8 @@ import { PlanetApi } from './planetApi'
 const uriPrefix = '/survey/:surveyId/geo/'
 const whispApiUrl = 'https://whisp.openforis.org/api/'
 
-// free altitude API urls
-const altitudeApiUrls = [
+// free elevation API urls
+const elevationApiUrls = [
   ({ lat, lng }) => `https://api.opentopodata.org/v1/aster30m?locations=${lat},${lng}`,
   ({ lat, lng }) => `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
 ]
@@ -78,20 +78,20 @@ export const init = (app) => {
     }
   )
 
-  app.get(`${uriPrefix}map/altitude`, AuthMiddleware.requireMapUsePermission, async (req, res) => {
+  app.get(`${uriPrefix}map/elevation`, AuthMiddleware.requireMapUsePermission, async (req, res) => {
     const { lat, lng } = Request.getParams(req)
-    let altitude = null
-    await Promises.each(altitudeApiUrls, async (urlPattern) => {
-      if (!Objects.isEmpty(altitude)) return
+    let elevation = null
+    await Promises.each(elevationApiUrls, async (urlPattern) => {
+      if (!Objects.isEmpty(elevation)) return
       try {
         const url = urlPattern({ lat, lng })
         const { data } = await axios.get(url, { timeout: 10000 })
-        altitude = data?.results?.[0]?.elevation
+        elevation = data?.results?.[0]?.elevation
       } catch (error) {
         // ignore it
       }
     })
-    res.json(altitude)
+    res.json(elevation)
   })
 
   app.get(`${uriPrefix}map/wmts/capabilities`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {

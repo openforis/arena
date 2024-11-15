@@ -17,3 +17,12 @@
     color: $red;
   }
 }
+
+.panel-right.survey-user-extra-props {
+  .form {
+    row-gap: 1rem;
+  }
+  .btn-save {
+    justify-self: center;
+  }
+}

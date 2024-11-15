@@ -8,17 +8,16 @@ import { Surveys } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
-import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
 const NodeDefCode = (props) => {
   const {
@@ -40,10 +39,6 @@ const NodeDefCode = (props) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const draft = Survey.isDraft(surveyInfo)
 
-  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-  const itemsCount = Category.getItemsCount(category)
-  const autocomplete = itemsCount > Category.maxCategoryItemsInIndex
-
   const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
@@ -51,6 +46,7 @@ const NodeDefCode = (props) => {
 
   const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
   const [selectedItems, setSelectedItems] = useState([])
+  const autocomplete = typeof items === 'function'
 
   // On items or nodes change, update selectedItems
   useEffect(() => {
@@ -101,7 +97,6 @@ const NodeDefCode = (props) => {
       entryDataQuery={entryDataQuery}
       itemLabelFunction={itemLabelFunction}
       items={items}
-      autocomplete={autocomplete}
       nodeDef={nodeDef}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}

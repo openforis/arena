@@ -7,6 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 import Dropdown from '../../form/Dropdown'
 import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
+import { useI18n } from '@webapp/store/system'
 
 const Binary = (props) => {
   const {
@@ -21,9 +22,14 @@ const Binary = (props) => {
     variables = null,
   } = props
 
-  const isLeftLiteral = R.pipe(R.prop(BinaryOperandType.left), Expression.isLiteral)(node)
+  const i18n = useI18n()
 
-  const showOperator = !isLeftLiteral
+  const leftOperand = R.prop(BinaryOperandType.left)(node)
+  const leftOperandType = Expression.getType(leftOperand)
+
+  const showOperator = node.operator || ![Expression.types.Literal].includes(leftOperandType)
+
+  const binaryOperator = showOperator ? Expression.operators.findBinary(node.operator) : null
 
   const createOperand = (type) => (
     <BinaryOperand
@@ -49,8 +55,9 @@ const Binary = (props) => {
           <Dropdown
             className="operator"
             items={Expression.operators.binaryValues}
-            selection={Expression.operators.findBinary(node.operator)}
-            onChange={(item) => onChange(R.assoc('operator', R.propOr('', 'value', item), node))}
+            placeholder={i18n.t('expressionEditor.operator')}
+            selection={binaryOperator}
+            onChange={(item) => onChange(R.assoc('operator', item?.value ?? '', node))}
           />
 
           {createOperand(BinaryOperandType.right)}

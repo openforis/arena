@@ -6,7 +6,10 @@ export const dataExportOptions = {
   includeAnalysis: 'includeAnalysis',
   includeDataFromAllCycles: 'includeDataFromAllCycles',
   includeFiles: 'includeFiles',
+  includeFileAttributeDefs: 'includeFileAttributeDefs',
   recordsModifiedAfter: 'recordsModifiedAfter',
+  includeInternalUuids: 'includeInternalUuids',
+  includeDateCreated: 'includeDateCreated',
 }
 
 export const defaultDataExportOptionsSelection = {
@@ -17,5 +20,8 @@ export const defaultDataExportOptionsSelection = {
   [dataExportOptions.includeAnalysis]: false,
   [dataExportOptions.includeDataFromAllCycles]: false,
   [dataExportOptions.includeFiles]: false,
+  [dataExportOptions.includeFileAttributeDefs]: false,
   [dataExportOptions.recordsModifiedAfter]: null,
+  [dataExportOptions.includeInternalUuids]: false,
+  [dataExportOptions.includeDateCreated]: false,
 }
