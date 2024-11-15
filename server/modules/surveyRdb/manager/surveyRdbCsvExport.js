@@ -10,15 +10,6 @@ import { Query } from '@common/model/query'
 
 const maxExpandedCategoryItems = 20
 
-const csvObjectTransformerNullsToEmpty = (obj) => {
-  Object.entries(obj).forEach(([key, value]) => {
-    if (A.isNull(value)) {
-      obj[key] = ''
-    }
-  })
-  return obj
-}
-
 const visitCategoryItems = ({ survey, nodeDef, itemVisitor }) => {
   const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
   if (items.length <= maxExpandedCategoryItems) {
@@ -201,7 +192,7 @@ const getCsvObjectTransformer = ({
     transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
   }
   if (nullsToEmpty) {
-    transformers.push(csvObjectTransformerNullsToEmpty)
+    transformers.push(getCsvObjectTransformerNullsToEmpty)
   }
   if (keepFileNamesUnique) {
     const { transformer } = getCsvObjectTransformerUniqueFileNames({
