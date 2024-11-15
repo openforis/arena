@@ -74,13 +74,15 @@ const resetNotApplicableProps = (query) => {
   return query
 }
 
-export const assocMode = (mode) =>
-  A.pipe(
-    A.assoc(keys.mode, mode),
-    assocFilter(defaults[keys.filter]),
-    assocSort(defaults[keys.sort]),
-    resetNotApplicableProps
-  )
+export const assocMode = (mode) => (query) => {
+  const prevMode = getMode(query)
+  let queryUpdated = A.pipe(A.assoc(keys.mode, mode), resetNotApplicableProps)(query)
+  if (prevMode == modes.aggregate || mode === modes.aggregate) {
+    // changing mode from raw to aggregate or vice versa: reset filter and sort
+    queryUpdated = A.pipe(assocFilter(defaults[keys.filter]), assocSort(defaults[keys.sort]))(queryUpdated)
+  }
+  return queryUpdated
+}
 
 export const toggleMeasureAggregateFunction =
   ({ nodeDefUuid, aggregateFn }) =>
