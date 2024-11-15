@@ -1,13 +1,29 @@
 import area from '@turf/area'
-import centroid from '@turf/centroid'
+import turfCentroid from '@turf/centroid'
 import length from '@turf/length'
 
 import { PointFactory } from '@openforis/arena-core'
 
-const countVertices = (geoJson) => {
-  const polygon = geoJson.type === 'Feature' ? geoJson.geometry : geoJson
-  return polygon?.coordinates?.[0]?.length ?? 0
+const Type = {
+  Feature: 'Feature',
+  FeatureCollection: 'FeatureCollection',
 }
+
+const centroidFeature = turfCentroid
+
+const countVertices = (geoJsonOrGeometry) => {
+  const geometry = geoJsonOrGeometry.type === Type.Feature ? geoJsonOrGeometry.geometry : geoJsonOrGeometry
+  return geometry?.coordinates?.[0]?.length ?? 0
+}
+
+const createPointFeature = ({ x, y, properties }) => ({
+  type: Type.Feature,
+  geometry: {
+    type: 'Point',
+    coordinates: [x, y],
+  },
+  properties,
+})
 
 const parse = (geoJsonText) => {
   let geoJson = null
@@ -25,12 +41,27 @@ const pointFeatureToPoint = (pointFeature) => {
   return PointFactory.createInstance({ x, y })
 }
 
-const validateFeature = (geoJson) => geoJson?.type === 'Feature' && !!geoJson.geometry
+const centroidPoint = (geoJson) => pointFeatureToPoint(centroidFeature(geoJson))
+
+const validateFeature = (geoJson) => {
+  const { features, geometry, type } = geoJson ?? {}
+  if (!type) return false
+  switch (type) {
+    case Type.Feature:
+      return !!geometry
+    case Type.FeatureCollection:
+      return !!features
+    default:
+      return false
+  }
+}
 
 export const GeoJsonUtils = {
   area,
-  centroid,
+  centroidFeature,
+  centroidPoint,
   countVertices,
+  createPointFeature,
   parse,
   perimeter: length,
   pointFeatureToPoint,

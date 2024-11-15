@@ -10,8 +10,7 @@ const calculateActualCenterPoint = ({ centerPoint, geoJson, markerPoint, srsInde
     return markerPoint
   }
   if (geoJson) {
-    const centroidFeaturePoint = GeoJsonUtils.centroid(geoJson.geometry)
-    const centroidPoint = GeoJsonUtils.pointFeatureToPoint(centroidFeaturePoint)
+    const centroidPoint = GeoJsonUtils.centroidPoint(geoJson)
     if (centroidPoint) {
       return centroidPoint
     }
