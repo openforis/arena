@@ -1,6 +1,6 @@
 import { FileNames } from '@openforis/arena-core'
 
-const nameWithIndexRegEx = /(.*)\s\((\d+)\)/ // file name like "example (1).txt"
+const nameWithIndexRegEx = /^(.*)\s\((\d+)\)$/ // file name like "example (1).txt"
 
 export class UniqueFileNamesGenerator {
   constructor() {
