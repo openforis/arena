@@ -40,7 +40,9 @@ const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey 
   const val = singlePropValueConverter({ value })
   let dateObj = null
   const valueIsInValidFormat = allowedFormats.some((format) => {
-    dateObj = DateUtils.parse(val, format, false) // date and time values are without timezone
+    // date and time values are without timezone
+    // use strict parsing to check if date is in the specified format
+    dateObj = DateUtils.parse(val, format, { keepTimeZone: false, strict: true })
     return DateUtils.isValidDateObject(dateObj)
   })
   if (!valueIsInValidFormat) {
