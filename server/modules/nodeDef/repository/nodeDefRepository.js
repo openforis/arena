@@ -3,11 +3,27 @@ import * as R from 'ramda'
 import { Objects } from '@openforis/arena-core'
 import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-server'
 
+import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ServerDB from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 const { getSchemaSurvey } = Schemata
+
+// advanced properties to track as draft (to be used when publishing record)
+const advancedPropKeysDraftToTrack = [
+  NodeDef.keysPropsAdvanced.applicable,
+  NodeDef.keysPropsAdvanced.defaultValues,
+  NodeDef.keysPropsAdvanced.fileNameExpression,
+  NodeDef.keysPropsAdvanced.validations,
+]
+
+const rowPropertyByAdvancedPropKeys = {
+  [NodeDef.keysPropsAdvanced.applicable]: A.camelize(NodeDef.keys.draftAdvancedApplicable),
+  [NodeDef.keysPropsAdvanced.defaultValues]: A.camelize(NodeDef.keys.draftAdvancedDefaultValues),
+  [NodeDef.keysPropsAdvanced.fileNameExpression]: A.camelize(NodeDef.keys.draftAdvancedFileNameExpression),
+  [NodeDef.keysPropsAdvanced.validations]: A.camelize(NodeDef.keys.draftAdvancedValidations),
+}
 
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) => {
   const rowUpdated = { ...row }
@@ -15,18 +31,14 @@ const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =
   if (advanced || backup) {
     if (!R.isEmpty(rowUpdated.props_advanced_draft)) {
       // there are draft advanced props to merge with "published" advanced props
-      rowUpdated.draft_advanced = true
+      rowUpdated[A.camelize(NodeDef.keys.draftAdvanced)] = true
 
       // set updated props flags
-      if (rowUpdated.props_advanced_draft[NodeDef.keysPropsAdvanced.validations]) {
-        rowUpdated.draft_advanced_validations = true
-      }
-      if (rowUpdated.props_advanced_draft[NodeDef.keysPropsAdvanced.applicable]) {
-        rowUpdated.draft_advanced_applicable = true
-      }
-      if (rowUpdated.props_advanced_draft[NodeDef.keysPropsAdvanced.defaultValues]) {
-        rowUpdated.draft_advanced_default_values = true
-      }
+      advancedPropKeysDraftToTrack.forEach((advancedPropKey) => {
+        if (rowUpdated.props_advanced_draft[advancedPropKey]) {
+          rowUpdated[rowPropertyByAdvancedPropKeys[advancedPropKey]] = true
+        }
+      })
 
       if (draft && !backup) {
         // merge props_advanced and props_advanced_draft into props_advanced
