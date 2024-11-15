@@ -41,9 +41,7 @@ const pointExtractorByNodeDefType = {
   },
   [NodeDef.nodeDefType.geo]: ({ attributeValue }) => {
     const geoJson = JSON.parse(attributeValue)
-
-    const centroidFeaturePoint = GeoJsonUtils.centroid(geoJson.geometry)
-    const point = GeoJsonUtils.pointFeatureToPoint(centroidFeaturePoint)
+    const point = GeoJsonUtils.centroidPoint(geoJson)
     return { point, properties: { data: geoJson } }
   },
 }
@@ -77,22 +75,17 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
 
       if (!point) return acc
 
+      const { x, y } = point
+
       const properties = {
         ...extractCommonProperties({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }),
-        point: PointFactory.createInstance({ x: point.x, y: point.y }),
+        point: PointFactory.createInstance({ x, y }),
         ...extraProperties,
       }
 
-      const pointFeature = {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: [point.x, point.y],
-        },
-        properties,
-      }
+      const pointFeature = GeoJsonUtils.createPointFeature({ x, y, properties })
 
-      acc.bounds.extend([point.x, point.y])
+      acc.bounds.extend([point.y, point.x])
       acc.points.push(pointFeature)
       acc.pointIndexByDataIndex[index] = acc.points.length - 1
 

@@ -3,9 +3,26 @@ import { useCallback, useEffect, useState } from 'react'
 import { PointFactory, Points } from '@openforis/arena-core'
 
 import { useSurveySrsIndex } from '@webapp/store/survey'
+import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
+
+const calculateActualCenterPoint = ({ centerPoint, geoJson, markerPoint, srsIndex }) => {
+  if (markerPoint && Points.isValid(markerPoint, srsIndex)) {
+    return markerPoint
+  }
+  if (geoJson) {
+    const centroidPoint = GeoJsonUtils.centroidPoint(geoJson)
+    if (centroidPoint) {
+      return centroidPoint
+    }
+  }
+  if (centerPoint && Points.isValid(centerPoint, srsIndex)) {
+    return centerPoint
+  }
+  return PointFactory.createInstance({ x: 0, y: 0 })
+}
 
 export const useMap = (props) => {
-  const { centerPoint, markerPoint, onMarkerPointChange } = props
+  const { centerPoint, geoJson, markerPoint, onMarkerPointChange } = props
 
   const srsIndex = useSurveySrsIndex()
 
@@ -30,18 +47,13 @@ export const useMap = (props) => {
 
   // on markerPoint update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
-    const actualCenterPoint =
-      markerPoint && Points.isValid(markerPoint, srsIndex)
-        ? markerPoint
-        : centerPoint && Points.isValid(centerPoint, srsIndex)
-        ? centerPoint
-        : PointFactory.createInstance({ x: 0, y: 0 })
+    const actualCenterPoint = calculateActualCenterPoint({ centerPoint, geoJson, markerPoint, srsIndex })
 
     setState((statePrev) => ({
       ...statePrev,
       centerPositionLatLon: actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null,
     }))
-  }, [centerPoint, fromPointToLatLon, markerPoint, srsIndex])
+  }, [centerPoint, fromPointToLatLon, geoJson, markerPoint, srsIndex])
 
   const onMarkerPointUpdated = useCallback((markerPointUpdated) => {
     setState((statePrev) => ({ ...statePrev, markerPointUpdated }))
