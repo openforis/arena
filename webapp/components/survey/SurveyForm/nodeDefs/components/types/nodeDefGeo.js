@@ -11,7 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, ButtonIconDelete, ExpansionPanel, Map, PanelRight } from '@webapp/components'
+import { Button, ButtonDownload, ButtonIconDelete, ExpansionPanel, Map, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
 import { GeoPolygonInfo } from '@webapp/components/geo/GeoPolygonInfo'
@@ -21,6 +21,7 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
+import { downloadTextToFile } from '@webapp/utils/domUtils'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
@@ -56,6 +57,7 @@ const NodeDefGeo = (props) => {
   const value = Node.getValue(node, NodeDefUiProps.getDefaultValue(nodeDef))
   const valueText = value ? JSON.stringify(value) : ''
 
+  const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
   const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap])
@@ -74,6 +76,10 @@ const NodeDefGeo = (props) => {
     },
     [dispatch, node, nodeDef, updateNode]
   )
+
+  const onDownloadClick = useCallback(() => {
+    downloadTextToFile(valueText, `${nodeDefName}.geojson`)
+  }, [nodeDefName, valueText])
 
   const onClearValueClick = useCallback(async () => {
     if (await confirm({ key: 'surveyForm.nodeDefGeo.confirmDelete' })) {
@@ -130,16 +136,23 @@ const NodeDefGeo = (props) => {
       </div>
       <div className="action-buttons">
         {valueText && (
-          <>
+          <div className="row">
             {mapTriggerButton}
+            <ButtonDownload className="btn-s" onClick={onDownloadClick} showLabel={false} variant="contained" />
             {mapPanelRight}
-          </>
+          </div>
         )}
         {!entryDisabled && (
-          <>
-            <UploadButton className="btn-s" showLabel={false} onChange={onFilesChange} maxSize={maxFileSize} />
+          <div className="row">
+            <UploadButton
+              className="btn-s"
+              showLabel={false}
+              onChange={onFilesChange}
+              maxSize={maxFileSize}
+              variant="outlined"
+            />
             {valueText && <ButtonIconDelete onClick={onClearValueClick} />}
-          </>
+          </div>
         )}
       </div>
     </div>

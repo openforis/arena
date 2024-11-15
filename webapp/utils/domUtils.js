@@ -46,6 +46,21 @@ export const copyToClipboard = async (text) => {
   }
 }
 
+export const downloadToFile = (url, outputFileName) => {
+  const link = document.createElement('a')
+  link.href = url
+  link.download = outputFileName
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+export const downloadTextToFile = (text, outputFileName) => {
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  downloadToFile(url, outputFileName)
+}
+
 export const downloadSvgToPng = (svgElement) => {
   const serializer = new XMLSerializer()
   const svgString = serializer.serializeToString(svgElement)
@@ -67,12 +82,7 @@ export const downloadSvgToPng = (svgElement) => {
 
     // Create a download link for the canvas image
     const pngUrl = canvas.toDataURL('image/png')
-    const downloadLink = document.createElement('a')
-    downloadLink.href = pngUrl
-    downloadLink.download = 'chart.png'
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
+    downloadToFile(pngUrl, 'chart.png')
     URL.revokeObjectURL(url)
   }
 }
