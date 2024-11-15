@@ -16,12 +16,12 @@ const VALUE_PROP_DEFAULT = 'value'
 
 const allowedBooleanValues = ['true', 'false', '1', '0']
 const allowedDateFormats = [
-  DateUtils.formats.dateISO,
-  'YYYY.MM.DD',
-  'YYYY/MM/DD',
   DateUtils.formats.dateDefault,
   'DD-MM-YYYY',
   'DD.MM.YYYY',
+  'YYYY.MM.DD',
+  'YYYY/MM/DD',
+  DateUtils.formats.dateISO,
 ]
 const allowedTimeFormats = [DateUtils.formats.timeStorage]
 
@@ -39,11 +39,11 @@ const numericValueConverter = ({ value, headers }) => {
 const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey }) => {
   const val = singlePropValueConverter({ value })
   let dateObj = null
-  const timeFormat = allowedFormats.some((format) => {
-    dateObj = DateUtils.parse(val, format)
+  const valueIsInValidFormat = allowedFormats.some((format) => {
+    dateObj = DateUtils.parse(val, format, false) // date and time values are without timezone
     return DateUtils.isValidDateObject(dateObj)
   })
-  if (!timeFormat) {
+  if (!valueIsInValidFormat) {
     throw new SystemError(errorKey, { headers, value: val })
   }
   return DateUtils.format(dateObj, formatTo)
