@@ -9,12 +9,16 @@ import CategoriesExportJob from './jobs/CategoriesExportJob'
 import FilesExportJob from './jobs/FilesExportJob'
 import ZipCreationJob from './jobs/ZipCreationJob'
 
-const createInternalJobs = ({ includeCategories, includeFiles }) => [
-  new CSVDataExtractionJob(),
-  ...(includeCategories ? [new CategoriesExportJob()] : []),
-  ...(includeFiles ? [new FilesExportJob()] : []),
-  new ZipCreationJob(),
-]
+const createInternalJobs = (params) => {
+  const { options } = params ?? {}
+  const { includeCategories, includeFiles } = options ?? {}
+  return [
+    new CSVDataExtractionJob(),
+    ...(includeCategories ? [new CategoriesExportJob()] : []),
+    ...(includeFiles ? [new FilesExportJob()] : []),
+    new ZipCreationJob(),
+  ]
+}
 
 export default class DataExportJob extends Job {
   constructor(params) {
