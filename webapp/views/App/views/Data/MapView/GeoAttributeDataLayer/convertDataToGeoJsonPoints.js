@@ -75,15 +75,17 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
 
       if (!point) return acc
 
+      const { x, y } = point
+
       const properties = {
         ...extractCommonProperties({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }),
-        point: PointFactory.createInstance({ x: point.x, y: point.y }),
+        point: PointFactory.createInstance({ x, y }),
         ...extraProperties,
       }
 
-      const pointFeature = GeoJsonUtils.createPointFeature({ x: point.x, y: point.y, properties })
+      const pointFeature = GeoJsonUtils.createPointFeature({ x, y, properties })
 
-      acc.bounds.extend([point.x, point.y])
+      acc.bounds.extend([point.y, point.x])
       acc.points.push(pointFeature)
       acc.pointIndexByDataIndex[index] = acc.points.length - 1
 
