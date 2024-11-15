@@ -14,6 +14,7 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
+import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 
@@ -33,23 +34,22 @@ const _convertItemsToPoints = (items) => {
 
     bounds.extend([lat, long])
 
-    acc.push({
-      type: 'Feature',
-      properties: {
-        cluster: false,
-        itemUuid,
-        itemCodes,
-        itemLatLongPoint,
-        key: itemUuid,
-        location,
-        locationPoint,
-        recordUuid,
-      },
-      geometry: {
-        type: 'Point',
-        coordinates: [long, lat],
-      },
-    })
+    acc.push(
+      GeoJsonUtils.createPointFeature({
+        x: long,
+        y: lat,
+        properties: {
+          cluster: false,
+          itemUuid,
+          itemCodes,
+          itemLatLongPoint,
+          key: itemUuid,
+          location,
+          locationPoint,
+          recordUuid,
+        },
+      })
+    )
     return acc
   }, [])
 
