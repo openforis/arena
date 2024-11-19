@@ -172,6 +172,7 @@ export const {
   getNodeDefKeysSorted,
   isNodeDefRootKey,
   findNodeDef,
+  findNodeDefByName,
   getNodeDefAreaBasedEstimate,
   getAreaBasedEstimatedOfNodeDef,
   getNodeDefMaxDecimalDigits,

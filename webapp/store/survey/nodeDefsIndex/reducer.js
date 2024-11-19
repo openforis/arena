@@ -23,11 +23,23 @@ const actionHandlers = {
 
   [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => Survey.addNodeDefToIndex({ nodeDefsIndex: state, nodeDef }),
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef }),
+  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef, prevNodeDef = null }) => {
+    let stateUpdated = state
+    if (prevNodeDef) {
+      stateUpdated = Survey.deleteNodeDefIndex({ nodeDefsIndex: stateUpdated, nodeDef: prevNodeDef })
+    }
+    stateUpdated = Survey.addNodeDefToIndex({ nodeDefsIndex: stateUpdated, nodeDef })
+    return stateUpdated
+  },
 
-  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, isNodeDefNew }) =>
-    isNodeDefNew
-      ? Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef }) // Remove node def from state
-      : state,
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) => {
+    let stateUpdated = Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef })
+    if (isNodeDefNew) {
+      return stateUpdated
+    }
+    stateUpdated = Survey.addNodeDefToIndex({ nodeDefsIndex: stateUpdated, nodeDef: nodeDefOriginal })
+    return stateUpdated
+  },
 }
 
 export default exportReducer(actionHandlers)

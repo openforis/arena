@@ -31,7 +31,12 @@ export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
 
 // ==== PLAIN ACTIONS
-export const updateNodeDef = ({ nodeDef, dirty = false }) => ({ type: nodeDefUpdate, nodeDef, dirty })
+export const updateNodeDef = ({ nodeDef, prevNodeDef = null, dirty = false }) => ({
+  type: nodeDefUpdate,
+  nodeDef,
+  prevNodeDef,
+  dirty,
+})
 
 export const saveNodeDef = ({ nodeDef, nodeDefParent, surveyCycleKey, nodeDefValidation }) => ({
   type: nodeDefSave,

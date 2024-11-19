@@ -190,6 +190,8 @@ export const getNodeDefsByTaxonomyUuid = (uuid) =>
 
 export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predicate))
 
+export const findNodeDefByName = (name) => (survey) => Surveys.findNodeDefByName({ survey, name })
+
 export const getNodeDefMaxDecimalDigits = (nodeDef) => (survey) => {
   const referenceNodeDef =
     survey && NodeDef.isAreaBasedEstimatedOf(nodeDef) ? getAreaBasedEstimatedOfNodeDef(nodeDef)(survey) : nodeDef
