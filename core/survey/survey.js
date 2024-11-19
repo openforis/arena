@@ -163,7 +163,6 @@ export const {
   hasNodeDefChildrenEntities,
   getNodeDefChildrenSorted,
   getNodeDefChildByName,
-  getNodeDefSiblingByName,
   getNodeDefByName,
   getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid,
