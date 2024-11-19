@@ -78,6 +78,7 @@ export default class RecordCheckJob extends Job {
           NodeDef.hasAdvancedPropsDraft(def) &&
           (NodeDef.hasAdvancedPropsApplicableDraft(def) ||
             NodeDef.hasAdvancedPropsDefaultValuesDraft(def) ||
+            NodeDef.hasAdvancedPropsFileNameExpressionDraft(def) ||
             NodeDef.hasAdvancedPropsValidationsDraft(def))
         ) {
           // Already existing node def but applicable or default values or validations have been updated
@@ -95,6 +96,7 @@ export default class RecordCheckJob extends Job {
         )
         this.logDebug('survey fetched')
       }
+
       surveyAndNodeDefs = {
         survey,
         nodeDefAddedUuids,

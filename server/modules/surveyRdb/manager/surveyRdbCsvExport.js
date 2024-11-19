@@ -1,23 +1,14 @@
 import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
 
 import { ArrayUtils } from '@core/arrayUtils'
-import { Query } from '@common/model/query'
 import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
 
 const maxExpandedCategoryItems = 20
-
-const csvObjectTransformerNullsToEmpty = (obj) => {
-  Object.entries(obj).forEach(([key, value]) => {
-    if (A.isNull(value)) {
-      obj[key] = ''
-    }
-  })
-  return obj
-}
 
 const visitCategoryItems = ({ survey, nodeDef, itemVisitor }) => {
   const items = Survey.getNodeDefCategoryItems(nodeDef)(survey)
@@ -162,15 +153,56 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformer = ({ survey, query, expandCategoryItems, nullsToEmpty = false }) => {
+const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNamesGenerator }) => {
+  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
+  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
+  const transformer = (obj) => {
+    nodeDefFileCols.forEach((nodeDef) => {
+      const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
+      const fileName = obj[fileNameField]
+      const fileUuid = obj[ColumnNodeDef.getFileUuidColumnName(nodeDef)]
+      const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
+      obj[fileNameField] = uniqueFileName
+    })
+    return obj
+  }
+  return { transformer }
+}
+
+const getCsvObjectTransformerNullsToEmpty = () => (obj) => {
+  Object.entries(obj).forEach(([key, value]) => {
+    if (A.isNull(value)) {
+      obj[key] = ''
+    }
+  })
+  return obj
+}
+
+const getCsvObjectTransformer = ({
+  survey,
+  query,
+  expandCategoryItems,
+  nullsToEmpty = false,
+  keepFileNamesUnique = false, // if true, uniqueFileNamesGenerator must be specified
+  uniqueFileNamesGenerator = null, // required if keepFileNamesUnique is true
+}) => {
   const transformers = []
   if (expandCategoryItems) {
     transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
   }
   if (nullsToEmpty) {
-    transformers.push(csvObjectTransformerNullsToEmpty)
+    transformers.push(getCsvObjectTransformerNullsToEmpty)
   }
-  return transformers.length === 0 ? null : A.pipe(...transformers)
+  if (keepFileNamesUnique) {
+    const { transformer } = getCsvObjectTransformerUniqueFileNames({
+      survey,
+      query,
+      uniqueFileNamesGenerator,
+    })
+    transformers.push(transformer)
+  }
+  return { transformers }
 }
 
 export const SurveyRdbCsvExport = {

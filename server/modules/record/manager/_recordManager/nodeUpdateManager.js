@@ -94,6 +94,7 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
   }
 
+  let value = Node.getValue(node)
   if (NodeDef.isFile(nodeDef)) {
     // mark old file as deleted if changed
     const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
@@ -107,7 +108,7 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
     {
       surveyId,
       nodeUuid: Node.getUuid(node),
-      value: Node.getValue(node),
+      value,
       meta,
       draft: Record.isPreview(record),
       reloadNode: updateDependents,

@@ -2,6 +2,7 @@ import pgPromise from 'pg-promise'
 
 import { Dates, Objects, SystemError } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -24,6 +25,7 @@ import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
+import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 
 // ==== DDL
 
@@ -81,6 +83,7 @@ export const fetchViewData = async (params, client = db) => {
     includeInternalUuids = false,
     includeDateCreated = false,
     nullsToEmpty = false,
+    uniqueFileNamesGenerator = null,
   } = params
 
   // Fetch data
@@ -113,16 +116,20 @@ export const fetchViewData = async (params, client = db) => {
           includeInternalUuids,
           includeDateCreated,
         })
+
     await db.stream(result, (dbStream) => {
+      const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
+        survey,
+        query,
+        expandCategoryItems,
+        nullsToEmpty,
+        keepFileNamesUnique: true,
+        uniqueFileNamesGenerator,
+      })
       const csvTransform = CSVWriter.transformJsonToCsv({
         fields,
         options: {
-          objectTransformer: SurveyRdbCsvExport.getCsvObjectTransformer({
-            survey,
-            query,
-            expandCategoryItems,
-            nullsToEmpty,
-          }),
+          objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
         },
       })
       dbStream.pipe(csvTransform).pipe(streamOutput)
@@ -249,6 +256,8 @@ export const fetchEntitiesDataToCsvFiles = async (
       cycle,
     })(survey)
 
+  const uniqueFileNamesGenerator = new UniqueFileNamesGenerator()
+
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
     const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
@@ -293,12 +302,14 @@ export const fetchEntitiesDataToCsvFiles = async (
         addCycle,
         includeCategoryItemsLabels,
         expandCategoryItems,
+        uniqueFileNamesGenerator,
         includeInternalUuids,
         includeDateCreated,
       },
       client
     )
   })
+  return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
 }
 
 export const fetchEntitiesFileUuidsByCycle = async (

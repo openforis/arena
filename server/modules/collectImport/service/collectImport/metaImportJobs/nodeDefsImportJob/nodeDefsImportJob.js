@@ -381,7 +381,12 @@ export default class NodeDefsImportJob extends Job {
         ]
       }
     }
-
+    if (type === NodeDef.nodeDefType.file) {
+      const fileNameExpression = CollectSurvey.getCollectAttribute('fileNameExpression')(collectNodeDef)
+      if (fileNameExpression) {
+        propsAdvanced[NodeDef.keysPropsAdvanced.fileNameExpression] = fileNameExpression
+      }
+    }
     return propsAdvanced
   }
 

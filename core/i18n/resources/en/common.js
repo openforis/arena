@@ -36,7 +36,7 @@ Do you want to ignore them?`,
     convert: 'Convert',
     copy: 'Copy',
     createdWith: 'Created with',
-    createdWithApp: `t(common.createdWith) {{app}}`,
+    createdWithApp: `$t(common.createdWith) {{app}}`,
     csvExport: 'CSV Export',
     csvImport: 'CSV Import',
     cycle: 'Cycle',
@@ -1282,8 +1282,7 @@ E.g. this.region = region_attribute_name
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
     fileProps: {
-      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
-      maxFileSize: 'Max. file size (Mb)',
+      fileNameExpression: 'File name expression',
       fileType: 'File type',
       fileTypes: {
         image: 'Image',
@@ -1291,6 +1290,8 @@ E.g. this.region = region_attribute_name
         audio: 'Audio',
         other: 'Other',
       },
+      maxFileSize: 'Max. file size (Mb)',
+      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
     },
     mobileProps: {
       title: 'Mobile App',
@@ -1665,6 +1666,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as YYYY-MM-DD or DD/MM/YYYY. E.g. 2023-01-15 or 15/01/2023',
       invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
       invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
+      invalidTime:
+        'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
       errorUpdatingValues: 'Error updating values',
       multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
