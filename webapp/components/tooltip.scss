@@ -54,14 +54,9 @@
   }
 
   .MuiTextField-root fieldset,
+  .MuiTextField-root:hover fieldset,
   .MuiTextField-root .Mui-focused fieldset {
-    border-width: 1px;
-    border-style: solid;
     border-color: red;
-  }
-
-  .MuiTextField-root .Mui-focused fieldset {
-    border-width: 2px;
   }
 }
 

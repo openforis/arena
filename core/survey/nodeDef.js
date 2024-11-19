@@ -31,6 +31,7 @@ export const keys = {
   draftAdvanced: 'draftAdvanced',
   draftAdvancedApplicable: 'draftAdvancedApplicable',
   draftAdvancedDefaultValues: 'draftAdvancedDefaultValues',
+  draftAdvancedFileNameExpression: 'draftAdvancedFileNameExpression',
   draftAdvancedValidations: 'draftAdvancedValidations',
   type: 'type',
   deleted: 'deleted',
@@ -154,6 +155,8 @@ export const keysPropsAdvanced = {
 
   // code and taxon
   itemsFilter: 'itemsFilter',
+  // file
+  fileNameExpression: 'fileNameExpression',
 }
 
 const commonAttributePropsAdvancedKeys = [
@@ -367,6 +370,8 @@ export const getAllPropsAndAllPropsDraft =
 export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
 export const hasAdvancedPropsApplicableDraft = (nodeDef) => R.prop(keys.draftAdvancedApplicable, nodeDef) === true
 export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
+export const hasAdvancedPropsFileNameExpressionDraft = (nodeDef) =>
+  R.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
 export const hasAdvancedPropsValidationsDraft = (nodeDef) => R.prop(keys.draftAdvancedValidations, nodeDef) === true
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
@@ -391,6 +396,7 @@ export const getAllExpressions = (nodeDef) => {
     return acc
   }, [])
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   return expressions
 }
 
@@ -398,6 +404,8 @@ export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClo
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
+// file
+export const getFileNameExpression = getPropAdvanced(keysPropsAdvanced.fileNameExpression, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])

@@ -10,7 +10,7 @@ export default class CSVDataExtractionJob extends Job {
   async execute() {
     const { survey, cycle, recordUuids, search, options, outputDir } = this.context
 
-    await SurveyRdbService.fetchEntitiesDataToCsvFiles(
+    const { fileNamesByFileUuid } = await SurveyRdbService.fetchEntitiesDataToCsvFiles(
       {
         user: this.user,
         survey,
@@ -26,5 +26,6 @@ export default class CSVDataExtractionJob extends Job {
       },
       this.tx
     )
+    this.setContext({ fileNamesByFileUuid })
   }
 }

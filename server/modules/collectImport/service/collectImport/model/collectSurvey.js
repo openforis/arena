@@ -142,7 +142,8 @@ export const getUiAttribute =
 export const getCollectAttribute =
   (name, defaultValue = null) =>
   (collectXmlElement) => {
-    const value = getAttribute(`collect:${name}`, defaultValue)(collectXmlElement)
+    const value =
+      getAttribute(`collect:${name}`)(collectXmlElement) ?? getAttribute(`n0:${name}`, defaultValue)(collectXmlElement)
     return _transformValue(value)
   }
 

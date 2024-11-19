@@ -1,5 +1,7 @@
 import * as fs from 'fs'
 
+import { NodeValues, Objects } from '@openforis/arena-core'
+
 import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -392,7 +394,18 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     draft: !Survey.isPublished(surveySummary),
+    advanced: true,
+    includeBigCategories: false,
+    includeBigTaxonomies: false,
   })
+  // return calculatd name (if any)
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  if (NodeDef.getFileNameExpression(nodeDef)) {
+    const calculatedName = NodeValues.getFileNameCalculated(node)
+    if (Objects.isNotEmpty(calculatedName)) {
+      return calculatedName
+    }
+  }
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 
   const fileNameParts = []

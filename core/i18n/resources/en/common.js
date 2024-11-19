@@ -1282,8 +1282,7 @@ E.g. this.region = region_attribute_name
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
     fileProps: {
-      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
-      maxFileSize: 'Max. file size (Mb)',
+      fileNameExpression: 'File name expression',
       fileType: 'File type',
       fileTypes: {
         image: 'Image',
@@ -1291,6 +1290,8 @@ E.g. this.region = region_attribute_name
         audio: 'Audio',
         other: 'Other',
       },
+      maxFileSize: 'Max. file size (Mb)',
+      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
     },
     mobileProps: {
       title: 'Mobile App',
