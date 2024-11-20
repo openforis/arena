@@ -8,22 +8,24 @@ import * as ProcessUtils from '@core/processUtils'
 
 import { Button } from '@webapp/components/buttons'
 
+const { types } = Expression
+
 const availableOperandExpressionTypes = [
-  Expression.types.Identifier,
-  Expression.types.Literal,
-  ...(ProcessUtils.ENV.experimentalFeatures ? [Expression.types.CallExpression] : []),
+  types.Identifier,
+  types.Literal,
+  ...(ProcessUtils.ENV.experimentalFeatures ? [types.CallExpression] : []),
 ]
 
 const expressionTypeAcronymByType = {
-  [Expression.types.CallExpression]: 'call',
-  [Expression.types.Identifier]: 'var',
-  [Expression.types.Literal]: 'const',
+  [types.CallExpression]: 'call',
+  [types.Identifier]: 'var',
+  [types.Literal]: 'const',
 }
 
 const expressionGeneratorByType = {
-  [Expression.types.CallExpression]: () => Expression.newCall(),
-  [Expression.types.Identifier]: () => Expression.newIdentifier(),
-  [Expression.types.Literal]: () => Expression.newLiteral(),
+  [types.CallExpression]: () => Expression.newCall(),
+  [types.Identifier]: () => Expression.newIdentifier(),
+  [types.Literal]: () => Expression.newLiteral(),
 }
 
 const BinaryOperandExpressionTypeButton = (props) => {
@@ -54,6 +56,14 @@ export const BinaryOperandType = {
 BinaryOperandType.isLeft = (type) => type === BinaryOperandType.left
 BinaryOperandType.isRight = (type) => type === BinaryOperandType.right
 
+const toUiOperandExpressionType = (type) => {
+  if (type === types.UnaryExpression) {
+    // unary expressions managed as literal expressions in UI
+    return types.Literal
+  }
+  return type
+}
+
 const BinaryOperand = (props) => {
   const {
     canDelete = false,
@@ -69,17 +79,17 @@ const BinaryOperand = (props) => {
   } = props
 
   const nodeOperand = node[type]
-  const operandExpressionType = Expression.getType(nodeOperand)
+  const operandExpressionType = toUiOperandExpressionType(Expression.getType(nodeOperand))
   const isLeft = BinaryOperandType.isLeft(type)
   const currentNodeDefIsBoolean = NodeDef.isBoolean(nodeDefCurrent)
 
   const canOperandExpressionBeOfType = useCallback(
     (expressionType) => {
       switch (expressionType) {
-        case Expression.types.Identifier:
-        case Expression.types.CallExpression:
+        case types.Identifier:
+        case types.CallExpression:
           return true
-        case Expression.types.Literal:
+        case types.Literal:
           return !isLeft || !isBoolean || currentNodeDefIsBoolean
         default:
           return false
