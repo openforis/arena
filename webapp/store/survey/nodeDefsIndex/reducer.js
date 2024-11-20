@@ -23,23 +23,22 @@ const actionHandlers = {
 
   [NodeDefsActions.nodeDefCreate]: (state, { nodeDef }) => Survey.addNodeDefToIndex({ nodeDefsIndex: state, nodeDef }),
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef }),
-  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef, prevNodeDef = null }) => {
-    let stateUpdated = state
-    if (prevNodeDef) {
-      stateUpdated = Survey.deleteNodeDefIndex({ nodeDefsIndex: stateUpdated, nodeDef: prevNodeDef })
-    }
-    stateUpdated = Survey.addNodeDefToIndex({ nodeDefsIndex: stateUpdated, nodeDef })
-    return stateUpdated
-  },
+  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef, prevNodeDef = null }) =>
+    Survey.updateNodeDefUuidByNameIndex({
+      nodeDefsIndex: state,
+      nodeDef,
+      nodeDefPrevious: prevNodeDef,
+    }),
 
-  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) => {
-    let stateUpdated = Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef })
-    if (isNodeDefNew) {
-      return stateUpdated
-    }
-    stateUpdated = Survey.addNodeDefToIndex({ nodeDefsIndex: stateUpdated, nodeDef: nodeDefOriginal })
-    return stateUpdated
-  },
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+    isNodeDefNew
+      ? Survey.deleteNodeDefIndex({ nodeDefsIndex: state, nodeDef })
+      : // restore node defs index using the original node def name
+        Survey.updateNodeDefUuidByNameIndex({
+          nodeDefsIndex: state,
+          nodeDef: nodeDefOriginal,
+          nodeDefPrevious: nodeDef,
+        }),
 }
 
 export default exportReducer(actionHandlers)

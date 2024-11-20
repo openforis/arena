@@ -21,6 +21,11 @@ export const addNodeDefToIndex = ({ nodeDefsIndex, nodeDef }) => {
   return getNodeDefsIndex(surveyUpdated)
 }
 
+export const updateNodeDefUuidByNameIndex = ({ nodeDefsIndex, nodeDef, nodeDefPrevious }) => {
+  const surveyUpdated = Surveys.updateNodeDefUuidByNameIndex(nodeDef, nodeDefPrevious)({ nodeDefsIndex })
+  return getNodeDefsIndex(surveyUpdated)
+}
+
 // ==== DELETE
 
 export const deleteNodeDefIndex = ({ nodeDefsIndex, nodeDef }) => {

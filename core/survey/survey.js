@@ -249,8 +249,13 @@ export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
 
-export const { addNodeDefToIndex, deleteNodeDefIndex, initNodeDefsIndex, initAndAssocNodeDefsIndex } =
-  SurveyNodeDefsIndex
+export const {
+  addNodeDefToIndex,
+  updateNodeDefUuidByNameIndex,
+  deleteNodeDefIndex,
+  initNodeDefsIndex,
+  initAndAssocNodeDefsIndex,
+} = SurveyNodeDefsIndex
 
 // ====== NodeDefsValidation
 export const { getNodeDefsValidation, assocNodeDefsValidation, getNodeDefValidation } = SurveyNodeDefsValidation
