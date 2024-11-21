@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
 export const FormPropertyItem = (props) => {
   const { objectkey, labelKey, onPropertyChange, value, samplingPolygonObject, readOnly, getFieldValidation } = props
@@ -10,9 +10,9 @@ export const FormPropertyItem = (props) => {
       <Input
         key={objectkey}
         id={`sampling-polygon-${labelKey}`}
+        numberFormat={NumberFormats.integer()}
         onChange={onPropertyChange}
         readOnly={readOnly}
-        type="number"
         validation={getFieldValidation(samplingPolygonObject[objectkey])}
         value={value}
       />

@@ -3,7 +3,7 @@ import './SamplingPolygonEditor.scss'
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { Objects } from '@openforis/arena-core'
+import { Numbers, Objects } from '@openforis/arena-core'
 
 import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
 
@@ -21,7 +21,7 @@ const SamplingPolygonEditor = (props) => {
 
   const samplingPolygonObject = Objects.isEmpty(samplingPolygon) ? getSamplingPolygonDefaults() : samplingPolygon
 
-  const inputPropertiesForAll = [
+  const commonInputFields = [
     { key: 'offsetNorth', labelKey: 'offsetNorth' },
     { key: 'offsetEast', labelKey: 'offsetEast' },
     { key: 'controlPointOffsetNorth', labelKey: 'controlPointOffsetNorth' },
@@ -37,7 +37,8 @@ const SamplingPolygonEditor = (props) => {
 
   const onPropertyChange = (key) => (e) => {
     const value = e?.target?.value ?? e
-    onSamplingPolygonChange({ ...samplingPolygonObject, [key]: Number(value) })
+    const numericValue = Numbers.toNumber(value)
+    onSamplingPolygonChange({ ...samplingPolygonObject, [key]: numericValue })
   }
 
   const onShapeChange = (value) => {
@@ -71,7 +72,7 @@ const SamplingPolygonEditor = (props) => {
             readOnly={readOnly}
           />
         )}
-        {inputPropertiesForAll.map(({ key, labelKey }) => (
+        {commonInputFields.map(({ key, labelKey }) => (
           <FormPropertyItem
             key={key}
             objectKey={key}
