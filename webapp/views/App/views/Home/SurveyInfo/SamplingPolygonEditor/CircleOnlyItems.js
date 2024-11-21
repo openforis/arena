@@ -12,7 +12,7 @@ const controlPointsOptions = [0, 4, 5, 10, 12, 21]
 
 export const CircleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
-  const inputPropertiesForCircle = [{ key: 'radius', labelKey: 'radius' }]
+  const inputPropertiesForCircle = [{ key: 'radius' }]
   return (
     <>
       <FormItem label="samplingPolygonOptions.numberOfControlPoints">
@@ -24,11 +24,10 @@ export const CircleOnlyItems = (props) => {
           onChange={onPropertyChange('numberOfPointsCircle')}
         />
       </FormItem>
-      {inputPropertiesForCircle.map(({ key, labelKey }) => (
+      {inputPropertiesForCircle.map(({ key }) => (
         <FormPropertyItem
           key={key}
           objectKey={key}
-          labelKey={labelKey}
           onPropertyChange={onPropertyChange(key)}
           value={samplingPolygonObject[key]}
           samplingPolygonObject={samplingPolygonObject}

@@ -22,10 +22,10 @@ const SamplingPolygonEditor = (props) => {
   const samplingPolygonObject = Objects.isEmpty(samplingPolygon) ? getSamplingPolygonDefaults() : samplingPolygon
 
   const commonInputFields = [
-    { key: 'offsetNorth', labelKey: 'offsetNorth' },
-    { key: 'offsetEast', labelKey: 'offsetEast' },
-    { key: 'controlPointOffsetNorth', labelKey: 'controlPointOffsetNorth' },
-    { key: 'controlPointOffsetEast', labelKey: 'controlPointOffsetEast' },
+    { key: 'offsetNorth' },
+    { key: 'offsetEast' },
+    { key: 'controlPointOffsetNorth' },
+    { key: 'controlPointOffsetEast' },
   ]
 
   const onSamplingPolygonChange = useCallback(
@@ -72,11 +72,10 @@ const SamplingPolygonEditor = (props) => {
             readOnly={readOnly}
           />
         )}
-        {commonInputFields.map(({ key, labelKey }) => (
+        {commonInputFields.map(({ key }) => (
           <FormPropertyItem
             key={key}
             objectKey={key}
-            labelKey={labelKey}
             onPropertyChange={onPropertyChange(key)}
             value={samplingPolygonObject[key]}
             samplingPolygonObject={samplingPolygonObject}

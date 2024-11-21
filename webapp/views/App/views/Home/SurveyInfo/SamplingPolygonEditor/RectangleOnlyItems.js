@@ -6,18 +6,17 @@ import { FormPropertyItem } from './FormPropertyItem'
 export const RectangleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
   const inputPropertiesForRectangle = [
-    { key: 'lengthLatitude', labelKey: 'lengthLatitude' },
-    { key: 'lengthLongitude', labelKey: 'lengthLongitude' },
-    { key: 'numberOfPointsNorth', labelKey: 'numberOfControlPointsNorth' },
-    { key: 'numberOfPointsEast', labelKey: 'numberOfControlPointsEast' },
+    { key: 'lengthLatitude' },
+    { key: 'lengthLongitude' },
+    { key: 'numberOfPointsNorth' },
+    { key: 'numberOfPointsEast' },
   ]
   return (
     <>
-      {inputPropertiesForRectangle.map(({ key, labelKey }) => (
+      {inputPropertiesForRectangle.map(({ key }) => (
         <FormPropertyItem
           key={key}
           objectKey={key}
-          labelKey={labelKey}
           onPropertyChange={onPropertyChange(key)}
           value={samplingPolygonObject[key]}
           samplingPolygonObject={samplingPolygonObject}
