@@ -19,15 +19,15 @@ export const CoordinateAttributePolygon = (props) => {
   const { latitude, longitude } = props
 
   const samplingPolygon = Survey.getSamplingPolygon(surveyInfo)
-  const latitudeLengthMeters = SamplingPolygon.getLengthLatitude(surveyInfo)
-  const longitudeLengthMeters = SamplingPolygon.getLengthLongitude(surveyInfo)
-  const numberOfPointsNorth = SamplingPolygon.getNumberOfPointsNorth(surveyInfo)
-  const numberOfPointsEast = SamplingPolygon.getNumberOfPointsEast(surveyInfo)
-  const numberOfPointsCircle = SamplingPolygon.getNumberOfPointsCircle(surveyInfo)
-  const controlPointOffsetNorth = SamplingPolygon.getControlPointOffsetNorth(surveyInfo)
-  const controlPointOffsetEast = SamplingPolygon.getControlPointOffsetEast(surveyInfo)
-  const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
-  const radius = SamplingPolygon.getRadius(surveyInfo)
+  const latitudeLengthMeters = SamplingPolygon.getLengthLatitude(samplingPolygon)
+  const longitudeLengthMeters = SamplingPolygon.getLengthLongitude(samplingPolygon)
+  const numberOfPointsNorth = SamplingPolygon.getNumberOfPointsNorth(samplingPolygon)
+  const numberOfPointsEast = SamplingPolygon.getNumberOfPointsEast(samplingPolygon)
+  const numberOfPointsCircle = SamplingPolygon.getNumberOfPointsCircle(samplingPolygon)
+  const controlPointOffsetNorth = SamplingPolygon.getControlPointOffsetNorth(samplingPolygon)
+  const controlPointOffsetEast = SamplingPolygon.getControlPointOffsetEast(samplingPolygon)
+  const isCircle = SamplingPolygon.isCircle(samplingPolygon)
+  const radius = SamplingPolygon.getRadius(samplingPolygon)
 
   const latitudeDeg = GeoUtils.metersToDegreesLatitude(latitudeLengthMeters) //how many degrees lat length is
   const longitudeDeg = GeoUtils.metersToDegreesLongitude(longitudeLengthMeters, latitude) // how many degrees lng length is (at the middle point)

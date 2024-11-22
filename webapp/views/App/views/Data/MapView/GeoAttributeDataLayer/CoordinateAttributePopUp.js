@@ -104,9 +104,9 @@ export const CoordinateAttributePopUp = (props) => {
   const generateGeoJson = useCallback(() => {
     const samplingPolygon = Survey.getSamplingPolygon(surveyInfo)
     if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
-      const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
+      const isCircle = SamplingPolygon.isCircle(samplingPolygon)
       if (isCircle) {
-        const radius = SamplingPolygon.getRadius(surveyInfo)
+        const radius = SamplingPolygon.getRadius(samplingPolygon)
         return circleToPolygon([longitude, latitude], radius)
       } else {
         const bounds = GeoUtils.generateBounds({ latitude, longitude, ...samplingPolygon })
