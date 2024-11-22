@@ -13,7 +13,7 @@ export const useValidate = ({ setState }) => {
   const dispatch = useDispatch()
   const survey = useSelector(SurveyState.getSurvey)
 
-  return useCallback(async ({ nodeDefUpdated }) => {
+  return useCallback(async ({ nodeDef, nodeDefUpdated }) => {
     const surveyUpdated = Survey.assocNodeDef({ nodeDef: nodeDefUpdated })(survey)
 
     // Update local state immediately (see issue #3240)
@@ -25,7 +25,7 @@ export const useValidate = ({ setState }) => {
     })
 
     // // Dispatch update action
-    dispatch(NodeDefsActions.updateNodeDef({ nodeDef: nodeDefUpdated, dirty }))
+    dispatch(NodeDefsActions.updateNodeDef({ prevNodeDef: nodeDef, nodeDef: nodeDefUpdated, dirty }))
 
     // // Validate node def
     const validation = await SurveyValidator.validateNodeDef(surveyUpdated, nodeDefUpdated)
