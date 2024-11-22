@@ -12,7 +12,7 @@ import { FormPropertyItem } from './FormPropertyItem'
 import { CircleOnlyItems } from './CircleOnlyItems'
 import { RectangleOnlyItems } from './RectangleOnlyItems'
 
-import { getSamplingPolygonDefaults } from '@webapp/model/SamplingPolygon'
+import { getSamplingPolygonDefaults } from '@core/survey/SamplingPolygon'
 
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props

@@ -103,7 +103,9 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
 )
-export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})
+export const getSamplingPolygon = (surveyInfo) => {
+  return ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo)
+}
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 

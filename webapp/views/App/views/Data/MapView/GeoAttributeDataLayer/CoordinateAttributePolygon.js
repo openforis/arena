@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Rectangle, Circle } from 'react-leaflet'
-import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
 
-import * as SamplingPolygon from '@webapp/model/SamplingPolygon'
+import * as Survey from '@core/survey/survey'
+import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { GeoUtils } from '@webapp/utils/geoUtils'
 
 export const CoordinateAttributePolygon = (props) => {
   const surveyInfo = useSurveyInfo()
@@ -17,8 +18,9 @@ export const CoordinateAttributePolygon = (props) => {
 
   const { latitude, longitude } = props
 
-  const len_lat_meters = SamplingPolygon.getLengthLatitude(surveyInfo)
-  const len_lng_meters = SamplingPolygon.getLengthLongitude(surveyInfo)
+  const samplingPolygon = Survey.getSamplingPolygon(surveyInfo)
+  const latitudeLengthMeters = SamplingPolygon.getLengthLatitude(surveyInfo)
+  const longitudeLengthMeters = SamplingPolygon.getLengthLongitude(surveyInfo)
   const numberOfPointsNorth = SamplingPolygon.getNumberOfPointsNorth(surveyInfo)
   const numberOfPointsEast = SamplingPolygon.getNumberOfPointsEast(surveyInfo)
   const numberOfPointsCircle = SamplingPolygon.getNumberOfPointsCircle(surveyInfo)
@@ -27,20 +29,20 @@ export const CoordinateAttributePolygon = (props) => {
   const isCircle = SamplingPolygon.getIsCircle(surveyInfo)
   const radius = SamplingPolygon.getRadius(surveyInfo)
 
-  const len_lat = SamplingPolygon.MetersToDegreesLatitude(len_lat_meters) //how many degrees lat length is
-  const len_lng = SamplingPolygon.MetersToDegreesLongitude(len_lng_meters, latitude) // how many degrees lng length is (at the middle point)
+  const latitudeDeg = GeoUtils.metersToDegreesLatitude(latitudeLengthMeters) //how many degrees lat length is
+  const longitudeDeg = GeoUtils.metersToDegreesLongitude(longitudeLengthMeters, latitude) // how many degrees lng length is (at the middle point)
   const control_point_latlng = L.latLng(
-    latitude + SamplingPolygon.MetersToDegreesLatitude(controlPointOffsetNorth),
-    longitude + SamplingPolygon.MetersToDegreesLongitude(controlPointOffsetEast, latitude)
+    latitude + GeoUtils.metersToDegreesLatitude(controlPointOffsetNorth),
+    longitude + GeoUtils.metersToDegreesLongitude(controlPointOffsetEast, latitude)
   )
 
-  const bounds = SamplingPolygon.getBounds(surveyInfo, latitude, longitude)
+  const bounds = GeoUtils.generateBounds({ latitude, longitude, ...samplingPolygon })
 
   const pointSize = 10
-  const pointSizeLat = SamplingPolygon.MetersToDegreesLatitude(pointSize)
+  const pointSizeLat = GeoUtils.metersToDegreesLatitude(pointSize)
 
-  const pointDistanceLat = len_lat / numberOfPointsNorth
-  const startLat = bounds.getSouthWest().lat + len_lat / numberOfPointsEast / 2 - pointSizeLat / 2
+  const pointDistanceLat = latitudeDeg / numberOfPointsNorth
+  const startLat = bounds.getSouthWest().lat + latitudeDeg / numberOfPointsEast / 2 - pointSizeLat / 2
 
   const [colors, setColors] = useState([...Array(numberOfPointsEast)].map(() => Array(numberOfPointsNorth).fill(0))) // this generates zero matrix
   const [circleColors, setCircleColors] = useState(Array(numberOfPointsCircle).fill(0))
@@ -124,7 +126,7 @@ export const CoordinateAttributePolygon = (props) => {
     const middle_latlng = L.latLng(middle)
     let pointArray = []
     for (let i = 0; i < 360; i += 360 / amount) {
-      const latlng = GeometryUtil.destination(middle_latlng, i + angle, radius)
+      const latlng = GeoUtils.destination(middle_latlng, i + angle, radius)
       const pointIndex = circleControlPointIndex
       pointArray.push(
         <Circle
@@ -151,13 +153,10 @@ export const CoordinateAttributePolygon = (props) => {
     for (let eastIndex = 0; eastIndex < numberOfPointsEast; eastIndex++) {
       for (let northIndex = 0; northIndex < numberOfPointsNorth; northIndex++) {
         const pointDistanceLng =
-          SamplingPolygon.MetersToDegreesLongitude(len_lng_meters, startLat + northIndex * pointDistanceLat) /
+          GeoUtils.metersToDegreesLongitude(longitudeLengthMeters, startLat + northIndex * pointDistanceLat) /
           numberOfPointsEast
-        const pointSizeLng = SamplingPolygon.MetersToDegreesLongitude(
-          pointSize,
-          startLat + northIndex * pointDistanceLat
-        )
-        const startLon = bounds.getSouthWest().lng + len_lng / numberOfPointsNorth / 2 - pointSizeLat / 2
+        const pointSizeLng = GeoUtils.metersToDegreesLongitude(pointSize, startLat + northIndex * pointDistanceLat)
+        const startLon = bounds.getSouthWest().lng + longitudeDeg / numberOfPointsNorth / 2 - pointSizeLat / 2
         points.push(
           <Rectangle
             bounds={[
