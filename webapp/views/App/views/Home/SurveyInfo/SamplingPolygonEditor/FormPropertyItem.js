@@ -28,13 +28,11 @@ export const FormPropertyItem = (props) => {
 }
 
 FormPropertyItem.propTypes = {
-  key: PropTypes.string.isRequired,
   allowNegative: PropTypes.bool,
-  readOnly: PropTypes.bool.isRequired,
-  onPropertyChange: PropTypes.func,
-  samplingPolygonObject: PropTypes.object,
   getFieldValidation: PropTypes.func,
-  value: PropTypes.any,
   objectKey: PropTypes.string,
-  labelKey: PropTypes.string,
+  onPropertyChange: PropTypes.func,
+  readOnly: PropTypes.bool.isRequired,
+  samplingPolygonObject: PropTypes.object,
+  value: PropTypes.any,
 }
