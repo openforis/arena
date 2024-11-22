@@ -2,6 +2,21 @@ import * as Survey from '@core/survey/survey'
 import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
 
+const samplingPolygonDefaults = {
+  lengthLatitude: 0,
+  lengthLongitude: 0,
+  numberOfPointsNorth: 0,
+  numberOfPointsEast: 0,
+  offsetNorth: 0,
+  offsetEast: 0,
+  controlPointOffsetNorth: 0,
+  controlPointOffsetEast: 0,
+  isCircle: true,
+  radius: 0,
+}
+
+export const getSamplingPolygonDefaults = () => ({ ...samplingPolygonDefaults })
+
 export const getLengthLatitude = (surveyInfo) => {
   return Survey.getSamplingPolygon(surveyInfo).lengthLatitude || 0
 }

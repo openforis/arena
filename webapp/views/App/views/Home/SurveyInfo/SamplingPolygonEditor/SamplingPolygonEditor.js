@@ -5,14 +5,14 @@ import PropTypes from 'prop-types'
 
 import { Numbers, Objects } from '@openforis/arena-core'
 
-import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
-
 import { useI18n } from '@webapp/store/system'
 
 import SamplingPolygonShapeEditor from '../SamplingPolygonShapeEditor'
 import { FormPropertyItem } from './FormPropertyItem'
 import { CircleOnlyItems } from './CircleOnlyItems'
 import { RectangleOnlyItems } from './RectangleOnlyItems'
+
+import { getSamplingPolygonDefaults } from '@webapp/model/SamplingPolygon'
 
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
@@ -24,8 +24,8 @@ const SamplingPolygonEditor = (props) => {
   const commonInputFields = [
     { key: 'offsetNorth' },
     { key: 'offsetEast' },
-    { key: 'controlPointOffsetNorth' },
-    { key: 'controlPointOffsetEast' },
+    { key: 'controlPointOffsetNorth', allowNegative: false },
+    { key: 'controlPointOffsetEast', allowNegative: false },
   ]
 
   const onSamplingPolygonChange = useCallback(
@@ -72,15 +72,16 @@ const SamplingPolygonEditor = (props) => {
             readOnly={readOnly}
           />
         )}
-        {commonInputFields.map(({ key }) => (
+        {commonInputFields.map(({ key, allowNegative }) => (
           <FormPropertyItem
             key={key}
+            allowNegative={allowNegative}
+            getFieldValidation={getFieldValidation}
             objectKey={key}
             onPropertyChange={onPropertyChange(key)}
-            value={samplingPolygonObject[key]}
-            samplingPolygonObject={samplingPolygonObject}
             readOnly={readOnly}
-            getFieldValidation={getFieldValidation}
+            samplingPolygonObject={samplingPolygonObject}
+            value={samplingPolygonObject[key]}
           />
         ))}
       </div>

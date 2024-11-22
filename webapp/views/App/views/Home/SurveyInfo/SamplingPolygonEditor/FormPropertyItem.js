@@ -4,12 +4,20 @@ import PropTypes from 'prop-types'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
 export const FormPropertyItem = (props) => {
-  const { objectKey, onPropertyChange, value, samplingPolygonObject, readOnly, getFieldValidation } = props
+  const {
+    allowNegative = true,
+    getFieldValidation,
+    objectKey,
+    onPropertyChange,
+    readOnly,
+    samplingPolygonObject,
+    value,
+  } = props
   return (
     <FormItem label={`samplingPolygonOptions.${objectKey}`}>
       <Input
         id={`sampling-polygon-${objectKey}`}
-        numberFormat={NumberFormats.integer()}
+        numberFormat={NumberFormats.integer({ allowNegative })}
         onChange={onPropertyChange}
         readOnly={readOnly}
         validation={getFieldValidation(samplingPolygonObject[objectKey])}
@@ -21,6 +29,7 @@ export const FormPropertyItem = (props) => {
 
 FormPropertyItem.propTypes = {
   key: PropTypes.string.isRequired,
+  allowNegative: PropTypes.bool,
   readOnly: PropTypes.bool.isRequired,
   onPropertyChange: PropTypes.func,
   samplingPolygonObject: PropTypes.object,

@@ -10,12 +10,13 @@ import { Objects, PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 
 import { Button, ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
 import { ButtonPrevious } from '@webapp/components/buttons/ButtonPrevious'
 import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
+
+import * as SamplingPolygon from '@webapp/model/SamplingPolygon'
 
 import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import { useUserName } from '@webapp/store/user/hooks'

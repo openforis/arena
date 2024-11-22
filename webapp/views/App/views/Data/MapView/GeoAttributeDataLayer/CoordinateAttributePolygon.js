@@ -4,8 +4,7 @@ import { Rectangle, Circle } from 'react-leaflet'
 import GeometryUtil from 'leaflet-geometryutil'
 import L from 'leaflet'
 
-import * as SamplingPolygon from '@core/survey/SamplingPolygon'
-
+import * as SamplingPolygon from '@webapp/model/SamplingPolygon'
 import { useMapContextOptions } from '@webapp/components/Map/MapContext'
 import { useSurveyInfo } from '@webapp/store/survey'
 
