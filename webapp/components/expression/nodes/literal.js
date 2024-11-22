@@ -23,6 +23,7 @@ import { TestId } from '@webapp/utils/testId'
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
+import { Objects } from '@openforis/arena-core'
 
 const isValueText = (nodeDef, value) =>
   nodeDef
@@ -43,6 +44,18 @@ const loadItems = async (params) => {
   return items
 }
 
+const _findNodeDefByName = ({ survey, name }) => {
+  if (Objects.isEmpty(name)) {
+    return null
+  }
+  const nodeDef = Survey.findNodeDefByName(name)(survey)
+  if (nodeDef) {
+    return nodeDef
+  }
+  const nameWithoutSubfix = name.replace('_label', '')
+  return Survey.findNodeDefByName(nameWithoutSubfix)(survey)
+}
+
 const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
   if (!type || BinaryOperandType.isLeft(type)) {
     return nodeDefCurrent
@@ -57,12 +70,7 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => 
       if (identifierName === Expression.thisVariable) {
         return nodeDefCurrent
       }
-      const nodeDef = Survey.getNodeDefByName(identifierName)(survey)
-      if (!nodeDef) {
-        const nameWithOutSubfix = identifierName.replace('_label', '')
-        return Survey.getNodeDefByName(nameWithOutSubfix)(survey)
-      }
-      return nodeDef
+      return _findNodeDefByName({ survey, name: identifierName })
     }
   }
   return null

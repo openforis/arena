@@ -136,11 +136,13 @@ export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   return R.pipe(getNodeDefChildren(nodeDef), R.any(NodeDef.isEntity))(survey)
 }
 
-export const getNodeDefChildByName = (nodeDef, childName) =>
-  R.pipe(
-    getNodeDefChildren(nodeDef),
-    R.find((childDef) => childName === NodeDef.getName(childDef))
-  )
+export const getNodeDefChildByName = (nodeDef, childName) => (survey) =>
+  SurveyNodeDefsIndex.hasNodeDefsIndexByName(survey)
+    ? Surveys.getNodeDefByName({ survey, name: childName })
+    : R.pipe(
+        getNodeDefChildren(nodeDef),
+        R.find((childDef) => childName === NodeDef.getName(childDef))
+      )(survey)
 
 export const getNodeDefParent = (nodeDef) => (survey) => {
   if (NodeDef.isRoot(nodeDef)) return null
@@ -153,11 +155,6 @@ export const getNodeDefAreaBasedEstimate = (nodeDef) => (survey) =>
 
 export const getAreaBasedEstimatedOfNodeDef = (nodeDef) => (survey) =>
   getNodeDefByUuid(NodeDef.getAreaBasedEstimatedOf(nodeDef))(survey)
-
-export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
-  const parentDef = getNodeDefParent(nodeDef)(survey)
-  return getNodeDefChildByName(parentDef, name)(survey)
-}
 
 const _nodeDefKeysFilter = (n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n)
 
@@ -183,8 +180,7 @@ export const getNodeDefsRootUnique = (survey) => {
   )
 }
 
-export const getNodeDefByName = (name) =>
-  R.pipe(getNodeDefsArray, R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name)))
+export const getNodeDefByName = (name) => (survey) => Surveys.getNodeDefByName({ survey, name })
 
 export const getNodeDefsByCategoryUuid = (uuid) =>
   R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid)))
@@ -193,6 +189,8 @@ export const getNodeDefsByTaxonomyUuid = (uuid) =>
   R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid)))
 
 export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predicate))
+
+export const findNodeDefByName = (name) => (survey) => Surveys.findNodeDefByName({ survey, name })
 
 export const getNodeDefMaxDecimalDigits = (nodeDef) => (survey) => {
   const referenceNodeDef =
