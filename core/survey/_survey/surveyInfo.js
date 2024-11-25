@@ -8,6 +8,8 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
+import * as SamplingPolygon from '../SamplingPolygon'
+
 export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
@@ -103,7 +105,10 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
 )
-export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})
+export const getSamplingPolygon = (surveyInfo) => {
+  const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo)
+  return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
+}
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 

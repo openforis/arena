@@ -3,9 +3,7 @@ import './SamplingPolygonEditor.scss'
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { Objects } from '@openforis/arena-core'
-
-import { getSamplingPolygonDefaults } from '@core/survey/_survey/surveyDefaults'
+import { Numbers, Objects } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -14,6 +12,8 @@ import { FormPropertyItem } from './FormPropertyItem'
 import { CircleOnlyItems } from './CircleOnlyItems'
 import { RectangleOnlyItems } from './RectangleOnlyItems'
 
+import { getSamplingPolygonDefaults } from '@core/survey/SamplingPolygon'
+
 const SamplingPolygonEditor = (props) => {
   const { readOnly, samplingPolygon, getFieldValidation, setSamplingPolygon } = props
 
@@ -21,11 +21,11 @@ const SamplingPolygonEditor = (props) => {
 
   const samplingPolygonObject = Objects.isEmpty(samplingPolygon) ? getSamplingPolygonDefaults() : samplingPolygon
 
-  const inputPropertiesForAll = [
-    { key: 'offsetNorth', labelKey: 'offsetNorth' },
-    { key: 'offsetEast', labelKey: 'offsetEast' },
-    { key: 'controlPointOffsetNorth', labelKey: 'controlPointOffsetNorth' },
-    { key: 'controlPointOffsetEast', labelKey: 'controlPointOffsetEast' },
+  const commonInputFields = [
+    { key: 'offsetNorth' },
+    { key: 'offsetEast' },
+    { key: 'controlPointOffsetNorth', allowNegative: false },
+    { key: 'controlPointOffsetEast', allowNegative: false },
   ]
 
   const onSamplingPolygonChange = useCallback(
@@ -37,7 +37,8 @@ const SamplingPolygonEditor = (props) => {
 
   const onPropertyChange = (key) => (e) => {
     const value = e?.target?.value ?? e
-    onSamplingPolygonChange({ ...samplingPolygonObject, [key]: Number(value) })
+    const numericValue = Numbers.toNumber(value)
+    onSamplingPolygonChange({ ...samplingPolygonObject, [key]: numericValue })
   }
 
   const onShapeChange = (value) => {
@@ -71,16 +72,16 @@ const SamplingPolygonEditor = (props) => {
             readOnly={readOnly}
           />
         )}
-        {inputPropertiesForAll.map(({ key, labelKey }) => (
+        {commonInputFields.map(({ key, allowNegative }) => (
           <FormPropertyItem
             key={key}
-            objectKey={key}
-            labelKey={labelKey}
-            onPropertyChange={onPropertyChange(key)}
-            value={samplingPolygonObject[key]}
-            samplingPolygonObject={samplingPolygonObject}
-            readOnly={readOnly}
+            allowNegative={allowNegative}
             getFieldValidation={getFieldValidation}
+            objectKey={key}
+            onPropertyChange={onPropertyChange(key)}
+            readOnly={readOnly}
+            samplingPolygonObject={samplingPolygonObject}
+            value={samplingPolygonObject[key]}
           />
         ))}
       </div>

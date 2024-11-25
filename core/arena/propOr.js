@@ -13,5 +13,5 @@ import { prop } from './prop'
  */
 export const propOr = _curry3((defaultValue, property, object) => {
   const value = object ? prop(property, object) : null
-  return value || defaultValue
+  return value ?? defaultValue
 })
