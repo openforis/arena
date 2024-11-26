@@ -5,7 +5,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as DateUtils from '@core/dateUtils'
-import * as ProcessUtils from '@core/processUtils'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'
@@ -87,15 +86,13 @@ const Row = (props) => {
       <div data-testid={TestId.userList.edit}>
         <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
-      {canEditUser && ProcessUtils.ENV.experimentalFeatures && (
-        <Button
-          iconClassName="icon-cog"
-          title="usersView.editSurveyUserExtraPropsForUser"
-          titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
-          onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
-          variant="text"
-        />
-      )}
+      <Button
+        iconClassName="icon-cog"
+        title="usersView.editSurveyUserExtraPropsForUser"
+        titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
+        onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
+        variant="text"
+      />
     </>
   )
 }

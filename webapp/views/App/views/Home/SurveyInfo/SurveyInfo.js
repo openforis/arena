@@ -2,8 +2,6 @@ import './SurveyInfo.scss'
 
 import React from 'react'
 
-import * as ProcessUtils from '@core/processUtils'
-
 import { useAuthCanEditSurvey, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -76,17 +74,15 @@ const SurveyInfo = () => {
     })
   }
   if (!readOnly) {
-    if (ProcessUtils.ENV.experimentalFeatures) {
-      tabs.push({
-        key: 'extraProps',
-        component: SurveyUserExtraPropDefsEditor,
-        label: 'homeView.surveyInfo.userExtraProps.title',
-        props: {
-          extraPropDefs: userExtraPropDefs,
-          onExtraPropDefsUpdate: setUserExtraPropDefs,
-        },
-      })
-    }
+    tabs.push({
+      key: 'extraProps',
+      component: SurveyUserExtraPropDefsEditor,
+      label: 'homeView.surveyInfo.userExtraProps.title',
+      props: {
+        extraPropDefs: userExtraPropDefs,
+        onExtraPropDefsUpdate: setUserExtraPropDefs,
+      },
+    })
     if (isSystemAdmin) {
       tabs.push({
         key: 'configuration',

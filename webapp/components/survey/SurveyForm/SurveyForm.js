@@ -10,7 +10,6 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
-import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { SurveyState, useSurvey } from '@webapp/store/survey'
@@ -200,13 +199,11 @@ const SurveyForm = (props) => {
                 onSelect={onNodeDefTreeSelect}
               />
               <div className="display-flex sidebar-bottom-bar">
-                {edit && ProcessUtils.ENV.experimentalFeatures && (
-                  <ButtonGroup
-                    items={treeSelectViewModeItems}
-                    onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
-                    selectedItemKey={treeSelectViewMode}
-                  />
-                )}
+                <ButtonGroup
+                  items={treeSelectViewModeItems}
+                  onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
+                  selectedItemKey={treeSelectViewMode}
+                />
                 {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
               </div>
             </div>
