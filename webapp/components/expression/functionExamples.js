@@ -35,12 +35,7 @@ const functionExamples = {
   },
 }
 
-const experimentalFunctions = [
-  functionNames.geoPolygon,
-  functionNames.userEmail,
-  functionNames.userName,
-  functionNames.userProp,
-]
+const experimentalFunctions = []
 
 const isFunctionAvailable = (functionName) =>
   ProcessUtils.ENV.experimentalFeatures || !experimentalFunctions.includes(functionName)

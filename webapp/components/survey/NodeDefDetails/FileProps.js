@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Validation from '@core/validation/validation'
-import * as ProcessUtils from '@core/processUtils'
 
 import { useI18n } from '@webapp/store/system'
 
@@ -58,22 +57,20 @@ const FileProps = (props) => {
           validation={Validation.getFieldValidation(NodeDef.propKeys.maxFileSize)(validation)}
         />
       </FormItem>
-      {ProcessUtils.ENV.experimentalFeatures && (
-        <FormItem label="nodeDefEdit.fileProps.fileNameExpression">
-          <NodeDefSingleExpressionProp
-            canBeConstant
-            excludeCurrentNodeDef
-            isBoolean={false}
-            nodeDef={nodeDef}
-            onChange={({ query: value }) => {
-              Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })
-            }}
-            qualifier="fileNameExpression"
-            query={NodeDef.getFileNameExpression(nodeDef)}
-            validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
-          />
-        </FormItem>
-      )}
+      <FormItem label="nodeDefEdit.fileProps.fileNameExpression">
+        <NodeDefSingleExpressionProp
+          canBeConstant
+          excludeCurrentNodeDef
+          isBoolean={false}
+          nodeDef={nodeDef}
+          onChange={({ query: value }) => {
+            Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.fileNameExpression, value })
+          }}
+          qualifier="fileNameExpression"
+          query={NodeDef.getFileNameExpression(nodeDef)}
+          validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
+        />
+      </FormItem>
       <FormItem label="nodeDefEdit.fileProps.fileType">
         <ButtonGroup selectedItemKey={NodeDef.getFileType(nodeDef)} onChange={selectFileType} items={fileTypes} />
       </FormItem>

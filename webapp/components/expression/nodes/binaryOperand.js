@@ -4,17 +4,12 @@ import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as ProcessUtils from '@core/processUtils'
 
 import { Button } from '@webapp/components/buttons'
 
 const { types } = Expression
 
-const availableOperandExpressionTypes = [
-  types.Identifier,
-  types.Literal,
-  ...(ProcessUtils.ENV.experimentalFeatures ? [types.CallExpression] : []),
-]
+const availableOperandExpressionTypes = [types.Identifier, types.Literal, types.CallExpression]
 
 const expressionTypeAcronymByType = {
   [types.CallExpression]: 'call',

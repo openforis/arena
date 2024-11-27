@@ -15,7 +15,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
-const experimentalNodeDefTypes = [NodeDef.nodeDefType.geo]
+const experimentalNodeDefTypes = []
 
 const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props

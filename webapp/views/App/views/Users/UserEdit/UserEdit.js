@@ -6,7 +6,6 @@ import { useNavigate, useParams } from 'react-router'
 import { Objects } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
-import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
@@ -122,7 +121,7 @@ const UserEdit = () => {
         </FormItem>
       )}
 
-      {ProcessUtils.ENV.experimentalFeatures && <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />}
+      <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
       {canEditSystemAdmin && (
         <FormItem label="authGroups.systemAdmin.label">
@@ -168,15 +167,13 @@ const UserEdit = () => {
               />
             </FormItem>
           )}
-          {ProcessUtils.ENV.experimentalFeatures && (
-            <ExpansionPanel
-              buttonLabel="usersView.surveyExtraProp.label_other"
-              className="extra-props"
-              startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
-            >
-              <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
-            </ExpansionPanel>
-          )}
+          <ExpansionPanel
+            buttonLabel="usersView.surveyExtraProp.label_other"
+            className="extra-props"
+            startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
+          >
+            <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
+          </ExpansionPanel>
         </>
       )}
       {editingSameUser && hideSurveyGroup && canUseMap && (
