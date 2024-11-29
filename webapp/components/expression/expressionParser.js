@@ -14,18 +14,22 @@ export const parseQuery = ({ query, mode, canBeConstant = false }) => {
   return Expression.newBinaryEmpty({ canBeConstant, exprQuery })
 }
 
+export const normalize = ({ expr, canBeConstant = false, canBeCall = false }) => {
+  if (canBeConstant || canBeCall) {
+    // expr can be a binary expression with an empty operator and right operand;
+    // formatting and parsing it again will keep only the left operand in the evaluation
+    const exprString = Expression.toString(expr)
+    if (isNotBlank(exprString)) {
+      return Expression.fromString(exprString)
+    }
+  }
+  return expr
+}
+
 export const isExprValid = ({ expr, canBeConstant = false, canBeCall = false }) => {
   try {
-    if (canBeConstant || canBeCall) {
-      // expr can be a binary expression with an empty operator and right operand;
-      // formatting and parsing it again allows to consider only the left operand in the evaluation
-      const exprString = Expression.toString(expr)
-      if (isNotBlank(exprString)) {
-        const exprToValidate = Expression.fromString(exprString)
-        return Expression.isValid(exprToValidate)
-      }
-    }
-    return Expression.isValid(expr)
+    const exprToValidate = normalize({ expr, canBeConstant, canBeCall })
+    return Expression.isValid(exprToValidate)
   } catch (error) {
     return false
   }
