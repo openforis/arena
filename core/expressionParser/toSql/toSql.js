@@ -13,6 +13,7 @@ const stdlib2sql = {
   sum: 'sum',
   avg: 'avg',
   isEmpty: (param) => `coalesce(${param}, '') = ''`,
+  isNotEmpty: (param) => `coalesce(${param}, '') <> ''`,
   '!': (param) => `NOT (${param})`,
 }
 
@@ -129,7 +130,7 @@ export const identifier = (node, params) => {
 
 export const call = (node, params) => {
   const { callee, arguments: argumentsNode } = node
-  const { name } = callee
+  const name = callee.name ?? callee.value // callee can be literal or identifier
   const sqlFnNameOrFn = stdlib2sql[name]
   if (!sqlFnNameOrFn) {
     throw new SystemError('undefinedFunction', { name })

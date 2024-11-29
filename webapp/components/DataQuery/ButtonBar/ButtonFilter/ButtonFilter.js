@@ -6,16 +6,15 @@ import { Query } from '@common/model/query'
 
 import { ButtonIconFilter } from '@webapp/components/buttons'
 import ExpressionEditorPopup from '@webapp/components/expression/expressionEditorPopup'
+import * as ExpressionParser from '@webapp/components/expression/expressionParser'
 
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useI18n } from '@webapp/store/system'
 
 import { State } from '../store'
 
 const ButtonFilter = (props) => {
   const { disabled, state, Actions } = props
 
-  const i18n = useI18n()
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
@@ -35,6 +34,7 @@ const ButtonFilter = (props) => {
 
       {State.isPanelFilterShown(state) && (
         <ExpressionEditorPopup
+          canBeCall
           nodeDefUuidContext={entityDefUuid}
           nodeDefUuidCurrent={entityDefUuid}
           includeAnalysis
@@ -42,9 +42,10 @@ const ButtonFilter = (props) => {
           excludeCurrentNodeDef={false}
           query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
-          header={i18n.t('dataView.filterRecords.expressionEditorHeader')}
+          header="dataView.filterRecords.expressionEditorHeader"
           onChange={({ expr }) => {
-            onChangeQuery(Query.assocFilter(expr)(query))
+            const exprNormalized = ExpressionParser.normalize({ expr, canBeCall: true })
+            onChangeQuery(Query.assocFilter(exprNormalized)(query))
             Actions.closePanels()
           }}
           onClose={Actions.closePanels}
