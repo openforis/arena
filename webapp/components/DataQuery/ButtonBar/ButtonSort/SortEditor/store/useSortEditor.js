@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { Objects } from '@openforis/arena-core'
 
 import { Query, Sort } from '@common/model/query'
-import * as ObjectUtils from '@core/objectUtils'
 import * as Expression from '@core/expressionParser/expression'
 
 import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
@@ -21,7 +20,15 @@ const getVariables = ({ survey, cycle, entityDef, attributeDefUuids, lang }) => 
   })
   if (Objects.isEmpty(attributeDefUuids)) return variables
 
-  const variablesByUuid = ObjectUtils.toUuidIndexedObj(variables)
+  const variablesByUuid = variables.reduce((acc, variable) => {
+    const { uuid } = variable
+    if (!acc[uuid]) {
+      // keep only first variable
+      // variables for composite attributes have same UUID for different properties (e.g. taxon)
+      acc[uuid] = variable
+    }
+    return acc
+  }, {})
   return attributeDefUuids.map((uuid) => variablesByUuid[uuid]).filter(Boolean)
 }
 

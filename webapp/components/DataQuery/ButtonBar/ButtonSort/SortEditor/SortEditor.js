@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 
 import { Button } from '@webapp/components/buttons'
 import PanelRight from '@webapp/components/PanelRight'
-import { useI18n } from '@webapp/store/system'
 import { Sort, SortCriteria } from '@common/model/query'
 
 import { useSortEditor } from './store'
@@ -13,11 +12,10 @@ import SortCriteriaEditor from './SortCriteriaEditor'
 const SortEditor = (props) => {
   const { onChange, onClose, query } = props
 
-  const i18n = useI18n()
   const { draft, sort, sortDraft, setSortDraft, variables, variablesAvailable } = useSortEditor({ query })
 
   return (
-    <PanelRight onClose={onClose} header={i18n.t('common.orderBy')}>
+    <PanelRight onClose={onClose} header="common.orderBy">
       <div className="sort-editor">
         {sortDraft.map((sortCriteria, idx) => (
           <SortCriteriaEditor
