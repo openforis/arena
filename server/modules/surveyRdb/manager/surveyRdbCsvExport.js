@@ -192,7 +192,7 @@ const getCsvObjectTransformer = ({
     transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
   }
   if (nullsToEmpty) {
-    transformers.push(getCsvObjectTransformerNullsToEmpty)
+    transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
   if (keepFileNamesUnique) {
     const { transformer } = getCsvObjectTransformerUniqueFileNames({
