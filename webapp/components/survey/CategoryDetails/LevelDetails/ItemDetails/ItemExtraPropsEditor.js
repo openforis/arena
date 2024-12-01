@@ -10,17 +10,32 @@ import * as Validation from '@core/validation/validation'
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useI18n } from '@webapp/store/system'
+import { useSurveySrsIndex } from '@webapp/store/survey'
+
+const numericFields = ['x', 'y']
+
+const parsePoint = ({ value, srsIndex }) => {
+  const srssArray = Object.values(srsIndex)
+  const surveyUniqueSrs = srssArray.length === 1 ? srssArray[0] : null
+  const surveyUniqueSrsCode = surveyUniqueSrs?.code
+  const point = Points.parse(value) ?? {}
+  // assing unique srs as default, if any
+  point.srs = point.srs ?? surveyUniqueSrsCode
+  return point
+}
 
 const GeometryPointExtraPropEditor = (props) => {
   const { extraPropKey, item, readOnly, updateProp, validation } = props
 
+  const srsIndex = useSurveySrsIndex()
+
   const value = CategoryItem.getExtraProp(extraPropKey)(item)
 
-  const point = Points.parse(value) || {}
+  const point = parsePoint({ value, srsIndex })
   const { x, y, srs } = point
 
   const onFieldChange = (field) => (value) => {
-    const pointUpdated = { ...point, [field]: ['x', 'y'].includes(field) ? Number(value) : value }
+    const pointUpdated = { ...point, [field]: numericFields.includes(field) ? Number(value) : value }
     const extra = A.pipe(CategoryItem.getExtra, A.assoc(extraPropKey, pointUpdated))(item)
     updateProp({ key: CategoryItem.keysProps.extra, value: extra })
   }
