@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import { Points } from '@openforis/arena-core'
 
@@ -12,7 +13,7 @@ import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useI18n } from '@webapp/store/system'
 import { useSurveySrsIndex } from '@webapp/store/survey'
 
-const numericFields = ['x', 'y']
+const pointNumericFields = ['x', 'y']
 
 const parsePoint = ({ value, srsIndex }) => {
   const srssArray = Object.values(srsIndex)
@@ -35,7 +36,7 @@ const GeometryPointExtraPropEditor = (props) => {
   const { x, y, srs } = point
 
   const onFieldChange = (field) => (value) => {
-    const pointUpdated = { ...point, [field]: numericFields.includes(field) ? Number(value) : value }
+    const pointUpdated = { ...point, [field]: pointNumericFields.includes(field) ? Number(value) : value }
     const extra = A.pipe(CategoryItem.getExtra, A.assoc(extraPropKey, pointUpdated))(item)
     updateProp({ key: CategoryItem.keysProps.extra, value: extra })
   }
@@ -73,6 +74,14 @@ const GeometryPointExtraPropEditor = (props) => {
   )
 }
 
+GeometryPointExtraPropEditor.propTypes = {
+  extraPropKey: PropTypes.string.isRequired,
+  item: PropTypes.object,
+  readOnly: PropTypes.bool,
+  updateProp: PropTypes.func.isRequired,
+  validation: PropTypes.object,
+}
+
 export const ItemExtraPropsEditor = (props) => {
   const { item, itemExtraDefs, readOnly, updateProp, validation } = props
 
@@ -108,4 +117,12 @@ export const ItemExtraPropsEditor = (props) => {
       )}
     </fieldset>
   )
+}
+
+ItemExtraPropsEditor.propTypes = {
+  item: PropTypes.object,
+  itemExtraDefs: PropTypes.object.isRequired,
+  readOnly: PropTypes.bool,
+  updateProp: PropTypes.func.isRequired,
+  validation: PropTypes.object,
 }
