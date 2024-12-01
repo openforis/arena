@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { Points } from '@openforis/arena-core'
+import { Numbers, Objects, Points } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
@@ -17,11 +17,11 @@ const pointNumericFields = ['x', 'y']
 
 const parsePoint = ({ value, srsIndex }) => {
   const srssArray = Object.values(srsIndex)
-  const surveyUniqueSrs = srssArray.length === 1 ? srssArray[0] : null
-  const surveyUniqueSrsCode = surveyUniqueSrs?.code
+  const surveyDefaultSrs = srssArray.length > 0 ? srssArray[0] : null
+  const surveyDefaultSrsCode = surveyDefaultSrs?.code
   const point = Points.parse(value) ?? {}
-  // assing unique srs as default, if any
-  point.srs = point.srs ?? surveyUniqueSrsCode
+  // assing default (first) srs if missing in parsed point
+  point.srs = point.srs ?? surveyDefaultSrsCode
   return point
 }
 
@@ -36,7 +36,10 @@ const GeometryPointExtraPropEditor = (props) => {
   const { x, y, srs } = point
 
   const onFieldChange = (field) => (value) => {
-    const pointUpdated = { ...point, [field]: pointNumericFields.includes(field) ? Number(value) : value }
+    let pointUpdated = { ...point, [field]: pointNumericFields.includes(field) ? Numbers.toNumber(value) : value }
+    if (Objects.isEmpty(pointUpdated.x) && Objects.isEmpty(pointUpdated.y)) {
+      pointUpdated = null
+    }
     const extra = A.pipe(CategoryItem.getExtra, A.assoc(extraPropKey, pointUpdated))(item)
     updateProp({ key: CategoryItem.keysProps.extra, value: extra })
   }
