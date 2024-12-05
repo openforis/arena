@@ -11,22 +11,37 @@ import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
 
+const parsePoint = (geometryPoint) => {
+  if (Objects.isEmpty(geometryPoint)) return null
+  const point = Points.parse(geometryPoint)
+  if (point) return point
+  try {
+    return JSON.parse(geometryPoint)
+  } catch (error) {
+    return null
+  }
+}
+
+const transformGeometryPointExtraProperty = ({ extraDef, obj }) => {
+  // split geometry point into separate columns
+  const extraDefName = ExtraPropDef.getName(extraDef)
+  const geometryPoint = obj[extraDefName]
+  const point = parsePoint(geometryPoint)
+  delete obj[extraDefName]
+  if (point) {
+    obj[extraDefName + '_x'] = point.x
+    obj[extraDefName + '_y'] = point.y
+    obj[extraDefName + '_srs'] = point.srs
+  }
+}
+
 const categoryItemExportTransformer =
   ({ category, language = null, includeLevelPosition = false }) =>
   (obj) => {
     const extraDefs = Category.getItemExtraDefsArray(category)
     extraDefs.forEach((extraDef) => {
       if (ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint) {
-        // split geometry point into separate columns
-        const extraDefName = ExtraPropDef.getName(extraDef)
-        const geometryPoint = obj[extraDefName]
-        if (!Objects.isEmpty(geometryPoint)) {
-          const point = Points.parse(geometryPoint)
-          delete obj[extraDefName]
-          obj[extraDefName + '_x'] = point.x
-          obj[extraDefName + '_y'] = point.y
-          obj[extraDefName + '_srs'] = point.srs
-        }
+        transformGeometryPointExtraProperty({ extraDef, obj })
       }
     })
     if (language) {
