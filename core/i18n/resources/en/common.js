@@ -1859,6 +1859,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     call: 'Function',
     operator: 'Operator',
 
+    coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
+
     error: {
       selectOneVariable: 'Please select one variable',
     },
