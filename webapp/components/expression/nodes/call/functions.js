@@ -2,6 +2,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
 import { CallCountEditor } from './callCountEditor'
+import { CallDistanceEditor } from './callDistanceEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
@@ -29,6 +30,10 @@ export const functions = {
   [functionNames.count]: {
     label: 'count(...)',
     component: CallCountEditor,
+  },
+  [functionNames.distance]: {
+    label: 'distance(...)',
+    component: CallDistanceEditor,
   },
   [functionNames.includes]: {
     label: 'includes(...)',
