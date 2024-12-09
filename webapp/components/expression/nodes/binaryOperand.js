@@ -5,7 +5,7 @@ import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { Button } from '@webapp/components/buttons'
+import { ButtonGroup } from '@webapp/components/form'
 
 const { types } = Expression
 
@@ -21,27 +21,6 @@ const expressionGeneratorByType = {
   [types.CallExpression]: () => Expression.newCall(),
   [types.Identifier]: () => Expression.newIdentifier(),
   [types.Literal]: () => Expression.newLiteral(),
-}
-
-const BinaryOperandExpressionTypeButton = (props) => {
-  const { active, expressionType, onClick } = props
-  const acronym = expressionTypeAcronymByType[expressionType]
-  return (
-    <Button
-      active={active}
-      className={`btn-switch-operand btn-switch-operand-${acronym}`}
-      label={`expressionEditor.${acronym}`}
-      onClick={onClick}
-      size="small"
-      variant="outlined"
-    />
-  )
-}
-
-BinaryOperandExpressionTypeButton.propTypes = {
-  active: PropTypes.bool.isRequired,
-  expressionType: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
 }
 
 export const BinaryOperandType = {
@@ -98,7 +77,7 @@ const BinaryOperand = (props) => {
     [canOperandExpressionBeOfType]
   )
 
-  const onOperandTypeClick = (newType) => () => {
+  const onOperandTypeChange = (newType) => {
     const newOperatorExpression = expressionGeneratorByType[newType]()
     let nodeUpdated = { ...node, [type]: newOperatorExpression }
     if (isLeft && !isBoolean) {
@@ -113,14 +92,16 @@ const BinaryOperand = (props) => {
 
   return (
     <div className={`binary-${type}`}>
-      {applicableOperandExpressionTypes.map((expressionType) => (
-        <BinaryOperandExpressionTypeButton
-          key={expressionType}
-          active={operandExpressionType === expressionType}
-          expressionType={expressionType}
-          onClick={onOperandTypeClick(expressionType)}
-        />
-      ))}
+      <ButtonGroup
+        className="binary-operand-type-btn-group"
+        selectedItemKey={operandExpressionType}
+        onChange={onOperandTypeChange}
+        items={applicableOperandExpressionTypes.map((expressionType) => {
+          const acronym = expressionTypeAcronymByType[expressionType]
+          const label = `expressionEditor.${acronym}`
+          return { key: expressionType, label }
+        })}
+      />
       {React.createElement(renderNode, {
         canDelete,
         isBoolean,
