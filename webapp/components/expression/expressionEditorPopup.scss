@@ -106,21 +106,12 @@
       width: 160px;
     }
 
-    .btn-switch-operand {
-      font-size: 0.75rem;
-      margin: 0 0.1rem;
-      height: 32px;
-      align-self: flex-end;
-      text-wrap: nowrap;
+    .binary-operand-type-btn-group {
+      height: 2rem;
+      margin: 0 0.2rem;
 
-      &.btn-switch-operand-const {
-        width: 7rem;
-      }
-      &.btn-switch-operand-var {
-        width: 5rem;
-      }
-      &.btn-switch-operand-call {
-        width: 5rem;
+      button {
+        white-space: nowrap;
       }
     }
 
