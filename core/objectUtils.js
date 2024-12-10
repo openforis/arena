@@ -130,17 +130,21 @@ export const toIndexedObj = (array, propNameOrExtractor) =>
 
 export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
-export const groupByProp = (propNameOrExtractor) => (items) =>
-  items.reduce((acc, item) => {
-    const prop = _getProp(propNameOrExtractor)(item)
-    let itemsByProp = acc[prop]
-    if (!itemsByProp) {
-      itemsByProp = []
-      acc[prop] = itemsByProp
-    }
-    itemsByProp.push(item)
-    return acc
-  }, {})
+export const groupByProps =
+  (...propNamesOrExtractors) =>
+  (items) =>
+    items.reduce((acc, item) => {
+      const props = propNamesOrExtractors.map((propNameOrExtractor) => _getProp(propNameOrExtractor)(item))
+      let itemsPartial = R.path(props)(acc)
+      if (!itemsPartial) {
+        itemsPartial = []
+      }
+      itemsPartial.push(item)
+      setInPath(props, itemsPartial)(acc)
+      return acc
+    }, {})
+
+export const groupByProp = groupByProps
 
 export const clone = (obj) => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
 
