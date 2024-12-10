@@ -56,8 +56,9 @@ const validateLevels = async ({ category, itemsCache, bigCategory }) => {
 
 // ====== ITEMS
 
-const validateItemCodeUniqueness = (siblingsAndSelfByCode) => (_propName, item) => {
-  const isUnique = siblingsAndSelfByCode[CategoryItem.getCode(item)]?.length === 1
+const validateItemCodeUniqueness = (itemsByParentAndCode) => (_propName, item) => {
+  const siblingItems = R.path([CategoryItem.getParentUuid(item), CategoryItem.getCode(item)])(itemsByParentAndCode)
+  const isUnique = siblingItems?.length === 1
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
 }
 
@@ -68,11 +69,11 @@ const validateNotEmptyChildrenItems =
       ? { key: Validation.messageKeys.categoryEdit.childrenEmpty, severity: ValidationResult.severity.warning }
       : null
 
-const itemValidators = ({ isLeaf, siblingsAndSelfByCode, childrenCount = 0 }) => ({
+const itemValidators = ({ isLeaf, itemsByParentAndCode, childrenCount = 0 }) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
-    validateItemCodeUniqueness(siblingsAndSelfByCode),
+    validateItemCodeUniqueness(itemsByParentAndCode),
   ],
   [keys.children]: [validateNotEmptyChildrenItems({ isLeaf, childrenCount })],
 })
@@ -182,15 +183,15 @@ const validateItemsAndDescendants = async ({
   const pushItems = (items) => {
     // Group sibling items by code to optimize item code uniqueness check
     // do it only one time for every sibling
-    const siblingsAndSelfByCode = ObjectUtils.groupByProp(CategoryItem.getCode)(items)
+    const itemsByParentAndCode = ObjectUtils.groupByProps(CategoryItem.getParentUuid, CategoryItem.getCode)(items)
     items.forEach((item) => {
-      item.siblingsAndSelfByCode = siblingsAndSelfByCode
+      item.itemsByParentAndCode = itemsByParentAndCode
       stack.push(item)
     })
   }
 
   const popItem = (item) => {
-    delete item['siblingsAndSelfByCode']
+    delete item['itemsByParentAndCode']
     stack.pop()
     processed++
     onProgress?.({ total, processed })
@@ -200,7 +201,7 @@ const validateItemsAndDescendants = async ({
 
   while (!R.isEmpty(stack) && !stopIfFn?.()) {
     const item = stack[stack.length - 1] // Do not pop item: it can be visited again
-    const { siblingsAndSelfByCode } = item
+    const { itemsByParentAndCode } = item
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
     const itemChildren = itemsCache.getItemChildren(itemUuid)
@@ -214,7 +215,7 @@ const validateItemsAndDescendants = async ({
       /* eslint-disable no-await-in-loop */
       validation = await Validator.validate(
         item,
-        itemValidators({ isLeaf, siblingsAndSelfByCode, childrenCount }),
+        itemValidators({ isLeaf, itemsByParentAndCode, childrenCount }),
         false
       )
       validation = _validateItemExtraProps({ extraDefs, validation, srsIndex })(item)
@@ -294,7 +295,10 @@ export const validateCategory = async ({
 
 export const validateItems = async ({ category, itemsToValidate, itemsCountByItemUuid }) => {
   const prevValidation = Category.getValidation(category)
-  const siblingsAndSelfByCode = ObjectUtils.groupByProp(CategoryItem.getCode)(itemsToValidate)
+  const itemsByParentAndCode = ObjectUtils.groupByProps(
+    CategoryItem.getParentUuid,
+    CategoryItem.getCode
+  )(itemsToValidate)
   const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
   let itemsValidationUpdated = prevItemsValidation
 
@@ -305,7 +309,7 @@ export const validateItems = async ({ category, itemsToValidate, itemsCountByIte
 
     const itemValidation = await Validator.validate(
       item,
-      itemValidators({ isLeaf, siblingsAndSelfByCode, childrenCount })
+      itemValidators({ isLeaf, itemsByParentAndCode, childrenCount })
     )
     itemsValidationUpdated = Validation.assocFieldValidation(itemUuid, itemValidation)(itemsValidationUpdated)
   }

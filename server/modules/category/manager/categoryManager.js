@@ -133,11 +133,12 @@ const _afterItemUpdate = async ({ surveyId, categoryUuid, itemUuid, prevItem }, 
   }
   const itemsToValidate = []
   for await (const code of codes) {
-    const itemsCount = await CategoryRepository.countItemsByLevelAndCode({ surveyId, levelUuid, code, draft }, client)
-    if (itemsCount <= Category.maxCategoryItemsInIndex) {
-      itemsToValidate.push(
-        ...(await CategoryRepository.fetchItemsByLevelAndCode({ surveyId, levelUuid, code, draft }, client))
-      )
+    const items = await CategoryRepository.fetchItemsByLevelParentAndCode(
+      { surveyId, levelUuid, parentUuid, code, draft },
+      client
+    )
+    if (items.length > 0 && items.length <= Category.maxCategoryItemsInIndex) {
+      itemsToValidate.push(...items)
     }
   }
   const addItemToValidate = (item) => {

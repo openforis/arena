@@ -250,33 +250,41 @@ export const fetchItemsByCategoryUuid = async (
   return backup || draft ? items : R.filter((item) => item.published)(items)
 }
 
-const getWhereConditionItemsWithLevelAndCode = ({ draft, tableAlias = 'i' }) => {
+const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null, tableAlias = 'i' }) => {
   const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, `${tableAlias}.`, true)
-  return `${tableAlias}.level_uuid = $/levelUuid/ AND COALESCE(${codeColumn}, '') = $/code/`
+  return `${tableAlias}.level_uuid = $/levelUuid/ 
+    AND parent_uuid ${parentUuid ? '= $/parentUuid/' : ' IS NULL'} 
+    AND COALESCE(${codeColumn}, '') = $/code/`
 }
 
-export const countItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+export const countItemsByLevelParentAndCode = async (
+  { surveyId, levelUuid, parentUuid, code, draft = false },
+  client = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const row = await client.one(
     `SELECT COUNT(*) 
      FROM ${schema}.category_item i
-     WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
+     WHERE ${getWhereConditionItemsWithLevelParentAndCode({ parentUuid, draft })}
   `,
-    { levelUuid, code: Strings.defaultIfEmpty('')(code) }
+    { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) }
   )
   return Number(row.count)
 }
 
-export const fetchItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+export const fetchItemsByLevelParentAndCode = async (
+  { surveyId, levelUuid, parentUuid, code, draft = false },
+  client = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const items = await client.map(
     `
       SELECT i.* 
       FROM ${schema}.category_item i
-      WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
+      WHERE ${getWhereConditionItemsWithLevelParentAndCode({ parentUuid, draft })}
      ORDER BY i.id
     `,
-    { levelUuid, code: Strings.defaultIfEmpty('')(code) },
+    { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) },
     (def) => DB.transformCallback(def, draft, true)
   )
 
