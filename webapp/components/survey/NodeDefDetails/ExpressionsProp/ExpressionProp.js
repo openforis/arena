@@ -82,7 +82,7 @@ const ExpressionProp = (props) => {
           />
         </div>
 
-        {applyIf && (
+        {applyIf && !isPlaceholder && (
           <div className="expression-item">
             <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
 
