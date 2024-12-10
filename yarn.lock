@@ -2761,22 +2761,6 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^0.0.205":
-  version "0.0.205"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/0.0.205/7a4a1074ac76b00880789904fc5fd5dc7d1d6382#7a4a1074ac76b00880789904fc5fd5dc7d1d6382"
-  integrity sha512-JISauhuzUbN/UReULxRRe50P7IhCcowkayt6pXAy8gF4m8VypKU1AfJgXLXZ3eSGnvXwyuk2TXzwrxIJ7epw/Q==
-  dependencies:
-    "@jsep-plugin/regex" "^1.0.3"
-    bignumber.js "^9.1.2"
-    jsep "^1.3.8"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    moment "^2.30.1"
-    proj4 "^2.11.0"
-    uuid "^10.0.0"
-
 "@openforis/arena-core@^1.0.6":
   version "1.0.6"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.6/5c9eccfc9d5c378481aac3149de7215cb1f35541#5c9eccfc9d5c378481aac3149de7215cb1f35541"
@@ -2793,13 +2777,13 @@
     proj4 "^2.11.0"
     uuid "^10.0.0"
 
-"@openforis/arena-server@^0.1.36":
-  version "0.1.36"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.36/6a1611be205496a934c5979f1aa7b57cfb4e2553#6a1611be205496a934c5979f1aa7b57cfb4e2553"
-  integrity sha512-OqJsTHdd257XJnPn1qXOXYKtO8f9FiPtbYnvmNc3Vm4J3i+Ium11rjZiHinW3pNz3blaXckxrlJYZ13tW5ef+w==
+"@openforis/arena-server@^0.1.38":
+  version "0.1.38"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.38/659348db89d49b9b6d76a8f10cdfc6bb400a356f#659348db89d49b9b6d76a8f10cdfc6bb400a356f"
+  integrity sha512-IQT+RTMgaQVH1Nq9FHwSvNboOnT68oyBMnK94huCf4HskJOAnkG7L7cic752d66qLAFt0JNqzthw9enEUZJpJg==
   dependencies:
     "@godaddy/terminus" "^4.12.1"
-    "@openforis/arena-core" "^0.0.205"
+    "@openforis/arena-core" "^1.0.6"
     bcryptjs "^2.4.3"
     compression "^1.7.4"
     connect-pg-simple "^10.0.0"
