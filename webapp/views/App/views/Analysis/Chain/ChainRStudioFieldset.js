@@ -7,6 +7,7 @@ import * as Chain from '@common/analysis/chain'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { Checkbox } from '@webapp/components/form'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
+import RecordsDropdown from './RecordsDropdown'
 
 export const ChainRStudioFieldset = (props) => {
   const { updateChain } = props
@@ -34,6 +35,13 @@ export const ChainRStudioFieldset = (props) => {
             validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
             onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
           />
+          <Checkbox
+            label="chainView.submitOnlySelectedRecordsIntoR"
+            checked={Chain.isSubmitOnlySelectedRecordsIntoR(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.submitOnlySelectedRecordsIntoR)(validation)}
+            onChange={(value) => updateChain(Chain.assocSubmitOnlySelectedRecordsIntoR(value)(chain))}
+          />
+          {Chain.isSubmitOnlySelectedRecordsIntoR(chain) && <RecordsDropdown onChange={(selectedRecordUuids) => {}} />}
           <Checkbox
             label="chainView.resultsBackFromRStudio"
             checked={Chain.isResultsBackFromRStudio(chain)}

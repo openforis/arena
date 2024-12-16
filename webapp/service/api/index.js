@@ -44,6 +44,7 @@ export {
   downloadDataQueryExport,
   fetchRecordsCountByStep,
   fetchRecordSummary,
+  fetchRecordsSummary,
   startExportDataToCSVJob,
   downloadExportedDataToCSVUrl,
   startRecordsCloneJob,
