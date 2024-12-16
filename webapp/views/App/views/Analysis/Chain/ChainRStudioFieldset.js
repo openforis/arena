@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
@@ -62,4 +63,8 @@ export const ChainRStudioFieldset = (props) => {
       </div>
     </fieldset>
   )
+}
+
+ChainRStudioFieldset.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }
