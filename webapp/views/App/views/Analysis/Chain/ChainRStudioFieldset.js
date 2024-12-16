@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
+import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
@@ -18,11 +19,11 @@ export const ChainRStudioFieldset = (props) => {
 
   const openRStudio = useCallback(() => {
     dispatch(ChainActions.openRStudio())
-  }, [])
+  }, [dispatch])
 
   const openRStudioLocal = useCallback(() => {
     dispatch(ChainActions.openRStudio({ isLocal: true }))
-  }, [])
+  }, [dispatch])
 
   return (
     <fieldset className="rstudio-fieldset">
@@ -41,7 +42,14 @@ export const ChainRStudioFieldset = (props) => {
             validation={Validation.getFieldValidation(Chain.keysProps.submitOnlySelectedRecordsIntoR)(validation)}
             onChange={(value) => updateChain(Chain.assocSubmitOnlySelectedRecordsIntoR(value)(chain))}
           />
-          {Chain.isSubmitOnlySelectedRecordsIntoR(chain) && <RecordsDropdown onChange={(selectedRecordUuids) => {}} />}
+          {Chain.isSubmitOnlySelectedRecordsIntoR(chain) && (
+            <RecordsDropdown
+              onChange={(selectedRecords) =>
+                updateChain(Chain.assocSelectedRecordUuids(selectedRecords.map(Record.getUuid))(chain))
+              }
+              selectedUuids={Chain.getSelectedRecordUuids(chain)}
+            />
+          )}
           <Checkbox
             label="chainView.resultsBackFromRStudio"
             checked={Chain.isResultsBackFromRStudio(chain)}

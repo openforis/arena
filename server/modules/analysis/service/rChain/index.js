@@ -40,7 +40,8 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
   const recordSteps = Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)
     ? [RecordStep.getStepIdByName(RecordStep.stepNames.analysis)]
     : null
-  const query = Query.create({ entityDefUuid: nodeDefUuid })
+  const filterRecordUuids = Chain.isSubmitOnlySelectedRecordsIntoR(chain) ? Chain.getSelectedRecordUuids(chain) : null
+  const query = Query.create({ entityDefUuid: nodeDefUuid, filterRecordUuids })
 
   // fetch data
   return SurveyRdbManager.fetchViewData({

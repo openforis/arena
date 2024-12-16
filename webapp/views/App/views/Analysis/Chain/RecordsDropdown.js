@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { RecordSummary } from '@core/record/recordSummary'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as ObjectUtils from '@core/objectUtils'
 
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
@@ -17,13 +18,19 @@ const RecordsDropdown = (props) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
 
-  const [state, setState] = useState({ loading: true, records: [] })
-  const { loading, records } = state
+  const [state, setState] = useState({ loading: true, records: [], recordsByUuid: {} })
+  const { loading, records, recordsByUuid } = state
 
   const loadRecords = useCallback(async () => {
     const _records = await API.fetchRecordsSummary({ surveyId, cycle })
-    setState({ loading: false, records: _records })
+    const recordsByUuid = ObjectUtils.toUuidIndexedObj(_records)
+    setState({ loading: false, records: _records, recordsByUuid })
   }, [cycle, surveyId])
+
+  const selectedRecords = useMemo(
+    () => selectedUuids?.map((uuid) => recordsByUuid[uuid]).filter(Boolean),
+    [recordsByUuid, selectedUuids]
+  )
 
   useEffect(() => {
     loadRecords()
@@ -48,7 +55,7 @@ const RecordsDropdown = (props) => {
       multiple
       onChange={onChange}
       readOnly={readOnly}
-      selection={selectedUuids}
+      selection={selectedRecords}
       testId={testId}
     />
   )
