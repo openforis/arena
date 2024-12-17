@@ -13,7 +13,6 @@ import * as Chain from '@common/analysis/chain'
 import { analysisModules, appModuleUri } from '@webapp/app/appModules'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { useSurvey } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 import { useLocationPathMatcher, useOnPageUnload } from '@webapp/components/hooks'
 import TabBar from '@webapp/components/tabBar'
@@ -25,7 +24,6 @@ import { ChainSamplingDesignProps } from './ChainSamplingDesignProps'
 import { ChainStatisticalAnalysisProps } from './statisticalAnalysis/ChainStatisticalAnalysisProps'
 
 const ChainComponent = () => {
-  const i18n = useI18n()
   const dispatch = useDispatch()
   const { chainUuid } = useParams()
   const chain = useChain()
@@ -72,17 +70,17 @@ const ChainComponent = () => {
       <TabBar
         tabs={[
           {
-            label: i18n.t('chainView.basic'),
+            label: 'chainView.basic',
             component: ChainBasicProps,
             props: { updateChain },
           },
           {
-            label: i18n.t('chainView.samplingDesign'),
+            label: 'chainView.samplingDesign',
             component: ChainSamplingDesignProps,
             props: { updateChain },
           },
           {
-            label: i18n.t('chainView.statisticalAnalysis.header'),
+            label: 'chainView.statisticalAnalysis.header',
             component: ChainStatisticalAnalysisProps,
             props: { updateChain },
           },

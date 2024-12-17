@@ -13,12 +13,16 @@ export const fetchRecordsCountByStep = async ({ surveyId, cycle }) => {
   const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/count/by-step`, { params: { cycle } })
   return countsByStep
 }
-export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
+export const fetchRecordsSummary = async ({ surveyId, cycle, recordUuid = null, search = null }) => {
   const {
     data: { list },
   } = await axios.get(`/api/survey/${surveyId}/records/summary`, {
-    params: { cycle, recordUuid },
+    params: { cycle, recordUuid, search },
   })
+  return list
+}
+export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
+  const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
 
