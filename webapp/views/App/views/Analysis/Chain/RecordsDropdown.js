@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { RecordSummary } from '@core/record/recordSummary'
@@ -19,22 +19,22 @@ const RecordsDropdown = (props) => {
   const cycle = useSurveyCycleKey()
 
   const [state, setState] = useState({ loading: true, records: [], recordsByUuid: {} })
-  const { loading, records, recordsByUuid } = state
-
-  const loadRecords = useCallback(async () => {
-    const _records = await API.fetchRecordsSummary({ surveyId, cycle })
-    const recordsByUuid = ObjectUtils.toUuidIndexedObj(_records)
-    setState({ loading: false, records: _records, recordsByUuid })
-  }, [cycle, surveyId])
+  const { loading, recordsByUuid } = state
 
   const selectedRecords = useMemo(
     () => selectedUuids?.map((uuid) => recordsByUuid[uuid]).filter(Boolean),
     [recordsByUuid, selectedUuids]
   )
 
-  useEffect(() => {
-    loadRecords()
-  }, [loadRecords])
+  const recordsLookupFunction = useCallback(
+    async (search) => {
+      const records = await API.fetchRecordsSummary({ surveyId, cycle, search })
+      const _recordsByUuid = ObjectUtils.toUuidIndexedObj(records)
+      setState({ loading: false, recordsByUuid: _recordsByUuid })
+      return records
+    },
+    [cycle, surveyId]
+  )
 
   const recordLabelFunction = useCallback(
     (record) => {
@@ -48,7 +48,7 @@ const RecordsDropdown = (props) => {
     <Dropdown
       className="form-input-container"
       disabled={disabled}
-      items={records}
+      items={recordsLookupFunction}
       itemValue="uuid"
       itemLabel={recordLabelFunction}
       loading={loading}
