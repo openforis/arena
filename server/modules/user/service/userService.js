@@ -417,8 +417,9 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   Logger.debug('deleting users with expired invitations')
   const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(client)
   if (deletedUsers.length > 0) {
-    Logger.debug('deleting expired users access requests by expired invitations')
     const deletedUsersEmails = deletedUsers.map(User.getEmail)
+    Logger.debug(`deleted users: ${deletedUsersEmails}`)
+    Logger.debug('deleting expired users access requests by expired invitations')
     await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
   }
   Logger.debug('deleting expired users access requests')
