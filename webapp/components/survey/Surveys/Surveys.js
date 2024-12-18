@@ -98,6 +98,7 @@ const Surveys = (props) => {
       {
         key: Survey.sortableKeys.dateCreated,
         header: 'common.dateCreated',
+        hidden: true,
         renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Survey.getDateCreated(Survey.getSurveyInfo(item))),
         width: '12rem',
         sortable: true,
