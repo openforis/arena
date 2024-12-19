@@ -4,6 +4,11 @@
   align-items: center;
   gap: 2rem;
 
+  .expansion-panel__content {
+    overflow: auto;
+    max-height: calc(100vh - 30rem);
+  }
+
   .form-item {
     .form-label {
       text-wrap: nowrap;
