@@ -34,6 +34,7 @@ export const {
   fetchSystemAdministratorsEmail,
   fetchUsersIntoStream,
   fetchActiveUserUuidsWithPreferredSurveyId,
+  fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
   updatePassword,
   resetUsersPrefsSurveyCycle,

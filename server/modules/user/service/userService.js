@@ -406,18 +406,19 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info('IDs of surveys to be deleted (if without any activity):', surveyIds)
+  Logger.info(`IDs of surveys to be deleted (if without any activity): ${surveyIds}`)
   for await (const surveyId of surveyIds) {
     const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
     // delete survey only if it is brand new
     if (activityLogsCount < 5) {
+      Logger.info(`Deleting survey ${surveyId}`)
       await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
     }
   }
   Logger.debug('deleting users with expired invitations')
-  const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(client)
-  if (deletedUsers.length > 0) {
-    const deletedUsersEmails = deletedUsers.map(User.getEmail)
+  const usersWithExpiredInvitation = await UserManager.deleteUsersWithExpiredInvitation(client)
+  if (usersWithExpiredInvitation.length > 0) {
+    const deletedUsersEmails = usersWithExpiredInvitation.map(User.getEmail)
     Logger.debug(`deleted users: ${deletedUsersEmails}`)
     Logger.debug('deleting expired users access requests by expired invitations')
     await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
@@ -425,7 +426,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)
 
-  return { deletedUsers, deletedSurveyIds: surveyIds }
+  return { deletedUsers: usersWithExpiredInvitation, deletedSurveyIds: surveyIds }
 }
 
 // ==== User prefs

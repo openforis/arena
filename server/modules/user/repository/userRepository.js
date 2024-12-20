@@ -314,8 +314,7 @@ export const fetchUsersWithExpiredInvitation = (client = db) =>
     `
     SELECT ${columnsCommaSeparated}
     FROM "user" u
-    WHERE ${expiredInvitationWhereCondition}
-    RETURNING ${columnsCommaSeparated}`,
+    WHERE ${expiredInvitationWhereCondition}`,
     [],
     camelize
   )
