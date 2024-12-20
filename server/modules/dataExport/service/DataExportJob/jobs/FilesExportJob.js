@@ -1,3 +1,5 @@
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 
 import Job from '@server/job/job'
@@ -14,7 +16,7 @@ export default class FilesExportJob extends Job {
   }
 
   async execute() {
-    const { survey, cycle, includeDataFromAllCycles, recordUuids } = this.context
+    const { survey, cycle, fileNamesByFileUuid, includeDataFromAllCycles, recordUuids } = this.context
 
     const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle(
       {
@@ -31,7 +33,10 @@ export default class FilesExportJob extends Job {
     // write the files in subfolders by cycle
     for await (const [cycle, fileUuids] of Object.entries(fileUuidsByCycle)) {
       for await (const fileUuid of fileUuids) {
-        await this.writeFile({ fileUuid, cycle })
+        const exportedFileName = fileNamesByFileUuid[fileUuid]
+        if (Objects.isNotEmpty(exportedFileName)) {
+          await this.writeFile({ fileUuid, cycle })
+        }
         this.incrementProcessedItems()
       }
     }
