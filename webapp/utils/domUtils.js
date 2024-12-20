@@ -86,3 +86,13 @@ export const downloadSvgToPng = (svgElement) => {
     URL.revokeObjectURL(url)
   }
 }
+
+export const htmlToString = (html) => {
+  try {
+    const div = document.createElement('div')
+    div.setHTMLUnsafe(html)
+    return div.innerText
+  } catch (error) {
+    return html
+  }
+}

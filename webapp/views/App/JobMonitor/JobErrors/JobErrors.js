@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import * as JobSerialized from '@common/job/jobSerialized'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import { htmlToString } from '@webapp/utils/domUtils'
+
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
@@ -53,7 +55,7 @@ const JobErrors = ({
             valueFormatter: (value) => {
               const validation = toValidation(value)
               const jointMessages = ValidationUtils.getJointMessages({ i18n, survey, showKeys: false })(validation)
-              return jointMessages.map(({ text }) => text).join(', ')
+              return jointMessages.map(({ text }) => htmlToString(text)).join(', ')
             },
           },
         ]}
