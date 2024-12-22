@@ -379,12 +379,12 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
 // DELETE
 export const { deleteUserResetPasswordExpired } = UserManager
 
-export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
+export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId }) =>
   db.tx(async (t) => {
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
     const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove, t)
 
-    await UserManager.deleteUser({ user, userUuidToRemove, survey }, t)
+    await UserManager.deleteUserFromSurvey({ user, userUuidToRemove, survey }, t)
 
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
@@ -416,10 +416,15 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
     }
   }
   Logger.debug('deleting users with expired invitations')
-  const usersWithExpiredInvitation = await UserManager.deleteUsersWithExpiredInvitation(client)
+  const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
   if (usersWithExpiredInvitation.length > 0) {
     const deletedUsersEmails = usersWithExpiredInvitation.map(User.getEmail)
-    Logger.debug(`deleted users: ${deletedUsersEmails}`)
+    const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
+    Logger.debug(`deleting users: ${deletedUsersEmails} ${usersWithExpiredInvitationUuids}`)
+    for await (const userUuid of usersWithExpiredInvitationUuids) {
+      Logger.debug(`deleting user: ${userUuid}`)
+      await UserManager.deleteUser(userUuid, client)
+    }
     Logger.debug('deleting expired users access requests by expired invitations')
     await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
   }

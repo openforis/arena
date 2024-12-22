@@ -436,6 +436,15 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
   )
 }
 
+export const deleteUser = (userUuid, client = db) =>
+  client.oneOrNone(
+    `DELETE FROM "user" u
+    WHERE u.uuid = $1
+    RETURNING ${columnsCommaSeparated}`,
+    [userUuid],
+    camelize
+  )
+
 export const deleteUsersWithExpiredInvitation = (client = db) =>
   client.any(
     `
