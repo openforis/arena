@@ -417,13 +417,22 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   }
   Logger.debug('deleting users with expired invitations')
   const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
+  const deletedUsers = []
+  const deletedUsersEmails = []
   if (usersWithExpiredInvitation.length > 0) {
-    const deletedUsersEmails = usersWithExpiredInvitation.map(User.getEmail)
+    const usersWithExpiredInvitationEmails = usersWithExpiredInvitation.map(User.getEmail)
     const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
-    Logger.debug(`deleting users: ${deletedUsersEmails} ${usersWithExpiredInvitationUuids}`)
-    for await (const userUuid of usersWithExpiredInvitationUuids) {
-      Logger.debug(`deleting user: ${userUuid}`)
-      await UserManager.deleteUser(userUuid, client)
+    Logger.debug(`deleting users: ${usersWithExpiredInvitationEmails} ${usersWithExpiredInvitationUuids}`)
+    for await (const user of usersWithExpiredInvitation) {
+      const userUuid = User.getUuid(user)
+      const userEmail = User.getEmail(user)
+      try {
+        await UserManager.deleteUser(userUuid, client)
+        deletedUsers.push(user)
+        deletedUsersEmails.push(userEmail)
+      } catch (error) {
+        Logger.debug(`error deleting user ${userEmail} [${userUuid}]`)
+      }
     }
     Logger.debug('deleting expired users access requests by expired invitations')
     await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
@@ -431,7 +440,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)
 
-  return { deletedUsers: usersWithExpiredInvitation, deletedSurveyIds: surveyIds }
+  return { deletedUsers, deletedSurveyIds: surveyIds }
 }
 
 // ==== User prefs
