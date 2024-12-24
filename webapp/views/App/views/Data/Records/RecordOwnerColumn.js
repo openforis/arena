@@ -2,6 +2,8 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
+import { Strings } from '@openforis/arena-core'
+
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 
@@ -58,7 +60,7 @@ export const RecordOwnerColumn = (props) => {
       canEdit={canEdit}
       className="record-owner-col"
       item={record}
-      renderItem={({ item }) => Record.getOwnerName(item)}
+      renderItem={({ item }) => Strings.defaultIfEmpty('---')(Record.getOwnerName(item))}
       renderItemEditing={() => <RecordOwnerDropdown selectedUuid={ownerUuid} onChange={onChange} />}
     />
   )
