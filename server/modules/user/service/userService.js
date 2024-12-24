@@ -431,7 +431,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
         deletedUsers.push(user)
         deletedUsersEmails.push(userEmail)
       } catch (error) {
-        Logger.debug(`error deleting user ${userEmail} [${userUuid}]`)
+        Logger.debug(`error deleting user ${userEmail} [${userUuid}]: ${String(error)}`)
       }
     }
     Logger.debug('deleting expired users access requests by expired invitations')
