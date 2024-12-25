@@ -34,10 +34,12 @@ export const {
   fetchSystemAdministratorsEmail,
   fetchUsersIntoStream,
   fetchActiveUserUuidsWithPreferredSurveyId,
+  fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
   updatePassword,
   resetUsersPrefsSurveyCycle,
   importNewUser,
+  deleteUser,
   deleteUsersWithExpiredInvitation,
 } = UserRepository
 
@@ -378,7 +380,7 @@ export const updateUserPrefsAndFetchGroups = async (user) => ({
 
 // ==== DELETE
 
-export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db) =>
+export const deleteUserFromSurvey = async ({ user, userUuidToRemove, survey }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))

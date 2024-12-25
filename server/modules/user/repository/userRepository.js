@@ -301,12 +301,12 @@ export const expiredInvitationWhereCondition = `
   AND NOT EXISTS (
     SELECT * 
     FROM user_invitation ui
-    WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
+    WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 WEEK' 
   )
   AND NOT EXISTS (
     SELECT * 
     FROM user_access_request uar
-    WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 MONTH'
+    WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 WEEK'
   )`
 
 export const fetchUsersWithExpiredInvitation = (client = db) =>
@@ -314,8 +314,7 @@ export const fetchUsersWithExpiredInvitation = (client = db) =>
     `
     SELECT ${columnsCommaSeparated}
     FROM "user" u
-    WHERE ${expiredInvitationWhereCondition}
-    RETURNING ${columnsCommaSeparated}`,
+    WHERE ${expiredInvitationWhereCondition}`,
     [],
     camelize
   )
@@ -436,6 +435,15 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
     [cycleKeysDeleted]
   )
 }
+
+export const deleteUser = (userUuid, client = db) =>
+  client.oneOrNone(
+    `DELETE FROM "user" u
+    WHERE u.uuid = $1
+    RETURNING ${columnsCommaSeparated}`,
+    [userUuid],
+    camelize
+  )
 
 export const deleteUsersWithExpiredInvitation = (client = db) =>
   client.any(

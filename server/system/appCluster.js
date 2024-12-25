@@ -14,6 +14,7 @@ import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
+import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 
 const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
 
@@ -59,5 +60,5 @@ export const run = async () => {
   await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
   // await SurveysFilesPropsCleanup.init()
-  // await ExpiredUserInvitationsCleanup.init()
+  await ExpiredUserInvitationsCleanup.init()
 }

@@ -371,7 +371,7 @@ export const init = (app) => {
       const { surveyId, userUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await UserService.deleteUser({ user, userUuidToRemove: userUuid, surveyId })
+      await UserService.deleteUserFromSurvey({ user, userUuidToRemove: userUuid, surveyId })
 
       Response.sendOk(res)
     } catch (error) {

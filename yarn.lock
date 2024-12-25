@@ -2777,10 +2777,26 @@
     proj4 "^2.11.0"
     uuid "^10.0.0"
 
-"@openforis/arena-server@^0.1.38":
-  version "0.1.38"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.38/659348db89d49b9b6d76a8f10cdfc6bb400a356f#659348db89d49b9b6d76a8f10cdfc6bb400a356f"
-  integrity sha512-IQT+RTMgaQVH1Nq9FHwSvNboOnT68oyBMnK94huCf4HskJOAnkG7L7cic752d66qLAFt0JNqzthw9enEUZJpJg==
+"@openforis/arena-core@^1.0.7":
+  version "1.0.7"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.7/07a0041e94145fbe31a087d85056f84f290b3a50#07a0041e94145fbe31a087d85056f84f290b3a50"
+  integrity sha512-oJxbNadkk9XAj9KWISjckpc/M0Xs7pC7gaOlxrMnUlBD5d1dgoE09CID8h/STxjWtnqIvlm+1xEt+ywkijBRAQ==
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.3"
+    bignumber.js "^9.1.2"
+    jsep "^1.3.8"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    moment "^2.30.1"
+    proj4 "^2.11.0"
+    uuid "^10.0.0"
+
+"@openforis/arena-server@^0.1.40":
+  version "0.1.40"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.40/93a2f1cf77fca3d462b1ab99e4c16f0276f52130#93a2f1cf77fca3d462b1ab99e4c16f0276f52130"
+  integrity sha512-NDezawb9N+2jgEL0Uo3HamM/3aRXbegZClJY2aYmyMLrYYMkpU2cmQ0n9xKRwBGMAoTWdDA0fICq3hA9y6wnAg==
   dependencies:
     "@godaddy/terminus" "^4.12.1"
     "@openforis/arena-core" "^1.0.6"
