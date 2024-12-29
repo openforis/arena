@@ -20,7 +20,7 @@ const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode,
   }
   // find itemUuid by code
   const code = getValueCode(value)
-  if (!Objects.isEmpty(code)) {
+  if (!Objects.isEmpty(code) && record) {
     const { itemUuid: itemUuidFound } = Survey.getCategoryItemUuidAndCodeHierarchy({
       nodeDef,
       code,
@@ -60,18 +60,16 @@ const dateTimeComparator =
 const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, record, parentNode, value, valueSearch, strict }) => {
-    if (record) {
-      const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value })
-      const itemUuidSearch = extractCategoryItemUuidFromValue({
-        survey,
-        nodeDef,
-        record,
-        parentNode,
-        value: valueSearch,
-      })
-      if (itemUuid && itemUuidSearch) {
-        return itemUuid === itemUuidSearch
-      }
+    const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value })
+    const itemUuidSearch = extractCategoryItemUuidFromValue({
+      survey,
+      nodeDef,
+      record,
+      parentNode,
+      value: valueSearch,
+    })
+    if (itemUuid && itemUuidSearch) {
+      return itemUuid === itemUuidSearch
     }
     if (!strict) {
       // compare just codes (record not available, tricky to find the "correct" category item without knowing its parent item)
