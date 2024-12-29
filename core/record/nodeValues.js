@@ -20,7 +20,7 @@ const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode,
   }
   // find itemUuid by code
   const code = getValueCode(value)
-  if (!Objects.isEmpty(code)) {
+  if (!Objects.isEmpty(code) && record) {
     const { itemUuid: itemUuidFound } = Survey.getCategoryItemUuidAndCodeHierarchy({
       nodeDef,
       code,
@@ -36,7 +36,8 @@ const extractCategoryItemCodeFromValue = ({ survey, value }) => {
   const itemUuid = getValueItemUuid(value)
   if (itemUuid) {
     const item = Survey.getCategoryItemByUuid(itemUuid)(survey)
-    return CategoryItems.getCode(item)
+    // item can be missing if category is big (not preloaded)
+    return item ? CategoryItems.getCode(item) : null
   }
   return getValueCode(value)
 }
@@ -59,12 +60,6 @@ const dateTimeComparator =
 const valueComparatorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, record, parentNode, value, valueSearch, strict }) => {
-    if (!strict || !record) {
-      // compare just codes (record not available, tricky to find the "correct" category item without knowing its parent item)
-      const code = extractCategoryItemCodeFromValue({ survey, value })
-      const codeSearch = extractCategoryItemCodeFromValue({ survey, value: valueSearch })
-      return code && codeSearch && code === codeSearch
-    }
     const itemUuid = extractCategoryItemUuidFromValue({ survey, nodeDef, record, parentNode, value })
     const itemUuidSearch = extractCategoryItemUuidFromValue({
       survey,
@@ -73,7 +68,18 @@ const valueComparatorByNodeDefType = {
       parentNode,
       value: valueSearch,
     })
-    return itemUuidSearch && itemUuid && itemUuidSearch === itemUuid
+    if (itemUuid && itemUuidSearch) {
+      return itemUuid === itemUuidSearch
+    }
+    if (!strict) {
+      // compare just codes (record not available, tricky to find the "correct" category item without knowing its parent item)
+      const code = extractCategoryItemCodeFromValue({ survey, value })
+      const codeSearch = extractCategoryItemCodeFromValue({ survey, value: valueSearch })
+      if (code && codeSearch) {
+        return code === codeSearch
+      }
+    }
+    return false
   },
   [NodeDef.nodeDefType.coordinate]: ({ value, valueSearch }) => R.equals(value, valueSearch),
   [NodeDef.nodeDefType.date]: dateTimeComparator({
