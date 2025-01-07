@@ -52,6 +52,7 @@ a:visited {
 // buttons
 button,
 .btn {
+  cursor: pointer;
   padding: 0.7rem 0.8rem;
   font-weight: 400;
   border: 1px solid $greyBorder;

@@ -11,11 +11,11 @@ import * as Node from '@core/record/node'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeRepository from '../../repository/nodeRepository'
 
-const _createUpdateResult = (record, node = null, nodes = {}) => {
+const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = false }) => {
   if (!node && Objects.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
-  const recordUpdated = Objects.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
+  const recordUpdated = Objects.isEmpty(nodes) ? record : Record.mergeNodes(nodes, { sideEffect })(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
 
@@ -58,7 +58,17 @@ export const insertNodesInBatch = async ({ user, surveyId, nodes, systemActivity
 }
 
 export const insertNode = async (
-  { user, survey, record, node, system, timezoneOffset, persistNodes = true, createMultipleEntities = true },
+  {
+    user,
+    survey,
+    record,
+    node,
+    system,
+    timezoneOffset,
+    persistNodes = true,
+    createMultipleEntities = true,
+    sideEffect = false,
+  },
   t
 ) => {
   node[Node.keys.created] = true // mark node as created (flag used by RDB manager to update data tables)
@@ -72,7 +82,7 @@ export const insertNode = async (
     const parentNode = Record.getParentNode(node)(record)
     const siblings = Record.getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
     if (siblings.some((sibling) => Objects.isEqual(Node.getValue(sibling), Node.getValue(node)))) {
-      return _createUpdateResult(record)
+      return _createUpdateResult({ record, sideEffect })
     }
   }
 
@@ -101,5 +111,5 @@ export const insertNode = async (
       )
     : nodesCreated
 
-  return _createUpdateResult(recordUpdated, node, nodesInserted)
+  return _createUpdateResult({ record: recordUpdated, node, nodes: nodesInserted, sideEffect })
 }
