@@ -4,6 +4,7 @@ import { Surveys, TraverseMethod } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
@@ -32,29 +33,31 @@ export const getNodeDefsByUuids =
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
-const filterNodeDefsWithoutSiblings = (nodeDefs) =>
-  nodeDefs.filter(
-    (nodeDef) =>
-      !NodeDef.isSampling(nodeDef) ||
-      nodeDefs.filter(
-        (_nodeDef) => NodeDef.isAnalysis(_nodeDef) && NodeDef.getChainUuid(_nodeDef) === NodeDef.getChainUuid(nodeDef)
-      ).length > 1
+const filterNodeDefsWithoutSiblings = (nodeDefs) => {
+  const analysisDefsByChainUuid = ObjectUtils.groupByProp(NodeDef.getChainUuid)(nodeDefs.filter(NodeDef.isAnalysis))
+  return nodeDefs.filter(
+    (nodeDef) => !NodeDef.isSampling(nodeDef) || analysisDefsByChainUuid[NodeDef.getChainUuid(nodeDef)]?.length > 1
   )
+}
 
 export const getNodeDefChildren =
-  (nodeDef, includeAnalysis = true) =>
+  (nodeDef, includeAnalysis = true, includeSamplingDefsWithoutSiblings = false) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
     let childDefs = Surveys.getNodeDefChildren({ survey: surveyIndexed, nodeDef, includeAnalysis })
-    childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    if (!includeSamplingDefsWithoutSiblings) {
+      childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    }
     return childDefs
   }
 
 export const getNodeDefChildrenSorted =
-  ({ nodeDef, includeAnalysis = false, cycle = null }) =>
+  ({ nodeDef, includeAnalysis = false, cycle = null, includeSamplingDefsWithoutSiblings = false }) =>
   (survey) => {
     let childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef, includeAnalysis, cycle })
-    childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    if (!includeSamplingDefsWithoutSiblings) {
+      childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    }
     return childDefs
   }
 
@@ -80,7 +83,7 @@ export const getNodeDefChildrenInOwnPage =
   }
 
 export const getNodeDefDescendantsInSingleEntities =
-  ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null }) =>
+  ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null, includeSamplingDefsWithoutSiblings = true }) =>
   (survey) => {
     const descendants = []
 
@@ -90,8 +93,13 @@ export const getNodeDefDescendantsInSingleEntities =
     while (!queue.isEmpty()) {
       const entityDefCurrent = queue.dequeue()
       const entityDefCurrentChildren = sorted
-        ? getNodeDefChildrenSorted({ nodeDef: entityDefCurrent, includeAnalysis, cycle })(survey)
-        : getNodeDefChildren(entityDefCurrent, includeAnalysis)(survey)
+        ? getNodeDefChildrenSorted({
+            nodeDef: entityDefCurrent,
+            includeAnalysis,
+            cycle,
+            includeSamplingDefsWithoutSiblings,
+          })(survey)
+        : getNodeDefChildren(entityDefCurrent, includeAnalysis, includeSamplingDefsWithoutSiblings)(survey)
 
       descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
 
@@ -119,6 +127,7 @@ export const getNodeDefDescendantAttributesInSingleEntities = ({
   includeMultipleAttributes = false,
   sorted = false,
   cycle = null,
+  includeSamplingDefsWithoutSiblings = true,
 }) =>
   getNodeDefDescendantsInSingleEntities({
     nodeDef,
@@ -126,6 +135,7 @@ export const getNodeDefDescendantAttributesInSingleEntities = ({
     filterFn: includeMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute,
     sorted,
     cycle,
+    includeSamplingDefsWithoutSiblings,
   })
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
