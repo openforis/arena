@@ -14,7 +14,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
@@ -377,7 +376,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
       const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
       const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-      await PromiseUtils.each(Object.entries(props), async ([key, value]) => {
+      for await (const [key, value] of Object.entries(props)) {
         const valuePrev = propsPrev[key]
 
         if (!R.equals(value, valuePrev)) {
@@ -403,7 +402,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
             }
           }
         }
-      })
+      }
       return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
     }
 
@@ -476,7 +475,9 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
 export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
-    await PromiseUtils.each(surveyIds, async (surveyId) => deleteSurvey(surveyId, { deleteUserPrefs: true }, t))
+    for await (const surveyId of surveyIds) {
+      await deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
+    }
     return surveyIds.length
   })
 
