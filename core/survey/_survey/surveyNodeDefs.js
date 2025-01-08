@@ -83,7 +83,7 @@ export const getNodeDefChildrenInOwnPage =
   }
 
 export const getNodeDefDescendantsInSingleEntities =
-  ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null, includeSamplingDefsWithoutSiblings = true }) =>
+  ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null, includeSamplingDefsWithoutSiblings = false }) =>
   (survey) => {
     const descendants = []
 
