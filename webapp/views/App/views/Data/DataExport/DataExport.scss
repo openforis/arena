@@ -6,7 +6,13 @@
 
   .expansion-panel__content {
     overflow: auto;
-    max-height: calc(100vh - 30rem);
+    max-height: calc(100vh - 18rem);
+  }
+
+  &.with-multiple-sources {
+    .expansion-panel__content {
+      max-height: calc(100vh - 30rem);
+    }
   }
 
   .form-item {

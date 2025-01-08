@@ -1,7 +1,8 @@
 import './DataExport.scss'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -51,29 +52,34 @@ const DataExport = (props) => {
       })
     )
 
-  const availableSources = [
-    {
-      key: sources.allRecords,
-      label: `dataView.dataExport.source.allRecords`,
-    },
-  ]
-  if (sourceSelectionAvailable && recordUuids.length > 0) {
-    availableSources.push({
-      key: sources.selectedRecords,
-      label: `dataView.dataExport.source.selectedRecord`,
-      labelParams: { count: recordUuids.length },
-    })
-  }
-  if (sourceSelectionAvailable && !Objects.isEmpty(search)) {
-    availableSources.push({
-      key: sources.filteredRecords,
-      label: `dataView.dataExport.source.filteredRecords`,
-    })
-  }
+  const availableSources = useMemo(() => {
+    const _availableSources = [
+      {
+        key: sources.allRecords,
+        label: `dataView.dataExport.source.allRecords`,
+      },
+    ]
+    if (sourceSelectionAvailable && recordUuids.length > 0) {
+      _availableSources.push({
+        key: sources.selectedRecords,
+        label: `dataView.dataExport.source.selectedRecord`,
+        labelParams: { count: recordUuids.length },
+      })
+    }
+    if (sourceSelectionAvailable && !Objects.isEmpty(search)) {
+      _availableSources.push({
+        key: sources.filteredRecords,
+        label: `dataView.dataExport.source.filteredRecords`,
+      })
+    }
+    return _availableSources
+  }, [recordUuids.length, search, sourceSelectionAvailable])
+
+  const multipleSources = availableSources.length > 1
 
   return (
-    <div className="data-export-container">
-      {availableSources.length > 1 && (
+    <div className={classNames('data-export-container', { 'with-multiple-sources': multipleSources })}>
+      {multipleSources && (
         <FormItem className="source-form-item" label="dataView.dataExport.source.label">
           <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />
         </FormItem>
