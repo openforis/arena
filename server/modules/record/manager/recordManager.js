@@ -40,6 +40,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     search = null,
     step = null,
     recordUuid = null,
+    ownerUuid = null,
     includeRootKeyValues = true,
     includePreview = false,
     includeCounts = false,
@@ -73,6 +74,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       sortOrder,
       search,
       step,
+      ownerUuid,
       recordUuids: recordUuid ? [recordUuid] : null,
       includePreview,
     },
@@ -119,7 +121,7 @@ export const fetchRecordSummary = async (
   return list[0]
 }
 
-export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client = db) => {
+export const countRecordsBySurveyId = async ({ surveyId, cycle, search, ownerUuid }, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
@@ -131,7 +133,10 @@ export const countRecordsBySurveyId = async ({ surveyId, cycle, search }, client
     client
   )
 
-  return RecordRepository.countRecordsBySurveyId({ surveyId, cycle, search, nodeDefKeys, nodeDefRoot }, client)
+  return RecordRepository.countRecordsBySurveyId(
+    { surveyId, cycle, search, nodeDefKeys, nodeDefRoot, ownerUuid },
+    client
+  )
 }
 
 export {

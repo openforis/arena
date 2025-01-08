@@ -1,4 +1,6 @@
 import { Objects } from '@openforis/arena-core'
+
+import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
@@ -12,6 +14,7 @@ import * as RecordFile from '@core/record/recordFile'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
@@ -137,11 +140,19 @@ export const init = (app) => {
     }
   })
 
+  const determineOwnerUuidForQuery = ({ req, surveyId }) => {
+    const user = Request.getUser(req)
+    const surveyInfo = SurveyService.fetchSurveyById({ surveyId })
+    const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
+    return canViewNotOwnedRecords ? null : User.getUuid(user)
+  }
+
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, search } = Request.getParams(req)
 
-      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
+      const ownerUuid = determineOwnerUuidForQuery({ req, surveyId })
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search, ownerUuid })
       res.json({ count })
     } catch (error) {
       next(error)
@@ -153,12 +164,15 @@ export const init = (app) => {
       const { surveyId, cycle, includeCounts, limit, offset, recordUuid, sortBy, sortOrder, search } =
         Request.getParams(req)
 
+      const ownerUuid = determineOwnerUuidForQuery({ req, surveyId })
+
       const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId({
         surveyId,
         cycle,
         includeCounts,
         offset,
         limit,
+        ownerUuid,
         recordUuid,
         sortBy,
         sortOrder,

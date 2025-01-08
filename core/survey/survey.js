@@ -114,6 +114,7 @@ export const {
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
+  getSecurity,
   getSRS,
   getSRSCodes,
   getSRSIndex,
