@@ -14,6 +14,7 @@ import { SurveyConfigurationEditor } from './SurveyConfigurationEditor'
 import { SurveyInfoSampleBasedImageInterpretation } from './SurveyInfoSampleBasedImageInterpretation'
 
 import { useSurveyInfoForm } from './store'
+import { SurveySecurityEditor } from './surveySecurityEditor'
 
 const SurveyInfo = () => {
   const readOnly = !useAuthCanEditSurvey()
@@ -24,6 +25,7 @@ const SurveyInfo = () => {
     userExtraPropDefs,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
+    security,
     setCycles,
     setDefaultCycleKey,
     setDescriptions,
@@ -33,6 +35,7 @@ const SurveyInfo = () => {
     setName,
     setSamplingPolygon,
     setSampleBasedImageInterpretationEnabled,
+    setSecurity,
     setSrs,
     setUserExtraPropDefs,
     getFieldValidation,
@@ -74,15 +77,26 @@ const SurveyInfo = () => {
     })
   }
   if (!readOnly) {
-    tabs.push({
-      key: 'extraProps',
-      component: SurveyUserExtraPropDefsEditor,
-      label: 'homeView.surveyInfo.userExtraProps.title',
-      props: {
-        extraPropDefs: userExtraPropDefs,
-        onExtraPropDefsUpdate: setUserExtraPropDefs,
+    tabs.push(
+      {
+        key: 'extraProps',
+        component: SurveyUserExtraPropDefsEditor,
+        label: 'homeView.surveyInfo.userExtraProps.title',
+        props: {
+          extraPropDefs: userExtraPropDefs,
+          onExtraPropDefsUpdate: setUserExtraPropDefs,
+        },
       },
-    })
+      {
+        key: 'security',
+        component: SurveySecurityEditor,
+        label: 'homeView.surveyInfo.security.title',
+        props: {
+          security,
+          onSecurityUpdate: setSecurity,
+        },
+      }
+    )
     if (isSystemAdmin) {
       tabs.push({
         key: 'configuration',

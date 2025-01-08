@@ -36,6 +36,7 @@ export const keys = {
   languages: 'languages',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
+  security: 'security',
   srs: 'srs',
   steps: 'steps',
   template: 'template',
@@ -109,6 +110,8 @@ export const getSamplingPolygon = (surveyInfo) => {
   const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo)
   return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
 }
+
+export const getSecurity = ObjectUtils.getProp(keys.security, {})
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 
