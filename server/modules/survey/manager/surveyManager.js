@@ -14,7 +14,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
@@ -370,44 +369,47 @@ export const updateSurveyProp = async (user, surveyId, key, value, system = fals
     return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
+const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = db) => {
+  const cycles = Object.keys(value)
+  const cyclesPrev = Object.keys(valuePrev)
+  // Add new cycles to nodeDefs
+  const cyclesAdded = R.difference(cycles, cyclesPrev)
+  if (!R.isEmpty(cyclesAdded)) {
+    await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, client)
+  }
+
+  // Remove delete cycles from nodeDefs
+  const cyclesRemoved = R.difference(cyclesPrev, cycles)
+  if (!R.isEmpty(cyclesRemoved)) {
+    await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, client)
+  }
+}
+
 export const updateSurveyProps = async (user, surveyId, props, client = db) =>
   client.tx(async (t) => {
     const validation = await validateSurveyInfo({ id: surveyId, props })
-    if (Validation.isValid(validation)) {
-      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
-      const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
-
-      await PromiseUtils.each(Object.entries(props), async ([key, value]) => {
-        const valuePrev = propsPrev[key]
-
-        if (!R.equals(value, valuePrev)) {
-          await Promise.all([
-            SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-            SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
-          ])
-
-          if (key === Survey.infoKeys.cycles) {
-            const cycles = Object.keys(value)
-            const cyclesPrev = Object.keys(valuePrev)
-            // Add new cycles to nodeDefs
-            const cyclesAdded = R.difference(cycles, cyclesPrev)
-            if (!R.isEmpty(cyclesAdded)) {
-              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, t)
-            }
-
-            // Remove delete cycles from nodeDefs
-            const cyclesRemoved = R.difference(cyclesPrev, cycles)
-            if (!R.isEmpty(cyclesRemoved)) {
-              await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, t)
-            }
-          }
-        }
-      })
-      return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+    if (!Validation.isValid(validation)) {
+      return assocSurveyInfo({ validation })
     }
+    const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
+    const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-    return assocSurveyInfo({ validation })
+    for await (const [key, value] of Object.entries(props)) {
+      const valuePrev = propsPrev[key]
+
+      if (!R.equals(value, valuePrev)) {
+        await Promise.all([
+          SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+          SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+          ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+        ])
+
+        if (key === Survey.infoKeys.cycles) {
+          await updateSurveyCyclesProp({ surveyId, value, valuePrev }, t)
+        }
+      }
+    }
+    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
@@ -476,7 +478,9 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
 export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
-    await PromiseUtils.each(surveyIds, async (surveyId) => deleteSurvey(surveyId, { deleteUserPrefs: true }, t))
+    for await (const surveyId of surveyIds) {
+      await deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
+    }
     return surveyIds.length
   })
 

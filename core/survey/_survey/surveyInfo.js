@@ -9,6 +9,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import * as SamplingPolygon from '../SamplingPolygon'
+import { SurveySecurity } from '../surveySecurity'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -36,6 +37,7 @@ export const keys = {
   languages: 'languages',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
+  security: 'security',
   srs: 'srs',
   steps: 'steps',
   template: 'template',
@@ -108,6 +110,11 @@ export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
 export const getSamplingPolygon = (surveyInfo) => {
   const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo)
   return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
+}
+
+export const getSecurity = (surveyInfo) => {
+  const security = ObjectUtils.getProp(keys.security, SurveySecurity.getDefaults())(surveyInfo)
+  return { ...SurveySecurity.getDefaults(), ...security }
 }
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])

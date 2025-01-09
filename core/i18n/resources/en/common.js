@@ -457,6 +457,10 @@ If there are records associated to this cycle, they will be deleted.`,
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
       sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
+      security: {
+        title: 'Security',
+        dataEditorViewNotOwnedRecordsAllowed: 'Data editor can view not owned records',
+      },
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',
       unpublishSurveyDialog: {
