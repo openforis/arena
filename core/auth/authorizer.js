@@ -68,10 +68,10 @@ export const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
 
 // READ
 export const canViewRecord = _hasSurveyPermission(permissions.recordView)
-export const canViewAllRecords = _hasSurveyPermission(permissions.recordCleanse)
+export const canExportAllRecords = _hasSurveyPermission(permissions.recordCleanse)
 export const canViewNotOwnedRecords = (user, surveyInfo) => {
   if (!canViewSurvey(user, surveyInfo)) return false
-  if (canViewAllRecords(user, surveyInfo)) return true
+  if (canExportAllRecords(user, surveyInfo)) return true
   const surveyUuid = Survey.getUuid(surveyInfo)
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
   return (
