@@ -10,7 +10,7 @@ import { Checkbox } from '@webapp/components/form'
 const { keys } = SurveySecurity
 
 export const SurveySecurityEditor = (props) => {
-  const { security = {}, onSecurityUpdate } = props
+  const { security = SurveySecurity.getDefaults(), onSecurityUpdate } = props
   return (
     <div className="survey-security-editor">
       {Object.values(keys).map((key) => (
