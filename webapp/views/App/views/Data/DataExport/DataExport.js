@@ -22,7 +22,9 @@ const sources = {
 }
 
 const DataExport = (props) => {
-  const { recordUuids, search, sourceSelectionAvailable = false } = props
+  const { recordUuids = null, search = null, sourceSelectionAvailable = false } = props
+
+  const selectedRecordsCount = recordUuids?.length ?? 0
 
   const dispatch = useDispatch()
 
@@ -59,11 +61,11 @@ const DataExport = (props) => {
         label: `dataView.dataExport.source.allRecords`,
       },
     ]
-    if (sourceSelectionAvailable && recordUuids.length > 0) {
+    if (sourceSelectionAvailable && selectedRecordsCount > 0) {
       _availableSources.push({
         key: sources.selectedRecords,
         label: `dataView.dataExport.source.selectedRecord`,
-        labelParams: { count: recordUuids.length },
+        labelParams: { count: selectedRecordsCount },
       })
     }
     if (sourceSelectionAvailable && !Objects.isEmpty(search)) {
@@ -73,7 +75,7 @@ const DataExport = (props) => {
       })
     }
     return _availableSources
-  }, [recordUuids.length, search, sourceSelectionAvailable])
+  }, [search, selectedRecordsCount, sourceSelectionAvailable])
 
   const multipleSources = availableSources.length > 1
 
