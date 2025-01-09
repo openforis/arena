@@ -211,7 +211,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
   if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
   if (!A.isEmpty(search))
-    recordsSelectWhereConditions.push(`${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%'`)
+    recordsSelectWhereConditions.push(`(${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%')`)
   if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('r.owner_uuid = $/ownerUuid/')
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')

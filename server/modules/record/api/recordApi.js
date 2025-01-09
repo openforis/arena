@@ -140,9 +140,9 @@ export const init = (app) => {
     }
   })
 
-  const determineOwnerUuidForQuery = ({ req, surveyId }) => {
+  const determineOwnerUuidForQuery = async ({ req, surveyId }) => {
     const user = Request.getUser(req)
-    const surveyInfo = SurveyService.fetchSurveyById({ surveyId })
+    const surveyInfo = await SurveyService.fetchSurveyById({ surveyId })
     const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
     return canViewNotOwnedRecords ? null : User.getUuid(user)
   }
@@ -151,7 +151,7 @@ export const init = (app) => {
     try {
       const { surveyId, cycle, search } = Request.getParams(req)
 
-      const ownerUuid = determineOwnerUuidForQuery({ req, surveyId })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
       const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search, ownerUuid })
       res.json({ count })
     } catch (error) {
@@ -164,7 +164,7 @@ export const init = (app) => {
       const { surveyId, cycle, includeCounts, limit, offset, recordUuid, sortBy, sortOrder, search } =
         Request.getParams(req)
 
-      const ownerUuid = determineOwnerUuidForQuery({ req, surveyId })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
 
       const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId({
         surveyId,
