@@ -100,7 +100,11 @@ export default class TableDataNodeDef extends TableSurveyRdb {
       return [nodeDef]
     }
     return R.pipe(
-      Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef, includeAnalysis }),
+      Survey.getNodeDefDescendantAttributesInSingleEntities({
+        nodeDef,
+        includeAnalysis,
+        includeSamplingDefsWithoutSiblings: true,
+      }),
       R.filter(NodeDef.isSingleAttribute),
       R.sortBy(R.ascend(R.prop('id')))
     )(survey)
