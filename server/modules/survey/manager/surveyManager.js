@@ -369,44 +369,47 @@ export const updateSurveyProp = async (user, surveyId, key, value, system = fals
     return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
+const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = db) => {
+  const cycles = Object.keys(value)
+  const cyclesPrev = Object.keys(valuePrev)
+  // Add new cycles to nodeDefs
+  const cyclesAdded = R.difference(cycles, cyclesPrev)
+  if (!R.isEmpty(cyclesAdded)) {
+    await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, client)
+  }
+
+  // Remove delete cycles from nodeDefs
+  const cyclesRemoved = R.difference(cyclesPrev, cycles)
+  if (!R.isEmpty(cyclesRemoved)) {
+    await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, client)
+  }
+}
+
 export const updateSurveyProps = async (user, surveyId, props, client = db) =>
   client.tx(async (t) => {
     const validation = await validateSurveyInfo({ id: surveyId, props })
-    if (Validation.isValid(validation)) {
-      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
-      const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
+    if (!Validation.isValid(validation)) {
+      return assocSurveyInfo({ validation })
+    }
+    const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
+    const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-      for await (const [key, value] of Object.entries(props)) {
-        const valuePrev = propsPrev[key]
+    for await (const [key, value] of Object.entries(props)) {
+      const valuePrev = propsPrev[key]
 
-        if (!R.equals(value, valuePrev)) {
-          await Promise.all([
-            SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-            SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
-          ])
+      if (!R.equals(value, valuePrev)) {
+        await Promise.all([
+          SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+          SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+          ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+        ])
 
-          if (key === Survey.infoKeys.cycles) {
-            const cycles = Object.keys(value)
-            const cyclesPrev = Object.keys(valuePrev)
-            // Add new cycles to nodeDefs
-            const cyclesAdded = R.difference(cycles, cyclesPrev)
-            if (!R.isEmpty(cyclesAdded)) {
-              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, t)
-            }
-
-            // Remove delete cycles from nodeDefs
-            const cyclesRemoved = R.difference(cyclesPrev, cycles)
-            if (!R.isEmpty(cyclesRemoved)) {
-              await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, t)
-            }
-          }
+        if (key === Survey.infoKeys.cycles) {
+          await updateSurveyCyclesProp({ surveyId, value, valuePrev }, t)
         }
       }
-      return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
     }
-
-    return assocSurveyInfo({ validation })
+    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
