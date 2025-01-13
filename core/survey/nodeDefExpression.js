@@ -18,10 +18,10 @@ export const keys = {
 // ====== CREATE
 
 export const createExpression = ({
-  expression = '',
-  applyIf = '',
-  severity = ValidationResult.severity.error,
-  messages = {},
+  expression = undefined,
+  applyIf = undefined,
+  severity = undefined,
+  messages = undefined,
   placeholder = false,
 }) => NodeDefExpressionFactory.createInstance({ applyIf, expression, messages, placeholder, severity })
 
