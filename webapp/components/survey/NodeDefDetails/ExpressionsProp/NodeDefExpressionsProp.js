@@ -25,7 +25,9 @@ const NodeDefExpressionsProp = (props) => {
     mode = Expression.modes.json,
     multiple = true,
     nodeDefUuidContext = null,
-    propName,
+    onChange: onChangeProp = null,
+    propName = null,
+    propExtractor = null,
     qualifier,
     readOnly = false,
     showLabels = false,
@@ -35,10 +37,12 @@ const NodeDefExpressionsProp = (props) => {
   const nodeDef = State.getNodeDef(state)
   const nodeDefValidation = State.getValidation(state)
 
-  const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
+  const values = propName ? NodeDef.getPropAdvanced(propName, [])(nodeDef) : propExtractor?.(nodeDef)
 
   const onChange = (expressions) =>
-    Actions.setProp({ state, key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions) })
+    onChangeProp
+      ? onChangeProp(expressions)
+      : Actions.setProp({ state, key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions) })
 
   return (
     <ExpressionsProp
@@ -69,9 +73,11 @@ NodeDefExpressionsProp.propTypes = {
 
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
 
   nodeDefUuidContext: PropTypes.string,
-  propName: PropTypes.string.isRequired,
+  propName: PropTypes.string,
+  propExtractor: PropTypes.func,
   info: PropTypes.string,
   label: PropTypes.string,
   mode: PropTypes.string,

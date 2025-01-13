@@ -4,6 +4,7 @@ import * as R from 'ramda'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
@@ -13,8 +14,9 @@ import { TestId } from '@webapp/utils/testId'
 
 import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
-import ExpressionsProp from './ExpressionsProp'
+import ExpressionsProp, { NodeDefExpressionsProp } from './ExpressionsProp'
 import { State } from './store'
+import { Objects } from '@openforis/arena-core'
 
 const ValidationsProps = (props) => {
   const { state, Actions } = props
@@ -31,22 +33,54 @@ const ValidationsProps = (props) => {
   const onValidationsUpdate = (validations) =>
     Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.validations, value: validations })
 
+  const countPropExtractor = (countType) => (nodeDef) => {
+    const minCount = R.pipe(
+      NodeDef.getValidations,
+      countType === NodeDefValidations.keys.min ? NodeDefValidations.getMinCount : NodeDefValidations.getMaxCount
+    )(nodeDef)
+    if (Objects.isEmpty(minCount)) return []
+    if (Array.isArray(minCount)) return minCount
+    return [NodeDefExpression.createExpression({ expression: minCount })]
+  }
+
   return (
     <div className="form">
       {NodeDef.isMultiple(nodeDef) && (
         <>
-          <FormItem label="nodeDefEdit.validationsProps.minCount">
-            <Input
-              value={NodeDefValidations.getMinCount(nodeDefValidations)}
-              disabled={readOnly}
-              validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.min)
-              )(validation)}
-              numberFormat={NumberFormats.integer()}
-              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
-            />
-          </FormItem>
+          <NodeDefExpressionsProp
+            qualifier={TestId.nodeDefDetails.minCount}
+            state={state}
+            Actions={Actions}
+            isBoolean={false}
+            label="nodeDefEdit.validationsProps.minCount"
+            onChange={(expressions) => {
+              let validationsUpdated = NodeDef.getValidations(nodeDef)
+              validationsUpdated = NodeDefValidations.assocMinCount(
+                R.reject(NodeDefExpression.isPlaceholder, expressions)
+              )(validationsUpdated)
+
+              Actions.setProp({
+                state,
+                key: NodeDef.keysPropsAdvanced.validations,
+                value: validationsUpdated,
+              })
+            }}
+            readOnly={readOnly}
+            propExtractor={countPropExtractor(NodeDefValidations.keys.min)}
+            nodeDefUuidContext={nodeDefUuidContext}
+            canBeConstant
+            excludeCurrentNodeDef
+          />
+          {/* <Input
+            value={NodeDefValidations.getMinCount(nodeDefValidations)}
+            disabled={readOnly}
+            validation={R.pipe(
+              Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
+              Validation.getFieldValidation(NodeDefValidations.keys.min)
+            )(validation)}
+            numberFormat={NumberFormats.integer()}
+            onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
+          /> */}
           <FormItem label="nodeDefEdit.validationsProps.maxCount">
             <Input
               value={NodeDefValidations.getMaxCount(nodeDefValidations)}
