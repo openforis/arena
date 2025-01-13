@@ -14,7 +14,7 @@ export const keys = {
 // COUNT
 export const dissocCount = R.dissoc(keys.count)
 
-const getCountProp = (key) => R.pathOr('', [keys.count, key])
+export const getCountProp = (key) => R.pathOr('', [keys.count, key])
 
 export const getMinCount = getCountProp(keys.min)
 
@@ -26,7 +26,7 @@ export const hasMinOrMaxCount = (validations) => {
   return !Number.isNaN(minCount) || !Number.isNaN(maxCount)
 }
 
-const assocCountProp = (key) => (value) =>
+export const assocCountProp = (key) => (value) =>
   R.pipe(
     R.ifElse(R.always(R.isEmpty(value)), R.dissocPath([keys.count, key]), R.assocPath([keys.count, key], value)),
     // If validations count obj is empty, it gets removed from validations
