@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -17,7 +17,7 @@ import { TestId } from '@webapp/utils/testId'
 import { FormItem } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
-import ExpressionsProp, { NodeDefExpressionsProp } from './ExpressionsProp'
+import ExpressionsProp, { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
 import { State } from './store'
 
 const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
@@ -32,8 +32,10 @@ const CountProp = (props) => {
     return [NodeDefExpression.createExpression({ expression: count })]
   }
 
-  const onExpressionsUpdate = (validationsUpdateFn) => {
-    const validationsUpdated = validationsUpdateFn(NodeDef.getValidations(nodeDef))
+  const onChange = (value) => {
+    const valueUpdated = Array.isArray(value) ? R.reject(NodeDefExpression.isPlaceholder, value) : value
+    const validations = NodeDef.getValidations(nodeDef)
+    const validationsUpdated = NodeDefValidations.assocCountProp(countType)(valueUpdated)(validations)
     Actions.setProp({
       state,
       key: NodeDef.keysPropsAdvanced.validations,
@@ -41,24 +43,29 @@ const CountProp = (props) => {
     })
   }
 
+  const determineValueType = useCallback(() => {
+    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    return Objects.isEmpty(count) || !Array.isArray(count) ? ValueType.constant : ValueType.expression
+  }, [countType, nodeDef])
+
   return (
-    <NodeDefExpressionsProp
-      qualifier={TestId.nodeDefDetails[`${countType}Count`]}
-      state={state}
-      Actions={Actions}
-      isBoolean={false}
-      label={`nodeDefEdit.validationsProps.${countType}Count`}
-      onChange={(expressions) => {
-        onExpressionsUpdate(
-          NodeDefValidations.assocCountProp(countType)(R.reject(NodeDefExpression.isPlaceholder, expressions))
-        )
-      }}
-      readOnly={readOnly}
-      propExtractor={countPropExtractor(countType)}
-      nodeDefUuidContext={nodeDefUuidContext}
-      canBeConstant
-      excludeCurrentNodeDef
-    />
+    <div>
+      <NodeDefExpressionsProp
+        qualifier={TestId.nodeDefDetails[`${countType}Count`]}
+        state={state}
+        Actions={Actions}
+        isBoolean={false}
+        label={`nodeDefEdit.validationsProps.${countType}Count`}
+        onChange={onChange}
+        readOnly={readOnly}
+        propExtractor={countPropExtractor(countType)}
+        nodeDefUuidContext={nodeDefUuidContext}
+        canBeConstant
+        excludeCurrentNodeDef
+        valueTypeSelection
+        determineValueType={determineValueType}
+      />
+    </div>
   )
 }
 

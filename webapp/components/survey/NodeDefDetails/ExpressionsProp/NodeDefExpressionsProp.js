@@ -32,6 +32,8 @@ const NodeDefExpressionsProp = (props) => {
     readOnly = false,
     showLabels = false,
     state,
+    valueTypeSelection = false,
+    determineValueType = null,
   } = props
 
   const nodeDef = State.getNodeDef(state)
@@ -64,6 +66,8 @@ const NodeDefExpressionsProp = (props) => {
       isBoolean={isBoolean}
       hideAdvanced={hideAdvanced}
       excludeCurrentNodeDef={excludeCurrentNodeDef}
+      valueTypeSelection={valueTypeSelection}
+      determineValueType={determineValueType}
     />
   )
 }
@@ -92,6 +96,9 @@ NodeDefExpressionsProp.propTypes = {
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
   excludeCurrentNodeDef: PropTypes.bool,
+
+  valueTypeSelection: PropTypes.bool,
+  determineValueType: PropTypes.func,
 }
 
 export default NodeDefExpressionsProp

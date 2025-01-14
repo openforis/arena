@@ -1884,6 +1884,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     selectAFunction: 'Select a function',
+
+    valueType: {
+      constant: 'Constant',
+      expression: 'Expression',
+    },
   },
 
   // ====== Auth
