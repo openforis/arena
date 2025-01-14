@@ -56,7 +56,7 @@ const ExpressionsProp = (props) => {
   const [valueType, setValueType] = useState(determineValueType?.())
 
   useEffect(() => {
-    if (valueTypeSelection && !determineValueType) return
+    if (!valueTypeSelection || !determineValueType) return
     const valueTypeNext = determineValueType()
     if (valueTypeNext !== valueType) {
       setValueType(valueTypeNext)
@@ -194,7 +194,7 @@ const ExpressionsProp = (props) => {
 ExpressionsProp.propTypes = {
   applyIf: PropTypes.bool,
   canBeConstant: PropTypes.bool,
-  determineValueType: PropTypes.bool,
+  determineValueType: PropTypes.func,
   excludeCurrentNodeDef: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
   info: PropTypes.string,

@@ -42,6 +42,7 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
 
 // Validator functions
 export const {
+  getProp,
   validateRequired,
   validateItemPropUniqueness,
   validateMinLength,

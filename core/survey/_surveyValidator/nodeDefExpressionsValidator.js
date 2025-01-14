@@ -16,6 +16,14 @@ const expressionsByDependencyTypeFns = {
     NodeDef.getValidations,
     NodeDefValidations.getExpressions
   ),
+  [SurveyDependencyTypes.dependencyTypes.validationsMinCount]: R.pipe(
+    NodeDef.getValidations,
+    NodeDefValidations.getMinCount
+  ),
+  [SurveyDependencyTypes.dependencyTypes.validationsMaxCount]: R.pipe(
+    NodeDef.getValidations,
+    NodeDefValidations.getMaxCount
+  ),
   [SurveyDependencyTypes.dependencyTypes.formula]: NodeDef.getFormula,
   [SurveyDependencyTypes.dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
 }

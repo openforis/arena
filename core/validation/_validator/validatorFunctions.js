@@ -14,7 +14,7 @@ const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 const validEmailRegex =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
+export const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
 
 export const validateRequired = (errorKey) => (propName, obj) => {
   const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
