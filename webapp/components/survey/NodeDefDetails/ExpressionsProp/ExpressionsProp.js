@@ -238,7 +238,7 @@ ExpressionsProp.propTypes = {
   validation: PropTypes.object,
   values: PropTypes.array, // Array of expressions
   valueTypeSelection: PropTypes.bool,
-  valueConstantEditorNumberFormat: PropTypes.string,
+  valueConstantEditorNumberFormat: PropTypes.object,
 }
 
 export default ExpressionsProp

@@ -101,7 +101,7 @@ NodeDefExpressionsProp.propTypes = {
 
   valueTypeSelection: PropTypes.bool,
   determineValueType: PropTypes.func,
-  valueConstantEditorNumberFormat: PropTypes.string,
+  valueConstantEditorNumberFormat: PropTypes.object,
 }
 
 export default NodeDefExpressionsProp
