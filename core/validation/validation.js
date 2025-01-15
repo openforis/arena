@@ -59,11 +59,10 @@ export const getFieldValidation =
     if (typeof field === 'string') {
       let validationCurrent = validation
       const parts = field.split('.')
-      for (let index = 0; index < parts.length; index++) {
-        const part = parts[index]
+      parts.some((part) => {
         validationCurrent = _getFieldValidation(part, defaultValue)(validationCurrent)
-        if (!validationCurrent) return null
-      }
+        return !validationCurrent // breaks the look if there is no field validation
+      })
       return validationCurrent
     } else {
       return _getFieldValidation(field, defaultValue)(validation)
