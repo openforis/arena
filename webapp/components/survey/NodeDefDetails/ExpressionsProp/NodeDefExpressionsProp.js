@@ -34,12 +34,13 @@ const NodeDefExpressionsProp = (props) => {
     state,
     valueTypeSelection = false,
     determineValueType = null,
+    valueConstantEditorNumberFormat = null,
   } = props
 
   const nodeDef = State.getNodeDef(state)
   const nodeDefValidation = State.getValidation(state)
 
-  const values = propName ? NodeDef.getPropAdvanced(propName, [])(nodeDef) : propExtractor?.(nodeDef)
+  const values = propExtractor ? propExtractor(nodeDef) : NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
   const onChange = (expressions) =>
     onChangeProp
@@ -68,6 +69,7 @@ const NodeDefExpressionsProp = (props) => {
       excludeCurrentNodeDef={excludeCurrentNodeDef}
       valueTypeSelection={valueTypeSelection}
       determineValueType={determineValueType}
+      valueConstantEditorNumberFormat={valueConstantEditorNumberFormat}
     />
   )
 }
@@ -99,6 +101,7 @@ NodeDefExpressionsProp.propTypes = {
 
   valueTypeSelection: PropTypes.bool,
   determineValueType: PropTypes.func,
+  valueConstantEditorNumberFormat: PropTypes.string,
 }
 
 export default NodeDefExpressionsProp

@@ -6,15 +6,19 @@ import { useDispatch } from 'react-redux'
 import * as R from 'ramda'
 import classNames from 'classnames'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Validation from '@core/validation/validation'
 import * as Expression from '@core/expressionParser/expression'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
-import ExpressionProp from './ExpressionProp'
 import { ButtonGroup } from '@webapp/components/form'
+import { FormItem, Input } from '@webapp/components/form/Input'
+import ValidationTooltip from '@webapp/components/validationTooltip'
+
+import ExpressionProp from './ExpressionProp'
 
 export const ValueType = {
   constant: 'constant',
@@ -25,6 +29,26 @@ const valueTypeItems = Object.keys(ValueType).map((valueType) => ({
   key: valueType,
   label: `expressionEditor.valueType.${valueType}`,
 }))
+
+const ExpressionsWrapper = (props) => {
+  const { validation, children } = props
+
+  const hasFieldValidations = Objects.isNotEmpty(Validation.getFieldValidations(validation))
+  const className = 'node-def-edit_expressions-wrapper'
+
+  return hasFieldValidations ? (
+    <div className="node-def-edit_expressions-wrapper">{children}</div>
+  ) : (
+    <ValidationTooltip className={className} validation={validation}>
+      {children}
+    </ValidationTooltip>
+  )
+}
+
+ExpressionsWrapper.propTypes = {
+  validation: PropTypes.object,
+  children: PropTypes.node,
+}
 
 const ExpressionsProp = (props) => {
   const {
@@ -49,6 +73,7 @@ const ExpressionsProp = (props) => {
     validation = null,
     values = [],
     valueTypeSelection = false,
+    valueConstantEditorNumberFormat = null,
   } = props
 
   const dispatch = useDispatch()
@@ -155,14 +180,14 @@ const ExpressionsProp = (props) => {
 
   return (
     <FormItem info={info} label={label} className={classNames({ error: Validation.isNotValid(validation) })}>
-      <div className="node-def-edit_expressions-wrapper">
+      <ExpressionsWrapper validation={validation}>
         {valueType === ValueType.constant ? (
           <>
             <ButtonGroup items={valueTypeItems} onChange={onValueTypeChange} selectedItemKey={valueType} />
             <Input
               className="node-def-edit_constant-value"
               disabled={readOnly}
-              numberFormat={NumberFormats.integer()}
+              numberFormat={valueConstantEditorNumberFormat}
               onChange={onChange}
               validation={validation}
               value={values?.[0]?.expression}
@@ -186,7 +211,7 @@ const ExpressionsProp = (props) => {
               })}
           </div>
         )}
-      </div>
+      </ExpressionsWrapper>
     </FormItem>
   )
 }
@@ -213,6 +238,7 @@ ExpressionsProp.propTypes = {
   validation: PropTypes.object,
   values: PropTypes.array, // Array of expressions
   valueTypeSelection: PropTypes.bool,
+  valueConstantEditorNumberFormat: PropTypes.string,
 }
 
 export default ExpressionsProp

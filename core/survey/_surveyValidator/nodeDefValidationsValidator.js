@@ -10,24 +10,34 @@ import * as NodeDefExpressionsValidator from './nodeDefExpressionsValidator'
 
 const { keys } = NodeDefValidations
 
-const validateMinCount = (propName, item) => {
-  const count = Validator.getProp(propName)(item)
-  if (Array.isArray(count)) {
-    // return NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations)
+const validateCountProp =
+  ({ survey, nodeDef, dependencyType, errorKey }) =>
+  (propName, item) => {
+    const count = Validator.getProp(propName)(item)
+    return Array.isArray(count)
+      ? NodeDefExpressionsValidator.validate(survey, nodeDef, dependencyType)
+      : Validator.validatePositiveNumber(errorKey)(propName, item)
   }
-  return Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMinMustBePositiveNumber)(
-    propName,
-    item
-  )
-}
 
 export const validate = async (survey, nodeDef) => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
-        [`${keys.count}.${keys.min}`]: [validateMinCount],
+        [`${keys.count}.${keys.min}`]: [
+          validateCountProp({
+            survey,
+            nodeDef,
+            dependencyType: Survey.dependencyTypes.minCount,
+            errorKey: Validation.messageKeys.nodeDefEdit.countMinMustBePositiveNumber,
+          }),
+        ],
         [`${keys.count}.${keys.max}`]: [
-          Validator.validatePositiveNumber(Validation.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber),
+          validateCountProp({
+            survey,
+            nodeDef,
+            dependencyType: Survey.dependencyTypes.maxCount,
+            errorKey: Validation.messageKeys.nodeDefEdit.countMaxMustBePositiveNumber,
+          }),
         ],
       })
     : Validation.newInstance()

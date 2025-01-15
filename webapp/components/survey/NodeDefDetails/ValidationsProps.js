@@ -14,7 +14,7 @@ import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { FormItem } from '@webapp/components/form/Input'
+import { FormItem, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
 
 import ExpressionsProp, { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
@@ -58,12 +58,14 @@ const CountProp = (props) => {
         label={`nodeDefEdit.validationsProps.${countType}Count`}
         onChange={onChange}
         readOnly={readOnly}
+        propName={`validations.${countType}`}
         propExtractor={countPropExtractor(countType)}
         nodeDefUuidContext={nodeDefUuidContext}
         canBeConstant
         excludeCurrentNodeDef
         valueTypeSelection
         determineValueType={determineValueType}
+        valueConstantEditorNumberFormat={NumberFormats.integer()}
       />
     </div>
   )

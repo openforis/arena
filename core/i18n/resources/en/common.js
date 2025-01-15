@@ -1726,6 +1726,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
       taxonomyRequired: 'Taxonomy is required',
       validationsInvalid: 'Invalid "Validations"',
+      countMaxInvalid: 'Invalid "Max count"',
+      countMinInvalid: 'Invalid "Min count"',
     },
 
     record: {
