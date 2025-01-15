@@ -2761,10 +2761,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^1.0.8":
-  version "1.0.8"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.8/e683aa24fff471d2428741ca5eac9e4a7a695712#e683aa24fff471d2428741ca5eac9e4a7a695712"
-  integrity sha512-jE0YLrrXDIyn3vBUt8yS1uM/hGeLBe9X8DGkUhqp9DKqci7RsfvvdhA7n4vhZ+r7fJjdfQuVSgBhP6IsAh3cLA==
+"@openforis/arena-core@^1.0.8", "@openforis/arena-core@^1.0.9":
+  version "1.0.9"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.9/65ab8f014ef98ad83a206cc53052fa9810b49f68#65ab8f014ef98ad83a206cc53052fa9810b49f68"
+  integrity sha512-Y0qSlirRWZTb6j+4G/RHt0optLTTqZyewJWkXoVuR2uSlLyBzYgo+En1MDnjSGjJsPFjGgO4w5OKvAIR4GQkRw==
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
     bignumber.js "^9.1.2"
