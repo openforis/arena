@@ -3,7 +3,7 @@ import { Objects } from '@openforis/arena-core'
 const findIndex =
   ({ item, compareFn = null }) =>
   (array) =>
-    array.findIndex((_item) => (compareFn ? compareFn(_item) : _item === item))
+    array.findIndex((_item) => (compareFn ? compareFn(_item, item) : _item === item))
 
 const addOrRemoveItem =
   ({ item, compareFn = null }) =>
@@ -30,9 +30,9 @@ const addIfNotEmpty =
   }
 
 const addItems =
-  ({ items, compareFn = null, avoidDuplicates = true }) =>
+  ({ items, compareFn = null, avoidDuplicates = true, sideEffect = false }) =>
   (array) => {
-    const result = [...array]
+    const result = sideEffect ? array : [...array]
     items.forEach((item) => {
       if (!avoidDuplicates || findIndex({ item, compareFn })(result) < 0) {
         result.push(item)

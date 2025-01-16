@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Validation from '@core/validation/validation'
 
@@ -11,10 +14,71 @@ import { useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
+import { FormItem, NumberFormats } from '@webapp/components/form/Input'
 import Checkbox from '@webapp/components/form/checkbox'
-import ExpressionsProp from './ExpressionsProp'
+
+import ExpressionsProp, { NodeDefExpressionsProp, ValueType } from './ExpressionsProp'
 import { State } from './store'
+
+const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
+
+const CountProp = (props) => {
+  const { Actions, countType, nodeDef, nodeDefUuidContext, readOnly, state } = props
+
+  const countPropExtractor = (countType) => (nodeDef) => {
+    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    if (Objects.isEmpty(count)) return []
+    if (Array.isArray(count)) return count
+    return [NodeDefExpression.createExpression({ expression: count })]
+  }
+
+  const onChange = (value) => {
+    const valueUpdated = Array.isArray(value) ? R.reject(NodeDefExpression.isPlaceholder, value) : value
+    const validations = NodeDef.getValidations(nodeDef)
+    const validationsUpdated = NodeDefValidations.assocCountProp(countType)(valueUpdated)(validations)
+    Actions.setProp({
+      state,
+      key: NodeDef.keysPropsAdvanced.validations,
+      value: validationsUpdated,
+    })
+  }
+
+  const determineValueType = useCallback(() => {
+    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    return Objects.isEmpty(count) || !Array.isArray(count) ? ValueType.constant : ValueType.expression
+  }, [countType, nodeDef])
+
+  return (
+    <div>
+      <NodeDefExpressionsProp
+        qualifier={TestId.nodeDefDetails[`${countType}Count`]}
+        state={state}
+        Actions={Actions}
+        isBoolean={false}
+        label={`nodeDefEdit.validationsProps.${countType}Count`}
+        onChange={onChange}
+        readOnly={readOnly}
+        propName={`validations.${countType}`}
+        propExtractor={countPropExtractor(countType)}
+        nodeDefUuidContext={nodeDefUuidContext}
+        canBeConstant
+        excludeCurrentNodeDef
+        valueTypeSelection
+        determineValueType={determineValueType}
+        valueConstantEditorNumberFormat={NumberFormats.integer()}
+      />
+    </div>
+  )
+}
+
+CountProp.propTypes = {
+  Actions: PropTypes.object.isRequired,
+  countType: PropTypes.string.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  nodeDefUuidContext: PropTypes.string.isRequired,
+  readOnly: PropTypes.bool,
+  state: PropTypes.object.isRequired,
+}
 
 const ValidationsProps = (props) => {
   const { state, Actions } = props
@@ -35,30 +99,17 @@ const ValidationsProps = (props) => {
     <div className="form">
       {NodeDef.isMultiple(nodeDef) && (
         <>
-          <FormItem label="nodeDefEdit.validationsProps.minCount">
-            <Input
-              value={NodeDefValidations.getMinCount(nodeDefValidations)}
-              disabled={readOnly}
-              validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.min)
-              )(validation)}
-              numberFormat={NumberFormats.integer()}
-              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMinCount(value)(nodeDefValidations))}
+          {countTypes.map((countType) => (
+            <CountProp
+              key={countType}
+              Actions={Actions}
+              countType={countType}
+              nodeDef={nodeDef}
+              nodeDefUuidContext={nodeDefUuidContext}
+              readOnly={readOnly}
+              state={state}
             />
-          </FormItem>
-          <FormItem label="nodeDefEdit.validationsProps.maxCount">
-            <Input
-              value={NodeDefValidations.getMaxCount(nodeDefValidations)}
-              disabled={readOnly}
-              validation={R.pipe(
-                Validation.getFieldValidation(NodeDef.keysPropsAdvanced.validations),
-                Validation.getFieldValidation(NodeDefValidations.keys.max)
-              )(validation)}
-              numberFormat={NumberFormats.integer()}
-              onChange={(value) => onValidationsUpdate(NodeDefValidations.assocMaxCount(value)(nodeDefValidations))}
-            />
-          </FormItem>
+          ))}
         </>
       )}
       {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (

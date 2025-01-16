@@ -1,7 +1,25 @@
 @import '~@webapp/style/vars';
 
+.node-def-edit_expressions-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+
+  .btn-group {
+    height: 2rem;
+  }
+
+  .node-def-edit_constant-value {
+    width: 10rem;
+  }
+}
+
 .node-def-edit__expressions {
+  flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 
   //custom tooltip error
   .tooltip-error {
@@ -53,9 +71,8 @@
 
 .node-def-edit__expression {
   position: relative;
-  padding: 1rem;
-  margin: 1rem 0;
   border: 1px solid $greyBorder;
+  padding: 0rem 1rem;
 
   &.placeholder {
     border: 1px dashed $greyBorder;

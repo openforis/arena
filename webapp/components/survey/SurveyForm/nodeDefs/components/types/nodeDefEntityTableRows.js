@@ -7,11 +7,11 @@ import * as R from 'ramda'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Node from '@core/record/node'
 import { debounce } from '@core/functionsDefer'
 
 import { elementOffset } from '@webapp/utils/domUtils'
+import { useNodesMinCount } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
@@ -34,8 +34,8 @@ const NodeDefEntityTableRows = (props) => {
 
   const survey = useSelector(SurveyState.getSurvey)
   const nodeDefColumnUuids = NodeDefLayout.getLayoutChildren(surveyCycleKey)(nodeDef)
-  const nodeDefValidations = NodeDef.getValidations(nodeDef)
-  const minCount = NodeDefValidations.getMinCount(nodeDefValidations)
+  const nodeDefUuid = nodeDef?.uuid
+  const minCount = useNodesMinCount({ parentNodeUuid: parentNode?.uuid, nodeDefUuid })
   const canDeleteRows = !NodeDef.isEnumerate(nodeDef) && (!minCount || nodes.length > minCount)
 
   const nodeDefColumns = R.reduce(
@@ -84,37 +84,36 @@ const NodeDefEntityTableRows = (props) => {
   }
 
   // NodeDef update effect entry mode
-  if (!edit) {
-    useEffect(() => {
-      // Reset scrolls and set grid size
-      const tableDataRowsRefEl = tableDataRowsRef.current
-      tableDataRowsRefEl.scrollLeft = 0
-      tableDataRowsRefEl.scrollTop = 0
+  useEffect(() => {
+    if (edit) return
+    // Reset scrolls and set grid size
+    const tableDataRowsRefEl = tableDataRowsRef.current
+    tableDataRowsRefEl.scrollLeft = 0
+    tableDataRowsRefEl.scrollTop = 0
 
-      const updateGridSize = () => {
-        const { height, width } = elementOffset(tableDataRowsRef.current)
+    const updateGridSize = () => {
+      const { height, width } = elementOffset(tableDataRowsRef.current)
 
-        setGridSize((gridSizePrev) => ({
-          ...gridSizePrev,
-          width,
-          height,
-        }))
-      }
+      setGridSize((gridSizePrev) => ({
+        ...gridSizePrev,
+        width,
+        height,
+      }))
+    }
 
-      updateGridSize()
+    updateGridSize()
 
-      // Add resize event listener
-      const onWindowResize = () => {
-        debounce(updateGridSize, 'upgrade-grid-size', 200)()
-      }
+    // Add resize event listener
+    const onWindowResize = () => {
+      debounce(updateGridSize, 'upgrade-grid-size', 200)()
+    }
 
-      window.addEventListener('resize', onWindowResize)
+    window.addEventListener('resize', onWindowResize)
 
-      return () => {
-        window.removeEventListener('resize', onWindowResize)
-      }
-    }, [NodeDef.getUuid(nodeDef)])
-  }
+    return () => {
+      window.removeEventListener('resize', onWindowResize)
+    }
+  }, [edit, nodeDefUuid])
 
   const createRow = ({ renderType, node = null, key = undefined, canDelete = true, index = undefined, ref = null }) => {
     const nodeDefName = NodeDef.getName(nodeDef)

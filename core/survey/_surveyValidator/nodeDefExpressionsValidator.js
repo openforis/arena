@@ -9,29 +9,34 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as NodeDefExpressionValidator from '../nodeDefExpressionValidator'
 import * as SurveyDependencyTypes from '../_survey/surveyDependencyTypes'
 
+const { dependencyTypes } = SurveyDependencyTypes
+
 const expressionsByDependencyTypeFns = {
-  [SurveyDependencyTypes.dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
-  [SurveyDependencyTypes.dependencyTypes.applicable]: NodeDef.getApplicable,
-  [SurveyDependencyTypes.dependencyTypes.validations]: R.pipe(
-    NodeDef.getValidations,
-    NodeDefValidations.getExpressions
-  ),
-  [SurveyDependencyTypes.dependencyTypes.formula]: NodeDef.getFormula,
-  [SurveyDependencyTypes.dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
+  [dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
+  [dependencyTypes.applicable]: NodeDef.getApplicable,
+  [dependencyTypes.validations]: R.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
+  [dependencyTypes.formula]: NodeDef.getFormula,
+  [dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
+  [dependencyTypes.maxCount]: R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount),
+  [dependencyTypes.minCount]: R.pipe(NodeDef.getValidations, NodeDefValidations.getMinCount),
 }
 
 const applyIfUniquenessByDependencyType = {
-  [SurveyDependencyTypes.dependencyTypes.defaultValues]: true,
-  [SurveyDependencyTypes.dependencyTypes.applicable]: false,
-  [SurveyDependencyTypes.dependencyTypes.validations]: false,
-  [SurveyDependencyTypes.dependencyTypes.formula]: false,
+  [dependencyTypes.defaultValues]: true,
+  [dependencyTypes.applicable]: false,
+  [dependencyTypes.validations]: false,
+  [dependencyTypes.formula]: false,
+  [dependencyTypes.maxCount]: true,
+  [dependencyTypes.minCount]: true,
 }
 
 const errorKeyByDependencyType = {
-  [SurveyDependencyTypes.dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
-  [SurveyDependencyTypes.dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
-  [SurveyDependencyTypes.dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
-  [SurveyDependencyTypes.dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
+  [dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
+  [dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
+  [dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
+  [dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
+  [dependencyTypes.maxCount]: Validation.messageKeys.nodeDefEdit.countMaxInvalid,
+  [dependencyTypes.minCount]: Validation.messageKeys.nodeDefEdit.countMinInvalid,
 }
 
 const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
@@ -115,15 +120,17 @@ export const validate = async (survey, nodeDef, dependencyType) => {
   )
 
   validations.forEach((validation, index) => {
-    Validation.setField(String(index), validation)(result)
-    if (!Validation.isValid(validation)) {
-      Validation.setValid(false)(result)
+    if (validation) {
+      Validation.setField(String(index), validation)(result)
+      if (!Validation.isValid(validation)) {
+        Validation.setValid(false)(result)
+      }
     }
   })
 
   if (!Validation.isValid(result)) {
     Validation.setErrors([{ key: errorKey }])(result)
+    return result
   }
-
-  return result
+  return null
 }

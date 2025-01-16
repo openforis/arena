@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid'
+import { NodeDefExpressionFactory } from '@openforis/arena-core/dist/nodeDef/nodeDef'
 
 import * as ValidationResult from '@core/validation/validationResult'
 
@@ -18,19 +18,12 @@ export const keys = {
 // ====== CREATE
 
 export const createExpression = ({
-  expression = '',
-  applyIf = '',
-  severity = ValidationResult.severity.error,
-  messages = {},
+  expression = undefined,
+  applyIf = undefined,
+  severity = undefined,
+  messages = undefined,
   placeholder = false,
-}) => ({
-  applyIf,
-  expression,
-  placeholder,
-  messages,
-  severity,
-  uuid: uuidv4(),
-})
+}) => NodeDefExpressionFactory.createInstance({ applyIf, expression, messages, placeholder, severity })
 
 export const createExpressionPlaceholder = () => createExpression({ placeholder: true })
 

@@ -49,10 +49,25 @@ export const newInstance = (valid = true, fields = {}, errors = [], warnings = [
 
 // ====== READ
 
-export const isValid = R.propOr(true, keys.valid)
+export const isValid = (validation) => !validation || R.propOr(true, keys.valid)(validation)
 export const isNotValid = (validation) => validation && !isValid(validation)
 export const getFieldValidations = R.propOr({}, keys.fields)
-export const getFieldValidation = (field, defaultValue = newInstance()) => R.pathOr(defaultValue, [keys.fields, field])
+const _getFieldValidation = (field, defaultValue = newInstance()) => R.pathOr(defaultValue, [keys.fields, field])
+export const getFieldValidation =
+  (field, defaultValue = newInstance()) =>
+  (validation) => {
+    if (typeof field === 'string') {
+      let validationCurrent = validation
+      const parts = field.split('.')
+      parts.some((part) => {
+        validationCurrent = _getFieldValidation(part, defaultValue)(validationCurrent)
+        return !validationCurrent // breaks the look if there is no field validation
+      })
+      return validationCurrent
+    } else {
+      return _getFieldValidation(field, defaultValue)(validation)
+    }
+  }
 export const getFieldValidationsByFields = (fields) => (validation) =>
   fields.reduce((acc, field) => {
     const fieldValidation = getFieldValidation(field, null)(validation)

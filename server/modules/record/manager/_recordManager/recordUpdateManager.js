@@ -304,16 +304,24 @@ const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
   }
 }
 
+const validationDependencyTypes = [
+  SurveyDependencyType.validations,
+  SurveyDependencyType.minCount,
+  SurveyDependencyType.maxCount,
+]
+
 const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
   const dependentNodePointersToValidate = Object.values(nodes).reduce((acc, node) => {
-    const dependentValidationPointers = Records.getDependentNodePointers({
-      survey,
-      record,
-      node,
-      dependencyType: SurveyDependencyType.validations,
-      includeSelf: true,
+    validationDependencyTypes.forEach((dependencyType) => {
+      const dependentPointers = Records.getDependentNodePointers({
+        survey,
+        record,
+        node,
+        dependencyType,
+        includeSelf: true,
+      })
+      acc.push(...dependentPointers)
     })
-    acc.push(...dependentValidationPointers)
     return acc
   }, [])
   const dependentNodesToValidate = NodePointers.getNodesFromNodePointers({

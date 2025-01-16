@@ -1726,6 +1726,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
       taxonomyRequired: 'Taxonomy is required',
       validationsInvalid: 'Invalid "Validations"',
+      countMaxInvalid: 'Invalid "Max count"',
+      countMinInvalid: 'Invalid "Min count"',
     },
 
     record: {
@@ -1878,12 +1880,19 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     qualifier: {
       'default-values': 'default value',
       'default-values-apply-if': 'default value apply if',
+      'max-count': 'max count',
+      'min-count': 'min count',
       'relevant-if': 'relevant if',
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
     },
 
     selectAFunction: 'Select a function',
+
+    valueType: {
+      constant: 'Constant',
+      expression: 'Expression',
+    },
   },
 
   // ====== Auth

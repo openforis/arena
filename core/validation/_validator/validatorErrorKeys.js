@@ -98,6 +98,8 @@ export const ValidatorErrorKeys = {
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',
+    countMaxInvalid: 'validationErrors.nodeDefEdit.countMaxInvalid',
+    countMinInvalid: 'validationErrors.nodeDefEdit.countMinInvalid',
   },
 
   record: {

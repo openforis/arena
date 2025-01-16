@@ -109,6 +109,8 @@ export const TestId = {
     defaultValues: 'default-values',
     expressionDeleteBtn: (id) => `${id}-delete-btn`,
     formula: 'formula',
+    maxCount: 'max-count',
+    minCount: 'min-count',
     nextBtn: 'node-def-next-btn',
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
