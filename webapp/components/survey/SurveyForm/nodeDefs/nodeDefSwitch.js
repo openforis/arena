@@ -43,7 +43,7 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
 
 const _maxCountReached = ({ parentNode, nodeDef, nodes }) => {
   const maxCount = Nodes.getChildrenMaxCount({ parentNode, nodeDef })
-  return maxCount && nodes.length === Number(maxCount)
+  return maxCount && nodes.length >= Number(maxCount)
 }
 
 const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
