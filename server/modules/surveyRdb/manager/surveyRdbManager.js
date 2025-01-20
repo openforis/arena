@@ -233,7 +233,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
   })(survey)
 
-  const recordUuids = await _determineRecordUuidsFilter({
+  const filterRecordUuids = await _determineRecordUuidsFilter({
     survey,
     cycle,
     recordsModifiedAfter,
@@ -241,7 +241,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     search,
   })
 
-  if (recordUuids?.length === 0) {
+  if (filterRecordUuids?.length === 0) {
     throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
   }
 
@@ -265,12 +265,10 @@ export const fetchEntitiesDataToCsvFiles = async (
     const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
-    const childDefs = (
-      NodeDef.isEntity(nodeDefContext)
-        ? getChildAttributes(nodeDefContext)
-        : // Multiple attribute
-          [nodeDefContext]
-    ).filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
+    const childDefs = NodeDef.isEntity(nodeDefContext)
+      ? getChildAttributes(nodeDefContext)
+      : // Multiple attribute
+        [nodeDefContext]
 
     const ancestorDefs = []
     if (includeAncestorAttributes) {
@@ -282,13 +280,16 @@ export const fetchEntitiesDataToCsvFiles = async (
         false
       )(survey)
     } else {
-      ancestorDefs.push(...Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey))
+      const ancestorKeyDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
+      ancestorDefs.push(...ancestorKeyDefs)
     }
 
-    let query = Query.create({ entityDefUuid })
-    const queryAttributeDefUuids = ancestorDefs.concat(childDefs).map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(queryAttributeDefUuids)(query)
-    query = Query.assocFilterRecordUuids(recordUuids)(query)
+    const queryAttributeDefUuids = ancestorDefs
+      .concat(childDefs)
+      .filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
+      .map(NodeDef.getUuid)
+
+    const query = Query.create({ entityDefUuid, attributeDefUuids: queryAttributeDefUuids, filterRecordUuids })
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 

@@ -9,8 +9,9 @@ export class UniqueFileNamesGenerator {
   }
 
   generateUniqueFileName(inputFileName, key) {
-    if (this._fileNamesByKey[key]) {
-      throw new Error('Cannot generate a unique file name associated to the same key')
+    const existingFileName = this._fileNamesByKey[key]
+    if (existingFileName) {
+      return existingFileName
     }
     if (!this._keysByFileName[inputFileName]) {
       this._keysByFileName[inputFileName] = key

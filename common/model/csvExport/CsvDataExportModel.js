@@ -202,7 +202,6 @@ export class CsvDataExportModel {
         (includeFileAttributeDefs || includeFiles || !NodeDef.isFile(nodeDef)) &&
         (includeReadOnlyAttributes || !NodeDef.isReadOnly(nodeDef) || NodeDef.isKey(nodeDef))
     )
-
     return this._createColumnsFromAttributeDefs(descendantDefs)
   }
 

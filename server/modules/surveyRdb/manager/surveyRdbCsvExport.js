@@ -159,9 +159,10 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
   const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
   const transformer = (obj) => {
     nodeDefFileCols.forEach((nodeDef) => {
+      const fileUuidField = ColumnNodeDef.getFileUuidColumnName(nodeDef)
+      const fileUuid = obj[fileUuidField]
       const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
       const fileName = obj[fileNameField]
-      const fileUuid = obj[ColumnNodeDef.getFileUuidColumnName(nodeDef)]
       const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
       obj[fileNameField] = uniqueFileName
     })
