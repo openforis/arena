@@ -1,7 +1,6 @@
 import { createChain } from './createChain'
 import { fetchChain } from './fetchChain'
 import { updateChain } from './updateChain'
-import { fetchAndValidateChain } from './validateChain'
 import { deleteChain } from './deleteChain'
 import { resetChainStore } from './resetChainStore'
 import { createNodeDef } from './createNodeDef'
@@ -14,7 +13,6 @@ export const ChainActions = {
   createChain,
   fetchChain,
   updateChain,
-  fetchAndValidateChain,
   deleteChain,
   resetChainStore,
   createNodeDef,

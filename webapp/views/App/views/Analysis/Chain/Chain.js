@@ -41,7 +41,7 @@ const ChainComponent = () => {
 
   useEffect(() => {
     const init = async () => {
-      dispatch(ChainActions.fetchAndValidateChain({ chainUuid }))
+      dispatch(ChainActions.fetchChain({ chainUuid, validate: true }))
       if (canHaveRecords) {
         dispatch(ChainActions.fetchRecordsCountByStep)
       }
