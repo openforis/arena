@@ -1,4 +1,4 @@
-export { update } from './update'
+export { update, validate } from './update'
 import { ChainSummaryGenerator } from './chainSummaryGenerator'
 const { generateChainSummary } = ChainSummaryGenerator
 export { generateChainSummary }

@@ -40,11 +40,13 @@ const ChainComponent = () => {
   )
 
   useEffect(() => {
-    dispatch(ChainActions.fetchChain({ chainUuid }))
-
-    if (canHaveRecords) {
-      dispatch(ChainActions.fetchRecordsCountByStep)
+    const init = async () => {
+      dispatch(ChainActions.fetchAndValidateChain({ chainUuid }))
+      if (canHaveRecords) {
+        dispatch(ChainActions.fetchRecordsCountByStep)
+      }
     }
+    init()
   }, [dispatch, chainUuid, canHaveRecords])
 
   const locationPathMatcher = useLocationPathMatcher()
