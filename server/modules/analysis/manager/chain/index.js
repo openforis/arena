@@ -49,12 +49,11 @@ export const { countChains, fetchChains, fetchChain } = ChainRepository
 // ====== UPDATE
 export const { updateChain } = ChainRepository
 
-export const updateChainValidation = async ({ surveyId, chainUuid, validation }, client = DB.client) => {
-  return ChainRepository.updateChain(
+export const updateChainValidation = async ({ surveyId, chainUuid, validation }, client = DB.client) =>
+  ChainRepository.updateChain(
     { surveyId, chainUuid, fields: { [TableChain.columnSet.validation]: validation } },
     client
   )
-}
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
   DB.client.tx(async (tx) => {
