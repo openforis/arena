@@ -1,11 +1,6 @@
-import * as Survey from '@core/survey/survey'
-import * as Chain from '@common/analysis/chain'
-import * as ChainValidator from '@common/analysis/chainValidator'
-
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as AnalysisService from '../service'
 
@@ -104,19 +99,29 @@ export const init = (app) => {
 
       const { chain } = Request.getBody(req)
 
-      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-      const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-      const validation = await ChainValidator.validateChain({ chain, defaultLang, survey })
+      const chainUpdated = await AnalysisService.update({ user, surveyId, chain })
 
-      const chainWithValdidation = Chain.assocValidation(validation)(chain)
-
-      await AnalysisService.update({ user, surveyId, chain: chainWithValdidation })
-
-      res.json(chainWithValdidation)
+      res.json(chainUpdated)
     } catch (error) {
       next(error)
     }
   })
+
+  app.put(
+    '/survey/:surveyId/chain/validate',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        const chainUpdated = await AnalysisService.validate({ surveyId, chainUuid })
+
+        res.json(chainUpdated)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   // ====== DELETE - Chain
 
