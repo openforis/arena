@@ -22,7 +22,10 @@ export const ChainRStudioFieldset = (props) => {
   const recordsCountByStep = useChainRecordsCountByStep()
   const analysisRecordsAvailable = Number(recordsCountByStep[RecordStep.analysisCode]) > 0
 
-  const _openRStudio = useCallback(({ isLocal = false }) => dispatch(ChainActions.openRStudio({ isLocal })), [dispatch])
+  const _openRStudio = useCallback(
+    ({ isLocal = false } = {}) => dispatch(ChainActions.openRStudio({ isLocal })),
+    [dispatch]
+  )
 
   const openRStudio = useCallback(() => _openRStudio(), [_openRStudio])
   const openRStudioLocal = useCallback(() => _openRStudio({ isLocal: true }), [_openRStudio])
