@@ -203,7 +203,7 @@ const ExpressionsProp = (props) => {
               })
             )}
             {!readOnly &&
-              (multiple || R.isEmpty(values)) &&
+              (multiple || R.isEmpty(values) || values.every(NodeDefExpression.isEmpty)) &&
               createExpressionProp({
                 index: values.length,
                 expression: NodeDefExpression.createExpressionPlaceholder(),
