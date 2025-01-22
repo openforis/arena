@@ -18,7 +18,7 @@ const hasRecordsToProcess = (state) => {
   const chain = getChain(state)
   const recordsCountByStep = getRecordsCountByStep(state)
   const totalRecords = Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)
-    ? Number(recordsCountByStep[RecordStep.getStepIdByName(RecordStep.stepNames.analysis)]) || 0
+    ? Number(recordsCountByStep[RecordStep.analysisCode]) || 0
     : RecordStep.steps.reduce((acc, step) => acc + Number(recordsCountByStep[step.id]) || 0, 0)
   return totalRecords > 0
 }
