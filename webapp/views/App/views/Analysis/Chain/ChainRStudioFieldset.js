@@ -20,8 +20,7 @@ export const ChainRStudioFieldset = (props) => {
   const validation = Chain.getValidation(chain)
 
   const recordsCountByStep = useChainRecordsCountByStep()
-  const analysisRecordsAvailable =
-    Number(recordsCountByStep[RecordStep.getStepIdByName(RecordStep.stepNames.analysis)]) > 0
+  const analysisRecordsAvailable = Number(recordsCountByStep[RecordStep.analysisCode]) > 0
 
   const _openRStudio = useCallback(({ isLocal = false }) => dispatch(ChainActions.openRStudio({ isLocal })), [dispatch])
 
