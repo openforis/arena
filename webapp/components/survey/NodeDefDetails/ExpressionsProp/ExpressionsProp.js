@@ -199,7 +199,7 @@ const ExpressionsProp = (props) => {
           <div className="node-def-edit__expressions">
             {uiValues.map((value, index) => (
               <ExpressionProp
-                key={String(index)}
+                key={NodeDefExpression.getUuid(value)}
                 applyIf={applyIf}
                 canBeConstant={canBeConstant}
                 excludeCurrentNodeDef={excludeCurrentNodeDef}
