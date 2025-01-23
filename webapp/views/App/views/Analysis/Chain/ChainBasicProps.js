@@ -8,8 +8,7 @@ import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
-import { useChain } from '@webapp/store/ui/chain'
-import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
+import { useChain, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
 
 import * as API from '@webapp/service/api'
 
