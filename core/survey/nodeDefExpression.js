@@ -43,8 +43,9 @@ export const getSeverity = R.propOr(ValidationResult.severity.error, keys.severi
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)
 
-export const isEmpty = (expression = {}) =>
-  StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
+export const isExpressionEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression))
+export const isApplyIfEmpty = (expression = {}) => StringUtils.isBlank(getApplyIf(expression))
+export const isEmpty = (expression = {}) => isExpressionEmpty(expression) && isApplyIfEmpty(expression)
 
 export const isSimilarTo = (expressionA) => (expressionB) => {
   if (isEmpty(expressionA) && isEmpty(expressionB)) return true

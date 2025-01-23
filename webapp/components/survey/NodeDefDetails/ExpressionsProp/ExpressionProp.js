@@ -46,6 +46,7 @@ const ExpressionProp = (props) => {
   }))
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
+  const expressionEmpty = NodeDefExpression.isEmpty(expression)
 
   const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
@@ -82,7 +83,7 @@ const ExpressionProp = (props) => {
           />
         </div>
 
-        {applyIf && !isPlaceholder && (
+        {applyIf && !isPlaceholder && !expressionEmpty && (
           <div className="expression-item">
             <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
 
@@ -111,7 +112,7 @@ const ExpressionProp = (props) => {
               selectedItemKey={NodeDefExpression.getSeverity(expression)}
               onChange={(severityVal) => onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))}
               items={severityItems}
-              disabled={NodeDefExpression.isEmpty(expression)}
+              disabled={expressionEmpty}
             />
           </div>
         )}
@@ -120,7 +121,7 @@ const ExpressionProp = (props) => {
             formLabelKey="common.errorMessage"
             labels={NodeDefExpression.getMessages(expression)}
             onChange={(messages) => onUpdate(NodeDefExpression.assocMessages(messages)(expression))}
-            readOnly={NodeDefExpression.isEmpty(expression)}
+            readOnly={expressionEmpty}
           />
         )}
       </div>
