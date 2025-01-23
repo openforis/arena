@@ -109,22 +109,21 @@ const ExpressionsProp = (props) => {
           onChange([NodeDefExpression.createExpression({ expression: constantValue })])
         }
         setValueType(valueTypeNext)
+      } else if (valuesIsEmpty) {
+        // converting from expression to constant
+        // no expressions to convert; just switch type
+        setValueType(valueTypeNext)
       } else {
         // converting from expression to constant
-        if (valuesIsEmpty) {
-          // no expressions to convert; just switch type
+        // expressions defined: try to convert them into a constant value
+        const constantValue = extractConstantValue({ values })
+        if (!Objects.isEmpty(constantValue)) {
+          onChange(constantValue)
           setValueType(valueTypeNext)
-        } else {
-          // expressions defined: try to convert them into a constant value
-          const constantValue = extractConstantValue({ values })
-          if (!Objects.isEmpty(constantValue)) {
-            onChange(constantValue)
-            setValueType(valueTypeNext)
-          } else if (await confirm({ key: 'nodeDefEdit.expressionsProp.confirmDelete' })) {
-            // expression cannot be converted into constant: clear it
-            onChange(null)
-            setValueType(valueTypeNext)
-          }
+        } else if (await confirm({ key: 'nodeDefEdit.expressionsProp.confirmDelete' })) {
+          // expression cannot be converted into constant: clear it
+          onChange(null)
+          setValueType(valueTypeNext)
         }
       }
     },
@@ -200,7 +199,7 @@ const ExpressionsProp = (props) => {
           <div className="node-def-edit__expressions">
             {uiValues.map((value, index) => (
               <ExpressionProp
-                key={index}
+                key={String(index)}
                 applyIf={applyIf}
                 canBeConstant={canBeConstant}
                 excludeCurrentNodeDef={excludeCurrentNodeDef}
