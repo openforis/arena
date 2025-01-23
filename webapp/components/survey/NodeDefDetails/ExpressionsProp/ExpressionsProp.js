@@ -42,9 +42,10 @@ const extractConstantValue = ({ values }) => {
     return null
   }
   const expression = NodeDefExpression.getExpression(nodeDefExpr)
-  const stringValue =
-    typeof expression === 'string' || Expression.isLiteral(expression) ? expression.value ?? expression : null
-  return R.pipe(StringUtils.unquote, StringUtils.unquoteDouble)(stringValue)
+  const stringValue = typeof expression === 'string' ? expression : null
+  return Expression.isLiteral(Expression.fromString(stringValue))
+    ? R.pipe(StringUtils.unquote, StringUtils.unquoteDouble)(stringValue)
+    : null
 }
 
 const ExpressionsWrapper = (props) => {
