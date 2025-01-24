@@ -22,6 +22,8 @@ import { State } from './store'
 
 const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
 
+const countPropNumberFormat = NumberFormats.integer({ allowNegative: false })
+
 const CountProp = (props) => {
   const { Actions, countType, nodeDef, nodeDefUuidContext, readOnly, state } = props
 
@@ -65,7 +67,7 @@ const CountProp = (props) => {
         excludeCurrentNodeDef
         valueTypeSelection
         determineValueType={determineValueType}
-        valueConstantEditorNumberFormat={NumberFormats.integer()}
+        valueConstantEditorNumberFormat={countPropNumberFormat}
       />
     </div>
   )
