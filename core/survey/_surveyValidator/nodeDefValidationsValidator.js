@@ -16,7 +16,7 @@ const validateCountProp =
     const count = Validator.getProp(propName)(item)
     return Array.isArray(count)
       ? NodeDefExpressionsValidator.validate(survey, nodeDef, dependencyType)
-      : Validator.validatePositiveNumber(errorKey)(propName, item)
+      : Validator.validatePositiveOrZeroNumber(errorKey)(propName, item)
   }
 
 export const validate = async (survey, nodeDef) => {
