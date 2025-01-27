@@ -117,6 +117,10 @@ export const designerModules = {
     key: 'surveyHierarchy',
     path: 'surveyHierarchy',
   },
+  surveyDependencyTree: {
+    key: 'surveyDependencyTree',
+    path: 'surveyDependencyTree',
+  },
   categories: {
     key: 'categories',
     path: 'categories',

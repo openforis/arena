@@ -17,6 +17,29 @@ const transitionDuration = 750
 const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
 
+const diagonal = (s, d) => {
+  // x and y are reverted
+  const middleX = (s.y + d.y) / 2 + nodeWidth / 2
+  return `M ${s.y} ${s.x}
+    C ${middleX} ${s.x},
+      ${middleX} ${d.x},
+      ${d.y + nodeWidth} ${d.x}`
+}
+
+const line = (s, d) => {
+  // check why X and Y are reversed
+  const { x: sY, y: sX } = s
+  const { x: dY, y: dX } = d
+  return `M${sX},${sY}
+      L${dX + nodeWidth},${dY}`
+}
+
+const DEFAULT_OPTIONS = {
+  parentChild: {
+    directLines: true,
+  },
+}
+
 export default class TreeChart {
   constructor({
     domElement,
@@ -29,6 +52,7 @@ export default class TreeChart {
     svgClass = 'hierarchy_tree_svg',
     rootNodeElementId = 'hierarchy__root-g',
     wrapperClass = 'hierarchy__tree',
+    options = DEFAULT_OPTIONS,
   }) {
     this.domElement = domElement
     this.data = data
@@ -39,7 +63,7 @@ export default class TreeChart {
     this.svgClass = svgClass
     this.rootNodeElementId = rootNodeElementId
     this.wrapperClass = wrapperClass
-
+    this.options = { ...DEFAULT_OPTIONS, ...options }
     this.nodesByUuidMap = {}
 
     this.onNodeClick = (nodeUuid) => {
@@ -258,13 +282,6 @@ export default class TreeChart {
     // Update the links...
     const link = this.svg.selectAll('path.link').data(links, (d) => d.data.uuid)
 
-    // Creates a curved (diagonal) path from parent to the child nodes
-    const diagonal = (s, d) =>
-      `M ${s.y} ${s.x}
-        C ${(s.y + d.y) / 2 + nodeWidth / 2} ${s.x},
-          ${(s.y + d.y) / 2 + nodeWidth / 2} ${d.x},
-          ${d.y + nodeWidth} ${d.x}`
-
     // Enter any new links at the parent's previous position
     const linkEnter = link
       .enter()
@@ -283,7 +300,7 @@ export default class TreeChart {
       .transition()
       .duration(transitionDuration)
       .ease(easeEnter)
-      .attr('d', (d) => diagonal(d, d.parent))
+      .attr('d', (d) => (this.options.parentChild.directLines ? line(d, d.parent) : diagonal(d, d.parent)))
 
     // Remove any exiting links
     link
