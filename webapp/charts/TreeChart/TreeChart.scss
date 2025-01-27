@@ -1,0 +1,58 @@
+@import 'webapp/style/vars';
+
+.hierarchy__tree {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+
+  svg {
+    position: absolute;
+  }
+
+  .node {
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 0;
+    padding: 0.2rem 0.5rem;
+
+    .node-grid {
+      display: flex;
+      align-items: center;
+      border: 1px solid $greyBorder;
+      justify-content: space-between;
+      transition: background-color 1s ease;
+      background-color: white;
+      height: auto;
+      padding: 6px;
+
+      .btn {
+        transform: rotate(-90deg);
+        padding: 0.3rem;
+      }
+
+      &.node-virtual {
+        background-color: $grey;
+      }
+
+      &.highlight {
+        background-color: $blueLightActive;
+      }
+
+      .node-label {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+    }
+  }
+
+  .link {
+    fill: none;
+    stroke: $blueLightActive;
+    stroke-width: 1px;
+  }
+}

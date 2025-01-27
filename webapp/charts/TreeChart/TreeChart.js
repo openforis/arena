@@ -1,6 +1,7 @@
+import './TreeChart.scss'
+
 import * as d3 from 'd3'
 
-import * as NodeDef from '@core/survey/nodeDef'
 import { elementOffset } from '@webapp/utils/domUtils'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
@@ -16,16 +17,34 @@ const transitionDuration = 750
 const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
 
-export default class Tree {
-  constructor({ domElement, data, lang, i18n, onEntityClick }) {
-    this.nodesByUuidMap = {}
-    this._lang = lang
-    this.i18n = i18n
-    this.data = data
+export default class TreeChart {
+  constructor({
+    domElement,
+    data,
+    i18n,
+    nodeClassFunction,
+    nodeLabelFunction,
+    nodeTooltipFunction,
+    onNodeClick: onNodeClickProp,
+    svgClass = 'hierarchy_tree_svg',
+    rootNodeElementId = 'hierarchy__root-g',
+    wrapperClass = 'hierarchy__tree',
+  }) {
     this.domElement = domElement
-    this.onEntityClick = (nodeDefUuid) => {
-      onEntityClick(nodeDefUuid)
-      this.expandToNode(nodeDefUuid)
+    this.data = data
+    this.i18n = i18n
+    this.nodeClassFunction = nodeClassFunction
+    this._nodeLabelFunction = nodeLabelFunction
+    this._nodeTooltipFunction = nodeTooltipFunction
+    this.svgClass = svgClass
+    this.rootNodeElementId = rootNodeElementId
+    this.wrapperClass = wrapperClass
+
+    this.nodesByUuidMap = {}
+
+    this.onNodeClick = (nodeUuid) => {
+      onNodeClickProp(nodeUuid)
+      this.expandToNode(nodeUuid)
     }
 
     this.svg = null
@@ -34,7 +53,6 @@ export default class Tree {
 
     this.rootG = null
     this.resizeObserver = null
-    this._nodeDefLabelType = NodeDef.NodeDefLabelTypes.label
 
     this.initSvg()
   }
@@ -75,9 +93,9 @@ export default class Tree {
   }
 
   resizeObserverCallback() {
-    const svgEl = document.querySelectorAll('.survey-hierarchy__svg')[0]
+    const svgEl = document.querySelectorAll(`.${this.svgClass}`)[0]
     if (!svgEl) return
-    const treeEl = document.querySelectorAll('.survey-hierarchy__tree')[0]
+    const treeEl = document.querySelectorAll(`.${this.wrapperClass}`)[0]
     const treeElSize = elementOffset(treeEl)
 
     const bBox = this.rootG.getBBox()
@@ -106,13 +124,13 @@ export default class Tree {
     this.svg = d3
       .select(this.domElement)
       .append('svg')
-      .classed('survey-hierarchy__svg', true)
+      .classed(this.svgClass, true)
       .attr('width', width + svgMargin.right + svgMargin.left)
       .attr('height', height + svgMargin.top + svgMargin.bottom)
       .append('g')
-      .attr('id', 'survey-hierarchy__root-g')
+      .attr('id', this.rootNodeElementId)
 
-    this.rootG = document.querySelector('#survey-hierarchy__root-g')
+    this.rootG = document.querySelector(`#${this.rootNodeElementId}`)
 
     // InitObserver
     this.resizeObserver = new ResizeObserver(this.resizeObserverCallback.bind(this))
@@ -186,17 +204,17 @@ export default class Tree {
 
     const nodeGrid = fo
       .append('xhtml:div')
-      .attr('class', (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`)
-      .on('click', (_, d) => this.onEntityClick(d.data.uuid))
+      .attr('class', this.nodeClassFunction)
+      .on('click', (_, d) => this.onNodeClick(d.data.uuid))
 
     // node label element
     nodeGrid
       .append('xhtml:span')
       .attr('class', 'node-label')
       // label
-      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+      .text(this.nodeLabelFunction)
       // tooltip
-      .attr('title', (d) => NodeDef.getDescription(this.lang)(d.data))
+      .attr('title', this.nodeTooltipFunction)
 
     // node expand/collapse button
     nodeGrid
@@ -305,30 +323,30 @@ export default class Tree {
       .classed('highlight', true)
   }
 
-  _updateLabels() {
+  updateLabels() {
     this.svg
       .selectAll('.node-label')
       // label
-      .text((d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang: this.lang, type: this.nodeDefLabelType }))
+      .text(this.nodeLabelFunction)
       // tooltip
-      .attr('title', (d) => NodeDef.getDescription(this.lang)(d.data))
+      .attr('title', this.nodeTooltipFunction)
   }
 
-  get nodeDefLabelType() {
-    return this._nodeDefLabelType
+  get nodeLabelFunction() {
+    return this._nodeLabelFunction
   }
 
-  set nodeDefLabelType(nodeDefLabelType) {
-    this._nodeDefLabelType = nodeDefLabelType
-    this._updateLabels()
+  set nodeLabelFunction(func) {
+    this._nodeLabelFunction = func
+    this.updateLabels()
   }
 
-  get lang() {
-    return this._lang
+  get nodeTooltipFunction() {
+    return this._nodeTooltipFunction
   }
 
-  set lang(lang) {
-    this._lang = lang
-    this._updateLabels()
+  set nodeTooltipFunction(func) {
+    this._nodeTooltipFunction = func
+    this.updateLabels()
   }
 }

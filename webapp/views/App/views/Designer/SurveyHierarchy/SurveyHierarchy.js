@@ -1,51 +1,28 @@
 import './SurveyHierarchy.scss'
 
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import { NodeDefsSelector } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
 import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
 
-import Tree from './Tree'
+import { SurveyHierarchyTree } from './SurveyHierarchyTree'
 
 const SurveyHierarchy = () => {
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
   const cycle = useSurveyCycleKey()
-  const i18n = useI18n()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity, cycle)(survey)
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
-  const [tree, setTree] = useState(null)
 
   const treeRef = useRef(null)
-
-  useEffect(() => {
-    const treeElement = treeRef.current
-    setTree(
-      new Tree({ domElement: treeElement, data: hierarchy.root, lang, i18n, onEntityClick: setSelectedNodeDefUuid })
-    )
-  }, [])
-
-  useEffect(() => {
-    return () => tree?.disconnect()
-  }, [tree])
-
-  useEffect(() => {
-    if (tree) tree.nodeDefLabelType = nodeDefLabelType
-  }, [nodeDefLabelType, tree])
-
-  useEffect(() => {
-    if (tree) tree.lang = lang
-  }, [lang, tree])
 
   return (
     <div className="survey-hierarchy">
@@ -56,8 +33,12 @@ const SurveyHierarchy = () => {
       </div>
 
       <div className="survey-hierarchy__center">
-        <div className="survey-hierarchy__tree" ref={treeRef} />
-
+        <SurveyHierarchyTree
+          ref={treeRef}
+          data={hierarchy?.root}
+          nodeDefLabelType={nodeDefLabelType}
+          onEntityClick={setSelectedNodeDefUuid}
+        />
         <div className="survey-hierarchy__attributes">
           <NodeDefsSelector
             canSelectAttributes={false}
@@ -65,7 +46,7 @@ const SurveyHierarchy = () => {
             nodeDefLabelType={nodeDefLabelType}
             nodeDefUuidEntity={selectedNodeDefUuid}
             onChangeEntity={(nodeDefUuidEntity) => {
-              tree.expandToNode(nodeDefUuidEntity)
+              treeRef.current.expandToNode(nodeDefUuidEntity)
               setSelectedNodeDefUuid(nodeDefUuidEntity)
             }}
             showAncestors={false}
