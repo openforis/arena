@@ -9,7 +9,9 @@ const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 const treeNodeWidth = 80
 const treeNodeHeight = 10
 const nodeWidth = 150
+const nodeHalfWidth = nodeWidth / 2
 const nodeHeight = 80
+const nodeHalfHeight = nodeHeight / 2
 const nodeLabelDist = 19
 const nodeLinkLength = 230
 
@@ -44,6 +46,7 @@ export default class TreeChart {
   constructor({
     domElement,
     data,
+    extraLinks,
     i18n,
     nodeClassFunction,
     nodeLabelFunction,
@@ -56,6 +59,7 @@ export default class TreeChart {
   }) {
     this.domElement = domElement
     this.data = data
+    this.extraLinks = extraLinks
     this.i18n = i18n
     this.nodeClassFunction = nodeClassFunction
     this._nodeLabelFunction = nodeLabelFunction
@@ -67,7 +71,7 @@ export default class TreeChart {
     this.nodesByUuidMap = {}
 
     this.onNodeClick = (nodeUuid) => {
-      onNodeClickProp(nodeUuid)
+      onNodeClickProp?.(nodeUuid)
       this.expandToNode(nodeUuid)
     }
 
@@ -184,6 +188,10 @@ export default class TreeChart {
     const nodes = this.updateNodes(treeData, node)
 
     this.updateLinks(treeData, node)
+
+    if (this.extraLinks) {
+      this.updateExtraLinks()
+    }
 
     // Store the old positions for transition
 
@@ -309,11 +317,52 @@ export default class TreeChart {
       .duration(transitionDuration)
       .ease(easeExit)
       .attr('d', () => {
-        const o = { x: node.x, y: node.y }
+        const { x, y } = node
+        const o = { x, y }
         return diagonal(o, o)
       })
       .style('opacity', 0)
       .remove()
+  }
+
+  updateExtraLinks() {
+    this.svg
+      .append('defs')
+      .append('marker')
+      .attr('id', 'arrowhead')
+      .attr('refX', 6)
+      .attr('refY', 6)
+      .attr('markerWidth', 10)
+      .attr('markerHeight', 10)
+      .attr('orient', 'auto')
+      .append('path')
+      .attr('d', 'M 0 0 12 6 0 12 3 6')
+      .style('fill', 'black')
+
+    // Create SVG elements for the extra links
+    const extraLinksGroup = this.svg.append('g').attr('class', 'extra-links')
+    const { nodesByUuidMap } = this
+    extraLinksGroup
+      .selectAll('.extra-link')
+      .data(this.extraLinks)
+      .enter()
+      .append('path')
+      .attr('class', 'extra-link')
+      .attr('d', function (d) {
+        // Calculate the link path
+        const sourceNode = nodesByUuidMap[d.source]
+        const { x: sY, y: sX } = sourceNode
+        const targetNode = nodesByUuidMap[d.target]
+        const { x: tY, y: tX } = targetNode
+        return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth},${tY - 30}`
+      })
+
+    // Style the extra links
+    extraLinksGroup
+      .selectAll('.extra-link')
+      .style('stroke', 'red')
+      .style('stroke-width', 2)
+      .attr('marker-end', 'url(#arrowhead)')
   }
 
   expandToNode(uuid) {

@@ -11,6 +11,14 @@ import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/su
 import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
 import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 
+const generateExtraLinks = ({ dependencyGraph }) =>
+  Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
+    dependentNodeDefUuids.forEach((target) => {
+      acc.push({ source, target })
+    })
+    return acc
+  }, [])
+
 export const SurveyDependencyTree = () => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
@@ -47,6 +55,7 @@ export const SurveyDependencyTree = () => {
         <SurveyDependencyTreeChart
           ref={treeRef}
           data={hierarchy?.root}
+          extraLinks={generateExtraLinks({ dependencyGraph })}
           nodeDefLabelType={nodeDefLabelType}
           onEntityClick={setSelectedNodeDefUuid}
         />
