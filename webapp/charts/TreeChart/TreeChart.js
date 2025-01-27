@@ -330,13 +330,13 @@ export default class TreeChart {
       .append('defs')
       .append('marker')
       .attr('id', 'arrowhead')
-      .attr('refX', 6)
-      .attr('refY', 6)
-      .attr('markerWidth', 10)
-      .attr('markerHeight', 10)
+      .attr('refX', 4)
+      .attr('refY', 4)
+      .attr('markerWidth', 20)
+      .attr('markerHeight', 20)
       .attr('orient', 'auto')
       .append('path')
-      .attr('d', 'M 0 0 12 6 0 12 3 6')
+      .attr('d', 'M 0 0 8 4 0 8 4 4')
       .style('fill', 'black')
 
     // Create SVG elements for the extra links

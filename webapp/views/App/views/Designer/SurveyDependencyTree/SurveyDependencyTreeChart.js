@@ -60,6 +60,7 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
 
 SurveyDependencyTreeChart.propTypes = {
   data: PropTypes.object.isRequired,
+  extraLinks: PropTypes.array,
   nodeDefLabelType: PropTypes.string,
   onEntityClick: PropTypes.func.isRequired,
 }
