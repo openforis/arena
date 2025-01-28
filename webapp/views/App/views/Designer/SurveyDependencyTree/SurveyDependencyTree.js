@@ -27,6 +27,21 @@ export const SurveyDependencyTree = () => {
 
   const dependencyGraphFull = Survey.getDependencyGraph(survey)
   const dependencyGraph = dependencyGraphFull[dependencyType]
+  const dependencyNodeDefsByUuid = Object.entries(dependencyGraph).reduce(
+    (acc, [nodeDefUuid, dependentNodeDefUuids]) => {
+      const nodeDefUuids = [nodeDefUuid, ...dependentNodeDefUuids]
+      nodeDefUuids.forEach((uuid) => {
+        if (!acc[uuid]) {
+          const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
+          Survey.visitAncestorsAndSelf(nodeDef, (nd) => {
+            acc[NodeDef.getUuid(nd)] = nd
+          })
+        }
+      })
+      return acc
+    },
+    {}
+  )
 
   const hierarchy = Survey.getHierarchy(
     (nodeDef) => NodeDef.isEntity(nodeDef) || NodeDef.isAttribute(nodeDef),

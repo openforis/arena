@@ -19,13 +19,14 @@ const transitionDuration = 750
 const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
 
-const diagonal = (s, d) => {
+const diagonal = (s, d, randomOffset = false) => {
   // x and y are reverted
   const middleX = (s.y + d.y) / 2 + nodeWidth / 2
+  const offset = randomOffset ? Math.ceil(Math.random() * 10) : 0
   return `M ${s.y} ${s.x}
     C ${middleX} ${s.x},
       ${middleX} ${d.x},
-      ${d.y + nodeWidth} ${d.x}`
+      ${d.y + nodeWidth + offset} ${d.x}`
 }
 
 const line = (s, d) => {
@@ -61,6 +62,7 @@ export default class TreeChart {
     this.data = data
     this.extraLinks = extraLinks
     this.i18n = i18n
+    this.nodeWrapperClassName = 'node'
     this.nodeClassFunction = nodeClassFunction
     this._nodeLabelFunction = nodeLabelFunction
     this._nodeTooltipFunction = nodeTooltipFunction
@@ -102,7 +104,6 @@ export default class TreeChart {
       node.children = node._children
       node._children = null
     }
-
     this.update(node)
   }
 
@@ -180,6 +181,10 @@ export default class TreeChart {
 
     // Collapse the node and all it's children
     this.update(this.root)
+
+    if (this.extraLinks) {
+      this.updateExtraLinks()
+    }
   }
 
   update(node) {
@@ -188,10 +193,6 @@ export default class TreeChart {
     const nodes = this.updateNodes(treeData, node)
 
     this.updateLinks(treeData, node)
-
-    if (this.extraLinks) {
-      this.updateExtraLinks()
-    }
 
     // Store the old positions for transition
 
@@ -221,7 +222,7 @@ export default class TreeChart {
     const nodeEnter = node
       .enter()
       .append('g')
-      .attr('class', 'node')
+      .attr('class', this.nodeWrapperClassName)
       .attr('transform', () => `translate(${source.y0}, ${source.x0})`)
 
     const hasChildren = (d) => d.children || d._children
@@ -326,6 +327,49 @@ export default class TreeChart {
   }
 
   updateExtraLinks() {
+    this.addArrowHeadMarker()
+
+    const { nodesByUuidMap } = this
+
+    const links = this.svg.append('g').attr('class', 'extra-links').selectAll('.extra-link').data(this.extraLinks)
+
+    links
+      .enter()
+      .insert('path', 'g')
+      .attr('class', 'extra-link')
+      .attr('d', (d) => {
+        const o = { x: d.x, y: d.y }
+        return diagonal(o, o)
+      })
+      .transition()
+      .duration(transitionDuration)
+      .ease(easeEnter)
+      .attr('d', (d) => {
+        const sourceNode = nodesByUuidMap[d.source]
+        const { x: sY, y: sX } = sourceNode
+        const targetNode = nodesByUuidMap[d.target]
+        const { x: tY, y: tX } = targetNode
+        const randomOffset = Math.ceil(Math.random() * nodeWidth * 0.4)
+        return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth + randomOffset},${tY - 30}`
+      })
+      .style('stroke', 'red')
+      .style('stroke-width', 2)
+      .attr('marker-end', 'url(#arrowhead)')
+
+    // links
+    //   .exit()
+    //   .transition()
+    //   .duration(transitionDuration)
+    //   .ease(easeExit)
+    //   .attr('d', (d) => {
+    //     const o = { x: d.x, y: d.y }
+    //     return diagonal(o, o)
+    //   })
+    //   .style('opacity', 0)
+    //   .remove()
+  }
+
+  addArrowHeadMarker() {
     this.svg
       .append('defs')
       .append('marker')
@@ -338,31 +382,6 @@ export default class TreeChart {
       .append('path')
       .attr('d', 'M 0 0 8 4 0 8 4 4')
       .style('fill', 'black')
-
-    // Create SVG elements for the extra links
-    const extraLinksGroup = this.svg.append('g').attr('class', 'extra-links')
-    const { nodesByUuidMap } = this
-    extraLinksGroup
-      .selectAll('.extra-link')
-      .data(this.extraLinks)
-      .enter()
-      .append('path')
-      .attr('class', 'extra-link')
-      .attr('d', function (d) {
-        // Calculate the link path
-        const sourceNode = nodesByUuidMap[d.source]
-        const { x: sY, y: sX } = sourceNode
-        const targetNode = nodesByUuidMap[d.target]
-        const { x: tY, y: tX } = targetNode
-        return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth},${tY - 30}`
-      })
-
-    // Style the extra links
-    extraLinksGroup
-      .selectAll('.extra-link')
-      .style('stroke', 'red')
-      .style('stroke-width', 2)
-      .attr('marker-end', 'url(#arrowhead)')
   }
 
   expandToNode(uuid) {
