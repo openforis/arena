@@ -38,6 +38,8 @@ const line = (s, d) => {
 }
 
 const DEFAULT_OPTIONS = {
+  collapsible: true,
+  startCollapsed: true,
   parentChild: {
     directLines: true,
   },
@@ -50,6 +52,7 @@ export default class TreeChart {
     extraLinks,
     i18n,
     nodeClassFunction,
+    nodeFilterFunction,
     nodeLabelFunction,
     nodeTooltipFunction,
     onNodeClick: onNodeClickProp,
@@ -111,9 +114,9 @@ export default class TreeChart {
     this.nodesByUuidMap[node.data.uuid] = node
 
     if (node.children) {
-      node.children.forEach((childNode) => {
+      const childrenFiltered = this.nodeFilterFunction ? node.children.filter(this.nodeFilterFunction) : node.children
+      childrenFiltered.forEach((childNode) => {
         this.initNode(childNode)
-
         if (collapseChildren) {
           this.collapseNode(childNode)
         }
@@ -177,7 +180,7 @@ export default class TreeChart {
     this.root.x0 = height / 2
     this.root.y0 = 0
 
-    this.initNode(this.root, true)
+    this.initNode(this.root, this.options.startCollapsed)
 
     // Collapse the node and all it's children
     this.update(this.root)
@@ -250,17 +253,19 @@ export default class TreeChart {
       .attr('title', this.nodeTooltipFunction)
 
     // node expand/collapse button
-    nodeGrid
-      .append('xhtml:button')
-      .attr('class', 'btn')
-      .attr('title', () => this.i18n.t('common.expandCollapse'))
-      .style('display', (d) => (hasChildren(d) ? 'block' : 'none'))
-      .on('click', (event, d) => {
-        event.stopPropagation()
-        this.toggleNode(d)
-      })
-      .append('xhtml:span')
-      .attr('class', 'icon icon-tree icon-12px')
+    if (this.options.collapsible) {
+      nodeGrid
+        .append('xhtml:button')
+        .attr('class', 'btn')
+        .attr('title', () => this.i18n.t('common.expandCollapse'))
+        .style('display', (d) => (hasChildren(d) ? 'block' : 'none'))
+        .on('click', (event, d) => {
+          event.stopPropagation()
+          this.toggleNode(d)
+        })
+        .append('xhtml:span')
+        .attr('class', 'icon icon-tree icon-12px')
+    }
 
     // UPDATE
     const nodeUpdate = nodeEnter.merge(node)
@@ -333,6 +338,7 @@ export default class TreeChart {
 
     const links = this.svg.append('g').attr('class', 'extra-links').selectAll('.extra-link').data(this.extraLinks)
 
+    // draw a line from the bottom (center) of the source node to the top of the target node
     links
       .enter()
       .insert('path', 'g')

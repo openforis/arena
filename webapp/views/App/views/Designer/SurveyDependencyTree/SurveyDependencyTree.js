@@ -1,6 +1,6 @@
 import './SurveyDependencyTree.scss'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -19,6 +19,23 @@ const generateExtraLinks = ({ dependencyGraph }) =>
     return acc
   }, [])
 
+const calculateDependentNodeDefsByUuid = ({ dependencyGraph, survey }) =>
+  Object.entries(dependencyGraph).reduce((acc, [nodeDefUuid, dependentNodeDefUuids]) => {
+    if (!dependentNodeDefUuids.length) {
+      return acc
+    }
+    const nodeDefUuids = [nodeDefUuid, ...dependentNodeDefUuids]
+    nodeDefUuids.forEach((uuid) => {
+      if (!acc[uuid]) {
+        const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
+        Survey.visitAncestorsAndSelf(nodeDef, (nd) => {
+          acc[NodeDef.getUuid(nd)] = nd
+        })(survey)
+      }
+    })
+    return acc
+  }, {})
+
 export const SurveyDependencyTree = () => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
@@ -27,32 +44,21 @@ export const SurveyDependencyTree = () => {
 
   const dependencyGraphFull = Survey.getDependencyGraph(survey)
   const dependencyGraph = dependencyGraphFull[dependencyType]
-  const dependencyNodeDefsByUuid = Object.entries(dependencyGraph).reduce(
-    (acc, [nodeDefUuid, dependentNodeDefUuids]) => {
-      const nodeDefUuids = [nodeDefUuid, ...dependentNodeDefUuids]
-      nodeDefUuids.forEach((uuid) => {
-        if (!acc[uuid]) {
-          const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
-          Survey.visitAncestorsAndSelf(nodeDef, (nd) => {
-            acc[NodeDef.getUuid(nd)] = nd
-          })
-        }
-      })
-      return acc
-    },
-    {}
-  )
 
-  const hierarchy = Survey.getHierarchy(
-    (nodeDef) => NodeDef.isEntity(nodeDef) || NodeDef.isAttribute(nodeDef),
-    cycle
-  )(survey)
+  const hierarchy = useMemo(() => {
+    const dependencyNodeDefsByUuid = calculateDependentNodeDefsByUuid({ dependencyGraph, survey })
+    const _hierarchy = Survey.getHierarchy(
+      (nodeDef) => !!dependencyNodeDefsByUuid[NodeDef.getUuid(nodeDef)],
+      cycle
+    )(survey)
+    Survey.traverseHierarchyItemSync(_hierarchy.root, (nodeDefItem) => {
+      const uuid = NodeDef.getUuid(nodeDefItem)
+      nodeDefItem.dependents = dependencyGraph[uuid]
+    })
+    return _hierarchy
+  }, [cycle, dependencyGraph, survey])
 
-  const traverse = (nodeDefItem) => {
-    const uuid = NodeDef.getUuid(nodeDefItem)
-    nodeDefItem.dependents = dependencyGraph[uuid]
-  }
-  Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
+  const extraLinks = useMemo(() => generateExtraLinks({ dependencyGraph }), [dependencyGraph])
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
@@ -70,7 +76,7 @@ export const SurveyDependencyTree = () => {
         <SurveyDependencyTreeChart
           ref={treeRef}
           data={hierarchy?.root}
-          extraLinks={generateExtraLinks({ dependencyGraph })}
+          extraLinks={extraLinks}
           nodeDefLabelType={nodeDefLabelType}
           onEntityClick={setSelectedNodeDefUuid}
         />

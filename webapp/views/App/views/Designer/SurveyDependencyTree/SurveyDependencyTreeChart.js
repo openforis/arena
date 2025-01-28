@@ -38,6 +38,7 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
       rootNodeElementId: 'survey-dependency-tree__root-g',
       wrapperClass: 'survey-dependency-tree',
       options: {
+        collapsible: false,
         parentChild: { directLines: true },
       },
     })
