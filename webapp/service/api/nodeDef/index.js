@@ -18,14 +18,14 @@ export const fetchNodeDefs = async ({ surveyId, params } = {}) => {
 // ==== CREATE
 export const putNodeDefProps = async ({ surveyId, nodeDefUuid, parentUuid, cycle, props, propsAdvanced } = {}) => {
   const {
-    data: { nodeDefsValidation, nodeDefsUpdated },
+    data: { dependencyGraph, nodeDefsValidation, nodeDefsUpdated },
   } = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`, {
     parentUuid,
     cycle,
     props,
     propsAdvanced,
   })
-  return { nodeDefsValidation, nodeDefsUpdated }
+  return { dependencyGraph, nodeDefsValidation, nodeDefsUpdated }
 }
 
 export const postNodeDef = async ({ surveyId, surveyCycleKey, nodeDef } = {}) => {
