@@ -10,6 +10,7 @@ import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
 import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
 import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
+import { ButtonGroup } from '@webapp/components/form'
 
 const generateExtraLinks = ({ dependencyGraph }) =>
   Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
@@ -36,29 +37,38 @@ const calculateDependentNodeDefsByUuid = ({ dependencyGraph, survey }) =>
     return acc
   }, {})
 
+const dependencyTypesItems = Object.keys(Survey.dependencyTypes).map((key) => ({ key, label: `${key}` }))
+
+const colorByDependencyType = {
+  [Survey.dependencyTypes.applicable]: 'red',
+  [Survey.dependencyTypes.defaultValues]: 'green',
+}
+
 export const SurveyDependencyTree = () => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
-  const [dependencyType, setDependencyType] = useState(Survey.dependencyTypes.applicable)
-
-  const dependencyGraphFull = Survey.getDependencyGraph(survey)
-  const dependencyGraph = dependencyGraphFull[dependencyType]
+  const [dependencyTypes, setDependencyTypes] = useState([Survey.dependencyTypes.defaultValues])
 
   const hierarchy = useMemo(() => {
-    const dependencyNodeDefsByUuid = calculateDependentNodeDefsByUuid({ dependencyGraph, survey })
-    const _hierarchy = Survey.getHierarchy(
-      (nodeDef) => !!dependencyNodeDefsByUuid[NodeDef.getUuid(nodeDef)],
-      cycle
-    )(survey)
-    Survey.traverseHierarchyItemSync(_hierarchy.root, (nodeDefItem) => {
-      const uuid = NodeDef.getUuid(nodeDefItem)
-      nodeDefItem.dependents = dependencyGraph[uuid]
-    })
-    return _hierarchy
-  }, [cycle, dependencyGraph, survey])
+    const dependencyGraphFull = Survey.getDependencyGraph(survey)
+    const dependencyNodeDefsByUuid = dependencyTypes.reduce((acc, dependencyType) => {
+      const dependencyGraph = dependencyGraphFull[dependencyType]
+      Object.assign(acc, calculateDependentNodeDefsByUuid({ dependencyGraph, survey }))
+      return acc
+    }, {})
+    return Survey.getHierarchy((nodeDef) => !!dependencyNodeDefsByUuid[NodeDef.getUuid(nodeDef)], cycle)(survey)
+  }, [cycle, dependencyTypes, survey])
 
-  const extraLinks = useMemo(() => generateExtraLinks({ dependencyGraph }), [dependencyGraph])
+  const extraLinksGroups = useMemo(() => {
+    const dependencyGraphFull = Survey.getDependencyGraph(survey)
+    return dependencyTypes.reduce((acc, dependencyType) => {
+      const dependencyGraph = dependencyGraphFull[dependencyType]
+      const links = generateExtraLinks({ dependencyGraph })
+      acc.push({ key: dependencyType, links, color: colorByDependencyType[dependencyType] })
+      return acc
+    }, [])
+  }, [dependencyTypes, survey])
 
   const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
@@ -67,6 +77,12 @@ export const SurveyDependencyTree = () => {
   return (
     <div className="survey-hierarchy">
       <div className="survey-hierarchy__button-bar">
+        <ButtonGroup
+          multiple
+          onChange={setDependencyTypes}
+          selectedItemKey={dependencyTypes}
+          items={dependencyTypesItems}
+        />
         <SurveySchemaSummaryDownloadButton />
 
         <NodeDefLabelSwitch className="btn-s" labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
@@ -76,7 +92,7 @@ export const SurveyDependencyTree = () => {
         <SurveyDependencyTreeChart
           ref={treeRef}
           data={hierarchy?.root}
-          extraLinks={extraLinks}
+          extraLinksGroups={extraLinksGroups}
           nodeDefLabelType={nodeDefLabelType}
           onEntityClick={setSelectedNodeDefUuid}
         />

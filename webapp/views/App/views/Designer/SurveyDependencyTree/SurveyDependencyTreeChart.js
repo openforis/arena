@@ -10,7 +10,7 @@ import { useI18n } from '@webapp/store/system'
 const nodeClassFunction = (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`
 
 export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
-  const { data, extraLinks, nodeDefLabelType } = props
+  const { data, extraLinksGroups, nodeDefLabelType } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -29,7 +29,7 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
     ref.current = new TreeChart({
       domElement,
       data,
-      extraLinks,
+      extraLinksGroups,
       i18n,
       nodeClassFunction,
       nodeLabelFunction,
@@ -61,7 +61,7 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
 
 SurveyDependencyTreeChart.propTypes = {
   data: PropTypes.object.isRequired,
-  extraLinks: PropTypes.array,
+  extraLinksGroups: PropTypes.array,
   nodeDefLabelType: PropTypes.string,
   onEntityClick: PropTypes.func.isRequired,
 }

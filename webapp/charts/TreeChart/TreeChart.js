@@ -49,7 +49,7 @@ export default class TreeChart {
   constructor({
     domElement,
     data,
-    extraLinks,
+    extraLinksGroups,
     i18n,
     nodeClassFunction,
     nodeFilterFunction,
@@ -63,10 +63,11 @@ export default class TreeChart {
   }) {
     this.domElement = domElement
     this.data = data
-    this.extraLinks = extraLinks
+    this.extraLinksGroups = extraLinksGroups
     this.i18n = i18n
     this.nodeWrapperClassName = 'node'
     this.nodeClassFunction = nodeClassFunction
+    this.nodeFilterFunction = nodeFilterFunction
     this._nodeLabelFunction = nodeLabelFunction
     this._nodeTooltipFunction = nodeTooltipFunction
     this.svgClass = svgClass
@@ -185,7 +186,7 @@ export default class TreeChart {
     // Collapse the node and all it's children
     this.update(this.root)
 
-    if (this.extraLinks) {
+    if (this.extraLinksGroups) {
       this.updateExtraLinks()
     }
   }
@@ -336,43 +337,51 @@ export default class TreeChart {
 
     const { nodesByUuidMap } = this
 
-    const links = this.svg.append('g').attr('class', 'extra-links').selectAll('.extra-link').data(this.extraLinks)
+    this.extraLinksGroups.forEach((group) => {
+      const { key, links, color } = group
 
-    // draw a line from the bottom (center) of the source node to the top of the target node
-    links
-      .enter()
-      .insert('path', 'g')
-      .attr('class', 'extra-link')
-      .attr('d', (d) => {
-        const o = { x: d.x, y: d.y }
-        return diagonal(o, o)
-      })
-      .transition()
-      .duration(transitionDuration)
-      .ease(easeEnter)
-      .attr('d', (d) => {
-        const sourceNode = nodesByUuidMap[d.source]
-        const { x: sY, y: sX } = sourceNode
-        const targetNode = nodesByUuidMap[d.target]
-        const { x: tY, y: tX } = targetNode
-        const randomOffset = Math.ceil(Math.random() * nodeWidth * 0.4)
-        return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth + randomOffset},${tY - 30}`
-      })
-      .style('stroke', 'red')
-      .style('stroke-width', 2)
-      .attr('marker-end', 'url(#arrowhead)')
+      const linksSelection = this.svg
+        .append('g')
+        .attr('class', `extra-links-${key}`)
+        .selectAll('.extra-link')
+        .data(links)
 
-    // links
-    //   .exit()
-    //   .transition()
-    //   .duration(transitionDuration)
-    //   .ease(easeExit)
-    //   .attr('d', (d) => {
-    //     const o = { x: d.x, y: d.y }
-    //     return diagonal(o, o)
-    //   })
-    //   .style('opacity', 0)
-    //   .remove()
+      // draw a line from the bottom (center) of the source node to the top of the target node
+      linksSelection
+        .enter()
+        .insert('path', 'g')
+        .attr('class', 'extra-link')
+        .attr('d', (d) => {
+          const o = { x: d.x, y: d.y }
+          return diagonal(o, o)
+        })
+        .transition()
+        .duration(transitionDuration)
+        .ease(easeEnter)
+        .attr('d', (d) => {
+          const sourceNode = nodesByUuidMap[d.source]
+          const { x: sY, y: sX } = sourceNode
+          const targetNode = nodesByUuidMap[d.target]
+          const { x: tY, y: tX } = targetNode
+          const randomOffset = Math.ceil(Math.random() * nodeWidth * 0.4)
+          return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth + randomOffset},${tY - 30}`
+        })
+        .style('stroke', color)
+        .style('stroke-width', 2)
+        .attr('marker-end', 'url(#arrowhead)')
+
+      // links
+      //   .exit()
+      //   .transition()
+      //   .duration(transitionDuration)
+      //   .ease(easeExit)
+      //   .attr('d', (d) => {
+      //     const o = { x: d.x, y: d.y }
+      //     return diagonal(o, o)
+      //   })
+      //   .style('opacity', 0)
+      //   .remove()
+    })
   }
 
   addArrowHeadMarker() {
