@@ -36,20 +36,21 @@ const ButtonGroup = ({
   return (
     <MuiButtonGroup className={classNames('btn-group', className)}>
       {items.map((item) => {
-        const selected = selectedItemKey === item.key || (multiple && R.includes(item.key, selectedItemKey))
+        const { key, disabled: itemDisabled, icon, iconClassName, label, labelParams, title } = item
+        const selected = selectedItemKey === key || (multiple && R.includes(key, selectedItemKey))
         const variant = selected ? 'contained' : 'outlined'
         return (
           <Button
-            key={item.key}
+            key={key}
             className={`btn-s${deselectable ? ' deselectable' : ''}`}
-            disabled={Boolean(item.disabled) || disabled}
-            icon={item.icon}
-            iconClassName={item.iconClassName}
+            disabled={Boolean(itemDisabled) || disabled}
+            icon={icon}
+            iconClassName={iconClassName}
             onClick={onItemClick({ item, selected })}
-            label={item.label}
-            labelParams={item.labelParams}
-            title={item.title}
-            testId={groupName ? `${groupName}_${item.key}` : null}
+            label={label}
+            labelParams={labelParams}
+            title={title}
+            testId={groupName ? `${groupName}_${key}` : null}
             variant={variant}
           />
         )
