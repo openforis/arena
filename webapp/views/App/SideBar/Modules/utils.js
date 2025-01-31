@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 
@@ -48,7 +49,12 @@ export const getModulesHierarchy = (user, surveyInfo) => {
     getModule({
       module: appModules.designer,
       children: [
-        ...(canEditSurvey ? [designerModules.formDesigner, designerModules.surveyDependencyTree] : []),
+        ...(canEditSurvey
+          ? [
+              designerModules.formDesigner,
+              ...(ProcessUtils.ENV.experimentalFeatures ? [designerModules.surveyDependencyTree] : []),
+            ]
+          : []),
         designerModules.surveyHierarchy,
         designerModules.categories,
         designerModules.taxonomies,

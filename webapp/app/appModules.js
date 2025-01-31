@@ -112,7 +112,6 @@ export const designerModules = {
     key: 'nodeDef',
     path: 'nodeDef',
   },
-
   surveyHierarchy: {
     key: 'surveyHierarchy',
     path: 'surveyHierarchy',
