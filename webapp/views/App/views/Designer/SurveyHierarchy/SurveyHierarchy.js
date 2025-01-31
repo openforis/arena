@@ -1,6 +1,6 @@
 import './SurveyHierarchy.scss'
 
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -24,6 +24,12 @@ const SurveyHierarchy = () => {
 
   const treeRef = useRef(null)
 
+  const onEntitySelect = useCallback((entityDefUuid) => {
+    setSelectedNodeDefUuid((prevSelectedEntityDefUuid) =>
+      entityDefUuid === prevSelectedEntityDefUuid ? null : entityDefUuid
+    )
+  }, [])
+
   return (
     <div className="survey-hierarchy">
       <div className="survey-hierarchy__button-bar">
@@ -37,7 +43,7 @@ const SurveyHierarchy = () => {
           ref={treeRef}
           data={hierarchy?.root}
           nodeDefLabelType={nodeDefLabelType}
-          onEntityClick={setSelectedNodeDefUuid}
+          onEntityClick={onEntitySelect}
         />
         <div className="survey-hierarchy__attributes">
           <NodeDefsSelector
@@ -45,9 +51,11 @@ const SurveyHierarchy = () => {
             hierarchy={hierarchy}
             nodeDefLabelType={nodeDefLabelType}
             nodeDefUuidEntity={selectedNodeDefUuid}
-            onChangeEntity={(nodeDefUuidEntity) => {
-              treeRef.current.expandToNode(nodeDefUuidEntity)
-              setSelectedNodeDefUuid(nodeDefUuidEntity)
+            onChangeEntity={(entityDefUuid) => {
+              if (entityDefUuid) {
+                treeRef.current.expandToNode(entityDefUuid)
+              }
+              onEntitySelect(entityDefUuid)
             }}
             showAncestors={false}
             showSingleEntities

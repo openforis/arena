@@ -1,6 +1,6 @@
 import './SurveyDependencyTree.scss'
 
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useRef, useMemo, useCallback } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -97,6 +97,13 @@ export const SurveyDependencyTree = () => {
 
   const message = determineMessage({ hierarchy, dependencyTypes })
 
+  const onNodeClick = useCallback(
+    (nodeDefUuid) => {
+      setSelectedNodeDefUuid(selectedNodeDefUuid === nodeDefUuid ? null : nodeDefUuid)
+    },
+    [selectedNodeDefUuid]
+  )
+
   return (
     <div className="survey-dependency-tree">
       <div className="survey-dependency-tree__button-bar">
@@ -125,7 +132,7 @@ export const SurveyDependencyTree = () => {
             data={hierarchy?.root}
             extraLinksGroups={extraLinksGroups}
             nodeDefLabelType={nodeDefLabelType}
-            onEntityClick={setSelectedNodeDefUuid}
+            onNodeClick={onNodeClick}
           />
         )}
       </div>

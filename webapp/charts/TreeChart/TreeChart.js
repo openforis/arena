@@ -18,7 +18,7 @@ const nodeLinkLength = 230
 const transitionDuration = 750
 const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
-const extraLinksTransitionDuration = 1000
+const extraLinksTransitionDuration = 2000
 
 const diagonal = (s, d, randomOffset = false) => {
   // x and y are reverted
@@ -385,7 +385,7 @@ export default class TreeChart {
           const { x: tY, y: tX } = targetNode
           const isDescendant = tX > sX
           if (isDescendant) {
-            const randomHOffset = Math.ceil(Math.random() * nodeHeight * 0.3)
+            const randomHOffset = Math.ceil(Math.random() * nodeHeight * 0.2)
             return `M${sX + nodeWidth},${sY + randomHOffset} L${tX},${tY + randomHOffset}`
           } else {
             const randomXOffset = Math.ceil(Math.random() * nodeWidth * 0.4)
@@ -434,13 +434,15 @@ export default class TreeChart {
 
     this.update(this.root)
 
+    const node = this.svg.selectAll('.node-grid').filter((d) => d.data.uuid === uuid)
+    const highlightedBefore = node.attr('class').includes('highlight')
+
     this.svg
       // Remove higlight class for all node-grid elements
       .selectAll('.node-grid')
       .classed('highlight', false)
-      // Add 'higlight' class to the selected node-grid element
-      .filter((d) => d.data.uuid === uuid)
-      .classed('highlight', true)
+
+    node.classed('highlight', !highlightedBefore)
   }
 
   updateLabels() {

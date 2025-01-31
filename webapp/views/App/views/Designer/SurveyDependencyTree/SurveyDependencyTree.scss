@@ -18,5 +18,9 @@
 
   .survey-dependency-tree__center {
     flex: 1;
+
+    .hierarchy__tree {
+      flex: 1;
+    }
   }
 }
