@@ -104,6 +104,63 @@ export default class TreeChart {
     this.initSvg()
   }
 
+  initSvg() {
+    const { collapsible, startCollapsed } = this.options
+
+    // Set the dimensions and margins of the diagram
+    const { domElement } = this
+    const width = domElement.clientWidth - svgMargin.left - svgMargin.right
+    const height = domElement.clientHeight - svgMargin.top - svgMargin.bottom
+
+    // Append the svg object to the body of the page
+    // appends a 'group' element to 'svg'
+    // moves the 'group' element to the top left margin
+    this.svg = d3
+      .select(domElement)
+      .append('svg')
+      .classed(this.svgClass, true)
+      .attr('width', width + svgMargin.right + svgMargin.left)
+      .attr('height', height + svgMargin.top + svgMargin.bottom)
+      .append('g')
+      .attr('id', this.rootNodeElementId)
+
+    this.rootG = document.querySelector(`#${this.rootNodeElementId}`)
+
+    // InitObserver
+    this.resizeObserver = new ResizeObserver(this.resizeObserverCallback.bind(this))
+    this.resizeObserver.observe(this.rootG)
+
+    // Declares a tree layout and assigns the size
+    this.tree = d3
+      .tree()
+      .size([height, width])
+      .nodeSize([treeNodeWidth, treeNodeHeight])
+      .separation((a, b) => (a.parent === b.parent ? 1 : 2))
+
+    // Assigns parent, children, height, depth
+    this.root = d3.hierarchy(this.data, (d) => d.children)
+    this.root.x0 = height / 2
+    this.root.y0 = 0
+
+    this.initNode(this.root, collapsible && startCollapsed)
+
+    // Collapse the node and all it's children
+    this.update(this.root)
+
+    if (this.extraLinksGroups) {
+      this.updateExtraLinks()
+    }
+  }
+
+  destroy() {
+    if (this.domElement) {
+      const containerSelection = d3.select(this.domElement)
+      containerSelection.selectAll('svg').remove()
+    }
+    this.svg = null
+    this.resizeObserver?.disconnect()
+  }
+
   /* eslint-disable no-param-reassign */
   collapseNode(node) {
     if (node.children) {
@@ -159,53 +216,6 @@ export default class TreeChart {
     }
   }
 
-  initSvg() {
-    const { collapsible, startCollapsed } = this.options
-
-    // Set the dimensions and margins of the diagram
-    const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
-    const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
-
-    // Append the svg object to the body of the page
-    // appends a 'group' element to 'svg'
-    // moves the 'group' element to the top left margin
-    this.svg = d3
-      .select(this.domElement)
-      .append('svg')
-      .classed(this.svgClass, true)
-      .attr('width', width + svgMargin.right + svgMargin.left)
-      .attr('height', height + svgMargin.top + svgMargin.bottom)
-      .append('g')
-      .attr('id', this.rootNodeElementId)
-
-    this.rootG = document.querySelector(`#${this.rootNodeElementId}`)
-
-    // InitObserver
-    this.resizeObserver = new ResizeObserver(this.resizeObserverCallback.bind(this))
-    this.resizeObserver.observe(this.rootG)
-
-    // Declares a tree layout and assigns the size
-    this.tree = d3
-      .tree()
-      .size([height, width])
-      .nodeSize([treeNodeWidth, treeNodeHeight])
-      .separation((a, b) => (a.parent === b.parent ? 1 : 2))
-
-    // Assigns parent, children, height, depth
-    this.root = d3.hierarchy(this.data, (d) => d.children)
-    this.root.x0 = height / 2
-    this.root.y0 = 0
-
-    this.initNode(this.root, collapsible && startCollapsed)
-
-    // Collapse the node and all it's children
-    this.update(this.root)
-
-    if (this.extraLinksGroups) {
-      this.updateExtraLinks()
-    }
-  }
-
   update(node) {
     const treeData = this.tree(this.root)
 
@@ -222,10 +232,6 @@ export default class TreeChart {
         d.y0 = d.y
       }
     )
-  }
-
-  disconnect() {
-    this.resizeObserver.disconnect()
   }
 
   updateNodes(treeData, source) {

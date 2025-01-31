@@ -26,6 +26,8 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
 
   useEffect(() => {
     const domElement = wrapperRef.current
+    ref.current?.destroy()
+
     ref.current = new TreeChart({
       domElement,
       data,
@@ -42,11 +44,11 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
         parentChild: { directLines: true },
       },
     })
-  }, [])
+  }, [data, extraLinksGroups])
 
   useEffect(() => {
     const tree = ref.current
-    return () => tree?.disconnect()
+    return () => tree?.destroy()
   }, [ref])
 
   // force updating labels in TreeChart when label and tooltip function change (depending on lang and labelType)

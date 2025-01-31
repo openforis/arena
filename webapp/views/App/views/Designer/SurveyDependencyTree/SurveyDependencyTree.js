@@ -37,7 +37,13 @@ const calculateDependentNodeDefsByUuid = ({ dependencyGraph, survey }) =>
     return acc
   }, {})
 
-const dependencyTypesItems = Object.keys(Survey.dependencyTypes).map((key) => ({ key, label: `${key}` }))
+const dependencyTypesItems = [
+  Survey.dependencyTypes.applicable,
+  Survey.dependencyTypes.defaultValues,
+  Survey.dependencyTypes.itemsFilter,
+  Survey.dependencyTypes.minCount,
+  Survey.dependencyTypes.maxCount,
+].map((key) => ({ key, label: `${key}` }))
 
 const colorByDependencyType = {
   [Survey.dependencyTypes.applicable]: 'red',
@@ -53,7 +59,7 @@ export const SurveyDependencyTree = () => {
   const hierarchy = useMemo(() => {
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
     const dependencyNodeDefsByUuid = dependencyTypes.reduce((acc, dependencyType) => {
-      const dependencyGraph = dependencyGraphFull[dependencyType]
+      const dependencyGraph = dependencyGraphFull[dependencyType] ?? {}
       Object.assign(acc, calculateDependentNodeDefsByUuid({ dependencyGraph, survey }))
       return acc
     }, {})
