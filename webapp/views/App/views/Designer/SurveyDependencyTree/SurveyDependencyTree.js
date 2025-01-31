@@ -40,15 +40,6 @@ const calculateDependentNodeDefsByUuid = ({ dependencyGraph, survey }) =>
     return acc
   }, {})
 
-const dependencyTypesItems = [
-  Survey.dependencyTypes.applicable,
-  Survey.dependencyTypes.defaultValues,
-  Survey.dependencyTypes.validations,
-  Survey.dependencyTypes.itemsFilter,
-  Survey.dependencyTypes.minCount,
-  Survey.dependencyTypes.maxCount,
-].map((key) => ({ key, label: `surveyDependencyTreeView.dependencyTypes.${key}` }))
-
 const colorByDependencyType = {
   [Survey.dependencyTypes.applicable]: 'green',
   [Survey.dependencyTypes.defaultValues]: 'blue',
@@ -57,6 +48,19 @@ const colorByDependencyType = {
   [Survey.dependencyTypes.minCount]: 'orange',
   [Survey.dependencyTypes.maxCount]: 'yellow',
 }
+
+const dependencyTypesItems = [
+  Survey.dependencyTypes.applicable,
+  Survey.dependencyTypes.defaultValues,
+  Survey.dependencyTypes.validations,
+  Survey.dependencyTypes.itemsFilter,
+  Survey.dependencyTypes.minCount,
+  Survey.dependencyTypes.maxCount,
+].map((key) => ({
+  key,
+  label: `surveyDependencyTreeView.dependencyTypes.${key}`,
+  icon: <span className="dependency-icon" style={{ backgroundColor: colorByDependencyType[key] }} />,
+}))
 
 const determineMessage = ({ hierarchy, dependencyTypes }) => {
   if (!dependencyTypes?.length) return 'surveyDependencyTreeView.selectAtLeastOneDependencyType'

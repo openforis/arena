@@ -14,6 +14,7 @@ export const Button = forwardRef((props, ref) => {
     className,
     color,
     disabled = false,
+    icon = null,
     iconAlt,
     iconClassName,
     iconHeight,
@@ -67,6 +68,7 @@ export const Button = forwardRef((props, ref) => {
         <>
           {iconClassName && <span className={classNames('icon', iconClassName, { 'icon-left': Boolean(label) })} />}
           {iconSrc && <img alt={iconAlt} height={iconHeight} src={iconSrc} width={iconWidth} />}
+          {icon}
         </>
       )}
       {label}
@@ -90,6 +92,7 @@ Button.propTypes = {
   color: PropTypes.string,
   disabled: PropTypes.bool,
   id: PropTypes.string,
+  icon: PropTypes.node,
   iconAlt: PropTypes.string,
   iconClassName: PropTypes.string,
   iconHeight: PropTypes.number,

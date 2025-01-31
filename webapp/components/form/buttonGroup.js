@@ -43,6 +43,7 @@ const ButtonGroup = ({
             key={item.key}
             className={`btn-s${deselectable ? ' deselectable' : ''}`}
             disabled={Boolean(item.disabled) || disabled}
+            icon={item.icon}
             iconClassName={item.iconClassName}
             onClick={onItemClick({ item, selected })}
             label={item.label}

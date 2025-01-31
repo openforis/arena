@@ -14,6 +14,13 @@
     .form-item {
       display: flex;
     }
+
+    .dependency-icon {
+      width: 20px;
+      height: 20px;
+      position: relative;
+      margin-right: 0.4rem;
+    }
   }
 
   .survey-dependency-tree__center {
