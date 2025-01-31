@@ -515,6 +515,20 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  surveyDependencyTreeView: {
+    dependencyTypesLabel: 'Dependency types',
+    dependencyTypes: {
+      applicable: 'Applicability',
+      defaultValues: 'Default value',
+      itemsFilter: 'Items filter',
+      minCount: 'Min count',
+      maxCount: 'Max count',
+      validations: 'Validations',
+    },
+    selectAtLeastOneDependencyType: 'Select at least one dependency type',
+    noDependenciesToDisplay: 'No dependencies to display',
+  },
+
   designerView: {
     formPreview: 'Form preview',
   },

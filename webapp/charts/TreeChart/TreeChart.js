@@ -18,6 +18,7 @@ const nodeLinkLength = 230
 const transitionDuration = 750
 const easeEnter = d3.easeExpOut
 const easeExit = d3.easeExpOut
+const extraLinksTransitionDuration = 1000
 
 const diagonal = (s, d, randomOffset = false) => {
   // x and y are reverted
@@ -373,13 +374,6 @@ export default class TreeChart {
         .insert('path', 'g')
         .attr('class', 'extra-link')
         .attr('d', (d) => {
-          const o = { x: d.x, y: d.y }
-          return diagonal(o, o)
-        })
-        .transition()
-        .duration(transitionDuration)
-        .ease(easeEnter)
-        .attr('d', (d) => {
           const { source, target } = d
           const sourceNode = nodesByUuidMap[source]
           const targetNode = nodesByUuidMap[target]
@@ -400,20 +394,13 @@ export default class TreeChart {
         })
         .attr('fill', 'none')
         .style('stroke', color)
-        .style('stroke-width', 3)
+        .style('stroke-width', 2)
         .attr('marker-end', 'url(#arrowhead)')
-
-      // links
-      //   .exit()
-      //   .transition()
-      //   .duration(transitionDuration)
-      //   .ease(easeExit)
-      //   .attr('d', (d) => {
-      //     const o = { x: d.x, y: d.y }
-      //     return diagonal(o, o)
-      //   })
-      //   .style('opacity', 0)
-      //   .remove()
+        // add fade in effect
+        .attr('opacity', 0)
+        .transition()
+        .duration(extraLinksTransitionDuration)
+        .attr('opacity', 1)
     })
   }
 

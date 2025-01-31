@@ -6,11 +6,14 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import NodeDefLabelSwitch, { useNodeDefLabelSwitch } from '@webapp/components/survey/NodeDefLabelSwitch'
 import SurveySchemaSummaryDownloadButton from '@webapp/components/survey/SurveySchemaSummaryDownloadButton'
-import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 import { ButtonGroup } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
+
+import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 
 const generateExtraLinks = ({ dependencyGraph }) =>
   Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
@@ -40,17 +43,29 @@ const calculateDependentNodeDefsByUuid = ({ dependencyGraph, survey }) =>
 const dependencyTypesItems = [
   Survey.dependencyTypes.applicable,
   Survey.dependencyTypes.defaultValues,
+  Survey.dependencyTypes.validations,
   Survey.dependencyTypes.itemsFilter,
   Survey.dependencyTypes.minCount,
   Survey.dependencyTypes.maxCount,
-].map((key) => ({ key, label: `${key}` }))
+].map((key) => ({ key, label: `surveyDependencyTreeView.dependencyTypes.${key}` }))
 
 const colorByDependencyType = {
-  [Survey.dependencyTypes.applicable]: 'red',
-  [Survey.dependencyTypes.defaultValues]: 'green',
+  [Survey.dependencyTypes.applicable]: 'green',
+  [Survey.dependencyTypes.defaultValues]: 'blue',
+  [Survey.dependencyTypes.validations]: 'red',
+  [Survey.dependencyTypes.itemsFilter]: 'brown',
+  [Survey.dependencyTypes.minCount]: 'orange',
+  [Survey.dependencyTypes.maxCount]: 'yellow',
+}
+
+const determineMessage = ({ hierarchy, dependencyTypes }) => {
+  if (!dependencyTypes?.length) return 'surveyDependencyTreeView.selectAtLeastOneDependencyType'
+  if (hierarchy.length <= 1) return 'surveyDependencyTreeView.noDependenciesToDisplay'
+  return null
 }
 
 export const SurveyDependencyTree = () => {
+  const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
@@ -69,7 +84,7 @@ export const SurveyDependencyTree = () => {
   const extraLinksGroups = useMemo(() => {
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
     return dependencyTypes.reduce((acc, dependencyType) => {
-      const dependencyGraph = dependencyGraphFull[dependencyType]
+      const dependencyGraph = dependencyGraphFull[dependencyType] ?? {}
       const links = generateExtraLinks({ dependencyGraph })
       acc.push({ key: dependencyType, links, color: colorByDependencyType[dependencyType] })
       return acc
@@ -80,28 +95,39 @@ export const SurveyDependencyTree = () => {
 
   const treeRef = useRef(null)
 
+  const message = determineMessage({ hierarchy, dependencyTypes })
+
   return (
-    <div className="survey-hierarchy">
-      <div className="survey-hierarchy__button-bar">
-        <ButtonGroup
-          multiple
-          onChange={setDependencyTypes}
-          selectedItemKey={dependencyTypes}
-          items={dependencyTypesItems}
-        />
+    <div className="survey-dependency-tree">
+      <div className="survey-dependency-tree__button-bar">
+        <FormItem label="surveyDependencyTreeView.dependencyTypesLabel">
+          <ButtonGroup
+            multiple
+            onChange={setDependencyTypes}
+            selectedItemKey={dependencyTypes}
+            items={dependencyTypesItems}
+          />
+        </FormItem>
+
+        <div className="spacer" />
+
         <SurveySchemaSummaryDownloadButton />
 
         <NodeDefLabelSwitch className="btn-s" labelType={nodeDefLabelType} onChange={toggleLabelFunction} />
       </div>
 
-      <div className="survey-hierarchy__center">
-        <SurveyDependencyTreeChart
-          ref={treeRef}
-          data={hierarchy?.root}
-          extraLinksGroups={extraLinksGroups}
-          nodeDefLabelType={nodeDefLabelType}
-          onEntityClick={setSelectedNodeDefUuid}
-        />
+      <div className="survey-dependency-tree__center">
+        {message ? (
+          <span className="message">{i18n.t(message)}</span>
+        ) : (
+          <SurveyDependencyTreeChart
+            ref={treeRef}
+            data={hierarchy?.root}
+            extraLinksGroups={extraLinksGroups}
+            nodeDefLabelType={nodeDefLabelType}
+            onEntityClick={setSelectedNodeDefUuid}
+          />
+        )}
       </div>
     </div>
   )
