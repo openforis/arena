@@ -3,6 +3,7 @@ import './TreeChart.scss'
 import * as d3 from 'd3'
 
 import { elementOffset } from '@webapp/utils/domUtils'
+import { Objects } from '@openforis/arena-core'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 
@@ -11,7 +12,6 @@ const treeNodeHeight = 10
 const nodeWidth = 150
 const nodeHalfWidth = nodeWidth / 2
 const nodeHeight = 80
-const nodeHalfHeight = nodeHeight / 2
 const nodeLabelDist = 19
 const nodeLinkLength = 230
 
@@ -35,6 +35,19 @@ const line = (s, d) => {
   const { x: dY, y: dX } = d
   return `M${sX},${sY}
       L${dX + nodeWidth},${dY}`
+}
+
+const semiArc = ({ point }) => {
+  const path = d3.path()
+  const radius = 30
+  const { x: y, y: x } = point
+
+  // Draw the semi-arc path
+  const startAngle = Math.PI / 5 // 36 degrees
+  const endAngle = (7 * Math.PI) / 4 // 315 degrees
+  path.arc(x, y, radius, startAngle, endAngle)
+
+  return path.toString()
 }
 
 const DEFAULT_OPTIONS = {
@@ -147,6 +160,8 @@ export default class TreeChart {
   }
 
   initSvg() {
+    const { collapsible, startCollapsed } = this.options
+
     // Set the dimensions and margins of the diagram
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
     const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
@@ -181,7 +196,7 @@ export default class TreeChart {
     this.root.x0 = height / 2
     this.root.y0 = 0
 
-    this.initNode(this.root, this.options.startCollapsed)
+    this.initNode(this.root, collapsible && startCollapsed)
 
     // Collapse the node and all it's children
     this.update(this.root)
@@ -359,15 +374,27 @@ export default class TreeChart {
         .duration(transitionDuration)
         .ease(easeEnter)
         .attr('d', (d) => {
-          const sourceNode = nodesByUuidMap[d.source]
+          const { source, target } = d
+          const sourceNode = nodesByUuidMap[source]
+          const targetNode = nodesByUuidMap[target]
+          if (Objects.isEqual(source, target)) {
+            // source == target => draw a semi-arc from the source to the source itself
+            return semiArc({ point: sourceNode })
+          }
           const { x: sY, y: sX } = sourceNode
-          const targetNode = nodesByUuidMap[d.target]
           const { x: tY, y: tX } = targetNode
-          const randomOffset = Math.ceil(Math.random() * nodeWidth * 0.4)
-          return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth + randomOffset},${tY - 30}`
+          const isDescendant = tX > sX
+          if (isDescendant) {
+            const randomHOffset = Math.ceil(Math.random() * nodeHeight * 0.3)
+            return `M${sX + nodeWidth},${sY + randomHOffset} L${tX},${tY + randomHOffset}`
+          } else {
+            const randomXOffset = Math.ceil(Math.random() * nodeWidth * 0.4)
+            return `M${sX + nodeHalfWidth},${sY + 10} L${tX + nodeHalfWidth + randomXOffset},${tY - 25}`
+          }
         })
+        .attr('fill', 'none')
         .style('stroke', color)
-        .style('stroke-width', 2)
+        .style('stroke-width', 3)
         .attr('marker-end', 'url(#arrowhead)')
 
       // links
