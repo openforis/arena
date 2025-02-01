@@ -16,8 +16,8 @@ const actionHandlers = {
   [SurveyActions.surveyDefsReset]: () => ({}),
 
   // NodeDefs load
-  [SurveyActions.surveyDefsLoad]: (_state, { dependencyGraph }) => dependencyGraph,
-  [NodeDefsActions.dependencyGraphUpdate]: (_state, { dependencyGraph }) => dependencyGraph,
+  [SurveyActions.surveyDefsLoad]: (_state, { dependencyGraph }) => dependencyGraph ?? {},
+  [NodeDefsActions.dependencyGraphUpdate]: (_state, { dependencyGraph }) => dependencyGraph ?? {},
 }
 
 export default exportReducer(actionHandlers)
