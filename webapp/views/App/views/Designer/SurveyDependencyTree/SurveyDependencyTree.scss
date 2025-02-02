@@ -1,0 +1,33 @@
+.survey-dependency-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  .survey-dependency-tree__button-bar {
+    display: flex;
+    justify-content: space-evenly;
+
+    .spacer {
+      flex: 1;
+    }
+
+    .form-item {
+      display: flex;
+    }
+
+    .dependency-icon {
+      width: 20px;
+      height: 20px;
+      position: relative;
+      margin-right: 0.4rem;
+    }
+  }
+
+  .survey-dependency-tree__center {
+    flex: 1;
+
+    .hierarchy__tree {
+      flex: 1;
+    }
+  }
+}

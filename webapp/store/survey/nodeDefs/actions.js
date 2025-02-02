@@ -29,6 +29,7 @@ export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
+export const dependencyGraphUpdate = 'survey/dependencyGraph/update'
 
 // ==== PLAIN ACTIONS
 export const updateNodeDef = ({ nodeDef, prevNodeDef = null, dirty = false }) => ({
@@ -128,6 +129,20 @@ const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDe
   }
 }
 
+// ==== Internal update nodeDefs actions
+const _onNodeDefsUpdate =
+  ({ nodeDefsUpdated, nodeDefsValidation, dependencyGraph }) =>
+  (dispatch) => {
+    dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+    if (!R.isEmpty(nodeDefsUpdated)) {
+      dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
+    }
+    if (!R.isEmpty(dependencyGraph)) {
+      dispatch({ type: dependencyGraphUpdate, dependencyGraph })
+    }
+  }
+
 export const moveNodeDef =
   ({ nodeDefUuid, targetParentNodeDefUuid, navigate }) =>
   async (dispatch, getState) => {
@@ -142,7 +157,7 @@ export const moveNodeDef =
       targetParentNodeDefUuid,
     })
 
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
 
     // update survey index: parent entity has changed
     const allNodeDefs = { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated }
@@ -151,15 +166,6 @@ export const moveNodeDef =
     _handleNodeDefMoveValidationErrors({ dispatch, navigate, survey, nodeDefUuid, nodeDefsValidation })
   }
 
-// ==== Internal update nodeDefs actions
-const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
-  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
-
-  if (!R.isEmpty(nodeDefsUpdated)) {
-    dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
-  }
-}
-
 export const putNodeDefProps =
   ({ nodeDefUuid, parentUuid, props = {}, propsAdvanced }) =>
   async (dispatch, getState) => {
@@ -167,7 +173,7 @@ export const putNodeDefProps =
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({
+    const { dependencyGraph, nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({
       surveyId,
       nodeDefUuid,
       parentUuid,
@@ -176,7 +182,7 @@ export const putNodeDefProps =
       propsAdvanced,
     })
 
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation, dependencyGraph }))
   }
 
 export const putNodeDefsProps =
@@ -189,10 +195,10 @@ export const putNodeDefsProps =
     const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefsProps({ surveyId, nodeDefs, cycle })
 
     dispatch(
-      _onNodeDefsUpdate(
-        nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
-        nodeDefsValidation
-      )
+      _onNodeDefsUpdate({
+        nodeDefsUpdated: nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
+        nodeDefsValidation,
+      })
     )
   }
 
@@ -205,7 +211,7 @@ export const postNodeDef =
 
     const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDef({ surveyId, surveyCycleKey, nodeDef })
 
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
   }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
@@ -314,7 +320,7 @@ export const removeNodeDef =
               dispatch({ type: nodeDefDelete, nodeDef }),
             ])
 
-            dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+            dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
             callBack?.()
             if (navigate) {
               navigate(-1)
@@ -344,7 +350,7 @@ export const convertNodeDef =
           const surveyId = Survey.getId(survey)
           const { nodeDefsUpdated, nodeDefsValidation } = await API.convertNodeDef({ surveyId, nodeDefUuid, toType })
 
-          await dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+          await dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
 
           navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
         },

@@ -278,6 +278,7 @@ Do you want to proceed?`,
     designer: 'Survey',
     formDesigner: 'Form Designer',
     surveyHierarchy: 'Hierarchy',
+    surveyDependencyTree: 'Dependency tree',
     category: 'Category',
     categories: 'Categories',
     nodeDef: 'Node Definition',
@@ -512,6 +513,20 @@ $t(common.cantUndoWarning)`,
       year: '{{count}} Year',
       year_other: '{{count}} Years',
     },
+  },
+
+  surveyDependencyTreeView: {
+    dependencyTypesLabel: 'Dependency types',
+    dependencyTypes: {
+      applicable: 'Applicability',
+      defaultValues: 'Default value',
+      itemsFilter: 'Items filter',
+      minCount: 'Min count',
+      maxCount: 'Max count',
+      validations: 'Validations',
+    },
+    selectAtLeastOneDependencyType: 'Select at least one dependency type',
+    noDependenciesToDisplay: 'No dependencies to display',
   },
 
   designerView: {
