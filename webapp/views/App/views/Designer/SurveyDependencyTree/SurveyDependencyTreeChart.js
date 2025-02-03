@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import TreeChart from '@webapp/charts/TreeChart'
+import { highlightClassName } from '@webapp/charts/TreeChart/TreeChart'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
@@ -13,14 +14,20 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
 
-  const nodeClassFunction = (d) => {
-    const nodeDef = d.data
-    const classes = ['node-grid']
-    if (NodeDef.isVirtual(nodeDef)) {
-      classes.push('node-virtual')
-    }
-    return classes.join(' ')
-  }
+  const nodeClassFunction = useCallback(
+    (d) => {
+      const nodeDef = d.data
+      const classes = ['node-grid']
+      if (NodeDef.isVirtual(nodeDef)) {
+        classes.push('node-virtual')
+      }
+      if (selectedNodeUuid && NodeDef.getUuid(nodeDef) === selectedNodeUuid) {
+        classes.push(highlightClassName)
+      }
+      return classes.join(' ')
+    },
+    [selectedNodeUuid]
+  )
 
   const nodeLabelFunction = useCallback(
     (d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang, type: nodeDefLabelType }),

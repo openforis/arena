@@ -59,7 +59,7 @@ const DEFAULT_OPTIONS = {
   },
 }
 
-const highlightClassName = 'highlight'
+export const highlightClassName = 'highlight'
 
 export default class TreeChart {
   constructor({
