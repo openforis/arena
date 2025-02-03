@@ -59,6 +59,8 @@ const DEFAULT_OPTIONS = {
   },
 }
 
+const highlightClassName = 'highlight'
+
 export default class TreeChart {
   constructor({
     domElement,
@@ -70,6 +72,7 @@ export default class TreeChart {
     nodeLabelFunction,
     nodeTooltipFunction,
     onNodeClick: onNodeClickProp,
+    selectedNodeUuid = null,
     svgClass = 'hierarchy_tree_svg',
     rootNodeElementId = 'hierarchy__root-g',
     wrapperClass = 'hierarchy__tree',
@@ -89,6 +92,7 @@ export default class TreeChart {
     this.wrapperClass = wrapperClass
     this.options = { ...DEFAULT_OPTIONS, ...options }
     this.nodesByUuidMap = {}
+    this.selectedNodeUuid = selectedNodeUuid
 
     this.onNodeClick = (nodeUuid) => {
       onNodeClickProp?.(nodeUuid)
@@ -183,7 +187,8 @@ export default class TreeChart {
   }
 
   initNode(node, collapseChildren = false) {
-    this.nodesByUuidMap[node.data.uuid] = node
+    const { uuid } = node.data
+    this.nodesByUuidMap[uuid] = node
 
     if (node.children) {
       const childrenFiltered = this.nodeFilterFunction ? node.children.filter(this.nodeFilterFunction) : node.children
@@ -377,6 +382,7 @@ export default class TreeChart {
           const { source, target } = d
           const sourceNode = nodesByUuidMap[source]
           const targetNode = nodesByUuidMap[target]
+          if (!sourceNode || !targetNode) return null
           if (Objects.isEqual(source, target)) {
             // source == target => draw a semi-arc from the source to the source itself
             return semiArc({ point: sourceNode })
@@ -435,14 +441,15 @@ export default class TreeChart {
     this.update(this.root)
 
     const node = this.svg.selectAll('.node-grid').filter((d) => d.data.uuid === uuid)
-    const highlightedBefore = node.attr('class').includes('highlight')
+    const highlightedBefore = node.attr('class').includes(highlightClassName)
 
     this.svg
       // Remove higlight class for all node-grid elements
       .selectAll('.node-grid')
-      .classed('highlight', false)
+      .classed(highlightClassName, false)
 
-    node.classed('highlight', !highlightedBefore)
+    const highlightedNext = !highlightedBefore
+    node.classed(highlightClassName, highlightedNext)
   }
 
   updateLabels() {
@@ -452,6 +459,15 @@ export default class TreeChart {
       .text(this.nodeLabelFunction)
       // tooltip
       .attr('title', this.nodeTooltipFunction)
+  }
+
+  updateSelection() {
+    // Remove higlight class for all node-grid elements
+    this.svg.selectAll('.node-grid').classed(highlightClassName, false)
+    if (this.selectedNodeUuid) {
+      const node = this.svg.selectAll('.node-grid').filter((d) => d.data.uuid === this.selectedNodeUuid)
+      node.classed(highlightClassName, true)
+    }
   }
 
   get nodeLabelFunction() {

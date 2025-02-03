@@ -7,13 +7,20 @@ import TreeChart from '@webapp/charts/TreeChart'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-const nodeClassFunction = (d) => `node-grid${NodeDef.isVirtual(d.data) ? ' node-virtual' : ''}`
-
 export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
-  const { data, extraLinksGroups, nodeDefLabelType, onNodeClick } = props
+  const { data, extraLinksGroups, nodeDefLabelType, onNodeClick, selectedNodeUuid } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
+
+  const nodeClassFunction = (d) => {
+    const nodeDef = d.data
+    const classes = ['node-grid']
+    if (NodeDef.isVirtual(nodeDef)) {
+      classes.push('node-virtual')
+    }
+    return classes.join(' ')
+  }
 
   const nodeLabelFunction = useCallback(
     (d) => NodeDef.getLabelWithType({ nodeDef: d.data, lang, type: nodeDefLabelType }),
@@ -44,8 +51,9 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
         collapsible: false,
         parentChild: { directLines: true },
       },
+      selectedNodeUuid,
     })
-  }, [data, extraLinksGroups])
+  }, [data, extraLinksGroups, selectedNodeUuid])
 
   useEffect(() => {
     const tree = ref.current
@@ -59,6 +67,10 @@ export const SurveyDependencyTreeChart = forwardRef((props, ref) => {
     tree.nodeTooltipFunction = nodeTooltipFunction
   }, [nodeLabelFunction, nodeTooltipFunction, ref])
 
+  useEffect(() => {
+    ref.current?.updateSelection()
+  }, [ref, selectedNodeUuid])
+
   return <div className="hierarchy__tree survey-dependency-tree" ref={wrapperRef} />
 })
 
@@ -67,4 +79,5 @@ SurveyDependencyTreeChart.propTypes = {
   extraLinksGroups: PropTypes.array,
   nodeDefLabelType: PropTypes.string,
   onNodeClick: PropTypes.func.isRequired,
+  selectedNodeUuid: PropTypes.string,
 }

@@ -49,13 +49,9 @@ export const getModulesHierarchy = (user, surveyInfo) => {
     getModule({
       module: appModules.designer,
       children: [
-        ...(canEditSurvey
-          ? [
-              designerModules.formDesigner,
-              ...(ProcessUtils.ENV.experimentalFeatures ? [designerModules.surveyDependencyTree] : []),
-            ]
-          : []),
+        ...(canEditSurvey ? [designerModules.formDesigner] : []),
         designerModules.surveyHierarchy,
+        ...(canEditSurvey && ProcessUtils.ENV.experimentalFeatures ? [designerModules.surveyDependencyTree] : []),
         designerModules.categories,
         designerModules.taxonomies,
       ],

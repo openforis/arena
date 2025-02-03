@@ -1,6 +1,6 @@
 import './SurveyDependencyTree.scss'
 
-import React, { useState, useRef, useMemo, useCallback } from 'react'
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,20 +15,31 @@ import { FormItem } from '@webapp/components/form/Input'
 
 import { SurveyDependencyTreeChart } from './SurveyDependencyTreeChart'
 
-const generateExtraLinks = ({ dependencyGraph }) =>
+const generateExtraLinks = ({ dependencyGraph, selectedNodeDefUuid }) =>
   Object.entries(dependencyGraph).reduce((acc, [source, dependentNodeDefUuids]) => {
-    dependentNodeDefUuids.forEach((target) => {
+    if (selectedNodeDefUuid && source !== selectedNodeDefUuid && !dependentNodeDefUuids.includes(selectedNodeDefUuid)) {
+      return acc
+    }
+    const uniqueDependentNodeDefUuids = [...new Set(dependentNodeDefUuids)]
+    uniqueDependentNodeDefUuids.forEach((target) => {
       acc.push({ source, target })
     })
     return acc
   }, [])
 
-const calculateDependentNodeDefsByUuid = ({ dependencyGraph, survey }) =>
+const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNodeDefUuid }) =>
   Object.entries(dependencyGraph).reduce((acc, [nodeDefUuid, dependentNodeDefUuids]) => {
     if (!dependentNodeDefUuids.length) {
       return acc
     }
-    const nodeDefUuids = [nodeDefUuid, ...dependentNodeDefUuids]
+    const sourceAndDependentUuids = [nodeDefUuid, ...dependentNodeDefUuids]
+    const nodeDefUuids =
+      !selectedNodeDefUuid || nodeDefUuid === selectedNodeDefUuid
+        ? sourceAndDependentUuids
+        : dependentNodeDefUuids.includes(selectedNodeDefUuid)
+          ? [nodeDefUuid, selectedNodeDefUuid]
+          : []
+
     nodeDefUuids.forEach((uuid) => {
       if (!acc[uuid]) {
         const nodeDef = Survey.getNodeDefByUuid(uuid)(survey)
@@ -74,28 +85,33 @@ export const SurveyDependencyTree = () => {
   const cycle = useSurveyCycleKey()
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
   const [dependencyTypes, setDependencyTypes] = useState([Survey.dependencyTypes.defaultValues])
+  const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
 
   const hierarchy = useMemo(() => {
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
     const dependencyNodeDefsByUuid = dependencyTypes.reduce((acc, dependencyType) => {
       const dependencyGraph = dependencyGraphFull[dependencyType] ?? {}
-      Object.assign(acc, calculateDependentNodeDefsByUuid({ dependencyGraph, survey }))
+      Object.assign(acc, calculateDependentNodeDefsByUuid({ survey, dependencyGraph, selectedNodeDefUuid }))
       return acc
     }, {})
     return Survey.getHierarchy((nodeDef) => !!dependencyNodeDefsByUuid[NodeDef.getUuid(nodeDef)], cycle)(survey)
-  }, [cycle, dependencyTypes, survey])
+  }, [cycle, dependencyTypes, selectedNodeDefUuid, survey])
 
   const extraLinksGroups = useMemo(() => {
     const dependencyGraphFull = Survey.getDependencyGraph(survey)
     return dependencyTypes.reduce((acc, dependencyType) => {
       const dependencyGraph = dependencyGraphFull[dependencyType] ?? {}
-      const links = generateExtraLinks({ dependencyGraph })
+      const links = generateExtraLinks({ dependencyGraph, selectedNodeDefUuid })
       acc.push({ key: dependencyType, links, color: colorByDependencyType[dependencyType] })
       return acc
     }, [])
-  }, [dependencyTypes, survey])
+  }, [dependencyTypes, selectedNodeDefUuid, survey])
 
-  const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
+  useEffect(() => {
+    if (hierarchy.length <= 1 && selectedNodeDefUuid) {
+      setSelectedNodeDefUuid(null)
+    }
+  }, [hierarchy.length, selectedNodeDefUuid])
 
   const treeRef = useRef(null)
 
@@ -137,6 +153,7 @@ export const SurveyDependencyTree = () => {
             extraLinksGroups={extraLinksGroups}
             nodeDefLabelType={nodeDefLabelType}
             onNodeClick={onNodeClick}
+            selectedNodeUuid={selectedNodeDefUuid}
           />
         )}
       </div>
