@@ -1,6 +1,7 @@
 {
-  "license": "MIT",
   "name": "open-foris-arena",
+  "version": "2.0.8",
+  "license": "MIT",
   "engines": {
     "node": "^20.11.1",
     "yarn": "^1.22.19"
@@ -211,7 +212,6 @@
   "browserslist": [
     "last 2 versions"
   ],
-  "version": "0.3.9",
   "lint-staged": {
     "{common,core,server,test,webapp}/**/*.js": "eslint --cache --fix"
   }
