@@ -19,11 +19,20 @@ export const jobThreadMessageTypes = {
   cancelJob: 'cancelJob',
 }
 
+const calculatePartialProgress = (job) => {
+  const { processed, status, total } = job
+  if (status === jobStatus.succeeded) {
+    return 100
+  }
+  if (total > 0) {
+    return Math.floor((100 * processed) / total)
+  }
+  return 0
+}
+
 const calculateJobProgress = (job) => {
   const { currentInnerJobIndex, innerJobs, processed, total } = job
-  const partialProgress =
-    job.status === jobStatus.succeeded ? 100 : total > 0 ? Math.floor((100 * processed) / total) : 0
-
+  const partialProgress = calculatePartialProgress(job)
   if (
     innerJobs.length === 0 ||
     currentInnerJobIndex < 0 ||
