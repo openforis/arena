@@ -275,13 +275,13 @@ export const fetchEntitiesDataToCsvFiles = async (
       Survey.visitAncestors(
         nodeDefContext,
         (nodeDef) => {
-          ancestorDefs.push(...getChildAttributes(nodeDef))
+          ancestorDefs.unshift(...getChildAttributes(nodeDef))
         },
         false
       )(survey)
     } else {
       const ancestorKeyDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
-      ancestorDefs.push(...ancestorKeyDefs)
+      ancestorDefs.unshift(...ancestorKeyDefs)
     }
 
     const queryAttributeDefUuids = ancestorDefs
