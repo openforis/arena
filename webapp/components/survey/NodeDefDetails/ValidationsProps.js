@@ -63,7 +63,6 @@ const CountProp = (props) => {
         propName={`validations.${countType}`}
         propExtractor={countPropExtractor(countType)}
         nodeDefUuidContext={nodeDefUuidContext}
-        canBeConstant
         excludeCurrentNodeDef
         valueTypeSelection
         determineValueType={determineValueType}
