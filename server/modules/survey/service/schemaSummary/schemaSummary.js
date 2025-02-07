@@ -1,4 +1,4 @@
-import { Surveys } from '@openforis/arena-core'
+import { Objects, Surveys } from '@openforis/arena-core'
 
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
@@ -36,20 +36,39 @@ const getDefaultValueApplyIf = ({ nodeDef }) => {
     : ''
 }
 
+const getExpressionsSummary = ({ expressions, includeSeverity = false }) =>
+  expressions
+    .reduce((acc, expression) => {
+      const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
+      const parts = []
+      if (includeSeverity) {
+        parts.push(`(${severity})`)
+      }
+      parts.push(`Expression: ${expr.trim()}`)
+      if (applyIf) {
+        parts.push(`- Apply if: ${applyIf.trim()}`)
+      }
+      acc.push(parts.join(' '))
+      return acc
+    }, [])
+    .join('\n')
+
 const getValidationsSummary = ({ nodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
-  return expressions
-    .reduce((summaryTexts, expression) => {
-      const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
+  return getExpressionsSummary({ expressions, includeSeverity: true })
+}
 
-      let text = `(${severity}) Expression: ${expr.trim()}`
-      if (applyIf) {
-        text += ` - Apply if: ${applyIf.trim()}`
-      }
-      return [...summaryTexts, text]
-    }, [])
-    .join('\n')
+const getValidationCountSummary = ({ nodeDef, countType }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  const count = NodeDefValidations.getCountProp(countType)(validations)
+  if (Objects.isEmpty(count)) {
+    return ''
+  }
+  if (Array.isArray(count)) {
+    return getExpressionsSummary({ expressions: count })
+  }
+  return String(count)
 }
 
 const getValidationMessages = ({ nodeDef, lang }) => {
@@ -152,8 +171,8 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
-      minCount: String(NodeDefValidations.getMinCount(NodeDef.getValidations(nodeDef))),
-      maxCount: String(NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef))),
+      minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
+      maxCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.max }),
       validations: getValidationsSummary({ nodeDef }),
       // validation messages
       ...languages.reduce(
