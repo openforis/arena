@@ -40,8 +40,6 @@ export default class SurveyPublishJob extends Job {
     await super.onStart()
 
     await ActivityLogManager.insert(this.user, this.surveyId, ActivityLog.type.surveyPublish, null, false, this.tx)
-
-    throw new Error('===test')
   }
 }
 
