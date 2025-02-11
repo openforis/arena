@@ -34,7 +34,7 @@ const JobMonitor = () => {
   return (
     <Modal className="app-job-monitor" closeOnEsc={false} title={`jobs:${JobSerialized.getType(job)}`}>
       <ModalBody>
-        <JobProgress job={job} />
+        <JobProgress progressPercent={JobSerialized.getProgressPercent(job)} status={JobSerialized.getStatus(job)} />
         <JobErrors
           errorKeyHeaderName={errorKeyHeaderName}
           exportFileName={errorsExportFileName}
