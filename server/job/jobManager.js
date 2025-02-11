@@ -1,9 +1,11 @@
-import { enqueue } from './jobQueue'
+import * as JobQueue from './jobQueue'
 
-export { getActiveJobSummary, cancelActiveJobByUserUuid } from './jobThreadExecutor'
+export const getActiveJobSummary = JobQueue.getActiveJobByUserUuid
+
+export const cancelActiveJobByUserUuid = JobQueue.cancelActiveJobByUserUuid
 
 export const enqueueJob = (jobInfo) => {
-  enqueue(jobInfo).catch(() => {
+  JobQueue.enqueue(jobInfo).catch(() => {
     // ignore it
   })
 }

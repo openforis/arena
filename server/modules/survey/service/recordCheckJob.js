@@ -30,6 +30,10 @@ export default class RecordCheckJob extends Job {
     this.total = R.length(recordsUuidAndCycle)
 
     for await (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
+      if (this.isCanceled()) {
+        return
+      }
+
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
       const { requiresCheck } = surveyAndNodeDefs

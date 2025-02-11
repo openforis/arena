@@ -51,19 +51,23 @@ export const cancelActiveJobByUserUuid = async (userUuid) => {
   if (!jobThread) {
     return
   }
-
   jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
 }
 
 // ====== EXECUTE
 
-export const executeJobThread = (jobInfo, onJobUpdate = null) => {
+export const executeJobThread = (jobInfo, onJobUpdate = null, onThreadEnd = null) => {
   const { type: jobType, params: jobParams } = jobInfo
 
-  const thread = new ThreadManager('jobThread.js', { jobType, jobParams }, (job) => {
-    _notifyJobUpdate(job)
-    onJobUpdate?.(job)
-  })
-
-  userJobThreads.putThread(jobInfo.userUuid, thread)
+  const thread = new ThreadManager(
+    'jobThread.js',
+    { jobType, jobParams },
+    (job) => {
+      _notifyJobUpdate(job)
+      onJobUpdate?.(job)
+    },
+    onThreadEnd
+  )
+  const { uuid: userUuid } = jobParams?.user ?? {}
+  userJobThreads.putThread(userUuid, thread)
 }
