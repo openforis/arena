@@ -124,6 +124,7 @@
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "buffer": "^6.0.3",
+    "bullmq": "^5.40.2",
     "camelize": "^1.0.0",
     "circle-to-polygon": "^2.2.0",
     "classnames": "^2.5.1",
