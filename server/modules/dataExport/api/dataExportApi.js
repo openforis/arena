@@ -20,7 +20,7 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        const job = DataExportService.startCsvDataExportJob({
+        const job = await DataExportService.startCsvDataExportJob({
           user,
           surveyId,
           cycle,

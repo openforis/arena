@@ -20,7 +20,7 @@ import CategoriesExportJob from './CategoriesExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
-export const importCategory = (user, surveyId, categoryUuid, summary) => {
+export const importCategory = async (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
@@ -28,14 +28,14 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
     [CategoryImportJobParams.keys.summary]: summary,
   })
 
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
 
   return job
 }
 
-export const createBatchImportJob = ({ user, surveyId, filePath }) => {
+export const startBatchImportJob = async ({ user, surveyId, filePath }) => {
   const job = new CategoriesBatchImportJob({ user, surveyId, filePath })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return job
 }
 
@@ -106,15 +106,9 @@ export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, 
   await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
 }
 
-export const exportAllCategories = ({ user, surveyId, draft }) => {
-  const job = new CategoriesExportJob({
-    user,
-    surveyId,
-    draft,
-  })
-
-  JobManager.enqueueJob(job)
-
+export const exportAllCategories = async ({ user, surveyId, draft }) => {
+  const job = new CategoriesExportJob({ user, surveyId, draft })
+  await JobManager.enqueueJob(job)
   return job
 }
 

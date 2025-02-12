@@ -19,7 +19,7 @@ export const init = (app) => {
 
       const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
 
-      const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget, options })
+      const job = await ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget, options })
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {

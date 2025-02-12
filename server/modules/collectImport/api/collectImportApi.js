@@ -27,7 +27,7 @@ export const init = (app) => {
       const validation = await SurveyService.validateSurveyImportFromCollect({ newSurvey })
 
       if (Validation.isValid(validation)) {
-        const job = CollectImportService.startCollectImportJob({
+        const job = await CollectImportService.startCollectImportJob({
           user,
           filePath: file.tempFilePath,
           newSurvey,

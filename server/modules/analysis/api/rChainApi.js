@@ -162,7 +162,7 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        const job = AnalysisService.startPersistResultsJob({
+        const job = await AnalysisService.startPersistResultsJob({
           user,
           surveyId,
           cycle,

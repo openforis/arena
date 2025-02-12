@@ -18,30 +18,21 @@ const onJobUpdate = async ({ job, bullJob }) => {
 const processJob = (bullJob) => {
   const { data: jobInfo } = bullJob
   return new Promise((resolve, reject) => {
-    JobThreadExecutor.executeJobThread(
-      jobInfo,
-      (job) => {
-        onJobUpdate({ job, bullJob })
-          .then(() => {
-            if (job.ended) {
-              if (job.failed) {
-                reject(new Error(JSON.stringify(job.errors)))
-              } else {
-                resolve()
-              }
+    JobThreadExecutor.executeJobThread(jobInfo, (job) => {
+      onJobUpdate({ job, bullJob })
+        .then(() => {
+          if (job.ended) {
+            if (job.failed) {
+              reject(new Error(JSON.stringify(job.errors)))
+            } else {
+              resolve()
             }
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      },
-      () => {
-        const bullJobs = getActiveJobsByJobUuid(jobInfo.uuid)
-        if (bullJobs.length > 0) {
-          console.log('===here')
-        }
-      }
-    )
+          }
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
   })
 }
 
@@ -65,7 +56,7 @@ const getActiveJobs = async (filterFn) => {
   return activeJobs.filter(filterFn).map((bullJob) => bullJob.data)
 }
 
-const getActiveJobsByJobUuid = async (jobUuid) => getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid)
+const getActiveJobByUuid = async (jobUuid) => getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid)[0]
 
 const getActiveJobsByUserUuid = async (userUuid) =>
   getActiveJobs((bullJob) => bullJob.data?.params?.user?.uuid === userUuid)
@@ -77,4 +68,11 @@ const getActiveJobsBySurveyId = async (userUuid) =>
 
 const cancelActiveJobByUserUuid = JobThreadExecutor.cancelActiveJobByUserUuid
 
-export { cancelActiveJobByUserUuid, enqueue, getActiveJobsBySurveyId, getActiveJobsByUserUuid, getActiveJobByUserUuid }
+export {
+  cancelActiveJobByUserUuid,
+  enqueue,
+  getActiveJobByUuid,
+  getActiveJobsBySurveyId,
+  getActiveJobsByUserUuid,
+  getActiveJobByUserUuid,
+}

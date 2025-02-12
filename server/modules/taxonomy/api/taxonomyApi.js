@@ -209,12 +209,12 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/taxonomies/:taxonomyUuid/upload',
     AuthMiddleware.requireSurveyEditPermission,
-    (req, res) => {
+    async (req, res) => {
       const { surveyId, taxonomyUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       const file = Request.getFile(req)
 
-      const job = TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
+      const job = await TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
 
       res.json({ job: jobToJSON(job) })
     }

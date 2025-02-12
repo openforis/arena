@@ -41,7 +41,7 @@ export const init = (app) => {
         })
 
         if (cloneFrom) {
-          const job = SurveyService.cloneSurvey({
+          const job = await SurveyService.cloneSurvey({
             surveyId: cloneFrom,
             cycle: cloneFromCycle,
             surveyInfoTarget,
@@ -198,7 +198,12 @@ export const init = (app) => {
 
       const user = Request.getUser(req)
 
-      const { job, outputFileName } = SurveyService.exportSurvey({ surveyId, user, includeData, includeActivityLog })
+      const { job, outputFileName } = await SurveyService.exportSurvey({
+        surveyId,
+        user,
+        includeData,
+        includeActivityLog,
+      })
       res.json({ job, outputFileName })
     } catch (error) {
       next(error)
@@ -264,20 +269,20 @@ export const init = (app) => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     const { surveyId } = Request.getParams(req)
     const user = Request.getUser(req)
 
-    const job = SurveyService.startPublishJob(user, surveyId)
+    const job = await SurveyService.startPublishJob(user, surveyId)
 
     res.json({ job: JobUtils.jobToJSON(job) })
   })
 
-  app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+  app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     const { surveyId } = Request.getParams(req)
     const user = Request.getUser(req)
 
-    const job = SurveyService.startUnpublishJob(user, surveyId)
+    const job = await SurveyService.startUnpublishJob(user, surveyId)
 
     res.json({ job: JobUtils.jobToJSON(job) })
   })
@@ -288,7 +293,7 @@ export const init = (app) => {
       const filePath = Request.getFilePath(req)
       const { surveyId } = Request.getParams(req)
 
-      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath })
+      const job = await SurveyService.startLabelsImportJob({ user, surveyId, filePath })
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {

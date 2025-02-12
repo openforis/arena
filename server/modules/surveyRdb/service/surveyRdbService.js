@@ -119,7 +119,7 @@ export const refreshAllRdbs = async () => {
     .map((surveySummary) => surveySummary.id)
 
   const job = new SurveysRdbRefreshJob({ surveyIds })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
 
   return { job: JobUtils.jobToJSON(job) }
 }

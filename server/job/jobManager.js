@@ -4,8 +4,7 @@ export const getActiveJobSummary = JobQueue.getActiveJobByUserUuid
 
 export const cancelActiveJobByUserUuid = JobQueue.cancelActiveJobByUserUuid
 
-export const enqueueJob = (jobInfo) => {
-  JobQueue.enqueue(jobInfo).catch(() => {
-    // ignore it
-  })
+export const enqueueJob = async (jobInfo) => {
+  await JobQueue.enqueue(jobInfo)
+  return jobInfo
 }

@@ -15,31 +15,31 @@ import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
 
 // JOBS
-export const startPublishJob = (user, surveyId) => {
+export const startPublishJob = async (user, surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyPublishJob({ user, surveyId })
 
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
 
   return job
 }
 
-export const startUnpublishJob = (user, surveyId) => {
+export const startUnpublishJob = async (user, surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
   const job = new SurveyUnpublishJob({ user, surveyId })
 
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
 
   return job
 }
 
-export const exportSurvey = ({ surveyId, user, includeData = false, includeActivityLog = true }) => {
+export const exportSurvey = async ({ surveyId, user, includeData = false, includeActivityLog = true }) => {
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
   const job = new SurveyExportJob({ surveyId, user, outputFileName, backup: includeData, includeActivityLog })
 
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
 
   return { job: JobUtils.jobToJSON(job), outputFileName }
 }
@@ -94,9 +94,9 @@ export const exportSurveysList = async ({ user, draft, template, outputStream })
   })
 }
 
-export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
+export const cloneSurvey = async ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget, cycle })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }
 
@@ -112,15 +112,9 @@ export const deleteSurvey = async (surveyId) => {
   await SurveyManager.deleteSurvey(surveyId)
 }
 
-export const startLabelsImportJob = ({ user, surveyId, filePath }) => {
-  const job = new SurveyLabelsImportJob({
-    user,
-    surveyId,
-    filePath,
-  })
-
-  JobManager.enqueueJob(job)
-
+export const startLabelsImportJob = async ({ user, surveyId, filePath }) => {
+  const job = new SurveyLabelsImportJob({ user, surveyId, filePath })
+  await JobManager.enqueueJob(job)
   return job
 }
 

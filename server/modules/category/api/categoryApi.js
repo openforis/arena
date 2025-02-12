@@ -52,7 +52,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const summary = Request.getBody(req)
 
-        const job = CategoryService.importCategory(user, surveyId, categoryUuid, summary)
+        const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
         res.json({ job })
       } catch (error) {
         next(error)
@@ -69,7 +69,7 @@ export const init = (app) => {
         const { surveyId } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        const job = CategoryService.createBatchImportJob({ user, surveyId, filePath })
+        const job = await CategoryService.startBatchImportJob({ user, surveyId, filePath })
 
         res.json({ job })
       } catch (error) {
@@ -123,7 +123,7 @@ export const init = (app) => {
         const { surveyId, draft = false } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const job = CategoryService.exportAllCategories({ user, surveyId, draft })
+        const job = await CategoryService.exportAllCategories({ user, surveyId, draft })
         res.json({ job })
       } catch (error) {
         next(error)

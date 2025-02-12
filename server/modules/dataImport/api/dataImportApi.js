@@ -15,7 +15,7 @@ export const init = (app) => {
       const { surveyId, deleteAllRecords, cycle, forceImport } = Request.getParams(req)
       const file = Request.getFile(req)
 
-      const job = DataImportService.startCollectDataImportJob({
+      const job = await DataImportService.startCollectDataImportJob({
         user,
         surveyId,
         filePath: file.tempFilePath,
@@ -46,7 +46,7 @@ export const init = (app) => {
       } = Request.getParams(req)
       const filePath = Request.getFilePath(req)
 
-      const job = DataImportService.startCSVDataImportJob({
+      const job = await DataImportService.startCSVDataImportJob({
         user,
         surveyId,
         filePath,

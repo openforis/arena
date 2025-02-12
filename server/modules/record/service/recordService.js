@@ -145,9 +145,9 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
 }
 
 // Records export job
-export const startRecordsExportJob = ({ user, surveyId, recordUuids }) => {
+export const startRecordsExportJob = async ({ user, surveyId, recordUuids }) => {
   const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return job
 }
 
@@ -308,9 +308,9 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
 }
 
 // RECORDS CLONE
-export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
+export const startRecordsCloneJob = async ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
   const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return job
 }
 

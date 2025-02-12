@@ -86,7 +86,7 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, cycleFrom, cycleTo, recordsUuids } = Request.getParams(req)
 
-      const job = RecordService.startRecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
+      const job = await RecordService.startRecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
       const jobSerialized = JobUtils.jobToJSON(job)
       res.json({ job: jobSerialized })
     } catch (error) {
@@ -230,7 +230,7 @@ export const init = (app) => {
         throw new Error('record uuids not specified')
       }
 
-      const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
+      const job = await RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
       next(error)

@@ -4,7 +4,7 @@ import CollectDataImportJob from '@server/modules/collectImport/service/collectI
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import DataImportJob from './DataImportJob/DataImportJob'
 
-export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
+export const startCollectDataImportJob = async ({ user, surveyId, filePath, deleteAllRecords, cycle, forceImport }) => {
   const job = new CollectDataImportJob({
     user,
     surveyId,
@@ -13,11 +13,11 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
     cycle,
     forceImport,
   })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return job
 }
 
-export const startCSVDataImportJob = ({
+export const startCSVDataImportJob = async ({
   user,
   surveyId,
   filePath,
@@ -44,6 +44,6 @@ export const startCSVDataImportJob = ({
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return job
 }

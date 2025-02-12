@@ -59,9 +59,9 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
 
 // ==== UPDATE
 
-export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
+export const startPersistResultsJob = async ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
-  JobManager.enqueueJob(job)
+  await JobManager.enqueueJob(job)
   return job
 }
 

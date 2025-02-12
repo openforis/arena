@@ -49,7 +49,7 @@ export const init = (app) => {
 
       const filePath = Request.getFilePath(req)
 
-      const job = ArenaMobileImportService.startArenaMobileImportJob({
+      const job = await ArenaMobileImportService.startArenaMobileImportJob({
         user,
         filePath,
         surveyId,
