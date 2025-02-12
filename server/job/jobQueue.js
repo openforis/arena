@@ -52,12 +52,12 @@ const getActiveJobs = async (filterFn) => {
 
 // getters
 
-const getActiveJobByUuid = async (jobUuid) => getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid)[0]
+const getActiveJobByUuid = async (jobUuid) => (await getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid))[0]
 
 const getActiveJobsByUserUuid = async (userUuid) =>
   getActiveJobs((bullJob) => bullJob.data?.params?.user?.uuid === userUuid)
 
-const getActiveJobByUserUuid = async (userUuid) => getActiveJobByUserUuid(userUuid)[0]
+const getActiveJobByUserUuid = async (userUuid) => (await getActiveJobByUserUuid(userUuid))[0]
 
 const getActiveJobsBySurveyId = async (surveyId) =>
   getActiveJobs((bullJob) => bullJob.data?.params?.surveyId === surveyId)
