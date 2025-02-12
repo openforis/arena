@@ -76,6 +76,11 @@ const ENV = {
   fileStorageAwsS3BucketRegion: process.env.FILE_STORAGE_AWS_S3_BUCKET_REGION,
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
+  // Job Queue
+  jobQueueEnabled: isTrue(process.env.JOB_QUEUE_ENABLED),
+  // Redis
+  redisHost: process.env.REDIS_HOST,
+  redisPort: process.env.REDIS_PORT || 6379,
 }
 
 module.exports = {

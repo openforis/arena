@@ -1,12 +1,19 @@
 import { Queue, Worker } from 'bullmq'
 import IORedis from 'ioredis'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as JobThreadExecutor from './jobThreadExecutor'
 
-const connection = new IORedis({ maxRetriesPerRequest: null })
+const connection = ProcessUtils.ENV.redisHost
+  ? new IORedis({ host: ProcessUtils.ENV.redisHost, port: ProcessUtils.ENV.redisPort, maxRetriesPerRequest: null })
+  : null
 const queueName = 'jobQueue'
-const bullQueue = new Queue(queueName, { connection })
+const bullQueue = connection ? new Queue(queueName, { connection }) : null
 const concurrency = 1
+
+const enabled = !!bullQueue
+
+// init worker
 
 const onJobUpdate = async ({ job, bullJob }) => {
   const { ended, progressPercent } = job
@@ -36,23 +43,14 @@ const processJob = (bullJob) => {
   })
 }
 
-const bullWorker = new Worker(queueName, processJob, {
-  connection,
-  concurrency,
-})
-
-bullWorker.on('completed', (job) => {
-  console.log(`${job.id} has completed!`)
-})
-
-bullWorker.on('failed', (job, err) => {
-  console.log(`${job.id} has failed with ${err.message}`)
-})
+new Worker(queueName, processJob, { connection, concurrency })
 
 const getActiveJobs = async (filterFn) => {
   const activeJobs = await bullQueue.getActive()
   return activeJobs.filter(filterFn).map((bullJob) => bullJob.data)
 }
+
+// getters
 
 const getActiveJobByUuid = async (jobUuid) => getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid)[0]
 
@@ -64,15 +62,18 @@ const getActiveJobByUserUuid = async (userUuid) => getActiveJobByUserUuid(userUu
 const getActiveJobsBySurveyId = async (surveyId) =>
   getActiveJobs((bullJob) => bullJob.data?.params?.surveyId === surveyId)
 
+// enquee
 const enqueue = async (job) => {
   const { type, params, uuid } = job
   await bullQueue.add('job', { type, params, uuid })
   return job
 }
 
+// cancel
 const cancelActiveJobByUserUuid = JobThreadExecutor.cancelActiveJobByUserUuid
 
 export {
+  enabled,
   cancelActiveJobByUserUuid,
   enqueue,
   getActiveJobByUuid,
