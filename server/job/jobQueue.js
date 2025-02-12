@@ -15,35 +15,37 @@ const enabled = !!bullQueue
 
 // init worker
 
-const onJobUpdate = async ({ job, bullJob }) => {
-  const { ended, progressPercent } = job
-  if (!ended) {
-    await bullJob.updateProgress(progressPercent)
+if (enabled) {
+  const onJobUpdate = async ({ job, bullJob }) => {
+    const { ended, progressPercent } = job
+    if (!ended) {
+      await bullJob.updateProgress(progressPercent)
+    }
   }
-}
 
-const processJob = (bullJob) => {
-  const { data: jobInfo } = bullJob
-  return new Promise((resolve, reject) => {
-    JobThreadExecutor.executeJobThread(jobInfo, (job) => {
-      onJobUpdate({ job, bullJob })
-        .then(() => {
-          if (job.ended) {
-            if (job.failed) {
-              reject(new Error(JSON.stringify(job.errors)))
-            } else {
-              resolve()
+  const processJob = (bullJob) => {
+    const { data: jobInfo } = bullJob
+    return new Promise((resolve, reject) => {
+      JobThreadExecutor.executeJobThread(jobInfo, (job) => {
+        onJobUpdate({ job, bullJob })
+          .then(() => {
+            if (job.ended) {
+              if (job.failed) {
+                reject(new Error(JSON.stringify(job.errors)))
+              } else {
+                resolve()
+              }
             }
-          }
-        })
-        .catch((error) => {
-          reject(error)
-        })
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      })
     })
-  })
-}
+  }
 
-new Worker(queueName, processJob, { connection, concurrency })
+  new Worker(queueName, processJob, { connection, concurrency })
+}
 
 // getters
 
