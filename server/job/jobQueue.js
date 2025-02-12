@@ -14,6 +14,7 @@ const concurrency = 1
 const enabled = !!bullQueue
 
 // init worker
+let worker = null
 
 if (enabled) {
   const onJobUpdate = async ({ job, bullJob }) => {
@@ -44,14 +45,16 @@ if (enabled) {
     })
   }
 
-  new Worker(queueName, processJob, { connection, concurrency })
+  worker = new Worker(queueName, processJob, { connection, concurrency })
 }
 
 // getters
 
 const getActiveJobs = async (filterFn) => {
   const activeJobs = await bullQueue.getActive()
-  return activeJobs.filter(filterFn).map((bullJob) => bullJob.data)
+  const jobInfos = activeJobs.filter(filterFn).map((bullJob) => bullJob.data)
+  const jobSummaries = JobThreadExecutor.getActiveJobSummaries()
+  return jobInfos.map((jobInfo) => jobSummaries.find((summary) => summary.uuid === jobInfo.uuid))
 }
 
 const getActiveJobByUuid = async (jobUuid) => (await getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid))[0]
@@ -74,12 +77,16 @@ const enqueue = async (job) => {
 // cancel
 const cancelActiveJobByUserUuid = JobThreadExecutor.cancelActiveJobByUserUuid
 
+// destroy
+const destroy = worker.close
+
 export {
   enabled,
-  cancelActiveJobByUserUuid,
   enqueue,
   getActiveJobByUuid,
   getActiveJobsBySurveyId,
   getActiveJobsByUserUuid,
   getActiveJobByUserUuid,
+  cancelActiveJobByUserUuid,
+  destroy,
 }

@@ -44,6 +44,10 @@ const _notifyJobUpdate = (jobSerialized) => {
 
 export const getActiveJobSummary = (userUuid) => activeJobSummariesByUserUuid.get(userUuid)
 
+export const getActiveJobSummaries = () => Object.values(activeJobSummariesByUserUuid)
+
+export const getActiveJobSummaryByUuid = (jobUuid) => getActiveJobSummaries().filter((job) => job.uuid === jobUuid)[0]
+
 // ====== UPDATE
 
 export const cancelActiveJobByUserUuid = async (userUuid) => {
