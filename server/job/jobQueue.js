@@ -45,12 +45,12 @@ const processJob = (bullJob) => {
 
 new Worker(queueName, processJob, { connection, concurrency })
 
+// getters
+
 const getActiveJobs = async (filterFn) => {
   const activeJobs = await bullQueue.getActive()
   return activeJobs.filter(filterFn).map((bullJob) => bullJob.data)
 }
-
-// getters
 
 const getActiveJobByUuid = async (jobUuid) => (await getActiveJobs((bullJob) => bullJob.data?.uuid === jobUuid))[0]
 
