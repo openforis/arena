@@ -49,8 +49,6 @@ bullWorker.on('failed', (job, err) => {
   console.log(`${job.id} has failed with ${err.message}`)
 })
 
-const enqueue = async (jobInfo) => bullQueue.add('job', jobInfo)
-
 const getActiveJobs = async (filterFn) => {
   const activeJobs = await bullQueue.getActive()
   return activeJobs.filter(filterFn).map((bullJob) => bullJob.data)
@@ -63,8 +61,14 @@ const getActiveJobsByUserUuid = async (userUuid) =>
 
 const getActiveJobByUserUuid = async (userUuid) => getActiveJobByUserUuid(userUuid)[0]
 
-const getActiveJobsBySurveyId = async (userUuid) =>
-  getActiveJobs((bullJob) => bullJob.data?.params?.surveyId === userUuid)
+const getActiveJobsBySurveyId = async (surveyId) =>
+  getActiveJobs((bullJob) => bullJob.data?.params?.surveyId === surveyId)
+
+const enqueue = async (job) => {
+  const { type, params, uuid } = job
+  await bullQueue.add('job', { type, params, uuid })
+  return job
+}
 
 const cancelActiveJobByUserUuid = JobThreadExecutor.cancelActiveJobByUserUuid
 

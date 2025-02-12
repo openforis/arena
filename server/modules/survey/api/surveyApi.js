@@ -269,22 +269,30 @@ export const init = (app) => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
-    const { surveyId } = Request.getParams(req)
-    const user = Request.getUser(req)
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-    const job = await SurveyService.startPublishJob(user, surveyId)
+      const job = await SurveyService.startPublishJob(user, surveyId)
 
-    res.json({ job: JobUtils.jobToJSON(job) })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
   })
 
-  app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
-    const { surveyId } = Request.getParams(req)
-    const user = Request.getUser(req)
+  app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-    const job = await SurveyService.startUnpublishJob(user, surveyId)
+      const job = await SurveyService.startUnpublishJob(user, surveyId)
 
-    res.json({ job: JobUtils.jobToJSON(job) })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
