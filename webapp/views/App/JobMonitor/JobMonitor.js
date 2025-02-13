@@ -55,11 +55,11 @@ const JobMonitor = () => {
           />
         )}
 
-        {/* {Objects.isNotEmpty(jobsQueue) &&
+        {Objects.isNotEmpty(jobsQueue) &&
           jobsQueue.map((jobQueued) => {
             const { type, uuid, queueStatus } = jobQueued
             return `${type} ${uuid} ${queueStatus}`
-          })} */}
+          })}
       </ModalBody>
 
       <ModalFooter>
