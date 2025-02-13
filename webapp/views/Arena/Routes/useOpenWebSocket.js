@@ -6,30 +6,31 @@ import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import { SystemErrorActions } from '@webapp/store/system'
-import { JobActions } from '@webapp/store/app'
+import { JobActions, JobsQueueActions } from '@webapp/store/app'
 
 import { useUser } from '@webapp/store/user'
+
+const jobQueueUpdateEvent = 'jobQueue/jobUpdate'
 
 export const useOpenWebSocket = () => {
   const dispatch = useDispatch()
   const user = useUser()
   const userUuid = User.getUuid(user)
 
-  const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [])
+  const onJobUpdate = useCallback((job) => dispatch(JobActions.updateJob({ job })), [dispatch])
+  const onJobQueueUpdate = useCallback((jobInfo) => dispatch(JobsQueueActions.updateJob({ jobInfo })), [dispatch])
 
   const openSocket = useCallback(async () => {
     await AppWebSocket.openSocket((error) => dispatch(SystemErrorActions.throwSystemError({ error })))
     AppWebSocket.on(WebSocketEvents.jobUpdate, onJobUpdate)
-  }, [onJobUpdate])
+    AppWebSocket.on(jobQueueUpdateEvent, onJobQueueUpdate)
+  }, [dispatch, onJobQueueUpdate, onJobUpdate])
 
   const closeSocket = useCallback(() => {
     AppWebSocket.closeSocket()
     AppWebSocket.off(WebSocketEvents.jobUpdate, onJobUpdate)
-  }, [onJobUpdate])
-
-  useEffect(() => {
-    return () => closeSocket()
-  }, [closeSocket])
+    AppWebSocket.off(jobQueueUpdateEvent, onJobQueueUpdate)
+  }, [onJobQueueUpdate, onJobUpdate])
 
   useEffect(() => {
     if (userUuid) {
@@ -37,5 +38,6 @@ export const useOpenWebSocket = () => {
     } else {
       closeSocket()
     }
+    return () => closeSocket()
   }, [closeSocket, openSocket, userUuid])
 }
