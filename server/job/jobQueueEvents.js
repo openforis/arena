@@ -16,6 +16,7 @@ export const initJobQueueEvents = ({ queueName, connection, getUserUuidByJobUuid
   const events = ['waiting', 'active', 'completed', 'failed']
   events.forEach((event) => {
     queueEvents.on(event, ({ jobId }) => {
+      console.log('-=== job event', event, jobId)
       notifyUser({ jobId, status: event })
     })
   })

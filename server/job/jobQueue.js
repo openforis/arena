@@ -1,5 +1,6 @@
 import { Queue, Worker } from 'bullmq'
 import IORedis from 'ioredis'
+import { isMainThread } from 'worker_threads'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as JobThreadExecutor from './jobThreadExecutor'
@@ -57,7 +58,7 @@ const getUserUuidByJobUuid = (jobUuid) => userUuidByJobUuid[jobUuid]
 const getSurveyIdByJobUuid = (jobUuid) => surveyIdByJobUuid[jobUuid]
 
 // init worker
-if (enabled) {
+if (enabled && !worker && isMainThread) {
   const onJobUpdate = async ({ job, bullJob }) => {
     const { ended, progressPercent } = job
     if (!ended) {
