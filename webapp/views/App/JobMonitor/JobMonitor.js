@@ -13,6 +13,8 @@ import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
 import JobProgress from './JobProgress'
+import { useJobsQueue } from '@webapp/store/app/jobsQueue/hooks'
+import { Objects } from '@openforis/arena-core'
 
 const getCustomCloseButtonComponent = ({ closeButton, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
@@ -25,7 +27,9 @@ const JobMonitor = () => {
   const dispatch = useDispatch()
   const { job, closeButton, errorKeyHeaderName, errorsExportFileName } = useJob()
 
-  if (!job || JobSerialized.isCanceled(job)) return null
+  const jobsQueue = useJobsQueue()
+
+  if ((!job || JobSerialized.isCanceled(job)) && Objects.isEmpty(jobsQueue)) return null
 
   const innerJobs = JobSerialized.getInnerJobs(job)
   const hasInnerJobs = innerJobs.length > 0
@@ -50,6 +54,12 @@ const JobMonitor = () => {
             openPanel={JobSerialized.isFailed(job)}
           />
         )}
+
+        {/* {Objects.isNotEmpty(jobsQueue) &&
+          jobsQueue.map((jobQueued) => {
+            const { type, uuid, queueStatus } = jobQueued
+            return `${type} ${uuid} ${queueStatus}`
+          })} */}
       </ModalBody>
 
       <ModalFooter>
