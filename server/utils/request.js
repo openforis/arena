@@ -6,6 +6,8 @@ export const getServerUrl = (req) => `${req.protocol}://${req.get('host')}`
 
 export const getHost = (req) => req.header('host')
 
+export const getRemoteAddress = (req) => req.headers['x-forwarded-for'] ?? req.socket.remoteAddress
+
 export const getUrl = R.prop('url')
 
 export const getParams = (req) =>

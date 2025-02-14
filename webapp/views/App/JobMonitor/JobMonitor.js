@@ -3,6 +3,8 @@ import './JobMonitor.scss'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { useJob, JobActions } from '@webapp/store/app'
@@ -14,7 +16,8 @@ import InnerJobs from './InnerJobs'
 import JobErrors from './JobErrors'
 import JobProgress from './JobProgress'
 import { useJobsQueue } from '@webapp/store/app/jobsQueue/hooks'
-import { Objects } from '@openforis/arena-core'
+
+import { JobQueue } from './JobQueue/JobQueue'
 
 const getCustomCloseButtonComponent = ({ closeButton, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
@@ -30,6 +33,8 @@ const JobMonitor = () => {
   const jobsQueue = useJobsQueue()
 
   if ((!job || JobSerialized.isCanceled(job)) && Objects.isEmpty(jobsQueue)) return null
+
+  const jobsInQueueToShow = jobsQueue?.filter?.((jobQueue) => jobQueue.uuid !== JobSerialized.getUuid(job)) ?? []
 
   const innerJobs = JobSerialized.getInnerJobs(job)
   const hasInnerJobs = innerJobs.length > 0
@@ -55,11 +60,7 @@ const JobMonitor = () => {
           />
         )}
 
-        {Objects.isNotEmpty(jobsQueue) &&
-          jobsQueue.map((jobQueued) => {
-            const { type, uuid, queueStatus } = jobQueued
-            return `${type} ${uuid} ${queueStatus}`
-          })}
+        {Objects.isNotEmpty(jobsInQueueToShow) && <JobQueue jobs={jobsInQueueToShow} />}
       </ModalBody>
 
       <ModalFooter>

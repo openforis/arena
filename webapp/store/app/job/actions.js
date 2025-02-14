@@ -37,7 +37,9 @@ export const updateJob =
 
 export const hideJobMonitor = () => updateJob({ job: null })
 
-export const cancelJob = () => async (dispatch) => {
-  await axios.delete('/api/jobs/active')
-  dispatch(hideJobMonitor())
-}
+export const cancelJob =
+  (jobUuid = null) =>
+  async (dispatch) => {
+    await axios.delete(jobUuid ? `/api/jobs/all/${jobUuid}` : '/api/jobs/active')
+    dispatch(hideJobMonitor())
+  }

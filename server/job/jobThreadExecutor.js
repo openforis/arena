@@ -52,10 +52,7 @@ export const getActiveJobSummaryByUuid = (jobUuid) => getActiveJobSummaries().fi
 
 export const cancelActiveJobByUserUuid = async (userUuid) => {
   const jobThread = userJobThreads.getThread(userUuid)
-  if (!jobThread) {
-    return
-  }
-  jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
+  jobThread?.postMessage({ type: jobThreadMessageTypes.cancelJob })
 }
 
 // ====== EXECUTE

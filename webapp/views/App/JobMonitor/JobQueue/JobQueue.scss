@@ -1,0 +1,8 @@
+.job-queue {
+  display: flex;
+  flex-direction: column;
+
+  .job {
+    display: flex;
+  }
+}

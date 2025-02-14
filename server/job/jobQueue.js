@@ -4,7 +4,7 @@ import { isMainThread } from 'worker_threads'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as JobThreadExecutor from './jobThreadExecutor'
-import { initJobQueueEvents } from './jobQueueEvents'
+import { initJobQueueEvents, notifyUser } from './jobQueueEvents'
 
 const connection = ProcessUtils.ENV.redisHost
   ? new IORedis({ host: ProcessUtils.ENV.redisHost, port: ProcessUtils.ENV.redisPort, maxRetriesPerRequest: null })
@@ -57,40 +57,38 @@ const getActiveJobsBySurveyId = async (surveyId) =>
 const getUserUuidByJobUuid = (jobUuid) => userUuidByJobUuid[jobUuid]
 const getSurveyIdByJobUuid = (jobUuid) => surveyIdByJobUuid[jobUuid]
 
+const jobQueueReader = { getUserUuidByJobUuid, getJobSummary }
+
 // init worker
 if (enabled && !worker && isMainThread) {
-  const onJobUpdate = async ({ job, bullJob }) => {
-    const { ended, progressPercent } = job
-    if (!ended) {
-      await bullJob.updateProgress(progressPercent)
+  const onJobUpdate =
+    ({ bullJob, resolve, reject }) =>
+    (job) => {
+      const { ended, errors, failed, progressPercent } = job
+      if (ended) {
+        if (failed) {
+          reject(new Error(JSON.stringify(errors)))
+        } else {
+          resolve()
+        }
+      } else {
+        bullJob.updateProgress(progressPercent).catch(() => {
+          // ignore it
+        })
+      }
     }
-  }
 
   const processJob = (bullJob) => {
     const { data: jobInfo } = bullJob
     return new Promise((resolve, reject) => {
-      JobThreadExecutor.executeJobThread(jobInfo, (job) => {
-        onJobUpdate({ job, bullJob })
-          .then(() => {
-            if (job.ended) {
-              if (job.failed) {
-                reject(new Error(JSON.stringify(job.errors)))
-              } else {
-                resolve()
-              }
-            }
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
+      JobThreadExecutor.executeJobThread(jobInfo, onJobUpdate({ bullJob, resolve, reject }))
     })
   }
 
   worker = new Worker(queueName, processJob, { connection, concurrency })
 
   // init queue events handler
-  initJobQueueEvents({ queueName, connection, getUserUuidByJobUuid, getJobSummary })
+  initJobQueueEvents({ queueName, connection, jobQueue: jobQueueReader })
 }
 
 // enquee
@@ -111,6 +109,21 @@ const enqueue = async (job) => {
 // cancel
 const cancelActiveJobByUserUuid = JobThreadExecutor.cancelActiveJobByUserUuid
 
+const cancelJob = async (jobUuid) => {
+  const job = await bullQueue.getJob(jobUuid)
+  if (job) {
+    if ((await job.getState()) === 'waiting') {
+      await job.remove()
+      notifyUser({ jobUuid, status: 'canceled', jobQueue: jobQueueReader })
+    }
+  } else {
+    const activeJob = JobThreadExecutor.getActiveJobSummaryByUuid(jobUuid)
+    if (activeJob) {
+      JobThreadExecutor.cancelActiveJobByUserUuid(activeJob.userUuid)
+    }
+  }
+}
+
 // destroy
 const destroy = worker?.close
 
@@ -125,5 +138,6 @@ export {
   getUserUuidByJobUuid,
   getSurveyIdByJobUuid,
   cancelActiveJobByUserUuid,
+  cancelJob,
   destroy,
 }
