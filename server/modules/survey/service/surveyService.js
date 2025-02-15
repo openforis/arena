@@ -20,7 +20,7 @@ export const startPublishJob = (user, surveyId) => {
 
   const job = new SurveyPublishJob({ user, surveyId })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }
@@ -30,7 +30,7 @@ export const startUnpublishJob = (user, surveyId) => {
 
   const job = new SurveyUnpublishJob({ user, surveyId })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }
@@ -39,7 +39,7 @@ export const exportSurvey = ({ surveyId, user, includeData = false, includeActiv
   const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
   const job = new SurveyExportJob({ surveyId, user, outputFileName, backup: includeData, includeActivityLog })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return { job: JobUtils.jobToJSON(job), outputFileName }
 }
@@ -96,7 +96,7 @@ export const exportSurveysList = async ({ user, draft, template, outputStream })
 
 export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget, cycle })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }
 
@@ -119,7 +119,7 @@ export const startLabelsImportJob = ({ user, surveyId, filePath }) => {
     filePath,
   })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }
