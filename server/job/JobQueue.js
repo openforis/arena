@@ -1,4 +1,4 @@
-import { Objects, Queue } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import * as Log from '@server/log/log'
 
@@ -8,7 +8,7 @@ export class JobQueue {
   constructor() {
     this._logger = Log.getLogger('JobQueue')
 
-    this._queue = new Queue()
+    this._queue = []
 
     this._maxConcurrentJobs = 3
 
@@ -52,9 +52,8 @@ export class JobQueue {
       await JobThreadExecutor.cancelActiveJobByUserUuid(userUuid)
     } else {
       // remove job from queue
-      const jobs = this._queue.items
-      const queueIndex = jobs.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
-      jobs.splice(queueIndex, 1)
+      const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
+      this._queue.splice(queueIndex, 1)
     }
   }
 
@@ -75,7 +74,7 @@ export class JobQueue {
       this._runningGlobalJob = false
     }
 
-    this._logger.debug(`job ended: ${uuid} (${status}); remaining jobs: ${this._queue.size}`)
+    this._logger.debug(`job ended: ${uuid} (${status}); remaining jobs: ${this._queue.length}`)
 
     this._startNextJob()
   }
@@ -91,7 +90,7 @@ export class JobQueue {
   }
 
   _findNextJobIndex() {
-    return this._queue.items.findIndex((jobInfo) => {
+    return this._queue.findIndex((jobInfo) => {
       const { params } = jobInfo
       const { surveyId, user } = params ?? {}
       const { uuid: userUuid } = user
@@ -113,7 +112,7 @@ export class JobQueue {
   }
 
   _startNextJob() {
-    if (this._queue.isEmpty()) {
+    if (this._queue.length === 0) {
       return false
     }
     if (Object.keys(this._runningJobUuidByUuid).length === this._maxConcurrentJobs) {
@@ -122,7 +121,7 @@ export class JobQueue {
     }
     const nextJobIndex = this._findNextJobIndex()
     if (nextJobIndex >= 0) {
-      const jobInfo = this._queue.items.splice(nextJobIndex, 1)[0]
+      const jobInfo = this._queue.splice(nextJobIndex, 1)[0]
       const { uuid, params } = jobInfo
       const { surveyId, user } = params ?? {}
       const { uuid: userUuid } = user
@@ -137,6 +136,8 @@ export class JobQueue {
         this._runningGlobalJob = true
       }
       this._executeJob(jobInfo)
+
+      this._startNextJob()
     }
     this._logger.debug('cannot run next job: wait for current one to complete.')
   }
@@ -154,7 +155,7 @@ export class JobQueue {
       // only one global job (not associated to any survey, e.g. survey creation)
       return false
     }
-    this._queue.enqueue(jobInfo)
+    this._queue.push(jobInfo)
     this._jobInfoByUuid[uuid] = jobInfo
     this._jobUuidByUserUuid[userUuid] = uuid
 
