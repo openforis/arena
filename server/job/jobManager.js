@@ -13,5 +13,5 @@ export const cancelActiveJobByUserUuid = async (userUuid) => queue.cancelJobByUs
 // ====== EXECUTE
 
 export const enqueueJob = (job) => {
-  return queue.enqueue(job)
+  queue.enqueue(job)
 }

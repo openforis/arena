@@ -90,21 +90,25 @@ export class JobQueue {
   }
 
   _findNextJobIndex() {
-    return this._queue.findIndex((jobInfo) => {
+    let firstGlobalJobIndex = -1
+    let firstSurveyJobIndex = -1
+    this._queue.some((jobInfo, index) => {
       const { params } = jobInfo
-      const { surveyId, user } = params ?? {}
-      const { uuid: userUuid } = user
-      if (this._runningJobUuidByUserUuid[userUuid]) {
-        // one job per user
-        return false
-      }
+      const { surveyId } = params ?? {}
       if (!surveyId) {
         // global jobs first
-        return !this._runningGlobalJob
+        if (!this._runningGlobalJob && firstGlobalJobIndex < 0) {
+          firstGlobalJobIndex = index
+        }
+      } else {
+        // one job per survey
+        if (!this._runningJobUuidBySurveyId[surveyId] && firstSurveyJobIndex < 0) {
+          firstSurveyJobIndex = index
+        }
       }
-      // one job per survey
-      return !this._runningJobUuidBySurveyId[surveyId]
+      return firstGlobalJobIndex >= 0
     })
+    return !this._runningGlobalJob && firstGlobalJobIndex >= 0 ? firstGlobalJobIndex : firstSurveyJobIndex
   }
 
   _executeJob(jobInfo) {
@@ -138,8 +142,9 @@ export class JobQueue {
       this._executeJob(jobInfo)
 
       this._startNextJob()
+    } else {
+      this._logger.debug('cannot run next job: wait for current one to complete.')
     }
-    this._logger.debug('cannot run next job: wait for current one to complete.')
   }
 
   enqueue(job) {
@@ -149,19 +154,18 @@ export class JobQueue {
     const { uuid: userUuid } = user
     if (this._runningJobUuidByUserUuid[userUuid]) {
       // only one job per user and per survey
-      return false
+      throw new Error('Only one job per user can run at a time')
     }
     if (!surveyId && this._runningGlobalJob) {
       // only one global job (not associated to any survey, e.g. survey creation)
-      return false
+      throw new Error('Only one global job can run at a time')
     }
+    this._logger.debug(`enqueuing job ${type} (${uuid})`)
+
     this._queue.push(jobInfo)
     this._jobInfoByUuid[uuid] = jobInfo
     this._jobUuidByUserUuid[userUuid] = uuid
 
-    if (!this.isRunning()) {
-      this._startNextJob()
-    }
-    return true
+    this._startNextJob()
   }
 }

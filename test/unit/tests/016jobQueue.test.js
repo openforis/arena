@@ -15,13 +15,28 @@ class TestJobQueue extends JobQueue {
       jobInfo.status = jobStatus.succeeded
       _this.onJobEnd(jobInfo)
       this.jobExecutorListener(jobInfo)
-    }, 100)
+    }, 200)
   }
+}
+
+const enqueueJobsAndExpectExecutionOrder = async ({ jobs, expectedExecutedJobUuids }) => {
+  const executedJobUuids = []
+  await new Promise((resolve) => {
+    const queue = new TestJobQueue((jobExecuted) => {
+      executedJobUuids.push(jobExecuted.uuid)
+      if (executedJobUuids.length === jobs.length) {
+        resolve()
+      }
+    })
+    jobs.forEach((job) => {
+      queue.enqueue(job)
+    })
+  })
+  expect(executedJobUuids).toEqual(expectedExecutedJobUuids)
 }
 
 describe('JobQueue test', () => {
   test('survey jobs executed sequentially', async () => {
-    const executedJobUuids = []
     const user1 = { uuid: UUIDs.v4() }
     const user2 = { uuid: UUIDs.v4() }
     const user3 = { uuid: UUIDs.v4() }
@@ -30,24 +45,37 @@ describe('JobQueue test', () => {
     const surveyId1 = 1
     const surveyId2 = 2
 
-    const job1 = { type: 'TestJob', params: { surveyId: surveyId1, user: user1 }, uuid: UUIDs.v4() }
-    const job2 = { type: 'TestJob', params: { surveyId: surveyId1, user: user2 }, uuid: UUIDs.v4() }
-    const job3 = { type: 'TestJob', params: { surveyId: surveyId2, user: user3 }, uuid: UUIDs.v4() }
-    const job4 = { type: 'TestJob', params: { surveyId: surveyId1, user: user4 }, uuid: UUIDs.v4() }
+    const job1 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user1 }, uuid: UUIDs.v4() }
+    const job2 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user2 }, uuid: UUIDs.v4() }
+    const job3 = { type: 'SurveyJob', params: { surveyId: surveyId2, user: user3 }, uuid: UUIDs.v4() }
+    const job4 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user4 }, uuid: UUIDs.v4() }
     const jobs = [job1, job2, job3, job4]
-    const expectedExecutedJobUuids = jobs.map((job) => job.uuid)
 
-    await new Promise((resolve) => {
-      const queue = new TestJobQueue((jobExecuted) => {
-        executedJobUuids.push(jobExecuted.uuid)
-        if (executedJobUuids.length === jobs.length) {
-          resolve()
-        }
-      })
-      jobs.forEach((job) => {
-        queue.enqueue(job)
-      })
-    })
-    expect(executedJobUuids).toEqual(expectedExecutedJobUuids)
+    // expecting job 3 to be executed before job 2 while job 1 is still running
+    const expectedExecutedJobUuids = [job1.uuid, job3.uuid, job2.uuid, job4.uuid]
+
+    await enqueueJobsAndExpectExecutionOrder({ jobs, expectedExecutedJobUuids })
+  })
+
+  test('global jobs executed before survey ones', async () => {
+    const user1 = { uuid: UUIDs.v4() }
+    const user2 = { uuid: UUIDs.v4() }
+    const user3 = { uuid: UUIDs.v4() }
+    const user4 = { uuid: UUIDs.v4() }
+
+    const surveyId1 = 1
+    const surveyId2 = 2
+
+    const job1 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user1 }, uuid: UUIDs.v4() }
+    const job2 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user2 }, uuid: UUIDs.v4() }
+    const job3 = { type: 'SurveyJob', params: { surveyId: surveyId2, user: user2 }, uuid: UUIDs.v4() }
+    const job4 = { type: 'GlobalJob', params: { user: user3 }, uuid: UUIDs.v4() }
+    const job5 = { type: 'SurveyJob', params: { surveyId: surveyId2, user: user4 }, uuid: UUIDs.v4() }
+    const jobs = [job1, job2, job3, job4, job5]
+
+    // expecting job 4 (global) to run before the other (except the first)
+    const expectedExecutedJobUuids = [job1.uuid, job3.uuid, job4.uuid, job2.uuid, job5.uuid]
+
+    await enqueueJobsAndExpectExecutionOrder({ jobs, expectedExecutedJobUuids })
   })
 })
