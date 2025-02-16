@@ -2,38 +2,66 @@ import { Objects, Queue } from '@openforis/arena-core'
 
 import { executeJobThread } from './jobThreadExecutor'
 
-const mainQueue = new Queue()
-
-const queueBySurveyId = {}
+const queue = new Queue()
 
 const maxConcurrentJobs = 3
-const runningJobsByUuid = {}
-let currentSurveyQueueIndex = 0
+let runningGlobalJob = false
+const runningJobUuidByUuid = {}
+const runningJobUuidBySurveyId = {}
+const runningJobUuidByUserUuid = {}
+const jobInfoByUuid = {}
 
-const isRunning = () => Objects.isNotEmpty(runningJobsByUuid)
+const isRunning = () => Objects.isNotEmpty(runningJobUuidByUuid)
+
+const onJobEnd = (job) => {
+  const jobInfo = jobInfoByUuid[job.uuid]
+
+  const { uuid, params } = jobInfo
+  const { user, surveyId } = params
+  const { uuid: userUuid } = user
+
+  delete jobInfoByUuid[uuid]
+  delete runningJobUuidByUuid[uuid]
+  delete runningJobUuidByUserUuid[userUuid]
+  if (surveyId) {
+    delete runningJobUuidBySurveyId[surveyId]
+  } else {
+    runningGlobalJob = false
+  }
+  startNextJob()
+}
 
 const onJobUpdate = (job) => {
-  if (job.ended) {
-    delete runningJobsByUuid[job.uuid]
-    startNextJob()
+  const { ended } = job
+  if (ended) {
+    onJobEnd(job)
   }
 }
 
+const findNextJobIndex = () =>
+  queue.items.findIndex((jobInfo) => {
+    const { params } = jobInfo
+    const { surveyId, user } = params ?? {}
+    const { uuid: userUuid } = user
+    return !(runningJobUuidByUserUuid[userUuid] || (surveyId ? runningJobUuidBySurveyId[surveyId] : runningGlobalJob))
+  })
+
 const startNextJob = () => {
-  if (Object.keys(runningJobsByUuid).length === maxConcurrentJobs) {
+  if (queue.isEmpty() || Object.keys(runningJobUuidByUuid).length === maxConcurrentJobs) {
     return
   }
-  // main queue first (admin jobs e.g. survey creation)
-  if (!mainQueue.isEmpty()) {
-    const jobInfo = mainQueue.dequeue()
-    executeJobThread(jobInfo, onJobUpdate)
-  } else {
-    const queueSurveyId = Object.keys(queueBySurveyId)[currentSurveyQueueIndex]
-    const surveyQueue = queueBySurveyId[queueSurveyId]
-    const jobInfo = surveyQueue.dequeue()
-    currentSurveyQueueIndex = (currentSurveyQueueIndex + 1) % Object.keys(queueBySurveyId).length
-    if (surveyQueue.isEmpty()) {
-      delete queueBySurveyId[queueSurveyId]
+  const nextJobIndex = findNextJobIndex()
+  if (nextJobIndex >= 0) {
+    const jobInfo = queue.items.splice(nextJobIndex, 1)[0]
+    const { uuid, params } = jobInfo
+    const { surveyId, user } = params ?? {}
+    const { uuid: userUuid } = user
+    runningJobUuidByUuid[uuid] = uuid
+    runningJobUuidByUserUuid[userUuid] = uuid
+    if (surveyId) {
+      runningJobUuidBySurveyId[surveyId] = uuid
+    } else {
+      runningGlobalJob = true
     }
     executeJobThread(jobInfo, onJobUpdate)
   }
@@ -41,15 +69,9 @@ const startNextJob = () => {
 
 export const enqueue = (job) => {
   const { uuid, type, params } = job
-  const { surveyId } = params
   const jobInfo = { uuid, type, params }
-  if (surveyId) {
-    const surveyQueue = queueBySurveyId[surveyId] ?? new Queue()
-    surveyQueue.enqueue(jobInfo)
-    queueBySurveyId[surveyId] = surveyQueue
-  } else {
-    mainQueue.enqueue(jobInfo)
-  }
+  queue.enqueue(jobInfo)
+  jobInfoByUuid[uuid] = jobInfo
 
   if (!isRunning()) {
     startNextJob()
