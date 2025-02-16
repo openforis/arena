@@ -63,6 +63,7 @@ export const executeJobThread = (job, onUpdate) => {
     _notifyJobUpdate(job)
     onUpdate?.(job)
   })
-
-  userJobThreads.putThread(job.userUuid, thread)
+  const { user } = jobParams
+  const { uuid: userUuid } = user
+  userJobThreads.putThread(userUuid, thread)
 }

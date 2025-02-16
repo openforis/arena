@@ -51,6 +51,7 @@ export const createJob = (jobType, params, jobUuid) => {
   const job = new JobClass(params)
   if (jobUuid) {
     job.uuid = jobUuid
+    job.initLogger()
   }
   return job
 }
