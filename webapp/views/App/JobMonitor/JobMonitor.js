@@ -53,7 +53,7 @@ const JobMonitor = () => {
       </ModalBody>
 
       <ModalFooter>
-        {JobSerialized.isRunning(job) && (
+        {(JobSerialized.isPending(job) || JobSerialized.isRunning(job)) && (
           <Button
             className="modal-footer__item"
             onClick={() => dispatch(JobActions.cancelJob())}
