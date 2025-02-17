@@ -19,6 +19,10 @@ class TestJobQueue extends JobQueue {
   }
 }
 
+const runDelayed = (func) => {
+  setTimeout(func, 200)
+}
+
 const enqueueJobs = async ({ jobs }) => {
   const executedJobUuids = []
   await new Promise((resolve, reject) => {
@@ -33,13 +37,8 @@ const enqueueJobs = async ({ jobs }) => {
         queue.enqueue(job)
         return false
       } catch (error) {
-        queue.destroy().then(() => {
-          // wait for jobs to complete
-          setTimeout(() => {
-            reject(error)
-          }, 200)
-        })
-        return true // breaks the loop
+        queue.destroy().then(runDelayed(() => reject(error)))
+        return true
       }
     })
   })

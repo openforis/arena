@@ -99,11 +99,9 @@ export class JobQueue {
         if (!this._runningGlobalJob && firstGlobalJobIndex < 0) {
           firstGlobalJobIndex = index
         }
-      } else {
+      } else if (!this._runningJobUuidBySurveyId[surveyId] && firstSurveyJobIndex < 0) {
         // one job per survey
-        if (!this._runningJobUuidBySurveyId[surveyId] && firstSurveyJobIndex < 0) {
-          firstSurveyJobIndex = index
-        }
+        firstSurveyJobIndex = index
       }
       return firstGlobalJobIndex >= 0
     })
