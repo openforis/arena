@@ -19,23 +19,50 @@ class TestJobQueue extends JobQueue {
   }
 }
 
-const enqueueJobsAndExpectExecutionOrder = async ({ jobs, expectedExecutedJobUuids }) => {
+const enqueueJobs = async ({ jobs }) => {
   const executedJobUuids = []
-  await new Promise((resolve) => {
+  await new Promise((resolve, reject) => {
     const queue = new TestJobQueue((jobExecuted) => {
       executedJobUuids.push(jobExecuted.uuid)
       if (executedJobUuids.length === jobs.length) {
         resolve()
       }
     })
-    jobs.forEach((job) => {
-      queue.enqueue(job)
+    jobs.some((job) => {
+      try {
+        queue.enqueue(job)
+        return false
+      } catch (error) {
+        queue.destroy().then(() => {
+          // wait for jobs to complete
+          setTimeout(() => {
+            reject(error)
+          }, 200)
+        })
+        return true // breaks the loop
+      }
     })
   })
+  return executedJobUuids
+}
+
+const enqueueJobsAndExpectExecutionOrder = async ({ jobs, expectedExecutedJobUuids }) => {
+  const executedJobUuids = await enqueueJobs({ jobs })
   expect(executedJobUuids).toEqual(expectedExecutedJobUuids)
 }
 
 describe('JobQueue test', () => {
+  test('user can enqueue only one job', async () => {
+    const user1 = { uuid: UUIDs.v4() }
+
+    const surveyId1 = 1
+
+    const job1 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user1 }, uuid: UUIDs.v4() }
+    const job2 = { type: 'SurveyJob', params: { surveyId: surveyId1, user: user1 }, uuid: UUIDs.v4() }
+
+    await expect(enqueueJobs({ jobs: [job1, job2] })).rejects.toThrow()
+  })
+
   test('survey jobs executed sequentially', async () => {
     const user1 = { uuid: UUIDs.v4() }
     const user2 = { uuid: UUIDs.v4() }

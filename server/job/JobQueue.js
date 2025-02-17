@@ -54,6 +54,8 @@ export class JobQueue {
       // remove job from queue
       const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
       this._queue.splice(queueIndex, 1)
+      delete this._jobUuidByUserUuid[userUuid]
+      delete this._jobInfoByUuid[jobUuid]
     }
   }
 
@@ -150,15 +152,12 @@ export class JobQueue {
   enqueue(job) {
     const { params, status, type, uuid } = job
     const jobInfo = { params, status, type, uuid }
-    const { surveyId, user } = params ?? {}
+    const { user } = params ?? {}
     const { uuid: userUuid } = user
+
     if (this._runningJobUuidByUserUuid[userUuid]) {
       // only one job per user and per survey
       throw new Error('Only one job per user can run at a time')
-    }
-    if (!surveyId && this._runningGlobalJob) {
-      // only one global job (not associated to any survey, e.g. survey creation)
-      throw new Error('Only one global job can run at a time')
     }
     this._logger.debug(`enqueuing job ${type} (${uuid})`)
 
@@ -167,5 +166,11 @@ export class JobQueue {
     this._jobUuidByUserUuid[userUuid] = uuid
 
     this._startNextJob()
+  }
+
+  async destroy() {
+    for await (const userUuid of Object.keys(this._jobUuidByUserUuid)) {
+      await this.cancelJobByUserUuid(userUuid)
+    }
   }
 }
