@@ -14,6 +14,7 @@ import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
+import { waitFor } from '@core/promiseUtils'
 
 export default class RecordCheckJob extends Job {
   constructor(params) {
@@ -25,6 +26,7 @@ export default class RecordCheckJob extends Job {
   }
 
   async execute() {
+    await waitFor(120)
     const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
 
     this.total = R.length(recordsUuidAndCycle)

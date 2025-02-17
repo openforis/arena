@@ -34,10 +34,7 @@ export class JobQueue {
     if (!jobInfo) {
       return null
     }
-    const { params, uuid: jobUuid } = jobInfo
-    if (this._runningJobUuidByUserUuid(jobUuid)) {
-      const { user } = params
-      const { uuid: userUuid } = user
+    if (this._runningJobUuidByUserUuid[userUuid]) {
       return JobThreadExecutor.getActiveJobSummary(userUuid)
     } else {
       return jobInfo
