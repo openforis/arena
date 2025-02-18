@@ -8,6 +8,17 @@ const pgp = pgPromise()
 
 export const QueryStream = _QueryStream
 
+export const fetchQueryAsStream = async ({ query, client, transformer = null }) =>
+  new Promise((resolve, reject) => {
+    try {
+      client.stream(new QueryStream(query), (dbStream) => {
+        resolve(transformer ? dbStream.pipe(transformer) : dbStream)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+
 export const selectDate = (field, fieldAlias = null) =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS ${fieldAlias || field}`
 

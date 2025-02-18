@@ -113,14 +113,5 @@ export const getValidationReportStream = ({ surveyId, cycle, recordUuid = null }
       callback(null, item)
     },
   })
-
-  return new Promise((resolve, reject) => {
-    try {
-      client.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
-        resolve(dbStream.pipe(rowsToItemsTransformer))
-      })
-    } catch (error) {
-      reject(error)
-    }
-  })
+  return DbUtils.fetchQueryAsStream({ query: queryFormatted, client, transformer: rowsToItemsTransformer })
 }

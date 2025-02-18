@@ -254,8 +254,8 @@ export {
   deleteExpiredUserAccessRequests,
 } from '../repository/userAccessRequestRepository'
 
-export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
-  const headers = [
+export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFormat }) => {
+  const fields = [
     'email',
     ...Object.values(UserAccessRequest.keysProps).map(StringUtils.toSnakeCase),
     'status',
@@ -280,10 +280,15 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
   })
 
-  const transformer = FlatDataWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
-  transformer.pipe(outputStream)
+  const stream = await UserAccessRequestRepository.fetchUserAccessRequestsAsStream()
 
-  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({ transformer })
+  return FlatDataWriter.writeItemsStreamToStream({
+    stream,
+    outputStream,
+    fields,
+    options: { objectTransformer },
+    fileFormat,
+  })
 }
 
 // ==== UPDATE
