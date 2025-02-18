@@ -1,6 +1,7 @@
+import * as ProcessUtils from '@core/processUtils'
 import { JobQueue } from './JobQueue'
 
-const queue = new JobQueue()
+const queue = new JobQueue({ concurrency: ProcessUtils.ENV.jobQueueConcurrency })
 
 // ====== READ
 

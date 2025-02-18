@@ -4,13 +4,19 @@ import * as Log from '@server/log/log'
 
 import * as JobThreadExecutor from './jobThreadExecutor'
 
+const defaultConfiguration = {
+  concurrency: 3,
+}
+
 export class JobQueue {
-  constructor() {
+  constructor(configuration = defaultConfiguration) {
+    const { concurrency } = { ...defaultConfiguration, ...configuration }
+
     this._logger = Log.getLogger('JobQueue')
 
     this._queue = []
 
-    this._maxConcurrentJobs = 3
+    this._maxConcurrentJobs = concurrency
 
     this._runningGlobalJob = false
     this._jobInfoByUuid = {} // all jobs (running or queued)

@@ -74,6 +74,8 @@ const ENV = {
   fileStorageAwsSecretAccessKey: process.env.FILE_STORAGE_AWS_SECRET_ACCESS_KEY,
   fileStorageAwsS3BucketName: process.env.FILE_STORAGE_AWS_S3_BUCKET_NAME,
   fileStorageAwsS3BucketRegion: process.env.FILE_STORAGE_AWS_S3_BUCKET_REGION,
+  // Job queue
+  jobQueueConcurrency: process.env.JOB_QUEUE_CONCURRENCY || 3,
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
 }
