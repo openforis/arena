@@ -309,9 +309,6 @@ export const exportValidationReportToFlatData = async ({
     'record_date_created',
     'record_date_modified',
   ]
-  const streamTransformer = FlatDataWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
-  streamTransformer.pipe(res)
-
   const reportStream = await RecordManager.getValidationReportStream({ surveyId, cycle, recordUuid })
 
   return FlatDataWriter.writeItemsStreamToStream({
