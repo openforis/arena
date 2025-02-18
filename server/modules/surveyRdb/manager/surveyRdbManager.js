@@ -13,7 +13,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 import { db } from '../../../db/db'
-import * as CSVWriter from '../../../utils/file/csvWriter'
+import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
 
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
@@ -126,7 +126,7 @@ export const fetchViewData = async (params, client = db) => {
         keepFileNamesUnique: true,
         uniqueFileNamesGenerator,
       })
-      const csvTransform = CSVWriter.transformJsonToCsv({
+      const csvTransform = FlatDataWriter.transformJsonToCsv({
         fields,
         options: {
           objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
@@ -171,7 +171,7 @@ export const fetchViewDataAgg = async (params) => {
   if (streamOutput) {
     await db.stream(result, (dbStream) => {
       const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
-      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
+      const csvTransform = FlatDataWriter.transformJsonToCsv({ fields })
       dbStream.pipe(csvTransform).pipe(streamOutput)
     })
     return null

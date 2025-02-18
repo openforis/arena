@@ -4,6 +4,7 @@ import Archiver from 'archiver'
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { FileFormats } from '@server/utils/file/fileFormats'
 import SystemError, { StatusCodes } from '@core/systemError'
 import UnauthorizedError from './unauthorizedError'
 
@@ -14,7 +15,14 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
+}
+
+const contentTypeByFileFormat = {
+  [FileFormats.csv]: contentTypes.csv,
+  [FileFormats.xlsx]: contentTypes.xlsx,
+  [FileFormats.zip]: contentTypes.zip,
 }
 
 export const sendOk = (res) => res.json({ status: status.ok })
@@ -40,15 +48,16 @@ export const sendErr = (res, err) => {
   }
 }
 
-export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType = null }) => {
+export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType = null, fileFormat = null }) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize) {
     res.setHeader('Content-Length', fileSize)
   }
 
-  if (contentType) {
-    res.setHeader('Content-Type', contentType)
-    res.set('Content-Type', contentType)
+  const finalContentType = contentType ?? contentTypeByFileFormat[fileFormat]
+  if (finalContentType) {
+    res.setHeader('Content-Type', finalContentType)
+    res.set('Content-Type', finalContentType)
   }
 }
 

@@ -6,7 +6,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 
 import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
@@ -137,7 +137,7 @@ export const exportCategoryToStream = async (
   })
 
   return client.stream(categoryStream, (dbStream) => {
-    const csvTransform = CSVWriter.transformJsonToCsv({
+    const csvTransform = FlatDataWriter.transformJsonToCsv({
       fields: headers,
       options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
     })

@@ -18,6 +18,7 @@ import * as SurveyService from '../service/surveyService'
 import * as FileService from '../../record/service/fileService'
 import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 export const init = (app) => {
   // ==== CREATE
@@ -221,13 +222,19 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary' })
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+      const fileName = ExportFileNameGenerator.generate({
+        survey,
+        cycle,
+        fileType: 'SchemaSummary',
+        fileFormat,
+      })
 
-      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
+
+      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }

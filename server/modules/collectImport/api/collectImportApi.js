@@ -6,7 +6,7 @@ import { db } from '@server/db/db'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
@@ -89,7 +89,7 @@ export const init = (app) => {
         Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
 
         await db.stream(reportItemsStream, (dbStream) => {
-          const csvTransform = CSVWriter.transformJsonToCsv({ fields: headers })
+          const csvTransform = FlatDataWriter.transformJsonToCsv({ fields: headers })
           dbStream.pipe(csvTransform).pipe(res)
         })
       } catch (error) {

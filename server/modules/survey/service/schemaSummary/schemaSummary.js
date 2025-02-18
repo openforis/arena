@@ -13,7 +13,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
 
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
@@ -187,7 +187,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   })
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) => {
   const items = await generateSchemaSummaryItems({ surveyId, cycle })
-  await CSVWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false } })
+  await FlatDataWriter.writeItemsToStream({ items, options: { removeNewLines: false }, outputStream, fileFormat })
 }

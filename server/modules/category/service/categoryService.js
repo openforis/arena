@@ -7,7 +7,7 @@ import * as Record from '@core/record/record'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as CSVWriter from '@server/utils/file/flatDataWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'

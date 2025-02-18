@@ -27,7 +27,7 @@ import { ValidationUtils } from '@core/validation/validationUtils'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as JobManager from '@server/job/jobManager'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
@@ -141,7 +141,7 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
     'errors',
     'warnings',
   ]
-  return CSVWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
+  return FlatDataWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
 }
 
 // Records export job
@@ -301,7 +301,7 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
     'record_date_created',
     'record_date_modified',
   ]
-  const streamTransformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
+  const streamTransformer = FlatDataWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
   streamTransformer.pipe(res)
 
   await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })

@@ -2,7 +2,7 @@ import i18n from '@core/i18n/i18nFactory'
 import * as AuthGroup from '@core/auth/authGroup'
 import { Countries } from '@core/Countries'
 
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as UserManager from '../manager/userManager'
 
@@ -38,7 +38,7 @@ const exportUsersIntoStream = async ({ outputStream }) => {
     country: transformCountry(obj.country),
   })
 
-  const transformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
+  const transformer = FlatDataWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
   transformer.pipe(outputStream)
   await UserManager.fetchUsersIntoStream({ transformer })
 }
