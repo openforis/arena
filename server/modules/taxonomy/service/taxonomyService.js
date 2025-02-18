@@ -58,7 +58,7 @@ export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
     filePath,
   })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }

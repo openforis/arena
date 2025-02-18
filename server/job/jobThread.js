@@ -8,9 +8,9 @@ const logger = Log.getLogger('JobThread')
 
 class JobThread extends Thread {
   createJob() {
-    const { jobType, jobParams } = this.params
+    const { jobType, jobParams, jobUuid } = this.params
 
-    this.job = JobCreator.createJob(jobType, jobParams)
+    this.job = JobCreator.createJob(jobType, jobParams, jobUuid)
 
     this.job.onEvent(() => this.sendJobToParentThread())
     this.job.start()

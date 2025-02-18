@@ -28,14 +28,14 @@ export const importCategory = (user, surveyId, categoryUuid, summary) => {
     [CategoryImportJobParams.keys.summary]: summary,
   })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }
 
 export const createBatchImportJob = ({ user, surveyId, filePath }) => {
   const job = new CategoriesBatchImportJob({ user, surveyId, filePath })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
 
@@ -113,7 +113,7 @@ export const exportAllCategories = ({ user, surveyId, draft }) => {
     draft,
   })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }

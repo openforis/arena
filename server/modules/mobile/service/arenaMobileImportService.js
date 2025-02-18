@@ -6,7 +6,7 @@ import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobile
 export const startArenaMobileImportJob = ({ user, filePath, surveyId, conflictResolutionStrategy }) => {
   const job = new ArenaMobileDataImportJob({ user, filePath, surveyId, conflictResolutionStrategy })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }

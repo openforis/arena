@@ -13,7 +13,7 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
     cycle,
     forceImport,
   })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
 
@@ -44,6 +44,6 @@ export const startCSVDataImportJob = ({
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
