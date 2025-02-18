@@ -1,5 +1,6 @@
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 import * as ObjectUtils from '../../../../core/objectUtils'
 import * as Taxon from '../../../../core/survey/taxon'
@@ -11,7 +12,6 @@ import * as TaxonomyService from '../service/taxonomyService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
-import { FileFormats } from '@server/utils/file/fileFormats'
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
