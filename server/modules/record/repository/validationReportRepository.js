@@ -103,10 +103,7 @@ export const fetchValidationReport = async (
 export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
   client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid })
 
-export const exportValidationReportToStream = (
-  { streamTransformer, surveyId, cycle, recordUuid = null },
-  client = db
-) => {
+export const getValidationReportStream = ({ surveyId, cycle, recordUuid = null }, client = db) => {
   const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })
 
   const rowsToItemsTransformer = new Transform({
@@ -117,7 +114,13 @@ export const exportValidationReportToStream = (
     },
   })
 
-  return client.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
-    dbStream.pipe(rowsToItemsTransformer).pipe(streamTransformer)
+  return new Promise((resolve, reject) => {
+    try {
+      client.stream(new DbUtils.QueryStream(queryFormatted), (dbStream) => {
+        resolve(dbStream.pipe(rowsToItemsTransformer))
+      })
+    } catch (error) {
+      reject(error)
+    }
   })
 }

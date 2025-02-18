@@ -44,6 +44,7 @@ import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -244,11 +245,18 @@ export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSoc
 // VALIDATION REPORT
 export const { fetchValidationReport, countValidationReportItems } = RecordManager
 
-export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, recordUuid = null }) => {
+export const exportValidationReportToFlatData = async ({
+  res,
+  surveyId,
+  cycle,
+  lang,
+  recordUuid = null,
+  fileFormat = FileFormats.csv,
+}) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport' })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport', fileFormat })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
 
   const objectTransformer = (item) => {
     const nodeDef = RecordValidationReportItem.getNodeDef(survey)(item)
@@ -304,7 +312,15 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
   const streamTransformer = FlatDataWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
   streamTransformer.pipe(res)
 
-  await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
+  const reportStream = await RecordManager.getValidationReportStream({ surveyId, cycle, recordUuid })
+
+  return FlatDataWriter.writeItemsStreamToStream({
+    stream: reportStream,
+    outputStream: res,
+    fields: headers,
+    options: { objectTransformer },
+    fileFormat,
+  })
 }
 
 // RECORDS CLONE
