@@ -33,7 +33,7 @@ const generate = ({
   if (includeTimestamp) {
     parts.push(DateUtils.nowFormatDefault())
   }
-  const finalExtension = fileFormat ? extensionByFileFormat[fileFormat] : extension
+  const finalExtension = extensionByFileFormat[fileFormat] ?? extension
   return `${parts.join('_')}.${finalExtension}`
 }
 

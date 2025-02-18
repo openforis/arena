@@ -1,4 +1,3 @@
-import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
@@ -7,6 +6,8 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import { FileFormats } from '@server/utils/file/fileFormats'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
@@ -65,11 +66,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = true } = Request.getParams(req)
+        const { surveyId, draft = true, fileFormat = FileFormats.csv } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
-        const surveyName = Survey.getName(surveyInfo)
         const messageLangCode = Survey.getDefaultLanguage(surveyInfo)
 
         const reportItemsStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
@@ -85,13 +85,17 @@ export const init = (app) => {
           'resolved',
         ]
 
-        const fileName = `${surveyName}_collect-report_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-        await db.stream(reportItemsStream, (dbStream) => {
-          const csvTransform = FlatDataWriter.transformJsonToCsv({ fields: headers })
-          dbStream.pipe(csvTransform).pipe(res)
+        const fileName = ExportFileNameGenerator.generate({
+          survey,
+          fileType: 'collect-report',
+          includeTimestamp: true,
+          fileFormat,
         })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
+
+        await db.stream(reportItemsStream, (dbStream) =>
+          FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields: headers, fileFormat })
+        )
       } catch (error) {
         next(error)
       }

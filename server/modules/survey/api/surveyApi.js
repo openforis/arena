@@ -231,7 +231,6 @@ export const init = (app) => {
         fileType: 'SchemaSummary',
         fileFormat,
       })
-
       Response.setContentTypeFile({ res, fileName, fileFormat })
 
       await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
