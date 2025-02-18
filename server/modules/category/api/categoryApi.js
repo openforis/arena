@@ -7,6 +7,7 @@ import * as ObjectUtils from '@core/objectUtils'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
@@ -238,9 +239,9 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const { surveyId, categoryUuid, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res })
+        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res, fileFormat })
       } catch (error) {
         next(error)
       }

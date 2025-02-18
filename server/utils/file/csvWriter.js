@@ -29,3 +29,8 @@ export const writeItemsToStream = ({
     items.forEach((row) => transform.write(row))
     transform.end()
   })
+
+export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
+  const csvTransform = transformJsonToCsv({ fields, options })
+  stream.pipe(csvTransform).pipe(outputStream)
+}

@@ -1422,7 +1422,7 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
     schemaSummary: 'Schema summary',
-    schemaSummaryTitle: 'Export schema summary to CSV',
+    schemaSummaryTitle: 'Export schema summary to Excel',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
     move: `Move '{{nodeDefLabel}}'`,

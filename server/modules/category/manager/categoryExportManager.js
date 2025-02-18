@@ -8,6 +8,7 @@ import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { db } from '@server/db/db'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 const levelPositionField = 'level'
 
@@ -108,6 +109,7 @@ export const exportCategoryToStream = async (
     includeLevelPosition = false,
     includeReportingDataCumulativeArea = false,
     outputStream,
+    fileFormat = FileFormats.csv,
   },
   client = db
 ) => {
@@ -136,11 +138,13 @@ export const exportCategoryToStream = async (
     includeCumulativeArea,
   })
 
-  return client.stream(categoryStream, (dbStream) => {
-    const csvTransform = FlatDataWriter.transformJsonToCsv({
+  return client.stream(categoryStream, (dbStream) =>
+    FlatDataWriter.writeItemsStreamToStream({
+      stream: dbStream,
+      outputStream,
       fields: headers,
       options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
+      fileFormat,
     })
-    dbStream.pipe(csvTransform).pipe(outputStream)
-  })
+  )
 }

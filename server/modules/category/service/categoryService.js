@@ -13,6 +13,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import { CategoryImportTemplateGenerator } from '@server/modules/category/manager/categoryImportTemplateGenerator'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryImportJob from './categoryImportJob'
@@ -50,15 +51,17 @@ export const exportCategory = async ({
   includeLevelPosition = false,
   includeReportingDataCumulativeArea = false,
   res,
+  fileFormat = FileFormats.csv,
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const fileName = ExportFileNameGenerator.generate({
     survey,
     fileType: 'Category',
+    fileFormat,
     itemName: Category.getName(category),
   })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
 
   await CategoryManager.exportCategoryToStream({
     survey,
@@ -71,6 +74,7 @@ export const exportCategory = async ({
     includeLevelPosition,
     includeReportingDataCumulativeArea,
     outputStream: res,
+    fileFormat,
   })
 }
 
