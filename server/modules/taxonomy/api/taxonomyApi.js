@@ -11,6 +11,7 @@ import * as TaxonomyService from '../service/taxonomyService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
@@ -167,7 +168,7 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
+        const { surveyId, taxonomyUuid, draft, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
         const [survey, taxonomy] = await Promise.all([
           SurveyService.fetchSurveyById({ surveyId, draft }),
@@ -177,10 +178,11 @@ export const init = (app) => {
           survey,
           fileType: 'Taxonomy',
           itemName: Taxonomy.getName(taxonomy),
+          fileFormat,
         })
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
+        await TaxonomyService.exportTaxa({ surveyId, taxonomyUuid, draft, outputStream: res, fileFormat })
       } catch (error) {
         next(error)
       }

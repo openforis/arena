@@ -33,7 +33,7 @@ export const {
   deleteTaxonomy,
 } = TaxonomyManager
 
-export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
+export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFormat, draft = false }) => {
   const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
     surveyId,
     taxonomyUuid,
@@ -44,10 +44,9 @@ export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) 
 
   const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
 
-  await db.stream(taxaStream, (dbStream) => {
-    const csvTransform = FlatDataWriter.transformJsonToCsv({ fields: headers })
-    dbStream.pipe(csvTransform).pipe(output)
-  })
+  await db.stream(taxaStream, (dbStream) =>
+    FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields: headers, fileFormat })
+  )
 }
 
 export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
