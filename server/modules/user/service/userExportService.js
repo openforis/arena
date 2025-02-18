@@ -6,7 +6,7 @@ import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as UserManager from '../manager/userManager'
 
-const exportUsersIntoStream = async ({ outputStream }) => {
+const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
   const transformSurveyNames = (surveyNames) =>
     surveyNames
       ? Object.values(AuthGroup.groupNames).reduce(
@@ -19,7 +19,7 @@ const exportUsersIntoStream = async ({ outputStream }) => {
 
   const transformCountry = (countryCode) => (countryCode ? Countries.getCountryName({ code: countryCode }) : '')
 
-  const headers = [
+  const fields = [
     'email',
     'name',
     'title',
@@ -37,10 +37,14 @@ const exportUsersIntoStream = async ({ outputStream }) => {
     title: transformTitle(obj.title),
     country: transformCountry(obj.country),
   })
-
-  const transformer = FlatDataWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
-  transformer.pipe(outputStream)
-  await UserManager.fetchUsersIntoStream({ transformer })
+  const stream = await UserManager.fetchUsersIntoStream()
+  return FlatDataWriter.writeItemsStreamToStream({
+    stream,
+    fields,
+    options: { objectTransformer },
+    outputStream,
+    fileFormat,
+  })
 }
 
 export const UserExportService = {

@@ -12,16 +12,18 @@ const extensionByFileFormat = {
 }
 
 const generate = ({
-  survey,
   fileType,
-  cycle,
+  survey = null,
+  cycle = null,
   itemName = null,
   fileFormat = null,
   extension = 'csv',
   includeTimestamp = false,
 }) => {
-  const parts = [Survey.getName(survey)]
-
+  const parts = []
+  if (survey) {
+    parts.push(Survey.getName(survey))
+  }
   if (Objects.isNotEmpty(cycle)) {
     parts.push(`(cycle-${RecordCycle.getLabel(cycle)})`)
   }
