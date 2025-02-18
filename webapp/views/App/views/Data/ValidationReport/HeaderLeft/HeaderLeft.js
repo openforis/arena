@@ -13,7 +13,7 @@ export const HeaderLeft = ({ restParams }) => {
         className="btn-csv-export"
         href={`/api/survey/${surveyId}/validationReport/csv`}
         requestParams={restParams}
-        label="common.csvExport"
+        label="common.exportToExcel"
       />
     </>
   )
