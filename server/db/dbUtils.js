@@ -20,10 +20,12 @@ export const stream = async ({ queryStream, client = db, transformer = null, pro
     client
       .stream(queryStream, (dbStream) => {
         const transformedStream = transformer ? dbStream.pipe(transformer) : dbStream
-        processor?.(transformedStream).then(() => {
-          streamProcessed = true
-          onComplete()
-        })
+        processor?.(transformedStream)
+          .then(() => {
+            streamProcessed = true
+            onComplete()
+          })
+          .catch((error) => reject(error))
       })
       .then(() => {
         streamComplete = true
