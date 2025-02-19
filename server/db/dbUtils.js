@@ -8,7 +8,7 @@ const pgp = pgPromise()
 
 export const QueryStream = _QueryStream
 
-export const getStream = async ({ queryStream, client, transformer = null }) =>
+export const getStream = async ({ queryStream, client = db, transformer = null }) =>
   new Promise((resolve, reject) => {
     try {
       client.stream(queryStream, (dbStream) => {

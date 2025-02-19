@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
-import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
@@ -72,18 +72,9 @@ export const init = (app) => {
         const surveyInfo = Survey.getSurveyInfo(survey)
         const messageLangCode = Survey.getDefaultLanguage(surveyInfo)
 
-        const reportItemsStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
+        const reportItemsQueryStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
 
-        const headers = [
-          'id',
-          'node_def_uuid',
-          'node_def_name',
-          'type',
-          'expression',
-          'apply_if',
-          'message',
-          'resolved',
-        ]
+        const fields = ['id', 'node_def_uuid', 'node_def_name', 'type', 'expression', 'apply_if', 'message', 'resolved']
 
         const fileName = ExportFileNameGenerator.generate({
           survey,
@@ -93,9 +84,8 @@ export const init = (app) => {
         })
         Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await db.stream(reportItemsStream, (dbStream) =>
-          FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields: headers, fileFormat })
-        )
+        const dbStream = await DbUtils.getStream({ queryStream: reportItemsQueryStream })
+        await FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields, fileFormat })
       } catch (error) {
         next(error)
       }

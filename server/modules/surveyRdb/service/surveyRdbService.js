@@ -75,7 +75,8 @@ export const fetchViewData = async (params) => {
         recordOwnerUuid,
         offset,
         limit,
-        streamOutput: outputStream,
+        outputStream,
+        options,
       })
     : await SurveyRdbManager.fetchViewData({
         survey,

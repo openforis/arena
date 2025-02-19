@@ -1,5 +1,5 @@
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
-import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -34,7 +34,7 @@ export const {
 } = TaxonomyManager
 
 export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFormat, draft = false }) => {
-  const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
+  const { taxonomy, taxaStream: taxaQueryStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
     surveyId,
     taxonomyUuid,
     draft
@@ -42,11 +42,10 @@ export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFor
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
   const extraPropKeys = Taxonomy.getExtraPropKeys(taxonomy)
 
-  const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
+  const fields = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
 
-  await db.stream(taxaStream, (dbStream) =>
-    FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields: headers, fileFormat })
-  )
+  const dbStream = await DbUtils.getStream({ queryStream: taxaQueryStream })
+  await FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat })
 }
 
 export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {

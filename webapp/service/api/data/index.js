@@ -129,8 +129,8 @@ export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, option
   return tempFileName
 }
 
-export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, tempFileName }) => {
-  const params = new URLSearchParams({ cycle, tempFileName }).toString()
+export const downloadDataQueryExport = ({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat }) => {
+  const params = new URLSearchParams({ cycle, tempFileName, fileFormat }).toString()
   window.open(`/api/surveyRdb/${surveyId}/${entityDefUuid}/export/download?${params}`, 'data-query-export')
 }
 

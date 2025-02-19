@@ -16,6 +16,7 @@ import { db } from '../../../db/db'
 import * as DbUtils from '../../../db/dbUtils'
 import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { FileFormats } from '@server/utils/file/fileFormats'
 
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
@@ -154,30 +155,33 @@ export const fetchViewData = async (params, client = db) => {
  * @param {number} [params.offset=null] - The query offset.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
- *
+ * @param {boolean} [params.outputStream=null] - The output to be used to stream the data (if specified).
+ * @param {object} [params.options=null] - Export options object (e.g. {fileFormat: 'csv'}).
+ * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = async (params) => {
-  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, streamOutput = null } = params
+export const fetchViewDataAgg = async (params, client = db) => {
+  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, outputStream = null, options = {} } = params
+  const { fileFormat = FileFormats.csv } = options
 
   // Fetch data
-  const result = await DataViewRepository.fetchViewDataAgg({
-    survey,
-    cycle,
-    query,
-    recordOwnerUuid,
-    limit,
-    offset,
-    stream: Boolean(streamOutput),
-  })
+  const result = await DataViewRepository.fetchViewDataAgg(
+    {
+      survey,
+      cycle,
+      query,
+      recordOwnerUuid,
+      limit,
+      offset,
+      stream: Boolean(outputStream),
+    },
+    client
+  )
 
-  if (streamOutput) {
-    await db.stream(result, (dbStream) => {
-      const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
-      const csvTransform = FlatDataWriter.transformJsonToCsv({ fields })
-      dbStream.pipe(csvTransform).pipe(streamOutput)
-    })
+  if (outputStream) {
+    const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
+    const dbStream = await DbUtils.getStream({ queryStream: result, client })
+    await FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat })
     return null
   }
   return result
