@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { DateFormats, Objects } from '@openforis/arena-core'
 
 import { ExpansionPanel } from '@webapp/components'
-import { Checkbox } from '@webapp/components/form'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { DateInput } from '@webapp/components/form/DateTimeInput'
 
@@ -12,6 +12,7 @@ import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { dataExportOptions } from './dataExportOptions'
+import { useI18n } from '@webapp/store/system'
 
 const infoMessageKeyByOption = {
   expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
@@ -20,6 +21,7 @@ const infoMessageKeyByOption = {
 export const DataExportOptionsPanel = (props) => {
   const { availableOptions: availableOptionsProp, onOptionChange, selectedOptionsByKey } = props
 
+  const i18n = useI18n()
   const isSystemAdmin = useUserIsSystemAdmin()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const cycles = useSurveyCycleKeys()
@@ -31,12 +33,12 @@ export const DataExportOptionsPanel = (props) => {
     }
     const options = [
       dataExportOptions.includeCategoryItemsLabels,
-      dataExportOptions.expandCategoryItems,
-      dataExportOptions.includeCategories,
       dataExportOptions.includeAncestorAttributes,
       dataExportOptions.includeFiles,
       dataExportOptions.includeFileAttributeDefs,
       dataExportOptions.includeDateCreated,
+      dataExportOptions.includeCategories,
+      dataExportOptions.expandCategoryItems,
     ]
     if (canAnalyzeRecords) {
       options.push(dataExportOptions.includeAnalysis)
@@ -52,6 +54,16 @@ export const DataExportOptionsPanel = (props) => {
 
   return (
     <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
+      <FormItem label={`dataExportView.options.${dataExportOptions.fileFormat}Label`}>
+        <ButtonGroup
+          selectedItemKey={selectedOptionsByKey[dataExportOptions.fileFormat]}
+          onChange={onOptionChange(dataExportOptions.fileFormat)}
+          items={['xlsx', 'csv'].map((key) => ({
+            key,
+            label: i18n.t(`dataExportView.options.fileFormat.${key}`),
+          }))}
+        />
+      </FormItem>
       {availableOptions.map((optionKey) => (
         <Checkbox
           key={optionKey}

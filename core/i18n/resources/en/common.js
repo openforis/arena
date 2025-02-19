@@ -555,6 +555,11 @@ $t(common.cantUndoWarning)`,
   dataExportView: {
     options: {
       header: '$t(common.options)',
+      fileFormatLabel: 'File format',
+      fileFormat: {
+        csv: 'CSV',
+        xlsx: 'Excel',
+      },
       includeCategoryItemsLabels: 'Include category items labels',
       includeCategories: 'Include categories',
       expandCategoryItems: 'Expand category items',
