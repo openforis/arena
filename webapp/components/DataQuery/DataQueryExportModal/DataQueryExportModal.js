@@ -33,6 +33,8 @@ export const DataQueryExportModal = (props) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const isAggregateMode = Query.isModeAggregate(query)
   const { selectedOptionsByKey } = state
+  const fileFormat = (selectedOptionsByKey ?? {})[dataExportOptions.fileFormat]
+
   const availableOptions = useMemo(
     () =>
       isAggregateMode ? [] : [dataExportOptions.includeCategoryItemsLabels, dataExportOptions.expandCategoryItems],
@@ -41,9 +43,9 @@ export const DataQueryExportModal = (props) => {
 
   const onExportClick = useCallback(async () => {
     const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options: selectedOptionsByKey })
-    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName })
+    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
     onClose()
-  }, [cycle, entityDefUuid, onClose, query, selectedOptionsByKey, surveyId])
+  }, [cycle, entityDefUuid, fileFormat, onClose, query, selectedOptionsByKey, surveyId])
 
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {

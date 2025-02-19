@@ -1,8 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { Query } from '@common/model/query'
 
+import { defaultDataExportOptionsSelection } from '@webapp/views/App/views/Data/DataExport/dataExportOptions'
+import * as API from '@webapp/service/api'
+
 import { DataExplorerState } from './state'
+import * as SurveyState from '../survey/state'
 
 const initialState = {
   [DataExplorerState.keys.displayType]: DataExplorerState.displayTypes.table,
@@ -13,6 +17,18 @@ const initialState = {
   [DataExplorerState.keys.selectedQuerySummaryUuid]: null,
   [DataExplorerState.keys.codesVisible]: false,
 }
+
+const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, { getState }) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const cycle = SurveyState.getSurveyCycleKey(state)
+  const query = DataExplorerState.getQuery(state)
+  const entityDefUuid = Query.getEntityDefUuid(query)
+  const options = { ...defaultDataExportOptionsSelection, ...params }
+  const { fileFormat } = options
+  const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
+  API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
+})
 
 export const slice = createSlice({
   name: 'dataQuery',
@@ -40,6 +56,9 @@ export const slice = createSlice({
 
     closeRecordEditModal: (state) => DataExplorerState.dissocRecordEditModalProps(state),
   },
+  extraReducers: (builder) => {
+    builder.addCase(exportQueryData.fulfilled, (state) => state)
+  },
 })
 
 const {
@@ -64,6 +83,7 @@ export const DataExplorerActions = {
   setCodesVisible,
   openRecordEditModal,
   closeRecordEditModal,
+  exportQueryData,
 }
 
 export const { reducer: DataExplorerReducer } = slice

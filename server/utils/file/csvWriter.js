@@ -2,7 +2,7 @@ import { Transform } from 'json2csv'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
 
-export const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
+const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
   const options = { ...FlatDataWriterUtils.defaultOptions, ...optionsParam }
   const { objectTransformer = null } = options
   const transform = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)
@@ -32,5 +32,5 @@ export const writeItemsToStream = ({
 
 export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
   const csvTransform = transformJsonToCsv({ fields, options })
-  stream.pipe(csvTransform).pipe(outputStream)
+  return stream.pipe(csvTransform).pipe(outputStream)
 }
