@@ -70,7 +70,7 @@ export const DataQueryExportModal = (props) => {
           onOptionChange={onOptionChange}
           selectedOptionsByKey={selectedOptionsByKey}
         />
-        <ButtonDownload className="btn-primary" label="common.csvExport" onClick={onExportClick} />
+        <ButtonDownload className="btn-primary" label="common.export" onClick={onExportClick} />
       </ModalBody>
     </Modal>
   )
