@@ -2,6 +2,9 @@ import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
 
+import * as DateUtils from '../../../core/dateUtils'
+import { FileFormats } from '@core/fileFormats'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { survey } from '../mock/survey'
@@ -11,7 +14,6 @@ import { gotoHome, gotoDataExport } from './_navigation'
 
 import { downloadsPath } from '../paths'
 import { cluster, tree, plot } from '../mock/nodeDefs'
-import * as DateUtils from '../../../core/dateUtils'
 import { parseCsvAsync } from '../../utils/csvUtils'
 
 let extractedFolderName = ''
@@ -40,7 +42,10 @@ export default () =>
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {
-      const prepareExportBtnSelector = getSelector(TestId.dataExport.prepareExport, 'button')
+      const csvFileFormatSelector = getSelector(TestId.dataExport.fileFormatOption(FileFormats.csv), 'button')
+      await page.click(csvFileFormatSelector)
+
+      const prepareExportBtnSelector = getSelector(TestId.dataExport.startExport, 'button')
       await page.waitForSelector(prepareExportBtnSelector)
 
       // click on the export button and wait for the job dialog to open

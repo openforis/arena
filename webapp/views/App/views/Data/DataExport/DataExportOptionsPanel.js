@@ -3,20 +3,24 @@ import PropTypes from 'prop-types'
 
 import { DateFormats, Objects } from '@openforis/arena-core'
 
+import { FileFormats } from '@core/fileFormats'
+
 import { ExpansionPanel } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { DateInput } from '@webapp/components/form/DateTimeInput'
 
+import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { dataExportOptions } from './dataExportOptions'
-import { useI18n } from '@webapp/store/system'
 
 const infoMessageKeyByOption = {
   expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
 }
+
+const availableFileFormats = [FileFormats.xlsx, FileFormats.csv]
 
 export const DataExportOptionsPanel = (props) => {
   const { availableOptions: availableOptionsProp, onOptionChange, selectedOptionsByKey } = props
@@ -56,12 +60,13 @@ export const DataExportOptionsPanel = (props) => {
     <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
       <FormItem label={`dataExportView.options.${dataExportOptions.fileFormat}Label`}>
         <ButtonGroup
-          selectedItemKey={selectedOptionsByKey[dataExportOptions.fileFormat]}
-          onChange={onOptionChange(dataExportOptions.fileFormat)}
-          items={['xlsx', 'csv'].map((key) => ({
+          groupName="fileFormat"
+          items={availableFileFormats.map((key) => ({
             key,
             label: i18n.t(`dataExportView.options.fileFormat.${key}`),
           }))}
+          onChange={onOptionChange(dataExportOptions.fileFormat)}
+          selectedItemKey={selectedOptionsByKey[dataExportOptions.fileFormat]}
         />
       </FormItem>
       {availableOptions.map((optionKey) => (

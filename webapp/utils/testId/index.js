@@ -49,8 +49,9 @@ export const TestId = {
     surveyStatus: 'survey-status',
   },
   dataExport: {
+    fileFormatOption: (fileFormat) => `fileFormat_${fileFormat}`,
     exportCSV: 'exportCSV',
-    prepareExport: 'prepareExport',
+    startExport: 'startExport',
   },
   dataImport: {
     importFromCollectTab: 'importFromCollectTab',
