@@ -3,9 +3,11 @@ import Archiver from 'archiver'
 
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
-import * as FileUtils from '@server/utils/file/fileUtils'
-import { FileFormats } from '@server/utils/file/fileFormats'
+import { FileFormats } from '@core/fileFormats'
 import SystemError, { StatusCodes } from '@core/systemError'
+
+import * as FileUtils from '@server/utils/file/fileUtils'
+
 import UnauthorizedError from './unauthorizedError'
 
 const status = {

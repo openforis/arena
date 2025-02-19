@@ -1,11 +1,11 @@
 import { Transform } from 'json2csv'
 
 import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as CSVWriter from './csvWriter'
 import * as ExcelWriter from './excelWriter'
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
-import { FileFormats } from './fileFormats'
 import { StreamUtils } from '../streamUtils'
 
 const _transformObj =

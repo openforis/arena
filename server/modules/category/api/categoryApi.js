@@ -4,10 +4,10 @@ import * as Response from '@server/utils/response'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
-import { FileFormats } from '@server/utils/file/fileFormats'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'

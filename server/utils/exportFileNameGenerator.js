@@ -3,8 +3,7 @@ import { Objects } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as DateUtils from '@core/dateUtils'
-
-import { FileFormats } from './file/fileFormats'
+import { FileFormats } from '@core/fileFormats'
 
 const extensionByFileFormat = {
   [FileFormats.csv]: 'csv',

@@ -23,6 +23,7 @@ import * as ValidationResult from '@core/validation/validationResult'
 import i18n from '@core/i18n/i18nFactory'
 import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
@@ -44,7 +45,6 @@ import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
-import { FileFormats } from '@server/utils/file/fileFormats'
 
 const Logger = Log.getLogger('RecordService')
 

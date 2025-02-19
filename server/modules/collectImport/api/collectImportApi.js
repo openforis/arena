@@ -1,12 +1,12 @@
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { FileFormats } from '@core/fileFormats'
 
 import * as DbUtils from '@server/db/dbUtils'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
-import { FileFormats } from '@server/utils/file/fileFormats'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'

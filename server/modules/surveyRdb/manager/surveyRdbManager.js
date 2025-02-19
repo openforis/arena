@@ -8,6 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
@@ -16,7 +17,6 @@ import { db } from '../../../db/db'
 import * as DbUtils from '../../../db/dbUtils'
 import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
-import { FileFormats } from '@server/utils/file/fileFormats'
 
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 

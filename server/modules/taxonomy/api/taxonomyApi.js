@@ -1,7 +1,7 @@
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
-import { FileFormats } from '@server/utils/file/fileFormats'
 
+import { FileFormats } from '@core/fileFormats'
 import * as ObjectUtils from '../../../../core/objectUtils'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'

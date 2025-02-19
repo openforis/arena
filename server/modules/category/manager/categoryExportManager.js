@@ -4,11 +4,11 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
+import { FileFormats } from '@core/fileFormats'
 
 import { db } from '@server/db/db'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
-import { FileFormats } from '@server/utils/file/fileFormats'
 
 const levelPositionField = 'level'
 
