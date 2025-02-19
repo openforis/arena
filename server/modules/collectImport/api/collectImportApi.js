@@ -84,8 +84,11 @@ export const init = (app) => {
         })
         Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        const dbStream = await DbUtils.getStream({ queryStream: reportItemsQueryStream })
-        await FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields, fileFormat })
+        await DbUtils.stream({
+          queryStream: reportItemsQueryStream,
+          processor: async (dbStream) =>
+            FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields, fileFormat }),
+        })
       } catch (error) {
         next(error)
       }

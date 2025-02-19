@@ -8,20 +8,33 @@ const pgp = pgPromise()
 
 export const QueryStream = _QueryStream
 
-export const getStream = async ({ queryStream, client = db, transformer = null }) =>
+export const stream = async ({ queryStream, client = db, transformer = null, processor = null }) =>
   new Promise((resolve, reject) => {
-    try {
-      client.stream(queryStream, (dbStream) => {
-        resolve(transformer ? dbStream.pipe(transformer) : dbStream)
-      })
-    } catch (error) {
-      reject(error)
+    let streamProcessed = false
+    let streamComplete = false
+    const onComplete = () => {
+      if ((!processor || streamProcessed) && streamComplete) {
+        resolve()
+      }
     }
+    client
+      .stream(queryStream, (dbStream) => {
+        const transformedStream = transformer ? dbStream.pipe(transformer) : dbStream
+        processor?.(transformedStream).then(() => {
+          streamProcessed = true
+          onComplete()
+        })
+      })
+      .then(() => {
+        streamComplete = true
+        onComplete()
+      })
+      .catch((error) => reject(error))
   })
 
-export const fetchQueryAsStream = async ({ query, client, transformer = null }) => {
+export const fetchQueryAsStream = async ({ query, client = db, transformer = null }) => {
   const queryStream = new QueryStream(query)
-  return getStream({ queryStream, client, transformer })
+  return stream({ queryStream, client, transformer })
 }
 
 export const selectDate = (field, fieldAlias = null) =>

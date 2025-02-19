@@ -44,8 +44,11 @@ export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFor
 
   const fields = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
 
-  const dbStream = await DbUtils.getStream({ queryStream: taxaQueryStream })
-  await FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat })
+  await DbUtils.stream({
+    queryStream: taxaQueryStream,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
+  })
 }
 
 export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {

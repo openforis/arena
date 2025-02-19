@@ -110,8 +110,6 @@ export const fetchViewData = async (params, client = db) => {
   )
 
   if (outputStream) {
-    const dbStream = await DbUtils.getStream({ queryStream: result, client })
-
     const fields = columnNodeDefs
       ? null // all fields will be included in the CSV file
       : SurveyRdbCsvExport.getCsvExportFields({
@@ -131,14 +129,19 @@ export const fetchViewData = async (params, client = db) => {
       keepFileNamesUnique: true,
       uniqueFileNamesGenerator,
     })
-    return FlatDataWriter.writeItemsStreamToStream({
-      stream: dbStream,
-      fields,
-      options: {
-        objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
-      },
-      outputStream,
-      fileFormat,
+    await DbUtils.stream({
+      queryStream: result,
+      client,
+      processor: async (dbStream) =>
+        FlatDataWriter.writeItemsStreamToStream({
+          stream: dbStream,
+          fields,
+          options: {
+            objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
+          },
+          outputStream,
+          fileFormat,
+        }),
     })
   }
   return result
@@ -180,9 +183,12 @@ export const fetchViewDataAgg = async (params, client = db) => {
 
   if (outputStream) {
     const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
-    const dbStream = await DbUtils.getStream({ queryStream: result, client })
-    await FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat })
-    return null
+    return DbUtils.stream({
+      queryStream: result,
+      client,
+      processor: async (dbStream) =>
+        FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
+    })
   }
   return result
 }
