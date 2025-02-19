@@ -64,7 +64,7 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
  * @param {boolean|object} [params.outputStream=null] - The output to be used to stream the data (if specified).
- * @param {string} [params.outputFileFormat=null] - The format of the output file (csv or xlsx).
+ * @param {string} [params.fileFormat=null] - The format of the output file (csv or xlsx).
  *
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
@@ -81,7 +81,7 @@ export const fetchViewData = async (params, client = db) => {
     offset = 0,
     limit = null,
     outputStream = null,
-    outputFileFormat = null,
+    fileFormat = null,
     addCycle = false,
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
@@ -138,7 +138,7 @@ export const fetchViewData = async (params, client = db) => {
         objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
       },
       outputStream,
-      fileFormat: outputFileFormat,
+      fileFormat,
     })
   }
   return result
@@ -309,7 +309,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         cycle,
         recordOwnerUuid,
         outputStream,
-        outputFileFormat: fileFormat,
+        fileFormat,
         query,
         addCycle,
         includeCategoryItemsLabels,
