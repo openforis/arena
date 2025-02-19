@@ -3,9 +3,11 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
+import { FileFormats } from '@core/fileFormats'
 
 import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
@@ -112,8 +114,17 @@ const FormHeader = (props) => {
             label="common.advancedFunctions"
             items={[
               {
-                key: 'schema-summary',
-                content: <SurveySchemaSummaryDownloadButton />,
+                key: 'schema-summary-csv',
+                content: (
+                  <SurveySchemaSummaryDownloadButton
+                    fileFormat={FileFormats.csv}
+                    testId={TestId.surveyForm.schemaSummary}
+                  />
+                ),
+              },
+              {
+                key: 'schema-summary-excel',
+                content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
               },
               {
                 key: 'labels-export',

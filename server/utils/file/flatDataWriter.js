@@ -9,7 +9,7 @@ export const writeItemsToStream = ({
   items,
   fields = null,
   options = FlatDataWriterUtils.defaultOptions,
-  fileFormat = FileFormats.xlsx,
+  fileFormat = FileFormats.csv,
   outputStream,
 }) =>
   fileFormat === FileFormats.csv

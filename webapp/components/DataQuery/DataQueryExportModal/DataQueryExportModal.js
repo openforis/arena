@@ -33,7 +33,7 @@ export const DataQueryExportModal = (props) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const isAggregateMode = Query.isModeAggregate(query)
   const { selectedOptionsByKey } = state
-  const fileFormat = (selectedOptionsByKey ?? {})[dataExportOptions.fileFormat]
+  const fileFormat = selectedOptionsByKey[dataExportOptions.fileFormat]
 
   const availableOptions = useMemo(
     () =>
