@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 
 import * as DateUtils from '../../../core/dateUtils'
-import { FileFormats } from '@core/fileFormats'
+import { FileFormats } from '../../../core/fileFormats'
 
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
