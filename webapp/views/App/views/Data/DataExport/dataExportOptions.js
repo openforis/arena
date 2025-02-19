@@ -10,6 +10,7 @@ export const dataExportOptions = {
   recordsModifiedAfter: 'recordsModifiedAfter',
   includeInternalUuids: 'includeInternalUuids',
   includeDateCreated: 'includeDateCreated',
+  fileFormat: 'fileFormat',
 }
 
 export const defaultDataExportOptionsSelection = {
@@ -24,4 +25,5 @@ export const defaultDataExportOptionsSelection = {
   [dataExportOptions.recordsModifiedAfter]: null,
   [dataExportOptions.includeInternalUuids]: false,
   [dataExportOptions.includeDateCreated]: false,
+  [dataExportOptions.fileFormat]: 'xlsx',
 }

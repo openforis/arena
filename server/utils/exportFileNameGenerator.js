@@ -11,6 +11,8 @@ const extensionByFileFormat = {
   [FileFormats.xlsx]: 'xlsx',
 }
 
+const getExtensionByFileFormat = (fileFormat) => extensionByFileFormat[fileFormat ?? FileFormats.csv]
+
 const generate = ({
   fileType,
   survey = null,
@@ -41,4 +43,5 @@ const generate = ({
 
 export const ExportFileNameGenerator = {
   generate,
+  getExtensionByFileFormat,
 }

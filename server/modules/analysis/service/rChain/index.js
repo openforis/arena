@@ -53,7 +53,7 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
     includeFileAttributeDefs: false,
     addCycle: true,
     nullsToEmpty: true,
-    streamOutput: res,
+    outputStream: res,
   })
 }
 
