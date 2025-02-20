@@ -6,7 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { ButtonMenu } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
@@ -18,6 +18,7 @@ import { TestId } from '@webapp/utils/testId'
 import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 import { useNotifyWarning } from '@webapp/components/hooks'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 
 const Header = (props) => {
   const { state, Actions } = props
@@ -74,10 +75,9 @@ const Header = (props) => {
             onChange={([file]) => Actions.upload({ state, file })}
           />
         )}
-        <ButtonDownload
+        <ButtonMenuExport
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}
-          label="common.exportToExcel"
         />
         {canEdit && (
           <ButtonMenu
