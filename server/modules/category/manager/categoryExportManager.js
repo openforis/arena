@@ -121,14 +121,14 @@ export const exportCategoryToStream = async (
   // get survey languages
   const languages = Survey.getLanguages(survey)
 
-  const categoryStream = CategoryRepository.generateCategoryExportStream({
+  const queryStream = CategoryRepository.generateCategoryExportStream({
     surveyId,
     category,
     languages,
     includeCumulativeArea,
   })
 
-  const headers = getCategoryExportHeaders({
+  const fields = getCategoryExportHeaders({
     category,
     languages,
     language,
@@ -141,12 +141,12 @@ export const exportCategoryToStream = async (
 
   return DbUtils.stream({
     client,
-    queryStream: categoryStream,
+    queryStream,
     processor: async (dbStream) =>
       FlatDataWriter.writeItemsStreamToStream({
         stream: dbStream,
         outputStream,
-        fields: headers,
+        fields,
         options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
         fileFormat,
       }),

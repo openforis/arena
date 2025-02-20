@@ -9,7 +9,7 @@ export const ButtonDownload = forwardRef((props, ref) => {
     iconClassName = 'icon-download2 icon-14px',
     label = 'common.download',
     onClick: onClickProp,
-    requestParams,
+    requestParams = null,
     variant = 'outlined',
     ...otherProps
   } = props
