@@ -24,6 +24,8 @@ export class JobQueue {
     this._runningJobUuidByUuid = {} // running jobs
     this._runningJobUuidBySurveyId = {} // running jobs by survey id
     this._runningJobUuidByUserUuid = {} // running jobs by user uuid
+
+    this._logger.debug(`initializing job queue with ${concurrency} max concurrent jobs`)
   }
 
   isRunning() {

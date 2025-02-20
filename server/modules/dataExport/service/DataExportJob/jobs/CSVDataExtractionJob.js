@@ -21,7 +21,9 @@ export default class CSVDataExtractionJob extends Job {
         outputDir,
         callback: ({ step, total }) => {
           this.total = total
-          this.processed = step
+          if (step) {
+            this.processed = step
+          }
         },
       },
       this.tx
