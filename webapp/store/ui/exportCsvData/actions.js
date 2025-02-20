@@ -10,7 +10,7 @@ export const startCSVExport =
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const job = await API.startExportDataToCSVJob({ surveyId, cycle, recordUuids, search, options })
+    const job = await API.startExportDataJob({ surveyId, cycle, recordUuids, search, options })
 
     dispatch(JobActions.showJobMonitor({ job, closeButton: DataExportDownloadButton }))
   }

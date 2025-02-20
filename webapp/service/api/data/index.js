@@ -101,8 +101,8 @@ export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle, includeFiles
 }
 
 // ==== DATA EXPORT
-export const startExportDataToCSVJob = async ({ surveyId, cycle, recordUuids, search, options }) => {
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-export/csv`, {
+export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-export`, {
     cycle,
     recordUuids,
     search,
@@ -112,9 +112,9 @@ export const startExportDataToCSVJob = async ({ surveyId, cycle, recordUuids, se
   return job
 }
 
-export const downloadExportedDataToCSVUrl = ({ surveyId, cycle, exportUuid }) => {
+export const downloadExportedDataUrl = ({ surveyId, cycle, exportUuid }) => {
   const params = new URLSearchParams({ cycle })
-  return `/api/survey/${surveyId}/data-export/csv/${exportUuid}?${params.toString()}`
+  return `/api/survey/${surveyId}/data-export/${exportUuid}?${params.toString()}`
 }
 
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, options }) => {
