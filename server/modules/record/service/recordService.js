@@ -81,7 +81,7 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
-export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
+export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
     cycle,
@@ -128,8 +128,8 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
   }
 
   const survey = await SurveyManager.fetchSurveyById({ surveyId })
-  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'Records' })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'Records', fileFormat })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
 
   const fields = [
     ...nodeDefKeys.flatMap((nodeDefKey) => NodeDefTable.getColumnNames(nodeDefKey)),
@@ -142,7 +142,13 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
     'errors',
     'warnings',
   ]
-  return FlatDataWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
+  return FlatDataWriter.writeItemsToStream({
+    outputStream: res,
+    fileFormat,
+    items: list,
+    fields,
+    options: { objectTransformer },
+  })
 }
 
 // Records export job
@@ -251,7 +257,7 @@ export const exportValidationReportToFlatData = async ({
   cycle,
   lang,
   recordUuid = null,
-  fileFormat = FileFormats.csv,
+  fileFormat = FileFormats.xlsx,
 }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
@@ -296,7 +302,7 @@ export const exportValidationReportToFlatData = async ({
       record_date_modified: DateUtils.formatDateTimeExport(RecordValidationReportItem.getRecordDateModified(item)),
     }
   }
-  const headers = [
+  const fields = [
     'path',
     'path_labels',
     'name',
@@ -309,14 +315,18 @@ export const exportValidationReportToFlatData = async ({
     'record_date_created',
     'record_date_modified',
   ]
-  const reportStream = await RecordManager.getValidationReportStream({ surveyId, cycle, recordUuid })
-
-  return FlatDataWriter.writeItemsStreamToStream({
-    stream: reportStream,
-    outputStream: res,
-    fields: headers,
-    options: { objectTransformer },
-    fileFormat,
+  await RecordManager.getValidationReportAsStream({
+    surveyId,
+    cycle,
+    recordUuid,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        outputStream: res,
+        fields,
+        options: { objectTransformer },
+        fileFormat,
+      }),
   })
 }
 

@@ -247,7 +247,7 @@ export {
 } from './_recordManager/recordValidationManager'
 
 export {
-  getValidationReportStream,
+  getValidationReportAsStream,
   fetchValidationReport,
   countValidationReportItems,
 } from './_recordManager/validationReportManager'

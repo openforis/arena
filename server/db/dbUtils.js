@@ -10,10 +10,10 @@ export const QueryStream = _QueryStream
 
 export const stream = async ({ queryStream, client = db, transformer = null, processor = null }) =>
   new Promise((resolve, reject) => {
-    let streamProcessed = false
     let streamComplete = false
+    let streamProcessed = false
     const onComplete = () => {
-      if ((!processor || streamProcessed) && streamComplete) {
+      if (streamComplete && (!processor || streamProcessed)) {
         resolve()
       }
     }
@@ -34,9 +34,9 @@ export const stream = async ({ queryStream, client = db, transformer = null, pro
       .catch((error) => reject(error))
   })
 
-export const fetchQueryAsStream = async ({ query, client = db, transformer = null }) => {
+export const fetchQueryAsStream = async ({ query, client = db, transformer = null, processor = null }) => {
   const queryStream = new QueryStream(query)
-  return stream({ queryStream, client, transformer })
+  return stream({ queryStream, client, transformer, processor })
 }
 
 export const selectDate = (field, fieldAlias = null) =>
