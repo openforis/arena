@@ -296,7 +296,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/csv', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/validationReport/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
