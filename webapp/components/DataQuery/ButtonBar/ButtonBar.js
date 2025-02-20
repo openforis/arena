@@ -118,7 +118,6 @@ const ButtonBar = (props) => {
               disabled={queryChangeDisabled}
               label="common.export"
               onClick={(options) => dispatch(DataExplorerActions.exportQueryData(options))}
-              variant="outlined"
             />
           ) : (
             <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />

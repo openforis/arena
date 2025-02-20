@@ -110,10 +110,11 @@ export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, 
   await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
 }
 
-export const exportAllCategories = ({ user, surveyId, draft }) => {
+export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {
   const job = new CategoriesExportJob({
     user,
     surveyId,
+    fileFormat,
     draft,
   })
 

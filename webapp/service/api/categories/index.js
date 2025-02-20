@@ -80,10 +80,10 @@ export const fetchSamplingPointData = ({ surveyId, levelIndex = 0, limit = 500, 
     data: { levelIndex, limit, offset },
   })
 
-export const startExportAllCategoriesJob = async ({ surveyId, draft = true }) => {
+export const startExportAllCategoriesJob = async ({ surveyId, fileFormat, draft = true }) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft })
+  } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft, fileFormat })
 
   return { job }
 }

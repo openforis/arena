@@ -14,7 +14,7 @@ const labelByFileFormat = {
 const exportFormats = [FileFormats.xlsx, FileFormats.csv]
 
 export const ButtonMenuExport = (props) => {
-  const { onClick: onClickProp, variant = null } = props
+  const { label = 'common.export', onClick: onClickProp, variant = 'outlined' } = props
 
   const items = exportFormats.map((fileFormat) => ({
     key: fileFormat,
@@ -30,7 +30,7 @@ export const ButtonMenuExport = (props) => {
     <ButtonMenu
       className="btn-menu-advanced"
       iconClassName="icon-download2 icon-14px"
-      label="common.export"
+      label={label}
       items={items}
       variant={variant}
     />
@@ -38,6 +38,7 @@ export const ButtonMenuExport = (props) => {
 }
 
 ButtonMenuExport.propTypes = {
+  label: PropTypes.string,
   onClick: PropTypes.func.isRequired,
   variant: PropTypes.string,
 }
