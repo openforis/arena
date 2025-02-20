@@ -33,7 +33,10 @@ export default class ArenaMobileDataImportJob extends Job {
 
     this.setContext({ arenaSurveyFileZip })
 
-    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
+    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
+      tx
+    )
     this.setContext({ survey })
   }
 
