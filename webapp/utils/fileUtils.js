@@ -1,3 +1,5 @@
+const excelRowsLimit = 10000
+
 const getExtension = (file) => {
   const fileName = typeof file === 'string' ? file : file.name
   const extension = fileName.split('.').pop()
@@ -58,6 +60,7 @@ const readAsText = async (file, ignoreErrors = true) =>
   })
 
 export const FileUtils = {
+  excelRowsLimit,
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,

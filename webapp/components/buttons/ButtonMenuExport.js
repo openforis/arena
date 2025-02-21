@@ -6,6 +6,7 @@ import { FileFormats } from '@core/fileFormats'
 
 import { ButtonDownload } from './ButtonDownload'
 import { ButtonMenu } from './ButtonMenu'
+import { useNotifyWarning } from '../hooks'
 
 const labelByFileFormat = {
   [FileFormats.csv]: 'common.exportToCSV',
@@ -17,6 +18,7 @@ const exportFormats = [FileFormats.xlsx, FileFormats.csv]
 export const ButtonMenuExport = (props) => {
   const {
     className = null,
+    excelExportDisabled = false,
     href = null,
     label = 'common.export',
     onClick: onClickProp,
@@ -25,8 +27,15 @@ export const ButtonMenuExport = (props) => {
     variant = 'outlined',
   } = props
 
+  const notifyWarning = useNotifyWarning()
+
   const items = exportFormats.map((fileFormat) => {
-    const onClick = onClickProp ? () => onClickProp({ fileFormat }) : undefined
+    let onClick = undefined
+    if (excelExportDisabled) {
+      onClick = () => notifyWarning({ key: 'common.exportToExcelTooManyItems' })
+    } else if (onClickProp) {
+      onclick = () => onClickProp({ fileFormat })
+    }
 
     return {
       key: fileFormat,
@@ -55,6 +64,7 @@ export const ButtonMenuExport = (props) => {
 
 ButtonMenuExport.propTypes = {
   className: PropTypes.string,
+  excelExportDisabled: PropTypes.bool,
   href: PropTypes.string,
   label: PropTypes.string,
   onClick: PropTypes.func.isRequired,

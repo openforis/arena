@@ -15,12 +15,11 @@ export const ButtonDownload = forwardRef((props, ref) => {
   } = props
 
   const onClick = useCallback(async () => {
-    if (href) {
-      const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
-      window.open(url, '_blank')
-    }
     if (onClickProp) {
       await onClickProp()
+    } else if (href) {
+      const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
+      window.open(url, '_blank')
     }
   }, [href, onClickProp, requestParams])
 
