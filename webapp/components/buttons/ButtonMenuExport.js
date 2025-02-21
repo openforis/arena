@@ -67,7 +67,7 @@ ButtonMenuExport.propTypes = {
   excelExportDisabled: PropTypes.bool,
   href: PropTypes.string,
   label: PropTypes.string,
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   requestParams: PropTypes.object,
   testId: PropTypes.string,
   variant: PropTypes.string,

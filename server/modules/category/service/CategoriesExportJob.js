@@ -58,8 +58,9 @@ export default class CategoriesExportJob extends Job {
     })
 
     // write to archive
-    const zipEntryName = `${Category.getName(category) || `category_${index}`}.${fileFormat}`
-    this.archiver.addFile(categoryTempFilePath, zipEntryName)
+    const zipEntryName = Category.getName(category) || `category_${index}`
+    const zipEntryNameFull = `${zipEntryName}.${fileFormat}`
+    this.archiver.addFile(categoryTempFilePath, zipEntryNameFull)
 
     this.incrementProcessedItems()
   }
