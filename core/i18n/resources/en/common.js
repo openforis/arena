@@ -554,7 +554,6 @@ $t(common.cantUndoWarning)`,
 
   dataExportView: {
     error: 'Error exporting data: {{details}}',
-    errorExcelExport: 'Error exporting data. Try to export the data using CSV format.',
     options: {
       header: '$t(common.options)',
       fileFormatLabel: 'File format',

@@ -1,3 +1,5 @@
+import { SystemError } from '@openforis/arena-core'
+
 const readStreamToBuffer = async (stream) => {
   if (!stream) return null
   const chunks = []
@@ -16,7 +18,7 @@ const readStreamToItems = async (stream, limit = 10000) => {
       count++
       if (count === limit) {
         stream.destroy()
-        reject(new Error(`Too many items to process (> ${limit}). Use CSV export instead.`))
+        reject(new SystemError(`dataExport.excelMaxCellsLimitExceeded`))
       }
     })
     stream.on('end', () => resolve(items))

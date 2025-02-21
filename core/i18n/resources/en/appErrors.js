@@ -10,6 +10,7 @@ export default {
     emptyHeaders: 'Empty headers found',
   },
   dataExport: {
+    excelMaxCellsLimitExceeded: 'Error exporting data. Try to export the data using CSV format.',
     noRecordsMatchingSearchCriteria: 'No records matching search criteria',
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',

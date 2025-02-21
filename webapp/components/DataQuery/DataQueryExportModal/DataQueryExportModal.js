@@ -54,7 +54,8 @@ export const DataQueryExportModal = (props) => {
       })
       API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
     } catch (error) {
-      const key = fileFormat === FileFormats.xlsx ? 'dataExportView.errorExcelExport' : 'dataExportView.error'
+      const key =
+        fileFormat === FileFormats.xlsx ? 'appErrors:dataExport.excelMaxCellsLimitExceeded' : 'dataExportView.error'
       notifyWarning({ key, params: { details: String(error) } })
     }
     onClose()
