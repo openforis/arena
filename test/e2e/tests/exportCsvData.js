@@ -43,16 +43,16 @@ export default () =>
 
     test(`Export data ${survey.name}`, async () => {
       const csvFileFormatSelector = getSelector(TestId.dataExport.fileFormatOption(FileFormats.csv), 'button')
+      await page.waitForSelector(csvFileFormatSelector)
       await page.click(csvFileFormatSelector)
 
       const prepareExportBtnSelector = getSelector(TestId.dataExport.startExport, 'button')
-      await page.waitForSelector(prepareExportBtnSelector)
 
       // click on the export button and wait for the job dialog to open
       await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(prepareExportBtnSelector)])
 
       // wait for the job to complete: export button will appear
-      const downloadBtnSelector = getSelector(TestId.dataExport.exportCSV, 'button')
+      const downloadBtnSelector = getSelector(TestId.dataExport.downloadExportedFileBtn, 'button')
       await page.waitForSelector(downloadBtnSelector)
 
       await expect(downloadBtnSelector).toBeTruthy()
@@ -64,7 +64,7 @@ export default () =>
 
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.click(getSelector(TestId.dataExport.exportCSV, 'button')),
+        page.click(getSelector(TestId.dataExport.downloadExportedFileBtn, 'button')),
       ])
 
       const surveyZipPath = path.resolve(downloadsPath, zipFileName)

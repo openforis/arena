@@ -23,7 +23,7 @@ export const DataExportDownloadButton = (props) => {
 
   return (
     <ButtonDownload
-      testId={TestId.dataExport.exportCSV}
+      testId={TestId.dataExport.downloadExportedFileBtn}
       href={API.downloadExportedDataUrl({ surveyId, cycle, exportUuid })}
       onClick={onClick}
       variant="contained"

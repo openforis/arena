@@ -50,7 +50,7 @@ export const TestId = {
   },
   dataExport: {
     fileFormatOption: (fileFormat) => `fileFormat_${fileFormat}`,
-    exportCSV: 'exportCSV',
+    downloadExportedFileBtn: 'downloadExportedFileBtn',
     startExport: 'startExport',
   },
   dataImport: {
