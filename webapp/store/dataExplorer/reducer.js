@@ -1,12 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { Query } from '@common/model/query'
+import { FileFormats } from '@core/fileFormats'
 
 import { defaultDataExportOptionsSelection } from '@webapp/views/App/views/Data/DataExport/dataExportOptions'
 import * as API from '@webapp/service/api'
 
 import { DataExplorerState } from './state'
 import * as SurveyState from '../survey/state'
+import { notifyWarning } from '../ui/notification/actions'
 
 const initialState = {
   [DataExplorerState.keys.displayType]: DataExplorerState.displayTypes.table,
@@ -18,7 +20,7 @@ const initialState = {
   [DataExplorerState.keys.codesVisible]: false,
 }
 
-const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, { getState }) => {
+const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, { dispatch, getState }) => {
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const cycle = SurveyState.getSurveyCycleKey(state)
@@ -26,8 +28,13 @@ const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, 
   const entityDefUuid = Query.getEntityDefUuid(query)
   const options = { ...defaultDataExportOptionsSelection, ...params }
   const { fileFormat } = options
-  const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
-  API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
+  try {
+    const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options })
+    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
+  } catch (error) {
+    const key = fileFormat === FileFormats.xlsx ? 'dataExportView.error' : 'dataExportView.error'
+    dispatch(notifyWarning({ key, params: { details: String(error) } }))
+  }
 })
 
 export const slice = createSlice({
