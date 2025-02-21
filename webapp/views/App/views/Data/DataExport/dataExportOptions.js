@@ -1,3 +1,5 @@
+import { FileFormats } from '@core/fileFormats'
+
 export const dataExportOptions = {
   fileFormat: 'fileFormat',
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',
@@ -14,7 +16,7 @@ export const dataExportOptions = {
 }
 
 export const defaultDataExportOptionsSelection = {
-  [dataExportOptions.fileFormat]: 'xlsx',
+  [dataExportOptions.fileFormat]: FileFormats.csv,
   [dataExportOptions.includeCategoryItemsLabels]: true,
   [dataExportOptions.includeFiles]: false,
   [dataExportOptions.includeFileAttributeDefs]: false,

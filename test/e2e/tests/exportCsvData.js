@@ -42,9 +42,9 @@ export default () =>
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {
-      const csvFileFormatSelector = getSelector(TestId.dataExport.fileFormatOption(FileFormats.csv), 'button')
-      await page.waitForSelector(csvFileFormatSelector)
-      await page.click(csvFileFormatSelector)
+      // const csvFileFormatSelector = getSelector(TestId.dataExport.fileFormatOption(FileFormats.csv), 'button')
+      // await page.waitForSelector(csvFileFormatSelector)
+      // await page.click(csvFileFormatSelector)
 
       const startExportBtnSelector = getSelector(TestId.dataExport.startExport, 'button')
       await page.waitForSelector(startExportBtnSelector)
