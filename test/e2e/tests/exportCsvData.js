@@ -46,10 +46,11 @@ export default () =>
       await page.waitForSelector(csvFileFormatSelector)
       await page.click(csvFileFormatSelector)
 
-      const prepareExportBtnSelector = getSelector(TestId.dataExport.startExport, 'button')
+      const startExportBtnSelector = getSelector(TestId.dataExport.startExport, 'button')
+      await page.waitForSelector(startExportBtnSelector)
 
       // click on the export button and wait for the job dialog to open
-      await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(prepareExportBtnSelector)])
+      await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(startExportBtnSelector)])
 
       // wait for the job to complete: export button will appear
       const downloadBtnSelector = getSelector(TestId.dataExport.downloadExportedFileBtn, 'button')
