@@ -20,11 +20,11 @@ const cellBorder = {
 
 export const writeItemsToStream = async ({
   outputStream,
-  items,
+  items = [],
   fields = null,
   options = FlatDataWriterUtils.defaultOptions,
 }) => {
-  if (Objects.isEmpty(items) || Objects.isEmpty(items[0])) return null
+  if (Objects.isEmpty(fields) && (Objects.isEmpty(items) || Objects.isEmpty(items[0]))) return null
 
   const { objectTransformer = null } = options
   const itemTransformer = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)

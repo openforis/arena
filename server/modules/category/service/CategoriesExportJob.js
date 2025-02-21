@@ -40,7 +40,7 @@ export default class CategoriesExportJob extends Job {
   }
 
   async exportCategory({ category, index }) {
-    const { surveyId, draft } = this.context
+    const { surveyId, fileFormat, draft } = this.context
 
     // create temp file
     const categoryTempFileName = FileUtils.newTempFileName()
@@ -49,10 +49,16 @@ export default class CategoriesExportJob extends Job {
     // export category into temp file
     const outputStream = FileUtils.createWriteStream(categoryTempFilePath)
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
-    await CategoryManager.exportCategoryToStream({ survey, categoryUuid: category.uuid, draft, outputStream })
+    await CategoryManager.exportCategoryToStream({
+      survey,
+      categoryUuid: category.uuid,
+      draft,
+      fileFormat,
+      outputStream,
+    })
 
     // write to archive
-    const zipEntryName = `${Category.getName(category) || `category_${index}`}.csv`
+    const zipEntryName = `${Category.getName(category) || `category_${index}`}.${fileFormat}`
     this.archiver.addFile(categoryTempFilePath, zipEntryName)
 
     this.incrementProcessedItems()

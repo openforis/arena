@@ -121,10 +121,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = false } = Request.getParams(req)
+        const { surveyId, fileFormat, draft = false } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const job = CategoryService.exportAllCategories({ user, surveyId, draft })
+        const job = CategoryService.exportAllCategories({ user, surveyId, fileFormat, draft })
         res.json({ job })
       } catch (error) {
         next(error)

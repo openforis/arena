@@ -45,8 +45,8 @@ export {
   fetchRecordsCountByStep,
   fetchRecordSummary,
   fetchRecordsSummary,
-  startExportDataToCSVJob,
-  downloadExportedDataToCSVUrl,
+  startExportDataJob,
+  downloadExportedDataUrl,
   startRecordsCloneJob,
   mergeRecords,
 } from './data'

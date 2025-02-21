@@ -23,6 +23,7 @@ import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 
 const MAX_LEVELS = 5
 
@@ -78,11 +79,10 @@ const CategoryDetails = (props) => {
               }
             />
           )}
-          <ButtonDownload
+          <ButtonMenuExport
             className="export-btn"
             testId={TestId.categoryDetails.exportBtn}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            label="common.exportToExcel"
           />
           {!readOnly && (
             <ButtonMenu

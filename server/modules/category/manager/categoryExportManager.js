@@ -7,6 +7,7 @@ import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { FileFormats } from '@core/fileFormats'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
 
@@ -120,14 +121,14 @@ export const exportCategoryToStream = async (
   // get survey languages
   const languages = Survey.getLanguages(survey)
 
-  const categoryStream = CategoryRepository.generateCategoryExportStream({
+  const queryStream = CategoryRepository.generateCategoryExportStream({
     surveyId,
     category,
     languages,
     includeCumulativeArea,
   })
 
-  const headers = getCategoryExportHeaders({
+  const fields = getCategoryExportHeaders({
     category,
     languages,
     language,
@@ -138,13 +139,16 @@ export const exportCategoryToStream = async (
     includeCumulativeArea,
   })
 
-  return client.stream(categoryStream, (dbStream) =>
-    FlatDataWriter.writeItemsStreamToStream({
-      stream: dbStream,
-      outputStream,
-      fields: headers,
-      options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
-      fileFormat,
-    })
-  )
+  return DbUtils.stream({
+    client,
+    queryStream,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        outputStream,
+        fields,
+        options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
+        fileFormat,
+      }),
+  })
 }
