@@ -42,9 +42,9 @@ export default {
   TaxonomiesImportJob: 'Taxonomies Import',
   TaxonomiesValidationJob: 'Taxonomies Validation',
   TaxonomyImportJob: 'Taxonomy Import',
-  // export csv data
-  DataExportJob: 'Export CSV data',
-  ZipCreationJob: 'ZIP file Creation',
+  // data export
+  DataExportJob: 'Data Export',
+  ZipCreationJob: 'ZIP File Creation',
   CSVDataExtraction: 'Data Export',
   // import arena survey
   ArenaImportJob: 'Arena import',
