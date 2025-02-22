@@ -16,7 +16,7 @@ export const dataExportOptions = {
 }
 
 export const defaultDataExportOptionsSelection = {
-  [dataExportOptions.fileFormat]: FileFormats.csv,
+  [dataExportOptions.fileFormat]: FileFormats.xlsx,
   [dataExportOptions.includeCategoryItemsLabels]: true,
   [dataExportOptions.includeFiles]: false,
   [dataExportOptions.includeFileAttributeDefs]: false,
