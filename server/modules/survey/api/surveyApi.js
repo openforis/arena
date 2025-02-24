@@ -4,6 +4,7 @@ import { Authorizer } from '@openforis/arena-core'
 import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as Response from '../../../utils/response'
 import * as Request from '../../../utils/request'
@@ -221,13 +222,18 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary' })
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+      const fileName = ExportFileNameGenerator.generate({
+        survey,
+        cycle,
+        fileType: 'SchemaSummary',
+        fileFormat,
+      })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
 
-      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res })
+      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }

@@ -26,7 +26,7 @@ const HeaderLeft = (props) => {
           <Checkbox checked={onlyOwn} label="surveysView.onlyOwn" onChange={() => setOnlyOwn(!onlyOwn)} />
         )}
       </div>
-      {canExportSurveys && count > 0 && <ButtonDownload href="/api/surveys/export" label="common.csvExport" />}
+      {canExportSurveys && count > 0 && <ButtonDownload href="/api/surveys/export" label="common.exportToExcel" />}
     </>
   )
 }

@@ -4,6 +4,7 @@ import * as Response from '@server/utils/response'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
@@ -120,10 +121,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = false } = Request.getParams(req)
+        const { surveyId, fileFormat, draft = false } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const job = CategoryService.exportAllCategories({ user, surveyId, draft })
+        const job = CategoryService.exportAllCategories({ user, surveyId, fileFormat, draft })
         res.json({ job })
       } catch (error) {
         next(error)
@@ -238,9 +239,9 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const { surveyId, categoryUuid, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res })
+        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res, fileFormat })
       } catch (error) {
         next(error)
       }

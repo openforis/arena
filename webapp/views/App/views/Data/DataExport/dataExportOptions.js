@@ -1,27 +1,31 @@
+import { FileFormats } from '@core/fileFormats'
+
 export const dataExportOptions = {
+  fileFormat: 'fileFormat',
   includeCategoryItemsLabels: 'includeCategoryItemsLabels',
-  expandCategoryItems: 'expandCategoryItems',
-  includeCategories: 'includeCategories',
-  includeAncestorAttributes: 'includeAncestorAttributes',
-  includeAnalysis: 'includeAnalysis',
-  includeDataFromAllCycles: 'includeDataFromAllCycles',
   includeFiles: 'includeFiles',
   includeFileAttributeDefs: 'includeFileAttributeDefs',
+  includeAncestorAttributes: 'includeAncestorAttributes',
+  includeAnalysis: 'includeAnalysis',
+  expandCategoryItems: 'expandCategoryItems',
+  includeCategories: 'includeCategories',
+  includeDataFromAllCycles: 'includeDataFromAllCycles',
   recordsModifiedAfter: 'recordsModifiedAfter',
-  includeInternalUuids: 'includeInternalUuids',
   includeDateCreated: 'includeDateCreated',
+  includeInternalUuids: 'includeInternalUuids',
 }
 
 export const defaultDataExportOptionsSelection = {
+  [dataExportOptions.fileFormat]: FileFormats.xlsx,
   [dataExportOptions.includeCategoryItemsLabels]: true,
-  [dataExportOptions.expandCategoryItems]: false,
-  [dataExportOptions.includeCategories]: false,
-  [dataExportOptions.includeAncestorAttributes]: false,
-  [dataExportOptions.includeAnalysis]: false,
-  [dataExportOptions.includeDataFromAllCycles]: false,
   [dataExportOptions.includeFiles]: false,
   [dataExportOptions.includeFileAttributeDefs]: false,
+  [dataExportOptions.includeAncestorAttributes]: false,
+  [dataExportOptions.includeAnalysis]: false,
+  [dataExportOptions.expandCategoryItems]: false,
+  [dataExportOptions.includeCategories]: false,
+  [dataExportOptions.includeDataFromAllCycles]: false,
   [dataExportOptions.recordsModifiedAfter]: null,
-  [dataExportOptions.includeInternalUuids]: false,
   [dataExportOptions.includeDateCreated]: false,
+  [dataExportOptions.includeInternalUuids]: false,
 }

@@ -3,7 +3,7 @@ import * as DateUtils from '@core/dateUtils'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as SurveyManager from '../manager/surveyManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
@@ -86,7 +86,7 @@ export const exportSurveysList = async ({ user, draft, template, outputStream })
       return acc
     }, {})
 
-  await CSVWriter.writeItemsToStream({
+  await FlatDataWriter.writeItemsToStream({
     outputStream,
     items,
     fields,
@@ -100,8 +100,8 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
   return JobUtils.jobToJSON(job)
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) =>
-  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream })
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) =>
+  SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream, fileFormat })
 
 export const exportLabels = async ({ surveyId, outputStream }) =>
   SurveyLabelsExport.exportLabels({ surveyId, outputStream })

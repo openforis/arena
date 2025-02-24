@@ -8,12 +8,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 import { db } from '../../../db/db'
-import * as CSVWriter from '../../../utils/file/csvWriter'
+import * as DbUtils from '../../../db/dbUtils'
+import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
@@ -60,7 +63,8 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {boolean|object} [params.outputStream=null] - The output to be used to stream the data (if specified).
+ * @param {string} [params.fileFormat=null] - The format of the output file (csv or xlsx).
  *
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
@@ -76,7 +80,8 @@ export const fetchViewData = async (params, client = db) => {
     recordOwnerUuid = null,
     offset = 0,
     limit = null,
-    streamOutput = null,
+    outputStream = null,
+    fileFormat = null,
     addCycle = false,
     includeCategoryItemsLabels = true,
     expandCategoryItems = false,
@@ -99,12 +104,12 @@ export const fetchViewData = async (params, client = db) => {
       recordOwnerUuid,
       offset,
       limit,
-      stream: Boolean(streamOutput),
+      stream: Boolean(outputStream),
     },
     client
   )
 
-  if (streamOutput) {
+  if (outputStream) {
     const fields = columnNodeDefs
       ? null // all fields will be included in the CSV file
       : SurveyRdbCsvExport.getCsvExportFields({
@@ -116,25 +121,28 @@ export const fetchViewData = async (params, client = db) => {
           includeInternalUuids,
           includeDateCreated,
         })
-
-    await db.stream(result, (dbStream) => {
-      const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
-        survey,
-        query,
-        expandCategoryItems,
-        nullsToEmpty,
-        keepFileNamesUnique: true,
-        uniqueFileNamesGenerator,
-      })
-      const csvTransform = CSVWriter.transformJsonToCsv({
-        fields,
-        options: {
-          objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
-        },
-      })
-      dbStream.pipe(csvTransform).pipe(streamOutput)
+    const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
+      survey,
+      query,
+      expandCategoryItems,
+      nullsToEmpty,
+      keepFileNamesUnique: true,
+      uniqueFileNamesGenerator,
     })
-    return null
+    await DbUtils.stream({
+      queryStream: result,
+      client,
+      processor: async (dbStream) =>
+        FlatDataWriter.writeItemsStreamToStream({
+          stream: dbStream,
+          fields,
+          options: {
+            objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
+          },
+          outputStream,
+          fileFormat,
+        }),
+    })
   }
   return result
 }
@@ -150,31 +158,37 @@ export const fetchViewData = async (params, client = db) => {
  * @param {number} [params.offset=null] - The query offset.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
- *
+ * @param {boolean} [params.outputStream=null] - The output to be used to stream the data (if specified).
+ * @param {object} [params.options=null] - Export options object (e.g. {fileFormat: 'csv'}).
+ * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = async (params) => {
-  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, streamOutput = null } = params
+export const fetchViewDataAgg = async (params, client = db) => {
+  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, outputStream = null, options = {} } = params
+  const { fileFormat = FileFormats.csv } = options
 
   // Fetch data
-  const result = await DataViewRepository.fetchViewDataAgg({
-    survey,
-    cycle,
-    query,
-    recordOwnerUuid,
-    limit,
-    offset,
-    stream: Boolean(streamOutput),
-  })
+  const result = await DataViewRepository.fetchViewDataAgg(
+    {
+      survey,
+      cycle,
+      query,
+      recordOwnerUuid,
+      limit,
+      offset,
+      stream: Boolean(outputStream),
+    },
+    client
+  )
 
-  if (streamOutput) {
-    await db.stream(result, (dbStream) => {
-      const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
-      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
-      dbStream.pipe(csvTransform).pipe(streamOutput)
+  if (outputStream) {
+    const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
+    return DbUtils.stream({
+      queryStream: result,
+      client,
+      processor: async (dbStream) =>
+        FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
     })
-    return null
   }
   return result
 }
@@ -225,6 +239,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeInternalUuids,
     includeDateCreated,
     recordsModifiedAfter,
+    fileFormat,
   } = options
 
   const addCycle = Survey.getCycleKeys(survey).length > 1
@@ -261,7 +276,8 @@ export const fetchEntitiesDataToCsvFiles = async (
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
     const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
-    const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.csv`
+    const extension = ExportFileNameGenerator.getExtensionByFileFormat(fileFormat)
+    const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
     const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
@@ -298,7 +314,8 @@ export const fetchEntitiesDataToCsvFiles = async (
         survey,
         cycle,
         recordOwnerUuid,
-        streamOutput: outputStream,
+        outputStream,
+        fileFormat,
         query,
         addCycle,
         includeCategoryItemsLabels,

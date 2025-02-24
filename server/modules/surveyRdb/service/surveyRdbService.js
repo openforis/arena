@@ -42,7 +42,7 @@ const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
  * @param {!Query} [params.query] - The Query to execute.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {Stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {Stream.Writable} [params.outputStream=null] - The output to be used to stream the data (if specified).
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
@@ -55,7 +55,7 @@ export const fetchViewData = async (params) => {
     offset = 0,
     limit = null,
     columnNodeDefs = false,
-    streamOutput = null,
+    outputStream = null,
     addCycle = false,
     options = {},
   } = params
@@ -68,7 +68,16 @@ export const fetchViewData = async (params) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   const data = Query.isModeAggregate(parsedQuery)
-    ? await SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, recordOwnerUuid, offset, limit, streamOutput })
+    ? await SurveyRdbManager.fetchViewDataAgg({
+        survey,
+        cycle,
+        query,
+        recordOwnerUuid,
+        offset,
+        limit,
+        outputStream,
+        options,
+      })
     : await SurveyRdbManager.fetchViewData({
         survey,
         cycle,
@@ -77,7 +86,7 @@ export const fetchViewData = async (params) => {
         recordOwnerUuid,
         offset,
         limit,
-        streamOutput,
+        outputStream,
         addCycle,
         ...options,
       })
@@ -135,9 +144,9 @@ export const exportViewDataToTempFile = async ({
 }) => {
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
-  const streamOutput = FileUtils.createWriteStream(tempFilePath)
+  const outputStream = FileUtils.createWriteStream(tempFilePath)
 
-  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle, options })
+  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, outputStream, addCycle, options })
 
   return tempFileName
 }

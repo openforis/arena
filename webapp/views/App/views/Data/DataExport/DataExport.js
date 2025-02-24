@@ -93,7 +93,7 @@ const DataExport = (props) => {
         className="btn-primary"
         label="dataExportView.startExport"
         onClick={onExportClick}
-        testId={TestId.dataExport.prepareExport}
+        testId={TestId.dataExport.startExport}
       />
     </div>
   )

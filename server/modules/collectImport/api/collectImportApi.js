@@ -1,12 +1,13 @@
-import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import { FileFormats } from '@core/fileFormats'
 
-import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
@@ -65,32 +66,28 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = true } = Request.getParams(req)
+        const { surveyId, draft = true, fileFormat = FileFormats.csv } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
-        const surveyName = Survey.getName(surveyInfo)
         const messageLangCode = Survey.getDefaultLanguage(surveyInfo)
 
-        const reportItemsStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
+        const reportItemsQueryStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
 
-        const headers = [
-          'id',
-          'node_def_uuid',
-          'node_def_name',
-          'type',
-          'expression',
-          'apply_if',
-          'message',
-          'resolved',
-        ]
+        const fields = ['id', 'node_def_uuid', 'node_def_name', 'type', 'expression', 'apply_if', 'message', 'resolved']
 
-        const fileName = `${surveyName}_collect-report_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+        const fileName = ExportFileNameGenerator.generate({
+          survey,
+          fileType: 'collect-report',
+          includeTimestamp: true,
+          fileFormat,
+        })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await db.stream(reportItemsStream, (dbStream) => {
-          const csvTransform = CSVWriter.transformJsonToCsv({ fields: headers })
-          dbStream.pipe(csvTransform).pipe(res)
+        await DbUtils.stream({
+          queryStream: reportItemsQueryStream,
+          processor: async (dbStream) =>
+            FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields, fileFormat }),
         })
       } catch (error) {
         next(error)

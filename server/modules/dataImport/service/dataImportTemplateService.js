@@ -10,7 +10,7 @@ import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 
 import { contentTypes, setContentTypeFile } from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipArchiver } from '@server/utils/file/zipArchiver'
 
@@ -79,7 +79,7 @@ const exportDataImportTemplate = async ({ surveyId, cycle, nodeDefUuid, includeF
     contentType: contentTypes.csv,
   })
 
-  await CSVWriter.writeItemsToStream({ outputStream: res, items: [template] })
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, items: [template] })
 }
 
 const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, res }) => {
@@ -105,7 +105,10 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, res
     const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.csv`
     const tempFilePath = FileUtils.newTempFilePath()
 
-    await CSVWriter.writeItemsToStream({ outputStream: FileUtils.createWriteStream(tempFilePath), items: [template] })
+    await FlatDataWriter.writeItemsToStream({
+      outputStream: FileUtils.createWriteStream(tempFilePath),
+      items: [template],
+    })
 
     archiver.addFile(tempFilePath, zipEntryName)
     tempFilePaths.push(tempFilePath)

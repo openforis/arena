@@ -9,18 +9,18 @@ export const ButtonDownload = forwardRef((props, ref) => {
     iconClassName = 'icon-download2 icon-14px',
     label = 'common.download',
     onClick: onClickProp,
-    requestParams,
+    requestParams = null,
     variant = 'outlined',
     ...otherProps
   } = props
 
   const onClick = useCallback(async () => {
+    if (onClickProp) {
+      await onClickProp()
+    }
     if (href) {
       const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
       window.open(url, '_blank')
-    }
-    if (onClickProp) {
-      await onClickProp()
     }
   }, [href, onClickProp, requestParams])
 

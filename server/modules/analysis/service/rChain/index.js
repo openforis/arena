@@ -7,6 +7,7 @@ import FileZip from '@server/utils/file/fileZip'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordStep from '@core/record/recordStep'
+import { FileFormats } from '@core/fileFormats'
 
 import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
@@ -27,7 +28,15 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, to
   new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
-export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
+export const fetchNodeData = async ({
+  res,
+  surveyId,
+  cycle,
+  chainUuid,
+  nodeDefUuid,
+  draft = true,
+  fileFormat = FileFormats.csv,
+}) => {
   // prepare query
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
@@ -53,7 +62,8 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
     includeFileAttributeDefs: false,
     addCycle: true,
     nullsToEmpty: true,
-    streamOutput: res,
+    outputStream: res,
+    fileFormat,
   })
 }
 

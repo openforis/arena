@@ -42,10 +42,10 @@ export default {
   TaxonomiesImportJob: 'Taxonomies Import',
   TaxonomiesValidationJob: 'Taxonomies Validation',
   TaxonomyImportJob: 'Taxonomy Import',
-  // export csv data
-  DataExportJob: 'Export CSV data',
-  ZipCreationJob: 'ZIP file Creation',
-  CSVDataExtraction: 'Data Export',
+  // data export
+  DataExportJob: 'Data Export',
+  ZipCreationJob: 'ZIP File Creation',
+  CSVDataExtraction: 'Data Extraction',
   // import arena survey
   ArenaImportJob: 'Arena import',
   ArenaSurveyReaderJob: 'Arena Survey Reader',

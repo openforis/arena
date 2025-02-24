@@ -9,7 +9,15 @@ import MenuItem from '@mui/material/MenuItem'
 import { Button } from './Button'
 
 export const ButtonMenu = (props) => {
-  const { className, closeMenuOnItemClick = true, menuClassName, items, variant = 'text', ...otherProps } = props
+  const {
+    className,
+    closeMenuOnItemClick = true,
+    menuClassName,
+    items,
+    testId = null,
+    variant = 'text',
+    ...otherProps
+  } = props
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -35,6 +43,7 @@ export const ButtonMenu = (props) => {
       <Button
         className={classNames('button-menu__button', className)}
         onClick={onButtonClick}
+        testId={testId}
         variant={variant}
         {...otherProps}
       >

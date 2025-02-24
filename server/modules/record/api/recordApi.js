@@ -13,6 +13,7 @@ import * as Record from '@core/record/record'
 import * as RecordFile from '@core/record/recordFile'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as RecordService from '../service/recordService'
@@ -186,9 +187,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records/summary/export', requireRecordListExportPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      await RecordService.exportRecordsSummaryToCsv({ res, surveyId, cycle })
+      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -295,11 +296,11 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/csv', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/validationReport/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, lang, recordUuid } = Request.getParams(req)
+      const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      await RecordService.exportValidationReportToCSV({ res, surveyId, cycle, lang, recordUuid })
+      await RecordService.exportValidationReportToFlatData({ res, surveyId, cycle, lang, recordUuid, fileFormat })
     } catch (error) {
       next(error)
     }

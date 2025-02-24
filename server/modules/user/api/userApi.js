@@ -1,12 +1,13 @@
 import * as A from '@core/arena'
+import { FileFormats } from '@core/fileFormats'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
-import * as DateUtils from '@core/dateUtils'
 
 import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -159,12 +160,12 @@ export const init = (app) => {
     }
   })
 
-  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const fileName = `users_${DateUtils.nowFormatDefault()}.csv`
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-      await UserExportService.exportUsersIntoStream({ outputStream: res })
+      const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+      const fileName = ExportFileNameGenerator.generate({ fileType: 'users', includeTimestamp: true, fileFormat })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
+      await UserExportService.exportUsersIntoStream({ outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -272,12 +273,17 @@ export const init = (app) => {
   app.get(
     '/users/users-access-request/export',
     AuthMiddleware.requireUsersAllViewPermission,
-    async (_req, res, next) => {
+    async (req, res, next) => {
       try {
-        const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+        const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const fileName = ExportFileNameGenerator.generate({
+          itemName: 'user_access_requests',
+          includeTimestamp: true,
+          fileFormat,
+        })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
+        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res, fileFormat })
       } catch (error) {
         next(error)
       }

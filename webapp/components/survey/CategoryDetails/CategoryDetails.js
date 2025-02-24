@@ -13,8 +13,10 @@ import * as Validation from '@core/validation/validation'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 
@@ -45,6 +47,14 @@ const CategoryDetails = (props) => {
   if (!category) return null
 
   const categoryUuid = Category.getUuid(category)
+  const itemsCount =
+    Category.getItemsCount(category) > 0
+      ? Category.getItemsCount(category)
+      : Category.getLevelsArray(category).reduce((acc, level) => {
+          acc += CategoryLevel.getItemsCount(level)
+          return acc
+        }, 0)
+  const excelExportDisabled = itemsCount > FileUtils.excelRowsLimit
 
   const importSummary = State.getImportSummary(state)
   const editingItemExtraDefs = State.isEditingItemExtraDefs(state)
@@ -78,11 +88,11 @@ const CategoryDetails = (props) => {
               }
             />
           )}
-          <ButtonDownload
+          <ButtonMenuExport
             className="export-btn"
-            testId={TestId.categoryDetails.exportBtn}
+            excelExportDisabled={excelExportDisabled}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            label="common.csvExport"
+            testId={TestId.categoryDetails.exportBtn}
           />
           {!readOnly && (
             <ButtonMenu
