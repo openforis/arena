@@ -2,7 +2,9 @@ import { parse as csvParser } from 'csv'
 
 import { SystemError } from '@openforis/arena-core'
 
+import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
+
 import * as FileUtils from './fileUtils'
 
 const _extractValidHeaders = (row) => {
@@ -36,7 +38,13 @@ const _rowToObject = ({ headers, row }) =>
     {}
   )
 
-export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
+export const createReaderFromStream = ({
+  stream,
+  fileFormat = FileFormats.csv,
+  onHeaders = null,
+  onRow = null,
+  onTotalChange = null,
+}) => {
   const jobStatus = { canceled: false }
 
   const _tryOrCancel = async (fnPromise) => {
@@ -48,9 +56,10 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     }
   }
 
-  const parser = stream.pipe(
-    csvParser({ relaxColumnCount: true, skip_empty_lines: true, skip_records_with_empty_values: true })
-  )
+  const parser =
+    fileFormat === FileFormats.csv
+      ? stream.pipe(csvParser({ relaxColumnCount: true, skip_empty_lines: true, skip_records_with_empty_values: true }))
+      : null
 
   const start = async () => {
     let headers = null

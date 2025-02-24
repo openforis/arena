@@ -205,14 +205,14 @@ const createReaderFromStream = ({
     },
   })
 
-  return FlatDataReader.createReaderFromStream(
+  return FlatDataReader.createReaderFromStream({
     stream,
-    async (headers) => {
+    onHeaders: async (headers) => {
       if (validateHeaders) {
         await _validateHeaders({ csvDataExportModel })(headers)
       }
     },
-    async (row) => {
+    onRow: async (row) => {
       // combine several columns into single values for every attribute definition
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
@@ -255,8 +255,8 @@ const createReaderFromStream = ({
 
       await onRowItem({ row, valuesByDefUuid, errors })
     },
-    onTotalChange
-  )
+    onTotalChange,
+  })
 }
 
 export const DataImportCsvFileReader = {

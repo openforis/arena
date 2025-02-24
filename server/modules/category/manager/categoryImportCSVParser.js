@@ -56,10 +56,9 @@ const _getItemValue = ({ survey, item, row }) => {
 export const createRowsReaderFromStream = async ({ stream, survey, summary, onRowItem, onTotalChange }) => {
   const items = CategoryImportSummary.getItems(summary)
 
-  return FlatDataReader.createReaderFromStream(
+  return FlatDataReader.createReaderFromStream({
     stream,
-    null,
-    async (row) => {
+    onRow: async (row) => {
       try {
         const codes = []
         const extra = {}
@@ -104,6 +103,6 @@ export const createRowsReaderFromStream = async ({ stream, survey, summary, onRo
         await onRowItem({ error })
       }
     },
-    onTotalChange
-  )
+    onTotalChange,
+  })
 }

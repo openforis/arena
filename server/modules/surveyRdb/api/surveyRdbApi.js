@@ -97,7 +97,12 @@ export const init = (app) => {
         const { surveyId, cycle, tempFileName, fileFormat } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById({ surveyId })
-        const outputFileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ExlorerTable', fileFormat })
+        const outputFileName = ExportFileNameGenerator.generate({
+          survey,
+          cycle,
+          fileType: 'ExplorerTable',
+          fileFormat,
+        })
 
         Response.sendFile({
           res,

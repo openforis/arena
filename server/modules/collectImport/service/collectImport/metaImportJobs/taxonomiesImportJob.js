@@ -94,20 +94,20 @@ export default class TaxonomiesImportJob extends Job {
 
     const totalPrevious = this.total
 
-    const flatDataReader = FlatDataReader.createReaderFromStream(
-      speciesFileStream,
-      (headers) => this.onHeaders(headers),
-      async (row) => {
+    const flatDataReader = FlatDataReader.createReaderFromStream({
+      stream: speciesFileStream,
+      onHeaders: (headers) => this.onHeaders(headers),
+      onRow: async (row) => {
         if (this.isCanceled()) {
           flatDataReader.cancel()
           return
         }
         await this.onRow(speciesFileName, taxonomyUuid, row)
       },
-      (total) => {
+      onTotalChange: (total) => {
         this.total = totalPrevious + total
-      }
-    )
+      },
+    })
     await flatDataReader.start()
 
     if (this.isRunning()) {
