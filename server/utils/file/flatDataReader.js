@@ -6,6 +6,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
 
 import * as FileUtils from './fileUtils'
+import { ExcelReader } from './excelReader'
 
 const _extractValidHeaders = (row) => {
   // remove last empty columns
@@ -45,7 +46,7 @@ export const createReaderFromStream = ({
   onRow = null,
   onTotalChange = null,
 }) => {
-  const jobStatus = { canceled: false }
+  const readerStatus = { canceled: false }
 
   const _tryOrCancel = async (fnPromise) => {
     try {
@@ -80,8 +81,11 @@ export const createReaderFromStream = ({
       }
     }
 
-    for await (const row of parser) {
-      if (jobStatus.canceled) {
+    const parserOrRows =
+      fileFormat === FileFormats.csv ? parser : await ExcelReader.extractRowsFromExcelStream({ stream })
+
+    for await (const row of parserOrRows) {
+      if (readerStatus.canceled) {
         break
       } else {
         await _processRow(row)
@@ -90,7 +94,7 @@ export const createReaderFromStream = ({
   }
 
   const cancel = () => {
-    jobStatus.canceled = true
+    readerStatus.canceled = true
     stream?.destroy()
   }
 
