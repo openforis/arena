@@ -2,6 +2,7 @@ export const functionNames = {
   avg: 'avg',
   categoryItemProp: 'categoryItemProp',
   count: 'count',
+  dateTimeDiff: 'dateTimeDiff',
   distance: 'distance',
   first: 'first',
   geoPolygon: 'geoPolygon',

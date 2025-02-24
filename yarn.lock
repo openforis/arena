@@ -2786,7 +2786,23 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@openforis/arena-core@^1.0.10", "@openforis/arena-core@^1.0.8":
+"@openforis/arena-core@^1.0.11":
+  version "1.0.11"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.11/8ba0fa6f46541163a6a7d236af141953b53f329f#8ba0fa6f46541163a6a7d236af141953b53f329f"
+  integrity sha512-beDR3ddKP36o+52LN2cLwHY+skobiqyB626nGv2iXkJ54sDNSM1R0pf30CYIL8xem+i/iwZagTEHSS6s/CJ/zg==
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.4"
+    bignumber.js "^9.1.2"
+    jsep "^1.4.0"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    moment "^2.30.1"
+    proj4 "^2.15.0"
+    uuid "^11.0.3"
+
+"@openforis/arena-core@^1.0.8":
   version "1.0.10"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.10/4bb87ca2611be7db54f54626426516c3967e6f40#4bb87ca2611be7db54f54626426516c3967e6f40"
   integrity sha512-ZxwMh9PeiRphij1Ox9zNVyo+ijQ2zwXS+q5Shy4/ChHk1I1+2taKP6gXYOr0RC+pKrEmuYlfoNKnrvd+Al51nw==

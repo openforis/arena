@@ -1234,8 +1234,10 @@ $t(common.appNameFull)
     functionDescriptions: {
       categoryItemProp:
         'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
+      dateTimeDiff: 'Returns the difference (in minutes) from 2 date-time couples',
       distance: 'Returns the distance (in meters) between the specified coordinates',
       first: 'Returns the first value or node of the specified multiple attribute or entity',
+      geoPolygon: 'Generates a polygon in GeoJSON from a list of coordinates',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
