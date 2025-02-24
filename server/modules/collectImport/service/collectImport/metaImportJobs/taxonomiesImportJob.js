@@ -14,7 +14,7 @@ import Job from '@server/job/job'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import TaxonomyImportManager from '@server/modules/taxonomy/manager/taxonomyImportManager'
 
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const SPECIES_FILES_PATH = 'species/'
 const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
@@ -94,12 +94,12 @@ export default class TaxonomiesImportJob extends Job {
 
     const totalPrevious = this.total
 
-    const csvReader = CSVReader.createReaderFromStream(
+    const flatDataReader = FlatDataReader.createReaderFromStream(
       speciesFileStream,
       (headers) => this.onHeaders(headers),
       async (row) => {
         if (this.isCanceled()) {
-          csvReader.cancel()
+          flatDataReader.cancel()
           return
         }
         await this.onRow(speciesFileName, taxonomyUuid, row)
@@ -108,7 +108,7 @@ export default class TaxonomiesImportJob extends Job {
         this.total = totalPrevious + total
       }
     )
-    await csvReader.start()
+    await flatDataReader.start()
 
     if (this.isRunning()) {
       this.logDebug(`file ${speciesFileName} read correctly`)

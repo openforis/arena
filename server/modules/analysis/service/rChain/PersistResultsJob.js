@@ -48,7 +48,7 @@ export default class PersistResultsJob extends CsvDataImportJob {
     )
   }
 
-  async createCsvReader() {
+  async createFlatDataReader() {
     const { cycle, nodeDefUuid, survey } = this.context
 
     return DataImportCsvFileReader.createReaderFromStream({

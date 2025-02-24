@@ -9,7 +9,7 @@ import * as Srs from '@core/geo/srs'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const _checkSrs = ({ survey, srs, columnName }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -56,7 +56,7 @@ const _getItemValue = ({ survey, item, row }) => {
 export const createRowsReaderFromStream = async ({ stream, survey, summary, onRowItem, onTotalChange }) => {
   const items = CategoryImportSummary.getItems(summary)
 
-  return CSVReader.createReaderFromStream(
+  return FlatDataReader.createReaderFromStream(
     stream,
     null,
     async (row) => {

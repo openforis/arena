@@ -23,7 +23,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
     super(type, params)
 
     this.dataImportFileReader = null
-    this.csvReader = null
+    this.flatDataReader = null
     this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
@@ -51,8 +51,8 @@ export default class CsvDataImportJob extends DataImportBaseJob {
 
     await this.fetchRecordsSummary()
 
-    this.csvReader = await this.createCsvReader()
-    await this.startCsvReader()
+    this.flatDataReader = await this.createFlatDataReader()
+    await this.startFlatDataReader()
 
     if (!this.hasErrors() && this.processed === 0) {
       // Error: empty file
@@ -115,7 +115,7 @@ export default class CsvDataImportJob extends DataImportBaseJob {
     this.setContext({ recordsSummary: recordsSummary.list })
   }
 
-  async createCsvReader() {
+  async createFlatDataReader() {
     const { cycle, nodeDefUuid, survey, includeFiles } = this.context
 
     const stream = await this.dataImportFileReader.getCsvFileStream()
@@ -131,9 +131,9 @@ export default class CsvDataImportJob extends DataImportBaseJob {
     })
   }
 
-  async startCsvReader() {
+  async startFlatDataReader() {
     try {
-      await this.csvReader.start()
+      await this.flatDataReader.start()
     } catch (e) {
       const errorKey = e.key || e.toString()
       const errorParams = e.params
@@ -143,12 +143,12 @@ export default class CsvDataImportJob extends DataImportBaseJob {
 
   async cancel() {
     await super.cancel()
-    this.csvReader?.cancel()
+    this.flatDataReader?.cancel()
   }
 
   async setStatusFailed() {
     await super.setStatusFailed()
-    this.csvReader?.cancel()
+    this.flatDataReader?.cancel()
   }
 
   async onRowItem({ valuesByDefUuid, errors }) {

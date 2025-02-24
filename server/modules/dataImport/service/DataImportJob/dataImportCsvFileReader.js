@@ -9,7 +9,7 @@ import * as Category from '@core/survey/category'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import { uuidv4 } from '@core/uuid'
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 const VALUE_PROP_DEFAULT = 'value'
@@ -205,7 +205,7 @@ const createReaderFromStream = ({
     },
   })
 
-  return CSVReader.createReaderFromStream(
+  return FlatDataReader.createReaderFromStream(
     stream,
     async (headers) => {
       if (validateHeaders) {

@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 import SystemError from '@core/systemError'
 
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import { Strings } from '@openforis/arena-core'
 
 const defaultLevelName = 'level_1'
@@ -185,7 +185,7 @@ export const createImportSummaryFromStream = async ({
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
-  const columnNames = await CSVReader.readHeadersFromStream(stream)
+  const columnNames = await FlatDataReader.readHeadersFromStream(stream)
   return createImportSummaryFromColumnNames({
     columnNames,
     defaultLang,
