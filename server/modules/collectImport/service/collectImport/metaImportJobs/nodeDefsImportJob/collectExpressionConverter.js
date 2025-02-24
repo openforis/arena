@@ -88,6 +88,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
       pattern: /idm:position\(\)/,
       replace: `index(${NodeDef.getName(Survey.getNodeDefParent(nodeDefCurrent)(survey))}) + 1`,
     },
+    { pattern: 'idm:datetime-diff', replace: 'dateTimeDiff' },
     {
       pattern: /idm:samplingPointCoordinate\(([^)]+)\)/,
       // change the function name but keep the same arguments.
