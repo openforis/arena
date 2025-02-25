@@ -6,6 +6,7 @@ const { functionNames, modes } = Expression
 const functionExamples = {
   [modes.json]: {
     [functionNames.categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
+    [functionNames.dateTimeDiff]: 'dateTimeDiff(date_1, time_1, date_2, time_2)',
     [functionNames.distance]: 'distance(coordinate_attribute_1, coordinate_attribute_2)',
     [functionNames.first]: 'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
     [functionNames.geoPolygon]:
