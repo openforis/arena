@@ -30,10 +30,11 @@ export const init = (app) => {
     }
   })
 
-  app.post(`${uriPrefix}/csv`, requireRecordCreatePermission, async (req, res, next) => {
+  app.post(`${uriPrefix}/flat-data`, requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const {
+        fileFormat,
         surveyId,
         cycle,
         nodeDefUuid,
@@ -46,10 +47,11 @@ export const init = (app) => {
       } = Request.getParams(req)
       const filePath = Request.getFilePath(req)
 
-      const job = DataImportService.startCSVDataImportJob({
+      const job = DataImportService.startFlatDataImportJob({
         user,
         surveyId,
         filePath,
+        fileFormat,
         cycle,
         nodeDefUuid,
         dryRun,
@@ -66,21 +68,28 @@ export const init = (app) => {
     }
   })
 
-  app.get(`${uriPrefix}/csv/template`, requireRecordCreatePermission, async (req, res, next) => {
+  app.get(`${uriPrefix}/flat-data/template`, requireRecordCreatePermission, async (req, res, next) => {
     try {
-      const { surveyId, nodeDefUuid, cycle, includeFiles } = Request.getParams(req)
+      const { surveyId, nodeDefUuid, cycle, includeFiles, fileFormat } = Request.getParams(req)
 
-      await DataImportTemplateService.exportDataImportTemplate({ surveyId, cycle, nodeDefUuid, includeFiles, res })
+      await DataImportTemplateService.exportDataImportTemplate({
+        surveyId,
+        cycle,
+        nodeDefUuid,
+        includeFiles,
+        fileFormat,
+        res,
+      })
     } catch (error) {
       next(error)
     }
   })
 
-  app.get(`${uriPrefix}/csv/templates`, requireRecordCreatePermission, async (req, res, next) => {
+  app.get(`${uriPrefix}/flat-data/templates`, requireRecordCreatePermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, includeFiles } = Request.getParams(req)
+      const { surveyId, cycle, includeFiles, fileFormat } = Request.getParams(req)
 
-      await DataImportTemplateService.exportAllDataImportTemplates({ surveyId, cycle, includeFiles, res })
+      await DataImportTemplateService.exportAllDataImportTemplates({ surveyId, cycle, fileFormat, includeFiles, res })
     } catch (error) {
       next(error)
     }

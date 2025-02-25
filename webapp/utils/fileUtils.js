@@ -46,6 +46,7 @@ const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) 
 
 const acceptByExtension = {
   csv: { 'text/csv': ['.csv'] },
+  xlsx: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] },
   zip: { 'application/zip': ['.zip'] },
 }
 

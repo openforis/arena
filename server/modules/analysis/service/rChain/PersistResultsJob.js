@@ -2,14 +2,15 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
-import CsvDataImportJob from '@server/modules/dataImport/service/DataImportJob/CsvDataImportJob'
-import { DataImportCsvFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportCsvFileReader'
+import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/FlatDataImportJob'
+import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import FileZip from '@server/utils/file/fileZip'
 
 import { RecordsProvider } from './RecordsProvider'
+import { FileFormats } from '@core/fileFormats'
 
-export default class PersistResultsJob extends CsvDataImportJob {
+export default class PersistResultsJob extends FlatDataImportJob {
   constructor(params) {
     super(params, PersistResultsJob.type)
   }
@@ -49,10 +50,12 @@ export default class PersistResultsJob extends CsvDataImportJob {
   }
 
   async createFlatDataReader() {
-    const { cycle, nodeDefUuid, survey } = this.context
+    const { context, stream } = this
+    const { cycle, nodeDefUuid, survey } = context
 
-    return DataImportCsvFileReader.createReaderFromStream({
-      stream: this.stream,
+    return DataImportFlatDataFileReader.createReaderFromStream({
+      stream,
+      fileFormat: FileFormats.csv,
       survey,
       cycle,
       nodeDefUuid,

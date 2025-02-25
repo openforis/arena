@@ -17,10 +17,11 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
   return job
 }
 
-export const startCSVDataImportJob = ({
+export const startFlatDataImportJob = ({
   user,
   surveyId,
   filePath,
+  fileFormat,
   cycle,
   nodeDefUuid,
   dryRun = false,
@@ -34,6 +35,7 @@ export const startCSVDataImportJob = ({
     user,
     surveyId,
     filePath,
+    fileFormat,
     cycle,
     nodeDefUuid,
     dryRun,

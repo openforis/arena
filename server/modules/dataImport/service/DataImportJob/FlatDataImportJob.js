@@ -11,15 +11,15 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 
-import { DataImportCsvFileReader } from './dataImportCsvFileReader'
+import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
 import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
 
-export default class CsvDataImportJob extends DataImportBaseJob {
-  constructor(params, type = CsvDataImportJob.type) {
+export default class FlatDataImportJob extends DataImportBaseJob {
+  constructor(params, type = FlatDataImportJob.type) {
     super(type, params)
 
     this.dataImportFileReader = null
@@ -116,12 +116,13 @@ export default class CsvDataImportJob extends DataImportBaseJob {
   }
 
   async createFlatDataReader() {
-    const { cycle, nodeDefUuid, survey, includeFiles } = this.context
+    const { cycle, nodeDefUuid, survey, fileFormat, includeFiles } = this.context
 
     const stream = await this.dataImportFileReader.getCsvFileStream()
 
-    return DataImportCsvFileReader.createReaderFromStream({
+    return DataImportFlatDataFileReader.createReaderFromStream({
       stream,
+      fileFormat,
       survey,
       cycle,
       nodeDefUuid,
@@ -320,4 +321,4 @@ export default class CsvDataImportJob extends DataImportBaseJob {
   }
 }
 
-CsvDataImportJob.type = 'DataImportJob'
+FlatDataImportJob.type = 'DataImportJob'

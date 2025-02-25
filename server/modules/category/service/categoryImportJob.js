@@ -16,7 +16,7 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as CategoryManager from '../manager/categoryManager'
-import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
+import * as CategoryImportFlatDataParser from '../manager/categoryImportFlatDataParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
 import { CategoryValidationJob } from './CategoryValidationJob'
@@ -265,7 +265,7 @@ export class CategoryImportInternalJob extends Job {
     })
     await this.itemsUpdater.init()
 
-    const reader = await CategoryImportCSVParser.createRowsReaderFromStream({
+    const reader = await CategoryImportFlatDataParser.createRowsReaderFromStream({
       stream: await this.createReadStream(),
       survey,
       summary,

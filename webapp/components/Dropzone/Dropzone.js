@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'
 
-import { Strings } from '@openforis/arena-core'
+import { Arrays, Strings } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
@@ -33,8 +33,9 @@ const Dropzone = (props) => {
 
   const acceptedExtensions = useMemo(
     () =>
+      // every "accept" item can be an array of extensions or a list of comma separated values
       Object.values(acceptPropObject)
-        .flatMap((value) => value.split(','))
+        .flatMap((value) => Arrays.toArray(value).flatMap((val) => val.split(',')))
         .map((value) => Strings.removePrefix('.')(value).trim()),
     [acceptPropObject]
   )
