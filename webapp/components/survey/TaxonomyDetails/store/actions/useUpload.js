@@ -22,29 +22,37 @@ export const useUpload = ({ setState }) => {
   const refreshTaxonomy = useRefreshTaxonomy({ setState })
   const surveyId = useSurveyId()
 
-  const onUploadComplete = async ({ taxonomyUuid }) => {
-    await refreshTaxonomy({ taxonomyUuid })
-    dispatch(SurveyActions.metaUpdated())
-  }
+  const onUploadComplete = useCallback(
+    async ({ taxonomyUuid }) => {
+      await refreshTaxonomy({ taxonomyUuid })
+      dispatch(SurveyActions.metaUpdated())
+    },
+    [dispatch, refreshTaxonomy]
+  )
 
-  return useCallback(async ({ state, file }) => {
-    const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
-    if (!allowedFileFormats.includes(fileFormat)) {
-      const extension = FileUtils.getExtension(file)
-      dispatch(NotificationActions.notifyWarning({ key: 'dropzone.error.invalidFileExtension', params: { extension } }))
-      return
-    }
-    const taxonomy = State.getTaxonomy(state)
-    const taxonomyUuid = Taxonomy.getUuid(taxonomy)
-    const formData = API.objectToFormData({ file, fileFormat })
+  return useCallback(
+    async ({ state, file }) => {
+      const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
+      if (!allowedFileFormats.includes(fileFormat)) {
+        const extension = FileUtils.getExtension(file)
+        dispatch(
+          NotificationActions.notifyWarning({ key: 'dropzone.error.invalidFileExtension', params: { extension } })
+        )
+        return
+      }
+      const taxonomy = State.getTaxonomy(state)
+      const taxonomyUuid = Taxonomy.getUuid(taxonomy)
+      const formData = API.objectToFormData({ file, fileFormat })
 
-    const { data } = await API.uploadTaxa({ surveyId, taxonomyUuid, formData })
+      const { data } = await API.uploadTaxa({ surveyId, taxonomyUuid, formData })
 
-    await dispatch(
-      JobActions.showJobMonitor({
-        job: data.job,
-        onComplete: async () => onUploadComplete({ taxonomyUuid }),
-      })
-    )
-  }, [])
+      dispatch(
+        JobActions.showJobMonitor({
+          job: data.job,
+          onComplete: async () => onUploadComplete({ taxonomyUuid }),
+        })
+      )
+    },
+    [dispatch, onUploadComplete, surveyId]
+  )
 }
