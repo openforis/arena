@@ -187,12 +187,13 @@ export const createImportSummaryFromStream = async ({
   ignoreLabelsAndDescriptions = false,
 }) => {
   const columnNames = await FlatDataReader.readHeadersFromStream({ stream, fileFormat })
-  return createImportSummaryFromColumnNames({
+  const summary = createImportSummaryFromColumnNames({
     columnNames,
     defaultLang,
     codeColumnPattern,
     ignoreLabelsAndDescriptions,
   })
+  return CategoryImportSummary.assocFileFormat(fileFormat)(summary)
 }
 
 export const createImportSummary = async ({ filePath, fileFormat, defaultLang }) => {

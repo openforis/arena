@@ -250,7 +250,7 @@ export class CategoryImportInternalJob extends Job {
   }
 
   async _readItems() {
-    this.logDebug('reading CSV file rows')
+    this.logDebug('reading flat data file rows')
 
     const { surveyId, survey, category, summary, user, tx } = this
 

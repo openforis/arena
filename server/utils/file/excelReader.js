@@ -10,13 +10,23 @@ const extractRowsFromExcelStream = async ({ stream }) => {
   if (!worksheet) return []
 
   const rows = []
-
-  worksheet.eachRow((row) => {
-    const rowValues = []
-    row.eachCell((cell) => {
-      rowValues.push(cell.value)
-    })
-    rows.push(rowValues)
+  let headers = null
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) {
+      headers = []
+      row.eachCell((cell) => {
+        headers.push(cell.value)
+      })
+      rows.push(headers)
+    } else {
+      const rowValues = []
+      headers.forEach((_header, index) => {
+        const cell = row.getCell(index + 1)
+        const cellValue = cell?.value ?? '' // null values considered as empty strings
+        rowValues.push(cellValue)
+      })
+      rows.push(rowValues)
+    }
   })
   return rows
 }

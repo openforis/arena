@@ -103,3 +103,5 @@ export const assocItemDataType = (key, dataType) => (summary) => {
   const itemUpdated = R.assoc(keysItem.dataType, dataType)(item)
   return R.assocPath([keys.items, itemIdx], itemUpdated)(summary)
 }
+
+export const assocFileFormat = R.assoc(keys.fileFormat)
