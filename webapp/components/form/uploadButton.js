@@ -21,6 +21,7 @@ const UploadButton = (props) => {
     onChange = null,
     showLabel = true,
     showIcon = true,
+    title = null,
     variant = 'contained',
   } = props
 
@@ -56,6 +57,7 @@ const UploadButton = (props) => {
         }}
         showLabel={showLabel}
         showIcon={showIcon}
+        title={title}
         variant={variant}
       />
     </>
@@ -72,6 +74,7 @@ UploadButton.propTypes = {
   onChange: PropTypes.func,
   showIcon: PropTypes.bool,
   showLabel: PropTypes.bool,
+  title: PropTypes.string,
   variant: PropTypes.oneOf(['contained', 'outlined', 'text']),
 }
 

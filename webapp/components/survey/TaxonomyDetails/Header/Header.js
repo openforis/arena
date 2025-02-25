@@ -69,10 +69,11 @@ const Header = (props) => {
       <div className="button-bar">
         {canEdit && (
           <UploadButton
+            accept=".csv,.xlsx"
             inputFieldId="taxonomy-upload-input"
-            label="common.csvImport"
-            accept=".csv"
+            label="common.import"
             onChange={([file]) => Actions.upload({ state, file })}
+            title="common.importFromExcelOrCSVFile"
           />
         )}
         <ButtonMenuExport

@@ -36,10 +36,10 @@ export default class SurveyLabelsImportJob extends Job {
 
     const nodeDefsUpdated = []
 
-    this.flatDataReader = FlatDataReader.createReaderFromFile(
+    this.flatDataReader = FlatDataReader.createReaderFromFile({
       filePath,
-      this.validateHeaders,
-      async (row) => {
+      onHeaders: this.validateHeaders,
+      onRow: async (row) => {
         const nodeDef = await this.getNodeDef({ survey, row })
         if (!nodeDef) return
 
@@ -55,8 +55,8 @@ export default class SurveyLabelsImportJob extends Job {
 
         this.incrementProcessedItems()
       },
-      (total) => (this.total = total)
-    )
+      onTotalChange: (total) => (this.total = total),
+    })
 
     await this.flatDataReader.start()
 

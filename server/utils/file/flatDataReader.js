@@ -101,8 +101,8 @@ export const createReaderFromStream = ({
   return { start, cancel }
 }
 
-export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
-  createReaderFromStream(FileUtils.createReadStream(filePath), onHeaders, onRow, onTotalChange)
+export const createReaderFromFile = ({ filePath, fileFormat, onHeaders = null, onRow = null, onTotalChange = null }) =>
+  createReaderFromStream({ stream: FileUtils.createReadStream(filePath), fileFormat, onHeaders, onRow, onTotalChange })
 
 export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.csv }) => {
   let result = []

@@ -8,6 +8,7 @@ import * as Validation from '@core/validation/validation'
 import { languageCodesISO639part2 } from '@core/app/languages'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import Job from '@server/job/job'
 
@@ -38,7 +39,6 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async execute() {
-    const { tx } = this
     const { collectSurveyFileZip, survey } = this.context
 
     const taxonomies = []
@@ -50,7 +50,7 @@ export default class TaxonomiesImportJob extends Job {
         break
       }
 
-      await this.importTaxonomyFromSpeciesFile(speciesFileName, tx)
+      await this.importTaxonomyFromSpeciesFile({ speciesFileName })
 
       if (!this.isRunning()) {
         break
@@ -68,8 +68,9 @@ export default class TaxonomiesImportJob extends Job {
     })
   }
 
-  async importTaxonomyFromSpeciesFile(speciesFileName, tx) {
-    const { collectSurveyFileZip, surveyId } = this.context
+  async importTaxonomyFromSpeciesFile({ speciesFileName }) {
+    const { context, tx } = this
+    const { collectSurveyFileZip, fileFormat = FileFormats.csv, surveyId } = context
 
     this.logDebug(`importing file ${speciesFileName}`)
 
@@ -96,6 +97,7 @@ export default class TaxonomiesImportJob extends Job {
 
     const flatDataReader = FlatDataReader.createReaderFromStream({
       stream: speciesFileStream,
+      fileFormat,
       onHeaders: (headers) => this.onHeaders(headers),
       onRow: async (row) => {
         if (this.isCanceled()) {

@@ -29,10 +29,11 @@ export default class TaxonomyImportJob extends Job {
   constructor(params) {
     super(TaxonomyImportJob.type, params)
 
-    const { taxonomyUuid, filePath } = params
+    const { taxonomyUuid, filePath, fileFormat } = params
 
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
+    this.fileFormat = fileFormat
 
     this.flatDataReader = null
     this.taxonomyImportManager = null // To be initialized in onHeaders
@@ -43,7 +44,7 @@ export default class TaxonomyImportJob extends Job {
   }
 
   async execute() {
-    const { user, surveyId, taxonomyUuid, tx } = this
+    const { filePath, fileFormat, user, surveyId, taxonomyUuid, tx } = this
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
@@ -69,14 +70,15 @@ export default class TaxonomyImportJob extends Job {
     // 3. start CSV row parsing
     this.logDebug('start CSV file parsing')
 
-    this.flatDataReader = FlatDataReader.createReaderFromFile(
-      this.filePath,
-      async (headers) => this._onHeaders(headers),
-      async (row) => this._onRow(row),
-      (total) => {
+    this.flatDataReader = FlatDataReader.createReaderFromFile({
+      filePath,
+      fileFormat,
+      onHeaders: async (headers) => this._onHeaders(headers),
+      onRow: async (row) => this._onRow(row),
+      onTotalChange: (total) => {
         this.total = total
-      }
-    )
+      },
+    })
     await this.flatDataReader.start()
 
     this.logDebug(`CSV file processed, ${this.processed} rows processed`)
