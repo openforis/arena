@@ -29,7 +29,7 @@ export default class SurveyLabelsImportJob extends Job {
 
   async execute() {
     const { context, tx } = this
-    const { filePath, surveyId } = context
+    const { filePath, fileFormat, surveyId } = context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true }, tx)
     this.setContext({ survey })
     const langCodes = Survey.getLanguages(Survey.getSurveyInfo(survey))
@@ -38,6 +38,7 @@ export default class SurveyLabelsImportJob extends Job {
 
     this.flatDataReader = FlatDataReader.createReaderFromFile({
       filePath,
+      fileFormat,
       onHeaders: this.validateHeaders,
       onRow: async (row) => {
         const nodeDef = await this.getNodeDef({ survey, row })

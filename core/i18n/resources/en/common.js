@@ -1520,8 +1520,9 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       analysis: 'Analysis',
     },
     confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
-    exportLabels: 'Export labels to CSV',
-    importLabels: 'Import labels from CSV',
+    exportLabels_csv: 'Export labels to CSV',
+    exportLabels_xlsx: 'Export labels to Excel',
+    importLabels: 'Import labels from Excel or CSV',
   },
 
   taxonomy: {

@@ -8,7 +8,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
 
-const exportLabels = async ({ surveyId, outputStream }) => {
+const exportLabels = async ({ surveyId, outputStream, fileFormat }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, includeAnalysis: false })
   const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
   const items = []
@@ -43,7 +43,7 @@ const exportLabels = async ({ surveyId, outputStream }) => {
     traverseMethod: TraverseMethod.dfs,
   })(survey)
 
-  await FlatDataWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false } })
+  await FlatDataWriter.writeItemsToStream({ outputStream, fileFormat, items, options: { removeNewLines: false } })
 }
 
 export const SurveyLabelsExport = {

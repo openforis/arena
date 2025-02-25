@@ -34,6 +34,8 @@ import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 
+const labelsExportAllowedFileFormats = [FileFormats.xlsx, FileFormats.csv]
+
 const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef, analysis } = props
 
@@ -126,22 +128,23 @@ const FormHeader = (props) => {
                 key: 'schema-summary-excel',
                 content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
               },
-              {
-                key: 'labels-export',
+              ...labelsExportAllowedFileFormats.map((fileFormat) => ({
+                key: `labels-export-${fileFormat}`,
                 content: (
                   <ButtonDownload
                     href={`/api/survey/${surveyId}/labels`}
-                    label="surveyForm.exportLabels"
+                    label={`surveyForm.exportLabels_${fileFormat}`}
+                    requestParams={{ fileFormat }}
                     variant="text"
                   />
                 ),
-              },
+              })),
               {
                 key: 'labels-import',
                 content: (
                   <OpenFileUploadDialogButton
                     label="surveyForm.importLabels"
-                    accept=".csv"
+                    accept=".csv,.xlsx"
                     onOk={({ files }) => onLabelsImportFileSelected(files[0])}
                     variant="text"
                   />
