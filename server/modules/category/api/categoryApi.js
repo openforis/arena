@@ -259,14 +259,15 @@ export const init = (app) => {
           draft = true,
           generic = false,
           samplingPointData = false,
+          fileFormat = FileFormats.csv,
         } = Request.getParams(req)
 
         if (generic) {
-          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res })
+          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res, fileFormat })
         } else if (samplingPointData) {
-          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res })
+          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res, fileFormat })
         } else {
-          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res })
+          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res, fileFormat })
         }
       } catch (error) {
         next(error)

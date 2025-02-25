@@ -1600,9 +1600,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
-    templateForDataImport: 'Template for data import',
-    templateForDataImportGeneric: 'Template for data import (generic)',
-    templateForSamplingPointDataImport: 'Template for Sampling Point Data import',
+    templateForImport: 'Template for import',
+    templateFor_specificDataImport_csv: 'Template for data import (CSV)',
+    templateFor_specificDataImport_xlsx: 'Template for data import (Excel)',
+    templateFor_genericDataImport_csv: 'Template for data import (generic, CSV)',
+    templateFor_genericDataImport_xlsx: 'Template for data import (generic, Excel)',
+    templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
+    templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },
 
   extraProp: {

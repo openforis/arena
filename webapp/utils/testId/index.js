@@ -26,9 +26,6 @@ export const TestId = {
     itemDescriptionPrefix: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-description`,
     itemDescription: (levelIdx, itemIdx) => _withLang(TestId.categoryDetails.itemDescriptionPrefix(levelIdx, itemIdx)),
     exportBtn: 'category-export-btn',
-    templateForDataImportBtn: 'category-template-data-import-btn',
-    templateForDataImportGenericBtn: 'category-template-data-import-generic-btn',
-    templateForSamplingPointDataImportBtn: 'category-template-sampling-point-data-import-btn',
   },
   categorySelector: {
     dropdown: 'category-selector-dropdown',
