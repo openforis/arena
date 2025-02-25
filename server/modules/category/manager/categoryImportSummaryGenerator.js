@@ -181,11 +181,12 @@ export const createImportSummaryFromColumnNames = ({
 
 export const createImportSummaryFromStream = async ({
   stream,
+  fileFormat,
   defaultLang,
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
-  const columnNames = await FlatDataReader.readHeadersFromStream(stream)
+  const columnNames = await FlatDataReader.readHeadersFromStream({ stream, fileFormat })
   return createImportSummaryFromColumnNames({
     columnNames,
     defaultLang,
@@ -194,8 +195,12 @@ export const createImportSummaryFromStream = async ({
   })
 }
 
-export const createImportSummary = async ({ filePath, defaultLang }) => {
-  const summary = await createImportSummaryFromStream({ stream: fs.createReadStream(filePath), defaultLang })
+export const createImportSummary = async ({ filePath, fileFormat, defaultLang }) => {
+  const summary = await createImportSummaryFromStream({
+    stream: fs.createReadStream(filePath),
+    fileFormat,
+    defaultLang,
+  })
   return {
     ...summary,
     [CategoryImportSummary.keys.filePath]: filePath,

@@ -32,10 +32,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId } = Request.getParams(req)
+        const { surveyId, fileFormat } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath })
+        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath, fileFormat })
 
         res.json({ summary, error })
       } catch (error) {
@@ -53,7 +53,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const summary = Request.getBody(req)
 
-        const job = CategoryService.importCategory(user, surveyId, categoryUuid, summary)
+        const job = CategoryService.importCategory({ user, surveyId, categoryUuid, summary })
         res.json({ job })
       } catch (error) {
         next(error)

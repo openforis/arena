@@ -3,6 +3,7 @@ import * as R from 'ramda'
 export const keys = {
   items: 'items',
   filePath: 'filePath',
+  fileFormat: 'fileFormat',
 }
 
 export const keysItem = {
@@ -35,6 +36,8 @@ export const getItems = R.propOr([], keys.items)
 export const getItemColumns = R.propOr({}, keysItem.columns)
 
 export const getFilePath = R.prop(keys.filePath)
+
+export const getFileFormat = R.prop(keys.fileFormat)
 
 // ===== ITEM
 

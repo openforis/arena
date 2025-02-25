@@ -28,6 +28,8 @@ import { State, useActions, useLocalState } from './store'
 
 const MAX_LEVELS = 5
 
+const allowedImportExtensions = '.csv,.xlsx'
+
 const CategoryDetails = (props) => {
   const { categoryUuid: categoryUuidProp, onCategoryUpdate, showClose = true } = props
 
@@ -81,8 +83,8 @@ const CategoryDetails = (props) => {
           {!readOnly && (
             <OpenFileUploadDialogButton
               className="import-btn"
-              label="common.csvImport"
-              accept=".csv"
+              label="common.import"
+              accept={allowedImportExtensions}
               onOk={({ files, onUploadProgress }) =>
                 Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
               }

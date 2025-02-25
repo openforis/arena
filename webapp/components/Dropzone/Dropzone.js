@@ -32,7 +32,10 @@ const Dropzone = (props) => {
   )
 
   const acceptedExtensions = useMemo(
-    () => Object.values(acceptPropObject).flat().map(Strings.removePrefix('.')),
+    () =>
+      Object.values(acceptPropObject)
+        .flatMap((value) => value.split(','))
+        .map((value) => Strings.removePrefix('.')(value).trim()),
     [acceptPropObject]
   )
 

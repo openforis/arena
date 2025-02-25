@@ -1,3 +1,10 @@
+import { FileFormats } from '@core/fileFormats'
+
+const fileFormatByExtension = {
+  csv: FileFormats.csv,
+  xlsx: FileFormats.xlsx,
+}
+
 const excelRowsLimit = 10000
 
 const getExtension = (file) => {
@@ -59,10 +66,16 @@ const readAsText = async (file, ignoreErrors = true) =>
     reader.readAsText(file)
   })
 
+const determineFileFormatFromFileName = (fileName) => {
+  const extension = getExtension(fileName)
+  return extension ? fileFormatByExtension[extension.toLocaleLowerCase()] : undefined
+}
+
 export const FileUtils = {
   excelRowsLimit,
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,
   readAsText,
+  determineFileFormatFromFileName,
 }

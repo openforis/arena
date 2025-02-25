@@ -252,7 +252,7 @@ export class CategoryImportInternalJob extends Job {
   async _readItems() {
     this.logDebug('reading CSV file rows')
 
-    const { surveyId, category, user, tx } = this
+    const { surveyId, survey, category, summary, user, tx } = this
 
     // init items updater
     this.itemsUpdater = new CategoryItemsUpdater({
@@ -267,8 +267,8 @@ export class CategoryImportInternalJob extends Job {
 
     const reader = await CategoryImportCSVParser.createRowsReaderFromStream({
       stream: await this.createReadStream(),
-      survey: this.survey,
-      summary: this.summary,
+      survey,
+      summary,
       onRowItem: async (itemRow) => {
         if (this.isCanceled()) {
           reader.cancel()

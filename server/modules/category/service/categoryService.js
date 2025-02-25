@@ -21,7 +21,7 @@ import CategoriesExportJob from './CategoriesExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
-export const importCategory = (user, surveyId, categoryUuid, summary) => {
+export const importCategory = ({ user, surveyId, categoryUuid, summary }) => {
   const job = new CategoryImportJob({
     user,
     surveyId,

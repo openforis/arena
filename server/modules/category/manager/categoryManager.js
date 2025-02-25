@@ -265,11 +265,11 @@ export const insertItems = async (user, surveyId, items, client = db) =>
 
 export const { createImportSummaryFromStream } = CategoryImportSummaryGenerator
 
-export const createImportSummary = async ({ surveyId, filePath }) => {
+export const createImportSummary = async ({ surveyId, filePath, fileFormat }) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true })
   const defaultLang = Survey.getDefaultLanguage(surveyInfo)
   try {
-    return { summary: await CategoryImportSummaryGenerator.createImportSummary({ filePath, defaultLang }) }
+    return { summary: await CategoryImportSummaryGenerator.createImportSummary({ filePath, fileFormat, defaultLang }) }
   } catch (error) {
     return { error: error.toJSON?.() ?? error.toString() }
   }
