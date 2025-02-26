@@ -91,7 +91,13 @@ const columnsByNodeDefType = {
               header: `${nodeDefName}_scientific_name`,
               nodeDef,
               dataType: columnDataType.text,
-              valueProp: Node.valuePropsTaxon,
+              valueProp: Node.valuePropsTaxon.scientificName,
+            },
+            {
+              header: `${nodeDefName}_vernacular_name`,
+              nodeDef,
+              dataType: columnDataType.text,
+              valueProp: Node.valuePropsTaxon.vernacularName,
             },
           ]
         : []),

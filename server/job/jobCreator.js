@@ -9,7 +9,7 @@ import CollectImportJob from '@server/modules/collectImport/service/collectImpor
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
-import DataExportJob from '@server/modules/dataExport/service/DataExportJob'
+import DataExportJob from '@server/modules/dataExport/service/dataExportJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'

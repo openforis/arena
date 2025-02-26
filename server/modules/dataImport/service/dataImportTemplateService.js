@@ -53,7 +53,6 @@ const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFi
       includeCategoryItemsLabels: false,
       includeFiles,
       includeReadOnlyAttributes: false,
-      includeTaxonScientificName: false,
     },
   })
   const template = exportModel.columns.reduce((acc, column) => {
