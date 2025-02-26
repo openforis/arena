@@ -9,6 +9,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
+import { Objects } from '@openforis/arena-core'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
@@ -27,6 +28,8 @@ const orderByFieldBySortBy = {
   [userSortBy.status]: 'status',
 }
 // In sql queries, user table must be surrounded by "" e.g. "user"
+
+const usersSearchCondition = `(u.email ILIKE $/search/ OR u.name ILIKE $/search/)`
 
 // CREATE
 
@@ -67,13 +70,14 @@ export const insertUser = async (
 
 // READ
 
-export const countUsers = async (client = db) =>
+export const countUsers = async ({ search = null } = {}, client = db) =>
   client.one(
     `
     SELECT count(*)
     FROM "user" u
+    ${Objects.isEmpty(search) ? '' : `WHERE ${usersSearchCondition}`}
     `,
-    [],
+    { search: DbUtils.prepareParameterForFilter(search) },
     (row) => Number(row.count)
   )
 
@@ -123,6 +127,7 @@ const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
 const _usersSelectQuery = ({
   onlyAccepted = false,
   selectFields,
+  search = null,
   sortBy = userSortBy.email,
   sortOrder = DbOrder.asc,
   includeSurveys = false,
@@ -134,7 +139,10 @@ const _usersSelectQuery = ({
   if (onlyAccepted) {
     whereConditions.push(`u.status = '${User.userStatus.ACCEPTED}'`)
   }
-  const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+  if (Objects.isNotEmpty(search)) {
+    whereConditions.push(usersSearchCondition)
+  }
+  const whereClause = DbUtils.getWhereClause(...whereConditions)
 
   return `${getUsersSelectQueryPrefix({ includeSurveys })}
     SELECT ${selectFields.join(', ')}, ${
@@ -176,23 +184,23 @@ const _usersSelectQuery = ({
 }
 
 export const fetchUsers = async (
-  { offset = 0, onlyAccepted = false, limit = null, sortBy = 'email', sortOrder = 'ASC' },
+  { offset = 0, onlyAccepted = false, limit = null, search = null, sortBy = 'email', sortOrder = 'ASC' },
   client = db
 ) =>
   client.map(
-    `${_usersSelectQuery({ onlyAccepted, selectFields, sortBy, sortOrder })}
+    `${_usersSelectQuery({ onlyAccepted, selectFields, search, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [],
+    { search: DbUtils.prepareParameterForFilter(search) },
     camelize
   )
 
-export const fetchUsersIntoStream = async (client = db) => {
+export const fetchUsersIntoStream = async ({ processor }, client = db) => {
   const select = _usersSelectQuery({
     selectFields: ['u.email', 'u.name', `u.props ->> '${User.keysProps.title}' AS title`, 'u.status'],
     includeSurveys: true,
   })
-  return DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(select, []), client })
+  return DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(select, []), client, processor })
 }
 
 export const fetchUsersBySurveyId = async (
