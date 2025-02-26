@@ -108,11 +108,15 @@ const props = {
           // Scientific name from taxon item
           return taxonScientificName
         }
-        if (Node.getVernacularNameUuid(node) && columnName.endsWith(ColumnNodeDef.columnSuffixTaxonVernacularName)) {
+        if (columnName.endsWith(ColumnNodeDef.columnSuffixTaxonVernacularName)) {
           // Vernacular name
-          const vernacularName = Taxon.getVernacularName(taxon)
-          const vernacularLang = Taxon.getVernacularLanguage(taxon)
-          return `${vernacularName} (${vernacularLang})`
+          if (Node.getVernacularNameUuid(node)) {
+            const vernacularName = Taxon.getVernacularName(taxon)
+            const vernacularLang = Taxon.getVernacularLanguage(taxon)
+            return `${vernacularName} (${vernacularLang})`
+          } else if (Taxon.isUnkOrUnlTaxon(taxon)) {
+            return Node.getVernacularName(node)
+          }
         }
         return null
       }

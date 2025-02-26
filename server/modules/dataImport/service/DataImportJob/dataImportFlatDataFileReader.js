@@ -6,6 +6,7 @@ import SystemError from '@core/systemError'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as Taxon from '@core/survey/taxon'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import { uuidv4 } from '@core/uuid'
@@ -105,10 +106,18 @@ const valueConverterByNodeDefType = {
     const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
     const taxonCode = value[Node.valuePropsTaxon.code]
     const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-    if (taxon) {
-      return Node.newNodeValueTaxon({ taxonUuid: taxon.uuid })
+    if (!taxon) {
+      throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
     }
-    throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
+    const { uuid: taxonUuid } = taxon
+    if (taxonCode === Taxon.unlistedCode) {
+      return {
+        [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
+        [Node.valuePropsTaxon.scientificName]: value[Node.valuePropsTaxon.scientificName],
+        [Node.valuePropsTaxon.vernacularName]: value[Node.valuePropsTaxon.vernacularName],
+      }
+    }
+    return Node.newNodeValueTaxon({ taxonUuid })
   },
   [NodeDef.nodeDefType.text]: singlePropValueConverter,
   [NodeDef.nodeDefType.time]: ({ value, headers }) =>
@@ -184,7 +193,6 @@ const createReaderFromStream = ({
     nodeDefContext,
     options: {
       includeCategoryItemsLabels: false,
-      includeTaxonScientificName: false,
       includeFiles,
       includeAnalysis,
     },
