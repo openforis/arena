@@ -187,12 +187,12 @@ export const fetchUsers = async (
     camelize
   )
 
-export const fetchUsersIntoStream = async (client = db) => {
+export const fetchUsersIntoStream = async ({ processor }, client = db) => {
   const select = _usersSelectQuery({
     selectFields: ['u.email', 'u.name', `u.props ->> '${User.keysProps.title}' AS title`, 'u.status'],
     includeSurveys: true,
   })
-  return DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(select, []), client })
+  return DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(select, []), client, processor })
 }
 
 export const fetchUsersBySurveyId = async (

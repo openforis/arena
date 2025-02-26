@@ -37,13 +37,15 @@ const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
     title: transformTitle(obj.title),
     country: transformCountry(obj.country),
   })
-  const stream = await UserManager.fetchUsersIntoStream()
-  return FlatDataWriter.writeItemsStreamToStream({
-    stream,
-    fields,
-    options: { objectTransformer },
-    outputStream,
-    fileFormat,
+  await UserManager.fetchUsersIntoStream({
+    processor: (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        fields,
+        options: { objectTransformer },
+        outputStream,
+        fileFormat,
+      }),
   })
 }
 

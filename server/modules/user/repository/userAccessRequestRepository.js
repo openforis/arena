@@ -38,8 +38,8 @@ export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, clien
     camelize
   )
 
-export const fetchUserAccessRequestsAsStream = async (client = db) =>
-  DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(userAccessRequestsSelect, []), client })
+export const fetchUserAccessRequestsAsStream = async ({ processor }, client = db) =>
+  DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(userAccessRequestsSelect, []), client, processor })
 
 export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
   client.oneOrNone(

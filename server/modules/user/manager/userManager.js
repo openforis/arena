@@ -280,14 +280,15 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFor
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
   })
 
-  const stream = await UserAccessRequestRepository.fetchUserAccessRequestsAsStream()
-
-  return FlatDataWriter.writeItemsStreamToStream({
-    stream,
-    outputStream,
-    fields,
-    options: { objectTransformer },
-    fileFormat,
+  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({
+    processor: (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        outputStream,
+        fields,
+        options: { objectTransformer },
+        fileFormat,
+      }),
   })
 }
 

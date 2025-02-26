@@ -34,7 +34,7 @@ export const stream = async ({ queryStream, client = db, transformer = null, pro
       .catch((error) => reject(error))
   })
 
-export const fetchQueryAsStream = async ({ query, client = db, transformer = null, processor = null }) => {
+export const fetchQueryAsStream = async ({ query, processor, client = db, transformer = null }) => {
   const queryStream = new QueryStream(query)
   return stream({ queryStream, client, transformer, processor })
 }
