@@ -2,6 +2,7 @@ import { create } from './create'
 
 import {
   getCategory,
+  getFileFormat,
   getImportSummary,
   getItemActive,
   getItemActiveLastLevelIndex,
@@ -28,6 +29,7 @@ import {
   dissocItem,
   dissocItemsLoading,
   dissocItems,
+  assocFileFormat,
   assocImportSummary,
   assocImportSummaryItemDataType,
   dissocImportSummary,
@@ -39,6 +41,7 @@ export const State = {
   create,
 
   getCategory,
+  getFileFormat,
   getImportSummary,
   isItemsLoading,
   getItemActive,
@@ -63,6 +66,7 @@ export const State = {
   dissocItem,
   dissocItemsLoading,
   dissocItems,
+  assocFileFormat,
   assocImportSummary,
   assocImportSummaryItemDataType,
   dissocImportSummary,

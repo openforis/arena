@@ -1,3 +1,10 @@
+import { FileFormats } from '@core/fileFormats'
+
+const fileFormatByExtension = {
+  csv: FileFormats.csv,
+  xlsx: FileFormats.xlsx,
+}
+
 const excelRowsLimit = 10000
 
 const getExtension = (file) => {
@@ -39,6 +46,7 @@ const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) 
 
 const acceptByExtension = {
   csv: { 'text/csv': ['.csv'] },
+  xlsx: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] },
   zip: { 'application/zip': ['.zip'] },
 }
 
@@ -59,10 +67,16 @@ const readAsText = async (file, ignoreErrors = true) =>
     reader.readAsText(file)
   })
 
+const determineFileFormatFromFileName = (fileName) => {
+  const extension = getExtension(fileName)
+  return extension ? fileFormatByExtension[extension.toLocaleLowerCase()] : undefined
+}
+
 export const FileUtils = {
   excelRowsLimit,
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,
   readAsText,
+  determineFileFormatFromFileName,
 }

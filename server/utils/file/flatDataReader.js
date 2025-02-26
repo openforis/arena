@@ -2,8 +2,11 @@ import { parse as csvParser } from 'csv'
 
 import { SystemError } from '@openforis/arena-core'
 
+import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
+
 import * as FileUtils from './fileUtils'
+import { ExcelReader } from './excelReader'
 
 const _extractValidHeaders = (row) => {
   // remove last empty columns
@@ -28,16 +31,21 @@ const _extractValidHeaders = (row) => {
 }
 
 const _rowToObject = ({ headers, row }) =>
-  headers.reduce(
-    (acc, header, index) =>
-      Object.assign(acc, {
-        [header]: StringUtils.trim(row[index]),
-      }),
-    {}
-  )
+  headers.reduce((acc, header, index) => {
+    const cellValue = row[index]
+    const trimmedCellValue = StringUtils.isString(cellValue) ? StringUtils.trim(cellValue) : cellValue
+    acc[header] = trimmedCellValue
+    return acc
+  }, {})
 
-export const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
-  const jobStatus = { canceled: false }
+export const createReaderFromStream = ({
+  stream,
+  fileFormat = FileFormats.csv,
+  onHeaders = null,
+  onRow = null,
+  onTotalChange = null,
+}) => {
+  const readerStatus = { canceled: false }
 
   const _tryOrCancel = async (fnPromise) => {
     try {
@@ -48,9 +56,10 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
     }
   }
 
-  const parser = stream.pipe(
-    csvParser({ relaxColumnCount: true, skip_empty_lines: true, skip_records_with_empty_values: true })
-  )
+  const parser =
+    fileFormat === FileFormats.csv
+      ? stream.pipe(csvParser({ relaxColumnCount: true, skip_empty_lines: true, skip_records_with_empty_values: true }))
+      : null
 
   const start = async () => {
     let headers = null
@@ -71,8 +80,11 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
       }
     }
 
-    for await (const row of parser) {
-      if (jobStatus.canceled) {
+    const parserOrRows =
+      fileFormat === FileFormats.csv ? parser : await ExcelReader.extractRowsFromExcelStream({ stream })
+
+    for await (const row of parserOrRows) {
+      if (readerStatus.canceled) {
         break
       } else {
         await _processRow(row)
@@ -81,22 +93,26 @@ export const createReaderFromStream = (stream, onHeaders = null, onRow = null, o
   }
 
   const cancel = () => {
-    jobStatus.canceled = true
+    readerStatus.canceled = true
     stream?.destroy()
   }
 
   return { start, cancel }
 }
 
-export const createReaderFromFile = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
-  createReaderFromStream(FileUtils.createReadStream(filePath), onHeaders, onRow, onTotalChange)
+export const createReaderFromFile = ({ filePath, fileFormat, onHeaders = null, onRow = null, onTotalChange = null }) =>
+  createReaderFromStream({ stream: FileUtils.createReadStream(filePath), fileFormat, onHeaders, onRow, onTotalChange })
 
-export const readHeadersFromStream = async (stream) => {
+export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.csv }) => {
   let result = []
 
-  const reader = createReaderFromStream(stream, (headers) => {
-    reader.cancel()
-    result = headers
+  const reader = createReaderFromStream({
+    stream,
+    fileFormat,
+    onHeaders: (headers) => {
+      reader.cancel()
+      result = headers
+    },
   })
   await reader.start()
 

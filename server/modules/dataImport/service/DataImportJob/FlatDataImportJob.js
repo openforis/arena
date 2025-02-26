@@ -11,19 +11,19 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 
-import { DataImportCsvFileReader } from './dataImportCsvFileReader'
+import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
 import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
 
-export default class CsvDataImportJob extends DataImportBaseJob {
-  constructor(params, type = CsvDataImportJob.type) {
+export default class FlatDataImportJob extends DataImportBaseJob {
+  constructor(params, type = FlatDataImportJob.type) {
     super(type, params)
 
     this.dataImportFileReader = null
-    this.csvReader = null
+    this.flatDataReader = null
     this.entitiesWithMultipleAttributesClearedByUuid = {} // used to clear multiple attribute values only once
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
@@ -51,8 +51,8 @@ export default class CsvDataImportJob extends DataImportBaseJob {
 
     await this.fetchRecordsSummary()
 
-    this.csvReader = await this.createCsvReader()
-    await this.startCsvReader()
+    this.flatDataReader = await this.createFlatDataReader()
+    await this.startFlatDataReader()
 
     if (!this.hasErrors() && this.processed === 0) {
       // Error: empty file
@@ -115,13 +115,14 @@ export default class CsvDataImportJob extends DataImportBaseJob {
     this.setContext({ recordsSummary: recordsSummary.list })
   }
 
-  async createCsvReader() {
-    const { cycle, nodeDefUuid, survey, includeFiles } = this.context
+  async createFlatDataReader() {
+    const { cycle, nodeDefUuid, survey, fileFormat, includeFiles } = this.context
 
     const stream = await this.dataImportFileReader.getCsvFileStream()
 
-    return DataImportCsvFileReader.createReaderFromStream({
+    return DataImportFlatDataFileReader.createReaderFromStream({
       stream,
+      fileFormat,
       survey,
       cycle,
       nodeDefUuid,
@@ -131,9 +132,9 @@ export default class CsvDataImportJob extends DataImportBaseJob {
     })
   }
 
-  async startCsvReader() {
+  async startFlatDataReader() {
     try {
-      await this.csvReader.start()
+      await this.flatDataReader.start()
     } catch (e) {
       const errorKey = e.key || e.toString()
       const errorParams = e.params
@@ -143,12 +144,12 @@ export default class CsvDataImportJob extends DataImportBaseJob {
 
   async cancel() {
     await super.cancel()
-    this.csvReader?.cancel()
+    this.flatDataReader?.cancel()
   }
 
   async setStatusFailed() {
     await super.setStatusFailed()
-    this.csvReader?.cancel()
+    this.flatDataReader?.cancel()
   }
 
   async onRowItem({ valuesByDefUuid, errors }) {
@@ -320,4 +321,4 @@ export default class CsvDataImportJob extends DataImportBaseJob {
   }
 }
 
-CsvDataImportJob.type = 'DataImportJob'
+FlatDataImportJob.type = 'DataImportJob'

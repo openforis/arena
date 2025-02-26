@@ -50,11 +50,8 @@ export const writeItemsToStream = async ({
   // loop over the items
   items.forEach((item) => {
     const transformedItem = itemTransformer(item)
-    worksheet.addRow(transformedItem)
-  })
-
-  //   // Loop through all cells and apply the border style
-  worksheet.eachRow((row) => {
+    const row = worksheet.addRow(transformedItem)
+    // apply border style
     row.eachCell({ includeEmpty: true }, (cell) => {
       cell.border = cellBorder
     })

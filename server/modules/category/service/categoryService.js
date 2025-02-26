@@ -8,7 +8,7 @@ import { FileFormats } from '@core/fileFormats'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/flatDataWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
@@ -21,7 +21,7 @@ import CategoriesExportJob from './CategoriesExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
-export const importCategory = (user, surveyId, categoryUuid, summary) => {
+export const importCategory = ({ user, surveyId, categoryUuid, summary }) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
@@ -78,36 +78,35 @@ export const exportCategory = async ({
   })
 }
 
-export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res }) => {
+export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res, fileFormat }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const templateData = CategoryImportTemplateGenerator.generateTemplate({ survey })
-  const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'CategoryImportGeneric' })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-  await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
+  const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'CategoryImportGeneric', fileFormat })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
-export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res }) => {
+export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res, fileFormat }) => {
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const templateData = CategoryImportTemplateGenerator.generateTemplate({ survey, category })
+  const categoryName = Category.getName(category)
   const fileName = ExportFileNameGenerator.generate({
     survey,
     fileType: 'CategoryImport',
-    itemName: Category.getName(category),
+    itemName: categoryName,
+    fileFormat,
   })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-  await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
-export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, draft, res }) => {
+export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, draft, res, fileFormat }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const templateData = CategoryImportTemplateGenerator.generateSamplingPointDataTemplate({ survey })
-  const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'SamplingPointDataImport' })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-  await CSVWriter.writeItemsToStream({ outputStream: res, items: templateData })
+  const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'SamplingPointDataImport', fileFormat })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
 export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {

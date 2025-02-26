@@ -32,7 +32,7 @@ const determineActiveStep = ({ canSelectCycle, state }) => {
   return getStepIndex(stepKeys.startImport)
 }
 
-export const useDataImportCsvViewSteps = ({ canSelectCycle, state }) => {
+export const useDataImportFlatDataViewSteps = ({ canSelectCycle, state }) => {
   const activeStep = determineActiveStep({ canSelectCycle, state })
   const stepKeysFiltered = getStepKeysFiltered({ canSelectCycle })
 

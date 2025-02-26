@@ -32,10 +32,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId } = Request.getParams(req)
+        const { surveyId, fileFormat } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath })
+        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath, fileFormat })
 
         res.json({ summary, error })
       } catch (error) {
@@ -53,7 +53,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const summary = Request.getBody(req)
 
-        const job = CategoryService.importCategory(user, surveyId, categoryUuid, summary)
+        const job = CategoryService.importCategory({ user, surveyId, categoryUuid, summary })
         res.json({ job })
       } catch (error) {
         next(error)
@@ -259,14 +259,15 @@ export const init = (app) => {
           draft = true,
           generic = false,
           samplingPointData = false,
+          fileFormat = FileFormats.csv,
         } = Request.getParams(req)
 
         if (generic) {
-          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res })
+          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res, fileFormat })
         } else if (samplingPointData) {
-          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res })
+          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res, fileFormat })
         } else {
-          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res })
+          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res, fileFormat })
         }
       } catch (error) {
         next(error)

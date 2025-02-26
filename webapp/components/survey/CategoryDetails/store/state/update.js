@@ -108,6 +108,8 @@ export const dissocItem = ({ levelIndex, itemUuid }) =>
     _refreshItemsArray({ levelIndex })
   )
 
+export const assocFileFormat = ({ fileFormat }) => A.assoc(keys.fileFormat, fileFormat)
+
 export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
 
 export const assocImportSummaryItemDataType =

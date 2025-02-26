@@ -103,8 +103,8 @@ export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) 
 export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) =>
   SchemaSummary.exportSchemaSummary({ surveyId, cycle, outputStream, fileFormat })
 
-export const exportLabels = async ({ surveyId, outputStream }) =>
-  SurveyLabelsExport.exportLabels({ surveyId, outputStream })
+export const exportLabels = async ({ surveyId, outputStream, fileFormat }) =>
+  SurveyLabelsExport.exportLabels({ surveyId, outputStream, fileFormat })
 
 export const deleteSurvey = async (surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
@@ -112,16 +112,9 @@ export const deleteSurvey = async (surveyId) => {
   await SurveyManager.deleteSurvey(surveyId)
 }
 
-export const startLabelsImportJob = ({ user, surveyId, filePath }) => {
-  const job = new SurveyLabelsImportJob({
-    user,
-    surveyId,
-    filePath,
-  })
-
-  JobManager.enqueueJob(job)
-
-  return job
+export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) => {
+  const job = new SurveyLabelsImportJob({ user, surveyId, filePath, fileFormat })
+  return JobManager.enqueueJob(job)
 }
 
 export const {

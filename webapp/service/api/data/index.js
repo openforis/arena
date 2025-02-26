@@ -47,6 +47,7 @@ export const startDataImportFromCsvJob = async ({
   cycle,
   nodeDefUuid,
   file,
+  fileFormat,
   dryRun = false,
   insertNewRecords = false,
   insertMissingNodes = false,
@@ -59,6 +60,7 @@ export const startDataImportFromCsvJob = async ({
     cycle,
     nodeDefUuid,
     file,
+    fileFormat,
     dryRun,
     insertNewRecords,
     insertMissingNodes,
@@ -66,7 +68,7 @@ export const startDataImportFromCsvJob = async ({
     includeFiles,
     abortOnErrors,
   })
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/csv`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -90,15 +92,11 @@ export const startDataImportFromArenaJob = async ({
   return job
 }
 
-export const getDataImportFromCsvTemplateUrl = ({ surveyId, nodeDefUuid, cycle, includeFiles }) => {
-  const params = new URLSearchParams({ nodeDefUuid, cycle, includeFiles })
-  return `/api/survey/${surveyId}/data-import/csv/template?${params.toString()}`
-}
+export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>
+  `/api/survey/${surveyId}/data-import/flat-data/template`
 
-export const getDataImportFromCsvTemplatesUrl = ({ surveyId, cycle, includeFiles }) => {
-  const params = new URLSearchParams({ cycle, includeFiles })
-  return `/api/survey/${surveyId}/data-import/csv/templates?${params.toString()}`
-}
+export const getDataImportFromCsvTemplatesUrl = ({ surveyId }) =>
+  `/api/survey/${surveyId}/data-import/flat-data/templates`
 
 // ==== DATA EXPORT
 export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search, options }) => {

@@ -241,13 +241,11 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
-
+      const { surveyId, fileFormat } = Request.getParams(req)
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels' })
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-      await SurveyService.exportLabels({ surveyId, outputStream: res })
+      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels', fileFormat })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
+      await SurveyService.exportLabels({ surveyId, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -292,9 +290,9 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const filePath = Request.getFilePath(req)
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, fileFormat } = Request.getParams(req)
 
-      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath })
+      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath, fileFormat })
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {

@@ -51,12 +51,13 @@ export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFor
   })
 }
 
-export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
+export const importTaxonomy = ({ user, surveyId, taxonomyUuid, filePath, fileFormat }) => {
   const job = new TaxonomyImportJob({
     user,
     surveyId,
     taxonomyUuid,
     filePath,
+    fileFormat,
   })
 
   JobManager.enqueueJob(job)

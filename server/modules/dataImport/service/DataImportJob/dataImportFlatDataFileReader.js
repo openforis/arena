@@ -9,8 +9,8 @@ import * as Category from '@core/survey/category'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import { uuidv4 } from '@core/uuid'
-import * as CSVReader from '@server/utils/file/csvReader'
-import * as FileUtils from '@server/utils/file/fileUtils'
+
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const VALUE_PROP_DEFAULT = 'value'
 
@@ -149,39 +149,24 @@ const _validateHeaders =
   }
 
 /**
- * Creates a CSV reader that transforms every row extracting a node value for each column associated to a node definition.
+ * Creates a reader that transforms every row extracting a node value for each column associated to a node definition.
  *
  * @param {!object} params - The parameters object.
- * @param {!string} [params.filePath] - File path to be read.
+ * @param {!string} [params.stream] - File stream to be read.
+ * @param {!string} [params.fileFormat] - Format of the input file (csv or xlsx).
  * @param {!object} [params.survey] - The survey object.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
+ * @param {boolean} [params.includeAnalysis = false] - Whether to include analysis attributes or not.
+ * @param {boolean} [params.validateHeaders = true] - Whether to validate input file headers or not.
  * @param {boolean} [params.includeFiles = false] - Whether to include file attributes or not.
  * @param {Function} [params.onTotalChange = null] - Function invoked when total number of rows is calculated.
  * @returns {object} - Object with start and cancel functions to control the reader.
  */
-const createReader = ({
-  filePath,
-  survey,
-  cycle,
-  nodeDefUuid,
-  onRowItem,
-  onTotalChange = null,
-  includeFiles = false,
-}) =>
-  createReaderFromStream({
-    stream: FileUtils.createReadStream(filePath),
-    survey,
-    cycle,
-    nodeDefUuid,
-    includeFiles,
-    onRowItem,
-    onTotalChange,
-  })
-
 const createReaderFromStream = ({
   stream,
+  fileFormat,
   survey,
   cycle,
   nodeDefUuid,
@@ -205,14 +190,15 @@ const createReaderFromStream = ({
     },
   })
 
-  return CSVReader.createReaderFromStream(
+  return FlatDataReader.createReaderFromStream({
     stream,
-    async (headers) => {
+    fileFormat,
+    onHeaders: async (headers) => {
       if (validateHeaders) {
         await _validateHeaders({ csvDataExportModel })(headers)
       }
     },
-    async (row) => {
+    onRow: async (row) => {
       // combine several columns into single values for every attribute definition
       const valuesByDefUuidTemp = csvDataExportModel.columns.reduce((valuesByDefUuidAcc, column) => {
         const { header, nodeDef, valueProp = VALUE_PROP_DEFAULT } = column
@@ -255,11 +241,10 @@ const createReaderFromStream = ({
 
       await onRowItem({ row, valuesByDefUuid, errors })
     },
-    onTotalChange
-  )
+    onTotalChange,
+  })
 }
 
-export const DataImportCsvFileReader = {
-  createReader,
+export const DataImportFlatDataFileReader = {
   createReaderFromStream,
 }

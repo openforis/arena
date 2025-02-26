@@ -25,8 +25,19 @@ import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
+import { FileFormats } from '@core/fileFormats'
 
 const MAX_LEVELS = 5
+
+const allowedImportExtensions = '.csv,.xlsx'
+
+const templateFileFormats = [FileFormats.csv, FileFormats.xlsx]
+
+const templateTypes = {
+  specificDataImport: 'specificDataImport',
+  genericDataImport: 'genericDatImport',
+  samplingPointDataImport: 'samplingPointDataImport',
+}
 
 const CategoryDetails = (props) => {
   const { categoryUuid: categoryUuidProp, onCategoryUpdate, showClose = true } = props
@@ -81,8 +92,8 @@ const CategoryDetails = (props) => {
           {!readOnly && (
             <OpenFileUploadDialogButton
               className="import-btn"
-              label="common.csvImport"
-              accept=".csv"
+              label="common.import"
+              accept={allowedImportExtensions}
               onOk={({ files, onUploadProgress }) =>
                 Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
               }
@@ -97,45 +108,25 @@ const CategoryDetails = (props) => {
           {!readOnly && (
             <ButtonMenu
               className="date-import-template-menu-btn"
-              label="categoryEdit.templateForDataImport"
+              label="categoryEdit.templateForImport"
               iconClassName="icon-download2 icon-14px"
-              items={[
-                {
-                  key: 'data-import-template-download',
+              items={Object.keys(templateTypes).flatMap((templateType) =>
+                templateFileFormats.map((fileFormat) => ({
+                  key: `data-import-template-${templateType}-${fileFormat}`,
                   content: (
                     <ButtonDownload
-                      className="btn-transparent"
-                      testId={TestId.categoryDetails.templateForDataImportBtn}
                       href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      label="categoryEdit.templateForDataImport"
+                      requestParams={{
+                        fileFormat,
+                        generic: templateType === templateTypes.genericDataImport,
+                        samplingPointData: templateType === templateTypes.samplingPointDataImport,
+                      }}
+                      label={`categoryEdit.templateFor_${templateType}_${fileFormat}`}
+                      variant="text"
                     />
                   ),
-                },
-                {
-                  key: 'data-import-generic-template-download',
-                  content: (
-                    <ButtonDownload
-                      className="btn-transparent"
-                      testId={TestId.categoryDetails.templateForDataImportGenericBtn}
-                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      requestParams={{ generic: true }}
-                      label="categoryEdit.templateForDataImportGeneric"
-                    />
-                  ),
-                },
-                {
-                  key: 'data-import-sampling-point-data-template-download',
-                  content: (
-                    <ButtonDownload
-                      className="btn-transparent"
-                      testId={TestId.categoryDetails.templateForSamplingPointDataImportBtn}
-                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      requestParams={{ samplingPointData: true }}
-                      label="categoryEdit.templateForSamplingPointDataImport"
-                    />
-                  ),
-                },
-              ]}
+                }))
+              )}
               variant="outlined"
             />
           )}

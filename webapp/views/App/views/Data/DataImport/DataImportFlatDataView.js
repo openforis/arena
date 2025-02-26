@@ -1,4 +1,4 @@
-import './DataImportCsvView.scss'
+import './DataImportFlatDataView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -19,15 +19,16 @@ import { useI18n } from '@webapp/store/system'
 import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
-import { ButtonDownload, ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
+import { ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 
 import { DataImportCompleteDialog } from './DataImportCompleteDialog'
-import { useDataImportCsvViewSteps } from './useDataImportCsvViewSteps'
+import { useDataImportFlatDataViewSteps } from './useDataImportFlatDataViewSteps'
 import { ImportStartButton } from './ImportStartButton'
 
 const importTypes = {
@@ -47,7 +48,7 @@ const allowedLabelTypes = [
   NodeDef.NodeDefLabelTypes.labelAndName,
 ]
 
-export const DataImportCsvView = () => {
+export const DataImportFlatDataView = () => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -79,6 +80,7 @@ export const DataImportCsvView = () => {
     cycle,
     dataImportType,
     file,
+    fileFormat,
     jobCompleted,
     nodeDefLabelType,
     selectedNodeDefUuid,
@@ -89,7 +91,10 @@ export const DataImportCsvView = () => {
   } = state
 
   const fileAccept = useMemo(
-    () => (includeFiles ? FileUtils.acceptByExtension.zip : FileUtils.acceptByExtension.csv),
+    () =>
+      includeFiles
+        ? FileUtils.acceptByExtension.zip
+        : { ...FileUtils.acceptByExtension.csv, ...FileUtils.acceptByExtension.xlsx },
     [includeFiles]
   )
 
@@ -97,7 +102,7 @@ export const DataImportCsvView = () => {
 
   const errorsExportFileName = `${Survey.getName(surveyInfo)}_(cycle-${RecordCycle.getLabel(cycle)})_ImportError`
 
-  const { activeStep, steps } = useDataImportCsvViewSteps({ state, canSelectCycle })
+  const { activeStep, steps } = useDataImportFlatDataViewSteps({ state, canSelectCycle })
 
   const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
@@ -129,7 +134,11 @@ export const DataImportCsvView = () => {
     [survey]
   )
 
-  const onFilesDrop = useCallback((files) => setStateProp('file')(files[0]), [setStateProp])
+  const onFilesDrop = useCallback((files) => {
+    const file = files[0]
+    const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
+    setState((statePrev) => ({ ...statePrev, file, fileFormat }))
+  }, [])
 
   const onImportJobStart = useCallback(
     (job) => {
@@ -163,6 +172,7 @@ export const DataImportCsvView = () => {
   const importStartParams = {
     surveyId,
     file,
+    fileFormat,
     cycle,
     nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
@@ -219,24 +229,20 @@ export const DataImportCsvView = () => {
         </div>
         <div className="buttons-container">
           {!Objects.isEmpty(cycle) && (
-            <ButtonDownload
+            <ButtonMenuExport
               className="download-templates-btn"
-              href={API.getDataImportFromCsvTemplatesUrl({ surveyId, cycle, includeFiles })}
+              href={API.getDataImportFromCsvTemplatesUrl({ surveyId })}
               label="dataImportView.downloadAllTemplates"
+              requestParams={{ cycle, includeFiles }}
             />
           )}
           {selectedNodeDefUuid && (
             <>
-              <ButtonDownload
+              <ButtonMenuExport
                 className="download-template-btn"
-                href={API.getDataImportFromCsvTemplateUrl({
-                  surveyId,
-                  cycle,
-                  nodeDefUuid: selectedNodeDefUuid,
-                  includeFiles,
-                })}
+                href={API.getDataImportFromCsvTemplateUrl({ surveyId })}
                 label="dataImportView.downloadTemplate"
-                disabled={!selectedNodeDefUuid}
+                requestParams={{ cycle, nodeDefUuid: selectedNodeDefUuid, includeFiles }}
               />
 
               {dataImportType === importTypes.updateExistingRecords && (

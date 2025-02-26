@@ -1,10 +1,10 @@
 import Job from '@server/job/job'
 
-import CsvDataImportJob from './CsvDataImportJob'
+import FlatDataImportJob from './FlatDataImportJob'
 import DataFilesImportJob from './DataFilesImportJob'
 
 const createInternalJobs = ({ includeFiles }) => [
-  new CsvDataImportJob({ keepReaderOpenOnEnd: true }),
+  new FlatDataImportJob({ keepReaderOpenOnEnd: true }),
   ...(includeFiles ? [new DataFilesImportJob()] : []),
 ]
 
@@ -27,8 +27,8 @@ export default class DataImportJob extends Job {
 
     this.errors = this.combineInnerJobsErrors()
 
-    const csvDataImportJob = this.innerJobs[0]
-    csvDataImportJob?.dataImportFileReader?.close()
+    const flatDataImportJob = this.innerJobs[0]
+    flatDataImportJob?.dataImportFileReader?.close()
   }
 }
 
