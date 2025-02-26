@@ -3,6 +3,7 @@ import * as pgPromise from 'pg-promise'
 import * as _QueryStream from 'pg-query-stream'
 
 import { db } from '@server/db/db'
+import { Objects } from '@openforis/arena-core'
 
 const pgp = pgPromise()
 
@@ -142,6 +143,24 @@ export const getPropColCombined = (propName, draft, columnPrefix = '', asText = 
  */
 export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
   `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`
+
+export const filterTypes = {
+  includes: 'includes',
+  startsWith: 'startsWith',
+  endsWith: 'endsWith',
+}
+
+export const prepareParameterForFilter = (value, filterType = filterTypes.includes) => {
+  if (Objects.isEmpty(value)) return null
+  switch (filterType) {
+    case filterTypes.includes:
+      return `%${value}%`
+    case filterTypes.startsWith:
+      return `%${value}`
+    default:
+      return `${value}%`
+  }
+}
 
 export const formatQuery = pgp.as.format
 

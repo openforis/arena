@@ -141,7 +141,8 @@ export const init = (app) => {
 
   app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const count = await UserService.countUsers()
+      const { search } = Request.getParams(req)
+      const count = await UserService.countUsers({ search })
       res.json({ count })
     } catch (error) {
       next(error)
@@ -150,9 +151,9 @@ export const init = (app) => {
 
   app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const { offset, onlyAccepted, limit, sortBy, sortOrder } = Request.getParams(req)
+      const { offset, onlyAccepted, limit, search, sortBy, sortOrder } = Request.getParams(req)
 
-      const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, sortBy, sortOrder })
+      const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder })
 
       res.json({ list })
     } catch (error) {
