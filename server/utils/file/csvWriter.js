@@ -17,16 +17,22 @@ export const writeItemsToStream = ({
   options = FlatDataWriterUtils.defaultOptions,
 }) =>
   new Promise((resolve, reject) => {
-    const fields = fieldsParam ?? Object.keys(items[0] ?? {})
+    try {
+      const fields = fieldsParam ?? Object.keys(items[0] ?? {})
 
-    const stream = new Stream.Readable({ objectMode: true, highWaterMark: 512 }).on('error', reject).on('end', resolve)
+      const stream = new Stream.Readable({ objectMode: true, highWaterMark: 512 })
+        .on('error', reject)
+        .on('end', resolve)
 
-    pipeDataStreamToStream({ stream, fields, options, outputStream })
+      pipeDataStreamToStream({ stream, fields, options, outputStream })
 
-    items.forEach((row) => stream.push(row))
+      items.forEach((row) => stream.push(row))
 
-    stream.push(null) // end of data
-    stream.destroy()
+      stream.push(null) // end of data
+      stream.destroy()
+    } finally {
+      outputStream?.end()
+    }
   })
 
 export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
