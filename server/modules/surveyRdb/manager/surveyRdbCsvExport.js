@@ -1,9 +1,11 @@
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
-
 import { ArrayUtils } from '@core/arrayUtils'
+
 import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
@@ -163,10 +165,10 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
       const fileUuid = obj[fileUuidField]
       const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
       const fileName = obj[fileNameField]
-      // if (fileUuid && Objects.isNotEmpty(fileName)) {
-      const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
-      obj[fileNameField] = uniqueFileName
-      // }
+      if (fileUuid && Objects.isNotEmpty(fileName)) {
+        const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
+        obj[fileNameField] = uniqueFileName
+      }
     })
     return obj
   }
