@@ -1,3 +1,5 @@
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -163,8 +165,10 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
       const fileUuid = obj[fileUuidField]
       const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
       const fileName = obj[fileNameField]
-      const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
-      obj[fileNameField] = uniqueFileName
+      if (fileUuid && Objects.isNotEmpty(fileName)) {
+        const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
+        obj[fileNameField] = uniqueFileName
+      }
     })
     return obj
   }
@@ -195,7 +199,7 @@ const getCsvObjectTransformer = ({
   if (nullsToEmpty) {
     transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
-  if (keepFileNamesUnique) {
+  if (keepFileNamesUnique && uniqueFileNamesGenerator) {
     const { transformer } = getCsvObjectTransformerUniqueFileNames({
       survey,
       query,
