@@ -604,7 +604,7 @@ $t(common.cantUndoWarning)`,
 
     importFromArena: 'Arena/Arena Mobile',
     importFromCollect: 'Collect / Collect Mobile',
-    importFromCsv: 'CSV',
+    importFromCsvExcel: 'CSV/Excel',
     importFromCsvStepsInfo: `### Importing steps
 1. Select the target entity
 2. Download a template
