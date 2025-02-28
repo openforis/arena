@@ -19,7 +19,7 @@ const DataImport = () => {
         tabs={[
           {
             id: TestId.dataImport.importFromCsvTab,
-            label: i18n.t('dataImportView.importFromCsv'),
+            label: i18n.t('dataImportView.importFromCsvExcel'),
             component: DataImportFlatDataView,
           },
           {
