@@ -604,13 +604,13 @@ $t(common.cantUndoWarning)`,
 
     importFromArena: 'Arena/Arena Mobile',
     importFromCollect: 'Collect / Collect Mobile',
-    importFromCsv: 'CSV',
+    importFromCsvExcel: 'CSV/Excel',
     importFromCsvStepsInfo: `### Importing steps
 1. Select the target entity
 2. Download a template
-3. Fill in the template and save it (CSV) [UTF-8]
+3. Fill in the template and save it (if in CSV, use UTF-8 as encoding)
 4. Check options
-5. Upload the CSV file
+5. Upload the CSV/Excel file
 6. Validate the file
 7. Start import
 `,
@@ -1689,7 +1689,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile: 'ZIP file must contain only .csv files (one for each category), without any directories',
+      invalidImportFile:
+        'ZIP file must contain only .csv or .xlsx files (one for each category), without any directories',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
       nameDuplicate: 'A category with the same name already exists: {{name}}',
       srsNotDefined: 'SRS with code {{srs}} not defined in survey',
