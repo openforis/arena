@@ -42,7 +42,7 @@ export default class ArenaMobileDataImportJob extends Job {
     )
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (!Surveys.isVisibleInMobile(surveyInfo) || !Surveys.isRecordsUploadFromMobileAllowed(surveyInfo)) {
-      throw new SystemError('data.importFromMobileNotAllawed')
+      throw new SystemError('dataImport.importFromMobileNotAllawed')
     }
     this.setContext({ survey })
   }
