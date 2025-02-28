@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { DEFAULT_SRS, Objects } from '@openforis/arena-core'
+import { DEFAULT_SRS, Objects, Surveys } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
@@ -9,7 +9,6 @@ import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import * as SamplingPolygon from '../SamplingPolygon'
-import { SurveySecurity } from '../surveySecurity'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -112,10 +111,7 @@ export const getSamplingPolygon = (surveyInfo) => {
   return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
 }
 
-export const getSecurity = (surveyInfo) => {
-  const security = ObjectUtils.getProp(keys.security, SurveySecurity.getDefaults())(surveyInfo)
-  return { ...SurveySecurity.getDefaults(), ...security }
-}
+export const getSecurity = Surveys.getSecurity
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 

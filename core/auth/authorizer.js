@@ -1,8 +1,9 @@
+import { Surveys } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 import * as AuthGroup from '@core/auth/authGroup'
-import { SurveySecurity } from '@core/survey/surveySecurity'
 
 const { permissions, keys } = AuthGroup
 
@@ -76,7 +77,7 @@ export const canViewNotOwnedRecords = (user, surveyInfo) => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
   return (
     AuthGroup.getName(groupInCurrentSurvey) === AuthGroup.groupNames.dataEditor &&
-    SurveySecurity.isDataEditorViewNotOwnedRecordsAllowed(Survey.getSecurity(surveyInfo))
+    Surveys.isDataEditorViewNotOwnedRecordsAllowed(surveyInfo)
   )
 }
 export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
