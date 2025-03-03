@@ -2,6 +2,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
 import { CallCountEditor } from './callCountEditor'
+import { CallDateTimeDiffEditor } from './callDateTimeDiffEditor'
 import { CallDistanceEditor } from './callDistanceEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
@@ -34,6 +35,10 @@ export const functions = {
   [functionNames.distance]: {
     label: 'distance(...)',
     component: CallDistanceEditor,
+  },
+  [functionNames.dateTimeDiff]: {
+    label: 'dateTimeDiff(...)',
+    component: CallDateTimeDiffEditor,
   },
   [functionNames.includes]: {
     label: 'includes(...)',
