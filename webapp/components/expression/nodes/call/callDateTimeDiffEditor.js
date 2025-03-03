@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
+import { Arrays, Objects } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 
@@ -8,19 +10,19 @@ import { FormItem } from '@webapp/components/form/Input'
 
 import Identifier from '../identifier'
 import { CallEditorPropTypes } from './callEditorPropTypes'
-import { Arrays, Objects } from '@openforis/arena-core'
 
 const dateVariablesFilterFn = (variable) => variable.root || variable.nodeDefType === NodeDef.nodeDefType.date
 const timeVariablesFilterFn = (variable) => variable.root || variable.nodeDefType === NodeDef.nodeDefType.time
 
 const callee = Expression.functionNames.dateTimeDiff
+const labelPrefix = 'expressionEditor.dateTimeDiffEditor.'
 
 const labelByParameterIndex = [
-  'expressionEditor.dateTimeDiffEditor.firstDate',
-  'expressionEditor.dateTimeDiffEditor.firstTime',
-  `${labelPrefix}.secondDate',
-  '${labelPrefix}.secondTime',
-]
+  'firstDateAttribute',
+  'firstTimeAttribute',
+  'secondDateAttribute',
+  'secondTimeAttribute',
+].map((label) => `${labelPrefix}${label}`)
 
 export const CallDateTimeDiffEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props

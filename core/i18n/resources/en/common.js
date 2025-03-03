@@ -1903,6 +1903,12 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
+    dateTimeDiffEditor: {
+      firstDateAttribute: 'First date attribute',
+      firstTimeAttribute: 'First time attribute',
+      secondDateAttribute: 'Second date attribute',
+      secondTimeAttribute: 'Second time attribute',
+    },
     error: {
       selectOneVariable: 'Please select one variable',
     },
