@@ -1228,6 +1228,7 @@ $t(common.appNameFull)
     additionalFields: 'Additional fields',
     basic: 'Basic',
     advanced: 'Advanced',
+    mobileApp: 'Mobile App',
     validations: 'Validations',
     function: 'Function',
     editingFunction: 'Editing function {{functionName}}',
@@ -1301,9 +1302,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
-      hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
-      includedInMultipleEntitySummary: 'Include in multiple entity summary',
       itemsFilter: 'Items filter',
       itemsFilterInfo: `Expression used to filter selectable items.
 In the expression, the word "this" will refer to the item itself. 
@@ -1312,6 +1311,20 @@ E.g. this.region = region_attribute_name
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
+    },
+    mobileAppProps: {
+      hiddenInMobile: {
+        label: 'Hidden in Arena Mobile',
+        info: `If marked, the attribute won't be visible in AM`,
+      },
+      includedInMultipleEntitySummary: {
+        label: 'Include in multiple entity summary',
+        info: `If marked, the attribute will be visible in the entity summary view`,
+      },
+      includedInPreviousCycleLink: {
+        label: 'Include in previous cycle link',
+        info: `If marked, the value from previous cycle will be shown in the data entry form (when the link to the previous cycle is active)`,
+      },
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',

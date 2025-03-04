@@ -15,10 +15,13 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import ButtonBar from './ButtonBar'
-import ValidationsProps from './ValidationsProps'
-import AdvancedProps from './AdvancedProps'
 import BasicProps from './BasicProps'
+import AdvancedProps from './AdvancedProps'
+import { MobileAppProps } from './MobileAppProps'
+import ValidationsProps from './ValidationsProps'
 import AnalysisEntitySelector from './AnalysisEntitySelector'
+
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import { State, useNodeDefDetails } from './store'
 
@@ -27,10 +30,12 @@ const NodeDefDetails = (props) => {
 
   const { state, Actions, editingFromDesigner } = useNodeDefDetails({ nodeDefUuid })
 
+  const cycle = useSurveyCycleKey()
   const nodeDef = State.getNodeDef(state)
   const nodeDefNull = !nodeDef
   const nodeDefIsRoot = nodeDef && NodeDef.isRoot(nodeDef)
   const nodeDefType = nodeDef && NodeDef.getType(nodeDef)
+  const canHaveMobileProps = NodeDef.canHaveMobileProps(cycle)(nodeDef)
 
   const tabs = useMemo(() => {
     if (nodeDefNull) return []
@@ -50,6 +55,14 @@ const NodeDefDetails = (props) => {
         id: TestId.nodeDefDetails.advanced,
         props: tabProps,
       })
+      if (canHaveMobileProps) {
+        _tabs.push({
+          label: 'nodeDefEdit.mobileApp',
+          component: MobileAppProps,
+          id: TestId.nodeDefDetails.mobile,
+          props: tabProps,
+        })
+      }
       if (NodeDefUIProps.getValidationsEnabledByType(nodeDefType)) {
         _tabs.push({
           label: 'nodeDefEdit.validations',
@@ -60,7 +73,7 @@ const NodeDefDetails = (props) => {
       }
     }
     return _tabs
-  }, [Actions, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
+  }, [Actions, canHaveMobileProps, editingFromDesigner, nodeDefIsRoot, nodeDefNull, nodeDefType, state])
 
   if (!nodeDef) return null
 

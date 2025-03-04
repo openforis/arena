@@ -109,6 +109,7 @@ export const TestId = {
     formula: 'formula',
     maxCount: 'max-count',
     minCount: 'min-count',
+    mobile: 'mobile',
     nextBtn: 'node-def-next-btn',
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
