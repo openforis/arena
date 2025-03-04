@@ -1,24 +1,30 @@
 import './SurveySecurityEditor.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import { SurveySecurity } from '@core/survey/surveySecurity'
+import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'
 
 import { Checkbox } from '@webapp/components/form'
 
-const { keys } = SurveySecurity
-
 export const SurveySecurityEditor = (props) => {
-  const { security = SurveySecurity.getDefaults(), onSecurityUpdate } = props
+  const { security = surveySecurityDefaults, onSecurityUpdate } = props
+
+  const onPropUpdate = useCallback(
+    (prop) => (value) => {
+      onSecurityUpdate({ ...security, [prop]: value })
+    },
+    [onSecurityUpdate, security]
+  )
+
   return (
     <div className="survey-security-editor">
-      {Object.values(keys).map((key) => (
+      {Object.values(SurveySecurityProp).map((key) => (
         <Checkbox
           key={key}
           checked={security[key]}
           label={`homeView.surveyInfo.security.${key}`}
-          onChange={(value) => onSecurityUpdate({ ...security, [key]: value })}
+          onChange={onPropUpdate}
         />
       ))}
     </div>

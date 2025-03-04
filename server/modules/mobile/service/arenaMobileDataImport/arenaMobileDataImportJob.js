@@ -8,14 +8,17 @@ import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesI
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import { Surveys, SystemError } from '@openforis/arena-core'
 
 export default class ArenaMobileDataImportJob extends Job {
   /**
    * Creates a new data import job to import survey records and files in Arena format.
    *
    * @param {!object} params - The import parameters.
-   * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!object} [params.user] - The user performing the import.
+   * @param {!number} [params.surveyId] - The id of the survey in which data will be imported.
+   * @param {!string} [params.filePath] - The file path of the file to import.
+   * @param {!string} [params.conflictResolutionStrategy] - How to resolve conflicting records (duplicate keys).
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
   constructor(params) {
@@ -37,6 +40,10 @@ export default class ArenaMobileDataImportJob extends Job {
       { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
       tx
     )
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    if (!Surveys.isVisibleInMobile(surveyInfo) || !Surveys.isRecordsUploadFromMobileAllowed(surveyInfo)) {
+      throw new SystemError('dataImport.importFromMobileNotAllawed')
+    }
     this.setContext({ survey })
   }
 
