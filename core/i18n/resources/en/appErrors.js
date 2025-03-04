@@ -13,6 +13,9 @@ export default {
     excelMaxCellsLimitExceeded: 'Error exporting data. Try to export the data using CSV format.',
     noRecordsMatchingSearchCriteria: 'No records matching search criteria',
   },
+  dataImport: {
+    importFromMobileNotAllawed: 'Data import from Arena Mobile not allowed',
+  },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
   expression: {
     undefinedFunction: '$t(expression.undefinedFunction)',
