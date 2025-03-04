@@ -557,6 +557,8 @@ export const updateLayout = (updateFn) => (nodeDef) => {
 export const updateLayoutProp = ({ cycle, prop, value }) =>
   updateLayout(NodeDefLayout.assocLayoutProp(cycle, prop, value))
 
+export const dissocLayoutProp = ({ cycle, prop }) => updateLayout(NodeDefLayout.dissocLayoutProp(cycle, prop))
+
 export const copyLayout =
   ({ cycleFrom, cyclesTo }) =>
   (nodeDef) =>
@@ -654,26 +656,30 @@ export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   !isFile(nodeDef) &&
   NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
+export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
+  !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
   // clear hidden in mobile if not applicable
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
-    nodeDefUpdated = updateLayoutProp({
-      cycle,
-      prop: NodeDefLayout.keys.hiddenInMobile,
-      value: false,
-    })(nodeDefUpdated)
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
   }
-  // clear inclulde in multiple entity summary if not applicable
+  // clear include in multiple entity summary if not applicable
   if (
     !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
     NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDefUpdated))
   ) {
-    nodeDefUpdated = updateLayoutProp({
-      cycle,
-      prop: NodeDefLayout.keys.includedInMultipleEntitySummary,
-      value: false,
-    })(nodeDefUpdated)
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary })(
+      nodeDefUpdated
+    )
+  }
+  // clear include in previous cycle link if not applicable
+  if (
+    !canIncludeInPreviousCycleLink(cycle)(nodeDefUpdated) &&
+    NodeDefLayout.isIncludedInPreviousCycleLink(getLayout(nodeDefUpdated))
+  ) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInPreviousCycleLink })(nodeDefUpdated)
   }
   if (!canBeExcludedInClone(nodeDefUpdated) && isExcludedInClone(nodeDefUpdated)) {
     nodeDefUpdated = assocExcludedInClone(false)(nodeDefUpdated)

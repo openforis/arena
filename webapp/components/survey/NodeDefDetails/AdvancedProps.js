@@ -5,7 +5,6 @@ import * as Validation from '@core/validation/validation'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyCycleKey } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
@@ -26,32 +25,10 @@ const AdvancedProps = (props) => {
   const nodeDefUuidContext = NodeDef.getParentUuid(nodeDef)
   const autoIncrementalKey = NodeDef.isAutoIncrementalKey(nodeDef)
 
-  const i18n = useI18n()
   const cycle = useSurveyCycleKey()
-
-  const createLayoutPropCheckbox = ({ prop }) => (
-    <Checkbox
-      checked={NodeDefLayout.getPropLayout(cycle, prop, false)(nodeDef)}
-      disabled={readOnly}
-      label={`nodeDefEdit.advancedProps.${prop}`}
-      validation={Validation.getFieldValidation(prop)(validation)}
-      onChange={(value) => Actions.setLayoutProp({ state, key: prop, value })}
-    />
-  )
 
   return (
     <div className="form">
-      {NodeDef.canHaveMobileProps(cycle)(nodeDef) && (
-        <fieldset className="mobile-props-container">
-          <legend>{i18n.t('nodeDefEdit.mobileProps.title')}</legend>
-          <div className="internal-container">
-            {NodeDef.canBeHiddenInMobile(nodeDef) &&
-              createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
-            {NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
-              createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
-          </div>
-        </fieldset>
-      )}
       {NodeDef.canHaveDefaultValue(nodeDef) && (
         <>
           <FormItem label="nodeDefEdit.advancedProps.readOnly">

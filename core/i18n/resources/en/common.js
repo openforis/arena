@@ -607,13 +607,13 @@ $t(common.cantUndoWarning)`,
 
     importFromArena: 'Arena/Arena Mobile',
     importFromCollect: 'Collect / Collect Mobile',
-    importFromCsv: 'CSV',
+    importFromCsvExcel: 'CSV/Excel',
     importFromCsvStepsInfo: `### Importing steps
 1. Select the target entity
 2. Download a template
-3. Fill in the template and save it (CSV) [UTF-8]
+3. Fill in the template and save it (if in CSV, use UTF-8 as encoding)
 4. Check options
-5. Upload the CSV file
+5. Upload the CSV/Excel file
 6. Validate the file
 7. Start import
 `,
@@ -1231,6 +1231,7 @@ $t(common.appNameFull)
     additionalFields: 'Additional fields',
     basic: 'Basic',
     advanced: 'Advanced',
+    mobileApp: 'Mobile App',
     validations: 'Validations',
     function: 'Function',
     editingFunction: 'Editing function {{functionName}}',
@@ -1304,9 +1305,7 @@ $t(common.appNameFull)
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
       defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
-      hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
-      includedInMultipleEntitySummary: 'Include in multiple entity summary',
       itemsFilter: 'Items filter',
       itemsFilterInfo: `Expression used to filter selectable items.
 In the expression, the word "this" will refer to the item itself. 
@@ -1315,6 +1314,20 @@ E.g. this.region = region_attribute_name
       readOnly: 'Read only',
       relevantIf: 'Relevant if',
       script: 'Script',
+    },
+    mobileAppProps: {
+      hiddenInMobile: {
+        label: 'Hidden in Arena Mobile',
+        info: `If marked, the attribute won't be visible in AM`,
+      },
+      includedInMultipleEntitySummary: {
+        label: 'Include in multiple entity summary',
+        info: `If marked, the attribute will be visible in the entity summary view`,
+      },
+      includedInPreviousCycleLink: {
+        label: 'Include in previous cycle link',
+        info: `If marked, the value from previous cycle will be shown in the data entry form (when the link to the previous cycle is active)`,
+      },
     },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
@@ -1692,7 +1705,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile: 'ZIP file must contain only .csv files (one for each category), without any directories',
+      invalidImportFile:
+        'ZIP file must contain only .csv or .xlsx files (one for each category), without any directories',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
       nameDuplicate: 'A category with the same name already exists: {{name}}',
       srsNotDefined: 'SRS with code {{srs}} not defined in survey',
@@ -1905,6 +1919,12 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
 
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
+    dateTimeDiffEditor: {
+      firstDateAttribute: 'First date attribute',
+      firstTimeAttribute: 'First time attribute',
+      secondDateAttribute: 'Second date attribute',
+      secondTimeAttribute: 'Second time attribute',
+    },
     error: {
       selectOneVariable: 'Please select one variable',
     },
