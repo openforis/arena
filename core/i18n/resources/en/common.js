@@ -462,7 +462,7 @@ If there are records associated to this cycle, they will be deleted.`,
       sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
       security: {
         title: 'Security',
-        dataEditorViewNotOwnedRecordsAllowed: 'Data editor can view not owned records',
+        dataEditorViewNotOwnedRecordsAllowed: 'Data Editor can view not owned records',
         visibleInMobile: 'Visible in Arena Mobile',
         allowRecordsDownloadInMobile: 'Allow downloading records from server to Arena Mobile',
         allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
