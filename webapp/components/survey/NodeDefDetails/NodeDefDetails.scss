@@ -85,18 +85,9 @@
     }
   }
 
-  .mobile-props-container {
+  .mobile-props {
     justify-self: center;
     width: 40rem;
-
-    .internal-container {
-      display: flex;
-      gap: 4rem;
-
-      .form-item {
-        display: flex;
-      }
-    }
   }
 }
 
