@@ -1,17 +1,13 @@
-import { Transform } from 'json2csv'
+import Stream from 'stream'
+import { StreamParser } from '@json2csv/plainjs'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
 
-const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
+const getParserOptions = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
   const options = { ...FlatDataWriterUtils.defaultOptions, ...optionsParam }
   const { objectTransformer = null } = options
   const transform = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)
-  const opts = { fields, transforms: [transform] }
-  const transformOpts = {
-    objectMode: true,
-    highWaterMark: 512,
-  }
-  return new Transform(opts, transformOpts)
+  return { fields, transforms: [transform] }
 }
 
 export const writeItemsToStream = ({
@@ -21,16 +17,34 @@ export const writeItemsToStream = ({
   options = FlatDataWriterUtils.defaultOptions,
 }) =>
   new Promise((resolve, reject) => {
-    const fields = fieldsParam ?? Object.keys(items[0] ?? {})
-    const transform = transformJsonToCsv({ fields, options })
-    transform.pipe(outputStream)
-    transform.on('error', reject).on('finish', resolve)
+    try {
+      const fields = fieldsParam ?? Object.keys(items[0] ?? {})
 
-    items.forEach((row) => transform.write(row))
-    transform.end()
+      const stream = new Stream.Readable({ objectMode: true, highWaterMark: 512 })
+        .on('error', reject)
+        .on('end', resolve)
+
+      pipeDataStreamToStream({ stream, fields, options, outputStream })
+
+      items.forEach((row) => stream.push(row))
+
+      stream.push(null) // end of data
+      stream.destroy()
+    } finally {
+      outputStream?.end()
+    }
   })
 
 export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
-  const csvTransform = transformJsonToCsv({ fields, options })
-  return stream.pipe(csvTransform).pipe(outputStream)
+  const parser = new StreamParser(getParserOptions({ fields, options }), {})
+
+  parser.onData = (data) => outputStream.write(data)
+
+  stream
+    .on('data', (item) => {
+      parser.pushLine(item)
+    })
+    .on('end', () => {
+      parser.end()
+    })
 }
