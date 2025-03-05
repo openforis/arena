@@ -3,6 +3,7 @@ import { Objects, PointFactory, Points, Strings } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as DateTimeUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
+import * as StringUtils from '@core/stringUtils'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -36,40 +37,6 @@ const _extractTaxon = ({ survey, node }) => {
  * In case of any errors, return NULL.
  */
 const props = {
-  [nodeDefType.entity]: {
-    [colValueProcessor]: () => () => Node.getUuid,
-  },
-
-  [nodeDefType.integer]: {
-    [colValueProcessor]: ({ nodeCol }) => {
-      const value = Node.getValue(nodeCol)
-      const num = NumberUtils.toNumber(value)
-      return () => (Number.isInteger(num) ? num : null)
-    },
-  },
-
-  [nodeDefType.decimal]: {
-    [colValueProcessor]: ({ nodeCol }) => {
-      const value = Node.getValue(nodeCol)
-      const num = NumberUtils.toNumber(value)
-      return () => (!Number.isNaN(num) && Number.isFinite(num) ? num : null)
-    },
-  },
-
-  [nodeDefType.date]: {
-    [colValueProcessor]: ({ nodeCol }) => {
-      const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
-      return () => (DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null)
-    },
-  },
-
-  [nodeDefType.time]: {
-    [colValueProcessor]: ({ nodeCol }) => {
-      const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
-      return () => (DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null)
-    },
-  },
-
   [nodeDefType.code]: {
     [colValueProcessor]: ({ survey, nodeCol }) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
@@ -85,7 +52,68 @@ const props = {
       }
     },
   },
-
+  [nodeDefType.coordinate]: {
+    [colValueProcessor]:
+      ({ survey }) =>
+      (node, columnName) => {
+        const valueProps = Node.valuePropsCoordinate
+        const valueProp = Object.values(valueProps).find((valueProp) => columnName.endsWith(`_${valueProp}`))
+        if (valueProp) {
+          const nodeValue = Node.getValue(node)
+          const fieldValue = nodeValue[valueProp]
+          if (Objects.isEmpty(fieldValue)) return null
+          if (valueProp === valueProps.srs) {
+            return StringUtils.prependIfMissing('EPSG:')(fieldValue)
+          }
+          return Number(fieldValue)
+        }
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const srsIndex = Survey.getSRSIndex(surveyInfo)
+        const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
+        const point = PointFactory.createInstance({ srs, x, y })
+        if (point && Points.isValid(point, srsIndex)) {
+          return Points.toString(point)
+        }
+        return null
+      },
+  },
+  [nodeDefType.date]: {
+    [colValueProcessor]: ({ nodeCol }) => {
+      const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
+      return () => (DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null)
+    },
+  },
+  [nodeDefType.decimal]: {
+    [colValueProcessor]: ({ nodeCol }) => {
+      const value = Node.getValue(nodeCol)
+      const num = NumberUtils.toNumber(value)
+      return () => (!Number.isNaN(num) && Number.isFinite(num) ? num : null)
+    },
+  },
+  [nodeDefType.entity]: {
+    [colValueProcessor]: () => () => Node.getUuid,
+  },
+  [nodeDefType.file]: {
+    [colValueProcessor]: ({ nodeDefCol }) => {
+      const fileNameExpression = NodeDef.getFileNameExpression(nodeDefCol)
+      return (node, columnName) => {
+        if (columnName.endsWith(ColumnNodeDef.columnSuffixFileName)) {
+          return fileNameExpression ? Node.getFileNameCalculated(node) : Node.getFileName(node)
+        }
+        if (columnName.endsWith(ColumnNodeDef.columnSuffixFileUuid)) {
+          return Node.getFileUuid(node)
+        }
+        return null
+      }
+    },
+  },
+  [nodeDefType.integer]: {
+    [colValueProcessor]: ({ nodeCol }) => {
+      const value = Node.getValue(nodeCol)
+      const num = NumberUtils.toNumber(value)
+      return () => (Number.isInteger(num) ? num : null)
+    },
+  },
   [nodeDefType.taxon]: {
     [colValueProcessor]: ({ survey, nodeDefCol, nodeCol }) => {
       const taxon = _extractTaxon({ survey, node: nodeCol })
@@ -122,45 +150,10 @@ const props = {
       }
     },
   },
-
-  [nodeDefType.coordinate]: {
-    [colValueProcessor]:
-      ({ survey }) =>
-      (node, columnName) => {
-        const valueProp = Object.values(Node.valuePropsCoordinate).find((valueProp) =>
-          columnName.endsWith(`_${valueProp}`)
-        )
-        if (valueProp) {
-          const nodeValue = Node.getValue(node)
-          const fieldValue = nodeValue[valueProp]
-          if (Objects.isEmpty(fieldValue)) return null
-          if (valueProp === Node.valuePropsCode.srs) return fieldValue
-          return Number(fieldValue)
-        }
-
-        const surveyInfo = Survey.getSurveyInfo(survey)
-        const srsIndex = Survey.getSRSIndex(surveyInfo)
-        const [x, y, srs] = [Node.getCoordinateX(node), Node.getCoordinateY(node), Node.getCoordinateSrs(node)]
-        const point = PointFactory.createInstance({ srs, x, y })
-        if (point && Points.isValid(point, srsIndex)) {
-          return Points.toString(point)
-        }
-        return null
-      },
-  },
-
-  [nodeDefType.file]: {
-    [colValueProcessor]: ({ nodeDefCol }) => {
-      const fileNameExpression = NodeDef.getFileNameExpression(nodeDefCol)
-      return (node, columnName) => {
-        if (columnName.endsWith(ColumnNodeDef.columnSuffixFileName)) {
-          return fileNameExpression ? Node.getFileNameCalculated(node) : Node.getFileName(node)
-        }
-        if (columnName.endsWith(ColumnNodeDef.columnSuffixFileUuid)) {
-          return Node.getFileUuid(node)
-        }
-        return null
-      }
+  [nodeDefType.time]: {
+    [colValueProcessor]: ({ nodeCol }) => {
+      const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
+      return () => (DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null)
     },
   },
 }
