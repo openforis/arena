@@ -59,7 +59,7 @@ const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName 
   if (!taxon || Objects.isEmpty(vernacularName)) return null
 
   // match vernacular names with language specified (e.g. "Mahogany (eng)") or simple ones, like "Mahogany"
-  const regExp = /^([^(]+)(\s+\(([^)]+)\))?$/
+  const regExp = /^([^(]+)(\s\(([^)]+)\))?$/
   const vernacularNameParts = regExp.exec(vernacularName)
   const vernacularNameText = vernacularNameParts[1]
   const vernacularNameLang = vernacularNameParts[3]
