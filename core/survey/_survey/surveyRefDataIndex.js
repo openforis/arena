@@ -124,12 +124,14 @@ export const getTaxonUuid = (nodeDef, taxonCode) => (survey) => {
   return Taxon.getUuid(taxon)
 }
 
-export const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => (survey) => {
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxon = getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-  const vernacularNamesUuidByName = Taxon.getVernacularNames(taxon)
-  return vernacularNamesUuidByName[vernacularName]
-}
+export const getTaxonVernacularNameUuid =
+  ({ nodeDef, taxonCode, vernacularName }) =>
+  (survey) => {
+    const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+    const taxon = getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
+    const vernacularNamesUuidByName = Taxon.getVernacularNames(taxon)
+    return vernacularNamesUuidByName[vernacularName]
+  }
 
 export const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => (survey) =>
   Surveys.includesTaxonVernacularName({ survey, nodeDef, taxonCode, vernacularNameUuid })

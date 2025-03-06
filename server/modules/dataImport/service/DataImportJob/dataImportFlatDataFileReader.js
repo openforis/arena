@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
 import { uuidv4 } from '@core/uuid'
@@ -50,6 +51,23 @@ const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey 
     throw new SystemError(errorKey, { headers, value: val })
   }
   return DateUtils.format(dateObj, formatTo)
+}
+
+const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName }) => {
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
+  if (!taxon || Objects.isEmpty(vernacularName)) return null
+
+  // match vernacular names with language specified (e.g. "Mahogany (eng)") or simple ones, like "Mahogany"
+  const regExp = /^([^(]+)(\s\(([^)]+)\))?$/
+  const vernacularNameParts = regExp.exec(vernacularName)
+  const vernacularNameText = vernacularNameParts[1]
+  const vernacularNameLang = vernacularNameParts[3]
+  const vernacularNames = vernacularNameLang
+    ? Taxon.getVernacularNamesByLang(vernacularNameLang)(taxon)
+    : Object.values(Taxon.getVernacularNames(taxon)).flat()
+  const vernacularNameObj = vernacularNames.find((vn) => TaxonVernacularName.getName(vn) === vernacularNameText)
+  return TaxonVernacularName.getUuid(vernacularNameObj)
 }
 
 const valueConverterByNodeDefType = {
@@ -110,14 +128,22 @@ const valueConverterByNodeDefType = {
       throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
     }
     const { uuid: taxonUuid } = taxon
+    const vernacularName = value[Node.valuePropsTaxon.vernacularName]
+    const scientificName = value[Node.valuePropsTaxon.scientificName]
+
     if (taxonCode === Taxon.unlistedCode) {
       return {
         [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
-        [Node.valuePropsTaxon.scientificName]: value[Node.valuePropsTaxon.scientificName],
-        [Node.valuePropsTaxon.vernacularName]: value[Node.valuePropsTaxon.vernacularName],
+        [Node.valuePropsTaxon.scientificName]: scientificName,
+        [Node.valuePropsTaxon.vernacularName]: vernacularName,
       }
     }
-    return Node.newNodeValueTaxon({ taxonUuid })
+    const vernacularNameUuid = extractVernacularNameUuid({ vernacularName, nodeDef, taxonCode, survey })
+    const nodeValue = Node.newNodeValueTaxon({ taxonUuid })
+    if (vernacularNameUuid) {
+      nodeValue[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
+    }
+    return nodeValue
   },
   [NodeDef.nodeDefType.text]: singlePropValueConverter,
   [NodeDef.nodeDefType.time]: ({ value, headers }) =>
