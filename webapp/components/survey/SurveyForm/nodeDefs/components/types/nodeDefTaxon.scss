@@ -1,9 +1,10 @@
 .survey-form__node-def-taxon {
   display: grid;
-  row-gap: 0.3rem;
+  row-gap: 0.2rem;
 
   .form-item {
     grid-template-columns: 125px 1fr;
+    padding: 0;
   }
 }
 
