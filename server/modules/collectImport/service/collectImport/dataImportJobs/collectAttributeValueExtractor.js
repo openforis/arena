@@ -110,23 +110,23 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
 const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
   const {
-    code,
+    code: taxonCode,
     scientific_name: scientificName,
     vernacular_name: vernacularName,
   } = CollectRecord.getTextValues(collectNode)
-  const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
+  const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
 
   if (taxonUuid) {
     const value = {
       [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
     }
 
-    if (code === Taxon.unlistedCode) {
+    if (taxonCode === Taxon.unlistedCode) {
       value[Node.valuePropsTaxon.scientificName] = scientificName
     }
 
     if (vernacularName) {
-      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(nodeDef, code, vernacularName)(survey)
+      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid({ nodeDef, taxonCode, vernacularName })(survey)
       if (vernacularNameUuid) {
         value[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
       } else {

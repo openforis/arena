@@ -92,7 +92,9 @@ const valueComparatorByNodeDefType = {
     if (value === valueSearch) return true
     if (!value) return false
     if (!valueSearch) return false
-    return value[Node.valuePropsTaxon.taxonUuid] === valueSearch[Node.valuePropsTaxon.taxonUuid]
+    return [Node.valuePropsTaxon.taxonUuid, Node.valuePropsTaxon.vernacularNameUuid].every(
+      (prop) => value[prop] === valueSearch[prop]
+    )
   },
   [NodeDef.nodeDefType.text]: singlePropValueEqualComparator,
   [NodeDef.nodeDefType.time]: dateTimeComparator({
