@@ -7,9 +7,10 @@ import { LoaderActions } from '@webapp/store/ui/loader'
 import * as SurveyState from '../state'
 import * as SurveyStatusState from '../status/state'
 import { surveyDefsLoad, surveyDefsReset } from './actionTypes'
+import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 const loadSurveyDefs =
-  ({ draft, includeAnalysis, validate, showLoader = true }) =>
+  ({ navigate, draft, includeAnalysis, validate, showLoader = true }) =>
   async (dispatch, getState) => {
     if (showLoader) {
       dispatch(LoaderActions.showLoader())
@@ -17,25 +18,27 @@ const loadSurveyDefs =
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
+    try {
+      const survey = await API.fetchSurveyFull({ surveyId, draft, advanced: true, validate, cycle, includeAnalysis })
 
-    const survey = await API.fetchSurveyFull({ surveyId, draft, advanced: true, validate, cycle, includeAnalysis })
+      const surveyUpdated = await fetchAndAssocCategoryItemsCounts({ survey, draft })
 
-    const surveyUpdated = await fetchAndAssocCategoryItemsCounts({ survey, draft })
-
-    dispatch({ type: surveyDefsLoad, ...surveyUpdated, draft, includeAnalysis, validate })
-
+      dispatch({ type: surveyDefsLoad, ...surveyUpdated, draft, includeAnalysis, validate })
+    } catch (error) {
+      navigate(appModuleUri(homeModules.surveyList))
+    }
     if (showLoader) {
       dispatch(LoaderActions.hideLoader())
     }
   }
 
 export const initSurveyDefs =
-  ({ draft = false, includeAnalysis = true, validate = false }) =>
+  ({ navigate, draft = false, includeAnalysis = true, validate = false }) =>
   async (dispatch, getState) => {
     const state = getState()
 
     if (!SurveyStatusState.isFetchedWithSameParams({ draft, includeAnalysis, validate })(state)) {
-      dispatch(loadSurveyDefs({ draft, includeAnalysis, validate }))
+      dispatch(loadSurveyDefs({ navigate, draft, includeAnalysis, validate }))
     }
   }
 
@@ -53,14 +56,16 @@ const fetchAndAssocCategoryItemsCounts = async ({ survey, draft }) => {
   return Survey.assocCategories(categoriesUpdated)(survey)
 }
 
-export const refreshSurveyDefs = async (dispatch, getState) => {
-  const state = getState()
-  if (SurveyStatusState.isFetched(state)) {
-    const draft = SurveyStatusState.isDraft(state)
-    const includeAnalysis = SurveyStatusState.isIncludeAnalysis(state)
-    const validate = SurveyStatusState.isValidate(state)
-    dispatch(loadSurveyDefs({ draft, includeAnalysis, validate, showLoader: false }))
+export const refreshSurveyDefs =
+  ({ navigate }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    if (SurveyStatusState.isFetched(state)) {
+      const draft = SurveyStatusState.isDraft(state)
+      const includeAnalysis = SurveyStatusState.isIncludeAnalysis(state)
+      const validate = SurveyStatusState.isValidate(state)
+      dispatch(loadSurveyDefs({ navigate, draft, includeAnalysis, validate, showLoader: false }))
+    }
   }
-}
 
 export const resetSurveyDefs = () => ({ type: surveyDefsReset })
