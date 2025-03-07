@@ -65,7 +65,7 @@ const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName 
   const vernacularNameLang = vernacularNameParts[3]
   const vernacularNames = vernacularNameLang
     ? Taxon.getVernacularNamesByLang(vernacularNameLang)(taxon)
-    : Object.values(Taxon.getVernacularNames(taxon)).flat()
+    : Taxon.getVernacularNamesArray(taxon)
   const vernacularNameObj = vernacularNames.find((vn) => TaxonVernacularName.getName(vn) === vernacularNameText)
   return TaxonVernacularName.getUuid(vernacularNameObj)
 }
