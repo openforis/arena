@@ -76,10 +76,9 @@ const props = {
           const nodeValue = Node.getValue(node)
           const fieldValue = nodeValue[valueProp]
           if (Objects.isEmpty(fieldValue)) return null
-          if (valueProp === valueProps.srs) {
-            return StringUtils.prependIfMissing('EPSG:')(fieldValue)
-          }
-          return Number(fieldValue)
+          return valueProp === valueProps.srs
+            ? StringUtils.prependIfMissing('EPSG:')(String(fieldValue))
+            : Number(fieldValue)
         }
         const surveyInfo = Survey.getSurveyInfo(survey)
         const srsIndex = Survey.getSRSIndex(surveyInfo)
