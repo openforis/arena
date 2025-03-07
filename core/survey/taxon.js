@@ -50,12 +50,15 @@ export const getGenus = ObjectUtils.getProp(propKeys.genus, '')
 export const getScientificName = ObjectUtils.getProp(propKeys.scientificName, '')
 
 export const getVernacularNames = R.propOr({}, keys.vernacularNames)
+export const getVernacularNamesArray = (taxon) => Object.values(getVernacularNames(taxon)).flat()
 
 export const getVernacularNamesByLang = (lang) => R.pipe(getVernacularNames, R.propOr([], lang))
 
 export const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
 export const getVernacularNameUuid = R.prop(keys.vernacularNameUuid)
 export const getVernacularName = R.propOr('', keys.vernacularName)
+export const getVernacularNameObjByUuid = (uuid) => (taxon) =>
+  getVernacularNamesArray(taxon).find((vn) => TaxonVernacularName.getUuid(vn) === uuid)
 
 export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
 export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))

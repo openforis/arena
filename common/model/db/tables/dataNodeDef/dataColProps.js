@@ -10,6 +10,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 import ColumnNodeDef from './columnNodeDef'
 
@@ -29,6 +30,19 @@ const _extractTaxon = ({ survey, node }) => {
   const taxonUuid = Node.getTaxonUuid(node)
   if (!taxonUuid) return null
   return NodeRefData.getTaxon(node) ?? Survey.getTaxonByUuid(taxonUuid)(survey)
+}
+
+const _extractVernacularNameAndLang = ({ taxon, vernacularNameUuid }) => {
+  let vernacularName, vernacularLang
+  const vernacularNameObj = Taxon.getVernacularNameObjByUuid(vernacularNameUuid)(taxon)
+  if (vernacularNameObj) {
+    vernacularName = TaxonVernacularName.getName(vernacularNameObj)
+    vernacularLang = TaxonVernacularName.getLang(vernacularNameObj)
+  } else {
+    vernacularName = Taxon.getVernacularName(taxon)
+    vernacularLang = Taxon.getVernacularLanguage(taxon)
+  }
+  return vernacularName ? { vernacularName, vernacularLang } : {}
 }
 
 /**
@@ -62,10 +76,9 @@ const props = {
           const nodeValue = Node.getValue(node)
           const fieldValue = nodeValue[valueProp]
           if (Objects.isEmpty(fieldValue)) return null
-          if (valueProp === valueProps.srs) {
-            return StringUtils.prependIfMissing('EPSG:')(fieldValue)
-          }
-          return Number(fieldValue)
+          return valueProp === valueProps.srs
+            ? StringUtils.prependIfMissing('EPSG:')(String(fieldValue))
+            : Number(fieldValue)
         }
         const surveyInfo = Survey.getSurveyInfo(survey)
         const srsIndex = Survey.getSRSIndex(surveyInfo)
@@ -138,10 +151,10 @@ const props = {
         }
         if (columnName.endsWith(ColumnNodeDef.columnSuffixTaxonVernacularName)) {
           // Vernacular name
-          if (Node.getVernacularNameUuid(node)) {
-            const vernacularName = Taxon.getVernacularName(taxon)
-            const vernacularLang = Taxon.getVernacularLanguage(taxon)
-            return `${vernacularName} (${vernacularLang})`
+          const vernacularNameUuid = Node.getVernacularNameUuid(node)
+          if (vernacularNameUuid) {
+            const { vernacularName, vernacularLang } = _extractVernacularNameAndLang({ taxon, vernacularNameUuid })
+            return vernacularName ? `${vernacularName} (${vernacularLang})` : null
           } else if (Taxon.isUnkOrUnlTaxon(taxon)) {
             return Node.getVernacularName(node)
           }
