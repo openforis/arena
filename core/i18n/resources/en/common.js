@@ -1725,7 +1725,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       invalidTime:
         'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
-      errorUpdatingValues: 'Error updating values',
+      errorUpdatingValues: 'Error updating values: {{details}}',
       multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
