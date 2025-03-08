@@ -19,6 +19,7 @@ import { NodeRdbManager } from './nodeRDBManager'
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
     let recordSummaryToStore = Record.dissocNodes(record)
+    delete recordSummaryToStore['_nodesIndex']
     if (Validation.isObjValid(recordSummaryToStore)) {
       recordSummaryToStore = Validation.dissocValidation(recordSummaryToStore)
     }
