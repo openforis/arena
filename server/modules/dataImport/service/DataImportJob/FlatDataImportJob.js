@@ -185,6 +185,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const sideEffect = !includeFiles
 
       const updateResult = new RecordUpdateResult({ record: this.currentRecord })
+      if (newRecord) {
+        Record.getNodesArray(record).forEach((node) => updateResult.addNode(node, { sideEffect: true }))
+      }
 
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
         user,
@@ -227,7 +230,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     } catch (e) {
       const { key, params } = e
       const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
-      this._addError(errorKey, params)
+      const errorParams = key ? params : { details: String(e) }
+      this._addError(errorKey, errorParams)
     }
   }
 
