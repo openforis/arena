@@ -67,8 +67,8 @@ export const createReaderFromStream = ({
 
     const _processRow = async (row) => {
       // Skip first row (headers)
-      if (total++ > 0) {
-        onTotalChange?.(total)
+      if (onTotalChange && fileFormat === FileFormats.csv && total++ > 0) {
+        onTotalChange(total)
       }
       if (headers) {
         // Headers have been read, process row
@@ -83,6 +83,9 @@ export const createReaderFromStream = ({
     const parserOrRows =
       fileFormat === FileFormats.csv ? parser : await ExcelReader.extractRowsFromExcelStream({ stream })
 
+    if (onTotalChange && fileFormat === FileFormats.xlsx) {
+      onTotalChange(parserOrRows.length)
+    }
     for await (const row of parserOrRows) {
       if (readerStatus.canceled) {
         break
