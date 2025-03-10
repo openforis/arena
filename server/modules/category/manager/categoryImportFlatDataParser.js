@@ -45,7 +45,7 @@ const _getItemValue = ({ survey, item, row }) => {
     const y = row[itemKey + '_y']
     let srs = row[itemKey + '_srs']
     if (!Objects.isEmpty(x) && !Objects.isEmpty(y) && !Objects.isEmpty(srs)) {
-      srs = StringUtils.removePrefix('EPSG:')(srs)
+      srs = StringUtils.removePrefix(Srs.idPrefix)(srs)
       _checkSrs({ survey, srs, columnName: itemKey + '_srs' })
       return Points.toString(PointFactory.createInstance({ x, y, srs }))
     }
