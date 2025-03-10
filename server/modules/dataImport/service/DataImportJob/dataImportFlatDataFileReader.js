@@ -147,7 +147,10 @@ const valueConverterByNodeDefType = {
     }
     return nodeValue
   },
-  [NodeDef.nodeDefType.text]: singlePropValueConverter,
+  [NodeDef.nodeDefType.text]: ({ value }) => {
+    const val = singlePropValueConverter({ value })
+    return val === null || val === undefined ? null : String(val)
+  },
   [NodeDef.nodeDefType.time]: ({ value, headers }) =>
     extractDateOrTime({
       value,
