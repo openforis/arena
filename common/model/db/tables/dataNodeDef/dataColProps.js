@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 import * as DateTimeUtils from '@core/dateUtils'
 import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
+import * as Srs from '@core/geo/srs'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -77,7 +78,7 @@ const props = {
           const fieldValue = nodeValue[valueProp]
           if (Objects.isEmpty(fieldValue)) return null
           return valueProp === valueProps.srs
-            ? StringUtils.prependIfMissing('EPSG:')(String(fieldValue))
+            ? StringUtils.prependIfMissing(Srs.idPrefix)(String(fieldValue))
             : Number(fieldValue)
         }
         const surveyInfo = Survey.getSurveyInfo(survey)

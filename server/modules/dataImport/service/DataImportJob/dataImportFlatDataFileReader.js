@@ -3,6 +3,7 @@ import { Objects } from '@openforis/arena-core'
 import { CsvDataExportModel } from '@common/model/csvExport'
 
 import SystemError from '@core/systemError'
+import * as Srs from '@core/geo/srs'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
@@ -10,6 +11,7 @@ import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
+import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
@@ -94,7 +96,7 @@ const valueConverterByNodeDefType = {
     return { [Node.valuePropsCode.code]: code }
   },
   [NodeDef.nodeDefType.coordinate]: ({ value }) => {
-    const srsId = value[Node.valuePropsCoordinate.srs]
+    const srsId = StringUtils.removePrefix(Srs.idPrefix)(value[Node.valuePropsCoordinate.srs])
     const x = value[Node.valuePropsCoordinate.x]
     const y = value[Node.valuePropsCoordinate.y]
     return Node.newNodeValueCoordinate({ x, y, srsId })
