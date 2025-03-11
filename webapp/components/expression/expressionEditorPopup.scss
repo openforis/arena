@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .expression-editor-popup {
   display: flex;
@@ -24,6 +24,7 @@
     font-family: inherit;
   }
 }
+
 .MuiButton-root.expression-editor-popup__toggle-advanced {
   position: absolute;
   right: 20px;
@@ -40,6 +41,7 @@
     margin-bottom: 15px;
   }
 }
+
 .expression-editor-popup__expr-container {
   margin-top: 1.5rem;
   position: relative;
@@ -51,6 +53,7 @@
     border: 1px solid black;
     margin-bottom: 15px;
   }
+
   textarea,
   span {
     font-size: 1rem;
@@ -87,6 +90,7 @@
         min-width: 10rem;
         max-width: 20rem;
       }
+
       .call {
         .identifier {
           width: 20rem;
@@ -160,7 +164,7 @@
   gap: 5rem;
   margin-top: 2rem;
 
-  > button {
+  >button {
     margin: 0px 0.3rem;
     font-weight: 600;
   }
@@ -174,6 +178,7 @@
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
   }
+
   .cm-completion-option.function {
     .cm-completionLabel {
       font-weight: bold;

@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 //== buttons
 $sidebarBtnMargin: 1px;
@@ -22,9 +22,11 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
       position: absolute;
       top: 0;
     }
+
     .sidebar__btn-open {
       left: 15px;
     }
+
     .sidebar__btn-close {
       right: 15px;
     }

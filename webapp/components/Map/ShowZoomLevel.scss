@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .show-zoom-level {
   background-color: rgba($color: $white, $alpha: 0.4);

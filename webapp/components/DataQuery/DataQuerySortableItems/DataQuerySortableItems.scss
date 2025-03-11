@@ -1,4 +1,4 @@
-@import 'webapp/style/partials';
+@use '~@webapp/style/vars' as *;
 
 .data-query__sortable-items-form-item {
   display: flex;
@@ -26,6 +26,7 @@
     background-color: lighten($orangeLight, 10%);
     border: 1px dashed $blue;
   }
+
   &.draggable-source--is-dragging {
     color: transparent;
     background-color: transparent;

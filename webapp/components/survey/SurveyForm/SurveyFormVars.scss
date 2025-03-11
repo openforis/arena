@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 $formBorder: 1px solid $greyBorder;
 $formBorderEdit: 1px dashed $greyBorder;

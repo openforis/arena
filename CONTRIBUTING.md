@@ -54,8 +54,7 @@ docker container restart arena-db
 To install dependencies:
 
 ```shell
-yarn
-npm rebuild node-sass # Sometimes needed
+yarn install
 ```
 
 To run the server and the Web app in parallel with "hot reload" on any changes:

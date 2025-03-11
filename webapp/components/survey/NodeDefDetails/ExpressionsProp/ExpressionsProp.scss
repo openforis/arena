@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .node-def-edit_expressions-wrapper {
   display: flex;
@@ -109,9 +109,11 @@
 
   .labels-editor.with-label {
     @extend .node-def-edit__expression-grid-item;
+
     .labels-editor-label {
       justify-content: center;
     }
+
     .labels-editor__labels {
       margin-left: 0.5rem;
     }

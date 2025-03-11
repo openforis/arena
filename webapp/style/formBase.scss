@@ -1,4 +1,4 @@
-@import './vars';
+@use './vars' as *;
 
 input,
 label,
@@ -72,7 +72,8 @@ button,
 button:disabled,
 *[aria-disabled='true'] {
   color: currentColor;
-  display: inline-block; /* For IE11/ MS Edge bug */
+  display: inline-block;
+  /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
   opacity: 0.9;

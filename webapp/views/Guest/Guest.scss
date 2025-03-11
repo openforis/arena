@@ -1,12 +1,14 @@
-@import 'webapp/style/vars';
-@import 'webapp/style/layoutMixins';
+@use '~@webapp/style/vars' as *;
+@use '~@webapp/style/layoutMixins' as *;
 
 @keyframes not-logged-in__bg-animation {
+
   0%,
   100% {
     transform: scale(1, 1);
     opacity: 0.2;
   }
+
   50% {
     transform: scale(1.1, 1.1);
     opacity: 0.05;
@@ -60,7 +62,7 @@
     grid-row-gap: 10px;
     z-index: $zIndex10TopOfApp;
 
-    > div {
+    >div {
       padding: 10px 0;
       text-align: center;
       font-size: 1.25rem;

@@ -1,5 +1,5 @@
-@import 'webapp/style/vars';
-@import 'webapp/components/survey/SurveyForm/SurveyFormVars';
+@use '~@webapp/style/vars' as *;
+@use '~@webapp/components/survey/SurveyForm/SurveyFormVars' as *;
 
 .survey-form-header {
   display: flex;
@@ -24,7 +24,7 @@
 .survey-form-header__actions {
   display: flex;
 
-  > *:not(:last-child) {
+  >*:not(:last-child) {
     margin: 0 1rem;
   }
 
@@ -32,6 +32,7 @@
     position: relative;
   }
 }
+
 .survey-form-header__options {
   display: flex;
   justify-content: flex-end;
@@ -41,7 +42,7 @@
 .survey-form-header__record-actions-steps {
   border: 1px solid $greyBorder;
 
-  > * {
+  >* {
     margin: 0 0.5rem;
     font-size: 0.8rem;
   }

@@ -1,8 +1,8 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 $borderColor: $greyBorder;
 
-.app__container .app-module > .category {
+.app__container .app-module>.category {
   overflow: hidden; // scrollbars managed in .category__levels
 }
 

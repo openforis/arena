@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .expansion-panel {
   .btn-toggle {
@@ -16,6 +16,7 @@
   .btn-toggle {
     transform: unset;
   }
+
   .expansion-panel__content {
     display: none;
   }

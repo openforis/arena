@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .map-kml-uploader-wrapper {
   display: flexbox;
@@ -58,13 +58,13 @@
     color: #555;
   }
 
-  input:hover + label,
-  input:focus + label {
+  input:hover+label,
+  input:focus+label {
     transform: scale(1);
   }
 
   /* Adding an outline to the label on focus */
-  input:focus + label {
+  input:focus+label {
     outline: 1px solid #000;
     outline: -webkit-focus-ring-color auto 2px;
   }
