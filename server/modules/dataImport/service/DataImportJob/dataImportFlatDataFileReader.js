@@ -21,29 +21,23 @@ const VALUE_PROP_DEFAULT = 'value'
 const allowedBooleanValues = ['true', 'false', 'yes', 'no', '1', '0']
 const booleanTrueValues = ['true', 'yes', '1']
 
-const allowedDateFormats = [
-  DateUtils.formats.dateDefault,
-  'DD-MM-YYYY',
-  'DD.MM.YYYY',
-  'YYYY.MM.DD',
-  'YYYY/MM/DD',
-  DateUtils.formats.dateISO,
-  'D-MM-YYYY',
-  'D-M-YYYY',
-  'DD-M-YYYY',
-  'D.MM.YYYY',
-  'DD.M.YYYY',
-  'D.M.YYYY',
-  'YYYY.MM.D',
-  'YYYY.M.D',
-  'YYYY.M.DD',
-  'YYYY/MM/D',
-  'YYYY/M/D',
-  'YYYY/M/DD',
-  'YYYY-MM-D',
-  'YYYY-M-D',
-  'YYYY-M-DD',
+const generateAllowedDateFormats = (sep) => [
+  `DD${sep}MM${sep}YYYY`,
+  `D${sep}MM${sep}YYYY`,
+  `D${sep}M${sep}YYYY`,
+  `DD${sep}M${sep}YYYY`,
+  `YYYY${sep}MM${sep}DD`,
+  `YYYY${sep}MM${sep}D`,
+  `YYYY${sep}M${sep}D`,
+  `YYYY${sep}M${sep}DD`,
 ]
+
+const dateFormatsSeparators = ['/', '-', '.']
+
+const allowedDateFormats = dateFormatsSeparators.reduce((acc, separator) => {
+  acc.push(...generateAllowedDateFormats(separator))
+  return acc
+}, [])
 const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm']
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
