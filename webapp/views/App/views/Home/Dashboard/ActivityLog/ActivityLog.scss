@@ -1,5 +1,5 @@
-@import 'webapp/style/vars';
-@import 'webapp/style/animate';
+@use '~@webapp/style/vars' as *;
+@use '~@webapp/style/animate' as *;
 
 .activity-log {
   width: calc(min(450px, 100vw));

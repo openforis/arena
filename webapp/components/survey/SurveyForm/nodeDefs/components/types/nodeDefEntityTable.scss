@@ -1,5 +1,5 @@
-@import 'webapp/style/vars';
-@import '../../../SurveyFormVars';
+@use '~@webapp/style/vars' as *;
+@use '../../../SurveyFormVars' as *;
 
 .survey-form__node-def-entity-table {
   display: grid;

@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 $tableHeaderHeight: 50px;
 $tableFooterHeight: 30px;
@@ -57,7 +57,7 @@ $tableFooterHeight: 30px;
       border-bottom: none;
     }
 
-    > div {
+    >div {
       //width: calc(100% / 6);
       white-space: nowrap;
       overflow: hidden;

@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .taxonomy {
   display: grid;
@@ -36,6 +36,7 @@
         .table__row-header {
           display: inline-grid;
         }
+
         .table__rows {
           overflow-x: hidden;
           right: inherit;
@@ -47,6 +48,7 @@
 
 .taxonomy.onlyRequiredColumns {
   .table__content {
+
     .table__row-header,
     .table__rows {
       width: calc(100% - 10px);

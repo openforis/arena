@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .user-edit {
   margin: auto;
@@ -45,6 +45,7 @@
         }
       }
     }
+
     .btn-add {
       justify-self: center;
     }

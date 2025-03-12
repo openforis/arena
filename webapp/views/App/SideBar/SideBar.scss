@@ -1,10 +1,11 @@
-@import 'webapp/style/vars';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
 
 //== buttons
 $sidebarBtnMargin: 1px;
 $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 //== popup-menu
-$sidebarPopupMenuBgColor: lighten($blue, 40%);
+$sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
 
 .sidebar {
   display: flex;
@@ -22,9 +23,11 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
       position: absolute;
       top: 0;
     }
+
     .sidebar__btn-open {
       left: 15px;
     }
+
     .sidebar__btn-close {
       right: 15px;
     }
@@ -114,7 +117,7 @@ $sidebarPopupMenuBgColor: lighten($blue, 40%);
     width: $sidebarWidthOpened;
     padding: 10px 20px;
     font-size: 0.75rem;
-    color: lighten($black, 25%);
+    color: color.adjust($black, $lightness: 25%);
     font-weight: 600;
     text-align: center;
   }

@@ -1,6 +1,6 @@
-@import 'webapp/style/vars';
-@import './SurveyFormVars';
-@import './react-grid-layout';
+@use '~@webapp/style/vars' as *;
+@use './SurveyFormVars' as *;
+@use './react-grid-layout' as *;
 
 .survey-form-wrapper {
   display: flex;
@@ -33,11 +33,12 @@
       transition-property: none;
     }
 
-    .react-grid-item > .react-resizable-handle {
+    .react-grid-item>.react-resizable-handle {
       display: none;
     }
 
     &.mounted {
+
       //react-grid-item css animation are enabled after component didMount
       .react-grid-item.cssTransforms {
         transition-property: transform;

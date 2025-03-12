@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .loader {
   position: fixed;
@@ -27,6 +27,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -36,6 +37,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -48,7 +50,7 @@
   top: calc(50vh - 40px);
   left: calc(50vw - 40px);
 
-  > div {
+  >div {
     position: absolute;
     top: 0;
     opacity: 0;
@@ -61,12 +63,12 @@
     animation: ball-scale-multiple 1s 0s linear infinite;
   }
 
-  > div:nth-child(2) {
+  >div:nth-child(2) {
     -webkit-animation-delay: -0.4s;
     animation-delay: -0.4s;
   }
 
-  > div:nth-child(3) {
+  >div:nth-child(3) {
     -webkit-animation-delay: -0.2s;
     animation-delay: -0.2s;
   }

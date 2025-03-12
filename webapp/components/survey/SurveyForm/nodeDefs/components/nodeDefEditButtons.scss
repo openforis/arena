@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .survey-form__node-def-edit-buttons {
   position: absolute;
