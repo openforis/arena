@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .data-query__sortable-items-form-item {
@@ -23,7 +24,7 @@
   background-color: white;
 
   &.draggable-mirror {
-    background-color: lighten($orangeLight, 10%);
+    background-color: color.adjust($orangeLight, $lightness: 10%);
     border: 1px dashed $blue;
   }
 

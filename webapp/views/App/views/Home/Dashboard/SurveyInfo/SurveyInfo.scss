@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .home-dashboard__survey-info {
@@ -16,7 +17,7 @@
     font-size: 0.7rem;
     text-transform: uppercase;
     padding: 0 0.5rem;
-    color: lighten($black, 20%);
+    color: color.adjust($black, $lightness: 20%);
     margin-left: 1rem;
   }
 

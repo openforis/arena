@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '~@webapp/style/text' as t;
 @use '~@webapp/style/vars' as v;
 
@@ -9,7 +10,7 @@
   grid-column-gap: 22px;
   align-items: center;
 
-  >div {
+  > div {
     padding-left: 8px;
     @include t.line-clamp(1);
   }
@@ -63,12 +64,12 @@
 }
 
 .analysis-node-def.draggable-mirror {
-  background-color: lighten(v.$orangeLight, 10%);
+  background-color: color.adjust(v.$orangeLight, $lightness: 10%);
   border: 1px dashed v.$blue;
 
   .analysis-node-def__btn-move {
     span {
-      color: lighten(v.$black, 5%);
+      color: color.adjust(v.$black, $lightness: 5%);
     }
   }
 }
@@ -117,7 +118,7 @@
   height: 16px;
 
   span {
-    color: lighten(v.$black, 30%);
+    color: color.adjust(v.$black, $lightness: 30%);
   }
 
   &:hover {
@@ -125,7 +126,7 @@
     cursor: move !important;
 
     span {
-      color: lighten(v.$black, 5%);
+      color: color.adjust(v.$black, $lightness: 5%);
     }
   }
 }

@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .expansion-panel {
@@ -7,7 +8,7 @@
     transform: rotate(90deg);
 
     &:hover {
-      color: lighten($black, 25%);
+      color: color.adjust($black, $lightness: 25%);
     }
   }
 }
