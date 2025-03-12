@@ -18,7 +18,9 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const VALUE_PROP_DEFAULT = 'value'
 
-const allowedBooleanValues = ['true', 'false', '1', '0']
+const allowedBooleanValues = ['true', 'false', 'yes', 'no', '1', '0']
+const booleanTrueValues = ['true', 'yes', '1']
+
 const allowedDateFormats = [
   DateUtils.formats.dateDefault,
   'DD-MM-YYYY',
@@ -26,8 +28,23 @@ const allowedDateFormats = [
   'YYYY.MM.DD',
   'YYYY/MM/DD',
   DateUtils.formats.dateISO,
+  'D-MM-YYYY',
+  'D-M-YYYY',
+  'DD-M-YYYY',
+  'D.MM.YYYY',
+  'DD.M.YYYY',
+  'D.M.YYYY',
+  'YYYY.MM.D',
+  'YYYY.M.D',
+  'YYYY.M.DD',
+  'YYYY/MM/D',
+  'YYYY/M/D',
+  'YYYY/M/DD',
+  'YYYY-MM-D',
+  'YYYY-M-D',
+  'YYYY-M-DD',
 ]
-const allowedTimeFormats = [DateUtils.formats.timeStorage]
+const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm']
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
 
@@ -78,7 +95,7 @@ const valueConverterByNodeDefType = {
     if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
       throw new SystemError('validationErrors.dataImport.invalidBoolean', { value: val, headers })
     }
-    return String(['true', '1'].includes(String(val).toLocaleLowerCase()))
+    return String(booleanTrueValues.includes(String(val).toLocaleLowerCase()))
   },
   [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]

@@ -1715,7 +1715,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     dataImport: {
       emptyFile: 'The file you are trying to import is empty',
       invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
-      invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
+      invalidBoolean: 'Invalid boolean value in column {{headers}}: {{value}}',
       invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
       invalidDate:
