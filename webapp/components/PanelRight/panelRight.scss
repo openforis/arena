@@ -1,4 +1,5 @@
-@import 'webapp/style/vars';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
 
 .panel-right {
   position: fixed;
@@ -19,6 +20,7 @@
     grid-template-rows: $headerHeight 1fr $footerHeight;
   }
 }
+
 .panel-right__header,
 .panel-right__footer {
   display: flex;
@@ -37,6 +39,7 @@
     right: 5px;
     color: $white;
   }
+
   .btn-resize {
     position: absolute;
     right: 5px;
@@ -46,7 +49,7 @@
 
 .panel-right__content,
 .panel-right__footer {
-  background-color: darken($greyAppBg, 1%);
+  background-color: color.adjust($greyAppBg, $lightness: -1%);
 }
 
 .panel-right__content {
@@ -59,6 +62,7 @@
     transform: translateX(500px);
     opacity: 0;
   }
+
   to {
     transform: none;
     opacity: 1;

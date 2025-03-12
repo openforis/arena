@@ -1,8 +1,9 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .tooltip {
   &:hover {
     cursor: default;
+
     &.hoverable {
       cursor: pointer;
     }
@@ -81,6 +82,7 @@
   &.bottom:after {
     border-bottom-color: $red;
   }
+
   &.top:after {
     border-top-color: $red;
   }
@@ -93,6 +95,7 @@
   &.bottom:after {
     border-bottom-color: $orange;
   }
+
   &.top:after {
     border-top-color: $orange;
   }
@@ -105,6 +108,7 @@
   &.bottom:after {
     border-bottom-color: $greyAppBg;
   }
+
   &.top:after {
     border-top-color: $greyAppBg;
   }

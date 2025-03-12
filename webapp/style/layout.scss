@@ -1,4 +1,4 @@
-@import './layoutMixins';
+@use './layoutMixins' as *;
 
 // layout
 .full-screen-fixed {

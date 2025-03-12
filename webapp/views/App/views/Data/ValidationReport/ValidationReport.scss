@@ -1,6 +1,6 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
-.app-module > :first-child.validation-report {
+.app-module> :first-child.validation-report {
   overflow-y: hidden;
 
   .footer {

@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .node-def-edit {
   position: relative;
@@ -70,6 +70,7 @@
     .btn-next {
       margin-left: 5rem;
     }
+
     .btn-previous {
       margin-right: 5rem;
     }
