@@ -20,6 +20,10 @@ import NodeDefGeo from './components/types/nodeDefGeo'
 
 const { boolean, code, coordinate, date, decimal, entity, file, geo, integer, taxon, text, time } = NodeDef.nodeDefType
 
+const singleEntityIcon = <span className="icon icon-insert-template icon-left" />
+const multipleAttributeIcon = <span title="Multiple">M</span>
+const keyIcon = <span className="icon icon-key icon-left" />
+
 const propsUI = {
   [integer]: {
     icon: <span className="icon-left node_def__icon">123</span>,
@@ -134,9 +138,9 @@ export const getIconByType = getPropByType('icon')
 
 export const getIconByNodeDef = (nodeDef, includeKey = false) => (
   <div className="node-def__icon-wrapper">
-    {includeKey && NodeDef.isKey(nodeDef) && <span className="icon icon-key icon-left" />}
-    {NodeDef.isMultipleAttribute(nodeDef) && <span title="Multiple">M</span>}
-    {getIconByType(NodeDef.getType(nodeDef))}
+    {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
+    {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
+    {NodeDef.isSingleEntity(nodeDef) ? singleEntityIcon : getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )
 

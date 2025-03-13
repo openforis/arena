@@ -112,6 +112,7 @@ const DEFAULT_OPTIONS = {
   includeAncestorAttributes: false,
   includeCategoryItemsLabels: true,
   expandCategoryItems: false,
+  exportSingleEntitiesInSeparateFiles: false,
   includeReadOnlyAttributes: true,
   includeTaxonScientificName: true,
   includeFiles: true,
