@@ -558,6 +558,7 @@ $t(common.cantUndoWarning)`,
 
   dataExportView: {
     error: 'Error exporting data: {{details}}',
+    optionNotCompatibleWithDataImport: 'Not compatible with data import',
     options: {
       header: '$t(common.options)',
       fileFormatLabel: 'File format',
@@ -568,7 +569,7 @@ $t(common.cantUndoWarning)`,
       includeCategoryItemsLabels: 'Include category items labels',
       includeCategories: 'Include categories',
       expandCategoryItems: 'Expand category items',
-      exportSingleEntitiesInSeparateFiles: 'Export single entities in separate files',
+      exportSingleEntitiesIntoSeparateFiles: 'Export single entities into separate files',
       includeAncestorAttributes: 'Include ancestor attributes',
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',

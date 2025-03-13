@@ -6,7 +6,7 @@ export const dataExportOptions = {
   includeFiles: 'includeFiles',
   includeFileAttributeDefs: 'includeFileAttributeDefs',
   includeAncestorAttributes: 'includeAncestorAttributes',
-  exportSingleEntitiesInSeparateFiles: 'exportSingleEntitiesInSeparateFiles',
+  exportSingleEntitiesIntoSeparateFiles: 'exportSingleEntitiesIntoSeparateFiles',
   includeAnalysis: 'includeAnalysis',
   expandCategoryItems: 'expandCategoryItems',
   includeCategories: 'includeCategories',
@@ -22,7 +22,7 @@ export const defaultDataExportOptionsSelection = {
   [dataExportOptions.includeFiles]: false,
   [dataExportOptions.includeFileAttributeDefs]: false,
   [dataExportOptions.includeAncestorAttributes]: false,
-  [dataExportOptions.exportSingleEntitiesInSeparateFiles]: false,
+  [dataExportOptions.exportSingleEntitiesIntoSeparateFiles]: false,
   [dataExportOptions.includeAnalysis]: false,
   [dataExportOptions.expandCategoryItems]: false,
   [dataExportOptions.includeCategories]: false,
@@ -30,4 +30,14 @@ export const defaultDataExportOptionsSelection = {
   [dataExportOptions.recordsModifiedAfter]: null,
   [dataExportOptions.includeDateCreated]: false,
   [dataExportOptions.includeInternalUuids]: false,
+}
+
+export const dataImportNonCompatibilityByOption = {
+  [dataExportOptions.includeCategoryItemsLabels]: true,
+  [dataExportOptions.includeAncestorAttributes]: true,
+  [dataExportOptions.exportSingleEntitiesIntoSeparateFiles]: true,
+  [dataExportOptions.includeAnalysis]: true,
+  [dataExportOptions.expandCategoryItems]: true,
+  [dataExportOptions.includeDateCreated]: true,
+  [dataExportOptions.includeInternalUuids]: true,
 }

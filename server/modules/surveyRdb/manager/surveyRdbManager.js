@@ -233,7 +233,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeCategoryItemsLabels,
     expandCategoryItems,
     includeAncestorAttributes,
-    exportSingleEntitiesInSeparateFiles,
+    exportSingleEntitiesIntoSeparateFiles,
     includeAnalysis,
     includeFileAttributeDefs,
     includeFiles,
@@ -249,7 +249,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     filterFn: (nodeDef) =>
       NodeDef.isRoot(nodeDef) ||
       NodeDef.isMultiple(nodeDef) ||
-      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesInSeparateFiles),
+      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
   })(survey)
 
   const filterRecordUuids = await _determineRecordUuidsFilter({
@@ -267,7 +267,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   callback?.({ total: nodeDefs.length })
 
   const getChildAttributes = (nodeDef) => {
-    if (exportSingleEntitiesInSeparateFiles) {
+    if (exportSingleEntitiesIntoSeparateFiles) {
       const children = Survey.getNodeDefChildrenSorted({ cycle, nodeDef, includeAnalysis })(survey)
       return children.filter(
         (child) => (NodeDef.isAttribute(child) && NodeDef.isSingle(child)) || !!expandCategoryItems

@@ -14,7 +14,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
-import { dataExportOptions as options } from './dataExportOptions'
+import { dataImportNonCompatibilityByOption, dataExportOptions as options } from './dataExportOptions'
 
 const infoMessageKeyByOption = {
   expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
@@ -43,7 +43,7 @@ export const DataExportOptionsPanel = (props) => {
       options.includeDateCreated,
       options.includeCategories,
       options.expandCategoryItems,
-      options.exportSingleEntitiesInSeparateFiles,
+      options.exportSingleEntitiesIntoSeparateFiles,
     ]
     if (canAnalyzeRecords) {
       _options.push(options.includeAnalysis)
@@ -64,7 +64,7 @@ export const DataExportOptionsPanel = (props) => {
           groupName="fileFormat"
           items={availableFileFormats.map((key) => ({
             key,
-            label: i18n.t(`dataExportView.options.fileFormat.${key}`),
+            label: `dataExportView.options.fileFormat.${key}`,
           }))}
           onChange={onOptionChange(options.fileFormat)}
           selectedItemKey={selectedOptionsByKey[options.fileFormat]}
@@ -74,6 +74,7 @@ export const DataExportOptionsPanel = (props) => {
         <Checkbox
           key={optionKey}
           checked={selectedOptionsByKey[optionKey]}
+          className={dataImportNonCompatibilityByOption[optionKey] ? 'with-asterisk' : undefined}
           disabled={optionKey === options.includeFileAttributeDefs && selectedOptionsByKey[options.includeFiles]}
           info={infoMessageKeyByOption[optionKey]}
           label={`dataExportView.options.${optionKey}`}
@@ -87,6 +88,11 @@ export const DataExportOptionsPanel = (props) => {
           valueFormat={DateFormats.dateStorage}
         />
       </FormItem>
+      {availableOptions.some((optionKey) => dataImportNonCompatibilityByOption[optionKey]) && (
+        <span className="not-compatible-with-data-import-message">
+          *{i18n.t('dataExportView.optionNotCompatibleWithDataImport')}
+        </span>
+      )}
     </ExpansionPanel>
   )
 }
