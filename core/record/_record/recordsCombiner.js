@@ -213,6 +213,29 @@ const _mergeSingleAttributeValues = ({
   })
 }
 
+const _areNotSameValues = ({ survey, childDef, updateResult, entityTarget, sourceValues, targetValues }) =>
+  sourceValues.length !== targetValues.length ||
+  sourceValues.some((sourceValue, index) => {
+    const targetValue = targetValues[index]
+    return !NodeValues.isValueEqual({
+      survey,
+      nodeDef: childDef,
+      value: sourceValue,
+      valueSearch: targetValue,
+      record: updateResult.record,
+      parentNode: entityTarget,
+    })
+  })
+
+const replaceNodes = ({ childrenSource, childrenTarget, entityTarget, sideEffect, updateResult }) => {
+  const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
+  const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(updateResult.record)
+  updateResult.merge(nodesDeleteUpdateResult)
+  childrenSource.forEach((childSource) => {
+    _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })
+  })
+}
+
 const _mergeMultipleAttributes = ({
   updateResult,
   survey,
@@ -222,31 +245,37 @@ const _mergeMultipleAttributes = ({
   entityTarget,
   sideEffect,
 }) => {
-  const sourceValues = childrenSource.map(Node.getValue)
-  const targetValues = childrenTarget.map(Node.getValue)
-  if (
-    (sourceValues.length > 0 && sourceValues.length !== targetValues.length) ||
-    sourceValues.some((sourceValue, index) => {
-      const targetValue = childrenTarget[index]
-      return !NodeValues.isValueEqual({
-        survey,
-        nodeDef: childDef,
-        value: sourceValue,
-        valueSearch: targetValue,
-        record: updateResult.record,
-        parentNode: entityTarget,
+  if (childrenSource.length > 0) {
+    const sourceValues = childrenSource.map(Node.getValue)
+    const targetValues = childrenTarget.map(Node.getValue)
+
+    if (NodeDef.isCode(childDef)) {
+      // replace nodes if values are different
+      if (_areNotSameValues({ survey, childDef, updateResult, entityTarget, sourceValues, targetValues })) {
+        // different values, replace all nodes
+        replaceNodes({ childrenSource, childrenTarget, entityTarget, updateResult, sideEffect })
+      }
+    } else {
+      // keep nodes from both records, unless they have the same value
+      childrenSource.forEach((childSource) => {
+        const sourceValue = Node.getValue(childSource)
+        if (
+          !targetValues.find((targetValue) =>
+            NodeValues.isValueEqual({
+              survey,
+              nodeDef: childDef,
+              value: sourceValue,
+              valueSearch: targetValue,
+              record: updateResult.record,
+              parentNode: entityTarget,
+            })
+          )
+        ) {
+          // value not in target values => add it to the record
+          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })
+        }
       })
-    })
-  ) {
-    // different values, replace all nodes
-    const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
-    const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
-      updateResult.record
-    )
-    updateResult.merge(nodesDeleteUpdateResult)
-    childrenSource.forEach((childSource) => {
-      _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })
-    })
+    }
   }
 }
 

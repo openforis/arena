@@ -12,6 +12,12 @@ let survey = {}
 let record1 = null
 let record2 = null
 
+const expectValuesToBe = ({ expectedValuesByPath, record: recordUpdated }) => {
+  Object.entries(expectedValuesByPath).forEach(([path, expectedValue]) => {
+    expectValueToBe({ survey, record: recordUpdated, path, expectedValue })
+  })
+}
+
 describe('Records merge Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
@@ -42,6 +48,12 @@ describe('Records merge Test', () => {
           RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 12), RB.attribute('dbh', 18)),
           RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 10), RB.attribute('dbh', 15)),
           RB.entity('tree', RB.attribute('tree_id', 3), RB.attribute('tree_height', 30), RB.attribute('dbh', 20))
+        ),
+        RB.entity(
+          'plot',
+          RB.attribute('plot_id', 3),
+          RB.attribute('plot_multiple_number', 100),
+          RB.attribute('plot_multiple_number', 200)
         )
       )
     ).build()
@@ -72,6 +84,15 @@ describe('Records merge Test', () => {
         RB.entity(
           'plot',
           RB.attribute('plot_id', 3),
+          RB.attribute('plot_multiple_number', 200),
+          RB.attribute('plot_multiple_number', 300)
+        ),
+        RB.entity(
+          'plot',
+          RB.attribute('plot_id', 4),
+          RB.attribute('plot_multiple_number', 90),
+          RB.attribute('plot_multiple_number', 100),
+          RB.attribute('plot_multiple_number', 110),
           RB.entity('tree', RB.attribute('tree_id', 1), RB.attribute('tree_height', 13), RB.attribute('dbh', 5)),
           RB.entity('tree', RB.attribute('tree_id', 2), RB.attribute('tree_height', 14), RB.attribute('dbh', 6)),
           RB.entity('tree', RB.attribute('tree_id', 3), RB.attribute('tree_height', 15), RB.attribute('dbh', 7))
@@ -86,13 +107,17 @@ describe('Records merge Test', () => {
       recordSource: record2,
     })(record1)
 
-    expect(Object.values(nodesUpdated).length).toBe(26)
+    expect(Object.values(nodesUpdated).length).toBe(30)
 
-    expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 3 })
+    expectChildrenLengthToBe({ survey, record: recordUpdated, path: 'cluster', childName: 'plot', expectedLength: 4 })
 
-    expectValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[0].plot_id', expectedValue: 1 })
-    expectValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[1].plot_id', expectedValue: 2 })
-    expectValueToBe({ survey, record: recordUpdated, path: 'cluster.plot[2].plot_id', expectedValue: 3 })
+    const expectedValuesByPath = {
+      'cluster.plot[0].plot_id': 1,
+      'cluster.plot[1].plot_id': 2,
+      'cluster.plot[2].plot_id': 3,
+      'cluster.plot[3].plot_id': 4,
+    }
+    expectValuesToBe({ expectedValuesByPath, record: recordUpdated })
 
     expectChildrenLengthToBe({
       survey,
@@ -109,43 +134,38 @@ describe('Records merge Test', () => {
       recordSource: record2,
     })(record1)
 
-    expectValueToBe({
-      survey,
-      record: recordUpdated,
-      path: 'cluster.plot[0].plot_multiple_number[0]',
-      expectedValue: 10,
-    })
-    expectValueToBe({
-      survey,
-      record: recordUpdated,
-      path: 'cluster.plot[0].plot_multiple_number[1]',
-      expectedValue: 20,
-    })
+    const expectedValuesByPath = {
+      'cluster.plot[0].plot_multiple_number[0]': 10,
+      'cluster.plot[0].plot_multiple_number[1]': 20,
+    }
+    expectValuesToBe({ expectedValuesByPath, record: recordUpdated })
   })
 
-  it('Multiple attributes replaced', async () => {
+  it('Multiple attributes added', async () => {
     const { record: recordUpdated } = await Record.mergeRecords({
       survey,
       recordSource: record2,
     })(record1)
 
-    expectValueToBe({
+    const expectedValuesByPath = {
+      'cluster.plot[1].plot_multiple_number[0]': 30,
+      'cluster.plot[1].plot_multiple_number[1]': 40,
+      'cluster.plot[1].plot_multiple_number[2]': 50,
+    }
+    expectValuesToBe({ expectedValuesByPath, record: recordUpdated })
+  })
+
+  it('Multiple attributes merged', async () => {
+    const { record: recordUpdated } = await Record.mergeRecords({
       survey,
-      record: recordUpdated,
-      path: 'cluster.plot[1].plot_multiple_number[0]',
-      expectedValue: 30,
-    })
-    expectValueToBe({
-      survey,
-      record: recordUpdated,
-      path: 'cluster.plot[1].plot_multiple_number[1]',
-      expectedValue: 40,
-    })
-    expectValueToBe({
-      survey,
-      record: recordUpdated,
-      path: 'cluster.plot[1].plot_multiple_number[2]',
-      expectedValue: 50,
-    })
+      recordSource: record2,
+    })(record1)
+
+    const expectedValuesByPath = {
+      'cluster.plot[2].plot_multiple_number[0]': 100,
+      'cluster.plot[2].plot_multiple_number[1]': 200,
+      'cluster.plot[2].plot_multiple_number[2]': 300,
+    }
+    expectValuesToBe({ expectedValuesByPath, record: recordUpdated })
   })
 })
