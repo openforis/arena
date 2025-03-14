@@ -23,6 +23,7 @@ const Checkbox = (props) => {
     disabled = false,
     id = null,
     info,
+    infoParams = null,
     indeterminate = false,
     label = null,
     onChange: onChangeProp = null,
@@ -74,7 +75,7 @@ const Checkbox = (props) => {
         ) : (
           <MuiFormControlLabel className="btn-checkbox-label width100" control={control} label={i18n.t(label)} />
         )}
-        {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
+        {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info, infoParams)} />}
       </ValidationTooltip>
     </div>
   )
@@ -89,6 +90,7 @@ Checkbox.propTypes = {
   disabled: PropTypes.bool,
   indeterminate: PropTypes.bool,
   info: PropTypes.string,
+  infoParams: PropTypes.object,
   label: PropTypes.string,
   onChange: PropTypes.func,
   radio: PropTypes.bool,

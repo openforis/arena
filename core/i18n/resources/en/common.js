@@ -674,6 +674,12 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
       includeFiles: 'Include files',
+      deleteExistingEntities: 'Delete existing entities',
+    },
+    optionsInfo: {
+      deleteExistingEntities: `WARNING: all entities "{{nodeDefName}}" 
+and all their descendants in all records being updated 
+will be deleted before inserting the new ones.`,
     },
     startImport: 'Start import',
     startImportConfirm: `By pressing 'Ok' you will start the import process.

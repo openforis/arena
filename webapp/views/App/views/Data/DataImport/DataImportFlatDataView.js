@@ -16,7 +16,7 @@ import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
@@ -37,8 +37,10 @@ const importTypes = {
 }
 
 const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
-const optionsRecordUpdateSystemAdmin = ['includeFiles', 'deleteExistingNodes']
-
+const optionsRecordUpdateSystemAdmin = ['includeFiles', 'deleteExistingEntities']
+const infoVisibleByOption = {
+  deleteExistingEntities: true,
+}
 const fileMaxSizeDefault = 20 // 20MB
 const fileMaxSizeWithFiles = 1024 // 1GB
 
@@ -74,7 +76,7 @@ export const DataImportFlatDataView = () => {
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
     includeFiles: false,
-    deleteExistingNodes: false,
+    deleteExistingEntities: false,
   })
 
   const {
@@ -89,7 +91,7 @@ export const DataImportFlatDataView = () => {
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
     includeFiles,
-    deleteExistingNodes,
+    deleteExistingEntities,
   } = state
 
   const fileAccept = useMemo(
@@ -119,7 +121,7 @@ export const DataImportFlatDataView = () => {
   const onImportTypeChange = useCallback(
     (value) => {
       setState((statePrev) => {
-        const stateNext = { ...statePrev, deleteExistingNodes: false, dataImportType: value }
+        const stateNext = { ...statePrev, deleteExistingEntities: false, dataImportType: value }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedNodeDefUuid = NodeDef.getUuid(nodeDefRoot)
@@ -171,6 +173,8 @@ export const DataImportFlatDataView = () => {
     }
   }, [jobCompleted])
 
+  const selectedNodeDef = useNodeDefByUuid(selectedNodeDefUuid)
+
   const importStartParams = {
     surveyId,
     file,
@@ -179,7 +183,7 @@ export const DataImportFlatDataView = () => {
     nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
-    deleteExistingNodes,
+    deleteExistingEntities,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
     includeFiles,
   }
@@ -255,6 +259,8 @@ export const DataImportFlatDataView = () => {
                       key={optionKey}
                       checked={state[optionKey]}
                       label={`dataImportView.options.${optionKey}`}
+                      info={infoVisibleByOption[optionKey] ? `dataImportView.optionsInfo.${optionKey}` : undefined}
+                      infoParams={{ nodeDefName: NodeDef.getName(selectedNodeDef) }}
                       onChange={setStateProp(optionKey)}
                     />
                   ))}

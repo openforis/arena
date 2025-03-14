@@ -70,12 +70,9 @@ export const DataImportArenaView = () => {
         {surveyCycleKeys.length > 1 && (
           <fieldset>
             <legend>{i18n.t('dataImportView.options.header')}</legend>
-
-            {
-              <FormItem className="display-flex" label="dataImportView.importIntoCycle">
-                <CycleSelector selectedCycle={cycle} onChange={setCycle} />
-              </FormItem>
-            }
+            <FormItem className="display-flex" label="dataImportView.importIntoCycle">
+              <CycleSelector selectedCycle={cycle} onChange={setCycle} />
+            </FormItem>
           </fieldset>
         )}
 

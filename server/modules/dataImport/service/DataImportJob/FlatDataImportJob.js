@@ -154,7 +154,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
-    const { survey, nodeDefUuid, includeFiles, insertNewRecords, insertMissingNodes, deleteExistingNodes, user } =
+    const { survey, nodeDefUuid, includeFiles, insertNewRecords, insertMissingNodes, deleteExistingEntities, user } =
       context
 
     if (this.isCanceled()) {
@@ -191,7 +191,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         this.currentRecord = updateResult.record
       }
 
-      if (!insertNewRecords && deleteExistingNodes) {
+      if (!insertNewRecords && deleteExistingEntities) {
         const nodesToDelete = Record.getNodesByDefUuid(nodeDefUuid)(this.currentRecord)
         if (nodesToDelete.length > 0) {
           const nodeUuidsToDelete = nodesToDelete.map(Node.getUuid)
