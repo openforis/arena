@@ -205,7 +205,7 @@ const SurveyForm = (props) => {
                     onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
                     selectedItemKey={treeSelectViewMode}
                   />
-                  {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
+                  {canEditDef && viewOnlyPages && <FormPagesEditButtons />}
                 </div>
               )}
             </div>
