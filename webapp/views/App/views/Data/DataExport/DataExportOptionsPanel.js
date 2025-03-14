@@ -58,7 +58,7 @@ export const DataExportOptionsPanel = (props) => {
   }, [availableOptionsProp, canAnalyzeRecords, hasMultipleCycles, isSystemAdmin])
 
   return (
-    <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
+    <ExpansionPanel className="data-export-expansion-panel" buttonLabel="dataExportView.options.header">
       <FormItem label={`dataExportView.options.${options.fileFormat}Label`}>
         <ButtonGroup
           groupName="fileFormat"

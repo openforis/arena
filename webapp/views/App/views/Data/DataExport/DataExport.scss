@@ -4,6 +4,14 @@
   align-items: center;
   gap: 2rem;
 
+  &.with-multiple-sources {
+    .expansion-panel__content {
+      max-height: calc(100vh - 30rem);
+    }
+  }
+}
+
+.data-export-expansion-panel {
   .expansion-panel__content {
     overflow: auto;
     max-height: calc(100vh - 18rem);
@@ -33,17 +41,11 @@
     .not-compatible-with-data-import-message {
       font-style: italic;
     }
-  }
 
-  &.with-multiple-sources {
-    .expansion-panel__content {
-      max-height: calc(100vh - 30rem);
-    }
-  }
-
-  .form-item {
-    .form-label {
-      text-wrap: nowrap;
+    .form-item {
+      .form-label {
+        text-wrap: nowrap;
+      }
     }
   }
 }
