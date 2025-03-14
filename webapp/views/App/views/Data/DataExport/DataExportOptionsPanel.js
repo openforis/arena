@@ -14,7 +14,7 @@ import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKeys } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
-import { dataExportOptions } from './dataExportOptions'
+import { dataImportNonCompatibilityByOption, dataExportOptions as options } from './dataExportOptions'
 
 const infoMessageKeyByOption = {
   expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
@@ -35,60 +35,64 @@ export const DataExportOptionsPanel = (props) => {
     if (Objects.isNotEmpty(availableOptionsProp)) {
       return availableOptionsProp
     }
-    const options = [
-      dataExportOptions.includeCategoryItemsLabels,
-      dataExportOptions.includeAncestorAttributes,
-      dataExportOptions.includeFiles,
-      dataExportOptions.includeFileAttributeDefs,
-      dataExportOptions.includeDateCreated,
-      dataExportOptions.includeCategories,
-      dataExportOptions.expandCategoryItems,
+    const _options = [
+      options.includeCategoryItemsLabels,
+      options.includeAncestorAttributes,
+      options.includeFiles,
+      options.includeFileAttributeDefs,
+      options.includeDateCreated,
+      options.includeCategories,
+      options.expandCategoryItems,
+      options.exportSingleEntitiesIntoSeparateFiles,
     ]
     if (canAnalyzeRecords) {
-      options.push(dataExportOptions.includeAnalysis)
+      _options.push(options.includeAnalysis)
     }
     if (hasMultipleCycles) {
-      options.push(dataExportOptions.includeDataFromAllCycles)
+      _options.push(options.includeDataFromAllCycles)
     }
     if (isSystemAdmin) {
-      options.push(dataExportOptions.includeInternalUuids)
+      _options.push(options.includeInternalUuids)
     }
-    return options
+    return _options
   }, [availableOptionsProp, canAnalyzeRecords, hasMultipleCycles, isSystemAdmin])
 
   return (
-    <ExpansionPanel className="options" buttonLabel="dataExportView.options.header">
-      <FormItem label={`dataExportView.options.${dataExportOptions.fileFormat}Label`}>
+    <ExpansionPanel className="data-export-expansion-panel" buttonLabel="dataExportView.options.header">
+      <FormItem label={`dataExportView.options.${options.fileFormat}Label`}>
         <ButtonGroup
           groupName="fileFormat"
           items={availableFileFormats.map((key) => ({
             key,
-            label: i18n.t(`dataExportView.options.fileFormat.${key}`),
+            label: `dataExportView.options.fileFormat.${key}`,
           }))}
-          onChange={onOptionChange(dataExportOptions.fileFormat)}
-          selectedItemKey={selectedOptionsByKey[dataExportOptions.fileFormat]}
+          onChange={onOptionChange(options.fileFormat)}
+          selectedItemKey={selectedOptionsByKey[options.fileFormat]}
         />
       </FormItem>
       {availableOptions.map((optionKey) => (
         <Checkbox
           key={optionKey}
           checked={selectedOptionsByKey[optionKey]}
-          disabled={
-            optionKey === dataExportOptions.includeFileAttributeDefs &&
-            selectedOptionsByKey[dataExportOptions.includeFiles]
-          }
+          className={dataImportNonCompatibilityByOption[optionKey] ? 'with-asterisk' : undefined}
+          disabled={optionKey === options.includeFileAttributeDefs && selectedOptionsByKey[options.includeFiles]}
           info={infoMessageKeyByOption[optionKey]}
           label={`dataExportView.options.${optionKey}`}
           onChange={onOptionChange(optionKey)}
         />
       ))}
-      <FormItem label={`dataExportView.options.${dataExportOptions.recordsModifiedAfter}`}>
+      <FormItem label={`dataExportView.options.${options.recordsModifiedAfter}`}>
         <DateInput
-          onChange={onOptionChange(dataExportOptions.recordsModifiedAfter)}
-          value={selectedOptionsByKey[dataExportOptions.recordsModifiedAfter]}
+          onChange={onOptionChange(options.recordsModifiedAfter)}
+          value={selectedOptionsByKey[options.recordsModifiedAfter]}
           valueFormat={DateFormats.dateStorage}
         />
       </FormItem>
+      {availableOptions.some((optionKey) => dataImportNonCompatibilityByOption[optionKey]) && (
+        <span className="not-compatible-with-data-import-message">
+          *{i18n.t('dataExportView.optionNotCompatibleWithDataImport')}
+        </span>
+      )}
     </ExpansionPanel>
   )
 }
