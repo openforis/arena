@@ -72,7 +72,7 @@ const Checkbox = (props) => {
         {Objects.isEmpty(label) ? (
           control
         ) : (
-          <MuiFormControlLabel className="width100" control={control} label={i18n.t(label)} />
+          <MuiFormControlLabel className="btn-checkbox-label width100" control={control} label={i18n.t(label)} />
         )}
         {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
       </ValidationTooltip>
