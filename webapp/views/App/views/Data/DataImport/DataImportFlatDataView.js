@@ -37,7 +37,7 @@ const importTypes = {
 }
 
 const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
-const optionsRecordUpdateSystemAdmin = ['includeFiles']
+const optionsRecordUpdateSystemAdmin = ['includeFiles', 'deleteExistingNodes']
 
 const fileMaxSizeDefault = 20 // 20MB
 const fileMaxSizeWithFiles = 1024 // 1GB
@@ -74,6 +74,7 @@ export const DataImportFlatDataView = () => {
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
     includeFiles: false,
+    deleteExistingNodes: false,
   })
 
   const {
@@ -88,6 +89,7 @@ export const DataImportFlatDataView = () => {
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
     includeFiles,
+    deleteExistingNodes,
   } = state
 
   const fileAccept = useMemo(
@@ -117,7 +119,7 @@ export const DataImportFlatDataView = () => {
   const onImportTypeChange = useCallback(
     (value) => {
       setState((statePrev) => {
-        const stateNext = { ...statePrev, dataImportType: value }
+        const stateNext = { ...statePrev, deleteExistingNodes: false, dataImportType: value }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedNodeDefUuid = NodeDef.getUuid(nodeDefRoot)
@@ -177,6 +179,7 @@ export const DataImportFlatDataView = () => {
     nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
+    deleteExistingNodes,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
     includeFiles,
   }

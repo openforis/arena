@@ -89,6 +89,7 @@ export const {
   updateNodesDependents,
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
+  deleteNodes,
   deleteNodesInEntityByNodeDefUuid,
 } = RecordNodesUpdater
 export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'

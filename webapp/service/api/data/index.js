@@ -53,6 +53,7 @@ export const startDataImportFromCsvJob = async ({
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
   includeFiles = false,
+  deleteExistingNodes = false,
   abortOnErrors = true,
   onUploadProgress,
 }) => {
@@ -66,6 +67,7 @@ export const startDataImportFromCsvJob = async ({
     insertMissingNodes,
     updateRecordsInAnalysis,
     includeFiles,
+    deleteExistingNodes,
     abortOnErrors,
   })
   const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, { onUploadProgress })

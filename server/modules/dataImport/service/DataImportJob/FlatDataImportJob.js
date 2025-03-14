@@ -154,7 +154,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
-    const { survey, nodeDefUuid, includeFiles, insertMissingNodes, user } = context
+    const { survey, nodeDefUuid, includeFiles, insertNewRecords, insertMissingNodes, deleteExistingNodes, user } =
+      context
 
     if (this.isCanceled()) {
       return
@@ -187,6 +188,23 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const updateResult = new RecordUpdateResult({ record: this.currentRecord })
       if (newRecord) {
         Record.getNodesArray(record).forEach((node) => updateResult.addNode(node, { sideEffect: true }))
+        this.currentRecord = updateResult.record
+      }
+
+      if (!insertNewRecords && deleteExistingNodes) {
+        const nodesToDelete = Record.getNodesByDefUuid(nodeDefUuid)(this.currentRecord)
+        if (nodesToDelete.length > 0) {
+          const nodeUuidsToDelete = nodesToDelete.map(Node.getUuid)
+          const nodesDeleteUpdateResult = await Record.deleteNodes({
+            user,
+            survey,
+            record: this.currentRecord,
+            nodeUuids: nodeUuidsToDelete,
+            sideEffect,
+          })
+          updateResult.merge(nodesDeleteUpdateResult)
+          this.currentRecord = updateResult.record
+        }
       }
 
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
