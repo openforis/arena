@@ -230,7 +230,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     } catch (e) {
       const { key, params } = e
       const errorKey = key ?? Validation.messageKeys.dataImport.errorUpdatingValues
-      const errorParams = key ? params : { details: String(e) }
+      const errorParams = params ?? { details: String(e) }
       this._addError(errorKey, errorParams)
     }
   }
