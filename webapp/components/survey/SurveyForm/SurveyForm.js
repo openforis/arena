@@ -198,14 +198,16 @@ const SurveyForm = (props) => {
                 includeSingleEntities
                 onSelect={onNodeDefTreeSelect}
               />
-              <div className="display-flex sidebar-bottom-bar">
-                <ButtonGroup
-                  items={treeSelectViewModeItems}
-                  onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
-                  selectedItemKey={treeSelectViewMode}
-                />
-                {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
-              </div>
+              {edit && (
+                <div className="display-flex sidebar-bottom-bar">
+                  <ButtonGroup
+                    items={treeSelectViewModeItems}
+                    onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
+                    selectedItemKey={treeSelectViewMode}
+                  />
+                  {edit && canEditDef && viewOnlyPages && <FormPagesEditButtons />}
+                </div>
+              )}
             </div>
             <div className="survey-form__internal-container-wrapper width100 height100">{internalContainer}</div>
           </Split>
