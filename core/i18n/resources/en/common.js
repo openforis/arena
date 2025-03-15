@@ -641,9 +641,11 @@ $t(common.cantUndoWarning)`,
       DataImportJob: {
         importCompleteSummary: `
         - {{processed}} rows processed
-        - {{updatedValues}} values updated
         - {{insertedRecords}} records created
-        - {{updatedRecords}} records updated`,
+        - {{updatedRecords}} records updated
+        - {{entitiesCreated}} entities created
+        - {{entitiesDeleted}} entities deleted
+        - {{updatedValues}} values updated`,
         importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
@@ -658,10 +660,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         - {{processed}} rows processed`,
         validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
         validationCompleteSuccessfully: `## Validation complete without errors
-        - {{processed}} rows processed
-        - {{updatedValues}} values would be updated
         - {{insertedRecords}} records would be created
-        - {{updatedRecords}} records would be updated`,
+        - {{updatedRecords}} records would be updated
+        - {{entitiesCreated}} entities would be created
+        - {{entitiesDeleted}} entities would be deleted
+        - {{updatedValues}} values would be updated`,
         validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
         - {{insertedFiles}} files would be inserted
         - {{updatedFiles}} files would be updated
