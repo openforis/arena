@@ -9,16 +9,16 @@ const readStreamToBuffer = async (stream) => {
   return Buffer.concat(chunks)
 }
 
-const readStreamToItems = async (stream, limit = 10000) => {
+const readStreamToItems = async (stream, maxCellsLimit = 1000000) => {
   const items = []
-  let count = 0
+  let cellsCount = 0
   await new Promise((resolve, reject) => {
     stream.on('data', (row) => {
       items.push(row)
-      count++
-      if (count === limit) {
+      cellsCount += Object.keys(row)
+      if (cellsCount === maxCellsLimit) {
         stream.destroy()
-        reject(new SystemError(`dataExport.excelMaxCellsLimitExceeded`))
+        reject(new SystemError(`dataExport.excelMaxCellsLimitExceeded`, { limit: maxCellsLimit }))
       }
     })
     stream.on('end', () => resolve(items))

@@ -233,6 +233,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeCategoryItemsLabels,
     expandCategoryItems,
     includeAncestorAttributes,
+    exportSingleEntitiesIntoSeparateFiles,
     includeAnalysis,
     includeFileAttributeDefs,
     includeFiles,
@@ -245,7 +246,10 @@ export const fetchEntitiesDataToCsvFiles = async (
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
   const nodeDefs = Survey.findDescendants({
-    filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+    filterFn: (nodeDef) =>
+      NodeDef.isRoot(nodeDef) ||
+      NodeDef.isMultiple(nodeDef) ||
+      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
   })(survey)
 
   const filterRecordUuids = await _determineRecordUuidsFilter({
@@ -262,19 +266,30 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   callback?.({ total: nodeDefs.length })
 
-  const getChildAttributes = (nodeDef) =>
-    Survey.getNodeDefDescendantAttributesInSingleEntities({
+  const getChildAttributes = (nodeDef) => {
+    if (exportSingleEntitiesIntoSeparateFiles) {
+      const children = Survey.getNodeDefChildrenSorted({ cycle, nodeDef, includeAnalysis })(survey)
+      return children.filter(
+        (child) => (NodeDef.isAttribute(child) && NodeDef.isSingle(child)) || !!expandCategoryItems
+      )
+    }
+    return Survey.getNodeDefDescendantAttributesInSingleEntities({
       nodeDef,
       includeAnalysis,
       includeMultipleAttributes: !!expandCategoryItems,
       sorted: true,
       cycle,
     })(survey)
+  }
 
   const uniqueFileNamesGenerator = new UniqueFileNamesGenerator()
 
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
-    const entityDefUuid = NodeDef.getUuid(nodeDefContext)
+    const ancestorMultipleEntity =
+      NodeDef.isRoot(nodeDefContext) || NodeDef.isMultiple(nodeDefContext)
+        ? nodeDefContext
+        : Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
+    const ancestorEntityDefUuid = NodeDef.getUuid(ancestorMultipleEntity)
     const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
     const extension = ExportFileNameGenerator.getExtensionByFileFormat(fileFormat)
     const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
@@ -305,7 +320,11 @@ export const fetchEntitiesDataToCsvFiles = async (
       .filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
       .map(NodeDef.getUuid)
 
-    const query = Query.create({ entityDefUuid, attributeDefUuids: queryAttributeDefUuids, filterRecordUuids })
+    const query = Query.create({
+      entityDefUuid: ancestorEntityDefUuid,
+      attributeDefUuids: queryAttributeDefUuids,
+      filterRecordUuids,
+    })
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 

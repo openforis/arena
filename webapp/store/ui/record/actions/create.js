@@ -5,9 +5,10 @@ import * as Node from '@core/record/node'
 
 import { SurveyState } from '@webapp/store/survey'
 import { UserState } from '@webapp/store/user'
-import { LoaderActions } from '@webapp/store/ui'
+import { LoaderActions, SurveyFormActions } from '@webapp/store/ui'
 
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
+import { TreeSelectViewMode } from '@webapp/model'
 
 import * as ActionTypes from './actionTypes'
 import { recordNodesUpdate } from './common'
@@ -16,6 +17,8 @@ export const createRecord =
   ({ navigate = null, preview = false }) =>
   async (dispatch, getState) => {
     dispatch(LoaderActions.showLoader())
+
+    dispatch(SurveyFormActions.setTreeSelectViewMode(TreeSelectViewMode.onlyPages))
 
     const state = getState()
     const user = UserState.getUser(state)
