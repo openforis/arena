@@ -37,7 +37,6 @@ const importTypes = {
 }
 
 const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
-const optionsRecordUpdateSystemAdmin = ['includeFiles', 'deleteExistingEntities']
 const infoVisibleByOption = {
   deleteExistingEntities: true,
 }
@@ -59,10 +58,6 @@ export const DataImportFlatDataView = () => {
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
   const isSystemAdmin = useUserIsSystemAdmin()
-  const allowedOptionsRecordUpdate = useMemo(
-    () => [...optionsRecordUpdate, ...(isSystemAdmin ? optionsRecordUpdateSystemAdmin : [])],
-    [isSystemAdmin]
-  )
   const canSelectCycle = surveyCycleKeys.length > 1
 
   const [state, setState] = useState({
@@ -94,6 +89,19 @@ export const DataImportFlatDataView = () => {
     deleteExistingEntities,
   } = state
 
+  const selectedNodeDef = useNodeDefByUuid(selectedNodeDefUuid)
+
+  const allowedOptionsRecordUpdate = useMemo(() => {
+    const _options = [...optionsRecordUpdate]
+    if (isSystemAdmin) {
+      _options.push('includeFiles')
+      if (selectedNodeDef && !NodeDef.isRoot(selectedNodeDef)) {
+        _options.push('deleteExistingEntities')
+      }
+      return _options
+    }
+  }, [isSystemAdmin, selectedNodeDef])
+
   const fileAccept = useMemo(
     () =>
       includeFiles
@@ -110,7 +118,13 @@ export const DataImportFlatDataView = () => {
 
   const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
-  const onNodeDefSelect = (nodeDef) => setStateProp('selectedNodeDefUuid')(NodeDef.getUuid(nodeDef))
+  const onNodeDefSelect = (nodeDef) => {
+    setState((statePrev) => ({
+      ...statePrev,
+      selectedNodeDefUuid: NodeDef.getUuid(nodeDef),
+      deleteExistingEntities: false,
+    }))
+  }
 
   const onNodeDefLabelTypeChange = useCallback(() => {
     const nodeDefLabelTypeNext =
@@ -121,7 +135,12 @@ export const DataImportFlatDataView = () => {
   const onImportTypeChange = useCallback(
     (value) => {
       setState((statePrev) => {
-        const stateNext = { ...statePrev, deleteExistingEntities: false, dataImportType: value }
+        const stateNext = {
+          ...statePrev,
+          deleteExistingEntities: false,
+          dataImportType: value,
+          file: null,
+        }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedNodeDefUuid = NodeDef.getUuid(nodeDefRoot)
@@ -131,7 +150,6 @@ export const DataImportFlatDataView = () => {
           stateNext.preventUpdatingRecordsInAnalysis = true
           stateNext.selectedNodeDefUuid = null
         }
-        stateNext.file = null
         return stateNext
       })
     },
@@ -172,8 +190,6 @@ export const DataImportFlatDataView = () => {
       })
     }
   }, [jobCompleted])
-
-  const selectedNodeDef = useNodeDefByUuid(selectedNodeDefUuid)
 
   const importStartParams = {
     surveyId,
