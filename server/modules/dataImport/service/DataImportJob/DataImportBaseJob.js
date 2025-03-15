@@ -22,6 +22,8 @@ export default class DataImportBaseJob extends Job {
     this.skippedRecordsUuids = new Set()
     this.updatedRecordsUuids = new Set()
     this.updatedValues = 0
+    this.entitiesDeleted = 0
+    this.entitiesCreated = 0
 
     this.currentRecord = null
     this.nodesDeleteBatchPersister = null
@@ -91,7 +93,16 @@ export default class DataImportBaseJob extends Job {
   }
 
   generateResult() {
-    const { errors, insertedRecordsUuids, processed, skippedRecordsUuids, updatedRecordsUuids, updatedValues } = this
+    const {
+      entitiesCreated,
+      entitiesDeleted,
+      errors,
+      insertedRecordsUuids,
+      processed,
+      skippedRecordsUuids,
+      updatedRecordsUuids,
+      updatedValues,
+    } = this
 
     return {
       errorsCount: Object.keys(errors).length,
@@ -103,6 +114,8 @@ export default class DataImportBaseJob extends Job {
       updatedRecords: updatedRecordsUuids.size,
       updatedRecordsUuids: Array.from(updatedRecordsUuids),
       updatedValues,
+      entitiesCreated,
+      entitiesDeleted,
     }
   }
 
