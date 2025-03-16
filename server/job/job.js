@@ -252,6 +252,7 @@ export default class Job {
   combineInnerJobsResults() {
     const results = {}
     this.innerJobs.forEach((innerJob) => Object.assign(results, innerJob.result ?? {}))
+    this.logDebug('combining results ' + results)
     return results
   }
 

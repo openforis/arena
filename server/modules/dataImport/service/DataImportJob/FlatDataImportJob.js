@@ -1,4 +1,4 @@
-import { RecordUpdateResult } from '@openforis/arena-core'
+import { Objects, RecordUpdateResult } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -28,7 +28,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
     this.filesToDeleteByUuid = {}
-    this.entitiesDeletedByRecordUuid = {}
+    this.entityUuidTouchedByRecordUuid = {}
+    this.entitiesCreated = 0
   }
 
   async onStart() {
@@ -68,6 +69,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         dataImportFileReader: this.dataImportFileReader,
         updatedFilesByUuid: this.updatedFilesByUuid,
         filesToDeleteByUuid: this.filesToDeleteByUuid,
+        entityUuidTouchedByRecordUuid: this.entityUuidTouchedByRecordUuid,
       })
     }
   }
@@ -153,32 +155,6 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.flatDataReader?.cancel()
   }
 
-  async deleteExistingEntitiesIfNecessary() {
-    const { context, currentRecord } = this
-    const { survey, nodeDefUuid, includeFiles, insertNewRecords, deleteExistingEntities, user } = context
-
-    if (insertNewRecords || !deleteExistingEntities || this.entitiesDeletedByRecordUuid[Record.getUuid(currentRecord)])
-      return null
-
-    const sideEffect = !includeFiles
-    const entitiesToDelete = Record.getNodesByDefUuid(nodeDefUuid)(currentRecord)
-
-    const entitiesToDeleteCount = entitiesToDelete.length
-    if (entitiesToDeleteCount === 0) return null
-
-    const nodeUuidsToDelete = entitiesToDelete.map(Node.getUuid)
-    const nodesDeleteUpdateResult = await Record.deleteNodes({
-      user,
-      survey,
-      record: currentRecord,
-      nodeUuids: nodeUuidsToDelete,
-      sideEffect,
-    })
-    this.entitiesDeletedByRecordUuid[Record.getUuid(currentRecord)] = true
-    this.entitiesDeleted += entitiesToDeleteCount
-    return nodesDeleteUpdateResult
-  }
-
   async onRowItem({ valuesByDefUuid, errors }) {
     const { context, tx } = this
     const { survey, nodeDefUuid, includeFiles, insertMissingNodes, user } = context
@@ -201,6 +177,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         tx,
       })
       this.currentRecord = record
+      const recordUuid = Record.getUuid(this.currentRecord)
 
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const ancestorMultipleEntityDef = NodeDef.isMultipleAttribute(nodeDef)
@@ -217,12 +194,6 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         this.currentRecord = updateResult.record
       }
 
-      const entitiesDeletedResult = await this.deleteExistingEntitiesIfNecessary()
-      if (entitiesDeletedResult) {
-        updateResult.merge(entitiesDeletedResult)
-        this.currentRecord = entitiesDeletedResult.record
-      }
-
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
         user,
         survey,
@@ -231,6 +202,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         insertMissingNodes,
         sideEffect,
       })(this.currentRecord)
+
+      const entityUuid = Node.getUuid(entity)
+
+      Objects.setInPath({ obj: this.entityUuidTouchedByRecordUuid, path: [recordUuid, entityUuid], value: true })
 
       if (Node.isCreated(entity)) {
         this.entitiesCreated += 1
@@ -251,11 +226,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       updateResult.merge(updateResultUpdateAttributes)
       this.currentRecord = updateResult.record
 
-      const nodesUpdated = updateResult.nodes
+      const { nodes: nodesUpdated } = updateResult
       await this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
-      const recordUuid = Record.getUuid(this.currentRecord)
       const nodesUpdatedArray = Object.values(nodesUpdated)
       if (newRecord) {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
@@ -337,8 +311,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   generateResult() {
     const result = super.generateResult()
-    const { dryRun } = this.context
-    return { ...result, dryRun }
+    const { context, entitiesCreated } = this
+    const { dryRun } = context
+    return { ...result, dryRun, entitiesCreated }
   }
 
   async beforeSuccess() {
