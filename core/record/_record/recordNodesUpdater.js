@@ -329,5 +329,6 @@ export const RecordNodesUpdater = {
   updateNodesDependents,
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
+  deleteNodes,
   deleteNodesInEntityByNodeDefUuid,
 }

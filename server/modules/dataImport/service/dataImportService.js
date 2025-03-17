@@ -29,6 +29,7 @@ export const startFlatDataImportJob = ({
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
   includeFiles = false,
+  deleteExistingEntities = false,
   abortOnErrors = true,
 }) => {
   const jobParams = {
@@ -43,6 +44,7 @@ export const startFlatDataImportJob = ({
     insertMissingNodes,
     updateRecordsInAnalysis,
     includeFiles,
+    deleteExistingEntities,
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
