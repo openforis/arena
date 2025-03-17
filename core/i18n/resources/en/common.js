@@ -686,11 +686,12 @@ and all their descendants in all records being updated
 will be deleted before inserting the new ones.`,
     },
     startImport: 'Start import',
-    startImportConfirm: `By pressing 'Ok' you will start the import process.
-
-**It won't be possible to rollback the changes.**
-
+    startImportConfirm: `By pressing 'Ok' you will start the import process.  
+**It won't be possible to rollback the changes.**  
 Are you sure you want to continue?`,
+    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)  
+**($t(dataImportView.options.deleteExistingEntities) option selected: existing entities will be deleted before creating new ones)**
+`,
     steps: {
       selectImportType: 'Select Import Type',
       selectCycle: 'Select Cycle',
