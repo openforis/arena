@@ -641,9 +641,11 @@ $t(common.cantUndoWarning)`,
       DataImportJob: {
         importCompleteSummary: `
         - {{processed}} rows processed
-        - {{updatedValues}} values updated
         - {{insertedRecords}} records created
-        - {{updatedRecords}} records updated`,
+        - {{updatedRecords}} records updated
+        - {{entitiesCreated}} entities created
+        - {{entitiesDeleted}} entities deleted
+        - {{updatedValues}} values updated`,
         importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
@@ -659,9 +661,11 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
         validationCompleteSuccessfully: `## Validation complete without errors
         - {{processed}} rows processed
-        - {{updatedValues}} values would be updated
         - {{insertedRecords}} records would be created
-        - {{updatedRecords}} records would be updated`,
+        - {{updatedRecords}} records would be updated
+        - {{entitiesCreated}} entities would be created
+        - {{entitiesDeleted}} entities would be deleted
+        - {{updatedValues}} values would be updated`,
         validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
         - {{insertedFiles}} files would be inserted
         - {{updatedFiles}} files would be updated
@@ -674,13 +678,20 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
       includeFiles: 'Include files',
+      deleteExistingEntities: 'Delete existing entities',
+    },
+    optionsInfo: {
+      deleteExistingEntities: `WARNING: all entities "{{nodeDefName}}" 
+and all their descendants in all records being updated 
+will be deleted before inserting the new ones.`,
     },
     startImport: 'Start import',
-    startImportConfirm: `By pressing 'Ok' you will start the import process.
-
-**It won't be possible to rollback the changes.**
-
+    startImportConfirm: `By pressing 'Ok' you will start the import process.  
+**It won't be possible to rollback the changes.**  
 Are you sure you want to continue?`,
+    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)  
+**($t(dataImportView.options.deleteExistingEntities) option selected: existing entities will be deleted before creating new ones)**
+`,
     steps: {
       selectImportType: 'Select Import Type',
       selectCycle: 'Select Cycle',

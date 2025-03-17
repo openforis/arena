@@ -2,10 +2,12 @@ import Job from '@server/job/job'
 
 import FlatDataImportJob from './FlatDataImportJob'
 import DataFilesImportJob from './DataFilesImportJob'
+import EntitiesDeleteJob from './EntitiesDeleteJob'
 
-const createInternalJobs = ({ includeFiles }) => [
+const createInternalJobs = ({ includeFiles, deleteExistingEntities }) => [
   new FlatDataImportJob({ keepReaderOpenOnEnd: true }),
   ...(includeFiles ? [new DataFilesImportJob()] : []),
+  ...(deleteExistingEntities ? [new EntitiesDeleteJob()] : []),
 ]
 
 export default class DataImportJob extends Job {
@@ -18,6 +20,7 @@ export default class DataImportJob extends Job {
     const { includeFiles } = this.context
     return {
       ...result,
+      entitiesDeleted: result.entitiesDeleted || 0,
       includeFiles,
     }
   }

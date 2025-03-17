@@ -1,4 +1,4 @@
-import { RecordUpdateResult } from '@openforis/arena-core'
+import { Objects, RecordUpdateResult } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -28,6 +28,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.updatedFilesByUuid = {}
     this.updatedFilesByName = {}
     this.filesToDeleteByUuid = {}
+    this.entityUuidTouchedByRecordUuid = {}
+    this.entitiesCreated = 0
   }
 
   async onStart() {
@@ -67,6 +69,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         dataImportFileReader: this.dataImportFileReader,
         updatedFilesByUuid: this.updatedFilesByUuid,
         filesToDeleteByUuid: this.filesToDeleteByUuid,
+        entityUuidTouchedByRecordUuid: this.entityUuidTouchedByRecordUuid,
       })
     }
   }
@@ -174,6 +177,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         tx,
       })
       this.currentRecord = record
+      const recordUuid = Record.getUuid(this.currentRecord)
 
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const ancestorMultipleEntityDef = NodeDef.isMultipleAttribute(nodeDef)
@@ -187,6 +191,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const updateResult = new RecordUpdateResult({ record: this.currentRecord })
       if (newRecord) {
         Record.getNodesArray(record).forEach((node) => updateResult.addNode(node, { sideEffect: true }))
+        this.currentRecord = updateResult.record
       }
 
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
@@ -197,6 +202,14 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         insertMissingNodes,
         sideEffect,
       })(this.currentRecord)
+
+      const entityUuid = Node.getUuid(entity)
+
+      Objects.setInPath({ obj: this.entityUuidTouchedByRecordUuid, path: [recordUuid, entityUuid], value: true })
+
+      if (Node.isCreated(entity)) {
+        this.entitiesCreated += 1
+      }
 
       updateResult.merge(entityUpdateResult)
       this.currentRecord = updateResult.record
@@ -213,11 +226,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       updateResult.merge(updateResultUpdateAttributes)
       this.currentRecord = updateResult.record
 
-      const nodesUpdated = updateResult.nodes
+      const { nodes: nodesUpdated } = updateResult
       await this.persistUpdatedNodes({ nodesUpdated })
 
       // update counts
-      const recordUuid = Record.getUuid(this.currentRecord)
       const nodesUpdatedArray = Object.values(nodesUpdated)
       if (newRecord) {
         this.updatedValues += Record.getNodesArray(this.currentRecord).length
@@ -299,8 +311,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   generateResult() {
     const result = super.generateResult()
-    const { dryRun } = this.context
-    return { ...result, dryRun }
+    const { context, entitiesCreated } = this
+    const { dryRun } = context
+    return { ...result, dryRun, entitiesCreated }
   }
 
   async beforeSuccess() {

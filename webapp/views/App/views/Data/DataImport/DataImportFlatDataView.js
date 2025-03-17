@@ -16,7 +16,7 @@ import * as API from '@webapp/service/api'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/store/survey'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { ButtonIconInfo, Dropzone, ExpansionPanel, Stepper } from '@webapp/components'
@@ -37,8 +37,9 @@ const importTypes = {
 }
 
 const optionsRecordUpdate = ['preventAddingNewEntityData', 'preventUpdatingRecordsInAnalysis']
-const optionsRecordUpdateSystemAdmin = ['includeFiles']
-
+const infoVisibleByOption = {
+  deleteExistingEntities: true,
+}
 const fileMaxSizeDefault = 20 // 20MB
 const fileMaxSizeWithFiles = 1024 // 1GB
 
@@ -57,10 +58,6 @@ export const DataImportFlatDataView = () => {
   const surveyCycleKeys = useSurveyCycleKeys()
   const dispatch = useDispatch()
   const isSystemAdmin = useUserIsSystemAdmin()
-  const allowedOptionsRecordUpdate = useMemo(
-    () => [...optionsRecordUpdate, ...(isSystemAdmin ? optionsRecordUpdateSystemAdmin : [])],
-    [isSystemAdmin]
-  )
   const canSelectCycle = surveyCycleKeys.length > 1
 
   const [state, setState] = useState({
@@ -74,6 +71,7 @@ export const DataImportFlatDataView = () => {
     preventAddingNewEntityData: false,
     preventUpdatingRecordsInAnalysis: true,
     includeFiles: false,
+    deleteExistingEntities: false,
   })
 
   const {
@@ -88,7 +86,21 @@ export const DataImportFlatDataView = () => {
     preventAddingNewEntityData,
     preventUpdatingRecordsInAnalysis,
     includeFiles,
+    deleteExistingEntities,
   } = state
+
+  const selectedNodeDef = useNodeDefByUuid(selectedNodeDefUuid)
+
+  const allowedOptionsRecordUpdate = useMemo(() => {
+    const _options = [...optionsRecordUpdate]
+    if (isSystemAdmin) {
+      _options.push('includeFiles')
+      if (selectedNodeDef && !NodeDef.isRoot(selectedNodeDef)) {
+        _options.push('deleteExistingEntities')
+      }
+      return _options
+    }
+  }, [isSystemAdmin, selectedNodeDef])
 
   const fileAccept = useMemo(
     () =>
@@ -106,7 +118,13 @@ export const DataImportFlatDataView = () => {
 
   const setStateProp = useCallback((prop) => (value) => setState((statePrev) => ({ ...statePrev, [prop]: value })), [])
 
-  const onNodeDefSelect = (nodeDef) => setStateProp('selectedNodeDefUuid')(NodeDef.getUuid(nodeDef))
+  const onNodeDefSelect = (nodeDef) => {
+    setState((statePrev) => ({
+      ...statePrev,
+      selectedNodeDefUuid: NodeDef.getUuid(nodeDef),
+      deleteExistingEntities: false,
+    }))
+  }
 
   const onNodeDefLabelTypeChange = useCallback(() => {
     const nodeDefLabelTypeNext =
@@ -117,7 +135,12 @@ export const DataImportFlatDataView = () => {
   const onImportTypeChange = useCallback(
     (value) => {
       setState((statePrev) => {
-        const stateNext = { ...statePrev, dataImportType: value }
+        const stateNext = {
+          ...statePrev,
+          deleteExistingEntities: false,
+          dataImportType: value,
+          file: null,
+        }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
           stateNext.selectedNodeDefUuid = NodeDef.getUuid(nodeDefRoot)
@@ -127,7 +150,6 @@ export const DataImportFlatDataView = () => {
           stateNext.preventUpdatingRecordsInAnalysis = true
           stateNext.selectedNodeDefUuid = null
         }
-        stateNext.file = null
         return stateNext
       })
     },
@@ -177,6 +199,7 @@ export const DataImportFlatDataView = () => {
     nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
     insertMissingNodes: !preventAddingNewEntityData,
+    deleteExistingEntities,
     updateRecordsInAnalysis: !preventUpdatingRecordsInAnalysis,
     includeFiles,
   }
@@ -252,6 +275,8 @@ export const DataImportFlatDataView = () => {
                       key={optionKey}
                       checked={state[optionKey]}
                       label={`dataImportView.options.${optionKey}`}
+                      info={infoVisibleByOption[optionKey] ? `dataImportView.optionsInfo.${optionKey}` : undefined}
+                      infoParams={{ nodeDefName: NodeDef.getName(selectedNodeDef) }}
                       onChange={setStateProp(optionKey)}
                     />
                   ))}
@@ -277,11 +302,16 @@ export const DataImportFlatDataView = () => {
               </div>
 
               <ImportStartButton
-                confirmMessageKey="dataImportView.startImportConfirm"
+                confirmMessageKey={
+                  deleteExistingEntities
+                    ? 'dataImportView.startImportConfirmWithDeleteExistingEntities'
+                    : 'dataImportView.startImportConfirm'
+                }
                 disabled={!file}
                 showConfirm
                 startFunction={API.startDataImportFromCsvJob}
                 startFunctionParams={importStartParams}
+                strongConfirmRequiredText={deleteExistingEntities ? 'delete' : 'import'}
                 onUploadComplete={onImportJobStart}
               />
             </>
