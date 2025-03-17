@@ -17,11 +17,10 @@ export default class DataImportJob extends Job {
 
   generateResult() {
     const result = super.combineInnerJobsResults()
-    this.logDebug('combining results ' + result)
-
     const { includeFiles } = this.context
     return {
       ...result,
+      entitiesDeleted: result.entitiesDeleted || 0,
       includeFiles,
     }
   }

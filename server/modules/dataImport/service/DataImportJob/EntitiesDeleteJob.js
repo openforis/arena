@@ -34,7 +34,13 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
     const recordUuid = Record.getUuid(currentRecord)
     const sideEffect = !includeFiles
     const nodes = Record.getNodesByDefUuid(nodeDefUuid)(currentRecord)
-    const nodeUuidsToDelete = nodes.filter((node) => !entityUuidTouchedByRecordUuid[recordUuid]?.[Node.getUuid(node)])
+    const nodeUuidsToDelete = nodes.reduce((acc, node) => {
+      const nodeUuid = Node.getUuid(node)
+      if (!entityUuidTouchedByRecordUuid[recordUuid]?.[nodeUuid]) {
+        acc.push(nodeUuid)
+      }
+      return acc
+    }, [])
     if (nodeUuidsToDelete.length === 0) return null
 
     const updateResult = await Record.deleteNodes({
@@ -47,6 +53,7 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
     this.entitiesDeleted += nodeUuidsToDelete.length
 
     const { nodes: nodesUpdated } = updateResult
+
     await this.persistUpdatedNodes({ nodesUpdated })
   }
 

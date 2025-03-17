@@ -660,6 +660,7 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         - {{processed}} rows processed`,
         validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
         validationCompleteSuccessfully: `## Validation complete without errors
+        - {{processed}} rows processed
         - {{insertedRecords}} records would be created
         - {{updatedRecords}} records would be updated
         - {{entitiesCreated}} entities would be created
