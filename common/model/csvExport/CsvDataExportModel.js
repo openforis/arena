@@ -45,14 +45,14 @@ const columnsByNodeDefType = {
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
+      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
+      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
       {
         header: `${nodeDefName}_srs`,
         nodeDef,
         dataType: columnDataType.text,
         valueProp: Node.valuePropsCoordinate.srs,
       },
-      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
-      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
       ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
         header: `${nodeDefName}_${field}`,
         nodeDef,
