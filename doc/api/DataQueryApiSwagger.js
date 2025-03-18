@@ -3,26 +3,26 @@
  * tags:
  *   name: DataTable
  *   description: The data table management API
- * /surveyRdb/{surveyId}/{tableNodeDefUuid}/query:
+ * /api/surveyRdb/{surveyId}/{tableNodeDefUuid}/query:
  *   post:
  *     summary: Query survey data table
  *     tags: []
+ *     parameters:
+ *       - name: surveyId
+ *         description: The survey ID
+ *         in: path
+ *         schema:
+ *           type: number
+ *         required: true
+ *       - name: tableNodeDefUuid
+ *         description: The node definition UUID associated to the data table
+ *         in: path
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
  *     requestBody:
  *       required: true
- *       parameters:
- *         - in: path
- *           name: surveyId
- *           schema:
- *             type: number
- *           required: true
- *           description: The survey id
- *         - in: path
- *           name: tableNodeDefUuid
- *           schema:
- *             type: string
- *             format: uuid
- *           required: true
- *           description: The node definition UUID associated to the data table
  *       content:
  *         application/json:
  *           schema:
@@ -34,5 +34,7 @@
  *           application/json:
  *             schema:
  *               type: array
- *               items: object
+ *               items:
+ *                 type: object
+ *                 description: result item structure depends on the selected attributes or dimensions; it will be like a dictionary.
  */

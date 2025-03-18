@@ -2,6 +2,7 @@ import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 
 import * as Log from '@server/log/log'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 const Logger = Log.getLogger('SwaggerInitializer')
 
@@ -29,7 +30,7 @@ const specs = swaggerJSDoc(options)
 
 const init = (app) => {
   Logger.debug('initializing swagger UI')
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
+  app.use('/api-docs', AuthMiddleware.requireLoggedInUser, swaggerUi.serve, swaggerUi.setup(specs))
 }
 
 export const SwaggerInitializer = { init }
