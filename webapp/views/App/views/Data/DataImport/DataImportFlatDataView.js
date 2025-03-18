@@ -311,7 +311,8 @@ export const DataImportFlatDataView = () => {
                 showConfirm
                 startFunction={API.startDataImportFromCsvJob}
                 startFunctionParams={importStartParams}
-                strongConfirmRequiredText={deleteExistingEntities ? 'delete' : 'import'}
+                strongConfirm={deleteExistingEntities}
+                strongConfirmRequiredText={deleteExistingEntities ? 'update' : null}
                 onUploadComplete={onImportJobStart}
               />
             </>
