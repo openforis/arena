@@ -14,9 +14,10 @@ export const ImportStartButton = (props) => {
     label = 'dataImportView.startImport',
     onUploadComplete,
     showConfirm = false,
-    strongConfirmRequiredText,
     startFunction,
     startFunctionParams = {},
+    strongConfirm = false,
+    strongConfirmRequiredText = null,
   } = props
 
   const dispatch = useDispatch()
@@ -40,7 +41,7 @@ export const ImportStartButton = (props) => {
           key: confirmMessageKey,
           params: confirmMessageParams,
           onOk: onStartConfirmed,
-          strongConfirm: true,
+          strongConfirm,
           strongConfirmRequiredText,
         })
       )
@@ -68,9 +69,10 @@ ImportStartButton.propTypes = {
   confirmMessageParams: PropTypes.object,
   disabled: PropTypes.bool,
   label: PropTypes.string,
+  onUploadComplete: PropTypes.func.isRequired,
   showConfirm: PropTypes.bool,
   startFunction: PropTypes.func.isRequired,
   startFunctionParams: PropTypes.object,
+  strongConfirm: PropTypes.bool,
   strongConfirmRequiredText: PropTypes.string,
-  onUploadComplete: PropTypes.func.isRequired,
 }
