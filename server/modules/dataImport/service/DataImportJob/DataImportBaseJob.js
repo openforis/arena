@@ -72,7 +72,7 @@ export default class DataImportBaseJob extends Job {
         await this.nodesUpdateBatchPersister.addItem(node)
       }
     }
-
+    await RecordManager.assocRefDataToNodes({ survey, nodes: nodesArray }, tx)
     const { record: recordUpdated, rdbUpdates } = RecordManager.generateRdbUpates({ survey, record, nodesArray }, tx)
     await this.rdbUpdatesBatchPersister.addItem(rdbUpdates)
 

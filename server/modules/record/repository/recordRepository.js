@@ -184,9 +184,11 @@ export const fetchRecordsSummaryBySurveyId = async (
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColumnName = NodeDefTable.getColumnName
   const getNodeDefKeyColAlias = NodeDef.getName
-  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, key) => {
-    const colName = NodeDef.isCode(key) ? ColumnNodeDef.getCodeLabelColumnName(key) : getNodeDefKeyColumnName(key)
-    acc[getNodeDefKeyColAlias(key)] = colName
+  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, keyDef) => {
+    const colName = NodeDef.isCode(keyDef)
+      ? ColumnNodeDef.getCodeLabelColumnName(keyDef)
+      : getNodeDefKeyColumnName(keyDef)
+    acc[getNodeDefKeyColAlias(keyDef)] = colName
     return acc
   }, {})
   const nodeDefKeysSelect = nodeDefKeys
