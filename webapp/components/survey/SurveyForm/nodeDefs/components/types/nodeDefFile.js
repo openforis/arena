@@ -23,6 +23,8 @@ const FileInput = (props) => {
   const fileReady = !edit && originalFileName
   const fileUrl = `/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`
 
+  const updateDisabled = edit || !canEditRecord || readOnly
+
   const handleFileChange = (file) => {
     const value = {
       [Node.valuePropsFile.fileUuid]: uuidv4(),
@@ -51,7 +53,7 @@ const FileInput = (props) => {
     <div className="survey-form__node-def-file">
       <UploadButton
         className="btn-s"
-        disabled={edit || !canEditRecord || readOnly}
+        disabled={updateDisabled}
         showLabel={false}
         onChange={(files) => handleFileChange(files[0])}
         maxSize={NodeDef.getMaxFileSize(nodeDef)}
@@ -72,7 +74,9 @@ const FileInput = (props) => {
           }
           {!isImage && downloadButton}
 
-          <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={handleNodeDelete} />
+          {!updateDisabled && (
+            <NodeDeleteButton disabled={updateDisabled} nodeDef={nodeDef} node={node} removeNode={handleNodeDelete} />
+          )}
         </>
       )}
     </div>
