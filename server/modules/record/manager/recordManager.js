@@ -154,17 +154,16 @@ export {
 } from '../repository/recordRepository'
 
 export const fetchRecordAndNodesByUuid = async (
-  { surveyId, recordUuid, draft = false, fetchForUpdate = true },
+  { surveyId, recordUuid, draft = false, fetchForUpdate = true, includeRefData = true },
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
   if (!record) return null
 
   const nodes = await NodeRepository.fetchNodesByRecordUuid(
-    { surveyId, recordUuid, includeRefData: fetchForUpdate, draft },
+    { surveyId, recordUuid, includeRefData: fetchForUpdate || includeRefData, draft },
     client
   )
-
   const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)
   return Record.assocNodes({ nodes: indexedNodes, updateNodesIndex: fetchForUpdate, sideEffect: true })(record)
 }
