@@ -412,7 +412,11 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
-  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: Node.getRecordUuid(node) })
+  const record = await fetchRecordAndNodesByUuid({
+    surveyId,
+    recordUuid: Node.getRecordUuid(node),
+    includeRefData: true,
+  })
   const surveySummary = await SurveyManager.fetchSurveyById({ surveyId })
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
@@ -448,12 +452,19 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
         const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
 
         if (ancestorKeyDefs.length > 0) {
-          const ancestorKeyValues = Record.getEntityKeyValues(survey, ancestorNode)(record)
-          const keyValuesFormatted = ancestorKeyDefs.map((keyDef, index) => {
-            const keyValue = ancestorKeyValues[index]
-            const keyValueFormatted = NodeValueFormatter.format({ survey, nodeDef: keyDef, value: keyValue })
-            return encodeURIComponent(keyValueFormatted)
-          })
+          const ancestorKeyNodes = Record.getEntityKeyNodes(survey, ancestorNode)(record)
+          const keyValuesFormatted = ancestorKeyDefs
+            .map((keyDef, index) => {
+              const keyNode = ancestorKeyNodes[index]
+              const keyValueFormatted = NodeValueFormatter.format({
+                survey,
+                nodeDef: keyDef,
+                node: keyNode,
+                value: Node.getValue(keyNode),
+              })
+              return encodeURIComponent(keyValueFormatted)
+            })
+            .filter(Objects.isNotEmpty)
           fileNameParts.unshift(keyValuesFormatted.join('_'))
         }
       }
