@@ -58,13 +58,7 @@ const CategoryDetails = (props) => {
   if (!category) return null
 
   const categoryUuid = Category.getUuid(category)
-  const itemsCount =
-    Category.getItemsCount(category) > 0
-      ? Category.getItemsCount(category)
-      : Category.getLevelsArray(category).reduce((acc, level) => {
-          acc += CategoryLevel.getItemsCount(level)
-          return acc
-        }, 0)
+  const itemsCount = Category.getItemsCountOrLevelsItemsCount(category)
   const excelExportDisabled = itemsCount > FileUtils.excelRowsLimit
 
   const importSummary = State.getImportSummary(state)

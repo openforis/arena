@@ -183,7 +183,7 @@ export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesT
     const isTaxon = NodeDef.isTaxon(nodeDef)
     if ((isCode || isTaxon) && !Node.isValueBlank(node)) {
       const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-      const taxonomy = Survey.getTaxonomyByUuid()
+      const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
       if (
         !onlyForBigCategoriesTaxonomies ||
         (isCode && Category.isBigCategory(category)) ||
@@ -191,17 +191,14 @@ export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesT
       ) {
         const refData = {}
         if (isCode) {
-          refData[NodeRefData.keys.categoryItem] = await CategoryRepository.fetchItemByUuid(
+          const categoryItem = await CategoryRepository.fetchItemByUuid(
             { surveyId, uuid: Node.getCategoryItemUuid(node) },
             client
           )
+          refData[NodeRefData.keys.categoryItem] = categoryItem
         } else {
-          refData[NodeRefData.keys.taxon] = await TaxonomyRepository.fetchTaxonByUuid(
-            surveyId,
-            Node.getTaxonUuid(node),
-            false,
-            client
-          )
+          const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, Node.getTaxonUuid(node), false, client)
+          refData[NodeRefData.keys.taxon] = taxon
         }
         node[NodeRefData.keys.refData] = refData
       }
