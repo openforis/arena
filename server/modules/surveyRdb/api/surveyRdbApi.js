@@ -19,6 +19,44 @@ export const init = (app) => {
     }
   })
 
+  /**
+   * @openapi
+   * /api/surveyRdb/{surveyId}/{tableNodeDefUuid}/query:
+   *   post:
+   *     summary: Retrieves data from a survey data table
+   *     tags:
+   *       - Data Query
+   *     parameters:
+   *       - name: surveyId
+   *         description: The survey ID
+   *         in: path
+   *         schema:
+   *           type: number
+   *         required: true
+   *       - name: tableNodeDefUuid
+   *         description: The node definition UUID associated to the data table
+   *         in: path
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         required: true
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/DataQueryParameters'
+   *     responses:
+   *       200:
+   *         description: The result items
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 description: result item structure depends on the selected attributes or dimensions; it will be like a dictionary.
+   */
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, query, offset, limit } = Request.getParams(req)
@@ -32,6 +70,41 @@ export const init = (app) => {
     }
   })
 
+  /**
+   * @openapi
+   * /api/surveyRdb/{surveyId}/{tableNodeDefUuid}/query/count:
+   *   post:
+   *     summary: Counts the number of items returned by a query on a survey data table
+   *     tags:
+   *       - Data Query
+   *     parameters:
+   *       - name: surveyId
+   *         description: The survey ID
+   *         in: path
+   *         schema:
+   *           type: number
+   *         required: true
+   *       - name: tableNodeDefUuid
+   *         description: The node definition UUID associated to the data table
+   *         in: path
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         required: true
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/DataQueryParameters'
+   *     responses:
+   *       200:
+   *         description: The number of items returned by the query
+   *         content:
+   *           text/plain:
+   *             schema:
+   *               type: string
+   */
   app.post(
     '/surveyRdb/:surveyId/:nodeDefUuidTable/query/count',
     requireRecordListViewPermission,
