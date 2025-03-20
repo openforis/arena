@@ -37,6 +37,19 @@ export class JobQueue {
     return this._jobInfoByUuid[jobUuid]
   }
 
+  getJobSummary(jobUuid) {
+    const jobInfo = this._jobInfoByUuid[jobUuid]
+    if (!jobInfo) return null
+    const { params } = jobInfo
+    const { user } = params
+    const { uuid: userUuid } = user
+    if (this._runningJobUuidByUserUuid[userUuid]) {
+      return JobThreadExecutor.getActiveJobSummary(userUuid)
+    } else {
+      return jobInfo
+    }
+  }
+
   getRunningJobSummaryByUserUuid(userUuid) {
     const jobInfo = this._getJobInfoByUserUuid(userUuid)
     if (!jobInfo) {
@@ -49,6 +62,14 @@ export class JobQueue {
     }
   }
 
+  deleteJobInfo({ jobUuid }) {
+    const $this = this
+    // delay job info canceling; give time to clients to fetch the updated job
+    setTimeout(() => {
+      delete $this._jobInfoByUuid[jobUuid]
+    }, 60000)
+  }
+
   async cancelJobByUserUuid(userUuid) {
     const jobUuid = this._jobUuidByUserUuid[userUuid]
     if (!jobUuid) return
@@ -59,8 +80,8 @@ export class JobQueue {
       // remove job from queue
       const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
       this._queue.splice(queueIndex, 1)
+      this.deleteJobInfo({ jobUuid })
       delete this._jobUuidByUserUuid[userUuid]
-      delete this._jobInfoByUuid[jobUuid]
     }
   }
 
@@ -71,7 +92,7 @@ export class JobQueue {
     const { user, surveyId } = params
     const { uuid: userUuid } = user
 
-    delete this._jobInfoByUuid[uuid]
+    this.deleteJobInfo({ jobUuid: uuid })
     delete this._jobUuidByUserUuid[userUuid]
     delete this._runningJobUuidByUuid[uuid]
     delete this._runningJobUuidByUserUuid[userUuid]
