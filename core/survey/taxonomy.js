@@ -38,6 +38,11 @@ export const getExtraPropsDefsArray = R.pipe(getExtraPropsDefs, ExtraPropDef.ext
 
 export const getTaxaCount = R.prop(keys.taxaCount)
 
+export const isBigTaxonomy = (taxonomy) => {
+  const taxaCount = getTaxaCount(taxonomy)
+  return taxaCount > maxTaxaInIndex
+}
+
 // UPDATE
 export const assocExtraPropsDefs = (extraPropsDefs) => (taxonomy) =>
   ObjectUtils.setProp(keysProps.extraPropsDefs, extraPropsDefs)(taxonomy)

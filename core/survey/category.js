@@ -62,6 +62,15 @@ export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
 
 export const getItemsCount = R.propOr(-1, keys.itemsCount)
+export const getItemsCountOrLevelsItemsCount = (category) =>
+  getItemsCount(category) > 0
+    ? getItemsCount(category)
+    : getLevelsArray(category).reduce((acc, level) => {
+        acc += CategoryLevel.getItemsCount(level)
+        return acc
+      }, 0)
+
+export const isBigCategory = (category) => getItemsCountOrLevelsItemsCount(category) > maxCategoryItemsInIndex
 
 // ====== UPDATE
 export const assocProp =

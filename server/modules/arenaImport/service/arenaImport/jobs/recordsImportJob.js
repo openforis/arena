@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
@@ -37,7 +36,7 @@ export default class RecordsImportJob extends Job {
     )
 
     // import records sequentially
-    await PromiseUtils.each(recordSummaries, async (recordSummary) => {
+    for await (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
 
       // insert activity log
@@ -68,7 +67,7 @@ export default class RecordsImportJob extends Job {
       await this.insertOrSkipRecord({ record, nodesBatchPersister })
 
       this.incrementProcessedItems()
-    })
+    }
 
     await nodesBatchPersister.flush()
   }
@@ -83,12 +82,12 @@ export default class RecordsImportJob extends Job {
 
     // insert nodes (add them to batch persister)
     const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-    await PromiseUtils.each(nodes, async (node) => {
+    for await (const node of nodes) {
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         await nodesBatchPersister.addItem(node)
       }
-    })
+    }
   }
 
   /**
