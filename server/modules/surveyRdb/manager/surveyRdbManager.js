@@ -246,6 +246,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
   const nodeDefs = Survey.findDescendants({
+    cycle,
     filterFn: (nodeDef) =>
       NodeDef.isRoot(nodeDef) ||
       NodeDef.isMultiple(nodeDef) ||

@@ -372,11 +372,12 @@ export const visitDescendantsAndSelf =
   }
 
 export const findDescendants =
-  ({ nodeDef = null, filterFn }) =>
+  ({ nodeDef = null, cycle = null, filterFn }) =>
   (survey) => {
     const descendants = []
     visitDescendantsAndSelf({
       nodeDef,
+      cycle,
       visitorFn: (nodeDefCurrent) => {
         if (filterFn(nodeDefCurrent)) {
           descendants.push(nodeDefCurrent)
