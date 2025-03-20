@@ -6,6 +6,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
@@ -175,6 +177,27 @@ export const fetchRecordAndNodesByUuid = async (
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
+const fetchNodeRefData = async ({ surveyId, node, isCode }, client) => {
+  if (isCode) {
+    const categoryItemUuid = Node.getCategoryItemUuid(node)
+    const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: categoryItemUuid }, client)
+    return { [NodeRefData.keys.categoryItem]: categoryItem }
+  } else {
+    const taxonUuid = Node.getTaxonUuid(node)
+    const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, taxonUuid, false, client)
+    const vernacularNameUuid = Node.getVernacularNameUuid(node)
+    const vernacularName = vernacularNameUuid
+      ? await TaxonomyRepository.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, false, client)
+      : null
+    if (vernacularName) {
+      taxon[Taxon.keys.vernacularNameUuid] = vernacularNameUuid
+      taxon[Taxon.keys.vernacularName] = TaxonVernacularName.getName(vernacularName)
+      taxon[Taxon.keys.vernacularLanguage] = TaxonVernacularName.getLang(vernacularName)
+    }
+    return { [NodeRefData.keys.taxon]: taxon }
+  }
+}
+
 export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesTaxonomies = true }, client = db) => {
   const surveyId = Survey.getId(survey)
   for await (const node of nodes) {
@@ -182,24 +205,16 @@ export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesT
     const isCode = NodeDef.isCode(nodeDef)
     const isTaxon = NodeDef.isTaxon(nodeDef)
     if ((isCode || isTaxon) && !Node.isValueBlank(node)) {
-      const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
-      const taxonomy = Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey)
+      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+      const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
+      const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+      const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
       if (
         !onlyForBigCategoriesTaxonomies ||
         (isCode && Category.isBigCategory(category)) ||
         (isTaxon && Taxonomy.isBigTaxonomy(taxonomy))
       ) {
-        const refData = {}
-        if (isCode) {
-          const categoryItem = await CategoryRepository.fetchItemByUuid(
-            { surveyId, uuid: Node.getCategoryItemUuid(node) },
-            client
-          )
-          refData[NodeRefData.keys.categoryItem] = categoryItem
-        } else {
-          const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, Node.getTaxonUuid(node), false, client)
-          refData[NodeRefData.keys.taxon] = taxon
-        }
+        const refData = await fetchNodeRefData({ surveyId, node, isCode }, client)
         node[NodeRefData.keys.refData] = refData
       }
     }
