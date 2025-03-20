@@ -123,19 +123,20 @@ arena.waitForJobToComplete = function(job) {
     stop("Error: job not started properly")
   }
   pb <- txtProgressBar(min = 0, max = 100)
-  while (!is.null(job) && !job$ended) {
+  while (!is.null(job) && (job$status == 'pending' || job$status == 'running')) {
     setTxtProgressBar(pb, job$progressPercent)
     Sys.sleep(15)
-    job <- arena.get('/jobs/active')
+    job <- arena.get(paste0('/jobs/', job$uuid))
   }
-  if (!is.null(job) && job$ended) {
+  
+  if (!is.null(job)) {
     setTxtProgressBar(pb, 100)
   }
   close(pb)
   if (is.null(job)) {
     stop("Job complete but state is unknown")
   }
-  if (job$succeeded) {
+  if (job$status == 'succeeded') {
     return(TRUE)
   }
   stop("Error: job failed or canceled")
