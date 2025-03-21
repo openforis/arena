@@ -239,8 +239,6 @@ const updateAttributesInEntityWithValues =
     for await (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
       if (_canAttributeBeUpdated({ entityDef, attributeDef })) {
-        // update attribute values
-
         const { record: currentRecord } = updateResult
 
         const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
