@@ -58,7 +58,7 @@ export const createReaderFromStream = ({
 
   const parser =
     fileFormat === FileFormats.csv
-      ? stream.pipe(csvParser({ relaxColumnCount: true, skip_empty_lines: true, skip_records_with_empty_values: true }))
+      ? stream.pipe(csvParser({ relaxColumnCount: true, skipEmptyLines: true, skipRecordsWithEmptyValues: true }))
       : null
 
   const start = async () => {

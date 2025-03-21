@@ -92,7 +92,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
 
     await this.persistUpdatedNodes({ nodesUpdated })
 
-    // // current record could have been changed (e.g. node flags removed etc): update records cache too
+    // current record could have been changed(e.g.node flags removed etc): update records cache too
     this.currentRecord = recordUpdated
     this.recordsProvider.add(recordUpdated)
 
