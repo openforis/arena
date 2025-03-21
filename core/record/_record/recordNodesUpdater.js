@@ -206,6 +206,13 @@ const getOrCreateEntityByKeys =
     return { entity, updateResult }
   }
 
+const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
+  // consider only attributes descendants of the specified entity
+  NodeDef.isDescendantOf(entityDef)(attributeDef) &&
+  (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
+  // update also read-only values with value evaluated only one time with external data (e.g. from CSV)
+  (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
+
 const updateAttributesInEntityWithValues =
   ({ user, survey, entity, valuesByDefUuid, timezoneOffset, sideEffect = false }) =>
   async (record) => {
@@ -229,41 +236,29 @@ const updateAttributesInEntityWithValues =
 
     const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
 
-    // consider only attributes descendants of the specified entity
-
-    const valuesByDefUuidEntriesInDescendantAttributes = Object.entries(valuesByDefUuid).filter(
-      ([attributeDefUuid]) => {
-        const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
-        return (
-          NodeDef.isDescendantOf(entityDef)(attributeDef) &&
-          (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
-          // update also read-only values with value evaluated only one time with external data (e.g. from CSV)
-          (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
-        )
-      }
-    )
-
-    // update attribute values
-    for await (const [attributeDefUuid, value] of valuesByDefUuidEntriesInDescendantAttributes) {
+    for await (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
+      if (_canAttributeBeUpdated({ entityDef, attributeDef })) {
+        // update attribute values
 
-      const { record: currentRecord } = updateResult
+        const { record: currentRecord } = updateResult
 
-      const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
-        survey,
-        parentNode: entity,
-        nodeDefUuid: attributeDefUuid,
-      })(currentRecord)
+        const attributeParentEntity = RecordReader.getNodeParentInDescendantSingleEntities({
+          survey,
+          parentNode: entity,
+          nodeDefUuid: attributeDefUuid,
+        })(currentRecord)
 
-      const attributeUpdateResult = _addOrUpdateAttribute({
-        survey,
-        entity: attributeParentEntity,
-        attributeDef,
-        value,
-        sideEffect,
-      })(currentRecord)
+        const attributeUpdateResult = _addOrUpdateAttribute({
+          survey,
+          entity: attributeParentEntity,
+          attributeDef,
+          value,
+          sideEffect,
+        })(currentRecord)
 
-      await updateDependentNodes(attributeUpdateResult)
+        await updateDependentNodes(attributeUpdateResult)
+      }
     }
     return updateResult
   }
