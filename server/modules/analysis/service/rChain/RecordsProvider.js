@@ -3,10 +3,10 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { ItemsCache } from './ItemsCache'
 
 export class RecordsProvider {
-  constructor({ surveyId, tx }) {
+  constructor({ surveyId, tx, maxItems = 100, maxTotalItemsSize = 10000 }) {
     this.surveyId = surveyId
     this.tx = tx
-    this._recordsCache = new ItemsCache({ maxItems: 10 })
+    this._recordsCache = new ItemsCache({ maxItems, maxTotalItemsSize })
   }
 
   async getOrFetch(recordUuid) {
@@ -21,6 +21,6 @@ export class RecordsProvider {
   }
 
   add(record) {
-    this._recordsCache.add(Record.getUuid(record), record)
+    this._recordsCache.add(Record.getUuid(record), record, Record.getNodesArray(record).length)
   }
 }
