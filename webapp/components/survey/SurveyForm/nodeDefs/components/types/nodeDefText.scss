@@ -39,3 +39,10 @@
     background-color: $blueLightFocus;
   }
 }
+
+.survey-form__node-def-header {
+  border: $formBorder;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+}

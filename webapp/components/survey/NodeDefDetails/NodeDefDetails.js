@@ -22,11 +22,14 @@ import ValidationsProps from './ValidationsProps'
 import AnalysisEntitySelector from './AnalysisEntitySelector'
 
 import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import { State, useNodeDefDetails } from './store'
 
 const NodeDefDetails = (props) => {
   const { nodeDefUuid = null } = props
+
+  const i18n = useI18n()
 
   const { state, Actions, editingFromDesigner } = useNodeDefDetails({ nodeDefUuid })
 
@@ -102,11 +105,14 @@ const NodeDefDetails = (props) => {
             textTransformFunction={StringUtils.normalizeName}
           />
           <div className="attribute-selector">
-            {nodeDefType} {NodeDefUIProps.getIconByType(nodeDefType)}
+            {i18n.t(`surveyForm.addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
           </div>
         </FormItem>
 
-        <TabBar showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef)} tabs={tabs} />
+        <TabBar
+          showTabs={!NodeDef.isAnalysis(nodeDef) && !NodeDef.isRoot(nodeDef) && !NodeDef.isLayoutElement(nodeDef)}
+          tabs={tabs}
+        />
 
         <ButtonBar state={state} Actions={Actions} />
       </div>

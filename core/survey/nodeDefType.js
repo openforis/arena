@@ -11,4 +11,6 @@ export const nodeDefType = {
   taxon: 'taxon',
   file: 'file',
   entity: 'entity',
+  // layout elements
+  formHeader: 'formHeader',
 }

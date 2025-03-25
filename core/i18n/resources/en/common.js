@@ -1361,6 +1361,16 @@ E.g. this.region = region_attribute_name
     mobileProps: {
       title: 'Mobile App',
     },
+    formHeaderProps: {
+      headerColorLabel: 'Header color',
+      headerColor: {
+        blue: 'Blue',
+        green: 'Green',
+        orange: 'Orange',
+        red: 'Red',
+        yellow: 'Yellow',
+      },
+    },
     textProps: {
       textInputType: 'Text input type',
       textInputTypes: {
@@ -1460,6 +1470,8 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       taxon: 'Taxon',
       text: 'Text',
       time: 'Time',
+      // layout elments
+      formHeader: 'Form Header',
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
