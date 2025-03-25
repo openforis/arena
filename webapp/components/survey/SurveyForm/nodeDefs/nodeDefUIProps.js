@@ -21,7 +21,8 @@ import NodeDefText from './components/types/nodeDefText'
 import NodeDefTime from './components/types/nodeDefTime'
 import NodeDefGeo from './components/types/nodeDefGeo'
 
-const { boolean, code, coordinate, date, decimal, entity, file, geo, integer, taxon, text, time } = NodeDef.nodeDefType
+const { boolean, code, coordinate, date, decimal, entity, file, formHeader, geo, integer, taxon, text, time } =
+  NodeDef.nodeDefType
 
 export const headerColorRgbCodesByColor = {
   [FormHeaderColor.blue]: '#b3e5fc',
@@ -30,7 +31,6 @@ export const headerColorRgbCodesByColor = {
   [FormHeaderColor.red]: '#f97c7c',
   [FormHeaderColor.yellow]: '#fffdaf',
 }
-
 
 const singleEntityIcon = <span className="icon icon-insert-template icon-left" />
 const multipleAttributeIcon = <span title="Multiple">M</span>
@@ -149,8 +149,8 @@ const propsUI = {
 
 const getPropByType =
   (prop, defaultValue = null) =>
-    (nodeDefType) =>
-      R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+  (nodeDefType) =>
+    R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
 const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 

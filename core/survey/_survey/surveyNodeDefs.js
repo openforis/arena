@@ -26,9 +26,9 @@ export const getNodeDefByUuid = (uuid) => R.pipe(getNodeDefs, R.propOr(null, uui
 
 export const getNodeDefsByUuids =
   (uuids = []) =>
-    (survey) =>
-      // do not throw error if node defs are missing
-      Surveys.findNodeDefsByUuids({ survey, uuids })
+  (survey) =>
+    // do not throw error if node defs are missing
+    Surveys.findNodeDefsByUuids({ survey, uuids })
 
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
@@ -42,90 +42,95 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) => {
 
 export const getNodeDefChildren =
   (nodeDef, includeAnalysis = true, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false) =>
-    (survey) => {
-      const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
-      let childDefs = Surveys.getNodeDefChildren({
-        survey: surveyIndexed,
-        nodeDef,
-        includeAnalysis,
-        includeLayoutElements,
-      })
+  (survey) => {
+    const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
+    let childDefs = Surveys.getNodeDefChildren({
+      survey: surveyIndexed,
+      nodeDef,
+      includeAnalysis,
+      includeLayoutElements,
+    })
+    if (!includeSamplingDefsWithoutSiblings) {
       childDefs = filterNodeDefsWithoutSiblings(childDefs)
-      if (!includeSamplingDefsWithoutSiblings) {
-        childDefs = filterNodeDefsWithoutSiblings(childDefs)
-      }
-      return childDefs
     }
+    return childDefs
+  }
 
 export const getNodeDefChildrenSorted =
-  ({ nodeDef, includeAnalysis = false, cycle = null, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false }) =>
-    (survey) => {
-      let childDefs = Surveys.getNodeDefChildrenSorted({ survey, cycle, nodeDef, includeAnalysis, includeLayoutElements })
-      if (!includeSamplingDefsWithoutSiblings) {
-        childDefs = filterNodeDefsWithoutSiblings(childDefs)
-      }
-      return childDefs
+  ({
+    nodeDef,
+    includeAnalysis = false,
+    cycle = null,
+    includeLayoutElements = false,
+    includeSamplingDefsWithoutSiblings = false,
+  }) =>
+  (survey) => {
+    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, cycle, nodeDef, includeAnalysis, includeLayoutElements })
+    if (!includeSamplingDefsWithoutSiblings) {
+      childDefs = filterNodeDefsWithoutSiblings(childDefs)
     }
+    return childDefs
+  }
 
 export const getNodeDefChildrenInOwnPage =
   ({ nodeDef, cycle, includeAnalysis = true, includeLayoutElements = false }) =>
-    (survey) => {
-      const children = getNodeDefChildren(nodeDef, includeAnalysis, includeLayoutElements)(survey)
-      const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
-      const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
-      if (childrenIndex.length === 0) return childrenInOwnPage
+  (survey) => {
+    const children = getNodeDefChildren(nodeDef, includeAnalysis, includeLayoutElements)(survey)
+    const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
+    const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
+    if (childrenIndex.length === 0) return childrenInOwnPage
 
-      // sort children following order in layout children index
-      childrenInOwnPage.sort((childA, childB) => {
-        const positionInIndexA = childrenIndex.indexOf(childA.uuid)
-        const positionInIndexB = childrenIndex.indexOf(childB.uuid)
-        if (positionInIndexA >= 0 && positionInIndexB >= 0) return positionInIndexA - positionInIndexB
-        if (positionInIndexA < 0) return -1
-        if (positionInIndexB < 0) return 1
-        // otherwise keep creation order
-        return childA.id - childB.id
-      })
-      return childrenInOwnPage
-    }
+    // sort children following order in layout children index
+    childrenInOwnPage.sort((childA, childB) => {
+      const positionInIndexA = childrenIndex.indexOf(childA.uuid)
+      const positionInIndexB = childrenIndex.indexOf(childB.uuid)
+      if (positionInIndexA >= 0 && positionInIndexB >= 0) return positionInIndexA - positionInIndexB
+      if (positionInIndexA < 0) return -1
+      if (positionInIndexB < 0) return 1
+      // otherwise keep creation order
+      return childA.id - childB.id
+    })
+    return childrenInOwnPage
+  }
 
 export const getNodeDefDescendantsInSingleEntities =
   ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null, includeSamplingDefsWithoutSiblings = false }) =>
-    (survey) => {
-      const descendants = []
+  (survey) => {
+    const descendants = []
 
-      const queue = new Queue()
-      queue.enqueue(nodeDef)
+    const queue = new Queue()
+    queue.enqueue(nodeDef)
 
-      while (!queue.isEmpty()) {
-        const entityDefCurrent = queue.dequeue()
-        const entityDefCurrentChildren = sorted
-          ? getNodeDefChildrenSorted({
+    while (!queue.isEmpty()) {
+      const entityDefCurrent = queue.dequeue()
+      const entityDefCurrentChildren = sorted
+        ? getNodeDefChildrenSorted({
             nodeDef: entityDefCurrent,
             includeAnalysis,
             cycle,
             includeSamplingDefsWithoutSiblings,
           })(survey)
-          : getNodeDefChildren(entityDefCurrent, includeAnalysis, false, includeSamplingDefsWithoutSiblings)(survey)
+        : getNodeDefChildren(entityDefCurrent, includeAnalysis, false, includeSamplingDefsWithoutSiblings)(survey)
 
-        descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
+      descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
 
-        // visit nodes inside single entities
-        queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
-      }
-      if (sorted) {
-        // analysis node defs at the end
-        return [...descendants].sort((descendant1, descendant2) => {
-          const isAnalysis1 = NodeDef.isAnalysis(descendant1)
-          const isAnalysis2 = NodeDef.isAnalysis(descendant2)
-          if (isAnalysis1 === isAnalysis2) {
-            // both node defs are analysis or not: keep previous order
-            return descendants.indexOf(descendant1) - descendants.indexOf(descendant2)
-          }
-          return isAnalysis1 && !isAnalysis2 ? 1 : -1
-        })
-      }
-      return descendants
+      // visit nodes inside single entities
+      queue.enqueueItems(entityDefCurrentChildren.filter(NodeDef.isSingleEntity))
     }
+    if (sorted) {
+      // analysis node defs at the end
+      return [...descendants].sort((descendant1, descendant2) => {
+        const isAnalysis1 = NodeDef.isAnalysis(descendant1)
+        const isAnalysis2 = NodeDef.isAnalysis(descendant2)
+        if (isAnalysis1 === isAnalysis2) {
+          // both node defs are analysis or not: keep previous order
+          return descendants.indexOf(descendant1) - descendants.indexOf(descendant2)
+        }
+        return isAnalysis1 && !isAnalysis2 ? 1 : -1
+      })
+    }
+    return descendants
+  }
 
 export const getNodeDefDescendantAttributesInSingleEntities = ({
   nodeDef,
@@ -156,9 +161,9 @@ export const getNodeDefChildByName = (nodeDef, childName) => (survey) =>
   SurveyNodeDefsIndex.hasNodeDefsIndexByName(survey)
     ? Surveys.getNodeDefByName({ survey, name: childName })
     : R.pipe(
-      getNodeDefChildren(nodeDef),
-      R.find((childDef) => childName === NodeDef.getName(childDef))
-    )(survey)
+        getNodeDefChildren(nodeDef),
+        R.find((childDef) => childName === NodeDef.getName(childDef))
+      )(survey)
 
 export const getNodeDefParent = (nodeDef) => (survey) => {
   if (NodeDef.isRoot(nodeDef)) return null
@@ -178,8 +183,8 @@ export const getNodeDefKeys = (nodeDef) => (survey) => getNodeDefChildren(nodeDe
 
 export const getNodeDefKeysSorted =
   ({ nodeDef, cycle }) =>
-    (survey) =>
-      getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter(_nodeDefKeysFilter)
+  (survey) =>
+    getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefRootKeys = (survey) => {
   const root = getNodeDefRoot(survey)
@@ -238,31 +243,31 @@ export const dissocNodeDef = (nodeDefUuid) => updateNodeDefs(R.dissoc(nodeDefUui
 
 export const findAncestors =
   ({ nodeDef, predicate, visitorFn, includeSelf = true, stopAtFirstFound = false }) =>
-    (survey) => {
-      const result = []
-      let nodeDefToVisit = includeSelf ? nodeDef : getNodeDefParent(nodeDef)(survey)
-      while (nodeDefToVisit) {
-        visitorFn?.(nodeDefToVisit)
-        if (predicate?.(nodeDefToVisit)) {
-          result.push(nodeDefToVisit)
-          if (stopAtFirstFound) {
-            return result
-          }
+  (survey) => {
+    const result = []
+    let nodeDefToVisit = includeSelf ? nodeDef : getNodeDefParent(nodeDef)(survey)
+    while (nodeDefToVisit) {
+      visitorFn?.(nodeDefToVisit)
+      if (predicate?.(nodeDefToVisit)) {
+        result.push(nodeDefToVisit)
+        if (stopAtFirstFound) {
+          return result
         }
-        nodeDefToVisit = getNodeDefParent(nodeDefToVisit)(survey)
       }
-      return result
+      nodeDefToVisit = getNodeDefParent(nodeDefToVisit)(survey)
     }
+    return result
+  }
 
 export const findAncestor =
   ({ nodeDef, predicate }) =>
-    (survey) =>
-      findAncestors({ nodeDef, predicate, includeSelf: false, stopAtFirstFound: true })(survey)[0]
+  (survey) =>
+    findAncestors({ nodeDef, predicate, includeSelf: false, stopAtFirstFound: true })(survey)[0]
 
 export const visitAncestors =
   (nodeDef, visitorFn, includeSelf = true) =>
-    (survey) =>
-      findAncestors({ nodeDef, visitorFn, includeSelf })(survey)
+  (survey) =>
+    findAncestors({ nodeDef, visitorFn, includeSelf })(survey)
 
 export const visitAncestorsAndSelf = (nodeDef, visitorFn) => visitAncestors(nodeDef, visitorFn, true)
 
@@ -287,19 +292,19 @@ export const getNodeDefAncestorMultipleEntity = (nodeDef) => (survey) => {
 
 export const getNodeDefAncestorsKeyAttributes =
   (nodeDef, includeSelf = false) =>
-    (survey) => {
-      let ancestorsKeyAttributes = []
-      visitAncestors(
-        nodeDef,
-        (ancestorDef) => {
-          const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
-          ancestorsKeyAttributes = [...ancestorKeyAttributes, ...ancestorsKeyAttributes]
-        },
-        includeSelf
-      )(survey)
+  (survey) => {
+    let ancestorsKeyAttributes = []
+    visitAncestors(
+      nodeDef,
+      (ancestorDef) => {
+        const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
+        ancestorsKeyAttributes = [...ancestorKeyAttributes, ...ancestorsKeyAttributes]
+      },
+      includeSelf
+    )(survey)
 
-      return ancestorsKeyAttributes
-    }
+    return ancestorsKeyAttributes
+  }
 
 export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (survey) => {
   let ancestorsKeyAttributesIndexed = {}
@@ -312,41 +317,41 @@ export const getNodeDefAncestorsKeyAttributesByAncestorUuid = (nodeDef) => (surv
 
 export const getNodeDefPath =
   ({ nodeDef, showLabels = false, labelLang = null, includeRootEntity = true, separator = ' / ' }) =>
-    (survey) => {
-      const pathParts = []
+  (survey) => {
+    const pathParts = []
 
-      visitAncestorsAndSelf(nodeDef, (currentNodeDef) => {
-        if (!includeRootEntity && NodeDef.isRoot(currentNodeDef)) return
-        const pathPart = showLabels ? NodeDef.getLabel(currentNodeDef, labelLang) : NodeDef.getName(currentNodeDef)
-        pathParts.unshift(pathPart)
-      })(survey)
+    visitAncestorsAndSelf(nodeDef, (currentNodeDef) => {
+      if (!includeRootEntity && NodeDef.isRoot(currentNodeDef)) return
+      const pathPart = showLabels ? NodeDef.getLabel(currentNodeDef, labelLang) : NodeDef.getName(currentNodeDef)
+      pathParts.unshift(pathPart)
+    })(survey)
 
-      return pathParts.join(separator)
-    }
+    return pathParts.join(separator)
+  }
 
 export const getHierarchy =
   (filterFn = NodeDef.isEntity, cycle = undefined) =>
-    (survey) => {
-      let length = 1
-      const h = (array, nodeDef) => {
-        const childDefs = []
-        if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
-          const childDefsNotFiltered = cycle
-            ? getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
-            : getNodeDefChildren(nodeDef)(survey)
-          childDefs.push(...childDefsNotFiltered.filter(filterFn))
-        }
-        length += childDefs.length
-        const item = { ...nodeDef, children: childDefs.reduce(h, []) }
-        array.push(item)
-        return array
+  (survey) => {
+    let length = 1
+    const h = (array, nodeDef) => {
+      const childDefs = []
+      if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
+        const childDefsNotFiltered = cycle
+          ? getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
+          : getNodeDefChildren(nodeDef)(survey)
+        childDefs.push(...childDefsNotFiltered.filter(filterFn))
       }
-
-      return {
-        root: h([], getNodeDefRoot(survey))[0],
-        length,
-      }
+      length += childDefs.length
+      const item = { ...nodeDef, children: childDefs.reduce(h, []) }
+      array.push(item)
+      return array
     }
+
+    return {
+      root: h([], getNodeDefRoot(survey))[0],
+      length,
+    }
+  }
 
 export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
   await visitorFn(nodeDefItem, depth)
@@ -366,47 +371,47 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
 
 export const visitDescendantsAndSelf =
   ({ nodeDef = null, cycle = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
-    (survey) => {
-      const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
-      return Surveys.visitDescendantsAndSelfNodeDef({
-        survey,
-        cycle,
-        nodeDef: nodeDefToVisit,
-        visitor: visitorFn,
-        traverseMethod,
-      })
-    }
+  (survey) => {
+    const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
+    return Surveys.visitDescendantsAndSelfNodeDef({
+      survey,
+      cycle,
+      nodeDef: nodeDefToVisit,
+      visitor: visitorFn,
+      traverseMethod,
+    })
+  }
 
 export const findDescendants =
   ({ nodeDef = null, cycle = null, filterFn }) =>
-    (survey) => {
-      const descendants = []
-      visitDescendantsAndSelf({
-        nodeDef,
-        cycle,
-        visitorFn: (nodeDefCurrent) => {
-          if (filterFn(nodeDefCurrent)) {
-            descendants.push(nodeDefCurrent)
-          }
-        },
-      })(survey)
-      return descendants
-    }
+  (survey) => {
+    const descendants = []
+    visitDescendantsAndSelf({
+      nodeDef,
+      cycle,
+      visitorFn: (nodeDefCurrent) => {
+        if (filterFn(nodeDefCurrent)) {
+          descendants.push(nodeDefCurrent)
+        }
+      },
+    })(survey)
+    return descendants
+  }
 
 export const getNodeDefDescendantsAndSelf =
   ({ nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs } = {}) =>
-    (survey) => {
-      const descendants = []
-      visitDescendantsAndSelf({
-        nodeDef,
-        cycle,
-        visitorFn: (visitedNodeDef) => {
-          descendants.push(visitedNodeDef)
-        },
-        traverseMethod,
-      })(survey)
-      return descendants
-    }
+  (survey) => {
+    const descendants = []
+    visitDescendantsAndSelf({
+      nodeDef,
+      cycle,
+      visitorFn: (visitedNodeDef) => {
+        descendants.push(visitedNodeDef)
+      },
+      traverseMethod,
+    })(survey)
+    return descendants
+  }
 
 // ====== NODE DEFS CODE UTILS
 export const getNodeDefParentCode = (nodeDef) => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))
@@ -426,34 +431,34 @@ export const getNodeDefCategoryLevelIndex = (nodeDef) => (survey) => {
 
 export const getNodeDefCodeCandidateParents =
   ({ nodeDef, category }) =>
-    (survey) => {
-      if (!category || !nodeDef) {
-        return []
-      }
-      const levelsLength = Category.getLevelsArray(category).length
-      const candidates = []
-      visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
-        if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
-          const candidatesAncestor = R.pipe(
-            getNodeDefChildren(nodeDefAncestor),
-            R.reject(
-              (n) =>
-                // Reject multiple attributes
-                NodeDef.isMultiple(n) ||
-                // Or different category nodeDef
-                NodeDef.getCategoryUuid(n) !== NodeDef.getCategoryUuid(nodeDef) ||
-                // Or itself
-                NodeDef.isEqual(n)(nodeDef) ||
-                // Or leaves nodeDef
-                getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
-            )
-          )(survey)
-
-          candidates.push(...candidatesAncestor)
-        }
-      })(survey)
-      return candidates
+  (survey) => {
+    if (!category || !nodeDef) {
+      return []
     }
+    const levelsLength = Category.getLevelsArray(category).length
+    const candidates = []
+    visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
+      if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
+        const candidatesAncestor = R.pipe(
+          getNodeDefChildren(nodeDefAncestor),
+          R.reject(
+            (n) =>
+              // Reject multiple attributes
+              NodeDef.isMultiple(n) ||
+              // Or different category nodeDef
+              NodeDef.getCategoryUuid(n) !== NodeDef.getCategoryUuid(nodeDef) ||
+              // Or itself
+              NodeDef.isEqual(n)(nodeDef) ||
+              // Or leaves nodeDef
+              getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
+          )
+        )(survey)
+
+        candidates.push(...candidatesAncestor)
+      }
+    })(survey)
+    return candidates
+  }
 
 export const canUpdateCategory = (nodeDef) => (survey) =>
   (!NodeDef.isPublished(nodeDef) || SurveyInfo.isTemplate(SurveyInfo.getInfo(survey))) &&

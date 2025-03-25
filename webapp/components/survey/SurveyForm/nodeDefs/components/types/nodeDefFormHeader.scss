@@ -1,4 +1,4 @@
-@import '../../../SurveyFormVars';
+@use '../../../SurveyFormVars' as *;
 
 .survey-form__node-def-form-header {
   border: $formBorder;
