@@ -15,7 +15,7 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
   if (emptyRootKeyValueIndex >= 0) {
     const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
-    throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissing, { keyName })
+    throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissingOrInvalid, { keyName })
   }
 }
 
@@ -48,7 +48,6 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
       })
     })
   )
-
   const keyNameValuePairs = rootKeyDefs
     .map((keyDef, index) => {
       const name = NodeDef.getName(keyDef)
@@ -64,18 +63,18 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
     }
     const recordToInsert = Record.newRecord(user, cycle)
     let record = null
-    if (dryRun) {
-      const { record: recordCreated } = await RecordUpdater.createRootEntity({
-        survey,
-        record: recordToInsert,
-        sideEffect: true,
-      })
-      record = recordCreated
-    } else {
-      record = await RecordManager.insertRecord(user, Survey.getId(survey), recordToInsert, true, tx)
-      record = await RecordManager.initNewRecord({ user, survey, record, createMultipleEntities: false }, tx)
-    }
+    const { record: recordCreated } = await RecordUpdater.createRootEntity({
+      user,
+      survey,
+      record: recordToInsert,
+      sideEffect: true,
+    })
+    record = recordCreated
 
+    if (!dryRun) {
+      const recordInserted = await RecordManager.insertRecord(user, Survey.getId(survey), record, true, tx)
+      record.id = recordInserted.id
+    }
     return {
       newRecord: true,
       record,

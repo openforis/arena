@@ -6,7 +6,7 @@ import Job from '@server/job/job'
 
 import { languageCodesISO639part2 } from '@core/app/languages'
 import * as StringUtils from '@core/stringUtils'
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
@@ -29,12 +29,13 @@ export default class TaxonomyImportJob extends Job {
   constructor(params) {
     super(TaxonomyImportJob.type, params)
 
-    const { taxonomyUuid, filePath } = params
+    const { taxonomyUuid, filePath, fileFormat } = params
 
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
+    this.fileFormat = fileFormat
 
-    this.csvReader = null
+    this.flatDataReader = null
     this.taxonomyImportManager = null // To be initialized in onHeaders
     this.vernacularLanguageCodes = null
     this.extraPropsDefs = null
@@ -43,7 +44,7 @@ export default class TaxonomyImportJob extends Job {
   }
 
   async execute() {
-    const { user, surveyId, taxonomyUuid, tx } = this
+    const { filePath, fileFormat, user, surveyId, taxonomyUuid, tx } = this
 
     this.logDebug(`starting taxonomy import on survey ${surveyId}, taxonomy ${taxonomyUuid}`)
 
@@ -69,15 +70,16 @@ export default class TaxonomyImportJob extends Job {
     // 3. start CSV row parsing
     this.logDebug('start CSV file parsing')
 
-    this.csvReader = CSVReader.createReaderFromFile(
-      this.filePath,
-      async (headers) => this._onHeaders(headers),
-      async (row) => this._onRow(row),
-      (total) => {
+    this.flatDataReader = FlatDataReader.createReaderFromFile({
+      filePath,
+      fileFormat,
+      onHeaders: async (headers) => this._onHeaders(headers),
+      onRow: async (row) => this._onRow(row),
+      onTotalChange: (total) => {
         this.total = total
-      }
-    )
-    await this.csvReader.start()
+      },
+    })
+    await this.flatDataReader.start()
 
     this.logDebug(`CSV file processed, ${this.processed} rows processed`)
 
@@ -96,8 +98,8 @@ export default class TaxonomyImportJob extends Job {
   async cancel() {
     await super.cancel()
 
-    if (this.csvReader) {
-      this.csvReader.cancel()
+    if (this.flatDataReader) {
+      this.flatDataReader.cancel()
     }
   }
 
@@ -109,11 +111,11 @@ export default class TaxonomyImportJob extends Job {
       // extra prop defs
       const extraPropsColumns = filterExtraPropsColumns(headers)
 
-      this.extraPropsDefs = extraPropsColumns.reduce((extraPropsAcc, header) => {
+      this.extraPropsDefs = extraPropsColumns.reduce((extraPropsAcc, header, index) => {
         const extraPropNameNormalized = StringUtils.normalizeName(header)
         return {
           ...extraPropsAcc,
-          [extraPropNameNormalized]: { key: extraPropNameNormalized, originalHeader: header },
+          [extraPropNameNormalized]: { key: extraPropNameNormalized, originalHeader: header, index },
         }
       }, {})
       this.taxonomyImportManager = new TaxonomyImportManager({
@@ -133,7 +135,7 @@ export default class TaxonomyImportJob extends Job {
       })
     } else {
       this.logDebug('invalid headers, setting status to "failed"')
-      this.csvReader.cancel()
+      this.flatDataReader.cancel()
       await this.setStatusFailed()
     }
   }

@@ -3,7 +3,8 @@ import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
 import * as Expression from '../../../../../core/expressionParser/expression'
 
-import TableDataNodeDef, { ColumnNodeDef } from '../../tables/dataNodeDef'
+import TableDataNodeDef from '../../tables/dataNodeDef'
+import ColumnNodeDef from '../../tables/dataNodeDef/columnNodeDef'
 
 const columnSet = {
   dateCreated: TableDataNodeDef.columnSetCommon.dateCreated,
@@ -48,6 +49,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefUuid.nameFull
   }
 
+  get columnUuidName() {
+    return this.columnNodeDefUuid.name
+  }
+
   get columnIdName() {
     const { nodeDef } = this.tableData
     return `_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`
@@ -66,35 +71,46 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefUuids.flatMap((columnNodeDef) => columnNodeDef.namesFull)
   }
 
-  get columnNodeDefs() {
-    const columns = []
-    // table entity uuid column - it doesn't exist for virtual entities
-    if (!this.virtual && !NodeDef.isMultipleAttribute(this.nodeDef)) {
-      columns.push(new ColumnNodeDef(this.tableData, this.nodeDef))
-    }
-    // attribute columns
-    columns.push(...this.tableData.columnNodeDefs)
-    // multiple attribute columns
-    columns.push(
-      ...Survey.getNodeDefChildren(
-        this.nodeDef,
-        true
-      )(this.survey)
-        .filter((nodeDef) => NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef))
-        .map((multAttrDef) => new ColumnNodeDef(this.tableData, multAttrDef))
-    )
-    // parent view columns
-    if (this.viewDataParent) {
-      columns.unshift(
-        ...this.viewDataParent.columnNodeDefs
+  get _multipleAttributeColumns() {
+    const { nodeDef, survey, tableData } = this
+
+    return Survey.getNodeDefDescendantAttributesInSingleEntities({
+      nodeDef,
+      includeAnalysis: true,
+      includeMultipleAttributes: true,
+    })(survey)
+      .filter((nodeDef) => NodeDef.isMultipleAttribute(nodeDef) && NodeDef.canMultipleAttributeBeAggregated(nodeDef))
+      .map((multAttrDef) => new ColumnNodeDef(tableData, multAttrDef))
+  }
+
+  get _parentViewColumns() {
+    const { nodeDef, viewDataParent } = this
+    return viewDataParent
+      ? viewDataParent.columnNodeDefs
           .filter(
             (parentColumnNodeDef) =>
               !NodeDef.isMultipleAttribute(parentColumnNodeDef.nodeDef) ||
-              (!NodeDef.isEqual(parentColumnNodeDef.nodeDef)(this.nodeDef) &&
+              (!NodeDef.isEqual(parentColumnNodeDef.nodeDef)(nodeDef) &&
                 NodeDef.canMultipleAttributeBeAggregated(parentColumnNodeDef.nodeDef))
           )
-          .map((columnNodeDef) => new ColumnNodeDef(this.viewDataParent, columnNodeDef.nodeDef))
-      )
+          .map((columnNodeDef) => new ColumnNodeDef(viewDataParent, columnNodeDef.nodeDef))
+      : []
+  }
+
+  get columnNodeDefs() {
+    const { nodeDef, tableData, viewDataParent, virtual } = this
+    const columns = []
+    // table entity uuid column - it doesn't exist for virtual entities
+    if (!virtual && !NodeDef.isMultipleAttribute(nodeDef)) {
+      columns.push(new ColumnNodeDef(tableData, nodeDef))
+    }
+    // attribute columns
+    columns.push(...tableData.columnNodeDefs)
+    // multiple attribute columns
+    columns.push(...this._multipleAttributeColumns)
+    // parent view columns
+    if (viewDataParent) {
+      columns.unshift(...this._parentViewColumns)
     }
     return columns
   }
@@ -105,6 +121,10 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get columnNodeDefNamesFull() {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
+  }
+
+  get columnParentUuidName() {
+    return this.viewDataParent?.columnUuidName
   }
 
   get tableData() {

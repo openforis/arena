@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .helper__first_time_help {
   display: flex;
@@ -10,9 +10,9 @@
   text-align: left;
 }
 
-.helper__survey_info{
-    margin-bottom: 5rem;
-    height: initial !important;
+.helper__survey_info {
+  margin-bottom: 5rem;
+  height: initial !important;
 }
 
 .helper__first_time_help__container {

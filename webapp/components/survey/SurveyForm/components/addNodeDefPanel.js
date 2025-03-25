@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { SurveyState, NodeDefsActions } from '@webapp/store/survey'
@@ -14,14 +15,20 @@ import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
+const experimentalNodeDefTypes = []
+
 const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props
 
   const i18n = useI18n()
 
+  const availableNodeDefTypes = Object.values(NodeDef.nodeDefType).filter(
+    (type) => ProcessUtils.ENV.experimentalFeatures || !experimentalNodeDefTypes.includes(type)
+  )
+
   return (
     <>
-      {Object.values(NodeDef.nodeDefType).map((type) => {
+      {availableNodeDefTypes.map((type) => {
         const nodeDefProps = NodeDefUIProps.getDefaultPropsByType(type, surveyCycleKey)
 
         // Cannot add entities when entity is rendered as table

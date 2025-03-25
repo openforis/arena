@@ -10,6 +10,7 @@ import * as API from '@webapp/service/api'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { DialogConfirmActions } from '@webapp/store/ui/dialogConfirm'
@@ -17,6 +18,7 @@ import { NotificationActions } from '@webapp/store/ui/notification'
 
 import * as SurveyState from '../state'
 import { surveyDefsIndexUpdate } from '../actions/actionTypes'
+import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefUpdate = 'survey/nodeDef/update'
@@ -27,9 +29,15 @@ export const nodeDefPropsUpdateCancel = 'survey/nodeDef/props/update/cancel'
 
 export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 export const nodeDefsUpdate = 'survey/nodeDefs/update'
+export const dependencyGraphUpdate = 'survey/dependencyGraph/update'
 
 // ==== PLAIN ACTIONS
-export const updateNodeDef = ({ nodeDef }) => ({ type: nodeDefUpdate, nodeDef })
+export const updateNodeDef = ({ nodeDef, prevNodeDef = null, dirty = false }) => ({
+  type: nodeDefUpdate,
+  nodeDef,
+  prevNodeDef,
+  dirty,
+})
 
 export const saveNodeDef = ({ nodeDef, nodeDefParent, surveyCycleKey, nodeDefValidation }) => ({
   type: nodeDefSave,
@@ -51,12 +59,18 @@ export const cancelEdit = ({ nodeDef, nodeDefOriginal }) => ({
 export const createNodeDef = (parent, type, props, navigate) => async (dispatch, getState) => {
   const state = getState()
   const cycle = SurveyState.getSurveyCycleKey(state)
+  const treeSelectViewMode = SurveyFormState.getGlobalStateTreeSelectViewMode(state)
 
   const nodeDef = NodeDef.newNodeDef(parent, type, [cycle], props)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)
+  if (treeSelectViewMode === TreeSelectViewMode.onlyPages) {
+    navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
+  } else {
+    dispatch(SurveyFormActions.setFormActiveNodeDefUuid(nodeDefUuid))
+  }
 
   return nodeDef
 }
@@ -115,6 +129,20 @@ const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDe
   }
 }
 
+// ==== Internal update nodeDefs actions
+const _onNodeDefsUpdate =
+  ({ nodeDefsUpdated, nodeDefsValidation, dependencyGraph }) =>
+  (dispatch) => {
+    dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
+
+    if (!R.isEmpty(nodeDefsUpdated)) {
+      dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
+    }
+    if (!R.isEmpty(dependencyGraph)) {
+      dispatch({ type: dependencyGraphUpdate, dependencyGraph })
+    }
+  }
+
 export const moveNodeDef =
   ({ nodeDefUuid, targetParentNodeDefUuid, navigate }) =>
   async (dispatch, getState) => {
@@ -129,7 +157,7 @@ export const moveNodeDef =
       targetParentNodeDefUuid,
     })
 
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
 
     // update survey index: parent entity has changed
     const allNodeDefs = { ...Survey.getNodeDefs(survey), ...nodeDefsUpdated }
@@ -138,15 +166,6 @@ export const moveNodeDef =
     _handleNodeDefMoveValidationErrors({ dispatch, navigate, survey, nodeDefUuid, nodeDefsValidation })
   }
 
-// ==== Internal update nodeDefs actions
-const _onNodeDefsUpdate = (nodeDefsUpdated, nodeDefsValidation) => (dispatch) => {
-  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
-
-  if (!R.isEmpty(nodeDefsUpdated)) {
-    dispatch({ type: nodeDefsUpdate, nodeDefs: nodeDefsUpdated })
-  }
-}
-
 export const putNodeDefProps =
   ({ nodeDefUuid, parentUuid, props = {}, propsAdvanced }) =>
   async (dispatch, getState) => {
@@ -154,7 +173,7 @@ export const putNodeDefProps =
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
 
-    const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({
+    const { dependencyGraph, nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefProps({
       surveyId,
       nodeDefUuid,
       parentUuid,
@@ -163,7 +182,7 @@ export const putNodeDefProps =
       propsAdvanced,
     })
 
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation, dependencyGraph }))
   }
 
 export const putNodeDefsProps =
@@ -176,10 +195,10 @@ export const putNodeDefsProps =
     const { nodeDefsValidation, nodeDefsUpdated } = await API.putNodeDefsProps({ surveyId, nodeDefs, cycle })
 
     dispatch(
-      _onNodeDefsUpdate(
-        nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
-        nodeDefsValidation
-      )
+      _onNodeDefsUpdate({
+        nodeDefsUpdated: nodeDefsUpdated.reduce((acc, nodeDef) => ({ ...acc, [nodeDef.uuid]: nodeDef }), {}),
+        nodeDefsValidation,
+      })
     )
   }
 
@@ -192,7 +211,7 @@ export const postNodeDef =
 
     const { nodeDefsValidation, nodeDefsUpdated } = await API.postNodeDef({ surveyId, surveyCycleKey, nodeDef })
 
-    dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+    dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
   }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) =>
@@ -243,10 +262,8 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
-  const nodeDefDependents = R.pipe(
-    Survey.buildAndAssocDependencyGraph,
-    Survey.getNodeDefDependencies(nodeDefUuid)
-  )(survey)
+  const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
+  const nodeDefDependents = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
 
   const nodeDefDependentsNotDescendants = nodeDefDependents.filter(
     (dependent) =>
@@ -289,6 +306,7 @@ export const removeNodeDef =
         DialogConfirmActions.showDialogConfirm({
           key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
           params: { name: NodeDef.getName(nodeDef) },
+          okButtonLabel: 'common.delete',
           onOk: async () => {
             const surveyId = Survey.getId(survey)
             const surveyCycleKey = SurveyState.getSurveyCycleKey(state)
@@ -302,7 +320,7 @@ export const removeNodeDef =
               dispatch({ type: nodeDefDelete, nodeDef }),
             ])
 
-            dispatch(_onNodeDefsUpdate(nodeDefsUpdated, nodeDefsValidation))
+            dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
             callBack?.()
             if (navigate) {
               navigate(-1)
@@ -311,4 +329,31 @@ export const removeNodeDef =
         })
       )
     }
+  }
+
+export const convertNodeDef =
+  ({ nodeDef, toType, navigate }) =>
+  async (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+    const toTypeLabel = toType
+
+    dispatch(
+      DialogConfirmActions.showDialogConfirm({
+        key: 'surveyForm.nodeDefEditFormActions.confirmConvert',
+        params: { name: NodeDef.getName(nodeDef), toType: toTypeLabel },
+        okButtonLabel: 'common.convert',
+        onOk: async () => {
+          const surveyId = Survey.getId(survey)
+          const { nodeDefsUpdated, nodeDefsValidation } = await API.convertNodeDef({ surveyId, nodeDefUuid, toType })
+
+          await dispatch(_onNodeDefsUpdate({ nodeDefsUpdated, nodeDefsValidation }))
+
+          navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
+        },
+      })
+    )
   }

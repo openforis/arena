@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .arena-tooltip.MuiTooltip-popper {
   &[data-popper-placement*='top'] .MuiTooltip-tooltip {
@@ -10,11 +10,13 @@
   }
 
   .MuiTooltip-tooltip {
+    font-size: medium;
     color: $colorTextPrimary;
-    background-color: $greyAppBg;
+    background-color: $tooltipBg;
+    border: 1px solid $tooltipBg;
 
     .MuiTooltip-arrow {
-      color: $greyAppBg;
+      color: $tooltipBg;
     }
   }
 }

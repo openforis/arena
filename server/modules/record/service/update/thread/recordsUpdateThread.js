@@ -4,6 +4,7 @@ import { WebSocketEvent } from '@openforis/arena-server'
 import * as Log from '@server/log/log'
 
 import Thread from '@server/threads/thread'
+import IdleTimeoutCache from '@server/utils/IdleTimeoutCache'
 
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -14,7 +15,6 @@ import Queue from '@core/queue'
 import * as RecordManager from '../../../manager/recordManager'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
-import IdleTimeoutCache from './IdleTimeoutCache'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
@@ -82,11 +82,18 @@ class RecordsUpdateThread extends Thread {
       } catch (error) {
         // SystemError is an expected error type, e.g. when there's a problem with expressions.
         if (error instanceof SystemError) {
+          const recordUuid = msg.recordUuid ?? msg.node?.recordUuid
+          const { key, params } = error
+          const nestedError = params.error
+          if (nestedError && nestedError instanceof SystemError) {
+            params.error = { key: nestedError.key, params: nestedError.params }
+          }
           this.postMessage({
             type: WebSocketEvent.applicationError,
             content: {
-              key: error.key,
-              params: error.params,
+              key,
+              params,
+              recordUuid,
             },
           })
           return // Stop processing

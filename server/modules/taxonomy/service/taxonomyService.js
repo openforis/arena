@@ -1,5 +1,5 @@
-import * as CSVWriter from '@server/utils/file/csvWriter'
-import { db } from '@server/db/db'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import * as DbUtils from '@server/db/dbUtils'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 
@@ -15,6 +15,7 @@ export const {
   fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
   countTaxonomiesBySurveyId,
+  countTaxaBySurveyId,
   countTaxaByTaxonomyUuid,
   findTaxaByCode,
   findTaxaByScientificName,
@@ -32,8 +33,8 @@ export const {
   deleteTaxonomy,
 } = TaxonomyManager
 
-export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
-  const { taxonomy, taxaStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
+export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFormat, draft = false }) => {
+  const { taxonomy, taxaStream: taxaQueryStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
     surveyId,
     taxonomyUuid,
     draft
@@ -41,23 +42,25 @@ export const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) 
   const vernacularLangCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
   const extraPropKeys = Taxonomy.getExtraPropKeys(taxonomy)
 
-  const headers = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
+  const fields = ['code', 'family', 'genus', 'scientific_name', ...vernacularLangCodes, ...extraPropKeys]
 
-  await db.stream(taxaStream, (dbStream) => {
-    const csvTransform = CSVWriter.transformJsonToCsv({ fields: headers })
-    dbStream.pipe(csvTransform).pipe(output)
+  await DbUtils.stream({
+    queryStream: taxaQueryStream,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
   })
 }
 
-export const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
+export const importTaxonomy = ({ user, surveyId, taxonomyUuid, filePath, fileFormat }) => {
   const job = new TaxonomyImportJob({
     user,
     surveyId,
     taxonomyUuid,
     filePath,
+    fileFormat,
   })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }

@@ -5,34 +5,29 @@ import classNames from 'classnames'
 
 const FooterWithExport =
   ({ exportFileName }) =>
-  () =>
-    (
-      <GridFooterContainer>
-        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
-        <GridFooter />
-      </GridFooterContainer>
-    )
+  () => (
+    <GridFooterContainer>
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+      <GridFooter />
+    </GridFooterContainer>
+  )
 
 const DataGrid = (props) => {
   const {
-    allowExportToCsv,
-    autoPageSize,
-    autoRowHeight,
-    checkboxSelection,
+    allowExportToCsv = false,
+    autoPageSize = false,
+    autoRowHeight = false,
+    checkboxSelection = false,
     className,
     columns: columnsProp,
-    density,
+    density = 'standard',
     exportFileName,
-    disableSelectionOnClick,
+    disableSelectionOnClick = true,
     getRowClassName,
     getRowId,
     initialState,
     rows,
   } = props
-
-  const components = {
-    ...(allowExportToCsv ? { Footer: FooterWithExport({ exportFileName }) } : {}),
-  }
 
   const columns = useMemo(() => columnsProp.map((col) => ({ ...col, disableColumnMenu: true })), [columnsProp])
 
@@ -44,7 +39,6 @@ const DataGrid = (props) => {
       checkboxSelection={checkboxSelection}
       className={classNames('data-grid', className)}
       columns={columns}
-      components={components}
       density={density}
       disableRowSelectionOnClick={disableSelectionOnClick}
       getRowClassName={getRowClassName}
@@ -52,6 +46,7 @@ const DataGrid = (props) => {
       getRowId={getRowId}
       initialState={initialState}
       rows={rows}
+      slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
   )
 }
@@ -70,15 +65,6 @@ DataGrid.propTypes = {
   getRowId: PropTypes.func,
   initialState: PropTypes.object,
   rows: PropTypes.array.isRequired,
-}
-
-DataGrid.defaultProps = {
-  allowExportToCsv: false,
-  autoPageSize: false,
-  autoRowHeight: false,
-  checkboxSelection: false,
-  density: 'standard',
-  disableSelectionOnClick: true,
 }
 
 export default DataGrid

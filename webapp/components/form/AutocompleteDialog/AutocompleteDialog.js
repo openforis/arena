@@ -9,15 +9,15 @@ import { useLocalState, State } from './store'
 
 const AutocompleteDialog = (props) => {
   const {
-    inputField,
-    sourceElement,
-    items,
+    className = '',
+    inputField = null,
+    itemLabel = () => '',
+    itemKey = null,
+    items = [],
     itemRenderer: ItemRenderer,
-    itemLabel,
-    itemKey,
-    className,
-    onItemSelect,
-    onClose,
+    onItemSelect = null,
+    onClose = null,
+    sourceElement = null, // Used to calculate the size of the dialog if available, otherwise the input field is used
   } = props
   const list = useRef(null)
 
@@ -38,8 +38,8 @@ const AutocompleteDialog = (props) => {
   })
 
   const calculatedPosition = useMemo(
-    () => State.calculatePosition(state),
-    [State.getSourceElement(state), State.getInputField(state)]
+    () => State.calculatePosition({ sourceElement, inputField }),
+    [sourceElement, inputField]
   )
 
   return (
@@ -71,18 +71,6 @@ AutocompleteDialog.propTypes = {
   className: PropTypes.string,
   onItemSelect: PropTypes.func,
   onClose: PropTypes.func,
-}
-
-AutocompleteDialog.defaultProps = {
-  items: [],
-  itemRenderer: null,
-  itemLabel: () => '',
-  itemKey: null,
-  inputField: null,
-  sourceElement: null, // Used to calculate the size of the dialog if available, otherwise the input field is used
-  className: '',
-  onItemSelect: null,
-  onClose: null,
 }
 
 export default AutocompleteDialog

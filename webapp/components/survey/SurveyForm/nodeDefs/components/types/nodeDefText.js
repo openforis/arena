@@ -30,17 +30,16 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
 
 const MultipleTextInput = (props) => {
   const { nodeDef, parentNode, nodes, canEditRecord } = props
+  const nodeDefType = NodeDef.getType(nodeDef)
 
   return (
-    <div>
+    <>
       {nodes.map(
         (n) =>
           (!Node.isPlaceholder(n) || canEditRecord) && (
             <div
               key={Node.getUuid(n)}
-              className={`survey-form__node-def-${NodeDef.getType(
-                nodeDef
-              )} survey-form__node-def-text-multiple-container`}
+              className={`survey-form__node-def-text-multiple-container survey-form__node-def-${nodeDefType}`}
             >
               <NodeDefErrorBadge nodeDef={nodeDef} edit={false} parentNode={parentNode} node={n} />
 
@@ -52,7 +51,7 @@ const MultipleTextInput = (props) => {
             </div>
           )
       )}
-    </div>
+    </>
   )
 }
 

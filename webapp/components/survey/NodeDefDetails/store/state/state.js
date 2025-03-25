@@ -57,10 +57,12 @@ export const isDisplayAsEnabled = isEntityAndNotRoot
 export const isDisplayInEnabled = isEntityAndNotRoot
 
 // ===== UPDATE
-const assocNodeDef = R.assoc(keys.nodeDef)
+export const assocNodeDef = R.assoc(keys.nodeDef)
+
+export const assocValidation = (validation) => R.assoc(keys.validation, validation)
 
 export const assocNodeDefAndValidation = (nodeDef, nodeDefValidation) =>
-  R.pipe(assocNodeDef(nodeDef), R.assoc(keys.validation, nodeDefValidation))
+  R.pipe(assocNodeDef(nodeDef), assocValidation(nodeDefValidation))
 
 export const assocNodeDefProp = (key, value) => (state) => {
   const nodeDef = getNodeDef(state)

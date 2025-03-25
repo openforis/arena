@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .ace_editor {
   border: 1px solid $greyBorder;

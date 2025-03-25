@@ -8,12 +8,19 @@ import * as Taxon from '@core/survey/taxon'
 import { useTaxa } from './useTaxa'
 
 const NodeDefTaxonAutocompleteItemRenderer = (props) => {
-  const { item: taxon, ...otherProps } = props
+  const { item: taxon, onKeyDown, onMouseDown } = props
 
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
-    <div {...otherProps} key={Taxon.getUuid(taxon)} className="item" tabIndex="1">
+    <div
+      key={Taxon.getUuid(taxon)}
+      className="item"
+      onKeyDown={onKeyDown}
+      onMouseDown={onMouseDown}
+      role="button"
+      tabIndex="1"
+    >
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>
       {vernacularLang && <div style={{ gridColumn: 2 }}>{`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}</div>}
@@ -21,18 +28,24 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
   )
 }
 
+NodeDefTaxonAutocompleteItemRenderer.propTypes = {
+  item: PropTypes.object.isRequired,
+  onKeyDown: PropTypes.func,
+  onMouseDown: PropTypes.func,
+}
+
 const NodeDefTaxonAutocompleteDialog = (props) => {
   const {
-    nodeDef,
-    parentNode,
-    draft,
-    entryDataQuery,
-    inputRef,
-    field,
-    fieldValue,
     autocompleteSourceElement,
+    draft = false,
+    entryDataQuery,
+    field = '',
+    fieldValue = '',
+    inputRef,
+    nodeDef,
     onItemSelect,
     onClose,
+    parentNode,
   } = props
 
   const taxa = useTaxa({ nodeDef, parentNode, draft, entryDataQuery, field, fieldValue })
@@ -52,21 +65,17 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
   )
 }
 
-NodeDefTaxonAutocompleteDialog.defaultProps = {
-  surveyId: null,
-  taxonomyUuid: null,
-  draft: false,
-
-  inputRef: null,
-  field: '',
-  fieldValue: '',
-  onItemSelect: null,
-  onClose: null,
-  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
-}
-
-NodeDefTaxonAutocompleteItemRenderer.propTypes = {
-  item: PropTypes.object.isRequired,
+NodeDefTaxonAutocompleteDialog.propTypes = {
+  autocompleteSourceElement: PropTypes.node.isRequired, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
+  draft: PropTypes.bool,
+  entryDataQuery: PropTypes.bool,
+  field: PropTypes.string,
+  fieldValue: PropTypes.string,
+  inputRef: PropTypes.object.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  onItemSelect: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  parentNode: PropTypes.object.isRequired,
 }
 
 export default NodeDefTaxonAutocompleteDialog

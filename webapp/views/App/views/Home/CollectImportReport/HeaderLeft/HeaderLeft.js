@@ -18,7 +18,7 @@ const HeaderLeft = (props) => {
         label="homeView.collectImportReport.excludeResolvedItems"
         onChange={(value) => setExcludeResolved(value)}
       />
-      <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.csvExport" />
+      <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.exportToExcel" />
     </header>
   )
 }

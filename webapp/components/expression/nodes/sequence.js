@@ -5,7 +5,18 @@ import * as R from 'ramda'
 import EditButtons from './editButtons'
 
 const Sequence = (props) => {
-  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, onDelete, renderNode, type, variables } = props
+  const {
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    node,
+    nodeDefCurrent = null,
+    onChange,
+    onDelete = null,
+    renderNode,
+    type = null,
+    variables = null,
+  } = props
 
   const { expression } = node
 
@@ -43,16 +54,6 @@ Sequence.propTypes = {
   isBoolean: PropTypes.bool,
   type: PropTypes.string,
   variables: PropTypes.array,
-}
-
-Sequence.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  nodeDefCurrent: null,
-  onDelete: null,
-  type: null,
-  variables: null,
 }
 
 export default Sequence

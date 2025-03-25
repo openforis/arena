@@ -81,7 +81,7 @@ export const buildGraph = (survey) => {
   return getDependencyGraph(surveyUpdated)
 }
 
-export const buildAndAssocDependencyGraph = (survey) => Surveys.buildAndAssocDependencyGraph(survey)
+export const buildAndAssocDependencyGraph = (survey) => Surveys.buildAndAssocDependencyGraph({ ...survey })
 
 // DELETE
 export const removeNodeDefDependencies =

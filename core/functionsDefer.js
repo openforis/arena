@@ -2,11 +2,19 @@ const debounceTimeouts = {}
 const throttleTimeouts = {}
 const throttleLastRan = {}
 
+export const cancelDebounce = (id) => {
+  const timeoutId = debounceTimeouts[id]
+  if (timeoutId) {
+    clearTimeout(debounceTimeouts[id])
+    delete debounceTimeouts[id]
+  }
+}
+
 export const debounce = (func, id, delay = 500, immediate = false) => {
   return function (...args) {
     const context = this
 
-    const later = function () {
+    const onTimeout = function () {
       delete debounceTimeouts[id]
       if (!immediate) {
         func.apply(context, args)
@@ -14,8 +22,8 @@ export const debounce = (func, id, delay = 500, immediate = false) => {
     }
 
     const callNow = immediate && !debounceTimeouts[id]
-    clearTimeout(debounceTimeouts[id])
-    debounceTimeouts[id] = setTimeout(later, delay)
+    cancelDebounce(id)
+    debounceTimeouts[id] = setTimeout(onTimeout, delay)
     if (callNow) {
       func.apply(context, args)
     }

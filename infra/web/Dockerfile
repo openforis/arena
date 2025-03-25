@@ -1,6 +1,6 @@
 ############################################################
 
-ARG node_version=18.12.1
+ARG node_version=22.14.0
 
 FROM node:${node_version} AS base
 RUN apt update
@@ -9,7 +9,7 @@ RUN apt install -y git
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
 
-RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass
+RUN cd /app; yarn install --ignore-scripts --frozen-lockfile;
 
 COPY .git /app/.git
 RUN cd /app; git reset --hard

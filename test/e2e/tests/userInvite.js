@@ -23,7 +23,7 @@ const inviteUser = (userToInvite) =>
   test(`Invite user`, async () => {
     await page.click(getSelector(TestId.userList.inviteBtn, 'a'))
 
-    await page.fill(getSelector(TestId.userInvite.email, 'input'), userToInvite.email)
+    await FormUtils.fillInput(TestId.userInvite.email, userToInvite.email)
 
     await FormUtils.selectDropdownItem({ testId: TestId.userInvite.group, label: userToInvite.authGroup.label })
 

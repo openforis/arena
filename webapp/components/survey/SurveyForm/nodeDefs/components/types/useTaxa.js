@@ -6,12 +6,10 @@ import { useSurvey } from '@webapp/store/survey'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useItemsFilter } from './useItemsFilter'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
-import { useRecord } from '@webapp/store/ui/record'
 
 export const useTaxa = ({ nodeDef, draft, entryDataQuery, field, fieldValue, parentNode }) => {
   const survey = useSurvey()
   const surveyId = Survey.getId(survey)
-  const record = useRecord()
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
 
   const params = useMemo(
@@ -40,5 +38,5 @@ export const useTaxa = ({ nodeDef, draft, entryDataQuery, field, fieldValue, par
     [entryDataQuery]
   )
 
-  return useItemsFilter({ survey, nodeDef, record, parentNode, items: list, alwaysIncludeItemFunction })
+  return useItemsFilter({ nodeDef, parentNode, items: list, alwaysIncludeItemFunction })
 }

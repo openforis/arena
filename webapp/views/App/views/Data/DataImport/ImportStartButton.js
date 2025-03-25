@@ -7,15 +7,17 @@ import { DialogConfirmActions } from '@webapp/store/ui'
 
 export const ImportStartButton = (props) => {
   const {
-    className,
+    className = 'btn-primary start-btn',
     confirmMessageKey,
     confirmMessageParams,
-    disabled,
-    label,
-    showConfirm,
-    startFunction,
-    startFunctionParams,
+    disabled = false,
+    label = 'dataImportView.startImport',
     onUploadComplete,
+    showConfirm = false,
+    startFunction,
+    startFunctionParams = {},
+    strongConfirm = false,
+    strongConfirmRequiredText = null,
   } = props
 
   const dispatch = useDispatch()
@@ -39,12 +41,14 @@ export const ImportStartButton = (props) => {
           key: confirmMessageKey,
           params: confirmMessageParams,
           onOk: onStartConfirmed,
+          strongConfirm,
+          strongConfirmRequiredText,
         })
       )
     } else {
       await onStartConfirmed()
     }
-  }, [confirmMessageKey, confirmMessageParams, dispatch, onStartConfirmed, showConfirm])
+  }, [confirmMessageKey, confirmMessageParams, dispatch, onStartConfirmed, showConfirm, strongConfirmRequiredText])
 
   return (
     <>
@@ -65,16 +69,10 @@ ImportStartButton.propTypes = {
   confirmMessageParams: PropTypes.object,
   disabled: PropTypes.bool,
   label: PropTypes.string,
+  onUploadComplete: PropTypes.func.isRequired,
   showConfirm: PropTypes.bool,
   startFunction: PropTypes.func.isRequired,
   startFunctionParams: PropTypes.object,
-  onUploadComplete: PropTypes.func.isRequired,
-}
-
-ImportStartButton.defaultProps = {
-  className: 'btn-primary start-btn',
-  disabled: false,
-  label: 'dataImportView.startImport',
-  showConfirm: false,
-  startFunctionParams: {},
+  strongConfirm: PropTypes.bool,
+  strongConfirmRequiredText: PropTypes.string,
 }

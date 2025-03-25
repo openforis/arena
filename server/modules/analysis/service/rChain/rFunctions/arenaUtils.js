@@ -1,4 +1,6 @@
-const stringifyValues = (values) => values.map((val) => `'${val}'`)
+import { quote } from '@core/stringUtils'
+
+const stringifyValues = (values) => values.map(quote)
 
 export const arenaDfColumnsAsCharacter = (df, columns) =>
   `arena.dfColumnsAsCharacter( ${df}, c(${stringifyValues(columns)}) )`

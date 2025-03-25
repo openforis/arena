@@ -1,3 +1,5 @@
+import { Surveys } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
@@ -48,10 +50,13 @@ export const getMaxSurveysUserCanCreate = (user) => {
 export const canViewSurvey = (user, surveyInfo) =>
   User.isSystemAdmin(user) || _hasAuthGroupForSurvey({ user, surveyInfo })
 export const canExportSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canExportSurveysList = (user) => User.isSystemAdmin(user)
 export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditSurveyConfig = (user) => User.isSystemAdmin(user)
+export const canEditSurveyOwner = (user) => User.isSystemAdmin(user)
 export const canEditTemplates = (user) => User.isSystemAdmin(user)
 export const canRefreshAllSurveyRdbs = (user) => User.isSystemAdmin(user)
 
@@ -64,32 +69,52 @@ export const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
 
 // READ
 export const canViewRecord = _hasSurveyPermission(permissions.recordView)
-export const canViewAllRecords = _hasSurveyPermission(permissions.recordCleanse)
+export const canExportAllRecords = _hasSurveyPermission(permissions.recordCleanse)
+export const canViewNotOwnedRecords = (user, surveyInfo) => {
+  if (!canViewSurvey(user, surveyInfo)) return false
+  if (canExportAllRecords(user, surveyInfo)) return true
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
+  return (
+    AuthGroup.getName(groupInCurrentSurvey) === AuthGroup.groupNames.dataEditor &&
+    Surveys.isDataEditorViewNotOwnedRecordsAllowed(surveyInfo)
+  )
+}
 export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
 
 // UPDATE
-export const canEditRecord = (user, record) => {
-  if (!(user && record)) {
+export const canEditRecord = (user, record, ignoreRecordStep = false) => {
+  if (
+    !user ||
+    !record ||
+    // records in analysis cannot be edited
+    (!ignoreRecordStep && Record.isInAnalysisStep(record))
+  ) {
     return false
   }
-
+  // system admin does not have an auth group associated to the survey, but he can always edit records;
   if (User.isSystemAdmin(user)) {
     return true
   }
-
-  const recordDataStep = Record.getStep(record)
-
+  // if user doesn't have an auth group associated to the survey, he cannot edit records
   const userAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Record.getSurveyUuid(record) })(user)
   if (!userAuthGroup) return false
 
-  // Level = 'all' or 'own'. If 'own', user can only edit the records that he created
+  // Level = 'all' or 'own'. If 'own', user can only edit records assigned to him
   // If 'all', he can edit all survey's records
-  const level = AuthGroup.getRecordEditLevel(recordDataStep)(userAuthGroup)
-
+  const level = AuthGroup.getRecordEditLevel(Record.getStep(record))(userAuthGroup)
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
+const canChangeRecordProps = (user, record) => canEditRecord(user, record, true)
+
 export const canDeleteRecord = canEditRecord
+
+export const canDemoteRecord = canChangeRecordProps
+
+export const canChangeRecordOwner = canChangeRecordProps
+
+export const canChangeRecordStep = canChangeRecordProps
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 
@@ -115,12 +140,6 @@ export const canUseExplorer = canCleanseRecords
 export const canUseMap = canAnalyzeRecords
 
 // ======
-// ====== Charts
-// ======
-
-export const canUseCharts = (user, _surveyInfo) => User.isSystemAdmin(user)
-
-// ======
 // ====== Users
 // ======
 
@@ -130,12 +149,7 @@ export const canInviteUsers = _hasSurveyPermission(permissions.userInvite)
 // READ
 export const canViewSurveyUsers = _hasSurveyPermission(permissions.userInvite)
 
-export const canViewUser = (user, _surveyInfo, userToView) =>
-  // system admin
-  User.isSystemAdmin(user) ||
-  // same user
-  User.isEqual(userToView)(user) ||
-  // both users have an auth group in the same survey
+const _usersBelongToSameSurvey = ({ user, userToView }) =>
   User.getAuthGroups(user).some(
     (authGroupUser) =>
       AuthGroup.isSurveyGroup(authGroupUser) &&
@@ -146,8 +160,16 @@ export const canViewUser = (user, _surveyInfo, userToView) =>
       )
   )
 
+export const canViewUser = (user, surveyInfo, userToView) =>
+  User.isSystemAdmin(user) ||
+  User.isEqual(userToView)(user) ||
+  _usersBelongToSameSurvey({ user, userToView, surveyInfo })
+
 export const canViewOtherUsersEmail = ({ user, surveyInfo }) =>
   User.isSystemAdmin(user) || canInviteUsers(user, surveyInfo)
+
+export const canViewOtherUsersNameInSameSurvey = (user, surveyInfo) =>
+  _hasSurveyPermission(permissions.recordView)(user, surveyInfo)
 
 export const canViewAllUsers = (user) => User.isSystemAdmin(user)
 
@@ -162,7 +184,7 @@ export const canEditUser = (user, surveyInfo, userToUpdate) =>
   User.hasAccepted(userToUpdate) &&
   (User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate))
 
-export const canEditUserEmail = _hasUserEditAccess
+export const canEditUserEmail = (user) => User.isSystemAdmin(user)
 
 export const canEditUserGroup = (user, surveyInfo, userToUpdate) =>
   !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)

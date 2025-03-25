@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { FileFormats } from '@core/fileFormats'
+
 import { ButtonDownload } from '@webapp/components/buttons'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
-import { TestId } from '@webapp/utils/testId'
 
 const SurveySchemaSummaryDownloadButton = (props) => {
-  const { className } = props
+  const { className, fileFormat = FileFormats.xlsx, testId } = props
 
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
@@ -14,17 +15,19 @@ const SurveySchemaSummaryDownloadButton = (props) => {
   return (
     <ButtonDownload
       className={className}
-      testId={TestId.surveyForm.schemaSummary}
+      testId={testId}
       href={`/api/survey/${surveyId}/schema-summary/`}
-      requestParams={{ cycle: surveyCycleKey }}
-      label="surveyForm.schemaSummary"
-      title="surveyForm.schemaSummaryTitle"
+      requestParams={{ cycle: surveyCycleKey, fileFormat }}
+      label={`surveyForm.schemaSummary_${fileFormat}`}
+      variant="text"
     />
   )
 }
 
 SurveySchemaSummaryDownloadButton.propTypes = {
   className: PropTypes.string,
+  fileFormat: PropTypes.string,
+  testId: PropTypes.string,
 }
 
 export default SurveySchemaSummaryDownloadButton

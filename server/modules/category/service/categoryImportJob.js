@@ -16,12 +16,13 @@ import * as PromiseUtils from '@core/promiseUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as CategoryManager from '../manager/categoryManager'
-import * as CategoryImportCSVParser from '../manager/categoryImportCSVParser'
+import * as CategoryImportFlatDataParser from '../manager/categoryImportFlatDataParser'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
+import { CategoryValidationJob } from './CategoryValidationJob'
 
-export default class CategoryImportJob extends Job {
-  constructor(params, type = CategoryImportJob.type) {
+export class CategoryImportInternalJob extends Job {
+  constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)
 
     this.survey = null
@@ -36,7 +37,8 @@ export default class CategoryImportJob extends Job {
   async onStart() {
     await super.onStart()
 
-    this.survey = await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx)
+    this.survey =
+      this.contextSurvey ?? (await SurveyManager.fetchSurveyById({ surveyId: this.surveyId, draft: true }, this.tx))
 
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
@@ -88,16 +90,8 @@ export default class CategoryImportJob extends Job {
 
   async beforeSuccess() {
     await super.beforeSuccess()
-
-    // Validate category
-    this.logDebug('category validation start')
-    this.category = await CategoryManager.validateCategory(
-      { survey: this.survey, categoryUuid: Category.getUuid(this.category) },
-      this.tx
-    )
-    this.logDebug('category validation end')
-
-    this.setResult({
+    this.setContext({
+      survey: this.survey,
       category: this.category,
     })
   }
@@ -119,6 +113,7 @@ export default class CategoryImportJob extends Job {
         const itemKey = CategoryImportSummary.getItemKey(item)
         accExtraDef[itemKey] = ExtraPropDef.newItem({
           dataType: CategoryImportSummary.getItemDataType(item),
+          index: Object.values(accExtraDef).length,
         })
       }
       return accExtraDef
@@ -255,9 +250,9 @@ export default class CategoryImportJob extends Job {
   }
 
   async _readItems() {
-    this.logDebug('reading CSV file rows')
+    this.logDebug('reading flat data file rows')
 
-    const { surveyId, category, user, tx } = this
+    const { surveyId, survey, category, summary, user, tx } = this
 
     // init items updater
     this.itemsUpdater = new CategoryItemsUpdater({
@@ -270,16 +265,15 @@ export default class CategoryImportJob extends Job {
     })
     await this.itemsUpdater.init()
 
-    const reader = await CategoryImportCSVParser.createRowsReaderFromStream({
+    const reader = await CategoryImportFlatDataParser.createRowsReaderFromStream({
       stream: await this.createReadStream(),
-      survey: this.survey,
-      summary: this.summary,
+      survey,
+      summary,
       onRowItem: async (itemRow) => {
         if (this.isCanceled()) {
           reader.cancel()
           return
         }
-
         await this._onRow(itemRow)
       },
       onTotalChange: (total) => {
@@ -320,7 +314,6 @@ export default class CategoryImportJob extends Job {
         }
       }
     }
-
     this.incrementProcessedItems()
   }
 
@@ -367,6 +360,21 @@ export default class CategoryImportJob extends Job {
     this.addError({
       error: Validation.newInstance(false, {}, [{ key, params }]),
     })
+  }
+}
+
+export default class CategoryImportJob extends Job {
+  constructor(params, type = CategoryImportJob.type, internalJobConstructor = CategoryImportInternalJob) {
+    super(type, params, [new internalJobConstructor(params), new CategoryValidationJob(params)])
+  }
+
+  generateResult() {
+    const result = super.generateResult()
+    const { category } = this.context
+    return {
+      ...result,
+      category,
+    }
   }
 }
 

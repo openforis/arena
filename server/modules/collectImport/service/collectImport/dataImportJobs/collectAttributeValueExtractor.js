@@ -1,6 +1,5 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid'
 import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
 
@@ -87,21 +86,19 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
   const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${fileName}`)
 
   if (content) {
-    const fileUuid = uuidv4()
     const fileSize = Buffer.byteLength(content)
-    const file = RecordFile.createFile(
-      fileUuid,
-      fileName,
-      fileSize,
+    const file = RecordFile.createFile({
+      name: fileName,
+      size: fileSize,
       content,
-      Node.getRecordUuid(node),
-      Node.getUuid(node)
-    )
+      recordUuid: Node.getRecordUuid(node),
+      nodeUuid: Node.getUuid(node),
+    })
     await FileManager.insertFile(Survey.getId(survey), file, tx)
 
     return {
       value: {
-        [Node.valuePropsFile.fileUuid]: fileUuid,
+        [Node.valuePropsFile.fileUuid]: RecordFile.getUuid(file),
         [Node.valuePropsFile.fileName]: fileName,
         [Node.valuePropsFile.fileSize]: fileSize,
       },
@@ -113,23 +110,23 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
 
 const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
   const {
-    code,
+    code: taxonCode,
     scientific_name: scientificName,
     vernacular_name: vernacularName,
   } = CollectRecord.getTextValues(collectNode)
-  const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
+  const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
 
   if (taxonUuid) {
     const value = {
       [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
     }
 
-    if (code === Taxon.unlistedCode) {
+    if (taxonCode === Taxon.unlistedCode) {
       value[Node.valuePropsTaxon.scientificName] = scientificName
     }
 
     if (vernacularName) {
-      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(nodeDef, code, vernacularName)(survey)
+      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid({ nodeDef, taxonCode, vernacularName })(survey)
       if (vernacularNameUuid) {
         value[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
       } else {

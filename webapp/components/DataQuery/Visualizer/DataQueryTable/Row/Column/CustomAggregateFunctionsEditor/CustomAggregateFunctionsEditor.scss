@@ -1,0 +1,29 @@
+.custom-aggregate-functions {
+  flex: 1;
+
+  .table__row-header,
+  .table__row {
+    display: grid;
+    grid-template-columns: 30px 1fr 50px;
+    height: fit-content;
+
+    .form {
+      column-span: all;
+      display: flex;
+      flex-direction: column;
+      row-gap: 1rem;
+      width: 600px;
+      height: 300px;
+      max-width: none;
+      margin: auto;
+
+      .form-item {
+        height: auto;
+      }
+
+      .button-bar {
+        position: inherit;
+      }
+    }
+  }
+}

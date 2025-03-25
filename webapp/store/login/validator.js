@@ -26,16 +26,22 @@ export const validateEmail = async (obj) =>
     email: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), UserValidator.validateEmail],
   })
 
-export const validateResetPasswordObj = async (obj) =>
-  Validator.validate(obj, {
-    [User.keysProps.title]: [Validator.validateRequired(Validation.messageKeys.user.titleRequired)],
-    name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
+export const validateResetPasswordObj = async (obj) => {
+  const propsValidations = {
     password: [
       Validator.validateRequired(Validation.messageKeys.user.passwordRequired),
       UserPasswordValidator.validatePassword,
     ],
     passwordConfirm: [_validatePasswordConfirm],
-  })
+  }
+  if (!obj.hasAlreadyAccepted) {
+    Object.assign(propsValidations, {
+      [User.keysProps.title]: [Validator.validateRequired(Validation.messageKeys.user.titleRequired)],
+      name: [Validator.validateRequired(Validation.messageKeys.user.nameRequired)],
+    })
+  }
+  return Validator.validate(obj, propsValidations)
+}
 
 export const getFirstError = (validation, order) =>
   R.pipe(

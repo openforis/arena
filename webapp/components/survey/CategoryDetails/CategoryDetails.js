@@ -3,35 +3,46 @@ import './CategoryDetails.scss'
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
+import classNames from 'classnames'
 
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
+import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { Button, ButtonDownload, ButtonMenu } from '@webapp/components'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { Checkbox, UploadButton } from '@webapp/components/form'
+import { Checkbox, OpenFileUploadDialogButton } from '@webapp/components/form'
 
-import { ExtraPropDefsEditor } from '../ExtraPropDefsEditor'
+import { ExtraPropDefsEditorPanel } from '../ExtraPropDefsEditor'
 import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
-import classNames from 'classnames'
+import { FileFormats } from '@core/fileFormats'
 
 const MAX_LEVELS = 5
 
+const allowedImportExtensions = '.csv,.xlsx'
+
+const templateFileFormats = [FileFormats.csv, FileFormats.xlsx]
+
+const templateTypes = {
+  specificDataImport: 'specificDataImport',
+  genericDataImport: 'genericDatImport',
+  samplingPointDataImport: 'samplingPointDataImport',
+}
+
 const CategoryDetails = (props) => {
-  const { showClose, onCategoryUpdate, categoryUuid: categoryUuidProp } = props
+  const { categoryUuid: categoryUuidProp, onCategoryUpdate, showClose = true } = props
 
   const { categoryUuid: categoryUuidParam } = useParams()
-  const i18n = useI18n()
   const surveyId = useSurveyId()
 
   const readOnly = !useAuthCanEditSurvey()
@@ -47,6 +58,8 @@ const CategoryDetails = (props) => {
   if (!category) return null
 
   const categoryUuid = Category.getUuid(category)
+  const itemsCount = Category.getItemsCountOrLevelsItemsCount(category)
+  const excelExportDisabled = itemsCount > FileUtils.excelRowsLimit
 
   const importSummary = State.getImportSummary(state)
   const editingItemExtraDefs = State.isEditingItemExtraDefs(state)
@@ -58,7 +71,7 @@ const CategoryDetails = (props) => {
     <>
       <div className="category">
         <div className="category__header">
-          <FormItem label={i18n.t('categoryEdit.categoryName')}>
+          <FormItem label="categoryEdit.categoryName">
             <Input
               id={TestId.categoryDetails.categoryName}
               value={Category.getName(category)}
@@ -71,61 +84,44 @@ const CategoryDetails = (props) => {
           </FormItem>
 
           {!readOnly && (
-            <UploadButton
+            <OpenFileUploadDialogButton
               className="import-btn"
-              label="common.csvImport"
-              accept=".csv"
-              onChange={(files) => Actions.uploadCategory({ categoryUuid, file: files[0] })}
+              label="common.import"
+              accept={allowedImportExtensions}
+              onOk={({ files, onUploadProgress }) =>
+                Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+              }
             />
           )}
-          <ButtonDownload
+          <ButtonMenuExport
             className="export-btn"
-            testId={TestId.categoryDetails.exportBtn}
+            excelExportDisabled={excelExportDisabled}
             href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            label="common.csvExport"
+            testId={TestId.categoryDetails.exportBtn}
           />
           {!readOnly && (
             <ButtonMenu
               className="date-import-template-menu-btn"
-              label="categoryEdit.templateForDataImport"
+              label="categoryEdit.templateForImport"
               iconClassName="icon-download2 icon-14px"
-              items={[
-                {
-                  key: 'data-import-template-download',
+              items={Object.keys(templateTypes).flatMap((templateType) =>
+                templateFileFormats.map((fileFormat) => ({
+                  key: `data-import-template-${templateType}-${fileFormat}`,
                   content: (
                     <ButtonDownload
-                      className="btn-transparent"
-                      testId={TestId.categoryDetails.templateForDataImportBtn}
                       href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      label="categoryEdit.templateForDataImport"
+                      requestParams={{
+                        fileFormat,
+                        generic: templateType === templateTypes.genericDataImport,
+                        samplingPointData: templateType === templateTypes.samplingPointDataImport,
+                      }}
+                      label={`categoryEdit.templateFor_${templateType}_${fileFormat}`}
+                      variant="text"
                     />
                   ),
-                },
-                {
-                  key: 'data-import-generic-template-download',
-                  content: (
-                    <ButtonDownload
-                      className="btn-transparent"
-                      testId={TestId.categoryDetails.templateForDataImportGenericBtn}
-                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      requestParams={{ generic: true }}
-                      label="categoryEdit.templateForDataImportGeneric"
-                    />
-                  ),
-                },
-                {
-                  key: 'data-import-sampling-point-data-template-download',
-                  content: (
-                    <ButtonDownload
-                      className="btn-transparent"
-                      testId={TestId.categoryDetails.templateForSamplingPointDataImportBtn}
-                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      requestParams={{ samplingPointData: true }}
-                      label="categoryEdit.templateForSamplingPointDataImport"
-                    />
-                  ),
-                },
-              ]}
+                }))
+              )}
+              variant="outlined"
             />
           )}
 
@@ -162,7 +158,7 @@ const CategoryDetails = (props) => {
         </div>
 
         {editingItemExtraDefs && (
-          <ExtraPropDefsEditor
+          <ExtraPropDefsEditorPanel
             toggleEditExtraPropsPanel={Actions.toggleEditExtraPropertiesPanel}
             extraPropDefs={Category.getItemExtraDefsArray(category)}
             isExtraPropDefReadOnly={(extraPropDef) => Category.isExtraPropDefReadOnly(extraPropDef)(category)}
@@ -211,7 +207,7 @@ const CategoryDetails = (props) => {
 
         {showClose && (
           <div className="button-bar">
-            <Button onClick={Actions.onDoneClick} label="common.done" />
+            <Button onClick={Actions.onDoneClick} label="common.done" primary />
           </div>
         )}
       </div>
@@ -225,12 +221,6 @@ CategoryDetails.propTypes = {
   categoryUuid: PropTypes.string,
   onCategoryUpdate: PropTypes.func,
   showClose: PropTypes.bool,
-}
-
-CategoryDetails.defaultProps = {
-  categoryUuid: null,
-  onCategoryUpdate: null,
-  showClose: true,
 }
 
 export default CategoryDetails

@@ -5,17 +5,33 @@ const _getJson = async (zipFile, entryName, defaultValue = null) => {
   return content ? JSON.parse(content) : defaultValue
 }
 
+const _getPartsCount = (zipFile, partFileNameGetter) => {
+  let count = 0
+  while (zipFile.hasEntry(partFileNameGetter(count))) {
+    count = count + 1
+  }
+  return count
+}
+
 // Survey
 export const getSurvey = async (zipFile) => _getJson(zipFile, ExportFile.survey)
 
 // Taxonomies
 export const getTaxonomies = async (zipFile) => _getJson(zipFile, ExportFile.taxonomies, [])
 export const getTaxa = async (zipFile, taxonomyUuid) => _getJson(zipFile, ExportFile.taxa({ taxonomyUuid }), [])
+export const getTaxaPart = async ({ zipFile, taxonomyUuid, index }) =>
+  _getJson(zipFile, ExportFile.taxaPart({ taxonomyUuid, index }), [])
+export const getTaxaPartsCount = ({ zipFile, taxonomyUuid }) =>
+  _getPartsCount(zipFile, (index) => ExportFile.taxaPart({ taxonomyUuid, index }))
 
 // Categories
 export const getCategories = async (zipFile) => _getJson(zipFile, ExportFile.categories, {})
 export const getCategoryItems = async (zipFile, categoryUuid) =>
-  _getJson(zipFile, ExportFile.categoryItems({ categoryUuid }), [])
+  _getJson(zipFile, ExportFile.categoryItemsSingleFile({ categoryUuid }), [])
+export const getCategoryItemsPart = async ({ zipFile, categoryUuid, index = 0 }) =>
+  _getJson(zipFile, ExportFile.categoryItemsPart({ categoryUuid, index }), [])
+export const getCategoryItemsPartsCount = ({ zipFile, categoryUuid }) =>
+  _getPartsCount(zipFile, (index) => ExportFile.categoryItemsPart({ categoryUuid, index }))
 
 // Records
 export const getRecords = async (zipFile) => _getJson(zipFile, ExportFile.records, [])
@@ -34,13 +50,8 @@ export const getFileUuidsOld = async (zipFile) => {
 export const getFileOld = async (zipFile, fileUuid) => _getJson(zipFile, ExportFile.fileOld({ fileUuid }))
 
 // Activities
-export const getActivitiesFilesCount = (zipFile) => {
-  let count = 0
-  while (zipFile.hasEntry(ExportFile.activityLog({ index: count }))) {
-    count = count + 1
-  }
-  return count
-}
+export const getActivitiesFilesCount = (zipFile) =>
+  _getPartsCount(zipFile, (index) => ExportFile.activityLog({ index }))
 export const getActivities = async (zipFile, index = 0) => _getJson(zipFile, ExportFile.activityLog({ index }), [])
 
 // Users

@@ -8,10 +8,14 @@ import { MapUtils } from '@core/map/mapUtils'
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SrsManager from '@server/modules/geo/manager/srsManager'
+
 import { PlanetApi } from './planetApi'
 
-// free altitude API urls
-const altitudeApiUrls = [
+const uriPrefix = '/survey/:surveyId/geo/'
+const whispApiUrl = 'https://whisp.openforis.org/api/'
+
+// free elevation API urls
+const elevationApiUrls = [
   ({ lat, lng }) => `https://api.opentopodata.org/v1/aster30m?locations=${lat},${lng}`,
   ({ lat, lng }) => `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
 ]
@@ -25,7 +29,7 @@ const getMapTileForwardUrl = (req) => {
 
 export const init = (app) => {
   // ==== READ
-  app.get('/survey/:surveyId/geo/srs/find', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get(`${uriPrefix}srs/find`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { codeOrName } = Request.getParams(req)
 
@@ -38,7 +42,7 @@ export const init = (app) => {
   })
 
   app.get(
-    '/survey/:surveyId/geo/map/:provider/tile/:z/:y/:x',
+    `${uriPrefix}map/:provider/tile/:z/:y/:x`,
     AuthMiddleware.requireMapUsePermission,
     // createProxyMiddleware({ router: getForwardUrl, changeOrigin: true, secure: false })
     async (req, res) => {
@@ -55,7 +59,7 @@ export const init = (app) => {
   )
 
   app.get(
-    '/survey/:surveyId/geo/map/:provider/available_montly_periods',
+    `${uriPrefix}map/:provider/available_montly_periods`,
     AuthMiddleware.requireMapUsePermission,
     async (req, res, next) => {
       const { provider } = Request.getParams(req)
@@ -74,35 +78,44 @@ export const init = (app) => {
     }
   )
 
-  app.get('/survey/:surveyId/geo/map/altitude', AuthMiddleware.requireMapUsePermission, async (req, res) => {
+  app.get(`${uriPrefix}map/elevation`, AuthMiddleware.requireMapUsePermission, async (req, res) => {
     const { lat, lng } = Request.getParams(req)
-    let altitude = null
-    await Promises.each(altitudeApiUrls, async (urlPattern) => {
-      if (!Objects.isEmpty(altitude)) return
+    let elevation = null
+    await Promises.each(elevationApiUrls, async (urlPattern) => {
+      if (!Objects.isEmpty(elevation)) return
       try {
         const url = urlPattern({ lat, lng })
         const { data } = await axios.get(url, { timeout: 10000 })
-        altitude = data?.results?.[0]?.elevation
+        elevation = data?.results?.[0]?.elevation
       } catch (error) {
         // ignore it
       }
     })
-    res.json(altitude)
+    res.json(elevation)
   })
 
-  app.get(
-    '/survey/:surveyId/geo/map/wmts/capabilities',
-    AuthMiddleware.requireMapUsePermission,
-    async (req, res, next) => {
-      const { url } = Request.getParams(req)
-      try {
-        const { data } = await axios.get(url)
-        const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
-        const json = JSON.parse(jsonstring)
-        res.json(json)
-      } catch (error) {
-        next(error)
-      }
+  app.get(`${uriPrefix}map/wmts/capabilities`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
+    const { url } = Request.getParams(req)
+    try {
+      const { data } = await axios.get(url)
+      const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
+      const json = JSON.parse(jsonstring)
+      res.json(json)
+    } catch (error) {
+      next(error)
     }
-  )
+  })
+
+  app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
+    const geojson = Request.getBody(req)
+    const url = `${whispApiUrl}geojson`
+    try {
+      const {
+        data: { token },
+      } = await axios.post(url, geojson)
+      res.json(token)
+    } catch (error) {
+      next(error)
+    }
+  })
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import * as API from '@webapp/service/api'
@@ -11,9 +12,11 @@ import { useSurveyCycleKey, useSurveyCycleKeys, useSurveyId } from '@webapp/stor
 
 import { NotificationActions } from '@webapp/store/ui'
 import { Dropzone } from '@webapp/components'
+import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { FileUtils } from '@webapp/utils/fileUtils'
+
 import { ImportStartButton } from './ImportStartButton'
 
 const fileMaxSize = 1000 // 1 GB
@@ -28,6 +31,7 @@ export const DataImportArenaView = () => {
   const dispatch = useDispatch()
 
   const [cycle, setCycle] = useState(surveyCycle)
+  const [conflictResolutionStrategy, setConflictResolutionStrategy] = useState(ConflictResolutionStrategy.skipExisting)
   const [file, setFile] = useState(null)
 
   const onImportJobStart = useCallback(
@@ -37,6 +41,7 @@ export const DataImportArenaView = () => {
           job,
           autoHide: true,
           onComplete: async (jobCompleted) => {
+            setFile(null)
             const { processed, insertedRecords, skippedRecords, updatedRecords } = JobSerialized.getResult(jobCompleted)
             dispatch(
               NotificationActions.notifyInfo({
@@ -51,13 +56,13 @@ export const DataImportArenaView = () => {
     [dispatch]
   )
 
-  const onFilesDrop = async (files) => {
+  const onFilesDrop = useCallback(async (files) => {
     const _file = files.filter((file) => {
       const extension = FileUtils.getExtension(file)
       return acceptedFileExtensions.includes(extension)
     })[0]
     setFile(_file)
-  }
+  }, [])
 
   return (
     <div className="data-import">
@@ -65,15 +70,25 @@ export const DataImportArenaView = () => {
         {surveyCycleKeys.length > 1 && (
           <fieldset>
             <legend>{i18n.t('dataImportView.options.header')}</legend>
-
-            {
-              <FormItem label={i18n.t('dataImportView.importIntoCycle')}>
-                <CycleSelector selectedCycle={cycle} onChange={setCycle} />
-              </FormItem>
-            }
+            <FormItem className="display-flex" label="dataImportView.importIntoCycle">
+              <CycleSelector selectedCycle={cycle} onChange={setCycle} />
+            </FormItem>
           </fieldset>
         )}
 
+        <FormItem
+          className="display-flex"
+          info="dataImportView.conflictResolutionStrategy.info"
+          label="dataImportView.conflictResolutionStrategy.label"
+        >
+          <Dropdown
+            itemLabel={(strategy) => i18n.t(`dataImportView.conflictResolutionStrategy.${strategy}`)}
+            itemValue={(item) => item}
+            items={Object.values(ConflictResolutionStrategy)}
+            onChange={setConflictResolutionStrategy}
+            selection={conflictResolutionStrategy}
+          />
+        </FormItem>
         <Dropzone maxSize={fileMaxSize} onDrop={onFilesDrop} accept={fileAccept} droppedFiles={file ? [file] : []} />
 
         <ImportStartButton
@@ -81,7 +96,7 @@ export const DataImportArenaView = () => {
           disabled={!file}
           showConfirm
           startFunction={API.startDataImportFromArenaJob}
-          startFunctionParams={{ surveyId, cycle, file }}
+          startFunctionParams={{ surveyId, cycle, conflictResolutionStrategy, file }}
           onUploadComplete={onImportJobStart}
         />
       </div>

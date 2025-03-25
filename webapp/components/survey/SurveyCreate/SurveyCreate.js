@@ -13,10 +13,11 @@ import { RecordCycle } from '@core/record/recordCycle'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
+import { contentTypes } from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyInfo } from '@webapp/store/survey'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-import { contentTypes } from '@webapp/service/api'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import { FormItem, Input } from '@webapp/components/form/Input'
@@ -24,16 +25,33 @@ import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
+import { SurveyType } from '@webapp/model'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
 
+const fileMaxSizeDefault = 1000 // 1GB
+const fileMaxSizeSystemAdmin = 2000 // 2GB
+
+const importSourceButtonGroupItems = Object.values(importSources).map((key) => ({
+  key,
+  label: `surveyCreate:source.${key}`,
+}))
+
+const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
+  .reverse()
+  .map((key) => ({
+    key,
+    label: `surveyCreate:cloneFromType.${key}`,
+  }))
+
 const SurveyCreate = (props) => {
-  const { showImport, submitButtonLabel, template } = props
+  const { showImport = true, submitButtonLabel = 'surveyCreate:createSurvey', template = false } = props
 
   const surveyInfo = useSurveyInfo()
   const i18n = useI18n()
   const navigate = useNavigate()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
     useCreateSurvey({
@@ -47,6 +65,7 @@ const SurveyCreate = (props) => {
     source,
     validation,
     cloneFrom,
+    cloneFromType,
     cloneFromCycle,
     options,
     file,
@@ -59,6 +78,8 @@ const SurveyCreate = (props) => {
     navigate(appModuleUri(homeModules.dashboard))
   }, [Survey.getUuid(surveyInfo)])
 
+  const fileMaxSize = isSystemAdmin ? fileMaxSizeSystemAdmin : fileMaxSizeDefault
+
   return (
     <div className="home-survey-create">
       <div className="row">
@@ -70,26 +91,24 @@ const SurveyCreate = (props) => {
           items={[
             {
               key: createTypes.fromScratch,
-              label: i18n.t(
-                template ? 'homeView.surveyCreate.newTemplateFromScratch' : 'homeView.surveyCreate.newSurveyFromScratch'
-              ),
+              label: template ? 'surveyCreate:newTemplateFromScratch' : 'surveyCreate:newSurveyFromScratch',
             },
             {
               key: createTypes.clone,
-              label: i18n.t('common.clone'),
+              label: 'common.clone',
             },
             ...(showImport
               ? [
                   {
                     key: createTypes.import,
-                    label: i18n.t('common.import'),
+                    label: 'common.import',
                   },
                 ]
               : []),
           ]}
         />
       </div>
-      <FormItem label={i18n.t('common.name')}>
+      <FormItem label="common.name">
         <Input
           disabled={uploading}
           id={TestId.surveyCreate.surveyName}
@@ -100,7 +119,7 @@ const SurveyCreate = (props) => {
       </FormItem>
       {createType === createTypes.fromScratch && (
         <>
-          <FormItem label={i18n.t('common.label')}>
+          <FormItem label="common.label">
             <Input
               id={TestId.surveyCreate.surveyLabel}
               value={label}
@@ -108,7 +127,7 @@ const SurveyCreate = (props) => {
               onChange={(value) => onUpdate({ name: 'label', value })}
             />
           </FormItem>
-          <FormItem label={i18n.t('common.language')}>
+          <FormItem label="common.language">
             <LanguageDropdown
               selection={lang}
               validation={Validation.getFieldValidation('lang')(validation)}
@@ -121,24 +140,37 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.clone && (
         <>
-          <FormItem label={i18n.t('common.cloneFrom')}>
-            <SurveyDropdown
-              selection={cloneFrom?.value}
-              onChange={(value) => {
-                const cycles = value?.cycles || []
-                const lastCycleKey = cycles[cycles.length - 1]
-                onUpdate({ name: 'cloneFrom', value }, { name: 'cloneFromCycle', value: lastCycleKey })
-              }}
-            />
+          <FormItem className="clone-from">
+            <fieldset>
+              <legend>{i18n.t('common.cloneFrom')}</legend>
+              <RadioButtonGroup
+                className="clone-from-type_btn-group"
+                items={cloneFromTypeButtonGroupItems}
+                onChange={(value) => onUpdate({ name: 'cloneFromType', value })}
+                row
+                value={cloneFromType}
+              />
+              <SurveyDropdown
+                onChange={(value) => {
+                  const cycles = value?.cycles || []
+                  const lastCycleKey = cycles[cycles.length - 1]
+                  onUpdate({ name: 'cloneFrom', value }, { name: 'cloneFromCycle', value: lastCycleKey })
+                }}
+                selection={cloneFrom?.value}
+                type={cloneFromType}
+              />
+            </fieldset>
           </FormItem>
           {cloneFrom?.cycles?.length > 1 && (
-            <FormItem label={i18n.t('common.cycle')}>
+            <FormItem label="common.cycle">
               <Dropdown
+                className="cycle-dropdown"
                 items={cloneFrom.cycles}
                 itemValue={(cycleKey) => cycleKey}
                 itemLabel={RecordCycle.getLabel}
                 onChange={(cycleKey) => onUpdate({ name: 'cloneFromCycle', value: cycleKey })}
                 selection={cloneFromCycle}
+                validation={Validation.getFieldValidation('cloneFromCycle')(validation)}
               />
             </FormItem>
           )}
@@ -147,16 +179,13 @@ const SurveyCreate = (props) => {
 
       {createType !== createTypes.import && (
         <div className="row">
-          <button
-            data-testid={TestId.surveyCreate.submitBtn}
-            type="button"
-            className="btn"
-            onClick={onCreate}
+          <Button
             disabled={createType === createTypes.clone && !cloneFrom}
-          >
-            <span className="icon icon-plus icon-left icon-12px" />
-            {i18n.t(submitButtonLabel)}
-          </button>
+            iconClassName="icon-plus icon-12px"
+            label={submitButtonLabel}
+            onClick={onCreate}
+            testId={TestId.surveyCreate.submitBtn}
+          />
         </div>
       )}
 
@@ -164,7 +193,7 @@ const SurveyCreate = (props) => {
         <>
           {uploading && uploadProgressPercent >= 0 ? (
             <div className="row">
-              <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
+              <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey="common.uploadingFile" />
             </div>
           ) : (
             <>
@@ -175,22 +204,14 @@ const SurveyCreate = (props) => {
                     <Checkbox
                       id={TestId.surveyCreate.optionIncludeDataCheckbox}
                       checked={options['includeData']}
-                      label={`homeView.surveyCreate.options.includeData`}
+                      label={`surveyCreate:options.includeData`}
                       onChange={(value) => onOptionChange({ key: 'includeData', value })}
                     />
                   </div>
                 </fieldset>
               </div>
-              <FormItem label={i18n.t('homeView.surveyCreate.source.label')}>
-                <RadioButtonGroup
-                  items={Object.values(importSources).map((key) => ({
-                    key,
-                    label: `homeView.surveyCreate.source.${key}`,
-                  }))}
-                  onChange={onSourceChange}
-                  row
-                  value={source}
-                />
+              <FormItem label="surveyCreate:source.label">
+                <RadioButtonGroup items={importSourceButtonGroupItems} onChange={onSourceChange} row value={source} />
               </FormItem>
               <div className="row">
                 <Dropzone
@@ -199,7 +220,7 @@ const SurveyCreate = (props) => {
                       ? { [contentTypes.zip]: ['.zip'] }
                       : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
                   }
-                  maxSize={1000}
+                  maxSize={fileMaxSize}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />
@@ -208,7 +229,7 @@ const SurveyCreate = (props) => {
                 <Button
                   className="btn-primary"
                   disabled={!file || uploading}
-                  label={'homeView.surveyCreate.startImport'}
+                  label="surveyCreate:startImport"
                   onClick={onImport}
                   testId={TestId.surveyCreate.startImportBtn}
                 />
@@ -225,12 +246,6 @@ SurveyCreate.propTypes = {
   showImport: PropTypes.bool,
   submitButtonLabel: PropTypes.string,
   template: PropTypes.bool,
-}
-
-SurveyCreate.defaultProps = {
-  showImport: true,
-  submitButtonLabel: 'homeView.surveyCreate.createSurvey',
-  template: false,
 }
 
 export { SurveyCreate }

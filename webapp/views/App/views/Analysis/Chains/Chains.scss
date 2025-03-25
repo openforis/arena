@@ -1,9 +1,10 @@
-@import 'webapp/style/vars';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
 
 .chains {
   .column-draft {
     .icon {
-      color: lighten($black, 30%);
+      color: color.adjust($black, $lightness: 30%);
     }
   }
 

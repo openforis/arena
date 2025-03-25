@@ -9,11 +9,17 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const TaxonomyList = (props) => {
-  const { canSelect, selectedItemUuid, onSelect: onTaxonomySelect, onTaxonomyOpen, onTaxonomyCreated } = props
+  const {
+    canSelect = false,
+    onSelect: onTaxonomySelect = null,
+    onTaxonomyOpen = null,
+    onTaxonomyCreated = null,
+    selectedItemUuid = null,
+  } = props
 
   const canEdit = useAuthCanEditSurvey()
 
-  let gridTemplateColumns = 'repeat(2, 1fr) 8rem repeat(2, 6rem)'
+  let gridTemplateColumns = 'repeat(2, 1fr) 8rem 8rem repeat(2, 6rem)'
   if (canSelect) {
     // select button
     gridTemplateColumns += ' 6rem'
@@ -23,7 +29,7 @@ const TaxonomyList = (props) => {
 
   if (canEdit) {
     // delete button
-    gridTemplateColumns += ' 6rem'
+    gridTemplateColumns += ' 2rem'
   }
 
   return (
@@ -47,14 +53,6 @@ TaxonomyList.propTypes = {
   onTaxonomyOpen: PropTypes.func,
   onTaxonomyCreated: PropTypes.func,
   selectedItemUuid: PropTypes.string,
-}
-
-TaxonomyList.defaultProps = {
-  canSelect: false,
-  onSelect: null,
-  onTaxonomyOpen: null,
-  onTaxonomyCreated: null,
-  selectedItemUuid: null,
 }
 
 export default TaxonomyList

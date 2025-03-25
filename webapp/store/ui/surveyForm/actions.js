@@ -20,9 +20,20 @@ import * as SurveyFormState from './state'
 export const formReset = 'survey/form/reset'
 export const resetForm = () => (dispatch) => dispatch({ type: formReset })
 
+// Tree select view mode
+export const treeSelectViewModeUpdate = 'survey/form/treeSelect/viewMode/update'
+
+export const setTreeSelectViewMode = (mode) => (dispatch) => dispatch({ type: treeSelectViewModeUpdate, mode })
+
 export const formNodeDefAddChildToUpdate = 'survey/form/nodeDef/addChildTo/update'
 
-// Set current nodeDef unlocked
+// Active nodeDef (if tree select view mode is "allNodes")
+export const formActiveNodeDefUpdate = 'survey/form/activeNodeDef/update'
+
+export const setFormActiveNodeDefUuid = (nodeDefUuid) => (dispatch) =>
+  dispatch({ type: formActiveNodeDefUpdate, nodeDefUuid })
+
+// Node def add-child-to
 export const setFormNodeDefAddChildTo = (nodeDef) => (dispatch) =>
   dispatch({ type: formNodeDefAddChildToUpdate, nodeDef })
 

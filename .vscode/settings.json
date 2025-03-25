@@ -3,11 +3,14 @@
   "eslint.format.enable": true,
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "git-blame.gitWebUrl": "",
-  "i18n-ally.localesPaths": [
-    "core/i18n",
-    "webapp/store/system/i18n"
-  ]
+  "i18n-ally.dirStructure": "dir",
+  "i18n-ally.editor.preferEditor": true,
+  "i18n-ally.enabledParsers": ["js", "json"],
+  "i18n-ally.fullReloadOnChanged": true,
+  "i18n-ally.localesPaths": ["core/i18n/resources"],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.namespace": true
 }

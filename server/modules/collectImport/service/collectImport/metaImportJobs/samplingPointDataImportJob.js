@@ -8,7 +8,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CollectImportJobContext from '../collectImportJobContext'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
-import CategoryImportJob from '../../../../category/service/categoryImportJob'
+import CategoryImportJob, { CategoryImportInternalJob } from '../../../../category/service/categoryImportJob'
 import * as CategoryImportJobParams from '../../../../category/service/categoryImportJobParams'
 
 const keysExtra = {
@@ -24,14 +24,14 @@ const keysItem = {
 
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
-export default class SamplingPointDataImportJob extends CategoryImportJob {
+class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
   constructor(params) {
     super(
       {
         ...params,
         [CategoryImportJobParams.keys.categoryName]: Survey.samplingPointDataCategoryName,
       },
-      'SamplingPointDataImportJob'
+      'SamplingPointDataImportInternalJob'
     )
   }
 
@@ -77,10 +77,18 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
   }
 
   extractItemExtraDef() {
-    return R.pipe(
-      R.omit(R.keys(keysExtra)),
-      R.assoc(keysItem.location, ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.geometryPoint }))
-    )(super.extractItemExtraDef())
+    const itemExtraDef = super.extractItemExtraDef()
+    const itemExtraDefUpdated = Object.entries(itemExtraDef).reduce((acc, [key, extraDef]) => {
+      if (!Object.keys(keysExtra).includes(key)) {
+        acc[key] = { ...extraDef, [ExtraPropDef.keys.index]: Object.values(acc).length }
+      }
+      return acc
+    }, {})
+    itemExtraDefUpdated[keysItem.location] = ExtraPropDef.newItem({
+      dataType: ExtraPropDef.dataTypes.geometryPoint,
+      index: Object.values(itemExtraDefUpdated).length,
+    })
+    return itemExtraDefUpdated
   }
 
   extractItemExtraProps(extra) {
@@ -109,5 +117,11 @@ export default class SamplingPointDataImportJob extends CategoryImportJob {
     const contextUpdated = CollectImportJobContext.assocSurvey(surveyUpdated)(this.context)
 
     this.setContext(contextUpdated)
+  }
+}
+
+export default class SamplingPointDataImportJob extends CategoryImportJob {
+  constructor(params) {
+    super(params, 'SamplingPointDataImportJob', SamplingPointDataImportInternalJob)
   }
 }

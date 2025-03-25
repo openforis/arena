@@ -1,4 +1,5 @@
 export const recordCreate = 'ui/record/create'
+export const recordEditLock = 'ui/record/edit/lock'
 export const recordLoad = 'ui/record/load'
 export const recordLoadError = 'ui/record/load/error'
 export const recordDelete = 'ui/record/delete'

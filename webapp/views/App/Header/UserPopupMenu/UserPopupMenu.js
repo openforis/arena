@@ -55,7 +55,7 @@ const UserPopupMenu = (props) => {
     return () => {
       window.removeEventListener('click', onClickListener)
     }
-  }, [])
+  }, [onClose])
 
   return (
     <div className="user-popup-menu" ref={elementRef} onMouseLeave={onClose}>
@@ -98,7 +98,7 @@ const UserPopupMenu = (props) => {
           className="btn-s btn-transparent"
         >
           <span className="icon icon-plus icon-12px icon-left" />
-          {i18n.t('homeView.surveyCreate.newSurvey')}
+          {i18n.t('surveyCreate:newSurvey')}
         </Link>
       )}
 
@@ -124,7 +124,7 @@ const UserPopupMenu = (props) => {
               className="btn-s btn-transparent"
             >
               <span className="icon icon-plus icon-12px icon-left" />
-              {i18n.t('homeView.surveyCreate.newTemplate')}
+              {i18n.t('surveyCreate:newTemplate')}
             </Link>
           )}
         </>
@@ -162,18 +162,6 @@ const UserPopupMenu = (props) => {
 
       <Separator />
 
-      <Link
-        data-testid={TestId.header.passwordChangeBtn}
-        to={appModuleUri(userModules.userPasswordChange)}
-        onClick={onClose}
-        className="btn-s btn-transparent"
-      >
-        <span className="icon icon-pencil icon-12px icon-left" />
-        {i18n.t('appModules.userPasswordChange')}
-      </Link>
-
-      <Separator />
-
       <button
         data-testid={TestId.header.userLogoutBtn}
         type="button"
@@ -191,11 +179,7 @@ const UserPopupMenu = (props) => {
 }
 
 UserPopupMenu.propTypes = {
-  onClose: PropTypes.func,
-}
-
-UserPopupMenu.defaultProps = {
-  onClose: () => ({}),
+  onClose: PropTypes.func.isRequired,
 }
 
 export default UserPopupMenu

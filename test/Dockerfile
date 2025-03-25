@@ -2,7 +2,7 @@
 # to make this work faster when there have been changes.
 ############################################################
 
-FROM node:18.12.1 AS test
+FROM node:22.14.0 AS test
 
 # Install Chromium dependencies, git and netcat
 RUN apt-get update; \
@@ -26,7 +26,7 @@ RUN npm install cross-env -g
 # Cache these as much as possible:
 COPY package.json yarn.lock /app/
 
-RUN cd /app; yarn install --ignore-scripts --frozen-lockfile; npm rebuild node-sass --unsafe-perm
+RUN cd /app; yarn install --ignore-scripts --frozen-lockfile;
 
 COPY .git /app/.git
 RUN cd /app; git reset --hard; yarn build:server:dev

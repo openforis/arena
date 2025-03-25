@@ -1,46 +1,30 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
-import { Query } from '@common/model/query'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
-import { ExplorerStorage } from '@webapp/service/storage/explorer'
+import { DataExplorerActions } from '@webapp/store/dataExplorer'
 
 import DataQuery from '@webapp/components/DataQuery'
 import { useLocationPathMatcher } from '@webapp/components/hooks/useIsInRoute'
 
 const Explorer = () => {
-  const queryStorage = ExplorerStorage.getQuery()
-  const [query, setQuery] = useState(queryStorage || Query.create())
-
-  const getQueryFromState = () => {
-    let result = null
-    setQuery((queryPrev) => {
-      result = queryPrev
-      return queryPrev
-    })
-    return result
-  }
+  const dispatch = useDispatch()
 
   const pathMatcher = useLocationPathMatcher()
 
-  // on unmount, store query into local storage if location is record edit module
-  const onUnmount = () => {
-    if (!pathMatcher(appModuleUri(dataModules.explorer))) {
-      if (pathMatcher(`${appModuleUri(dataModules.record)}:uuid`)) {
-        // do not use "query": in this callback it's value is not up to date
-        const queryCurrent = getQueryFromState()
-        ExplorerStorage.persistQuery(queryCurrent)
-      } else {
-        ExplorerStorage.removeQuery()
-      }
+  const onUnmount = useCallback(() => {
+    // if editing record (editMode is set) do not reset data explorer state
+    if (!pathMatcher(appModuleUri(dataModules.explorer)) && !pathMatcher(`${appModuleUri(dataModules.record)}:uuid`)) {
+      dispatch(DataExplorerActions.reset())
     }
-  }
+  }, [dispatch, pathMatcher])
 
   useEffect(() => {
     return onUnmount
-  }, [])
+  }, [onUnmount])
 
-  return <DataQuery query={query} onChangeQuery={setQuery} />
+  return <DataQuery />
 }
 
 export default Explorer

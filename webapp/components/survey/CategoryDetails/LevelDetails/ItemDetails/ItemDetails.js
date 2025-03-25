@@ -1,6 +1,6 @@
 import './itemDetails.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -8,14 +8,12 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Validation from '@core/validation/validation'
-import { normalizeName } from '@core/stringUtils'
 
 import { Button, ButtonDelete } from '@webapp/components'
 import ErrorBadge from '@webapp/components/errorBadge'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 
-import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
@@ -25,14 +23,15 @@ import classNames from 'classnames'
 import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
 
 const ItemDetails = (props) => {
-  const { level, index, item, state, setState } = props
+  const { level, index, item: itemProp, state, setState } = props
 
   const elemRef = useRef(null)
   const isInitialMount = useRef(true)
 
-  const i18n = useI18n()
   const readOnly = !useAuthCanEditSurvey()
   const lang = useSurveyPreferredLang()
+
+  const [item, setItem] = useState(itemProp)
 
   const category = State.getCategory(state)
   const categoryUuid = Category.getUuid(category)
@@ -55,7 +54,13 @@ const ItemDetails = (props) => {
 
   const setActive = () => (active ? null : Actions.setItemActive({ categoryUuid, levelIndex, itemUuid }))
 
-  const updateProp = ({ key, value }) => Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
+  const updateProp = useCallback(
+    ({ key, value }) => {
+      setItem(CategoryItem.assocProp({ key, value }))
+      Actions.updateItemProp({ categoryUuid, levelIndex, itemUuid, key, value })
+    },
+    [Actions, categoryUuid, itemUuid, levelIndex]
+  )
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -73,6 +78,7 @@ const ItemDetails = (props) => {
       id={prefixId}
       data-testid={TestId.categoryDetails.item(levelIndex, index)}
       className={classNames('category__item', { active, 'not-valid': !Validation.isValid(validation) })}
+      key={CategoryItem.getUuid(item)}
       onKeyDown={setActive}
       onClick={setActive}
       ref={elemRef}
@@ -95,13 +101,15 @@ const ItemDetails = (props) => {
             onClick={() => Actions.resetItemActive({ levelIndex })}
           />
 
-          <FormItem label={i18n.t('common.code')}>
+          <FormItem label="common.code">
             <Input
               id={TestId.categoryDetails.itemCode(levelIndex, index)}
               value={CategoryItem.getCode(item)}
               disabled={disabled}
               validation={Validation.getFieldValidation(CategoryItem.keysProps.code)(validation)}
-              onChange={(value) => updateProp({ key: CategoryItem.keysProps.code, value: normalizeName(value) })}
+              onChange={(value) =>
+                updateProp({ key: CategoryItem.keysProps.code, value: CategoryItem.normalizeCode(value) })
+              }
               readOnly={readOnly}
             />
           </FormItem>
@@ -147,7 +155,7 @@ const ItemDetails = (props) => {
           <div>
             {'\u00A0'}-{'\u00A0'}
           </div>
-          <div className="ellipsis">{CategoryItem.getLabel(lang)(item)}</div>
+          <div className="ellipsis">{CategoryItem.getLabel(lang, false)(item)}</div>
         </>
       )}
     </div>

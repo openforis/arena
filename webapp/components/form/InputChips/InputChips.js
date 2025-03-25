@@ -7,25 +7,25 @@ import classNames from 'classnames'
 import Dropdown from '../Dropdown'
 
 import { useLocalState, State } from './store'
-import Chip from './Chip'
+import Chip from '../chip'
 
 const InputChips = (props) => {
   const {
-    className,
-    idInput,
+    className = undefined,
+    disabled = false,
+    idInput = null,
+    itemLabel = 'label',
+    itemKey = 'value',
     items,
-    itemKey,
-    itemLabel,
-    selection,
-    requiredItems,
-    minCharactersToAutocomplete,
-    readOnly,
-    disabled,
+    minCharactersToAutocomplete = 0,
+    onChange = null, // Callback to receive all selection change
+    onItemAdd = null, // Callback to receive added item
+    onItemRemove = null, // Callback to receive removed item
+    placeholder = undefined,
+    readOnly = false,
+    requiredItems = 0,
+    selection = [],
     validation,
-    placeholder,
-    onChange,
-    onItemAdd,
-    onItemRemove,
   } = props
 
   const { state, Actions } = useLocalState({
@@ -41,11 +41,9 @@ const InputChips = (props) => {
       {selection.map((item) => (
         <Chip
           key={State.getItemKey(state)(item)}
-          item={item}
-          itemLabel={State.getItemLabel(state)(item)}
-          onDelete={Actions.removeItem({ selection, state })}
-          canBeRemoved={selection.length > requiredItems}
-          readOnly={readOnly}
+          label={State.getItemLabel(state)(item)}
+          onDelete={() => Actions.removeItem({ selection, state })(item)}
+          readOnly={readOnly || selection.length <= requiredItems}
         />
       ))}
 
@@ -87,25 +85,6 @@ InputChips.propTypes = {
   onChange: PropTypes.func,
   onItemAdd: PropTypes.func,
   onItemRemove: PropTypes.func,
-}
-
-InputChips.defaultProps = {
-  className: undefined,
-  idInput: null,
-
-  itemLabel: 'label',
-  itemKey: 'value',
-  selection: [],
-  requiredItems: 0,
-  minCharactersToAutocomplete: 0,
-  readOnly: false,
-  disabled: false,
-  validation: {},
-  placeholder: undefined,
-
-  onChange: null, // Callback to receive all selection change
-  onItemAdd: null, // Callback to receive added item
-  onItemRemove: null, // Callback to receive removed item
 }
 
 export default InputChips

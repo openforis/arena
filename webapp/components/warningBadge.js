@@ -3,7 +3,7 @@ import './warningBadge.scss'
 import React from 'react'
 import { useI18n } from '@webapp/store/system'
 
-const WarningBadge = ({ show, label, showLabel, title, titleParams }) => {
+const WarningBadge = ({ label = null, show = true, showLabel = true, title = undefined, titleParams = undefined }) => {
   const i18n = useI18n()
   const titleText = title ? i18n.t(title, titleParams) : undefined
 
@@ -15,14 +15,6 @@ const WarningBadge = ({ show, label, showLabel, title, titleParams }) => {
       </div>
     </div>
   ) : null
-}
-
-WarningBadge.defaultProps = {
-  show: true,
-  label: null,
-  showLabel: true,
-  title: undefined,
-  titleParams: undefined,
 }
 
 export default WarningBadge

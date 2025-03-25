@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .user-invite {
   width: 70%;
@@ -12,6 +12,12 @@
     .tooltip {
       &:hover {
         cursor: default;
+      }
+    }
+
+    .form-input-chip-text {
+      .input-text {
+        width: 30rem;
       }
     }
   }

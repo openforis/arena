@@ -13,7 +13,6 @@ import { ChainActions, useChain } from '@webapp/store/ui/chain'
 
 import { useSurvey } from '@webapp/store/survey'
 
-import { useI18n } from '@webapp/store/system'
 import { FormItem } from '@webapp/components/form/Input'
 
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
@@ -37,7 +36,6 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 
 const BaseUnitSelector = () => {
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const survey = useSurvey()
 
   const chain = useChain()
@@ -56,7 +54,7 @@ const BaseUnitSelector = () => {
   if (!chain || A.isEmpty(chain)) return null
 
   return (
-    <FormItem label={i18n.t('common.baseUnit')} className="node-def-edit__base-unit">
+    <FormItem label="common.baseUnit" className="node-def-edit__base-unit">
       <div className="node-def-edit__base-unit-selector">
         <EntitySelector
           hierarchy={Survey.getHierarchy()(survey)}

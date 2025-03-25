@@ -25,6 +25,7 @@ import * as Mailer from '@server/utils/mailer'
 import { ReCaptchaUtils } from '@server/utils/reCaptchaUtils'
 import * as Log from '@server/log/log'
 
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -75,6 +76,7 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
  *
  * @param {!string} email - Email of the user.
  * @param {!string} serverUrl - Address of the server.
+ * @returns {Promise<object>} - THe generated password reset uuid.
  */
 export const generateResetPasswordUuid = async (email, serverUrl) => {
   try {
@@ -127,7 +129,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
 
     const { email, props } = userAccessRequest
     const { country: countryCode } = props
-    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : null
+    const country = countryCode ? Countries.getCountryName({ code: countryCode }) : ''
 
     // send the emails only after use access request has been inserted into the db
     const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
@@ -208,7 +210,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
       languages: ['en'],
     })
 
-    const survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
+    let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
 
     // 3) find group to associate to the user
     let group = null
@@ -220,39 +222,36 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
     }
 
     // 4) invite user to that group and send email
-    const { userInvited } = await UserInviteService.inviteUser(
+    const surveyId = Survey.getId(survey)
+    const { invitedUsers } = await UserInviteService.inviteUsers(
       {
         user,
-        surveyId: Survey.getId(survey),
+        surveyId,
         surveyCycleKey: Survey.cycleOneKey,
         invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
         serverUrl,
       },
       t
     )
+    const userInvited = invitedUsers[0]
+    const surveyOwnerUuid = User.getUuid(userInvited)
+
+    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
+    survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
+
     return { survey, userInvited }
   })
 
 // ====== READ
 
-export const fetchUsersBySurveyId = async ({ user, surveyId, offset = 0, limit = null }) => {
-  const isSystemAdmin = User.isSystemAdmin(user)
-
-  return UserManager.fetchUsersBySurveyId({ surveyId, offset, limit, isSystemAdmin })
-}
-
-export const countUsersBySurveyId = async (user, surveyId) => {
-  const isSystemAdmin = User.isSystemAdmin(user)
-
-  return UserManager.countUsersBySurveyId(surveyId, isSystemAdmin)
-}
-
 export const {
   countUsers,
+  countUsersBySurveyId,
   exportUserAccessRequestsIntoStream,
   fetchUsers,
   fetchUserByUuid,
   fetchUserByUuidWithPassword,
+  fetchUsersBySurveyId,
   fetchUserProfilePicture,
   countUserAccessRequests,
   fetchUserAccessRequests,
@@ -265,6 +264,20 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
 
 export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
 
+export const fetchResetPasswordUrl = async ({ serverUrl, surveyId, userUuid }) => {
+  const survey = await SurveyManager.fetchSurveyById({ surveyId })
+  const surveyUuid = Survey.getUuid(survey)
+  const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+    surveyUuid,
+    userUuid,
+  })
+  if (!invitation) {
+    throw new SystemError('appErrors:userNotInvitedToSurvey')
+  }
+  const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
+  return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
+}
+
 // ====== UPDATE
 
 const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
@@ -276,12 +289,10 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
 
   if (
     !User.isSystemAdmin(user) &&
-    (userToUpdateWillBeSystemAdmin ||
-      User.isSystemAdmin(userToUpdateOld) ||
-      userToUpdateWillBeSurveyManager ||
-      User.isSurveyManager(userToUpdateOld))
+    (userToUpdateWillBeSystemAdmin || // only system admins can assign system admin role
+      User.isSystemAdmin(userToUpdateOld) || // only system admins can edit other system admins
+      (userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
   ) {
-    // only system admins can update other system admins or survey managers or assign that group
     throw new UnauthorizedError(User.getName(user))
   }
 
@@ -368,12 +379,12 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
 // DELETE
 export const { deleteUserResetPasswordExpired } = UserManager
 
-export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
+export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId }) =>
   db.tx(async (t) => {
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
     const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove, t)
 
-    await UserManager.deleteUser({ user, userUuidToRemove, survey }, t)
+    await UserManager.deleteUserFromSurvey({ user, userUuidToRemove, survey }, t)
 
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
@@ -393,11 +404,52 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
     }
   })
 
+export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
+  const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
+  Logger.info(`IDs of surveys to be deleted (if without any activity): ${surveyIds}`)
+  for await (const surveyId of surveyIds) {
+    const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
+    // delete survey only if it is brand new
+    if (activityLogsCount < 5) {
+      Logger.info(`Deleting survey ${surveyId}`)
+      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
+    }
+  }
+  Logger.debug('deleting users with expired invitations')
+  const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
+  const deletedUsers = []
+  const deletedUsersEmails = []
+  if (usersWithExpiredInvitation.length > 0) {
+    const usersWithExpiredInvitationEmails = usersWithExpiredInvitation.map(User.getEmail)
+    const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
+    Logger.debug(`deleting users: ${usersWithExpiredInvitationEmails} ${usersWithExpiredInvitationUuids}`)
+    for await (const user of usersWithExpiredInvitation) {
+      const userUuid = User.getUuid(user)
+      const userEmail = User.getEmail(user)
+      try {
+        await UserManager.deleteUser(userUuid, client)
+        deletedUsers.push(user)
+        deletedUsersEmails.push(userEmail)
+      } catch (error) {
+        Logger.debug(`error deleting user ${userEmail} [${userUuid}]: ${String(error)}`)
+      }
+    }
+    if (deletedUsersEmails.length > 0) {
+      Logger.debug('deleting expired users access requests by expired invitations')
+      await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
+    }
+  }
+  Logger.debug('deleting expired users access requests')
+  await UserManager.deleteExpiredUserAccessRequests(client)
+
+  return { deletedUsers, deletedSurveyIds: surveyIds }
+}
+
 // ==== User prefs
-export const { updateUserPrefs } = UserManager
+export const { updateUserPrefs, updateUserPrefsAndFetchGroups } = UserManager
 
 // ==== User Invite
-export const { inviteUser } = UserInviteService
+export const { inviteUsers } = UserInviteService
 
 // ==== WebSocket events
 export const notifyActiveUsersAboutSurveyUpdate = async ({ surveyId }) => {

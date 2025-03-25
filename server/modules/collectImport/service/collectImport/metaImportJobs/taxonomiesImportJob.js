@@ -8,13 +8,14 @@ import * as Validation from '@core/validation/validation'
 import { languageCodesISO639part2 } from '@core/app/languages'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import Job from '@server/job/job'
 
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import TaxonomyImportManager from '@server/modules/taxonomy/manager/taxonomyImportManager'
 
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const SPECIES_FILES_PATH = 'species/'
 const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
@@ -38,7 +39,6 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async execute() {
-    const { tx } = this
     const { collectSurveyFileZip, survey } = this.context
 
     const taxonomies = []
@@ -50,7 +50,7 @@ export default class TaxonomiesImportJob extends Job {
         break
       }
 
-      await this.importTaxonomyFromSpeciesFile(speciesFileName, tx)
+      await this.importTaxonomyFromSpeciesFile({ speciesFileName })
 
       if (!this.isRunning()) {
         break
@@ -68,8 +68,9 @@ export default class TaxonomiesImportJob extends Job {
     })
   }
 
-  async importTaxonomyFromSpeciesFile(speciesFileName, tx) {
-    const { collectSurveyFileZip, surveyId } = this.context
+  async importTaxonomyFromSpeciesFile({ speciesFileName }) {
+    const { context, tx } = this
+    const { collectSurveyFileZip, fileFormat = FileFormats.csv, surveyId } = context
 
     this.logDebug(`importing file ${speciesFileName}`)
 
@@ -94,21 +95,22 @@ export default class TaxonomiesImportJob extends Job {
 
     const totalPrevious = this.total
 
-    const csvReader = CSVReader.createReaderFromStream(
-      speciesFileStream,
-      (headers) => this.onHeaders(headers),
-      async (row) => {
+    const flatDataReader = FlatDataReader.createReaderFromStream({
+      stream: speciesFileStream,
+      fileFormat,
+      onHeaders: (headers) => this.onHeaders(headers),
+      onRow: async (row) => {
         if (this.isCanceled()) {
-          csvReader.cancel()
+          flatDataReader.cancel()
           return
         }
         await this.onRow(speciesFileName, taxonomyUuid, row)
       },
-      (total) => {
+      onTotalChange: (total) => {
         this.total = totalPrevious + total
-      }
-    )
-    await csvReader.start()
+      },
+    })
+    await flatDataReader.start()
 
     if (this.isRunning()) {
       this.logDebug(`file ${speciesFileName} read correctly`)

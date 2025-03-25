@@ -3,9 +3,9 @@ import './nodeDefTaxon.scss'
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+import PropTypes from 'prop-types'
 
 import { FormItem } from '@webapp/components/form/Input'
-import { useI18n } from '@webapp/store/system'
 
 import * as Taxon from '@core/survey/taxon'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -45,18 +45,17 @@ const NodeDefTaxon = (props) => {
   const [selection, setSelection] = useState(selectionDefault)
   const elementRef = useRef(null)
 
-  const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const taxonRefData = edit ? null : NodeRefData.getTaxon(node)
   const visibleFields = useMemo(() => NodeDef.getVisibleFields(nodeDef), [nodeDef])
 
   const updateSelectionFromNode = useCallback(() => {
-    const unlisted = taxonRefData && Taxon.isUnlistedTaxon(taxonRefData)
+    const unkOrUnl = taxonRefData && Taxon.isUnkOrUnlTaxon(taxonRefData)
     const selectionUpdate = taxonRefData
       ? {
           [code]: Taxon.getCode(taxonRefData),
-          [scientificName]: unlisted ? Node.getScientificName(node) : Taxon.getScientificName(taxonRefData),
-          [vernacularName]: unlisted ? Node.getVernacularName(node) : R.defaultTo('', taxonRefData[vernacularName]),
+          [scientificName]: unkOrUnl ? Node.getScientificName(node) : Taxon.getScientificName(taxonRefData),
+          [vernacularName]: unkOrUnl ? Node.getVernacularName(node) : R.defaultTo('', taxonRefData[vernacularName]),
         }
       : selectionDefault
 
@@ -78,7 +77,7 @@ const NodeDefTaxon = (props) => {
         const nodeValue = {
           [taxonUuid]: Taxon.getUuid(selectedTaxon),
         }
-        if (Taxon.isUnlistedTaxon(selectedTaxon)) {
+        if (Taxon.isUnkOrUnlTaxon(selectedTaxon)) {
           if (selection[scientificName]) {
             nodeValue[scientificName] = selection[scientificName]
           }
@@ -121,16 +120,18 @@ const NodeDefTaxon = (props) => {
     [node, selection, taxonRefData, updateNodeValue]
   )
 
-  if (!edit) {
-    useEffect(() => {
+  useEffect(() => {
+    if (!edit) {
       updateSelectionFromNode()
-    }, [
-      Taxon.getUuid(taxonRefData),
-      Taxon.getVernacularNameUuid(taxonRefData),
-      Node.getScientificName(node),
-      Node.getVernacularName(node),
-    ])
-  }
+    }
+  }, [
+    edit,
+    updateSelectionFromNode,
+    Taxon.getUuid(taxonRefData),
+    Taxon.getVernacularNameUuid(taxonRefData),
+    Node.getScientificName(node),
+    Node.getVernacularName(node),
+  ])
 
   const isTableBody = renderType === NodeDefLayout.renderType.tableBody
   const className = isTableBody
@@ -171,7 +172,7 @@ const NodeDefTaxon = (props) => {
           (field === vernacularName ? NodeDef.getVernacularNameLabel(lang)(nodeDef) : null) ||
           `surveyForm.nodeDefTaxon.${field}`
         return (
-          <FormItem key={field} label={i18n.t(fieldLabelKey)}>
+          <FormItem key={field} label={fieldLabelKey}>
             {inputField}
           </FormItem>
         )
@@ -193,3 +194,17 @@ const mapStateToProps = (state, props) => {
 }
 
 export default connect(mapStateToProps)(NodeDefTaxon)
+
+NodeDefTaxon.propTypes = {
+  canEditRecord: PropTypes.bool,
+  draft: PropTypes.bool,
+  edit: PropTypes.bool,
+  entryDataQuery: PropTypes.bool,
+  node: PropTypes.object,
+  nodeDef: PropTypes.object.isRequired,
+  parentNode: PropTypes.object,
+  readOnly: PropTypes.bool,
+  renderType: PropTypes.string,
+  surveyId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  updateNode: PropTypes.func.isRequired,
+}

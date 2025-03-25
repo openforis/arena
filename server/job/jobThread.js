@@ -1,13 +1,16 @@
 import Thread from '@server/threads/thread'
+import * as Log from '@server/log/log'
 
 import { jobThreadMessageTypes, jobToJSON } from './jobUtils'
 import * as JobCreator from './jobCreator'
 
+const logger = Log.getLogger('JobThread')
+
 class JobThread extends Thread {
   createJob() {
-    const { jobType, jobParams } = this.params
+    const { jobType, jobParams, jobUuid } = this.params
 
-    this.job = JobCreator.createJob(jobType, jobParams)
+    this.job = JobCreator.createJob(jobType, jobParams, jobUuid)
 
     this.job.onEvent(() => this.sendJobToParentThread())
     this.job.start()
@@ -22,7 +25,7 @@ class JobThread extends Thread {
         await this.job.cancel()
         break
       default:
-        console.log(`Skipping unknown message type: ${msg.type}`)
+        logger.error(`Skipping unknown message type: ${msg.type}`)
     }
   }
 

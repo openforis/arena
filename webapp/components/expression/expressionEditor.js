@@ -16,19 +16,21 @@ import { Button } from '../buttons'
 
 const ExpressionEditor = (props) => {
   const {
-    index,
+    canBeCall = false,
+    canBeConstant = false,
+    excludeCurrentNodeDef = true,
+    index = 0,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = '',
+    nodeDefUuidCurrent = null,
+    onChange = () => {},
+    placeholder = false,
     qualifier,
-    placeholder,
-    query,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    mode,
-    isContextParent,
-    canBeConstant,
-    isBoolean,
-    onChange,
-    types,
+    query = '',
+    readOnly = false,
+    types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
   const i18n = useI18n()
@@ -70,6 +72,7 @@ const ExpressionEditor = (props) => {
           excludeCurrentNodeDef={excludeCurrentNodeDef}
           mode={mode}
           isContextParent={isContextParent}
+          canBeCall={canBeCall}
           canBeConstant={canBeConstant}
           isBoolean={isBoolean}
           onClose={onClose}
@@ -84,13 +87,15 @@ const ExpressionEditor = (props) => {
               {query}
             </div>
           )}
-          <Button
-            className="btn-s btn-edit"
-            iconClassName="icon-pencil2 icon-14px"
-            id={`${idPrefix}-edit-btn`}
-            onClick={() => setEdit(true)}
-            testId={TestId.expressionEditor.editBtn(qualifier)}
-          />
+          {!readOnly && (
+            <Button
+              className="btn-s btn-edit"
+              iconClassName="icon-pencil2 icon-14px"
+              id={`${idPrefix}-edit-btn`}
+              onClick={() => setEdit(true)}
+              testId={TestId.expressionEditor.editBtn(qualifier)}
+            />
+          )}
         </div>
       )}
     </div>
@@ -108,25 +113,11 @@ ExpressionEditor.propTypes = {
   mode: PropTypes.oneOf([Expression.modes.json, Expression.modes.sql]),
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   onChange: PropTypes.func,
-}
-
-ExpressionEditor.defaultProps = {
-  index: 0,
-  placeholder: false,
-  query: '',
-  nodeDefUuidContext: '',
-  nodeDefUuidCurrent: null,
-  excludeCurrentNodeDef: true,
-  mode: Expression.modes.json,
-  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
-
-  onChange: () => {},
+  readOnly: PropTypes.bool,
 }
 
 export default ExpressionEditor

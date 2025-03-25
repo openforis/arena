@@ -19,9 +19,9 @@ import NodeDefFormHeader from './components/types/nodeDefFormHeader'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
 import NodeDefText from './components/types/nodeDefText'
 import NodeDefTime from './components/types/nodeDefTime'
+import NodeDefGeo from './components/types/nodeDefGeo'
 
-const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity, formHeader } =
-  NodeDef.nodeDefType
+const { boolean, code, coordinate, date, decimal, entity, file, geo, integer, taxon, text, time } = NodeDef.nodeDefType
 
 export const headerColorRgbCodesByColor = {
   [FormHeaderColor.blue]: '#b3e5fc',
@@ -30,6 +30,11 @@ export const headerColorRgbCodesByColor = {
   [FormHeaderColor.red]: '#f97c7c',
   [FormHeaderColor.yellow]: '#fffdaf',
 }
+
+
+const singleEntityIcon = <span className="icon icon-insert-template icon-left" />
+const multipleAttributeIcon = <span title="Multiple">M</span>
+const keyIcon = <span className="icon icon-key icon-left" />
 
 const propsUI = {
   [integer]: {
@@ -45,13 +50,7 @@ const propsUI = {
   },
 
   [text]: {
-    icon: (
-      <span className="icon-left display-flex">
-        {R.range(0, 3).map((i) => (
-          <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
-        ))}
-      </span>
-    ),
+    icon: <span className="icon-left node_def__icon">ABC</span>,
     defaultValue: '',
   },
 
@@ -95,6 +94,11 @@ const propsUI = {
         labelKey: `surveyForm.nodeDefCoordinate.${field}`,
       })),
     ],
+  },
+
+  [geo]: {
+    component: NodeDefGeo,
+    icon: <span className="icon icon-codepen icon-left" />,
   },
 
   [taxon]: {
@@ -145,17 +149,18 @@ const propsUI = {
 
 const getPropByType =
   (prop, defaultValue = null) =>
-  (nodeDefType) =>
-    R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+    (nodeDefType) =>
+      R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
 const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
 export const getIconByType = getPropByType('icon')
 
-export const getIconByNodeDef = (nodeDef) => (
+export const getIconByNodeDef = (nodeDef, includeKey = false) => (
   <div className="node-def__icon-wrapper">
-    {NodeDef.isMultiple(nodeDef) && <span title="Multiple">M</span>}
-    {getIconByType(NodeDef.getType(nodeDef))}
+    {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
+    {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
+    {NodeDef.isSingleEntity(nodeDef) ? singleEntityIcon : getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )
 

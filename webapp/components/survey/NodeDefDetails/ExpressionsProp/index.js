@@ -1,4 +1,4 @@
 import NodeDefExpressionsProp from './NodeDefExpressionsProp'
 
-export { default } from './ExpressionsProp'
+export { default, ValueType } from './ExpressionsProp'
 export { NodeDefExpressionsProp }

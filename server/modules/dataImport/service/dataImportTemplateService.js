@@ -4,14 +4,24 @@ import { CsvDataExportModel } from '@common/model/csvExport'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import * as DateUtils from '@core/dateUtils'
+import * as StringUtils from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid'
 
 import { contentTypes, setContentTypeFile } from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipArchiver } from '@server/utils/file/zipArchiver'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+let templateFileValue = null
+{
+  const fileUuid = uuidv4()
+  const fileName = `${fileUuid}.bin`
+  templateFileValue = Node.newNodeValueFile({ fileUuid, fileName })
+}
 
 const valuesByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: () => true,
@@ -22,9 +32,7 @@ const valuesByNodeDefType = {
   },
   [NodeDef.nodeDefType.date]: () => DateUtils.formatDateISO(new Date()),
   [NodeDef.nodeDefType.decimal]: () => 123.45,
-  [NodeDef.nodeDefType.file]: () => {
-    throw new Error('File attribute import not supported')
-  },
+  [NodeDef.nodeDefType.file]: ({ valueProp }) => templateFileValue[valueProp],
   [NodeDef.nodeDefType.integer]: () => 123,
   [NodeDef.nodeDefType.taxon]: () => 'TAXON_CODE',
   [NodeDef.nodeDefType.text]: () => 'Text',
@@ -34,18 +42,17 @@ const valuesByNodeDefType = {
   },
 }
 
-const extractDataImportTemplate = async ({ survey, cycle, entityDefUuid }) => {
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFiles }) => {
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const exportModel = new CsvDataExportModel({
     survey,
     cycle,
-    nodeDefContext: entityDef,
+    nodeDefContext: nodeDef,
     options: {
       includeAnalysis: false,
       includeCategoryItemsLabels: false,
-      includeFiles: false,
+      includeFiles,
       includeReadOnlyAttributes: false,
-      includeTaxonScientificName: false,
     },
   })
   const template = exportModel.columns.reduce((acc, column) => {
@@ -56,25 +63,30 @@ const extractDataImportTemplate = async ({ survey, cycle, entityDefUuid }) => {
 
   return {
     template,
-    entityDef,
+    nodeDef,
   }
 }
 
-const exportDataImportTemplate = async ({ surveyId, cycle, entityDefUuid, res }) => {
+const exportDataImportTemplate = async ({ surveyId, cycle, nodeDefUuid, includeFiles, fileFormat, res }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const { template, entityDef } = await extractDataImportTemplate({ survey, cycle, entityDefUuid })
+  const { template, nodeDef } = await extractDataImportTemplate({
+    survey,
+    cycle,
+    nodeDefUuid,
+    includeFiles,
+  })
 
   setContentTypeFile({
     res,
-    fileName: `data_import_template_${NodeDef.getName(entityDef)}.csv`,
-    contentType: contentTypes.csv,
+    fileName: `data_import_template_${NodeDef.getName(nodeDef)}.${fileFormat}`,
+    fileFormat,
   })
 
-  await CSVWriter.writeItemsToStream({ outputStream: res, items: [template] })
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: [template] })
 }
 
-const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
+const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fileFormat, res }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
   const archiver = new ZipArchiver(res)
@@ -85,24 +97,29 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, res }) => {
     contentType: contentTypes.zip,
   })
 
-  const multipleEntityDefUuids = []
-
-  Survey.visitDescendantsAndSelf({
-    visitorFn: (nodeDef) => {
-      if (NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)) {
-        multipleEntityDefUuids.push(NodeDef.getUuid(nodeDef))
-      }
-    },
-  })(survey)
+  const multipleNodeDefUuids = Survey.findDescendants({
+    filterFn: (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef),
+  })(survey).map(NodeDef.getUuid)
 
   const tempFilePaths = []
 
-  await Promises.each(multipleEntityDefUuids, async (entityDefUuid) => {
-    const { template, entityDef } = await extractDataImportTemplate({ survey, cycle, entityDefUuid })
-    const zipEntryName = `data_import_template_${NodeDef.getName(entityDef)}.csv`
+  await Promises.each(multipleNodeDefUuids, async (nodeDefUuid, idx) => {
+    const { template, nodeDef } = await extractDataImportTemplate({
+      survey,
+      cycle,
+      nodeDefUuid,
+      includeFiles,
+      fileFormat,
+    })
+    const prefix = `data_import_template_${StringUtils.padStart(2, '0')(String(idx + 1))}`
+    const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.${fileFormat}`
     const tempFilePath = FileUtils.newTempFilePath()
 
-    await CSVWriter.writeItemsToStream({ outputStream: FileUtils.createWriteStream(tempFilePath), items: [template] })
+    await FlatDataWriter.writeItemsToStream({
+      outputStream: FileUtils.createWriteStream(tempFilePath),
+      fileFormat,
+      items: [template],
+    })
 
     archiver.addFile(tempFilePath, zipEntryName)
     tempFilePaths.push(tempFilePath)

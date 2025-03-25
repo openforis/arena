@@ -7,6 +7,8 @@
     .cluster-marker__clustered-points-popup {
       .leaflet-popup-content {
         width: 20rem;
+        max-height: 7rem;
+        overflow-y: auto;
 
         li {
           line-height: 1.5rem;
@@ -28,15 +30,14 @@
 
           button {
             margin: 0;
+            height: 2rem;
+          }
+
+          .new-record-btn {
+            width: 20rem;
           }
         }
       }
     }
-  }
-}
-
-.map-record-edit-modal {
-  .flexible-modal-mask {
-    display: none;
   }
 }

@@ -1,36 +1,39 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import { useI18n } from '@webapp/store/system'
+import * as A from '@core/arena'
+
 import { FormItem } from '@webapp/components/form/Input'
+import { Dropdown } from '@webapp/components/form'
+
 import { FormPropertyItem } from './FormPropertyItem'
+
+const controlPointsOptions = [0, 4, 5, 10, 12, 21]
 
 export const CircleOnlyItems = (props) => {
   const { onPropertyChange, samplingPolygonObject, readOnly, getFieldValidation } = props
-  const i18n = useI18n()
-  const inputPropertiesForCircle = [{ key: 'radius', labelKey: 'radius' }]
+  const inputPropertiesForCircle = [{ key: 'radius', allowNegative: false }]
   return (
     <>
-      <FormItem label={i18n.t('samplingPolygonOptions.numberOfControlPoints')}>
-        <select value={samplingPolygonObject.numberOfPointsCircle} onChange={onPropertyChange('numberOfPointsCircle')}>
-          <option value="0">0</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="12">12</option>
-          <option value="21">21</option>
-        </select>
+      <FormItem label="samplingPolygonOptions.numberOfControlPoints">
+        <Dropdown
+          items={controlPointsOptions}
+          itemLabel={A.identity}
+          itemValue={A.identity}
+          selection={samplingPolygonObject.numberOfPointsCircle}
+          onChange={onPropertyChange('numberOfPointsCircle')}
+        />
       </FormItem>
-      {inputPropertiesForCircle.map(({ key, labelKey }) => (
+      {inputPropertiesForCircle.map(({ key, allowNegative }) => (
         <FormPropertyItem
           key={key}
-          ObjectKey={key}
-          labelKey={labelKey}
-          onPropertyChange={onPropertyChange(key)}
-          value={samplingPolygonObject[key]}
-          samplingPolygonObject={samplingPolygonObject}
-          readOnly={readOnly}
+          allowNegative={allowNegative}
           getFieldValidation={getFieldValidation}
+          objectKey={key}
+          onPropertyChange={onPropertyChange(key)}
+          readOnly={readOnly}
+          samplingPolygonObject={samplingPolygonObject}
+          value={samplingPolygonObject[key]}
         />
       ))}
     </>

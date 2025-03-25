@@ -24,6 +24,7 @@ export const valuePropsDate = {
 export const valuePropsFile = {
   fileUuid: 'fileUuid',
   fileName: 'fileName',
+  fileNameCalculated: 'fileNameCalculated',
   fileSize: 'fileSize',
 }
 

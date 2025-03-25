@@ -5,10 +5,6 @@
     flex-direction: column;
 }
   
-.center-text {
-    text-align: center;
-}
-
 .chart-scroll {
     height: 300px;
     overflow-y: scroll;

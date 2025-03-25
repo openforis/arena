@@ -14,13 +14,17 @@ import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
+import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
+import { SwaggerInitializer } from './swaggerInitializer'
+
+const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info('server initialization start')
 
-  const arenaApp = await ArenaServer.init()
+  const arenaApp = await ArenaServer.init({ fileSizeLimit })
   const { express: app } = arenaApp
 
   if (ProcessUtils.isEnvDevelopment) {
@@ -46,6 +50,8 @@ export const run = async () => {
   authApi.init(app)
   app.use('/api', apiRouter.router)
 
+  SwaggerInitializer.init(app)
+
   await ArenaServer.start(arenaApp)
 
   // ====== System Admin user creation
@@ -56,4 +62,6 @@ export const run = async () => {
   await UserResetPasswordCleanup.init()
   await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
+  // await SurveysFilesPropsCleanup.init()
+  await ExpiredUserInvitationsCleanup.init()
 }

@@ -1,5 +1,3 @@
-import * as PromiseUtils from '@core/promiseUtils'
-
 export default class BatchPersister {
   constructor(insertHandler, bufferSize = 1000, tx = null) {
     this.insertHandler = insertHandler
@@ -19,7 +17,9 @@ export default class BatchPersister {
 
   async addItems(items, t = null) {
     const tx = t || this.tx
-    await PromiseUtils.each(items, async (item) => this.addItem(item, tx))
+    for await (const item of items) {
+      await this.addItem(item, tx)
+    }
   }
 
   async flush(t = null) {

@@ -1,34 +1,33 @@
 import * as A from '../../../core/arena'
 import { mergeProps } from './mergeProps'
 
-const _assocPublishedDraft = (row) => ({
-  ...row,
-  published: !A.isEmpty(row.props),
-  draft: !A.isEmpty(row.props_draft),
-})
+const _assocPublishedDraft = (row) => {
+  row.published = !A.isEmpty(row.props)
+  row.draft = !A.isEmpty(row.props_draft)
+  return row
+}
 
 export const transformCallback = (row, draft = false, assocPublishedDraft = false, backup = false) => {
   if (A.isNull(row)) {
     return null
   }
-
-  let rowUpdated = row
   // Assoc published and draft properties based on props
   if (backup || assocPublishedDraft) {
-    rowUpdated = _assocPublishedDraft(rowUpdated)
+    _assocPublishedDraft(row)
   }
-  rowUpdated = A.camelizePartial({
+  A.camelizePartial({
     skip: ['validation', 'props', 'props_draft'],
     limitToLevel: 1,
-  })(rowUpdated)
+    sideEffect: true,
+  })(row)
 
   if (!backup) {
-    return mergeProps({ draft })(rowUpdated)
+    return mergeProps({ draft })(row)
   }
   // backup
   // keep props_draft and camelize props_draft column into propsDraft
-  rowUpdated.propsDraft = row.props_draft
-  delete rowUpdated.props_draft
+  row.propsDraft = row.props_draft
+  delete row.props_draft
 
-  return rowUpdated
+  return row
 }

@@ -3,27 +3,28 @@ import React, { useState } from 'react'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
+import { Button } from './buttons'
 
 const TabBarButtons = ({ tabs, selection, onClick }) => (
   <div className="flex-center tab-bar__header">
     {tabs.map((tab, i) => (
-      <button
+      <Button
         key={String(i)}
-        aria-disabled={Boolean(tab.disabled)}
-        className={`btn${i === selection ? ' active' : ''}`}
-        data-testid={tab.id ? TestId.tabBar.tabBarBtn(tab.id) : null}
+        active={i === selection}
+        disabled={Boolean(tab.disabled)}
+        iconClassName={tab.icon ? `${tab.icon} icon-12px` : undefined}
+        label={tab.label}
         onClick={() => onClick(i)}
-        type="button"
-      >
-        {tab.icon && <span className={`icon ${tab.icon} icon-12px icon-left`} />}
-        {tab.label}
-      </button>
+        testId={tab.id ? TestId.tabBar.tabBarBtn(tab.id) : null}
+        variant="outlined"
+      />
     ))}
   </div>
 )
 
 const TabBar = (props) => {
-  const { tabs, showTabs, selection, className, renderer, onClick } = props
+  const { className = '', onClick = null, renderer = null, selection = 0, showTabs = true, tabs = [] } = props
+
   const [selectionState, setSelectionState] = useState(selection)
 
   const tab = tabs[selectionState]
@@ -48,15 +49,6 @@ const TabBar = (props) => {
         : React.createElement(tab.component, { ...tab.props, ...props })}
     </div>
   )
-}
-
-TabBar.defaultProps = {
-  className: '',
-  selection: 0,
-  tabs: [],
-  showTabs: true,
-  renderer: null,
-  onClick: null,
 }
 
 export default TabBar

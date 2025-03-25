@@ -9,6 +9,7 @@ export const keys = {
   dateCreated: 'dateCreated',
   dateModified: 'dateModified',
   draft: 'draft',
+  extra: 'extra',
   id: 'id',
   index: 'index',
   name: 'name',
@@ -25,6 +26,7 @@ export const keysProps = {
   descriptions: 'descriptions',
   labels: 'labels',
   cycles: 'cycles',
+  extra: 'extra',
 }
 
 // ====== READ
@@ -44,6 +46,9 @@ export const getLabel = (lang, defaultTo = null) => R.pipe(getLabels, R.propOr(d
 
 export const getDescriptions = getProp(keysProps.descriptions, {})
 export const getDescription = (lang, defaultTo = null) => R.pipe(getDescriptions, R.propOr(defaultTo, lang))
+
+export const getExtra = getProp(keysProps.extra, {})
+export const getExtraProp = (extraPropKey) => R.pipe(getExtra, R.propOr(null, extraPropKey))
 
 export const getDate = (prop) => R.pipe(R.propOr(null, prop), R.unless(R.isNil, DateUtils.parseISO))
 export const getDateCreated = getDate(keys.dateCreated)
@@ -104,14 +109,56 @@ export const setInPath =
 
 export const dissocTemporary = R.unless(R.isNil, R.dissoc(keys.temporary))
 
+export const keepNonEmptyProps = (obj) =>
+  Object.entries(obj).reduce((acc, [key, value]) => {
+    if (!isBlank(value)) {
+      acc[key] = value
+    }
+    return acc
+  }, {})
+
 // ====== UTILS / uuid
-export const toIndexedObj = (array, propName) =>
+const _getProp = (propNameOrExtractor) => (item) =>
+  typeof propNameOrExtractor === 'string' ? R.path(propNameOrExtractor.split('.'))(item) : propNameOrExtractor(item)
+
+export const toIndexedObj = (array, propNameOrExtractor) =>
   array.reduce((acc, item) => {
-    const prop = R.path(propName.split('.'), item)
+    const prop = _getProp(propNameOrExtractor)(item)
     acc[prop] = item
     return acc
   }, {})
 
 export const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
+export const groupByProps =
+  (...propNamesOrExtractors) =>
+  (items) =>
+    items.reduce((acc, item) => {
+      const props = propNamesOrExtractors.map((propNameOrExtractor) => _getProp(propNameOrExtractor)(item))
+      let itemsPartial = R.path(props)(acc)
+      if (!itemsPartial) {
+        itemsPartial = []
+      }
+      itemsPartial.push(item)
+      setInPath(props, itemsPartial)(acc)
+      return acc
+    }, {})
+
+export const groupByProp = groupByProps
+
 export const clone = (obj) => (R.isNil(obj) ? obj : JSON.parse(JSON.stringify(obj)))
+
+export const getPropsAndPropsDraft =
+  ({ backup = false } = {}) =>
+  (obj) => {
+    // if not backup, keep published props empty (consider only )
+    // if backup, keep both props and propsDraft
+    const props = getProps(obj)
+    const propsDraft = getPropsDraft(obj)
+    return {
+      props: backup ? props : {},
+      propsDraft: backup ? propsDraft : { ...props, ...propsDraft },
+    }
+  }
+
+export const getPropsAndPropsDraftCombined = (obj) => ({ ...getProps(obj), ...getPropsDraft(obj) })

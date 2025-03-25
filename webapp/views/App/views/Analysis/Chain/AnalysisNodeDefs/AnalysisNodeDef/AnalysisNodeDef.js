@@ -15,7 +15,7 @@ import { useI18n } from '@webapp/store/system'
 import InputSwitch from '@webapp/components/form/InputSwitch'
 import WarningBadge from '@webapp/components/warningBadge'
 
-const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
+const AnalysisNodeDef = ({ nodeDefUuid, dataCount = undefined }) => {
   const dispatch = useDispatch()
   const i18n = useI18n()
   const survey = useSurvey()
@@ -66,12 +66,10 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
       </div>
       <div>{NodeDef.getName(nodeDef)}</div>
       <div>{NodeDef.getLabel(nodeDef, lang)}</div>
-      <div>
-        {NodeDef.isDecimal(nodeDef)
-          ? NodeDef.hasAreaBasedEstimated(nodeDef)
-            ? i18n.t('common.true')
-            : i18n.t('common.false')
-          : '-'}
+      <div className="analysis-node-def__area-based">
+        {NodeDef.isDecimal(nodeDef) && NodeDef.hasAreaBasedEstimated(nodeDef) && (
+          <span className="icon icon-checkmark" />
+        )}
       </div>
       <div className="analysis-node-def__type">
         {i18n.t(nodeDefType === NodeDef.nodeDefType.decimal ? 'chain.quantitative' : 'chain.categorical')}
@@ -99,10 +97,6 @@ const AnalysisNodeDef = ({ nodeDefUuid, dataCount }) => {
 AnalysisNodeDef.propTypes = {
   nodeDefUuid: PropTypes.string.isRequired,
   dataCount: PropTypes.number,
-}
-
-AnalysisNodeDef.defaultProps = {
-  dataCount: undefined,
 }
 
 export { AnalysisNodeDef }

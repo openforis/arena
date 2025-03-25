@@ -1,17 +1,13 @@
 import React from 'react'
 
-import { TextInput } from './TextInput'
+import { SimpleTextInput } from './SimpleTextInput'
 
 const EmailInput = (props) => {
-  return <TextInput {...props} textTransformFunction={(text) => text.toLocaleLowerCase().trim()} />
+  return <SimpleTextInput {...props} textTransformFunction={(text) => text.toLocaleLowerCase().trim()} />
 }
 
 EmailInput.propTypes = {
-  ...TextInput.propTypes,
-}
-
-EmailInput.defaultProps = {
-  ...TextInput.defaultProps,
+  ...SimpleTextInput.propTypes,
 }
 
 export default EmailInput

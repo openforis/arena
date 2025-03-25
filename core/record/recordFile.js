@@ -1,7 +1,11 @@
 import * as R from 'ramda'
 
-import { truncate } from '@core/stringUtils'
+import { FileNames } from '@openforis/arena-core'
+
 import * as ObjectUtils from '@core/objectUtils'
+import { truncate } from '@core/stringUtils'
+import { uuidv4 } from '@core/uuid'
+import * as Node from './node'
 
 const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -17,22 +21,35 @@ export const propKeys = {
   nodeUuid: 'nodeUuid',
 }
 
-export const createFile = (uuid, fileName, fileSize, content, recordUuid, nodeUuid) => ({
-  [keys.uuid]: uuid,
+export const invalidPropKeys = {
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+}
+
+export const createFile = ({ name, uuid = null, size = null, content = null, recordUuid = null, nodeUuid = null }) => ({
+  [keys.uuid]: uuid ?? uuidv4(),
   [keys.props]: {
-    [propKeys.name]: fileName,
-    [propKeys.size]: fileSize,
+    [propKeys.name]: name,
+    [propKeys.size]: size,
     [propKeys.recordUuid]: recordUuid,
     [propKeys.nodeUuid]: nodeUuid,
   },
   [keys.content]: content,
 })
 
-const getExtensionFromFileName = (fileName) => R.pipe(R.split('.'), R.tail)(fileName)
+export const createFileFromNode = ({ node, size = null, content = null }) =>
+  createFile({
+    uuid: Node.getFileUuid(node),
+    name: Node.getFileName(node),
+    recordUuid: Node.getRecordUuid(node),
+    nodeUuid: Node.getUuid(node),
+    size,
+    content,
+  })
 
 export const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
-    const extension = getExtensionFromFileName(fileName)
+    const extension = FileNames.getExtension(fileName)
 
     return R.pipe(R.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
   }
@@ -45,8 +62,33 @@ export const { getUuid, getProps } = ObjectUtils
 export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
 export const getName = ObjectUtils.getProp(propKeys.name)
 export const getSize = ObjectUtils.getProp(propKeys.size)
+export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
+export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
 export const getContent = R.prop(keys.content)
-export const getExtension = R.pipe(getName, getExtensionFromFileName)
+export const getExtension = R.pipe(getName, FileNames.getExtension)
 
 // UPDATE
 export const assocContent = R.assoc(keys.content)
+export const assocSize = (size) => ObjectUtils.setProp(propKeys.size, size)
+
+const assocProps = R.assoc(keys.props)
+
+const hasInvalidProps = (file) => Object.hasOwn(getProps(file), invalidPropKeys.fileName)
+
+export const cleanupInvalidProps = (file) => {
+  if (!hasInvalidProps(file)) {
+    return file
+  }
+  const props = getProps(file)
+
+  const propsUpdated = {
+    [propKeys.name]: props[invalidPropKeys.fileName],
+    [propKeys.size]: props[invalidPropKeys.fileSize],
+    [propKeys.recordUuid]: props[propKeys.recordUuid],
+    [propKeys.nodeUuid]: props[propKeys.nodeUuid],
+  }
+  if (props.deleted) {
+    propsUpdated[propKeys.deleted] = true
+  }
+  return assocProps(propsUpdated)(file)
+}

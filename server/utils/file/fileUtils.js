@@ -5,6 +5,8 @@ import { join, sep } from 'path'
 import * as ProcessUtils from '../../../core/processUtils'
 import { uuidv4 } from '../../../core/uuid'
 
+const dirSeparator = '/'
+
 // ====== DIR
 
 export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
@@ -48,6 +50,37 @@ export const getFileSize = (path) => {
   const stats = fs.statSync(path)
   const { size } = stats
   return size
+}
+
+export const visitDirFiles = ({ path, visitor }) => {
+  if (!exists(path)) return
+
+  const stack = []
+  const files = fs.readdirSync(path)
+  stack.push(...files.map((file) => path + dirSeparator + file))
+
+  while (stack.length > 0) {
+    const filePath = stack.pop()
+
+    visitor(filePath)
+
+    const stats = fs.statSync(filePath)
+    if (stats.isDirectory()) {
+      const filesPaths = fs.readdirSync(filePath).map((file) => filePath + dirSeparator + file)
+      stack.push(...filesPaths)
+    }
+  }
+}
+
+export const getDirSize = (path) => {
+  let totalSize = 0
+  visitDirFiles({
+    path,
+    visitor: (filePath) => {
+      totalSize = totalSize + getFileSize(filePath)
+    },
+  })
+  return totalSize
 }
 
 const getFileName = (file) => (typeof file === 'string' ? file : file.name)

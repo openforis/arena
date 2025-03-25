@@ -1,13 +1,17 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .node-def-edit {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 100%;
-  top: 0px;
-  left: 0px;
-  z-index: $zIndex10TopOfApp;
   background-color: white;
+
+  &.full-screen {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: $zIndex10TopOfApp;
+  }
 
   .form_row,
   .form-item_body {
@@ -29,6 +33,10 @@
       margin-left: 20%;
     }
   }
+
+  .max-file-size {
+    width: 6rem;
+  }
 }
 
 .node-def-edit__container {
@@ -45,6 +53,7 @@
   .form-item,
   .labels-editor.with-label {
     grid-template-columns: 0.2fr 0.7fr;
+    padding: 0;
   }
 
   .panel-right__content {
@@ -61,6 +70,7 @@
     .btn-next {
       margin-left: 5rem;
     }
+
     .btn-previous {
       margin-right: 5rem;
     }
@@ -74,6 +84,11 @@
     .dropdown {
       width: 100%;
     }
+  }
+
+  .mobile-props {
+    justify-self: center;
+    width: 40rem;
   }
 }
 

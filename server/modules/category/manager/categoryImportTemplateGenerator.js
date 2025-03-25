@@ -14,8 +14,8 @@ const generateCategoryTemplate = () => {
   category = Category.assocLevel({ level: Category.newLevel(category) })(category)
   // extra props
   category = Category.assocItemExtraDef({
-    ['extra_prop_text']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
-    ['extra_prop_number']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+    ['extra_prop_text']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text, index: 0 }),
+    ['extra_prop_number']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number, index: 1 }),
   })(category)
   return category
 }
@@ -27,9 +27,9 @@ const generateSamplingPointDataCategoryTemplate = () => {
   category = Category.assocLevel({ level: Category.newLevel(category) })(category)
   // extra props
   category = Category.assocItemExtraDef({
-    ['location_x']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
-    ['location_y']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
-    ['location_srs']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+    ['location_x']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number, index: 0 }),
+    ['location_y']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number, index: 1 }),
+    ['location_srs']: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text, index: 2 }),
   })(category)
   return category
 }

@@ -22,16 +22,16 @@ import ButtonMetaItemAdd, { metaItemTypes } from '@webapp/components/survey/Butt
 
 export const CategorySelector = (props) => {
   const {
-    disabled,
-    categoryUuid,
-    validation,
-    onChange,
-    onCategoryLoad,
-    filterFunction,
-    emptySelection,
-    showAdd,
-    showEdit,
-    showManage,
+    categoryUuid = null, // Selected categoryUuid
+    disabled = false,
+    emptySelection = false,
+    filterFunction = null,
+    onCategoryLoad = A.identity,
+    onChange = A.identity,
+    showAdd = true,
+    showEdit = true,
+    showManage = true,
+    validation = null,
   } = props
 
   const i18n = useI18n()
@@ -56,17 +56,18 @@ export const CategorySelector = (props) => {
     [filterFunction, surveyId, emptySelection, emptyItem, showCategoriesPanel, categoryToEdit]
   )
 
+  const loadCategory = useCallback(async () => {
+    let categorySelected = null
+    if (!A.isEmpty(categoryUuid)) {
+      categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
+      onCategoryLoad(categorySelected)
+    }
+    setCategory(categorySelected)
+  }, [categoryUuid, onCategoryLoad, surveyId])
+
   useEffect(() => {
-    ;(async () => {
-      if (!A.isEmpty(categoryUuid)) {
-        const categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
-        setCategory(categorySelected)
-        onCategoryLoad(categorySelected)
-      } else {
-        setCategory(null)
-      }
-    })()
-  }, [categoryUuid, showCategoriesPanel, onCategoryLoad, setCategory, surveyId])
+    loadCategory()
+  }, [loadCategory])
 
   const onCategoryUpdate = useCallback(
     ({ category: categoryUpdated }) => {
@@ -81,7 +82,7 @@ export const CategorySelector = (props) => {
       return false
     }
     return true
-  }, [surveyId, categoryToEdit, notifyWarning])
+  }, [categoryToEdit, notifyWarning])
 
   const onCategoryEditPanelClose = useCallback(async () => {
     const categoryEditedUuid = Category.getUuid(categoryToEdit)
@@ -110,17 +111,21 @@ export const CategorySelector = (props) => {
         itemValue={Category.keys.uuid}
         itemLabel={(item) => (item.uuid ? Category.getName(item) : emptyItem.label)}
         validation={validation}
+        validationTooltipPosition="top"
         selection={category}
         onChange={onChange}
       />
 
-      {showEdit && category && <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel />}
+      {showEdit && category && (
+        <ButtonIconEdit onClick={() => setCategoryToEdit(category)} size="small" showLabel variant="outlined" />
+      )}
 
       {showAdd && !disabled && (
         <ButtonMetaItemAdd
           id={TestId.categorySelector.addCategoryBtn}
           onAdd={setCategoryToEdit}
           metaItemType={metaItemTypes.category}
+          variant="outlined"
         />
       )}
       {showManage && <ButtonManage size="small" onClick={() => setShowCategoriesPanel(true)} />}
@@ -163,17 +168,4 @@ CategorySelector.propTypes = {
   showAdd: PropTypes.bool,
   showEdit: PropTypes.bool,
   showManage: PropTypes.bool,
-}
-
-CategorySelector.defaultProps = {
-  categoryUuid: null, // Selected categoryUuid
-  validation: null,
-  disabled: false,
-  onChange: () => ({}),
-  onCategoryLoad: () => ({}),
-  filterFunction: null,
-  emptySelection: false,
-  showAdd: true,
-  showEdit: true,
-  showManage: true,
 }

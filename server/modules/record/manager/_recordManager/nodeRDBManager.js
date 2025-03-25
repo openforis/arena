@@ -3,20 +3,38 @@ import * as Record from '@core/record/record'
 
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
 
-const persistNodesToRDB = async ({ survey, record, nodesArray }, t) => {
+const { updateTablesFromUpdates } = DataTableUpdateRepository
+
+const generateRdbUpates = ({ survey, record, nodesArray }) => {
   // include ancestor nodes (used to find the correct rdb table to update)
   const nodesAndDependentsAndAncestors = nodesArray.reduce((nodesAcc, node) => {
     Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
     return nodesAcc
   }, {})
-
-  await DataTableUpdateRepository.updateTables({ survey, record, nodes: nodesAndDependentsAndAncestors }, t)
-
+  const rdbUpdates = DataTableUpdateRepository.generateRdbUpdates({
+    survey,
+    record,
+    nodes: nodesAndDependentsAndAncestors,
+  })
   // Merge updated nodes with existing ones (remove created/updated flags nodes)
   const nodes = ObjectUtils.toUuidIndexedObj(nodesArray)
-  return Record.mergeNodes(nodes, true)(record)
+  const recordUpdated = Record.mergeNodes(nodes, { removeFlags: true, sideEffect: true })(record)
+  return {
+    record: recordUpdated,
+    rdbUpdates,
+  }
+}
+
+const persistNodesToRDB = async ({ survey, record, nodesArray }, t) => {
+  const { rdbUpdates, record: recordUpdated } = generateRdbUpates({ survey, record, nodesArray })
+
+  await updateTablesFromUpdates({ rdbUpdates }, t)
+
+  return recordUpdated
 }
 
 export const NodeRdbManager = {
+  generateRdbUpates,
   persistNodesToRDB,
+  updateTablesFromUpdates,
 }

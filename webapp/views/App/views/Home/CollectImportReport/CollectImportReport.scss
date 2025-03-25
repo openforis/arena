@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .collect-import-report {
   .table__header {
@@ -6,6 +6,7 @@
       column-gap: 2rem;
     }
   }
+
   .table__rows {
     height: calc(100% - 45px);
   }
@@ -35,10 +36,6 @@
       a {
         display: block;
       }
-    }
-
-    .full-width {
-      width: 100%;
     }
   }
 }

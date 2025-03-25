@@ -2,10 +2,16 @@ export const NA = 'NA'
 
 export const comment = (text) => `# ${text}`
 
-export const tryCatch = ({ code, errorFnName = 'saveError' }) => `tryCatch(${code},error=${errorFnName})`
+export const tryCatch = ({ code, ignoreErrors = false, errorFnName = 'saveError' }) => {
+  const tryCatchArguments = [code]
+  if (!ignoreErrors) {
+    tryCatchArguments.push(`error=${errorFnName}`)
+  }
+  return `tryCatch(${tryCatchArguments.join(', ')})`
+}
 
 export const source = (path) => `source("${path}")`
-export const sourceWithTryCatch = (path) => tryCatch({ code: source(path) })
+export const sourceWithTryCatch = (path, ignoreErrors = false) => tryCatch({ code: source(path), ignoreErrors })
 
 export const setVar = (name, value) => `${name} <- ${value}`
 

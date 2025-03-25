@@ -54,8 +54,7 @@ docker container restart arena-db
 To install dependencies:
 
 ```shell
-yarn
-npm rebuild node-sass # Sometimes needed
+yarn install
 ```
 
 To run the server and the Web app in parallel with "hot reload" on any changes:
@@ -78,6 +77,20 @@ Note: What's tested is the **committed** code only. Uncommitted changes are igno
 
 ```shell
 yarn test:docker
+```
+
+## Running tests locally
+First of all, build the project:
+```shell
+yarn build
+```
+then start the server locally:
+```shell
+pm2-runtime ./dist/server.js
+```
+In another shell tab/window, run the e2e tests:
+```shell
+yarn test:e2e:watch
 ```
 
 ## Run R Studio Server locally

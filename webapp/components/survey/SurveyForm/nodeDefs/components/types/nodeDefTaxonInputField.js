@@ -8,20 +8,23 @@ import NodeDefTaxonAutocompleteDialog from './nodeDefTaxonAutocompleteDialog'
 
 const NodeDefTaxonInputField = (props) => {
   const {
-    id,
-    surveyId,
-    nodeDef,
-    parentNode,
-    edit,
+    autocompleteSourceElement = null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
+    canEditRecord = false,
+    draft = false,
+    edit = false,
     entryDataQuery,
-    draft,
-    canEditRecord,
-    readOnly,
-    field,
-    selection,
-    onChangeTaxon,
-    onChangeSelectionField,
-    autocompleteSourceElement,
+    field = Node.valuePropsTaxon.code,
+    id = null,
+    nodeDef,
+    onChangeTaxon = null, // Function to call when the taxon value changed
+    onChangeSelectionField = null, // Function to call when local selection changes
+    parentNode,
+    readOnly = false,
+    selection = {
+      [Node.valuePropsTaxon.code]: '',
+      [Node.valuePropsTaxon.scientificName]: '',
+      [Node.valuePropsTaxon.vernacularName]: '',
+    },
   } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
@@ -58,40 +61,20 @@ const NodeDefTaxonInputField = (props) => {
 
       {autocompleteOpened && (
         <NodeDefTaxonAutocompleteDialog
-          surveyId={surveyId}
-          nodeDef={nodeDef}
-          parentNode={parentNode}
+          autocompleteSourceElement={autocompleteSourceElement}
           draft={draft}
           entryDataQuery={entryDataQuery}
-          inputRef={inputRef}
           field={field}
           fieldValue={inputRef.current.value}
+          nodeDef={nodeDef}
+          inputRef={inputRef}
           onItemSelect={onItemSelectAutocomplete}
           onClose={onItemSelectAutocomplete}
-          autocompleteSourceElement={autocompleteSourceElement}
+          parentNode={parentNode}
         />
       )}
     </>
   )
-}
-
-NodeDefTaxonInputField.defaultProps = {
-  id: null,
-  surveyId: null,
-  edit: false,
-  draft: false,
-  canEditRecord: false,
-  readOnly: false,
-
-  field: Node.valuePropsTaxon.code,
-  selection: {
-    [Node.valuePropsTaxon.code]: '',
-    [Node.valuePropsTaxon.scientificName]: '',
-    [Node.valuePropsTaxon.vernacularName]: '',
-  },
-  onChangeTaxon: null, // Function to call when the taxon value changed
-  onChangeSelectionField: null, // Function to call when local selection changes
-  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonInputField

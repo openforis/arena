@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import { db } from '@server/db/db'
 
+import { NodeDefsFixer, Objects } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -8,12 +10,14 @@ import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
 
 import * as ObjectUtils from '@core/objectUtils'
 
+import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
-import { Objects } from '@openforis/arena-core'
+
+const logger = Log.getLogger('NodeDefManager')
 
 export {
   addNodeDefsCycles,
@@ -127,6 +131,7 @@ export { fetchNodeDefByUuid } from '../repository/nodeDefRepository'
 export const fetchNodeDefsBySurveyId = async (
   {
     surveyId,
+    surveyCycles,
     cycle = null,
     draft = false,
     advanced = false,
@@ -140,7 +145,19 @@ export const fetchNodeDefsBySurveyId = async (
     { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
     client
   )
-  return ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+  const nodeDefs = ObjectUtils.toUuidIndexedObj(nodeDefsDb)
+
+  const { nodeDefs: nodeDefsFixed, updatedNodeDefs } = NodeDefsFixer.fixNodeDefs({
+    nodeDefs,
+    cycles: surveyCycles,
+    sideEffect: true,
+  })
+  const updatedNodeDefsCount = Object.values(updatedNodeDefs).length
+  if (updatedNodeDefsCount) {
+    logger.debug(`Survey ${surveyId} has broken node defs (${updatedNodeDefsCount} has been fixed)`)
+  }
+
+  return nodeDefsFixed
 }
 
 // ======= UPDATE
@@ -154,7 +171,7 @@ const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
   ]).length > 0
 
 export const updateNodeDefProps = async (
-  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
+  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
   client = db
 ) =>
   client.tx(async (t) => {
@@ -278,7 +295,7 @@ export const updateNodeDefProps = async (
       ...Object.values(nodeDefsUpdated).map((nodeDefToUpdate) =>
         _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
       ),
-      markSurveyDraft(surveyId, t),
+      ...(markSurveyAsDraft ? [markSurveyDraft(surveyId, t)] : []),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
 
@@ -334,6 +351,31 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     await markSurveyDraft(surveyId, t)
 
     return result
+  })
+
+export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, client = db) =>
+  client.tx(async (t) => {
+    const surveyId = Survey.getId(survey)
+
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    let nodeDefUpdated = NodeDef.convertToType({ toType })(nodeDef)
+
+    nodeDefUpdated = await NodeDefRepository.updateNodeDefTypeAndProps(
+      {
+        surveyId,
+        nodeDefUuid,
+        type: toType,
+        props: NodeDef.getProps(nodeDefUpdated),
+        propsAdvanced: NodeDef.getPropsAdvanced(nodeDefUpdated),
+      },
+      t
+    )
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefConversion, nodeDefUpdated, false, t)
+
+    await markSurveyDraft(surveyId, t)
+
+    return nodeDefUpdated
   })
 
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {

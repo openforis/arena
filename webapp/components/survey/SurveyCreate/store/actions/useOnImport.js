@@ -13,7 +13,7 @@ import { NotificationActions } from '@webapp/store/ui'
 
 import { importSources } from '../importSources'
 
-const urlBasedOnSource = {
+const urlBySource = {
   [importSources.collect]: '/api/survey/collect-import',
   [importSources.arena]: '/api/survey/arena-import',
 }
@@ -33,7 +33,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) => {
       const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
       setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
     }
-    const { data } = await axios.post(urlBasedOnSource[source], formData, { onUploadProgress })
+    const { data } = await axios.post(urlBySource[source], formData, { onUploadProgress })
 
     const { job, validation } = data
 

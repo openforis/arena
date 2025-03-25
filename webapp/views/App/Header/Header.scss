@@ -1,4 +1,5 @@
-@import 'webapp/style/vars';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
 
 .app-header {
   height: 45px;
@@ -25,9 +26,10 @@
 .app-header__survey {
   display: flex;
   align-items: center;
+  gap: 1rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: lighten($black, 20%);
+  color: color.adjust($black, $lightness: 20%);
 
   .dropdown {
     margin-left: 10px;
@@ -44,7 +46,7 @@
   }
 
   .btn-publish {
-    margin-left: 15px;
+    height: 2rem;
   }
 }
 

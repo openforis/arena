@@ -29,6 +29,14 @@ export const getNodesArray = (record) => Object.values(getNodes(record))
 
 export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getParentNode }
 
+export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
+  try {
+    return getNodeChildren(parentNode, childDefUuid)(record)
+  } catch (error) {
+    return []
+  }
+}
+
 /**
  * ==== hierarchy
  */

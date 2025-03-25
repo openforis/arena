@@ -1,8 +1,10 @@
 .btn-rstudio {
   padding: 0.2rem 0.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   height: 4rem;
+  width: 7rem;
 }
 
 .btn-rstudio[aria-disabled='true'] {

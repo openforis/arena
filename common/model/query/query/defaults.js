@@ -10,5 +10,5 @@ export const defaults = {
   [keys.entityDefUuid]: null,
   [keys.attributeDefUuids]: [],
   [keys.dimensions]: [],
-  [keys.measures]: new Map(),
+  [keys.measures]: {},
 }

@@ -60,4 +60,24 @@ describe('A.camelize', () => {
       expect(valueCamelized).toEqual(expected)
     })
   })
+
+  it('no side effect', () => {
+    const objectA = { p_1: 'A', p_2: 'B', p_3: 5 }
+    const objectAString = JSON.stringify(objectA)
+    const objectB = { prop_a: 1, prop_b: 2, prop_c: objectA }
+    const objectBCamelized = A.camelizePartial({ sideEffect: false })(objectB)
+    expect(objectAString).toEqual(JSON.stringify(objectA))
+    expect(objectBCamelized).not.toEqual(objectB)
+    expect(JSON.stringify(objectBCamelized)).not.toEqual(JSON.stringify(objectB))
+  })
+
+  it('side effect', () => {
+    const objectA = { p_1: 'A', p_2: 'B', p_3: 5 }
+    const objectAString = JSON.stringify(objectA)
+    const objectB = { prop_a: 1, prop_b: 2, prop_c: objectA }
+    const objectBCamelized = A.camelizePartial({ sideEffect: true })(objectB)
+    expect(objectAString).not.toEqual(JSON.stringify(objectA))
+    expect(objectBCamelized).toEqual(objectB)
+    expect(JSON.stringify(objectBCamelized)).toEqual(JSON.stringify(objectB))
+  })
 })

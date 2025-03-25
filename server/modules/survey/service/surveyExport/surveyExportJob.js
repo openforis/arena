@@ -1,10 +1,4 @@
-import Archiver from 'archiver'
-
-import * as ProcessUtils from '@core/processUtils'
-
-import Job from '@server/job/job'
-import * as FileUtils from '@server/utils/file/fileUtils'
-
+import ZipFileCreatorBaseJob from '@server/job/zipFileCreatorBaseJob'
 import ActivityLogExportJob from './jobs/activityLogExportJob'
 import CategoriesExportJob from './jobs/categoriesExportJob'
 import ChainExportJob from './jobs/chainExportJob'
@@ -26,7 +20,7 @@ const createInnerJobs = ({ backup, includeActivityLog }) => {
   ]
 }
 
-export default class SurveyExportJob extends Job {
+export default class SurveyExportJob extends ZipFileCreatorBaseJob {
   /**
    * It creates a survey export job that exports a survey including node definitions, categories, taxonomies, chains and users.
    * If the export is for a backup, it includes also records, files and activity log.
@@ -47,39 +41,8 @@ export default class SurveyExportJob extends Job {
     )
   }
 
-  async onStart() {
-    super.onStart()
-    const { outputFileName: outputFileNameParam = null, surveyId } = this.context
-
-    // generate output file name if not specified in params
-    const outputFileName = outputFileNameParam || `survey_export_${surveyId}_${Date.now()}.zip`
-
-    const outputFilePath = FileUtils.join(ProcessUtils.ENV.tempFolder, outputFileName)
-
-    this.logDebug(`using output file: ${outputFilePath}`)
-
-    const outputFileStream = FileUtils.createWriteStream(outputFilePath)
-
-    const archive = Archiver('zip')
-    archive.pipe(outputFileStream)
-
-    this.setContext({ archive, outputFileName, filePath: outputFilePath })
-  }
-
-  async onEnd() {
-    await super.onEnd()
-    const { archive } = this.context
-    await archive.finalize()
-  }
-
   async beforeSuccess() {
-    const { survey, outputFileName } = this.context
-
-    this.setResult({
-      survey,
-      outputFileName,
-    })
-
+    await super.beforeSuccess()
     // cleanup job context
     this.deleteContextProps('survey', 'surveyId')
   }

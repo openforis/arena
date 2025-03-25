@@ -1,8 +1,16 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .guest__form {
   .form-input {
     padding: 20px 5px;
+  }
+
+  .MuiTextField-root {
+    margin: 1rem;
+
+    input {
+      padding: 1rem;
+    }
   }
 }
 

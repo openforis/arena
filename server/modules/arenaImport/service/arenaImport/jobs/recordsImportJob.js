@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
@@ -27,6 +26,8 @@ export default class RecordsImportJob extends Job {
 
     if (this.total == 0) return
 
+    const userUuid = User.getUuid(this.user)
+
     // use a batch persister to persist nodes in batch
     const nodesBatchPersister = new BatchPersister(
       async (nodes) =>
@@ -35,7 +36,7 @@ export default class RecordsImportJob extends Job {
     )
 
     // import records sequentially
-    await PromiseUtils.each(recordSummaries, async (recordSummary) => {
+    for await (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
 
       // insert activity log
@@ -51,17 +52,22 @@ export default class RecordsImportJob extends Job {
       // insert record
       let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
 
-      const ownerUuid = includingUsers
-        ? // user uuid in the db could be different by the one being imported (see UsersImportJob)
-          newUserUuidByOldUuid[Record.getOwnerUuid(record)]
-        : // ignore owner in imported file; consider current user as owner
-          User.getUuid(this.user)
+      let ownerUuid = null
+      if (includingUsers) {
+        // user uuid in the db could be different by the one being imported (see UsersImportJob);
+        ownerUuid = newUserUuidByOldUuid[Record.getOwnerUuid(record)]
+      }
+      if (!ownerUuid) {
+        // admin users are not exported (new owner uuid could be null); associate record to current user in that case
+        // ignore owner in imported file; consider current user as owner
+        ownerUuid = userUuid
+      }
       record = Record.assocOwnerUuid(ownerUuid)(record)
 
       await this.insertOrSkipRecord({ record, nodesBatchPersister })
 
       this.incrementProcessedItems()
-    })
+    }
 
     await nodesBatchPersister.flush()
   }
@@ -76,12 +82,12 @@ export default class RecordsImportJob extends Job {
 
     // insert nodes (add them to batch persister)
     const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-    await PromiseUtils.each(nodes, async (node) => {
+    for await (const node of nodes) {
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         await nodesBatchPersister.addItem(node)
       }
-    })
+    }
   }
 
   /**

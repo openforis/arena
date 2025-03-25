@@ -8,37 +8,51 @@ const columnDataType = {
   text: 'text',
 }
 
+const getExpandedCategoryItemColumnHeader = ({ nodeDef, code }) => `${NodeDef.getName(nodeDef)}__${code}`
+
 const getMainColumn = ({ nodeDef, dataType }) => ({ header: NodeDef.getName(nodeDef), nodeDef, dataType })
 
 const columnsByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.boolean })],
-  [NodeDef.nodeDefType.code]: ({ nodeDef, includeCategoryItemsLabels }) => {
+  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, includeCategoryItemsLabels, expandCategoryItems }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
-    return [
+    const result = [
       { header: nodeDefName, nodeDef, dataType: columnDataType.text, valueProp: Node.valuePropsCode.code },
-      ...(includeCategoryItemsLabels
-        ? [
-            {
-              header: `${nodeDefName}_label`,
-              nodeDef,
-              dataType: columnDataType.text,
-              valueProp: Node.valuePropsCode.label,
-            },
-          ]
-        : []),
     ]
+    if (includeCategoryItemsLabels) {
+      result.push({
+        header: `${nodeDefName}_label`,
+        nodeDef,
+        dataType: columnDataType.text,
+        valueProp: Node.valuePropsCode.label,
+      })
+    }
+    if (expandCategoryItems) {
+      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+      const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+      const items = Survey.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
+      items.forEach((item) => {
+        result.push({
+          header: getExpandedCategoryItemColumnHeader({ nodeDef, code: item.getCode(item) }),
+          nodeDef,
+          dataType: columnDataType.boolean,
+          valueProp: Node.valuePropsCode.label,
+        })
+      })
+    }
+    return result
   },
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
+      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
+      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
       {
         header: `${nodeDefName}_srs`,
         nodeDef,
         dataType: columnDataType.text,
         valueProp: Node.valuePropsCoordinate.srs,
       },
-      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
-      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
       ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
         header: `${nodeDefName}_${field}`,
         nodeDef,
@@ -77,7 +91,13 @@ const columnsByNodeDefType = {
               header: `${nodeDefName}_scientific_name`,
               nodeDef,
               dataType: columnDataType.text,
-              valueProp: Node.valuePropsTaxon,
+              valueProp: Node.valuePropsTaxon.scientificName,
+            },
+            {
+              header: `${nodeDefName}_vernacular_name`,
+              nodeDef,
+              dataType: columnDataType.text,
+              valueProp: Node.valuePropsTaxon.vernacularName,
             },
           ]
         : []),
@@ -91,6 +111,8 @@ const DEFAULT_OPTIONS = {
   includeAnalysis: true,
   includeAncestorAttributes: false,
   includeCategoryItemsLabels: true,
+  expandCategoryItems: false,
+  exportSingleEntitiesIntoSeparateFiles: false,
   includeReadOnlyAttributes: true,
   includeTaxonScientificName: true,
   includeFiles: true,
@@ -128,13 +150,14 @@ export class CsvDataExportModel {
   }
 
   _createColumnsFromAttributeDefs(attributeDefs) {
+    const { survey } = this
     const { includeCategoryItemsLabels, includeTaxonScientificName } = this.options
 
     return attributeDefs.reduce((acc, nodeDef) => {
       const columnsGetter = columnsByNodeDefType[NodeDef.getType(nodeDef)]
 
       const columnsPerAttribute = columnsGetter
-        ? columnsGetter({ nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
+        ? columnsGetter({ survey, nodeDef, includeCategoryItemsLabels, includeTaxonScientificName })
         : []
 
       if (NodeDef.isKey(nodeDef)) {
@@ -170,7 +193,7 @@ export class CsvDataExportModel {
 
   _extractAttributeDefsColumns(nodeDefContext) {
     const { cycle, options } = this
-    const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = options
+    const { includeAnalysis, includeFileAttributeDefs, includeFiles, includeReadOnlyAttributes } = options
 
     let descendantDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities({
@@ -183,9 +206,9 @@ export class CsvDataExportModel {
 
     descendantDefs = descendantDefs.filter(
       (nodeDef) =>
-        (includeFiles || !NodeDef.isFile(nodeDef)) && (includeReadOnlyAttributes || !NodeDef.isReadOnly(nodeDef))
+        (includeFileAttributeDefs || includeFiles || !NodeDef.isFile(nodeDef)) &&
+        (includeReadOnlyAttributes || !NodeDef.isReadOnly(nodeDef) || NodeDef.isKey(nodeDef))
     )
-
     return this._createColumnsFromAttributeDefs(descendantDefs)
   }
 
@@ -197,5 +220,7 @@ export class CsvDataExportModel {
     return this.columns.find((column) => column.header === header)
   }
 }
+
+CsvDataExportModel.getExpandedCategoryItemColumnHeader = getExpandedCategoryItemColumnHeader
 
 CsvDataExportModel.columnDataType = columnDataType

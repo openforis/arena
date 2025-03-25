@@ -1,18 +1,12 @@
+import { quote } from '@core/stringUtils'
+
 import * as Chain from '@common/analysis/chain'
 
 import * as ApiRoutes from '../../../../../../../common/apiRoutes'
+
 import RFileSystem from './rFileSystem'
 
-import {
-  arenaEndTime,
-  arenaStartTime,
-  arenaPut,
-  asNumeric,
-  paste,
-  setVar,
-  sysTime,
-  unlinkWd
-} from '../../rFunctions'
+import { arenaEndTime, arenaStartTime, arenaPut, asNumeric, paste, setVar, sysTime, unlinkWd } from '../../rFunctions'
 
 export default class RFileClose extends RFileSystem {
   constructor(rChain) {
@@ -24,8 +18,10 @@ export default class RFileClose extends RFileSystem {
 
     const { surveyId, chainUuid } = this.rChain
 
-    const params = { statusExec: `'${Chain.statusExec.success}'` }
-    const updateChain = arenaPut(ApiRoutes.rChain.chainStatusExec(surveyId, chainUuid), params)
+    const params = {
+      statusExec: quote(Chain.statusExec.success),
+    }
+    const updateChain = arenaPut(ApiRoutes.rChain.chainStatusExec({ surveyId, chainUuid }), params)
     await this.appendContent(updateChain)
 
     await this.appendContent(setVar(arenaEndTime, sysTime()))

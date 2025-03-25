@@ -14,7 +14,7 @@ import { ButtonAdd } from '@webapp/components'
 import { useConfirmDelete } from '@webapp/components/hooks'
 
 const CyclesEditor = (props) => {
-  const { cycles, readOnly, setCycles, validation } = props
+  const { cycles, readOnly, setCycles, validation = {} } = props
   const cycleEntries = Object.entries(cycles)
 
   const confirmDelete = useConfirmDelete()
@@ -28,8 +28,9 @@ const CyclesEditor = (props) => {
       params: { cycle: cycleLabel },
       headerText: 'homeView.surveyInfo.confirmDeleteCycleHeader',
       onOk: () => {
-        delete cycles[cycleKeyToDelete]
-        setCycles(cycles)
+        const cyclesUpdated = { ...cycles }
+        delete cyclesUpdated[cycleKeyToDelete]
+        setCycles(cyclesUpdated)
       },
       strongConfirm: true,
       strongConfirmRequiredText: `delete cycle ${cycleLabel}`,
@@ -77,9 +78,6 @@ CyclesEditor.propTypes = {
   readOnly: PropTypes.bool.isRequired,
   setCycles: PropTypes.func.isRequired,
   validation: PropTypes.object,
-}
-CyclesEditor.defaultProps = {
-  validation: {},
 }
 
 export default CyclesEditor

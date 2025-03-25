@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -7,7 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 
@@ -37,24 +37,25 @@ const NodeDefsSelectorAggregate = (props) => {
   const {
     dimensions,
     measures,
-    nodeDefLabelType,
-    nodeDefUuidEntity,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
     onChangeEntity,
     onChangeMeasures,
     onChangeDimensions,
-    showAnalysisAttributes,
+    showAnalysisAttributes = false,
   } = props
 
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })
 
+  const measuresNodeDefUuids = useMemo(() => Object.keys(measures), [measures])
+
   const onToggleMeasure = (nodeDefUuid) => {
-    const measuresUpdate = new Map(measures)
-    if (measuresUpdate.has(nodeDefUuid)) {
-      measuresUpdate.delete(nodeDefUuid)
+    const measuresUpdate = { ...measures }
+    if (measuresUpdate[nodeDefUuid]) {
+      delete measuresUpdate[nodeDefUuid]
     } else {
       let aggregateFn
       const variablePrevStep = variablesPrevSteps.find((variable) => StepVariable.getUuid(variable) === nodeDefUuid)
@@ -62,9 +63,12 @@ const NodeDefsSelectorAggregate = (props) => {
         const expr = Expression.fromString(StepVariable.getAggregate(variablePrevStep))
         aggregateFn = Expression.toSql(expr)
       } else {
-        aggregateFn = Query.DEFAULT_AGGREGATE_FUNCTIONS.sum
+        aggregateFn =
+          nodeDefUuidEntity === nodeDefUuid
+            ? Query.DEFAULT_AGGREGATE_FUNCTIONS.cnt
+            : Query.DEFAULT_AGGREGATE_FUNCTIONS.sum
       }
-      measuresUpdate.set(nodeDefUuid, [aggregateFn])
+      measuresUpdate[nodeDefUuid] = [aggregateFn]
     }
     onChangeMeasures(measuresUpdate)
   }
@@ -91,7 +95,6 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
-              lang={lang}
               filterFunction={(nodeDef) =>
                 NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
               }
@@ -107,13 +110,13 @@ const NodeDefsSelectorAggregate = (props) => {
 
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
-              onToggleAttribute={onToggleMeasure}
-              lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
               filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
+              includeEntityFrequencySelector
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
-              nodeDefUuidsAttributes={[...measures.keys()]}
+              nodeDefUuidsAttributes={measuresNodeDefUuids}
+              onToggleAttribute={onToggleMeasure}
               showAncestors={false}
               showMultipleAttributes={false}
               showAnalysisAttributes={showAnalysisAttributes}
@@ -130,7 +133,7 @@ const NodeDefsSelectorAggregate = (props) => {
                     key={variableNodeDefUuid}
                     nodeDef={childDef}
                     nodeDefLabelType={nodeDefLabelType}
-                    nodeDefUuidsAttributes={[...measures.keys()]}
+                    nodeDefUuidsAttributes={measuresNodeDefUuids}
                     nodeDefContext={Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)}
                     onToggleAttribute={onToggleMeasure}
                   />
@@ -146,19 +149,13 @@ const NodeDefsSelectorAggregate = (props) => {
 
 NodeDefsSelectorAggregate.propTypes = {
   dimensions: PropTypes.arrayOf(String).isRequired,
-  measures: PropTypes.instanceOf(Map).isRequired,
+  measures: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidEntity: PropTypes.string,
   onChangeEntity: PropTypes.func.isRequired,
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
   showAnalysisAttributes: PropTypes.bool,
-}
-
-NodeDefsSelectorAggregate.defaultProps = {
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
-  nodeDefUuidEntity: null,
-  showAnalysisAttributes: false,
 }
 
 export default NodeDefsSelectorAggregate

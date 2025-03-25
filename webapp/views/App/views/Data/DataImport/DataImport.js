@@ -6,7 +6,7 @@ import { useI18n } from '@webapp/store/system'
 
 import TabBar from '@webapp/components/tabBar'
 import { TestId } from '@webapp/utils/testId'
-import { DataImportCsvView } from './DataImportCsvView'
+import { DataImportFlatDataView } from './DataImportFlatDataView'
 import { CollectDataImportView } from './DataImportCollectView'
 import { DataImportArenaView } from './DataImportArenaView'
 
@@ -19,8 +19,8 @@ const DataImport = () => {
         tabs={[
           {
             id: TestId.dataImport.importFromCsvTab,
-            label: i18n.t('dataImportView.importFromCsv'),
-            component: DataImportCsvView,
+            label: i18n.t('dataImportView.importFromCsvExcel'),
+            component: DataImportFlatDataView,
           },
           {
             id: TestId.dataImport.importFromCollectTab,

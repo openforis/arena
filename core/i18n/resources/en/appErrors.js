@@ -1,0 +1,55 @@
+export default {
+  cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
+  cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
+  cannotInsertFileExceedingQuota: 'Cannot insert file: files storage quota would be exceeded',
+  cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
+  cantUpdateStep: `Can't update step`,
+  chainCannotBeSaved: 'Chain is invalid and cannot be saved',
+  csv: {
+    emptyHeaderFound: 'Empty header found at column {{columnPosition}}',
+    emptyHeaders: 'Empty headers found',
+  },
+  dataExport: {
+    excelMaxCellsLimitExceeded: 'Error exporting data. Try to export the data using CSV format.',
+    noRecordsMatchingSearchCriteria: 'No records matching search criteria',
+  },
+  dataImport: {
+    importFromMobileNotAllawed: 'Data import from Arena Mobile not allowed',
+  },
+  entryDataNotFound: 'Entry data not found: {{entryName}}',
+  expression: {
+    undefinedFunction: '$t(expression.undefinedFunction)',
+  },
+  functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
+  functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
+  generic: 'Unexpected error: {{text}}',
+  importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
+  invalidType: 'Invalid type {{type}}',
+  jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
+  paramIsRequired: 'Param {{param}} is required',
+  unableToFindParent: 'Unable to find parent of {{name}}',
+  unableToFindNode: 'Unable to find node with name {{name}}',
+  unableToFindSibling: 'Unable to find sibling with name {{name}}',
+  undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
+  invalidSyntax: 'Expression syntax is invalid',
+  networkError: 'Error communicating with the server',
+  record: {
+    errorUpdating: 'Error updating record',
+    entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
+    updateSelfAndDependentsDefaultValues:
+      '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
+  },
+  sessionExpiredRefreshPage: `Session could have expired.
+Try to refresh the page.`,
+  survey: {
+    nodeDefNameNotFound: 'Node definition not found: {{name}}',
+  },
+  unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
+  userHasPendingInvitation: `There's already a pending invitation for the user with email '{{email}}'; he/she cannot be invited to this survey until it's accepted`,
+  userHasRole: 'The given user has already a role in this survey',
+  userHasRole_other: 'The given users have already a role in this survey',
+  userInvalid: 'Invalid user',
+  userIsAdmin: 'The given user is already a system administrator',
+  userNotAllowedToChangePref: 'User not allowed to change pref',
+  userNotAuthorized: 'User {{userName}} is not authorized',
+}

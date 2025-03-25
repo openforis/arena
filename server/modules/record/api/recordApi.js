@@ -1,13 +1,21 @@
-import * as Request from '@server/utils/request'
+import { Objects } from '@openforis/arena-core'
 
-import { sendOk, setContentTypeFile } from '@server/utils/response'
+import * as Authorizer from '@core/auth/authorizer'
+import * as ProcessUtils from '@core/processUtils'
+
+import * as Request from '@server/utils/request'
+import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
 import * as RecordFile from '@core/record/recordFile'
 import * as Node from '@core/record/node'
+import * as DateUtils from '@core/dateUtils'
+import { FileFormats } from '@core/fileFormats'
 
+import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
@@ -17,10 +25,12 @@ import {
   requireRecordEditPermission,
   requireRecordListExportPermission,
   requireRecordListViewPermission,
+  requireRecordOwnerChangePermission,
+  requireRecordStepEditPermission,
   requireRecordViewPermission,
   requireRecordsEditPermission,
+  requireRecordsExportPermission,
 } from '../../auth/authApiMiddleware'
-import { DataImportTemplateService } from '@server/modules/dataImport/service/dataImportTemplateService'
 
 export const init = (app) => {
   // ==== CREATE
@@ -67,61 +77,6 @@ export const init = (app) => {
       await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset })
 
       sendOk(res)
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.post('/survey/:surveyId/record/importfromcollect', requireRecordCreatePermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, deleteAllRecords, cycle, forceImport } = Request.getParams(req)
-      const file = Request.getFile(req)
-
-      const job = RecordService.startCollectDataImportJob({
-        user,
-        surveyId,
-        filePath: file.tempFilePath,
-        deleteAllRecords,
-        cycle,
-        forceImport,
-      })
-      const jobSerialized = JobUtils.jobToJSON(job)
-      res.json({ job: jobSerialized })
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.post('/survey/:surveyId/record/importfromcsv', requireRecordCreatePermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const {
-        surveyId,
-        cycle,
-        entityDefUuid,
-        dryRun,
-        insertNewRecords,
-        insertMissingNodes,
-        updateRecordsInAnalysis,
-        abortOnErrors,
-      } = Request.getParams(req)
-      const filePath = Request.getFilePath(req)
-
-      const job = RecordService.startCSVDataImportJob({
-        user,
-        surveyId,
-        filePath,
-        cycle,
-        entityDefUuid,
-        dryRun,
-        insertNewRecords,
-        insertMissingNodes,
-        updateRecordsInAnalysis,
-        abortOnErrors,
-      })
-      const jobSerialized = JobUtils.jobToJSON(job)
-      res.json({ job: jobSerialized })
     } catch (error) {
       next(error)
     }
@@ -179,8 +134,27 @@ export const init = (app) => {
     try {
       const { surveyId } = Request.getParams(req)
 
-      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle(surveyId)
+      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle({ surveyId })
       res.json(recordsSummary)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  const determineOwnerUuidForQuery = async ({ req, surveyId }) => {
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyService.fetchSurveyById({ surveyId })
+    const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
+    return canViewNotOwnedRecords ? null : User.getUuid(user)
+  }
+
+  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, search } = Request.getParams(req)
+
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search, ownerUuid })
+      res.json({ count })
     } catch (error) {
       next(error)
     }
@@ -188,13 +162,19 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records/summary', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, limit, offset, sortBy, sortOrder, search } = Request.getParams(req)
+      const { surveyId, cycle, includeCounts, limit, offset, recordUuid, sortBy, sortOrder, search } =
+        Request.getParams(req)
+
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
 
       const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId({
         surveyId,
         cycle,
+        includeCounts,
         offset,
         limit,
+        ownerUuid,
+        recordUuid,
         sortBy,
         sortOrder,
         search,
@@ -207,9 +187,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/records/summary/export', requireRecordListExportPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      await RecordService.exportRecordsSummaryToCsv({ res, surveyId, cycle })
+      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -240,12 +220,33 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
+  // records export (only specified uuids)
+  app.post('/survey/:surveyId/records/export', requireRecordsExportPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, search } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
+      const recordUuids = Request.getJsonParam(req, 'recordUuids')
+      const user = Request.getUser(req)
 
-      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
-      res.json({ count })
+      if (Objects.isEmpty(recordUuids)) {
+        throw new Error('record uuids not specified')
+      }
+
+      const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // download generated record export file
+  app.get('/survey/:surveyId/records/export/download', requireRecordsExportPermission, async (req, res, next) => {
+    try {
+      const { surveyName, fileName } = Request.getParams(req)
+
+      const path = FileUtils.join(ProcessUtils.ENV.tempFolder, fileName)
+      const prefix = 'arena_records'
+      const date = DateUtils.nowFormatDefault()
+      sendFile({ res, path, name: `${prefix}_${surveyName}_${date}.zip` })
     } catch (error) {
       next(error)
     }
@@ -295,40 +296,11 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/csv', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/validationReport/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, lang, recordUuid } = Request.getParams(req)
+      const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      await RecordService.exportValidationReportToCSV({ res, surveyId, cycle, lang, recordUuid })
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.get('/survey/:surveyId/record/importfromcsv/template', requireRecordCreatePermission, async (req, res, next) => {
-    try {
-      const { surveyId, entityDefUuid, cycle } = Request.getParams(req)
-
-      await DataImportTemplateService.exportDataImportTemplate({
-        surveyId,
-        cycle,
-        entityDefUuid,
-        res,
-      })
-    } catch (error) {
-      next(error)
-    }
-  })
-
-  app.get('/survey/:surveyId/record/importfromcsv/templates', requireRecordCreatePermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle } = Request.getParams(req)
-
-      await DataImportTemplateService.exportAllDataImportTemplates({
-        surveyId,
-        cycle,
-        res,
-      })
+      await RecordService.exportValidationReportToFlatData({ res, surveyId, cycle, lang, recordUuid, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -337,7 +309,7 @@ export const init = (app) => {
   // ==== UPDATE
 
   // RECORD promote / demote
-  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
+  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordStepEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, step } = Request.getParams(req)
       const user = Request.getUser(req)
@@ -388,6 +360,37 @@ export const init = (app) => {
       const { count } = await RecordService.updateRecordsStep({ user, surveyId, cycle, stepFrom, stepTo, recordUuids })
 
       res.json({ count })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/record/:recordUuid/owner', requireRecordOwnerChangePermission, async (req, res, next) => {
+    try {
+      const { surveyId, recordUuid, ownerUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await RecordService.updateRecordOwner({ user, surveyId, recordUuid, ownerUuid })
+
+      sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/survey/:surveyId/records/merge', requireRecordViewPermission, async (req, res, next) => {
+    try {
+      const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const { record, nodesCreated, nodesUpdated } = await RecordService.mergeRecords({
+        user,
+        surveyId,
+        sourceRecordUuid,
+        targetRecordUuid,
+        dryRun,
+      })
+      res.json({ record, nodesCreated, nodesUpdated })
     } catch (error) {
       next(error)
     }

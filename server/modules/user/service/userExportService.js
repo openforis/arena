@@ -2,11 +2,11 @@ import i18n from '@core/i18n/i18nFactory'
 import * as AuthGroup from '@core/auth/authGroup'
 import { Countries } from '@core/Countries'
 
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as UserManager from '../manager/userManager'
 
-const exportUsersIntoStream = async ({ outputStream }) => {
+const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
   const transformSurveyNames = (surveyNames) =>
     surveyNames
       ? Object.values(AuthGroup.groupNames).reduce(
@@ -19,7 +19,7 @@ const exportUsersIntoStream = async ({ outputStream }) => {
 
   const transformCountry = (countryCode) => (countryCode ? Countries.getCountryName({ code: countryCode }) : '')
 
-  const headers = [
+  const fields = [
     'email',
     'name',
     'title',
@@ -37,10 +37,16 @@ const exportUsersIntoStream = async ({ outputStream }) => {
     title: transformTitle(obj.title),
     country: transformCountry(obj.country),
   })
-
-  const transformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
-  transformer.pipe(outputStream)
-  await UserManager.fetchUsersIntoStream({ transformer })
+  await UserManager.fetchUsersIntoStream({
+    processor: (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        fields,
+        options: { objectTransformer },
+        outputStream,
+        fileFormat,
+      }),
+  })
 }
 
 export const UserExportService = {

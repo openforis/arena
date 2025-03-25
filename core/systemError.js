@@ -46,4 +46,9 @@ export default class SystemError extends Error {
   get statusCode() {
     return this._statusCode
   }
+
+  toJSON() {
+    const { key, params, statusCode } = this
+    return { key, params, statusCode }
+  }
 }

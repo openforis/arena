@@ -1,0 +1,11 @@
+@use '~@webapp/style/vars' as *;
+
+.MuiTreeItem-root {
+  .MuiTreeItem-content.Mui-selected {
+    background-color: $blueLight;
+
+    .MuiTreeItem-label {
+      font-weight: bold;
+    }
+  }
+}

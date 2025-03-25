@@ -4,8 +4,11 @@ import { uuidv4 } from '@core/uuid'
 
 import * as Srs from '@core/geo/srs'
 
+import * as NodeDef from './nodeDef'
+
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
+import * as SurveyConfig from './_survey/surveyConfig'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -58,6 +61,7 @@ export const newSurvey = ({
   [SurveyInfo.keys.template]: template,
 })
 
+export const { configKeys } = SurveyConfig
 export const { keys: infoKeys, status } = SurveyInfo
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } = SurveyInfo
@@ -105,8 +109,12 @@ export const {
   getDefaultLabel,
   getDescription,
   getDescriptions,
+  getFieldManualLinks,
+  getUserExtraPropDefs,
+  getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
+  getSecurity,
   getSRS,
   getSRSCodes,
   getSRSIndex,
@@ -120,7 +128,6 @@ export const {
   getDatePublished,
   isPublished,
   isDraft,
-  isValid,
   isFromCollect,
   isRdbInitialized,
   getCollectUri,
@@ -133,12 +140,15 @@ export const {
   getProps,
   getPropsDraft,
   getFilesStatistics,
+  isValid,
+  canHaveRecords,
 } = SurveyInfo
 
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocFilesStatistics, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocFilesStatistics, assocOwnerUuid, assocRDBInitilized, assocSrs, markDraft } =
+  SurveyInfo
 
 // ====== READ nodeDefs
 export const {
@@ -154,7 +164,6 @@ export const {
   hasNodeDefChildrenEntities,
   getNodeDefChildrenSorted,
   getNodeDefChildByName,
-  getNodeDefSiblingByName,
   getNodeDefByName,
   getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid,
@@ -164,22 +173,26 @@ export const {
   getNodeDefKeysSorted,
   isNodeDefRootKey,
   findNodeDef,
+  findNodeDefByName,
   getNodeDefAreaBasedEstimate,
   getAreaBasedEstimatedOfNodeDef,
+  getNodeDefMaxDecimalDigits,
 } = SurveyNodeDefs
 
 // Hierarchy
 export const {
   isNodeDefAncestor,
+  findAncestor,
+  findAncestors,
   visitAncestorsAndSelf,
   visitAncestors,
   getNodeDefPath,
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
-  getDescendantsAndSelf,
   visitDescendantsAndSelf,
   findDescendants,
+  getNodeDefDescendantsAndSelf,
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,
   getNodeDefAncestorMultipleEntity,
@@ -237,14 +250,24 @@ export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
 
-export const { addNodeDefToIndex, deleteNodeDefIndex, initNodeDefsIndex, initAndAssocNodeDefsIndex } =
-  SurveyNodeDefsIndex
+export const {
+  addNodeDefToIndex,
+  updateNodeDefUuidByNameIndex,
+  deleteNodeDefIndex,
+  initNodeDefsIndex,
+  initAndAssocNodeDefsIndex,
+} = SurveyNodeDefsIndex
 
 // ====== NodeDefsValidation
 export const { getNodeDefsValidation, assocNodeDefsValidation, getNodeDefValidation } = SurveyNodeDefsValidation
 
 // ====== NodeDef Code
-export const { getNodeDefCategoryLevelIndex, getNodeDefParentCode, getNodeDefCodeCandidateParents } = SurveyNodeDefs
+export const {
+  getNodeDefCategoryLevelIndex,
+  getNodeDefParentCode,
+  getNodeDefAncestorCodes,
+  getNodeDefCodeCandidateParents,
+} = SurveyNodeDefs
 
 // TODO check where used
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
@@ -263,12 +286,24 @@ export const {
 } = SurveyCategories
 
 // ====== Taxonomies
-export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies } = SurveyTaxonomies
+export const { getTaxonomiesArray, getTaxonomyByName, getTaxonomyByUuid, assocTaxonomies, isTaxonomyUnused } =
+  SurveyTaxonomies
 
 // ====== Survey Reference data index
 // Category index
-export const { getCategoryItemUuidAndCodeHierarchy, getCategoryItemByUuid, getCategoryItemByHierarchicalCodes } =
-  SurveyRefDataIndex
+export const {
+  getCategoryItemUuidAndCodeHierarchy,
+  getCategoryItemByUuid,
+  getCategoryItemByHierarchicalCodes,
+  getCategoryItemsInLevel,
+} = SurveyRefDataIndex
+
+export const getNodeDefCategoryItems = (nodeDef) => (survey) => {
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+  return SurveyRefDataIndex.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
+}
+
 // Taxon index
 export const {
   getTaxonByCode,

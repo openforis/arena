@@ -9,31 +9,25 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useRecord } from '@webapp/store/ui/record'
+import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
 import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
 
-const getCodeUuidsHierarchy = ({ survey, record, parentNode, nodeDef }) => {
-  const nodeParentCode = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  return nodeParentCode ? [...Node.getHierarchyCode(nodeParentCode), Node.getUuid(nodeParentCode)] : []
-}
-
 const NodeDefCode = (props) => {
   const {
-    canEditRecord,
-    edit,
-    entryDataQuery,
+    canEditRecord = false,
+    edit = false,
+    entryDataQuery = false,
     nodeDef,
-    nodes,
-    parentNode,
-    readOnly: readOnlyProp,
+    nodes = [],
+    parentNode = null,
+    readOnly: readOnlyProp = false,
     removeNode,
     updateNode,
   } = props
@@ -41,33 +35,39 @@ const NodeDefCode = (props) => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
-  const record = useRecord()
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const draft = Survey.isDraft(surveyInfo)
-  const codeUuidsHierarchy = getCodeUuidsHierarchy({ survey, record, parentNode, nodeDef })
+
+  const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
-  const itemsArray = useItems({ survey, record, nodeDef, parentNode, draft, edit, entryDataQuery })
+  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
   const [selectedItems, setSelectedItems] = useState([])
+  const autocomplete = typeof items === 'function'
 
   // On items or nodes change, update selectedItems
   useEffect(() => {
     if (!edit) {
-      const selectedItemUuids = nodes.map(Node.getCategoryItemUuid)
-      const selectedItemsUpdate = itemsArray.filter((item) => selectedItemUuids.includes(CategoryItem.getUuid(item)))
+      const selectedItemsUpdate = nodes.reduce((acc, node) => {
+        const categoryItem = NodeRefData.getCategoryItem(node)
+        if (categoryItem) {
+          acc.push(categoryItem)
+        }
+        return acc
+      }, [])
       setSelectedItems(selectedItemsUpdate)
     }
-  }, [edit, itemsArray, nodes])
+  }, [edit, items, nodes])
 
   const onItemAdd = (item) => {
     const existingNode = singleNode ? nodes[0] : null
     const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
     const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
-    const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
+    const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
     const refData = { [NodeRefData.keys.categoryItem]: item }
 
     updateNode(nodeDef, node, value, null, meta, refData)
@@ -90,13 +90,13 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery ? (
+  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete ? (
     <NodeDefCodeDropdown
       canEditRecord={canEditRecord}
       edit={edit}
       entryDataQuery={entryDataQuery}
       itemLabelFunction={itemLabelFunction}
-      items={itemsArray}
+      items={items}
       nodeDef={nodeDef}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}
@@ -108,7 +108,7 @@ const NodeDefCode = (props) => {
       canEditRecord={canEditRecord}
       edit={edit}
       itemLabelFunction={itemLabelFunction}
-      items={itemsArray}
+      items={items}
       onItemAdd={onItemAdd}
       onItemRemove={onItemRemove}
       readOnly={readOnly}
@@ -127,15 +127,6 @@ NodeDefCode.propTypes = {
   readOnly: PropTypes.bool,
   removeNode: PropTypes.func.isRequired,
   updateNode: PropTypes.func.isRequired,
-}
-
-NodeDefCode.defaultProps = {
-  canEditRecord: false,
-  edit: false,
-  entryDataQuery: false,
-  nodes: [],
-  parentNode: null,
-  readOnly: false,
 }
 
 export default NodeDefCode

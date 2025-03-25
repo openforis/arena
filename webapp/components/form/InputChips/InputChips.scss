@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .form-input-chip {
   display: flex;
@@ -6,34 +6,18 @@
   align-items: flex-end;
   row-gap: 0.2rem;
 
-  .form-input {
-    padding: 0;
-
-    &:first-child {
-      .form-input-chip-item {
-        font-weight: 600;
-      }
-    }
-  }
-
   .dropdown {
     align-self: stretch;
     width: 10rem;
   }
 }
 
-.form-input-chip-item {
+.form-input-chip-text {
   display: flex;
-  height: 17px;
-  align-items: center;
-  margin: 0.25rem 0.3rem;
-  font-size: 0.7rem;
-  padding: 0.95rem 0.5rem;
-  border: 1px solid $greyBorder;
+  flex-direction: column;
 
-  .btn-remove {
-    padding: 0.2rem 0.5rem;
-    margin-left: 0.3rem;
-    border: none;
+  .chips-wrapper {
+    display: flex;
+    flex-flow: wrap;
   }
 }

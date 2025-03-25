@@ -1,12 +1,16 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+import PropTypes from 'prop-types'
 
+import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 import * as Chain from '@common/analysis/chain'
 
-import { ChainActions, useChain } from '@webapp/store/ui/chain'
+import { ChainActions, useChain, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
 import { Checkbox } from '@webapp/components/form'
 import ButtonRStudio from '@webapp/components/ButtonRStudio'
+import RecordsDropdown from './RecordsDropdown'
 
 export const ChainRStudioFieldset = (props) => {
   const { updateChain } = props
@@ -15,25 +19,44 @@ export const ChainRStudioFieldset = (props) => {
   const chain = useChain()
   const validation = Chain.getValidation(chain)
 
-  const openRStudio = useCallback(() => {
-    dispatch(ChainActions.openRStudio())
-  }, [])
+  const recordsCountByStep = useChainRecordsCountByStep()
+  const analysisRecordsAvailable = Number(recordsCountByStep[RecordStep.analysisCode]) > 0
 
-  const openRStudioLocal = useCallback(() => {
-    dispatch(ChainActions.openRStudio({ isLocal: true }))
-  }, [])
+  const _openRStudio = useCallback(
+    ({ isLocal = false } = {}) => dispatch(ChainActions.openRStudio({ isLocal })),
+    [dispatch]
+  )
+
+  const openRStudio = useCallback(() => _openRStudio(), [_openRStudio])
+  const openRStudioLocal = useCallback(() => _openRStudio({ isLocal: true }), [_openRStudio])
 
   return (
     <fieldset className="rstudio-fieldset">
       <legend>RStudio</legend>
       <div className="content">
         <div>
+          {analysisRecordsAvailable && (
+            <Checkbox
+              label="chainView.submitOnlyAnalysisStepDataIntoR"
+              checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
+              validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
+              onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
+            />
+          )}
           <Checkbox
-            label="chainView.submitOnlyAnalysisStepDataIntoR"
-            checked={Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)}
-            validation={Validation.getFieldValidation(Chain.keysProps.submitOnlyAnalysisStepDataIntoR)(validation)}
-            onChange={(value) => updateChain(Chain.assocSubmitOnlyAnalysisStepDataIntoR(value)(chain))}
+            label="chainView.submitOnlySelectedRecordsIntoR"
+            checked={Chain.isSubmitOnlySelectedRecordsIntoR(chain)}
+            validation={Validation.getFieldValidation(Chain.keysProps.submitOnlySelectedRecordsIntoR)(validation)}
+            onChange={(value) => updateChain(Chain.assocSubmitOnlySelectedRecordsIntoR(value)(chain))}
           />
+          {Chain.isSubmitOnlySelectedRecordsIntoR(chain) && (
+            <RecordsDropdown
+              onChange={(selectedRecords) =>
+                updateChain(Chain.assocSelectedRecordUuids(selectedRecords.map(Record.getUuid))(chain))
+              }
+              selectedUuids={Chain.getSelectedRecordUuids(chain)}
+            />
+          )}
           <Checkbox
             label="chainView.resultsBackFromRStudio"
             checked={Chain.isResultsBackFromRStudio(chain)}
@@ -46,4 +69,8 @@ export const ChainRStudioFieldset = (props) => {
       </div>
     </fieldset>
   )
+}
+
+ChainRStudioFieldset.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }

@@ -11,8 +11,8 @@ import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '../manager/nodeDefManager'
 
-const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
-  const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
+  SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     {
       surveyId,
       cycle,
@@ -22,9 +22,6 @@ const fetchSurvey = async ({ surveyId, cycle }, client = db) => {
     },
     client
   )
-  // build dependency graph if empty
-  return Survey.hasDependencyGraph(surveyDb) ? surveyDb : Survey.buildAndAssocDependencyGraph(surveyDb)
-}
 
 const _validateNodeDefs = async ({ survey, nodeDef, updatedNodeDefs, nodeDefsDependentByUuid }) => {
   const nodeDefsToValidateByUuid = {}
@@ -55,7 +52,10 @@ const afterNodeDefUpdate = async (
   { survey, nodeDef = null, nodeDefsDependentsUuids = [], nodeDefsUpdated = {} },
   client = db
 ) => {
-  const allUpdatedNodeDefs = { ...(nodeDef ? { [nodeDef.uuid]: nodeDef } : nodeDefsUpdated) }
+  const allUpdatedNodeDefs = { ...nodeDefsUpdated }
+  if (nodeDef && !allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)]) {
+    allUpdatedNodeDefs[NodeDef.getUuid(nodeDef)] = nodeDef
+  }
   const updatedNodeDefsNotDeleted = ObjectUtils.toUuidIndexedObj(
     Object.values(allUpdatedNodeDefs).filter((def) => !NodeDef.isDeleted(def))
   )
@@ -73,11 +73,9 @@ const afterNodeDefUpdate = async (
     ...nodeDefsDependentByUuid,
   })(surveyUpdated)
 
-  await SurveyManager.updateSurveyDependencyGraphs(
-    Survey.getId(surveyUpdated),
-    Survey.getDependencyGraph(surveyUpdated),
-    client
-  )
+  const dependencyGraph = Survey.getDependencyGraph(surveyUpdated)
+
+  await SurveyManager.updateSurveyDependencyGraphs(Survey.getId(surveyUpdated), dependencyGraph, client)
 
   const nodeDefsValidation = await _validateNodeDefs({
     survey: surveyUpdated,
@@ -87,7 +85,8 @@ const afterNodeDefUpdate = async (
   })
 
   return {
-    nodeDefsUpdated,
+    dependencyGraph,
+    nodeDefsUpdated: allUpdatedNodeDefs,
     nodeDefsValidation,
   }
 }
@@ -174,6 +173,17 @@ export const moveNodeDef = async ({ user, surveyId, nodeDefUuid, targetParentNod
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsDependentsUuids, nodeDefsUpdated }, t)
+  })
+
+export const convertNodeDef = async ({ user, surveyId, nodeDefUuid, toType }, client = db) =>
+  client.tx(async (t) => {
+    const survey = await fetchSurvey({ surveyId }, t)
+
+    const nodeDefsDependentsUuids = Survey.getNodeDefDependentsUuids(nodeDefUuid)(survey)
+
+    const nodeDef = await NodeDefManager.convertNodeDef({ user, survey, nodeDefUuid, toType }, t)
+
+    return afterNodeDefUpdate({ survey, nodeDef, nodeDefsDependentsUuids }, t)
   })
 
 export const fetchNodeDefsUpdatedAndValidated = async ({ user, surveyId, cycle, nodeDefsUpdated }, client = db) => {

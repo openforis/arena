@@ -1,15 +1,9 @@
-@import '~codemirror/lib/codemirror.css';
-@import '~codemirror/addon/hint/show-hint';
-@import 'webapp/style/vars';
-
-.CodeMirror-hints {
-  z-index: $zIndex20Dropdown;
-}
+@use '~@webapp/style/vars' as *;
 
 .expression-editor-popup {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  grid-row-gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 
   .query {
     background-color: rgba($blueLight, 0.15);
@@ -30,9 +24,11 @@
     font-family: inherit;
   }
 }
-.expression-editor-popup__toggle-advanced {
+
+.MuiButton-root.expression-editor-popup__toggle-advanced {
   position: absolute;
   right: 20px;
+  width: 10rem;
 }
 
 .expression-editor__variables-search {
@@ -45,6 +41,7 @@
     margin-bottom: 15px;
   }
 }
+
 .expression-editor-popup__expr-container {
   margin-top: 1.5rem;
   position: relative;
@@ -56,6 +53,7 @@
     border: 1px solid black;
     margin-bottom: 15px;
   }
+
   textarea,
   span {
     font-size: 1rem;
@@ -63,28 +61,20 @@
 
   //common
   .btns {
-    display: grid;
-    grid-template-columns: 2rem auto 1fr auto;
+    display: flex;
     align-items: center;
     width: 100%;
-
-    .btns__add {
-      grid-column: 2;
-    }
-
-    .btns__last {
-      grid-column: 4;
-    }
+    gap: 0.5rem;
   }
 
   input {
     text-align: center;
-    height: 100%;
   }
 
   //types
   .binary {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 1rem;
@@ -96,8 +86,15 @@
 
       .identifier,
       .dropdown-literal {
-        width: 100%;
-        max-width: 40rem;
+        flex: 1;
+        min-width: 10rem;
+        max-width: 20rem;
+      }
+
+      .call {
+        .identifier {
+          width: 20rem;
+        }
       }
     }
 
@@ -110,14 +107,16 @@
     }
 
     .btns {
-      width: 200px;
+      width: 160px;
     }
 
-    .btn-switch-operand {
-      font-size: 0.75rem;
-      margin: 0 0.1rem;
-      height: 32px;
-      align-self: flex-end;
+    .binary-operand-type-btn-group {
+      height: 2rem;
+      margin: 0 0.2rem;
+
+      button {
+        white-space: nowrap;
+      }
     }
 
     .operator {
@@ -125,19 +124,17 @@
     }
 
     .literal-btn-group-boolean {
-      justify-content: space-between;
-      width: 8rem;
       margin-left: 2rem;
     }
   }
 
   .literal {
-    width: 100%;
-    max-width: 40rem;
+    flex: 1;
+    min-width: 10rem;
+    max-width: 20rem;
 
     .form-input {
       margin-left: 0.5rem;
-      padding: 0.3rem;
       text-align: left;
     }
   }
@@ -167,8 +164,24 @@
   gap: 5rem;
   margin-top: 2rem;
 
-  > button {
+  >button {
     margin: 0px 0.3rem;
     font-weight: 600;
+  }
+}
+
+.cm-tooltip-autocomplete {
+  .cm-completionDetail {
+    margin-left: 2rem;
+    text-wrap: wrap;
+    white-space: pre-wrap;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .cm-completion-option.function {
+    .cm-completionLabel {
+      font-weight: bold;
+    }
   }
 }

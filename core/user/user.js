@@ -10,23 +10,21 @@ import * as UserProps from './_user/userProps'
 import { userStatus } from './_user/userStatus'
 
 export { keys } from './_user/userKeys'
+export { keysProps } from './_user/userProps'
 export { userStatus } from './_user/userStatus'
 
 export const nameMaxLength = 128
 
 export const { keysPrefs, keysSurveyPrefs } = UserPrefs
-export const { keysProps } = UserProps
 
 // ====== READ
-export const { isEqual } = ObjectUtils
-export const { getUuid } = ObjectUtils
+export const { getAuthGroups, getExtra, getExtraProp, getUuid, isEqual } = ObjectUtils
 export const getName = R.propOr('', keys.name)
 export const getEmail = R.prop(keys.email)
 export const getInvitedBy = R.prop(keys.invitedBy)
 export const getInvitedDate = R.prop(keys.invitedDate)
 export const getPassword = R.prop(keys.password)
 export const getLang = R.propOr('en', keys.lang)
-export const { getAuthGroups } = ObjectUtils
 export const getPrefs = R.propOr({}, keys.prefs)
 export const getProps = R.propOr({}, keys.props)
 export const getProfilePicture = R.prop(keys.profilePicture)
@@ -34,7 +32,11 @@ export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
 export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
+export const getAuthGroupExtraProps = R.propOr({}, keys.authGroupExtraProps)
+export const getAuthGroupExtraProp = (prop) => R.pipe(getAuthGroupExtraProps, R.prop(prop))
 export const getLastLoginTime = R.prop(keys.lastLoginTime)
+export const getSurveysCountDraft = R.prop(keys.surveysCountDraft)
+export const getSurveysCountPublished = R.prop(keys.surveysCountPublished)
 
 // ====== UPDATE
 export const assocProp = R.assoc
@@ -89,6 +91,8 @@ export const assocAuthGroup = (authGroup) => _updateAuthGroups(R.append(authGrou
 
 export const dissocAuthGroup = (authGroup) => _updateAuthGroups(R.reject(AuthGroup.isEqual(authGroup)))
 
+export const assocAuthGroupExtraProps = R.assoc(keys.authGroupExtraProps)
+
 // PREFS
 export const {
   newPrefs,
@@ -111,7 +115,9 @@ export const {
   assocTitle,
   assocMapApiKey,
   assocMaxSurveys,
+  assocExtra,
   titleKeys,
+  titleKeysArray,
   newProps,
   dissocPrivateProps,
   dissocRestrictedProps,

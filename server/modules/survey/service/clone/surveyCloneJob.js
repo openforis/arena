@@ -7,11 +7,12 @@ import { SurveyCreatorJobHelper } from '../surveyCreatorJobHelper'
 export default class SurveyCloneJob extends Job {
   constructor(params) {
     const backup = false
+    const cloning = true
     const { cycle } = params
     // pass backup parameter to inner jobs
     super(SurveyCloneJob.type, { ...params, backup }, [
       new SurveyExportJob({ backup, cycle, includeActivityLog: false }),
-      new ArenaImportJob({ backup }),
+      new ArenaImportJob({ backup, cloning }),
     ])
   }
 
@@ -24,10 +25,11 @@ export default class SurveyCloneJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { surveyId } = this.context
+    const { surveyId: sourceSurveyId } = this.params
+    const { surveyId: targetSurveyId } = this.context
 
-    if (surveyId) {
-      await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
+    if (targetSurveyId && sourceSurveyId !== targetSurveyId) {
+      await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId: targetSurveyId })
     }
   }
 }

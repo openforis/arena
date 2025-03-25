@@ -8,47 +8,32 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as DataExportService from '../service/dataExportService'
 
 export const init = (app) => {
-  // export-csv-data
-  // generate zip with CSV
-  app.post(
-    '/survey/:surveyId/data-export/csv',
-    AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const {
-          surveyId,
-          cycle,
-          includeCategories,
-          includeCategoryItemsLabels,
-          includeAnalysis,
-          includeDataFromAllCycles,
-          includeFiles,
-        } = Request.getParams(req)
+  app.post('/survey/:surveyId/data-export', AuthMiddleware.requireRecordsExportPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
 
-        const user = Request.getUser(req)
+      const user = Request.getUser(req)
 
-        const job = SurveyService.startExportCsvDataJob({
-          surveyId,
-          cycle,
-          user,
-          includeCategories,
-          includeCategoryItemsLabels,
-          includeAnalysis,
-          includeDataFromAllCycles,
-          includeFiles,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
+      const job = DataExportService.startCsvDataExportJob({
+        user,
+        surveyId,
+        cycle,
+        recordUuids,
+        search,
+        options,
+      })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // get zip with csv
   app.get(
-    '/survey/:surveyId/data-export/csv/:exportUuid',
+    '/survey/:surveyId/data-export/:exportUuid',
     AuthMiddleware.requireRecordsExportPermission,
     async (req, res, next) => {
       try {

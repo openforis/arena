@@ -123,7 +123,7 @@ export const init = (app) => {
         const { props, propsAdvanced } = Request.getBody(req)
         const { surveyId, cycle, nodeDefUuid, parentUuid } = Request.getParams(req)
 
-        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.updateNodeDefProps({
+        const { dependencyGraph, nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.updateNodeDefProps({
           user,
           surveyId,
           cycle,
@@ -135,7 +135,7 @@ export const init = (app) => {
 
         // do not send updated node def back to client (node def already updated client side)
         delete nodeDefsUpdated[nodeDefUuid]
-        res.json({ nodeDefsUpdated, nodeDefsValidation })
+        res.json({ dependencyGraph, nodeDefsUpdated, nodeDefsValidation })
       } catch (error) {
         next(error)
       }
@@ -176,6 +176,28 @@ export const init = (app) => {
           surveyId,
           nodeDefUuid,
           targetParentNodeDefUuid,
+        })
+
+        res.json({ nodeDefsUpdated, nodeDefsValidation })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/nodeDef/:nodeDefUuid/convert',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, nodeDefUuid, toType } = Request.getParams(req)
+
+        const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.convertNodeDef({
+          user,
+          surveyId,
+          nodeDefUuid,
+          toType,
         })
 
         res.json({ nodeDefsUpdated, nodeDefsValidation })

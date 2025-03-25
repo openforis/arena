@@ -1,4 +1,5 @@
 import React from 'react'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -12,29 +13,33 @@ import { useTable } from './useTable'
 
 const Table = (props) => {
   const {
-    cellTestIdExtractor,
-    className,
-    columns,
-    expandableRows,
-    gridTemplateColumns,
-    headerLeftComponent,
-    isRowExpandable,
-    isRowActive,
-    keyExtractor,
+    cellProps = {},
+    cellTestIdExtractor = null,
+    className = '',
+    columns = null,
+    expandableRows = false,
+    gridTemplateColumns = '1fr',
+    headerLeftComponent = DummyComponent,
+    headerProps = {},
+    isRowActive = null,
+    isRowExpandable = () => true,
+    keyExtractor = ({ item }) => ObjectUtils.getUuid(item),
     module,
-    moduleApiUri,
-    noItemsLabelKey,
-    noItemsLabelForSearchKey,
-    onRowClick: onRowClickProp,
-    onRowDoubleClick,
-    restParams,
-    rowComponent,
-    rowExpandedComponent,
-    rowHeaderComponent,
-    headerProps,
-    rowProps,
-    selectable,
-    visibleColumnsSelectionEnabled,
+    moduleApiUri = null,
+    noItemsLabelKey = 'common.noItems',
+    noItemsLabelForSearchKey = 'common.noItems',
+    onRowClick: onRowClickProp = null,
+    onRowDoubleClick = null,
+    restParams = {},
+    rowHeaderComponent = DummyComponent,
+    rowComponent = DummyComponent,
+    rowExpandedComponent = DummyComponent,
+    rowProps = {},
+    selectable = true,
+    selectOnClick = true,
+    showFooter = true,
+    showHeader = true,
+    visibleColumnsSelectionEnabled = false,
   } = props
 
   const {
@@ -51,9 +56,14 @@ const Table = (props) => {
     totalCount,
     initData,
     onRowClick,
+    onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
+    selectAllItems,
+    deselectAllItems,
+    visibleColumnKeys,
     visibleColumns,
+    visibleItemsCount,
   } = useTable({
     columns,
     keyExtractor,
@@ -62,6 +72,7 @@ const Table = (props) => {
     onRowClick: onRowClickProp,
     restParams,
     selectable,
+    selectOnClick,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -69,24 +80,28 @@ const Table = (props) => {
   }
 
   return (
-    <div className={`table ${className}`}>
-      <Header
-        columns={columns}
-        offset={offset}
-        list={list}
-        limit={limit}
-        count={count}
-        totalCount={totalCount}
-        search={search}
-        headerLeftComponent={headerLeftComponent}
-        headerProps={headerProps}
-        handleSearch={handleSearch}
-        onVisibleColumnsChange={onVisibleColumnsChange}
-        selectedItems={selectedItems}
-        visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
-      />
+    <div className={classNames('table', className, { 'with-footer': showFooter })}>
+      {showHeader && (
+        <Header
+          columns={columns}
+          offset={offset}
+          list={list}
+          limit={limit}
+          count={count}
+          totalCount={totalCount}
+          search={search}
+          headerLeftComponent={headerLeftComponent}
+          headerProps={headerProps}
+          handleSearch={handleSearch}
+          onVisibleColumnsChange={onVisibleColumnsChange}
+          selectedItems={selectedItems}
+          visibleColumnsSelectionEnabled={visibleColumnsSelectionEnabled}
+          visibleColumnKeys={visibleColumnKeys}
+        />
+      )}
 
       <Content
+        cellProps={cellProps}
         cellTestIdExtractor={cellTestIdExtractor}
         gridTemplateColumns={gridTemplateColumns}
         isRowActive={isRowActive}
@@ -103,6 +118,7 @@ const Table = (props) => {
         offset={offset}
         onRowClick={onRowClick}
         onRowDoubleClick={onRowDoubleClick}
+        onRowsScroll={onRowsScroll}
         rowComponent={rowComponent}
         rowExpandedComponent={rowExpandedComponent}
         rowHeaderComponent={rowHeaderComponent}
@@ -113,8 +129,11 @@ const Table = (props) => {
         sort={sort}
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
+        selectAllItems={selectAllItems}
+        deselectAllItems={deselectAllItems}
+        visibleItemsCount={visibleItemsCount}
       />
-      <Footer offset={offset} list={list} limit={limit} count={count} />
+      {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
     </div>
   )
 }
@@ -122,6 +141,7 @@ const Table = (props) => {
 const DummyComponent = () => <div />
 
 Table.propTypes = {
+  cellProps: PropTypes.object,
   cellTestIdExtractor: PropTypes.func,
   className: PropTypes.string,
   columns: PropTypes.array,
@@ -144,32 +164,10 @@ Table.propTypes = {
   rowHeaderComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
   selectable: PropTypes.bool, // if true, selectedItems will be updated on row click and passed to the HeaderLeft component
+  selectOnClick: PropTypes.bool,
+  showFooter: PropTypes.bool,
+  showHeader: PropTypes.bool,
   visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
-}
-
-Table.defaultProps = {
-  cellTestIdExtractor: null,
-  className: '',
-  columns: null,
-  expandableRows: false,
-  gridTemplateColumns: '1fr',
-  headerLeftComponent: DummyComponent,
-  headerProps: {},
-  isRowActive: null,
-  isRowExpandable: () => true,
-  keyExtractor: ({ item }) => ObjectUtils.getUuid(item),
-  moduleApiUri: null,
-  noItemsLabelKey: 'common.noItems',
-  noItemsLabelForSearchKey: 'common.noItems',
-  onRowClick: null,
-  onRowDoubleClick: null,
-  restParams: {},
-  rowHeaderComponent: DummyComponent,
-  rowComponent: DummyComponent,
-  rowExpandedComponent: DummyComponent,
-  rowProps: {},
-  selectable: true,
-  visibleColumnsSelectionEnabled: false,
 }
 
 export default Table

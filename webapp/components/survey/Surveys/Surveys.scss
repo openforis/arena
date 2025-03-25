@@ -2,9 +2,40 @@
   .table__header {
     column-gap: 5rem;
 
-    input {
-      width: 25rem;
-      padding: 0.5rem;
+    .filter-container {
+      display: flex;
+      gap: 2rem;
+
+      .surveys__header-left__input-search {
+        width: 25rem;
+      }
+    }
+  }
+
+  .records-count,
+  .files {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 0.2rem;
+  }
+
+  .records-count {
+    width: 5rem;
+
+    .app-icons-wrapper {
+      position: relative;
+      width: 30px;
+      height: 20px;
+    }
+  }
+
+  .owner-col {
+    .dropdown-wrapper {
+      width: 16rem;
+      .dropdown__menu {
+        width: 25rem;
+      }
     }
   }
 }

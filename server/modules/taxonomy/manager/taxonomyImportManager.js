@@ -147,7 +147,7 @@ export default class TaxonomyImportManager {
     const extraPropsDefsCleaned = Object.entries(this.extraPropsDefs).reduce((extraPropsDefsAcc, [key, extraProp]) => {
       const extraPropProps = { ...extraProp }
       delete extraPropProps['originalHeader']
-      extraPropsDefsAcc[key] = { ...extraPropProps }
+      extraPropsDefsAcc[key] = extraPropProps
       return extraPropsDefsAcc
     }, {})
 

@@ -1,15 +1,16 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Taxonomy from '../taxonomy'
+import * as SurveyNodeDefs from './surveyNodeDefs'
 
 const taxonomies = 'taxonomies'
 
 // ====== READ
-export const getTaxonomies = R.propOr({}, taxonomies)
+export const getTaxonomies = A.propOr({}, taxonomies)
 
-export const getTaxonomiesArray = R.pipe(getTaxonomies, R.values)
+export const getTaxonomiesArray = A.pipe(getTaxonomies, Object.values)
 
-export const getTaxonomyByUuid = (uuid) => R.pipe(getTaxonomies, R.prop(uuid))
+export const getTaxonomyByUuid = (uuid) => A.pipe(getTaxonomies, A.prop(uuid))
 
 export const getTaxonomyByName = (name) => (survey) => {
   const taxonomies = getTaxonomiesArray(survey)
@@ -17,4 +18,8 @@ export const getTaxonomyByName = (name) => (survey) => {
 }
 
 // ====== UPDATE
-export const assocTaxonomies = (newTaxonomies) => R.assoc(taxonomies, newTaxonomies)
+export const assocTaxonomies = (newTaxonomies) => A.assoc(taxonomies, newTaxonomies)
+
+// ====== UTILS
+export const isTaxonomyUnused = (taxonomy) => (survey) =>
+  A.isEmpty(SurveyNodeDefs.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(taxonomy))(survey))

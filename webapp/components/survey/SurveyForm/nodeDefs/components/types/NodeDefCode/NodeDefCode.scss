@@ -1,5 +1,5 @@
-@import 'webapp/style/vars';
-@import '../../../../SurveyFormVars';
+@use '~@webapp/style/vars' as *;
+@use '../../../../SurveyFormVars' as *;
 
 .survey-form__node-def-code {
   display: flex;
@@ -27,8 +27,17 @@
   .form-input-chip .dropdown {
     width: 100%;
   }
+
   .dropdown {
     height: 34px;
+  }
+
+  .code-checkbox-btn {
+    cursor: pointer;
+
+    &[aria-disabled='true'] {
+      cursor: default;
+    }
   }
 }
 

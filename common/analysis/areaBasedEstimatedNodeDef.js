@@ -12,14 +12,13 @@ const getLabels = ({ estimatedOfNodeDef }) =>
     return acc
   }, {})
 
-const getScript = ({ survey, chain, estimatedOfNodeDef }) => {
+const getScript = ({ survey, estimatedOfNodeDef }) => {
   const nodeDefName = getName({ estimatedOfNodeDef })
   const nodeDefParent = Survey.getNodeDefParent(estimatedOfNodeDef)(survey)
   const parentName = NodeDef.getName(nodeDefParent)
 
   const estimatedOfNodeDefName = NodeDef.getName(estimatedOfNodeDef)
-  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const samplingNodeDefName = SamplingNodeDefs.getEntityAreaNodeDefName({ nodeDefParent, baseUnitNodeDef })
+  const samplingNodeDefName = SamplingNodeDefs.getEntityAreaNodeDefName({ nodeDefParent })
 
   return `${parentName}$${nodeDefName} <- ${parentName}$${estimatedOfNodeDefName} / ${parentName}$${samplingNodeDefName}`
 }
@@ -39,11 +38,7 @@ const newNodeDef = ({ survey, chainUuid, estimatedOfNodeDef }) => {
     [NodeDef.keysPropsAdvanced.isBaseUnit]: false,
     [NodeDef.keysPropsAdvanced.isSampling]: true,
     [NodeDef.keysPropsAdvanced.areaBasedEstimatedOf]: NodeDef.getUuid(estimatedOfNodeDef),
-    [NodeDef.keysPropsAdvanced.script]: getScript({
-      survey,
-      chainUuid,
-      estimatedOfNodeDef,
-    }),
+    [NodeDef.keysPropsAdvanced.script]: getScript({ survey, estimatedOfNodeDef }),
   }
 
   const analysis = true

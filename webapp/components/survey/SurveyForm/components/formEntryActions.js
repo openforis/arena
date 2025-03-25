@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 
@@ -8,8 +8,8 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 import * as Validation from '@core/validation/validation'
 
-import { useAuthCanDemoteRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
-import { RecordActions, useRecord } from '@webapp/store/ui/record'
+import { useAuthCanDemoteRecord, useAuthCanEditRecord, useAuthCanPromoteRecord } from '@webapp/store/user/hooks'
+import { RecordActions, RecordState, useRecord } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
@@ -25,6 +25,7 @@ const RecordEntryButtons = () => {
   const record = useRecord()
   const noHeader = useIsRecordViewWithoutHeader()
 
+  const recordEditLocked = useSelector(RecordState.isRecordEditLocked)
   const stepId = Record.getStep(record)
   const step = RecordStep.getStep(stepId)
   const stepNext = RecordStep.getNextStep(stepId)
@@ -33,11 +34,21 @@ const RecordEntryButtons = () => {
 
   const canPromote = useAuthCanPromoteRecord(record) && !noHeader
   const canDemote = useAuthCanDemoteRecord(record) && !noHeader
+  const canEdit = useAuthCanEditRecord(record)
 
   const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
 
   return (
     <>
+      {canEdit && (
+        <Button
+          iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
+          label={`recordView.${recordEditLocked ? 'unlock' : 'lock'}`}
+          onClick={() => dispatch(RecordActions.toggleEditLock)}
+          testId={TestId.record.editLockToggleBtn}
+          variant="text"
+        />
+      )}
       {!valid && (
         <Link
           data-testid={TestId.record.invalidBtn}
@@ -52,7 +63,7 @@ const RecordEntryButtons = () => {
       <div className="survey-form-header__record-actions-steps">
         {canDemote && (
           <Button
-            className="btn-s btn-transparent"
+            iconClassName="icon-reply icon-12px"
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
@@ -62,9 +73,10 @@ const RecordEntryButtons = () => {
                 })
               )
             }
+            size="small"
             title="surveyForm.formEntryActions.demoteTo"
             titleParams={{ stepPrev: getStepLabel(stepPrev) }}
-            iconClassName="icon-reply icon-12px"
+            variant="text"
           />
         )}
 
@@ -77,7 +89,7 @@ const RecordEntryButtons = () => {
 
         {canPromote && (
           <Button
-            className="btn-s btn-transparent"
+            iconClassName="icon-redo2 icon-12px"
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
@@ -87,9 +99,10 @@ const RecordEntryButtons = () => {
                 })
               )
             }
+            size="small"
             title="surveyForm.formEntryActions.promoteTo"
             titleParams={{ stepNext: getStepLabel(stepNext) }}
-            iconClassName="icon-redo2 icon-12px"
+            variant="text"
           />
         )}
       </div>
@@ -98,23 +111,21 @@ const RecordEntryButtons = () => {
 }
 
 const FormEntryActions = (props) => {
-  const { preview, entry } = props
+  const { preview = false, entry = false } = props
 
-  const i18n = useI18n()
   const dispatch = useDispatch()
 
   return (
     <div className="survey-form-header__actions">
       {preview ? (
-        <button
-          className="btn-s btn-transparent"
-          data-testid={TestId.surveyForm.previewCloseBtn}
+        <Button
+          iconClassName="icon-eye-blocked icon-12px"
+          label="surveyForm.formEntryActions.closePreview"
           onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
-          type="button"
-        >
-          <span className="icon icon-eye-blocked icon-12px icon-left" />
-          {i18n.t('surveyForm.formEntryActions.closePreview')}
-        </button>
+          size="small"
+          testId={TestId.surveyForm.previewCloseBtn}
+          variant="text"
+        />
       ) : (
         entry && <RecordEntryButtons />
       )}
@@ -125,11 +136,6 @@ const FormEntryActions = (props) => {
 FormEntryActions.propTypes = {
   preview: PropTypes.bool,
   entry: PropTypes.bool,
-}
-
-FormEntryActions.defaultProps = {
-  preview: false,
-  entry: false,
 }
 
 export default FormEntryActions

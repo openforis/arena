@@ -17,7 +17,7 @@ export {
 } from './actionTypes'
 
 export { setActiveSurvey } from './active'
-export { initSurveyDefs, resetSurveyDefs } from './defs'
+export { initSurveyDefs, refreshSurveyDefs, resetSurveyDefs } from './defs'
 export { deleteSurvey } from './delete'
 export { exportSurvey } from './export'
 export { publishSurvey } from './publish'

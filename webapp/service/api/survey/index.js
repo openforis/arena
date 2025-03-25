@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
+import { FileUtils } from '@webapp/utils/fileUtils'
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== CREATE
@@ -18,6 +19,20 @@ export const fetchSurveys = async ({ draft = true, template = false } = {}) => {
   return surveys.map(Survey.getSurveyInfo)
 }
 
+export const fetchSurveyFull = async ({
+  surveyId,
+  cycle,
+  draft = true,
+  advanced = false,
+  includeAnalysis = false,
+  validate = false,
+} = {}) => {
+  const {
+    data: { survey },
+  } = await axios.get(`/api/survey/${surveyId}/full`, { params: { cycle, draft, advanced, includeAnalysis, validate } })
+  return survey
+}
+
 export const fetchSurveyTemplatesPublished = async () => {
   const {
     data: { list: surveys },
@@ -27,8 +42,24 @@ export const fetchSurveyTemplatesPublished = async () => {
 
 // ==== UPDATE
 export const startImportLabelsJob = async ({ surveyId, file }) => {
-  const formData = objectToFormData({ file })
-
+  const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
+  const formData = objectToFormData({ file, fileFormat })
   const { data: job } = await axios.put(`/api/survey/${surveyId}/labels`, formData)
   return job
+}
+
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }) => {
+  const formData = objectToFormData({ key, value })
+  const { data } = await axios.put(`/api/survey/${surveyId}/config`, formData)
+  return data
+}
+
+export const updateSurveyOwner = async ({ surveyId, ownerUuid }) => {
+  const { data } = await axios.put(`/api/survey/${surveyId}/owner`, { ownerUuid })
+  return data
+}
+
+export const updateSurveyProps = async ({ surveyId, props }) => {
+  const { data } = await axios.put(`/api/survey/${surveyId}/info`, props)
+  return data
 }

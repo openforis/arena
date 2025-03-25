@@ -104,7 +104,7 @@ export const openRStudio =
 
     const hadInstance = !isLocal && (await isInstanceRunning())
 
-    const { data } = await axios.get(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
+    const { data } = await axios.post(`/api/survey/${surveyId}/chain/${chainUuid}/script`, config)
 
     const { token, serverUrl } = data
 

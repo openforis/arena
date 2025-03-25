@@ -3,12 +3,14 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
+import { FileFormats } from '@core/fileFormats'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
-import { useI18n } from '@webapp/store/system'
 import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
@@ -16,13 +18,14 @@ import {
   useNodeDefLabelType,
   useNodeDefPage,
   useShowPageNavigation,
+  useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
 import * as API from '@webapp/service/api'
 
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
-import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
 import { OpenFileUploadDialogButton } from '@webapp/components/form'
 
 import FormEntryActions from '../components/formEntryActions'
@@ -31,12 +34,13 @@ import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 
+const labelsExportAllowedFileFormats = [FileFormats.xlsx, FileFormats.csv]
+
 const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef, analysis } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const i18n = useI18n()
 
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
@@ -45,6 +49,7 @@ const FormHeader = (props) => {
   const showPageNavigation = useShowPageNavigation()
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
+  const treeViewMode = useTreeSelectViewMode()
 
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
@@ -65,21 +70,20 @@ const FormHeader = (props) => {
   return (
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
-        <button
-          type="button"
-          className="btn-s btn-transparent"
+        <Button
+          iconClassName="icon-stack icon-12px"
           onClick={() => dispatch(SurveyFormActions.toggleFormPageNavigation())}
-          title={i18n.t(`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`)}
+          size="small"
+          title={`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`}
+          variant="text"
         >
-          <span className="icon icon-stack icon-12px icon-left" />
           <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
-        </button>
+        </Button>
 
-        {edit && canEditDef && (
-          <button
-            type="button"
-            className="btn-s btn-transparent"
-            data-testid={TestId.surveyForm.addSubPageBtn}
+        {edit && canEditDef && treeViewMode === TreeSelectViewMode.onlyPages && (
+          <Button
+            iconClassName="icon-plus icon-12px"
+            label="surveyForm.subPage"
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
@@ -90,10 +94,10 @@ const FormHeader = (props) => {
               }
               dispatch(NodeDefsActions.createNodeDef(nodeDefPage, NodeDef.nodeDefType.entity, propsNodeDef, navigate))
             }}
-          >
-            <span className="icon icon-plus icon-12px icon-left" />
-            {i18n.t('surveyForm.subPage')}
-          </button>
+            size="small"
+            testId={TestId.surveyForm.addSubPageBtn}
+            variant="text"
+          />
         )}
 
         <div
@@ -107,41 +111,57 @@ const FormHeader = (props) => {
       <div className="survey-form-header__options">
         {edit && canEditSurvey && (
           <ButtonMenu
-            className="btn-s btn-transparent btn-menu-advanced"
+            className="btn-menu-advanced"
             iconClassName="icon-cog icon-14px"
             label="common.advancedFunctions"
             items={[
               {
-                key: 'schema-summary',
-                content: <SurveySchemaSummaryDownloadButton className="btn-transparent" />,
+                key: 'schema-summary-csv',
+                content: (
+                  <SurveySchemaSummaryDownloadButton
+                    fileFormat={FileFormats.csv}
+                    testId={TestId.surveyForm.schemaSummary}
+                  />
+                ),
               },
               {
-                key: 'labels-export',
-                content: <ButtonDownload href={`/api/survey/${surveyId}/labels`} label="surveyForm.exportLabels" />,
+                key: 'schema-summary-excel',
+                content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
               },
+              ...labelsExportAllowedFileFormats.map((fileFormat) => ({
+                key: `labels-export-${fileFormat}`,
+                content: (
+                  <ButtonDownload
+                    href={`/api/survey/${surveyId}/labels`}
+                    label={`surveyForm.exportLabels_${fileFormat}`}
+                    requestParams={{ fileFormat }}
+                    variant="text"
+                  />
+                ),
+              })),
               {
                 key: 'labels-import',
                 content: (
                   <OpenFileUploadDialogButton
-                    className="btn-transparent"
                     label="surveyForm.importLabels"
-                    accept=".csv"
-                    onOk={(files) => onLabelsImportFileSelected(files[0])}
+                    accept=".csv,.xlsx"
+                    onOk={({ files }) => onLabelsImportFileSelected(files[0])}
+                    variant="text"
                   />
                 ),
               },
             ]}
+            size="small"
             testId={TestId.surveyForm.advancedFunctionBtn}
           />
         )}
         <NodeDefLabelSwitch
-          className="btn-s btn-transparent"
           labelType={nodeDefLabelType}
           onChange={() => {
             dispatch(SurveyFormActions.updateNodeDefLabelType())
           }}
+          size="small"
         />
-        <div> | </div>
       </div>
       {analysis && <FormEntryActions analysis={analysis} />}
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}

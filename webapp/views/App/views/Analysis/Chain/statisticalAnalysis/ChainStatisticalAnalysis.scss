@@ -1,7 +1,5 @@
-.statistical-analysis {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.app-module .chain .statistical-analysis {
+  justify-self: unset;
 
   .form_row {
     display: flex;

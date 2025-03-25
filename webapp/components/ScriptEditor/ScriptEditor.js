@@ -17,7 +17,16 @@ const { snippetCompleter, textCompleter, keyWordCompleter } = aceLangTools
 const defaultCompleters = [snippetCompleter, textCompleter, keyWordCompleter]
 
 export const ScriptEditor = (props) => {
-  const { name, mode, script, completer, height, width, onChange, readOnly } = props
+  const {
+    completer = null,
+    height = '200px',
+    mode,
+    name,
+    onChange,
+    readOnly = false,
+    script,
+    width = 'inherit',
+  } = props
 
   const editorRef = useRef()
 
@@ -71,11 +80,4 @@ ScriptEditor.propTypes = {
   script: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
-}
-
-ScriptEditor.defaultProps = {
-  completer: null,
-  height: '200px',
-  width: 'inherit',
-  readOnly: false,
 }

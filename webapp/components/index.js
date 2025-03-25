@@ -5,6 +5,8 @@ export {
   ButtonCancel,
   ButtonDownload,
   ButtonDelete,
+  ButtonIconAdd,
+  ButtonIconDelete,
   ButtonIconEdit,
   ButtonIconEditOrView,
   ButtonIconFilter,
@@ -38,3 +40,4 @@ export { ResizableModal } from './ResizableModal'
 export { Slider } from './Slider'
 export { Split } from './Split'
 export { Spinner } from './Spinner'
+export { Switch } from './Switch'

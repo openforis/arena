@@ -14,14 +14,21 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
 
-const _fetchSurvey = async (surveyId, cycle) => {
+const _fetchSurvey = async ({ surveyId, cycle }) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
-  return SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft, advanced: true })
+  return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    draft,
+    advanced: true,
+    includeBigCategories: false,
+    includeBigTaxonomies: false,
+  })
 }
 
 const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
-  return Authorizer.canViewAllRecords(user, surveyInfo)
+  return Authorizer.canExportAllRecords(user, surveyInfo)
     ? null // fetch all records' data
     : User.getUuid(user) // fetch only owned records' data
 }
@@ -35,7 +42,7 @@ const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
  * @param {!Query} [params.query] - The Query to execute.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {Stream.Writable} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {Stream.Writable} [params.outputStream=null] - The output to be used to stream the data (if specified).
  *
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
@@ -48,19 +55,29 @@ export const fetchViewData = async (params) => {
     offset = 0,
     limit = null,
     columnNodeDefs = false,
-    streamOutput = null,
+    outputStream = null,
     addCycle = false,
+    options = {},
   } = params
 
   let parsedQuery = query
   if (typeof query === 'string') {
     parsedQuery = A.parse(query)
   }
-  const survey = await _fetchSurvey(surveyId, cycle)
+  const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   const data = Query.isModeAggregate(parsedQuery)
-    ? await SurveyRdbManager.fetchViewDataAgg({ survey, cycle, query, recordOwnerUuid, offset, limit, streamOutput })
+    ? await SurveyRdbManager.fetchViewDataAgg({
+        survey,
+        cycle,
+        query,
+        recordOwnerUuid,
+        offset,
+        limit,
+        outputStream,
+        options,
+      })
     : await SurveyRdbManager.fetchViewData({
         survey,
         cycle,
@@ -69,8 +86,9 @@ export const fetchViewData = async (params) => {
         recordOwnerUuid,
         offset,
         limit,
-        streamOutput,
+        outputStream,
         addCycle,
+        ...options,
       })
 
   return data
@@ -89,7 +107,7 @@ export const fetchViewData = async (params) => {
 export const countTable = async (params) => {
   const { user, surveyId, cycle, query } = params
 
-  const survey = await _fetchSurvey(surveyId, cycle)
+  const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   return Query.isModeAggregate(query)
@@ -98,7 +116,7 @@ export const countTable = async (params) => {
 }
 
 export const fetchTableRowsCountByEntityDefUuid = async ({ surveyId, cycle, entityDefUuids = [] }) => {
-  const survey = await _fetchSurvey(surveyId, cycle)
+  const survey = await _fetchSurvey({ surveyId, cycle })
 
   return SurveyRdbManager.fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
 }
@@ -110,7 +128,7 @@ export const refreshAllRdbs = async () => {
     .map((surveySummary) => surveySummary.id)
 
   const job = new SurveysRdbRefreshJob({ surveyIds })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return { job: JobUtils.jobToJSON(job) }
 }
@@ -122,12 +140,13 @@ export const exportViewDataToTempFile = async ({
   query,
   columnNodeDefs = false,
   addCycle = false,
+  options = {},
 }) => {
   const tempFileName = FileUtils.newTempFileName()
   const tempFilePath = FileUtils.tempFilePath(tempFileName)
-  const streamOutput = FileUtils.createWriteStream(tempFilePath)
+  const outputStream = FileUtils.createWriteStream(tempFilePath)
 
-  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, streamOutput, addCycle })
+  await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, outputStream, addCycle, options })
 
   return tempFileName
 }
@@ -136,23 +155,25 @@ export const fetchEntitiesDataToCsvFiles = async ({
   user,
   survey,
   cycle: cycleParam,
+  recordUuids,
+  search,
+  options,
   outputDir,
-  includeCategoryItemsLabels,
-  includeAnalysis,
-  includeDataFromAllCycles,
   callback,
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
+  const { includeDataFromAllCycles } = options
   const cycle = includeDataFromAllCycles ? null : cycleParam
 
   return SurveyRdbManager.fetchEntitiesDataToCsvFiles({
     survey,
     cycle,
     outputDir,
-    includeCategoryItemsLabels,
-    includeAnalysis,
+    recordUuids,
     recordOwnerUuid,
+    search,
+    options,
     callback,
   })
 }
@@ -162,6 +183,7 @@ export const fetchEntitiesFileUuidsByCycle = async ({
   survey,
   cycle: cycleParam,
   includeDataFromAllCycles,
+  filterRecordUuids,
   callback,
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
@@ -172,6 +194,7 @@ export const fetchEntitiesFileUuidsByCycle = async ({
     survey,
     cycle,
     recordOwnerUuid,
+    filterRecordUuids,
     callback,
   })
 }

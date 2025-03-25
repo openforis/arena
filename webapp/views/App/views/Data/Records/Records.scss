@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .records {
   .table__row {
@@ -6,6 +6,38 @@
       left: 4rem;
       pointer-events: none;
       top: 0.5rem;
+    }
+
+    .date-created-col {
+      display: flex;
+      align-items: center;
+
+      .app-icon {
+        margin: 2px;
+      }
+    }
+
+    .files-col {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.2rem;
+      padding-right: 0.6rem;
+    }
+
+    .record-owner-col {
+      width: fit-content;
+      margin: auto;
+
+      &.editing {
+        width: 100%;
+      }
+    }
+
+    .action-buttons-col {
+      display: flex;
+      width: 100%;
     }
   }
 }

@@ -1,0 +1,29 @@
+.coordinate-attribute-popup-content {
+  display: flex;
+  flex-direction: column;
+
+  .button-bar {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 0.5rem;
+    margin-top: 12px;
+
+    .row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    button {
+      margin: 0 0.4rem;
+      padding: 0.4rem 0.6rem;
+      white-space: nowrap;
+    }
+
+    .earth-map-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}

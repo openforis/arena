@@ -8,16 +8,22 @@ import * as SQL from '../../sql'
 
 const { nodeDefType } = NodeDef
 
+const columnSuffixCodeLabel = '_label'
+const columnSuffixFileUuid = '_file_uuid'
+const columnSuffixFileName = '_file_name'
+const columnSuffixTaxonScientificName = '_scientific_name'
+const columnSuffixTaxonVernacularName = '_vernacular_name'
+
 const columnNamesSuffixGetterByType = {
-  [nodeDefType.code]: () => ['', '_label'],
+  [nodeDefType.code]: () => ['', columnSuffixCodeLabel],
   [nodeDefType.coordinate]: ({ nodeDef }) => {
     const suffixes = ['', '_x', '_y', '_srs']
     const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef)
     suffixes.push(...additionalFields.map((field) => `_${toSnakeCase(field)}`))
     return suffixes
   },
-  [nodeDefType.taxon]: () => ['', '_scientific_name'],
-  [nodeDefType.file]: () => ['_file_uuid', '_file_name'],
+  [nodeDefType.taxon]: () => ['', columnSuffixTaxonScientificName, columnSuffixTaxonVernacularName],
+  [nodeDefType.file]: () => [columnSuffixFileUuid, columnSuffixFileName],
 }
 
 const colTypesGetterByType = {
@@ -31,10 +37,11 @@ const colTypesGetterByType = {
   },
   [nodeDefType.date]: () => [SQL.types.date],
   [nodeDefType.decimal]: () => [SQL.types.decimal],
+  [nodeDefType.geo]: () => [SQL.types.varchar],
   [nodeDefType.entity]: () => [SQL.types.uuid],
   [nodeDefType.file]: () => [SQL.types.uuid, SQL.types.varchar],
   [nodeDefType.integer]: () => [SQL.types.bigint],
-  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar],
+  [nodeDefType.taxon]: () => [SQL.types.varchar, SQL.types.varchar, SQL.types.varchar, SQL.types.varchar],
   [nodeDefType.text]: () => [SQL.types.varchar],
   [nodeDefType.time]: () => [SQL.types.time],
 }
@@ -102,10 +109,30 @@ export default class ColumnNodeDef {
   get types() {
     return this._types
   }
+
+  get codeLabelColumn() {
+    return NodeDef.isCode(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}` : null
+  }
+
+  get fileNameColumn() {
+    return NodeDef.isFile(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixFileName}` : null
+  }
 }
+
+ColumnNodeDef.columnSuffixCodeLabel = columnSuffixCodeLabel
+ColumnNodeDef.columnSuffixFileUuid = columnSuffixFileUuid
+ColumnNodeDef.columnSuffixFileName = columnSuffixFileName
+ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
+ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
+
+const getColumnNameWithSuffix = (suffix) => (nodeDef) => `${NodeDef.getName(nodeDef)}${suffix}`
+ColumnNodeDef.getCodeLabelColumnName = getColumnNameWithSuffix(columnSuffixCodeLabel)
+ColumnNodeDef.getFileNameColumnName = getColumnNameWithSuffix(columnSuffixFileName)
+ColumnNodeDef.getFileUuidColumnName = getColumnNameWithSuffix(columnSuffixFileUuid)
 
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
+
 ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
   const columnName = ColumnNodeDef.getColumnName(nodeDef)
   if (Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS).includes(aggregateFn)) {

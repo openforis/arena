@@ -2,8 +2,10 @@ export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
   fetchCategories,
+  fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
   countSamplingPointData,
@@ -15,6 +17,7 @@ export {
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
+  updateCategoryItemProp,
 } from './categories'
 export { fetchChains, getChainSummaryExportUrl } from './analysis'
 
@@ -36,16 +39,38 @@ export {
   getDataImportFromCsvTemplateUrl,
   getDataImportFromCsvTemplatesUrl,
   updateRecordsStep,
+  updateRecordOwner,
   exportDataQueryToTempFile,
   downloadDataQueryExport,
   fetchRecordsCountByStep,
-  startExportDataToCSVJob,
-  downloadExportedDataToCSVUrl,
+  fetchRecordSummary,
+  fetchRecordsSummary,
+  startExportDataJob,
+  downloadExportedDataUrl,
   startRecordsCloneJob,
+  mergeRecords,
 } from './data'
-export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
-export { fetchSurveys, fetchSurveyTemplatesPublished, insertSurvey, startImportLabelsJob } from './survey'
 export {
+  insertDataQuerySummary,
+  fetchDataQuerySummary,
+  fetchDataQuerySummaries,
+  updateDataQuerySummary,
+  deleteDataQuerySummary,
+} from './dataQuery'
+export { fetchActiveJob } from './job'
+export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export {
+  fetchSurveyFull,
+  fetchSurveys,
+  fetchSurveyTemplatesPublished,
+  insertSurvey,
+  startImportLabelsJob,
+  updateSurveyConfigurationProp,
+  updateSurveyOwner,
+  updateSurveyProps,
+} from './survey'
+export {
+  convertNodeDef,
   fetchNodeDef,
   fetchNodeDefs,
   moveNodeDef,
@@ -60,6 +85,16 @@ export {
 export { cancelableGetRequest } from './cancelableRequest'
 export { getCurrentInstance, createInstance, terminateInstance } from './rStudio'
 
-export { createAccessRequest, acceptAccessRequest, fetchUser, fetchUserSurveys, changeUserPassword } from './user'
+export {
+  createAccessRequest,
+  acceptAccessRequest,
+  fetchUser,
+  fetchUserResetPasswordUrl,
+  fetchUserName,
+  fetchUsersBySurvey,
+  fetchUserSurveys,
+  fetchUsers,
+  changeUserPassword,
+} from './user'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'

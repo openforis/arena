@@ -4,8 +4,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import DfResults from './dfResults'
 
-import { writeCsv, arenaPutFile, zipr } from '../../rFunctions'
+import { writeCsv, arenaPutFile, zipr, arenaWaitForJobToComplete, setVar } from '../../rFunctions'
 import RFilePersistScriptsGeneric from './rFilePersistScriptsGeneric'
+
+const persistScriptJobVar = 'persistScriptJob'
 
 const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   const { chainUuid, surveyId, cycle, dirResults } = rChain
@@ -20,10 +22,14 @@ const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
   scripts.push(zipr(fileZip, fileResults))
   // put request
   scripts.push(
-    arenaPutFile(
-      ApiRoutes.rChain.entityData({ surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }),
-      fileZip
-    )
+    setVar(
+      persistScriptJobVar,
+      arenaPutFile(
+        ApiRoutes.rChain.entityData({ surveyId, cycle, chainUuid, entityUuid: NodeDef.getUuid(entity) }),
+        fileZip
+      )
+    ),
+    arenaWaitForJobToComplete(persistScriptJobVar)
   )
   return scripts
 }

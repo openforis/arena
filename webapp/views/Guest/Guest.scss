@@ -1,5 +1,6 @@
-@import 'webapp/style/vars';
-@import 'webapp/style/layoutMixins';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
+@use '~@webapp/style/layoutMixins' as *;
 
 @keyframes not-logged-in__bg-animation {
   0%,
@@ -7,6 +8,7 @@
     transform: scale(1, 1);
     opacity: 0.2;
   }
+
   50% {
     transform: scale(1.1, 1.1);
     opacity: 0.05;
@@ -95,9 +97,9 @@
   margin: 1rem 3rem;
   display: grid;
   grid-template-columns: 1fr;
-  justify-content: center;
-  align-content: center;
-  grid-row-gap: 2rem;
+  align-content: start;
+  grid-row-gap: 1rem;
+  overflow-y: auto;
 
   .title {
     font-size: 1.5rem;
@@ -116,11 +118,11 @@
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
-    background-color: lighten($greenLight, 10%);
+    background-color: color.adjust($greenLight, $lightness: 10%);
     color: $black;
     -webkit-text-fill-color: $black;
-    box-shadow: 0 0 0px 1000px lighten($greenLight, 10%) inset;
-    -webkit-box-shadow: 0 0 0px 1000px lighten($greenLight, 10%) inset;
+    box-shadow: 0 0 0px 1000px color.adjust($greenLight, $lightness: 10%) inset;
+    -webkit-box-shadow: 0 0 0px 1000px color.adjust($greenLight, $lightness: 10%) inset;
     font-family: $fontFamily;
     font-size: 1rem;
   }

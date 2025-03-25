@@ -1,9 +1,10 @@
 import './NodeDefsSelector.scss'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import * as A from '@core/arena'
+import { ArrayUtils } from '@core/arrayUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,7 +13,7 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -20,34 +21,46 @@ import FilterByChain from './FilterByChain'
 
 const NodeDefsSelector = (props) => {
   const {
-    nodeDefUuidsAttributes,
-    nodeDefUuidEntity,
-    hierarchy,
-    canSelectAttributes,
-    showAnalysisAttributes,
-    showAncestors,
-    showMultipleAttributes,
-    showSingleEntities,
-    onChangeAttributes,
-    onChangeEntity,
-    nodeDefLabelType,
+    canSelectAttributes = true,
+    hierarchy = null,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
+    nodeDefUuidsAttributes = [],
+    onChangeEntity = () => {},
+    onChangeAttributes = () => {},
+    showAnalysisAttributes = false,
+    showAncestors = true,
+    showMultipleAttributes = true,
+    showSingleEntities = false,
   } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
 
   const [filterTypes, setFilterTypes] = useState([])
   const [filterChainUuids, setFilterChainUuids] = useState([])
 
   const [showFilter, setShowFilter] = useState(false)
 
-  const onToggleAttribute = (nodeDefUuid) => {
-    const attributeDefUuidsUpdated = nodeDefUuidsAttributes.includes(nodeDefUuid)
-      ? nodeDefUuidsAttributes.filter((_nodeDefUuid) => _nodeDefUuid !== nodeDefUuid)
-      : [...nodeDefUuidsAttributes, nodeDefUuid]
-    onChangeAttributes(attributeDefUuidsUpdated)
-  }
+  const onAttributesSelection = useCallback(
+    ({ attributeDefUuids, selected }) => {
+      const attributeDefUuidsUpdated = selected
+        ? ArrayUtils.addItems({ items: attributeDefUuids })(nodeDefUuidsAttributes)
+        : ArrayUtils.removeItems({ items: attributeDefUuids })(nodeDefUuidsAttributes)
+      onChangeAttributes(attributeDefUuidsUpdated)
+    },
+    [nodeDefUuidsAttributes, onChangeAttributes]
+  )
+
+  const onToggleAttribute = useCallback(
+    (nodeDefUuid) => {
+      onAttributesSelection({
+        attributeDefUuids: [nodeDefUuid],
+        selected: !nodeDefUuidsAttributes.includes(nodeDefUuid),
+      })
+    },
+    [nodeDefUuidsAttributes, onAttributesSelection]
+  )
 
   return (
     <div className="node-defs-selector">
@@ -64,6 +77,7 @@ const NodeDefsSelector = (props) => {
         disabled={A.isEmpty(nodeDefUuidEntity)}
         onClick={() => setShowFilter(!showFilter)}
         title="dataView.filterAttributeTypes"
+        variant="outlined"
       />
 
       {showFilter && (
@@ -96,9 +110,9 @@ const NodeDefsSelector = (props) => {
 
       {nodeDefUuidEntity && (
         <AttributesSelector
-          lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          onAttributesSelection={onAttributesSelection}
           onToggleAttribute={onToggleAttribute}
           filterTypes={filterTypes}
           filterChainUuids={filterChainUuids}
@@ -126,20 +140,6 @@ NodeDefsSelector.propTypes = {
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
-}
-
-NodeDefsSelector.defaultProps = {
-  nodeDefUuidEntity: null,
-  nodeDefUuidsAttributes: [],
-  hierarchy: null,
-  canSelectAttributes: true,
-  showAnalysisAttributes: false,
-  showAncestors: true,
-  showMultipleAttributes: true,
-  showSingleEntities: false,
-  onChangeEntity: () => {},
-  onChangeAttributes: () => {},
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default NodeDefsSelector

@@ -1,8 +1,8 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 $borderColor: $greyBorder;
 
-.app__container .app-module > .category {
+.app__container .app-module>.category {
   overflow: hidden; // scrollbars managed in .category__levels
 }
 
@@ -30,7 +30,7 @@ $borderColor: $greyBorder;
   }
 
   .date-import-template-menu-btn {
-    width: 12rem;
+    width: 14rem;
   }
 
   .reporting-data-checkbox {
@@ -78,6 +78,10 @@ $borderColor: $greyBorder;
   border-top: 1px dashed $borderColor;
   border-bottom: 1px dashed $borderColor;
 
+  .loading-bar {
+    position: relative;
+  }
+
   &:first-child {
     border-left: 1px dashed $borderColor;
   }
@@ -85,6 +89,11 @@ $borderColor: $greyBorder;
   .category__level-header {
     display: flex;
     justify-content: space-between;
+  }
+
+  .category__level-items-message {
+    align-self: center;
+    padding: 1rem;
   }
 
   .category__level-items-header {
@@ -113,55 +122,5 @@ $borderColor: $greyBorder;
     .category__level-items-header {
       margin-top: 0;
     }
-  }
-}
-
-.category__item {
-  position: relative;
-  border-bottom: 1px dotted $borderColor;
-  display: grid;
-  align-content: center;
-  grid-template-columns: 80px auto 1fr;
-  column-gap: 10px;
-  min-height: 35px;
-  grid-row-gap: 0.2rem;
-  font-size: 0.9rem;
-
-  &.not-valid {
-    grid-template-columns: 26px 44px auto 1fr;
-
-    .badge {
-      position: relative;
-    }
-  }
-
-  &.active {
-    grid-template-columns: 1fr;
-    border: 2px dashed $borderColor;
-    background-color: rgba($grey, 0.4);
-    padding: 1.5rem 0;
-
-    .badge {
-      position: absolute;
-    }
-  }
-
-  &:not(.active):hover {
-    background-color: rgba($greenLight, 0.6);
-    cursor: pointer;
-  }
-
-  .labels-editor.with-label {
-    grid-template-columns: 0.3fr 0.65fr;
-  }
-
-  .btn-close {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-
-  .btn-delete {
-    justify-self: center;
   }
 }

@@ -4,9 +4,12 @@ import * as R from 'ramda'
 
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 const TaxaTableRow = (props) => {
-  const { row: taxon, idx, offset, vernacularLanguageCodes, extraPropsDefs } = props
+  const { extraPropsDefsArray, idx, offset, row: taxon, vernacularLanguageCodes } = props
+
+  const extraPropKeys = extraPropsDefsArray.map(ExtraPropDef.getName)
 
   return (
     <>
@@ -23,16 +26,17 @@ const TaxaTableRow = (props) => {
           </div>
         )
       })}
-      {Object.keys(extraPropsDefs).map((extraProp) => (
-        <div key={`extra_prop_${extraProp}`}>{Taxon.getExtraProp(extraProp)(taxon)}</div>
+      {extraPropKeys.map((extraPropKey) => (
+        <div key={`extra_prop_${extraPropKey}`}>{Taxon.getExtraProp(extraPropKey)(taxon)}</div>
       ))}
     </>
   )
 }
 TaxaTableRow.propTypes = {
-  row: PropTypes.object.isRequired,
+  extraPropsDefsArray: PropTypes.array.isRequired,
   idx: PropTypes.number.isRequired,
   offset: PropTypes.number.isRequired,
+  row: PropTypes.object.isRequired,
   vernacularLanguageCodes: PropTypes.array.isRequired,
 }
 

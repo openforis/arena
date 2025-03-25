@@ -1,11 +1,14 @@
 import * as R from 'ramda'
 
-import { DEFAULT_SRS, Objects } from '@openforis/arena-core'
+import { DEFAULT_SRS, Objects, Surveys } from '@openforis/arena-core'
 
 import * as AuthGroup from '@core/auth/authGroup'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
+
+import * as SamplingPolygon from '../SamplingPolygon'
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -26,16 +29,19 @@ export const keys = {
   cycles: 'cycles',
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
+  fieldManualLinks: 'fieldManualLinks',
   filesStatistics: 'filesStatistics',
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
   sampleBasedImageInterpretationEnabled: 'sampleBasedImageInterpretationEnabled',
   samplingPolygon: 'samplingPolygon',
+  security: 'security',
   srs: 'srs',
   steps: 'steps',
   template: 'template',
   temporary: 'temporary',
+  userExtraPropDefs: 'userExtraPropDefs',
 }
 
 export const collectReportKeys = {
@@ -100,7 +106,12 @@ export const getLabel = (surveyInfo, lang, defaultToName = true) => {
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
 )
-export const getSamplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})
+export const getSamplingPolygon = (surveyInfo) => {
+  const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo)
+  return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
+}
+
+export const getSecurity = Surveys.getSecurity
 
 export const getSRS = ObjectUtils.getProp(keys.srs, [])
 
@@ -160,6 +171,12 @@ export const getLanguage = (preferredLang) => (surveyInfo) =>
 
 export const isTemplate = R.propEq(keys.template, true)
 
+export const getFieldManualLinks = ObjectUtils.getProp(keys.fieldManualLinks, {})
+
+export const getUserExtraPropDefs = ObjectUtils.getProp(keys.userExtraPropDefs, {})
+
+export const getUserExtraPropDefsArray = R.pipe(getUserExtraPropDefs, ExtraPropDef.extraDefsToArray)
+
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)
 
@@ -169,9 +186,13 @@ export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
 
 export const assocRDBInitilized = R.assoc(keys.rdbInitialized)
 
+export const assocOwnerUuid = R.assoc(keys.ownerUuid)
+
 // ====== UTILS
 
-export const isValid = (surveyInfo) => surveyInfo && surveyInfo.id
+export const isValid = (surveyInfo) => !!surveyInfo?.id
+export const canHaveRecords = (surveyInfo) =>
+  isValid(surveyInfo) && !isTemplate(surveyInfo) && isRdbInitialized(surveyInfo)
 
 // ====== AUTH GROUPS
 

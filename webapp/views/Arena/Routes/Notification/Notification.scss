@@ -1,11 +1,13 @@
-@import 'webapp/style/vars';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
 
 $appNotificationWidth: 500px;
+$appNotificationWidthSmallScreens: 90vw;
 
 .notification {
   position: fixed;
   top: 10px;
-  z-index: $zIndex80AppNotification;
+  z-index: $zIndexAppNotification;
   width: $appNotificationWidth;
   padding: 10px;
 
@@ -16,26 +18,33 @@ $appNotificationWidth: 500px;
   font-weight: 600;
   text-align: center;
 
-  transform: translate(calc(50vw - #{$appNotificationWidth / 2}), 15px);
+  transform: translate(calc(50vw - calc($appNotificationWidth / 2)), 15px);
 
   .notification-content {
     white-space: pre-wrap;
   }
 }
 
+@media screen and (max-width: 768px) {
+  .notification {
+    width: $appNotificationWidthSmallScreens;
+    transform: translate(calc(50vw - calc($appNotificationWidthSmallScreens / 2)), 15px);
+  }
+}
+
 .notification.info {
-  background-color: lighten($blueLightActive, 18%);
-  border-color: lighten($blueLightActive, 5%);
+  background-color: color.adjust($blueLightActive, $lightness: 18%);
+  border-color: color.adjust($blueLightActive, $lightness: 5%);
 }
 
 .notification.warning {
-  background-color: lighten($orangeLight, 8%);
+  background-color: color.adjust($orangeLight, $lightness: 8%);
   border-color: $orange;
 }
 
 .notification.error {
   color: $white;
-  background-color: lighten($red, 10%);
+  background-color: color.adjust($red, $lightness: 10%);
   border-color: $red;
 }
 
@@ -65,11 +74,12 @@ $appNotificationWidth: 500px;
 @keyframes notification-in {
   from {
     opacity: 0;
-    transform: translate(calc(50vw - #{$appNotificationWidth / 2}), -15px);
+    transform: translate(calc(50vw - calc($appNotificationWidth / 2)), -15px);
   }
+
   to {
     opacity: 1;
-    transform: translate(calc(50vw - #{$appNotificationWidth / 2}), 15px);
+    transform: translate(calc(50vw - calc($appNotificationWidth / 2)), 15px);
   }
 }
 
@@ -77,6 +87,7 @@ $appNotificationWidth: 500px;
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }

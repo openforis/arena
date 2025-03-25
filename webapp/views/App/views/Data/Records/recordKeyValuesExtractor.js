@@ -7,7 +7,9 @@ import * as Record from '@core/record/record'
 import * as DateUtils from '@core/dateUtils'
 
 const valueFormattersByType = {
-  [NodeDef.nodeDefType.code]: ({ cycle, nodeDef, value: code, categoryItemsByCodeDefUuid, lang }) => {
+  [NodeDef.nodeDefType.code]: ({ cycle, nodeDef, value: code, categoryItemsByCodeDefUuid = null, lang = null }) => {
+    if (!categoryItemsByCodeDefUuid) return code
+
     const item = categoryItemsByCodeDefUuid[NodeDef.getUuid(nodeDef)]?.find(
       (item) => CategoryItem.getCode(item) === code
     )
@@ -25,11 +27,21 @@ const valueFormattersByType = {
       formatFrom: DateUtils.formats.datetimeISO,
       formatTo: DateUtils.formats.dateDefault,
     }),
+  [NodeDef.nodeDefType.time]: ({ value }) =>
+    DateUtils.convertDate({
+      dateStr: value,
+      formatFrom: 'HH:mm:ss',
+      formatTo: DateUtils.formats.timeStorage,
+    }),
 }
 
-const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid, lang }) => {
+const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid = null, lang = null }) => {
   const name = NodeDef.getName(nodeDef)
-  const value = record[A.camelize(name)]
+  let keyField = name
+  if (NodeDef.isCode(nodeDef) && !categoryItemsByCodeDefUuid) {
+    keyField = `${keyField}_label`
+  }
+  const value = record[A.camelize(keyField)]
   const cycle = Record.getCycle(record)
   const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
   return value && formatter ? formatter({ cycle, nodeDef, value, categoryItemsByCodeDefUuid, lang }) : value
@@ -40,7 +52,17 @@ const extractKeyValues = ({ survey, record, categoryItemsByCodeDefUuid, lang }) 
   return nodeDefKeys.map((nodeDef) => extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang }))
 }
 
+const extractKeyValuesAndLabels = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  return nodeDefKeys.map((nodeDef) => {
+    const label = NodeDef.getLabel(nodeDef, lang)
+    const keyValue = extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang })
+    return `${label}=${keyValue}`
+  })
+}
+
 export const RecordKeyValuesExtractor = {
   extractKeyValue,
   extractKeyValues,
+  extractKeyValuesAndLabels,
 }

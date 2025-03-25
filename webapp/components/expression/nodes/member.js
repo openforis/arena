@@ -22,8 +22,4 @@ Member.propTypes = {
   variables: PropTypes.array,
 }
 
-Member.defaultProps = {
-  variables: null,
-}
-
 export default Member

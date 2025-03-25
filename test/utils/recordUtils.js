@@ -41,7 +41,7 @@ export const getNodePath = (node) => (survey, record) => {
 }
 
 export const findNodeByPath = (path) => (survey, record) => {
-  const parts = R.ifElse(R.is(Array), R.identity, R.split('/'))(path)
+  const parts = R.ifElse(R.is(Array), R.identity, R.split(/[\\/|.]/))(path)
 
   let currentNodeDef = null
   let currentNode = null
@@ -80,6 +80,8 @@ export const findNodeByPath = (path) => (survey, record) => {
 
   return currentNode
 }
+
+export const findNodeValueByPath = (path) => (survey, record) => Node.getValue(findNodeByPath(path)(survey, record))
 
 export const getValidationChildrenCount = (parentNode, childDef) =>
   R.pipe(

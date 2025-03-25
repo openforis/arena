@@ -33,4 +33,4 @@ export const columns = {
 /**
  * @deprecated - Use ViewDataNodeDef.
  */
-export const getColUuid = (nodeDef) => `${NodeDef.getName(nodeDef)}_${DataTable.columnNameUuuid}`
+export const getColUuid = (nodeDef) => `${NodeDef.getName(nodeDef)}_${DataTable.columnNameUuid}`

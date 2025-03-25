@@ -5,16 +5,17 @@ import classNames from 'classnames'
 
 import { SortCriteria } from '@common/model/query'
 
-import { useI18n } from '@webapp/store/system'
-
 import Dropdown from '@webapp/components/form/Dropdown'
-import Tooltip from '@webapp/components/tooltip'
+import { Button, ButtonIconClose } from '@webapp/components/buttons'
+
+const titleKeyByOrder = {
+  [SortCriteria.orders.asc]: 'common.ascending',
+  [SortCriteria.orders.desc]: 'common.descending',
+}
 
 const SortCriteriaEditor = (props) => {
-  const { onChange, onDelete, placeholder, sortCriteria, variables, variablesAvailable } = props
+  const { onChange, onDelete = null, placeholder = false, sortCriteria, variables, variablesAvailable } = props
   const selection = placeholder ? null : variables.find(({ value }) => value === SortCriteria.getVariable(sortCriteria))
-
-  const i18n = useI18n()
 
   return (
     <div className="sort-criteria-editor">
@@ -28,32 +29,19 @@ const SortCriteriaEditor = (props) => {
       />
 
       <div className="sort-criteria-editor__order">
-        <Tooltip messages={placeholder ? null : [i18n.t('common.ascending')]}>
-          <button
-            type="button"
-            aria-disabled={placeholder}
-            className={classNames('btn', 'btn-xs', { active: !placeholder && SortCriteria.isOrderAsc(sortCriteria) })}
-            onClick={() => onChange(SortCriteria.assocOrderAsc(sortCriteria))}
-          >
-            <span className="icon icon-sort-amount-asc icon-14px" />
-          </button>
-        </Tooltip>
-
-        <Tooltip messages={placeholder ? null : [i18n.t('common.descending')]}>
-          <button
-            type="button"
-            aria-disabled={placeholder}
-            className={classNames('btn', 'btn-xs', { active: !placeholder && SortCriteria.isOrderDesc(sortCriteria) })}
-            onClick={() => onChange(SortCriteria.assocOrderDesc(sortCriteria))}
-          >
-            <span className="icon icon-sort-amount-desc icon-14px" />
-          </button>
-        </Tooltip>
+        {Object.values(SortCriteria.orders).map((order) => (
+          <Button
+            key={order}
+            disabled={placeholder}
+            className={classNames('btn-xs', { active: !placeholder && SortCriteria.getOrder(sortCriteria) === order })}
+            onClick={() => onChange(SortCriteria.assocOrder(order)(sortCriteria))}
+            iconClassName={`icon-sort-amount-${order}`}
+            title={placeholder ? null : titleKeyByOrder[order]}
+          />
+        ))}
       </div>
 
-      <button type="button" className="btn btn-xs btn-transparent" onClick={onDelete} aria-disabled={placeholder}>
-        <span className="icon icon-cross icon-10px" />
-      </button>
+      <ButtonIconClose disabled={placeholder} onClick={onDelete} />
     </div>
   )
 }
@@ -65,11 +53,6 @@ SortCriteriaEditor.propTypes = {
   sortCriteria: PropTypes.object.isRequired,
   variables: PropTypes.array.isRequired,
   variablesAvailable: PropTypes.array.isRequired,
-}
-
-SortCriteriaEditor.defaultProps = {
-  onDelete: null,
-  placeholder: false,
 }
 
 export default SortCriteriaEditor

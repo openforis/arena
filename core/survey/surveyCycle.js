@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
 
-export const dateFormat = 'yyyy-MM-dd'
+export const dateFormat = 'YYYY-MM-DD'
 
 export const keys = {
   dateStart: 'dateStart',

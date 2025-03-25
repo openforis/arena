@@ -1,6 +1,6 @@
 ############################################################
 
-ARG node_version=18.12.1
+ARG node_version=22.14.0
 
 FROM node:${node_version} AS arena
 
@@ -19,7 +19,6 @@ RUN echo -e "scripts-prepend-node-path=true\n\
 
 RUN yarn install --frozen-lockfile \
     && yarn build \
-    && npm rebuild node-sass \
     && rm -r /app/.npmrc
 
 RUN npm install pm2 -g

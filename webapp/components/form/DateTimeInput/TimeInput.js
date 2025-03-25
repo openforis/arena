@@ -7,12 +7,12 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker'
 import * as DateUtils from '@core/dateUtils'
 import { useDateTimeInput } from './useDateTimeInput'
 
-const format = DateUtils.formats.timeStorage
+const valueFormat = DateUtils.formats.timeStorage
 
 const TimeInput = (props) => {
-  const { disabled, onChange, value } = props
+  const { disabled = false, onChange, value } = props
 
-  const { dateValue, onInputChange, errorRef } = useDateTimeInput({ format, onChange, value })
+  const { dateValue, onInputChange, errorRef } = useDateTimeInput({ onChange, value, valueFormat })
 
   return (
     <TimePicker
@@ -29,10 +29,6 @@ TimeInput.propTypes = {
   disabled: PropTypes.bool,
   value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-}
-
-TimeInput.defaultProps = {
-  disabled: false,
 }
 
 export default TimeInput

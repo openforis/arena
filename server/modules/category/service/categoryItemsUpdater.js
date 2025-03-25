@@ -17,14 +17,14 @@ export default class CategoryItemsUpdater {
     this.category = category
     this.user = user
     /**
-     * DB transaction
+     * DB transaction.
      */
     this.tx = tx
     this.errorHandler = errorHandler
     this.itemExtraPropsExtrator = itemExtraPropsExtrator
 
     /**
-     * Processed category items indexed by ancestor codes + code (as a string)
+     * Processed category items indexed by ancestor codes + code (as a string).
      */
     this.itemsCacheByCodes = {}
 

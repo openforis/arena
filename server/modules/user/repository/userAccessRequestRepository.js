@@ -38,10 +38,8 @@ export const fetchUserAccessRequests = ({ offset = 0, limit = null } = {}, clien
     camelize
   )
 
-export const fetchUserAccessRequestsAsStream = async ({ transformer }, client = db) => {
-  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(userAccessRequestsSelect, []))
-  await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
-}
+export const fetchUserAccessRequestsAsStream = async ({ processor }, client = db) =>
+  DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(userAccessRequestsSelect, []), client, processor })
 
 export const fetchUserAccessRequestByEmail = ({ email }, client = db) =>
   client.oneOrNone(
@@ -86,4 +84,18 @@ export const updateUserAccessRequestStatus = ({ userUuid, email, status }, clien
     WHERE email = $/email/
   `,
     { email, status, userUuid }
+  )
+
+export const deleteUserAccessRequestsByEmail = ({ emails }, client = db) =>
+  client.none(
+    `DELETE FROM user_access_request 
+    WHERE email IN ($1:csv)`,
+    [emails]
+  )
+
+export const deleteExpiredUserAccessRequests = (client = db) =>
+  client.none(
+    `DELETE FROM user_access_request 
+    WHERE status = '${UserAccessRequest.status.CREATED}' 
+      AND date_created < NOW() - INTERVAL '1 MONTH'`
   )

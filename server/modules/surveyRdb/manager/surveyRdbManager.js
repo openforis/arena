@@ -1,14 +1,22 @@
 import pgPromise from 'pg-promise'
 
+import { Dates, Objects, SystemError } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
+import * as StringUtils from '@core/stringUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 
 import { db } from '../../../db/db'
-import * as CSVWriter from '../../../utils/file/csvWriter'
+import * as DbUtils from '../../../db/dbUtils'
+import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
@@ -19,6 +27,8 @@ import * as DataTableInsertRepository from '../repository/dataTableInsertReposit
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
+import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
+import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 
 // ==== DDL
 
@@ -28,6 +38,7 @@ export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
 // Data tables and views
 export const { createDataTable } = DataTableRepository
 export const { createDataView, countViewDataAgg } = DataViewRepository
+export { deleteRowsByRecordUuid } from '../repository/dataTableDeleteRepository'
 
 // Node key views
 export { createNodeKeysView } from '../repository/nodeKeysViewRepository'
@@ -38,30 +49,6 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
 
 // ==== DML
-
-const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItemsLabels = true }) => {
-  const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
-  const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
-
-  // Consider only user selected fields (from column node defs)
-  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
-  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fields = nodeDefCols.flatMap((nodeDefCol) => {
-    if (!includeCategoryItemsLabels && NodeDef.isCode(nodeDefCol)) {
-      // keep only code column
-      return [NodeDef.getName(nodeDefCol)]
-    }
-    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const columnNames = columnNodeDef.names
-    if (NodeDef.isCoordinate(nodeDefCol)) {
-      // exclude geometry column
-      return columnNames.filter((name) => name !== columnNodeDef.name)
-    }
-    return columnNames
-  })
-  // Cycle is 0-based
-  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
-}
 
 /**
  * Executes a select query on an entity definition data view.
@@ -76,7 +63,8 @@ const _getExportFields = ({ survey, query, addCycle = false, includeCategoryItem
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset=null] - The query offset.
  * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
+ * @param {boolean|object} [params.outputStream=null] - The output to be used to stream the data (if specified).
+ * @param {string} [params.fileFormat=null] - The format of the output file (csv or xlsx).
  *
  * @param {pgPromise.IDatabase} [client=db] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
@@ -92,9 +80,15 @@ export const fetchViewData = async (params, client = db) => {
     recordOwnerUuid = null,
     offset = 0,
     limit = null,
-    streamOutput = null,
+    outputStream = null,
+    fileFormat = null,
     addCycle = false,
     includeCategoryItemsLabels = true,
+    expandCategoryItems = false,
+    includeInternalUuids = false,
+    includeDateCreated = false,
+    nullsToEmpty = false,
+    uniqueFileNamesGenerator = null,
   } = params
 
   // Fetch data
@@ -105,51 +99,52 @@ export const fetchViewData = async (params, client = db) => {
       query,
       columnNodeDefs,
       includeFileAttributeDefs,
+      includeDateCreated,
       recordSteps,
       recordOwnerUuid,
       offset,
       limit,
-      stream: Boolean(streamOutput),
+      stream: Boolean(outputStream),
     },
     client
   )
 
-  if (streamOutput) {
+  if (outputStream) {
     const fields = columnNodeDefs
       ? null // all fields will be included in the CSV file
-      : _getExportFields({ survey, query, addCycle, includeCategoryItemsLabels })
-
-    await db.stream(result, (dbStream) => {
-      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
-      dbStream.pipe(csvTransform).pipe(streamOutput)
+      : SurveyRdbCsvExport.getCsvExportFields({
+          survey,
+          query,
+          addCycle,
+          includeCategoryItemsLabels,
+          expandCategoryItems,
+          includeInternalUuids,
+          includeDateCreated,
+        })
+    const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
+      survey,
+      query,
+      expandCategoryItems,
+      nullsToEmpty,
+      keepFileNamesUnique: true,
+      uniqueFileNamesGenerator,
     })
-    return null
+    await DbUtils.stream({
+      queryStream: result,
+      client,
+      processor: async (dbStream) =>
+        FlatDataWriter.writeItemsStreamToStream({
+          stream: dbStream,
+          fields,
+          options: {
+            objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
+          },
+          outputStream,
+          fileFormat,
+        }),
+    })
   }
   return result
-}
-
-const _getExportFieldsAgg = ({ survey, query }) => {
-  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
-  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-
-  const fields = []
-  // dimensions
-  Query.getDimensions(query).forEach((dimension) => {
-    const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(viewDataNodeDef.survey)
-    fields.push(new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name)
-  })
-  // measures
-  Array.from(Query.getMeasures(query).entries()).forEach(([nodeDefUuid, aggFunctions]) => {
-    const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    aggFunctions.forEach((aggregateFnOrUuid) => {
-      const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
-        nodeDef: nodeDefMeasure,
-        aggregateFn: aggregateFnOrUuid,
-      })
-      fields.push(fieldAlias)
-    })
-  })
-  return fields
 }
 
 /**
@@ -163,66 +158,174 @@ const _getExportFieldsAgg = ({ survey, query }) => {
  * @param {number} [params.offset=null] - The query offset.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.streamOutput=null] - The output to be used to stream the data (if specified).
- *
+ * @param {boolean} [params.outputStream=null] - The output to be used to stream the data (if specified).
+ * @param {object} [params.options=null] - Export options object (e.g. {fileFormat: 'csv'}).
+ * @param {object} client - DB client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
-export const fetchViewDataAgg = async (params) => {
-  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, streamOutput = null } = params
+export const fetchViewDataAgg = async (params, client = db) => {
+  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, outputStream = null, options = {} } = params
+  const { fileFormat = FileFormats.csv } = options
 
   // Fetch data
-  const result = await DataViewRepository.fetchViewDataAgg({
-    survey,
-    cycle,
-    query,
-    recordOwnerUuid,
-    limit,
-    offset,
-    stream: Boolean(streamOutput),
-  })
+  const result = await DataViewRepository.fetchViewDataAgg(
+    {
+      survey,
+      cycle,
+      query,
+      recordOwnerUuid,
+      limit,
+      offset,
+      stream: Boolean(outputStream),
+    },
+    client
+  )
 
-  if (streamOutput) {
-    await db.stream(result, (dbStream) => {
-      const fields = _getExportFieldsAgg({ survey, query })
-      const csvTransform = CSVWriter.transformJsonToCsv({ fields })
-      dbStream.pipe(csvTransform).pipe(streamOutput)
+  if (outputStream) {
+    const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
+    return DbUtils.stream({
+      queryStream: result,
+      client,
+      processor: async (dbStream) =>
+        FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
     })
-    return null
   }
   return result
 }
 
+const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search }) => {
+  if (recordUuids) return recordUuids
+
+  if (Objects.isEmpty(search) && !recordsModifiedAfter) return null
+
+  const surveyId = Survey.getId(survey)
+  const nodeDefRoot = Survey.getNodeDefRoot(survey)
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  let recordsSummaries = await RecordRepository.fetchRecordsSummaryBySurveyId({
+    surveyId,
+    nodeDefRoot,
+    nodeDefKeys,
+    cycle,
+    search,
+  })
+  if (recordsModifiedAfter) {
+    recordsSummaries = recordsSummaries.filter((recordSummary) =>
+      Dates.isAfter(Record.getDateModified(recordSummary), recordsModifiedAfter)
+    )
+  }
+  return recordsSummaries.map(Record.getUuid)
+}
+
 export const fetchEntitiesDataToCsvFiles = async (
-  { survey, cycle, outputDir, includeCategoryItemsLabels, includeAnalysis, recordOwnerUuid = null, callback },
+  {
+    survey,
+    cycle,
+    search = null,
+    recordOwnerUuid = null,
+    recordUuids: recordUuidsParam = null,
+    options,
+    outputDir,
+    callback,
+  },
   client = db
 ) => {
+  const {
+    includeCategoryItemsLabels,
+    expandCategoryItems,
+    includeAncestorAttributes,
+    exportSingleEntitiesIntoSeparateFiles,
+    includeAnalysis,
+    includeFileAttributeDefs,
+    includeFiles,
+    includeInternalUuids,
+    includeDateCreated,
+    recordsModifiedAfter,
+    fileFormat,
+  } = options
+
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
-    (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
-  )
+  const nodeDefs = Survey.findDescendants({
+    cycle,
+    filterFn: (nodeDef) =>
+      NodeDef.isRoot(nodeDef) ||
+      NodeDef.isMultiple(nodeDef) ||
+      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
+  })(survey)
+
+  const filterRecordUuids = await _determineRecordUuidsFilter({
+    survey,
+    cycle,
+    recordsModifiedAfter,
+    recordUuids: recordUuidsParam,
+    search,
+  })
+
+  if (filterRecordUuids?.length === 0) {
+    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
+  }
 
   callback?.({ total: nodeDefs.length })
 
+  const getChildAttributes = (nodeDef) => {
+    if (exportSingleEntitiesIntoSeparateFiles) {
+      const children = Survey.getNodeDefChildrenSorted({ cycle, nodeDef, includeAnalysis })(survey)
+      return children.filter(
+        (child) => (NodeDef.isAttribute(child) && NodeDef.isSingle(child)) || !!expandCategoryItems
+      )
+    }
+    return Survey.getNodeDefDescendantAttributesInSingleEntities({
+      nodeDef,
+      includeAnalysis,
+      includeMultipleAttributes: !!expandCategoryItems,
+      sorted: true,
+      cycle,
+    })(survey)
+  }
+
+  const uniqueFileNamesGenerator = new UniqueFileNamesGenerator()
+
   await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
-    const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    const outputFilePath = FileUtils.join(outputDir, `${NodeDef.getName(nodeDefContext)}.csv`)
+    const ancestorMultipleEntity =
+      NodeDef.isRoot(nodeDefContext) || NodeDef.isMultiple(nodeDefContext)
+        ? nodeDefContext
+        : Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
+    const ancestorEntityDefUuid = NodeDef.getUuid(ancestorMultipleEntity)
+    const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
+    const extension = ExportFileNameGenerator.getExtensionByFileFormat(fileFormat)
+    const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
+    const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)
 
     const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? Survey.getNodeDefDescendantAttributesInSingleEntities({
-          nodeDef: nodeDefContext,
-          includeAnalysis,
-          sorted: true,
-          cycle,
-        })(survey)
-      : [nodeDefContext] // Multiple attribute
+      ? getChildAttributes(nodeDefContext)
+      : // Multiple attribute
+        [nodeDefContext]
 
-    const ancestorKeys = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
+    const ancestorDefs = []
+    if (includeAncestorAttributes) {
+      Survey.visitAncestors(
+        nodeDefContext,
+        (nodeDef) => {
+          ancestorDefs.unshift(...getChildAttributes(nodeDef))
+        },
+        false
+      )(survey)
+    } else {
+      const ancestorKeyDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
+      ancestorDefs.unshift(...ancestorKeyDefs)
+    }
 
-    let query = Query.create({ entityDefUuid })
-    const queryAttributeDefsUuids = ancestorKeys.concat(childDefs).map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+    const queryAttributeDefUuids = ancestorDefs
+      .concat(childDefs)
+      .filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
+      .map(NodeDef.getUuid)
+
+    const query = Query.create({
+      entityDefUuid: ancestorEntityDefUuid,
+      attributeDefUuids: queryAttributeDefUuids,
+      filterRecordUuids,
+    })
 
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
 
@@ -231,17 +334,26 @@ export const fetchEntitiesDataToCsvFiles = async (
         survey,
         cycle,
         recordOwnerUuid,
-        streamOutput: outputStream,
+        outputStream,
+        fileFormat,
         query,
         addCycle,
         includeCategoryItemsLabels,
+        expandCategoryItems,
+        uniqueFileNamesGenerator,
+        includeInternalUuids,
+        includeDateCreated,
       },
       client
     )
   })
+  return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
 }
 
-export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwnerUuid = null }, client = db) => {
+export const fetchEntitiesFileUuidsByCycle = async (
+  { survey, cycle, recordOwnerUuid = null, filterRecordUuids = null },
+  client = db
+) => {
   const nodeDefs = Survey.getNodeDefsArray(survey).filter(
     (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef)
   )
@@ -261,9 +373,11 @@ export const fetchEntitiesFileUuidsByCycle = async ({ survey, cycle, recordOwner
     }
 
     const entityDefUuid = NodeDef.getUuid(nodeDefContext)
-    let query = Query.create({ entityDefUuid })
-    const queryAttributeDefsUuids = childrenFileDefs.map(NodeDef.getUuid)
-    query = Query.assocAttributeDefUuids(queryAttributeDefsUuids)(query)
+    const query = Query.create({
+      entityDefUuid,
+      attributeDefUuids: childrenFileDefs.map(NodeDef.getUuid),
+      filterRecordUuids,
+    })
 
     const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)

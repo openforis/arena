@@ -7,7 +7,7 @@ import * as Chain from '@common/analysis/chain'
 import * as API from '@webapp/service/api'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
 import { ButtonDelete, ButtonDownload } from '@webapp/components'
-import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const ButtonBar = () => {
   const dispatch = useDispatch()
@@ -15,6 +15,7 @@ const ButtonBar = () => {
   const surveyId = useSurveyId()
   const chain = useChain()
   const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
 
   const deleteChain = () => dispatch(ChainActions.deleteChain({ chain, navigate }))
 
@@ -24,7 +25,7 @@ const ButtonBar = () => {
         className="chain-summary-download-btn"
         label="chainView.downloadSummaryJSON"
         href={API.getChainSummaryExportUrl({ surveyId, chainUuid: Chain.getUuid(chain) })}
-        requestParams={{ cycle }}
+        requestParams={{ cycle, lang }}
       />
       <ButtonDelete label="chainView.deleteChain" onClick={deleteChain} />
     </div>

@@ -15,8 +15,8 @@ export const useExportAll = () => {
   // always export draft properties
   const draft = true
 
-  return useCallback(async () => {
-    const { job } = await API.startExportAllCategoriesJob({ surveyId, draft })
+  return useCallback(async ({ fileFormat }) => {
+    const { job } = await API.startExportAllCategoriesJob({ surveyId, draft, fileFormat })
 
     dispatch(
       JobActions.showJobMonitor({
@@ -28,6 +28,7 @@ export const useExportAll = () => {
               href={`/api/survey/${surveyId}/categories/export/download`}
               requestParams={{ tempFileName, draft }}
               onClick={() => dispatch(JobActions.hideJobMonitor())}
+              variant="contained"
             />
           )
         },

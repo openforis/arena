@@ -81,6 +81,8 @@ const _getSurveysSelectQuery = ({
   limit = null,
   sortBy = Survey.sortableKeys.dateModified,
   sortOrder = 'DESC',
+  includeOwnerEmailAddress = false,
+  onlyOwn = false,
 }) => {
   const checkAccess = (!template || draft) && !User.isSystemAdmin(user)
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -120,6 +122,7 @@ const _getSurveysSelectQuery = ({
             NULL
         END AS status,
         u.name AS owner_name
+        ${includeOwnerEmailAddress ? `, u.email AS owner_email` : ''}
         ${checkAccess ? ', json_build_array(row_to_json(g.*)) AS auth_groups' : ''}
       FROM survey s
         JOIN "user" u 
@@ -143,12 +146,14 @@ const _getSurveysSelectQuery = ({
       , s.status
       , ${labelCol} AS label
       , s.owner_name
+      ${includeOwnerEmailAddress ? `, s.owner_email AS owner_email` : ''}
       ${checkAccess ? ', s.auth_groups' : ''}
     FROM survey_view s
     WHERE 
       -- if draft is false, fetch only published surveys
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
       ${_getSelectWhereCondition({ draft, search })}
+      ${onlyOwn ? ' AND s.owner_uuid = $/userUuid/' : ''}
     ORDER BY ${sortByField} ${sortOrder}
     LIMIT ${limit === null ? 'ALL' : limit}
     OFFSET ${offset}
@@ -166,20 +171,34 @@ export const fetchUserSurveys = async (
     search: searchParam = null,
     sortBy = Survey.sortableKeys.dateModified,
     sortOrder = 'DESC',
+    includeOwnerEmailAddress = false,
+    onlyOwn = false,
   },
   client = db
 ) => {
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
 
   return client.map(
-    _getSurveysSelectQuery({ user, draft, template, offset, limit, lang, search, sortBy, sortOrder }),
+    _getSurveysSelectQuery({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeOwnerEmailAddress,
+      onlyOwn,
+    }),
     { userUuid: User.getUuid(user), template, search },
     (def) => DB.transformCallback(def, true)
   )
 }
 
 export const countUserSurveys = async (
-  { user, draft = false, template = false, search: searchParam = null, lang = null },
+  { user, draft = false, template = false, search: searchParam = null, lang = null, onlyOwn = false },
   client = db
 ) => {
   const search = StringUtils.isNotBlank(searchParam) ? `%${searchParam.toLowerCase()}%` : null
@@ -187,7 +206,7 @@ export const countUserSurveys = async (
   return client.one(
     `
     SELECT COUNT(*)
-    FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search })}) AS s`,
+    FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search, onlyOwn })}) AS s`,
     { search, template, userUuid: User.getUuid(user) },
     (row) => Number(row.count)
   )
@@ -246,6 +265,15 @@ export const fetchDependencies = async (surveyId, client = db) =>
     R.prop('dependencies')
   )
 
+export const fetchFilesTotalSpace = async (surveyId, client = db) =>
+  client.oneOrNone(
+    `SELECT config#>'{${Survey.configKeys.filesTotalSpace}}' AS value
+     FROM survey 
+     WHERE id = $1`,
+    [surveyId],
+    R.prop('value')
+  )
+
 export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
   client.map(
     `SELECT id 
@@ -273,6 +301,14 @@ export const updateSurveyProp = async (surveyId, key, value, client = db) => {
     (def) => DB.transformCallback(def, true)
   )
 }
+
+export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
+  client.none(
+    `UPDATE survey 
+    SET owner_uuid = $/ownerUuid/
+    WHERE id = $/surveyId/`,
+    { surveyId, ownerUuid }
+  )
 
 export const publishSurveyProps = async (surveyId, client = db) =>
   client.none(
@@ -334,6 +370,17 @@ export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
     `,
     [surveyId]
   )
+
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) =>
+  client.none(
+    `UPDATE survey
+    SET config = jsonb_set(coalesce(config, '{}'), '{${key}}', $/value/)
+    WHERE id = $/surveyId/`,
+    { surveyId, value }
+  )
+
+export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
+  client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
 
 // ============== DELETE
 export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])

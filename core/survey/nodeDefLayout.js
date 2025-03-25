@@ -13,9 +13,18 @@ export const keys = {
   layoutChildren: 'layoutChildren', // React Data Grid layout (form layout) or sorted children uuids (table layout)
   hiddenWhenNotRelevant: 'hiddenWhenNotRelevant', // Boolean: true if the node must be hidden when is not relevant
   hiddenInMobile: 'hiddenInMobile', // Boolean: true if the node must be always hidden in Arena Mobile
+  includedInMultipleEntitySummary: 'includedInMultipleEntitySummary', // Boolean: true if the attribute must be included in the multiple entity summary (in mobile)
+  includedInPreviousCycleLink: 'includedInPreviousCycleLink', // Boolean: true if the previous cycle value must be visible for this node
   // Node Def Code
   codeShown: 'codeShown', // Boolean: true if the code of the category item should be shown, false otherwise
 }
+
+export const commonAttributeKeys = [
+  keys.hiddenWhenNotRelevant,
+  keys.hiddenInMobile,
+  keys.includedInMultipleEntitySummary,
+  keys.includedInPreviousCycleLink,
+]
 
 export const renderType = {
   // Entity
@@ -49,19 +58,31 @@ export const newLayout = (cycle, renderAs, pageUuid = null) =>
 
 // ====== READ
 
+const layoutPropsDefault = {
+  indexChildren: [],
+  columnsNo: 3,
+  columnWidth: `${columnWidthMinPx}px`,
+  layoutChildren: [],
+  hiddenWhenNotRelevant: false,
+  hiddenInMobile: false,
+  includedInMultipleEntitySummary: false,
+  includedInPreviousCycleLink: true,
+  codeShown: true,
+}
+
 export const getLayout = ObjectUtils.getProp(keys.layout, {})
 
 export const getLayoutCycle = (cycle) => R.pipe(getLayout, R.prop(cycle))
 
 export const hasLayoutCycle = (cycle) => (nodeDef) => Boolean(getLayoutCycle(cycle)(nodeDef))
 
-const _getPropLayout = (cycle, prop, defaultTo = null) => R.pipe(getLayoutCycle(cycle), R.propOr(defaultTo, prop))
+export const getPropLayout = (cycle, prop) => R.pipe(getLayoutCycle(cycle), R.propOr(layoutPropsDefault[prop], prop))
 
-export const getIndexChildren = (cycle) => _getPropLayout(cycle, keys.indexChildren, [])
+export const getIndexChildren = (cycle) => getPropLayout(cycle, keys.indexChildren)
 
-export const getRenderType = (cycle) => _getPropLayout(cycle, keys.renderType)
+export const getRenderType = (cycle) => getPropLayout(cycle, keys.renderType)
 
-export const getLayoutChildren = (cycle) => _getPropLayout(cycle, keys.layoutChildren, [])
+export const getLayoutChildren = (cycle) => getPropLayout(cycle, keys.layoutChildren)
 
 export const getLayoutChildrenSorted = (cycle) => (nodeDef) => {
   const layoutChildren = getLayoutChildren(cycle)(nodeDef)
@@ -108,9 +129,17 @@ export const getLayoutChildrenCompressed =
     )
   }
 
-export const isHiddenWhenNotRelevant = (cycle) => _getPropLayout(cycle, keys.hiddenWhenNotRelevant, false)
+export const isHiddenWhenNotRelevant = (cycle) => getPropLayout(cycle, keys.hiddenWhenNotRelevant)
 
-export const isHiddenInMobile = (cycle) => _getPropLayout(cycle, keys.hiddenInMobile, false)
+export const isHiddenInMobile = (cycle) => getPropLayout(cycle, keys.hiddenInMobile)
+
+export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) => !isHiddenInMobile(cycle)(nodeDef)
+
+export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) => !isHiddenInMobile(cycle)(nodeDef)
+
+export const isIncludedInMultipleEntitySummary = (cycle) => getPropLayout(cycle, keys.includedInMultipleEntitySummary)
+
+export const isIncludedInPreviousCycleLink = (cycle) => getPropLayout(cycle, keys.includedInPreviousCycleLink)
 
 /**
  * Returns the uuids of the layout children items.
@@ -128,9 +157,9 @@ export const getLayoutChildrenUuids = (cycle) => (nodeDef) => {
     : R.pipe(R.sortWith([R.ascend(R.prop('y')), R.ascend(R.prop('x'))]), R.map(R.prop('i')))(layoutChildren)
 }
 
-export const getColumnsNo = (cycle) => _getPropLayout(cycle, keys.columnsNo, 3)
+export const getColumnsNo = (cycle) => getPropLayout(cycle, keys.columnsNo)
 
-export const getPageUuid = (cycle) => _getPropLayout(cycle, keys.pageUuid)
+export const getPageUuid = (cycle) => getPropLayout(cycle, keys.pageUuid)
 
 export const hasPage = (cycle) => R.pipe(getPageUuid(cycle), R.isNil, R.not)
 
@@ -149,7 +178,7 @@ export const isDisplayInOwnPage = (cycle) => isDisplayIn(cycle, displayIn.ownPag
 export const isRenderFromInOwnPage = (cycle) => (nodeDef) =>
   isRenderForm(cycle)(nodeDef) && isDisplayInOwnPage(cycle)(nodeDef)
 
-export const getColumnWidth = (cycle) => _getPropLayout(cycle, keys.columnWidth, `${columnWidthMinPx}px`)
+export const getColumnWidth = (cycle) => getPropLayout(cycle, keys.columnWidth)
 
 const _getColumnWidthPart = ({ cycle, nodeDef, partIndex }) => {
   const width = getColumnWidth(cycle)(nodeDef)
@@ -159,7 +188,7 @@ const _getColumnWidthPart = ({ cycle, nodeDef, partIndex }) => {
 export const getColumnWidthValue = (cycle) => (nodeDef) => _getColumnWidthPart({ cycle, nodeDef, partIndex: 1 })
 export const getColumnWidthUnit = (cycle) => (nodeDef) => _getColumnWidthPart({ cycle, nodeDef, partIndex: 2 })
 
-export const isCodeShown = (cycle) => _getPropLayout(cycle, keys.codeShown, true)
+export const isCodeShown = (cycle) => getPropLayout(cycle, keys.codeShown)
 
 // ====== UPDATE
 
@@ -173,6 +202,8 @@ export const dissocLayoutCycles = (cycles) => (nodeDefLayout) =>
 
 export const assocLayoutProp = (cycle, prop, value) => R.assocPath([cycle, prop], value)
 
+export const dissocLayoutProp = (cycle, prop) => R.dissocPath([cycle, prop])
+
 export const assocIndexChildren = (cycle, indexChildren) => assocLayoutProp(cycle, keys.indexChildren, indexChildren)
 
 export const assocLayoutChildren = (cycle, layoutChildren) =>
@@ -185,6 +216,9 @@ export const assocPageUuid = (cycle, pageUuid) => assocLayoutProp(cycle, keys.pa
 export const assocColumnWidth = (cycle, columnWidth) => assocLayoutProp(cycle, keys.columnWidth, columnWidth)
 
 export const assocCodeShown = (cycle, codeShown) => assocLayoutProp(cycle, keys.codeShown, codeShown)
+
+export const assocIncludeInMultipleEntitySummary = (cycle, value) =>
+  assocLayoutProp(cycle, keys.includedInMultipleEntitySummary, value)
 
 // ====== UTILS
 

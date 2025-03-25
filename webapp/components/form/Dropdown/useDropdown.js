@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { Objects } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 export const useDropdown = ({
@@ -21,10 +22,6 @@ export const useDropdown = ({
   title,
 }) => {
   const selectRef = useRef(null)
-  const inputValue = selectRef?.current?.inputRef?.value
-  const searchMinCharsReached =
-    !minCharactersToAutocomplete || minCharactersToAutocomplete <= inputValue?.trim()?.length
-
   const getProperty = (propOrFunction) => (item) =>
     propOrFunction.constructor === String ? A.prop(propOrFunction, item) : propOrFunction(item)
 
@@ -37,28 +34,45 @@ export const useDropdown = ({
 
   const [state, setState] = useState({
     items: asyncItemsLoading ? [] : itemsProp,
-    loading: asyncItemsLoading,
+    loading: false,
+    inputValue: selectRef?.current?.inputRef?.value ?? '',
   })
 
-  const { items, loading } = state
+  const updateState = useCallback((newProps) => setState((statePrev) => ({ ...statePrev, ...newProps })), [])
+
+  const { items, loading, inputValue } = state
+
+  const searchMinCharsReached =
+    !minCharactersToAutocomplete || minCharactersToAutocomplete <= inputValue?.trim()?.length
 
   const fetchItems = useCallback(async () => {
-    if (!asyncItemsLoading) {
-      setState({ items: itemsProp, loading: false })
-    } else {
-      if (searchMinCharsReached && !loading) {
-        setState({ items: [], loading: true })
-      }
-      const _items = searchMinCharsReached && itemsProp ? await itemsProp(inputValue) : []
-
-      setState({ items: _items, loading: false })
+    if (!searchMinCharsReached) return
+    if (!loading) {
+      updateState({ items: [], loading: true })
     }
-  }, [asyncItemsLoading, itemsProp, searchMinCharsReached, loading, inputValue])
+    let _items = itemsProp ? await itemsProp(inputValue) : []
+    if (_items?.data?.items) {
+      // items is the result of a fetch
+      _items = _items.data.items
+      if (typeof _items === 'object') {
+        _items = Object.values(_items)
+      }
+    }
+    updateState({ items: _items, loading: false })
+  }, [inputValue, itemsProp, loading, searchMinCharsReached, updateState])
 
-  // fetch items on items prop update
+  const initializeItems = useCallback(async () => {
+    if (!asyncItemsLoading) {
+      updateState({ items: itemsProp })
+    } else {
+      await fetchItems()
+    }
+  }, [asyncItemsLoading, updateState, itemsProp, fetchItems])
+
+  // fetch items on items prop or input value update (only if async items loading is active)
   useEffect(() => {
-    fetchItems()
-  }, [asyncItemsLoading, itemsProp])
+    initializeItems()
+  }, [asyncItemsLoading, itemsProp, inputValue])
 
   // set title to control component
   useEffect(() => {
@@ -87,50 +101,38 @@ export const useDropdown = ({
   )
 
   const onChange = useCallback(
-    async (selection) => {
-      const options = multiple ? selection : [selection]
-      const items = options.map(getItemFromOption)
-      const paramToPass = multiple ? items : items[0]
-      if (!onBeforeChange || (await onBeforeChange(paramToPass))) {
-        onChangeProp(paramToPass)
+    async (dropdownSelection) => {
+      const selectedOptions = multiple ? dropdownSelection : [dropdownSelection]
+      const selectedItems = selectedOptions.map(getItemFromOption)
+      const selectionNext = multiple ? selectedItems : selectedItems[0]
+      if (Objects.isEqual(selection, selectionNext)) return
+
+      if (!onBeforeChange || (await onBeforeChange(selectionNext))) {
+        onChangeProp(selectionNext)
       }
     },
-    [getItemFromOption, multiple, onBeforeChange, onChangeProp]
+    [getItemFromOption, multiple, onBeforeChange, onChangeProp, selection]
   )
 
   const onInputChange = useCallback(
     (inputValue) => {
-      if (!minCharactersToAutocomplete) return
-
-      if (minCharactersToAutocomplete <= inputValue?.length) {
-        fetchItems()
-      } else {
-        setState({ items: [] })
-      }
+      updateState({ inputValue })
     },
-    [minCharactersToAutocomplete, fetchItems]
+    [updateState]
   )
 
   const itemToOption = useCallback(
     (item) => ({
+      ...item,
       description: getOptionDescription(item),
       icon: getOptionIcon(item),
       label: getOptionLabel(item),
       value: getOptionValue(item),
-      ...(item.options ? { options: item.options } : {}),
     }),
     [getOptionDescription, getOptionIcon, getOptionLabel, getOptionValue]
   )
 
   const options = items.map(itemToOption)
-
-  const findOptionByValue = useCallback(
-    (value) =>
-      options
-        .flatMap((option) => (option.options ? option.options : [option]))
-        .find((option) => option.value === value),
-    [options]
-  )
 
   const selectionToValue = useCallback(
     (sel) => {
@@ -139,12 +141,12 @@ export const useDropdown = ({
 
       if (multiple) {
         // selection is an array of items
-        return sel.map((selectedItem) => findOptionByValue(getOptionValue(selectedItem)))
+        return sel.map(itemToOption)
       }
       // selection is a single item
-      return findOptionByValue(getOptionValue(sel))
+      return itemToOption(sel)
     },
-    [findOptionByValue, getOptionValue, multiple]
+    [itemToOption, multiple]
   )
 
   const defaultValue = selectionToValue(defaultSelection)

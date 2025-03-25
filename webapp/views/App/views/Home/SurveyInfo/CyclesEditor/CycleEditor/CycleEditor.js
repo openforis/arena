@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import * as SurveyCycle from '@core/survey/surveyCycle'
 
-import { Button } from '@webapp/components'
+import { ButtonIconDelete } from '@webapp/components'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 
 import DateContainer from './DateContainer'
@@ -32,14 +32,7 @@ const CycleEditor = (props) => {
           />
         )}
 
-        {canDelete && (
-          <Button
-            className="btn-transparent btn-delete"
-            iconClassName="icon-bin2 icon-12px"
-            size="small"
-            onClick={() => onDelete(cycleKey)}
-          />
-        )}
+        {canDelete && <ButtonIconDelete onClick={() => onDelete(cycleKey)} />}
       </div>
     </ValidationTooltip>
   )

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 
-import { PointFactory } from '@openforis/arena-core'
+import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
@@ -12,6 +13,8 @@ import * as API from '@webapp/service/api'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { LoaderActions } from '@webapp/store/ui'
+import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 
@@ -24,19 +27,29 @@ const _convertItemsToPoints = (items) => {
     const { codes: itemCodes, latLng, location, uuid: itemUuid, recordUuid } = item
     if (!latLng) return acc
 
+    const locationPoint = Points.parse(location)
+
     const [lat, long] = latLng
-    const itemPoint = PointFactory.createInstance({ x: long, y: lat })
+    const itemLatLongPoint = PointFactory.createInstance({ x: long, y: lat })
 
     bounds.extend([lat, long])
 
-    acc.push({
-      type: 'Feature',
-      properties: { cluster: false, itemUuid, itemCodes, itemPoint, key: itemUuid, location, recordUuid },
-      geometry: {
-        type: 'Point',
-        coordinates: [long, lat],
-      },
-    })
+    acc.push(
+      GeoJsonUtils.createPointFeature({
+        x: long,
+        y: lat,
+        properties: {
+          cluster: false,
+          itemUuid,
+          itemCodes,
+          itemLatLongPoint,
+          key: itemUuid,
+          location,
+          locationPoint,
+          recordUuid,
+        },
+      })
+    )
     return acc
   }, [])
 
@@ -82,8 +95,9 @@ const _fetchItems = async ({ surveyId, levelIndex, fetchCancelRef, isMountedRef 
 }
 
 export const useSamplingPointDataLayer = (props) => {
-  const { levelIndex, markersColor } = props
+  const { levelIndex = 0, markersColor } = props
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
   const isMountedRef = useIsMountedRef()
   const map = useMap()
@@ -102,28 +116,34 @@ export const useSamplingPointDataLayer = (props) => {
 
   const overlayInnerName = i18n.t(
     loading ? 'mapView.samplingPointDataLayerNameLoading' : 'mapView.samplingPointDataLayerName',
-    { levelIndex }
+    { level: levelIndex + 1 }
   )
 
   // add icon close to name
   const overlayName = `${overlayInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
+
+  const fetchItemsAndConvertIntoPoints = useCallback(async () => {
+    dispatch(LoaderActions.showLoader())
+    try {
+      const items = await _fetchItems({ surveyId, levelIndex, fetchCancelRef, isMountedRef })
+      const { points, bounds } = _convertItemsToPoints(items)
+
+      // pan map into layer bounds center
+      if (map.getZoom() < 5 && points.length > 0) {
+        map.panTo(bounds.getCenter())
+      }
+      setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points, items }))
+    } finally {
+      dispatch(LoaderActions.hideLoader())
+    }
+  }, [dispatch, isMountedRef, levelIndex, map, surveyId])
 
   useMapLayerAdd({
     layerName: overlayName,
     callback: () => {
       const shouldLoadItems = !loaded && !loading
       if (shouldLoadItems) {
-        ;(async () => {
-          const items = await _fetchItems({ surveyId, levelIndex, fetchCancelRef, isMountedRef })
-          const { points, bounds } = _convertItemsToPoints(items)
-
-          // pan map into layer bounds center
-          if (map.getZoom() < 5 && points.length > 0) {
-            map.panTo(bounds.getCenter())
-          }
-
-          setState((statePrev) => ({ ...statePrev, loaded: true, loading: false, points, items }))
-        })()
+        fetchItemsAndConvertIntoPoints()
       }
       setState((statePrev) => ({ ...statePrev, loading: shouldLoadItems }))
     },
@@ -132,9 +152,8 @@ export const useSamplingPointDataLayer = (props) => {
   // cancel items fetch (if any) on unmount
   useEffect(() => {
     return () => {
-      if (fetchCancelRef.current) {
-        fetchCancelRef.current()
-      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchCancelRef.current?.()
     }
   }, [])
 

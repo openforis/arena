@@ -86,17 +86,6 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
       !!NodeDef.getParentCodeDefUuid(nodeDef)
   )
 
-  const getCodeAttributeAncestorNames = (nodeDef) => {
-    const codeAttributeAncestorNames = []
-
-    let currentParentCode = Survey.getNodeDefParentCode(nodeDef)(survey)
-    while (currentParentCode) {
-      codeAttributeAncestorNames.unshift(NodeDef.getName(currentParentCode))
-      currentParentCode = Survey.getNodeDefParentCode(currentParentCode)(survey)
-    }
-    return codeAttributeAncestorNames
-  }
-
   const categoryAttributeAncestors = codeAttributes2ndLevel.map((nodeDef) => ({
     attribute: NodeDef.getName(nodeDef),
     categoryName: getCategoryNameByUuid({
@@ -104,7 +93,7 @@ const generateCategoryAttributeAncestorsSummary = ({ survey }) => {
       categoryUuid: NodeDef.getCategoryUuid(nodeDef),
     }),
     categoryLevel: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey) + 1,
-    ancestors: getCodeAttributeAncestorNames(nodeDef),
+    ancestors: Survey.getNodeDefAncestorCodes(nodeDef)(survey).map(NodeDef.getName),
   }))
 
   ArrayUtils.sortByProps(['categoryName', 'categoryLevel'])(categoryAttributeAncestors)
@@ -146,6 +135,9 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   // const postStratificationAttributeDef = getNodeDefByUuid(
   //   ChainSamplingDesign.getPostStratificationAttributeDefUuid(chainSamplingDesign)
   // )
+  const firstPhaseCommonAttributeDef = getNodeDefByUuid(
+    ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(chainSamplingDesign)
+  )
   const clusteringEntityDef = getNodeDefByUuid(ChainSamplingDesign.getClusteringNodeDefUuid(chainSamplingDesign))
   const analysisNodeDefs = Survey.getAnalysisNodeDefs({
     chain,
@@ -165,14 +157,25 @@ const generateChainSummary = async ({ surveyId, chainUuid, cycle, lang: langPara
   return {
     ...surveySummary,
     label: Chain.getLabel(lang, defaultLang)(chain),
+    selectedLanguage: lang,
     selectedCycle: getCycleLabel(cycle),
-    cycles: Chain.getCycles(chain).map(getCycleLabel),
     samplingDesign: Chain.hasSamplingDesign(chain),
     baseUnit: NodeDef.getName(baseUnitNodeDef),
     baseUnitEntityKeys,
     ...(samplingStrategySpecified ? { samplingStrategy: samplingStrategyIndex + 1 } : {}),
     ...(ChainSamplingDesign.isStratificationEnabled(chainSamplingDesign)
       ? getCodeAttributeSummary('stratumAttribute', stratumAttributeDef)
+      : {}),
+    ...(ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(chainSamplingDesign)
+      ? {
+          phase1Category: getCategoryNameByUuid({
+            survey,
+            categoryUuid: ChainSamplingDesign.getFirstPhaseCategoryUuid(chainSamplingDesign),
+          }),
+        }
+      : {}),
+    ...(ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(chainSamplingDesign)
+      ? getCodeAttributeSummary('commonAttribute', firstPhaseCommonAttributeDef)
       : {}),
     ...(ChainSamplingDesign.isPostStratificationEnabled(chainSamplingDesign)
       ? { postStratificationAttribute: '' } // not supoprted in R script yet, keep it blank

@@ -22,7 +22,7 @@ import TaxaTableRow from './TaxaTableRow'
 import { State, useLocalState } from './store'
 
 const TaxonomyDetails = (props) => {
-  const { showClose } = props
+  const { showClose = true } = props
 
   const { state, Actions } = useLocalState(props)
 
@@ -35,17 +35,16 @@ const TaxonomyDetails = (props) => {
 
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
-  const extraPropsDefs = Taxonomy.getExtraPropsDefs(taxonomy)
-  const extraPropKeys = Object.keys(extraPropsDefs)
+  const extraPropsDefsArray = Taxonomy.getExtraPropsDefsArray(taxonomy)
 
-  const onlyRequiredColumns = R.isEmpty(vernacularLanguageCodes) && R.isEmpty(extraPropKeys)
+  const onlyRequiredColumns = R.isEmpty(vernacularLanguageCodes) && R.isEmpty(extraPropsDefsArray)
 
   const gridTemplateColumns = onlyRequiredColumns
     ? `.1fr .1fr .2fr .2fr .4fr`
     : `4rem 15rem 15rem 20rem 30rem ${
         R.isEmpty(vernacularLanguageCodes) ? '' : `repeat(${vernacularLanguageCodes.length}, 20rem)`
       }
-        ${R.isEmpty(extraPropsDefs) ? '' : `repeat(${Object.keys(extraPropsDefs).length}, 15rem)`}`
+        ${R.isEmpty(extraPropsDefsArray) ? '' : `repeat(${extraPropsDefsArray.length}, 15rem)`}`
 
   return (
     <div className={classNames('taxonomy', { onlyRequiredColumns })}>
@@ -61,7 +60,7 @@ const TaxonomyDetails = (props) => {
             rowHeaderComponent={TaxaTableRowHeader}
             rowComponent={TaxaTableRow}
             noItemsLabelKey="taxonomy.edit.taxaNotImported"
-            rowProps={{ surveyId, taxonomyUuid, vernacularLanguageCodes, extraPropsDefs, readOnly: !canEdit }}
+            rowProps={{ surveyId, taxonomyUuid, vernacularLanguageCodes, extraPropsDefsArray, readOnly: !canEdit }}
           />
         )}
       </div>
@@ -77,10 +76,6 @@ const TaxonomyDetails = (props) => {
 
 TaxonomyDetails.propTypes = {
   showClose: PropTypes.bool,
-}
-
-TaxonomyDetails.defaultProps = {
-  showClose: true,
 }
 
 export default TaxonomyDetails

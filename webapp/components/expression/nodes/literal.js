@@ -23,6 +23,7 @@ import { TestId } from '@webapp/utils/testId'
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
+import { Objects } from '@openforis/arena-core'
 
 const isValueText = (nodeDef, value) =>
   nodeDef
@@ -43,8 +44,20 @@ const loadItems = async (params) => {
   return items
 }
 
+const _findNodeDefByName = ({ survey, name }) => {
+  if (Objects.isEmpty(name)) {
+    return null
+  }
+  const nodeDef = Survey.findNodeDefByName(name)(survey)
+  if (nodeDef) {
+    return nodeDef
+  }
+  const nameWithoutSubfix = name.replace('_label', '')
+  return Survey.findNodeDefByName(nameWithoutSubfix)(survey)
+}
+
 const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
-  if (BinaryOperandType.isLeft(type)) {
+  if (!type || BinaryOperandType.isLeft(type)) {
     return nodeDefCurrent
   }
   if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
@@ -57,12 +70,7 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => 
       if (identifierName === Expression.thisVariable) {
         return nodeDefCurrent
       }
-      const nodeDef = Survey.getNodeDefByName(identifierName)(survey)
-      if (!nodeDef) {
-        const nameWithOutSubfix = identifierName.replace('_label', '')
-        return Survey.getNodeDefByName(nameWithOutSubfix)(survey)
-      }
-      return nodeDef
+      return _findNodeDefByName({ survey, name: identifierName })
     }
   }
   return null
@@ -154,14 +162,7 @@ const Literal = (props) => {
         )
       }
       default:
-        return (
-          <input
-            className="form-input"
-            value={nodeValueString}
-            size={25}
-            onChange={(e) => onChangeValue(e.target.value)}
-          />
-        )
+        return <Input onChange={onChangeValue} value={nodeValueString} />
     }
   }
 
@@ -169,15 +170,11 @@ const Literal = (props) => {
 }
 
 Literal.propTypes = {
-  expressionNodeParent: PropTypes.any.isRequired,
+  expressionNodeParent: PropTypes.any,
   node: PropTypes.any.isRequired,
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
-  type: PropTypes.string.isRequired,
-}
-
-Literal.defaultProps = {
-  nodeDefCurrent: null,
+  type: PropTypes.string,
 }
 
 export default Literal

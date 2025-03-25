@@ -1,11 +1,11 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
 
-const RowHeader = (props) => {
-  const { emailVisible } = props
+const RowHeader = () => {
   const i18n = useI18n()
+  const emailVisible = useAuthCanViewOtherUsersEmail()
 
   return (
     <>
@@ -16,16 +16,9 @@ const RowHeader = (props) => {
       <div>{i18n.t('usersView.invitedBy')}</div>
       <div>{i18n.t('usersView.invitedDate')}</div>
       <div>{i18n.t('usersView.accepted')}</div>
+      <div>{i18n.t('usersView.lastLogin')}</div>
     </>
   )
-}
-
-RowHeader.propTypes = {
-  emailVisible: PropTypes.bool,
-}
-
-RowHeader.defaultProps = {
-  emailVisible: false,
 }
 
 export default RowHeader

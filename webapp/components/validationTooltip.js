@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import * as Validation from '@core/validation/validation'
 
@@ -6,11 +7,11 @@ import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import Tooltip from './tooltip'
 
 const ValidationTooltip = (props) => {
-  const { validation, className, showKeys, children, id, insideTable, testId } = props
+  const { children, className, id, insideTable, position = 'bottom', showKeys = false, testId, validation } = props
 
   const isValid = Validation.isValid(validation)
 
-  const type = Validation.isError(validation) ? 'error' : Validation.isWarning(validation) ? 'warning' : ''
+  const type = Validation.isError(validation) ? 'error' : Validation.isWarning(validation) ? 'warning' : undefined
 
   const content = isValid ? null : React.createElement(ValidationFieldMessages, { validation, showKeys })
 
@@ -24,6 +25,7 @@ const ValidationTooltip = (props) => {
       showContent={showContent}
       id={id}
       insideTable={insideTable}
+      position={position}
       testId={testId}
     >
       {children}
@@ -31,12 +33,15 @@ const ValidationTooltip = (props) => {
   )
 }
 
-ValidationTooltip.defaultProps = {
-  id: null,
-  validation: null,
-  className: '',
-  showKeys: false,
-  testId: null,
+ValidationTooltip.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  id: PropTypes.string,
+  insideTable: PropTypes.bool,
+  position: PropTypes.oneOf(['bottom', 'top']),
+  showKeys: PropTypes.bool,
+  testId: PropTypes.string,
+  validation: PropTypes.object,
 }
 
 export default ValidationTooltip

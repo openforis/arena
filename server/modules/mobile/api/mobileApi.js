@@ -2,9 +2,14 @@ import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import * as Request from '../../../utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as JobUtils from '@server/job/jobUtils'
+import * as Log from '@server/log/log'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
+
+const Logger = Log.getLogger('Mobile API')
 
 const fetchSurvey = async ({ surveyId, cycle }) =>
   SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle, advanced: true })
@@ -13,9 +18,22 @@ export const init = (app) => {
   // ====== READ - all survey data
   app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      Logger.info('fetching survey data')
+
       const { surveyId, cycle } = Request.getParams(req)
 
+      const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
+      Logger.info('total category items', totalCategoryItems)
+
+      const totalTaxa = await TaxonomyService.countTaxaBySurveyId({ surveyId })
+      Logger.info('total taxa', totalTaxa)
+
+      Logger.info('constrained memory', process.constrainedMemory())
+      Logger.info('memory usage before', process.memoryUsage())
+
       const survey = await fetchSurvey({ surveyId, cycle })
+
+      Logger.info('memory usage after', process.memoryUsage())
 
       res.json({ survey })
     } catch (e) {

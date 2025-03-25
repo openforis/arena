@@ -25,7 +25,7 @@ export const useExtraPropDefsEditor = (props) => {
 
   const onItemAdd = useCallback(async () => {
     const extraPropDef = {
-      ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+      ...ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text, index: Object.values(extraPropDefs).length }),
       name: '', // name property is used only in UI
       newItem: true,
     }
@@ -38,7 +38,9 @@ export const useExtraPropDefsEditor = (props) => {
       const name = ExtraPropDef.getName(itemExtraDefOld)
       const { newItem } = itemExtraDefOld
       if (newItem) {
-        const itemExtraDefsUpdated = ArrayUtils.removeItemAtIndex({ index })(extraPropDefs)
+        const itemExtraDefsUpdated = ArrayUtils.removeItemAtIndex({ index })(extraPropDefs).map((item, index) =>
+          ExtraPropDef.assocIndex(index)(item)
+        )
         updateExtraPropDefsState(itemExtraDefsUpdated)
       } else {
         confirm({

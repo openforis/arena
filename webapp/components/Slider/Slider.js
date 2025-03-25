@@ -39,6 +39,7 @@ Slider.propTypes = {
   id: PropTypes.string.isRequired,
   max: PropTypes.number,
   min: PropTypes.number,
+  name: PropTypes.string,
   onChange: PropTypes.func,
   onMouseDown: PropTypes.func,
   onMouseUp: PropTypes.func,
@@ -50,11 +51,4 @@ Slider.propTypes = {
   ),
   step: PropTypes.number,
   value: PropTypes.number,
-}
-
-Slider.defaultProps = {
-  onChange: null,
-  onMouseDown: null,
-  onMouseUp: null,
-  options: null,
 }

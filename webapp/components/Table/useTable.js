@@ -1,10 +1,13 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
+import { useDispatch } from 'react-redux'
+
+import { ArrayUtils } from '@core/arrayUtils'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
-import { ArrayUtils } from '@core/arrayUtils'
+import { TablesActions, useTableMaxRows, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 export const useTable = ({
   columns,
@@ -14,16 +17,40 @@ export const useTable = ({
   restParams,
   onRowClick: onRowClickProp,
   selectable,
+  selectOnClick,
 }) => {
+  const dispatch = useDispatch()
+
   const [totalCount, setTotalCount] = useState(0)
-  const [visibleColumns, setVisibleColumns] = useState(columns)
+
+  const visibleColumnKeysInStore = useTableVisibleColumns(module)
+  const visibleColumnKeys = useMemo(() => {
+    if (visibleColumnKeysInStore) {
+      return visibleColumnKeysInStore
+    }
+    if (columns) {
+      return columns.reduce((acc, column) => {
+        if (!column.hidden) {
+          acc.push(column.key)
+        }
+        return acc
+      }, [])
+    }
+    return []
+  }, [columns, visibleColumnKeysInStore])
+  const visibleColumns = useMemo(
+    () => columns?.filter((column) => visibleColumnKeys.includes(column.key)) ?? [],
+    [columns, visibleColumnKeys]
+  )
+  const limitInState = useTableMaxRows(module)
+  const limitInLink = getLimit()
+  const limit = limitInState ?? limitInLink
 
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   const offset = getOffset()
-  const limit = getLimit()
   const sort = getSort()
   const search = getSearch()
 
@@ -77,12 +104,15 @@ export const useTable = ({
 
       updateQuery(navigate)({ sort: { by: orderByField, order }, offset: null })
     },
-    [sort]
+    [navigate, sort.by, sort.order]
   )
 
-  const handleSearch = useCallback((searchText) => {
-    updateQuery(navigate)({ search: searchText, offset: null })
-  }, [])
+  const handleSearch = useCallback(
+    (searchText) => {
+      updateQuery(navigate)({ search: searchText, offset: null })
+    },
+    [navigate]
+  )
 
   // on rest params and limit update, go to first page (reset offset)
   useOnUpdate(() => {
@@ -92,19 +122,27 @@ export const useTable = ({
   // selected items
   const [selectedItems, setSelectedItems] = useState([])
 
+  const selectAllItems = useCallback(() => {
+    setSelectedItems(list)
+  }, [list])
+
+  const deselectAllItems = useCallback(() => {
+    setSelectedItems([])
+  }, [])
+
   // reset selected items on data (list) update
   useOnUpdate(() => {
     if (selectedItems.length > 0) {
-      setSelectedItems([])
+      deselectAllItems()
     }
-  }, [list])
+  }, [deselectAllItems, list])
 
   const onRowClick = useCallback(
     async (item) => {
       if (onRowClickProp) {
         await onRowClickProp(item)
       }
-      if (selectable) {
+      if (selectable && selectOnClick) {
         const key = keyExtractor({ item })
         const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
           item,
@@ -113,14 +151,14 @@ export const useTable = ({
         setSelectedItems(selectedItemsUpdated)
       }
     },
-    [keyExtractor, onRowClickProp, selectable]
+    [keyExtractor, onRowClickProp, selectOnClick, selectable]
   )
 
   const onVisibleColumnsChange = useCallback(
-    (visibleColumnKeys) => {
-      setVisibleColumns(columns.filter((column) => visibleColumnKeys.includes(column.key)))
+    (visibleColumnKeysUpdated) => {
+      dispatch(TablesActions.updateVisibleColumns({ module, visibleColumns: visibleColumnKeysUpdated }))
     },
-    [columns]
+    [dispatch, module]
   )
 
   return {
@@ -139,6 +177,10 @@ export const useTable = ({
     onRowClick,
     onVisibleColumnsChange,
     selectedItems,
+    selectAllItems,
+    deselectAllItems,
+    visibleColumnKeys,
     visibleColumns,
+    visibleItemsCount: list?.length ?? 0,
   }
 }

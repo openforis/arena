@@ -1,15 +1,15 @@
-import { Dates, Objects, Promises, SystemError } from '@openforis/arena-core'
+import { Objects, Promises, RecordCloner, SystemError } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import { uuidv4 } from '@core/uuid'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
+import * as RecordFile from '@core/record/recordFile'
 import * as Node from '@core/record/node'
-import * as RecordValidation from '@core/record/recordValidation'
 
 import Job from '@server/job/job'
+import * as FileService from '@server/modules/record/service/fileService'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as DataTableUpdateRepository from '@server/modules/surveyRdb/repository/dataTableUpdateRepository'
@@ -26,6 +26,10 @@ export default class RecordsCloneJob extends Job {
 
     const { context, user, tx } = this
     const { surveyId } = context
+
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, advanced: true }, tx)
+    this.setContext({ survey })
+
     this.nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
   }
 
@@ -73,29 +77,26 @@ export default class RecordsCloneJob extends Job {
 
   async cloneRecord({ recordSummary }) {
     const { context, tx, user } = this
-    const { surveyId, cycleTo } = context
+    const { surveyId, survey, cycleTo } = context
 
-    const record = await RecordManager.fetchRecordAndNodesByUuid({
-      surveyId,
-      recordUuid: recordSummary.uuid,
-      fetchForUpdate: false,
-    })
-    record.uuid = uuidv4()
-    record.dateCreated = Dates.nowFormattedForStorage()
-    record.cycle = cycleTo
-    delete record.id
+    const recordUuid = recordSummary.uuid
+    const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
-    // assign new uuids to nodes
-    const { newUuidsByOldUuid, nodesArray } = this.assignNewUuidsToNodes(record)
+    // assign new UUIDs with side effect on record and nodes, faster when record is big
+    const {
+      record: recordCloned,
+      newNodeUuidsByOldUuid,
+      newFileUuidsByOldUuid,
+    } = RecordCloner.cloneRecord({ survey, record, cycleTo })
 
-    // assign new uuids to validation
-    this.assignNewUuidsToValidation({ record, newUuidsByOldUuid })
+    const newRecordUuid = Record.getUuid(recordCloned)
+    const nodes = Record.getNodes(recordCloned)
+    const nodesArray = Object.values(nodes)
 
     // insert record
-    await RecordManager.insertRecord(user, surveyId, record, true, tx)
+    await RecordManager.insertRecord(user, surveyId, recordCloned, true, tx)
 
     // insert nodes (add them to batch persister)
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId }, tx)
 
     await Promises.each(nodesArray, async (node) => {
       // check that the node definition associated to the node has not been deleted from the survey
@@ -105,67 +106,34 @@ export default class RecordsCloneJob extends Job {
     })
 
     // update RDB
-    await DataTableUpdateRepository.updateTables({ survey, record, nodes: Record.getNodes(record) }, tx)
+    await DataTableUpdateRepository.updateTables({ survey, record: recordCloned, nodes }, tx)
+
+    await this.cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid })
 
     this.incrementProcessedItems()
   }
 
-  assignNewUuidsToValidation({ record, newUuidsByOldUuid }) {
-    if (!record.validation?.fields) return
+  async cloneFiles({ newFileUuidsByOldUuid, newNodeUuidsByOldUuid, newRecordUuid }) {
+    const { context, tx } = this
+    const { surveyId } = context
 
-    Object.entries(record.validation.fields).forEach(([oldFieldKey, validationField]) => {
-      let newFieldKey
-      if (oldFieldKey.startsWith(RecordValidation.prefixValidationFieldChildrenCount)) {
-        const oldParentUuid = oldFieldKey.substring(
-          RecordValidation.prefixValidationFieldChildrenCount.length,
-          oldFieldKey.lastIndexOf('_')
-        )
-        const newParentUuid = newUuidsByOldUuid[oldParentUuid]
-        newFieldKey = oldFieldKey.replace(oldParentUuid, newParentUuid)
-      } else {
-        newFieldKey = newUuidsByOldUuid[oldFieldKey]
+    for await (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
+      const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
+      if (fileSummary) {
+        const content = await FileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)
+        const oldNodeUuid = RecordFile.getNodeUuid(fileSummary)
+        const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
+        const newFile = RecordFile.createFile({
+          content,
+          name: RecordFile.getName(fileSummary),
+          nodeUuid: newNodeUuid,
+          recordUuid: newRecordUuid,
+          size: RecordFile.getSize(fileSummary),
+          uuid: newFileUuid,
+        })
+        await FileService.insertFile(surveyId, newFile, tx)
       }
-      if (newFieldKey) {
-        record.validation.fields[newFieldKey] = validationField
-      }
-      delete record.validation.fields[oldFieldKey]
-    })
-  }
-
-  assignNewUuidsToNodes(record) {
-    // generate a new uuid for each node
-    const newUuidsByOldUuid = {}
-
-    // sort nodes before removing the id, to preserve their hierarchy (faster than comparing each meta.h property)
-    const nodesArray = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-
-    nodesArray.forEach((node) => {
-      node.recordUuid = record.uuid
-      node.dateCreated = node.dateModified = Dates.nowFormattedForStorage()
-
-      const oldUuid = Node.getUuid(node)
-      const newUuid = uuidv4()
-      newUuidsByOldUuid[oldUuid] = newUuid
-
-      node.uuid = newUuid
-      // consider every node as just created node
-      delete node.id
-      node.created = true // this flag will be used by the RDB generator)
-
-      delete record.nodes[oldUuid]
-      record.nodes[newUuid] = node
-    })
-
-    // update internal node uuids
-    nodesArray.forEach((node) => {
-      node.parentUuid = newUuidsByOldUuid[node.parentUuid]
-
-      node.hierarchy?.each((ancestorUuid, index) => {
-        node.hierarchy[index] = newUuidsByOldUuid[ancestorUuid]
-      })
-    })
-
-    return { newUuidsByOldUuid, nodesArray }
+    }
   }
 }
 

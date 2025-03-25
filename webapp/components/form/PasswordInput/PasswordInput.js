@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import classNames from 'classnames'
 
 import { Button } from '../../buttons'
-import { TextInput } from '../TextInput'
+import { SimpleTextInput } from '../SimpleTextInput'
 
 export const PasswordInput = (props) => {
   const { className } = props
@@ -20,16 +20,12 @@ export const PasswordInput = (props) => {
   const iconClassName = passwordShown ? 'icon-eye' : 'icon-eye-blocked'
 
   return (
-    <TextInput
+    <SimpleTextInput
       {...props}
       className={classNames('input-password', className)}
       type={passwordShown ? 'text' : 'password'}
       endAdornment={
-        <Button
-          className="btn-transparent"
-          onClick={onClickPasswordVisibility}
-          onMouseDown={onMouseDownPasswordVisibility}
-        >
+        <Button onClick={onClickPasswordVisibility} onMouseDown={onMouseDownPasswordVisibility} variant="text">
           <span className={classNames('icon', iconClassName)} />
         </Button>
       }
@@ -38,11 +34,7 @@ export const PasswordInput = (props) => {
 }
 
 PasswordInput.propTypes = {
-  ...TextInput.propTypes,
-}
-
-PasswordInput.defaultProps = {
-  ...TextInput.defaultProps,
+  ...SimpleTextInput.propTypes,
 }
 
 export default PasswordInput

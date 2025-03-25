@@ -26,7 +26,7 @@ const Records = () => {
   const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel()
 
   const navigateToRecord = useCallback(
-    (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`),
+    (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}?locked=true`),
     [navigate]
   )
   const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
@@ -51,18 +51,19 @@ const Records = () => {
 
   return (
     <Table
-      visibleColumnsSelectionEnabled
-      columns={columns}
-      module="records/summary"
-      restParams={{ cycle, recordsRequestedAt }}
+      cellProps={{ onRecordsUpdate }}
       className="records"
+      columns={columns}
       gridTemplateColumns={gridTemplateColumns}
       headerLeftComponent={HeaderLeft}
       headerProps={{ navigateToRecord, onRecordsUpdate }}
-      rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
+      module="records/summary"
       noItemsLabelKey="dataView.records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView.records.noRecordsAddedForThisSearch"
       onRowDoubleClick={navigateToRecord}
+      restParams={{ cycle, includeCounts: true, recordsRequestedAt }}
+      rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
+      visibleColumnsSelectionEnabled
     />
   )
 }

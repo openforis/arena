@@ -1,8 +1,14 @@
+import { quote } from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { ColumnNodeDef, TableNode, ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import { dfVar, setVar, sqldf, rm } from '../../rFunctions'
+
+const categoryTempVar = 'Category'
+const categoryValuesTempVar = 'Category_values'
+const computedCategoryLabelCol = 'computed_category_label'
+const computedCategoryUuidCol = 'computed_category_uuid'
 
 /**
  * Class that models a data frame step results.
@@ -48,14 +54,18 @@ export default class DfResults {
   }
 
   initDf() {
-    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity: this.entity, chain: this.chain, hideAreaBasedEstimate: false })(this.survey)
+    const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({
+      entity: this.entity,
+      chain: this.chain,
+      hideAreaBasedEstimate: false,
+    })(this.survey)
     const columnNames = NodeDefTable.getNodeDefsColumnNames({
       nodeDefs: analysisNodeDefsInEntity,
       includeExtendedCols: false,
     })
 
     const areaBasedNodeDefs = analysisNodeDefsInEntity.filter(NodeDef.isAreaBasedEstimatedOf)
-    areaBasedNodeDefs.forEach(areaBasedNodeDef => this.scripts.push(NodeDef.getScript(areaBasedNodeDef)) )
+    areaBasedNodeDefs.forEach((areaBasedNodeDef) => this.scripts.push(NodeDef.getScript(areaBasedNodeDef)))
     this.scripts.push(setVar(this.name, sqldf(`SELECT ${columnNames.join(', ')} FROM ${this.dfSourceName}`)))
   }
 
@@ -64,7 +74,7 @@ export default class DfResults {
       ? Survey.getNodeDefParent(this.entity)(this.survey)
       : this.entity
     const setUuids = [
-      { name: NodeDef.keysPropsAdvanced.chainUuid, value: `'${this.rChain.chainUuid}'` },
+      { name: NodeDef.keysPropsAdvanced.chainUuid, value: quote(this.rChain.chainUuid) },
       {
         name: TableNode.columnSet.recordUuid,
         value: dfVar(this.dfSourceName, ViewDataNodeDef.columnSet.recordUuid),
@@ -90,7 +100,6 @@ export default class DfResults {
         const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(this.survey)
 
         // copy category data frame into temp variable
-        const categoryTempVar = 'category'
         const dfCategory = this.rChain.listCategories.getDfCategoryItems(category)
         this.scripts.push(setVar(categoryTempVar, dfCategory))
 
@@ -98,21 +107,22 @@ export default class DfResults {
         const query = `
             SELECT 
                 r.*,
-                c.label as computed_category_label,
-                c.uuid as computed_category_uuid
+                c.label as ${computedCategoryLabelCol},
+                c.uuid as ${computedCategoryUuidCol}
             FROM ${this.name} r
             LEFT OUTER JOIN ${categoryTempVar} c
             ON r.${nodeVarName} = c.code  
         `
-        this.scripts.push(setVar('category_values', sqldf(query)))
+        this.scripts.push(setVar(categoryValuesTempVar, sqldf(query)))
 
-        this.scripts.push(setVar(`${this.name}$${nodeVarName}_code`, `category_values$${nodeVarName}`))
-        this.scripts.push(setVar(`${this.name}$${nodeVarName}_label`, `category_values$computed_category_label`))
-        this.scripts.push(setVar(`${this.name}$${nodeVarName}_uuid`, `category_values$computed_category_uuid`))
+        const dfColumnPrefix = `${this.name}$${nodeVarName}`
+        this.scripts.push(setVar(`${dfColumnPrefix}_code`, `${categoryValuesTempVar}$${nodeVarName}`))
+        this.scripts.push(setVar(`${dfColumnPrefix}_label`, `${categoryValuesTempVar}$${computedCategoryLabelCol}`))
+        this.scripts.push(setVar(`${dfColumnPrefix}_uuid`, `${categoryValuesTempVar}$${computedCategoryUuidCol}`))
 
         // remove temp category variable
         this.scripts.push(rm(categoryTempVar))
-        this.scripts.push(rm('category_values'))
+        this.scripts.push(rm(categoryValuesTempVar))
       }
     })
   }

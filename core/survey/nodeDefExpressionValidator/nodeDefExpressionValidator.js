@@ -44,6 +44,7 @@ export const validate = ({
   exprString,
   isContextParent = false,
   selfReferenceAllowed = false,
+  includeAnalysis = false,
 }) => {
   const { validationResult } = new CoreNodeDefExpressionValidator().validate({
     expression: exprString,
@@ -51,6 +52,7 @@ export const validate = ({
     nodeDefCurrent,
     isContextParent,
     selfReferenceAllowed,
+    includeAnalysis,
   })
   if (validationResult === null || validationResult.valid) return null
 

@@ -4,6 +4,7 @@ import { CategoryItems } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 
 export const keys = {
   uuid: ObjectUtils.keys.uuid,
@@ -21,6 +22,17 @@ export const keysProps = {
   index: 'index',
 }
 
+const codeAllowedCharacters = [
+  '-', // minus symbol first to avoid considering it as a range in the RegExp
+  '*',
+  '+',
+  '\\\\', // single backslash "\" character (it requires a double escape to be used in the RegExp)
+  '\\/',
+  '|',
+  '\\w',
+]
+const codeNotAllowedCharactersRegExp = new RegExp(`[^${codeAllowedCharacters.join('')}]`, 'g')
+
 // ====== CREATE
 export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
   [keys.uuid]: uuidv4(),
@@ -30,17 +42,28 @@ export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 })
 
 // ====== READ
-export const { getDescription, getDescriptions, getLabels, getProps, getPropsDraft, getUuid, isEqual, isPublished } =
-  ObjectUtils
+export const {
+  getDescription,
+  getDescriptions,
+  getExtra,
+  getExtraProp,
+  getLabels,
+  getProps,
+  getPropsDraft,
+  getPropsAndPropsDraft,
+  getUuid,
+  isEqual,
+  isPublished,
+} = ObjectUtils
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
 export const getCode = ObjectUtils.getProp(keysProps.code, '')
-export const getLabel = (language) => (item) => ObjectUtils.getLabel(language, getCode(item))(item)
+export const getLabel =
+  (language, defaultToCode = true) =>
+  (item) =>
+    ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
 export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
-
-// ====== READ - Extra Props
-export const getExtra = ObjectUtils.getProp(keysProps.extra)
-export const getExtraProp = (prop) => R.pipe(getExtra, R.prop(prop))
+export const getIndex = ObjectUtils.getProp(keysProps.index)
 
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
@@ -75,3 +98,10 @@ export const getAncestorCodes = (item) => {
 }
 
 export const getCodesHierarchy = (item) => [...getAncestorCodes(item), getCode(item)]
+
+export const normalizeCode = R.pipe(
+  StringUtils.leftTrim,
+  R.toLower,
+  R.replace(codeNotAllowedCharactersRegExp, '_'),
+  R.slice(0, 40)
+)

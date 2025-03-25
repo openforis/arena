@@ -1,5 +1,5 @@
-@import 'webapp/style/vars';
-@import '../SurveyFormVars';
+@use '~@webapp/style/vars' as *;
+@use '../SurveyFormVars' as *;
 
 // === page
 .survey-form__node-def-page {
@@ -57,8 +57,8 @@
 .survey-form__node-def-page,
 .survey-form__node-def-page-item {
   &.read-only {
+
     input,
-    .survey-form__node-def-boolean,
     .survey-form__node-def-code,
     .dropdown__control {
       background-color: rgba($greyBorder, 0.2);
@@ -70,6 +70,7 @@
 .survey-form__node-def-form-item {
   grid-template-columns: 1fr !important;
   grid-template-rows: 30px 1fr;
+  padding: 0;
 
   > :nth-child(1).form-label {
     align-self: end;
@@ -93,7 +94,6 @@
   .form-input {
     text-overflow: ellipsis;
     text-align: left;
-    border: $formBorder;
   }
 }
 
@@ -102,13 +102,24 @@
   position: relative;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow-y: auto;
 
-  > *:first-child {
-    position: absolute;
-    max-height: 100%;
+  >*:first-child {
     left: 10px;
     right: 10px;
     overflow-y: auto;
+  }
+
+  &.auto-resize {
+    height: auto;
+    max-height: unset;
+    overflow-y: unset;
+
+    >*:first-child {
+      height: auto;
+    }
   }
 }
 
@@ -120,7 +131,7 @@
     display: flex;
     align-items: center;
 
-    > .icon:not(:first-child) {
+    >.icon:not(:first-child) {
       margin-left: 6px;
     }
   }
@@ -149,14 +160,15 @@
       position: absolute;
       left: 12px;
       top: 8px;
-      width: 36px;
+      width: 20px;
+      height: 20px;
     }
 
     .badge__content {
       height: 100%;
       font-weight: 400;
 
-      > *:first-child {
+      >*:first-child {
         width: 100%;
         height: 100%;
         display: flex;

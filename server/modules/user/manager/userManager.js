@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import { db } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -19,8 +21,10 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as UserInvitationManager from './userInvitationManager'
+
+const { groupNames } = AuthGroup
 
 export const {
   countUsers,
@@ -30,31 +34,54 @@ export const {
   fetchSystemAdministratorsEmail,
   fetchUsersIntoStream,
   fetchActiveUserUuidsWithPreferredSurveyId,
+  fetchUsersWithExpiredInvitation,
   updateNamePasswordAndStatus,
   updatePassword,
   resetUsersPrefsSurveyCycle,
   importNewUser,
+  deleteUser,
+  deleteUsersWithExpiredInvitation,
 } = UserRepository
 
-export const { findResetPasswordUserUuidByUuid, deleteUserResetPasswordByUuid, deleteUserResetPasswordExpired } =
-  UserResetPasswordRepository
+export const {
+  fetchResetPasswordUuidByUserUuid,
+  findResetPasswordUserUuidByUuid,
+  deleteUserResetPasswordByUuid,
+  deleteUserResetPasswordExpired,
+} = UserResetPasswordRepository
+
+export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
+const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo }, client = db) => {
+  const groupsToAdd = []
+  if (
+    (AuthGroup.isSurveyManagerGroup(group) || AuthGroup.getName(group) === groupNames.surveyAdmin) &&
+    !User.isSurveyManager(userToAdd)
+  ) {
+    const surveyManagerGroup = await AuthGroupRepository.fetchGroupByName({ name: groupNames.surveyManager }, client)
+    groupsToAdd.push(surveyManagerGroup)
+  }
+  if (AuthGroup.isSurveyGroup(group)) {
+    groupsToAdd.push(group)
+  } else if (AuthGroup.isSystemAdminGroup(group) && User.isSystemAdmin(user) && !User.isSystemAdmin(userToAdd)) {
+    groupsToAdd.push(User.getSystemAdminGroup(user))
+  } else if (AuthGroup.isSurveyManagerGroup(group)) {
+    // accepting user access request
+    // when adding user to survey manager group, make him survey admin of the specified survey
+    groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
+  }
+  return groupsToAdd
+}
 
 export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
-    const groupsToAdd = []
-    if (!AuthGroup.isSurveyManagerGroup(group) || !User.isSurveyManager(userToAdd)) {
-      groupsToAdd.push(group)
-    }
-    if (AuthGroup.isSurveyManagerGroup(group)) {
-      // when adding user to survey manager group, make him survey admin of the specified survey
-      groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
-    }
+    const userUuid = User.getUuid(userToAdd)
+    const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)
     await PromiseUtils.each(groupsToAdd, async (groupToAdd) => {
       const groupUuid = groupToAdd.uuid
-      await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
+      await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t)
 
       if (AuthGroup.isSurveyGroup(groupToAdd)) {
         await ActivityLogRepository.insert(
@@ -62,7 +89,7 @@ export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, cli
           surveyId,
           ActivityLog.type.userInvite,
           {
-            [ActivityLog.keysContent.uuid]: User.getUuid(userToAdd),
+            [ActivityLog.keysContent.uuid]: userUuid,
             [ActivityLog.keysContent.groupUuid]: groupUuid,
           },
           false,
@@ -107,16 +134,12 @@ export const insertUser = async (
 
 export const insertSystemAdminUser = async ({ email, password }, client = db) =>
   client.tx(async (t) => {
-    const newUser = await UserRepository.insertUser(
-      {
-        email,
-        password,
-        status: User.userStatus.ACCEPTED,
-      },
-      t
-    )
-    const sysAdminGroup = await AuthGroupRepository.fetchGroupByName({ name: AuthGroup.groupNames.systemAdmin }, t)
-    await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(sysAdminGroup), User.getUuid(newUser), t)
+    const status = User.userStatus.ACCEPTED
+    const newUser = await UserRepository.insertUser({ email, password, status }, t)
+    const userUuid = User.getUuid(newUser)
+    const sysAdminGroup = await AuthGroupRepository.fetchGroupByName({ name: groupNames.systemAdmin }, t)
+    const systemAdminGroupUuid = AuthGroup.getUuid(sysAdminGroup)
+    await AuthGroupRepository.insertUserGroup({ groupUuid: systemAdminGroupUuid, userUuid }, t)
   })
 
 export const generateResetPasswordUuid = async (email, client = db) => {
@@ -135,17 +158,19 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 
 // ==== READ
 
-const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [] }) => {
+const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [], t }) => {
   // Assoc auth groups
 
-  const _userGroups = R.isEmpty(userGroups) ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user)) : userGroups
+  const _userGroups = R.isEmpty(userGroups)
+    ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
+    : userGroups
   let userUpdated = User.assocAuthGroups(_userGroups)(user)
 
   if (User.isInvited(userUpdated)) {
     const userUuid = User.getUuid(userUpdated)
     const invitation = invitationsByUserUuid[userUuid]
     const invitationValid =
-      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid))
+      invitation || (await UserResetPasswordRepository.existsResetPasswordValidByUserUuid(userUuid, t))
     userUpdated = User.assocInvitationExpired(!invitationValid)(userUpdated)
   }
 
@@ -153,6 +178,8 @@ const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUui
 }
 
 const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
+  if (users.length === 0) return users
+
   const usersUuids = users.map(User.getUuid)
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
@@ -163,6 +190,7 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
         user,
         invitationsByUserUuid,
         userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+        t,
       })
     )
   )
@@ -181,33 +209,34 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
-export const fetchUsers = async ({ offset, limit, sortBy, sortOrder }, client = db) =>
+export const fetchUsers = async (
+  { offset, onlyAccepted = false, limit, search = null, sortBy, sortOrder },
+  client = db
+) =>
   client.tx(async (t) => {
-    const users = (await UserRepository.fetchUsers({ offset, limit, sortBy, sortOrder }, t)).map(
+    const users = (await UserRepository.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder }, t)).map(
       User.dissocPrivateProps
     )
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
 export const fetchUsersBySurveyId = async (
-  { surveyId, offset = 0, limit = null, isSystemAdmin = false },
+  { surveyId, offset = 0, limit = null, onlyAccepted = false, includeSystemAdmins = false },
   client = db
 ) =>
   client.tx(async (t) => {
-    const users = (await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, isSystemAdmin, t)).map(
+    const users = (await UserRepository.fetchUsersBySurveyId({ surveyId, offset, limit, includeSystemAdmins }, t)).map(
       User.dissocPrivateProps
     )
-    const usersUuids = users.map(User.getUuid)
-    const invitations = await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t)
-    const invitationsByUserUuid = invitations.reduce(
-      (_invitationsByUserUuid, invitation) => ({
-        ..._invitationsByUserUuid,
-        [invitation.user_uuid]: invitation.result,
-      }),
-      {}
-    )
-
-    return _attachAuthGroupsAndInvitationToUsers({ users, invitationsByUserUuid, t })
+    const usersFiltered = users.filter((user) => !onlyAccepted || User.hasAccepted(user))
+    const usersUuids = usersFiltered.map(User.getUuid)
+    const invitations =
+      usersUuids.length > 0 ? await UserResetPasswordRepository.existResetPasswordValidByUserUuids(usersUuids, t) : []
+    const invitationsByUserUuid = invitations.reduce((acc, invitation) => {
+      acc[invitation.user_uuid] = invitation.result
+      return acc
+    }, {})
+    return _attachAuthGroupsAndInvitationToUsers({ users: usersFiltered, invitationsByUserUuid, t })
   })
 
 export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
@@ -224,10 +253,12 @@ export {
   fetchUserAccessRequests,
   fetchUserAccessRequestByUuid,
   fetchUserAccessRequestByEmail,
+  deleteUserAccessRequestsByEmail,
+  deleteExpiredUserAccessRequests,
 } from '../repository/userAccessRequestRepository'
 
-export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
-  const headers = [
+export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFormat }) => {
+  const fields = [
     'email',
     ...Object.values(UserAccessRequest.keysProps).map(StringUtils.toSnakeCase),
     'status',
@@ -252,10 +283,16 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream }) => {
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
   })
 
-  const transformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
-  transformer.pipe(outputStream)
-
-  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({ transformer })
+  await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({
+    processor: (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        outputStream,
+        fields,
+        options: { objectTransformer },
+        fileFormat,
+      }),
+  })
 }
 
 // ==== UPDATE
@@ -271,7 +308,7 @@ const _insertOrDeleteUserGroup = async ({ userUuid, authGroupsNew, userToUpdateO
   } else {
     // add user to the new group
     const groupNew = authGroupsNew.find((authGroup) => AuthGroup.getName(authGroup) === groupName)
-    await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(groupNew), userUuid, client)
+    await AuthGroupRepository.insertUserGroup({ groupUuid: AuthGroup.getUuid(groupNew), userUuid }, client)
   }
 }
 
@@ -290,13 +327,13 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
         // user will be system admin: delete all user groups and set his new group to SystemAdmin
         await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
       }
-      const groupName = AuthGroup.groupNames.systemAdmin
+      const groupName = groupNames.systemAdmin
       await _insertOrDeleteUserGroup({ userUuid, authGroupsNew, userToUpdateOld, groupName }, t)
     }
     // if user survey manager role changed, insert or delete the user auth group
     const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
     if (userToUpdateWillBeSurveyManager !== User.isSurveyManager(userToUpdateOld)) {
-      const groupName = AuthGroup.groupNames.surveyManager
+      const groupName = groupNames.surveyManager
       await _insertOrDeleteUserGroup({ userUuid, authGroupsNew, userToUpdateOld, groupName }, t)
     }
 
@@ -306,15 +343,18 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
       const surveyUuid = AuthGroup.getSurveyUuid(surveyAuthGroupNew)
       const groupUuid = AuthGroup.getUuid(surveyAuthGroupNew)
       const surveyAuthGroupOld = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdateOld)
-      if (!AuthGroup.isEqual(surveyAuthGroupNew)(surveyAuthGroupOld)) {
-        if (surveyAuthGroupOld) {
-          await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
-        } else {
-          await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
-        }
-        // Log user update activity only for non system admin users
-        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userUpdate, userToUpdate, false, t)
+      let authGroupProps = null
+      const authGroupExtraProps = User.getAuthGroupExtraProps(userToUpdate)
+      if (Objects.isNotEmpty(authGroupExtraProps)) {
+        authGroupProps = { extra: authGroupExtraProps }
       }
+      if (surveyAuthGroupOld) {
+        await AuthGroupRepository.updateUserGroup({ surveyId, userUuid, groupUuid, props: authGroupProps }, t)
+      } else {
+        await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t)
+      }
+      // Log user update activity only for non system admin users
+      await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userUpdate, userToUpdate, false, t)
     }
 
     // update user props and picture
@@ -340,14 +380,16 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
 
 export const updateUser = _userFetcher(_updateUser)
 
-export const updateUserPrefs = async (user) => ({
-  ...(await UserRepository.updateUserPrefs(user)),
+export const updateUserPrefs = async (user) => UserRepository.updateUserPrefs(user)
+
+export const updateUserPrefsAndFetchGroups = async (user) => ({
+  ...(await updateUserPrefs(user)),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
 
 // ==== DELETE
 
-export const deleteUser = async ({ user, userUuidToRemove, survey }, client = db) =>
+export const deleteUserFromSurvey = async ({ user, userUuidToRemove, survey }, client = db) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))

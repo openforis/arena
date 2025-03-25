@@ -15,7 +15,7 @@ const prepareTaxonToCompare = (taxon) =>
     (taxonUpdated) =>
       A.assoc(ObjectUtils.keys.props, prepareTaxonPropsToCompare(Taxon.getProps(taxonUpdated)))(taxonUpdated),
     (taxonUpdated) => {
-      const vernacularNamesArray = Object.values(Taxon.getVernacularNames(taxonUpdated)).flat()
+      const vernacularNamesArray = Taxon.getVernacularNamesArray(taxonUpdated)
       if (vernacularNamesArray.length === 0) return taxonUpdated
 
       const vernacularNamesArrayUpdated = vernacularNamesArray

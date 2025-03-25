@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .survey-form__node-def-entity-table-row-header {
   .react-grid-item {
@@ -24,6 +24,7 @@
     .icon {
       color: white;
     }
+
     .icon-info {
       padding-right: 5px;
     }

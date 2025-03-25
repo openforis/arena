@@ -87,14 +87,31 @@ export const useEditUser = ({ userUuid }) => {
     onUpdate(userUpdated)
   }
 
-  const onMapApiKeyTest = useCallback(async ({ provider, apiKey }) => {
-    const success = await API.testMapApiKey({ provider, apiKey })
-    if (success) {
-      dispatch(NotificationActions.notifyInfo({ key: 'user.mapApiKeys.keyIsCorrect' }))
-    } else {
-      dispatch(NotificationActions.notifyError({ key: 'user.mapApiKeys.keyIsNotCorrect' }))
-    }
-  }, [])
+  const onMapApiKeyTest = useCallback(
+    async ({ provider, apiKey }) => {
+      const success = await API.testMapApiKey({ provider, apiKey })
+      if (success) {
+        dispatch(NotificationActions.notifyInfo({ key: 'user.mapApiKeys.keyIsCorrect' }))
+      } else {
+        dispatch(NotificationActions.notifyError({ key: 'user.mapApiKeys.keyIsNotCorrect' }))
+      }
+    },
+    [dispatch]
+  )
+
+  const onExtraChange = useCallback(
+    (extra) => {
+      onUpdate(User.assocExtra(extra)(userToUpdate))
+    },
+    [onUpdate, userToUpdate]
+  )
+
+  const onSurveyExtraPropsChange = useCallback(
+    (extraPropsNew) => {
+      onUpdate(User.assocAuthGroupExtraProps(extraPropsNew)(userToUpdate))
+    },
+    [onUpdate, userToUpdate]
+  )
 
   return {
     hideSurveyGroup,
@@ -109,6 +126,8 @@ export const useEditUser = ({ userUuid }) => {
     onSave,
     onSurveyAuthGroupChange,
     onSurveyManagerChange,
+    onExtraChange,
+    onSurveyExtraPropsChange,
     onRemove,
     onInviteRepeat,
   }

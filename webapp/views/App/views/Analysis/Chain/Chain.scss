@@ -1,4 +1,4 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .app-module {
   .chain {
@@ -33,6 +33,7 @@
         .form-item {
           display: flex;
         }
+
         display: flex;
         gap: 3rem;
       }
@@ -45,10 +46,12 @@
     }
 
     .chain-basic-props,
-    .chain-sampling-design {
+    .chain-sampling-design,
+    .statistical-analysis {
       display: flex;
       flex-direction: column;
       justify-self: center;
+      gap: 0.5rem;
     }
 
     .chain-basic-props {
@@ -56,12 +59,11 @@
     }
 
     .chain-sampling-design {
-      gap: 1rem;
       width: 50rem;
 
       .form-item {
         width: 50rem;
-        grid-template-columns: 0.3fr 0.7fr;
+        grid-template-columns: 12rem 1fr;
       }
     }
 

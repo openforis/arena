@@ -1,4 +1,5 @@
 export const ValidatorErrorKeys = {
+  invalidEmail: 'validationErrors.invalidEmail',
   invalidNumber: 'validationErrors.invalidNumber',
   invalidField: 'validationErrors.invalidField',
   invalidDate: 'validationErrors.invalidDate',
@@ -53,7 +54,7 @@ export const ValidatorErrorKeys = {
     errorUpdatingValues: 'validationErrors.dataImport.errorUpdatingValues',
     multipleRecordsMatchingKeys: 'validationErrors.dataImport.multipleRecordsMatchingKeys',
     recordAlreadyExisting: 'validationErrors.dataImport.recordAlreadyExisting',
-    recordKeyMissing: 'validationErrors.dataImport.recordKeyMissing',
+    recordKeyMissingOrInvalid: 'validationErrors.dataImport.recordKeyMissingOrInvalid',
     recordNotFound: 'validationErrors.dataImport.recordNotFound',
   },
 
@@ -69,8 +70,10 @@ export const ValidatorErrorKeys = {
   },
 
   extraPropEdit: {
-    nameInvalid: 'validationErrors.extraPropEdit.nameInvalid',
     dataTypeRequired: 'validationErrors.extraPropEdit.dataTypeRequired',
+    nameInvalid: 'validationErrors.extraPropEdit.nameInvalid',
+    nameRequired: 'validationErrors.extraPropEdit.nameRequired',
+    valueRequired: 'validationErrors.extraPropEdit.valueRequired',
   },
   nodeDefEdit: {
     analysisParentEntityRequired: 'validationErrors.nodeDefEdit.analysisParentEntityRequired',
@@ -95,6 +98,8 @@ export const ValidatorErrorKeys = {
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',
+    countMaxInvalid: 'validationErrors.nodeDefEdit.countMaxInvalid',
+    countMinInvalid: 'validationErrors.nodeDefEdit.countMinInvalid',
   },
 
   record: {
@@ -116,6 +121,7 @@ export const ValidatorErrorKeys = {
     cycleDateEndInvalid: 'validationErrors.surveyInfoEdit.cycleDateEndInvalid',
     cycleDateEndMandatoryExceptForLastCycle: 'validationErrors.surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
     cycleDateStartAfterPrevDateEnd: 'validationErrors.surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
+    fieldManualLinksInvalid: 'validationErrors.surveyInfoEdit.fieldManualLinksInvalid',
   },
 
   taxonomyEdit: {

@@ -1,50 +1,63 @@
 import './buttonGroup.scss'
 
 import React from 'react'
-import PropTypes from 'prop-types'
-
+import classNames from 'classnames'
 import * as R from 'ramda'
+import PropTypes from 'prop-types'
+import MuiButtonGroup from '@mui/material/ButtonGroup'
+
+import { Button } from '../buttons'
 
 const ButtonGroup = ({
-  items,
-  groupName,
-  multiple,
-  selectedItemKey,
-  onChange,
-  disabled: disabledProp,
-  deselectable,
-  className,
-}) => (
-  <div className={`btn-group${className ? ` ${className}` : ''}`}>
-    {items.map((item) => {
-      const { key, disabled, icon, label } = item
-      const selected = selectedItemKey === key || (multiple && R.includes(key, selectedItemKey))
-      return (
-        <button
-          data-testid={groupName ? `${groupName}_${key}` : null}
-          key={key}
-          type="button"
-          className={`btn btn-s${selected ? ' active' : ''}${deselectable ? ' deselectable' : ''}`}
-          onClick={() => {
-            let value
-            if (multiple) {
-              value = R.ifElse(R.always(selected), R.without(key), R.append(key))(selectedItemKey)
-            } else if (selected) {
-              value = null
-            } else {
-              value = key
-            }
-            onChange(value)
-          }}
-          aria-disabled={Boolean(disabled) || disabledProp}
-        >
-          {icon?.({ key })}
-          {label}
-        </button>
-      )
-    })}
-  </div>
-)
+  className = null,
+  deselectable = false,
+  disabled = false,
+  groupName = null,
+  items = [],
+  multiple = false,
+  onChange = () => { },
+  selectedItemKey = null,
+}) => {
+  const onItemClick =
+    ({ item, selected }) =>
+      () => {
+        if (selected && !multiple && !deselectable) return
+        let value
+        if (multiple) {
+          value = R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
+        } else if (!selected) {
+          value = item.key
+        } else {
+          value = null
+        }
+        onChange(value)
+      }
+
+  return (
+    <MuiButtonGroup className={classNames('btn-group', className)}>
+      {items.map((item) => {
+        const { key, disabled: itemDisabled, icon, iconClassName, label, labelParams, title } = item
+        const selected = selectedItemKey === key || (multiple && R.includes(key, selectedItemKey))
+        const variant = selected ? 'contained' : 'outlined'
+        return (
+          <Button
+            key={key}
+            className={`btn-s${deselectable ? ' deselectable' : ''}`}
+            disabled={Boolean(itemDisabled) || disabled}
+            icon={icon}
+            iconClassName={iconClassName}
+            onClick={onItemClick({ item, selected })}
+            label={label}
+            labelParams={labelParams}
+            title={title}
+            testId={groupName ? `${groupName}_${key}` : null}
+            variant={variant}
+          />
+        )
+      })}
+    </MuiButtonGroup>
+  )
+}
 
 export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =>
   Object.keys(object).map((key) => ({
@@ -62,17 +75,6 @@ ButtonGroup.propTypes = {
   multiple: PropTypes.bool,
   deselectable: PropTypes.bool,
   className: PropTypes.string,
-}
-
-ButtonGroup.defaultProps = {
-  items: [],
-  groupName: null,
-  selectedItemKey: null,
-  onChange: () => {},
-  disabled: false,
-  multiple: false,
-  deselectable: false,
-  className: null,
 }
 
 export default ButtonGroup

@@ -9,6 +9,7 @@ export const useIsKeyEditDisabled = ({ nodeDef }) => {
     !nodeDef ||
     NodeDef.isRoot(nodeDef) ||
     NodeDef.isMultiple(nodeDef) ||
+    NodeDef.isAutoIncrementalKey(nodeDef) ||
     (!NodeDef.isKey(nodeDef) &&
       Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes)
   )

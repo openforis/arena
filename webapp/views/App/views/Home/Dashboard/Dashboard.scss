@@ -1,23 +1,36 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
+
+$surveyInfoBarHeight: 140px;
 
 .home-dashboard {
-
-}
-
-.chart-container-dashboard {
   display: flex;
-  flex: 1;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 5em;
-  width: 100%;
-  margin-top: 20px;
-}
+  flex-direction: column;
 
-.records-by-user {
-  height: 300px;
-  overflow-y: auto;
-  justify-content: center;
-  align-items: center;
+  .tabs-wrapper {
+    flex: 1;
+    border-top: 1px solid $greyBorder;
+    /* fix max height to get scrollbars only inside the tab content */
+    max-height: calc(100vh - #{$headerHeight} - #{$surveyInfoBarHeight});
+
+    .MuiTabs-root {
+      min-width: 300px;
+    }
+
+    .tab-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 20px;
+
+      .dashboard-chart-header,
+      .dashboard-chart-subtitle {
+        text-align: center;
+      }
+
+      .recharts-responsive-container {
+        align-self: center;
+      }
+    }
+  }
 }

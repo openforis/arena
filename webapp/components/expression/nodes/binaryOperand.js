@@ -1,62 +1,107 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
+import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { useI18n } from '@webapp/store/system'
+import { ButtonGroup } from '@webapp/components/form'
+
+const { types } = Expression
+
+const availableOperandExpressionTypes = [types.Identifier, types.Literal, types.CallExpression]
+
+const expressionTypeAcronymByType = {
+  [types.CallExpression]: 'call',
+  [types.Identifier]: 'var',
+  [types.Literal]: 'const',
+}
+
+const expressionGeneratorByType = {
+  [types.CallExpression]: () => Expression.newCall(),
+  [types.Identifier]: () => Expression.newIdentifier(),
+  [types.Literal]: () => Expression.newLiteral(),
+}
 
 export const BinaryOperandType = {
   left: 'left',
   right: 'right',
 }
-BinaryOperandType.isLeft = R.equals(BinaryOperandType.left)
-BinaryOperandType.isRight = R.equals(BinaryOperandType.right)
+BinaryOperandType.isLeft = (type) => type === BinaryOperandType.left
+BinaryOperandType.isRight = (type) => type === BinaryOperandType.right
+
+const toUiOperandExpressionType = (type) => {
+  if (type === types.UnaryExpression) {
+    // unary expressions managed as literal expressions in UI
+    return types.Literal
+  }
+  return type
+}
 
 const BinaryOperand = (props) => {
-  const { canDelete, isBoolean, level, node, nodeDefCurrent, onChange, onDelete, type, renderNode, variables } = props
+  const {
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    node,
+    nodeDefCurrent = null,
+    onChange,
+    onDelete = null,
+    renderNode,
+    type,
+    variables = null,
+  } = props
 
-  const i18n = useI18n()
-
-  const nodeOperand = R.prop(type, node)
+  const nodeOperand = node[type]
+  const operandExpressionType = toUiOperandExpressionType(Expression.getType(nodeOperand))
   const isLeft = BinaryOperandType.isLeft(type)
-  const canOperandBeLiteral = !isLeft || !isBoolean || NodeDef.isBoolean(nodeDefCurrent)
+  const currentNodeDefIsBoolean = NodeDef.isBoolean(nodeDefCurrent)
+
+  const canOperandExpressionBeOfType = useCallback(
+    (expressionType) => {
+      switch (expressionType) {
+        case types.Identifier:
+        case types.CallExpression:
+          return true
+        case types.Literal:
+          return !isLeft || !isBoolean || currentNodeDefIsBoolean
+        default:
+          return false
+      }
+    },
+    [currentNodeDefIsBoolean, isBoolean, isLeft]
+  )
+
+  const applicableOperandExpressionTypes = useMemo(
+    () => availableOperandExpressionTypes.filter(canOperandExpressionBeOfType),
+    [canOperandExpressionBeOfType]
+  )
+
+  const onOperandTypeChange = (newType) => {
+    const newOperatorExpression = expressionGeneratorByType[newType]()
+    let nodeUpdated = { ...node, [type]: newOperatorExpression }
+    if (isLeft && !isBoolean) {
+      // clear operator and right operand
+      nodeUpdated = A.pipe(
+        A.assoc('operator', ''),
+        A.assoc(BinaryOperandType.right, Expression.newIdentifier())
+      )(nodeUpdated)
+    }
+    onChange(nodeUpdated)
+  }
 
   return (
     <div className={`binary-${type}`}>
-      <button
-        type="button"
-        className={`btn btn-s btn-switch-operand btn-switch-operand-var${
-          !Expression.isLiteral(nodeOperand) ? ' active' : ''
-        }`}
-        onClick={() => onChange(R.assoc(type, Expression.newIdentifier(), node))}
-      >
-        {i18n.t('expressionEditor.var')}
-      </button>
-
-      {canOperandBeLiteral && (
-        <button
-          type="button"
-          className={`btn btn-s btn-switch-operand btn-switch-operand-const${
-            Expression.isLiteral(nodeOperand) ? ' active' : ''
-          }`}
-          onClick={() => {
-            const nodeUpdate =
-              isLeft && !isBoolean
-                ? R.pipe(
-                    R.assoc(type, Expression.newLiteral()),
-                    R.assoc('operator', ''),
-                    R.assoc(BinaryOperandType.right, Expression.newIdentifier())
-                  )(node)
-                : R.assoc(type, Expression.newLiteral(), node)
-
-            onChange(nodeUpdate)
-          }}
-        >
-          {i18n.t('expressionEditor.const')}
-        </button>
-      )}
+      <ButtonGroup
+        className="binary-operand-type-btn-group"
+        selectedItemKey={operandExpressionType}
+        onChange={onOperandTypeChange}
+        items={applicableOperandExpressionTypes.map((expressionType) => {
+          const acronym = expressionTypeAcronymByType[expressionType]
+          const label = `expressionEditor.${acronym}`
+          return { key: expressionType, label }
+        })}
+      />
       {React.createElement(renderNode, {
         canDelete,
         isBoolean,
@@ -64,7 +109,7 @@ const BinaryOperand = (props) => {
         expressionNodeParent: node,
         node: nodeOperand,
         nodeDefCurrent,
-        onChange: (item) => onChange(R.assoc(type, item, node)),
+        onChange: (item) => onChange(A.assoc(type, item, node)),
         onDelete,
         type,
         variables,
@@ -85,15 +130,6 @@ BinaryOperand.propTypes = {
   level: PropTypes.number,
   onDelete: PropTypes.func,
   variables: PropTypes.array,
-}
-
-BinaryOperand.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  nodeDefCurrent: null,
-  onDelete: null,
-  variables: null,
 }
 
 export default BinaryOperand

@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useLang } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'
@@ -22,6 +22,8 @@ const ADVANCED_EXPRESSION_SUFFIX = '\n'
 export const useExpressionEditorPopupState = (props) => {
   const {
     canBeConstant,
+    canBeCall,
+    excludeCurrentNodeDef,
     expr,
     mode,
     type,
@@ -30,9 +32,11 @@ export const useExpressionEditorPopupState = (props) => {
     onChange,
     query,
     groupByParent = true,
+    includeAnalysis = false,
   } = props
 
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   const lang = useLang()
   const editorType = type.length === 1 ? type[0] : null
 
@@ -48,9 +52,9 @@ export const useExpressionEditorPopupState = (props) => {
     // Either expr or query are passed by the parent component
     let exprDraft
     try {
-      exprDraft = expr || ExpressionParser.parseQuery(query, mode, canBeConstant)
+      exprDraft = expr ?? ExpressionParser.parseQuery({ query, mode, canBeConstant })
     } catch (error) {
-      exprDraft = ExpressionParser.parseQuery('', mode, canBeConstant)
+      exprDraft = ExpressionParser.parseQuery({ query: '', mode, canBeConstant })
     }
     const queryDraft = Expression.toString(exprDraft, mode)
 
@@ -67,7 +71,7 @@ export const useExpressionEditorPopupState = (props) => {
 
   const updateDraftExpr = (exprDraft) => {
     const queryDraft = Expression.toString(exprDraft, mode)
-    const exprDraftValid = ExpressionParser.isExprValid(exprDraft, canBeConstant)
+    const exprDraftValid = ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
     setState((prevState) => ({
       ...prevState,
@@ -82,7 +86,8 @@ export const useExpressionEditorPopupState = (props) => {
   const updateDraftQuery = useCallback(
     (queryDraft) => {
       const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
-      const exprDraftValid = queryDraft === '' ? null : ExpressionParser.isExprValid(exprDraft, canBeConstant)
+      const exprDraftValid =
+        queryDraft === '' ? null : ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
       setState((prevState) => ({
         ...prevState,
@@ -93,14 +98,14 @@ export const useExpressionEditorPopupState = (props) => {
         queryIsBasic: false,
       }))
     },
-    [canBeConstant, mode]
+    [canBeCall, canBeConstant, mode]
   )
 
   const resetDraftQuery = () => {
     setState((prevState) => ({
       ...prevState,
       queryDraft: '',
-      exprDraft: ExpressionParser.parseQuery('', mode, canBeConstant),
+      exprDraft: ExpressionParser.parseQuery({ query: '', mode, canBeConstant }),
       exprDraftValid: true,
       expressionCanBeApplied: query !== '',
     }))
@@ -131,12 +136,15 @@ export const useExpressionEditorPopupState = (props) => {
 
   const variables = ExpressionVariables.getVariables({
     survey,
+    cycle,
     nodeDefContext,
     nodeDefCurrent,
     mode,
     lang,
     groupByParent,
     editorType,
+    excludeCurrentNodeDef,
+    includeAnalysis,
   })
 
   return {

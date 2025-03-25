@@ -2,7 +2,7 @@ import './nodeDefMultipleEditDialog.scss'
 
 import React from 'react'
 
-import { useI18n } from '@webapp/store/system'
+import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
@@ -10,18 +10,12 @@ import * as NodeDefUiProps from '../nodeDefUIProps'
 const NodeDefMultipleEditDialog = (props) => {
   const { nodeDef, label, onClose } = props
 
-  const i18n = useI18n()
-
   return (
-    <Modal className="survey-form__node-def-multiple-edit-dialog" onClose={onClose} title={label}>
+    <Modal className="survey-form__node-def-multiple-edit-dialog" onClose={onClose} showCloseButton title={label}>
       <ModalBody>{React.createElement(NodeDefUiProps.getComponent(nodeDef), props)}</ModalBody>
 
       <ModalFooter>
-        <div>
-          <button className="btn modal-footer__item" onClick={onClose}>
-            {i18n.t('common.close')}
-          </button>
-        </div>
+        <Button className="btn modal-footer__item" onClick={onClose} label="common.close" />
       </ModalFooter>
     </Modal>
   )

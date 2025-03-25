@@ -18,8 +18,7 @@ import { resetDataVis } from '@webapp/views/App/views/Data/Explorer/actions'
 import ValidationReport from './ValidationReport'
 import Records from './Records'
 import Explorer from './Explorer'
-import Charts from './Charts'
-import ExportData from './ExportData'
+import DataExport from './DataExport'
 import DataImport from './DataImport'
 import { MapView } from './MapView'
 
@@ -70,20 +69,11 @@ const Data = () => {
                 },
               ]
             : []),
-          // Chart
-          ...(Authorizer.canUseCharts(user, surveyInfo)
-            ? [
-                {
-                  component: Charts,
-                  path: dataModules.charts.path,
-                },
-              ]
-            : []),
           // Data export
           ...(Authorizer.canExportRecords(user, surveyInfo)
             ? [
                 {
-                  component: ExportData,
+                  component: DataExport,
                   path: dataModules.export.path,
                 },
               ]

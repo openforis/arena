@@ -1,5 +1,6 @@
 import path from 'path'
 import { TestId, getSelector } from '../../../../webapp/utils/testId'
+import { FormUtils } from '../utils/formUtils'
 
 const waitForApi = async (action) => Promise.all([page.waitForResponse('**/taxonomies/**'), action])
 
@@ -9,10 +10,8 @@ const getFileName = (fileName) => path.resolve(__dirname, '..', '..', 'resources
 
 export const editTaxonomyDetails = (taxonomy) => {
   test(`Edit taxonomy ${taxonomy.name} details`, async () => {
-    await waitForApi(page.fill(getSelector(TestId.taxonomyDetails.taxonomyName, 'input'), taxonomy.name))
-    await waitForApi(
-      page.fill(getSelector(TestId.taxonomyDetails.taxonomyDescription(), 'input'), taxonomy.description)
-    )
+    await waitForApi(FormUtils.fillInput(TestId.taxonomyDetails.taxonomyName, taxonomy.name))
+    await waitForApi(FormUtils.fillInput(TestId.taxonomyDetails.taxonomyDescription(), taxonomy.description))
   })
 
   test(`Upload taxonomy ${taxonomy.name} invalid CSV`, async () => {

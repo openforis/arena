@@ -1,37 +1,74 @@
 import './tooltip.scss'
 
-import React from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import ReactDom from 'react-dom'
-import * as R from 'ramda'
+import PropTypes from 'prop-types'
+import classNames from 'classnames'
+
+import { Objects } from '@openforis/arena-core'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 
-class Tooltip extends React.Component {
-  constructor(props) {
-    super(props)
+const messageLineHeight = 20
+const messageComponentHeight = 35
 
-    this.state = { messageElement: null }
-    this.tooltipRef = React.createRef()
+const Tooltip = (props) => {
+  const {
+    children,
+    className = null,
+    id = null,
+    insideTable,
+    messageComponent,
+    messages = [],
+    position = 'bottom',
+    showContent = true, // Set to false to prevent showing tooltip on mouse over
+    testId,
+    type,
+  } = props
 
-    this.mouseEnter = this.mouseEnter.bind(this)
-    this.mouseLeave = this.mouseLeave.bind(this)
-  }
+  const [state, setState] = useState({ messageElement: null })
+  const containerRef = useRef(null)
 
-  getStyle() {
-    const elemOffset = this.tooltipRef.current && elementOffset(this.tooltipRef.current)
+  const { messageElement } = state
 
-    return elemOffset ? { top: elemOffset.top + elemOffset.height, left: elemOffset.left } : {}
-  }
+  const typeClassNameSuffix = type ? `-${type}` : ''
 
-  mouseEnter() {
-    const { messages, messageComponent, showContent, type } = this.props
+  const messageElementClassName = `tooltip__message${typeClassNameSuffix} ${position}`
 
-    if (showContent) {
-      const style = this.getStyle()
-      const className = `tooltip__message${type ? `-${type}` : ''}`
+  const hidePopup = useCallback(() => setState({ messageElement: null }), [])
 
-      if (messageComponent || !(R.isEmpty(messages) || R.isNil(messages))) {
-        this.setState({
+  useEffect(() => {
+    if (!showContent && messageElement) {
+      hidePopup()
+    }
+  }, [hidePopup, messageElement, showContent])
+
+  const calculateMessageElementHeight = useCallback(() => {
+    return messages?.length * messageLineHeight || messageComponentHeight
+  }, [messages])
+
+  const getStyle = useCallback(() => {
+    const elemOffset = containerRef.current && elementOffset(containerRef.current)
+    if (!elemOffset) return {}
+    const offsetTop = position === 'bottom' ? elemOffset.height : -elemOffset.height - calculateMessageElementHeight()
+    const top = elemOffset.top + offsetTop
+    return { top, left: elemOffset.left }
+  }, [calculateMessageElementHeight, position, containerRef])
+
+  const onMouseEnter = useCallback(
+    (event) => {
+      if (!showContent || !containerRef?.current?.contains?.(event.target)) {
+        if (messageElement) {
+          hidePopup()
+        }
+        return
+      }
+
+      const style = getStyle()
+      const className = messageElementClassName
+
+      if (messageComponent || !Objects.isEmpty(messages)) {
+        setState({
           messageElement: (
             <div className={className} style={style}>
               {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
@@ -39,46 +76,43 @@ class Tooltip extends React.Component {
           ),
         })
       }
-    }
-  }
+    },
+    [getStyle, hidePopup, messageComponent, messageElement, messageElementClassName, messages, showContent]
+  )
 
-  mouseLeave() {
-    this.setState({ messageElement: null })
-  }
+  const mainClassName = `tooltip${typeClassNameSuffix}`
+  const tooltipClass = classNames(mainClassName, className, {
+    howerable: showContent,
+    'inside-table': insideTable,
+  })
 
-  render() {
-    const { children, className, id, type, showContent, insideTable, testId } = this.props
-    const { messageElement } = this.state
+  return (
+    <div
+      className={tooltipClass}
+      data-testid={testId || id}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={hidePopup}
+      ref={containerRef}
+      onBlur={hidePopup}
+    >
+      {children}
 
-    const tooltipClass = `tooltip${type ? `-${type}` : ''}${className ? ` ${className}` : ''}${
-      showContent ? ' hoverable' : ''
-    } ${insideTable ? 'inside-table' : ''}`
-
-    return (
-      <div
-        className={tooltipClass}
-        data-testid={testId || id}
-        onMouseEnter={this.mouseEnter}
-        onMouseLeave={this.mouseLeave}
-        ref={this.tooltipRef}
-        onBlur={() => this.setState({ messageElement: null })}
-      >
-        {children}
-
-        {messageElement && ReactDom.createPortal(messageElement, document.body)}
-      </div>
-    )
-  }
+      {messageElement && ReactDom.createPortal(messageElement, document.body)}
+    </div>
+  )
 }
 
-Tooltip.defaultProps = {
-  className: null,
-  id: null,
-  messages: [], // Array of messages
-  messageComponent: null, // React message component
-  type: null, // Tooltip type (error or warning)
-  showContent: true, // Set to false not to show the tooltip on mouse over
-  testId: null,
+Tooltip.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string,
+  id: PropTypes.string,
+  insideTable: PropTypes.bool,
+  messages: PropTypes.array,
+  messageComponent: PropTypes.node,
+  position: PropTypes.oneOf(['bottom', 'top']),
+  showContent: PropTypes.bool,
+  testId: PropTypes.string,
+  type: PropTypes.oneOf(['info', 'error', 'warning']),
 }
 
 export default Tooltip

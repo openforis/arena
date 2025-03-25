@@ -6,6 +6,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { TestId } from '@webapp/utils/testId'
 
+import { ButtonIconAdd } from '@webapp/components'
+
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
 import NodeDefEntityTableRows from './nodeDefEntityTableRows'
@@ -23,18 +25,14 @@ const NodeDefEntityTable = (props) => {
           </div>
 
           {entry && canEditRecord && !NodeDef.isEnumerate(nodeDef) && (
-            <button
-              aria-disabled={!canAddNode}
-              className="btn btn-xs btn-add"
-              data-testid={TestId.surveyForm.entityAddBtn(NodeDef.getName(nodeDef))}
+            <ButtonIconAdd
+              disabled={!canAddNode}
               onClick={() => {
                 const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                 updateNode(nodeDef, entity)
               }}
-              type="button"
-            >
-              <span className="icon icon-plus icon-10px" />
-            </button>
+              testId={TestId.surveyForm.entityAddBtn(NodeDef.getName(nodeDef))}
+            />
           )}
         </NodeDefErrorBadge>
       </div>

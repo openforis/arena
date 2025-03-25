@@ -1,0 +1,8 @@
+.geo-polygon-info {
+  display: flex;
+  flex-direction: column;
+
+  .form-item {
+    grid-template-columns: 6rem 1fr;
+  }
+}

@@ -11,9 +11,9 @@ export const HeaderLeft = ({ restParams }) => {
     <>
       <ButtonDownload
         className="btn-csv-export"
-        href={`/api/survey/${surveyId}/validationReport/csv`}
+        href={`/api/survey/${surveyId}/validationReport/export`}
         requestParams={restParams}
-        label="common.csvExport"
+        label="common.exportToExcel"
       />
     </>
   )

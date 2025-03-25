@@ -1,33 +1,39 @@
-import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { Objects, RecordExpressionEvaluator } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-export const useItemsFilter = ({ survey, nodeDef, record, parentNode, items, alwaysIncludeItemFunction = null }) => {
-  const itemsFilter = NodeDef.getItemsFilter(nodeDef)
+import { RecordState } from '@webapp/store/ui/record'
+import { SurveyState } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
-  return useMemo(() => {
-    const itemsArray = Object.values(items || {})
-    if (itemsArray.length === 0 || Objects.isEmpty(itemsFilter)) return itemsArray
+export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFunction = null }) => {
+  const user = useUser()
+  return useSelector((state) => {
+    const itemsFilter = NodeDef.getItemsFilter(nodeDef)
+
+    if (!Array.isArray(items) || items.length === 0 || Objects.isEmpty(itemsFilter)) return items
+
+    const surveyInState = SurveyState.getSurvey(state)
+
+    // convert survey in state into the format used in arena-core
+    const survey = { ...Survey.getSurveyInfo(surveyInState), ...surveyInState }
+
+    const record = RecordState.getRecord(state)
 
     const expressionEvaluator = new RecordExpressionEvaluator()
 
-    return itemsArray.filter((item) => {
+    return items.filter((item) => {
       if (alwaysIncludeItemFunction?.(item)) return true
 
       try {
-        return expressionEvaluator.evalExpression({
-          survey,
-          record,
-          node: parentNode,
-          query: itemsFilter,
-          item,
-        })
+        return expressionEvaluator.evalExpression({ user, survey, record, node: parentNode, query: itemsFilter, item })
       } catch (error) {
         // TODO throw error?
         return false
       }
     })
-  }, [items, itemsFilter, alwaysIncludeItemFunction, parentNode, record, survey])
+  }, Objects.isEqual)
 }

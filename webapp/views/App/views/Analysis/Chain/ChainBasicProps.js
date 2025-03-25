@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
@@ -7,14 +8,12 @@ import * as Chain from '@common/analysis/chain'
 
 import { useI18n } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
-import { useChain } from '@webapp/store/ui/chain'
-import { useChainRecordsCountByStep } from '@webapp/store/ui/chain/hooks'
+import { useChain, useChainRecordsCountByStep } from '@webapp/store/ui/chain'
 
 import * as API from '@webapp/service/api'
 
 import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
-import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioFieldset } from './ChainRStudioFieldset'
 
@@ -60,11 +59,7 @@ export const ChainBasicProps = (props) => {
         labels={chain.props.descriptions}
         onChange={(descriptions) => updateChain({ ...chain, props: { ...chain.props, descriptions } })}
       />
-      <CyclesSelector
-        cyclesKeysSelected={chain.props.cycles}
-        onChange={(cycles) => updateChain({ ...chain, props: { ...chain.props, cycles } })}
-      />
-      <FormItem label={i18n.t('chainView.samplingDesign')} className="sampling-design-form-item">
+      <FormItem label="chainView.samplingDesign" className="sampling-design-form-item">
         <Checkbox
           checked={Chain.hasSamplingDesign(chain)}
           validation={Validation.getFieldValidation(Chain.keysProps.samplingDesign)(validation)}
@@ -72,7 +67,7 @@ export const ChainBasicProps = (props) => {
           disabled={samplingDesignDisabled}
         />
       </FormItem>
-      <FormItem label={i18n.t('chainView.records')}>
+      <FormItem label="chainView.records">
         <div className="records-count-wrapper">
           {RecordStep.steps.map(({ id, name }, index) => (
             <div className="records-count" key={id}>
@@ -91,4 +86,8 @@ export const ChainBasicProps = (props) => {
       <ChainRStudioFieldset updateChain={updateChain} />
     </div>
   )
+}
+
+ChainBasicProps.propTypes = {
+  updateChain: PropTypes.func.isRequired,
 }

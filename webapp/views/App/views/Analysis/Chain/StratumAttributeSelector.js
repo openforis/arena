@@ -1,70 +1,34 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 
-import { useI18n } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
 import { ChainActions, useChain } from '@webapp/store/ui/chain'
-import { Dropdown } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
+
+import { BaseUnitCodeAttributeSelector } from './BaseUnitCodeAttributeSelector'
 
 export const StratumAttributeSelector = () => {
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const chain = useChain()
-  const survey = useSurvey()
-
-  const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-
-  const onChange = (item) => {
-    const stratumDefUuid = item?.value
-    const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(chain)
-    dispatch(ChainActions.updateChain({ chain: chainUpdated }))
-  }
-
-  // selectable attribute defs can be code attributes in base unit or its ancestors
-  const selectableDefs = []
-  if (baseUnitNodeDef) {
-    Survey.visitAncestorsAndSelf(baseUnitNodeDef, (nodeDef) => {
-      // search inside single entities
-      const descendantDefs = Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef, includeAnalysis: true })(
-        survey
-      )
-      selectableDefs.push(
-        ...descendantDefs.filter(
-          (descendantDef) =>
-            //  only code attributes
-            NodeDef.isCode(descendantDef) &&
-            // adoid duplicates
-            !selectableDefs.some(NodeDef.isEqual(descendantDef))
-        )
-      )
-    })(survey)
-  }
-
-  const nodeDefToItem = (nodeDef) => ({
-    value: NodeDef.getUuid(nodeDef),
-    label: NodeDef.getLabel(nodeDef, null, NodeDef.NodeDefLabelTypes.name),
-  })
-
-  const emptySelectionItem = { value: null, label: i18n.t('common.notSpecified') }
   const samplingDesign = Chain.getSamplingDesign(chain)
-  const selectableItems = [
-    ...(ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign) ? [emptySelectionItem] : []),
-    ...selectableDefs.map(nodeDefToItem),
-  ]
 
-  const selectedNodeDefUuid = ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)
-  const selectedNodeDef = selectedNodeDefUuid ? Survey.getNodeDefByUuid(selectedNodeDefUuid)(survey) : null
-  const selectedItem = selectedNodeDef ? nodeDefToItem(selectedNodeDef) : emptySelectionItem
+  const onChange = useCallback(
+    (stratumDefUuid) => {
+      const chainUpdated = Chain.updateSamplingDesign(ChainSamplingDesign.assocStratumNodeDefUuid(stratumDefUuid))(
+        chain
+      )
+      dispatch(ChainActions.updateChain({ chain: chainUpdated }))
+    },
+    [chain, dispatch]
+  )
 
   return (
-    <FormItem label={i18n.t('chainView.stratumAttribute')}>
-      <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} />
-    </FormItem>
+    <BaseUnitCodeAttributeSelector
+      allowEmptySelection={ChainSamplingDesign.isStratificationNotSpecifiedAllowed(samplingDesign)}
+      label="chainView.stratumAttribute"
+      selectedNodeDefUuid={ChainSamplingDesign.getStratumNodeDefUuid(samplingDesign)}
+      onChange={onChange}
+    />
   )
 }

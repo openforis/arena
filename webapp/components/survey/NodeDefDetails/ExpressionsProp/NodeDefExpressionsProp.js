@@ -13,34 +13,44 @@ import { State } from '../store'
 
 const NodeDefExpressionsProp = (props) => {
   const {
-    qualifier,
-    state,
     Actions,
-    nodeDefUuidContext,
-    propName,
-    label,
-    multiple,
-    applyIf,
-    showLabels,
-    readOnly,
-    isContextParent,
-    canBeConstant,
-    isBoolean,
-    hideAdvanced,
-    mode,
+    applyIf = true,
+    canBeConstant = false,
+    excludeCurrentNodeDef = false,
+    hideAdvanced = false,
+    info = null,
+    isBoolean = true,
+    isContextParent = false,
+    label = '',
+    mode = Expression.modes.json,
+    multiple = true,
+    nodeDefUuidContext = null,
+    onChange: onChangeProp = null,
+    propName = null,
+    propExtractor = null,
+    qualifier,
+    readOnly = false,
+    showLabels = false,
+    state,
+    valueTypeSelection = false,
+    determineValueType = null,
+    valueConstantEditorNumberFormat = null,
   } = props
 
   const nodeDef = State.getNodeDef(state)
   const nodeDefValidation = State.getValidation(state)
 
-  const values = NodeDef.getPropAdvanced(propName, [])(nodeDef)
+  const values = propExtractor ? propExtractor(nodeDef) : NodeDef.getPropAdvanced(propName, [])(nodeDef)
 
   const onChange = (expressions) =>
-    Actions.setProp({ state, key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions) })
+    onChangeProp
+      ? onChangeProp(expressions)
+      : Actions.setProp({ state, key: propName, value: R.reject(NodeDefExpression.isPlaceholder, expressions) })
 
   return (
     <ExpressionsProp
       qualifier={qualifier}
+      info={info}
       label={label}
       readOnly={readOnly}
       applyIf={applyIf}
@@ -56,6 +66,10 @@ const NodeDefExpressionsProp = (props) => {
       canBeConstant={canBeConstant}
       isBoolean={isBoolean}
       hideAdvanced={hideAdvanced}
+      excludeCurrentNodeDef={excludeCurrentNodeDef}
+      valueTypeSelection={valueTypeSelection}
+      determineValueType={determineValueType}
+      valueConstantEditorNumberFormat={valueConstantEditorNumberFormat}
     />
   )
 }
@@ -65,9 +79,12 @@ NodeDefExpressionsProp.propTypes = {
 
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
+  onChange: PropTypes.func,
 
   nodeDefUuidContext: PropTypes.string,
-  propName: PropTypes.string.isRequired,
+  propName: PropTypes.string,
+  propExtractor: PropTypes.func,
+  info: PropTypes.string,
   label: PropTypes.string,
   mode: PropTypes.string,
 
@@ -80,22 +97,11 @@ NodeDefExpressionsProp.propTypes = {
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
-}
+  excludeCurrentNodeDef: PropTypes.bool,
 
-NodeDefExpressionsProp.defaultProps = {
-  nodeDefUuidContext: null,
-  label: '',
-  mode: Expression.modes.json,
-
-  applyIf: true,
-  showLabels: false,
-  multiple: true,
-  readOnly: false,
-
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
-  hideAdvanced: false,
+  valueTypeSelection: PropTypes.bool,
+  determineValueType: PropTypes.func,
+  valueConstantEditorNumberFormat: PropTypes.object,
 }
 
 export default NodeDefExpressionsProp

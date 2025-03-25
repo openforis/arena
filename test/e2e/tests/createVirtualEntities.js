@@ -13,8 +13,8 @@ export default () =>
       test(`Create entity`, async () => {
         await Promise.all([page.waitForNavigation(), page.click(getSelector(TestId.entities.addBtn, 'button'))])
 
-        await page.fill(getSelector(TestId.nodeDefDetails.nodeDefName, 'input'), entity.name)
-        await page.fill(getSelector(TestId.nodeDefDetails.nodeDefLabels(), 'input'), entity.label)
+        await FormUtils.fillInput(TestId.nodeDefDetails.nodeDefName, entity.name)
+        await FormUtils.fillInput(TestId.nodeDefDetails.nodeDefLabels(), entity.label)
 
         await FormUtils.selectDropdownItem({ testId: TestId.entities.entitySelector, label: 'Tree' })
 

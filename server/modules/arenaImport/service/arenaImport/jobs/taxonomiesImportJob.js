@@ -33,7 +33,7 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async _insertTaxonomy({ taxonomy }) {
-    const { arenaSurveyFileZip, backup, surveyId } = this.context
+    const { arenaSurveyFileZip: zipFile, backup, surveyId } = this.context
 
     const taxonomyImported = await TaxonomyManager.insertTaxonomy(
       {
@@ -45,9 +45,23 @@ export default class TaxonomiesImportJob extends Job {
       },
       this.tx
     )
-    const taxa = await ArenaSurveyFileZip.getTaxa(arenaSurveyFileZip, Taxonomy.getUuid(taxonomyImported))
+    const taxonomyUuid = Taxonomy.getUuid(taxonomyImported)
+    let taxa = await ArenaSurveyFileZip.getTaxa(zipFile, taxonomyUuid)
     if (taxa.length > 0) {
-      await TaxonomyManager.insertTaxa({ user: this.user, surveyId, taxa, addLogs: false, backup, client: this.tx })
+      await this.insertTaxa({ taxa })
+    } else {
+      const partsCount = ArenaSurveyFileZip.getTaxaPartsCount({ zipFile, taxonomyUuid })
+      let partIndex = 0
+      while (partIndex < partsCount) {
+        taxa = await ArenaSurveyFileZip.getTaxaPart({ zipFile, taxonomyUuid, index: partIndex })
+        await this.insertTaxa({ taxa })
+        partIndex = partIndex + 1
+      }
     }
+  }
+
+  async insertTaxa({ taxa }) {
+    const { backup, surveyId } = this.context
+    await TaxonomyManager.insertTaxa({ user: this.user, surveyId, taxa, addLogs: false, backup, client: this.tx })
   }
 }

@@ -1,53 +1,21 @@
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import * as ProcessUtils from '@core/processUtils'
+import { JobQueue } from './JobQueue'
 
-import ThreadsCache from '@server/threads/threadsCache'
-import ThreadManager from '@server/threads/threadManager'
+const queue = new JobQueue({ concurrency: ProcessUtils.ENV.jobQueueConcurrency })
 
-import { jobThreadMessageTypes } from './jobUtils'
+// ====== READ
 
-// USER JOB WORKERS
+export const getActiveJobSummary = (userUuid) => queue.getRunningJobSummaryByUserUuid(userUuid)
 
-const userJobThreads = new ThreadsCache()
-
-const _notifyJobUpdate = (jobSerialized) => {
-  const { userUuid } = jobSerialized
-
-  WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, jobSerialized)
-  if (!jobSerialized.ended) {
-    return
-  }
-
-  const jobThread = userJobThreads.getThread(userUuid)
-  if (!jobThread) {
-    return
-  }
-
-  const cleanupThread = () => {
-    jobThread.terminate()
-    userJobThreads.removeThread(userUuid)
-  }
-
-  // Delay thread termination by 1 second (give time to print debug info to the console)
-  setTimeout(cleanupThread, 1000)
-}
+export const getJobSummary = (jobUuid) => queue.getJobSummary(jobUuid)
 
 // ====== UPDATE
 
-export const cancelActiveJobByUserUuid = async (userUuid) => {
-  const jobThread = userJobThreads.getThread(userUuid)
-  if (!jobThread) {
-    return
-  }
-
-  jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
-}
+export const cancelActiveJobByUserUuid = async (userUuid) => queue.cancelJobByUserUuid(userUuid)
 
 // ====== EXECUTE
 
-export const executeJobThread = (job) => {
-  const { type: jobType, params: jobParams } = job
-
-  const thread = new ThreadManager('jobThread.js', { jobType, jobParams }, (job) => _notifyJobUpdate(job))
-
-  userJobThreads.putThread(job.userUuid, thread)
+export const enqueueJob = (job) => {
+  queue.enqueue(job)
+  return job
 }

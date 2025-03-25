@@ -1,12 +1,13 @@
 import * as A from '@core/arena'
+import { FileFormats } from '@core/fileFormats'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
-import * as DateUtils from '@core/dateUtils'
 
 import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -27,7 +28,7 @@ export const init = (app) => {
         const validation = await UserValidator.validateInvitation(invitation)
 
         if (!Validation.isValid(validation)) {
-          res.json({ errorKey: 'appErrors.userInvalid' })
+          res.json({ errorKey: 'appErrors:userInvalid' })
           return
         }
       }
@@ -35,10 +36,17 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
       try {
-        await UserService.inviteUser({ user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation })
-        Response.sendOk(res)
+        const { skippedEmails } = await UserService.inviteUsers({
+          user,
+          surveyId,
+          surveyCycleKey,
+          invitation,
+          serverUrl,
+          repeatInvitation,
+        })
+        res.json({ skippedEmails })
       } catch (e) {
-        const errorKey = e.key || 'appErrors.generic'
+        const errorKey = e.key || 'appErrors:generic'
         const errorParams = e.params || { text: e.message }
         res.json({ errorKey, errorParams })
       }
@@ -79,7 +87,7 @@ export const init = (app) => {
           })
           res.json({ survey, userInvited, validation })
         } catch (e) {
-          const errorKey = e.key || 'appErrors.generic'
+          const errorKey = e.key || 'appErrors:generic'
           const errorParams = e.params || { text: e.message }
           res.json({ errorKey, errorParams })
         }
@@ -91,12 +99,17 @@ export const init = (app) => {
 
   // ==== READ
 
-  const _getUser = async (req, res) => {
+  const _fetchUser = async (req) => {
     const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
     // show private info only if fetching the same user of the request
     const userResult = User.isEqual(Request.getUser(req))(user) ? user : User.dissocPrivateProps(user)
-    res.json(userResult)
+    return userResult
+  }
+
+  const _getUser = async (req, res) => {
+    const user = await _fetchUser(req)
+    res.json(user)
   }
 
   app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
@@ -128,7 +141,8 @@ export const init = (app) => {
 
   app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const count = await UserService.countUsers()
+      const { search } = Request.getParams(req)
+      const count = await UserService.countUsers({ search })
       res.json({ count })
     } catch (error) {
       next(error)
@@ -137,9 +151,9 @@ export const init = (app) => {
 
   app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const { offset, limit, sortBy, sortOrder } = Request.getParams(req)
+      const { offset, onlyAccepted, limit, search, sortBy, sortOrder } = Request.getParams(req)
 
-      const list = await UserService.fetchUsers({ offset, limit, sortBy, sortOrder })
+      const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder })
 
       res.json({ list })
     } catch (error) {
@@ -147,12 +161,12 @@ export const init = (app) => {
     }
   })
 
-  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const fileName = `users_${DateUtils.nowFormatDefault()}.csv`
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-      await UserExportService.exportUsersIntoStream({ outputStream: res })
+      const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+      const fileName = ExportFileNameGenerator.generate({ fileType: 'users', includeTimestamp: true, fileFormat })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
+      await UserExportService.exportUsersIntoStream({ outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -160,10 +174,9 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
       const { surveyId } = Request.getParams(req)
 
-      const count = await UserService.countUsersBySurveyId(user, surveyId)
+      const count = await UserService.countUsersBySurveyId(surveyId)
       res.json({ count })
     } catch (error) {
       next(error)
@@ -173,15 +186,51 @@ export const init = (app) => {
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { surveyId, offset, limit } = Request.getParams(req)
+      const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId({ user, surveyId, offset, limit })
+      const list = await UserService.fetchUsersBySurveyId({
+        user,
+        surveyId,
+        offset,
+        limit,
+        onlyAccepted,
+        includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
+      })
 
       res.json({ list })
     } catch (error) {
       next(error)
     }
   })
+
+  app.get(
+    '/survey/:surveyId/user/:userUuid/resetpasswordurl',
+    AuthMiddleware.requireUserInvitePermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, userUuid } = Request.getParams(req)
+        const serverUrl = Request.getServerUrl(req)
+        const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+        res.json(url)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/user/:userUuid/name',
+    AuthMiddleware.requireUserNameViewPermission,
+    async (req, res, next) => {
+      try {
+        const user = await _fetchUser(req)
+        const name = user ? User.getName(user) : null
+        res.json(name)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
@@ -225,12 +274,17 @@ export const init = (app) => {
   app.get(
     '/users/users-access-request/export',
     AuthMiddleware.requireUsersAllViewPermission,
-    async (_req, res, next) => {
+    async (req, res, next) => {
       try {
-        const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+        const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const fileName = ExportFileNameGenerator.generate({
+          itemName: 'user_access_requests',
+          includeTimestamp: true,
+          fileFormat,
+        })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
+        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res, fileFormat })
       } catch (error) {
         next(error)
       }
@@ -260,7 +314,7 @@ export const init = (app) => {
     const validation = await UserValidator.validateUser(userToUpdate)
 
     if (!Validation.isValid(validation)) {
-      throw new SystemError('appErrors.userInvalid')
+      throw new SystemError('appErrors:userInvalid')
     }
 
     const { surveyId } = Request.getParams(req)
@@ -324,7 +378,7 @@ export const init = (app) => {
       const { surveyId, userUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await UserService.deleteUser({ user, userUuidToRemove: userUuid, surveyId })
+      await UserService.deleteUserFromSurvey({ user, userUuidToRemove: userUuid, surveyId })
 
       Response.sendOk(res)
     } catch (error) {

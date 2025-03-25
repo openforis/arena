@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $fontFamily: 'Noto Sans', sans-serif;
 
 // sidebar
@@ -19,22 +21,25 @@ $greenLight: #f0f2e7;
 $yellow: #fee997;
 
 $grey: #e7e9ee;
-$greyAppBg: lighten($grey, 5%);
+$greyAppBg: color.adjust($grey, $lightness: 5%);
 $greyBorder: #d1d1dd;
 $blue: #3885ca;
-$blueLight: lighten($blue, 35%);
-$blueLightFocus: lighten($blue, 45%);
-$blueLightActive: lighten($blue, 25%);
-$blueDark: darken($blue, 20%);
+$blueLight: color.adjust($blue, $lightness: 35%);
+$blueLightFocus: color.adjust($blue, $lightness: 45%);
+$blueLightActive: color.adjust($blue, $lightness: 25%);
+$blueDark: color.adjust($blue, $lightness: -20%);
 $orange: #eba444;
 $orangeLight: #f9ccb2;
 $black: #2f3138;
 $yellowHighlight: #f8f6cc;
 $white: #ffffff;
 
-$colorTextPrimary: darken($blue, 20%);
-$borderColorFocussed: darken($blue, 20%);
+$colorTextPrimary: color.adjust($blue, $lightness: -20%);
+$borderColorFocussed: color.adjust($blue, $lightness: -20%);
 $backgroundColorSecondary: $white;
+$inputBackgroundColor: $white;
+
+$tooltipBg: $grey;
 
 //z-indexes
 
@@ -46,7 +51,7 @@ $zIndex15UserMenu: 15;
 $zIndex18PanelRight: 18;
 $zIndex20AppModalConfirm: 20;
 $zIndex20Dropdown: 20;
-$zIndex80AppNotification: 80;
+$zIndexAppNotification: 1400;
 $zIndex90AppError: 90;
 /* Policy: everything is below app loader to stop user action */
 $zIndex190AppLoader: 190;
@@ -62,4 +67,4 @@ $tableRowHeight: 35px;
 $tableRowBorder: 1px solid $greyBorder;
 
 // profile picture
-$profilePictureBorder: 2px solid lighten($greyBorder, 10%);
+$profilePictureBorder: 2px solid color.adjust($greyBorder, $lightness: 10%);

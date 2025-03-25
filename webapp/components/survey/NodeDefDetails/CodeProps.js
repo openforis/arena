@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as R from 'ramda'
 
@@ -8,7 +8,6 @@ import * as Category from '@core/survey/category'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Validation from '@core/validation/validation'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurveyCycleKey, useSurvey } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
@@ -19,21 +18,20 @@ import { CategorySelector } from '@webapp/components/survey/CategorySelector'
 
 import { State } from './store'
 
-const displayAsItems = ({ i18n }) => [
+const displayAsItems = [
   {
     key: NodeDefLayout.renderType.dropdown,
-    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.dropdown'),
+    label: 'nodeDefEdit.codeProps.displayAsTypes.dropdown',
   },
   {
     key: NodeDefLayout.renderType.checkbox,
-    label: i18n.t('nodeDefEdit.codeProps.displayAsTypes.checkbox'),
+    label: 'nodeDefEdit.codeProps.displayAsTypes.checkbox',
   },
 ]
 
 const CodeProps = (props) => {
   const { state, Actions } = props
 
-  const i18n = useI18n()
   const surveyCycleKey = useSurveyCycleKey()
   const survey = useSurvey()
   const readOnly = !useAuthCanEditSurvey()
@@ -41,23 +39,31 @@ const CodeProps = (props) => {
   const [category, setCategory] = useState(null)
 
   const nodeDef = State.getNodeDef(state)
+  const nodeDefCategoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const validation = State.getValidation(state)
   const canUpdateCategory = Survey.canUpdateCategory(nodeDef)(survey)
   const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents({ nodeDef, category })(survey)
   const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
 
-  const setCategoryProp = (categorySelected) =>
-    Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: Category.getUuid(categorySelected) })
+  const onCategoryChange = useCallback(
+    (selectedCategory) => {
+      const selectedCategoryUuid = Category.getUuid(selectedCategory)
+      if (canUpdateCategory && selectedCategoryUuid !== nodeDefCategoryUuid) {
+        Actions.setProp({ state, key: NodeDef.propKeys.categoryUuid, value: selectedCategoryUuid })
+      }
+    },
+    [Actions, canUpdateCategory, nodeDefCategoryUuid, state]
+  )
 
   return (
     <>
-      <FormItem label={i18n.t('nodeDefEdit.codeProps.category')}>
+      <FormItem label="nodeDefEdit.codeProps.category">
         <CategorySelector
           disabled={!canUpdateCategory}
-          categoryUuid={NodeDef.getCategoryUuid(nodeDef)}
+          categoryUuid={nodeDefCategoryUuid}
           validation={Validation.getFieldValidation(NodeDef.propKeys.categoryUuid)(validation)}
           editingNodeDef
-          onChange={setCategoryProp}
+          onChange={onCategoryChange}
           onCategoryLoad={setCategory}
         />
       </FormItem>
@@ -65,7 +71,7 @@ const CodeProps = (props) => {
       {!NodeDef.isAnalysis(nodeDef) && (
         <>
           {Category.isHierarchical(category) && (
-            <FormItem label={i18n.t('nodeDefEdit.codeProps.parentCode')}>
+            <FormItem label="nodeDefEdit.codeProps.parentCode">
               <div
                 style={{
                   display: 'grid',
@@ -87,15 +93,15 @@ const CodeProps = (props) => {
             </FormItem>
           )}
 
-          <FormItem label={i18n.t('nodeDefEdit.codeProps.displayAs')}>
+          <FormItem label="nodeDefEdit.codeProps.displayAs">
             <ButtonGroup
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
               onChange={(value) => Actions.setLayoutProp({ state, key: NodeDefLayout.keys.renderType, value })}
-              items={displayAsItems({ i18n })}
+              items={displayAsItems}
             />
           </FormItem>
 
-          <FormItem label={i18n.t('nodeDefEdit.codeProps.codeShown')}>
+          <FormItem label="nodeDefEdit.codeProps.codeShown">
             <Checkbox
               checked={NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)}
               disabled={readOnly}
