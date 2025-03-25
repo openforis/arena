@@ -15,23 +15,23 @@ const ButtonGroup = ({
   groupName = null,
   items = [],
   multiple = false,
-  onChange = () => { },
+  onChange = () => {},
   selectedItemKey = null,
 }) => {
   const onItemClick =
     ({ item, selected }) =>
-      () => {
-        if (selected && !multiple && !deselectable) return
-        let value
-        if (multiple) {
-          value = R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
-        } else if (!selected) {
-          value = item.key
-        } else {
-          value = null
-        }
-        onChange(value)
+    () => {
+      if (selected && !multiple && !deselectable) return
+      let value
+      if (multiple) {
+        value = R.ifElse(R.always(selected), R.without(item.key), R.append(item.key))(selectedItemKey)
+      } else if (!selected) {
+        value = item.key
+      } else {
+        value = null
       }
+      onChange(value)
+    }
 
   return (
     <MuiButtonGroup className={classNames('btn-group', className)}>
@@ -63,7 +63,7 @@ export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =
   Object.keys(object).map((key) => ({
     key,
     label: i18n.t(`${labelPrefix}${key}`),
-    icon,
+    icon: icon ? (typeof icon === 'function' ? icon({ key }) : icon) : null,
   }))
 
 ButtonGroup.propTypes = {

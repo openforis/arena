@@ -1,6 +1,6 @@
 import './FormHeaderProps.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { FormHeaderColor } from '@openforis/arena-core'
@@ -41,13 +41,15 @@ const FormHeaderProps = (props) => {
     [Actions, state]
   )
 
+  const items = useMemo(() => headerColorItems({ i18n }), [i18n])
+
   return (
     <FormItem label={i18n.t('nodeDefEdit.formHeaderProps.headerColorLabel')}>
       <ButtonGroup
         className="form-header-color-btn-group"
         selectedItemKey={headerColor}
         onChange={onHeaderColorChange}
-        items={headerColorItems({ i18n })}
+        items={items}
       />
     </FormItem>
   )
