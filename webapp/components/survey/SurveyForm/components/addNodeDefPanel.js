@@ -15,7 +15,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
-const experimentalNodeDefTypes = []
+const experimentalNodeDefTypes = [NodeDef.nodeDefType.formHeader]
 
 const AddNodeDefButtons = (props) => {
   const { surveyCycleKey, nodeDef, addNodeDef } = props
