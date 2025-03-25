@@ -2006,6 +2006,18 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
+"@date-io/core@^2.17.0":
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-2.17.0.tgz#360a4d0641f069776ed22e457876e8a8a58c205e"
+  integrity sha512-+EQE8xZhRM/hsY0CDTVyayMDDY5ihc4MqXCrPxooKw19yAzUIC6uUqsZeaOFNL9YKTNxYKrJP5DFgE8o5xRCOw==
+
+"@date-io/date-fns@^2.16.0":
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-2.17.0.tgz#1d9d0a02e0137524331819c9576a4e8e19a6142b"
+  integrity sha512-L0hWZ/mTpy3Gx/xXJ5tq5CzHo0L7ry6KEO9/w/JWiFWFLZgiNVo3ex92gOl3zmzjHqY/3Ev+5sehAr8UnGLEng==
+  dependencies:
+    "@date-io/core" "^2.17.0"
+
 "@discoveryjs/json-ext@0.5.7", "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -2786,10 +2798,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openforis/arena-core@^1.0.12":
-  version "1.0.12"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.12/8b6a2e5b8ecc828b690491cf362d875e6d3b7c0f#8b6a2e5b8ecc828b690491cf362d875e6d3b7c0f"
-  integrity sha512-S2OvY+VXjGLRKmjmQYvQb0tDQeeYn8dxIVgsHZELdWSihdK/eQgerxXHk2qalgDapb2OYXdRSkGlae97YCKsnA==
+"@openforis/arena-core@^1.0.14":
+  version "1.0.14"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.14/4407a0748a04aca3e3280422fb65d9bcd9eaf46a#4407a0748a04aca3e3280422fb65d9bcd9eaf46a"
+  integrity sha512-wXn3skyWlfrJZfcC6ARzUg7dgSWqkqpZBR+bJ/FGzwJ6qcXRr+cvtHoZATbvFNGCtdtYW5XpwSEhlcm+FrNJ8g==
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
     bignumber.js "^9.1.2"

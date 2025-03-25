@@ -23,7 +23,7 @@ const NodeDefFormItem = (props) => {
     ...otherProps,
   })
 
-  if (NodeDef.isEntity(nodeDef)) {
+  if (NodeDef.isEntity(nodeDef) || NodeDef.isFormHeader(nodeDef)) {
     return nodeDefComponent
   }
 

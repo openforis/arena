@@ -1,24 +1,36 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { FormHeaderColor } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
 
 import { NumberFormats } from '@webapp/components/form/Input'
 
+import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefCode from './components/types/NodeDefCode'
+import NodeDefCoordinate from './components/types/nodeDefCoordinate'
+import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
+import NodeDefFormHeader from './components/types/nodeDefFormHeader'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
-import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCode from './components/types/NodeDefCode'
-import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
-import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefTime from './components/types/nodeDefTime'
 import NodeDefGeo from './components/types/nodeDefGeo'
 
-const { boolean, code, coordinate, date, decimal, entity, file, geo, integer, taxon, text, time } = NodeDef.nodeDefType
+const { boolean, code, coordinate, date, decimal, entity, file, formHeader, geo, integer, taxon, text, time } =
+  NodeDef.nodeDefType
+
+export const headerColorRgbCodesByColor = {
+  [FormHeaderColor.blue]: '#b3e5fc',
+  [FormHeaderColor.green]: '#b2dfdb',
+  [FormHeaderColor.orange]: '#ffb38a',
+  [FormHeaderColor.red]: '#f97c7c',
+  [FormHeaderColor.yellow]: '#fffdaf',
+}
 
 const singleEntityIcon = <span className="icon icon-insert-template icon-left" />
 const multipleAttributeIcon = <span title="Multiple">M</span>
@@ -123,6 +135,14 @@ const propsUI = {
     defaultProps: (cycle) => ({
       [NodeDef.propKeys.multiple]: true,
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
+    }),
+  },
+
+  [formHeader]: {
+    component: NodeDefFormHeader,
+    icon: <span className="icon icon-minus icon-left" />,
+    defaultProps: () => ({
+      [NodeDef.propKeys.headerColor]: FormHeaderColor.blue,
     }),
   },
 }
