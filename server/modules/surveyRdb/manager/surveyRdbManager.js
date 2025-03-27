@@ -271,7 +271,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     if (exportSingleEntitiesIntoSeparateFiles) {
       const children = Survey.getNodeDefChildrenSorted({ cycle, nodeDef, includeAnalysis })(survey)
       return children.filter(
-        (child) => (NodeDef.isAttribute(child) && NodeDef.isSingle(child)) || !!expandCategoryItems
+        (child) => NodeDef.isAttribute(child) && (NodeDef.isSingle(child) || !!expandCategoryItems)
       )
     }
     return Survey.getNodeDefDescendantAttributesInSingleEntities({
