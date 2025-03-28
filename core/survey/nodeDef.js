@@ -20,6 +20,8 @@ import { valuePropsTaxon } from './nodeValueProps'
 
 export { nodeDefType }
 
+export const NodeDefLayoutElementTypes = [nodeDefType.formHeader]
+
 export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
@@ -89,6 +91,9 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
+
+  // layout elements
+  headerColor: 'headerColor',
 }
 
 const commonAttributePropsKeys = [
@@ -243,6 +248,8 @@ export const isInteger = isType(nodeDefType.integer)
 export const isTaxon = isType(nodeDefType.taxon)
 export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
+// layout elments
+export const isFormHeader = isType(nodeDefType.formHeader)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
@@ -289,6 +296,11 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
+
+// layout elements
+
+export const getHeaderColor = getProp(propKeys.headerColor)
+export const isLayoutElement = isFormHeader
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -598,8 +610,9 @@ export const keepOnlyOneCycle =
 export const canNodeDefBeMultiple = (nodeDef) =>
   // Entity def but not root
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
-  // Attribute def but not analysis
-  (!isAnalysis(nodeDef) &&
+  // Attribute def but not layout element and not analysis
+  (!isLayoutElement(nodeDef) &&
+    !isAnalysis(nodeDef) &&
     R.includes(getType(nodeDef), [
       nodeDefType.decimal,
       nodeDefType.code,
@@ -619,7 +632,8 @@ export const canNodeDefTypeBeKey = (type) =>
     nodeDefType.time,
   ])
 
-export const canNodeDefBeKey = (nodeDef) => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
+export const canNodeDefBeKey = (nodeDef) =>
+  !isLayoutElement(nodeDef) && !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
 export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&

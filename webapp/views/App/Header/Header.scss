@@ -1,7 +1,7 @@
 @use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
-.header {
+.app-header {
   height: 45px;
   display: grid;
   grid-template-columns: 70px 1fr 1fr 1fr 70px;
@@ -13,7 +13,7 @@
   }
 }
 
-.header__logo {
+.app-header__logo {
   display: flex;
   margin-left: 15px;
 
@@ -23,7 +23,7 @@
   }
 }
 
-.header__survey {
+.app-header__survey {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -50,7 +50,7 @@
   }
 }
 
-.header__survey-title {
+.app-header__survey-title {
   max-width: 30vw;
   white-space: nowrap;
   overflow: hidden;
@@ -58,14 +58,14 @@
   line-height: normal;
 }
 
-.header__loader-wrapper {
+.app-header__loader-wrapper {
   display: flex;
   align-items: center;
   width: 3rem;
   margin-left: 10px;
 }
 
-.header__btn-user {
+.app-header__btn-user {
   max-height: $headerHeight - 1px;
   margin-right: 20px;
   display: flex;

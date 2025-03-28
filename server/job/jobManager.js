@@ -7,6 +7,8 @@ const queue = new JobQueue({ concurrency: ProcessUtils.ENV.jobQueueConcurrency }
 
 export const getActiveJobSummary = (userUuid) => queue.getRunningJobSummaryByUserUuid(userUuid)
 
+export const getJobSummary = (jobUuid) => queue.getJobSummary(jobUuid)
+
 // ====== UPDATE
 
 export const cancelActiveJobByUserUuid = async (userUuid) => queue.cancelJobByUserUuid(userUuid)

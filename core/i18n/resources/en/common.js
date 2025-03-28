@@ -580,7 +580,20 @@ $t(common.cantUndoWarning)`,
       recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {
-      expandCategoryItems: 'add one boolean column for every category item',
+      expandCategoryItems:
+        'adds one boolean column for every category item with a value TRUE if the item has been selected, FALSE otherwise',
+      exportSingleEntitiesIntoSeparateFiles: `exports single entities in separate files; when it's not checked, attributes belonging to a single entity will be included among the ones of its nearest ancestor multiple entity`,
+      includeAnalysis: 'includes analysis attributes',
+      includeAncestorAttributes: 'includes attributes that belong to the ancestor entities, up to the root entity',
+      includeCategoryItemsLabels: 'adds a column with the label of every category item',
+      includeCategories: `categories will be exported in a subfolder called "categories"`,
+      includeDataFromAllCycles:
+        'data from all cycles will be included, othwerwise only the selected one will be considered',
+      includeDateCreated: 'includes the creation date of every entity (row) in a column called "date_created"',
+      includeFiles: `exports files associated to the records into a subfolder called "files"`,
+      includeFileAttributeDefs: `adds file attributes' columns: file internal identifier (file_uuid) and name (file_name)`,
+      includeInternalUuids: 'includes the internal identifiers (UUIDs) in columns ending with the suffix "_uuid"',
+      recordsModifiedAfter: 'exports only data from records modified after the specified date',
     },
     startExport: 'Start export',
   },
@@ -1361,6 +1374,16 @@ E.g. this.region = region_attribute_name
     mobileProps: {
       title: 'Mobile App',
     },
+    formHeaderProps: {
+      headerColorLabel: 'Header color',
+      headerColor: {
+        blue: 'Blue',
+        green: 'Green',
+        orange: 'Orange',
+        red: 'Red',
+        yellow: 'Yellow',
+      },
+    },
     textProps: {
       textInputType: 'Text input type',
       textInputTypes: {
@@ -1460,6 +1483,8 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       taxon: 'Taxon',
       text: 'Text',
       time: 'Time',
+      // layout elments
+      formHeader: 'Form Header',
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,

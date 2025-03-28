@@ -41,10 +41,15 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) => {
 }
 
 export const getNodeDefChildren =
-  (nodeDef, includeAnalysis = true, includeSamplingDefsWithoutSiblings = false) =>
+  (nodeDef, includeAnalysis = true, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
-    let childDefs = Surveys.getNodeDefChildren({ survey: surveyIndexed, nodeDef, includeAnalysis })
+    let childDefs = Surveys.getNodeDefChildren({
+      survey: surveyIndexed,
+      nodeDef,
+      includeAnalysis,
+      includeLayoutElements,
+    })
     if (!includeSamplingDefsWithoutSiblings) {
       childDefs = filterNodeDefsWithoutSiblings(childDefs)
     }
@@ -52,9 +57,15 @@ export const getNodeDefChildren =
   }
 
 export const getNodeDefChildrenSorted =
-  ({ nodeDef, includeAnalysis = false, cycle = null, includeSamplingDefsWithoutSiblings = false }) =>
+  ({
+    nodeDef,
+    includeAnalysis = false,
+    cycle = null,
+    includeLayoutElements = false,
+    includeSamplingDefsWithoutSiblings = false,
+  }) =>
   (survey) => {
-    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef, includeAnalysis, cycle })
+    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, cycle, nodeDef, includeAnalysis, includeLayoutElements })
     if (!includeSamplingDefsWithoutSiblings) {
       childDefs = filterNodeDefsWithoutSiblings(childDefs)
     }
@@ -62,9 +73,9 @@ export const getNodeDefChildrenSorted =
   }
 
 export const getNodeDefChildrenInOwnPage =
-  ({ nodeDef, cycle }) =>
+  ({ nodeDef, cycle, includeAnalysis = true, includeLayoutElements = false }) =>
   (survey) => {
-    const children = getNodeDefChildren(nodeDef)(survey)
+    const children = getNodeDefChildren(nodeDef, includeAnalysis, includeLayoutElements)(survey)
     const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
     const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
     if (childrenIndex.length === 0) return childrenInOwnPage
@@ -99,7 +110,7 @@ export const getNodeDefDescendantsInSingleEntities =
             cycle,
             includeSamplingDefsWithoutSiblings,
           })(survey)
-        : getNodeDefChildren(entityDefCurrent, includeAnalysis, includeSamplingDefsWithoutSiblings)(survey)
+        : getNodeDefChildren(entityDefCurrent, includeAnalysis, false, includeSamplingDefsWithoutSiblings)(survey)
 
       descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
 

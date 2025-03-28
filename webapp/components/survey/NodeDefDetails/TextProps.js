@@ -1,11 +1,9 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import { FormItem } from '@webapp/components/form/Input'
-
-import * as NodeDef from '@core/survey/nodeDef'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 import { State } from './store'
@@ -25,34 +23,31 @@ const TextProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
 
-  const selectLabelValue = useCallback(
+  const onLabelValueChange = useCallback(
     (value) => {
       Actions.setProp({ state, key: NodeDef.propKeys.textTransform, value })
     },
-    [state]
+    [Actions, state]
   )
 
-  useEffect(() => {
-    if (A.isEmpty(NodeDef.getTextTransform(nodeDef))) {
-      selectLabelValue(NodeDef.textTransformValues.none)
-    }
-  }, [])
+  const onInputTypeChange = useCallback(
+    (value) => {
+      Actions.setProp({ state, key: NodeDef.propKeys.textInputType, value })
+    }, [Actions, state])
 
   return (
     <>
       <FormItem label="nodeDefEdit.textProps.textTransform">
         <ButtonGroup
           selectedItemKey={NodeDef.getTextTransform(nodeDef)}
-          onChange={selectLabelValue}
+          onChange={onLabelValueChange}
           items={textTransformTypes}
         />
       </FormItem>
       <FormItem label="nodeDefEdit.textProps.textInputType">
         <ButtonGroup
           selectedItemKey={NodeDef.getTextInputType(nodeDef)}
-          onChange={(value) => {
-            Actions.setProp({ state, key: NodeDef.propKeys.textInputType, value })
-          }}
+          onChange={onInputTypeChange}
           items={textInputTypes}
         />
       </FormItem>

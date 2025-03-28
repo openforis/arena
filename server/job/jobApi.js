@@ -9,6 +9,12 @@ export const init = (app) => {
     res.json(jobSummary)
   })
 
+  app.get('/jobs/:jobUuid', async (req, res) => {
+    const { jobUuid } = Request.getParams(req)
+    const jobSummary = JobManager.getJobSummary(jobUuid)
+    res.json(jobSummary)
+  })
+
   app.delete('/jobs/active', async (req, res) => {
     await JobManager.cancelActiveJobByUserUuid(Request.getUserUuid(req))
 
