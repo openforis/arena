@@ -75,7 +75,7 @@ const Checkbox = (props) => {
         ) : (
           <MuiFormControlLabel className="btn-checkbox-label width100" control={control} label={i18n.t(label)} />
         )}
-        {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info, infoParams)} />}
+        {info && i18n.exists(info) && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info, infoParams)} />}
       </ValidationTooltip>
     </div>
   )
