@@ -16,10 +16,6 @@ import { useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { dataImportNonCompatibilityByOption, dataExportOptions as options } from './dataExportOptions'
 
-const infoMessageKeyByOption = {
-  expandCategoryItems: 'dataExportView.optionsInfo.expandCategoryItems',
-}
-
 const availableFileFormats = [FileFormats.xlsx, FileFormats.csv]
 
 export const DataExportOptionsPanel = (props) => {
@@ -76,12 +72,15 @@ export const DataExportOptionsPanel = (props) => {
           checked={selectedOptionsByKey[optionKey]}
           className={dataImportNonCompatibilityByOption[optionKey] ? 'with-asterisk' : undefined}
           disabled={optionKey === options.includeFileAttributeDefs && selectedOptionsByKey[options.includeFiles]}
-          info={infoMessageKeyByOption[optionKey]}
+          info={`dataExportView.optionsInfo.${optionKey}`}
           label={`dataExportView.options.${optionKey}`}
           onChange={onOptionChange(optionKey)}
         />
       ))}
-      <FormItem label={`dataExportView.options.${options.recordsModifiedAfter}`}>
+      <FormItem
+        info={`dataExportView.optionsInfo.${options.recordsModifiedAfter}`}
+        label={`dataExportView.options.${options.recordsModifiedAfter}`}
+      >
         <DateInput
           onChange={onOptionChange(options.recordsModifiedAfter)}
           value={selectedOptionsByKey[options.recordsModifiedAfter]}
