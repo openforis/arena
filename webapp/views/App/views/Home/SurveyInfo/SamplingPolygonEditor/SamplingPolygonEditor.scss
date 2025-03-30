@@ -1,5 +1,4 @@
 .sampling-polygon {
-  width: 80%;
   padding: 10px;
 
   .json-editor {
@@ -20,6 +19,10 @@
     .form-label {
       width: auto;
       white-space: nowrap;
+    }
+
+    .form-input-container {
+      width: 8rem;
     }
   }
 }

@@ -22,7 +22,7 @@ import TaxaTableRow from './TaxaTableRow'
 import { State, useLocalState } from './store'
 
 const TaxonomyDetails = (props) => {
-  const { showClose } = props
+  const { showClose = true } = props
 
   const { state, Actions } = useLocalState(props)
 
@@ -76,10 +76,6 @@ const TaxonomyDetails = (props) => {
 
 TaxonomyDetails.propTypes = {
   showClose: PropTypes.bool,
-}
-
-TaxonomyDetails.defaultProps = {
-  showClose: true,
 }
 
 export default TaxonomyDetails

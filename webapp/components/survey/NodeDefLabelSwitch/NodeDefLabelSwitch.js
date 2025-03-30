@@ -25,7 +25,12 @@ const buttonLabelKeysByType = {
 }
 
 const NodeDefLabelSwitch = (props) => {
-  const { allowedLabelTypes, className, onChange, labelType } = props
+  const {
+    allowedLabelTypes = [NodeDef.NodeDefLabelTypes.label, NodeDef.NodeDefLabelTypes.name],
+    className,
+    onChange,
+    labelType,
+  } = props
 
   const allowedTypeValues = Object.values(allowedLabelTypes)
   const labelTypeNext = allowedTypeValues[(allowedTypeValues.indexOf(labelType) + 1) % allowedTypeValues.length]
@@ -39,11 +44,6 @@ NodeDefLabelSwitch.propTypes = {
   labelType: PropTypes.string.isRequired,
   allowedLabelTypes: PropTypes.array,
   onChange: PropTypes.func.isRequired,
-}
-
-NodeDefLabelSwitch.defaultProps = {
-  allowedLabelTypes: [NodeDef.NodeDefLabelTypes.label, NodeDef.NodeDefLabelTypes.name],
-  className: '',
 }
 
 export default NodeDefLabelSwitch

@@ -1,9 +1,9 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .user-edit {
   margin: auto;
   padding: 1rem;
-  grid-row-gap: 1.5rem;
+  grid-row-gap: 0;
   width: 50rem;
 
   .profile-picture {
@@ -12,6 +12,7 @@
   }
 
   .form-item {
+    height: auto;
     grid-template-columns: 0.3fr 0.7fr;
 
     .tooltip {
@@ -29,6 +30,26 @@
       grid-template-columns: 0.3fr 0.7fr 5rem;
     }
   }
+
+  .extra-props {
+    .form {
+      height: auto;
+      grid-row-gap: 0;
+
+      .form-item {
+        width: 20rem;
+        white-space: nowrap;
+
+        .form-input-container {
+          width: 12rem;
+        }
+      }
+    }
+
+    .btn-add {
+      justify-self: center;
+    }
+  }
 }
 
 .user-edit__buttons {
@@ -37,6 +58,7 @@
   align-items: center;
   position: relative;
   gap: 3rem;
+  margin-top: 1rem;
 
   .btn-back {
     align-self: flex-start;

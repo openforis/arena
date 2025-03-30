@@ -210,7 +210,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
       languages: ['en'],
     })
 
-    const survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
+    let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
 
     // 3) find group to associate to the user
     let group = null
@@ -222,16 +222,23 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
     }
 
     // 4) invite user to that group and send email
-    const { userInvited } = await UserInviteService.inviteUsers(
+    const surveyId = Survey.getId(survey)
+    const { invitedUsers } = await UserInviteService.inviteUsers(
       {
         user,
-        surveyId: Survey.getId(survey),
+        surveyId,
         surveyCycleKey: Survey.cycleOneKey,
         invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
         serverUrl,
       },
       t
     )
+    const userInvited = invitedUsers[0]
+    const surveyOwnerUuid = User.getUuid(userInvited)
+
+    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
+    survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
+
     return { survey, userInvited }
   })
 
@@ -372,12 +379,12 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
 // DELETE
 export const { deleteUserResetPasswordExpired } = UserManager
 
-export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
+export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId }) =>
   db.tx(async (t) => {
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
     const userToDelete = await UserManager.fetchUserByUuid(userUuidToRemove, t)
 
-    await UserManager.deleteUser({ user, userUuidToRemove, survey }, t)
+    await UserManager.deleteUserFromSurvey({ user, userUuidToRemove, survey }, t)
 
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
@@ -399,20 +406,38 @@ export const deleteUser = async ({ user, userUuidToRemove, surveyId }) =>
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info('IDs of surveys to be deleted (if without any activity):', surveyIds)
+  Logger.info(`IDs of surveys to be deleted (if without any activity): ${surveyIds}`)
   for await (const surveyId of surveyIds) {
     const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
     // delete survey only if it is brand new
     if (activityLogsCount < 5) {
+      Logger.info(`Deleting survey ${surveyId}`)
       await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
     }
   }
   Logger.debug('deleting users with expired invitations')
-  const deletedUsers = await UserManager.deleteUsersWithExpiredInvitation(client)
-  if (deletedUsers.length > 0) {
-    Logger.debug('deleting expired users access requests by expired invitations')
-    const deletedUsersEmails = deletedUsers.map(User.getEmail)
-    await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
+  const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
+  const deletedUsers = []
+  const deletedUsersEmails = []
+  if (usersWithExpiredInvitation.length > 0) {
+    const usersWithExpiredInvitationEmails = usersWithExpiredInvitation.map(User.getEmail)
+    const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
+    Logger.debug(`deleting users: ${usersWithExpiredInvitationEmails} ${usersWithExpiredInvitationUuids}`)
+    for await (const user of usersWithExpiredInvitation) {
+      const userUuid = User.getUuid(user)
+      const userEmail = User.getEmail(user)
+      try {
+        await UserManager.deleteUser(userUuid, client)
+        deletedUsers.push(user)
+        deletedUsersEmails.push(userEmail)
+      } catch (error) {
+        Logger.debug(`error deleting user ${userEmail} [${userUuid}]: ${String(error)}`)
+      }
+    }
+    if (deletedUsersEmails.length > 0) {
+      Logger.debug('deleting expired users access requests by expired invitations')
+      await UserManager.deleteUserAccessRequestsByEmail({ emails: deletedUsersEmails }, client)
+    }
   }
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)

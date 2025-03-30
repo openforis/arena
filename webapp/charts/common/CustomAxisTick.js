@@ -6,7 +6,7 @@ import * as StringUtils from '@core/stringUtils'
 const labelTextFill = '#666'
 
 export const CustomAxisTick = (props) => {
-  const { labelRotation, payload, labelMaxChars, x, y } = props
+  const { labelRotation = 0, labelMaxChars = 14, payload, x, y } = props
   const { value } = payload
   const ellipsed = value.length > labelMaxChars
   const valueDisplay = StringUtils.truncate(labelMaxChars)(value)
@@ -29,9 +29,4 @@ CustomAxisTick.propTypes = {
   labelMaxChars: PropTypes.number,
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
-}
-
-CustomAxisTick.defaultProps = {
-  labelRotation: 0,
-  labelMaxChars: 14,
 }

@@ -62,6 +62,15 @@ export const getLevelValidation = (levelIndex) =>
   R.pipe(getValidation, Validation.getFieldValidation(keys.levels), Validation.getFieldValidation(levelIndex))
 
 export const getItemsCount = R.propOr(-1, keys.itemsCount)
+export const getItemsCountOrLevelsItemsCount = (category) =>
+  getItemsCount(category) > 0
+    ? getItemsCount(category)
+    : getLevelsArray(category).reduce((acc, level) => {
+        acc += CategoryLevel.getItemsCount(level)
+        return acc
+      }, 0)
+
+export const isBigCategory = (category) => getItemsCountOrLevelsItemsCount(category) > maxCategoryItemsInIndex
 
 // ====== UPDATE
 export const assocProp =
@@ -119,16 +128,7 @@ export const getItemExtraDefKeys = (category) => {
   const itemExtraDef = getItemExtraDef(category)
   return Object.keys(itemExtraDef)
 }
-export const getItemExtraDefsArray = (category) =>
-  // add uuid and name to each extra def item definition and put them in a array
-  Object.entries(getItemExtraDef(category))
-    .map(([name, item], index) => ({
-      ...item,
-      uuid: uuidv4(),
-      name,
-      index: ExtraPropDef.getIndex(item) ?? index,
-    }))
-    .sort((itemA, itemB) => ExtraPropDef.getIndex(itemA) - ExtraPropDef.getIndex(itemB))
+export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
@@ -159,3 +159,4 @@ export const isLevelDeleteAllowed = (level) => (category) =>
 export const isSamplingUnitsPlanCategory = (category) => getName(category) === samplingUnitsPlanCategoryName
 export const isExtraPropDefReadOnly = (extraPropDef) => (category) =>
   isReportingData(category) && ExtraPropDef.getName(extraPropDef) === reportingDataItemExtraDefKeys.area
+export const hasExtraDefs = (category) => getItemExtraDefKeys(category).length > 0

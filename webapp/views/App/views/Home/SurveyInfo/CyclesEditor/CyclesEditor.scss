@@ -1,4 +1,5 @@
-@import 'webapp/style/vars';
+@use 'sass:color';
+@use '~@webapp/style/vars' as *;
 
 .home-survey-info__cycles-editor {
   .cycles {
@@ -22,7 +23,7 @@
 
       .step {
         font-weight: 600;
-        color: lighten($black, 15%);
+        color: color.adjust($black, $lightness: 15%);
         top: inherit;
         height: initial;
       }
@@ -37,7 +38,7 @@
       .date-label {
         font-size: 0.7rem;
         text-transform: uppercase;
-        color: lighten($black, 15%);
+        color: color.adjust($black, $lightness: 15%);
         font-weight: 600;
       }
     }

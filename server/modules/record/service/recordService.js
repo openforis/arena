@@ -1,7 +1,10 @@
 import * as fs from 'fs'
 
+import { NodeValues, Objects } from '@openforis/arena-core'
+
 import * as Log from '@server/log/log'
 
+import * as ActivityLog from '@common/activityLog/activityLog'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as A from '@core/arena'
@@ -20,12 +23,16 @@ import * as ValidationResult from '@core/validation/validationResult'
 import i18n from '@core/i18n/i18nFactory'
 import * as Validation from '@core/validation/validation'
 import { ValidationUtils } from '@core/validation/validationUtils'
+import { FileFormats } from '@core/fileFormats'
 
+import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as JobManager from '@server/job/jobManager'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import { db } from '@server/db/db'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
@@ -35,6 +42,9 @@ import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMe
 import RecordsCloneJob from './recordsCloneJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
+import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
+import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
+import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -71,8 +81,12 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
-export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
-  const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({ surveyId, cycle })
+export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat }) => {
+  const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
+    surveyId,
+    cycle,
+    includeCounts: true,
+  })
 
   const valueFormattersByType = {
     [NodeDef.nodeDefType.date]: ({ value }) =>
@@ -105,6 +119,8 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
       }, {}),
       data_created: DateUtils.formatDateTimeExport(Record.getDateCreated(recordSummary)),
       date_modified: DateUtils.formatDateTimeExport(Record.getDateModified(recordSummary)),
+      files_count: Record.getFilesCount(recordSummary),
+      files_size: Record.getFilesSize(recordSummary),
       owner_name: Record.getOwnerName(recordSummary),
       errors: Validation.getErrorsCount(validation),
       warnings: Validation.getWarningsCount(validation),
@@ -112,25 +128,33 @@ export const exportRecordsSummaryToCsv = async ({ res, surveyId, cycle }) => {
   }
 
   const survey = await SurveyManager.fetchSurveyById({ surveyId })
-  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'Records' })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'Records', fileFormat })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
 
   const fields = [
     ...nodeDefKeys.flatMap((nodeDefKey) => NodeDefTable.getColumnNames(nodeDefKey)),
-    'step',
-    'owner_name',
     'data_created',
     'date_modified',
+    'files_count',
+    'files_size',
+    'owner_name',
+    'step',
     'errors',
     'warnings',
   ]
-  return CSVWriter.writeItemsToStream({ outputStream: res, items: list, fields, options: { objectTransformer } })
+  return FlatDataWriter.writeItemsToStream({
+    outputStream: res,
+    fileFormat,
+    items: list,
+    fields,
+    options: { objectTransformer },
+  })
 }
 
 // Records export job
 export const startRecordsExportJob = ({ user, surveyId, recordUuids }) => {
   const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
 
@@ -227,11 +251,18 @@ export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSoc
 // VALIDATION REPORT
 export const { fetchValidationReport, countValidationReportItems } = RecordManager
 
-export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, recordUuid = null }) => {
+export const exportValidationReportToFlatData = async ({
+  res,
+  surveyId,
+  cycle,
+  lang,
+  recordUuid = null,
+  fileFormat = FileFormats.xlsx,
+}) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport' })
-  Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport', fileFormat })
+  Response.setContentTypeFile({ res, fileName, fileFormat })
 
   const objectTransformer = (item) => {
     const nodeDef = RecordValidationReportItem.getNodeDef(survey)(item)
@@ -271,7 +302,7 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
       record_date_modified: DateUtils.formatDateTimeExport(RecordValidationReportItem.getRecordDateModified(item)),
     }
   }
-  const headers = [
+  const fields = [
     'path',
     'path_labels',
     'name',
@@ -284,16 +315,25 @@ export const exportValidationReportToCSV = async ({ res, surveyId, cycle, lang, 
     'record_date_created',
     'record_date_modified',
   ]
-  const streamTransformer = CSVWriter.transformJsonToCsv({ fields: headers, options: { objectTransformer } })
-  streamTransformer.pipe(res)
-
-  await RecordManager.exportValidationReportToStream({ streamTransformer, surveyId, cycle, recordUuid })
+  await RecordManager.getValidationReportAsStream({
+    surveyId,
+    cycle,
+    recordUuid,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        outputStream: res,
+        fields,
+        options: { objectTransformer },
+        fileFormat,
+      }),
+  })
 }
 
 // RECORDS CLONE
 export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
   const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
 
@@ -372,12 +412,27 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
 // generates the record file name in this format: file_SURVEYNAME_KEYVALUES_ATTRIBUTENAME_POSITION.EXTENSION
 export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file }) => {
   const node = await fetchNodeByUuid(surveyId, nodeUuid)
-  const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: Node.getRecordUuid(node) })
+  const record = await fetchRecordAndNodesByUuid({
+    surveyId,
+    recordUuid: Node.getRecordUuid(node),
+    includeRefData: true,
+  })
   const surveySummary = await SurveyManager.fetchSurveyById({ surveyId })
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     draft: !Survey.isPublished(surveySummary),
+    advanced: true,
+    includeBigCategories: false,
+    includeBigTaxonomies: false,
   })
+  // return calculatd name (if any)
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  if (NodeDef.getFileNameExpression(nodeDef)) {
+    const calculatedName = NodeValues.getFileNameCalculated(node)
+    if (Objects.isNotEmpty(calculatedName)) {
+      return calculatedName
+    }
+  }
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 
   const fileNameParts = []
@@ -397,12 +452,19 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
         const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
 
         if (ancestorKeyDefs.length > 0) {
-          const ancestorKeyValues = Record.getEntityKeyValues(survey, ancestorNode)(record)
-          const keyValuesFormatted = ancestorKeyDefs.map((keyDef, index) => {
-            const keyValue = ancestorKeyValues[index]
-            const keyValueFormatted = NodeValueFormatter.format({ survey, nodeDef: keyDef, value: keyValue })
-            return keyValueFormatted
-          })
+          const ancestorKeyNodes = Record.getEntityKeyNodes(survey, ancestorNode)(record)
+          const keyValuesFormatted = ancestorKeyDefs
+            .map((keyDef, index) => {
+              const keyNode = ancestorKeyNodes[index]
+              const keyValueFormatted = NodeValueFormatter.format({
+                survey,
+                nodeDef: keyDef,
+                node: keyNode,
+                value: Node.getValue(keyNode),
+              })
+              return encodeURIComponent(keyValueFormatted)
+            })
+            .filter(Objects.isNotEmpty)
           fileNameParts.unshift(keyValuesFormatted.join('_'))
         }
       }
@@ -414,3 +476,83 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
 
   return `file_${surveyName}_${fileNameParts.join('_')}.${extension}`
 }
+const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
+  const surveyId = Survey.getId(survey)
+
+  const nodesDeleteBatchPersister = new NodesDeleteBatchPersister({ user, surveyId, tx })
+  const nodesInsertBatchPersister = new NodesInsertBatchPersister({ user, surveyId, tx })
+  const nodesUpdateBatchPersister = new NodesUpdateBatchPersister({ user, surveyId, tx })
+
+  if (nodesArray.length === 0) return
+
+  for await (const node of nodesArray) {
+    if (Node.isDeleted(node)) {
+      await nodesDeleteBatchPersister.addItem(node)
+    } else if (Node.isCreated(node)) {
+      await nodesInsertBatchPersister.addItem(node)
+    } else if (Node.isUpdated(node)) {
+      await nodesUpdateBatchPersister.addItem(node)
+    }
+  }
+  await nodesDeleteBatchPersister.flush()
+  await nodesInsertBatchPersister.flush()
+  await nodesUpdateBatchPersister.flush()
+
+  await RecordManager.persistNodesToRDB({ survey, record, nodesArray }, tx)
+}
+
+export const mergeRecords = async (
+  { user, surveyId, sourceRecordUuid, targetRecordUuid, dryRun = false },
+  client = db
+) =>
+  client.tx(async (tx) => {
+    const recordSource = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: sourceRecordUuid }, tx)
+    const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid }, tx)
+
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      {
+        surveyId,
+        advanced: true,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+      },
+      tx
+    )
+
+    const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
+      survey,
+      recordSource,
+      sideEffect: true,
+    })(recordTarget)
+
+    const nodesArray = Object.values(nodesUpdated)
+
+    if (!dryRun) {
+      const logContent = {
+        sourceRecordUuid,
+        sourceRecordKeys: NodeValueFormatter.getFormattedRecordKeys({ survey, record: recordSource }),
+        targetRecordUuid,
+        targetRecordKeys: NodeValueFormatter.getFormattedRecordKeys({ survey, record: recordTarget }),
+      }
+      await ActivityLogService.insert(user, surveyId, ActivityLog.type.recordMerge, logContent, false, tx)
+
+      await persistRecordNodes({ user, survey, record: recordTargetUpdated, nodesArray }, tx)
+
+      await RecordManager.updateRecordMergedInto(
+        {
+          surveyId,
+          recordUuid: sourceRecordUuid,
+          mergedIntoRecordUuid: targetRecordUuid,
+        },
+        tx
+      )
+      await SurveyRdbManager.deleteRowsByRecordUuid({ survey, recordUuid: sourceRecordUuid }, tx)
+
+      await RecordManager.updateRecordDateModified({ surveyId, recordUuid: targetRecordUuid }, tx)
+    }
+    return {
+      record: recordTargetUpdated,
+      nodesCreated: nodesArray.filter(Node.isCreated).length,
+      nodesUpdated: nodesArray.filter(Node.isUpdated).length,
+    }
+  })

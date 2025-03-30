@@ -6,14 +6,14 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
+import * as Validation from '@core/validation/validation'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-import * as Validation from '@core/validation/validation'
-import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
+import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -133,11 +133,12 @@ const _afterItemUpdate = async ({ surveyId, categoryUuid, itemUuid, prevItem }, 
   }
   const itemsToValidate = []
   for await (const code of codes) {
-    const itemsCount = await CategoryRepository.countItemsByLevelAndCode({ surveyId, levelUuid, code, draft }, client)
-    if (itemsCount <= Category.maxCategoryItemsInIndex) {
-      itemsToValidate.push(
-        ...(await CategoryRepository.fetchItemsByLevelAndCode({ surveyId, levelUuid, code, draft }, client))
-      )
+    const items = await CategoryRepository.fetchItemsByLevelParentAndCode(
+      { surveyId, levelUuid, parentUuid, code, draft },
+      client
+    )
+    if (items.length > 0 && items.length <= Category.maxCategoryItemsInIndex) {
+      itemsToValidate.push(...items)
     }
   }
   const addItemToValidate = (item) => {
@@ -264,11 +265,11 @@ export const insertItems = async (user, surveyId, items, client = db) =>
 
 export const { createImportSummaryFromStream } = CategoryImportSummaryGenerator
 
-export const createImportSummary = async ({ surveyId, filePath }) => {
+export const createImportSummary = async ({ surveyId, filePath, fileFormat }) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true })
   const defaultLang = Survey.getDefaultLanguage(surveyInfo)
   try {
-    return { summary: await CategoryImportSummaryGenerator.createImportSummary({ filePath, defaultLang }) }
+    return { summary: await CategoryImportSummaryGenerator.createImportSummary({ filePath, fileFormat, defaultLang }) }
   } catch (error) {
     return { error: error.toJSON?.() ?? error.toString() }
   }
@@ -282,6 +283,7 @@ export const {
   fetchCategoriesBySurveyId,
   fetchCategoriesAndLevelsBySurveyId,
   fetchCategoryAndLevelsByUuid,
+  countItemsByParentUuid,
   fetchItemsByParentUuid,
   countItemsByLevelIndex,
   fetchItemsByLevelIndex,
@@ -362,42 +364,17 @@ export const updateCategoryItemExtraDefItem = async (
   client.tx(async (t) => {
     const category = await _fetchCategory({ surveyId, categoryUuid }, t)
 
-    // validate new item extra def
-    let itemExtraDefsArrayUpdated = [...Category.getItemExtraDefsArray(category)]
-    // remove old item
-    itemExtraDefsArrayUpdated = itemExtraDefsArrayUpdated.filter((item) => ExtraPropDef.getName(item) !== name)
-
-    if (!deleted) {
-      // add new extra def item
-      itemExtraDefsArrayUpdated.push(itemExtraDef)
-
-      const validation = await validateExtraPropDef({
-        extraPropDef: itemExtraDef,
-        extraPropDefsArray: itemExtraDefsArrayUpdated,
-      })
-      if (!Validation.isValid(validation)) {
-        throw new Error('Invalid category item extra def')
-      }
-    }
-
+    const extraPropDefs = Category.getItemExtraDef(category)
+    const itemExtraDefsToStore = await ExtraPropDefsUpdater.updateOrDeleteExtraDef({
+      extraPropDefs,
+      propName: name,
+      extraPropDef: itemExtraDef,
+      deleted,
+    })
     // update category items
     if (deleted || name !== ExtraPropDef.getName(itemExtraDef)) {
       await _updateCategoryItemsExtraDef({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t)
     }
-
-    // prepare itemExtraDefs for storage
-    // - remove unnecessary information (uuid, name)
-    // - index stored object by extra def name
-    const itemExtraDefsToStore = itemExtraDefsArrayUpdated.reduce(
-      (acc, item, index) => ({
-        ...acc,
-        [ExtraPropDef.getName(item)]: ExtraPropDef.newItem({
-          dataType: ExtraPropDef.getDataType(item),
-          index,
-        }),
-      }),
-      {}
-    )
 
     return updateCategoryProp(
       {

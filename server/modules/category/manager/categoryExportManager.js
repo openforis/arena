@@ -4,12 +4,38 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
+import { FileFormats } from '@core/fileFormats'
 
 import { db } from '@server/db/db'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as DbUtils from '@server/db/dbUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
+
+const parsePoint = (geometryPoint) => {
+  if (Objects.isEmpty(geometryPoint)) return null
+  const point = Points.parse(geometryPoint)
+  if (point) return point
+  try {
+    return JSON.parse(geometryPoint)
+  } catch (error) {
+    return null
+  }
+}
+
+const transformGeometryPointExtraProperty = ({ extraDef, obj }) => {
+  // split geometry point into separate columns
+  const extraDefName = ExtraPropDef.getName(extraDef)
+  const geometryPoint = obj[extraDefName]
+  const point = parsePoint(geometryPoint)
+  delete obj[extraDefName]
+  if (point) {
+    obj[extraDefName + '_x'] = point.x
+    obj[extraDefName + '_y'] = point.y
+    obj[extraDefName + '_srs'] = point.srs
+  }
+}
 
 const categoryItemExportTransformer =
   ({ category, language = null, includeLevelPosition = false }) =>
@@ -17,16 +43,7 @@ const categoryItemExportTransformer =
     const extraDefs = Category.getItemExtraDefsArray(category)
     extraDefs.forEach((extraDef) => {
       if (ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint) {
-        // split geometry point into separate columns
-        const extraDefName = ExtraPropDef.getName(extraDef)
-        const geometryPoint = obj[extraDefName]
-        if (!Objects.isEmpty(geometryPoint)) {
-          const point = Points.parse(geometryPoint)
-          delete obj[extraDefName]
-          obj[extraDefName + '_x'] = point.x
-          obj[extraDefName + '_y'] = point.y
-          obj[extraDefName + '_srs'] = point.srs
-        }
+        transformGeometryPointExtraProperty({ extraDef, obj })
       }
     })
     if (language) {
@@ -93,6 +110,7 @@ export const exportCategoryToStream = async (
     includeLevelPosition = false,
     includeReportingDataCumulativeArea = false,
     outputStream,
+    fileFormat = FileFormats.csv,
   },
   client = db
 ) => {
@@ -103,14 +121,14 @@ export const exportCategoryToStream = async (
   // get survey languages
   const languages = Survey.getLanguages(survey)
 
-  const categoryStream = CategoryRepository.generateCategoryExportStream({
+  const queryStream = CategoryRepository.generateCategoryExportStream({
     surveyId,
     category,
     languages,
     includeCumulativeArea,
   })
 
-  const headers = getCategoryExportHeaders({
+  const fields = getCategoryExportHeaders({
     category,
     languages,
     language,
@@ -121,11 +139,16 @@ export const exportCategoryToStream = async (
     includeCumulativeArea,
   })
 
-  return client.stream(categoryStream, (dbStream) => {
-    const csvTransform = CSVWriter.transformJsonToCsv({
-      fields: headers,
-      options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
-    })
-    dbStream.pipe(csvTransform).pipe(outputStream)
+  return DbUtils.stream({
+    client,
+    queryStream,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        outputStream,
+        fields,
+        options: { objectTransformer: categoryItemExportTransformer({ category, language, includeLevelPosition }) },
+        fileFormat,
+      }),
   })
 }

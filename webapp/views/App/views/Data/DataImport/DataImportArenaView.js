@@ -70,19 +70,16 @@ export const DataImportArenaView = () => {
         {surveyCycleKeys.length > 1 && (
           <fieldset>
             <legend>{i18n.t('dataImportView.options.header')}</legend>
-
-            {
-              <FormItem className="display-flex" label={i18n.t('dataImportView.importIntoCycle')}>
-                <CycleSelector selectedCycle={cycle} onChange={setCycle} />
-              </FormItem>
-            }
+            <FormItem className="display-flex" label="dataImportView.importIntoCycle">
+              <CycleSelector selectedCycle={cycle} onChange={setCycle} />
+            </FormItem>
           </fieldset>
         )}
 
         <FormItem
           className="display-flex"
           info="dataImportView.conflictResolutionStrategy.info"
-          label={i18n.t('dataImportView.conflictResolutionStrategy.label')}
+          label="dataImportView.conflictResolutionStrategy.label"
         >
           <Dropdown
             itemLabel={(strategy) => i18n.t(`dataImportView.conflictResolutionStrategy.${strategy}`)}

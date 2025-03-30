@@ -14,7 +14,7 @@ const margin = {
 const defaultLineFill = '#8884d8'
 
 export const LineChart = (props) => {
-  const { allowDecimals, data, dataColors, dataKeys, labelDataKey, showLegend } = props
+  const { allowDecimals = true, data, dataColors, dataKeys, labelDataKey, showLegend = false } = props
 
   return (
     <ChartWrapper>
@@ -40,9 +40,4 @@ LineChart.propTypes = {
   dataKeys: PropTypes.array.isRequired,
   labelDataKey: PropTypes.string.isRequired,
   showLegend: PropTypes.bool,
-}
-
-LineChart.defaultProps = {
-  allowDecimals: true,
-  showLegend: false,
 }

@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import * as ActivityLog from '@common/activityLog/activityLog'
 
 export default {
   common: {
@@ -34,10 +33,10 @@ Do you want to ignore them?`,
     cnt: 'Count',
     code: 'Code',
     collapse: 'Collapse',
+    convert: 'Convert',
     copy: 'Copy',
-    createdWithApp: `Created with {{app}}`,
-    csvExport: 'CSV Export',
-    csvImport: 'CSV Import',
+    createdWith: 'Created with',
+    createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Cycle',
     cycle_plural: 'Cycles',
     dateCreated: 'Date created',
@@ -74,6 +73,9 @@ Please check also the Spam/Junk mail folder.`,
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Export',
     exportAll: 'Export all',
+    exportToCSV: 'Export to CSV',
+    exportToExcel: 'Export to Excel',
+    exportToExcelTooManyItems: 'Too many items to export in Excel; please use CSV export.',
     expression: 'Expression',
     false: 'False',
     file: 'File',
@@ -82,12 +84,14 @@ Please check also the Spam/Junk mail folder.`,
     formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
     from: 'From',
+    function: 'Function',
     goToHomePage: 'Go to Home Page',
     group: 'Group',
     help: 'Help',
     hide: 'Hide',
     id: 'id',
     import: 'Import',
+    importFromExcelOrCSVFile: 'Import from Excel (.xlsx) or CSV file',
     info: 'Info',
     invalid: 'INVALID',
     item: 'Item',
@@ -102,6 +106,7 @@ Please check also the Spam/Junk mail folder.`,
 By confirming, all changes will be lost.
 Do you want to proceed?`,
     local: 'Local',
+    loading: 'Loading...',
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
@@ -158,6 +163,7 @@ Do you want to proceed?`,
     samplingPolygon: 'Sampling Polygon',
     show: 'Show',
     select: 'Select',
+    selectOne: 'Select one...',
     selectAll: 'Select all',
     selected: 'Selected',
     showLabels: 'Show labels',
@@ -173,6 +179,8 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
+    value: 'Value',
+    uploadingFile: 'Uploading file ({{progressPercent}}%)',
     view: 'View',
     warning: 'Warning',
     warning_plural: 'Warnings',
@@ -208,6 +216,7 @@ Do you want to proceed?`,
   dropzone: {
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
     error: {
+      fileNotValid: 'Selected file is not valid',
       fileTooBig: 'Selected file is too big',
       invalidFileExtension: 'Invalid file extension: {{extension}}',
     },
@@ -218,6 +227,12 @@ Do you want to proceed?`,
 
   error: {
     pageNotFound: 'Page not found',
+  },
+
+  geo: {
+    area: 'Area',
+    vertices: 'Vertices',
+    perimeter: 'Perimeter',
   },
 
   files: {
@@ -243,6 +258,7 @@ Do you want to proceed?`,
     boolean: 'Boolean',
     code: 'Code',
     coordinate: 'Coordinate',
+    geo: 'Geospatial',
     taxon: 'Taxon',
     file: 'File',
     entity: 'Entity',
@@ -264,6 +280,7 @@ Do you want to proceed?`,
     designer: 'Survey',
     formDesigner: 'Form Designer',
     surveyHierarchy: 'Hierarchy',
+    surveyDependencyTree: 'Dependency tree',
     category: 'Category',
     categories: 'Categories',
     nodeDef: 'Node Definition',
@@ -380,8 +397,8 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activityLog: {
         title: 'Activity log',
       },
-      exportWithData: 'Export with data',
-      exportWithDataNoActivityLog: 'Export with data (NO Activity Log)',
+      exportWithData: 'Export + data (Backup)',
+      exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
       surveyPropUpdate: {
         main: `<title>Welcome to Arena</title>
   
@@ -428,14 +445,28 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
+      basic: 'Basic info',
+      configuration: {
+        title: 'Configuration',
+        filesTotalSpace: 'Files total space (GB)',
+      },
       confirmDeleteCycleHeader: 'Delete this cycle?',
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
       cycleForArenaMobile: 'Cycle for Arena Mobile',
+      fieldManualLink: 'Field manual link',
       editInfo: 'Edit info',
       viewInfo: 'View info',
       preferredLanguage: 'Preferred language',
       sampleBasedImageInterpretation: 'Sample-based image interpretation',
+      sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
+      security: {
+        title: 'Security',
+        dataEditorViewNotOwnedRecordsAllowed: 'Data Editor can view not owned records',
+        visibleInMobile: 'Visible in Arena Mobile',
+        allowRecordsDownloadInMobile: 'Allow downloading records from server to Arena Mobile',
+        allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
+      },
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',
       unpublishSurveyDialog: {
@@ -444,6 +475,12 @@ If there are records associated to this cycle, they will be deleted.`,
   
   $t(common.cantUndoWarning)`,
         confirmName: 'Enter this survey’s name to confirm:',
+      },
+      userExtraProps: {
+        title: 'User extra properties',
+        info: `Extra properties that can be assigned to each user associated to the survey.  
+Those properties can be used in default values, validation rules and applicability expressions.  
+E.g.: *userProp('property_name') == 'some_value'*`,
       },
     },
     deleteSurveyDialog: {
@@ -456,29 +493,6 @@ $t(common.cantUndoWarning)`,
     surveyList: {
       active: '$t(common.active)',
       activate: 'Activate',
-    },
-    surveyCreate: {
-      createSurvey: 'Create Survey',
-      createTemplate: 'Create Template',
-      newSurvey: 'New Survey',
-      newSurveyFromScratch: 'New Survey From Scratch',
-      newTemplate: 'New Template',
-      newTemplateFromScratch: 'New Template From Scratch',
-      source: {
-        label: 'Source',
-        arena: 'Arena (.zip)',
-        collect: 'Collect (.collect, .collect-backup, .collect-data)',
-      },
-      startImport: 'Start import',
-      survey: 'Survey',
-      survey_other: 'Surveys',
-      template: 'Template',
-      template_other: 'Templates',
-      error: 'Error creating new survey',
-      errorMaxSurveysCountExceeded: `Error creating survey; please check that the maximum number of surveys that you can creeate ({{maxSurveysCount}}) has not been exceeded.`,
-      options: {
-        includeData: 'Include data',
-      },
     },
     collectImportReport: {
       excludeResolvedItems: 'Exclude resolved items',
@@ -506,62 +520,18 @@ $t(common.cantUndoWarning)`,
     },
   },
 
-  activityLogView: {
-    messages: {
-      // Survey
-      [ActivityLog.type.surveyCreate]: 'created the survey',
-      [ActivityLog.type.surveyPropUpdate]: 'updated survey {{key}}',
-      [ActivityLog.type.surveyPublish]: 'published the survey',
-      [ActivityLog.type.surveyCollectImport]: 'imported the survey from Collect',
-
-      // NodeDef
-      [ActivityLog.type.nodeDefCreate]: 'added node definition {{type}} in entity {{parentName}}',
-      [ActivityLog.type.nodeDefUpdate]: 'updated {{keys}} of node definition {{name}}',
-      [ActivityLog.type.nodeDefMarkDeleted]: 'deleted node definition {{name}}',
-
-      // Category
-      [ActivityLog.type.categoryInsert]: 'added category',
-      [ActivityLog.type.categoryPropUpdate]: 'updated {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryDelete]: 'deleted category {{categoryName}}',
-      [ActivityLog.type.categoryLevelInsert]: 'added level at index {{index}} to category {{categoryName}}',
-      [ActivityLog.type.categoryLevelPropUpdate]: 'updated level {{index}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryLevelDelete]: 'deleted level {{index}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemInsert]: 'added item to level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemPropUpdate]: 'updated item {{code}} {{key}} of category {{categoryName}}',
-      [ActivityLog.type.categoryItemDelete]:
-        'deleted item {{code}} at level {{levelIndex}} of category {{categoryName}}',
-      [ActivityLog.type.categoryImport]: 'imported CSV file to category {{categoryName}}',
-
-      // Taxonomy
-      [ActivityLog.type.taxonomyCreate]: 'added taxonomy',
-      [ActivityLog.type.taxonomyPropUpdate]: 'updated {{key}} of taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyDelete]: 'deleted taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonomyTaxaImport]: 'imported CSV file to taxonomy {{taxonomyName}}',
-      [ActivityLog.type.taxonInsert]: 'added taxon to taxonomy {{taxonomyName}}',
-
-      // Record
-      [ActivityLog.type.recordCreate]: 'added record',
-      [ActivityLog.type.recordDelete]: 'deleted record {{keys}}',
-      [ActivityLog.type.recordStepUpdate]: 'updated record {{keys}} step from {{stepFrom}} to {{stepTo}}',
-
-      // Node
-      [ActivityLog.type.nodeCreate]: 'added node {{name}} in {{parentPath}} to record {{recordKeys}}',
-      [ActivityLog.type.nodeValueUpdate]: 'updated node {{name}} in {{parentPath}} of record {{recordKeys}}',
-      [ActivityLog.type.nodeDelete]: 'deleted node {{name}} from record {{recordKeys}}',
-
-      // User
-      [ActivityLog.type.userInvite]: 'invited user {{email}} with role {{groupName}}',
-      [ActivityLog.type.userUpdate]: 'updated user {{name}}',
-      [ActivityLog.type.userRemove]: 'removed user {{name}} from survey',
-
-      // Analysis
-      [ActivityLog.type.chainCreate]: 'added processing chain',
-      [ActivityLog.type.chainPropUpdate]: 'updated {{key}} of processing chain {{label}}',
-      [ActivityLog.type.analysisNodeDefPropUpdate]:
-        'updated {{key}} to {{value}} of calculated node definition {{name}}',
-      [ActivityLog.type.chainStatusExecSuccess]: 'successfully executed processing chain {{label}}',
-      [ActivityLog.type.chainDelete]: 'deleted processing chain {{label}}',
+  surveyDependencyTreeView: {
+    dependencyTypesLabel: 'Dependency types',
+    dependencyTypes: {
+      applicable: 'Applicability',
+      defaultValues: 'Default value',
+      itemsFilter: 'Items filter',
+      minCount: 'Min count',
+      maxCount: 'Max count',
+      validations: 'Validations',
     },
+    selectAtLeastOneDependencyType: 'Select at least one dependency type',
+    noDependenciesToDisplay: 'No dependencies to display',
   },
 
   designerView: {
@@ -574,6 +544,8 @@ $t(common.cantUndoWarning)`,
     errorLoadingRecord: 'Error loading record: {{details}}',
     recordEditModalTitle: 'Record: {{keyValues}}',
     recordNotFound: 'Record not found',
+    lock: 'Lock',
+    unlock: 'Unlock',
   },
 
   dataExplorerView: {
@@ -585,19 +557,43 @@ $t(common.cantUndoWarning)`,
   },
 
   dataExportView: {
+    error: 'Error exporting data: {{details}}',
+    optionNotCompatibleWithDataImport: 'Not compatible with data import',
     options: {
       header: '$t(common.options)',
+      fileFormatLabel: 'File format',
+      fileFormat: {
+        csv: 'CSV',
+        xlsx: 'Excel',
+      },
       includeCategoryItemsLabels: 'Include category items labels',
       includeCategories: 'Include categories',
       expandCategoryItems: 'Expand category items',
+      exportSingleEntitiesIntoSeparateFiles: 'Export single entities into separate files',
       includeAncestorAttributes: 'Include ancestor attributes',
       includeAnalysis: 'Include result variables',
       includeDataFromAllCycles: 'Include data from all cycles',
+      includeDateCreated: 'Include creation date',
       includeFiles: 'Include files',
+      includeFileAttributeDefs: 'Include file attribute columns',
+      includeInternalUuids: 'Include internal UUIDs',
       recordsModifiedAfter: 'Records modified after',
     },
     optionsInfo: {
-      expandCategoryItems: 'add one boolean column for every category item',
+      expandCategoryItems:
+        'adds one boolean column for every category item with a value TRUE if the item has been selected, FALSE otherwise',
+      exportSingleEntitiesIntoSeparateFiles: `exports single entities in separate files; when it's not checked, attributes belonging to a single entity will be included among the ones of its nearest ancestor multiple entity`,
+      includeAnalysis: 'includes analysis attributes',
+      includeAncestorAttributes: 'includes attributes that belong to the ancestor entities, up to the root entity',
+      includeCategoryItemsLabels: 'adds a column with the label of every category item',
+      includeCategories: `categories will be exported in a subfolder called "categories"`,
+      includeDataFromAllCycles:
+        'data from all cycles will be included, othwerwise only the selected one will be considered',
+      includeDateCreated: 'includes the creation date of every entity (row) in a column called "date_created"',
+      includeFiles: `exports files associated to the records into a subfolder called "files"`,
+      includeFileAttributeDefs: `adds file attributes' columns: file internal identifier (file_uuid) and name (file_name)`,
+      includeInternalUuids: 'includes the internal identifiers (UUIDs) in columns ending with the suffix "_uuid"',
+      recordsModifiedAfter: 'exports only data from records modified after the specified date',
     },
     startExport: 'Start export',
   },
@@ -614,7 +610,11 @@ $t(common.cantUndoWarning)`,
     },
     deleteAllRecordsBeforeImport: 'Delete all records before import',
     downloadAllTemplates: 'Download all templates',
+    downloadAllTemplates_csv: 'Download all templates (CSV)',
+    downloadAllTemplates_xlsx: 'Download all templates (Excel)',
     downloadTemplate: 'Download template',
+    downloadTemplate_csv: 'Download template (CSV)',
+    downloadTemplate_xlsx: 'Download template (Excel)',
     errors: {
       rowNum: 'Row #',
     },
@@ -622,13 +622,13 @@ $t(common.cantUndoWarning)`,
 
     importFromArena: 'Arena/Arena Mobile',
     importFromCollect: 'Collect / Collect Mobile',
-    importFromCsv: 'CSV',
+    importFromCsvExcel: 'CSV/Excel',
     importFromCsvStepsInfo: `### Importing steps
 1. Select the target entity
 2. Download a template
-3. Fill in the template and save it (CSV) [UTF-8]
+3. Fill in the template and save it (if in CSV, use UTF-8 as encoding)
 4. Check options
-5. Upload the CSV file
+5. Upload the CSV/Excel file
 6. Validate the file
 7. Start import
 `,
@@ -654,9 +654,11 @@ $t(common.cantUndoWarning)`,
       DataImportJob: {
         importCompleteSummary: `
         - {{processed}} rows processed
-        - {{updatedValues}} values updated
         - {{insertedRecords}} records created
-        - {{updatedRecords}} records updated`,
+        - {{updatedRecords}} records updated
+        - {{entitiesCreated}} entities created
+        - {{entitiesDeleted}} entities deleted
+        - {{updatedValues}} values updated`,
         importCompleteSuccessfully: `## Import complete:
 $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
         importWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportJob.importCompleteSuccessfully)
@@ -668,17 +670,15 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       },
       DataImportValidationJob: {
         validationCompleteWithErrors: `## Validation complete ({{errorsFoundMessage}})
-        - {{processed}} rows processed
-        - {{insertedFiles}} files would be inserted
-        - {{updatedFiles}} files would be updated
-        - {{deletedFiles}} files would be deleted`,
-        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)
         - {{processed}} rows processed`,
+        validationWithFilesCompleteWithErrors: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteWithErrors)`,
         validationCompleteSuccessfully: `## Validation complete without errors
         - {{processed}} rows processed
-        - {{updatedValues}} values would be updated
         - {{insertedRecords}} records would be created
-        - {{updatedRecords}} records would be updated`,
+        - {{updatedRecords}} records would be updated
+        - {{entitiesCreated}} entities would be created
+        - {{entitiesDeleted}} entities would be deleted
+        - {{updatedValues}} values would be updated`,
         validationWithFilesCompleteSuccessfully: `$t(dataImportView.jobs.DataImportValidationJob.validationCompleteSuccessfully)
         - {{insertedFiles}} files would be inserted
         - {{updatedFiles}} files would be updated
@@ -691,13 +691,20 @@ $t(dataImportView.jobs.DataImportJob.importCompleteSummary)`,
       preventAddingNewEntityData: 'Prevent adding new entity data',
       preventUpdatingRecordsInAnalysis: 'Prevent updating records in Analysis step',
       includeFiles: 'Include files',
+      deleteExistingEntities: `delete selected entity's data in all records`,
+    },
+    optionsInfo: {
+      deleteExistingEntities: `WARNING: all entities "{{nodeDefName}}" 
+and all their descendants in all records  
+will be deleted before inserting the new ones.`,
     },
     startImport: 'Start import',
-    startImportConfirm: `By pressing 'Ok' you will start the import process.
-
-**It won't be possible to rollback the changes.**
-
+    startImportConfirm: `By pressing 'Ok' you will start the import process.  
+**It won't be possible to rollback the changes.**  
 Are you sure you want to continue?`,
+    startImportConfirmWithDeleteExistingEntities: `$t(dataImportView.startImportConfirm)  
+**($t(dataImportView.options.deleteExistingEntities) option selected: existing entities will be deleted before creating new ones)**
+`,
     steps: {
       selectImportType: 'Select Import Type',
       selectCycle: 'Select Cycle',
@@ -762,6 +769,15 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       confirmDeleteRecord: `Delete the record "{{keyValues}}"?`,
       confirmDeleteSelectedRecord_one: `Delete the selected record?`,
       confirmDeleteSelectedRecord_other: `Delete the selected {{count}} records?`,
+      confirmMergeSelectedRecords: `### Merge the selected records into one?
+
+- record "source" will be merged into record "target":
+  - source: [{{sourceRecordKeys}}], modified {{sourceRecordModifiedDate}};
+  - target: [{{targetRecordKeys}}], modified {{targetRecordModifiedDate}};
+
+- a preview of the result will be shown before merging is performed;
+
+- when merging will be confirmed, **the source record WILL BE DELETED**`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
       deleteRecord: 'Delete record',
@@ -771,15 +787,27 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       exportList: 'Export list',
       exportData: 'Export data',
       filterPlaceholder: 'Filter by keys or owner',
-      viewRecord: 'View record',
-      owner: 'Owner',
-      step: 'Step',
+      merge: {
+        label: 'Merge',
+        confirmLabel: 'Confirm merge',
+        confirmTooManyDifferencesMessage: `**Too many differences**.  
+It seems like the records are very different each other.  
+Many attributes (~{{nodesUpdated}}) will be updated during merge.  
+Continue with merge preview?`,
+        noChangesWillBeApplied: `No changes would be applied to target record.  
+Merge cannot be performed.`,
+        performedSuccessfullyMessage: 'Records merge performed successfully!',
+        previewTitle: 'Merging preview (record {{keyValues}})',
+      },
       noRecordsAdded: 'No records added',
       noRecordsAddedForThisSearch: 'No records found',
       noSelectedRecordsInStep: 'No selected records in step {{step}}',
+      owner: 'Owner',
       promoteAllRecordsToAnalysis: 'Cleansing -> Analysis',
       promoteAllRecordsToCleansing: 'Entry -> Cleansing',
+      step: 'Step',
       updateRecordsStep: 'Update records step',
+      viewRecord: 'View record',
     },
     recordsClone: {
       title: 'Records clone',
@@ -828,15 +856,17 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       noSelection:
         'Please make your selection using the left side panel or select an existing query from "Manage queries"',
     },
+    viewSelectedRecord: 'View selected record',
   },
 
   mapView: {
     createRecord: 'Create new record',
     editRecord: 'Edit record',
-    altitude: 'Altitude (m)',
+    earthMap: 'Earth Map',
+    elevation: 'Elevation (m)',
+    location: 'Location',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationUpdated: 'Location updated',
-    openInEarthMap: 'Open in Earth Map',
     options: {
       showLocationMarkers: 'Show location markers',
       showMarkersLabels: `Show markers' labels`,
@@ -848,10 +878,12 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
       title: 'Sampling Point Item',
-      location: 'Location',
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
+    whisp: 'Whisp',
+    whispEarthMap: 'Whisp Earth Map',
+    whispCsv: 'Whisp CSV',
   },
 
   samplingPolygonOptions: {
@@ -861,8 +893,8 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     lengthLatitude: 'Length Latitude (m)',
     lengthLongitude: 'Length Longitude (m)',
     numberOfControlPoints: 'Number of Control Points',
-    numberOfControlPointsEast: 'Number of Control Points East',
-    numberOfControlPointsNorth: 'Number of Control Points North',
+    numberOfPointsEast: 'Number of Control Points East',
+    numberOfPointsNorth: 'Number of Control Points North',
     offsetEast: 'Offset East (m)',
     offsetNorth: 'Offset North (m)',
     radius: 'Radius (m)',
@@ -884,39 +916,51 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
 
   surveysView: {
     chains: 'Chains',
+    confirmUpdateSurveyOwner: `Change the owner of the survey "{{surveyName}}" into "{{ownerName}}"?`,
     cycles: 'Cycles',
     datePublished: 'Date published',
+    editUserExtraProps: 'Edit user extra properties',
+    editUserExtraPropsForSurvey: 'Edit user extra properties for survey "{{surveyName}}"',
     filter: 'Filter',
     filterPlaceholder: 'Filter by name, label or owner',
     languages: 'Languages',
     nodes: 'Nodes',
     noSurveysMatchingFilter: 'No surveys matching the specified filter',
+    onlyOwn: 'Only own surveys',
     records: 'Records',
     recordsCreatedWithMoreApps: 'Records created with more apps:',
   },
 
   usersView: {
-    inviteUser: 'Invite',
     accepted: 'Accepted',
-    updateUserConfirmation: 'User {{name}} has been updated',
-    notAcceptedYet: 'Invitation not accepted yet',
-    invitedBy: 'Invited by',
-    invitedDate: 'Invited date',
-    lastLogin: 'Last login',
-    moreThan30DaysAgo: 'More than 30 days ago',
-    userSurveys: 'User Surveys',
-    surveyName: 'Survey name',
-    roleInSurvey: 'Role in survey',
-    roleInCurrentSurvey: 'Role in current survey',
-    userNotInvitedToAnySurvey: `User not invited to any survey`,
     confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
-    invitationExpiredClickToSendAgainTheInvitation: 'Invitation expired: click to send again the invitation',
     copyInvitationLink: 'Copy invitation link to clipboard',
     copyInvitationLinkConfirmMessage: `If the invited user hasn't received any emails at the address {{email}},  
 you can copy the invitation link to the clipboard and share it with him in other ways.
     
 Copy the invitation link to the clipboard?`,
+    editSurveyUserExtraPropsForUser: 'Edit survey user extra properties for user "{{userName}}"',
+    inviteUser: 'Invite',
+    invitationExpiredClickToSendAgainTheInvitation: 'Invitation expired: click to send again the invitation',
     invitationLinkCopiedToClipboard: 'Invitation link copied to your clipboard',
+    invitedBy: 'Invited by',
+    invitedDate: 'Invited date',
+    lastLogin: 'Last login',
+    moreThan30DaysAgo: 'More than 30 days ago',
+    notAcceptedYet: 'Invitation not accepted yet',
+    roleInCurrentSurvey: 'Role in current survey',
+    roleInSurvey: 'Role in survey',
+    filterPlaceholder: 'Filter by name or email',
+    surveyName: 'Survey name',
+    surveyExtraProp: {
+      label: 'Survey extra property',
+      label_other: 'Survey extra properties',
+    },
+    surveysDraft: 'Surveys (draft)',
+    surveysPublished: 'Surveys (published)',
+    updateUserConfirmation: 'User {{name}} has been updated',
+    userNotInvitedToAnySurvey: `User not invited to any survey`,
+    userSurveys: 'User Surveys',
   },
 
   usersAccessRequestView: {
@@ -1079,6 +1123,7 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
     records: 'Records',
     recordsInStepCount: '{{step}}: {{recordsCount}}',
     submitOnlyAnalysisStepDataIntoR: 'Submit only analysis step data to RStudio',
+    submitOnlySelectedRecordsIntoR: 'Submit only selected records to RStudio',
     includeEntitiesWithoutData: 'Include entities without data',
     cannotStartRStudio: {
       common: 'Cannot start RStudio',
@@ -1179,12 +1224,13 @@ $t(common.cantUndoWarning)`,
 
   expression: {
     identifierNotFound: 'Attribute or entity "{{name}}" not found',
+    invalidAttributeValuePropertyName: 'Invalid attribute value property name: {{attributeName}}.{{propName}}',
     invalidCategoryExtraProp: 'Invalid extra property name: {{propName}}',
     invalid: 'Invalid expression: {{details}}',
     missingFunctionParameters: 'Missing function parameters',
     undefinedFunction: 'Undefined function: {{name}}',
-    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
-    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
+    functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
+    functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
   },
 
   // ====== Help views
@@ -1212,8 +1258,10 @@ $t(common.appNameFull)
     additionalFields: 'Additional fields',
     basic: 'Basic',
     advanced: 'Advanced',
+    mobileApp: 'Mobile App',
     validations: 'Validations',
     function: 'Function',
+    editingFunction: 'Editing function {{functionName}}',
     editorHelp: {
       json: 'Valid expressions are a subset of Javascript.',
       sql: 'Only valid SQL expressions are allowed.',
@@ -1222,28 +1270,42 @@ $t(common.appNameFull)
     functionDescriptions: {
       categoryItemProp:
         'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
+      dateTimeDiff: 'Returns the difference (in minutes) from 2 date-time couples',
       distance: 'Returns the distance (in meters) between the specified coordinates',
       first: 'Returns the first value or node of the specified multiple attribute or entity',
+      geoPolygon: 'Generates a polygon in GeoJSON from a list of coordinates',
       includes: 'Returns true if the specified multiple attribute includes the specified value.',
       index: 'Returns the index of the specified node among its siblings',
       isEmpty: 'Returns true if the argument has no value specified',
+      isNotEmpty: 'Returns true if the argument has some value specified',
       last: 'Returns the last value or node of the specified multiple attribute or entity',
-      ln: 'Take the natural logarithm of x',
-      log10: 'Take the base 10 logarithm of x',
-      max: 'Take the maximum of the arguments',
-      min: 'Take the minimum of the arguments',
+      ln: 'Returns the natural logarithm of X',
+      log10: 'Returns the base 10 logarithm of X',
+      max: 'Returns the maximum of the arguments',
+      min: 'Returns the minimum of the arguments',
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
-      pow: 'Raise a number X to the power P',
+      pow: 'Returns the value of a base raised to a power',
+      rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+      userEmail: 'Returns the email of the logged in user',
+      userName: 'Returns the name of the logged in user',
+      userProp: 'Returns the value of the specified $t(extraProp.label) of the logged in user',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
       // SQL functions
       avg: 'Returns the average value of a numeric variable',
       count: 'Returns the number of rows that matches a specified criterion',
       sum: 'Returns the total sum of a numeric variable',
     },
+    functionName: {
+      rowIndex: 'Row index',
+    },
     basicProps: {
       analysis: 'Analysis',
+      autoIncrementalKey: {
+        label: 'Auto incremental',
+        info: 'Value will be automatically generated',
+      },
       displayAs: 'Display as',
       displayIn: 'Display in',
       entitySource: 'Entity Source',
@@ -1257,7 +1319,7 @@ $t(common.appNameFull)
       },
       form: 'Form',
       formula: 'Formula',
-      includedInClone: 'Included in clone',
+      includedInClonedData: 'Included in cloned data',
       key: 'Key',
       multiple: 'Multiple',
       ownPage: 'Its own page',
@@ -1268,10 +1330,9 @@ $t(common.appNameFull)
       areaBasedEstimate: 'Area-based estimate',
       defaultValues: 'Default values',
       defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
+      defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
       hidden: 'Hide in entry form',
-      hiddenInMobile: 'Hidden in Arena Mobile',
       hiddenWhenNotRelevant: 'Hidden when not relevant',
-      includedInMultipleEntitySummary: 'Include in multiple entity summary',
       itemsFilter: 'Items filter',
       itemsFilterInfo: `Expression used to filter selectable items.
 In the expression, the word "this" will refer to the item itself. 
@@ -1281,12 +1342,25 @@ E.g. this.region = region_attribute_name
       relevantIf: 'Relevant if',
       script: 'Script',
     },
+    mobileAppProps: {
+      hiddenInMobile: {
+        label: 'Hidden in Arena Mobile',
+        info: `If marked, the attribute won't be visible in AM`,
+      },
+      includedInMultipleEntitySummary: {
+        label: 'Include in multiple entity summary',
+        info: `If marked, the attribute will be visible in the entity summary view`,
+      },
+      includedInPreviousCycleLink: {
+        label: 'Include in previous cycle link',
+        info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)"`,
+      },
+    },
     decimalProps: {
       maxNumberDecimalDigits: 'Max number of decimal digits',
     },
     fileProps: {
-      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
-      maxFileSize: 'Max. file size (Mb)',
+      fileNameExpression: 'File name expression',
       fileType: 'File type',
       fileTypes: {
         image: 'Image',
@@ -1294,9 +1368,21 @@ E.g. this.region = region_attribute_name
         audio: 'Audio',
         other: 'Other',
       },
+      maxFileSize: 'Max. file size (Mb)',
+      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
     },
     mobileProps: {
       title: 'Mobile App',
+    },
+    formHeaderProps: {
+      headerColorLabel: 'Header color',
+      headerColor: {
+        blue: 'Blue',
+        green: 'Green',
+        orange: 'Orange',
+        red: 'Red',
+        yellow: 'Yellow',
+      },
     },
     textProps: {
       textInputType: 'Text input type',
@@ -1352,6 +1438,11 @@ E.g. this.region = region_attribute_name
       title: 'Cloning node definition "{{nodeDefName}}"',
       entitySelectLabel: 'Entity to clone into:',
     },
+    conversion: {
+      dialogTitle: 'Convert {{nodeDefName}} into another type',
+      fromType: 'From type',
+      toType: 'To type',
+    },
     moveDialog: {
       confirmButtonLabel: 'Move',
       title: 'Moving node definition "{{nodeDefName}}"',
@@ -1359,6 +1450,16 @@ E.g. this.region = region_attribute_name
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
     nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
+    filterVariable: 'Variable to filter items',
+    filterVariableForLevel: 'Variable for {{levelName}}',
+    unique: {
+      label: 'Unique',
+      info: `When an attribute is marked as **Unique**, its value must be unique inside the closest multiple entity (an error will be shown otherwise).  
+
+---
+
+E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tree_species* marked as **Unique**, you can have only one tree per species inside the same *plot*.`,
+    },
   },
 
   languagesEditor: {
@@ -1375,19 +1476,23 @@ E.g. this.region = region_attribute_name
       coordinate: 'Coordinate',
       date: 'Date',
       decimal: 'Decimal',
+      geo: 'Geospatial',
       entity: 'Table or form',
       file: 'File',
       integer: 'Integer',
       taxon: 'Taxon',
       text: 'Text',
       time: 'Time',
+      // layout elments
+      formHeader: 'Form Header',
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+    convert: `Convert '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,
-    schemaSummary: 'Schema summary',
-    schemaSummaryTitle: 'Export schema summary to CSV',
+    schemaSummary_csv: 'Schema summary (CSV)',
+    schemaSummary_xlsx: 'Schema summary (Excel)',
     hidePages: 'Hide pages',
     showPages: 'Show pages',
     move: `Move '{{nodeDefLabel}}'`,
@@ -1410,6 +1515,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     },
     nodeDefEditFormActions: {
       columns: 'Columns',
+      confirmConvert: 'Convert the attribute "{{name}}" into "{{toType}}"?',
       confirmDelete:
         'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
     },
@@ -1441,6 +1547,11 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       altitude: 'Altitude',
       altitudeAccuracy: 'Altitude accuracy',
     },
+    nodeDefGeo: {
+      confirmDelete: 'Delete this Geospatial value?',
+      geoJSON: 'GeoJSON',
+      invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
+    },
     nodeDefEntityForm: {
       addNewEntity: 'Add new {{name}}',
       confirmDelete: 'Are you sure you want to delete this entity?',
@@ -1458,14 +1569,19 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       fileUuid: 'File uuid',
       fileName: 'File name',
     },
+    nodeDefsTreeSelectMode: {
+      allNodeDefs: 'All nodes',
+      onlyPages: 'Only pages',
+    },
     step: {
       entry: 'Entry',
       cleansing: 'Cleansing',
       analysis: 'Analysis',
     },
-    confirmNodeDelete: 'Are you sure you want to delete this item?',
-    exportLabels: 'Export labels to CSV',
-    importLabels: 'Import labels from CSV',
+    confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
+    exportLabels_csv: 'Export labels to CSV',
+    exportLabels_xlsx: 'Export labels to Excel',
+    importLabels: 'Import labels from Excel or CSV',
   },
 
   taxonomy: {
@@ -1503,7 +1619,6 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     categoryName: 'Category name',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
     cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
-    cantImportCsvIntoPublishedCategory: 'Cannot import CSV into a published category.',
     confirmDelete: 'Delete the category {{categoryName}}?\n$t(common.cantUndoWarning)',
     confirmDeleteEmptyCategory: 'The category is **empty** and will be deleted. Continue?',
     confirmDeleteLevel: `Delete the category level '{{levelName}}' with all items?\n$t(common.cantUndoWarning)`,
@@ -1545,14 +1660,19 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
-    templateForDataImport: 'Template for data import',
-    templateForDataImportGeneric: 'Template for data import (generic)',
-    templateForSamplingPointDataImport: 'Template for Sampling Point Data import',
+    templateForImport: 'Template for import',
+    templateFor_specificDataImport_csv: 'Template for data import (CSV)',
+    templateFor_specificDataImport_xlsx: 'Template for data import (Excel)',
+    templateFor_genericDataImport_csv: 'Template for data import (generic, CSV)',
+    templateFor_genericDataImport_xlsx: 'Template for data import (generic, Excel)',
+    templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
+    templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },
 
   extraProp: {
     label: 'Extra property',
     label_plural: 'Extra properties',
+    addExtraProp: 'Add extra property',
     dataTypes: {
       geometryPoint: 'Geometry Point',
       number: 'Number',
@@ -1571,6 +1691,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         dataTypeChanged: 'Data type changed from {{dataTypeOld}} to {{dataTypeNew}}',
       },
     },
+    name: 'Property {{position}} name',
+    value: 'Value',
   },
 
   // ===== All validation errors
@@ -1622,7 +1744,8 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header',
       emptyFile: '$t(validationErrors.dataImport.emptyFile)',
-      invalidImportFile: 'ZIP file must contain only .csv files (one for each category), without any directories',
+      invalidImportFile:
+        'ZIP file must contain only .csv or .xlsx files (one for each category), without any directories',
       invalidParentItemOrder: 'Item with codes {{parentItemCodes}} must come before its children',
       nameDuplicate: 'A category with the same name already exists: {{name}}',
       srsNotDefined: 'SRS with code {{srs}} not defined in survey',
@@ -1631,19 +1754,21 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     dataImport: {
       emptyFile: 'The file you are trying to import is empty',
       invalidHeaders: 'Invalid columns: {{invalidHeaders}}',
-      invalidBoolean: 'Invalid boolean in column {{headers}}: {{value}}',
+      invalidBoolean: 'Invalid boolean value in column {{headers}}: {{value}}',
       invalidCode: `Invalid code for attribute '{{attributeName}}': {{code}}`,
       invalidCoordinate: 'Invalid coordinate in column {{headers}}: {{value}}',
       invalidDate:
         'Invalid date in column {{headers}}: {{value}}. Dates should be formatted as YYYY-MM-DD or DD/MM/YYYY. E.g. 2023-01-15 or 15/01/2023',
       invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
       invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
+      invalidTime:
+        'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
       missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
-      errorUpdatingValues: 'Error updating values',
+      errorUpdatingValues: 'Error updating values: {{details}}',
       multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
       recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
       recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
-      recordKeyMissing: 'Missing value for key attribute "{{keyName}}"',
+      recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
       recordNotFound: 'Record with keys "{{keyValues}}" not found',
     },
 
@@ -1656,6 +1781,13 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       unableToFindNodeChild: 'unable to find child node: {{name}}',
       unableToFindNodeParent: 'unable to find parent node: {{name}}',
       unableToFindNodeSibling: 'unable to find sibling node: {{name}}',
+    },
+
+    extraPropEdit: {
+      nameInvalid: 'Invalid name',
+      nameRequired: 'Name required',
+      dataTypeRequired: 'Data type required',
+      valueRequired: 'Value required',
     },
 
     nodeDefEdit: {
@@ -1684,13 +1816,15 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
         'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
       taxonomyRequired: 'Taxonomy is required',
       validationsInvalid: 'Invalid "Validations"',
+      countMaxInvalid: 'Invalid "Max count"',
+      countMinInvalid: 'Invalid "Min count"',
     },
 
     record: {
       keyDuplicate: 'Duplicate record key',
       entityKeyDuplicate: 'Duplicate key',
-      entityKeyValueNotSpecified: 'Entity key value for entity "{{entityName}}" not specified',
-      missingAncestorForEntity: 'Cannot find ancestor "{{ancestorName}}" for entity "{{entityName}}"',
+      entityKeyValueNotSpecified: 'Key value for "{{keyDefName}}" not specified',
+      missingAncestorForEntity: 'Cannot find "{{ancestorName}}" with these keys: {{keyValues}}',
       oneOrMoreInvalidValues: 'One or more values are invalid',
       uniqueAttributeDuplicate: 'Duplicate value',
       valueInvalid: 'Invalid value',
@@ -1713,6 +1847,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       cycleDateStartMandatory: 'Cycle start date is mandatory',
       cycleDateEndInvalid: 'Cycle end date is invalid',
       cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
+      fieldManualLinksInvalid: 'Field manual link is invalid',
     },
 
     surveyLabelsImport: {
@@ -1818,17 +1953,41 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     group: 'Group ()',
     var: 'Variable',
     const: 'Constant value',
+    call: 'Function',
+    operator: 'Operator',
+
+    coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
+
+    dateTimeDiffEditor: {
+      firstDateAttribute: 'First date attribute',
+      firstTimeAttribute: 'First time attribute',
+      secondDateAttribute: 'Second date attribute',
+      secondTimeAttribute: 'Second time attribute',
+    },
+    error: {
+      selectOneVariable: 'Please select one variable',
+    },
 
     header: {
       editingExpressionForNodeDefinition: 'Editing {{qualifier}} expression for "{{nodeDef}}"',
+      editingFunctionForNodeDefinition: 'Editing function "{{functionName}}" for "{{nodeDef}}"',
     },
 
     qualifier: {
       'default-values': 'default value',
       'default-values-apply-if': 'default value apply if',
+      'max-count': 'max count',
+      'min-count': 'min count',
       'relevant-if': 'relevant if',
       validations: 'validation rule',
       'validations-apply-if': 'validation rule apply if',
+    },
+
+    selectAFunction: 'Select a function',
+
+    valueType: {
+      constant: 'Constant',
+      expression: 'Expression',
     },
   },
 
@@ -1938,7 +2097,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
              $t(emails.signature)`,
     },
     userDeleted: {
-      subject: `You have been deleted from the survey {{surveyLabel}} in $t(common.appNameFull)`,
+      subject: `You have been removed from the survey {{surveyLabel}} in $t(common.appNameFull)`,
       body: `<p>Hello {{name}},</p>
       <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
       <p>If you want to have access again to that survey, please contact the survey administrator.</p>

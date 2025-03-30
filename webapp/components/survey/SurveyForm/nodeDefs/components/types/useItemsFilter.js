@@ -2,38 +2,38 @@ import { useSelector } from 'react-redux'
 
 import { Objects, RecordExpressionEvaluator } from '@openforis/arena-core'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { RecordState } from '@webapp/store/ui/record'
 import { SurveyState } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
 
-export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFunction = null }) =>
-  useSelector((state) => {
+export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFunction = null }) => {
+  const user = useUser()
+  return useSelector((state) => {
     const itemsFilter = NodeDef.getItemsFilter(nodeDef)
 
-    if (items.length === 0 || Objects.isEmpty(itemsFilter)) return items
+    if (!Array.isArray(items) || items.length === 0 || Objects.isEmpty(itemsFilter)) return items
 
-    const survey = SurveyState.getSurvey(state)
+    const surveyInState = SurveyState.getSurvey(state)
+
+    // convert survey in state into the format used in arena-core
+    const survey = { ...Survey.getSurveyInfo(surveyInState), ...surveyInState }
+
     const record = RecordState.getRecord(state)
 
     const expressionEvaluator = new RecordExpressionEvaluator()
-
-    if (!Array.isArray(items)) return []
 
     return items.filter((item) => {
       if (alwaysIncludeItemFunction?.(item)) return true
 
       try {
-        return expressionEvaluator.evalExpression({
-          survey,
-          record,
-          node: parentNode,
-          query: itemsFilter,
-          item,
-        })
+        return expressionEvaluator.evalExpression({ user, survey, record, node: parentNode, query: itemsFilter, item })
       } catch (error) {
         // TODO throw error?
         return false
       }
     })
   }, Objects.isEqual)
+}

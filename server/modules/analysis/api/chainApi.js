@@ -1,11 +1,6 @@
-import * as Survey from '@core/survey/survey'
-import * as Chain from '@common/analysis/chain'
-import * as ChainValidator from '@common/analysis/chainValidator'
-
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as AnalysisService from '../service'
 
@@ -14,10 +9,10 @@ export const init = (app) => {
 
   app.post('/survey/:surveyId/chain/', AuthMiddleware.requireRecordAnalysisPermission, async (req, res, next) => {
     try {
-      const { cycle, surveyId } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const chain = await AnalysisService.create({ user, surveyId, cycle })
+      const chain = await AnalysisService.create({ user, surveyId })
 
       res.json(chain)
     } catch (error) {
@@ -32,9 +27,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, surveyCycleKey: cycle, offset, limit } = Request.getParams(req)
+        const { surveyId, offset, limit } = Request.getParams(req)
 
-        const list = await AnalysisService.fetchChains({ surveyId, cycle, offset, limit })
+        const list = await AnalysisService.fetchChains({ surveyId, offset, limit })
 
         res.json({ list })
       } catch (error) {
@@ -48,9 +43,9 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, surveyCycleKey: cycle } = Request.getParams(req)
+        const { surveyId } = Request.getParams(req)
 
-        const count = await AnalysisService.countChains({ surveyId, cycle })
+        const count = await AnalysisService.countChains({ surveyId })
 
         res.json({ count })
       } catch (error) {
@@ -104,19 +99,29 @@ export const init = (app) => {
 
       const { chain } = Request.getBody(req)
 
-      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-      const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-      const validation = await ChainValidator.validateChain({ chain, defaultLang, survey })
+      const chainUpdated = await AnalysisService.update({ user, surveyId, chain })
 
-      const chainWithValdidation = Chain.assocValidation(validation)(chain)
-
-      await AnalysisService.update({ user, surveyId, chain: chainWithValdidation })
-
-      res.json(chainWithValdidation)
+      res.json(chainUpdated)
     } catch (error) {
       next(error)
     }
   })
+
+  app.put(
+    '/survey/:surveyId/chain/validate',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid } = Request.getParams(req)
+
+        const chainUpdated = await AnalysisService.validate({ surveyId, chainUuid })
+
+        res.json(chainUpdated)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   // ====== DELETE - Chain
 

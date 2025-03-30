@@ -9,7 +9,13 @@ import RowHeader from './RowHeader'
 import Row from './Row'
 
 const TaxonomyList = (props) => {
-  const { canSelect, selectedItemUuid, onSelect: onTaxonomySelect, onTaxonomyOpen, onTaxonomyCreated } = props
+  const {
+    canSelect = false,
+    onSelect: onTaxonomySelect = null,
+    onTaxonomyOpen = null,
+    onTaxonomyCreated = null,
+    selectedItemUuid = null,
+  } = props
 
   const canEdit = useAuthCanEditSurvey()
 
@@ -47,14 +53,6 @@ TaxonomyList.propTypes = {
   onTaxonomyOpen: PropTypes.func,
   onTaxonomyCreated: PropTypes.func,
   selectedItemUuid: PropTypes.string,
-}
-
-TaxonomyList.defaultProps = {
-  canSelect: false,
-  onSelect: null,
-  onTaxonomyOpen: null,
-  onTaxonomyCreated: null,
-  selectedItemUuid: null,
 }
 
 export default TaxonomyList

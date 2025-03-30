@@ -8,7 +8,13 @@ import * as DateUtils from '@core/dateUtils'
 import { useDateTimeInput } from './useDateTimeInput'
 
 const DateInput = (props) => {
-  const { disabled, displayFormat, onChange, value, valueFormat } = props
+  const {
+    disabled = false,
+    displayFormat = DateUtils.formats.dateDefault,
+    onChange = null,
+    value = null,
+    valueFormat = DateUtils.formats.dateDefault,
+  } = props
 
   const { dateValue, onInputChange, errorRef } = useDateTimeInput({ onChange, value, valueFormat })
 
@@ -30,14 +36,6 @@ DateInput.propTypes = {
   value: PropTypes.string,
   valueFormat: PropTypes.string,
   onChange: PropTypes.func,
-}
-
-DateInput.defaultProps = {
-  disabled: false,
-  displayFormat: DateUtils.formats.dateDefault,
-  value: null,
-  valueFormat: DateUtils.formats.dateDefault,
-  onChange: null,
 }
 
 export default DateInput

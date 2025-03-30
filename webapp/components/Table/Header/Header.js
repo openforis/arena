@@ -7,10 +7,10 @@ const Header = (props) => {
   const {
     columns,
     headerLeftComponent,
-    headerProps,
+    headerProps = {},
     onVisibleColumnsChange,
     totalCount,
-    visibleColumnsSelectionEnabled,
+    visibleColumnsSelectionEnabled = false,
     visibleColumnKeys,
   } = props
 
@@ -40,11 +40,6 @@ Header.propTypes = {
   totalCount: PropTypes.number.isRequired,
   visibleColumnsSelectionEnabled: PropTypes.bool,
   visibleColumnKeys: PropTypes.array.isRequired,
-}
-
-Header.defaultProps = {
-  headerProps: {},
-  visibleColumnsSelectionEnabled: false,
 }
 
 export default Header

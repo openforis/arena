@@ -9,6 +9,7 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
+import { Objects } from '@openforis/arena-core'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
@@ -27,6 +28,8 @@ const orderByFieldBySortBy = {
   [userSortBy.status]: 'status',
 }
 // In sql queries, user table must be surrounded by "" e.g. "user"
+
+const usersSearchCondition = `(u.email ILIKE $/search/ OR u.name ILIKE $/search/)`
 
 // CREATE
 
@@ -67,13 +70,14 @@ export const insertUser = async (
 
 // READ
 
-export const countUsers = async (client = db) =>
+export const countUsers = async ({ search = null } = {}, client = db) =>
   client.one(
     `
     SELECT count(*)
     FROM "user" u
+    ${Objects.isEmpty(search) ? '' : `WHERE ${usersSearchCondition}`}
     `,
-    [],
+    { search: DbUtils.prepareParameterForFilter(search) },
     (row) => Number(row.count)
   )
 
@@ -82,14 +86,14 @@ export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, 
     `
     SELECT count(*)
     FROM "user" u
-    JOIN survey s
-    ON s.id = $1
-    JOIN auth_group_user gu
-    ON gu.user_uuid = u.uuid
-    JOIN auth_group g
-    ON g.uuid = gu.group_uuid
-    AND g.survey_uuid = s.uuid 
-    AND g.name <> '${AuthGroup.groupNames.systemAdmin}'`,
+      JOIN survey s
+        ON s.id = $1
+      JOIN auth_group_user gu
+        ON gu.user_uuid = u.uuid
+      JOIN auth_group g
+        ON g.uuid = gu.group_uuid
+        AND g.survey_uuid = s.uuid 
+        AND g.name <> '${AuthGroup.groupNames.systemAdmin}'`,
     [surveyId, countSystemAdmins],
     (row) => Number(row.count)
   )
@@ -121,17 +125,24 @@ const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
   `
 
 const _usersSelectQuery = ({
+  onlyAccepted = false,
   selectFields,
+  search = null,
   sortBy = userSortBy.email,
   sortOrder = DbOrder.asc,
   includeSurveys = false,
-  whereConditions = [],
 }) => {
   // check sort by parameters
   const orderBy = orderByFieldBySortBy[sortBy] ?? 'email'
   const orderByDirection = DbOrder.normalize(sortOrder)
-
-  const whereClause = whereConditions?.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+  const whereConditions = []
+  if (onlyAccepted) {
+    whereConditions.push(`u.status = '${User.userStatus.ACCEPTED}'`)
+  }
+  if (Objects.isNotEmpty(search)) {
+    whereConditions.push(usersSearchCondition)
+  }
+  const whereClause = DbUtils.getWhereClause(...whereConditions)
 
   return `${getUsersSelectQueryPrefix({ includeSurveys })}
     SELECT ${selectFields.join(', ')}, ${
@@ -151,7 +162,19 @@ const _usersSelectQuery = ({
         SELECT uar.props ->> '${UserAccessRequest.keysProps.country}'
         FROM user_access_request uar
         WHERE uar.email = u.email
-      ) AS country
+      ) AS country,
+      (
+        SELECT COUNT(*) 
+        FROM survey s
+        WHERE s.owner_uuid = u.uuid
+          AND s.published
+      ) AS surveys_count_published,
+      (
+        SELECT COUNT(*) 
+        FROM survey s
+        WHERE s.owner_uuid = u.uuid
+          AND NOT s.published
+      ) AS surveys_count_draft
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
@@ -160,22 +183,24 @@ const _usersSelectQuery = ({
     ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
 
-export const fetchUsers = async ({ offset = 0, limit = null, sortBy = 'email', sortOrder = 'ASC' }, client = db) =>
+export const fetchUsers = async (
+  { offset = 0, onlyAccepted = false, limit = null, search = null, sortBy = 'email', sortOrder = 'ASC' },
+  client = db
+) =>
   client.map(
-    `${_usersSelectQuery({ selectFields, sortBy, sortOrder })}
+    `${_usersSelectQuery({ onlyAccepted, selectFields, search, sortBy, sortOrder })}
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [],
+    { search: DbUtils.prepareParameterForFilter(search) },
     camelize
   )
 
-export const fetchUsersIntoStream = async ({ transformer }, client = db) => {
+export const fetchUsersIntoStream = async ({ processor }, client = db) => {
   const select = _usersSelectQuery({
     selectFields: ['u.email', 'u.name', `u.props ->> '${User.keysProps.title}' AS title`, 'u.status'],
     includeSurveys: true,
   })
-  const stream = new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
-  await client.stream(stream, (dbStream) => dbStream.pipe(transformer))
+  return DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(select, []), client, processor })
 }
 
 export const fetchUsersBySurveyId = async (
@@ -283,12 +308,12 @@ export const expiredInvitationWhereCondition = `
   AND NOT EXISTS (
     SELECT * 
     FROM user_invitation ui
-    WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 MONTH' 
+    WHERE ui.user_uuid = u.uuid AND invited_date >= NOW() - INTERVAL '1 WEEK' 
   )
   AND NOT EXISTS (
     SELECT * 
     FROM user_access_request uar
-    WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 MONTH'
+    WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 WEEK'
   )`
 
 export const fetchUsersWithExpiredInvitation = (client = db) =>
@@ -296,8 +321,7 @@ export const fetchUsersWithExpiredInvitation = (client = db) =>
     `
     SELECT ${columnsCommaSeparated}
     FROM "user" u
-    WHERE ${expiredInvitationWhereCondition}
-    RETURNING ${columnsCommaSeparated}`,
+    WHERE ${expiredInvitationWhereCondition}`,
     [],
     camelize
   )
@@ -418,6 +442,15 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
     [cycleKeysDeleted]
   )
 }
+
+export const deleteUser = (userUuid, client = db) =>
+  client.oneOrNone(
+    `DELETE FROM "user" u
+    WHERE u.uuid = $1
+    RETURNING ${columnsCommaSeparated}`,
+    [userUuid],
+    camelize
+  )
 
 export const deleteUsersWithExpiredInvitation = (client = db) =>
   client.any(

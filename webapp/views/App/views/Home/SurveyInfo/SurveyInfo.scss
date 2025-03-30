@@ -1,6 +1,8 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .home-survey-info {
+  display: flex;
+  flex-direction: column;
   padding-top: 2rem;
 
   .form {
@@ -9,7 +11,7 @@
   }
 
   .form-item {
-    grid-template-columns: 0.2fr 0.7fr;
+    grid-template-columns: 0.2fr 0.65fr;
   }
 
   .lanuages_editor__input_chips {
@@ -22,11 +24,27 @@
     width: 10rem;
   }
 
-  .sample-based-image-interpretation-form-item {
-    align-items: baseline;
+  .sample-based-image-interpretation,
+  .extra-prop-defs-editor,
+  .survey-security-editor,
+  .survey-configuration {
+    justify-self: center;
   }
 
-  .btn-save {
-    justify-self: center;
+  .sample-based-image-interpretation {
+    width: 80%;
+  }
+
+  .survey-configuration {
+    width: 25rem;
+
+    .form-item {
+      grid-template-columns: 0.5fr 0.5fr;
+    }
+  }
+
+  .survey-info-save-btn {
+    margin-top: 2rem;
+    align-self: center;
   }
 }

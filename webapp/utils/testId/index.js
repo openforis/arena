@@ -26,9 +26,6 @@ export const TestId = {
     itemDescriptionPrefix: (levelIdx, itemIdx) => `item-${levelIdx}-${itemIdx}-description`,
     itemDescription: (levelIdx, itemIdx) => _withLang(TestId.categoryDetails.itemDescriptionPrefix(levelIdx, itemIdx)),
     exportBtn: 'category-export-btn',
-    templateForDataImportBtn: 'category-template-data-import-btn',
-    templateForDataImportGenericBtn: 'category-template-data-import-generic-btn',
-    templateForSamplingPointDataImportBtn: 'category-template-sampling-point-data-import-btn',
   },
   categorySelector: {
     dropdown: 'category-selector-dropdown',
@@ -49,8 +46,9 @@ export const TestId = {
     surveyStatus: 'survey-status',
   },
   dataExport: {
-    exportCSV: 'exportCSV',
-    prepareExport: 'prepareExport',
+    fileFormatOption: (fileFormat) => `fileFormat_${fileFormat}`,
+    downloadExportedFileBtn: 'downloadExportedFileBtn',
+    startExport: 'startExport',
   },
   dataImport: {
     importFromCollectTab: 'importFromCollectTab',
@@ -72,7 +70,6 @@ export const TestId = {
     },
   },
   expressionEditor: {
-    advancedQuery: 'expression-advanced-query',
     applyBtn: 'expression-apply-btn',
     editBtn: (id) => `${id}-edit-btn`,
     literalDropdown: 'expression-literal-dropdown',
@@ -110,6 +107,9 @@ export const TestId = {
     defaultValues: 'default-values',
     expressionDeleteBtn: (id) => `${id}-delete-btn`,
     formula: 'formula',
+    maxCount: 'max-count',
+    minCount: 'min-count',
+    mobile: 'mobile',
     nextBtn: 'node-def-next-btn',
     nodeDefDescriptions: _withLang('node-def-descriptions'),
     nodeDefLabels: _withLang('node-def-labels'),
@@ -131,6 +131,7 @@ export const TestId = {
     closeBtn: 'panel-right-close-btn',
   },
   record: {
+    editLockToggleBtn: 'record-edit-lock-toggle-btn',
     invalidBtn: 'record-invalid-btn',
     deleteBtn: 'record-delete-btn',
   },
@@ -186,6 +187,7 @@ export const TestId = {
   surveyInfo: {
     saveBtn: 'survey-info-save-btn',
     surveyDescription: _withLang('survey-description'),
+    surveyFieldManualLink: _withLang('survey-field-manual-link'),
     surveyName: 'survey-name',
     surveyLabel: _withLang('survey-label'),
     surveyLanguage: 'survey-language',

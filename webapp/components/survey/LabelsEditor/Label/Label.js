@@ -7,15 +7,16 @@ import { Input } from '@webapp/components/form/Input'
 import Badge from './Badge'
 
 const Label = ({
+  compactLanguage = false,
   inputFieldIdPrefix,
-  labels,
-  lang,
+  inputType = 'input',
+  labels = {},
+  lang = '',
   onChange,
   placeholder,
-  readOnly,
-  showLanguageBadge,
-  compactLanguage,
-  inputType,
+  readOnly = false,
+  showLanguageBadge = false,
+  textTransformFunction,
 }) => (
   <div className="labels-editor__label">
     {showLanguageBadge && <Badge lang={lang} compact={compactLanguage} />}
@@ -27,6 +28,7 @@ const Label = ({
       placeholder={placeholder}
       readOnly={readOnly}
       inputType={inputType}
+      textTransformFunction={textTransformFunction}
     />
   </div>
 )
@@ -41,18 +43,7 @@ Label.propTypes = {
   readOnly: PropTypes.bool,
   showLanguageBadge: PropTypes.bool,
   compactLanguage: PropTypes.bool,
-}
-
-Label.defaultProps = {
-  inputFieldIdPrefix: null,
-  inputType: 'input',
-  labels: {},
-  lang: '',
-  onChange: null,
-  placeholder: null,
-  readOnly: false,
-  showLanguageBadge: false,
-  compactLanguage: false,
+  textTransformFunction: PropTypes.func,
 }
 
 export default Label

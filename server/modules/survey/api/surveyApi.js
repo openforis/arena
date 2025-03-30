@@ -4,6 +4,7 @@ import { Authorizer } from '@openforis/arena-core'
 import * as DateUtils from '@core/dateUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as Response from '../../../utils/response'
 import * as Request from '../../../utils/request'
@@ -76,6 +77,7 @@ export const init = (app) => {
         sortBy,
         sortOrder,
         includeCounts = false,
+        onlyOwn = false,
       } = Request.getParams(req)
 
       const list = await SurveyService.fetchUserSurveysInfo({
@@ -89,6 +91,7 @@ export const init = (app) => {
         sortBy,
         sortOrder,
         includeCounts,
+        onlyOwn,
       })
 
       res.json({ list })
@@ -100,9 +103,9 @@ export const init = (app) => {
   app.get('/surveys/count', AuthMiddleware.requireLoggedInUser, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { draft = true, template = false, search = null, lang = null } = Request.getParams(req)
+      const { draft = true, template = false, search = null, lang = null, onlyOwn = false } = Request.getParams(req)
 
-      const count = await SurveyService.countUserSurveys({ user, draft, template, search, lang })
+      const count = await SurveyService.countUserSurveys({ user, draft, template, search, lang, onlyOwn })
 
       res.json({ count })
     } catch (error) {
@@ -144,7 +147,8 @@ export const init = (app) => {
     let surveyUpdated = survey
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
       const surveyId = Survey.getId(survey)
-      surveyUpdated = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+      const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+      surveyUpdated = Survey.assocFilesStatistics(filesStatistics)(survey)
     }
     res.json({ survey: surveyUpdated })
   }
@@ -218,13 +222,18 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/schema-summary', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle } = Request.getParams(req)
+      const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'SchemaSummary' })
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+      const fileName = ExportFileNameGenerator.generate({
+        survey,
+        cycle,
+        fileType: 'SchemaSummary',
+        fileFormat,
+      })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
 
-      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res })
+      await SurveyService.exportSchemaSummary({ surveyId, cycle, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -232,13 +241,11 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/labels', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
-
+      const { surveyId, fileFormat } = Request.getParams(req)
       const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
-      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels' })
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-      await SurveyService.exportLabels({ surveyId, outputStream: res })
+      const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'Labels', fileFormat })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
+      await SurveyService.exportLabels({ surveyId, outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -283,11 +290,34 @@ export const init = (app) => {
     try {
       const user = Request.getUser(req)
       const filePath = Request.getFilePath(req)
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, fileFormat } = Request.getParams(req)
 
-      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath })
+      const job = SurveyService.startLabelsImportJob({ user, surveyId, filePath, fileFormat })
 
       res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.put('/survey/:surveyId/config', AuthMiddleware.requireSurveyConfigEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { key, value } = Request.getBody(req)
+      const { surveyId } = Request.getParams(req)
+      const survey = await SurveyService.updateSurveyConfigurationProp({ surveyId, key, value })
+      await _sendSurvey({ survey, user, res })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.put('/survey/:surveyId/owner', AuthMiddleware.requireSurveyOwnerEditPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId, ownerUuid } = Request.getParams(req)
+      await SurveyService.updateSurveyOwner({ user, surveyId, ownerUuid })
+      Response.sendOk(res)
     } catch (error) {
       next(error)
     }

@@ -37,8 +37,4 @@ PasswordInput.propTypes = {
   ...SimpleTextInput.propTypes,
 }
 
-PasswordInput.defaultProps = {
-  ...SimpleTextInput.defaultProps,
-}
-
 export default PasswordInput

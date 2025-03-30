@@ -12,7 +12,6 @@ import { Button, RadioButtonGroup } from '@webapp/components'
 import { FormItem } from '@webapp/components/form/Input'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
@@ -26,7 +25,6 @@ export const RecordsCloneModal = (props) => {
   const { onClose, selectedRecordsUuids } = props
 
   const dispatch = useDispatch()
-  const i18n = useI18n()
   const surveyId = useSurveyId()
   const cycleFrom = useSurveyCycleKey()
 
@@ -102,15 +100,15 @@ export const RecordsCloneModal = (props) => {
   return (
     <Modal className="records-clone" onClose={onClose} showCloseButton title="dataView.recordsClone.title">
       <ModalBody>
-        <FormItem label={i18n.t('dataView.recordsClone.fromCycle')}>{cycleFromLabel}</FormItem>
-        <FormItem label={i18n.t('dataView.recordsClone.toCycle')}>
+        <FormItem label="dataView.recordsClone.fromCycle">{cycleFromLabel}</FormItem>
+        <FormItem label="dataView.recordsClone.toCycle">
           <CycleSelector
             selectedCycle={cycleTo}
             onChange={onCycleToChange}
             filterFunction={(cycle) => cycle > cycleFrom}
           />
         </FormItem>
-        <FormItem className="source-form-item" label={i18n.t('dataView.recordsClone.source.label')}>
+        <FormItem className="source-form-item" label="dataView.recordsClone.source.label">
           <RadioButtonGroup
             onChange={onSourceChange}
             value={source}

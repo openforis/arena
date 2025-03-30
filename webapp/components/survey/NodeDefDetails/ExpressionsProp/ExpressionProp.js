@@ -17,24 +17,25 @@ import ValidationTooltip from '@webapp/components/validationTooltip'
 
 const ExpressionProp = (props) => {
   const {
-    qualifier,
-    index,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    validation,
+    applyIf = true, // Show apply if expression editor
+    canBeConstant = false,
+    canBeCall = true,
+    excludeCurrentNodeDef = true,
     expression,
-    applyIf,
-    severity,
-    showLabels,
-    readOnly,
-    isContextParent,
-    canBeConstant,
-    isBoolean,
-    hideAdvanced,
-    mode,
-    onUpdate,
-    onDelete,
+    hideAdvanced = false,
+    index,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onUpdate = () => {},
+    onDelete = () => {},
+    qualifier,
+    readOnly = false,
+    severity = false, // Show severity (error/warning) button group
+    showLabels = false, // Show error message labels editor
+    validation = null,
   } = props
 
   const i18n = useI18n()
@@ -45,15 +46,15 @@ const ExpressionProp = (props) => {
   }))
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
+  const expressionEmpty = NodeDefExpression.isEmpty(expression)
 
   const expressionEditorTypes = [ExpressionEditorType.basic, ...(hideAdvanced ? [] : [ExpressionEditorType.advanced])]
 
   return (
     <ValidationTooltip validation={validation} showKeys={false}>
       <div className={`node-def-edit__expression${isPlaceholder ? ' placeholder' : ''}`}>
-        {!isPlaceholder && (
+        {!isPlaceholder && !readOnly && (
           <ButtonIconDelete
-            disabled={readOnly}
             id={`expression-editor-${index}-${qualifier}-expression-btn-delete`}
             onClick={() => onDelete(expression)}
             testId={TestId.nodeDefDetails.expressionDeleteBtn(qualifier)}
@@ -73,14 +74,16 @@ const ExpressionProp = (props) => {
             query={NodeDefExpression.getExpression(expression)}
             onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocExpression(query)(expression), callback)}
             isContextParent={isContextParent}
+            canBeCall={canBeCall}
             canBeConstant={canBeConstant}
             isBoolean={isBoolean}
             types={expressionEditorTypes}
             mode={mode}
+            readOnly={readOnly}
           />
         </div>
 
-        {applyIf && (
+        {applyIf && !isPlaceholder && !expressionEmpty && (
           <div className="expression-item">
             <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
 
@@ -94,7 +97,9 @@ const ExpressionProp = (props) => {
               query={NodeDefExpression.getApplyIf(expression)}
               onChange={({ query, callback }) => onUpdate(NodeDefExpression.assocApplyIf(query)(expression), callback)}
               isContextParent={isContextParent}
+              canBeCall
               canBeConstant={false}
+              readOnly={readOnly}
               types={expressionEditorTypes}
             />
           </div>
@@ -107,7 +112,7 @@ const ExpressionProp = (props) => {
               selectedItemKey={NodeDefExpression.getSeverity(expression)}
               onChange={(severityVal) => onUpdate(NodeDefExpression.assocSeverity(severityVal)(expression))}
               items={severityItems}
-              disabled={NodeDefExpression.isEmpty(expression)}
+              disabled={expressionEmpty}
             />
           </div>
         )}
@@ -116,7 +121,7 @@ const ExpressionProp = (props) => {
             formLabelKey="common.errorMessage"
             labels={NodeDefExpression.getMessages(expression)}
             onChange={(messages) => onUpdate(NodeDefExpression.assocMessages(messages)(expression))}
-            readOnly={NodeDefExpression.isEmpty(expression)}
+            readOnly={expressionEmpty}
           />
         )}
       </div>
@@ -140,6 +145,7 @@ ExpressionProp.propTypes = {
   readOnly: PropTypes.bool,
 
   isContextParent: PropTypes.bool,
+  canBeCall: PropTypes.bool,
   canBeConstant: PropTypes.bool,
   isBoolean: PropTypes.bool,
   hideAdvanced: PropTypes.bool,
@@ -147,27 +153,6 @@ ExpressionProp.propTypes = {
 
   onUpdate: PropTypes.func,
   onDelete: PropTypes.func,
-}
-
-ExpressionProp.defaultProps = {
-  nodeDefUuidContext: null,
-  nodeDefUuidCurrent: null,
-  excludeCurrentNodeDef: true,
-  validation: null,
-
-  applyIf: true, // Show apply if expression editor
-  severity: false, // Show severity (error/warning) button group
-  showLabels: false, // Show error message labels editor
-  readOnly: false,
-
-  isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
-  hideAdvanced: false,
-  mode: Expression.modes.json,
-
-  onUpdate: () => {},
-  onDelete: () => {},
 }
 
 export default ExpressionProp

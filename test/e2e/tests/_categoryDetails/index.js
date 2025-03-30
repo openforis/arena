@@ -85,10 +85,11 @@ export const addItems = (category, levelIdx, codePrefix = '') => {
 
 export const exportCategory = (category) => {
   test(`Export category ${category.name}`, async () => {
-    const [download] = await Promise.all([
-      page.waitForEvent('download'),
-      page.click(getSelector(TestId.categoryDetails.exportBtn, 'button')),
-    ])
+    await page.click(getSelector(TestId.categoryDetails.exportBtn, 'button'))
+    const exportButtonLocator = page.locator('button:text("Export to CSV")')
+
+    const [download] = await Promise.all([page.waitForEvent('download'), exportButtonLocator.click()])
+
     const exportFilePath = path.resolve(downloadsPath, `category-${category.name}-export.zip`)
 
     await download.saveAs(exportFilePath)

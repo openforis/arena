@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 import { marked } from 'marked'
 
 const Markdown = (props) => {
-  const { container: Container, className, source } = props
+  const { container: Container = 'div', className = undefined, source } = props
+
   const [output, setOutput] = useState('')
 
   useEffect(() => {
@@ -23,11 +24,6 @@ Markdown.propTypes = {
   source: PropTypes.string.isRequired, // Markdown text to render
   container: PropTypes.string, // The container element to use
   className: PropTypes.string, // The class name to apply to the container element
-}
-
-Markdown.defaultProps = {
-  container: 'div',
-  className: undefined,
 }
 
 export default Markdown

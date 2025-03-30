@@ -24,11 +24,12 @@ export const keys = {
 export const keysProps = {
   labels: ObjectUtils.keysProps.labels,
   descriptions: ObjectUtils.keysProps.descriptions,
-  cycles: ObjectUtils.keysProps.cycles,
   hasSamplingDesign: 'hasSamplingDesign',
   samplingDesign: 'samplingDesign',
   analysisNodeDefs: 'analysisNodeDefs',
   submitOnlyAnalysisStepDataIntoR: 'submitOnlyAnalysisStepDataIntoR',
+  submitOnlySelectedRecordsIntoR: 'submitOnlySelectedRecordsIntoR',
+  selectedRecordUuids: 'selectedRecordUuids',
   statisticalAnalysis: 'statisticalAnalysis',
   resultsBackFromRStudio: 'resultsBackFromRStudio',
   includeEntitiesWithoutData: 'includeEntitiesWithoutData',
@@ -46,7 +47,6 @@ export const {
   getUuid,
   getProps,
   getPropsDiff,
-  getCycles,
   getDateCreated,
   getDateModified,
   getDescriptions,
@@ -61,6 +61,8 @@ export const getScriptCommon = R.propOr(null, keys.scriptCommon)
 export const getScriptEnd = R.propOr(null, keys.scriptEnd)
 export const hasSamplingDesign = ObjectUtils.isPropTrue(keysProps.hasSamplingDesign)
 export const isSubmitOnlyAnalysisStepDataIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlyAnalysisStepDataIntoR)
+export const isSubmitOnlySelectedRecordsIntoR = ObjectUtils.isPropTrue(keysProps.submitOnlySelectedRecordsIntoR)
+export const getSelectedRecordUuids = ObjectUtils.getProp(keysProps.selectedRecordUuids, [])
 export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {})
 export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
 export const isResultsBackFromRStudio = ObjectUtils.getProp(keysProps.resultsBackFromRStudio, true)
@@ -71,6 +73,17 @@ export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.h
 
 export const assocSubmitOnlyAnalysisStepDataIntoR = (value) =>
   ObjectUtils.setProp(keysProps.submitOnlyAnalysisStepDataIntoR, value)
+
+export const assocSubmitOnlySelectedRecordsIntoR = (value) => (chain) => {
+  let chainUpdated = ObjectUtils.setProp(keysProps.submitOnlySelectedRecordsIntoR, value)(chain)
+  if (!value) {
+    chainUpdated = ObjectUtils.dissocProp(keysProps.selectedRecordUuids)(chainUpdated)
+  }
+  return chainUpdated
+}
+
+export const assocSelectedRecordUuids = (selectedRecordUuids) =>
+  ObjectUtils.setProp(keysProps.selectedRecordUuids, selectedRecordUuids)
 
 export const assocResultsBackFromRStudio = (value) => ObjectUtils.setProp(keysProps.resultsBackFromRStudio, value)
 

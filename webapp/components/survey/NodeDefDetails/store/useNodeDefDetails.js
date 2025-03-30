@@ -10,8 +10,11 @@ import { useActions } from './actions'
 import { State } from './state'
 import { useNodeDefValidationByUuid } from '@webapp/store/survey/hooks'
 
-export const useNodeDefDetails = () => {
-  const { nodeDefUuid } = useParams()
+export const useNodeDefDetails = (props) => {
+  const { nodeDefUuid: nodeDefUuidProp } = props
+  const { nodeDefUuid: nodeDefUuidParam } = useParams()
+
+  const nodeDefUuid = nodeDefUuidProp ?? nodeDefUuidParam
 
   const navigate = useNavigate()
 

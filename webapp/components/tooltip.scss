@@ -1,8 +1,9 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .tooltip {
   &:hover {
     cursor: default;
+
     &.hoverable {
       cursor: pointer;
     }
@@ -53,8 +54,10 @@
     border: 2px solid rgba($red, 0.6);
   }
 
-  .MuiTextField-root fieldset {
-    border: 1px solid red;
+  .MuiTextField-root fieldset,
+  .MuiTextField-root:hover fieldset,
+  .MuiTextField-root .Mui-focused fieldset {
+    border-color: red;
   }
 }
 
@@ -79,6 +82,7 @@
   &.bottom:after {
     border-bottom-color: $red;
   }
+
   &.top:after {
     border-top-color: $red;
   }
@@ -91,6 +95,7 @@
   &.bottom:after {
     border-bottom-color: $orange;
   }
+
   &.top:after {
     border-top-color: $orange;
   }
@@ -103,6 +108,7 @@
   &.bottom:after {
     border-bottom-color: $greyAppBg;
   }
+
   &.top:after {
     border-top-color: $greyAppBg;
   }

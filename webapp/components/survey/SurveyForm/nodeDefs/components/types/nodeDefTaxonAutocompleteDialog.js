@@ -28,18 +28,24 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
   )
 }
 
+NodeDefTaxonAutocompleteItemRenderer.propTypes = {
+  item: PropTypes.object.isRequired,
+  onKeyDown: PropTypes.func,
+  onMouseDown: PropTypes.func,
+}
+
 const NodeDefTaxonAutocompleteDialog = (props) => {
   const {
-    nodeDef,
-    parentNode,
-    draft,
-    entryDataQuery,
-    inputRef,
-    field,
-    fieldValue,
     autocompleteSourceElement,
+    draft = false,
+    entryDataQuery,
+    field = '',
+    fieldValue = '',
+    inputRef,
+    nodeDef,
     onItemSelect,
     onClose,
+    parentNode,
   } = props
 
   const taxa = useTaxa({ nodeDef, parentNode, draft, entryDataQuery, field, fieldValue })
@@ -59,23 +65,17 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
   )
 }
 
-NodeDefTaxonAutocompleteDialog.defaultProps = {
-  surveyId: null,
-  taxonomyUuid: null,
-  draft: false,
-
-  inputRef: null,
-  field: '',
-  fieldValue: '',
-  onItemSelect: null,
-  onClose: null,
-  autocompleteSourceElement: null, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
-}
-
-NodeDefTaxonAutocompleteItemRenderer.propTypes = {
-  item: PropTypes.object.isRequired,
-  onKeyDown: PropTypes.func,
-  onMouseDown: PropTypes.func,
+NodeDefTaxonAutocompleteDialog.propTypes = {
+  autocompleteSourceElement: PropTypes.node.isRequired, // Used as sourceElement for the autocompleteDialog when rendered in tableBody
+  draft: PropTypes.bool,
+  entryDataQuery: PropTypes.bool,
+  field: PropTypes.string,
+  fieldValue: PropTypes.string,
+  inputRef: PropTypes.object.isRequired,
+  nodeDef: PropTypes.object.isRequired,
+  onItemSelect: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
+  parentNode: PropTypes.object.isRequired,
 }
 
 export default NodeDefTaxonAutocompleteDialog

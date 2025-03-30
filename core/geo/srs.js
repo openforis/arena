@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+export const idPrefix = 'EPSG:'
+
 export const keys = {
   code: 'code',
   name: 'name',

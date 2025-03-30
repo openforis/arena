@@ -1,3 +1,13 @@
 .users-surveys-fieldset {
   height: 100%;
 }
+
+.users__header-left {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+
+  .users__header-left__input-search {
+    width: 20rem;
+  }
+}

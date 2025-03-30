@@ -17,6 +17,12 @@ const determineContentKey = ({ jobType, dryRun, includeFiles, hasErrors }) => {
   return `dataImportView.jobs.${jobType}.${action}${actionSuffix}Complete${status}`
 }
 
+const cleanupContent = ({ content }) => {
+  const parts = content.split('\n')
+  const nonZeroParts = parts.filter((part) => !part.trim().startsWith('- 0 '))
+  return nonZeroParts.join('\n')
+}
+
 export const DataImportCompleteDialog = (props) => {
   const { errorsExportFileName, job, onClose } = props
 
@@ -30,11 +36,12 @@ export const DataImportCompleteDialog = (props) => {
 
   const contentKey = determineContentKey({ jobType: job.type, dryRun, includeFiles, hasErrors })
   const content = i18n.t(contentKey, { ...jobResult, errorsFoundMessage })
+  const contentCleaned = cleanupContent({ content })
 
   return (
     <Modal className={classNames('data-import_complete-dialog', { 'with-errors': hasErrors })} onClose={onClose}>
       <ModalBody>
-        <Markdown source={content} />
+        <Markdown source={contentCleaned} />
         {hasErrors && (
           <JobErrors
             errorKeyHeaderName="dataImportView.errors.rowNum"

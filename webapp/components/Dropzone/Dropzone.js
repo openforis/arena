@@ -5,14 +5,21 @@ import PropTypes from 'prop-types'
 import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'
 
-import { Strings } from '@openforis/arena-core'
+import { Arrays, Strings } from '@openforis/arena-core'
 
 import { useI18n } from '@webapp/store/system'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { Alert } from '../Alert'
 
 const Dropzone = (props) => {
-  const { accept: acceptProp, disabled, droppedFiles, maxSize: maxSizeMB, multiple, onDrop: onDropProp } = props
+  const {
+    accept: acceptProp = {},
+    disabled = false,
+    droppedFiles = [],
+    maxSize: maxSizeMB = 50, // 50MB
+    multiple = false,
+    onDrop: onDropProp,
+  } = props
 
   const i18n = useI18n()
   const [errorMessage, setErrorMessage] = useState(null)
@@ -25,7 +32,11 @@ const Dropzone = (props) => {
   )
 
   const acceptedExtensions = useMemo(
-    () => Object.values(acceptPropObject).flat().map(Strings.removePrefix('.')),
+    () =>
+      // every "accept" item can be an array of extensions or a list of comma separated values
+      Object.values(acceptPropObject)
+        .flatMap((value) => Arrays.toArray(value).flatMap((val) => val.split(',')))
+        .map((value) => Strings.removePrefix('.')(value).trim()),
     [acceptPropObject]
   )
 
@@ -39,14 +50,6 @@ const Dropzone = (props) => {
 
   const validateFiles = useCallback(
     (files) => {
-      if (!files.length) {
-        // Dropzone component filters out the files exceeding the specified max size
-        return i18n.t('dropzone.error.fileTooBig')
-      }
-      if (acceptProp && typeof acceptProp === 'object') {
-        // 'accept' is specified and files have been accepted successfully
-        return null
-      }
       const invalidExtension = files
         .map(FileUtils.getExtension)
         .find((extension) => !acceptedExtensions.includes(extension))
@@ -56,24 +59,52 @@ const Dropzone = (props) => {
       }
       return null
     },
-    [acceptProp, acceptedExtensions]
+    [acceptedExtensions, i18n]
   )
 
-  const onDrop = useCallback(
+  const onDropAccepted = useCallback(
     (files) => {
       const error = validateFiles(files)
       if (error) {
         setErrorMessage(error)
       } else {
+        setErrorMessage(null)
         onDropProp(files)
       }
     },
     [onDropProp, validateFiles]
   )
 
+  const onDropRejected = useCallback(
+    (fileRejections) => {
+      const errorMessages = fileRejections.map((fileRejection) => {
+        const { errors, file } = fileRejection
+        const errorCodes = errors.map((error) => error.code)
+
+        if (errorCodes.includes('file-invalid-type')) {
+          const extension = FileUtils.getExtension(file.path)
+          return i18n.t('dropzone.error.invalidFileExtension', { extension })
+        } else if (errorCodes.includes('file-too-large')) {
+          return i18n.t('dropzone.error.fileTooBig')
+        } else {
+          return i18n.t('dropzone.error.fileNotValid')
+        }
+      })
+      setErrorMessage(errorMessages.join(', '))
+    },
+    [i18n]
+  )
+
   return (
     <>
-      <ReactDropzone accept={accept} disabled={disabled} maxSize={maxSize} multiple={multiple} onDrop={onDrop}>
+      <ReactDropzone
+        accept={accept}
+        disabled={disabled}
+        maxSize={maxSize}
+        multiple={multiple}
+        onDropAccepted={onDropAccepted}
+        onDropRejected={onDropRejected}
+      >
         {({ getRootProps, getInputProps }) => (
           <div className={classNames('dropzone', { disabled })} {...getRootProps()}>
             <input {...getInputProps()} />
@@ -115,14 +146,6 @@ Dropzone.propTypes = {
   multiple: PropTypes.bool,
   onDrop: PropTypes.func.isRequired,
   droppedFiles: PropTypes.array,
-}
-
-Dropzone.defaultProps = {
-  accept: {},
-  disabled: false,
-  maxSize: 50, // 50MB
-  multiple: false,
-  droppedFiles: [],
 }
 
 export default Dropzone

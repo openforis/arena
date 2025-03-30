@@ -4,20 +4,27 @@ import PropTypes from 'prop-types'
 import * as JobSerialized from '@common/job/jobSerialized'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
+import { htmlToString } from '@webapp/utils/domUtils'
+
+import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
+import { ExpansionPanel } from '@webapp/components'
 import ValidationFieldMessages from '@webapp/components/validationFieldMessages'
 import { DataGrid } from '@webapp/components/DataGrid'
-import { useSurvey } from '@webapp/store/survey'
-import { ExpansionPanel } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
-const validationWrapper = (fields) => ({
+const toValidation = (fields) => ({
   valid: false,
   fields,
 })
 
-const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job, openPanel }) => {
+const JobErrors = ({
+  errorKeyHeaderName = 'common.item',
+  exportFileName: exportFileNameProp,
+  job = {},
+  openPanel = true,
+}) => {
   const errors = JobSerialized.getErrors(job)
   const errorsCount = JobSerialized.getErrorsCount(job)
 
@@ -44,23 +51,17 @@ const JobErrors = ({ errorKeyHeaderName, exportFileName: exportFileNameProp, job
             field: 'error',
             flex: 0.6,
             headerName: i18n.t('common.error', { count: errorsCount }),
-            renderCell: ({ value }) => (
-              <ValidationFieldMessages validation={validationWrapper(value)} showKeys={false} />
-            ),
-            valueFormatter: ({ value }) => {
-              const jointMessages = ValidationUtils.getJointMessages({ i18n, survey, showKeys: false })(
-                validationWrapper(value)
-              )
-              return jointMessages.map(({ text }) => text).join(', ')
+            renderCell: ({ value }) => <ValidationFieldMessages validation={toValidation(value)} showKeys={false} />,
+            valueFormatter: (value) => {
+              const validation = toValidation(value)
+              const jointMessages = ValidationUtils.getJointMessages({ i18n, survey, showKeys: false })(validation)
+              return jointMessages.map(({ text }) => htmlToString(text)).join(', ')
             },
           },
         ]}
         density="compact"
         exportFileName={exportFileName}
-        rows={Object.entries(errors).map(([errorKey, error]) => ({
-          errorKey,
-          error,
-        }))}
+        rows={Object.entries(errors).map(([errorKey, error]) => ({ errorKey, error }))}
         getRowId={(row) => row.errorKey}
       />
     </ExpansionPanel>
@@ -72,12 +73,6 @@ JobErrors.propTypes = {
   exportFileName: PropTypes.string,
   job: PropTypes.object,
   openPanel: PropTypes.bool,
-}
-
-JobErrors.defaultProps = {
-  errorKeyHeaderName: 'common.item',
-  job: {},
-  openPanel: true,
 }
 
 export default JobErrors

@@ -16,7 +16,7 @@ import JobProgress from './JobProgress'
 
 const getCustomCloseButtonComponent = ({ closeButton, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
-  if (closeButton instanceof Function) return closeButton({ job })
+  if (closeButton instanceof Function) return React.createElement(closeButton, { job })
   if (closeButton instanceof Object) return closeButton
   return null
 }
@@ -53,7 +53,7 @@ const JobMonitor = () => {
       </ModalBody>
 
       <ModalFooter>
-        {JobSerialized.isRunning(job) && (
+        {(JobSerialized.isPending(job) || JobSerialized.isRunning(job)) && (
           <Button
             className="modal-footer__item"
             onClick={() => dispatch(JobActions.cancelJob())}
@@ -61,7 +61,7 @@ const JobMonitor = () => {
           />
         )}
         {JobSerialized.isEnded(job) &&
-          (getCustomCloseButtonComponent({ closeButton, job }) || (
+          (getCustomCloseButtonComponent({ closeButton, job }) ?? (
             <Button
               className="modal-footer__item"
               onClick={() => dispatch(JobActions.hideJobMonitor())}

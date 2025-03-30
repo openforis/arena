@@ -46,8 +46,4 @@ LanguagesEditor.propTypes = {
   readOnly: PropTypes.bool.isRequired,
 }
 
-LanguagesEditor.defaultProps = {
-  idInput: null,
-}
-
 export default LanguagesEditor

@@ -13,33 +13,33 @@ import { useTable } from './useTable'
 
 const Table = (props) => {
   const {
-    cellProps,
-    cellTestIdExtractor,
-    className,
-    columns,
-    expandableRows,
-    gridTemplateColumns,
-    headerLeftComponent,
-    isRowExpandable,
-    isRowActive,
-    keyExtractor,
+    cellProps = {},
+    cellTestIdExtractor = null,
+    className = '',
+    columns = null,
+    expandableRows = false,
+    gridTemplateColumns = '1fr',
+    headerLeftComponent = DummyComponent,
+    headerProps = {},
+    isRowActive = null,
+    isRowExpandable = () => true,
+    keyExtractor = ({ item }) => ObjectUtils.getUuid(item),
     module,
-    moduleApiUri,
-    noItemsLabelKey,
-    noItemsLabelForSearchKey,
-    onRowClick: onRowClickProp,
-    onRowDoubleClick,
-    restParams,
-    rowComponent,
-    rowExpandedComponent,
-    rowHeaderComponent,
-    headerProps,
-    rowProps,
-    selectable,
-    selectOnClick,
-    showFooter,
-    showHeader,
-    visibleColumnsSelectionEnabled,
+    moduleApiUri = null,
+    noItemsLabelKey = 'common.noItems',
+    noItemsLabelForSearchKey = 'common.noItems',
+    onRowClick: onRowClickProp = null,
+    onRowDoubleClick = null,
+    restParams = {},
+    rowHeaderComponent = DummyComponent,
+    rowComponent = DummyComponent,
+    rowExpandedComponent = DummyComponent,
+    rowProps = {},
+    selectable = true,
+    selectOnClick = true,
+    showFooter = true,
+    showHeader = true,
+    visibleColumnsSelectionEnabled = false,
   } = props
 
   const {
@@ -59,8 +59,11 @@ const Table = (props) => {
     onRowsScroll,
     onVisibleColumnsChange,
     selectedItems,
+    selectAllItems,
+    deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
+    visibleItemsCount,
   } = useTable({
     columns,
     keyExtractor,
@@ -126,6 +129,9 @@ const Table = (props) => {
         sort={sort}
         handleSortBy={handleSortBy}
         selectedItems={selectedItems}
+        selectAllItems={selectAllItems}
+        deselectAllItems={deselectAllItems}
+        visibleItemsCount={visibleItemsCount}
       />
       {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
     </div>
@@ -162,35 +168,6 @@ Table.propTypes = {
   showFooter: PropTypes.bool,
   showHeader: PropTypes.bool,
   visibleColumnsSelectionEnabled: PropTypes.bool, // if true, visible columns selection menu button will be shown
-}
-
-Table.defaultProps = {
-  cellProps: {},
-  cellTestIdExtractor: null,
-  className: '',
-  columns: null,
-  expandableRows: false,
-  gridTemplateColumns: '1fr',
-  headerLeftComponent: DummyComponent,
-  headerProps: {},
-  isRowActive: null,
-  isRowExpandable: () => true,
-  keyExtractor: ({ item }) => ObjectUtils.getUuid(item),
-  moduleApiUri: null,
-  noItemsLabelKey: 'common.noItems',
-  noItemsLabelForSearchKey: 'common.noItems',
-  onRowClick: null,
-  onRowDoubleClick: null,
-  restParams: {},
-  rowHeaderComponent: DummyComponent,
-  rowComponent: DummyComponent,
-  rowExpandedComponent: DummyComponent,
-  rowProps: {},
-  selectable: true,
-  selectOnClick: true,
-  showFooter: true,
-  showHeader: true,
-  visibleColumnsSelectionEnabled: false,
 }
 
 export default Table

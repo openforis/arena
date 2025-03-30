@@ -353,6 +353,31 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     return result
   })
 
+export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, client = db) =>
+  client.tx(async (t) => {
+    const surveyId = Survey.getId(survey)
+
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    let nodeDefUpdated = NodeDef.convertToType({ toType })(nodeDef)
+
+    nodeDefUpdated = await NodeDefRepository.updateNodeDefTypeAndProps(
+      {
+        surveyId,
+        nodeDefUuid,
+        type: toType,
+        props: NodeDef.getProps(nodeDefUpdated),
+        propsAdvanced: NodeDef.getPropsAdvanced(nodeDefUpdated),
+      },
+      t
+    )
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefConversion, nodeDefUpdated, false, t)
+
+    await markSurveyDraft(surveyId, t)
+
+    return nodeDefUpdated
+  })
+
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 

@@ -14,7 +14,7 @@ const titleKeyByOrder = {
 }
 
 const SortCriteriaEditor = (props) => {
-  const { onChange, onDelete, placeholder, sortCriteria, variables, variablesAvailable } = props
+  const { onChange, onDelete = null, placeholder = false, sortCriteria, variables, variablesAvailable } = props
   const selection = placeholder ? null : variables.find(({ value }) => value === SortCriteria.getVariable(sortCriteria))
 
   return (
@@ -53,11 +53,6 @@ SortCriteriaEditor.propTypes = {
   sortCriteria: PropTypes.object.isRequired,
   variables: PropTypes.array.isRequired,
   variablesAvailable: PropTypes.array.isRequired,
-}
-
-SortCriteriaEditor.defaultProps = {
-  onDelete: null,
-  placeholder: false,
 }
 
 export default SortCriteriaEditor

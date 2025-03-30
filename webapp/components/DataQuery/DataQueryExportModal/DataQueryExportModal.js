@@ -6,12 +6,14 @@ import PropTypes from 'prop-types'
 import { Objects } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
+import { FileFormats } from '@core/fileFormats'
 
 import * as API from '@webapp/service/api'
 
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
+import { useNotifyWarning } from '@webapp/components/hooks'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import { ButtonDownload } from '@webapp/components/buttons'
 
@@ -24,6 +26,7 @@ import {
 export const DataQueryExportModal = (props) => {
   const { onClose } = props
 
+  const notifyWarning = useNotifyWarning()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
   const query = DataExplorerSelectors.useQuery()
@@ -33,6 +36,8 @@ export const DataQueryExportModal = (props) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const isAggregateMode = Query.isModeAggregate(query)
   const { selectedOptionsByKey } = state
+  const fileFormat = selectedOptionsByKey[dataExportOptions.fileFormat]
+
   const availableOptions = useMemo(
     () =>
       isAggregateMode ? [] : [dataExportOptions.includeCategoryItemsLabels, dataExportOptions.expandCategoryItems],
@@ -40,10 +45,21 @@ export const DataQueryExportModal = (props) => {
   )
 
   const onExportClick = useCallback(async () => {
-    const tempFileName = await API.exportDataQueryToTempFile({ surveyId, cycle, query, options: selectedOptionsByKey })
-    API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName })
+    try {
+      const tempFileName = await API.exportDataQueryToTempFile({
+        surveyId,
+        cycle,
+        query,
+        options: selectedOptionsByKey,
+      })
+      API.downloadDataQueryExport({ surveyId, cycle, entityDefUuid, tempFileName, fileFormat })
+    } catch (error) {
+      const key =
+        fileFormat === FileFormats.xlsx ? 'appErrors:dataExport.excelMaxCellsLimitExceeded' : 'dataExportView.error'
+      notifyWarning({ key, params: { details: String(error) } })
+    }
     onClose()
-  }, [cycle, entityDefUuid, onClose, query, selectedOptionsByKey, surveyId])
+  }, [cycle, entityDefUuid, fileFormat, notifyWarning, onClose, query, selectedOptionsByKey, surveyId])
 
   const onOptionChange = (option) => (value) =>
     setState((statePrev) => {
@@ -68,7 +84,7 @@ export const DataQueryExportModal = (props) => {
           onOptionChange={onOptionChange}
           selectedOptionsByKey={selectedOptionsByKey}
         />
-        <ButtonDownload className="btn-primary" label="common.csvExport" onClick={onExportClick} />
+        <ButtonDownload className="btn-primary" label="common.export" onClick={onExportClick} />
       </ModalBody>
     </Modal>
   )

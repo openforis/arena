@@ -1,6 +1,7 @@
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
+import { FileFormats } from '@core/fileFormats'
 import * as ObjectUtils from '../../../../core/objectUtils'
 import * as Taxon from '../../../../core/survey/taxon'
 import * as Taxonomy from '../../../../core/survey/taxonomy'
@@ -167,7 +168,7 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
+        const { surveyId, taxonomyUuid, draft, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
         const [survey, taxonomy] = await Promise.all([
           SurveyService.fetchSurveyById({ surveyId, draft }),
@@ -177,10 +178,11 @@ export const init = (app) => {
           survey,
           fileType: 'Taxonomy',
           itemName: Taxonomy.getName(taxonomy),
+          fileFormat,
         })
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await TaxonomyService.exportTaxa(surveyId, taxonomyUuid, res, draft)
+        await TaxonomyService.exportTaxa({ surveyId, taxonomyUuid, draft, outputStream: res, fileFormat })
       } catch (error) {
         next(error)
       }
@@ -210,11 +212,17 @@ export const init = (app) => {
     '/survey/:surveyId/taxonomies/:taxonomyUuid/upload',
     AuthMiddleware.requireSurveyEditPermission,
     (req, res) => {
-      const { surveyId, taxonomyUuid } = Request.getParams(req)
+      const { surveyId, taxonomyUuid, fileFormat } = Request.getParams(req)
       const user = Request.getUser(req)
       const file = Request.getFile(req)
 
-      const job = TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
+      const job = TaxonomyService.importTaxonomy({
+        user,
+        surveyId,
+        taxonomyUuid,
+        filePath: file.tempFilePath,
+        fileFormat,
+      })
 
       res.json({ job: jobToJSON(job) })
     }

@@ -1,24 +1,25 @@
 import React, { useCallback, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router'
+import PropTypes from 'prop-types'
 
+import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Survey from '@core/survey/survey'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
 import { useI18n } from '@webapp/store/system'
-
 import { SurveyActions, useOnSurveyCycleUpdate, useSurveyDefsFetched, useSurveyInfo } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
 import { RecordState } from '@webapp/store/ui/record'
 
 import { ActiveSurveyNotSelected } from '@webapp/components/survey/ActiveSurveyNotSelected'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 const SurveyDefsLoader = (props) => {
-  const { children, draft, requirePublish, validate, onSurveyCycleUpdate } = props
+  const { children, draft = false, onSurveyCycleUpdate = null, requirePublish = false, validate = false } = props
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const i18n = useI18n()
   const includeAnalysis = useAuthCanUseAnalysis()
   const surveyInfo = useSurveyInfo()
@@ -28,15 +29,15 @@ const SurveyDefsLoader = (props) => {
 
   useEffect(() => {
     if (surveyId && !ready) {
-      dispatch(SurveyActions.initSurveyDefs({ draft, validate, includeAnalysis }))
+      dispatch(SurveyActions.initSurveyDefs({ draft, validate, includeAnalysis, navigate }))
     }
-  }, [surveyId, ready])
+  }, [dispatch, navigate, surveyId, ready])
 
   useEffect(() => {
     if (surveyId && ready && recordPreviewUuid) {
-      dispatch(SurveyActions.refreshSurveyDefs)
+      dispatch(SurveyActions.refreshSurveyDefs({ navigate }))
     }
-  }, [dispatch, ready, recordPreviewUuid, surveyId])
+  }, [dispatch, navigate, ready, recordPreviewUuid, surveyId])
 
   const onSurveyUpdate = useCallback(
     ({ surveyId: surveyUpdatedId }) => {
@@ -86,13 +87,6 @@ SurveyDefsLoader.propTypes = {
   requirePublish: PropTypes.bool,
   validate: PropTypes.bool,
   onSurveyCycleUpdate: PropTypes.func,
-}
-
-SurveyDefsLoader.defaultProps = {
-  draft: false,
-  validate: false,
-  requirePublish: false,
-  onSurveyCycleUpdate: null,
 }
 
 export default SurveyDefsLoader

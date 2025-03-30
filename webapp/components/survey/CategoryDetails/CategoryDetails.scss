@@ -1,8 +1,8 @@
-@import '~@webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 $borderColor: $greyBorder;
 
-.app__container .app-module > .category {
+.app__container .app-module>.category {
   overflow: hidden; // scrollbars managed in .category__levels
 }
 
@@ -30,7 +30,7 @@ $borderColor: $greyBorder;
   }
 
   .date-import-template-menu-btn {
-    width: 12rem;
+    width: 14rem;
   }
 
   .reporting-data-checkbox {
@@ -77,6 +77,10 @@ $borderColor: $greyBorder;
   border-right: 1px dashed $borderColor;
   border-top: 1px dashed $borderColor;
   border-bottom: 1px dashed $borderColor;
+
+  .loading-bar {
+    position: relative;
+  }
 
   &:first-child {
     border-left: 1px dashed $borderColor;

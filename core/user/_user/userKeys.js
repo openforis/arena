@@ -21,4 +21,9 @@ export const keys = {
 
   // Used only when editing user auth groups
   authGroupsUuids: 'authGroupsUuids',
+  authGroupExtraProps: 'authGroupExtraProps',
+
+  // Used only in list view
+  surveysCountDraft: 'surveysCountDraft',
+  surveysCountPublished: 'surveysCountPublished',
 }

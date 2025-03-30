@@ -11,7 +11,7 @@ import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang, useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 
-const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
+const FilterByChain = ({ filterChainUuids = [], setFilterChainUuids = () => {} }) => {
   const surveyId = useSurveyId()
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -58,11 +58,6 @@ const FilterByChain = ({ filterChainUuids, setFilterChainUuids }) => {
 FilterByChain.propTypes = {
   filterChainUuids: PropTypes.array,
   setFilterChainUuids: PropTypes.func,
-}
-
-FilterByChain.defaultProps = {
-  filterChainUuids: [],
-  setFilterChainUuids: () => {},
 }
 
 export default FilterByChain

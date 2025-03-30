@@ -12,7 +12,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
 const _associateToGroup = async ({ userUuid, groupName }, client) => {
   const group = await AuthGroupRepository.fetchGroupByName({ name: groupName }, client)
-  await AuthGroupRepository.insertUserGroup(AuthGroup.getUuid(group), userUuid, client)
+  await AuthGroupRepository.insertUserGroup({ groupUuid: AuthGroup.getUuid(group), userUuid }, client)
 }
 
 const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userAlreadyExisting }, client) => {
@@ -34,7 +34,7 @@ const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userAlreadyE
   if (groupToAssociateToUser && !AuthGroup.isEqual(groupToAssociateToUser)(userGroupInExistingUser)) {
     const surveyGroupUuid = AuthGroup.getUuid(groupToAssociateToUser)
     const userUuid = userAlreadyExisting ? User.getUuid(userAlreadyExisting) : User.getUuid(user)
-    await AuthGroupRepository.insertUserGroup(surveyGroupUuid, userUuid, client)
+    await AuthGroupRepository.insertUserGroup({ groupUuid: surveyGroupUuid, userUuid }, client)
   }
 }
 

@@ -1,9 +1,6 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
 import { ResizableModal } from '@webapp/components'
@@ -48,18 +45,7 @@ const RecordEditModalTitle = () => {
 
   if (!record) return null
 
-  const root = Record.getRootNode(record)
-  const keyNodes = Record.getEntityKeyNodes(survey, root)(record)
-  const keyValues = keyNodes.map((keyNode) => {
-    const keyNodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(keyNode))(survey)
-    return NodeValueFormatter.format({
-      survey,
-      nodeDef: keyNodeDef,
-      value: Node.getValue(keyNode),
-      showLabel: true,
-      lang,
-    })
-  })
+  const keyValues = NodeValueFormatter.getFormattedRecordKeys({ survey, record, lang })
 
   const title = i18n.t('recordView.recordEditModalTitle', { keyValues })
 
@@ -67,10 +53,17 @@ const RecordEditModalTitle = () => {
 }
 
 export const RecordEditModal = (props) => {
-  const { initialState: initialStateProp, onClose, onRequestClose, parentNodeUuid, recordUuid } = props
+  const {
+    detachable = true,
+    initialState: initialStateProp,
+    onClose,
+    onRequestClose,
+    parentNodeUuid,
+    recordUuid,
+  } = props
 
   const onDetach = useCallback(() => {
-    const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}`
+    const recordEditUrl = `${window.location.origin}${appModuleUri(noHeaderModules.record)}${recordUuid}?locked=true`
     WindowUtils.openPopup(recordEditUrl, 'arena-record-edit-modal')
     onRequestClose?.()
   }, [onRequestClose, recordUuid])
@@ -92,16 +85,17 @@ export const RecordEditModal = (props) => {
       initHeight={initialHeight}
       left={initialLeft}
       onClose={onModalClose}
+      onDetach={detachable ? onDetach : undefined}
       onRequestClose={onRequestClose}
-      onDetach={onDetach}
       top={initialTop}
     >
-      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader />
+      <RecordEditor recordUuid={recordUuid} pageNodeUuid={parentNodeUuid} noHeader locked />
     </ResizableModal>
   )
 }
 
 RecordEditModal.propTypes = {
+  detachable: PropTypes.bool,
   initialState: PropTypes.object,
   onClose: PropTypes.func,
   onRequestClose: PropTypes.func,

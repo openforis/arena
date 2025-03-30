@@ -13,12 +13,20 @@ const dateFormat = {
 }
 
 const NodeDefDate = (props) => {
-  const { edit, entry, canEditRecord, nodeDef, nodes, readOnly, updateNode } = props
+  const {
+    canEditRecord = false,
+    edit = false,
+    entry = false,
+    nodeDef,
+    nodes = null,
+    readOnly = false,
+    updateNode,
+  } = props
 
   const node = entry ? nodes[0] : null
 
   const dateStr = Node.getValue(node, null)
-  const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display })
+  const nodeValueFormatted = DateUtils.convertDate({ dateStr, formatTo: dateFormat.display, keepTimeZone: false })
 
   const handleChangeDateInput = useCallback(
     (newDate) => {
@@ -54,14 +62,6 @@ NodeDefDate.propTypes = {
   nodes: PropTypes.array,
   readOnly: PropTypes.bool,
   updateNode: PropTypes.func.isRequired,
-}
-
-NodeDefDate.defaultProps = {
-  canEditRecord: false,
-  edit: false,
-  entry: false,
-  readOnly: false,
-  nodes: null,
 }
 
 export default NodeDefDate

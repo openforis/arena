@@ -11,15 +11,19 @@ import { LoadingBar } from '@webapp/components'
 
 export const VirtualizedList = (props) => {
   const {
-    className,
+    className = null,
     id,
-    overscanRowCount,
+    overscanRowCount = 10,
+    placeholderRenderer = () => (
+      <div key={uuidv4()} className="item-placeholder">
+        ...
+      </div>
+    ),
     rowCount,
     rowHeight,
     rowRenderer,
-    showScrollingPlaceholders,
-    placeholderRenderer,
-    virtualizationThreshold,
+    showScrollingPlaceholders = true,
+    virtualizationThreshold = 300,
   } = props
 
   const externalContainerRef = useRef(null)
@@ -141,16 +145,4 @@ VirtualizedList.propTypes = {
   rowRenderer: PropTypes.func.isRequired,
   showScrollingPlaceholders: PropTypes.bool,
   virtualizationThreshold: PropTypes.number, // threshold to consider before virtualizing the rendering
-}
-
-VirtualizedList.defaultProps = {
-  className: null,
-  overscanRowCount: 10,
-  placeholderRenderer: () => (
-    <div key={uuidv4()} className="item-placeholder">
-      ...
-    </div>
-  ),
-  showScrollingPlaceholders: true,
-  virtualizationThreshold: 300,
 }

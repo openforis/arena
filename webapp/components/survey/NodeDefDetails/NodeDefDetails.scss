@@ -1,13 +1,17 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .node-def-edit {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 100%;
-  top: 0px;
-  left: 0px;
-  z-index: $zIndex10TopOfApp;
   background-color: white;
+
+  &.full-screen {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: $zIndex10TopOfApp;
+  }
 
   .form_row,
   .form-item_body {
@@ -28,6 +32,10 @@
     &.without-label {
       margin-left: 20%;
     }
+  }
+
+  .max-file-size {
+    width: 6rem;
   }
 }
 
@@ -62,6 +70,7 @@
     .btn-next {
       margin-left: 5rem;
     }
+
     .btn-previous {
       margin-right: 5rem;
     }
@@ -77,18 +86,9 @@
     }
   }
 
-  .mobile-props-container {
+  .mobile-props {
     justify-self: center;
     width: 40rem;
-
-    .internal-container {
-      display: flex;
-      gap: 4rem;
-
-      .form-item {
-        display: flex;
-      }
-    }
   }
 }
 

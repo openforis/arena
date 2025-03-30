@@ -4,6 +4,7 @@ import { Surveys, TraverseMethod } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
+import * as ObjectUtils from '@core/objectUtils'
 import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
@@ -32,36 +33,49 @@ export const getNodeDefsByUuids =
 export const getNodeDefSource = (nodeDef) =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
-const filterNodeDefsWithoutSiblings = (nodeDefs) =>
-  nodeDefs.filter(
-    (nodeDef) =>
-      !NodeDef.isSampling(nodeDef) ||
-      nodeDefs.filter(
-        (_nodeDef) => NodeDef.isAnalysis(_nodeDef) && NodeDef.getChainUuid(_nodeDef) === NodeDef.getChainUuid(nodeDef)
-      ).length > 1
+const filterNodeDefsWithoutSiblings = (nodeDefs) => {
+  const analysisDefsByChainUuid = ObjectUtils.groupByProp(NodeDef.getChainUuid)(nodeDefs.filter(NodeDef.isAnalysis))
+  return nodeDefs.filter(
+    (nodeDef) => !NodeDef.isSampling(nodeDef) || analysisDefsByChainUuid[NodeDef.getChainUuid(nodeDef)]?.length > 1
   )
+}
 
 export const getNodeDefChildren =
-  (nodeDef, includeAnalysis = true) =>
+  (nodeDef, includeAnalysis = true, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
-    let childDefs = Surveys.getNodeDefChildren({ survey: surveyIndexed, nodeDef, includeAnalysis })
-    childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    let childDefs = Surveys.getNodeDefChildren({
+      survey: surveyIndexed,
+      nodeDef,
+      includeAnalysis,
+      includeLayoutElements,
+    })
+    if (!includeSamplingDefsWithoutSiblings) {
+      childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    }
     return childDefs
   }
 
 export const getNodeDefChildrenSorted =
-  ({ nodeDef, includeAnalysis = false, cycle = null }) =>
+  ({
+    nodeDef,
+    includeAnalysis = false,
+    cycle = null,
+    includeLayoutElements = false,
+    includeSamplingDefsWithoutSiblings = false,
+  }) =>
   (survey) => {
-    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, nodeDef, includeAnalysis, cycle })
-    childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, cycle, nodeDef, includeAnalysis, includeLayoutElements })
+    if (!includeSamplingDefsWithoutSiblings) {
+      childDefs = filterNodeDefsWithoutSiblings(childDefs)
+    }
     return childDefs
   }
 
 export const getNodeDefChildrenInOwnPage =
-  ({ nodeDef, cycle }) =>
+  ({ nodeDef, cycle, includeAnalysis = true, includeLayoutElements = false }) =>
   (survey) => {
-    const children = getNodeDefChildren(nodeDef)(survey)
+    const children = getNodeDefChildren(nodeDef, includeAnalysis, includeLayoutElements)(survey)
     const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
     const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
     if (childrenIndex.length === 0) return childrenInOwnPage
@@ -80,7 +94,7 @@ export const getNodeDefChildrenInOwnPage =
   }
 
 export const getNodeDefDescendantsInSingleEntities =
-  ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null }) =>
+  ({ nodeDef, includeAnalysis, filterFn, sorted = false, cycle = null, includeSamplingDefsWithoutSiblings = false }) =>
   (survey) => {
     const descendants = []
 
@@ -90,8 +104,13 @@ export const getNodeDefDescendantsInSingleEntities =
     while (!queue.isEmpty()) {
       const entityDefCurrent = queue.dequeue()
       const entityDefCurrentChildren = sorted
-        ? getNodeDefChildrenSorted({ nodeDef: entityDefCurrent, includeAnalysis, cycle })(survey)
-        : getNodeDefChildren(entityDefCurrent, includeAnalysis)(survey)
+        ? getNodeDefChildrenSorted({
+            nodeDef: entityDefCurrent,
+            includeAnalysis,
+            cycle,
+            includeSamplingDefsWithoutSiblings,
+          })(survey)
+        : getNodeDefChildren(entityDefCurrent, includeAnalysis, false, includeSamplingDefsWithoutSiblings)(survey)
 
       descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
 
@@ -119,6 +138,7 @@ export const getNodeDefDescendantAttributesInSingleEntities = ({
   includeMultipleAttributes = false,
   sorted = false,
   cycle = null,
+  includeSamplingDefsWithoutSiblings = true,
 }) =>
   getNodeDefDescendantsInSingleEntities({
     nodeDef,
@@ -126,6 +146,7 @@ export const getNodeDefDescendantAttributesInSingleEntities = ({
     filterFn: includeMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute,
     sorted,
     cycle,
+    includeSamplingDefsWithoutSiblings,
   })
 
 export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
@@ -136,11 +157,13 @@ export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
   return R.pipe(getNodeDefChildren(nodeDef), R.any(NodeDef.isEntity))(survey)
 }
 
-export const getNodeDefChildByName = (nodeDef, childName) =>
-  R.pipe(
-    getNodeDefChildren(nodeDef),
-    R.find((childDef) => childName === NodeDef.getName(childDef))
-  )
+export const getNodeDefChildByName = (nodeDef, childName) => (survey) =>
+  SurveyNodeDefsIndex.hasNodeDefsIndexByName(survey)
+    ? Surveys.getNodeDefByName({ survey, name: childName })
+    : R.pipe(
+        getNodeDefChildren(nodeDef),
+        R.find((childDef) => childName === NodeDef.getName(childDef))
+      )(survey)
 
 export const getNodeDefParent = (nodeDef) => (survey) => {
   if (NodeDef.isRoot(nodeDef)) return null
@@ -153,11 +176,6 @@ export const getNodeDefAreaBasedEstimate = (nodeDef) => (survey) =>
 
 export const getAreaBasedEstimatedOfNodeDef = (nodeDef) => (survey) =>
   getNodeDefByUuid(NodeDef.getAreaBasedEstimatedOf(nodeDef))(survey)
-
-export const getNodeDefSiblingByName = (nodeDef, name) => (survey) => {
-  const parentDef = getNodeDefParent(nodeDef)(survey)
-  return getNodeDefChildByName(parentDef, name)(survey)
-}
 
 const _nodeDefKeysFilter = (n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n)
 
@@ -183,8 +201,7 @@ export const getNodeDefsRootUnique = (survey) => {
   )
 }
 
-export const getNodeDefByName = (name) =>
-  R.pipe(getNodeDefsArray, R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name)))
+export const getNodeDefByName = (name) => (survey) => Surveys.getNodeDefByName({ survey, name })
 
 export const getNodeDefsByCategoryUuid = (uuid) =>
   R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid)))
@@ -193,6 +210,8 @@ export const getNodeDefsByTaxonomyUuid = (uuid) =>
   R.pipe(getNodeDefsArray, R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid)))
 
 export const findNodeDef = (predicate) => R.pipe(getNodeDefsArray, R.find(predicate))
+
+export const findNodeDefByName = (name) => (survey) => Surveys.findNodeDefByName({ survey, name })
 
 export const getNodeDefMaxDecimalDigits = (nodeDef) => (survey) => {
   const referenceNodeDef =
@@ -311,16 +330,17 @@ export const getNodeDefPath =
   }
 
 export const getHierarchy =
-  (filterFn = NodeDef.isEntity) =>
+  (filterFn = NodeDef.isEntity, cycle = undefined) =>
   (survey) => {
     let length = 1
     const h = (array, nodeDef) => {
-      const childDefs = [
-        ...(NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)
-          ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
-          : []),
-      ]
-
+      const childDefs = []
+      if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
+        const childDefsNotFiltered = cycle
+          ? getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
+          : getNodeDefChildren(nodeDef)(survey)
+        childDefs.push(...childDefsNotFiltered.filter(filterFn))
+      }
       length += childDefs.length
       const item = { ...nodeDef, children: childDefs.reduce(h, []) }
       array.push(item)
@@ -350,11 +370,12 @@ export const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => 
 }
 
 export const visitDescendantsAndSelf =
-  ({ nodeDef = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
+  ({ nodeDef = null, cycle = null, visitorFn, traverseMethod = TraverseMethod.bfs }) =>
   (survey) => {
     const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
     return Surveys.visitDescendantsAndSelfNodeDef({
       survey,
+      cycle,
       nodeDef: nodeDefToVisit,
       visitor: visitorFn,
       traverseMethod,
@@ -362,11 +383,12 @@ export const visitDescendantsAndSelf =
   }
 
 export const findDescendants =
-  ({ nodeDef = null, filterFn }) =>
+  ({ nodeDef = null, cycle = null, filterFn }) =>
   (survey) => {
     const descendants = []
     visitDescendantsAndSelf({
       nodeDef,
+      cycle,
       visitorFn: (nodeDefCurrent) => {
         if (filterFn(nodeDefCurrent)) {
           descendants.push(nodeDefCurrent)
@@ -376,22 +398,18 @@ export const findDescendants =
     return descendants
   }
 
-export const getDescendantsAndSelf =
-  ({ nodeDef = null }) =>
+export const getNodeDefDescendantsAndSelf =
+  ({ nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs } = {}) =>
   (survey) => {
     const descendants = []
-    const queue = new Queue()
-
-    queue.enqueue(nodeDef || getNodeDefRoot(survey))
-
-    while (!queue.isEmpty()) {
-      const nodeDefCurrent = queue.dequeue()
-
-      descendants.push(nodeDefCurrent)
-
-      const childrenDefs = getNodeDefChildren(nodeDefCurrent)(survey)
-      queue.enqueueItems(childrenDefs)
-    }
+    visitDescendantsAndSelf({
+      nodeDef,
+      cycle,
+      visitorFn: (visitedNodeDef) => {
+        descendants.push(visitedNodeDef)
+      },
+      traverseMethod,
+    })(survey)
     return descendants
   }
 

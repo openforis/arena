@@ -1,23 +1,40 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { FormHeaderColor } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { valuePropsCoordinate, valuePropsTaxon } from '@core/survey/nodeValueProps'
 
 import { NumberFormats } from '@webapp/components/form/Input'
 
+import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefCode from './components/types/NodeDefCode'
+import NodeDefCoordinate from './components/types/nodeDefCoordinate'
+import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
+import NodeDefFormHeader from './components/types/nodeDefFormHeader'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
-import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCode from './components/types/NodeDefCode'
-import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
-import NodeDefDate from './components/types/nodeDefDate'
 import NodeDefTime from './components/types/nodeDefTime'
+import NodeDefGeo from './components/types/nodeDefGeo'
 
-const { integer, decimal, text, date, time, boolean, code, coordinate, taxon, file, entity } = NodeDef.nodeDefType
+const { boolean, code, coordinate, date, decimal, entity, file, formHeader, geo, integer, taxon, text, time } =
+  NodeDef.nodeDefType
+
+export const headerColorRgbCodesByColor = {
+  [FormHeaderColor.blue]: '#b3e5fc',
+  [FormHeaderColor.green]: '#b2dfdb',
+  [FormHeaderColor.orange]: '#ffb38a',
+  [FormHeaderColor.red]: '#f97c7c',
+  [FormHeaderColor.yellow]: '#fffdaf',
+}
+
+const singleEntityIcon = <span className="icon icon-insert-template icon-left" />
+const multipleAttributeIcon = <span title="Multiple">M</span>
+const keyIcon = <span className="icon icon-key icon-left" />
 
 const propsUI = {
   [integer]: {
@@ -33,13 +50,7 @@ const propsUI = {
   },
 
   [text]: {
-    icon: (
-      <span className="icon-left display-flex">
-        {R.range(0, 3).map((i) => (
-          <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }} />
-        ))}
-      </span>
-    ),
+    icon: <span className="icon-left node_def__icon">ABC</span>,
     defaultValue: '',
   },
 
@@ -85,6 +96,11 @@ const propsUI = {
     ],
   },
 
+  [geo]: {
+    component: NodeDefGeo,
+    icon: <span className="icon icon-codepen icon-left" />,
+  },
+
   [taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left" />,
@@ -121,6 +137,14 @@ const propsUI = {
       [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(cycle, NodeDefLayout.renderType.table),
     }),
   },
+
+  [formHeader]: {
+    component: NodeDefFormHeader,
+    icon: <span className="icon icon-minus icon-left" />,
+    defaultProps: () => ({
+      [NodeDef.propKeys.headerColor]: FormHeaderColor.blue,
+    }),
+  },
 }
 
 const getPropByType =
@@ -132,10 +156,11 @@ const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropBy
 
 export const getIconByType = getPropByType('icon')
 
-export const getIconByNodeDef = (nodeDef) => (
+export const getIconByNodeDef = (nodeDef, includeKey = false) => (
   <div className="node-def__icon-wrapper">
-    {NodeDef.isMultipleAttribute(nodeDef) && <span title="Multiple">M</span>}
-    {getIconByType(NodeDef.getType(nodeDef))}
+    {includeKey && NodeDef.isKey(nodeDef) && keyIcon}
+    {NodeDef.isMultipleAttribute(nodeDef) && multipleAttributeIcon}
+    {NodeDef.isSingleEntity(nodeDef) ? singleEntityIcon : getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )
 

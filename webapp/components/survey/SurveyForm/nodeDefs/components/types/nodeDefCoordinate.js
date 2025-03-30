@@ -12,7 +12,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { useI18n } from '@webapp/store/system'
 import { RecordState } from '@webapp/store/ui/record'
 
 import { Button, Map, PanelRight } from '@webapp/components'
@@ -28,10 +27,19 @@ import * as NodeDefUiProps from '../../nodeDefUIProps'
 const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
 
 const NodeDefCoordinate = (props) => {
-  const { insideTable, surveyInfo, nodeDef, nodes, edit, entry, renderType, canEditRecord, readOnly, updateNode } =
-    props
+  const {
+    canEditRecord,
+    edit,
+    entry,
+    insideTable = false,
+    nodeDef,
+    nodes,
+    readOnly = false,
+    renderType,
+    surveyInfo,
+    updateNode,
+  } = props
 
-  const i18n = useI18n()
   const lang = useSurveyPreferredLang()
   const canUseMap = useAuthCanUseMap()
   const noHeader = useSelector(RecordState.hasNoHeader)
@@ -185,11 +193,11 @@ const NodeDefCoordinate = (props) => {
   return (
     <div className={classNames('survey-form__node-def-coordinate', { 'with-map': canUseMap })}>
       <div className="form-items">
-        <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>{xInput}</FormItem>
-        <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>{yInput}</FormItem>
-        <FormItem label={i18n.t('common.srs')}>{srsDropdown}</FormItem>
+        <FormItem label="surveyForm.nodeDefCoordinate.x">{xInput}</FormItem>
+        <FormItem label="surveyForm.nodeDefCoordinate.y">{yInput}</FormItem>
+        <FormItem label="common.srs">{srsDropdown}</FormItem>
         {additionalFields.map((additionalField, index) => (
-          <FormItem key={additionalField} label={i18n.t(`surveyForm.nodeDefCoordinate.${additionalField}`)}>
+          <FormItem key={additionalField} label={`surveyForm.nodeDefCoordinate.${additionalField}`}>
             {additionalInputFields[index]}
           </FormItem>
         ))}
@@ -211,12 +219,6 @@ NodeDefCoordinate.propTypes = {
   renderType: PropTypes.string,
   surveyInfo: PropTypes.object.isRequired,
   updateNode: PropTypes.func.isRequired,
-}
-
-NodeDefCoordinate.defaultProps = {
-  insideTable: false,
-  readOnly: false,
-  renderType: undefined,
 }
 
 export default NodeDefCoordinate

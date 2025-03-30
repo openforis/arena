@@ -1,9 +1,11 @@
-@import 'webapp/style/vars';
-@import '../../../SurveyFormVars';
+@use '~@webapp/style/vars' as *;
+@use '../../../SurveyFormVars' as *;
 
 .survey-form__node-def-boolean {
   display: flex;
-  border: $formBorder;
+  margin-left: 0.2rem;
+  height: 1.2rem;
+  align-self: center;
 }
 
 .survey-form__node-def-entity-table-row {

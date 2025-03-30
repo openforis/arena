@@ -9,6 +9,8 @@ import * as SQL from '../../sql'
 const { nodeDefType } = NodeDef
 
 const columnSuffixCodeLabel = '_label'
+const columnSuffixFileUuid = '_file_uuid'
+const columnSuffixFileName = '_file_name'
 const columnSuffixTaxonScientificName = '_scientific_name'
 const columnSuffixTaxonVernacularName = '_vernacular_name'
 
@@ -21,7 +23,7 @@ const columnNamesSuffixGetterByType = {
     return suffixes
   },
   [nodeDefType.taxon]: () => ['', columnSuffixTaxonScientificName, columnSuffixTaxonVernacularName],
-  [nodeDefType.file]: () => ['_file_uuid', '_file_name'],
+  [nodeDefType.file]: () => [columnSuffixFileUuid, columnSuffixFileName],
 }
 
 const colTypesGetterByType = {
@@ -35,6 +37,7 @@ const colTypesGetterByType = {
   },
   [nodeDefType.date]: () => [SQL.types.date],
   [nodeDefType.decimal]: () => [SQL.types.decimal],
+  [nodeDefType.geo]: () => [SQL.types.varchar],
   [nodeDefType.entity]: () => [SQL.types.uuid],
   [nodeDefType.file]: () => [SQL.types.uuid, SQL.types.varchar],
   [nodeDefType.integer]: () => [SQL.types.bigint],
@@ -108,16 +111,24 @@ export default class ColumnNodeDef {
   }
 
   get codeLabelColumn() {
-    if (!NodeDef.isCode(this.nodeDef)) return null
-    return `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}`
+    return NodeDef.isCode(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}` : null
+  }
+
+  get fileNameColumn() {
+    return NodeDef.isFile(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixFileName}` : null
   }
 }
 
 ColumnNodeDef.columnSuffixCodeLabel = columnSuffixCodeLabel
+ColumnNodeDef.columnSuffixFileUuid = columnSuffixFileUuid
+ColumnNodeDef.columnSuffixFileName = columnSuffixFileName
 ColumnNodeDef.columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
 ColumnNodeDef.columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
 
-ColumnNodeDef.getCodeLabelColumnName = (nodeDef) => `${NodeDef.getName(nodeDef)}${columnSuffixCodeLabel}`
+const getColumnNameWithSuffix = (suffix) => (nodeDef) => `${NodeDef.getName(nodeDef)}${suffix}`
+ColumnNodeDef.getCodeLabelColumnName = getColumnNameWithSuffix(columnSuffixCodeLabel)
+ColumnNodeDef.getFileNameColumnName = getColumnNameWithSuffix(columnSuffixFileName)
+ColumnNodeDef.getFileUuidColumnName = getColumnNameWithSuffix(columnSuffixFileUuid)
 
 ColumnNodeDef.getColumnNames = getColumnNames
 ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)

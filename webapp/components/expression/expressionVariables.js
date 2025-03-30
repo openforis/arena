@@ -7,24 +7,21 @@ import * as Expression from '@core/expressionParser/expression'
 import { ExpressionEditorType } from './expressionEditorType'
 
 // TODO: match all nodeDefTypes and throw an error if unknown:
-const toSqlType = (nodeDef) => {
-  if (NodeDef.isInteger(nodeDef)) {
-    return sqlTypes.bigint
-  }
-  if (NodeDef.isDecimal(nodeDef)) {
-    return sqlTypes.decimal
-  }
-  return sqlTypes.varchar
+const sqlTypeByNodeDefType = {
+  [NodeDef.nodeDefType.integer]: sqlTypes.bigint,
+  [NodeDef.nodeDefType.decimal]: sqlTypes.decimal,
 }
+const getSqlType = (nodeDef) => sqlTypeByNodeDefType[NodeDef.getType(nodeDef)] ?? sqlTypes.varchar
 
 const getJsVariables = (nodeDef) => [
   {
-    value: NodeDef.getName(nodeDef),
     label: NodeDef.getName(nodeDef),
-    type: toSqlType(nodeDef),
-    uuid: NodeDef.getUuid(nodeDef),
+    multiple: NodeDef.isMultiple(nodeDef),
+    nodeDefType: NodeDef.getType(nodeDef),
     parentUuid: NodeDef.getParentUuid(nodeDef),
-    entity: NodeDef.isEntity(nodeDef),
+    type: getSqlType(nodeDef),
+    uuid: NodeDef.getUuid(nodeDef),
+    value: NodeDef.getName(nodeDef),
   },
 ]
 
@@ -37,12 +34,13 @@ const getSqlVariables = (nodeDef, lang) => {
     (columnNames.length === 1 ? '' : ` - ${ColumnNodeDef.extractColumnName({ nodeDef, columnName: col })}`)
 
   return columnNames.map((col) => ({
-    value: col,
     label: getLabel(col),
-    type: toSqlType(nodeDef),
-    uuid: NodeDef.getUuid(nodeDef),
+    multiple: NodeDef.isMultiple(nodeDef),
+    nodeDefType: NodeDef.getType(nodeDef),
     parentUuid: NodeDef.getParentUuid(nodeDef),
-    entity: NodeDef.isEntity(nodeDef),
+    type: getSqlType(nodeDef),
+    uuid: NodeDef.getUuid(nodeDef),
+    value: col,
   }))
 }
 
@@ -145,6 +143,7 @@ const getVariablesGroupedByParentUuid = ({
   mode,
   nodeDefCurrent = null,
   excludeCurrentNodeDef = false,
+  includeThis = true,
 }) => {
   const variablesGroupedByParentUuid = variables.reduce(
     (byParentUuid, variable) => ({
@@ -167,7 +166,7 @@ const getVariablesGroupedByParentUuid = ({
     // sort groups by hierarchy level, in descending order
     .sort((groupA, groupB) => groupB.hierarchyLevel - groupA.hierarchyLevel)
 
-  if (!nodeDefCurrent || excludeCurrentNodeDef) {
+  if (!nodeDefCurrent || excludeCurrentNodeDef || !includeThis || NodeDef.isEntity(nodeDefCurrent)) {
     return groups
   }
   // always show current variable at the beginning
@@ -247,5 +246,7 @@ export const getVariablesChildren = ({
 
   _sortVariables({ nodeDefCurrent, variables })
 
-  return groupByParent ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent }) : variables
+  return groupByParent
+    ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, includeThis: false })
+    : variables
 }

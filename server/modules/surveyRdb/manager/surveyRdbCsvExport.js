@@ -1,13 +1,14 @@
-import * as A from '@core/arena'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
+import { Objects } from '@openforis/arena-core'
 
-import { Query } from '@common/model/query'
+import * as A from '@core/arena'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+
+import { ArrayUtils } from '@core/arrayUtils'
 import { CsvDataExportModel } from '@common/model/csvExport'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
-
-import * as DataTable from '@server/modules/surveyRdb/schemaRdb/dataTable'
+import { Query } from '@common/model/query'
 
 const maxExpandedCategoryItems = 20
 
@@ -66,6 +67,8 @@ const getCsvExportFields = ({
   addCycle = false,
   includeCategoryItemsLabels = true,
   expandCategoryItems = false,
+  includeInternalUuids = false,
+  includeDateCreated = false,
 }) => {
   const entityDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
@@ -73,22 +76,35 @@ const getCsvExportFields = ({
   // Consider only user selected fields (from column node defs)
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  const fields = nodeDefCols.flatMap((nodeDefCol) => {
-    const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
-    const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
-    if (fieldsExtractor) {
-      return fieldsExtractor({
-        survey,
-        columnNodeDef,
-        includeCategoryItemsLabels,
-        expandCategoryItems,
-      })
-    } else {
-      return columnNodeDef.names
-    }
-  })
-  // Cycle is 0-based
-  return [...(addCycle ? [DataTable.columnNameRecordCycle] : []), ...fields]
+  const fields = []
+  if (includeInternalUuids) {
+    ArrayUtils.addIfNotEmpty(viewDataNodeDef.columnParentUuidName)(fields)
+    fields.push(viewDataNodeDef.columnUuidName)
+  }
+  if (addCycle) {
+    // Cycle is 0-based
+    fields.push(ViewDataNodeDef.columnSet.recordCycle)
+  }
+  if (includeDateCreated) {
+    fields.push(ViewDataNodeDef.columnSet.dateCreated)
+  }
+  fields.push(
+    ...nodeDefCols.flatMap((nodeDefCol) => {
+      const columnNodeDef = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+      const fieldsExtractor = fieldsExtractorByNodeDefType[NodeDef.getType(nodeDefCol)]
+      if (fieldsExtractor) {
+        return fieldsExtractor({
+          survey,
+          columnNodeDef,
+          includeCategoryItemsLabels,
+          expandCategoryItems,
+        })
+      } else {
+        return columnNodeDef.names
+      }
+    })
+  )
+  return fields
 }
 
 const getCsvExportFieldsAgg = ({ survey, query }) => {
@@ -139,18 +155,43 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   }
 }
 
-const getCsvObjectTransformerNullsToEmpty = () => {
-  return (obj) => {
-    Object.entries(obj).forEach(([key, value]) => {
-      if (A.isNull(value)) {
-        obj[key] = ''
+const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNamesGenerator }) => {
+  const nodeDefUuidCols = Query.getAttributeDefUuids(query)
+  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
+  const transformer = (obj) => {
+    nodeDefFileCols.forEach((nodeDef) => {
+      const fileUuidField = ColumnNodeDef.getFileUuidColumnName(nodeDef)
+      const fileUuid = obj[fileUuidField]
+      const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
+      const fileName = obj[fileNameField]
+      if (fileUuid && Objects.isNotEmpty(fileName)) {
+        const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
+        obj[fileNameField] = uniqueFileName
       }
     })
     return obj
   }
+  return { transformer }
 }
 
-const getCsvObjectTransformer = ({ survey, query, expandCategoryItems, nullsToEmpty = false }) => {
+const getCsvObjectTransformerNullsToEmpty = () => (obj) => {
+  Object.entries(obj).forEach(([key, value]) => {
+    if (A.isNull(value)) {
+      obj[key] = ''
+    }
+  })
+  return obj
+}
+
+const getCsvObjectTransformer = ({
+  survey,
+  query,
+  expandCategoryItems,
+  nullsToEmpty = false,
+  keepFileNamesUnique = false, // if true, uniqueFileNamesGenerator must be specified
+  uniqueFileNamesGenerator = null, // required if keepFileNamesUnique is true
+}) => {
   const transformers = []
   if (expandCategoryItems) {
     transformers.push(getCsvObjectTransformerExpandCategoryItems({ survey, query }))
@@ -158,7 +199,15 @@ const getCsvObjectTransformer = ({ survey, query, expandCategoryItems, nullsToEm
   if (nullsToEmpty) {
     transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
-  return transformers.length === 0 ? null : A.pipe(...transformers)
+  if (keepFileNamesUnique && uniqueFileNamesGenerator) {
+    const { transformer } = getCsvObjectTransformerUniqueFileNames({
+      survey,
+      query,
+      uniqueFileNamesGenerator,
+    })
+    transformers.push(transformer)
+  }
+  return { transformers }
 }
 
 export const SurveyRdbCsvExport = {

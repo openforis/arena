@@ -2,6 +2,9 @@ import AdmZip from 'adm-zip'
 import fs from 'fs'
 import path from 'path'
 
+import * as DateUtils from '../../../core/dateUtils'
+import { FileFormats } from '../../../core/fileFormats'
+
 import { TestId, getSelector } from '../../../webapp/utils/testId'
 
 import { survey } from '../mock/survey'
@@ -11,7 +14,6 @@ import { gotoHome, gotoDataExport } from './_navigation'
 
 import { downloadsPath } from '../paths'
 import { cluster, tree, plot } from '../mock/nodeDefs'
-import * as DateUtils from '../../../core/dateUtils'
 import { parseCsvAsync } from '../../utils/csvUtils'
 
 let extractedFolderName = ''
@@ -40,14 +42,18 @@ export default () =>
     gotoDataExport()
 
     test(`Export data ${survey.name}`, async () => {
-      const prepareExportBtnSelector = getSelector(TestId.dataExport.prepareExport, 'button')
-      await page.waitForSelector(prepareExportBtnSelector)
+      const csvFileFormatSelector = getSelector(TestId.dataExport.fileFormatOption(FileFormats.csv), 'button')
+      await page.waitForSelector(csvFileFormatSelector)
+      await page.click(csvFileFormatSelector)
+
+      const startExportBtnSelector = getSelector(TestId.dataExport.startExport, 'button')
+      await page.waitForSelector(startExportBtnSelector)
 
       // click on the export button and wait for the job dialog to open
-      await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(prepareExportBtnSelector)])
+      await Promise.all([page.waitForSelector(getSelector(TestId.modal.modal)), page.click(startExportBtnSelector)])
 
       // wait for the job to complete: export button will appear
-      const downloadBtnSelector = getSelector(TestId.dataExport.exportCSV, 'button')
+      const downloadBtnSelector = getSelector(TestId.dataExport.downloadExportedFileBtn, 'button')
       await page.waitForSelector(downloadBtnSelector)
 
       await expect(downloadBtnSelector).toBeTruthy()
@@ -59,7 +65,7 @@ export default () =>
 
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.click(getSelector(TestId.dataExport.exportCSV, 'button')),
+        page.click(getSelector(TestId.dataExport.downloadExportedFileBtn, 'button')),
       ])
 
       const surveyZipPath = path.resolve(downloadsPath, zipFileName)

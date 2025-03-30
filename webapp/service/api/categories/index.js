@@ -47,6 +47,21 @@ export const fetchCategoryItems = ({
     data: { draft, parentUuid, search, lang },
   })
 
+export const countCategoryItems = async ({
+  surveyId,
+  categoryUuid,
+  draft = true,
+  parentUuid = null,
+  search = null,
+}) => {
+  const {
+    data: { count },
+  } = await axios.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items/count`, {
+    params: { draft, parentUuid, search },
+  })
+  return count
+}
+
 export const fetchCategoryItemsInLevelRequest = ({ surveyId, categoryUuid, levelIndex, draft = true }) =>
   cancelableGetRequest({
     url: `/api/survey/${surveyId}/categories/${categoryUuid}/levels/${levelIndex}/items`,
@@ -65,10 +80,10 @@ export const fetchSamplingPointData = ({ surveyId, levelIndex = 0, limit = 500, 
     data: { levelIndex, limit, offset },
   })
 
-export const startExportAllCategoriesJob = async ({ surveyId, draft = true }) => {
+export const startExportAllCategoriesJob = async ({ surveyId, fileFormat, draft = true }) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft })
+  } = await axios.post(`/api/survey/${surveyId}/categories/export`, { draft, fileFormat })
 
   return { job }
 }

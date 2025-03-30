@@ -13,14 +13,15 @@ export const startCollectDataImportJob = ({ user, surveyId, filePath, deleteAllR
     cycle,
     forceImport,
   })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
 
-export const startCSVDataImportJob = ({
+export const startFlatDataImportJob = ({
   user,
   surveyId,
   filePath,
+  fileFormat,
   cycle,
   nodeDefUuid,
   dryRun = false,
@@ -28,12 +29,14 @@ export const startCSVDataImportJob = ({
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
   includeFiles = false,
+  deleteExistingEntities = false,
   abortOnErrors = true,
 }) => {
   const jobParams = {
     user,
     surveyId,
     filePath,
+    fileFormat,
     cycle,
     nodeDefUuid,
     dryRun,
@@ -41,9 +44,10 @@ export const startCSVDataImportJob = ({
     insertMissingNodes,
     updateRecordsInAnalysis,
     includeFiles,
+    deleteExistingEntities,
     abortOnErrors,
   }
   const job = dryRun ? new DataImportValidationJob(jobParams) : new DataImportJob(jobParams)
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }

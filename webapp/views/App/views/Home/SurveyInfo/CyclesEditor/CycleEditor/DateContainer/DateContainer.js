@@ -38,8 +38,4 @@ DateContainer.propTypes = {
   onChange: PropTypes.func.isRequired,
 }
 
-DateContainer.defaultProps = {
-  date: null,
-}
-
 export default DateContainer

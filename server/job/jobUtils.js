@@ -19,15 +19,30 @@ export const jobThreadMessageTypes = {
   cancelJob: 'cancelJob',
 }
 
-const calculateJobProgress = (job) => {
-  const partialProgress =
-    job.status === jobStatus.succeeded ? 100 : job.total > 0 ? Math.floor((100 * job.processed) / job.total) : 0
+const calculatePartialProgress = (job) => {
+  const { processed, status, total } = job
+  if (status === jobStatus.succeeded) {
+    return 100
+  }
+  if (total > 0) {
+    return Math.floor((100 * processed) / total)
+  }
+  return 0
+}
 
-  if (job.innerJobs.length === 0 || job.currentInnerJobIndex < 0 || partialProgress === 100) {
+const calculateJobProgress = (job) => {
+  const { currentInnerJobIndex, innerJobs, processed, total } = job
+  const partialProgress = calculatePartialProgress(job)
+  if (
+    innerJobs.length === 0 ||
+    currentInnerJobIndex < 0 ||
+    partialProgress === 100 ||
+    processed > currentInnerJobIndex
+  ) {
     return partialProgress
   }
-
-  return partialProgress + Math.floor(calculateJobProgress(job.getCurrentInnerJob()) / job.total)
+  const currentInnerJobProgress = calculateJobProgress(job.getCurrentInnerJob())
+  return partialProgress + Math.floor(currentInnerJobProgress / total)
 }
 
 const calculatedElapsedMillis = (job) =>

@@ -28,12 +28,7 @@ export const useSurveyInfoForm = () => {
     setValidation(Validation.getValidation(surveyInfo))
   }, [surveyInfo])
 
-  // Setter methods
-  const setDefaultCycleKey = (value) => setObjectField(Survey.infoKeys.defaultCycleKey, value)
-  const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
-  const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
-  const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
-  const setSamplingPolygon = (value) => setObjectField(Survey.infoKeys.samplingPolygon, value)
+  // Setters
   const setCycles = (value) => {
     const cycleKeysNext = Object.keys(value)
     const fieldsUpdated = { [Survey.infoKeys.cycles]: value }
@@ -42,12 +37,18 @@ export const useSurveyInfoForm = () => {
     }
     return setObjectFields(fieldsUpdated)
   }
-
-  const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
+  const setDefaultCycleKey = (value) => setObjectField(Survey.infoKeys.defaultCycleKey, value)
   const setDescriptions = (descriptions) => setObjectField(Survey.infoKeys.descriptions, descriptions)
-
+  const setFieldManualLinks = (links) => setObjectField(Survey.infoKeys.fieldManualLinks, links)
+  const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
+  const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
+  const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
   const setSampleBasedImageInterpretationEnabled = (value) =>
     setObjectField(Survey.infoKeys.sampleBasedImageInterpretationEnabled, value)
+  const setSamplingPolygon = (value) => setObjectField(Survey.infoKeys.samplingPolygon, value)
+  const setSecurity = (value) => setObjectField(Survey.infoKeys.security, value)
+  const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
+  const setUserExtraPropDefs = (value) => setObjectField(Survey.infoKeys.userExtraPropDefs, value)
 
   const saveProps = () => {
     enableValidation()
@@ -62,11 +63,14 @@ export const useSurveyInfoForm = () => {
     setCycles,
     setDefaultCycleKey,
     setDescriptions,
+    setFieldManualLinks,
     setLabels,
     setLanguages,
     setName,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
+    setSecurity,
     setSrs,
+    setUserExtraPropDefs,
   }
 }

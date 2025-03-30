@@ -7,7 +7,10 @@ export const nodeDefType = {
   boolean: 'boolean',
   code: 'code',
   coordinate: 'coordinate',
+  geo: 'geo',
   taxon: 'taxon',
   file: 'file',
   entity: 'entity',
+  // layout elements
+  formHeader: 'formHeader',
 }

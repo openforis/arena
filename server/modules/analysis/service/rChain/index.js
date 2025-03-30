@@ -7,6 +7,7 @@ import FileZip from '@server/utils/file/fileZip'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as RecordStep from '@core/record/recordStep'
+import { FileFormats } from '@core/fileFormats'
 
 import { TableChain } from '@common/model/db'
 import { Query } from '@common/model/query'
@@ -27,7 +28,15 @@ export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, to
   new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
 
 // ==== READ
-export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUuid, draft = true }) => {
+export const fetchNodeData = async ({
+  res,
+  surveyId,
+  cycle,
+  chainUuid,
+  nodeDefUuid,
+  draft = true,
+  fileFormat = FileFormats.csv,
+}) => {
   // prepare query
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
@@ -40,7 +49,8 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
   const recordSteps = Chain.isSubmitOnlyAnalysisStepDataIntoR(chain)
     ? [RecordStep.getStepIdByName(RecordStep.stepNames.analysis)]
     : null
-  const query = Query.create({ entityDefUuid: nodeDefUuid })
+  const filterRecordUuids = Chain.isSubmitOnlySelectedRecordsIntoR(chain) ? Chain.getSelectedRecordUuids(chain) : null
+  const query = Query.create({ entityDefUuid: nodeDefUuid, filterRecordUuids })
 
   // fetch data
   return SurveyRdbManager.fetchViewData({
@@ -52,7 +62,8 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
     includeFileAttributeDefs: false,
     addCycle: true,
     nullsToEmpty: true,
-    streamOutput: res,
+    outputStream: res,
+    fileFormat,
   })
 }
 
@@ -60,7 +71,7 @@ export const fetchNodeData = async ({ res, surveyId, cycle, chainUuid, nodeDefUu
 
 export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
   return job
 }
 

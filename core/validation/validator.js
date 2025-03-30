@@ -1,22 +1,49 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
+import { ArrayUtils } from '@core/arrayUtils'
+
 import * as Validation from './validation'
 import * as ValidationResult from './validationResult'
 import * as ValidatorFunctions from './_validator/validatorFunctions'
 
+const extractNestedErrorsOrWarnings = (validationResultOrValidation) => {
+  const errors = []
+  const warnings = []
+  const stack = [validationResultOrValidation]
+  const addUniqueItems = (items) =>
+    ArrayUtils.addItems({ items, avoidDuplicates: true, compareFn: Objects.isEqual, sideEffect: true })
+
+  while (stack.length > 0) {
+    const currentItem = stack.pop()
+    if (currentItem) {
+      if (typeof currentItem === 'string') {
+        errors.push(currentItem)
+      } else if (currentItem.key) {
+        const arr = ValidationResult.isError(currentItem) ? errors : warnings
+        const itemToAdd = R.omit([ValidationResult.keys.severity], currentItem)
+        addUniqueItems([itemToAdd])(arr)
+      } else {
+        addUniqueItems(Validation.getErrors(currentItem))(errors)
+        addUniqueItems(Validation.getWarnings(currentItem))(warnings)
+        const fieldValidations = Validation.getFieldValidations(currentItem)
+        stack.push(...Object.values(fieldValidations))
+      }
+    }
+  }
+  return { errors, warnings }
+}
+
 const validateProp = async (obj, prop, validations = []) => {
   const validationsEvaluated = await Promise.all(validations.map((validationFn) => validationFn(prop, obj)))
-
   const errors = []
   const warnings = []
   validationsEvaluated.forEach((validationResult) => {
-    if (validationResult) {
-      // Add validation result to errors or warnings
-      const arr = ValidationResult.isError(validationResult) ? errors : warnings
-      arr.push(R.omit([ValidationResult.keys.severity], validationResult))
-    }
+    const { errors: errorsCurrent, warnings: warningsCurrent } = extractNestedErrorsOrWarnings(validationResult)
+    errors.push(...errorsCurrent)
+    warnings.push(...warningsCurrent)
   })
-
   return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
 }
 
@@ -42,6 +69,7 @@ export const validate = async (obj, propsValidations, removeValidFields = true) 
 
 // Validator functions
 export const {
+  getProp,
   validateRequired,
   validateItemPropUniqueness,
   validateMinLength,
@@ -49,6 +77,7 @@ export const {
   validateName,
   validateNumber,
   validatePositiveNumber,
+  validatePositiveOrZeroNumber,
   validateEmail,
   validateEmails,
   isEmailValueValid,

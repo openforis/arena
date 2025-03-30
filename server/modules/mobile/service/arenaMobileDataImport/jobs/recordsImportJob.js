@@ -194,11 +194,16 @@ export default class RecordsImportJob extends DataImportBaseJob {
         this.skippedRecordsUuids.add(recordUuid)
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
       } else if (
-        (conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated ||
-          (conflictResolutionStrategy === ConflictResolutionStrategy.merge && recordUuid === existingRecordUuid)) &&
-        Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))
+        conflictResolutionStrategy === ConflictResolutionStrategy.overwriteIfUpdated ||
+        (conflictResolutionStrategy === ConflictResolutionStrategy.merge && recordUuid === existingRecordUuid)
       ) {
-        await this.mergeWithExistingRecord()
+        if (Dates.isAfter(Record.getDateModified(record), Record.getDateModified(existingRecordSummary))) {
+          await this.mergeWithExistingRecord()
+        } else {
+          // skip record
+          this.skippedRecordsUuids.add(recordUuid)
+          this.logDebug(`record ${recordUuid} skipped; it already exists and it has not been updated`)
+        }
       } else if (conflictResolutionStrategy === ConflictResolutionStrategy.merge) {
         await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
       }

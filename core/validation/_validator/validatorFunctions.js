@@ -14,7 +14,7 @@ const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 const validEmailRegex =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
+export const getProp = (propName, defaultValue = null) => R.pathOr(defaultValue, propName.split('.'))
 
 export const validateRequired = (errorKey) => (propName, obj) => {
   const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
@@ -50,8 +50,11 @@ export const validateNumber =
     return value && isNaN(value) ? { key: errorKey, params: errorParams } : null
   }
 
-export const validatePositiveNumber =
-  (errorKey, errorParams = {}) =>
+export const validatePositiveNumber = (errorKey, errorParams = {}) =>
+  validatePositiveOrZeroNumber(errorKey, errorParams, false)
+
+export const validatePositiveOrZeroNumber =
+  (errorKey, errorParams = {}, allowZero = true) =>
   (propName, item) => {
     const validateNumberResult = validateNumber(errorKey, errorParams)(propName, item)
     if (validateNumberResult) {
@@ -60,7 +63,7 @@ export const validatePositiveNumber =
 
     const value = getProp(propName)(item)
 
-    return value && value <= 0 ? { key: errorKey, params: errorParams } : null
+    return value && (allowZero ? value < 0 : value <= 0) ? { key: errorKey, params: errorParams } : null
   }
 
 export const isEmailValueValid = (email) => Objects.isEmpty(email) || validEmailRegex.test(email)

@@ -9,7 +9,17 @@ import { useI18n } from '@webapp/store/system'
 import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = (props) => {
-  const { children, className, id, labelKey, showIcon, showLabel, showKeys, validation, insideTable } = props
+  const {
+    children = null,
+    className = '',
+    id = null,
+    labelKey = 'common.invalid',
+    showIcon = false,
+    showKeys = false,
+    showLabel = true,
+    validation = null,
+    insideTable = false,
+  } = props
 
   const i18n = useI18n()
   const valid = Validation.isValid(validation)
@@ -42,22 +52,12 @@ ErrorBadge.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   id: PropTypes.string,
+  insideTable: PropTypes.bool,
   labelKey: PropTypes.string,
   showIcon: PropTypes.bool,
   showKeys: PropTypes.bool,
   showLabel: PropTypes.bool,
   validation: PropTypes.object,
-}
-
-ErrorBadge.defaultProps = {
-  children: null,
-  className: '',
-  id: null,
-  labelKey: 'common.invalid',
-  showIcon: false,
-  showKeys: false,
-  showLabel: true,
-  validation: null,
 }
 
 export default ErrorBadge

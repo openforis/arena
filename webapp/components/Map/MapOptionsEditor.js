@@ -31,7 +31,7 @@ export const MapOptionsEditor = () => {
   return (
     <div className="map-options leaflet-bottom leaflet-right">
       <div className="leaflet-control leaflet-bar">
-        {!popupOpen && <ButtonIconGear onMouseOver={onIconMouseOver} />}
+        {!popupOpen && <ButtonIconGear onMouseOver={onIconMouseOver} variant="contained" />}
         {popupOpen && (
           <div className="popup" onMouseLeave={onPopupMouseLeave}>
             {Object.entries(options)

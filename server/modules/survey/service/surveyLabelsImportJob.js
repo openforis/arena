@@ -4,7 +4,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
 import Job from '@server/job/job'
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import { SurveyLabelsExportModel } from './surveyLabelsExportModel'
@@ -29,17 +29,18 @@ export default class SurveyLabelsImportJob extends Job {
 
   async execute() {
     const { context, tx } = this
-    const { filePath, surveyId } = context
+    const { filePath, fileFormat, surveyId } = context
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true }, tx)
     this.setContext({ survey })
     const langCodes = Survey.getLanguages(Survey.getSurveyInfo(survey))
 
     const nodeDefsUpdated = []
 
-    this.csvReader = CSVReader.createReaderFromFile(
+    this.flatDataReader = FlatDataReader.createReaderFromFile({
       filePath,
-      this.validateHeaders,
-      async (row) => {
+      fileFormat,
+      onHeaders: this.validateHeaders,
+      onRow: async (row) => {
         const nodeDef = await this.getNodeDef({ survey, row })
         if (!nodeDef) return
 
@@ -55,10 +56,10 @@ export default class SurveyLabelsImportJob extends Job {
 
         this.incrementProcessedItems()
       },
-      (total) => (this.total = total)
-    )
+      onTotalChange: (total) => (this.total = total),
+    })
 
-    await this.csvReader.start()
+    await this.flatDataReader.start()
 
     if (nodeDefsUpdated.length > 0) {
       await NodeDefManager.updateNodeDefPropsInBatch(
@@ -90,7 +91,7 @@ export default class SurveyLabelsImportJob extends Job {
     const validHeaders = [...fixedHeaders, ...dynamicHeaders]
     const invalidHeaders = headers.filter((header) => !validHeaders.includes(header)).join(', ')
     if (invalidHeaders) {
-      await this.addErrorAndStopCsvReader('invalidHeaders', { invalidHeaders })
+      await this.addErrorAndStopFlatDataReader('invalidHeaders', { invalidHeaders })
     }
   }
 
@@ -103,19 +104,19 @@ export default class SurveyLabelsImportJob extends Job {
       nodeDef = Survey.getNodeDefByName(name)(survey)
     }
     if (!nodeDef) {
-      await this.addErrorAndStopCsvReader('cannotFindNodeDef', { name })
+      await this.addErrorAndStopFlatDataReader('cannotFindNodeDef', { name })
     }
     return nodeDef
   }
 
-  async addErrorAndStopCsvReader(key, params) {
+  async addErrorAndStopFlatDataReader(key, params) {
     this.addError({
       error: {
         valid: false,
         errors: [{ key: `${errorPrefix}${key}`, params }],
       },
     })
-    this.csvReader.cancel()
+    this.flatDataReader.cancel()
     await this.setStatusFailed()
   }
 }

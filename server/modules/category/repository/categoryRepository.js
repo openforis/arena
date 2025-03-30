@@ -250,33 +250,41 @@ export const fetchItemsByCategoryUuid = async (
   return backup || draft ? items : R.filter((item) => item.published)(items)
 }
 
-const getWhereConditionItemsWithLevelAndCode = ({ draft, tableAlias = 'i' }) => {
+const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null, tableAlias = 'i' }) => {
   const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, `${tableAlias}.`, true)
-  return `${tableAlias}.level_uuid = $/levelUuid/ AND COALESCE(${codeColumn}, '') = $/code/`
+  return `${tableAlias}.level_uuid = $/levelUuid/ 
+    AND parent_uuid ${parentUuid ? '= $/parentUuid/' : ' IS NULL'} 
+    AND COALESCE(${codeColumn}, '') = $/code/`
 }
 
-export const countItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+export const countItemsByLevelParentAndCode = async (
+  { surveyId, levelUuid, parentUuid, code, draft = false },
+  client = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const row = await client.one(
     `SELECT COUNT(*) 
      FROM ${schema}.category_item i
-     WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
+     WHERE ${getWhereConditionItemsWithLevelParentAndCode({ parentUuid, draft })}
   `,
-    { levelUuid, code: Strings.defaultIfEmpty('')(code) }
+    { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) }
   )
   return Number(row.count)
 }
 
-export const fetchItemsByLevelAndCode = async ({ surveyId, levelUuid, code, draft = false }, client = db) => {
+export const fetchItemsByLevelParentAndCode = async (
+  { surveyId, levelUuid, parentUuid, code, draft = false },
+  client = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const items = await client.map(
     `
       SELECT i.* 
       FROM ${schema}.category_item i
-      WHERE ${getWhereConditionItemsWithLevelAndCode({ draft })}
+      WHERE ${getWhereConditionItemsWithLevelParentAndCode({ parentUuid, draft })}
      ORDER BY i.id
     `,
-    { levelUuid, code: Strings.defaultIfEmpty('')(code) },
+    { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) },
     (def) => DB.transformCallback(def, draft, true)
   )
 
@@ -341,26 +349,38 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 const _getSearchQueryParam = ({ searchValue }) =>
   `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
-export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = 5000 },
-  client = db
-) => {
+const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
-  const search = _getSearchQueryParam({ searchValue })
-  const items = await client.map(
-    `SELECT i.* 
-    FROM ${getSurveyDBSchema(surveyId)}.category_item i
-    JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return `SELECT i.* 
+    FROM ${schema}.category_item i
+    JOIN ${schema}.category_level l 
       ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $/categoryUuid/ 
       AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
       ${searchValueCondition}
     ORDER BY i.id
-    LIMIT $/limit/`,
-    { categoryUuid, search, limit },
-    (def) => dbTransformCallback(def, draft, true)
-  )
+    ${limit ? 'LIMIT $/limit/' : ''}`
+}
 
+export const countItemsByParentUuid = async (
+  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null },
+  client = db
+) => {
+  const search = _getSearchQueryParam({ searchValue })
+  const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang })
+  return client.one(`SELECT COUNT(items.*) FROM (${select}) AS items`, { categoryUuid, search }, (r) => Number(r.count))
+}
+
+export const fetchItemsByParentUuid = async (
+  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = NaN },
+  client = db
+) => {
+  const search = _getSearchQueryParam({ searchValue })
+  const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
+  const items = await client.map(select, { categoryUuid, search, limit }, (def) =>
+    dbTransformCallback(def, draft, true)
+  )
   return draft ? items : R.filter((item) => item.published)(items)
 }
 

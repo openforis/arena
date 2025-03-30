@@ -23,8 +23,10 @@ const AnalysisNodeDefs = () => {
   const i18n = useI18n()
 
   const chain = useChain()
-  const validation = Chain.getValidation(chain)
   const survey = useSurvey()
+
+  const hasSamplingDesign = Chain.hasSamplingDesign(chain)
+  const validation = Chain.getValidation(chain)
 
   const analysisNodeDefsContainerRef = useRef(null)
 
@@ -39,10 +41,10 @@ const AnalysisNodeDefs = () => {
 
   // hide sampling node defs if chain doen't use sampling design
   useOnUpdate(() => {
-    if (!Chain.hasSamplingDesign(chain)) {
+    if (!hasSamplingDesign) {
       setShowSamplingNodeDefs(false)
     }
-  }, [Chain.hasSamplingDesign(chain)])
+  }, [hasSamplingDesign])
 
   return (
     <div className="analysis-node-defs">

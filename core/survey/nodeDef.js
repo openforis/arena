@@ -20,6 +20,8 @@ import { valuePropsTaxon } from './nodeValueProps'
 
 export { nodeDefType }
 
+export const NodeDefLayoutElementTypes = [nodeDefType.formHeader]
+
 export const keys = {
   id: ObjectUtils.keys.id,
   uuid: ObjectUtils.keys.uuid,
@@ -31,6 +33,7 @@ export const keys = {
   draftAdvanced: 'draftAdvanced',
   draftAdvancedApplicable: 'draftAdvancedApplicable',
   draftAdvancedDefaultValues: 'draftAdvancedDefaultValues',
+  draftAdvancedFileNameExpression: 'draftAdvancedFileNameExpression',
   draftAdvancedValidations: 'draftAdvancedValidations',
   type: 'type',
   deleted: 'deleted',
@@ -52,6 +55,7 @@ export const propKeys = {
   descriptions: ObjectUtils.keysProps.descriptions,
   enumerate: 'enumerate', // only for multiple entities
   key: 'key',
+  autoIncrementalKey: 'autoIncrementalKey',
   labels: ObjectUtils.keysProps.labels,
   multiple: 'multiple',
   name: ObjectUtils.keys.name,
@@ -87,7 +91,22 @@ export const propKeys = {
   includeAccuracy: 'includeAccuracy',
   includeAltitude: 'includeAltitude',
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
+
+  // layout elements
+  headerColor: 'headerColor',
 }
+
+const commonAttributePropsKeys = [
+  propKeys.cycles,
+  propKeys.descriptions,
+  propKeys.hidden,
+  propKeys.key,
+  propKeys.labels,
+  propKeys.layout,
+  propKeys.multiple,
+  propKeys.name,
+  propKeys.readOnly,
+]
 
 export const textInputTypes = {
   singleLine: 'singleLine',
@@ -141,7 +160,18 @@ export const keysPropsAdvanced = {
 
   // code and taxon
   itemsFilter: 'itemsFilter',
+  // file
+  fileNameExpression: 'fileNameExpression',
 }
+
+const commonAttributePropsAdvancedKeys = [
+  keysPropsAdvanced.applicable,
+  keysPropsAdvanced.defaultValues,
+  keysPropsAdvanced.defaultValueEvaluatedOneTime,
+  keysPropsAdvanced.excludedInClone,
+  keysPropsAdvanced.validations,
+  keysPropsAdvanced.formula,
+]
 
 export const metaKeys = {
   h: 'h',
@@ -152,6 +182,17 @@ const MAX_FILE_SIZE_DEFAULT = 10
 
 export const visibleFieldsDefaultByType = {
   [nodeDefType.taxon]: [valuePropsTaxon.code, valuePropsTaxon.scientificName, valuePropsTaxon.vernacularName],
+}
+
+export const createAutoIncrementalKeyDefaultValues = ({ nodeDef, nodeDefParent }) => {
+  const nodeDefName = getName(nodeDef)
+  const nodeDefParentName = getName(nodeDefParent)
+  return [
+    NodeDefExpression.createExpression({ expression: '1', applyIf: 'index($context) == 0' }),
+    NodeDefExpression.createExpression({
+      expression: `Math.max(parent($context).${nodeDefParentName}.${nodeDefName}) + 1`,
+    }),
+  ]
 }
 
 // ==== READ
@@ -176,6 +217,7 @@ export const getName = getProp(propKeys.name, '')
 export const getCycles = getProp(propKeys.cycles, [])
 
 export const isKey = ObjectUtils.isPropTrue(propKeys.key)
+export const isAutoIncrementalKey = ObjectUtils.isPropTrue(propKeys.autoIncrementalKey)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const isMultiple = ObjectUtils.isPropTrue(propKeys.multiple)
 export const isSingle = R.pipe(isMultiple, R.not)
@@ -200,11 +242,14 @@ export const isCode = isType(nodeDefType.code)
 export const isCoordinate = isType(nodeDefType.coordinate)
 export const isDate = isType(nodeDefType.date)
 export const isDecimal = isType(nodeDefType.decimal)
+export const isGeo = isType(nodeDefType.geo)
 export const isFile = isType(nodeDefType.file)
 export const isInteger = isType(nodeDefType.integer)
 export const isTaxon = isType(nodeDefType.taxon)
 export const isText = isType(nodeDefType.text)
 export const isTime = isType(nodeDefType.time)
+// layout elments
+export const isFormHeader = isType(nodeDefType.formHeader)
 
 export const isReadOnly = getProp(propKeys.readOnly, false)
 export const isHidden = getProp(propKeys.hidden, false)
@@ -251,6 +296,11 @@ export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.s
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
 export const getTextTransformFunction = (nodeDef) =>
   TextUtils.transform({ transformFunction: getTextTransform(nodeDef) })
+
+// layout elements
+
+export const getHeaderColor = getProp(propKeys.headerColor)
+export const isLayoutElement = isFormHeader
 
 // ==== READ meta
 export const getMeta = R.propOr({}, keys.meta)
@@ -332,6 +382,8 @@ export const getAllPropsAndAllPropsDraft =
 export const hasAdvancedPropsDraft = (nodeDef) => R.prop(keys.draftAdvanced, nodeDef) === true
 export const hasAdvancedPropsApplicableDraft = (nodeDef) => R.prop(keys.draftAdvancedApplicable, nodeDef) === true
 export const hasAdvancedPropsDefaultValuesDraft = (nodeDef) => R.prop(keys.draftAdvancedDefaultValues, nodeDef) === true
+export const hasAdvancedPropsFileNameExpressionDraft = (nodeDef) =>
+  R.prop(keys.draftAdvancedFileNameExpression, nodeDef) === true
 export const hasAdvancedPropsValidationsDraft = (nodeDef) => R.prop(keys.draftAdvancedValidations, nodeDef) === true
 const isPropAdvanced = (key) => Object.keys(keysPropsAdvanced).includes(key)
 
@@ -356,6 +408,7 @@ export const getAllExpressions = (nodeDef) => {
     return acc
   }, [])
   ArrayUtils.addIfNotEmpty(getItemsFilter(nodeDef))(expressions)
+  ArrayUtils.addIfNotEmpty(getFileNameExpression(nodeDef))(expressions)
   return expressions
 }
 
@@ -363,6 +416,8 @@ export const isExcludedInClone = getPropAdvanced(keysPropsAdvanced.excludedInClo
 
 // code and taxon
 export const getItemsFilter = getPropAdvanced(keysPropsAdvanced.itemsFilter, '')
+// file
+export const getFileNameExpression = getPropAdvanced(keysPropsAdvanced.fileNameExpression, '')
 
 // Advanced props - Analysis
 export const getFormula = getPropAdvanced(keysPropsAdvanced.formula, [])
@@ -432,6 +487,10 @@ export const mergePropsAdvanced = (propsAdvanced) => (nodeDef) =>
   R.pipe(getPropsAdvanced, R.mergeLeft(propsAdvanced), (propsAdvancedUpdated) =>
     assocPropsAdvanced(propsAdvancedUpdated, nodeDef)
   )(nodeDef)
+export const assocDefaultValues = (defaultValues) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValues]: defaultValues })
+export const assocDefaultValueEvaluatedOnlyOneTime = (evaluatedOnlyOneTime) =>
+  mergePropsAdvanced({ [keysPropsAdvanced.defaultValueEvaluatedOneTime]: evaluatedOnlyOneTime })
 export const assocValidations = (validations) => mergePropsAdvanced({ [keysPropsAdvanced.validations]: validations })
 export const dissocTemporary = R.dissoc(keys.temporary)
 export const assocProp = ({ key, value }) =>
@@ -473,6 +532,31 @@ export const changeParentEntity =
     }
   }
 
+export const convertToType =
+  ({ toType }) =>
+  (nodeDef) => {
+    const propsUpdated = R.pick(commonAttributePropsKeys)(getProps(nodeDef))
+    const propsAdvancedToKeep = isAutoIncrementalKey(nodeDef)
+      ? commonAttributePropsAdvancedKeys.filter((prop) => prop !== keysPropsAdvanced.defaultValues)
+      : commonAttributePropsAdvancedKeys
+    const propsAdvancedUpdated = R.pick(propsAdvancedToKeep)(getPropsAdvanced(nodeDef))
+
+    const layout = getLayout(nodeDef)
+    const layoutUpdated = Object.entries(layout).reduce((acc, [cycleKey, cycleLayout]) => {
+      acc[cycleKey] = R.pick(NodeDefLayout.commonAttributeKeys)(cycleLayout)
+      return acc
+    }, {})
+    propsUpdated[propKeys.layout] = layoutUpdated
+
+    const nodeDefUpdated = {
+      ...nodeDef,
+      [keys.type]: toType,
+      [keys.props]: propsUpdated,
+      [keys.propsAdvanced]: propsAdvancedUpdated,
+    }
+    return nodeDefUpdated
+  }
+
 // layout
 export const assocLayout = (layout) => ObjectUtils.setProp(propKeys.layout, layout)
 
@@ -484,6 +568,8 @@ export const updateLayout = (updateFn) => (nodeDef) => {
 
 export const updateLayoutProp = ({ cycle, prop, value }) =>
   updateLayout(NodeDefLayout.assocLayoutProp(cycle, prop, value))
+
+export const dissocLayoutProp = ({ cycle, prop }) => updateLayout(NodeDefLayout.dissocLayoutProp(cycle, prop))
 
 export const copyLayout =
   ({ cycleFrom, cyclesTo }) =>
@@ -524,8 +610,9 @@ export const keepOnlyOneCycle =
 export const canNodeDefBeMultiple = (nodeDef) =>
   // Entity def but not root
   (isEntity(nodeDef) && !isRoot(nodeDef)) ||
-  // Attribute def but not analysis
-  (!isAnalysis(nodeDef) &&
+  // Attribute def but not layout element and not analysis
+  (!isLayoutElement(nodeDef) &&
+    !isAnalysis(nodeDef) &&
     R.includes(getType(nodeDef), [
       nodeDefType.decimal,
       nodeDefType.code,
@@ -545,7 +632,8 @@ export const canNodeDefTypeBeKey = (type) =>
     nodeDefType.time,
   ])
 
-export const canNodeDefBeKey = (nodeDef) => !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
+export const canNodeDefBeKey = (nodeDef) =>
+  !isLayoutElement(nodeDef) && !isAnalysis(nodeDef) && canNodeDefTypeBeKey(getType(nodeDef))
 
 export const canHaveDefaultValue = (nodeDef) =>
   isSingleAttribute(nodeDef) &&
@@ -555,6 +643,7 @@ export const canHaveDefaultValue = (nodeDef) =>
     nodeDefType.coordinate,
     nodeDefType.date,
     nodeDefType.decimal,
+    nodeDefType.geo,
     nodeDefType.integer,
     nodeDefType.taxon,
     nodeDefType.text,
@@ -581,26 +670,30 @@ export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   !isFile(nodeDef) &&
   NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
+export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
+  !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
   // clear hidden in mobile if not applicable
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
-    nodeDefUpdated = updateLayoutProp({
-      cycle,
-      prop: NodeDefLayout.keys.hiddenInMobile,
-      value: false,
-    })(nodeDefUpdated)
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
   }
-  // clear inclulde in multiple entity summary if not applicable
+  // clear include in multiple entity summary if not applicable
   if (
     !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
     NodeDefLayout.isIncludedInMultipleEntitySummary(getLayout(nodeDefUpdated))
   ) {
-    nodeDefUpdated = updateLayoutProp({
-      cycle,
-      prop: NodeDefLayout.keys.includedInMultipleEntitySummary,
-      value: false,
-    })(nodeDefUpdated)
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary })(
+      nodeDefUpdated
+    )
+  }
+  // clear include in previous cycle link if not applicable
+  if (
+    !canIncludeInPreviousCycleLink(cycle)(nodeDefUpdated) &&
+    NodeDefLayout.isIncludedInPreviousCycleLink(getLayout(nodeDefUpdated))
+  ) {
+    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInPreviousCycleLink })(nodeDefUpdated)
   }
   if (!canBeExcludedInClone(nodeDefUpdated) && isExcludedInClone(nodeDefUpdated)) {
     nodeDefUpdated = assocExcludedInClone(false)(nodeDefUpdated)
@@ -610,3 +703,18 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
 
 export const canHaveMobileProps = (cycle) => (nodeDef) =>
   canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
+  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
+
+  const defaultValues = getDefaultValues(nodeDef)
+  if (defaultValues.length === 0) return true
+
+  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
+  return (
+    defaultValues.length === autoIncrementalDefaultValues.length &&
+    autoIncrementalDefaultValues.every((defaultValue, index) =>
+      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
+    )
+  )
+}

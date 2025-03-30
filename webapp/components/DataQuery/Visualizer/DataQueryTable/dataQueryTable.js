@@ -11,7 +11,7 @@ import { RowHeader, RowData } from './Row'
 import { useTable } from './store'
 
 const DataQueryTable = (props) => {
-  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
+  const { data, dataEmpty, dataLoading = false, dataLoadingError = false, nodeDefLabelType, offset, setData } = props
 
   const i18n = useI18n()
   const query = DataExplorerSelectors.useQuery()
@@ -71,11 +71,6 @@ DataQueryTable.propTypes = {
   nodeDefLabelType: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   setData: PropTypes.func.isRequired,
-}
-
-DataQueryTable.defaultProps = {
-  dataLoading: false,
-  dataLoadingError: false,
 }
 
 export default DataQueryTable

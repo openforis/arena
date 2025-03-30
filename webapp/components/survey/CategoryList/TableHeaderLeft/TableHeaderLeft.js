@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import * as Category from '@core/survey/category'
 
 import { useIsCategoriesRoute } from '@webapp/components/hooks'
-import { ButtonDownload } from '@webapp/components/buttons'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { UploadButton } from '@webapp/components/form'
 
 import { designerModules, appModuleUri } from '@webapp/app/appModules'
@@ -15,7 +15,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useActions, State } from '../store'
 
 const TableHeaderLeft = (props) => {
-  const { headerProps } = props
+  const { headerProps = {} } = props
   const { state, setState } = headerProps
   const navigate = useNavigate()
 
@@ -44,7 +44,7 @@ const TableHeaderLeft = (props) => {
     <>
       <ButtonMetaItemAdd onAdd={onAdd} metaItemType={metaItemTypes.category} />
 
-      <ButtonDownload label="common.exportAll" onClick={Actions.exportAll} />
+      <ButtonMenuExport label="common.exportAll" onClick={Actions.exportAll} />
 
       <UploadButton
         inputFieldId="taxonomy-upload-input"
@@ -58,10 +58,6 @@ const TableHeaderLeft = (props) => {
 
 TableHeaderLeft.propTypes = {
   headerProps: PropTypes.object,
-}
-
-TableHeaderLeft.defaultProps = {
-  headerProps: {},
 }
 
 export default TableHeaderLeft

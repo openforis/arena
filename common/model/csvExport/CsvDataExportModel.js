@@ -45,14 +45,14 @@ const columnsByNodeDefType = {
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const nodeDefName = NodeDef.getName(nodeDef)
     return [
+      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
+      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
       {
         header: `${nodeDefName}_srs`,
         nodeDef,
         dataType: columnDataType.text,
         valueProp: Node.valuePropsCoordinate.srs,
       },
-      { header: `${nodeDefName}_x`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.x },
-      { header: `${nodeDefName}_y`, nodeDef, dataType: columnDataType.numeric, valueProp: Node.valuePropsCoordinate.y },
       ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
         header: `${nodeDefName}_${field}`,
         nodeDef,
@@ -91,7 +91,13 @@ const columnsByNodeDefType = {
               header: `${nodeDefName}_scientific_name`,
               nodeDef,
               dataType: columnDataType.text,
-              valueProp: Node.valuePropsTaxon,
+              valueProp: Node.valuePropsTaxon.scientificName,
+            },
+            {
+              header: `${nodeDefName}_vernacular_name`,
+              nodeDef,
+              dataType: columnDataType.text,
+              valueProp: Node.valuePropsTaxon.vernacularName,
             },
           ]
         : []),
@@ -106,6 +112,7 @@ const DEFAULT_OPTIONS = {
   includeAncestorAttributes: false,
   includeCategoryItemsLabels: true,
   expandCategoryItems: false,
+  exportSingleEntitiesIntoSeparateFiles: false,
   includeReadOnlyAttributes: true,
   includeTaxonScientificName: true,
   includeFiles: true,
@@ -186,7 +193,7 @@ export class CsvDataExportModel {
 
   _extractAttributeDefsColumns(nodeDefContext) {
     const { cycle, options } = this
-    const { includeAnalysis, includeFiles, includeReadOnlyAttributes } = options
+    const { includeAnalysis, includeFileAttributeDefs, includeFiles, includeReadOnlyAttributes } = options
 
     let descendantDefs = NodeDef.isEntity(nodeDefContext)
       ? Survey.getNodeDefDescendantAttributesInSingleEntities({
@@ -199,10 +206,9 @@ export class CsvDataExportModel {
 
     descendantDefs = descendantDefs.filter(
       (nodeDef) =>
-        (includeFiles || !NodeDef.isFile(nodeDef)) &&
+        (includeFileAttributeDefs || includeFiles || !NodeDef.isFile(nodeDef)) &&
         (includeReadOnlyAttributes || !NodeDef.isReadOnly(nodeDef) || NodeDef.isKey(nodeDef))
     )
-
     return this._createColumnsFromAttributeDefs(descendantDefs)
   }
 

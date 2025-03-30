@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 $tableHeaderHeight: 50px;
 $tableFooterHeight: 30px;
@@ -37,6 +37,7 @@ $tableFooterHeight: 30px;
   .table__rows {
     position: absolute;
     overflow-y: auto;
+    scrollbar-gutter: stable;
     height: calc(100% - 50px);
     right: 10px;
     left: 10px;
@@ -56,7 +57,7 @@ $tableFooterHeight: 30px;
       border-bottom: none;
     }
 
-    > div {
+    >div {
       //width: calc(100% / 6);
       white-space: nowrap;
       overflow: hidden;
@@ -92,7 +93,6 @@ $tableFooterHeight: 30px;
 
   .table__row.active {
     background-color: $yellowHighlight;
-    pointer-events: none;
 
     .icon-action {
       color: $orange;
@@ -110,6 +110,7 @@ $tableFooterHeight: 30px;
     color: white;
     font-weight: 600;
     overflow: hidden;
+    padding-right: 16px;
   }
 
   .table__row-expanded-panel-wrapper {

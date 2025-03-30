@@ -1,5 +1,5 @@
-@import 'webapp/style/vars';
-@import '../../../SurveyFormVars';
+@use '~@webapp/style/vars' as *;
+@use '../../../SurveyFormVars' as *;
 
 .survey-form__node-def-integer,
 .survey-form__node-def-decimal {
@@ -38,4 +38,11 @@
   &:focus-within {
     background-color: $blueLightFocus;
   }
+}
+
+.survey-form__node-def-header {
+  border: $formBorder;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
 }

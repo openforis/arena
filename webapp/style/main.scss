@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+@use './vars' as v;
+@use './cssVars' as *;
+@use './layoutMixins' as *;
+@use './formBase' as *;
+@use './ico' as *;
+@use './table' as *;
+@use './layout' as *;
+@use './reactTransitions' as *;
 
-@import './vars';
-@import './cssVars';
-@import './layoutMixins';
-@import './formBase';
-@import './ico';
-@import './table';
-@import './layout';
-@import './reactTransitions';
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 * {
   box-sizing: border-box;
@@ -21,14 +21,14 @@ body,
 html {
   height: 100%;
   overflow: hidden;
-  font: 16px/1.6 $fontFamily;
+  font: 16px/1.6 v.$fontFamily;
 }
 
 body {
   margin: 0;
   font-weight: 400;
   letter-spacing: 1px;
-  color: $black;
+  color: v.$black;
 }
 
 #main {
@@ -84,11 +84,11 @@ body {
 }
 
 .error {
-  color: $red;
+  color: v.$red;
 }
 
 .separator-of {
-  border-bottom: 1px double $greyBorder;
+  border-bottom: 1px double v.$greyBorder;
   border-bottom-right-radius: 10% 2%;
   border-bottom-left-radius: 80% 10%;
   width: 70%;
@@ -98,7 +98,7 @@ body {
 .badge-of {
   padding: 0.15rem 0.3rem;
   font-size: 0.6rem;
-  background-color: $blueLight;
+  background-color: v.$blueLight;
   font-weight: 600;
   z-index: 2;
 }
@@ -110,7 +110,7 @@ body {
 // badge
 .badge {
   position: absolute;
-  z-index: $zIndex5Badge;
+  z-index: v.$zIndex5Badge;
   padding: 0.4rem 0.5rem;
   display: grid;
   align-items: center;
@@ -126,4 +126,16 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+/* Scrollbars (always show scrollbars in MacOS) */
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }

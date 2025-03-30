@@ -43,32 +43,33 @@ const SingleValueComponent = (reactSelectProps) => {
 
 const Dropdown = (props) => {
   const {
-    minCharactersToAutocomplete,
-    className,
-    clearable,
-    defaultSelection,
-    disabled,
-    id,
-    idInput: idInputProp,
-    itemDescription,
-    itemIcon,
-    itemLabel,
-    itemValue,
+    minCharactersToAutocomplete = 0,
+    className = undefined,
+    clearable = true,
+    defaultSelection = undefined,
+    disabled = false,
+    id = null,
+    idInput: idInputProp = null,
+    itemDescription = 'description',
+    itemIcon = 'icon',
+    itemLabel = 'label',
+    itemValue = 'value',
     items: itemsProp,
-    menuPlacement,
-    menuPosition,
-    multiple,
-    onBeforeChange,
+    loading: loadingProp = false,
+    menuPlacement = 'auto',
+    menuPosition = 'fixed',
+    multiple = false,
+    onBeforeChange = null,
     onChange: onChangeProp,
-    placeholder,
-    readOnly,
-    renderOptionLabel,
-    searchable,
-    selection,
-    testId,
-    title,
-    validation,
-    validationTooltipPosition,
+    placeholder = undefined,
+    readOnly = false, // TODO: investigate why there are both disabled and readOnly
+    renderOptionLabel = null,
+    searchable = true,
+    selection = undefined,
+    testId = null,
+    title = null,
+    validation = {},
+    validationTooltipPosition = 'top',
   } = props
 
   const {
@@ -116,7 +117,7 @@ const Dropdown = (props) => {
         inputId={inputId}
         isClearable={clearable && !readOnly}
         isDisabled={disabled}
-        isLoading={loading}
+        isLoading={loading || loadingProp}
         isMulti={multiple}
         isSearchable={searchable && !readOnly}
         onChange={onChange}
@@ -147,6 +148,7 @@ Dropdown.propTypes = {
   itemLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.func]), // item label function or property name
   itemValue: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   items: PropTypes.oneOfType([PropTypes.array, PropTypes.func]).isRequired,
+  loading: PropTypes.bool,
   menuPlacement: PropTypes.oneOf(['auto', 'top', 'bottom']),
   menuPosition: PropTypes.oneOf(['absolute', 'fixed']),
   multiple: PropTypes.bool,
@@ -161,33 +163,6 @@ Dropdown.propTypes = {
   title: PropTypes.string,
   validation: PropTypes.object,
   validationTooltipPosition: PropTypes.oneOf(['bottom', 'top']),
-}
-
-Dropdown.defaultProps = {
-  minCharactersToAutocomplete: 0,
-  className: undefined,
-  clearable: true,
-  defaultSelection: undefined,
-  disabled: false,
-  id: null,
-  idInput: null,
-  itemDescription: 'description',
-  itemIcon: 'icon',
-  itemLabel: 'label',
-  itemValue: 'value',
-  menuPlacement: 'auto',
-  menuPosition: 'fixed',
-  multiple: false,
-  onBeforeChange: null,
-  placeholder: undefined,
-  readOnly: false, // TODO: investigate why there are both disabled and readOnly
-  renderOptionLabel: null,
-  searchable: true,
-  selection: undefined,
-  testId: null,
-  title: null,
-  validation: {},
-  validationTooltipPosition: 'top',
 }
 
 export default Dropdown

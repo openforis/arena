@@ -94,16 +94,21 @@ export const init = (app) => {
     requireRecordListViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, tempFileName } = Request.getParams(req)
+        const { surveyId, cycle, tempFileName, fileFormat } = Request.getParams(req)
 
         const survey = await SurveyService.fetchSurveyById({ surveyId })
-        const outputFileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ExlorerTable' })
+        const outputFileName = ExportFileNameGenerator.generate({
+          survey,
+          cycle,
+          fileType: 'ExplorerTable',
+          fileFormat,
+        })
 
         Response.sendFile({
           res,
           path: FileUtils.tempFilePath(tempFileName),
           name: outputFileName,
-          contentType: Response.contentTypes.csv,
+          fileFormat,
         })
       } catch (error) {
         next(error)

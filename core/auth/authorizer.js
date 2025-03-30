@@ -1,3 +1,5 @@
+import { Surveys } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
@@ -53,6 +55,8 @@ export const canViewTemplates = (user) => User.isSystemAdmin(user)
 
 // UPDATE
 export const canEditSurvey = _hasSurveyPermission(permissions.surveyEdit)
+export const canEditSurveyConfig = (user) => User.isSystemAdmin(user)
+export const canEditSurveyOwner = (user) => User.isSystemAdmin(user)
 export const canEditTemplates = (user) => User.isSystemAdmin(user)
 export const canRefreshAllSurveyRdbs = (user) => User.isSystemAdmin(user)
 
@@ -65,7 +69,17 @@ export const canCreateRecord = _hasSurveyPermission(permissions.recordCreate)
 
 // READ
 export const canViewRecord = _hasSurveyPermission(permissions.recordView)
-export const canViewAllRecords = _hasSurveyPermission(permissions.recordCleanse)
+export const canExportAllRecords = _hasSurveyPermission(permissions.recordCleanse)
+export const canViewNotOwnedRecords = (user, surveyInfo) => {
+  if (!canViewSurvey(user, surveyInfo)) return false
+  if (canExportAllRecords(user, surveyInfo)) return true
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
+  return (
+    AuthGroup.getName(groupInCurrentSurvey) === AuthGroup.groupNames.dataEditor &&
+    Surveys.isDataEditorViewNotOwnedRecordsAllowed(surveyInfo)
+  )
+}
 export const canExportRecordsList = _hasSurveyPermission(permissions.surveyEdit)
 
 // UPDATE
@@ -92,9 +106,15 @@ export const canEditRecord = (user, record, ignoreRecordStep = false) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
+const canChangeRecordProps = (user, record) => canEditRecord(user, record, true)
+
 export const canDeleteRecord = canEditRecord
 
-export const canDemoteRecord = (user, record) => canEditRecord(user, record, true)
+export const canDemoteRecord = canChangeRecordProps
+
+export const canChangeRecordOwner = canChangeRecordProps
+
+export const canChangeRecordStep = canChangeRecordProps
 
 export const canCleanseRecords = _hasSurveyPermission(permissions.recordCleanse)
 

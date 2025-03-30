@@ -9,7 +9,7 @@ import CollectImportJob from '@server/modules/collectImport/service/collectImpor
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
-import DataExportJob from '@server/modules/dataExport/service/DataExportJob'
+import DataExportJob from '@server/modules/dataExport/service/dataExportJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
@@ -46,8 +46,12 @@ const jobClasses = [
 
 const jobClassesByType = ObjectUtils.toIndexedObj(jobClasses, 'type')
 
-export const createJob = (jobType, params) => {
+export const createJob = (jobType, params, jobUuid) => {
   const JobClass = jobClassesByType[jobType]
-
-  return new JobClass(params)
+  const job = new JobClass(params)
+  if (jobUuid) {
+    job.uuid = jobUuid
+    job.initLogger()
+  }
+  return job
 }

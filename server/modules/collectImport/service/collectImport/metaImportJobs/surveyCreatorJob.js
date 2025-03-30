@@ -17,8 +17,6 @@ import * as SrsManager from '../../../../geo/manager/srsManager'
 
 import * as CollectSurvey from '../model/collectSurvey'
 
-const SRS_ID_PREFIX = 'EPSG:'
-
 export default class SurveyCreatorJob extends Job {
   constructor(params) {
     super('SurveyCreatorJob', params)
@@ -81,7 +79,7 @@ export default class SurveyCreatorJob extends Job {
     )
     const srsCodes = srsElements.map((srsEl) => {
       const srsId = CollectSurvey.getAttribute('srid')(srsEl)
-      const srsIdCleaned = StringUtils.removePrefix(SRS_ID_PREFIX)(srsId)
+      const srsIdCleaned = StringUtils.removePrefix(Srs.idPrefix)(srsId)
       // fix old lat long SRS code used in Collect (EPSG:WGS84 instead of EPSG:4326)
       return srsIdCleaned === 'WGS84' ? '4326' : srsIdCleaned
     })

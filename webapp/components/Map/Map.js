@@ -1,7 +1,7 @@
 import './Map.scss'
 
 import React from 'react'
-import { MapContainer, ScaleControl } from 'react-leaflet'
+import { GeoJSON, MapContainer, ScaleControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { ButtonSave } from '@webapp/components'
@@ -32,7 +32,7 @@ L.Marker.prototype.options.icon = L.icon({
 const INITIAL_ZOOM_LEVEL = 3
 
 export const Map = (props) => {
-  const { editable, layers, markerPoint, markerTitle, showOptions } = props
+  const { editable = false, geoJson = null, layers = [], markerPoint, markerTitle, showOptions = true } = props
   const { centerPositionLatLon, markerPointUpdated, markerPointUpdatedToString, onMarkerPointUpdated, onSaveClick } =
     useMap(props)
 
@@ -54,6 +54,7 @@ export const Map = (props) => {
             onPointUpdated={onMarkerPointUpdated}
             title={markerTitle}
           />
+          {geoJson && <GeoJSON data={geoJson} />}
           {showOptions && (
             <>
               <MapOptionsEditor />
@@ -85,19 +86,10 @@ export const Map = (props) => {
 Map.propTypes = {
   centerPoint: PropTypes.object,
   editable: PropTypes.bool,
+  geoJson: PropTypes.object,
   layers: PropTypes.array,
   markerPoint: PropTypes.object,
   markerTitle: PropTypes.string,
   onMarkerPointChange: PropTypes.func,
   showOptions: PropTypes.bool,
-}
-
-Map.defaultProps = {
-  centerPoint: null,
-  editable: false,
-  layers: [],
-  markerPoint: null,
-  markerTitle: null,
-  onMarkerPointChange: null,
-  showOptions: true,
 }

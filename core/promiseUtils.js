@@ -40,3 +40,8 @@ export const each = async (iterable, callback, stopIfFn = null) => {
 
   return resolveGenerator(generator())
 }
+
+export const waitFor = (seconds) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, seconds * 1000)
+  })

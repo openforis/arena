@@ -1,4 +1,4 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .attributes-selector {
   position: relative;
@@ -7,4 +7,6 @@
   display: grid;
   align-content: start;
   grid-row-gap: 0.3rem;
+
+
 }

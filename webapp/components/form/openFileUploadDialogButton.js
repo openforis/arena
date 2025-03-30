@@ -10,7 +10,17 @@ import { FileUploadDialogActions } from '@webapp/store/ui'
 import { Button } from '../buttons'
 
 const OpenFileUploadDialogButton = (props) => {
-  const { label: labelProp, disabled, showLabel, showIcon, maxSize, accept, onOk, className, variant } = props
+  const {
+    accept = null, // E.g. .txt, .xls (null = all type of files are accepted)
+    className = 'btn', // Custom css class
+    disabled = false,
+    label: labelProp = 'common.upload',
+    maxSize = 10, // Mega bytes
+    onOk,
+    showLabel = true,
+    showIcon = true,
+    variant,
+  } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -43,16 +53,6 @@ OpenFileUploadDialogButton.propTypes = {
   showIcon: PropTypes.bool,
   showLabel: PropTypes.bool,
   variant: PropTypes.string,
-}
-
-OpenFileUploadDialogButton.defaultProps = {
-  accept: null, // E.g. .txt, .xls (null = all type of files are accepted)
-  className: 'btn', // Custom css class
-  disabled: false,
-  label: 'common.upload',
-  maxSize: 10, // Mega bytes
-  showLabel: true,
-  showIcon: true,
 }
 
 export default OpenFileUploadDialogButton

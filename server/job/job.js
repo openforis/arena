@@ -55,6 +55,10 @@ export default class Job {
 
     this.eventListener = null
 
+    this.initLogger()
+  }
+
+  initLogger() {
     this._logger = Log.getLogger(`Job ${this.constructor.name} (${this.uuid})`)
   }
 

@@ -8,6 +8,7 @@ import * as NodeDef from './nodeDef'
 
 import * as SurveySortKeys from './_survey/surveySortKeys'
 
+import * as SurveyConfig from './_survey/surveyConfig'
 import * as SurveyInfo from './_survey/surveyInfo'
 import * as SurveyCycle from './surveyCycle'
 import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
@@ -60,6 +61,7 @@ export const newSurvey = ({
   [SurveyInfo.keys.template]: template,
 })
 
+export const { configKeys } = SurveyConfig
 export const { keys: infoKeys, status } = SurveyInfo
 export const { dependencyTypes } = SurveyDependencies
 export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } = SurveyInfo
@@ -107,8 +109,12 @@ export const {
   getDefaultLabel,
   getDescription,
   getDescriptions,
+  getFieldManualLinks,
+  getUserExtraPropDefs,
+  getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
+  getSecurity,
   getSRS,
   getSRSCodes,
   getSRSIndex,
@@ -141,7 +147,8 @@ export const {
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocFilesStatistics, assocRDBInitilized, assocSrs, markDraft } = SurveyInfo
+export const { assocAuthGroups, assocFilesStatistics, assocOwnerUuid, assocRDBInitilized, assocSrs, markDraft } =
+  SurveyInfo
 
 // ====== READ nodeDefs
 export const {
@@ -157,7 +164,6 @@ export const {
   hasNodeDefChildrenEntities,
   getNodeDefChildrenSorted,
   getNodeDefChildByName,
-  getNodeDefSiblingByName,
   getNodeDefByName,
   getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid,
@@ -167,6 +173,7 @@ export const {
   getNodeDefKeysSorted,
   isNodeDefRootKey,
   findNodeDef,
+  findNodeDefByName,
   getNodeDefAreaBasedEstimate,
   getAreaBasedEstimatedOfNodeDef,
   getNodeDefMaxDecimalDigits,
@@ -183,9 +190,9 @@ export const {
   getHierarchy,
   traverseHierarchyItem,
   traverseHierarchyItemSync,
-  getDescendantsAndSelf,
   visitDescendantsAndSelf,
   findDescendants,
+  getNodeDefDescendantsAndSelf,
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,
   getNodeDefAncestorMultipleEntity,
@@ -243,8 +250,13 @@ export const { assocDependencyGraph } = SurveyDependencies
 export const buildDependencyGraph = SurveyDependencies.buildGraph
 export const { buildAndAssocDependencyGraph } = SurveyDependencies
 
-export const { addNodeDefToIndex, deleteNodeDefIndex, initNodeDefsIndex, initAndAssocNodeDefsIndex } =
-  SurveyNodeDefsIndex
+export const {
+  addNodeDefToIndex,
+  updateNodeDefUuidByNameIndex,
+  deleteNodeDefIndex,
+  initNodeDefsIndex,
+  initAndAssocNodeDefsIndex,
+} = SurveyNodeDefsIndex
 
 // ====== NodeDefsValidation
 export const { getNodeDefsValidation, assocNodeDefsValidation, getNodeDefValidation } = SurveyNodeDefsValidation

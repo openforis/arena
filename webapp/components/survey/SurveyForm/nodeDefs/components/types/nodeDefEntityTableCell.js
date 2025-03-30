@@ -46,18 +46,18 @@ const NodeDefEntityTableCellContent = (props) => {
 
 const NodeDefEntityTableCell = (props) => {
   const {
-    nodeDef,
-    parentNode,
     draggable,
-    renderType,
+    gridSize = {},
+    nodeDef,
     onDragStart,
     onDragOver,
     onDragEnd,
     onResizeStart,
     onResizeStop: onResizeStopProp,
-    gridSize,
+    parentNode = null,
+    renderType,
     resizable,
-    windowed,
+    windowed = true,
   } = props
 
   const cycle = useSurveyCycleKey()
@@ -162,12 +162,6 @@ NodeDefEntityTableCell.propTypes = {
   onResizeStart: PropTypes.func.isRequired,
   onResizeStop: PropTypes.func.isRequired,
   resizable: PropTypes.bool.isRequired,
-}
-
-NodeDefEntityTableCell.defaultProps = {
-  parentNode: null,
-  gridSize: {},
-  windowed: true,
 }
 
 export default NodeDefEntityTableCell

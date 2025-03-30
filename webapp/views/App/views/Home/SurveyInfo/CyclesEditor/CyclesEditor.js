@@ -14,7 +14,7 @@ import { ButtonAdd } from '@webapp/components'
 import { useConfirmDelete } from '@webapp/components/hooks'
 
 const CyclesEditor = (props) => {
-  const { cycles, readOnly, setCycles, validation } = props
+  const { cycles, readOnly, setCycles, validation = {} } = props
   const cycleEntries = Object.entries(cycles)
 
   const confirmDelete = useConfirmDelete()
@@ -78,9 +78,6 @@ CyclesEditor.propTypes = {
   readOnly: PropTypes.bool.isRequired,
   setCycles: PropTypes.func.isRequired,
   validation: PropTypes.object,
-}
-CyclesEditor.defaultProps = {
-  validation: {},
 }
 
 export default CyclesEditor

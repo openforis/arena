@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { useI18n } from '@webapp/store/system'
 import { Button } from '../buttons'
 
-const ButtonRStudio = ({ disabled, onClick, isLocal }) => {
+const ButtonRStudio = ({ disabled = false, isLocal = false, onClick }) => {
   const i18n = useI18n()
   return (
     <Button className="btn btn-s btn-rstudio" onClick={onClick} disabled={disabled} variant="outlined">
@@ -97,11 +97,6 @@ ButtonRStudio.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
   isLocal: PropTypes.bool,
-}
-
-ButtonRStudio.defaultProps = {
-  disabled: false,
-  isLocal: false,
 }
 
 export default ButtonRStudio

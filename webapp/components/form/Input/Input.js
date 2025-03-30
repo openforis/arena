@@ -6,8 +6,9 @@ import classNames from 'classnames'
 import { TextField } from '@mui/material'
 import PropTypes from 'prop-types'
 
-import { Strings } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
+import { useI18n } from '@webapp/store/system'
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
@@ -16,45 +17,49 @@ const textAreaRows = 3
 
 export const Input = React.forwardRef((props, ref) => {
   const {
-    className: classNameProp,
-    disabled,
-    id,
-    inputType,
-    maxLength,
-    name,
-    onChange,
-    onFocus,
-    onBlur,
-    placeholder,
-    readOnly,
-    title: titleProp,
-    type,
-    validation,
-    value,
-    numberFormat,
-    textTransformFunction,
+    className: classNameProp = null,
+    disabled = false,
+    id = null,
+    inputType = 'input',
+    maxLength = null,
+    name = undefined,
+    numberFormat = null,
+    onChange = null,
+    onFocus = undefined,
+    onBlur = undefined,
+    placeholder: placeholderProp = null,
+    readOnly = false,
+    textTransformFunction = undefined,
+    title: titleProp = null, // defaults to value
+    type = 'text',
+    validation = null,
+    value = '',
   } = props
+
+  const i18n = useI18n()
 
   // workaround for inputRef: useRef(ref) does not work as expected
   const inputRefInternal = useRef(null)
   const inputRef = ref ?? inputRefInternal
   const selectionAllowed = type === 'text'
-  const selectionInitial = selectionAllowed ? [value.length, value.length] : null
+  const selectionInitial = Objects.isNotEmpty(value) && selectionAllowed ? [value.length, value.length] : []
   const selectionRef = useRef(selectionInitial)
-  const valueText = Strings.defaultIfEmpty('')(value)
+  const valueText = Objects.isEmpty(value) ? '' : String(value)
   const title = titleProp ?? valueText
 
   const handleValueChange = useCallback(
     (newValue) => {
+      if (disabled) return
+
       const input = inputRef.current
       if (selectionAllowed) {
         selectionRef.current = [input.selectionStart, input.selectionEnd]
       }
       if (onChange) {
-        onChange(textTransformFunction(newValue))
+        onChange(textTransformFunction ? textTransformFunction(newValue) : newValue)
       }
     },
-    [inputRef, onChange, selectionAllowed, textTransformFunction]
+    [disabled, inputRef, onChange, selectionAllowed, textTransformFunction]
   )
 
   const onFormattedValueChange = useCallback(
@@ -70,13 +75,14 @@ export const Input = React.forwardRef((props, ref) => {
 
   const className = classNames('form-input', classNameProp)
   const rows = inputType === 'textarea' ? textAreaRows : undefined
+  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
 
   return (
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
         <NumericFormat
           autoComplete="off"
-          disabled={disabled}
+          disabled={disabled || readOnly}
           className={className}
           customInput={TextField}
           getInputRef={(el) => {
@@ -89,7 +95,6 @@ export const Input = React.forwardRef((props, ref) => {
           onFocus={onFocus}
           onBlur={onBlur}
           placeholder={placeholder}
-          readOnly={readOnly}
           title={title}
           type={type}
           value={value}
@@ -107,7 +112,7 @@ export const Input = React.forwardRef((props, ref) => {
           onBlur={onBlur}
           onChange={handleValueChange}
           onFocus={onFocus}
-          placeholder={placeholder}
+          placeholder={placeholderProp}
           readOnly={readOnly}
           rows={rows}
           testId={id}
@@ -127,15 +132,6 @@ Input.propTypes = {
   inputType: PropTypes.oneOf(['input', 'textarea']),
   maxLength: PropTypes.number,
   name: PropTypes.string,
-  onChange: PropTypes.func,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
-  placeholder: PropTypes.string,
-  readOnly: PropTypes.bool,
-  title: PropTypes.string,
-  type: PropTypes.oneOf(['text', 'number', 'password']),
-  validation: PropTypes.object,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   numberFormat: PropTypes.shape({
     decimalScale: PropTypes.number,
     decimalSeparator: PropTypes.string,
@@ -143,25 +139,14 @@ Input.propTypes = {
     maxLength: PropTypes.number,
     placeholder: PropTypes.string,
   }),
+  onChange: PropTypes.func,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  placeholder: PropTypes.string,
+  readOnly: PropTypes.bool,
   textTransformFunction: PropTypes.func,
-}
-
-Input.defaultProps = {
-  className: null,
-  disabled: false,
-  id: null,
-  inputType: 'input',
-  maxLength: null,
-  name: undefined,
-  onChange: null,
-  onFocus: () => {},
-  onBlur: () => {},
-  placeholder: null,
-  readOnly: false,
-  title: null, // defaults to value
-  type: 'text',
-  validation: null,
-  value: '',
-  numberFormat: null,
-  textTransformFunction: (s) => s,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  type: PropTypes.oneOf(['text', 'number', 'password']),
+  validation: PropTypes.object,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }

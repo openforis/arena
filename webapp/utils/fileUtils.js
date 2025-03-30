@@ -1,3 +1,12 @@
+import { FileFormats } from '@core/fileFormats'
+
+const fileFormatByExtension = {
+  csv: FileFormats.csv,
+  xlsx: FileFormats.xlsx,
+}
+
+const excelRowsLimit = 10000
+
 const getExtension = (file) => {
   const fileName = typeof file === 'string' ? file : file.name
   const extension = fileName.split('.').pop()
@@ -14,7 +23,7 @@ const getExtension = (file) => {
  *
  * @returns {string} - Formatted string.
  */
-const toHumanReadableFileSize = (bytes, { si = true, decimalPlaces = 1 } = {}) => {
+const toHumanReadableFileSize = (bytes, { si = false, decimalPlaces = 1 } = {}) => {
   const threshold = si ? 1000 : 1024
 
   if (Math.abs(bytes) < threshold) {
@@ -37,11 +46,37 @@ const toHumanReadableFileSize = (bytes, { si = true, decimalPlaces = 1 } = {}) =
 
 const acceptByExtension = {
   csv: { 'text/csv': ['.csv'] },
+  xlsx: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] },
   zip: { 'application/zip': ['.zip'] },
 }
 
+const readAsText = async (file, ignoreErrors = true) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const text = e.target.result
+      resolve(text)
+    }
+    reader.onerror = (error) => {
+      if (ignoreErrors) {
+        resolve(null)
+      } else {
+        reject(error)
+      }
+    }
+    reader.readAsText(file)
+  })
+
+const determineFileFormatFromFileName = (fileName) => {
+  const extension = getExtension(fileName)
+  return extension ? fileFormatByExtension[extension.toLocaleLowerCase()] : undefined
+}
+
 export const FileUtils = {
+  excelRowsLimit,
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,
+  readAsText,
+  determineFileFormatFromFileName,
 }

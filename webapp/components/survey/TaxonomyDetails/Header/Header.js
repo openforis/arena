@@ -6,23 +6,22 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
-import { ButtonDownload, ButtonMenu } from '@webapp/components/buttons'
+import { ButtonMenu } from '@webapp/components/buttons'
 import ErrorBadge from '@webapp/components/errorBadge'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import UploadButton from '@webapp/components/form/uploadButton'
 
-import { useI18n } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
-import { ExtraPropDefsEditor } from '../../ExtraPropDefsEditor'
+import { ExtraPropDefsEditorPanel } from '../../ExtraPropDefsEditor'
 import { State } from '../store'
 import { useNotifyWarning } from '@webapp/components/hooks'
+import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 
 const Header = (props) => {
   const { state, Actions } = props
-  const i18n = useI18n()
   const notifyWarn = useNotifyWarning()
   const surveyId = useSurveyId()
   const canEdit = useAuthCanEditSurvey()
@@ -45,7 +44,7 @@ const Header = (props) => {
       </div>
 
       <div>
-        <FormItem label={i18n.t('taxonomy.edit.taxonomyListName')}>
+        <FormItem label="taxonomy.edit.taxonomyListName">
           <Input
             id={TestId.taxonomyDetails.taxonomyName}
             value={Taxonomy.getName(taxonomy)}
@@ -70,16 +69,16 @@ const Header = (props) => {
       <div className="button-bar">
         {canEdit && (
           <UploadButton
+            accept=".csv,.xlsx"
             inputFieldId="taxonomy-upload-input"
-            label="common.csvImport"
-            accept=".csv"
+            label="common.import"
             onChange={([file]) => Actions.upload({ state, file })}
+            title="common.importFromExcelOrCSVFile"
           />
         )}
-        <ButtonDownload
+        <ButtonMenuExport
           href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export`}
           requestParams={{ draft: canEdit }}
-          label="common.csvExport"
         />
         {canEdit && (
           <ButtonMenu
@@ -96,7 +95,7 @@ const Header = (props) => {
       </div>
 
       {State.isEditingExtraPropDefs(state) && (
-        <ExtraPropDefsEditor
+        <ExtraPropDefsEditorPanel
           canAdd={false}
           extraPropDefs={Taxonomy.getExtraPropsDefsArray(taxonomy)}
           onExtraPropDefDelete={({ propName }) =>

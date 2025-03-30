@@ -98,7 +98,10 @@ export const getNodeSelectQuery = ({
       'r.owner_uuid AS record_owner_uuid',
       `${_getAncestorUuidSelectField(ancestorDef)} AS ancestor_uuid`
     )
-    fromParts.push(`JOIN ${schema}.record r ON r.uuid = n.record_uuid`)
+    fromParts.push(`JOIN ${schema}.record r 
+      ON r.uuid = n.record_uuid
+      -- exclude merged records
+      AND r.merged_into_record_uuid IS NULL`)
   }
 
   if (includeRefData) {

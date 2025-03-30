@@ -1,6 +1,9 @@
 import pgPromise from 'pg-promise'
 import * as R from 'ramda'
 
+import { Numbers, Objects } from '@openforis/arena-core'
+import { DBMigrator } from '@openforis/arena-server'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { uuidv4 } from '@core/uuid'
@@ -12,11 +15,9 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
-import * as PromiseUtils from '@core/promiseUtils'
 import SystemError from '@core/systemError'
 
 import { db } from '@server/db/db'
-import { DBMigrator } from '@openforis/arena-server'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
@@ -196,6 +197,7 @@ export const {
   fetchSurveysByName,
   fetchSurveyIdsAndNames,
   fetchDependencies,
+  fetchFilesTotalSpace,
 } = SurveyRepository
 
 export const fetchSurveyById = async ({ surveyId, draft = false, validate = false, backup = false }, client = db) => {
@@ -248,13 +250,14 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
   )(surveyDb)
 
+  if (Objects.isEmpty(dependencies)) {
+    survey = Survey.buildAndAssocDependencyGraph(survey)
+  } else {
+    survey = Survey.assocDependencyGraph(dependencies)(survey)
+  }
   if (validate) {
-    const dependencyGraph = dependencies || Survey.buildDependencyGraph(survey)
-    survey = Survey.assocDependencyGraph(dependencyGraph)(survey)
     const validation = await SurveyValidator.validateNodeDefs(survey)
     survey = Survey.assocNodeDefsValidation(validation)(survey)
-  } else if (dependencies) {
-    survey = Survey.assocDependencyGraph(dependencies)(survey)
   }
   return survey
 }
@@ -300,6 +303,7 @@ export const fetchUserSurveysInfo = async (
     sortOrder,
     includeCounts = false,
     includeOwnerEmailAddress = false,
+    onlyOwn = false,
   },
   client = db
 ) => {
@@ -324,6 +328,7 @@ export const fetchUserSurveysInfo = async (
         sortBy,
         sortOrder,
         includeOwnerEmailAddress,
+        onlyOwn,
       })
     ).map(assocSurveyInfo)
 
@@ -364,44 +369,47 @@ export const updateSurveyProp = async (user, surveyId, key, value, system = fals
     return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
+const updateSurveyCyclesProp = async ({ surveyId, value, valuePrev }, client = db) => {
+  const cycles = Object.keys(value)
+  const cyclesPrev = Object.keys(valuePrev)
+  // Add new cycles to nodeDefs
+  const cyclesAdded = R.difference(cycles, cyclesPrev)
+  if (!R.isEmpty(cyclesAdded)) {
+    await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, client)
+  }
+
+  // Remove delete cycles from nodeDefs
+  const cyclesRemoved = R.difference(cyclesPrev, cycles)
+  if (!R.isEmpty(cyclesRemoved)) {
+    await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, client)
+  }
+}
+
 export const updateSurveyProps = async (user, surveyId, props, client = db) =>
   client.tx(async (t) => {
     const validation = await validateSurveyInfo({ id: surveyId, props })
-    if (Validation.isValid(validation)) {
-      const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
-      const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
-
-      await PromiseUtils.each(Object.entries(props), async ([key, value]) => {
-        const valuePrev = propsPrev[key]
-
-        if (!R.equals(value, valuePrev)) {
-          await Promise.all([
-            SurveyRepository.updateSurveyProp(surveyId, key, value, t),
-            SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
-            ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
-          ])
-
-          if (key === Survey.infoKeys.cycles) {
-            const cycles = Object.keys(value)
-            const cyclesPrev = Object.keys(valuePrev)
-            // Add new cycles to nodeDefs
-            const cyclesAdded = R.difference(cycles, cyclesPrev)
-            if (!R.isEmpty(cyclesAdded)) {
-              await NodeDefManager.addNodeDefsCycles(surveyId, R.last(cyclesPrev), cyclesAdded, t)
-            }
-
-            // Remove delete cycles from nodeDefs
-            const cyclesRemoved = R.difference(cyclesPrev, cycles)
-            if (!R.isEmpty(cyclesRemoved)) {
-              await NodeDefManager.deleteNodeDefsCycles(surveyId, cyclesRemoved, t)
-            }
-          }
-        }
-      })
-      return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
+    if (!Validation.isValid(validation)) {
+      return assocSurveyInfo({ validation })
     }
+    const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
+    const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-    return assocSurveyInfo({ validation })
+    for await (const [key, value] of Object.entries(props)) {
+      const valuePrev = propsPrev[key]
+
+      if (!R.equals(value, valuePrev)) {
+        await Promise.all([
+          SurveyRepository.updateSurveyProp(surveyId, key, value, t),
+          SurveyRepositoryUtils.markSurveyDraft(surveyId, t),
+          ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, false, t),
+        ])
+
+        if (key === Survey.infoKeys.cycles) {
+          await updateSurveyCyclesProp({ surveyId, value, valuePrev }, t)
+        }
+      }
+    }
+    return fetchSurveyById({ surveyId, draft: true, validate: true }, t)
   })
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
@@ -414,6 +422,36 @@ export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>
 
 export const unpublishSurveyProps = async (surveyId, client = db) =>
   SurveyRepository.unpublishSurveyProps(surveyId, client)
+
+export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) => {
+  if (key !== Survey.configKeys.filesTotalSpace) {
+    throw new Error(`Configuration key update not supported: ${key}`)
+  }
+  const valueLimited = Numbers.limit({
+    minValue: FileManager.defaultSurveyFilesTotalSpaceMB,
+    maxValue: FileManager.maxSurveyFilesTotalSpaceMB,
+  })(value)
+  if (valueLimited === FileManager.defaultSurveyFilesTotalSpaceMB) {
+    await SurveyRepository.clearSurveyConfiguration({ surveyId }, client)
+  } else {
+    await SurveyRepository.updateSurveyConfigurationProp({ surveyId, key, value: String(valueLimited) }, client)
+  }
+  return fetchSurveyById({ surveyId, draft: true, validate: true }, client)
+}
+
+export const updateSurveyOwner = async ({ user, surveyId, ownerUuid }, client = db) =>
+  client.tx(async (t) => {
+    await SurveyRepository.updateSurveyOwner({ surveyId, ownerUuid }, t)
+    const systemActivity = false
+    await ActivityLogRepository.insert(
+      user,
+      surveyId,
+      ActivityLog.type.surveyOwnerUpdate,
+      { ownerUuid },
+      systemActivity,
+      t
+    )
+  })
 
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository
 
@@ -440,7 +478,9 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
 export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
-    await PromiseUtils.each(surveyIds, async (surveyId) => deleteSurvey(surveyId, { deleteUserPrefs: true }, t))
+    for await (const surveyId of surveyIds) {
+      await deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
+    }
     return surveyIds.length
   })
 

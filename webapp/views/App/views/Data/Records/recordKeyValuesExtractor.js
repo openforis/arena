@@ -52,7 +52,17 @@ const extractKeyValues = ({ survey, record, categoryItemsByCodeDefUuid, lang }) 
   return nodeDefKeys.map((nodeDef) => extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang }))
 }
 
+const extractKeyValuesAndLabels = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  return nodeDefKeys.map((nodeDef) => {
+    const label = NodeDef.getLabel(nodeDef, lang)
+    const keyValue = extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang })
+    return `${label}=${keyValue}`
+  })
+}
+
 export const RecordKeyValuesExtractor = {
   extractKeyValue,
   extractKeyValues,
+  extractKeyValuesAndLabels,
 }

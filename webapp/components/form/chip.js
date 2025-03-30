@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 const Chip = (props) => {
-  const { className, label, onDelete, readOnly, variant } = props
+  const { className, onDelete = null, label, readOnly = false, variant = 'outlined' } = props
 
   return (
     <MuiChip
@@ -22,12 +22,6 @@ Chip.propTypes = {
   readOnly: PropTypes.bool,
   onDelete: PropTypes.func,
   variant: PropTypes.oneOf(['filled', 'outlined']),
-}
-
-Chip.defaultProps = {
-  readOnly: false,
-  onDelete: null,
-  variant: 'outlined',
 }
 
 export default Chip

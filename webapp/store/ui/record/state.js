@@ -1,15 +1,15 @@
-import * as R from 'ramda'
-
+import * as A from '@core/arena'
 import * as Record from '@core/record/record'
 
 import * as UiState from '../state'
 
 export const stateKey = 'record'
 
-const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
+const getState = A.pipe(UiState.getState, A.propOr({}, stateKey))
 
 const keys = {
   recordEdit: 'recordEdit',
+  recordEditLocked: 'recordEditLocked',
   recordLoadError: 'recordLoadError',
   recordPreviewUuid: 'recordPreviewUuid',
   noHeader: 'noHeader',
@@ -17,30 +17,37 @@ const keys = {
 
 // ====== READ
 
-export const getRecord = R.pipe(getState, R.prop(keys.recordEdit))
+export const getRecord = A.pipe(getState, A.prop(keys.recordEdit))
 
-export const getRecordLoadError = R.pipe(getState, R.prop(keys.recordLoadError))
+export const isRecordEditLocked = A.pipe(
+  getState,
+  (recordState) => String(A.prop(keys.recordEditLocked)(recordState)) === 'true'
+)
 
-export const getRecordUuidPreview = R.pipe(getState, R.prop(keys.recordPreviewUuid))
+export const getRecordLoadError = A.pipe(getState, A.prop(keys.recordLoadError))
 
-export const hasNoHeader = R.pipe(getState, R.prop(keys.noHeader))
+export const getRecordUuidPreview = A.pipe(getState, A.prop(keys.recordPreviewUuid))
 
-export const getRecordUuid = R.pipe(getRecord, Record.getUuid)
+export const hasNoHeader = A.pipe(getState, A.prop(keys.noHeader))
+
+export const getRecordUuid = A.pipe(getRecord, Record.getUuid)
 
 // ====== UPDATE
 
 export const reset = () => ({})
 
-export const assocRecord = R.assoc(keys.recordEdit)
+export const assocRecord = A.assoc(keys.recordEdit)
 
-export const assocRecordLoadError = R.assoc(keys.recordLoadError)
+export const assocRecordLoadError = A.assoc(keys.recordLoadError)
 
-export const assocRecordUuidPreview = R.assoc(keys.recordPreviewUuid)
+export const assocRecordUuidPreview = A.assoc(keys.recordPreviewUuid)
 
-export const assocNoHeader = R.assoc(keys.noHeader)
+export const assocNoHeader = A.assoc(keys.noHeader)
+
+export const assocRecordEditLocked = A.assoc(keys.recordEditLocked)
 
 const _updateRecord = (fn) => (recordState) =>
-  R.pipe(R.prop(keys.recordEdit), fn, (record) => R.assoc(keys.recordEdit, record)(recordState))(recordState)
+  A.pipe(A.prop(keys.recordEdit), fn, (record) => A.assoc(keys.recordEdit, record)(recordState))(recordState)
 
 export const mergeRecordNodes = (nodes) => _updateRecord(Record.mergeNodes(nodes, { removeFlags: true }))
 

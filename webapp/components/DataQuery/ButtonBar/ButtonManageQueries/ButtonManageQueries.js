@@ -8,7 +8,7 @@ import { State } from '../store'
 import DataQueriesPanel from './DataQueriesPanel'
 
 const ButtonManageQueries = (props) => {
-  const { disabled, onChangeQuery, state, Actions } = props
+  const { disabled = false, onChangeQuery, state, Actions } = props
 
   return (
     <>
@@ -32,10 +32,6 @@ ButtonManageQueries.propTypes = {
   onChangeQuery: PropTypes.func.isRequired,
   state: PropTypes.object.isRequired,
   Actions: PropTypes.object.isRequired,
-}
-
-ButtonManageQueries.defaultProps = {
-  disabled: false,
 }
 
 export default ButtonManageQueries

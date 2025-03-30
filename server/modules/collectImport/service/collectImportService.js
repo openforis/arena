@@ -13,7 +13,7 @@ import CollectImportJob from './collectImport/collectImportJob'
 export const startCollectImportJob = ({ user, filePath, newSurvey, options }) => {
   const job = new CollectImportJob({ user, filePath, newSurvey, options })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }

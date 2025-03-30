@@ -1,0 +1,16 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_48_2274" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="16" y="16" width="128" height="128">
+<circle cx="80" cy="80" r="64" fill="#D9D9D9"/>
+</mask>
+<g mask="url(#mask0_48_2274)">
+<path d="M47 48H80V80H47V48Z" fill="#4B7ABD" stroke="white" stroke-width="2"/>
+<rect x="113" y="80" width="32" height="32" fill="#599609" stroke="white" stroke-width="2"/>
+<path d="M80 14H145V80H112.5L80 48V14Z" fill="#599609" stroke="white" stroke-width="2"/>
+<path d="M47 80H113V113V146H80V113H47V80Z" fill="#72AE23" stroke="white" stroke-width="2"/>
+<path d="M14.5 80L14.5 14L47 14L80 14L80 49L47.5 49L47 80L14.5 80Z" fill="#72AE23" stroke="white" stroke-width="2"/>
+<path d="M80 48L113 80H80V48Z" fill="#5EA4E4" stroke="white" stroke-width="2"/>
+<path d="M80 146L15 143.875V112L80 112V146Z" fill="#4C7E0B" stroke="white" stroke-width="2"/>
+<path d="M47 112L14 112V80H47V112Z" fill="#72AE23" stroke="white" stroke-width="2"/>
+<path d="M113 146L145 112H113V146Z" fill="#599609" stroke="white" stroke-width="2"/>
+</g>
+</svg>

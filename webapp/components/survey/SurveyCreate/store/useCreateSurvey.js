@@ -2,6 +2,8 @@ import { useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
+import { SurveyType } from '@webapp/model'
+
 import { useActions } from './actions'
 import { importSources } from './importSources'
 
@@ -17,6 +19,7 @@ const initialState = {
   label: '',
   lang: 'en',
   cloneFrom: null,
+  cloneFromType: SurveyType.template,
   cloneFromCycle: null,
   template: false,
   options: { includeData: false },

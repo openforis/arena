@@ -109,5 +109,5 @@ export const useAcceptRequestPanel = (props) => {
       )
     }
   }
-  return { i18n, roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, templateLabel, validation }
+  return { roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, templateLabel, validation }
 }

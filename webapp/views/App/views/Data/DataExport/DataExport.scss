@@ -4,9 +4,42 @@
   align-items: center;
   gap: 2rem;
 
-  .form-item {
-    .form-label {
-      text-wrap: nowrap;
+  &.with-multiple-sources {
+    .expansion-panel__content {
+      max-height: calc(100vh - 30rem);
+    }
+  }
+}
+
+.data-export-expansion-panel {
+  .expansion-panel__content {
+    overflow: auto;
+    max-height: calc(100vh - 18rem);
+
+    .btn-checkbox {
+      &.with-asterisk {
+        .MuiFormControlLabel-label:after {
+          content: ' *';
+        }
+      }
+      .btn-checkbox-label {
+        margin-right: 4px;
+        white-space: nowrap;
+      }
+
+      .info-icon-btn {
+        padding: 0 0;
+      }
+    }
+
+    .not-compatible-with-data-import-message {
+      font-style: italic;
+    }
+
+    .form-item {
+      .form-label {
+        text-wrap: nowrap;
+      }
     }
   }
 }

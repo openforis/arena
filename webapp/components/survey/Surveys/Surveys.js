@@ -1,6 +1,6 @@
 import './Surveys.scss'
 
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -12,29 +12,32 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'
 import { SurveyActions, useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/store/user'
+import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import Table from '@webapp/components/Table'
 import { TableCellFiles } from '@webapp/components/Table/TableCellFiles'
-import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 
 import HeaderLeft from './HeaderLeft'
 import { RecordsCountIcon } from './RecordsCountIcon'
+import { SurveyOwnerColumn } from './SurveyOwnerColumn'
 
 const Surveys = (props) => {
-  const { module, moduleApiUri, template } = props
+  const { module, moduleApiUri, template = false } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
   const lang = useBrowserLanguageCode()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   /**
    * Parameter passed to table rest params
    * (used to reload table data on survey publish).
    */
   const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
 
   // Redirect to dashboard on survey change
   useOnUpdate(() => {
@@ -52,6 +55,10 @@ const Surveys = (props) => {
   }
 
   const isRowActive = (surveyRow) => Survey.getId(surveyRow) === Survey.getIdSurveyInfo(surveyInfo)
+
+  const onSurveysUpdate = useCallback(() => {
+    setRequestedAt(Date.now())
+  }, [])
 
   const columns = useMemo(() => {
     const cols = [
@@ -84,13 +91,14 @@ const Surveys = (props) => {
         key: Survey.sortableKeys.ownerName,
         header: 'common.owner',
         hidden: true,
-        renderItem: ({ item }) => Survey.getOwnerName(Survey.getSurveyInfo(item)),
-        width: 'minmax(5rem, 12rem)',
+        renderItem: ({ item }) => <SurveyOwnerColumn item={item} onSurveysUpdate={onSurveysUpdate} />,
+        width: '16rem',
         sortable: true,
       },
       {
         key: Survey.sortableKeys.dateCreated,
         header: 'common.dateCreated',
+        hidden: true,
         renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Survey.getDateCreated(Survey.getSurveyInfo(item))),
         width: '12rem',
         sortable: true,
@@ -105,6 +113,7 @@ const Surveys = (props) => {
       {
         key: Survey.sortableKeys.datePublished,
         header: 'surveysView.datePublished',
+        hidden: true,
         renderItem: ({ item }) => DateUtils.formatDateTimeDisplay(Survey.getDatePublished(Survey.getSurveyInfo(item))),
         width: '12rem',
         sortable: true,
@@ -164,7 +173,7 @@ const Surveys = (props) => {
       )
     }
     return cols
-  }, [lang, template])
+  }, [lang, onSurveysUpdate, template])
 
   return (
     <Table
@@ -174,13 +183,14 @@ const Surveys = (props) => {
       className="surveys"
       columns={columns}
       headerLeftComponent={HeaderLeft}
+      headerProps={{ onlyOwn, setOnlyOwn }}
       isRowActive={isRowActive}
       keyExtractor={({ item }) => Survey.getId(item)}
       module={module}
       moduleApiUri={moduleApiUri}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
       onRowClick={onRowClick}
-      restParams={{ lang, template, requestedAt, includeCounts: true }}
+      restParams={{ lang, template, requestedAt, includeCounts: true, onlyOwn }}
       visibleColumnsSelectionEnabled
     />
   )
@@ -199,10 +209,6 @@ Surveys.propTypes = {
    * If true, show only survey templates.
    */
   template: PropTypes.bool,
-}
-
-Surveys.defaultProps = {
-  template: false,
 }
 
 export { Surveys }

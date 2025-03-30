@@ -113,7 +113,7 @@ export const ChainStatisticalAnalysisProps = () => {
   )
 
   const reportingAreaFormItem = (
-    <FormItem className="reporting-area" label={i18n.t('chainView.statisticalAnalysis.reportingArea')}>
+    <FormItem className="reporting-area" label="chainView.statisticalAnalysis.reportingArea">
       <Input
         numberFormat={NumberFormats.decimal()}
         onChange={onReportingAreaChange}
@@ -124,7 +124,7 @@ export const ChainStatisticalAnalysisProps = () => {
 
   return (
     <div className="statistical-analysis">
-      <FormItem label={i18n.t('chainView.statisticalAnalysis.entityToReport')}>
+      <FormItem label="chainView.statisticalAnalysis.entityToReport">
         <div className="entity-selector-wrapper">
           <EntitySelector
             hierarchy={Survey.getHierarchy()(survey)}
@@ -144,7 +144,7 @@ export const ChainStatisticalAnalysisProps = () => {
         </div>
       </FormItem>
 
-      <FormItem label={i18n.t('common.dimension_other')}>
+      <FormItem label="common.dimension_other">
         <DimensionsSelector
           chainUuid={chainUuid}
           entityDefUuid={ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)}
@@ -155,7 +155,7 @@ export const ChainStatisticalAnalysisProps = () => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('chainView.statisticalAnalysis.filter')}>
+      <FormItem label="chainView.statisticalAnalysis.filter">
         <Input
           className="filter"
           inputType="textarea"
@@ -164,7 +164,7 @@ export const ChainStatisticalAnalysisProps = () => {
         />
       </FormItem>
 
-      <FormItem label={i18n.t('chainView.statisticalAnalysis.reportingMethod')}>
+      <FormItem label="chainView.statisticalAnalysis.reportingMethod">
         <ButtonGroup
           selectedItemKey={ChainStatisticalAnalysis.getReportingMethod(chainStatisticalAnalysis)}
           onChange={onReportingMethodChange}
@@ -173,7 +173,7 @@ export const ChainStatisticalAnalysisProps = () => {
       </FormItem>
 
       {ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign) && (
-        <FormItem label={i18n.t('chainView.clusteringOnlyVariances')}>
+        <FormItem label="chainView.clusteringOnlyVariances">
           <Checkbox
             checked={ChainStatisticalAnalysis.isClusteringOnlyVariances(chainStatisticalAnalysis)}
             validation={Validation.getFieldValidation(ChainStatisticalAnalysis.keys.clusteringOnlyVariances)(
@@ -184,7 +184,7 @@ export const ChainStatisticalAnalysisProps = () => {
         </FormItem>
       )}
 
-      <FormItem label={i18n.t('chainView.nonResponseBiasCorrection')}>
+      <FormItem label="chainView.nonResponseBiasCorrection">
         <div className="nonResponseBiasCorrectionContainer">
           <Checkbox
             checked={ChainStatisticalAnalysis.isNonResponseBiasCorrection(chainStatisticalAnalysis)}

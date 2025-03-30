@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as StringUtils from '@core/stringUtils'
 
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -25,7 +26,11 @@ const getValidationText =
     if (RecordValidation.isValidationResultErrorCount(validationResult)) {
       return getValidationCountErrorText({ survey, i18n })(validationResult)
     }
-    return i18n.t(ValidationResult.getKey(validationResult), ValidationResult.getParams(validationResult))
+    let key = ValidationResult.getKey(validationResult)
+    if (!i18n.exists(key)) {
+      key = StringUtils.prependIfMissing('common.')(key)
+    }
+    return i18n.t(key, ValidationResult.getParams(validationResult))
   }
 
 const getJointText =

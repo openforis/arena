@@ -7,7 +7,7 @@ import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
 import SystemError from '@core/systemError'
 
-import * as CSVReader from '@server/utils/file/csvReader'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import { Strings } from '@openforis/arena-core'
 
 const defaultLevelName = 'level_1'
@@ -181,21 +181,27 @@ export const createImportSummaryFromColumnNames = ({
 
 export const createImportSummaryFromStream = async ({
   stream,
+  fileFormat,
   defaultLang,
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
-  const columnNames = await CSVReader.readHeadersFromStream(stream)
-  return createImportSummaryFromColumnNames({
+  const columnNames = await FlatDataReader.readHeadersFromStream({ stream, fileFormat })
+  const summary = createImportSummaryFromColumnNames({
     columnNames,
     defaultLang,
     codeColumnPattern,
     ignoreLabelsAndDescriptions,
   })
+  return CategoryImportSummary.assocFileFormat(fileFormat)(summary)
 }
 
-export const createImportSummary = async ({ filePath, defaultLang }) => {
-  const summary = await createImportSummaryFromStream({ stream: fs.createReadStream(filePath), defaultLang })
+export const createImportSummary = async ({ filePath, fileFormat, defaultLang }) => {
+  const summary = await createImportSummaryFromStream({
+    stream: fs.createReadStream(filePath),
+    fileFormat,
+    defaultLang,
+  })
   return {
     ...summary,
     [CategoryImportSummary.keys.filePath]: filePath,

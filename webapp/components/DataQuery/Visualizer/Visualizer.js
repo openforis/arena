@@ -12,7 +12,7 @@ const components = {
 }
 
 const Visualizer = (props) => {
-  const { data, dataEmpty, dataLoading, dataLoadingError, nodeDefLabelType, offset, setData } = props
+  const { data, dataEmpty, dataLoading, dataLoadingError = false, nodeDefLabelType, offset, setData } = props
 
   const displayType = DataExplorerSelectors.useDisplayType()
 
@@ -39,10 +39,6 @@ Visualizer.propTypes = {
   nodeDefLabelType: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
   setData: PropTypes.func.isRequired,
-}
-
-Visualizer.defaultProps = {
-  dataLoadingError: false,
 }
 
 export default memo(Visualizer)

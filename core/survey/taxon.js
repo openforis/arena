@@ -19,8 +19,8 @@ export const propKeys = {
   family: 'family',
   genus: 'genus',
   scientificName: 'scientificName',
-  extra: 'extra',
   index: 'index',
+  extra: ObjectUtils.keysProps.extra,
 }
 
 export const unlistedCode = 'UNL'
@@ -41,7 +41,8 @@ export const newTaxon = ({ taxonomyUuid, code, family, genus, scientificName, ve
 })
 
 // ====== READ
-export const { getUuid, getProps, getPropsDraft, getPropsAndPropsDraft, setProp } = ObjectUtils
+export const { getExtra, getExtraProp, getProps, getPropsDraft, getPropsAndPropsDraft, getUuid, isEqual, setProp } =
+  ObjectUtils
 export const getTaxonomyUuid = R.prop(keys.taxonomyUuid)
 export const getCode = ObjectUtils.getProp(propKeys.code, '')
 export const getFamily = ObjectUtils.getProp(propKeys.family, '')
@@ -49,24 +50,19 @@ export const getGenus = ObjectUtils.getProp(propKeys.genus, '')
 export const getScientificName = ObjectUtils.getProp(propKeys.scientificName, '')
 
 export const getVernacularNames = R.propOr({}, keys.vernacularNames)
+export const getVernacularNamesArray = (taxon) => Object.values(getVernacularNames(taxon)).flat()
 
 export const getVernacularNamesByLang = (lang) => R.pipe(getVernacularNames, R.propOr([], lang))
 
 export const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
 export const getVernacularNameUuid = R.prop(keys.vernacularNameUuid)
 export const getVernacularName = R.propOr('', keys.vernacularName)
-
-export const getExtra = ObjectUtils.getProp(propKeys.extra, {})
-export const getExtraProp = (extraPropKey) => (taxon) => {
-  const extra = getExtra(taxon)
-  return R.propOr(null, extraPropKey)(extra)
-}
+export const getVernacularNameObjByUuid = (uuid) => (taxon) =>
+  getVernacularNamesArray(taxon).find((vn) => TaxonVernacularName.getUuid(vn) === uuid)
 
 export const isUnlistedTaxon = R.pipe(getCode, R.equals(unlistedCode))
 export const isUnknownTaxon = R.pipe(getCode, R.equals(unknownCode))
 export const isUnkOrUnlTaxon = (taxon) => isUnlistedTaxon(taxon) || isUnknownTaxon(taxon)
-
-export const { isEqual } = ObjectUtils
 
 // ==== UPDATE
 export const assocVernacularNames = (lang, vernacularNames) =>

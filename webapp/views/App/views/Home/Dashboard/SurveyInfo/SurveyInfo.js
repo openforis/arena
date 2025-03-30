@@ -20,7 +20,7 @@ import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 const SurveyInfo = (props) => {
-  const { firstTime } = props
+  const { firstTime = false } = props
 
   const i18n = useI18n()
   const dispatch = useDispatch()
@@ -174,10 +174,6 @@ const SurveyInfo = (props) => {
 
 SurveyInfo.propTypes = {
   firstTime: PropTypes.bool,
-}
-
-SurveyInfo.defaultProps = {
-  firstTime: false,
 }
 
 export default SurveyInfo

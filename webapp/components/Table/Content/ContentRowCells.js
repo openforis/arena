@@ -8,7 +8,7 @@ import { ContentRowCell } from './ContentRowCell'
 export const ContentRowCells = (props) => {
   const {
     active,
-    cellProps,
+    cellProps = {},
     cellTestIdExtractor,
     columns,
     expandableRows,
@@ -63,8 +63,4 @@ ContentRowCells.propTypes = {
   itemSelected: PropTypes.bool,
   onRowExpandToggle: PropTypes.func.isRequired,
   rowExpanded: PropTypes.bool,
-}
-
-ContentRowCells.defaultProps = {
-  cellProps: {},
 }

@@ -18,20 +18,21 @@ import { ExpressionEditorType } from './expressionEditorType'
 
 const ExpressionEditorPopup = (props) => {
   const {
-    canBeConstant,
-    expr,
-    types,
-    isBoolean,
-    isContextParent,
-    mode,
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
-    excludeCurrentNodeDef,
-    onChange,
-    onClose,
-    query,
-    header,
-    includeAnalysis,
+    canBeCall = false,
+    canBeConstant = false,
+    excludeCurrentNodeDef = true,
+    expr = null,
+    header = '',
+    includeAnalysis = false,
+    isBoolean = true,
+    isContextParent = false,
+    mode = Expression.modes.json,
+    nodeDefUuidContext = null,
+    nodeDefUuidCurrent = null,
+    onChange = () => {},
+    onClose = () => {},
+    query = '',
+    types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
   const {
@@ -47,6 +48,7 @@ const ExpressionEditorPopup = (props) => {
     updateDraftQuery,
     variables,
   } = useExpressionEditorPopupState({
+    canBeCall,
     canBeConstant,
     excludeCurrentNodeDef,
     expr,
@@ -122,6 +124,7 @@ const ExpressionEditorPopup = (props) => {
 }
 
 ExpressionEditorPopup.propTypes = {
+  canBeCall: PropTypes.bool, // True if expression can be a function call
   canBeConstant: PropTypes.bool, // True if expression can be a constant value like a number or a string
   excludeCurrentNodeDef: PropTypes.bool,
   expr: PropTypes.object, // AST expression
@@ -137,23 +140,6 @@ ExpressionEditorPopup.propTypes = {
   onClose: PropTypes.func,
   query: PropTypes.string, // String representing the expression
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
-}
-
-ExpressionEditorPopup.defaultProps = {
-  canBeConstant: false,
-  excludeCurrentNodeDef: true,
-  expr: null,
-  header: '',
-  includeAnalysis: false,
-  isBoolean: true,
-  isContextParent: false,
-  mode: Expression.modes.json,
-  nodeDefUuidContext: null,
-  nodeDefUuidCurrent: null,
-  onChange: () => {},
-  onClose: () => {},
-  query: '',
-  types: [ExpressionEditorType.basic, ExpressionEditorType.advanced],
 }
 
 export default ExpressionEditorPopup

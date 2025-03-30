@@ -3,10 +3,13 @@ import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import { uuidv4 } from '@core/uuid'
+import { FileFormats } from '@core/fileFormats'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
 import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -15,6 +18,7 @@ import {
   useNodeDefLabelType,
   useNodeDefPage,
   useShowPageNavigation,
+  useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
@@ -30,6 +34,8 @@ import { usePath } from './usePath'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 
+const labelsExportAllowedFileFormats = [FileFormats.xlsx, FileFormats.csv]
+
 const FormHeader = (props) => {
   const { edit, entry, preview, canEditDef, analysis } = props
 
@@ -43,6 +49,7 @@ const FormHeader = (props) => {
   const showPageNavigation = useShowPageNavigation()
   const canEditSurvey = useAuthCanEditSurvey()
   const path = usePath(entry)
+  const treeViewMode = useTreeSelectViewMode()
 
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
@@ -73,7 +80,7 @@ const FormHeader = (props) => {
           <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
         </Button>
 
-        {edit && canEditDef && (
+        {edit && canEditDef && treeViewMode === TreeSelectViewMode.onlyPages && (
           <Button
             iconClassName="icon-plus icon-12px"
             label="surveyForm.subPage"
@@ -109,25 +116,35 @@ const FormHeader = (props) => {
             label="common.advancedFunctions"
             items={[
               {
-                key: 'schema-summary',
-                content: <SurveySchemaSummaryDownloadButton />,
-              },
-              {
-                key: 'labels-export',
+                key: 'schema-summary-csv',
                 content: (
-                  <ButtonDownload
-                    href={`/api/survey/${surveyId}/labels`}
-                    label="surveyForm.exportLabels"
-                    variant="text"
+                  <SurveySchemaSummaryDownloadButton
+                    fileFormat={FileFormats.csv}
+                    testId={TestId.surveyForm.schemaSummary}
                   />
                 ),
               },
+              {
+                key: 'schema-summary-excel',
+                content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
+              },
+              ...labelsExportAllowedFileFormats.map((fileFormat) => ({
+                key: `labels-export-${fileFormat}`,
+                content: (
+                  <ButtonDownload
+                    href={`/api/survey/${surveyId}/labels`}
+                    label={`surveyForm.exportLabels_${fileFormat}`}
+                    requestParams={{ fileFormat }}
+                    variant="text"
+                  />
+                ),
+              })),
               {
                 key: 'labels-import',
                 content: (
                   <OpenFileUploadDialogButton
                     label="surveyForm.importLabels"
-                    accept=".csv"
+                    accept=".csv,.xlsx"
                     onOk={({ files }) => onLabelsImportFileSelected(files[0])}
                     variant="text"
                   />
@@ -145,7 +162,6 @@ const FormHeader = (props) => {
           }}
           size="small"
         />
-        <div> | </div>
       </div>
       {analysis && <FormEntryActions analysis={analysis} />}
       {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}

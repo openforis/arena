@@ -5,6 +5,7 @@ export const keys = {
   dateCreated: ObjectUtils.keys.dateCreated,
   dateModified: ObjectUtils.keys.dateModified,
   info: 'info',
+  mergedIntoRecordUuid: 'mergedIntoRecordUuid',
   nodes: 'nodes',
   ownerName: 'ownerName',
   ownerUuid: 'ownerUuid',
@@ -12,6 +13,11 @@ export const keys = {
   step: 'step',
   surveyUuid: 'surveyUuid',
   uuid: ObjectUtils.keys.uuid,
+
+  // record summary
+  filesCount: 'filesCount',
+  filesSize: 'filesSize',
+  filesMissing: 'filesMissing',
 }
 
 export const infoKeys = {

@@ -10,37 +10,57 @@ import Literal from './literal'
 import Logical from './logical'
 import Member from './member'
 
+const { types } = Expression
+
 const componentFns = {
-  [Expression.types.Identifier]: () => Identifier,
-  [Expression.types.MemberExpression]: () => Member,
-  [Expression.types.Literal]: () => Literal,
-  [Expression.types.CallExpression]: () => Call,
-  [Expression.types.BinaryExpression]: (expressionNode) => {
+  [types.Identifier]: () => Identifier,
+  [types.MemberExpression]: () => Member,
+  [types.Literal]: () => Literal,
+  [types.CallExpression]: () => Call,
+  [types.BinaryExpression]: (expressionNode) => {
     const { logical: logicalOperators } = Expression.operators
     return [logicalOperators.or.value, logicalOperators.and.value].includes(expressionNode.operator) ? Logical : Binary
   },
-  [Expression.types.SequenceExpression]: () => Sequence,
+  [types.SequenceExpression]: () => Sequence,
+}
+
+const thisExpressionNode = { type: types.Identifier, name: Expression.thisVariable }
+
+const toUiComponentNode = (node) => {
+  const { type } = node
+  if (type === types.ThisExpression) {
+    return thisExpressionNode
+  }
+  if (type === types.UnaryExpression) {
+    // e.g. this > -1 ; -1 is a unary expression (value 1, operator -)
+    // in the expression editor it will be managed as a literal expression, with a value of "-1"
+    const { argument } = node
+    const { type: argumentType, value: argumentValue } = argument ?? {}
+    if (argumentType === types.Literal) {
+      const newValue = `${node.operator} ${argumentValue}`
+      return Expression.newLiteral(newValue)
+    }
+  }
+  return node
 }
 
 const ExpressionNode = (props) => {
   const {
-    canDelete,
-    isBoolean,
-    level,
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    expressionNodeParent = null,
     node,
-    expressionNodeParent,
-    nodeDefCurrent,
+    nodeDefCurrent = null,
     onChange,
-    onDelete,
-    type,
-    variables,
+    onDelete = null,
+    type = null,
+    variables = null,
   } = props
 
-  // transform a "this" expression into an Identifier expression
-  const componentNode =
-    node.type === Expression.types.ThisExpression
-      ? { type: Expression.types.Identifier, name: Expression.thisVariable }
-      : node
+  const componentNode = toUiComponentNode(node)
+  if (!componentNode) return null
+
   const componentFn = componentFns[componentNode.type]
   const component = componentFn(componentNode)
 
@@ -75,17 +95,6 @@ ExpressionNode.propTypes = {
   level: PropTypes.number,
   // Literal
   type: PropTypes.string,
-}
-
-ExpressionNode.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  expressionNodeParent: null,
-  nodeDefCurrent: null,
-  onDelete: null,
-  type: null,
-  variables: null,
 }
 
 export default ExpressionNode

@@ -3,21 +3,53 @@ import * as pgPromise from 'pg-promise'
 import * as _QueryStream from 'pg-query-stream'
 
 import { db } from '@server/db/db'
+import { Objects } from '@openforis/arena-core'
 
 const pgp = pgPromise()
 
 export const QueryStream = _QueryStream
+
+export const stream = async ({ queryStream, client = db, transformer = null, processor = null }) =>
+  new Promise((resolve, reject) => {
+    let streamComplete = false
+    let streamProcessed = false
+    const onComplete = () => {
+      if (streamComplete && (!processor || streamProcessed)) {
+        resolve()
+      }
+    }
+    client
+      .stream(queryStream, (dbStream) => {
+        const transformedStream = transformer ? dbStream.pipe(transformer) : dbStream
+        processor?.(transformedStream)
+          .then(() => {
+            streamProcessed = true
+            onComplete()
+          })
+          .catch((error) => reject(error))
+      })
+      .then(() => {
+        streamComplete = true
+        onComplete()
+      })
+      .catch((error) => reject(error))
+  })
+
+export const fetchQueryAsStream = async ({ query, processor, client = db, transformer = null }) => {
+  const queryStream = new QueryStream(query)
+  return stream({ queryStream, client, transformer, processor })
+}
 
 export const selectDate = (field, fieldAlias = null) =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS ${fieldAlias || field}`
 
 export const now = "timezone('UTC', now())"
 
-export const insertAllQueryBatch = (schema, table, cols, itemsValues) => {
+export const insertAllQueryBatch = (schema, table, cols, valuesByColumnName) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, {
     table: { schema, table },
   })
-  return pgp.helpers.insert(itemsValues, columnSet)
+  return pgp.helpers.insert(valuesByColumnName, columnSet)
 }
 
 export const insertAllQuery = (schema, table, cols, itemsValues) => {
@@ -26,7 +58,6 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
     for (const [i, element] of cols.entries()) {
       item[element] = itemValues[i]
     }
-
     return item
   })
 
@@ -112,6 +143,24 @@ export const getPropColCombined = (propName, draft, columnPrefix = '', asText = 
  */
 export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
   `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`
+
+export const filterTypes = {
+  includes: 'includes',
+  startsWith: 'startsWith',
+  endsWith: 'endsWith',
+}
+
+export const prepareParameterForFilter = (value, filterType = filterTypes.includes) => {
+  if (Objects.isEmpty(value)) return null
+  switch (filterType) {
+    case filterTypes.includes:
+      return `%${value}%`
+    case filterTypes.startsWith:
+      return `%${value}`
+    default:
+      return `${value}%`
+  }
+}
 
 export const formatQuery = pgp.as.format
 

@@ -1,10 +1,11 @@
 import './checkbox.scss'
 
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
+import classNames from 'classnames'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
 import MuiCheckbox from '@mui/material/Checkbox'
 import MuiRadio from '@mui/material/Radio'
+import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -12,32 +13,36 @@ import { useI18n } from '@webapp/store/system'
 
 import { ButtonIconInfo } from '../buttons/ButtonIconInfo'
 import ValidationTooltip from '../validationTooltip'
-import classNames from 'classnames'
 
 const Checkbox = (props) => {
   const {
+    allowClickEventBubbling = false,
     className,
-    id,
-    checked,
-    indeterminate,
+    checked = false,
+    controlStyle = null,
+    disabled = false,
+    id = null,
     info,
-    label,
-    onChange: onChangeProp,
-    disabled,
-    radio,
-    size,
+    infoParams = null,
+    indeterminate = false,
+    label = null,
+    onChange: onChangeProp = null,
+    radio = false,
+    size = 'medium',
+    validation = {},
     value,
-    validation,
   } = props
 
   const i18n = useI18n()
 
   const onChange = useCallback(
     (event) => {
-      event.stopPropagation()
-      onChangeProp?.(!checked)
+      if (!allowClickEventBubbling) {
+        event.stopPropagation()
+      }
+      onChangeProp?.(!checked, event)
     },
-    [onChangeProp, checked]
+    [allowClickEventBubbling, onChangeProp, checked]
   )
 
   const control = radio ? (
@@ -48,6 +53,7 @@ const Checkbox = (props) => {
       disabled={disabled}
       onClick={onChange}
       size={size}
+      style={controlStyle}
     />
   ) : (
     <MuiCheckbox
@@ -58,47 +64,39 @@ const Checkbox = (props) => {
       indeterminate={indeterminate}
       onClick={onChange}
       size={size}
+      style={controlStyle}
     />
   )
   return (
-    <div className={classNames(className, 'btn-checkbox')} style={{ justifySelf: 'start' }}>
+    <div className={classNames('btn-checkbox', className)} style={{ justifySelf: 'start' }}>
       <ValidationTooltip validation={validation}>
         {Objects.isEmpty(label) ? (
           control
         ) : (
-          <MuiFormControlLabel className="full-width" control={control} label={i18n.t(label)} />
+          <MuiFormControlLabel className="btn-checkbox-label width100" control={control} label={i18n.t(label)} />
         )}
-        {info && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info)} />}
+        {info && i18n.exists(info) && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info, infoParams)} />}
       </ValidationTooltip>
     </div>
   )
 }
 
 Checkbox.propTypes = {
+  allowClickEventBubbling: PropTypes.bool,
   className: PropTypes.string,
   id: PropTypes.string,
   checked: PropTypes.bool,
+  controlStyle: PropTypes.object,
   disabled: PropTypes.bool,
   indeterminate: PropTypes.bool,
   info: PropTypes.string,
+  infoParams: PropTypes.object,
   label: PropTypes.string,
   onChange: PropTypes.func,
   radio: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium']),
   validation: PropTypes.object,
   value: PropTypes.string,
-}
-
-Checkbox.defaultProps = {
-  id: null,
-  checked: false,
-  disabled: false,
-  indeterminate: false,
-  label: null,
-  onChange: null,
-  radio: false,
-  size: 'medium',
-  validation: {},
 }
 
 export default Checkbox

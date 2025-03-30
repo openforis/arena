@@ -3,10 +3,9 @@ import * as R from 'ramda'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import { ExtraPropDef } from '@core/survey/extraPropDef'
-import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
-import * as Taxonomy from '@core/survey/taxonomy'
+import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 import * as Taxon from '@core/survey/taxon'
-import * as Validation from '@core/validation/validation'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import { db } from '@server/db/db'
 
@@ -292,42 +291,17 @@ export const updateTaxonomyExtraPropDef = async (
   client.tx(async (t) => {
     const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, t)
 
-    // validate new item extra def
-    let extraPropDefsArrayUpdated = [...Taxonomy.getExtraPropsDefsArray(taxonomy)]
-    // remove old item
-    extraPropDefsArrayUpdated = extraPropDefsArrayUpdated.filter((def) => ExtraPropDef.getName(def) !== propName)
-
-    if (!deleted) {
-      // add new extra def item
-      extraPropDefsArrayUpdated.push(extraPropDef)
-
-      const validation = await validateExtraPropDef({
-        extraPropDef,
-        extraPropDefsArray: extraPropDefsArrayUpdated,
-      })
-      if (!Validation.isValid(validation)) {
-        throw new Error('Invalid taxonomy item extra def')
-      }
-    }
-
+    const extraPropDefs = Taxonomy.getExtraPropsDefs(taxonomy)
+    const extraPropDefsToStore = await ExtraPropDefsUpdater.updateOrDeleteExtraDef({
+      extraPropDefs,
+      propName,
+      extraPropDef,
+      deleted,
+    })
     // update category items
     if (deleted || propName !== ExtraPropDef.getName(extraPropDef)) {
       await _updateTaxaExtraDefProp({ surveyId, taxonomyUuid, propName, extraPropDef, deleted }, t)
     }
-
-    // prepare extraPropDefs for storage
-    // - remove unnecessary information (uuid, name)
-    // - index stored object by extra def name
-    const extraPropDefsToStore = extraPropDefsArrayUpdated.reduce(
-      (acc, item, index) => ({
-        ...acc,
-        [ExtraPropDef.getName(item)]: ExtraPropDef.newItem({
-          dataType: ExtraPropDef.getDataType(item),
-          index,
-        }),
-      }),
-      {}
-    )
 
     return updateTaxonomyProp(
       user,

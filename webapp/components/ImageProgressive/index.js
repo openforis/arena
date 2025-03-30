@@ -46,10 +46,4 @@ ImageProgressive.propTypes = {
   src: PropTypes.string.isRequired,
 }
 
-ImageProgressive.defaultProps = {
-  alt: undefined,
-  altSrc: undefined,
-  className: undefined,
-}
-
 export default ImageProgressive

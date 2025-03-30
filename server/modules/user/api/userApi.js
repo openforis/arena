@@ -1,12 +1,13 @@
 import * as A from '@core/arena'
+import { FileFormats } from '@core/fileFormats'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
-import * as DateUtils from '@core/dateUtils'
 
 import SystemError from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -140,7 +141,8 @@ export const init = (app) => {
 
   app.get('/users/count', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const count = await UserService.countUsers()
+      const { search } = Request.getParams(req)
+      const count = await UserService.countUsers({ search })
       res.json({ count })
     } catch (error) {
       next(error)
@@ -149,9 +151,9 @@ export const init = (app) => {
 
   app.get('/users', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const { offset, limit, sortBy, sortOrder } = Request.getParams(req)
+      const { offset, onlyAccepted, limit, search, sortBy, sortOrder } = Request.getParams(req)
 
-      const list = await UserService.fetchUsers({ offset, limit, sortBy, sortOrder })
+      const list = await UserService.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder })
 
       res.json({ list })
     } catch (error) {
@@ -159,12 +161,12 @@ export const init = (app) => {
     }
   })
 
-  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (_req, res, next) => {
+  app.get('/users/export', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
-      const fileName = `users_${DateUtils.nowFormatDefault()}.csv`
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
-
-      await UserExportService.exportUsersIntoStream({ outputStream: res })
+      const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+      const fileName = ExportFileNameGenerator.generate({ fileType: 'users', includeTimestamp: true, fileFormat })
+      Response.setContentTypeFile({ res, fileName, fileFormat })
+      await UserExportService.exportUsersIntoStream({ outputStream: res, fileFormat })
     } catch (error) {
       next(error)
     }
@@ -272,12 +274,17 @@ export const init = (app) => {
   app.get(
     '/users/users-access-request/export',
     AuthMiddleware.requireUsersAllViewPermission,
-    async (_req, res, next) => {
+    async (req, res, next) => {
       try {
-        const fileName = `user_access_requests_${DateUtils.nowFormatDefault()}.csv`
-        Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+        const { fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const fileName = ExportFileNameGenerator.generate({
+          itemName: 'user_access_requests',
+          includeTimestamp: true,
+          fileFormat,
+        })
+        Response.setContentTypeFile({ res, fileName, fileFormat })
 
-        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res })
+        await UserService.exportUserAccessRequestsIntoStream({ outputStream: res, fileFormat })
       } catch (error) {
         next(error)
       }
@@ -371,7 +378,7 @@ export const init = (app) => {
       const { surveyId, userUuid } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await UserService.deleteUser({ user, userUuidToRemove: userUuid, surveyId })
+      await UserService.deleteUserFromSurvey({ user, userUuidToRemove: userUuid, surveyId })
 
       Response.sendOk(res)
     } catch (error) {

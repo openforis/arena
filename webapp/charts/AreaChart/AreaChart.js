@@ -17,7 +17,7 @@ const margin = {
 }
 
 export const AreaChart = (props) => {
-  const { data, allowDecimals, colors: colorsProp, dataKeys, labelDataKey, showLegend } = props
+  const { allowDecimals = true, colors: colorsProp, data, dataKeys, labelDataKey = 'name', showLegend = false } = props
 
   const randomColors = useRandomColors(dataKeys.length, { onlyDarkColors: true })
   const colors = colorsProp ?? randomColors
@@ -50,10 +50,4 @@ AreaChart.propTypes = {
   dataKeys: PropTypes.array.isRequired,
   labelDataKey: PropTypes.string,
   showLegend: PropTypes.bool,
-}
-
-AreaChart.defaultProps = {
-  allowDecimals: true,
-  labelDataKey: 'name',
-  showLegend: false,
 }

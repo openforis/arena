@@ -1,9 +1,10 @@
-@import 'webapp/style/vars';
+@use '~@webapp/style/vars' as *;
 
 .node-defs-selector__chains {
   background-color: rgba($greyBorder, 0.8);
   padding: 1rem;
   margin-top: -0.3rem;
+
   .node-defs-selector__chains_filter {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

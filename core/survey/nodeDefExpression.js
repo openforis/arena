@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { uuidv4 } from '@core/uuid'
+import { NodeDefExpressionFactory } from '@openforis/arena-core/dist/nodeDef/nodeDef'
 
 import * as ValidationResult from '@core/validation/validationResult'
 
@@ -18,19 +18,12 @@ export const keys = {
 // ====== CREATE
 
 export const createExpression = ({
-  expression = '',
-  applyIf = '',
-  severity = ValidationResult.severity.error,
-  messages = {},
+  expression = undefined,
+  applyIf = undefined,
+  severity = undefined,
+  messages = undefined,
   placeholder = false,
-}) => ({
-  applyIf,
-  expression,
-  placeholder,
-  messages,
-  severity,
-  uuid: uuidv4(),
-})
+}) => NodeDefExpressionFactory.createInstance({ applyIf, expression, messages, placeholder, severity })
 
 export const createExpressionPlaceholder = () => createExpression({ placeholder: true })
 
@@ -50,8 +43,19 @@ export const getSeverity = R.propOr(ValidationResult.severity.error, keys.severi
 
 export const isPlaceholder = R.propEq(keys.placeholder, true)
 
-export const isEmpty = (expression = {}) =>
-  StringUtils.isBlank(getExpression(expression)) && StringUtils.isBlank(getApplyIf(expression))
+export const isExpressionEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression))
+export const isApplyIfEmpty = (expression = {}) => StringUtils.isBlank(getApplyIf(expression))
+export const isEmpty = (expression = {}) => isExpressionEmpty(expression) && isApplyIfEmpty(expression)
+
+export const isSimilarTo = (expressionA) => (expressionB) => {
+  if (isEmpty(expressionA) && isEmpty(expressionB)) return true
+  if (isEmpty(expressionA) || isEmpty(expressionB)) return false
+  const prepareExpr = (expr) => StringUtils.removeSuffix('\n')(expr.replaceAll(' ', ''))
+  return (
+    prepareExpr(getExpression(expressionA)) === prepareExpr(getExpression(expressionB)) &&
+    prepareExpr(getApplyIf(expressionA)) === prepareExpr(getApplyIf(expressionB))
+  )
+}
 
 // ====== UPDATE
 

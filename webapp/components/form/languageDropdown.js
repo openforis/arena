@@ -7,7 +7,7 @@ import { useI18n } from '@webapp/store/system'
 import Dropdown from './Dropdown'
 
 const LanguageDropdown = (props) => {
-  const { selection, onChange, validation, disabled } = props
+  const { disabled = false, onChange = () => ({}), selection = null, validation = {} } = props
 
   const i18n = useI18n()
 
@@ -30,13 +30,6 @@ LanguageDropdown.propTypes = {
   onChange: PropTypes.func,
   validation: PropTypes.object,
   disabled: PropTypes.bool,
-}
-
-LanguageDropdown.defaultProps = {
-  selection: null,
-  onChange: () => ({}),
-  validation: {},
-  disabled: false,
 }
 
 export default LanguageDropdown

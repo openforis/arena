@@ -1,4 +1,4 @@
-import { Surveys } from '@openforis/arena-core'
+import { Objects, Surveys } from '@openforis/arena-core'
 
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
@@ -13,7 +13,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as ValidationResult from '@core/validation/validationResult'
 
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
@@ -36,41 +36,69 @@ const getDefaultValueApplyIf = ({ nodeDef }) => {
     : ''
 }
 
+const getExpressionsSummary = ({ expressions, includeSeverity = false }) =>
+  expressions
+    .reduce((acc, expression) => {
+      const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
+      const parts = []
+      if (includeSeverity) {
+        parts.push(`(${severity})`)
+      }
+      parts.push(`Expression: ${expr.trim()}`)
+      if (applyIf) {
+        parts.push(`- Apply if: ${applyIf.trim()}`)
+      }
+      acc.push(parts.join(' '))
+      return acc
+    }, [])
+    .join('\n')
+
 const getValidationsSummary = ({ nodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const expressions = NodeDefValidations.getExpressions(validations)
-  return expressions
-    .reduce((summaryTexts, expression) => {
-      const { applyIf, expression: expr, severity = ValidationResult.severity.error } = expression
+  return getExpressionsSummary({ expressions, includeSeverity: true })
+}
 
-      let text = `(${severity}) Expression: ${expr.trim()}`
-      if (applyIf) {
-        text += ` - Apply if: ${applyIf.trim()}`
+const getValidationCountSummary = ({ nodeDef, countType }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  const count = NodeDefValidations.getCountProp(countType)(validations)
+  if (Objects.isEmpty(count)) {
+    return ''
+  }
+  if (Array.isArray(count)) {
+    return getExpressionsSummary({ expressions: count })
+  }
+  return String(count)
+}
+
+const getValidationMessages = ({ nodeDef, lang }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  const expressions = NodeDefValidations.getExpressions(validations)
+  return expressions
+    .reduce((acc, expression) => {
+      const message = NodeDefExpression.getMessage(lang)(expression)
+      if (message) {
+        acc.push(message)
       }
-      return [...summaryTexts, text]
+      return acc
     }, [])
     .join('\n')
 }
 
 export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
-  const nodeDefs = Survey.getNodeDefsArray(survey).filter(
-    (nodeDef) =>
-      // exclude "weight" node def created by the processing chain
-      !(NodeDef.isAnalysis(nodeDef) && SamplingNodeDefs.isWeightNodeDef(nodeDef))
-  )
-  const pathByNodeDefUuid = nodeDefs.reduce(
-    (paths, nodeDef) => ({ ...paths, [nodeDef.uuid]: getNodeDefPath({ survey, nodeDef }) }),
-    {}
-  )
-  // sort node defs by path
-  nodeDefs.sort((nodeDef1, nodeDef2) => {
-    const path1 = pathByNodeDefUuid[nodeDef1.uuid]
-    const path2 = pathByNodeDefUuid[nodeDef2.uuid]
-    if (path1 > path2) return 1
-    if (path2 > path1) return -1
-    return 0
-  })
+  const nodeDefs = []
+  Survey.visitDescendantsAndSelf({
+    cycle,
+    visitorFn: (nodeDef) => {
+      if (
+        // exclude "weight" node def created by the processing chain
+        !(NodeDef.isAnalysis(nodeDef) && SamplingNodeDefs.isWeightNodeDef(nodeDef))
+      ) {
+        nodeDefs.push(nodeDef)
+      }
+    },
+  })(survey)
 
   const getCategoryName = (nodeDef) => {
     if (!NodeDef.isCode(nodeDef)) return ''
@@ -114,7 +142,7 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
     return {
       uuid,
       name: NodeDef.getName(nodeDef),
-      path: pathByNodeDefUuid[uuid],
+      path: getNodeDefPath({ survey, nodeDef }),
       parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
       // labels
       ...languages.reduce(
@@ -143,15 +171,23 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
       required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
       unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
-      minCount: String(NodeDefValidations.getMinCount(NodeDef.getValidations(nodeDef))),
-      maxCount: String(NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef))),
+      minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
+      maxCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.max }),
       validations: getValidationsSummary({ nodeDef }),
+      // validation messages
+      ...languages.reduce(
+        (acc, lang) => ({
+          ...acc,
+          [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }),
+        }),
+        {}
+      ),
       cycle: String(NodeDef.getCycles(nodeDef).map(RecordCycle.getLabel)), // this is to show the user the value that they see into the UI -> https://github.com/openforis/arena/issues/1677
     }
   })
 }
 
-export const exportSchemaSummary = async ({ surveyId, cycle, outputStream }) => {
+export const exportSchemaSummary = async ({ surveyId, cycle, outputStream, fileFormat }) => {
   const items = await generateSchemaSummaryItems({ surveyId, cycle })
-  await CSVWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false } })
+  await FlatDataWriter.writeItemsToStream({ items, options: { removeNewLines: false }, outputStream, fileFormat })
 }

@@ -26,6 +26,7 @@ export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser
 export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUser())
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
 export const useAuthCanExportSurveysList = () => Authorizer.canExportSurveysList(useUser())
+export const useAuthCanEditSurveyOwner = () => Authorizer.canEditSurveyOwner(useUser())
 
 // ====== Auth / Analysis
 export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(), useSurveyInfo())
@@ -41,7 +42,7 @@ export const useAuthCanEditRecords = (records) => {
   const user = useUser()
   return records.length > 0 && records.every((record) => _canEditRecord({ user, surveyInfo, record }))
 }
-export const useAuthCanEditRecord = (record) => useAuthCanEditRecords([record])
+export const useAuthCanEditRecord = (record) => useAuthCanEditRecords(record ? [record] : [])
 export const useAuthCanDeleteRecords = (records) => useAuthCanEditRecords(records)
 export const useAuthCanDeleteRecord = (record) => useAuthCanDeleteRecords([record])
 export const useAuthCanCleanseRecords = () => Authorizer.canCleanseRecords(useUser(), useSurveyInfo())

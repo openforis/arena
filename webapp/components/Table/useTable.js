@@ -104,12 +104,15 @@ export const useTable = ({
 
       updateQuery(navigate)({ sort: { by: orderByField, order }, offset: null })
     },
-    [sort]
+    [navigate, sort.by, sort.order]
   )
 
-  const handleSearch = useCallback((searchText) => {
-    updateQuery(navigate)({ search: searchText, offset: null })
-  }, [])
+  const handleSearch = useCallback(
+    (searchText) => {
+      updateQuery(navigate)({ search: searchText, offset: null })
+    },
+    [navigate]
+  )
 
   // on rest params and limit update, go to first page (reset offset)
   useOnUpdate(() => {
@@ -119,12 +122,20 @@ export const useTable = ({
   // selected items
   const [selectedItems, setSelectedItems] = useState([])
 
+  const selectAllItems = useCallback(() => {
+    setSelectedItems(list)
+  }, [list])
+
+  const deselectAllItems = useCallback(() => {
+    setSelectedItems([])
+  }, [])
+
   // reset selected items on data (list) update
   useOnUpdate(() => {
     if (selectedItems.length > 0) {
-      setSelectedItems([])
+      deselectAllItems()
     }
-  }, [list])
+  }, [deselectAllItems, list])
 
   const onRowClick = useCallback(
     async (item) => {
@@ -147,7 +158,7 @@ export const useTable = ({
     (visibleColumnKeysUpdated) => {
       dispatch(TablesActions.updateVisibleColumns({ module, visibleColumns: visibleColumnKeysUpdated }))
     },
-    [module]
+    [dispatch, module]
   )
 
   return {
@@ -166,7 +177,10 @@ export const useTable = ({
     onRowClick,
     onVisibleColumnsChange,
     selectedItems,
+    selectAllItems,
+    deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
+    visibleItemsCount: list?.length ?? 0,
   }
 }

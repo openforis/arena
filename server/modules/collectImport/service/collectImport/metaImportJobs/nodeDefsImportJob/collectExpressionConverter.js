@@ -88,6 +88,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
       pattern: /idm:position\(\)/,
       replace: `index(${NodeDef.getName(Survey.getNodeDefParent(nodeDefCurrent)(survey))}) + 1`,
     },
+    { pattern: 'idm:datetime-diff', replace: 'dateTimeDiff' },
     {
       pattern: /idm:samplingPointCoordinate\(([^)]+)\)/,
       // change the function name but keep the same arguments.
@@ -109,6 +110,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
     // geo namespace
     // idm:distance is deprecated in Collect
     { pattern: '(geo|idm):distance', replace: 'distance' },
+    { pattern: 'geo:polygon', replace: 'geoPolygon' },
     // math namespace
     { pattern: /math:PI\(\)/, replace: 'Math.PI' },
     // convert directly some functions from math:fnName to Math.fnName

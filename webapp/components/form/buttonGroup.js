@@ -8,7 +8,16 @@ import MuiButtonGroup from '@mui/material/ButtonGroup'
 
 import { Button } from '../buttons'
 
-const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, disabled, deselectable, className }) => {
+const ButtonGroup = ({
+  className = null,
+  deselectable = false,
+  disabled = false,
+  groupName = null,
+  items = [],
+  multiple = false,
+  onChange = () => {},
+  selectedItemKey = null,
+}) => {
   const onItemClick =
     ({ item, selected }) =>
     () => {
@@ -27,18 +36,21 @@ const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, di
   return (
     <MuiButtonGroup className={classNames('btn-group', className)}>
       {items.map((item) => {
-        const selected = selectedItemKey === item.key || (multiple && R.includes(item.key, selectedItemKey))
+        const { key, disabled: itemDisabled, icon, iconClassName, label, labelParams, title } = item
+        const selected = selectedItemKey === key || (multiple && R.includes(key, selectedItemKey))
         const variant = selected ? 'contained' : 'outlined'
         return (
           <Button
-            key={item.key}
+            key={key}
             className={`btn-s${deselectable ? ' deselectable' : ''}`}
-            disabled={Boolean(item.disabled) || disabled}
-            iconClassName={item.iconClassName}
+            disabled={Boolean(itemDisabled) || disabled}
+            icon={icon}
+            iconClassName={iconClassName}
             onClick={onItemClick({ item, selected })}
-            label={item.label}
-            title={item.title}
-            testId={groupName ? `${groupName}_${item.key}` : null}
+            label={label}
+            labelParams={labelParams}
+            title={title}
+            testId={groupName ? `${groupName}_${key}` : null}
             variant={variant}
           />
         )
@@ -46,6 +58,13 @@ const ButtonGroup = ({ items, groupName, multiple, selectedItemKey, onChange, di
     </MuiButtonGroup>
   )
 }
+
+export const toButtonGroupItems = ({ i18n, object, labelPrefix, icon = null }) =>
+  Object.keys(object).map((key) => ({
+    key,
+    label: i18n.t(`${labelPrefix}${key}`),
+    icon: icon ? (typeof icon === 'function' ? icon({ key }) : icon) : null,
+  }))
 
 ButtonGroup.propTypes = {
   items: PropTypes.array,
@@ -56,17 +75,6 @@ ButtonGroup.propTypes = {
   multiple: PropTypes.bool,
   deselectable: PropTypes.bool,
   className: PropTypes.string,
-}
-
-ButtonGroup.defaultProps = {
-  items: [],
-  groupName: null,
-  selectedItemKey: null,
-  onChange: () => {},
-  disabled: false,
-  multiple: false,
-  deselectable: false,
-  className: null,
 }
 
 export default ButtonGroup

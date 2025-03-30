@@ -10,7 +10,7 @@ import * as StringUtils from '@core/stringUtils'
 import { uuidv4 } from '@core/uuid'
 
 import { contentTypes, setContentTypeFile } from '@server/utils/response'
-import * as CSVWriter from '@server/utils/file/csvWriter'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipArchiver } from '@server/utils/file/zipArchiver'
 
@@ -53,7 +53,6 @@ const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFi
       includeCategoryItemsLabels: false,
       includeFiles,
       includeReadOnlyAttributes: false,
-      includeTaxonScientificName: false,
     },
   })
   const template = exportModel.columns.reduce((acc, column) => {
@@ -68,21 +67,26 @@ const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFi
   }
 }
 
-const exportDataImportTemplate = async ({ surveyId, cycle, nodeDefUuid, includeFiles, res }) => {
+const exportDataImportTemplate = async ({ surveyId, cycle, nodeDefUuid, includeFiles, fileFormat, res }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const { template, nodeDef } = await extractDataImportTemplate({ survey, cycle, nodeDefUuid, includeFiles })
+  const { template, nodeDef } = await extractDataImportTemplate({
+    survey,
+    cycle,
+    nodeDefUuid,
+    includeFiles,
+  })
 
   setContentTypeFile({
     res,
-    fileName: `data_import_template_${NodeDef.getName(nodeDef)}.csv`,
-    contentType: contentTypes.csv,
+    fileName: `data_import_template_${NodeDef.getName(nodeDef)}.${fileFormat}`,
+    fileFormat,
   })
 
-  await CSVWriter.writeItemsToStream({ outputStream: res, items: [template] })
+  await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: [template] })
 }
 
-const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, res }) => {
+const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fileFormat, res }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
   const archiver = new ZipArchiver(res)
@@ -100,12 +104,22 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, res
   const tempFilePaths = []
 
   await Promises.each(multipleNodeDefUuids, async (nodeDefUuid, idx) => {
-    const { template, nodeDef } = await extractDataImportTemplate({ survey, cycle, nodeDefUuid, includeFiles })
+    const { template, nodeDef } = await extractDataImportTemplate({
+      survey,
+      cycle,
+      nodeDefUuid,
+      includeFiles,
+      fileFormat,
+    })
     const prefix = `data_import_template_${StringUtils.padStart(2, '0')(String(idx + 1))}`
-    const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.csv`
+    const zipEntryName = `${prefix}_${NodeDef.getName(nodeDef)}.${fileFormat}`
     const tempFilePath = FileUtils.newTempFilePath()
 
-    await CSVWriter.writeItemsToStream({ outputStream: FileUtils.createWriteStream(tempFilePath), items: [template] })
+    await FlatDataWriter.writeItemsToStream({
+      outputStream: FileUtils.createWriteStream(tempFilePath),
+      fileFormat,
+      items: [template],
+    })
 
     archiver.addFile(tempFilePath, zipEntryName)
     tempFilePaths.push(tempFilePath)

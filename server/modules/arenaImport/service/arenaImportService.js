@@ -6,7 +6,7 @@ import ArenaImportJob from './arenaImport/arenaImportJob'
 export const startArenaImportJob = ({ user, filePath, surveyInfoTarget, options }) => {
   const job = new ArenaImportJob({ user, filePath, surveyInfoTarget, options })
 
-  JobManager.executeJobThread(job)
+  JobManager.enqueueJob(job)
 
   return job
 }

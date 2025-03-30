@@ -1,21 +1,30 @@
 import './expressionEditorPopup.scss'
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import * as R from 'ramda'
+import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import ExpressionNode from './nodes/expressionNode'
 
 const BasicExpressionEditorPopup = (props) => {
-  const { nodeDefCurrent, isBoolean, variables, updateDraftExpr, queryDraft, exprDraft, exprDraftValid } = props
+  const {
+    exprDraft = null,
+    exprDraftValid = false,
+    isBoolean = true, // True if expression returns a boolean condition
+    nodeDefCurrent = null,
+    queryDraft = null,
+    updateDraftExpr,
+    variables,
+  } = props
 
   const i18n = useI18n()
 
   return (
     <>
       <div className="expression-editor__query-container">
-        <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
+        <div className={classNames('query', { invalid: !exprDraftValid })}>
           {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
         </div>
       </div>
@@ -43,14 +52,6 @@ BasicExpressionEditorPopup.propTypes = {
   queryDraft: PropTypes.string,
   updateDraftExpr: PropTypes.func.isRequired,
   variables: PropTypes.arrayOf(Object).isRequired,
-}
-
-BasicExpressionEditorPopup.defaultProps = {
-  exprDraft: null,
-  exprDraftValid: false,
-  isBoolean: true, // True if expression returns a boolean condition
-  nodeDefCurrent: null,
-  queryDraft: null,
 }
 
 export default BasicExpressionEditorPopup

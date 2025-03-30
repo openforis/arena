@@ -1,0 +1,10 @@
+@use '../../../SurveyFormVars' as *;
+
+.survey-form__node-def-form-header {
+  border: $formBorder;
+  padding: 0.3rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+}

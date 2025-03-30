@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
+import { TreeSelectViewMode } from '@webapp/model'
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
@@ -16,6 +17,8 @@ const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
 const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
 
 const keys = {
+  treeSelectViewMode: 'treeSelectViewMode', // Tree select view mode
+  nodeDefUuid: 'nodeDefUuid', // Current node def (if view mode is "allNodeDefs")
   nodeDefUuidPage: 'nodeDefUuidPage', // Current page nodeDef
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // NodeDef (entity) selected to add children to
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // Map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
@@ -23,6 +26,16 @@ const keys = {
   expandedPageNavigation: 'expandedPageNavigation',
   nodeDefLabelType: 'nodeDefLabelType', // NodeDef label function
 }
+
+// context state is global state
+export const getGlobalStateTreeSelectViewMode = getStateProp(keys.treeSelectViewMode, TreeSelectViewMode.onlyPages)
+// context state is SurveyFormState
+export const getTreeSelectViewMode = R.propOr(TreeSelectViewMode.onlyPages, keys.treeSelectViewMode)
+export const assocTreeSelectViewMode = R.assoc(keys.treeSelectViewMode)
+
+export const getFormActiveNodeDefUuid = (state) =>
+  getStateProp(keys.nodeDefUuid, NodeDef.getUuid(getFormActivePageNodeDef(state)))(state)
+export const assocFormActiveNodeDefUuid = R.assoc(keys.nodeDefUuid)
 
 // ====== nodeDefUuidPage
 

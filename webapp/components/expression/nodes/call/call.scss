@@ -1,0 +1,34 @@
+.expression-editor-popup__expr-container {
+  .call {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .function-dropdown {
+      width: 18rem;
+    }
+  }
+}
+
+.modal {
+  .function-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .form-item {
+      display: flex;
+
+      .form-label {
+        width: 11rem;
+      }
+      .dropdown-wrapper {
+        width: 20rem;
+      }
+    }
+
+    .literal {
+      width: auto;
+    }
+  }
+}

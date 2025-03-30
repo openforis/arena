@@ -3,6 +3,7 @@ import './ResizableModal.scss'
 import React, { useEffect, useRef } from 'react'
 import ReactModal from 'react-modal-resizable-draggable'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import { Button, ButtonIconClose } from '../buttons'
@@ -12,9 +13,9 @@ export const ResizableModal = (props) => {
     children,
     className,
     header: headerProp,
-    initHeight,
-    initWidth,
-    isOpen,
+    initHeight = 400,
+    initWidth = 600,
+    isOpen = true,
     left,
     onClose,
     onDetach,
@@ -38,7 +39,15 @@ export const ResizableModal = (props) => {
 
   return (
     <div className={classNames('resizable-modal', className)}>
-      <ReactModal initHeight={initHeight} initWidth={initWidth} isOpen={isOpen} left={left} ref={modalRef} top={top}>
+      <ReactModal
+        initHeight={initHeight}
+        initWidth={initWidth}
+        isOpen={isOpen}
+        left={left}
+        onRequestClose={onRequestClose}
+        ref={modalRef}
+        top={top}
+      >
         <div className="resizable-modal__header">
           <h3>{header}</h3>
           {onDetach && (
@@ -57,8 +66,16 @@ export const ResizableModal = (props) => {
   )
 }
 
-ResizableModal.defaultProps = {
-  initHeight: 400,
-  initWidth: 600,
-  isOpen: true,
+ResizableModal.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  initHeight: PropTypes.number,
+  initWidth: PropTypes.number,
+  isOpen: PropTypes.bool,
+  left: PropTypes.number,
+  onClose: PropTypes.func,
+  onDetach: PropTypes.func,
+  onRequestClose: PropTypes.func.isRequired,
+  top: PropTypes.number,
 }

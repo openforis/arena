@@ -11,53 +11,29 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as DataExportService from '../service/dataExportService'
 
 export const init = (app) => {
-  app.post(
-    '/survey/:surveyId/data-export/csv',
-    AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const {
-          surveyId,
-          cycle,
-          recordUuids,
-          search,
-          includeCategories,
-          includeCategoryItemsLabels,
-          expandCategoryItems,
-          includeAncestorAttributes,
-          includeAnalysis,
-          includeDataFromAllCycles,
-          includeFiles,
-          recordsModifiedAfter,
-        } = Request.getParams(req)
+  app.post('/survey/:surveyId/data-export', AuthMiddleware.requireRecordsExportPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
 
-        const user = Request.getUser(req)
+      const user = Request.getUser(req)
 
-        const job = DataExportService.startCsvDataExportJob({
-          user,
-          surveyId,
-          cycle,
-          recordUuids,
-          search,
-          includeCategories,
-          includeCategoryItemsLabels,
-          expandCategoryItems,
-          includeAncestorAttributes,
-          includeAnalysis,
-          includeDataFromAllCycles,
-          includeFiles,
-          recordsModifiedAfter,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
+      const job = DataExportService.startCsvDataExportJob({
+        user,
+        surveyId,
+        cycle,
+        recordUuids,
+        search,
+        options,
+      })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // get zip with csv
   app.get(
-    '/survey/:surveyId/data-export/csv/:exportUuid',
+    '/survey/:surveyId/data-export/:exportUuid',
     AuthMiddleware.requireRecordsExportPermission,
     async (req, res, next) => {
       try {

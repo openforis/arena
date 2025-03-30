@@ -26,7 +26,7 @@ const Records = () => {
   const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel()
 
   const navigateToRecord = useCallback(
-    (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}`),
+    (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}?locked=true`),
     [navigate]
   )
   const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())

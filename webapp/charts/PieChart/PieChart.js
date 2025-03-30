@@ -9,19 +9,19 @@ const fill = '#8884d8'
 export const PieChart = (props) => {
   const {
     data,
-    dataKey,
-    colorKey,
+    colorKey = 'color',
     children,
-    endAngle,
-    height,
+    dataKey = 'value',
+    endAngle = -270,
+    height = '100%',
     innerRadius,
-    label,
+    label = true,
     outerRadius,
-    startAngle,
-    showLabelLine,
-    showLegend,
-    showTooltip,
-    width,
+    startAngle = 90,
+    showLabelLine = true,
+    showLegend = true,
+    showTooltip = true,
+    width = '100%',
   } = props
 
   return (
@@ -65,17 +65,4 @@ PieChart.propTypes = {
   showTooltip: PropTypes.bool,
   startAngle: PropTypes.number,
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-}
-
-PieChart.defaultProps = {
-  colorKey: 'color',
-  dataKey: 'value',
-  endAngle: -270,
-  label: true,
-  showLabelLine: true,
-  showLegend: true,
-  showTooltip: true,
-  startAngle: 90,
-  width: '100%',
-  height: '100%',
 }

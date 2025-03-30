@@ -7,7 +7,16 @@ import * as Expression from '@core/expressionParser/expression'
 import { Button } from '@webapp/components/buttons'
 
 const Logical = (props) => {
-  const { canDelete, node, nodeDefCurrent, isBoolean, level, onChange, renderNode, variables } = props
+  const {
+    canDelete = false,
+    isBoolean = false,
+    level = 0,
+    node,
+    nodeDefCurrent = null,
+    onChange,
+    renderNode,
+    variables = null,
+  } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators
 
@@ -69,14 +78,6 @@ Logical.propTypes = {
   isBoolean: PropTypes.bool,
   level: PropTypes.number,
   variables: PropTypes.array,
-}
-
-Logical.defaultProps = {
-  canDelete: false,
-  isBoolean: false,
-  level: 0,
-  nodeDefCurrent: null,
-  variables: null,
 }
 
 export default Logical

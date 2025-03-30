@@ -25,10 +25,11 @@ export default class SurveyCloneJob extends Job {
   async onEnd() {
     await super.onEnd()
 
-    const { surveyId } = this.context
+    const { surveyId: sourceSurveyId } = this.params
+    const { surveyId: targetSurveyId } = this.context
 
-    if (surveyId) {
-      await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId })
+    if (targetSurveyId && sourceSurveyId !== targetSurveyId) {
+      await SurveyCreatorJobHelper.onJobEnd({ job: this, surveyId: targetSurveyId })
     }
   }
 }

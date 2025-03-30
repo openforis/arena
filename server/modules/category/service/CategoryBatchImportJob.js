@@ -1,6 +1,8 @@
 import * as Survey from '@core/survey/survey'
+import { FileFormats } from '@core/fileFormats'
 
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import CategoryImportJob, { CategoryImportInternalJob } from './categoryImportJob'
 
@@ -16,14 +18,12 @@ class CategoryBatchImportInternalJob extends CategoryImportInternalJob {
 
   async getOrCreateSummary() {
     const stream = await this.createReadStream()
-    const { survey } = this
+    const { survey, context } = this
+    const { fileZipEntryName } = context
     const surveyInfo = Survey.getSurveyInfo(survey)
     const defaultLang = Survey.getDefaultLanguage(surveyInfo)
-
-    return CategoryManager.createImportSummaryFromStream({
-      stream,
-      defaultLang,
-    })
+    const fileFormat = FileUtils.getFileExtension(fileZipEntryName) === 'xlsx' ? FileFormats.xlsx : FileFormats.csv
+    return CategoryManager.createImportSummaryFromStream({ stream, fileFormat, defaultLang })
   }
 }
 

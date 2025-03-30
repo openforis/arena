@@ -1,11 +1,13 @@
 import Job from '@server/job/job'
 
-import CsvDataImportJob from './CsvDataImportJob'
+import FlatDataImportJob from './FlatDataImportJob'
 import DataFilesImportJob from './DataFilesImportJob'
+import EntitiesDeleteJob from './EntitiesDeleteJob'
 
-const createInternalJobs = ({ includeFiles }) => [
-  new CsvDataImportJob({ keepReaderOpenOnEnd: true }),
+const createInternalJobs = ({ includeFiles, deleteExistingEntities }) => [
+  new FlatDataImportJob({ keepReaderOpenOnEnd: true }),
   ...(includeFiles ? [new DataFilesImportJob()] : []),
+  ...(deleteExistingEntities ? [new EntitiesDeleteJob()] : []),
 ]
 
 export default class DataImportJob extends Job {
@@ -18,6 +20,7 @@ export default class DataImportJob extends Job {
     const { includeFiles } = this.context
     return {
       ...result,
+      entitiesDeleted: result.entitiesDeleted || 0,
       includeFiles,
     }
   }
@@ -27,8 +30,8 @@ export default class DataImportJob extends Job {
 
     this.errors = this.combineInnerJobsErrors()
 
-    const csvDataImportJob = this.innerJobs[0]
-    csvDataImportJob?.dataImportFileReader?.close()
+    const flatDataImportJob = this.innerJobs[0]
+    flatDataImportJob?.dataImportFileReader?.close()
   }
 }
 

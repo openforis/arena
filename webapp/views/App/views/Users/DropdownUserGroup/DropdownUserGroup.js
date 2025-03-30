@@ -12,7 +12,14 @@ import { useUser } from '@webapp/store/user'
 import Dropdown from '@webapp/components/form/Dropdown'
 
 const DropdownUserGroup = (props) => {
-  const { editingLoggedUser, groupUuid, disabled, validation, onChange, showOnlySurveyGroups } = props
+  const {
+    disabled = false,
+    editingLoggedUser = false, // True if user being edited is the logged one
+    groupUuid = null,
+    onChange,
+    showOnlySurveyGroups = false,
+    validation,
+  } = props
 
   const user = useUser()
   const surveyInfo = useSurveyInfo()
@@ -43,15 +50,6 @@ DropdownUserGroup.propTypes = {
   validation: PropTypes.any,
   onChange: PropTypes.func,
   showOnlySurveyGroups: PropTypes.bool,
-}
-
-DropdownUserGroup.defaultProps = {
-  editingLoggedUser: false, // True if user being edited is the logged one
-  groupUuid: null,
-  disabled: false,
-  validation: null,
-  onChange: null,
-  showOnlySurveyGroups: false,
 }
 
 export default DropdownUserGroup

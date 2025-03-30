@@ -5,6 +5,7 @@ export {
   fetchItemsCountIndexedByCategoryUuid,
   fetchCategory,
   createCategory,
+  countCategoryItems,
   fetchCategoryItems,
   fetchCategoryItemsInLevelRequest,
   countSamplingPointData,
@@ -43,9 +44,11 @@ export {
   downloadDataQueryExport,
   fetchRecordsCountByStep,
   fetchRecordSummary,
-  startExportDataToCSVJob,
-  downloadExportedDataToCSVUrl,
+  fetchRecordsSummary,
+  startExportDataJob,
+  downloadExportedDataUrl,
   startRecordsCloneJob,
+  mergeRecords,
 } from './data'
 export {
   insertDataQuerySummary,
@@ -54,15 +57,20 @@ export {
   updateDataQuerySummary,
   deleteDataQuerySummary,
 } from './dataQuery'
-export { fetchAvailableMapPeriods, fetchAltitude, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export { fetchActiveJob } from './job'
+export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
 export {
   fetchSurveyFull,
   fetchSurveys,
   fetchSurveyTemplatesPublished,
   insertSurvey,
   startImportLabelsJob,
+  updateSurveyConfigurationProp,
+  updateSurveyOwner,
+  updateSurveyProps,
 } from './survey'
 export {
+  convertNodeDef,
   fetchNodeDef,
   fetchNodeDefs,
   moveNodeDef,
@@ -85,6 +93,7 @@ export {
   fetchUserName,
   fetchUsersBySurvey,
   fetchUserSurveys,
+  fetchUsers,
   changeUserPassword,
 } from './user'
 

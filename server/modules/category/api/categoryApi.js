@@ -4,6 +4,7 @@ import * as Response from '@server/utils/response'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as ObjectUtils from '@core/objectUtils'
+import { FileFormats } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
@@ -31,10 +32,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId } = Request.getParams(req)
+        const { surveyId, fileFormat } = Request.getParams(req)
         const filePath = Request.getFilePath(req)
 
-        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath })
+        const { summary, error } = await CategoryService.createImportSummary({ surveyId, filePath, fileFormat })
 
         res.json({ summary, error })
       } catch (error) {
@@ -52,7 +53,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const summary = Request.getBody(req)
 
-        const job = CategoryService.importCategory(user, surveyId, categoryUuid, summary)
+        const job = CategoryService.importCategory({ user, surveyId, categoryUuid, summary })
         res.json({ job })
       } catch (error) {
         next(error)
@@ -120,10 +121,10 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, draft = false } = Request.getParams(req)
+        const { surveyId, fileFormat, draft = false } = Request.getParams(req)
         const user = Request.getUser(req)
 
-        const job = CategoryService.exportAllCategories({ user, surveyId, draft })
+        const job = CategoryService.exportAllCategories({ user, surveyId, fileFormat, draft })
         res.json({ job })
       } catch (error) {
         next(error)
@@ -238,9 +239,9 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const { surveyId, categoryUuid, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res })
+        await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res, fileFormat })
       } catch (error) {
         next(error)
       }
@@ -258,14 +259,15 @@ export const init = (app) => {
           draft = true,
           generic = false,
           samplingPointData = false,
+          fileFormat = FileFormats.csv,
         } = Request.getParams(req)
 
         if (generic) {
-          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res })
+          await CategoryService.exportCategoryImportTemplateGeneric({ surveyId, draft, res, fileFormat })
         } else if (samplingPointData) {
-          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res })
+          await CategoryService.exportCategoryImportTemplateSamplingPointData({ surveyId, draft, res, fileFormat })
         } else {
-          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res })
+          await CategoryService.exportCategoryImportTemplate({ surveyId, categoryUuid, draft, res, fileFormat })
         }
       } catch (error) {
         next(error)
@@ -286,6 +288,29 @@ export const init = (app) => {
         )
 
         res.json({ items })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items/count',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
+
+        const count = await CategoryService.countItemsByParentUuid({
+          surveyId,
+          categoryUuid,
+          parentUuid,
+          draft,
+          search,
+          lang,
+        })
+
+        res.json({ count })
       } catch (error) {
         next(error)
       }

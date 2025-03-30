@@ -60,7 +60,7 @@ export const BaseUnitCodeAttributeSelector = (props) => {
   const selectedItem = selectedNodeDef ? nodeDefToItem(selectedNodeDef) : emptySelectionItem
 
   return (
-    <FormItem label={i18n.t(label)} info={info ? i18n.t(info) : undefined}>
+    <FormItem label={label} info={info}>
       <Dropdown selection={selectedItem} items={selectableItems} onChange={onChange} />
     </FormItem>
   )

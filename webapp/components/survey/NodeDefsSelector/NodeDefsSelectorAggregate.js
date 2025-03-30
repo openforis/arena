@@ -7,7 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 import { Query } from '@common/model/query'
 import * as StepVariable from '@common/analysis/stepVariable'
 
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 
@@ -37,16 +37,15 @@ const NodeDefsSelectorAggregate = (props) => {
   const {
     dimensions,
     measures,
-    nodeDefLabelType,
-    nodeDefUuidEntity,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
     onChangeEntity,
     onChangeMeasures,
     onChangeDimensions,
-    showAnalysisAttributes,
+    showAnalysisAttributes = false,
   } = props
 
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntity)(survey)
 
   const variablesPrevSteps = getPrevCalculations({ nodeDefUuidEntity, survey })
@@ -96,7 +95,6 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
-              lang={lang}
               filterFunction={(nodeDef) =>
                 NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
               }
@@ -112,7 +110,6 @@ const NodeDefsSelectorAggregate = (props) => {
 
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
-              lang={lang}
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
               filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
               includeEntityFrequencySelector
@@ -159,12 +156,6 @@ NodeDefsSelectorAggregate.propTypes = {
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
   showAnalysisAttributes: PropTypes.bool,
-}
-
-NodeDefsSelectorAggregate.defaultProps = {
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
-  nodeDefUuidEntity: null,
-  showAnalysisAttributes: false,
 }
 
 export default NodeDefsSelectorAggregate

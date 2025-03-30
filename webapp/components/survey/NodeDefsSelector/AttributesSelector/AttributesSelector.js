@@ -10,40 +10,41 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import ExpansionPanel from '@webapp/components/expansionPanel'
 import { Checkbox } from '@webapp/components/form'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseAnalysis } from '@webapp/store/user'
+import { useI18n } from '@webapp/store/system'
 
 import AttributeSelector from './AttributeSelector'
-import { useI18n } from '@webapp/store/system'
+import { AttributesList } from './AttributesList'
 
 const minDefsToShowSelectAll = 5
 
 const AttributesSelector = (props) => {
   const {
-    canSelectAttributes,
-    filterFunction,
-    filterTypes,
-    filterChainUuids,
-    lang,
-    ancestorSelector,
-    includeEntityFrequencySelector,
-    nodeDefLabelType,
-    nodeDefUuidsToExclude,
-    nodeDefUuidEntity,
-    nodeDefUuidsAttributes,
+    ancestorSelector = false,
+    canSelectAttributes = true,
+    filterFunction = null,
+    filterTypes = [],
+    filterChainUuids = [],
+    includeEntityFrequencySelector = false,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
+    nodeDefUuidsAttributes = [],
+    nodeDefUuidsToExclude = [],
     onAttributesSelection,
     onToggleAttribute,
-    showAnalysisAttributes,
-    showAncestors,
-    showAncestorsLabel,
-    showLabel,
-    showMultipleAttributes,
-    showSiblingsInSingleEntities,
+    showAnalysisAttributes = false,
+    showAncestors = true,
+    showAncestorsLabel = true,
+    showLabel = false,
+    showMultipleAttributes = true,
+    showSiblingsInSingleEntities = false,
   } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
   const canUseAnalysis = useAuthCanUseAnalysis()
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidEntity)(survey)
@@ -118,38 +119,35 @@ const AttributesSelector = (props) => {
               onChange={onSelectAll}
             />
           )}
-          {visibleChildDefs.map((childDef) => (
-            <AttributeSelector
-              key={NodeDef.getUuid(childDef)}
-              canSelectAttributes={canSelectAttributes}
-              nodeDef={childDef}
-              nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-              onToggleAttribute={onToggleAttribute}
-              showNodeDefPath={!showAncestorsLabel}
-              nodeDefLabelType={nodeDefLabelType}
-            />
-          ))}
+          <AttributesList
+            attributeDefs={visibleChildDefs}
+            canSelectAttributes={canSelectAttributes}
+            nodeDefContext={nodeDefContext}
+            nodeDefLabelType={nodeDefLabelType}
+            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+            onToggleAttribute={onToggleAttribute}
+            showAncestorsLabel={showAncestorsLabel}
+          />
         </ExpansionPanel>
       )}
       {showAncestors && nodeDefAncestor && (
         <AttributesSelector
-          lang={lang}
           ancestorSelector
+          canSelectAttributes={canSelectAttributes}
+          filterChainUuids={filterChainUuids}
+          filterFunction={filterFunction}
+          filterTypes={filterTypes}
+          nodeDefLabelType={nodeDefLabelType}
           nodeDefUuidEntity={NodeDef.getUuid(nodeDefAncestor)}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           nodeDefUuidsToExclude={[NodeDef.getUuid(nodeDefContext)]}
           onAttributesSelection={onAttributesSelection}
           onToggleAttribute={onToggleAttribute}
-          filterFunction={filterFunction}
-          filterTypes={filterTypes}
-          filterChainUuids={filterChainUuids}
-          canSelectAttributes={canSelectAttributes}
-          showLabel={showAncestorsLabel}
           showAnalysisAttributes={showAnalysisAttributes}
           showAncestorsLabel={showAncestorsLabel}
+          showLabel={showAncestorsLabel}
           showMultipleAttributes={showMultipleAttributes}
           showSiblingsInSingleEntities={showSiblingsInSingleEntities}
-          nodeDefLabelType={nodeDefLabelType}
         />
       )}
     </div>
@@ -163,7 +161,6 @@ AttributesSelector.propTypes = {
   filterTypes: PropTypes.array,
   filterChainUuids: PropTypes.array,
   includeEntityFrequencySelector: PropTypes.bool,
-  lang: PropTypes.string.isRequired,
   nodeDefUuidEntity: PropTypes.string,
   nodeDefUuidsAttributes: PropTypes.array,
   nodeDefUuidsToExclude: PropTypes.array,
@@ -176,25 +173,6 @@ AttributesSelector.propTypes = {
   showMultipleAttributes: PropTypes.bool,
   showSiblingsInSingleEntities: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
-}
-
-AttributesSelector.defaultProps = {
-  ancestorSelector: false,
-  canSelectAttributes: true,
-  filterFunction: null,
-  filterTypes: [],
-  filterChainUuids: [],
-  includeEntityFrequencySelector: false,
-  nodeDefUuidEntity: null,
-  nodeDefUuidsAttributes: [],
-  nodeDefUuidsToExclude: [],
-  showAnalysisAttributes: false,
-  showAncestors: true,
-  showAncestorsLabel: true,
-  showLabel: false,
-  showMultipleAttributes: true,
-  showSiblingsInSingleEntities: false,
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default AttributesSelector

@@ -13,7 +13,7 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
-import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
@@ -21,22 +21,21 @@ import FilterByChain from './FilterByChain'
 
 const NodeDefsSelector = (props) => {
   const {
-    nodeDefUuidsAttributes,
-    nodeDefUuidEntity,
-    hierarchy,
-    canSelectAttributes,
-    showAnalysisAttributes,
-    showAncestors,
-    showMultipleAttributes,
-    showSingleEntities,
-    onChangeAttributes,
-    onChangeEntity,
-    nodeDefLabelType,
+    canSelectAttributes = true,
+    hierarchy = null,
+    nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
+    nodeDefUuidEntity = null,
+    nodeDefUuidsAttributes = [],
+    onChangeEntity = () => {},
+    onChangeAttributes = () => {},
+    showAnalysisAttributes = false,
+    showAncestors = true,
+    showMultipleAttributes = true,
+    showSingleEntities = false,
   } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
 
   const [filterTypes, setFilterTypes] = useState([])
   const [filterChainUuids, setFilterChainUuids] = useState([])
@@ -111,7 +110,6 @@ const NodeDefsSelector = (props) => {
 
       {nodeDefUuidEntity && (
         <AttributesSelector
-          lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onAttributesSelection={onAttributesSelection}
@@ -142,20 +140,6 @@ NodeDefsSelector.propTypes = {
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
-}
-
-NodeDefsSelector.defaultProps = {
-  nodeDefUuidEntity: null,
-  nodeDefUuidsAttributes: [],
-  hierarchy: null,
-  canSelectAttributes: true,
-  showAnalysisAttributes: false,
-  showAncestors: true,
-  showMultipleAttributes: true,
-  showSingleEntities: false,
-  onChangeEntity: () => {},
-  onChangeAttributes: () => {},
-  nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
 }
 
 export default NodeDefsSelector
