@@ -68,7 +68,7 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode }) =>
       !_maxCountReached({ parentNode, nodeDef, nodes }) &&
       !_hasSiblingWithoutKeys({ survey, nodeDef, record, parentNode })
 
-    const nodesEmpty = nodes.every((node) => Record.isNodeEmpty(node)(record))
+    const nodesEmpty = nodes.every((node) => Record.isNodeEmpty({ node, survey })(record))
     return {
       nodes,
       nodesEmpty,

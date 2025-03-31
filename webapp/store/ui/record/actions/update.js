@@ -62,7 +62,7 @@ export const updateNode =
       dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
       dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
     }
-    checkAndConfirmUpdateNode({ dispatch, getState, nodeDef, onOk })
+    checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })
   }
 
 export const updateRecordStep = (step, navigate) => async (_dispatch, getState) => {

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Nodes, Records } from '@openforis/arena-core'
+import { Nodes, Records, Surveys } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
@@ -22,7 +22,7 @@ const {
 } = Records
 
 /**
- * === simple getters
+ * === simple getters.
  */
 export const getNodes = R.propOr({}, keys.nodes)
 export const getNodesArray = (record) => Object.values(getNodes(record))
@@ -37,9 +37,7 @@ export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
   }
 }
 
-/**
- * ==== hierarchy
- */
+// ==== hierarchy
 // ancestors
 
 export const visitAncestorsAndSelf =
@@ -168,7 +166,7 @@ export const getNodeParentInDescendantSingleEntities =
   }
 
 /**
- * Returns true if a node and all its ancestors are applicable
+ * Returns true if a node and all its ancestors are applicable.
  */
 export const isNodeApplicable = (node) => (record) => {
   if (Node.isRoot(node)) {
@@ -184,9 +182,7 @@ export const isNodeApplicable = (node) => (record) => {
   return false
 }
 
-/**
- * ==== dependency
- */
+// ==== dependency
 /**
  * Returns a list of dependent node pointers.
  * Every item in the list is in the format:
@@ -323,9 +319,24 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
 }
 
-export const isNodeEmpty = (node) => (record) => !findDescendantOrSelf(node, Node.hasUserInputValue)(record)
+export const isNodeFilledByUser =
+  ({ node, survey }) =>
+  (record) =>
+    !!findDescendantOrSelf(node, (visitedNode) => {
+      const visitedNodeDefUuid = Node.getNodeDefUuid(visitedNode)
+      const visitedNodeDef = SurveyNodeDefs.getNodeDefByUuid(visitedNodeDefUuid)(survey)
+      return (
+        !(Surveys.isNodeDefEnumerator({ survey, nodeDef: visitedNodeDef }) || NodeDef.isReadOnly(visitedNodeDef)) &&
+        Node.hasUserInputValue(visitedNode)
+      )
+    })(record)
 
-export const isEmpty = (record) => {
+export const isNodeEmpty =
+  ({ survey, node }) =>
+  (record) =>
+    !isNodeFilledByUser({ survey, node })(record)
+
+export const isEmpty = ({ survey, record }) => {
   const rootNode = getRootNode(record)
-  return isNodeEmpty(rootNode)(record)
+  return isNodeEmpty({ survey, node: rootNode })(record)
 }

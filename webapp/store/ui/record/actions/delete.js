@@ -30,7 +30,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
       data: { cycle, draft, timezoneOffset: Dates.getTimezoneOffset() },
     })
   }
-  checkAndConfirmUpdateNode({ dispatch, getState, nodeDef, onOk })
+  checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })
 }
 
 export const recordDeleted =

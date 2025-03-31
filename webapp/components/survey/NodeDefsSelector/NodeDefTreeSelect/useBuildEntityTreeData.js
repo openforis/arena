@@ -15,7 +15,7 @@ const getPageNode = ({ record, pagesUuidMap, nodeDefUuid }) => {
   return record && nodeUuid ? Record.getNodeByUuid(nodeUuid)(record) : null
 }
 
-const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) =>
+const isPageVisible = ({ survey, cycle, record, pageNodeDef, parentNode }) =>
   NodeDef.isRoot(pageNodeDef) ||
   !NodeDefLayout.isHiddenWhenNotRelevant(cycle)(pageNodeDef) ||
   Node.isChildApplicable(NodeDef.getUuid(pageNodeDef))(parentNode) ||
@@ -23,7 +23,7 @@ const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) =>
   Record.getNodeChildrenByDefUuid(
     parentNode,
     NodeDef.getUuid(pageNodeDef)
-  )(record).some((pageChildNode) => !Record.isNodeEmpty(pageChildNode)(record))
+  )(record).some((pageChildNode) => Record.isNodeFilledByUser({ node: pageChildNode, survey })(record))
 
 const getNodeDefAvailableChildren = ({
   survey,
@@ -44,7 +44,7 @@ const getNodeDefAvailableChildren = ({
     !NodeDef.isRoot(nodeDef) &&
     record &&
     parentPageNode &&
-    !isPageVisible({ cycle, record, pageNodeDef: nodeDef, parentNode: parentPageNode })
+    !isPageVisible({ survey, cycle, record, pageNodeDef: nodeDef, parentNode: parentPageNode })
 
   let children = null
   if (onlyPages) {
@@ -72,7 +72,7 @@ const getNodeDefAvailableChildren = ({
 
   const visibleChildren = pageNode
     ? childrenFiltered.filter((childDef) =>
-        isPageVisible({ cycle, record, pageNodeDef: childDef, parentNode: pageNode })
+        isPageVisible({ survey, cycle, record, pageNodeDef: childDef, parentNode: pageNode })
       )
     : childrenFiltered
 
