@@ -1,4 +1,4 @@
-import { Records, Surveys } from '@openforis/arena-core'
+import { Records, SurveyDependencyType, Surveys } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -21,12 +21,38 @@ export const recordNodesUpdate = (nodes) => (dispatch, getState) => {
   dispatch({ type: ActionTypes.nodesUpdate, nodes: nodes })
 }
 
+const findApplicableDependentEnumeratedEntityDefs = ({ survey, nodeDef }) => {
+  const result = []
+  const visitedNodeDefsByUuid = {}
+  const stack = [nodeDef]
+  while (stack.length > 0) {
+    const currentNodeDef = stack.pop()
+    const currentNodeDefUuid = NodeDef.getUuid(currentNodeDef)
+    if (!visitedNodeDefsByUuid[currentNodeDefUuid]) {
+      if (NodeDef.isEntity(currentNodeDef) && NodeDef.isEnumerate(currentNodeDef)) {
+        result.push(currentNodeDef)
+      }
+      const dependents = Surveys.getNodeDefDependents({
+        survey,
+        nodeDefUuid: currentNodeDefUuid,
+        dependencyType: SurveyDependencyType.applicable,
+      })
+      stack.push(...dependents)
+    }
+    visitedNodeDefsByUuid[currentNodeDefUuid] = true
+  }
+  return result
+}
+
 const findDependentEnumeratedEntityDefsNotEmpty = ({ survey, record, node, nodeDef }) => {
   const dependentEnumeratedEntityDefs = NodeDef.isCode(nodeDef)
     ? Surveys.getDependentEnumeratedEntityDefs({ survey, nodeDef })
-    : null
+    : []
 
-  if (!dependentEnumeratedEntityDefs) return []
+  const applicableDependentEnumeratedEntityDefs = findApplicableDependentEnumeratedEntityDefs({ survey, nodeDef })
+  dependentEnumeratedEntityDefs.push(...applicableDependentEnumeratedEntityDefs)
+
+  if (dependentEnumeratedEntityDefs.length === 0) return []
 
   const parentNode = Records.getParent(node)(record)
 
