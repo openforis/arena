@@ -3,9 +3,9 @@ import axios from 'axios'
 import { Dates } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as Record from '@core/record/record'
 
 import { debounceAction } from '@webapp/utils/reduxUtils'
 
@@ -18,7 +18,7 @@ import { appModules, appModuleUri } from '@webapp/app/appModules'
 
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
-import { recordNodesUpdate } from './common'
+import { checkAndConfirmUpdateNode, recordNodesUpdate } from './common'
 
 const _updateNodeDebounced = (node, file, delay) => {
   const action = async (dispatch, getState) => {
@@ -49,17 +49,20 @@ const _updateNodeDebounced = (node, file, delay) => {
 
 export const updateNode =
   (nodeDef, node, value, file = null, meta = {}, refData = null) =>
-  (dispatch) => {
-    const nodeToUpdate = A.pipe(
-      A.dissoc(Node.keys.placeholder),
-      Node.assocValue(value),
-      Node.mergeMeta(meta),
-      NodeRefData.assocRefData(refData),
-      A.assoc(Node.keys.dirty, true)
-    )(node)
+  (dispatch, getState) => {
+    const onOk = () => {
+      const nodeToUpdate = A.pipe(
+        A.dissoc(Node.keys.placeholder),
+        Node.assocValue(value),
+        Node.mergeMeta(meta),
+        NodeRefData.assocRefData(refData),
+        A.assoc(Node.keys.dirty, true)
+      )(node)
 
-    dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
-    dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
+      dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
+      dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
+    }
+    checkAndConfirmUpdateNode({ dispatch, getState, nodeDef, onOk })
   }
 
 export const updateRecordStep = (step, navigate) => async (_dispatch, getState) => {

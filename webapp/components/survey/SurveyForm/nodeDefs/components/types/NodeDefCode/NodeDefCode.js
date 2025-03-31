@@ -3,23 +3,21 @@ import './NodeDefCode.scss'
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import { Objects, Surveys } from '@openforis/arena-core'
+import { Surveys } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 
-import { useConfirmAsync } from '@webapp/components/hooks'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
-import { useDependentEnumeratedEntityDefs } from '@webapp/store/ui/surveyForm'
 
-import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
+import { useItems } from './store'
 
 const NodeDefCode = (props) => {
   const {
@@ -37,17 +35,12 @@ const NodeDefCode = (props) => {
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
-  const confirm = useConfirmAsync()
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const draft = Survey.isDraft(surveyInfo)
 
   const codeAttributesUuidsHierarchy = useRecordCodeAttributesUuidsHierarchy({ nodeDef, parentNode })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
-  const dependentEnumeratedEntityDefs = useDependentEnumeratedEntityDefs({ nodeDef })
-  const dependentEnumeratedEntityDefsLabel = dependentEnumeratedEntityDefs
-    .map((def) => NodeDef.getLabel(def, lang))
-    .join(', ')
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
@@ -71,63 +64,29 @@ const NodeDefCode = (props) => {
 
   const onItemAdd = useCallback(
     (item) => {
-      const performItemAdd = () => {
-        const existingNode = singleNode ? nodes[0] : null
-        const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+      const existingNode = singleNode ? nodes[0] : null
+      const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
-        const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
-        const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
-        const refData = { [NodeRefData.keys.categoryItem]: item }
+      const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
+      const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
+      const refData = { [NodeRefData.keys.categoryItem]: item }
 
-        updateNode(nodeDef, node, value, null, meta, refData)
-      }
-      if (Objects.isNotEmpty(dependentEnumeratedEntityDefsLabel)) {
-        confirm({
-          key: 'surveyForm.confirmUpdateDependentEnumeratedEntities',
-          params: { entityDefs: dependentEnumeratedEntityDefsLabel },
-        }).then((confirmed) => {
-          if (confirmed) {
-            performItemAdd()
-          }
-        })
-      } else {
-        performItemAdd()
-      }
+      updateNode(nodeDef, node, value, null, meta, refData)
     },
-    [
-      codeAttributesUuidsHierarchy,
-      confirm,
-      dependentEnumeratedEntityDefsLabel,
-      nodeDef,
-      nodes,
-      parentNode,
-      singleNode,
-      updateNode,
-    ]
+    [codeAttributesUuidsHierarchy, nodeDef, nodes, parentNode, singleNode, updateNode]
   )
 
-  const onItemRemove = (item) => {
-    const performItemRemove = () => {
+  const onItemRemove = useCallback(
+    (item) => {
       if (singleNode) {
         updateNode(nodeDef, nodes[0], {}, null, {}, {})
       } else {
         const nodeToRemove = nodes.find((node) => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
         removeNode(nodeDef, nodeToRemove)
       }
-    }
-    if (Objects.isNotEmpty(dependentEnumeratedEntityDefsLabel)) {
-      confirm({
-        key: 'surveyForm.confirmUpdateDependentEnumeratedEntities',
-        params: { entityDefs: dependentEnumeratedEntityDefsLabel },
-      }).then((confirmed) => {
-        if (confirmed) {
-          performItemRemove()
-        }
-      })
-    } else {
-      performItemRemove()
-    }
-  }
+    },
+    [nodeDef, nodes, removeNode, singleNode, updateNode]
+  )
 
   const itemLabelFunction = useCallback(
     (item) =>
