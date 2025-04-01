@@ -4,6 +4,7 @@ import { DateFormats, Dates } from '@openforis/arena-core'
 
 const {
   add,
+  addHours,
   addMinutes,
   convertDate,
   diffInMinutes,
@@ -19,7 +20,7 @@ const {
   subYears,
 } = Dates
 
-export { add, addMinutes, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
+export { add, addHours, addMinutes, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
 
 import { isBlank } from './stringUtils'
 
