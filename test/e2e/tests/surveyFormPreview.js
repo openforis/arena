@@ -60,7 +60,15 @@ export default () =>
         // it is possible the default value was set one minute after the startTime was initialized in the test
         const startTimeDate = new Date(startTime)
         const startTimePlus1Minute = DateUtils.addMinutes(startTimeDate, 1)
-        const possibleDateValues = [startTimeDate, startTimePlus1Minute]
+        // consider solar time too
+        const startTimePlus1Hour = DateUtils.addHours(startTimeDate, 1)
+        const startTimePlus1HourAnd1Minute = DateUtils.addMinutes(startTimePlus1Hour, 1)
+        const possibleDateValues = [
+          startTimeDate,
+          startTimePlus1Minute,
+          startTimePlus1Hour,
+          startTimePlus1HourAnd1Minute,
+        ]
         const expectedPossibleValues = possibleDateValues.map((possibleDateValue) => {
           const timezoneOffsetDiff = startTimeDate.getTimezoneOffset() // browser timezone=Europe/Rome
           const dateWithTimezoneOffset = DateUtils.addMinutes(possibleDateValue, timezoneOffsetDiff)
