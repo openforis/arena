@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Nodes, Records, Surveys } from '@openforis/arena-core'
+import { Nodes, Records } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
@@ -46,7 +46,7 @@ export const visitAncestorsAndSelf =
     Records.visitAncestorsAndSelf(node, visitor)(record)
 
 /**
- * Returns the list of ancestors from the given node to the root entity
+ * Returns the list of ancestors from the given node to the root entity.
  */
 export const getAncestorsAndSelf = (node) => (record) => {
   const ancestors = []
@@ -189,7 +189,7 @@ export const isNodeApplicable = (node) => (record) => {
  * {
  *   nodeCtx, //context node
  *   nodeDef, //node definition
- * }
+ * }.
  */
 export const getDependentNodePointers =
   (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
@@ -319,24 +319,12 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
 }
 
-export const isNodeFilledByUser =
-  ({ node, survey }) =>
-  (record) =>
-    !!findDescendantOrSelf(node, (visitedNode) => {
-      const visitedNodeDefUuid = Node.getNodeDefUuid(visitedNode)
-      const visitedNodeDef = SurveyNodeDefs.getNodeDefByUuid(visitedNodeDefUuid)(survey)
-      return (
-        !(Surveys.isNodeDefEnumerator({ survey, nodeDef: visitedNodeDef }) || NodeDef.isReadOnly(visitedNodeDef)) &&
-        Node.hasUserInputValue(visitedNode)
-      )
-    })(record)
+export const isNodeFilledByUser = (node) => (record) =>
+  !!findDescendantOrSelf(node, (visitedNode) => Node.hasUserInputValue(visitedNode))(record)
 
-export const isNodeEmpty =
-  ({ survey, node }) =>
-  (record) =>
-    !isNodeFilledByUser({ survey, node })(record)
+export const isNodeEmpty = (node) => (record) => !isNodeFilledByUser(node)(record)
 
-export const isEmpty = ({ survey, record }) => {
+export const isEmpty = (record) => {
   const rootNode = getRootNode(record)
-  return isNodeEmpty({ survey, node: rootNode })(record)
+  return isNodeEmpty(rootNode)(record)
 }

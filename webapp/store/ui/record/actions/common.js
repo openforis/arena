@@ -32,12 +32,22 @@ const findApplicableDependentEnumeratedEntityDefs = ({ survey, nodeDef }) => {
       if (NodeDef.isEntity(currentNodeDef) && NodeDef.isEnumerate(currentNodeDef)) {
         result.push(currentNodeDef)
       }
-      const dependents = Surveys.getNodeDefDependents({
+      const dependentsApplicable = Surveys.getNodeDefDependents({
         survey,
         nodeDefUuid: currentNodeDefUuid,
         dependencyType: SurveyDependencyType.applicable,
       })
-      stack.push(...dependents)
+      const dependentsDefaultValues = Surveys.getNodeDefDependents({
+        survey,
+        nodeDefUuid: currentNodeDefUuid,
+        dependencyType: SurveyDependencyType.defaultValues,
+      })
+      const allDependents = [...dependentsApplicable, ...dependentsDefaultValues]
+      allDependents.forEach((dependent) => {
+        if (!visitedNodeDefsByUuid[NodeDef.getUuid(dependent)]) {
+          stack.push(dependent)
+        }
+      })
     }
     visitedNodeDefsByUuid[currentNodeDefUuid] = true
   }
@@ -63,9 +73,7 @@ const findDependentEnumeratedEntityDefsNotEmpty = ({ survey, record, node, nodeD
       nodeDefDescendant: dependentEnumeratedEntityDef,
     })
     const dependentEntitiesNotEmpty = dependentEntities.filter((dependentEntity) =>
-      Records.getChildren(dependentEntity)(record).some((childNode) =>
-        Record.isNodeFilledByUser({ survey, node: childNode })(record)
-      )
+      Records.getChildren(dependentEntity)(record).some((childNode) => Record.isNodeFilledByUser(childNode)(record))
     )
     return dependentEntitiesNotEmpty.length > 0
   })

@@ -237,9 +237,8 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
       RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId, cycle, draft: true })
       await RecordManager.deleteRecordPreview(surveyId, recordUuid)
     } else {
-      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
       const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
-      if (Record.isEmpty({ survey, record })) {
+      if (Record.isEmpty(record)) {
         await deleteRecord({ socketId, user, surveyId, recordUuid, notifySameUser: true })
       }
     }
