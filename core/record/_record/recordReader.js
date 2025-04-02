@@ -110,23 +110,7 @@ export const visitDescendantsAndSelf =
     }
   }
 
-export const findDescendantOrSelf = (node, filterFn) => (record) => {
-  let found = null
-
-  visitDescendantsAndSelf(
-    node,
-    () => {},
-    (currentNode) => {
-      if (filterFn(currentNode)) {
-        found = currentNode
-        return true
-      }
-      return false
-    }
-  )(record)
-
-  return found
-}
+export const findDescendantOrSelf = (node, filterFn) => (record) => Records.findDescendantOrSelf(node, filterFn)(record)
 
 /**
  * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
@@ -319,12 +303,8 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
 }
 
-export const isNodeFilledByUser = (node) => (record) =>
-  !!findDescendantOrSelf(node, (visitedNode) => Node.hasUserInputValue(visitedNode))(record)
+export const isNodeFilledByUser = (node) => (record) => Records.isNodeFilledByUser(node)(record)
 
-export const isNodeEmpty = (node) => (record) => !isNodeFilledByUser(node)(record)
+export const isNodeEmpty = (node) => (record) => Records.isNodeEmpty(node)(record)
 
-export const isEmpty = (record) => {
-  const rootNode = getRootNode(record)
-  return isNodeEmpty(rootNode)(record)
-}
+export const isEmpty = (record) => Records.isEmpty(record)
