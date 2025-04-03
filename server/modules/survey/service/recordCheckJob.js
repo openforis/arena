@@ -117,9 +117,11 @@ export default class RecordCheckJob extends Job {
 
     // 1. fetch record and nodes
     let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
+    // this.logDebug(`record fetched`)
 
     // 2. remove deleted nodes
     if (!R.isEmpty(nodeDefDeletedUuids)) {
+      // this.logDebug(`remove deleted nodes`)
       const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(
         this.user,
         this.surveyId,
@@ -128,6 +130,7 @@ export default class RecordCheckJob extends Job {
         tx
       )
       record = recordDeletedNodes || record
+      // this.logDebug(`nodes deleted`)
     }
 
     const nodesInsertedByUuid = {}
@@ -145,6 +148,7 @@ export default class RecordCheckJob extends Job {
       record = recordUpdateInsert || record
       Object.assign(nodesInsertedByUuid, nodesUpdatedMissing)
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedMissing)
+      // this.logDebug('missing nodes inserted')
     }
 
     // 4. apply default values and recalculate applicability
