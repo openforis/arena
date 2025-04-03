@@ -22,7 +22,7 @@ const {
 } = Records
 
 /**
- * === simple getters
+ * === simple getters.
  */
 export const getNodes = R.propOr({}, keys.nodes)
 export const getNodesArray = (record) => Object.values(getNodes(record))
@@ -37,9 +37,7 @@ export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
   }
 }
 
-/**
- * ==== hierarchy
- */
+// ==== hierarchy
 // ancestors
 
 export const visitAncestorsAndSelf =
@@ -48,7 +46,7 @@ export const visitAncestorsAndSelf =
     Records.visitAncestorsAndSelf(node, visitor)(record)
 
 /**
- * Returns the list of ancestors from the given node to the root entity
+ * Returns the list of ancestors from the given node to the root entity.
  */
 export const getAncestorsAndSelf = (node) => (record) => {
   const ancestors = []
@@ -112,23 +110,7 @@ export const visitDescendantsAndSelf =
     }
   }
 
-export const findDescendantOrSelf = (node, filterFn) => (record) => {
-  let found = null
-
-  visitDescendantsAndSelf(
-    node,
-    () => {},
-    (currentNode) => {
-      if (filterFn(currentNode)) {
-        found = currentNode
-        return true
-      }
-      return false
-    }
-  )(record)
-
-  return found
-}
+export const findDescendantOrSelf = (node, filterFn) => (record) => Records.findDescendantOrSelf(node, filterFn)(record)
 
 /**
  * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
@@ -168,7 +150,7 @@ export const getNodeParentInDescendantSingleEntities =
   }
 
 /**
- * Returns true if a node and all its ancestors are applicable
+ * Returns true if a node and all its ancestors are applicable.
  */
 export const isNodeApplicable = (node) => (record) => {
   if (Node.isRoot(node)) {
@@ -184,16 +166,14 @@ export const isNodeApplicable = (node) => (record) => {
   return false
 }
 
-/**
- * ==== dependency
- */
+// ==== dependency
 /**
  * Returns a list of dependent node pointers.
  * Every item in the list is in the format:
  * {
  *   nodeCtx, //context node
  *   nodeDef, //node definition
- * }
+ * }.
  */
 export const getDependentNodePointers =
   (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
@@ -323,9 +303,8 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
   return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
 }
 
-export const isNodeEmpty = (node) => (record) => !findDescendantOrSelf(node, Node.hasUserInputValue)(record)
+export const isNodeFilledByUser = (node) => (record) => Records.isNodeFilledByUser(node)(record)
 
-export const isEmpty = (record) => {
-  const rootNode = getRootNode(record)
-  return isNodeEmpty(rootNode)(record)
-}
+export const isNodeEmpty = (node) => (record) => Records.isNodeEmpty(node)(record)
+
+export const isEmpty = (record) => Records.isEmpty(record)

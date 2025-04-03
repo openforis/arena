@@ -23,7 +23,7 @@ const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) =>
   Record.getNodeChildrenByDefUuid(
     parentNode,
     NodeDef.getUuid(pageNodeDef)
-  )(record).some((pageChildNode) => !Record.isNodeEmpty(pageChildNode)(record))
+  )(record).some((pageChildNode) => Record.isNodeFilledByUser(pageChildNode)(record))
 
 const getNodeDefAvailableChildren = ({
   survey,

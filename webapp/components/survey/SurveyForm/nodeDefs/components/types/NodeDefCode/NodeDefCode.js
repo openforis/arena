@@ -5,19 +5,19 @@ import PropTypes from 'prop-types'
 
 import { Surveys } from '@openforis/arena-core'
 
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as CategoryItem from '@core/survey/categoryItem'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import * as Survey from '@core/survey/survey'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
-import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
+import { useItems } from './store'
 
 const NodeDefCode = (props) => {
   const {
@@ -62,25 +62,31 @@ const NodeDefCode = (props) => {
     }
   }, [edit, items, nodes])
 
-  const onItemAdd = (item) => {
-    const existingNode = singleNode ? nodes[0] : null
-    const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
+  const onItemAdd = useCallback(
+    (item) => {
+      const existingNode = singleNode ? nodes[0] : null
+      const node = existingNode ?? Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
-    const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
-    const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
-    const refData = { [NodeRefData.keys.categoryItem]: item }
+      const value = Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item) })
+      const meta = { [Node.metaKeys.hierarchyCode]: codeAttributesUuidsHierarchy }
+      const refData = { [NodeRefData.keys.categoryItem]: item }
 
-    updateNode(nodeDef, node, value, null, meta, refData)
-  }
+      updateNode(nodeDef, node, value, null, meta, refData)
+    },
+    [codeAttributesUuidsHierarchy, nodeDef, nodes, parentNode, singleNode, updateNode]
+  )
 
-  const onItemRemove = (item) => {
-    if (singleNode) {
-      updateNode(nodeDef, nodes[0], {}, null, {}, {})
-    } else {
-      const nodeToRemove = nodes.find((node) => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
-      removeNode(nodeDef, nodeToRemove)
-    }
-  }
+  const onItemRemove = useCallback(
+    (item) => {
+      if (singleNode) {
+        updateNode(nodeDef, nodes[0], {}, null, {}, {})
+      } else {
+        const nodeToRemove = nodes.find((node) => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
+        removeNode(nodeDef, nodeToRemove)
+      }
+    },
+    [nodeDef, nodes, removeNode, singleNode, updateNode]
+  )
 
   const itemLabelFunction = useCallback(
     (item) =>
