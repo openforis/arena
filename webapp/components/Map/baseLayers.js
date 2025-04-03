@@ -7,9 +7,9 @@ const baseLayerProviders = {
   // wmts: 'WMTS',
 }
 
-const baseLayerAttribution = {
-  planet: 'Planet Labs PBC, NICFI Satellite Data Program',
-}
+// const baseLayerAttribution = {
+//   planet: 'Planet Labs PBC, NICFI Satellite Data Program',
+// }
 
 export const periodTypes = {
   monthly: 'monthly',
@@ -17,7 +17,7 @@ export const periodTypes = {
 }
 
 const planetDefaultPeriod = { year: 2021, month: 12 }
-const planetDefaultBiannualPeriod = { year: 2020, month: 6, yearTo: 2020, monthTo: 8 }
+// const planetDefaultBiannualPeriod = { year: 2020, month: 6, yearTo: 2020, monthTo: 8 }
 
 const _getPeriodKey = (period) => {
   const { year, month, yearTo, monthTo } = period
@@ -78,26 +78,26 @@ export const baseLayers = [
   // },
 
   // Planet Labs maps
-  {
-    key: 'planet_monthly_mosaics',
-    name: 'Planet NICFI (monthly mosaics)',
-    attribution: baseLayerAttribution.planet,
-    provider: baseLayerProviders.planet,
-    periodSelectorAvailable: true,
-    periodType: periodTypes.monthly,
-    url: ({ surveyId }) =>
-      getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period: planetDefaultPeriod }),
-  },
-  {
-    key: 'planet_biannual_mosaics',
-    name: 'Planet NICFI (biannual mosaics)',
-    attribution: baseLayerAttribution.planet,
-    provider: baseLayerProviders.planet,
-    periodSelectorAvailable: true,
-    periodType: periodTypes.biannual,
-    url: ({ surveyId }) =>
-      getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period: planetDefaultBiannualPeriod }),
-  },
+  // {
+  //   key: 'planet_monthly_mosaics',
+  //   name: 'Planet NICFI (monthly mosaics)',
+  //   attribution: baseLayerAttribution.planet,
+  //   provider: baseLayerProviders.planet,
+  //   periodSelectorAvailable: true,
+  //   periodType: periodTypes.monthly,
+  //   url: ({ surveyId }) =>
+  //     getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period: planetDefaultPeriod }),
+  // },
+  // {
+  //   key: 'planet_biannual_mosaics',
+  //   name: 'Planet NICFI (biannual mosaics)',
+  //   attribution: baseLayerAttribution.planet,
+  //   provider: baseLayerProviders.planet,
+  //   periodSelectorAvailable: true,
+  //   periodType: periodTypes.biannual,
+  //   url: ({ surveyId }) =>
+  //     getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period: planetDefaultBiannualPeriod }),
+  // },
 ]
 
 export const defaultBaseLayer = baseLayers[0]
