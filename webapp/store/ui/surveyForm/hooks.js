@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, Surveys } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -60,3 +60,9 @@ export const useNotAvailableEntityPageUuids = ({ edit }) =>
 
     return result.map(NodeDef.getUuid)
   }, Objects.isEqual)
+
+export const useDependentEnumeratedEntityDefs = ({ nodeDef }) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    return Surveys.getDependentEnumeratedEntityDefs({ survey, nodeDef })
+  })

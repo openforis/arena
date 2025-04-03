@@ -1488,6 +1488,9 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
     },
     clone: `Clone '{{nodeDefLabel}}'`,
     compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+    confirmUpdateDependentEnumeratedEntities: `If you continue, some enumerated entities ({{entityDefs}}) will be re-enumerated,  
+deleting the existing values inserted into them (if any).  
+Continue?`,
     convert: `Convert '{{nodeDefLabel}}'`,
     delete: `Delete '{{nodeDefLabel}}'`,
     edit: `Edit '{{nodeDefLabel}}'`,

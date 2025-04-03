@@ -5,6 +5,7 @@ import * as SurveyFormState from './state'
 export { SurveyFormActions, SurveyFormReducer, SurveyFormState }
 export {
   useActiveNodeDefUuid,
+  useDependentEnumeratedEntityDefs,
   useIsEditingNodeDefInFullScreen,
   useNodeDefLabelType,
   useNodeDefPage,
