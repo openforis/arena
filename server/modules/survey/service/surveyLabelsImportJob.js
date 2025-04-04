@@ -14,9 +14,8 @@ const errorPrefix = `validationErrors.surveyLabelsImport.`
 const extractLabels = ({ row, langCodes, columnPrefix }) =>
   langCodes.reduce((acc, langCode) => {
     const value = row[`${columnPrefix}${langCode}`]
-    const label = StringUtils.trim(value)
-    if (StringUtils.isNotBlank(label)) {
-      acc[langCode] = label
+    if (StringUtils.isNotBlank(value)) {
+      acc[langCode] = StringUtils.trim(value)
     }
     return acc
   }, {})
