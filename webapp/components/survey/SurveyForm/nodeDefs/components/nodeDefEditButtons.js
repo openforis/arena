@@ -19,6 +19,8 @@ import { Button } from '@webapp/components'
 
 import { NodeDefEditButtonsMenu } from './nodeDefEditButtonsMenu'
 
+const maxColumnsNo = 12
+
 const NodeDefEditButtons = (props) => {
   const { surveyCycleKey, nodeDef } = props
 
@@ -59,7 +61,7 @@ const NodeDefEditButtons = (props) => {
             value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
             type="number"
             min="1"
-            max="12"
+            max={maxColumnsNo}
             step="1"
             onChange={(event) => {
               const value = Number(event.target.value)
@@ -68,7 +70,7 @@ const NodeDefEditButtons = (props) => {
                   NodeDefsActions.putNodeDefLayoutProp({
                     nodeDef,
                     key: NodeDefLayout.keys.columnsNo,
-                    value,
+                    value: Math.min(value, maxColumnsNo),
                   })
                 )
             }}
