@@ -59,7 +59,7 @@ const NodeDefEditButtons = (props) => {
             value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
             type="number"
             min="1"
-            max="9"
+            max="12"
             step="1"
             onChange={(event) => {
               const value = Number(event.target.value)
