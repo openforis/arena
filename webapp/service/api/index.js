@@ -47,6 +47,8 @@ export {
   fetchRecordsSummary,
   startExportDataJob,
   downloadExportedDataUrl,
+  startExportDataSummaryJob,
+  downloadExportedDataSummaryUrl,
   startRecordsCloneJob,
   mergeRecords,
 } from './data'

@@ -200,7 +200,7 @@ export const fetchEntitiesFileUuidsByCycle = async ({
   })
 }
 
-export const fetchEntitiesDataSummaryToFlatData = async ({ survey, cycle, options }) => {
+export const fetchEntitiesDataSummaryToFlatData = async ({ survey, cycle, options, outputStream }) => {
   const entityDefs = SurveyRdbManager.getEntityDefsToExport({ survey, cycle, options })
   const countByEntityDef = {}
   for await (const entityDef of entityDefs) {
@@ -209,4 +209,5 @@ export const fetchEntitiesDataSummaryToFlatData = async ({ survey, cycle, option
     const count = SurveyRdbManager.countTable({ survey, cycle, query })
     countByEntityDef[entityDefUuid] = count
   }
+  console.log('===countByEntityDef', countByEntityDef)
 }
