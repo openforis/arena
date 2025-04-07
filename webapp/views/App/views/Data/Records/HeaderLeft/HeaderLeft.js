@@ -196,6 +196,13 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           {canExportRecordsData && (
             <ButtonDownload label="dataView.records.exportData" onClick={toggleRecordsDataExportModalOpen} />
           )}
+          {canAnalyzeRecords && (
+            <ButtonDownload
+              label="dataView.records.exportDataSummary"
+              href={`/api/survey/${surveyId}/records/summary/export`}
+              requestParams={{ cycle }}
+            />
+          )}
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
           )}

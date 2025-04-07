@@ -6,3 +6,9 @@ export const startCsvDataExportJob = ({ user, surveyId, cycle, recordUuids, sear
   JobManager.enqueueJob(job)
   return job
 }
+
+export const startDataSummaryExportJob = ({ user, surveyId, cycle }) => {
+  const job = new DataExportJob({ user, surveyId, cycle })
+  JobManager.enqueueJob(job)
+  return job
+}

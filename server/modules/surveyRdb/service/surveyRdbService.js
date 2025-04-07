@@ -3,6 +3,7 @@ import { Query } from '../../../../common/model/query'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
@@ -197,4 +198,15 @@ export const fetchEntitiesFileUuidsByCycle = async ({
     filterRecordUuids,
     callback,
   })
+}
+
+export const fetchEntitiesDataSummaryToFlatData = async ({ survey, cycle, options }) => {
+  const entityDefs = SurveyRdbManager.getEntityDefsToExport({ survey, cycle, options })
+  const countByEntityDef = {}
+  for await (const entityDef of entityDefs) {
+    const entityDefUuid = NodeDef.getUuid(entityDef)
+    const query = Query.create({ entityDefUuid })
+    const count = SurveyRdbManager.countTable({ survey, cycle, query })
+    countByEntityDef[entityDefUuid] = count
+  }
 }

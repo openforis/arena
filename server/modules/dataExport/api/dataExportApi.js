@@ -66,4 +66,28 @@ export const init = (app) => {
       }
     }
   )
+
+  app.post(
+    '/survey/:surveyId/data-summary-export',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle } = Request.getParams(req)
+
+        const user = Request.getUser(req)
+
+        const job = DataExportService.startCsvDataExportJob({
+          user,
+          surveyId,
+          cycle,
+          recordUuids,
+          search,
+          options,
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 }

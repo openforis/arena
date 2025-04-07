@@ -216,6 +216,17 @@ const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter
   return recordsSummaries.map(Record.getUuid)
 }
 
+export const getEntityDefsToExport = ({ survey, cycle, options }) => {
+  const { exportSingleEntitiesIntoSeparateFiles } = options
+  return Survey.findDescendants({
+    cycle,
+    filterFn: (nodeDef) =>
+      NodeDef.isRoot(nodeDef) ||
+      NodeDef.isMultiple(nodeDef) ||
+      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
+  })(survey)
+}
+
 export const fetchEntitiesDataToCsvFiles = async (
   {
     survey,
@@ -245,13 +256,7 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
-  const nodeDefs = Survey.findDescendants({
-    cycle,
-    filterFn: (nodeDef) =>
-      NodeDef.isRoot(nodeDef) ||
-      NodeDef.isMultiple(nodeDef) ||
-      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
-  })(survey)
+  const nodeDefs = getEntityDefsToExport({ survey, cycle, options })
 
   const filterRecordUuids = await _determineRecordUuidsFilter({
     survey,
