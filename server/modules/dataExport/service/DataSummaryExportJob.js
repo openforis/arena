@@ -9,11 +9,22 @@ export default class DataSummaryExportJob extends Job {
   }
 
   async execute() {
-    const { cycle, surveyId, options = {} } = this.context
+    const { cycle, surveyId, lang, options = {} } = this.context
+    const exportUuid = this.uuid // use job uuid as export uuid
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-    await SurveyRdbService.fetchEntitiesDataSummaryToFlatData({ survey, cycle, options })
+    await SurveyRdbService.fetchEntitiesDataSummaryToFlatData({ exportUuid, survey, cycle, lang, options })
+
+    this.setContext({ exportUuid })
+  }
+
+  async beforeSuccess() {
+    await super.beforeSuccess()
+
+    const { exportUuid } = this.context
+
+    this.setResult({ exportUuid })
   }
 }
 

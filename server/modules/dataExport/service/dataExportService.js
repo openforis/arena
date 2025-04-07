@@ -8,8 +8,8 @@ export const startCsvDataExportJob = ({ user, surveyId, cycle, recordUuids, sear
   return job
 }
 
-export const startDataSummaryExportJob = ({ user, surveyId, cycle, options }) => {
-  const job = new DataSummaryExportJob({ user, surveyId, cycle, options })
+export const startDataSummaryExportJob = ({ user, surveyId, cycle, lang, options }) => {
+  const job = new DataSummaryExportJob({ user, surveyId, cycle, lang, options })
   JobManager.enqueueJob(job)
   return job
 }

@@ -198,15 +198,9 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
             <ButtonDownload label="dataView.records.exportData" onClick={toggleRecordsDataExportModalOpen} />
           )}
           {canAnalyzeRecords && (
-            <Button
+            <ButtonDownload
               label="dataView.records.exportDataSummary"
-              onClick={() =>
-                dispatch(
-                  ExportCsvDataActions.startDataSummaryExport({
-                    options: {},
-                  })
-                )
-              }
+              onClick={() => dispatch(ExportCsvDataActions.startDataSummaryExport())}
             />
           )}
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (

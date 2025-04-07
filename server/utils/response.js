@@ -69,10 +69,11 @@ export const sendFileContent = (res, fileName, content, fileSize) => {
   res.end(null, 'binary')
 }
 
-export const sendFile = ({ res, path: filePath, name = null, contentType = null, onEnd = null }) => {
+export const sendFile = ({ res, path: filePath, name = null, contentType = null, fileFormat = null, onEnd = null }) => {
   const fileSize = FileUtils.getFileSize(filePath)
   const fileName = name || path.basename(filePath)
-  setContentTypeFile({ res, fileName, fileSize, contentType })
+  const finalContentType = contentType ?? contentTypeByFileFormat[fileFormat]
+  setContentTypeFile({ res, fileName, fileSize, contentType: finalContentType })
   FileUtils.createReadStream(filePath)
     .on('end', async () => {
       if (onEnd) await onEnd()

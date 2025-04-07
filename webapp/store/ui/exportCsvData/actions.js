@@ -19,13 +19,14 @@ export const startCSVExport =
   }
 
 export const startDataSummaryExport =
-  ({ options }) =>
+  ({ options } = {}) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getSurveyId(state)
     const cycle = SurveyState.getSurveyCycleKey(state)
+    const lang = SurveyState.getSurveyPreferredLang(state)
 
-    const job = await API.startExportDataSummaryJob({ surveyId, cycle, options })
+    const job = await API.startExportDataSummaryJob({ surveyId, cycle, lang, options })
 
     dispatch(JobActions.showJobMonitor({ job, closeButton: DataSummaryExportDownloadButton }))
   }

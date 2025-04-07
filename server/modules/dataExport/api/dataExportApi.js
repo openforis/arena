@@ -9,6 +9,7 @@ import * as JobUtils from '@server/job/jobUtils'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as DataExportService from '../service/dataExportService'
+import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 const checkExportUuid = (exportUuid) => {
   if (!isUuid(exportUuid)) {
@@ -16,13 +17,14 @@ const checkExportUuid = (exportUuid) => {
   }
 }
 
-const sendExportFileToResponse = ({ res, exportUuid, extension, fileName, contentType }) => {
-  const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.${extension}`)
+const sendTempFileToResponse = ({ res, tempFileName, fileFormat, outputFileName }) => {
+  const extension = getExtensionByFileFormat(fileFormat)
+  const tempFilePath = FileUtils.tempFilePath(`${tempFileName}.${extension}`)
   Response.sendFile({
     res,
     path: tempFilePath,
-    name: fileName,
-    contentType,
+    name: outputFileName,
+    fileFormat,
     onEnd: async () => FileUtils.deleteFile(tempFilePath),
   })
 }
@@ -60,16 +62,16 @@ export const init = (app) => {
 
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft: true })
 
+        const fileFormat = FileFormats.zip
         const extension = 'zip'
-        const fileName = ExportFileNameGenerator.generate({
+        const outputFileName = ExportFileNameGenerator.generate({
           survey,
           cycle,
           fileType: 'DataExport',
           extension,
           includeTimestamp: true,
         })
-        const contentType = Response.contentTypes.zip
-        sendExportFileToResponse({ res, exportUuid, extension, fileName, contentType })
+        sendTempFileToResponse({ res, tempFileName: exportUuid, fileFormat, outputFileName })
       } catch (error) {
         next(error)
       }
@@ -81,11 +83,11 @@ export const init = (app) => {
     AuthMiddleware.requireRecordAnalysisPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, options } = Request.getParams(req)
+        const { surveyId, cycle, lang, options } = Request.getParams(req)
 
         const user = Request.getUser(req)
 
-        const job = DataExportService.startDataSummaryExportJob({ user, surveyId, cycle, options })
+        const job = DataExportService.startDataSummaryExportJob({ user, surveyId, cycle, lang, options })
 
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
@@ -105,17 +107,16 @@ export const init = (app) => {
 
         const survey = await SurveyService.fetchSurveyById({ surveyId })
 
-        const extension = 'csv'
-        const contentType = Response.contentTypes.csv
-        const fileName = ExportFileNameGenerator.generate({
+        const fileFormat = FileFormats.xlsx
+        const outputFileName = ExportFileNameGenerator.generate({
           survey,
           cycle,
           fileType: 'DataSummaryExport',
-          extension: 'csv',
+          fileFormat,
           includeTimestamp: true,
         })
 
-        sendExportFileToResponse({ res, exportUuid, extension, fileName, contentType })
+        sendTempFileToResponse({ res, tempFileName: exportUuid, fileFormat, outputFileName })
       } catch (error) {
         next(error)
       }

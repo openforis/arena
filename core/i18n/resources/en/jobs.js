@@ -44,6 +44,7 @@ export default {
   TaxonomyImportJob: 'Taxonomy Import',
   // data export
   DataExportJob: 'Data Export',
+  DataSummaryExportJob: 'Data summary export',
   ZipCreationJob: 'ZIP File Creation',
   CSVDataExtraction: 'Data Extraction',
   // import arena survey
