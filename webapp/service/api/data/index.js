@@ -117,6 +117,17 @@ export const downloadExportedDataUrl = ({ surveyId, cycle, exportUuid }) => {
   return `/api/survey/${surveyId}/data-export/${exportUuid}?${params.toString()}`
 }
 
+export const startExportDataSummaryJob = async ({ surveyId, cycle, lang, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-summary-export`, { cycle, lang, options })
+  const { job } = data
+  return job
+}
+
+export const downloadExportedDataSummaryUrl = ({ surveyId, cycle, exportUuid }) => {
+  const params = new URLSearchParams({ cycle })
+  return `/api/survey/${surveyId}/data-summary-export/${exportUuid}?${params.toString()}`
+}
+
 export const exportDataQueryToTempFile = async ({ surveyId, cycle, query, options }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const {
