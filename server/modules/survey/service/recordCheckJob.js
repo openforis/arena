@@ -51,14 +51,15 @@ export default class RecordCheckJob extends Job {
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
+    const { surveyId, tx } = this
     this._cleanSurveysCache(cycle)
     let surveyAndNodeDefs = this.surveyAndNodeDefsByCycle[cycle]
     if (!surveyAndNodeDefs) {
       // 1. fetch survey
       this.logDebug(`fetching survey for cycle ${cycle}...`)
       let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
-        this.tx
+        { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+        tx
       )
 
       // 2. determine new, updated or deleted node defs
@@ -90,10 +91,10 @@ export default class RecordCheckJob extends Job {
         this.logDebug('survey has been updated: record check necessary; fetching survey and ref data...')
         // fetch survey reference data (used later for record validation)
         survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-          { surveyId: this.surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
-          this.tx
+          { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+          tx
         )
-        this.logDebug('survey fetched')
+        this.logDebug('survey with ref data fetched')
       }
 
       surveyAndNodeDefs = {
@@ -123,8 +124,8 @@ export default class RecordCheckJob extends Job {
     if (!R.isEmpty(nodeDefDeletedUuids)) {
       // this.logDebug(`remove deleted nodes`)
       const recordDeletedNodes = await RecordManager.deleteNodesByNodeDefUuids(
-        this.user,
-        this.surveyId,
+        user,
+        surveyId,
         nodeDefDeletedUuids,
         record,
         tx
