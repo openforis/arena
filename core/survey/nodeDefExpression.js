@@ -50,7 +50,8 @@ export const isEmpty = (expression = {}) => isExpressionEmpty(expression) && isA
 export const isSimilarTo = (expressionA) => (expressionB) => {
   if (isEmpty(expressionA) && isEmpty(expressionB)) return true
   if (isEmpty(expressionA) || isEmpty(expressionB)) return false
-  const prepareExpr = (expr) => StringUtils.removeSuffix('\n')(expr.replaceAll(' ', ''))
+  const prepareExpr = (expr) =>
+    StringUtils.isBlank(expr) ? '' : StringUtils.removeSuffix('\n')(expr.replaceAll(' ', ''))
   return (
     prepareExpr(getExpression(expressionA)) === prepareExpr(getExpression(expressionB)) &&
     prepareExpr(getApplyIf(expressionA)) === prepareExpr(getApplyIf(expressionB))
