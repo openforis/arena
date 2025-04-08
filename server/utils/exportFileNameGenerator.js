@@ -3,14 +3,7 @@ import { Objects } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import { RecordCycle } from '@core/record/recordCycle'
 import * as DateUtils from '@core/dateUtils'
-import { FileFormats } from '@core/fileFormats'
-
-const extensionByFileFormat = {
-  [FileFormats.csv]: 'csv',
-  [FileFormats.xlsx]: 'xlsx',
-}
-
-const getExtensionByFileFormat = (fileFormat) => extensionByFileFormat[fileFormat ?? FileFormats.csv]
+import { getExtensionByFileFormat } from '@core/fileFormats'
 
 const generate = ({
   fileType,
@@ -36,11 +29,10 @@ const generate = ({
   if (includeTimestamp) {
     parts.push(DateUtils.nowFormatDefault())
   }
-  const finalExtension = extensionByFileFormat[fileFormat] ?? extension
+  const finalExtension = getExtensionByFileFormat(fileFormat) ?? extension
   return `${parts.join('_')}.${finalExtension}`
 }
 
 export const ExportFileNameGenerator = {
   generate,
-  getExtensionByFileFormat,
 }

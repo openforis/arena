@@ -2,9 +2,8 @@ import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { FileFormats } from '@core/fileFormats'
+import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
@@ -27,7 +26,7 @@ export default class CategoriesExportJob extends Job {
 
     for await (const category of categories) {
       const { uuid: categoryUuid } = category
-      const extension = ExportFileNameGenerator.getExtensionByFileFormat(fileFormat)
+      const extension = getExtensionByFileFormat(fileFormat)
       const categoryTempFilePath = FileUtils.join(categoriesDir, `${Category.getName(category)}.${extension}`)
       const outputStream = FileUtils.createWriteStream(categoryTempFilePath)
       await CategoryManager.exportCategoryToStream({ survey, categoryUuid, outputStream, fileFormat }, this.tx)

@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
-import { FileFormats } from '@core/fileFormats'
+import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
@@ -16,7 +16,6 @@ import * as RecordRepository from '@server/modules/record/repository/recordRepos
 import { db } from '../../../db/db'
 import * as DbUtils from '../../../db/dbUtils'
 import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
 
@@ -216,6 +215,17 @@ const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter
   return recordsSummaries.map(Record.getUuid)
 }
 
+export const getEntityDefsToExport = ({ survey, cycle, options }) => {
+  const { exportSingleEntitiesIntoSeparateFiles } = options
+  return Survey.findDescendants({
+    cycle,
+    filterFn: (nodeDef) =>
+      NodeDef.isRoot(nodeDef) ||
+      NodeDef.isMultiple(nodeDef) ||
+      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
+  })(survey)
+}
+
 export const fetchEntitiesDataToCsvFiles = async (
   {
     survey,
@@ -245,13 +255,7 @@ export const fetchEntitiesDataToCsvFiles = async (
 
   const addCycle = Survey.getCycleKeys(survey).length > 1
 
-  const nodeDefs = Survey.findDescendants({
-    cycle,
-    filterFn: (nodeDef) =>
-      NodeDef.isRoot(nodeDef) ||
-      NodeDef.isMultiple(nodeDef) ||
-      (NodeDef.isSingleEntity(nodeDef) && exportSingleEntitiesIntoSeparateFiles),
-  })(survey)
+  const nodeDefs = getEntityDefsToExport({ survey, cycle, options })
 
   const filterRecordUuids = await _determineRecordUuidsFilter({
     survey,
@@ -292,7 +296,7 @@ export const fetchEntitiesDataToCsvFiles = async (
         : Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
     const ancestorEntityDefUuid = NodeDef.getUuid(ancestorMultipleEntity)
     const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
-    const extension = ExportFileNameGenerator.getExtensionByFileFormat(fileFormat)
+    const extension = getExtensionByFileFormat(fileFormat)
     const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
     const outputFilePath = FileUtils.join(outputDir, outputFileName)
     const outputStream = FileUtils.createWriteStream(outputFilePath)

@@ -3,16 +3,19 @@ import { Query } from '../../../../common/model/query'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as SurveyRdbManager from '../manager/surveyRdbManager'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
 
 import SurveysRdbRefreshJob from './SurveysRdbRefreshJob'
+import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 const _fetchSurvey = async ({ surveyId, cycle }) => {
   const draft = true // always load draft node defs (needed for custom aggregate functions)
@@ -197,4 +200,19 @@ export const fetchEntitiesFileUuidsByCycle = async ({
     filterRecordUuids,
     callback,
   })
+}
+
+export const fetchEntitiesDataSummaryToFlatData = async ({ exportUuid, survey, cycle, lang, options }) => {
+  const { fileFormat = FileFormats.xlsx } = options
+  const items = []
+  const entityDefs = SurveyRdbManager.getEntityDefsToExport({ survey, cycle, options })
+  for await (const entityDef of entityDefs) {
+    const entityDefUuid = NodeDef.getUuid(entityDef)
+    const query = Query.create({ entityDefUuid })
+    const count = await SurveyRdbManager.countTable({ survey, cycle, query })
+    items.push({ name: NodeDef.getName(entityDef), label: NodeDef.getLabel(entityDef, lang), count })
+  }
+  const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.${getExtensionByFileFormat(fileFormat)}`)
+  const outputStream = FileUtils.createWriteStream(tempFilePath)
+  await FlatDataWriter.writeItemsToStream({ outputStream, fileFormat, items })
 }

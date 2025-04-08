@@ -786,6 +786,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       editRecord: 'Edit record',
       exportList: 'Export list',
       exportData: 'Export data',
+      exportDataSummary: 'Export data summary',
       filterPlaceholder: 'Filter by keys or owner',
       merge: {
         label: 'Merge',

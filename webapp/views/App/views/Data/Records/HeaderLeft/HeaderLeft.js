@@ -31,6 +31,7 @@ import { RecordsDataExportModal } from './RecordsDataExportModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 import { RecordKeyValuesExtractor } from '../recordKeyValuesExtractor'
+import { ExportCsvDataActions } from '@webapp/store/ui'
 
 const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }) => {
   // sort selected records by date modified; source record will be the newest one
@@ -195,6 +196,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           )}
           {canExportRecordsData && (
             <ButtonDownload label="dataView.records.exportData" onClick={toggleRecordsDataExportModalOpen} />
+          )}
+          {canAnalyzeRecords && (
+            <ButtonDownload
+              label="dataView.records.exportDataSummary"
+              onClick={() => dispatch(ExportCsvDataActions.startDataSummaryExport())}
+            />
           )}
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />
