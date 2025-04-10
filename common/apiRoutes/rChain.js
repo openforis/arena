@@ -23,3 +23,11 @@ export const entityData = ({ surveyId, chainUuid, cycle, entityUuid }) =>
 
 export const multipleAttributeData = ({ surveyId, chainUuid, cycle, attributeDefUuid }) =>
   `${getRChainCyclePath({ surveyId, chainUuid, cycle })}/attributes/${attributeDefUuid}/data`
+
+// statistical analysis
+export const statisticalData = ({ surveyId, chainUuid, cycle, entityUuid }) =>
+  `${getRChainCyclePath({ surveyId, chainUuid, cycle })}/entities/${entityUuid}/statistical-data`
+
+// olap data
+export const olapData = ({ surveyId, chainUuid, cycle, entityUuid }) =>
+  `${getRChainCyclePath({ surveyId, chainUuid, cycle })}/entities/${entityUuid}/olap-data`

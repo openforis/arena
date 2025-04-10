@@ -219,4 +219,72 @@ export const init = (app) => {
       }
     }
   )
+
+  // ====== UPDATE - Statistical analysis data
+  app.put(
+    ApiRoutes.rChain.statisticalData({
+      surveyId: ':surveyId',
+      cycle: ':cycle',
+      chainUuid: ':chainUuid',
+      entityUuid: ':entityDefUuid',
+    }),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const filePath = Request.getFilePath(req)
+        const { surveyId, cycle, chainUuid, entityDefUuid, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
+
+        const user = Request.getUser(req)
+
+        // Extract the entity name from the file path
+        const fileName = filePath.split('/').pop()
+
+        // Save the statistical data to the database
+        await AnalysisService.saveStatisticalData({
+          user,
+          surveyId,
+          cycle,
+          entityDefUuid,
+          chainUuid,
+          filePath,
+          fileName,
+        })
+
+        Response.sendOk(res)
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  // ====== UPDATE - OLAP data
+  app.put(
+    ApiRoutes.rChain.olapData({
+      surveyId: ':surveyId',
+      cycle: ':cycle',
+      chainUuid: ':chainUuid',
+      entityUuid: ':entityDefUuid',
+    }),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, chainUuid } = Request.getParams(req)
+        const { data } = Request.getBody(req)
+
+        // Persist OLAP data to a CSV file
+        const filePath = await AnalysisService.persistOlapData({
+          surveyId,
+          cycle,
+          chainUuid,
+          data,
+        })
+
+        res.json({ filePath })
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
 }

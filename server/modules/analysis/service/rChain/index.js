@@ -1,8 +1,13 @@
 import * as PromiseUtils from '@core/promiseUtils'
+import * as fs from 'fs'
+import * as path from 'path'
+import * as csv from 'fast-csv'
 
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
+import * as FileUtils from '@server/utils/file/fileUtils'
+import { persistOlapData as persistOlapDataToFile } from './rFile/system/rFilePersistOlapData'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -19,6 +24,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as AnalysisManager from '../../manager'
+import * as RChainResultService from '../rChainResultService'
 
 import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
@@ -75,6 +81,75 @@ const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {
     return nodeDefName.replace(`${NodeDef.getName(entity)}_`, `${NodeDef.getName(entity)}-`)
   }
   return `${NodeDef.getName(entity)}-${nodeDefName}`
+}
+
+export const saveStatisticalData = async ({ surveyId, cycle, entityDefUuid, chainUuid, filePath, user, fileName }) => {
+  const fileZip = new FileZip(filePath)
+  await fileZip.init()
+
+  // Extract the zip file to a temporary directory
+  const tempDir = path.join(process.env.TEMP_FOLDER || '/tmp', `statistical_${Date.now()}`)
+  await FileUtils.mkdir(tempDir, { recursive: true })
+
+  try {
+    // Extract the OLAP CSV file from the zip
+    const entryNames = fileZip.getEntryNames()
+    const csvEntryName = entryNames.find((name) => name.endsWith('.csv'))
+
+    if (!csvEntryName) {
+      throw new Error('No CSV file found in the zip archive')
+    }
+
+    const csvData = await fileZip.getEntryAsText(csvEntryName)
+    const csvFilePath = path.join(tempDir, csvEntryName)
+    await fs.promises.writeFile(csvFilePath, csvData)
+
+    // Parse the CSV file
+    const rows = []
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(csvFilePath)
+        .pipe(csv.parse({ headers: true }))
+        .on('data', (row) => rows.push(row))
+        .on('error', reject)
+        .on('end', resolve)
+    })
+
+    // Save the data to the database
+    await RChainResultService.saveResultToCsv({
+      surveyId,
+      chainUuid,
+      cycle,
+      entityDef: { uuid: entityDefUuid },
+      data: rows,
+      tx: db,
+    })
+
+    return { success: true, rowCount: rows.length }
+  } finally {
+    // Clean up temporary files
+    await FileUtils.rmdir(tempDir, { recursive: true })
+  }
+}
+
+export const persistOlapData = async ({ surveyId, cycle, chainUuid, data }) => {
+  // Fetch survey and chain
+  const [survey, chain] = await Promise.all([
+    SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, advanced: true, draft: true }),
+    AnalysisManager.fetchChain({ surveyId, chainUuid, includeScript: true }),
+  ])
+
+  // Create output directory
+  const outputDir = path.join(process.env.TEMP_FOLDER || '/tmp', 'olap_data', surveyId, chainUuid)
+
+  // Persist OLAP data to a CSV file
+  const filePath = await persistOlapDataToFile({
+    survey,
+    chain,
+    data,
+    outputDir,
+  })
+
+  return filePath
 }
 
 export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }) => {

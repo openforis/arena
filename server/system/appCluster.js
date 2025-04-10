@@ -15,6 +15,7 @@ import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
+import * as RChainResultTableMigration from './schedulers/rChainResultTableMigration'
 
 const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
 
@@ -61,4 +62,7 @@ export const run = async () => {
   await RecordPreviewCleanup.init()
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
+
+  // ====== Database migrations
+  await RChainResultTableMigration.init()
 }

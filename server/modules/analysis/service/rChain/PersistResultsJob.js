@@ -6,6 +6,7 @@ import CsvDataImportJob from '@server/modules/dataImport/service/DataImportJob/C
 import { DataImportCsvFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportCsvFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import FileZip from '@server/utils/file/fileZip'
+import * as RChainResultService from '@server/modules/analysis/service/rChainResultService'
 
 import { RecordsProvider } from './RecordsProvider'
 
@@ -16,7 +17,7 @@ export default class PersistResultsJob extends CsvDataImportJob {
 
   async onStart() {
     const { surveyId, tx } = this
-    const { nodeDefUuid, filePath } = this.context
+    const { nodeDefUuid, filePath, chainUuid, cycle } = this.context
     await super.onStart()
 
     // survey is fetched after onStart is called
@@ -30,6 +31,14 @@ export default class PersistResultsJob extends CsvDataImportJob {
     const entityDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const zipEntryName = `${NodeDef.getName(entityDef)}.csv`
     this.stream = await this.fileZip.getEntryStream(zipEntryName)
+
+    // Store the entity definition for later use
+    this.entityDef = entityDef
+    this.chainUuid = chainUuid
+    this.cycle = cycle
+
+    // Initialize array to store CSV data for OLAP
+    this.csvData = []
   }
 
   async fetchSurvey() {
@@ -74,6 +83,10 @@ export default class PersistResultsJob extends CsvDataImportJob {
       await this.setStatusFailed()
       return
     }
+
+    // Store row data for CSV export
+    this.csvData.push(row)
+
     const { record_uuid: recordUuid, parent_uuid: entityUuid } = row
     const record = await this.recordsProvider.getOrFetch(recordUuid)
     const entity = Record.getNodeByUuid(entityUuid)(record)
@@ -102,6 +115,27 @@ export default class PersistResultsJob extends CsvDataImportJob {
 
   async onEnd() {
     await super.onEnd()
+
+    // Save CSV data for OLAP if we have data and didn't fail
+    if (this.csvData.length > 0 && !this.isFailed()) {
+      try {
+        const { surveyId, tx } = this
+
+        await RChainResultService.saveResultToCsv({
+          surveyId,
+          chainUuid: this.chainUuid,
+          cycle: this.cycle,
+          entityDef: this.entityDef,
+          data: this.csvData,
+          tx,
+        })
+
+        this.logDebug(`Saved ${this.csvData.length} rows to CSV for OLAP analysis`)
+      } catch (error) {
+        this.logError('Error saving CSV data for OLAP', error)
+      }
+    }
+
     this.fileZip?.close()
   }
 }

@@ -7,6 +7,7 @@ export { Schemata }
 export { default as TableRecord } from './tables/record'
 export { default as TableNode } from './tables/node'
 export { default as TableChain } from './tables/chain'
+export * as TableRChainResult from './tables/rChainResult'
 
 export { default as TableDataNodeDef, ColumnNodeDef } from './tables/dataNodeDef'
 
