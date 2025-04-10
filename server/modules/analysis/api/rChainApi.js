@@ -219,4 +219,36 @@ export const init = (app) => {
       }
     }
   )
+
+  // ====== UPDATE - OLAP data
+  app.put(
+    ApiRoutes.rChain.olapData({
+      surveyId: ':surveyId',
+      cycle: ':cycle',
+      chainUuid: ':chainUuid',
+    }),
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const filePath = Request.getFilePath(req)
+        const { surveyId, cycle, chainUuid, token } = Request.getParams(req)
+
+        AnalysisService.checkRStudioToken({ token, chainUuid })
+
+        const user = Request.getUser(req)
+
+        const job = AnalysisService.startPersistOLAPDataJob({
+          user,
+          surveyId,
+          cycle,
+          chainUuid,
+          filePath,
+        })
+
+        res.json(JobUtils.jobToJSON(job))
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
 }

@@ -23,6 +23,7 @@ import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
+import PersistOLAPDataJob from './PersistOLAPDataJob'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
   new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
@@ -71,8 +72,12 @@ export const fetchNodeData = async ({
 
 export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, chainUuid, filePath }) => {
   const job = new PersistResultsJob({ user, surveyId, cycle, chainUuid, nodeDefUuid: entityDefUuid, filePath })
-  JobManager.enqueueJob(job)
-  return job
+  return JobManager.enqueueJob(job)
+}
+
+export const startPersistOLAPDataJob = ({ user, surveyId, cycle, chainUuid, filePath }) => {
+  const job = new PersistOLAPDataJob({ user, surveyId, cycle, chainUuid, filePath })
+  return JobManager.enqueueJob(job)
 }
 
 const getAnalysisNodeDefZipEntryName = ({ entity, nodeDef }) => {
