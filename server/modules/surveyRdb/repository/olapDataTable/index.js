@@ -1,0 +1,1 @@
+export { createOLAPDataTable } from './create'
