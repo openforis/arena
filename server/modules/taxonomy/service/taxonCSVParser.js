@@ -27,11 +27,11 @@ export default class TaxonCSVParser {
     const family = familyRow || 'no_data'
 
     // the genus is always the first word of the scientific name
-    const genus = scientificName ? scientificName.split(' ')[0] : null
+    const genus = genusRow ?? scientificName ? scientificName.split(' ')[0] : null
 
     const taxon = Taxon.newTaxon({
       taxonomyUuid: this.taxonomyUuid,
-      code,
+      code: String(StringUtils.nullToEmpty(code)),
       family,
       genus,
       scientificName,
@@ -51,7 +51,7 @@ export default class TaxonCSVParser {
 
     // validate taxon uniqueness among inserted values
     if (Validation.isValid(validation)) {
-      const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
+      const code = R.pipe(Taxon.getCode, R.toString, R.toUpper)(taxon)
       this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
 
       const scientificName = Taxon.getScientificName(taxon)

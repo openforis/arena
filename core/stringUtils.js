@@ -41,7 +41,7 @@ export const removeNewLines = (value) => {
   return value.replaceAll(NEW_LINE_REG_EX, ' ')
 }
 
-export const nullToEmpty = (value) => (value === null ? '' : value)
+export const nullToEmpty = (value) => (value === null || value === undefined ? '' : value)
 
 export const appendIfMissing = (suffix) => (text) => (text.endsWith(suffix) ? text : `${text}${suffix}`)
 export const prependIfMissing = (prefix) => (text) => (text.startsWith(prefix) ? text : `${prefix}${text}`)
