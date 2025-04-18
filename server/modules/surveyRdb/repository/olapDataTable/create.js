@@ -1,7 +1,7 @@
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
-export const createOLAPDataTable = async ({ survey, cycle, chainId, entityDef }, client) => {
-  const table = new TableOlapData({ survey, cycle, chainId, entityDef })
+export const createOlapDataTable = async ({ survey, cycle, entityDef }, client) => {
+  const table = new TableOlapData({ survey, cycle, entityDef })
 
   return client.query(
     `CREATE TABLE

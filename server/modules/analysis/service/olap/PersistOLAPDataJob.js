@@ -1,9 +1,16 @@
+import { FileNames } from '@openforis/arena-core'
+
+import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
 
+import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+
+const insertBatchSize = 1000
 
 export default class PersistOLAPDataJob extends Job {
   constructor(params) {
@@ -11,6 +18,7 @@ export default class PersistOLAPDataJob extends Job {
 
     this.survey = null
     this.fileZip = null
+    this.olapDataRowsBatchPersister = null
   }
 
   async onStart() {
@@ -46,7 +54,16 @@ export default class PersistOLAPDataJob extends Job {
   async writeOLAPData() {
     const zipEntryNames = this.fileZip.getEntryNames()
     this.total = zipEntryNames.length
+    const { survey, context } = this
+    const { cycle } = context
+
     for await (const zipEntryName of zipEntryNames) {
+      const entityDefName = FileNames.getName(zipEntryName)
+      const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
+      this.olapDataRowsBatchPersister = new BatchPersister(
+        async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, entityDef, values }, this.tx),
+        insertBatchSize
+      )
       await this.importZipEntry(zipEntryName)
       this.incrementProcessedItems()
     }
@@ -58,10 +75,12 @@ export default class PersistOLAPDataJob extends Job {
       stream,
       fileFormat: FileFormats.csv,
       onRow: async (row) => {
-        // TODO store data in RDB OLAP data table
+        // TODO validate row
+        await this.olapDataRowsBatchPersister.addItem(row)
       },
     })
     await this.reader.start()
+    await this.olapDataRowsBatchPersister.flush()
     this.reader = null
   }
 

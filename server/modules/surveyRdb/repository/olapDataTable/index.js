@@ -1,1 +1,2 @@
-export { createOLAPDataTable } from './create'
+export { createOlapDataTable } from './create'
+export { insertOlapData } from './insert'

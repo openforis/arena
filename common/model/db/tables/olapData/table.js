@@ -20,12 +20,11 @@ const baseColumnNamesAndTypes = [
   `${baseColumnSet.expFactor}     ${SQL.types.decimal}`,
 ]
 
-const generateTableName = ({ cycle, chainId, entityDef }) =>
-  `${tableNamePrefix}_cycle_${cycle}_chain_${chainId}_${NodeDef.getName(entityDef)}`
+const generateTableName = ({ cycle, entityDef }) => `${tableNamePrefix}_cycle_${cycle}_${NodeDef.getName(entityDef)}`
 
 export default class TableOlapData extends TableSurveyRdb {
-  constructor({ survey, cycle, chainId, entityDef }) {
-    super(Survey.getId(survey), generateTableName({ cycle, chainId, entityDef }))
+  constructor({ survey, cycle, entityDef }) {
+    super(Survey.getId(survey), generateTableName({ cycle, entityDef }))
     this._survey = survey
     this._entityDef = entityDef
   }
@@ -40,6 +39,10 @@ export default class TableOlapData extends TableSurveyRdb {
         (nodeDef) => NodeDef.isSingleAttribute(nodeDef) && includedAttributeTypes.includes(NodeDef.getType(nodeDef))
       )
       .sort((nodeDefA, nodeDefB) => NodeDef.getId(nodeDefA) - NodeDef.getId(nodeDefB))
+  }
+
+  get columnNames() {
+    return [...Object.keys(baseColumnSet), ...this.attributeDefsForColumns.map((attrDef) => NodeDef.getName(attrDef))]
   }
 
   get columnNamesAndTypes() {

@@ -23,7 +23,7 @@ import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
-import PersistOLAPDataJob from './PersistOLAPDataJob'
+import PersistOLAPDataJob from '../olap/PersistOLAPDataJob'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
   new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()

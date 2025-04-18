@@ -86,6 +86,8 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     this.incrementProcessedItems()
     this.logDebug('create node keys hierarchy view - end')
 
+    await this.generateOlapTables({ survey, descendantMultipleDefs })
+
     this.logDebug(`${jobDescription} - end`)
   }
 
@@ -99,6 +101,27 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
       tx
     )
+  }
+
+  async generateOlapTables({ survey, descendantMultipleDefs }) {
+    const { tx } = this
+    const stopIfFunction = () => this.isCanceled()
+
+    this.logDebug('create OLAP data tables - start')
+    await PromiseUtils.each(
+      Survey.getCycleKeys(survey),
+      async (cycle) => {
+        await PromiseUtils.each(
+          // TODO generate only reporting tables
+          descendantMultipleDefs,
+          async (entityDef) => SurveyRdbManager.createOlapDataTable({ survey, cycle, entityDef }, tx),
+          stopIfFunction
+        )
+      },
+      stopIfFunction
+    )
+    this.incrementProcessedItems()
+    this.logDebug('create OLAP data tables - end')
   }
 }
 
