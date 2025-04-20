@@ -2,19 +2,23 @@ import { FileNames } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
+import * as StringUtils from '@core/stringUtils'
+import * as Chain from '@common/analysis/chain'
 
 import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
+import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 
 const insertBatchSize = 1000
+const zipEntryNamePrefix = 'OLAP_'
 
-export default class PersistOLAPDataJob extends Job {
+export default class PersistOlapDataJob extends Job {
   constructor(params) {
-    super(params, PersistOLAPDataJob.type)
+    super(PersistOlapDataJob.type, params)
 
     this.survey = null
     this.fileZip = null
@@ -42,26 +46,29 @@ export default class PersistOLAPDataJob extends Job {
   }
 
   async execute() {
-    await this.clearOLAPDataTables()
+    await this.clearTables()
 
-    await this.writeOLAPData()
+    await this.writeData()
   }
 
-  async clearOLAPDataTables() {
+  async clearTables() {
     // TODO
   }
 
-  async writeOLAPData() {
+  async writeData() {
     const zipEntryNames = this.fileZip.getEntryNames()
     this.total = zipEntryNames.length
-    const { survey, context } = this
+    const { survey, context, tx } = this
     const { cycle } = context
+    const surveyId = Survey.getId(survey)
+    const chains = await ChainManager.fetchChains({ surveyId }, tx)
+    const chain = chains.find(Chain.hasSamplingDesign)
 
     for await (const zipEntryName of zipEntryNames) {
-      const entityDefName = FileNames.getName(zipEntryName)
+      const entityDefName = FileNames.getName(StringUtils.removePrefix(zipEntryNamePrefix)(zipEntryName))
       const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
       this.olapDataRowsBatchPersister = new BatchPersister(
-        async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, entityDef, values }, this.tx),
+        async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
         insertBatchSize
       )
       await this.importZipEntry(zipEntryName)
@@ -70,7 +77,7 @@ export default class PersistOLAPDataJob extends Job {
   }
 
   async importZipEntry(zipEntryName) {
-    const stream = await this.zipFile.getEntryStream(zipEntryName)
+    const stream = await this.fileZip.getEntryStream(zipEntryName)
     this.reader = FlatDataReader.createReaderFromStream({
       stream,
       fileFormat: FileFormats.csv,
@@ -96,4 +103,4 @@ export default class PersistOLAPDataJob extends Job {
   }
 }
 
-PersistOLAPDataJob.type = 'PersistResultsJob'
+PersistOlapDataJob.type = 'PersistOlapDataJob'

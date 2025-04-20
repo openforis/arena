@@ -1,11 +1,12 @@
-import Job from '../../../../job/job'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as PromiseUtils from '@core/promiseUtils'
+import * as Chain from '@common/analysis/chain'
 
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as PromiseUtils from '../../../../../core/promiseUtils'
-
-import * as SurveyRdbManager from '../../manager/surveyRdbManager'
-import * as SurveyManager from '../../../survey/manager/surveyManager'
+import Job from '@server/job/job'
+import * as ChainManager from '@server/modules/analysis/manager'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   constructor(params) {
@@ -108,6 +109,11 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const stopIfFunction = () => this.isCanceled()
 
     this.logDebug('create OLAP data tables - start')
+    const surveyId = Survey.getId(survey)
+    const chains = await ChainManager.fetchChains({ surveyId }, tx)
+    const chain = chains.find(Chain.hasSamplingDesign)
+    if (!chain) return
+
     await PromiseUtils.each(
       Survey.getCycleKeys(survey),
       async (cycle) => {

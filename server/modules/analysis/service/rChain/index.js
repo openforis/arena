@@ -23,7 +23,7 @@ import * as AnalysisManager from '../../manager'
 
 import RChain from './rChain'
 import PersistResultsJob from './PersistResultsJob'
-import PersistOLAPDataJob from '../olap/PersistOLAPDataJob'
+import PersistOlapDataJob from '../olap/PersistOlapDataJob'
 
 export const generateScript = async ({ surveyId, cycle, chainUuid, serverUrl, token }) =>
   new RChain({ surveyId, cycle, chainUuid, serverUrl, token }).init()
@@ -75,8 +75,8 @@ export const startPersistResultsJob = ({ user, surveyId, cycle, entityDefUuid, c
   return JobManager.enqueueJob(job)
 }
 
-export const startPersistOLAPDataJob = ({ user, surveyId, cycle, chainUuid, filePath }) => {
-  const job = new PersistOLAPDataJob({ user, surveyId, cycle, chainUuid, filePath })
+export const startPersistOlapDataJob = ({ user, surveyId, cycle, chainUuid, filePath }) => {
+  const job = new PersistOlapDataJob({ user, surveyId, cycle, chainUuid, filePath })
   return JobManager.enqueueJob(job)
 }
 

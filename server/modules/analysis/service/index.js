@@ -21,7 +21,7 @@ export {
 export {
   generateScript,
   fetchNodeData,
-  startPersistOLAPDataJob,
+  startPersistOlapDataJob,
   startPersistResultsJob,
   persistUserScripts,
 } from './rChain'
