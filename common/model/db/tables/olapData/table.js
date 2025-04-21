@@ -29,11 +29,17 @@ export default class TableOlapData extends TableSurveyRdb {
   }
 
   get attributeDefsForColumns() {
-    return Survey.getNodeDefDescendantAttributesInSingleEntities({
-      nodeDef: this._entityDef,
-      includeAnalysis: true,
-      includeSamplingDefsWithoutSiblings: true,
+    const ancestorAndDescendantAttributeDefs = []
+    Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
+      ancestorAndDescendantAttributeDefs.unshift(
+        ...Survey.getNodeDefDescendantAttributesInSingleEntities({
+          nodeDef: ancestorDef,
+          includeAnalysis: true,
+          includeSamplingDefsWithoutSiblings: true,
+        })(this._survey)
+      )
     })(this._survey)
+    return ancestorAndDescendantAttributeDefs
       .filter(
         (nodeDef) => NodeDef.isSingleAttribute(nodeDef) && includedAttributeTypes.includes(NodeDef.getType(nodeDef))
       )

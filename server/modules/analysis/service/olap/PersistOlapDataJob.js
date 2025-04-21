@@ -4,6 +4,7 @@ import * as Survey from '@core/survey/survey'
 import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
 import * as Chain from '@common/analysis/chain'
+import TableOlapData from '@common/model/db/tables/olapData/table'
 
 import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
@@ -58,37 +59,60 @@ export default class PersistOlapDataJob extends Job {
   async writeData() {
     const zipEntryNames = this.fileZip.getEntryNames()
     this.total = zipEntryNames.length
-    const { survey, context, tx } = this
-    const { cycle } = context
+    const { survey, tx } = this
     const surveyId = Survey.getId(survey)
     const chains = await ChainManager.fetchChains({ surveyId }, tx)
     const chain = chains.find(Chain.hasSamplingDesign)
 
     for await (const zipEntryName of zipEntryNames) {
-      const entityDefName = FileNames.getName(StringUtils.removePrefix(zipEntryNamePrefix)(zipEntryName))
-      const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
-      this.olapDataRowsBatchPersister = new BatchPersister(
-        async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
-        insertBatchSize
-      )
-      await this.importZipEntry(zipEntryName)
+      await this.importZipEntry({ zipEntryName, chain })
       this.incrementProcessedItems()
     }
   }
 
-  async importZipEntry(zipEntryName) {
+  async importZipEntry({ zipEntryName, chain }) {
+    const { survey, context } = this
+    const { cycle } = context
+    const entityDefName = FileNames.getName(StringUtils.removePrefix(zipEntryNamePrefix)(zipEntryName))
+    const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
+    const olapDataRowsBatchPersister = new BatchPersister(
+      async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
+      insertBatchSize
+    )
     const stream = await this.fileZip.getEntryStream(zipEntryName)
     this.reader = FlatDataReader.createReaderFromStream({
       stream,
       fileFormat: FileFormats.csv,
       onRow: async (row) => {
-        // TODO validate row
-        await this.olapDataRowsBatchPersister.addItem(row)
+        if (this.isCanceled()) {
+          this.reader.cancel()
+          return
+        }
+        this.validateRow({ row, entityDef })
+        await olapDataRowsBatchPersister.addItem(row)
       },
     })
     await this.reader.start()
-    await this.olapDataRowsBatchPersister.flush()
+    await olapDataRowsBatchPersister.flush()
     this.reader = null
+  }
+
+  validateRow({ row, chain, entityDef }) {
+    const { survey, context } = this
+    const { cycle } = context
+    const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+    const table = new TableOlapData({ survey, cycle, entityDef, baseUnitDef })
+    const expectedColumnNames = table.columnNamesForInsert
+    const rowFields = Object.keys(row)
+    const missingRequiredColumnNames = expectedColumnNames.filter((colName) => !rowFields.includes(colName))
+    if (missingRequiredColumnNames.length > 0) {
+      throw new Error('missing required column names: ' + missingRequiredColumnNames)
+    }
+    const unexpectedColumnNames = rowFields.filter((colName) => !expectedColumnNames.includes(colName))
+    if (unexpectedColumnNames.length > 0) {
+      throw new Error('unexpected column names: ' + unexpectedColumnNames)
+    }
+    return true
   }
 
   async cancel() {
