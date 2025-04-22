@@ -37,7 +37,7 @@ import { FileUploadDialogActions } from '@webapp/store/ui'
 const labelsExportAllowedFileFormats = [FileFormats.xlsx, FileFormats.csv]
 
 const FormHeader = (props) => {
-  const { edit, entry, preview, canEditDef, analysis } = props
+  const { disableLockUnlock, disableValidationReport, edit, entry, preview, canEditDef, analysis } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -163,13 +163,30 @@ const FormHeader = (props) => {
           size="small"
         />
       </div>
-      {analysis && <FormEntryActions analysis={analysis} />}
-      {edit && canEditDef ? <FormEditActions /> : <FormEntryActions preview={preview} entry={entry} />}
+      {analysis && (
+        <FormEntryActions
+          disableLockUnlock={disableLockUnlock}
+          disableValidationReport={disableValidationReport}
+          analysis={analysis}
+        />
+      )}
+      {edit && canEditDef ? (
+        <FormEditActions />
+      ) : (
+        <FormEntryActions
+          disableLockUnlock={disableLockUnlock}
+          disableValidationReport={disableValidationReport}
+          preview={preview}
+          entry={entry}
+        />
+      )}
     </div>
   )
 }
 
 FormHeader.propTypes = {
+  disableLockUnlock: PropTypes.bool,
+  disableValidationReport: PropTypes.bool,
   canEditDef: PropTypes.bool.isRequired,
   edit: PropTypes.bool.isRequired,
   entry: PropTypes.bool.isRequired,

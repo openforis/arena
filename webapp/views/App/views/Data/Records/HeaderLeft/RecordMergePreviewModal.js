@@ -42,7 +42,7 @@ export const RecordMergePreviewModal = (props) => {
       initHeight={initialHeight}
       onRequestClose={onRequestClose}
     >
-      <RecordEditor editable={false} record={record} noHeader />
+      <RecordEditor editable={false} record={record} noHeader disableLockUnlock disableValidationReport />
       <div className="button-bar">
         <Button className="btn-cancel" onClick={onRequestClose} label="common.cancel" variant="outlined" />
         <Button

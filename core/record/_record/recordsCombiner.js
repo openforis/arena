@@ -165,8 +165,16 @@ export const replaceUpdatedNodes =
     })
   }
 
-const _addNodeToUpdateResult = ({ updateResult, node, parentEntity: parentEntityParam = undefined }) => {
+const _addNodeToUpdateResult = ({
+  updateResult,
+  node,
+  parentEntity: parentEntityParam = undefined,
+  assignNewUuid = false,
+}) => {
   const newNodeToAdd = Node.assocCreated(true)(node)
+  if (assignNewUuid) {
+    newNodeToAdd[Node.keys.uuid] = UUIDs.v4()
+  }
   delete newNodeToAdd[Node.keys.id] // clear internal id
   newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
 
@@ -272,7 +280,7 @@ const _mergeMultipleAttributes = ({
           )
         ) {
           // value not in target values => add it to the record
-          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })
+          _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget, assignNewUuid: true })
         }
       })
     }

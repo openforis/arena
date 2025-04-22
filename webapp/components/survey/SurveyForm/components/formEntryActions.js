@@ -18,7 +18,8 @@ import { Button } from '@webapp/components/buttons'
 import { appModuleUri, dataModules } from '@webapp/app/appModules'
 import { useIsRecordViewWithoutHeader } from '@webapp/store/ui/record/hooks'
 
-const RecordEntryButtons = () => {
+const RecordEntryButtons = (props) => {
+  const { disableLockUnlock = false, disableValidationReport = false } = props
   const i18n = useI18n()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -40,7 +41,7 @@ const RecordEntryButtons = () => {
 
   return (
     <>
-      {canEdit && (
+      {!disableLockUnlock && canEdit && (
         <Button
           iconClassName={recordEditLocked ? 'icon-lock' : 'icon-unlocked'}
           label={`recordView.${recordEditLocked ? 'unlock' : 'lock'}`}
@@ -49,7 +50,7 @@ const RecordEntryButtons = () => {
           variant="text"
         />
       )}
-      {!valid && (
+      {!disableValidationReport && !valid && (
         <Link
           data-testid={TestId.record.invalidBtn}
           className="btn btn-transparent error"
@@ -110,8 +111,13 @@ const RecordEntryButtons = () => {
   )
 }
 
+RecordEntryButtons.propTypes = {
+  disableLockUnlock: PropTypes.bool,
+  disableValidationReport: PropTypes.bool,
+}
+
 const FormEntryActions = (props) => {
-  const { preview = false, entry = false } = props
+  const { disableLockUnlock = false, disableValidationReport = false, preview = false, entry = false } = props
 
   const dispatch = useDispatch()
 
@@ -127,13 +133,17 @@ const FormEntryActions = (props) => {
           variant="text"
         />
       ) : (
-        entry && <RecordEntryButtons />
+        entry && (
+          <RecordEntryButtons disableLockUnlock={disableLockUnlock} disableValidationReport={disableValidationReport} />
+        )
       )}
     </div>
   )
 }
 
 FormEntryActions.propTypes = {
+  disableLockUnlock: PropTypes.bool,
+  disableValidationReport: PropTypes.bool,
   preview: PropTypes.bool,
   entry: PropTypes.bool,
 }
