@@ -72,7 +72,7 @@ export const createRowsReaderFromStream = async ({ stream, survey, summary, onRo
           const itemKey = CategoryImportSummary.getItemKey(item)
 
           if (CategoryImportSummary.isItemCode(item)) {
-            codes.push(itemValue)
+            codes.push(String(itemValue ?? ''))
           }
           if (Objects.isEmpty(itemValue)) {
             return
