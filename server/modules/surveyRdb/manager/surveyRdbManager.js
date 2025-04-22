@@ -282,7 +282,7 @@ export const fetchEntitiesDataToCsvFiles = async (
       nodeDef,
       includeAnalysis,
       includeMultipleAttributes: !!expandCategoryItems,
-      sorted: true,
+      sorted: Objects.isNotEmpty(cycle),
       cycle,
     })(survey)
   }

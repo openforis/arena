@@ -39,6 +39,8 @@ export default class DataExportJob extends Job {
 
     await FileUtils.mkdir(outputDir)
 
+    this.adjustCycle()
+
     const survey = await this._fetchSurvey()
 
     this.setContext({
@@ -48,22 +50,28 @@ export default class DataExportJob extends Job {
     })
   }
 
+  adjustCycle() {
+    const { cycle, options } = this.context
+    const { includeDataFromAllCycles } = options
+    const cycleToUse = includeDataFromAllCycles ? undefined : cycle
+    this.setContext({ cycle: cycleToUse })
+  }
+
   async _fetchSurvey() {
     const { surveyId, cycle, options } = this.context
-    const { includeAnalysis, includeDataFromAllCycles, expandCategoryItems } = options
-    const cycleToFetch = includeDataFromAllCycles ? undefined : cycle
+    const { includeAnalysis, expandCategoryItems } = options
 
     return expandCategoryItems
       ? await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
           surveyId,
-          cycle: cycleToFetch,
+          cycle,
           includeAnalysis,
           includeBigCategories: false,
           includeBigTaxonomies: false,
         })
       : await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
           surveyId,
-          cycle: cycleToFetch,
+          cycle,
           includeAnalysis,
         })
   }
