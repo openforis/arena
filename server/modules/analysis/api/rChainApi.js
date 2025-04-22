@@ -237,7 +237,7 @@ export const init = (app) => {
 
         const user = Request.getUser(req)
 
-        const job = AnalysisService.startPersistOLAPDataJob({
+        const job = AnalysisService.startPersistOlapDataJob({
           user,
           surveyId,
           cycle,

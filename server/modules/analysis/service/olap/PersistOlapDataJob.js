@@ -88,7 +88,7 @@ export default class PersistOlapDataJob extends Job {
           this.reader.cancel()
           return
         }
-        this.validateRow({ row, entityDef })
+        this.validateRow({ row, chain, entityDef })
         await olapDataRowsBatchPersister.addItem(row)
       },
     })

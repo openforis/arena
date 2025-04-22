@@ -8,7 +8,7 @@ export const createOlapDataTable = async ({ survey, cycle, chain, entityDef }, c
         ${table.nameQualified}
       (
         ${table.columnNamesAndTypes.join(', ')}
-        PRIMARY KEY (${TableOlapData.baseColumnSet.id})
+        , PRIMARY KEY (${TableOlapData.baseColumnSet.id})
       )`
   )
 }
