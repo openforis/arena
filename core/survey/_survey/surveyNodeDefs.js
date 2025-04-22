@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { Surveys, TraverseMethod } from '@openforis/arena-core'
+import { Objects, Surveys, TraverseMethod } from '@openforis/arena-core'
 
 import Queue from '@core/queue'
 
@@ -65,7 +65,28 @@ export const getNodeDefChildrenSorted =
     includeSamplingDefsWithoutSiblings = false,
   }) =>
   (survey) => {
-    let childDefs = Surveys.getNodeDefChildrenSorted({ survey, cycle, nodeDef, includeAnalysis, includeLayoutElements })
+    const cycleKeysToConsider = Objects.isEmpty(cycle) ? Surveys.getCycleKeys(survey) : [cycle]
+    // get child defs from the cycles to consider, then combine them keeping their sorting
+    let childDefs = cycleKeysToConsider.reduce((acc, currentCycle, currentCycleIndex) => {
+      const childDefsInCycle = Surveys.getNodeDefChildrenSorted({
+        survey,
+        cycle: currentCycle,
+        nodeDef,
+        includeAnalysis,
+        includeLayoutElements,
+      })
+      if (currentCycleIndex === 0) {
+        acc.push(...childDefsInCycle)
+      } else {
+        childDefsInCycle.forEach((childDef, index) => {
+          if (!acc.includes(childDef)) {
+            acc.splice(index, 0, childDef)
+          }
+        })
+      }
+      return acc
+    }, [])
+
     if (!includeSamplingDefsWithoutSiblings) {
       childDefs = filterNodeDefsWithoutSiblings(childDefs)
     }
