@@ -114,13 +114,16 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     const chain = chains.find(Chain.hasSamplingDesign)
     if (!chain) return
 
+    const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+    if (!baseUnitDef) return
+
     await PromiseUtils.each(
       Survey.getCycleKeys(survey),
       async (cycle) => {
         await PromiseUtils.each(
           // TODO generate only reporting tables
           descendantMultipleDefs,
-          async (entityDef) => SurveyRdbManager.createOlapDataTable({ survey, cycle, entityDef }, tx),
+          async (entityDef) => SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx),
           stopIfFunction
         )
       },

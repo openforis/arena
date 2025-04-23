@@ -7,6 +7,7 @@ import * as SQL from '../../sql'
 const tableNamePrefix = 'olap_data'
 
 const includedAttributeTypes = [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]
+const includedAnalysisAttributeTypes = [NodeDef.nodeDefType.integer, NodeDef.nodeDefType.decimal]
 
 const baseColumnSet = {
   id: 'id',
@@ -29,21 +30,24 @@ export default class TableOlapData extends TableSurveyRdb {
   }
 
   get attributeDefsForColumns() {
-    const ancestorAndDescendantAttributeDefs = []
+    const attributeDefs = []
     Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
-      ancestorAndDescendantAttributeDefs.unshift(
-        ...Survey.getNodeDefDescendantAttributesInSingleEntities({
-          nodeDef: ancestorDef,
-          includeAnalysis: true,
-          includeSamplingDefsWithoutSiblings: true,
-        })(this._survey)
+      const defs = Survey.getNodeDefDescendantAttributesInSingleEntities({
+        nodeDef: ancestorDef,
+        includeAnalysis: true,
+        includeSamplingDefsWithoutSiblings: true,
+      })(this._survey)
+      const filteredDefs = defs.filter(
+        (nodeDef) =>
+          (NodeDef.isSingleAttribute(nodeDef) &&
+            ((NodeDef.isKey(nodeDef) && NodeDef.getParentUuid(nodeDef) !== NodeDef.getUuid(this._entityDef)) ||
+              includedAttributeTypes.includes(NodeDef.getType(nodeDef)))) ||
+          (NodeDef.isAnalysis(nodeDef) && includedAnalysisAttributeTypes.includes(NodeDef.getType(nodeDef)))
       )
+      attributeDefs.unshift(...filteredDefs)
     })(this._survey)
-    return ancestorAndDescendantAttributeDefs
-      .filter(
-        (nodeDef) => NodeDef.isSingleAttribute(nodeDef) && includedAttributeTypes.includes(NodeDef.getType(nodeDef))
-      )
-      .sort((nodeDefA, nodeDefB) => NodeDef.getId(nodeDefA) - NodeDef.getId(nodeDefB))
+    return attributeDefs
+    //.sort((nodeDefA, nodeDefB) => NodeDef.getId(nodeDefA) - NodeDef.getId(nodeDefB))
   }
 
   get columnNames() {
