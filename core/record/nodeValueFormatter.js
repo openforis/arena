@@ -12,12 +12,13 @@ const format = ({ survey, nodeDef, value, node = null, showLabel = false, lang =
 const getFormattedRecordKeys = ({ survey, record, lang = null, showLabel = false }) => {
   const root = Records.getRoot(record)
   const keyNodes = Records.getEntityKeyNodes({ survey, record, entity: root })
-  const formattedKeyValues = keyNodes.map((keyNode) => {
-    const keyNodeDef = Surveys.getNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(keyNode) })
+  const formattedKeyValues = keyNodes.map((node) => {
+    const keyNodeDef = Surveys.getNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(node) })
     return NodeValueFormatter.format({
       survey,
       nodeDef: keyNodeDef,
-      value: Node.getValue(keyNode),
+      node,
+      value: Node.getValue(node),
       showLabel,
       lang,
     })

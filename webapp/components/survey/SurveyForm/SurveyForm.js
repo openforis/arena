@@ -70,6 +70,9 @@ const SurveyForm = (props) => {
     showPageNavigation,
     canEditRecord,
     parentNode,
+
+    disableLockUnlock = false,
+    disableValidationReport = false,
   } = props
 
   const i18n = useI18n()
@@ -182,7 +185,15 @@ const SurveyForm = (props) => {
 
   return (
     <div className="survey-form-wrapper">
-      <FormHeader edit={edit} analysis={analysis} entry={entry} preview={preview} canEditDef={canEditDef} />
+      <FormHeader
+        disableLockUnlock={disableLockUnlock}
+        disableValidationReport={disableValidationReport}
+        edit={edit}
+        analysis={analysis}
+        entry={entry}
+        preview={preview}
+        canEditDef={canEditDef}
+      />
 
       <div className={className} data-testid={TestId.surveyForm.surveyForm}>
         {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
@@ -248,6 +259,8 @@ SurveyForm.propTypes = {
   analysis: PropTypes.bool,
   canEditDef: PropTypes.bool,
   canEditRecord: PropTypes.bool,
+  disableLockUnlock: PropTypes.bool,
+  disableValidationReport: PropTypes.bool,
   edit: PropTypes.bool,
   entry: PropTypes.bool,
   hasNodeDefAddChildTo: PropTypes.bool,

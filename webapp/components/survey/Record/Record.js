@@ -8,6 +8,8 @@ import { useI18n } from '@webapp/store/system'
 
 const Record = (props) => {
   const {
+    disableLockUnlock = false,
+    disableValidationReport = false,
     editable: editableProp = true,
     locked = false,
     noHeader = false,
@@ -32,12 +34,24 @@ const Record = (props) => {
   if (!record) {
     return null
   }
-  return <SurveyForm draft={preview} preview={preview} edit={false} entry canEditRecord={editable} />
+  return (
+    <SurveyForm
+      disableLockUnlock={disableLockUnlock}
+      disableValidationReport={disableValidationReport}
+      draft={preview}
+      preview={preview}
+      edit={false}
+      entry
+      canEditRecord={editable}
+    />
+  )
 }
 
 export default Record
 
 Record.propTypes = {
+  disableLockUnlock: PropTypes.bool,
+  disableValidationReport: PropTypes.bool,
   editable: PropTypes.bool,
   locked: PropTypes.bool,
   noHeader: PropTypes.bool,
