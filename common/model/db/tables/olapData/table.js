@@ -65,6 +65,17 @@ export default class TableOlapData extends TableSurveyRdb {
     return this.columnNames.filter((columnName) => columnName !== baseColumnSet.id)
   }
 
+  get requiredColumnNamesForInsert() {
+    return [
+      // base columns
+      baseColumnSet.expFactor,
+      // base unit UUID
+      this.baseUnitUuidColumnName,
+      // key attribute columns
+      ...this.attributeDefsForColumns.filter(NodeDef.isKey).map(NodeDef.getName),
+    ]
+  }
+
   get baseUnitUuidColumnName() {
     return NodeDef.getName(this._baseUnitDef) + '_uuid'
   }

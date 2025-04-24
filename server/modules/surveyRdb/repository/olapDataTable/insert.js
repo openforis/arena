@@ -10,7 +10,8 @@ export const insertOlapData = async ({ survey, cycle, chain, entityDef, values }
   const surveyId = Survey.getId(survey)
   const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const table = new TableOlapData({ survey, cycle, entityDef, baseUnitDef })
+  const colNames = table.columnNamesForInsert
   await client.none(
-    DbUtils.insertAllQueryBatch(Schemata.getSchemaSurveyRdb(surveyId), table.name, table.columnNamesForInsert, values)
+    DbUtils.insertAllQueryBatch(Schemata.getSchemaSurveyRdb(surveyId), table.name, colNames, values, true)
   )
 }

@@ -102,12 +102,13 @@ export default class PersistOlapDataJob extends Job {
     const { cycle } = context
     const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
     const table = new TableOlapData({ survey, cycle, entityDef, baseUnitDef })
-    const expectedColumnNames = table.columnNamesForInsert
     const rowFields = Object.keys(row)
-    const missingRequiredColumnNames = expectedColumnNames.filter((colName) => !rowFields.includes(colName))
+    const requiredColumnNames = table.requiredColumnNamesForInsert
+    const missingRequiredColumnNames = requiredColumnNames.filter((colName) => !rowFields.includes(colName))
     if (missingRequiredColumnNames.length > 0) {
       throw new Error('missing required column names: ' + missingRequiredColumnNames)
     }
+    const expectedColumnNames = table.columnNamesForInsert
     const unexpectedColumnNames = rowFields.filter((colName) => !expectedColumnNames.includes(colName))
     if (unexpectedColumnNames.length > 0) {
       throw new Error('unexpected column names: ' + unexpectedColumnNames)
