@@ -41,40 +41,36 @@ export default class PersistOlapDataJob extends Job {
       },
       tx
     )
+    const chains = await ChainManager.fetchChains({ surveyId }, tx)
+    this.chain = chains.find(Chain.hasSamplingDesign)
 
     this.fileZip = new FileZip(filePath)
     await this.fileZip.init()
   }
 
   async execute() {
-    await this.clearTables()
-
     await this.writeData()
-  }
-
-  async clearTables() {
-    // TODO
   }
 
   async writeData() {
     const zipEntryNames = this.fileZip.getEntryNames()
     this.total = zipEntryNames.length
-    const { survey, tx } = this
-    const surveyId = Survey.getId(survey)
-    const chains = await ChainManager.fetchChains({ surveyId }, tx)
-    const chain = chains.find(Chain.hasSamplingDesign)
 
     for await (const zipEntryName of zipEntryNames) {
-      await this.importZipEntry({ zipEntryName, chain })
+      await this.importZipEntry({ zipEntryName })
       this.incrementProcessedItems()
     }
   }
 
-  async importZipEntry({ zipEntryName, chain }) {
-    const { survey, context } = this
+  async importZipEntry({ zipEntryName }) {
+    const { context, survey, chain, tx } = this
     const { cycle } = context
     const entityDefName = FileNames.getName(StringUtils.removePrefix(zipEntryNamePrefix)(zipEntryName))
     const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
+    const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
+
+    await SurveyRdbManager.clearOlapData({ survey, cycle, entityDef, baseUnitDef }, tx)
+
     const olapDataRowsBatchPersister = new BatchPersister(
       async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
       insertBatchSize
@@ -88,7 +84,7 @@ export default class PersistOlapDataJob extends Job {
           this.reader.cancel()
           return
         }
-        this.validateRow({ row, chain, entityDef })
+        this.validateRow({ row, entityDef })
         await olapDataRowsBatchPersister.addItem(row)
       },
     })
@@ -97,8 +93,8 @@ export default class PersistOlapDataJob extends Job {
     this.reader = null
   }
 
-  validateRow({ row, chain, entityDef }) {
-    const { survey, context } = this
+  validateRow({ row, entityDef }) {
+    const { context, survey, chain } = this
     const { cycle } = context
     const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
     const table = new TableOlapData({ survey, cycle, entityDef, baseUnitDef })
