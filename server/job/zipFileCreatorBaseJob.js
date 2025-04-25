@@ -7,7 +7,7 @@ import Job from '@server/job/job'
 
 export default class ZipFileCreatorBaseJob extends Job {
   async onStart() {
-    super.onStart()
+    await super.onStart()
     const { outputFileName: outputFileNameParam = null, surveyId } = this.context
 
     // generate output file name if not specified in params

@@ -11,9 +11,15 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 export default class SurveyRdbOlapDataTablesCreationJob extends Job {
   constructor(params) {
     super(SurveyRdbOlapDataTablesCreationJob.type, params)
+    // internal variables
+    this.survey = null
+    this.chain = null
+    this.baseUnitDef = null
   }
 
   async onStart() {
+    await super.onStart()
+
     const { surveyId, tx } = this
     this.survey = await this.fetchSurvey()
 
