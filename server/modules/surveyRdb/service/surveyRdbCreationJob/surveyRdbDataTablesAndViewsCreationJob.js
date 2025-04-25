@@ -1,10 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as PromiseUtils from '@core/promiseUtils'
-import * as Chain from '@common/analysis/chain'
 
 import Job from '@server/job/job'
-import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
@@ -87,8 +85,6 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
     this.incrementProcessedItems()
     this.logDebug('create node keys hierarchy view - end')
 
-    await this.generateOlapTables({ survey, descendantMultipleDefs })
-
     this.logDebug(`${jobDescription} - end`)
   }
 
@@ -102,35 +98,6 @@ export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
       { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
       tx
     )
-  }
-
-  async generateOlapTables({ survey, descendantMultipleDefs }) {
-    const { tx } = this
-    const stopIfFunction = () => this.isCanceled()
-
-    this.logDebug('create OLAP data tables - start')
-    const surveyId = Survey.getId(survey)
-    const chains = await ChainManager.fetchChains({ surveyId }, tx)
-    const chain = chains.find(Chain.hasSamplingDesign)
-    if (!chain) return
-
-    const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-    if (!baseUnitDef) return
-
-    await PromiseUtils.each(
-      Survey.getCycleKeys(survey),
-      async (cycle) => {
-        await PromiseUtils.each(
-          // TODO generate only reporting tables
-          descendantMultipleDefs,
-          async (entityDef) => SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx),
-          stopIfFunction
-        )
-      },
-      stopIfFunction
-    )
-    this.incrementProcessedItems()
-    this.logDebug('create OLAP data tables - end')
   }
 }
 

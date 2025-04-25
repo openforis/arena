@@ -93,3 +93,4 @@ export default class TableOlapData extends TableSurveyRdb {
 }
 
 TableOlapData.baseColumnSet = baseColumnSet
+TableOlapData.tableNamePrefix = tableNamePrefix

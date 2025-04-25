@@ -6,7 +6,7 @@ export const createOlapDataTable = async ({ survey, cycle, baseUnitDef, entityDe
   const table = new TableOlapData({ survey, cycle, baseUnitDef, entityDef })
 
   return client.query(
-    `CREATE TABLE
+    `CREATE TABLE IF NOT EXISTS
         ${table.nameQualified}
       (
         ${table.columnNamesAndTypes.join(', ')}

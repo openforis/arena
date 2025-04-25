@@ -102,12 +102,12 @@ export default class PersistOlapDataJob extends Job {
     const requiredColumnNames = table.requiredColumnNamesForInsert
     const missingRequiredColumnNames = requiredColumnNames.filter((colName) => !rowFields.includes(colName))
     if (missingRequiredColumnNames.length > 0) {
-      throw new Error('missing required column names: ' + missingRequiredColumnNames)
+      throw new Error('missing required columns: ' + missingRequiredColumnNames)
     }
     const expectedColumnNames = table.columnNamesForInsert
     const unexpectedColumnNames = rowFields.filter((colName) => !expectedColumnNames.includes(colName))
     if (unexpectedColumnNames.length > 0) {
-      throw new Error('unexpected column names: ' + unexpectedColumnNames)
+      throw new Error('unexpected columns: ' + unexpectedColumnNames)
     }
     return true
   }

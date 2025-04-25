@@ -32,7 +32,12 @@ import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 // ==== DDL
 
 // schema
-export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
+export {
+  createSchema,
+  dropSchema,
+  dropDataTablesAndViews,
+  dropOlapDataTablesAndViews,
+} from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
