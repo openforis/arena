@@ -29,8 +29,9 @@ export const selectSchemaExists = async (surveyId, client = db) => {
 const dropDataTablesAndViewsWithPrefixes = async ({ surveyId, prefixes }, client = db) => {
   const schema = Schemata.getSchemaSurveyRdb(surveyId)
   const items = await DbUtils.selectTablesAndViewsStartingWithPrefixes({ schema, prefixes }, client)
-  for await (const { table_name: name, table_type: type } of items) {
-    await client.query(`DROP ${type === 'BASE TABLE' ? 'TABLE' : 'VIEW'} IF EXISTS ${schema}.${name} CASCADE`)
+  for await (const { table_name: name, table_type: tableType } of items) {
+    const type = tableType === 'BASE TABLE' ? 'TABLE' : 'VIEW'
+    await client.query(`DROP ${type} IF EXISTS ${schema}.${name} CASCADE`)
   }
 }
 
