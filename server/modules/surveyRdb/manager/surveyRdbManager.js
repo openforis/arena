@@ -35,6 +35,7 @@ import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 export {
   createSchema,
   dropSchema,
+  selectOlapDataTablesExists,
   dropDataTablesAndViews,
   dropOlapDataTablesAndViews,
 } from '../repository/schemaRdbRepository'

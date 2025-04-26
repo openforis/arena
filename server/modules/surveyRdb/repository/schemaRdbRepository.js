@@ -2,6 +2,7 @@ import { Schemata } from '@common/model/db'
 import TableOlapData from '@common/model/db/tables/olapData/table'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 const dataTablePrefix = 'data_'
 const nodeViewPrefix = '_node_'
@@ -27,16 +28,19 @@ export const selectSchemaExists = async (surveyId, client = db) => {
 
 const dropDataTablesAndViewsWithPrefixes = async ({ surveyId, prefixes }, client = db) => {
   const schema = Schemata.getSchemaSurveyRdb(surveyId)
-  const items = await client.query(
-    `SELECT table_name, table_type
-    FROM information_schema.tables
-    WHERE table_schema = $1 
-      AND (${prefixes.map((prefix) => `table_name LIKE '${prefix}%'`).join(' OR ')})`,
-    [schema]
-  )
+  const items = await DbUtils.selectTablesAndViewsStartingWithPrefixes({ schema, prefixes }, client)
   for await (const { table_name: name, table_type: type } of items) {
     await client.query(`DROP ${type === 'BASE TABLE' ? 'TABLE' : 'VIEW'} IF EXISTS ${schema}.${name} CASCADE`)
   }
+}
+
+export const selectOlapDataTablesExists = async (surveyId, client = db) => {
+  const schema = Schemata.getSchemaSurveyRdb(surveyId)
+  const items = await DbUtils.selectTablesAndViewsStartingWithPrefixes(
+    { schema, prefixes: [olapDataTablePrefix] },
+    client
+  )
+  return items.length > 0
 }
 
 export const dropDataTablesAndViews = async (surveyId, client = db) =>

@@ -40,6 +40,15 @@ export const fetchQueryAsStream = async ({ query, processor, client = db, transf
   return stream({ queryStream, client, transformer, processor })
 }
 
+export const selectTablesAndViewsStartingWithPrefixes = async ({ schema, prefixes }, client = db) =>
+  client.query(
+    `SELECT table_name, table_type
+    FROM information_schema.tables
+    WHERE table_schema = $1 
+      AND (${prefixes.map((prefix) => `table_name LIKE '${prefix}%'`).join(' OR ')})`,
+    [schema]
+  )
+
 export const selectDate = (field, fieldAlias = null) =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS ${fieldAlias || field}`
 

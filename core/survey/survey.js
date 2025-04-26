@@ -177,6 +177,7 @@ export const {
   getNodeDefAreaBasedEstimate,
   getAreaBasedEstimatedOfNodeDef,
   getNodeDefMaxDecimalDigits,
+  getOlapDataTableEntityDefs,
 } = SurveyNodeDefs
 
 // Hierarchy
