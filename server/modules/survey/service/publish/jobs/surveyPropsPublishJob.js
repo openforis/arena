@@ -9,11 +9,12 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 
-const findDeletedLanguages = async ({ surveyId, surveyPublishedPrevious }, t) => {
+const findDeletedLanguages = async ({ surveyId }, t) => {
   const surveyNext = await SurveyManager.fetchSurveyById({ surveyId, draft: true, validate: false }, t)
   const surveyInfoNext = Survey.getSurveyInfo(surveyNext)
   if (Survey.isPublished(surveyInfoNext)) {
-    const publishedSurveyInfo = Survey.getSurveyInfo(surveyPublishedPrevious)
+    const publishedSurvey = await SurveyManager.fetchSurveyById({ surveyId, draft: false, validate: false }, t)
+    const publishedSurveyInfo = Survey.getSurveyInfo(publishedSurvey)
     return R.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfoNext))
   }
   return []
@@ -25,15 +26,11 @@ export default class SurveyPropsPublishJob extends Job {
   }
 
   async execute() {
-    const { context, surveyId, tx } = this
-
-    const { surveyPublishedPrevious } = context
+    const { surveyId, tx } = this
 
     this.total = 6
 
-    // fetch survey and node defs as it is before publishing changes and set it in context to use it in other jobs
-
-    const langsDeleted = await findDeletedLanguages({ surveyId, surveyPublishedPrevious }, tx)
+    const langsDeleted = await findDeletedLanguages({ surveyId }, tx)
     this.incrementProcessedItems()
 
     await NodeDefManager.permanentlyDeleteNodeDefs(surveyId, tx)
