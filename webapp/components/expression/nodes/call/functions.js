@@ -74,7 +74,7 @@ export const functions = {
   },
   [functionNames.userIsRecordOwner]: {
     label: 'userIsRecordOwner()',
-    component: functionNames.userIsRecordOwner,
+    callee: functionNames.userIsRecordOwner,
   },
   [functionNames.userName]: {
     label: 'userName()',
