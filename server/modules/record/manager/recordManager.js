@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
@@ -11,6 +12,7 @@ import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import * as User from '@core/user/user'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { db } from '@server/db/db'
@@ -20,6 +22,7 @@ import * as SurveyRepository from '@server/modules/survey/repository/surveyRepos
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
+import * as UserManager from '@server/modules/user/manager/userManager'
 import * as RecordRepository from '../repository/recordRepository'
 import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
@@ -160,6 +163,15 @@ export {
   updateRecordMergedInto,
 } from '../repository/recordRepository'
 
+const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
+  const owner = await UserManager.fetchUserByUuid(ownerUuid, client)
+  record[Record.keys.ownerName] = User.getName(owner)
+  record[Record.keys.ownerEmail] = User.getEmail(owner)
+  const surveyUuid = Record.getSurveyUuid(record)
+  const ownerAuthGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(owner)
+  record[Record.keys.ownerRole] = AuthGroup.getName(ownerAuthGroup)
+}
+
 export const fetchRecordAndNodesByUuid = async (
   { surveyId, recordUuid, draft = false, fetchForUpdate = true, includeRefData = true },
   client = db
@@ -167,6 +179,10 @@ export const fetchRecordAndNodesByUuid = async (
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
   if (!record) return null
 
+  const ownerUuid = Record.getOwnerUuid(record)
+  if (ownerUuid) {
+    await _fetchAndSetRecordOwner({ ownerUuid, record }, client)
+  }
   const nodes = await NodeRepository.fetchNodesByRecordUuid(
     { surveyId, recordUuid, includeRefData: fetchForUpdate || includeRefData, draft },
     client
