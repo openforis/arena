@@ -33,10 +33,13 @@ const tableColumns = [
 const dateColumns = ['date_created', 'date_modified']
 const tableName = 'record'
 
-const recordSelectFields = [
-  ...tableColumns.filter((col) => !dateColumns.includes(col)),
-  ...dateColumns.map((dateCol) => DbUtils.selectDate(dateCol)),
-].join(', ')
+const getRecordSelectFieldsArray = (tableAlias = null) => [
+  ...tableColumns.filter((col) => !dateColumns.includes(col)).map((col) => (tableAlias ? `${tableAlias}.${col}` : col)),
+  ...dateColumns.map((dateCol) => DbUtils.selectDate(tableAlias ? `${tableAlias}.${dateCol}` : dateCol, dateCol)),
+]
+const recordSelectFieldsArray = getRecordSelectFieldsArray()
+const recordSelectFields = recordSelectFieldsArray.join(', ')
+const recordSelectFieldsWithTableAlias = getRecordSelectFieldsArray('r').join(', ')
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -295,8 +298,13 @@ export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) => {
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   client.oneOrNone(
     `SELECT 
-     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
-     FROM ${getSchemaSurvey(surveyId)}.record WHERE uuid = $1`,
+      ${recordSelectFieldsWithTableAlias}, 
+      (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2),
+      u.name AS owner_name,
+      u.email AS owner_email
+     FROM ${getSchemaSurvey(surveyId)}.record r
+      LEFT JOIN "user" u ON u.uuid = r.owner_uuid
+     WHERE r.uuid = $1`,
     [recordUuid, surveyId],
     dbTransformCallback(surveyId)
   )

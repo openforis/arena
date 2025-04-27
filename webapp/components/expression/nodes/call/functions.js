@@ -56,9 +56,25 @@ export const functions = {
     label: 'taxonProp(...)',
     component: CallTaxonPropEditor,
   },
+  [functionNames.recordOwnerEmail]: {
+    label: 'recordOwnerEmail()',
+    callee: functionNames.recordOwnerEmail,
+  },
+  [functionNames.recordOwnerName]: {
+    label: 'recordOwnerName()',
+    callee: functionNames.recordOwnerName,
+  },
+  [functionNames.recordOwnerRole]: {
+    label: 'recordOwnerRole()',
+    callee: functionNames.recordOwnerRole,
+  },
   [functionNames.userEmail]: {
     label: 'userEmail()',
     callee: functionNames.userEmail,
+  },
+  [functionNames.userIsRecordOwner]: {
+    label: 'userIsRecordOwner()',
+    component: functionNames.userIsRecordOwner,
   },
   [functionNames.userName]: {
     label: 'userName()',
