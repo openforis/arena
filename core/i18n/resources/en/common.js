@@ -1287,6 +1287,10 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      recordDateCreated:
+        'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
+      recordDateLastModified:
+        'Returns the last modified date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
       recordOwnerEmail: 'Returns the email of the user owning the record',
       recordOwnerName: 'Returns the name of the user owning the record',
       recordOwnerRole: 'Returns the role (in the current survey) of the user owning the record',

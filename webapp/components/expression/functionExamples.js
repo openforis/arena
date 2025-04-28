@@ -23,6 +23,8 @@ const functionExamples = {
     [functionNames.now]: 'now()',
     [functionNames.parent]: `parent(this), parent($context), parent(node_name)`,
     [functionNames.pow]: 'pow(2,3) = 2³ = 8',
+    [functionNames.recordDateCreated]: 'recordDateCreated()',
+    [functionNames.recordDateLastModified]: 'recordDateLastModified()',
     [functionNames.recordOwnerEmail]: 'recordOwnerEmail()',
     [functionNames.recordOwnerName]: 'recordOwnerName()',
     [functionNames.recordOwnerRole]: 'recordOwnerRole()',

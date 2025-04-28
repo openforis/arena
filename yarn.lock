@@ -2799,7 +2799,7 @@
     fastq "^1.6.0"
 
 "@openforis/arena-core@../arena-core":
-  version "1.0.15"
+  version "1.0.16"
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
     bignumber.js "^9.1.2"
@@ -2812,10 +2812,10 @@
     proj4 "^2.15.0"
     uuid "^11.0.3"
 
-"@openforis/arena-core@^1.0.15":
-  version "1.0.15"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.15/a7019863271f69aa34b69463ec448794d84a633a#a7019863271f69aa34b69463ec448794d84a633a"
-  integrity sha512-xtnUs8aaZcsAVzLAvikwU/dxlbRJSiZ/KutJhXjXGEmpb1VVHRkV4mASdZF+1TTesRYUc7lb0A+k7mhIX2+rYQ==
+"@openforis/arena-core@^1.0.16":
+  version "1.0.16"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.16/6d398674e05d801791fdf1a8733238afaed1f5bc#6d398674e05d801791fdf1a8733238afaed1f5bc"
+  integrity sha512-RawJ+kHVhi3IsxFTKYm99Wu5to+7wzd+r88BAulBYN/mb6CBtu5IzC9jjPqt9d3Q9DH/qKMjFQ59blrASR1y0w==
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
     bignumber.js "^9.1.2"

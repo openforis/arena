@@ -45,7 +45,6 @@ export const functions = {
     component: CallIncludesEditor,
   },
   [functionNames.now]: {
-    label: 'now()',
     callee: functionNames.now,
   },
   [functionNames.categoryItemProp]: {
@@ -56,36 +55,35 @@ export const functions = {
     label: 'taxonProp(...)',
     component: CallTaxonPropEditor,
   },
+  [functionNames.recordDateCreated]: {
+    callee: functionNames.recordDateCreated,
+  },
+  [functionNames.recordDateLastModified]: {
+    callee: functionNames.recordDateLastModified,
+  },
   [functionNames.recordOwnerEmail]: {
-    label: 'recordOwnerEmail()',
     callee: functionNames.recordOwnerEmail,
   },
   [functionNames.recordOwnerName]: {
-    label: 'recordOwnerName()',
     callee: functionNames.recordOwnerName,
   },
   [functionNames.recordOwnerRole]: {
-    label: 'recordOwnerRole()',
     callee: functionNames.recordOwnerRole,
   },
   [functionNames.userEmail]: {
-    label: 'userEmail()',
     callee: functionNames.userEmail,
   },
   [functionNames.userIsRecordOwner]: {
-    label: 'userIsRecordOwner()',
     callee: functionNames.userIsRecordOwner,
   },
   [functionNames.userName]: {
-    label: 'userName()',
     callee: functionNames.userName,
   },
   [functionNames.userProp]: {
-    label: 'userProp()',
+    label: 'userProp(...)',
     component: CallUserPropEditor,
   },
   [functionNames.uuid]: {
-    label: 'uuid()',
     callee: functionNames.uuid,
   },
   ...complexFunctions,
