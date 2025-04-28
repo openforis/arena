@@ -1287,6 +1287,10 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      recordDateCreated:
+        'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
+      recordDateLastModified:
+        'Returns the last modified date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
       rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       userEmail: 'Returns the email of the logged in user',

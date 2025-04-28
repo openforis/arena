@@ -2798,6 +2798,20 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@openforis/arena-core@../arena-core":
+  version "1.0.16"
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.4"
+    bignumber.js "^9.1.2"
+    jsep "^1.4.0"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    moment "^2.30.1"
+    proj4 "^2.15.0"
+    uuid "^11.0.3"
+
 "@openforis/arena-core@^1.0.16":
   version "1.0.16"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.16/6d398674e05d801791fdf1a8733238afaed1f5bc#6d398674e05d801791fdf1a8733238afaed1f5bc"
