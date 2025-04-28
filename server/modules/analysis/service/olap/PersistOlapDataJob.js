@@ -22,8 +22,8 @@ export default class PersistOlapDataJob extends Job {
     super(PersistOlapDataJob.type, params)
 
     this.survey = null
+    this.chain = null
     this.fileZip = null
-    this.olapDataRowsBatchPersister = null
   }
 
   async onStart() {
@@ -67,9 +67,8 @@ export default class PersistOlapDataJob extends Job {
     const { cycle } = context
     const entityDefName = FileNames.getName(StringUtils.removePrefix(zipEntryNamePrefix)(zipEntryName))
     const entityDef = Survey.getNodeDefByName(entityDefName)(survey)
-    const baseUnitDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
-    await SurveyRdbManager.clearOlapData({ survey, cycle, entityDef, baseUnitDef }, tx)
+    await SurveyRdbManager.clearOlapData({ survey, cycle, chain, entityDef }, tx)
 
     const olapDataRowsBatchPersister = new BatchPersister(
       async (values) => SurveyRdbManager.insertOlapData({ survey, cycle, chain, entityDef, values }, this.tx),
