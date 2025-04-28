@@ -2812,22 +2812,6 @@
     proj4 "^2.15.0"
     uuid "^11.0.3"
 
-"@openforis/arena-core@^1.0.16":
-  version "1.0.16"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.16/6d398674e05d801791fdf1a8733238afaed1f5bc#6d398674e05d801791fdf1a8733238afaed1f5bc"
-  integrity sha512-RawJ+kHVhi3IsxFTKYm99Wu5to+7wzd+r88BAulBYN/mb6CBtu5IzC9jjPqt9d3Q9DH/qKMjFQ59blrASR1y0w==
-  dependencies:
-    "@jsep-plugin/regex" "^1.0.4"
-    bignumber.js "^9.1.2"
-    jsep "^1.4.0"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    moment "^2.30.1"
-    proj4 "^2.15.0"
-    uuid "^11.0.3"
-
 "@openforis/arena-core@^1.0.8":
   version "1.0.10"
   resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.10/4bb87ca2611be7db54f54626426516c3967e6f40#4bb87ca2611be7db54f54626426516c3967e6f40"
