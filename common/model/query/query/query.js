@@ -47,6 +47,7 @@ const isMode = (mode) => (query) => getMode(query) === mode
 export const isModeAggregate = isMode(modes.aggregate)
 export const isModeRaw = isMode(modes.raw)
 export const isModeRawEdit = isMode(modes.rawEdit)
+export const isModeOlap = isMode(modes.olap)
 
 // utils
 export const hasSelection = (query) =>

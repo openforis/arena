@@ -39,6 +39,7 @@ const NodeDefsSelectorAggregate = (props) => {
     measures,
     nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
     nodeDefUuidEntity = null,
+    olap = false,
     onChangeEntity,
     onChangeMeasures,
     onChangeDimensions,
@@ -96,7 +97,10 @@ const NodeDefsSelectorAggregate = (props) => {
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
               filterFunction={(nodeDef) =>
-                NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
+                NodeDef.isKey(nodeDef) ||
+                NodeDef.isCode(nodeDef) ||
+                NodeDef.isTaxon(nodeDef) ||
+                (olap && NodeDef.isBoolean(nodeDef))
               }
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
@@ -111,7 +115,7 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
-              filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
+              filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef) && (!olap || NodeDef.isAnalysis(nodeDef))}
               includeEntityFrequencySelector
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
@@ -152,6 +156,7 @@ NodeDefsSelectorAggregate.propTypes = {
   measures: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidEntity: PropTypes.string,
+  olap: PropTypes.bool,
   onChangeEntity: PropTypes.func.isRequired,
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
