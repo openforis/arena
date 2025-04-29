@@ -80,6 +80,10 @@ export default class TableOlapData extends TableSurveyRdb {
     return NodeDef.getName(this._baseUnitDef) + '_uuid'
   }
 
+  get expFactorColumnName() {
+    return baseColumnSet.expFactor
+  }
+
   get columnNamesAndTypes() {
     return [
       // base columns

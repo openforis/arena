@@ -116,7 +116,7 @@ const NodeDefsSelectorAggregate = (props) => {
             <AttributesSelector
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
               filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef) && (!olap || NodeDef.isAnalysis(nodeDef))}
-              includeEntityFrequencySelector
+              includeEntityFrequencySelector={!olap}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={measuresNodeDefUuids}

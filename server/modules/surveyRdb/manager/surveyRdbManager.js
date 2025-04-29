@@ -54,6 +54,7 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
 
 export { createOlapDataTable, insertOlapData, clearOlapData } from '../repository/olapDataTable'
+export { createOlapAreaView } from '../repository/olapAreaView'
 
 // ==== DML
 

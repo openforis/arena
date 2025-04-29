@@ -307,7 +307,13 @@ export const getMeta = R.propOr({}, keys.meta)
 export const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // Utils
-export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true) => {
+const getLabelSuffix = (nodeDef) => {
+  if (isVirtual(nodeDef)) return ' (V)'
+  if (isAnalysis(nodeDef) && isAttribute(nodeDef)) return ' (C)'
+  return ''
+}
+
+export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultToName = true, includeSuffix = true) => {
   let firstPart = ''
   const name = getName(nodeDef)
 
@@ -328,12 +334,10 @@ export const getLabel = (nodeDef, lang, type = NodeDefLabelTypes.label, defaultT
   if (StringUtils.isBlank(firstPart) && defaultToName) {
     firstPart = name
   }
-
-  const suffix = isVirtual(nodeDef) ? ' (V)' : isAnalysis(nodeDef) && isAttribute(nodeDef) ? ' (C)' : ''
-
-  return firstPart + suffix
+  return firstPart + (includeSuffix ? getLabelSuffix(nodeDef) : '')
 }
-export const getLabelWithType = ({ nodeDef, lang, type }) => getLabel(nodeDef, lang, type)
+export const getLabelWithType = ({ nodeDef, lang, type, includeSuffix }) =>
+  getLabel(nodeDef, lang, type, true, includeSuffix)
 
 export const getDescription = (lang) => (nodeDef) => R.propOr('', lang, getDescriptions(nodeDef))
 
