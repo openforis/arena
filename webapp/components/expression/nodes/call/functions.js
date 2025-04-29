@@ -55,6 +55,9 @@ export const functions = {
     label: 'taxonProp(...)',
     component: CallTaxonPropEditor,
   },
+  [functionNames.recordCycle]: {
+    callee: functionNames.recordCycle,
+  },
   [functionNames.recordDateCreated]: {
     callee: functionNames.recordDateCreated,
   },

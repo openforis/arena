@@ -1287,6 +1287,7 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      recordCycle: 'Returns the cycle of the current record',
       recordDateCreated:
         'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
       recordDateLastModified:

@@ -18,6 +18,7 @@ export const functionNames = {
   now: 'now',
   parent: 'parent',
   pow: 'pow',
+  recordCycle: 'recordCycle',
   recordDateCreated: 'recordDateCreated',
   recordDateLastModified: 'recordDateLastModified',
   recordOwnerEmail: 'recordOwnerEmail',
