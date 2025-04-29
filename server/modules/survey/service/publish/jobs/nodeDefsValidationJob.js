@@ -32,6 +32,13 @@ export default class NodeDefsValidationJob extends Job {
   async execute() {
     const { errors, surveyId, tx } = this
 
+    // fetch survey (published) as it is before starting publishing
+    const surveyPublishedPrevious = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, advanced: true, includeAnalysis: true },
+      tx
+    )
+    this.setContext({ surveyPublishedPrevious })
+
     await NodeDefManager.deleteOrphaneNodeDefs(surveyId, tx)
 
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)

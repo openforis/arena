@@ -80,6 +80,8 @@ const sortByProps = (props) => (array) =>
     return 0
   })
 
+const sortById = sortByProps(['id'])
+
 const toArray = (value) => {
   if (Objects.isNil(value)) return value
   return Array.isArray(value) ? value : [value]
@@ -96,5 +98,6 @@ export const ArrayUtils = {
   first,
   last,
   sortByProps,
+  sortById,
   toArray,
 }

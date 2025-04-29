@@ -2,10 +2,11 @@ import * as R from 'ramda'
 
 import { Objects, Surveys, TraverseMethod } from '@openforis/arena-core'
 
+import { ArrayUtils } from '@core/arrayUtils'
+import * as ObjectUtils from '@core/objectUtils'
+import * as PromiseUtils from '@core/promiseUtils'
 import Queue from '@core/queue'
 
-import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '../../promiseUtils'
 import * as NodeDef from '../nodeDef'
 import * as NodeDefLayout from '../nodeDefLayout'
 import * as NodeDefValidations from '../nodeDefValidations'
@@ -433,6 +434,12 @@ export const getNodeDefDescendantsAndSelf =
     })(survey)
     return descendants
   }
+
+// OLAP
+const multipleEntityFilterFunction = (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)
+
+export const getOlapDataTableEntityDefs = (survey) =>
+  ArrayUtils.sortById(findDescendants({ filterFn: multipleEntityFilterFunction })(survey))
 
 // ====== NODE DEFS CODE UTILS
 export const getNodeDefParentCode = (nodeDef) => getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))

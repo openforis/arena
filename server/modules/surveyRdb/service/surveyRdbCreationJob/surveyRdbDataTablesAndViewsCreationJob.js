@@ -1,11 +1,10 @@
-import Job from '../../../../job/job'
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as PromiseUtils from '@core/promiseUtils'
 
-import * as Survey from '../../../../../core/survey/survey'
-import * as NodeDef from '../../../../../core/survey/nodeDef'
-import * as PromiseUtils from '../../../../../core/promiseUtils'
-
-import * as SurveyRdbManager from '../../manager/surveyRdbManager'
-import * as SurveyManager from '../../../survey/manager/surveyManager'
+import Job from '@server/job/job'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 export default class SurveyRdbDataTablesAndViewsCreationJob extends Job {
   constructor(params) {

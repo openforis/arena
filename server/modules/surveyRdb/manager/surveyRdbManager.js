@@ -32,7 +32,13 @@ import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
 // ==== DDL
 
 // schema
-export { createSchema, dropSchema } from '../repository/schemaRdbRepository'
+export {
+  createSchema,
+  dropSchema,
+  selectOlapDataTablesExists,
+  dropDataTablesAndViews,
+  dropOlapDataTablesAndViews,
+} from '../repository/schemaRdbRepository'
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
@@ -46,6 +52,8 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 
 // Result tables and views
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
+
+export { createOlapDataTable, insertOlapData, clearOlapData } from '../repository/olapDataTable'
 
 // ==== DML
 

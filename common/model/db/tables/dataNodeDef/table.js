@@ -9,6 +9,8 @@ import TableRecord from '../record'
 import ColumnNodeDef from './columnNodeDef'
 import { TableDataNodeDefRowUtils } from './rowUtils'
 
+const tableNamePrefix = 'data'
+
 const columnSet = {
   id: Table.columnSetCommon.id,
   dateCreated: Table.columnSetCommon.dateCreated,
@@ -52,7 +54,7 @@ const rootDefColumnNamesAndTypes = [
  */
 export default class TableDataNodeDef extends TableSurveyRdb {
   constructor(survey, nodeDef) {
-    super(Survey.getId(survey), `data_${NodeDef.getName(nodeDef)}`, columnSet)
+    super(Survey.getId(survey), `${tableNamePrefix}_${NodeDef.getName(nodeDef)}`, columnSet)
     this._survey = survey
     this._nodeDef = nodeDef
   }
