@@ -20,10 +20,11 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
-  const recordUpdated = R.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
+  let recordUpdated = R.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
 
+  recordUpdated = Record.assocDateModified(new Date())(recordUpdated)
   return {
     record: recordUpdated,
     nodes: {

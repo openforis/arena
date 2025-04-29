@@ -12,6 +12,14 @@ import { useI18n } from '@webapp/store/system'
 import { functions, getComplexFunctionNameByExpression } from './functions'
 import { CallEditorDialog } from './callEditorDialog'
 
+const extractFunctionLabel = ({ i18n, functionKey, func }) => {
+  const { callee, label, labelKey } = func
+  if (labelKey) return i18n.t(labelKey)
+  if (label) return label
+  // default function label, e.g. functionName()
+  return `${callee ?? functionKey}()`
+}
+
 const Call = (props) => {
   const { node: expressionNode, variables, onChange } = props
 
@@ -30,10 +38,10 @@ const Call = (props) => {
 
   const dropdownItems = useMemo(
     () =>
-      Object.entries(functions).map(([funcKey, func]) => ({
-        value: funcKey,
-        label: func.label ?? i18n.t(func.labelKey),
-        description: i18n.t(`nodeDefEdit.functionDescriptions.${funcKey}`),
+      Object.entries(functions).map(([functionKey, func]) => ({
+        value: functionKey,
+        label: extractFunctionLabel({ i18n, functionKey, func }),
+        description: i18n.t(`nodeDefEdit.functionDescriptions.${functionKey}`),
       })),
     [i18n]
   )
