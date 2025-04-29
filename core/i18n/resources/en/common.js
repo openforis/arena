@@ -1287,9 +1287,19 @@ $t(common.appNameFull)
       now: 'Returns the current date or time',
       parent: 'Returns the parent entity of the specified node',
       pow: 'Returns the value of a base raised to a power',
+      recordCycle: 'Returns the cycle of the current record',
+      recordDateCreated:
+        'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
+      recordDateLastModified:
+        'Returns the last modified date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
+      recordOwnerEmail: 'Returns the email of the user owning the record',
+      recordOwnerName: 'Returns the name of the user owning the record',
+      recordOwnerRole: 'Returns the role (in the current survey) of the user owning the record',
       rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       userEmail: 'Returns the email of the logged in user',
+      userIsRecordOwner:
+        'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
       userName: 'Returns the name of the logged in user',
       userProp: 'Returns the value of the specified $t(extraProp.label) of the logged in user',
       uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',

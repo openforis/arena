@@ -18,6 +18,7 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSchemaSurvey } from '@common/model/db/schemata'
 import { ColumnNodeDef } from '@common/model/db'
 
+const tableName = 'record'
 const tableColumns = [
   Record.keys.uuid,
   Record.keys.step,
@@ -31,12 +32,12 @@ const tableColumns = [
   'merged_into_record_uuid',
 ]
 const dateColumns = ['date_created', 'date_modified']
-const tableName = 'record'
 
-const recordSelectFields = [
+const recordSelectFieldsArray = [
   ...tableColumns.filter((col) => !dateColumns.includes(col)),
   ...dateColumns.map((dateCol) => DbUtils.selectDate(dateCol)),
-].join(', ')
+]
+const recordSelectFields = recordSelectFieldsArray.join(', ')
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -295,8 +296,10 @@ export const fetchRecordCountsByStep = async (surveyId, cycle, client = db) => {
 export const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   client.oneOrNone(
     `SELECT 
-     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
-     FROM ${getSchemaSurvey(surveyId)}.record WHERE uuid = $1`,
+      ${recordSelectFields}, 
+      (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
     [recordUuid, surveyId],
     dbTransformCallback(surveyId)
   )

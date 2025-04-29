@@ -17,15 +17,21 @@ export { keys, infoKeys } from './_record/recordKeys'
 
 // ====== CREATE
 
-export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => ({
-  [keys.uuid]: uuidv4(),
-  [keys.ownerUuid]: User.getUuid(user),
-  [keys.step]: step || RecordStep.getDefaultStep(),
-  [keys.cycle]: cycle,
-  [keys.preview]: preview,
-  [keys.dateCreated]: dateCreated,
-  [keys.info]: { [infoKeys.createdWith]: AppInfo.newAppInfo() },
-})
+export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => {
+  const role = null
+  return {
+    [keys.uuid]: uuidv4(),
+    [keys.ownerEmail]: User.getEmail(user),
+    [keys.ownerName]: User.getName(user),
+    [keys.ownerRole]: role,
+    [keys.ownerUuid]: User.getUuid(user),
+    [keys.step]: step || RecordStep.getDefaultStep(),
+    [keys.cycle]: cycle,
+    [keys.preview]: preview,
+    [keys.dateCreated]: dateCreated,
+    [keys.info]: { [infoKeys.createdWith]: AppInfo.newAppInfo() },
+  }
+}
 
 // ====== READ
 export const getSurveyUuid = R.prop(keys.surveyUuid)
