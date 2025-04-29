@@ -25,7 +25,7 @@ export default class Table {
    *
    * @param {!string} schema - The schema.
    * @param {!string} name - The table name.
-   * @param {object.<string, string>} [columnSet={}] -  - The table column set.
+   * @param {{[key: string]: string}} [columnSet={}] - The table column set.
    */
   constructor(schema, name, columnSet = {}) {
     if (new.target === Table) {
