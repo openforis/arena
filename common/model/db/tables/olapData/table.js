@@ -29,6 +29,10 @@ export default class TableOlapData extends TableSurveyRdb {
     this._baseUnitDef = baseUnitDef
   }
 
+  getColumnNameByAttributeDef = (attributeDef) => {
+    return NodeDef.getName(attributeDef)
+  }
+
   get attributeDefsForColumns() {
     const attributeDefs = []
     Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
@@ -57,7 +61,7 @@ export default class TableOlapData extends TableSurveyRdb {
       // base unit UUID
       this.baseUnitUuidColumnName,
       // attribute columns
-      ...this.attributeDefsForColumns.map(NodeDef.getName),
+      ...this.attributeDefsForColumns.map((attributeDef) => this.getColumnNameByAttributeDef(attributeDef)),
     ]
   }
 
