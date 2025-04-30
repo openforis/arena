@@ -4,6 +4,8 @@ import TableOlapData from '@common/model/db/tables/olapData/table'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { db } from '@server/db/db'
+
 export const selectAreaFromOlapDataTable = async (
   { survey, cycle, baseUnitDef, entityDef, dimensionsDefs, measuresDefs },
   client = db
