@@ -17,14 +17,20 @@ export const selectAreaFromOlapDataTable = async (
   const measuresSelector = measuresColumnNames.map(
     (measureColumnName) => `SUM(${measureColumnName}) AS ${measureColumnName}`
   )
+  const measuresSelectorJoint = measuresSelector.join(', ')
   const measuresSelectorHa = measuresColumnNames.map(
     (measureColumnName) => `SUM(${measureColumnName})/area AS ${measureColumnName}_ha`
   )
+  const measuresSelectorHaJoint = measuresSelectorHa.join(', ')
 
-  client.query(`WITH area_table AS (
-    SELECT ${dimensionColumnNamesJoint}, SUM(${table.expFactorColumnName}) AS area FROM (
+  const areaTableSelect = `SELECT ${dimensionColumnNamesJoint}, SUM(${table.expFactorColumnName}) AS area FROM (
       SELECT DISTINCT(${table.baseUnitUuidColumnName}), ${table.expFactorColumnName}, ${dimensionColumnNamesJoint}
         FROM ${table.nameQualified}
-      ) GROUP BY ${dimensionColumnNamesJoint}
-  )`)
+      ) GROUP BY ${dimensionColumnNamesJoint}`
+
+  client.query(`WITH area_table AS (${areaTableSelect})
+      
+   SELECT ${table.baseUnitUuidColumnName}, ${dimensionColumnNamesJoint}, ${measuresSelectorJoint}, ${measuresSelectorHaJoint}
+   FROM ${table.nameQualified}
+   GROUP BY ${dimensionColumnNamesJoint}, ${measuresSelectorJoint}`)
 }
