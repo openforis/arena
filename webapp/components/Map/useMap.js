@@ -21,6 +21,9 @@ const calculateActualCenterPoint = ({ centerPoint, geoJson, markerPoint, srsInde
   return PointFactory.createInstance({ x: 0, y: 0 })
 }
 
+const pointToString = (point) =>
+  point && Number.isFinite(point.x) && Number.isFinite(point.y) ? `${point.y.toFixed(5)}, ${point.x.toFixed(5)}` : ''
+
 export const useMap = (props) => {
   const { centerPoint, geoJson, markerPoint, onMarkerPointChange } = props
 
@@ -63,9 +66,7 @@ export const useMap = (props) => {
     onMarkerPointChange(markerPointUpdated)
   }, [markerPointUpdated, onMarkerPointChange])
 
-  const markerPointUpdatedToString = markerPointUpdated
-    ? `${markerPointUpdated.y.toFixed(5)}, ${markerPointUpdated.x.toFixed(5)}`
-    : ''
+  const markerPointUpdatedToString = pointToString(markerPointUpdated)
 
   return {
     centerPositionLatLon,
