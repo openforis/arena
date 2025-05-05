@@ -134,18 +134,34 @@ export const useExpressionEditorPopupState = (props) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
 
-  const variables = ExpressionVariables.getVariables({
-    survey,
+  const [variables, setVariables] = useState([])
+  useEffect(() => {
+    setVariables(
+      ExpressionVariables.getVariables({
+        survey,
+        cycle,
+        nodeDefContext,
+        nodeDefCurrent,
+        mode,
+        lang,
+        groupByParent,
+        editorType,
+        excludeCurrentNodeDef,
+        includeAnalysis,
+      })
+    )
+  }, [
     cycle,
-    nodeDefContext,
-    nodeDefCurrent,
-    mode,
-    lang,
-    groupByParent,
     editorType,
     excludeCurrentNodeDef,
+    groupByParent,
     includeAnalysis,
-  })
+    lang,
+    mode,
+    nodeDefContext,
+    nodeDefCurrent,
+    survey,
+  ])
 
   return {
     ...state,
