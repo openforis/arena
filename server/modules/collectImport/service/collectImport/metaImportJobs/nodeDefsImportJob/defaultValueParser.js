@@ -7,15 +7,19 @@ import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import * as CollectSurvey from '../../model/collectSurvey'
 import { CollectExpressionConverter } from './collectExpressionConverter'
 
-const parseConstantValue = ({ survey, nodeDef, value }) => {
+const parseConstantValue = async ({ survey, nodeDef, value }) => {
   if (NodeDef.isBoolean(nodeDef)) {
-    const valueConverted = CollectExpressionConverter.convert({ survey, nodeDefCurrent: nodeDef, expression: value })
+    const valueConverted = await CollectExpressionConverter.convert({
+      survey,
+      nodeDefCurrent: nodeDef,
+      expression: value,
+    })
     return valueConverted ? JSON.stringify(valueConverted.trim()) : null
   }
   return JSON.stringify(value)
 }
 
-const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
+const parseDefaultValue = async ({ survey, collectDefaultValue, nodeDef, defaultLanguage }) => {
   const { value, expr: collectExpr, if: collectApplyIf } = CollectSurvey.getAttributes(collectDefaultValue)
 
   if (StringUtils.isBlank(value) && StringUtils.isBlank(collectExpr)) {
@@ -25,15 +29,15 @@ const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLangua
   }
 
   const exprConverted = StringUtils.isNotBlank(value)
-    ? parseConstantValue({ survey, nodeDef, value })
-    : CollectExpressionConverter.convert({
+    ? await parseConstantValue({ survey, nodeDef, value })
+    : await CollectExpressionConverter.convert({
         survey,
         nodeDefCurrent: nodeDef,
         expression: collectExpr,
       })
 
   const applyIfConverted = StringUtils.isNotBlank(collectApplyIf)
-    ? CollectExpressionConverter.convert({
+    ? await CollectExpressionConverter.convert({
         survey,
         nodeDefCurrent: nodeDef,
         expression: collectApplyIf,
@@ -63,11 +67,11 @@ const parseDefaultValue = ({ survey, collectDefaultValue, nodeDef, defaultLangua
   }
 }
 
-export const parseDefaultValues = ({ survey, nodeDef, collectDefaultValues, defaultLanguage }) => {
+export const parseDefaultValues = async ({ survey, nodeDef, collectDefaultValues, defaultLanguage }) => {
   const defaultValues = []
   const importIssues = []
 
-  collectDefaultValues.forEach((collectDefaultValue) => {
+  for await (const collectDefaultValue of collectDefaultValues) {
     const parseResult = parseDefaultValue({ survey, collectDefaultValue, nodeDef, defaultLanguage })
     if (parseResult) {
       const { defaultValue, importIssue } = parseResult
@@ -76,7 +80,7 @@ export const parseDefaultValues = ({ survey, nodeDef, collectDefaultValues, defa
       }
       importIssues.push(importIssue)
     }
-  })
+  }
 
   return { defaultValues, importIssues }
 }

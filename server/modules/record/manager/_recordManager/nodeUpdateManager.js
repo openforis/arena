@@ -176,7 +176,7 @@ export const updateNodesDependents = async (
   { user, survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
   tx
 ) => {
-  const { record: recordUpdatedDependents, nodes: allNodesUpdated } = Record.updateNodesDependents({
+  const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
     user,
     survey,
     record,

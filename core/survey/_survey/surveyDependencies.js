@@ -76,12 +76,12 @@ export const addNodeDefsDependencies = (nodeDefsIndexedByUuid) => (survey) =>
     survey
   )
 
-export const buildGraph = (survey) => {
-  const surveyUpdated = Surveys.buildAndAssocDependencyGraph(survey)
+export const buildGraph = async (survey) => {
+  const surveyUpdated = await Surveys.buildAndAssocDependencyGraph(survey)
   return getDependencyGraph(surveyUpdated)
 }
 
-export const buildAndAssocDependencyGraph = (survey) => Surveys.buildAndAssocDependencyGraph({ ...survey })
+export const buildAndAssocDependencyGraph = async (survey) => Surveys.buildAndAssocDependencyGraph({ ...survey })
 
 // DELETE
 export const removeNodeDefDependencies =

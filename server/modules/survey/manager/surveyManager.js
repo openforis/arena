@@ -245,13 +245,13 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   ])
 
   let survey = R.pipe(
-    Survey.assocNodeDefs({ nodeDefs }),
+    Survey.assocNodeDefsSimple({ nodeDefs }),
     Survey.assocCategories(categories),
     Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
   )(surveyDb)
 
   if (Objects.isEmpty(dependencies)) {
-    survey = Survey.buildAndAssocDependencyGraph(survey)
+    survey = await Survey.buildAndAssocDependencyGraph(survey)
   } else {
     survey = Survey.assocDependencyGraph(dependencies)(survey)
   }

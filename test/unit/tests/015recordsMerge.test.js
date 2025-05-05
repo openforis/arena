@@ -22,7 +22,7 @@ describe('Records merge Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
 
-    survey = DataTest.createTestSurvey({ user })
+    survey = await DataTest.createTestSurvey({ user })
 
     record1 = RB.record(
       user,

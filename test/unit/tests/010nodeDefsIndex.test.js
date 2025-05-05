@@ -11,7 +11,7 @@ describe('NodeDefsIndex Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
 
-    survey = DataTest.createTestSurvey({ user })
+    survey = await DataTest.createTestSurvey({ user })
   }, 10000)
 
   it('Index initialized', () => {
