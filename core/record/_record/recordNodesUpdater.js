@@ -177,7 +177,16 @@ const _getOrCreateEntityByKeys =
   }
 
 const getOrCreateEntityByKeys =
-  ({ user, survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entityDefUuid,
+    valuesByDefUuid,
+    categoryItemProvider,
+    timezoneOffset,
+    insertMissingNodes = false,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -198,6 +207,7 @@ const getOrCreateEntityByKeys =
         survey,
         record: updateResultEntity.record,
         nodes: updateResultEntity.nodes,
+        categoryItemProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -214,7 +224,7 @@ const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
   (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
 
 const updateAttributesInEntityWithValues =
-  ({ user, survey, entity, valuesByDefUuid, timezoneOffset, sideEffect = false }) =>
+  ({ user, survey, entity, valuesByDefUuid, categoryItemProvider, timezoneOffset, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -228,6 +238,7 @@ const updateAttributesInEntityWithValues =
         survey,
         record: nodeUpdateResult.record,
         nodes: nodeUpdateResult.nodes,
+        categoryItemProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -262,7 +273,16 @@ const updateAttributesInEntityWithValues =
   }
 
 const updateAttributesWithValues =
-  ({ user, survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entityDefUuid,
+    valuesByDefUuid,
+    categoryItemProvider,
+    timezoneOffset,
+    insertMissingNodes = false,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -272,6 +292,7 @@ const updateAttributesWithValues =
       survey,
       entityDefUuid,
       valuesByDefUuid,
+      categoryItemProvider,
       timezoneOffset,
       insertMissingNodes,
       sideEffect,
@@ -284,6 +305,7 @@ const updateAttributesWithValues =
       survey,
       entity,
       valuesByDefUuid,
+      categoryItemProvider,
       timezoneOffset,
       sideEffect,
     })(updateResult.record)
@@ -294,7 +316,7 @@ const updateAttributesWithValues =
   }
 
 const deleteNodesInEntityByNodeDefUuid =
-  ({ user, survey, entity, nodeDefUuids, sideEffect = false }) =>
+  ({ user, survey, entity, nodeDefUuids, categoryItemProvider, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -309,6 +331,7 @@ const deleteNodesInEntityByNodeDefUuid =
       survey,
       record,
       nodeUuids: nodeUuidsToDelete,
+      categoryItemProvider,
       sideEffect,
     })
     return updateResult.merge(nodesDeleteUpdateResult)

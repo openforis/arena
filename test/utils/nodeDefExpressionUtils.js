@@ -35,7 +35,7 @@ const _testExpressions = ({ queries, expressionEvaluator }) =>
 export const testRecordExpressions = ({ surveyFn, recordFn, queries }) =>
   _testExpressions({
     queries,
-    expressionEvaluator: ({ nodePath, query }) => {
+    expressionEvaluator: async ({ nodePath, query }) => {
       const survey = surveyFn()
       const record = recordFn()
       const node = RecordUtils.findNodeByPath(nodePath || 'cluster/cluster_id')(survey, record)

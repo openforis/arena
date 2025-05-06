@@ -11,10 +11,13 @@ import * as ObjectUtils from '@core/objectUtils'
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
 
 const logger = Log.getLogger('NodeUpdateManager')
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
@@ -181,6 +184,7 @@ export const updateNodesDependents = async (
     survey,
     record,
     nodes,
+    categoryItemProvider,
     timezoneOffset,
     logger,
     sideEffect,

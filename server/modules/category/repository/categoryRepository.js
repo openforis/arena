@@ -529,6 +529,37 @@ export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories
 
 export const { codeJointField, cumulativeAreaField, generateCategoryExportStream } = CategoryExportRepository
 
+export const fetchCategoryItemByCode = async (
+  { surveyId, categoryUuid, parentItemUuid, code, draft = false },
+  client = db
+) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
+  return client.map(
+    `SELECT i.* 
+     FROM ${getSurveyDBSchema(surveyId)}.category_item i
+       JOIN ${schema}.category_level l 
+         ON l.uuid = i.level_uuid
+         AND l.category_uuid = $1
+
+         AND parent_uuid ${parentItemUuid ? '= $/parentItemUuid/' : ' IS NULL'}
+         AND ${codeCol} = $/code/`,
+    { categoryUuid, parentItemUuid, code }
+  )
+}
+
+export const fetchCategoryItemByCodePaths = async ({ surveyId, categoryUuid, codePaths }, client = db) => {
+  let currentItem = null
+  for await (const code of codePaths) {
+    const parentItemUuid = currentItem ? CategoryItem.getUuid(currentItem) : null
+    currentItem = await fetchCategoryItemByCode({ surveyId, categoryUuid, parentItemUuid, code }, client)
+    if (!currentItem) {
+      return null
+    }
+  }
+  return currentItem
+}
+
 // ============== UPDATE
 
 export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
