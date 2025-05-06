@@ -31,7 +31,7 @@ export const GeoPolygonInfo = (props) => {
     [areaInUnit]
   )
 
-  const perimeterInMeters = useMemo(() => GeoJsonUtils.perimeter(geoJson), [geoJson])
+  const perimeterInMeters = useMemo(() => GeoJsonUtils.perimeterInKm(geoJson) * 1000, [geoJson])
 
   const perimeterInUnit = useCallback(
     (unit) => `${formatNumber(metersToUnit(unit)(perimeterInMeters))} ${abbreviationByUnit[unit]}`,
