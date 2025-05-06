@@ -14,7 +14,7 @@ import * as RecordReader from './recordReader'
 import { NodeValueFormatter } from '../nodeValueFormatter'
 import { updateAttributeValue } from './recordNodeValueUpdater'
 
-const { createNodeAndDescendants, createRootEntity, deleteNodes } = CoreRecordUpdater
+const { createRootEntity, deleteNodes } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
@@ -339,7 +339,6 @@ const deleteNodesInEntityByNodeDefUuid =
 
 export const RecordNodesUpdater = {
   afterNodesUpdate,
-  createNodeAndDescendants,
   createRootEntity,
   getOrCreateEntityByKeys,
   updateNodesDependents,
