@@ -63,7 +63,7 @@ export const GeoJsonUtils = {
   countVertices,
   createPointFeature,
   parse,
-  perimeter: length,
+  perimeterInKm: length,
   pointFeatureToPoint,
   validateFeature,
 }
