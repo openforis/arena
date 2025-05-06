@@ -68,7 +68,7 @@ const afterNodeDefUpdate = async (
   const nodeDefDependents = Survey.getNodeDefsByUuids(nodeDefsDependentsUuids)(surveyUpdated)
   const nodeDefsDependentByUuid = ObjectUtils.toUuidIndexedObj(nodeDefDependents)
 
-  surveyUpdated = Survey.addNodeDefsDependencies({
+  surveyUpdated = await Survey.addNodeDefsDependencies({
     ...updatedNodeDefsNotDeleted,
     ...nodeDefsDependentByUuid,
   })(surveyUpdated)

@@ -68,13 +68,15 @@ export const isNodeDefDependentOn = (nodeDefUuid, nodeDefSourceUuid) => (survey)
 export const assocDependencyGraph = (dependencyGraph) => R.assoc(keys.dependencyGraph, dependencyGraph)
 
 // ====== CREATE
-export const addNodeDefDependencies = (nodeDef) => (survey) => Surveys.addNodeDefDependencies({ nodeDef, survey })
+export const addNodeDefDependencies = (nodeDef) => async (survey) => Surveys.addNodeDefDependencies({ nodeDef, survey })
 
-export const addNodeDefsDependencies = (nodeDefsIndexedByUuid) => (survey) =>
-  Object.values(nodeDefsIndexedByUuid).reduce(
-    (surveyUpdated, nodeDef) => addNodeDefDependencies(nodeDef)(surveyUpdated),
-    survey
-  )
+export const addNodeDefsDependencies = (nodeDefsIndexedByUuid) => async (survey) => {
+  let surveyUpdated = survey
+  for await (const nodeDef of Object.values(nodeDefsIndexedByUuid)) {
+    surveyUpdated = await addNodeDefDependencies(nodeDef)(surveyUpdated)
+  }
+  return surveyUpdated
+}
 
 export const buildGraph = async (survey) => {
   const surveyUpdated = await Surveys.buildAndAssocDependencyGraph(survey)
