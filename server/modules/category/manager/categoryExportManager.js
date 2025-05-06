@@ -72,7 +72,7 @@ const getCategoryExportHeaders = ({
   if (includeUuid) {
     headers.push('uuid')
   }
-  if (includeSingleCode) {
+  if (includeSingleCode && !flat) {
     headers.push('code')
   }
   if (includeCodeJoint) {
