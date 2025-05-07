@@ -21,6 +21,11 @@ import * as CategoryLevel from '../../../../core/survey/categoryLevel'
 import * as CategoryItem from '../../../../core/survey/categoryItem'
 import * as CategoryExportRepository from './categoryExportRepository'
 
+const itemDBTransformCallback =
+  ({ draft = true } = {}) =>
+  (def) =>
+    DB.transformCallback(def, draft, true)
+
 // ============== CREATE
 
 export const insertCategory = async ({ surveyId, category, backup = false, client = db }) => {
@@ -54,7 +59,7 @@ export const insertItem = async (surveyId, item, client = db) =>
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
-    (def) => dbTransformCallback(def, true, true)
+    itemDBTransformCallback()
   )
 
 export const insertItems = async ({ surveyId, items, backup = false }, client = db) => {
@@ -285,7 +290,7 @@ export const fetchItemsByLevelParentAndCode = async (
      ORDER BY i.id
     `,
     { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) },
-    (def) => DB.transformCallback(def, draft, true)
+    itemDBTransformCallback({ draft })
   )
 
   return draft ? items : R.filter((item) => item.published)(items)
@@ -378,9 +383,7 @@ export const fetchItemsByParentUuid = async (
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
-  const items = await client.map(select, { categoryUuid, search, limit }, (def) =>
-    dbTransformCallback(def, draft, true)
-  )
+  const items = await client.map(select, { categoryUuid, search, limit }, itemDBTransformCallback({ draft }))
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
@@ -433,7 +436,7 @@ export const fetchItemsByLevelIndex = async (
     ${limit ? `LIMIT $/limit/` : ''}
     ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     { categoryUuid, levelIndex, limit, offset },
-    (item) => dbTransformCallback(item, draft, true)
+    itemDBTransformCallback({ draft })
   )
 }
 
@@ -529,30 +532,27 @@ export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories
 
 export const { codeJointField, cumulativeAreaField, generateCategoryExportStream } = CategoryExportRepository
 
-export const fetchCategoryItemByCode = async (
-  { surveyId, categoryUuid, parentItemUuid, code, draft = false },
-  client = db
-) => {
+export const fetchItemByCode = async ({ surveyId, categoryUuid, parentItemUuid, code, draft = false }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
-  return client.map(
+  return client.oneOrNone(
     `SELECT i.* 
-     FROM ${getSurveyDBSchema(surveyId)}.category_item i
+     FROM ${schema}.category_item i
        JOIN ${schema}.category_level l 
          ON l.uuid = i.level_uuid
-         AND l.category_uuid = $1
-
-         AND parent_uuid ${parentItemUuid ? '= $/parentItemUuid/' : ' IS NULL'}
-         AND ${codeCol} = $/code/`,
-    { categoryUuid, parentItemUuid, code }
+     WHERE l.category_uuid = $/categoryUuid/
+       AND parent_uuid ${parentItemUuid ? '= $/parentItemUuid/' : ' IS NULL'}
+       AND ${codeCol} = $/code/`,
+    { categoryUuid, parentItemUuid, code },
+    itemDBTransformCallback({ draft })
   )
 }
 
-export const fetchCategoryItemByCodePaths = async ({ surveyId, categoryUuid, codePaths }, client = db) => {
+export const fetchItemByCodePaths = async ({ surveyId, categoryUuid, codePaths }, client = db) => {
   let currentItem = null
   for await (const code of codePaths) {
     const parentItemUuid = currentItem ? CategoryItem.getUuid(currentItem) : null
-    currentItem = await fetchCategoryItemByCode({ surveyId, categoryUuid, parentItemUuid, code }, client)
+    currentItem = await fetchItemByCode({ surveyId, categoryUuid, parentItemUuid, code }, client)
     if (!currentItem) {
       return null
     }

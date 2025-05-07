@@ -39,6 +39,7 @@ export const afterNodesUpdate = async ({
     survey,
     record: updateResult.record,
     nodes: updateResult.nodes,
+    categoryItemProvider,
   })
   const recordValidationUpdated = A.pipe(
     Validation.getValidation,
