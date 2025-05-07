@@ -112,12 +112,17 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
   }
 
   async execute() {
-    const { survey, surveyId, baseUnitDef, tx } = this
+    const { survey, surveyId, chain, baseUnitDef, tx } = this
 
     const cycles = Survey.getCycleKeys(survey)
 
     // drop existing tables
     await SurveyRdbManager.dropOlapDataTablesAndViews(surveyId, tx)
+
+    if (!chain || !baseUnitDef) {
+      // do not create tables
+      return
+    }
 
     // Get multiple entity definitions
     const entityDefs = Survey.getOlapDataTableEntityDefs(survey)
