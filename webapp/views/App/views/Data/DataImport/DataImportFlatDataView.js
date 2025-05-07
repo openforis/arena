@@ -98,8 +98,8 @@ export const DataImportFlatDataView = () => {
       if (selectedNodeDef && !NodeDef.isRoot(selectedNodeDef)) {
         _options.push('deleteExistingEntities')
       }
-      return _options
     }
+    return _options
   }, [isSystemAdmin, selectedNodeDef])
 
   const fileAccept = useMemo(

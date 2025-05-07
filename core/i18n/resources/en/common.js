@@ -867,6 +867,7 @@ Merge cannot be performed.`,
     elevation: 'Elevation (m)',
     location: 'Location',
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
+    locationNotValidOrOutOfRange: 'Location not valid or out of UTM zone range',
     locationUpdated: 'Location updated',
     options: {
       showLocationMarkers: 'Show location markers',

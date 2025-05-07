@@ -22,12 +22,11 @@ export const useMapMarker = (props) => {
 
   const fromPointToLatLon = useCallback(
     (point) => {
-      if (Points.isValid(point, srsIndex)) {
-        const pointLatLong = Points.toLatLong(point, srsIndex)
-        const { x, y } = pointLatLong
-        return [y, x]
-      }
-      return null
+      if (!Points.isValid(point, srsIndex)) return null
+
+      const pointLatLong = Points.toLatLong(point, srsIndex)
+      const { x, y } = pointLatLong
+      return [y, x]
     },
     [srsIndex]
   )
@@ -55,7 +54,6 @@ export const useMapMarker = (props) => {
         pointLatLon: [lat, lng],
         pointUpdated,
       }))
-
       onPointUpdatedProp(pointUpdated)
     },
     [onPointUpdatedProp, pointSrs, srsIndex]

@@ -40,6 +40,13 @@ export const Map = (props) => {
     return null
   }
 
+  const markerPointUpdatedValid =
+    markerPointUpdated && Number.isFinite(markerPointUpdated.x) && Number.isFinite(markerPointUpdated.y)
+
+  const markerUpdatedText = markerPointUpdatedValid
+    ? markerPointUpdatedToString
+    : i18n.t('mapView.locationNotValidOrOutOfRange')
+
   return (
     <div className={`map-wrapper${editable ? ' editable' : ''}`}>
       {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
@@ -72,11 +79,11 @@ export const Map = (props) => {
           {markerPointUpdated && (
             <div className="location-updated-label">
               <label>
-                {i18n.t('mapView.locationUpdated')}:<span> {markerPointUpdatedToString}</span>
+                {i18n.t('mapView.locationUpdated')}:<span>{markerUpdatedText}</span>
               </label>
             </div>
           )}
-          <ButtonSave disabled={!markerPointUpdated} onClick={onSaveClick} />
+          <ButtonSave disabled={!markerPointUpdated || !markerPointUpdatedValid} onClick={onSaveClick} />
         </div>
       )}
     </div>
