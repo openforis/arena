@@ -15,6 +15,8 @@ import Loader from './Loader'
 import DialogConfirm from './DialogConfirm'
 import Notification from './Notification'
 
+const FallbackComponent = () => <>...</>
+
 const Routes = () => {
   const user = useUser()
   useOpenWebSocket()
@@ -25,7 +27,7 @@ const Routes = () => {
         <Route
           path={`/${guest}/*`}
           element={
-            <Suspense fallback={<>...</>}>
+            <Suspense fallback={<FallbackComponent />}>
               <Guest />
             </Suspense>
           }
@@ -33,7 +35,7 @@ const Routes = () => {
         <Route
           path={`/${noHeader}/*`}
           element={
-            <Suspense fallback={<>...</>}>
+            <Suspense fallback={<FallbackComponent />}>
               <NoHeaderView />
             </Suspense>
           }
@@ -42,7 +44,7 @@ const Routes = () => {
           <Route
             path={`/${app}/*`}
             element={
-              <Suspense fallback={<>...</>}>
+              <Suspense fallback={<FallbackComponent />}>
                 <AppView />
               </Suspense>
             }
@@ -51,8 +53,8 @@ const Routes = () => {
           <Route
             path="*"
             element={
-              <Suspense fallback={<>...</>}>
-                <Guest />{' '}
+              <Suspense fallback={<FallbackComponent />}>
+                <Guest />
               </Suspense>
             }
           />

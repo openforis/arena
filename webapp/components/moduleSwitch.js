@@ -14,7 +14,7 @@ const NotFoundPage = () => {
   return <div className="page-not-found-message">{i18n.t('error.pageNotFound')}</div>
 }
 
-const FallbackComponent = <>...</>
+const FallbackComponent = () => <>...</>
 
 const ModuleSwitch = (props) => {
   const { modules = [], moduleRoot = null, moduleDefault = null } = props
@@ -41,7 +41,7 @@ const ModuleSwitch = (props) => {
           key={i}
           path={module.path}
           element={
-            <React.Suspense fallback={FallbackComponent}>
+            <React.Suspense fallback={<FallbackComponent />}>
               {React.createElement(module.component, module.props)}
             </React.Suspense>
           }
