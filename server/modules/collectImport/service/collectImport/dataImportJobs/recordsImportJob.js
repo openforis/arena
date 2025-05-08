@@ -22,6 +22,17 @@ import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
 import * as CollectAttributeValueExtractor from './collectAttributeValueExtractor'
 
+const evaluateApplicability = async ({ survey, childDef, record, node }) => {
+  let applicable = true
+  const expressionsApplicable = NodeDef.getApplicable(childDef)
+
+  if (!R.isEmpty(expressionsApplicable)) {
+    const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, node, expressionsApplicable)
+    applicable = R.propOr(false, 'value', exprEval)
+  }
+  return applicable
+}
+
 export default class RecordsImportJob extends Job {
   constructor(params) {
     super(RecordsImportJob.type, params)
@@ -324,21 +335,9 @@ export default class RecordsImportJob extends Job {
       if (NodeDef.isEntity(nodeDef)) {
         const childrenApplicability = {}
         const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
-        for await (const childDef of nodeDefChildren) {
-          let applicable = true
-          const expressionsApplicable = NodeDef.getApplicable(childDef)
-
-          if (!R.isEmpty(expressionsApplicable)) {
-            const exprEval = await RecordExpressionParser.evalApplicableExpression(
-              survey,
-              recordUpdated,
-              node,
-              expressionsApplicable
-            )
-            applicable = R.propOr(false, 'value', exprEval)
-          }
+        for (const childDef of nodeDefChildren) {
+          const applicable = await evaluateApplicability({ survey, childDef, record: recordUpdated, node })
           const childDefUuid = NodeDef.getUuid(childDef)
-
           if (applicable) {
             const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)
             stack.push(...nodeChildren)
