@@ -112,6 +112,7 @@ describe('RecordExpressionParser Test', () => {
     {
       q: `categoryItemProp('hierarchical_category', 'prop9', '1')`,
       r: null,
+      e: new SystemError('expression.invalidCategoryExtraProp'),
     },
     {
       q: `categoryItemProp('hierarchical_category', 'prop1', '999')`,
@@ -148,7 +149,11 @@ describe('RecordExpressionParser Test', () => {
     { q: `taxonProp('trees', 'max_height', 'AFZ/QUA')`, r: 200 },
     { q: `taxonProp('trees', 'max_dbh', 'OLE/CAP')`, r: 40 },
     // taxonProp: unexisting prop or code
-    { q: `taxonProp('trees', 'unexisting_prop', 'AFZ/QUA')`, r: null },
+    {
+      q: `taxonProp('trees', 'unexisting_prop', 'AFZ/QUA')`,
+      r: null,
+      e: new SystemError('expression.invalidTaxonomyExtraProp'),
+    },
     { q: `taxonProp('trees', 'max_dbh', 'AFZ/QUA/OTHER')`, r: null },
     // global objects (Array)
     { q: 'Array.of(plot[0].plot_id, plot[1].plot_id, plot[2].plot_id)', r: [1, 2, 3] },
