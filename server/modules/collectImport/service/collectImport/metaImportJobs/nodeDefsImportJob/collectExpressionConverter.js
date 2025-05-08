@@ -80,6 +80,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
     { pattern: 'idm:not-blank', replace: '!isEmpty' },
     { pattern: 'idm:currentDate', replace: 'now' },
     { pattern: 'idm:currentTime', replace: 'now' },
+    { pattern: 'util:uuid()', replace: 'uuid' },
     {
       pattern: /idm:index\(\)/,
       replace: `index(${NodeDef.getName(Survey.getNodeDefParent(nodeDefCurrent)(survey))})`,
