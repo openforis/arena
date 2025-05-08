@@ -71,8 +71,8 @@ export const parseDefaultValues = async ({ survey, nodeDef, collectDefaultValues
   const defaultValues = []
   const importIssues = []
 
-  for await (const collectDefaultValue of collectDefaultValues) {
-    const parseResult = parseDefaultValue({ survey, collectDefaultValue, nodeDef, defaultLanguage })
+  for (const collectDefaultValue of collectDefaultValues) {
+    const parseResult = await parseDefaultValue({ survey, collectDefaultValue, nodeDef, defaultLanguage })
     if (parseResult) {
       const { defaultValue, importIssue } = parseResult
       if (defaultValue) {
