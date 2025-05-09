@@ -488,7 +488,7 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   if (nodesArray.length === 0) return
 
-  for await (const node of nodesArray) {
+  for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
       await nodesDeleteBatchPersister.addItem(node)
     } else if (Node.isCreated(node)) {

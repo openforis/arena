@@ -247,7 +247,7 @@ const updateAttributesInEntityWithValues =
 
     const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
 
-    for await (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
+    for (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
       if (_canAttributeBeUpdated({ entityDef, attributeDef })) {
         const { record: currentRecord } = updateResult

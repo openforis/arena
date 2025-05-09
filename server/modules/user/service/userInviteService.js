@@ -201,7 +201,7 @@ export const inviteUsers = async (
 
   const invitedUsers = []
   const skippedEmails = []
-  for await (const email of emails) {
+  for (const email of emails) {
     try {
       const invitedUser = await _inviteUser(
         {

@@ -394,7 +394,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
     const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-    for await (const [key, value] of Object.entries(props)) {
+    for (const [key, value] of Object.entries(props)) {
       const valuePrev = propsPrev[key]
 
       if (!R.equals(value, valuePrev)) {
@@ -478,7 +478,7 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
 export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
-    for await (const surveyId of surveyIds) {
+    for (const surveyId of surveyIds) {
       await deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
     }
     return surveyIds.length

@@ -120,7 +120,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
     },
     t
   )
-  for await (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
+  for (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
     const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
     await mergeAndPersistValidation({ survey, record, nodesValidation }, t)
   }
