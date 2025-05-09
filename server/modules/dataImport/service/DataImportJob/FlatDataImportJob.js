@@ -10,6 +10,7 @@ import * as Validation from '@core/validation/validation'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
@@ -17,6 +18,8 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 export default class FlatDataImportJob extends DataImportBaseJob {
   constructor(params, type = FlatDataImportJob.type) {
@@ -199,6 +202,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         survey,
         entityDefUuid,
         valuesByDefUuid,
+        categoryItemProvider,
         insertMissingNodes,
         sideEffect,
       })(this.currentRecord)
@@ -221,6 +225,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         entity,
         valuesByDefUuid,
         sideEffect,
+        categoryItemProvider,
       })(this.currentRecord)
 
       updateResult.merge(updateResultUpdateAttributes)

@@ -253,7 +253,7 @@ export const compressFormItems = (nodeDef) => async (dispatch, getState) => {
 
 // ==== DELETE
 
-const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
+const _checkCanRemoveNodeDef = (nodeDef) => async (dispatch, getState) => {
   const state = getState()
   const survey = SurveyState.getSurvey(state)
   const lang = SurveyState.getSurveyPreferredLang(state)
@@ -262,7 +262,7 @@ const _checkCanRemoveNodeDef = (nodeDef) => (dispatch, getState) => {
 
   // Check if nodeDef is referenced by other node definitions
   // dependency graph is not associated to the survey in UI, it's built every time it's needed
-  const surveyWithDependencies = Survey.buildAndAssocDependencyGraph(survey)
+  const surveyWithDependencies = await Survey.buildAndAssocDependencyGraph(survey)
   const nodeDefDependents = Survey.getNodeDefDependencies(nodeDefUuid)(surveyWithDependencies)
 
   const nodeDefDependentsNotDescendants = nodeDefDependents.filter(

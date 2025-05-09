@@ -58,7 +58,7 @@ class SurveyBuilder {
     return this
   }
 
-  build() {
+  async build() {
     let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
       name: this.name,
@@ -103,7 +103,7 @@ class SurveyBuilder {
    * @returns {Promise<Survey>} - The newly created survey object.
    */
   async buildAndStore(publish = true, client = db) {
-    const surveyParam = this.build()
+    const surveyParam = await this.build()
 
     return client.tx(async (t) => {
       const surveyCreationParams = {

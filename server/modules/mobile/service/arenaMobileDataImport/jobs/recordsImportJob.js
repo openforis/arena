@@ -13,12 +13,15 @@ import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
 }
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   if (!nodeDef) {
@@ -229,17 +232,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
       { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
       tx
     )
+    const recordUpdateParams = { survey, categoryItemProvider, recordSource: record, sideEffect: true }
     const { record: recordTargetUpdated, nodes: nodesUpdated } = merge
-      ? await Record.mergeRecords({
-          survey,
-          recordSource: record,
-          sideEffect: true,
-        })(recordTarget)
-      : await Record.replaceUpdatedNodes({
-          survey,
-          recordSource: record,
-          sideEffect: true,
-        })(recordTarget)
+      ? await Record.mergeRecords(recordUpdateParams)(recordTarget)
+      : await Record.replaceUpdatedNodes(recordUpdateParams)(recordTarget)
     this.currentRecord = recordTargetUpdated
 
     this.trackFileUuids({ nodes: nodesUpdated })

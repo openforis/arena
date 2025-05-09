@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -10,8 +10,8 @@ import * as ExpressionVariables from '@webapp/components/expression/expressionVa
 import { useLang } from '@webapp/store/system'
 import { useNodeDefByUuid, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-const getVariables = ({ survey, cycle, entityDef, attributeDefUuids, lang }) => {
-  const variables = ExpressionVariables.getVariables({
+const getVariables = async ({ survey, cycle, entityDef, attributeDefUuids, lang }) => {
+  const variables = await ExpressionVariables.getVariables({
     survey,
     cycle,
     nodeDefContext: entityDef,
@@ -46,8 +46,17 @@ export const useSortEditor = ({ query }) => {
 
   const [draft, setDraft] = useState(false)
   const [sortDraft, setSortDraft] = useState(sort)
-  const [variables] = useState(getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }))
-  const variablesAvailable = variables.filter(({ value }) => !Sort.containsVariable(value)(sortDraft))
+  const [variables, setVariables] = useState([])
+  useEffect(() => {
+    if (survey && entityDef && attributeDefUuids && lang) {
+      setVariables(getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }))
+    }
+  }, [survey, cycle, entityDef, attributeDefUuids, lang])
+
+  const variablesAvailable = useMemo(
+    () => variables.filter(({ value }) => !Sort.containsVariable(value)(sortDraft)),
+    [sortDraft, variables]
+  )
 
   return {
     draft,

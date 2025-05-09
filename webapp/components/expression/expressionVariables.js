@@ -189,7 +189,7 @@ const _sortVariables = ({ nodeDefCurrent, variables }) => {
   })
 }
 
-export const getVariables = ({
+export const getVariables = async ({
   survey: surveyParam,
   cycle,
   nodeDefContext,
@@ -201,7 +201,7 @@ export const getVariables = ({
   excludeCurrentNodeDef = false,
   includeAnalysis = false,
 }) => {
-  const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
+  const survey = await Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
   const variables = getVariablesFromAncestors({

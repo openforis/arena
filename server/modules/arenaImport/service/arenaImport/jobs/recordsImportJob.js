@@ -36,7 +36,7 @@ export default class RecordsImportJob extends Job {
     )
 
     // import records sequentially
-    for await (const recordSummary of recordSummaries) {
+    for (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
 
       // insert activity log
@@ -82,7 +82,7 @@ export default class RecordsImportJob extends Job {
 
     // insert nodes (add them to batch persister)
     const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
-    for await (const node of nodes) {
+    for (const node of nodes) {
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         await nodesBatchPersister.addItem(node)

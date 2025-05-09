@@ -36,7 +36,7 @@ export default class CategoriesExportJob extends Job {
       const totalPages = Math.ceil(itemsCount / itemsBatchSize)
       const pageIndexes = ArrayUtils.fromNumberOfElements(totalPages)
 
-      for await (const pageIndex of pageIndexes) {
+      for (const pageIndex of pageIndexes) {
         const offset = pageIndex * itemsBatchSize
         const itemsData = await CategoryService.fetchItemsByCategoryUuid(
           { surveyId, categoryUuid, backup, draft, offset, limit: itemsBatchSize },

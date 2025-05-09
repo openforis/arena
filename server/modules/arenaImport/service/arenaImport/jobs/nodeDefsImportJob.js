@@ -24,7 +24,7 @@ export default class NodeDefsImportJob extends Job {
       this.tx
     )
 
-    const surveyUpdated = Survey.assocNodeDefs({ nodeDefs: Survey.getNodeDefs(arenaSurvey) })(survey)
+    const surveyUpdated = Survey.assocNodeDefsSimple({ nodeDefs: Survey.getNodeDefs(arenaSurvey) })(survey)
     this.setContext({ survey: surveyUpdated })
   }
 }

@@ -206,7 +206,7 @@ export const fetchEntitiesDataSummaryToFlatData = async ({ exportUuid, survey, c
   const { fileFormat = FileFormats.xlsx } = options
   const items = []
   const entityDefs = SurveyRdbManager.getEntityDefsToExport({ survey, cycle, options })
-  for await (const entityDef of entityDefs) {
+  for (const entityDef of entityDefs) {
     const entityDefUuid = NodeDef.getUuid(entityDef)
     const query = Query.create({ entityDefUuid })
     const count = await SurveyRdbManager.countTable({ survey, cycle, query })

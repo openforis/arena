@@ -5,14 +5,14 @@ import {
   NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
 } from '@openforis/arena-core'
 
-export const findReferencedNodeDefs = ({
+export const findReferencedNodeDefs = async ({
   survey,
   nodeDef,
   exprString,
   isContextParent = true,
   selfReferenceAllowed = true,
 }) => {
-  const referencedNodeDefUuids = new CoreNodeDefExpressionValidator().findReferencedNodeDefUuids({
+  const referencedNodeDefUuids = await new CoreNodeDefExpressionValidator().findReferencedNodeDefUuids({
     expression: exprString,
     survey,
     nodeDef,
@@ -22,7 +22,7 @@ export const findReferencedNodeDefs = ({
   return Survey.getNodeDefsByUuids(referencedNodeDefUuids)(survey)
 }
 
-export const findReferencedNodeDefLast = ({
+export const findReferencedNodeDefLast = async ({
   survey,
   nodeDef,
   exprString,
@@ -38,7 +38,7 @@ export const findReferencedNodeDefLast = ({
   })
 }
 
-export const validate = ({
+export const validate = async ({
   survey,
   nodeDefCurrent,
   exprString,
@@ -46,7 +46,7 @@ export const validate = ({
   selfReferenceAllowed = false,
   includeAnalysis = false,
 }) => {
-  const { validationResult } = new CoreNodeDefExpressionValidator().validate({
+  const { validationResult } = await new CoreNodeDefExpressionValidator().validate({
     expression: exprString,
     survey,
     nodeDefCurrent,

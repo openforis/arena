@@ -132,7 +132,7 @@ const _afterItemUpdate = async ({ surveyId, categoryUuid, itemUuid, prevItem }, 
     }
   }
   const itemsToValidate = []
-  for await (const code of codes) {
+  for (const code of codes) {
     const items = await CategoryRepository.fetchItemsByLevelParentAndCode(
       { surveyId, levelUuid, parentUuid, code, draft },
       client

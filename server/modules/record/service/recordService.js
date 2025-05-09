@@ -26,6 +26,7 @@ import { ValidationUtils } from '@core/validation/validationUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import * as JobManager from '@server/job/jobManager'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
@@ -47,6 +48,8 @@ import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
 
 const Logger = Log.getLogger('RecordService')
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 // RECORD
 export const createRecord = async ({ user, surveyId, recordToCreate }) => {
@@ -485,7 +488,7 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   if (nodesArray.length === 0) return
 
-  for await (const node of nodesArray) {
+  for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
       await nodesDeleteBatchPersister.addItem(node)
     } else if (Node.isCreated(node)) {
@@ -522,6 +525,7 @@ export const mergeRecords = async (
     const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
       survey,
       recordSource,
+      categoryItemProvider,
       sideEffect: true,
     })(recordTarget)
 

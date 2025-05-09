@@ -89,7 +89,6 @@ export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = Reco
 // ====== UPDATE
 export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
 export const {
-  createNodeAndDescendants,
   createRootEntity,
   getOrCreateEntityByKeys,
   updateNodesDependents,

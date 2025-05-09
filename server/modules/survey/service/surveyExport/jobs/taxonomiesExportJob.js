@@ -36,7 +36,7 @@ export default class TaxonomiesExportJob extends Job {
     const totalPages = Math.ceil(taxaCount / taxaBatchSize)
     const pageIndexes = ArrayUtils.fromNumberOfElements(totalPages)
 
-    for await (const pageIndex of pageIndexes) {
+    for (const pageIndex of pageIndexes) {
       const offset = pageIndex * taxaBatchSize
       const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(
         { surveyId, taxonomyUuid, backup, draft, offset, limit: taxaBatchSize },

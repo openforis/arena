@@ -193,7 +193,7 @@ export class JobQueue {
   }
 
   async destroy() {
-    for await (const userUuid of Object.keys(this._jobUuidByUserUuid)) {
+    for (const userUuid of Object.keys(this._jobUuidByUserUuid)) {
       await this.cancelJobByUserUuid(userUuid)
     }
   }

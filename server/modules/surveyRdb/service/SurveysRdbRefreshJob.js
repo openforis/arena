@@ -11,7 +11,7 @@ export default class SurveysRdbRefreshJob extends Job {
     const { surveyIds } = this.context
     this.total = surveyIds.length
     const surveysIdsWithErrors = []
-    for await (const surveyId of surveyIds) {
+    for (const surveyId of surveyIds) {
       if (this.isCanceled()) {
         return
       }

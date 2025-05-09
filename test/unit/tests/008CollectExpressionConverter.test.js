@@ -10,7 +10,7 @@ describe('CollectExpressionConverter Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
 
-    survey = DataTest.createTestSurvey({ user })
+    survey = await DataTest.createTestSurvey({ user })
   }, 10000)
 
   // ====== value expr tests
@@ -97,9 +97,9 @@ describe('CollectExpressionConverter Test', () => {
 
   queries.forEach((query) => {
     const { q: expression, r: result, n: nodeName, e: errorExpected } = query
-    it(`${expression} => ${result}`, () => {
+    it(`${expression} => ${result}`, async () => {
       const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
-      const converted = CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
+      const converted = await CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
       if (errorExpected) {
         expect(converted).toBeNull()
       } else {

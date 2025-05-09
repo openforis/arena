@@ -248,6 +248,7 @@ const _updateNodeAndValidateRecordUniqueness = async (
     survey,
     record,
     node,
+    categoryItemProvider,
     timezoneOffset,
     nodesUpdateFn,
     nodesUpdateListener = null,
@@ -274,7 +275,10 @@ const _updateNodeAndValidateRecordUniqueness = async (
       t
     )
     recordUpdated = recordUpdated2
-    await _afterNodesUpdate({ survey, record: recordUpdated, nodes: updatedNodesAndDependents }, t)
+    await _afterNodesUpdate(
+      { survey, record: recordUpdated, nodes: updatedNodesAndDependents, categoryItemProvider },
+      t
+    )
 
     return recordUpdated
   })
