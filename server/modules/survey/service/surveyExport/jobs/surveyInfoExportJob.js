@@ -10,9 +10,12 @@ import { ExportFile } from '../exportFile'
 
 const keepOnlyOneCycle = ({ survey, cycle }) => {
   // create new cycle and set it in survey cycles
-  survey[Survey.infoKeys.props][Survey.infoKeys.cycles] = {
-    [Survey.cycleOneKey]: SurveyCycle.newCycle(),
-  }
+  Object.assign(survey[Survey.infoKeys.props], {
+    [Survey.infoKeys.cycles]: {
+      [Survey.cycleOneKey]: SurveyCycle.newCycle(),
+    },
+    [Survey.infoKeys.defaultCycleKey]: Survey.cycleOneKey,
+  })
   // move layout in spefified cycle into first cycle
   Survey.getNodeDefsArray(survey).forEach((nodeDef) => {
     NodeDef.keepOnlyOneCycle({ cycleToKeep: cycle, cycleTarget: Survey.cycleOneKey })(nodeDef)
