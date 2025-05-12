@@ -28,6 +28,7 @@ import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
 import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
+import { StreamUtils } from '@server/utils/streamUtils'
 
 // ==== DDL
 
@@ -42,7 +43,7 @@ export {
 
 // Data tables and views
 export const { createDataTable } = DataTableRepository
-export const { createDataView, countViewDataAgg } = DataViewRepository
+export const { createDataView, countViewData, countViewDataAgg } = DataViewRepository
 export { deleteRowsByRecordUuid } from '../repository/dataTableDeleteRepository'
 
 // Node key views
@@ -54,6 +55,8 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
 
 export { createOlapDataTable, insertOlapData, clearOlapData } from '../repository/olapDataTable'
+
+const maxExcelCellsLimit = 1000000
 
 // ==== DML
 
@@ -234,19 +237,17 @@ export const getEntityDefsToExport = ({ survey, cycle, options }) => {
   })(survey)
 }
 
-export const fetchEntitiesDataToCsvFiles = async (
-  {
-    survey,
-    cycle,
-    search = null,
-    recordOwnerUuid = null,
-    recordUuids: recordUuidsParam = null,
-    options,
-    outputDir,
-    callback,
-  },
-  client = db
-) => {
+const createEntityFetchParams = ({
+  survey,
+  outputDir,
+  filterRecordUuids,
+  cycle,
+  recordOwnerUuid,
+  uniqueFileNamesGenerator,
+  options,
+  nodeDefContext,
+  idx,
+}) => {
   const {
     includeCategoryItemsLabels,
     expandCategoryItems,
@@ -257,27 +258,8 @@ export const fetchEntitiesDataToCsvFiles = async (
     includeFiles,
     includeInternalUuids,
     includeDateCreated,
-    recordsModifiedAfter,
     fileFormat,
   } = options
-
-  const addCycle = Survey.getCycleKeys(survey).length > 1
-
-  const nodeDefs = getEntityDefsToExport({ survey, cycle, options })
-
-  const filterRecordUuids = await _determineRecordUuidsFilter({
-    survey,
-    cycle,
-    recordsModifiedAfter,
-    recordUuids: recordUuidsParam,
-    search,
-  })
-
-  if (filterRecordUuids?.length === 0) {
-    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
-  }
-
-  callback?.({ total: nodeDefs.length })
 
   const getChildAttributes = (nodeDef) => {
     if (exportSingleEntitiesIntoSeparateFiles) {
@@ -295,70 +277,139 @@ export const fetchEntitiesDataToCsvFiles = async (
     })(survey)
   }
 
+  const addCycle = Survey.getCycleKeys(survey).length > 1
+
+  const ancestorMultipleEntity =
+    NodeDef.isRoot(nodeDefContext) || NodeDef.isMultiple(nodeDefContext)
+      ? nodeDefContext
+      : Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
+  const ancestorEntityDefUuid = NodeDef.getUuid(ancestorMultipleEntity)
+  const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
+  const extension = getExtensionByFileFormat(fileFormat)
+  const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
+  const outputFilePath = FileUtils.join(outputDir, outputFileName)
+  const outputStream = FileUtils.createWriteStream(outputFilePath)
+
+  const childDefs = NodeDef.isEntity(nodeDefContext)
+    ? getChildAttributes(nodeDefContext)
+    : // Multiple attribute
+      [nodeDefContext]
+
+  const ancestorDefs = []
+  if (includeAncestorAttributes) {
+    Survey.visitAncestors(
+      nodeDefContext,
+      (nodeDef) => {
+        ancestorDefs.unshift(...getChildAttributes(nodeDef))
+      },
+      false
+    )(survey)
+  } else {
+    const ancestorKeyDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
+    ancestorDefs.unshift(...ancestorKeyDefs)
+  }
+
+  const queryAttributeDefUuids = ancestorDefs
+    .concat(childDefs)
+    .filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
+    .map(NodeDef.getUuid)
+
+  const query = Query.create({
+    entityDefUuid: ancestorEntityDefUuid,
+    attributeDefUuids: queryAttributeDefUuids,
+    filterRecordUuids,
+  })
+
+  return {
+    survey,
+    cycle,
+    recordOwnerUuid,
+    outputStream,
+    fileFormat,
+    query,
+    addCycle,
+    includeCategoryItemsLabels,
+    expandCategoryItems,
+    uniqueFileNamesGenerator,
+    includeInternalUuids,
+    includeDateCreated,
+  }
+}
+
+const checkCanExportEntitiesData = async ({ fileFormat, nodeDefs, fetchParamsByNodeDefUuid, client }) => {
+  if (fileFormat === FileFormats.xlsx) {
+    for (const nodeDefContext of nodeDefs) {
+      const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
+      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client)
+      const estimatedCellsCount = selectFields.length * count
+      if (estimatedCellsCount > StreamUtils.defaultMaxCellsLimit) {
+        throw new SystemError(`dataExport.excelMaxCellsLimitExceeded`, {
+          limit: maxExcelCellsLimit,
+          nodeDef: NodeDef.getName(nodeDefContext),
+        })
+      }
+    }
+  }
+}
+
+export const fetchEntitiesDataToCsvFiles = async (
+  {
+    survey,
+    cycle,
+    search = null,
+    recordOwnerUuid = null,
+    recordUuids: recordUuidsParam = null,
+    options,
+    outputDir,
+    callback,
+  },
+  client = db
+) => {
+  const { recordsModifiedAfter, fileFormat } = options
+
+  const nodeDefs = getEntityDefsToExport({ survey, cycle, options })
+
+  const filterRecordUuids = await _determineRecordUuidsFilter({
+    survey,
+    cycle,
+    recordsModifiedAfter,
+    recordUuids: recordUuidsParam,
+    search,
+  })
+
+  if (filterRecordUuids?.length === 0) {
+    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
+  }
+
+  callback?.({ total: nodeDefs.length })
+
   const uniqueFileNamesGenerator = new UniqueFileNamesGenerator()
 
-  await PromiseUtils.each(nodeDefs, async (nodeDefContext, idx) => {
-    const ancestorMultipleEntity =
-      NodeDef.isRoot(nodeDefContext) || NodeDef.isMultiple(nodeDefContext)
-        ? nodeDefContext
-        : Survey.getNodeDefAncestorMultipleEntity(nodeDefContext)(survey)
-    const ancestorEntityDefUuid = NodeDef.getUuid(ancestorMultipleEntity)
-    const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
-    const extension = getExtensionByFileFormat(fileFormat)
-    const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
-    const outputFilePath = FileUtils.join(outputDir, outputFileName)
-    const outputStream = FileUtils.createWriteStream(outputFilePath)
-
-    const childDefs = NodeDef.isEntity(nodeDefContext)
-      ? getChildAttributes(nodeDefContext)
-      : // Multiple attribute
-        [nodeDefContext]
-
-    const ancestorDefs = []
-    if (includeAncestorAttributes) {
-      Survey.visitAncestors(
-        nodeDefContext,
-        (nodeDef) => {
-          ancestorDefs.unshift(...getChildAttributes(nodeDef))
-        },
-        false
-      )(survey)
-    } else {
-      const ancestorKeyDefs = Survey.getNodeDefAncestorsKeyAttributes(nodeDefContext)(survey)
-      ancestorDefs.unshift(...ancestorKeyDefs)
-    }
-
-    const queryAttributeDefUuids = ancestorDefs
-      .concat(childDefs)
-      .filter((childDef) => includeFileAttributeDefs || includeFiles || !NodeDef.isFile(childDef))
-      .map(NodeDef.getUuid)
-
-    const query = Query.create({
-      entityDefUuid: ancestorEntityDefUuid,
-      attributeDefUuids: queryAttributeDefUuids,
+  const fetchParamsByNodeDefUuid = nodeDefs.reduce((acc, nodeDefContext, idx) => {
+    const fetchViewDataParams = createEntityFetchParams({
+      survey,
+      outputDir,
       filterRecordUuids,
+      cycle,
+      recordOwnerUuid,
+      uniqueFileNamesGenerator,
+      options,
+      nodeDefContext,
+      idx,
     })
+    acc[NodeDef.getUuid(nodeDefContext)] = fetchViewDataParams
+    return acc
+  }, [])
 
+  await checkCanExportEntitiesData({ nodeDefs, fetchParamsByNodeDefUuid, fileFormat, client })
+
+  let idx = 0
+  for (const nodeDefContext of nodeDefs) {
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
-
-    await fetchViewData(
-      {
-        survey,
-        cycle,
-        recordOwnerUuid,
-        outputStream,
-        fileFormat,
-        query,
-        addCycle,
-        includeCategoryItemsLabels,
-        expandCategoryItems,
-        uniqueFileNamesGenerator,
-        includeInternalUuids,
-        includeDateCreated,
-      },
-      client
-    )
-  })
+    const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
+    await fetchViewData(fetchViewDataParams, client)
+    idx++
+  }
   return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
 }
 
@@ -427,7 +478,7 @@ export const countTable = async ({ survey, cycle, recordOwnerUuid, query }, clie
   const nodeDefTable = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
   const filter = Query.getFilter(query)
-  return DataViewRepository.runCount({ surveyId, cycle, tableName, filter, recordOwnerUuid }, client)
+  return DataViewRepository.countDataTableRows({ surveyId, cycle, tableName, filter, recordOwnerUuid }, client)
 }
 
 /**
