@@ -1,5 +1,7 @@
 import { SystemError } from '@openforis/arena-core'
 
+const defaultMaxCellsLimit = 1000000
+
 const readStreamToBuffer = async (stream) => {
   if (!stream) return null
   const chunks = []
@@ -9,7 +11,7 @@ const readStreamToBuffer = async (stream) => {
   return Buffer.concat(chunks)
 }
 
-const readStreamToItems = async (stream, maxCellsLimit = 1000000) => {
+const readStreamToItems = async (stream, maxCellsLimit = defaultMaxCellsLimit) => {
   const items = []
   let cellsCount = 0
   await new Promise((resolve, reject) => {
@@ -28,6 +30,7 @@ const readStreamToItems = async (stream, maxCellsLimit = 1000000) => {
 }
 
 export const StreamUtils = {
+  defaultMaxCellsLimit,
   readStreamToBuffer,
   readStreamToItems,
 }

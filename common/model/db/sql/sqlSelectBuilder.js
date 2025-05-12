@@ -13,6 +13,10 @@ class SqlSelectBuilder extends SqlBuilder {
     this._orderBy = []
   }
 
+  get selectFields() {
+    return this._select
+  }
+
   select(...fields) {
     this._select.push(...fields)
     return this
