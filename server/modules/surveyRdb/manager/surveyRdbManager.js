@@ -28,6 +28,7 @@ import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
 import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
+import { StreamUtils } from '@server/utils/streamUtils'
 
 // ==== DDL
 
@@ -335,6 +336,22 @@ const createEntityFetchParams = ({
   }
 }
 
+const checkCanExportEntitiesData = async ({ fileFormat, nodeDefs, fetchParamsByNodeDefUuid, client }) => {
+  if (fileFormat === FileFormats.xlsx) {
+    for (const nodeDefContext of nodeDefs) {
+      const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
+      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client)
+      const estimatedCellsCount = selectFields.length * count
+      if (estimatedCellsCount > StreamUtils.defaultMaxCellsLimit) {
+        throw new SystemError(`dataExport.excelMaxCellsLimitExceeded`, {
+          limit: maxExcelCellsLimit,
+          nodeDef: NodeDef.getName(nodeDefContext),
+        })
+      }
+    }
+  }
+}
+
 export const fetchEntitiesDataToCsvFiles = async (
   {
     survey,
@@ -384,19 +401,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     return acc
   }, [])
 
-  if (fileFormat === FileFormats.xlsx) {
-    for (const nodeDefContext of nodeDefs) {
-      const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
-      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client)
-      const estimatedCellsCount = selectFields.length * count
-      if (estimatedCellsCount > maxExcelCellsLimit) {
-        throw new SystemError(`dataExport.excelMaxCellsLimitExceeded`, {
-          limit: maxExcelCellsLimit,
-          nodeDef: NodeDef.getName(nodeDefContext),
-        })
-      }
-    }
-  }
+  await checkCanExportEntitiesData({ nodeDefs, fetchParamsByNodeDefUuid, fileFormat, client })
 
   let idx = 0
   for (const nodeDefContext of nodeDefs) {
