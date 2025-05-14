@@ -81,6 +81,7 @@ export const propKeys = {
   taxonomyUuid: 'taxonomyUuid',
   vernacularNameLabels: 'vernacularNameLabels',
   visibleFields: 'visibleFields',
+  vernacularNameSelectionKept: 'ernacularNameSelectionKept',
 
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
@@ -291,6 +292,7 @@ export const getVisibleFields = (nodeDef) => {
   const visibleFieldsDefault = visibleFieldsDefaultByType[getType(nodeDef)]
   return getProp(propKeys.visibleFields, visibleFieldsDefault)(nodeDef)
 }
+export const isVernacularNameSelectionKept = ObjectUtils.isPropTrue(propKeys.vernacularNameSelectionKept)
 // text
 export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.singleLine)
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)

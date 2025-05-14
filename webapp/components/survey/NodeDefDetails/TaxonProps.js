@@ -13,6 +13,7 @@ import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { ButtonIconEdit, ButtonManage } from '@webapp/components/buttons'
+import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import Dropdown from '@webapp/components/form/Dropdown'
 import PanelRight from '@webapp/components/PanelRight'
@@ -116,6 +117,14 @@ const TaxonProps = (props) => {
         labels={NodeDef.getVernacularNameLabels(nodeDef)}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
       />
+
+      <FormItem label="surveyForm.nodeDefTaxon.vernacularNameSelectionKept">
+        <Checkbox
+          checked={NodeDef.isVernacularNameSelectionKept(nodeDef)}
+          validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}
+          onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameSelectionKept, value })}
+        />
+      </FormItem>
 
       <div className="taxon-props__panel-right">
         {showTaxonomiesPanel && !taxonomyToEdit && (
