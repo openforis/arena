@@ -22,6 +22,17 @@ import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
 import * as CollectAttributeValueExtractor from './collectAttributeValueExtractor'
 
+const evaluateApplicability = async ({ survey, childDef, record, node }) => {
+  let applicable = true
+  const expressionsApplicable = NodeDef.getApplicable(childDef)
+
+  if (!R.isEmpty(expressionsApplicable)) {
+    const exprEval = await RecordExpressionParser.evalApplicableExpression(survey, record, node, expressionsApplicable)
+    applicable = R.propOr(false, 'value', exprEval)
+  }
+  return applicable
+}
+
 export default class RecordsImportJob extends Job {
   constructor(params) {
     super(RecordsImportJob.type, params)
@@ -224,7 +235,7 @@ export default class RecordsImportJob extends Job {
         }
       }
     }
-    recordUpdated = this._updateRelevance(survey, recordUpdated)
+    recordUpdated = await this._updateRelevance(survey, recordUpdated)
 
     await this._insertRecordNodes(recordUpdated)
   }
@@ -309,11 +320,11 @@ export default class RecordsImportJob extends Job {
   /**
    * Evaluates all record entities children applicability and stores the updated nodes.
    *
-   * @param {!Survey} survey
-   * @param {!Record} record
-   * @returns {Promise<null>} - The result promise.
+   * @param {!Survey} survey - The survey object.
+   * @param {!Record} record - The record object.
+   * @returns {Promise<null>} - The updated record (promise).
    */
-  _updateRelevance(survey, record) {
+  async _updateRelevance(survey, record) {
     const stack = []
     stack.push(Record.getRootNode(record))
     let recordUpdated = record
@@ -324,21 +335,9 @@ export default class RecordsImportJob extends Job {
       if (NodeDef.isEntity(nodeDef)) {
         const childrenApplicability = {}
         const nodeDefChildren = Survey.getNodeDefChildren(nodeDef)(survey)
-        nodeDefChildren.forEach((childDef) => {
-          let applicable = true
-          const expressionsApplicable = NodeDef.getApplicable(childDef)
-
-          if (!R.isEmpty(expressionsApplicable)) {
-            const exprEval = RecordExpressionParser.evalApplicableExpression(
-              survey,
-              recordUpdated,
-              node,
-              expressionsApplicable
-            )
-            applicable = R.propOr(false, 'value', exprEval)
-          }
+        for (const childDef of nodeDefChildren) {
+          const applicable = await evaluateApplicability({ survey, childDef, record: recordUpdated, node })
           const childDefUuid = NodeDef.getUuid(childDef)
-
           if (applicable) {
             const nodeChildren = Record.getNodeChildrenByDefUuid(node, childDefUuid)(record)
             stack.push(...nodeChildren)
@@ -346,7 +345,7 @@ export default class RecordsImportJob extends Job {
             // store children applicability only if not applicable (applicable by default)
             childrenApplicability[childDefUuid] = applicable
           }
-        })
+        }
         if (!R.isEmpty(childrenApplicability)) {
           const nodeUpdated = Node.mergeMeta({ [Node.metaKeys.childApplicability]: childrenApplicability })(node)
           recordUpdated = Record.assocNode(nodeUpdated, { sideEffect: true })(recordUpdated)

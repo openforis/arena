@@ -83,9 +83,9 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
       return true
     }
 
-    for await (const cycle of cyclesPrev) {
+    for (const cycle of cyclesPrev) {
       let entityDefIndex = 0
-      for await (const entityDefNext of entityDefsNext) {
+      for (const entityDefNext of entityDefsNext) {
         const entityDefPrev = entityDefsPrev[entityDefIndex]
         const tableNext = new TableOlapData({
           survey: surveyNext,

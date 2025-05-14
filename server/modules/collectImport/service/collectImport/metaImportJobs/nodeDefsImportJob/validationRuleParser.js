@@ -86,7 +86,7 @@ const checkExpressionParserByType = {
   },
 }
 
-const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCurrent, defaultLanguage }) => {
+const parseValidationRule = async ({ survey, collectValidationRule, nodeDef: nodeDefCurrent, defaultLanguage }) => {
   const checkType = CollectSurvey.getElementName(collectValidationRule)
   const checkExpressionParser = checkExpressionParserByType[checkType]
   if (!checkExpressionParser) {
@@ -107,7 +107,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
   let unique = false
 
   if (checkType === collectCheckType.compare) {
-    exprConverted = CollectExpressionConverter.convert({
+    exprConverted = await CollectExpressionConverter.convert({
       survey,
       nodeDefCurrent,
       expression: collectExpr,
@@ -115,7 +115,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
     })
   } else if (checkType === collectCheckType.distance) {
     const { max, to } = CollectSurvey.getAttributes(collectValidationRule)
-    const toExprConverted = CollectExpressionConverter.convert({
+    const toExprConverted = await CollectExpressionConverter.convert({
       survey,
       nodeDefCurrent,
       expression: to,
@@ -139,7 +139,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
       // do not try to convert uniqueness expression in other cases, it should be converted "manually" into a more complex expression
     }
   } else {
-    exprConverted = CollectExpressionConverter.convert({
+    exprConverted = await CollectExpressionConverter.convert({
       survey,
       nodeDefCurrent,
       expression: collectExpr,
@@ -147,7 +147,7 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
   }
 
   if (StringUtils.isNotBlank(collectApplyIf)) {
-    applyIfConverted = CollectExpressionConverter.convert({
+    applyIfConverted = await CollectExpressionConverter.convert({
       survey,
       nodeDefCurrent,
       expression: collectApplyIf,
@@ -187,13 +187,13 @@ const parseValidationRule = ({ survey, collectValidationRule, nodeDef: nodeDefCu
   }
 }
 
-export const parseValidationRules = ({ survey, nodeDef, collectValidationRules, defaultLanguage }) => {
+export const parseValidationRules = async ({ survey, nodeDef, collectValidationRules, defaultLanguage }) => {
   const validationRules = []
   const importIssues = []
   let unique = false
 
-  collectValidationRules.forEach((collectValidationRule) => {
-    const parseResult = parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage })
+  for (const collectValidationRule of collectValidationRules) {
+    const parseResult = await parseValidationRule({ survey, collectValidationRule, nodeDef, defaultLanguage })
     if (parseResult) {
       const { validationRule, importIssue, unique: _unique } = parseResult
       if (validationRule) {
@@ -206,6 +206,6 @@ export const parseValidationRules = ({ survey, nodeDef, collectValidationRules, 
         unique = true
       }
     }
-  })
+  }
   return { validationRules, importIssues, unique }
 }

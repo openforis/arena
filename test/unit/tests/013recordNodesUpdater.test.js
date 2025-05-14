@@ -17,7 +17,7 @@ describe('RecordNodesUpdater Test', () => {
   beforeAll(async () => {
     const user = getContextUser()
 
-    survey = DataTest.createTestSurvey({ user })
+    survey = await DataTest.createTestSurvey({ user })
 
     record = DataTest.createTestRecord({ user, survey })
   }, 10000)

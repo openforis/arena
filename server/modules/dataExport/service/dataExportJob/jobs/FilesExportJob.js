@@ -31,8 +31,8 @@ export default class FilesExportJob extends Job {
     this.total = total
 
     // write the files in subfolders by cycle
-    for await (const [cycle, fileUuids] of Object.entries(fileUuidsByCycle)) {
-      for await (const fileUuid of fileUuids) {
+    for (const [cycle, fileUuids] of Object.entries(fileUuidsByCycle)) {
+      for (const fileUuid of fileUuids) {
         const exportedFileName = fileNamesByFileUuid[fileUuid]
         if (Objects.isNotEmpty(exportedFileName)) {
           await this.writeFile({ fileUuid, cycle })

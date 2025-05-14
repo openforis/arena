@@ -99,7 +99,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
 
   const listWithCounts = []
-  for await (const recordSummary of list) {
+  for (const recordSummary of list) {
     const recordUuid = Record.getUuid(recordSummary)
     const { count: filesCount, total: filesSize } = await FileRepository.fetchCountAndTotalFilesSize(
       { surveyId, recordUuid },
@@ -216,7 +216,7 @@ const fetchNodeRefData = async ({ surveyId, node, isCode }, client) => {
 
 export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesTaxonomies = true }, client = db) => {
   const surveyId = Survey.getId(survey)
-  for await (const node of nodes) {
+  for (const node of nodes) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const isCode = NodeDef.isCode(nodeDef)
     const isTaxon = NodeDef.isTaxon(nodeDef)

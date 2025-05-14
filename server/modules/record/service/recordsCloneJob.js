@@ -117,7 +117,7 @@ export default class RecordsCloneJob extends Job {
     const { context, tx } = this
     const { surveyId } = context
 
-    for await (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
+    for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
       const fileSummary = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
       if (fileSummary) {
         const content = await FileService.fetchFileContentAsBuffer({ surveyId, fileUuid }, tx)

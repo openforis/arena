@@ -12,9 +12,12 @@ import * as Validation from '@core/validation/validation'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as RecordRepository from '../../repository/recordRepository'
 import * as NodeCreationManager from './nodeCreationManager'
 import { NodeRdbManager } from './nodeRDBManager'
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
@@ -90,6 +93,7 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
       survey,
       entityDefUuid: NodeDef.getUuid(rootDef),
       valuesByDefUuid,
+      categoryItemProvider,
       insertMissingNodes: true,
     })(record)
 

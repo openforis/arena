@@ -24,7 +24,7 @@ export default class CategoriesExportJob extends Job {
     const categoriesDir = FileUtils.join(outputDir, categoriesOutputFolderName)
     await FileUtils.mkdir(categoriesDir)
 
-    for await (const category of categories) {
+    for (const category of categories) {
       const { uuid: categoryUuid } = category
       const extension = getExtensionByFileFormat(fileFormat)
       const categoryTempFilePath = FileUtils.join(categoriesDir, `${Category.getName(category)}.${extension}`)

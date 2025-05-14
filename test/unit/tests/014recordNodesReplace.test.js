@@ -16,7 +16,7 @@ const { nodeDefType } = NodeDef
 describe('RecordNodesUpdater (replace nodes) Test', () => {
   it('Test replace attribute in record', async () => {
     const user = getContextUser()
-    const survey = SB.survey(
+    const survey = await SB.survey(
       user,
       SB.entity(
         'cluster',
@@ -58,7 +58,7 @@ describe('RecordNodesUpdater (replace nodes) Test', () => {
 
   it('Test create nested entities', async () => {
     const user = getContextUser()
-    const survey = SB.survey(
+    const survey = await SB.survey(
       user,
       SB.entity(
         'cluster',
