@@ -1577,6 +1577,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       code: '$t(common.code)',
       scientificName: 'Scientific name',
       vernacularName: 'Vernacular name',
+      vernacularNameSelectionKept: 'Vernacular name selection kept',
       visibleFields: 'Visible fields',
     },
     nodeDefFile: {
