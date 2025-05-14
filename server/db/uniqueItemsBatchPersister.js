@@ -15,7 +15,7 @@ export default class UniqueItemsBatchPersister {
   }
 
   async addItems(itemsByKey) {
-    for await (const [key, item] of Object.entries(itemsByKey)) {
+    for (const [key, item] of Object.entries(itemsByKey)) {
       await this.addItem(key, item)
     }
   }

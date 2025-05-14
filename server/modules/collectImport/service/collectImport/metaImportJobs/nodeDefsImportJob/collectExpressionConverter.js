@@ -11,9 +11,9 @@ import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValid
  * @param {!NodeDef} [params.nodeDefCurrent] - The current node definition being evaluated.
  * @param {!string} [params.expression] - The expression to convert.
  * @param {boolean} [params.advancedExpressionEditor] - The generated expression will be ready for the 'advanced' expression editor.
- * @returns {string} - The converted expression or null if the conversion is not possible.
+ * @returns {Promise<string>} - The converted expression or null if the conversion is not possible.
  */
-const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor = true }) => {
+const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionEditor = true }) => {
   const itemsToReplace = [
     // operators
     { pattern: '\n', replace: ' ' }, // replace carriage return with space
@@ -133,7 +133,7 @@ const convert = ({ survey, nodeDefCurrent, expression, advancedExpressionEditor 
     // append new line to consider converted expression as an expression inserted with the "advanced expression editor"
     .concat(advancedExpressionEditor ? '\n' : '')
 
-  const validationResult = NodeDefExpressionValidator.validate({
+  const validationResult = await NodeDefExpressionValidator.validate({
     survey,
     nodeDefCurrent,
     exprString: converted,

@@ -14,7 +14,7 @@ import * as RecordReader from './recordReader'
 import { NodeValueFormatter } from '../nodeValueFormatter'
 import { updateAttributeValue } from './recordNodeValueUpdater'
 
-const { createNodeAndDescendants, createRootEntity, deleteNodes } = CoreRecordUpdater
+const { createRootEntity, deleteNodes } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
@@ -177,7 +177,16 @@ const _getOrCreateEntityByKeys =
   }
 
 const getOrCreateEntityByKeys =
-  ({ user, survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entityDefUuid,
+    valuesByDefUuid,
+    categoryItemProvider,
+    timezoneOffset,
+    insertMissingNodes = false,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -198,6 +207,7 @@ const getOrCreateEntityByKeys =
         survey,
         record: updateResultEntity.record,
         nodes: updateResultEntity.nodes,
+        categoryItemProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -214,7 +224,7 @@ const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
   (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
 
 const updateAttributesInEntityWithValues =
-  ({ user, survey, entity, valuesByDefUuid, timezoneOffset, sideEffect = false }) =>
+  ({ user, survey, entity, valuesByDefUuid, categoryItemProvider, timezoneOffset, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -228,6 +238,7 @@ const updateAttributesInEntityWithValues =
         survey,
         record: nodeUpdateResult.record,
         nodes: nodeUpdateResult.nodes,
+        categoryItemProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -236,7 +247,7 @@ const updateAttributesInEntityWithValues =
 
     const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
 
-    for await (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
+    for (const [attributeDefUuid, value] of Object.entries(valuesByDefUuid)) {
       const attributeDef = Survey.getNodeDefByUuid(attributeDefUuid)(survey)
       if (_canAttributeBeUpdated({ entityDef, attributeDef })) {
         const { record: currentRecord } = updateResult
@@ -262,7 +273,16 @@ const updateAttributesInEntityWithValues =
   }
 
 const updateAttributesWithValues =
-  ({ user, survey, entityDefUuid, valuesByDefUuid, timezoneOffset, insertMissingNodes = false, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entityDefUuid,
+    valuesByDefUuid,
+    categoryItemProvider,
+    timezoneOffset,
+    insertMissingNodes = false,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -272,6 +292,7 @@ const updateAttributesWithValues =
       survey,
       entityDefUuid,
       valuesByDefUuid,
+      categoryItemProvider,
       timezoneOffset,
       insertMissingNodes,
       sideEffect,
@@ -284,6 +305,7 @@ const updateAttributesWithValues =
       survey,
       entity,
       valuesByDefUuid,
+      categoryItemProvider,
       timezoneOffset,
       sideEffect,
     })(updateResult.record)
@@ -294,7 +316,7 @@ const updateAttributesWithValues =
   }
 
 const deleteNodesInEntityByNodeDefUuid =
-  ({ user, survey, entity, nodeDefUuids, sideEffect = false }) =>
+  ({ user, survey, entity, nodeDefUuids, categoryItemProvider, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -309,6 +331,7 @@ const deleteNodesInEntityByNodeDefUuid =
       survey,
       record,
       nodeUuids: nodeUuidsToDelete,
+      categoryItemProvider,
       sideEffect,
     })
     return updateResult.merge(nodesDeleteUpdateResult)
@@ -316,7 +339,6 @@ const deleteNodesInEntityByNodeDefUuid =
 
 export const RecordNodesUpdater = {
   afterNodesUpdate,
-  createNodeAndDescendants,
   createRootEntity,
   getOrCreateEntityByKeys,
   updateNodesDependents,

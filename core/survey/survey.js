@@ -217,12 +217,17 @@ export const {
 export const { dissocNodeDef, mergeNodeDefs } = SurveyNodeDefs
 
 // replace all the node defs in the survey with the specified ones
+export const assocNodeDefsSimple =
+  ({ nodeDefs }) =>
+  (survey) =>
+    SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
+
 export const assocNodeDefs =
   ({ nodeDefs, updateDependencyGraph = false }) =>
-  (survey) => {
-    let surveyUpdated = SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
+  async (survey) => {
+    let surveyUpdated = assocNodeDefsSimple({ nodeDefs })(survey)
     if (updateDependencyGraph) {
-      surveyUpdated = SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
+      surveyUpdated = await SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
     }
     return surveyUpdated
   }

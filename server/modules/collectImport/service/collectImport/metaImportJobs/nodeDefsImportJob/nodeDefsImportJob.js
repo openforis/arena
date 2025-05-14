@@ -348,7 +348,7 @@ export default class NodeDefsImportJob extends Job {
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
-      const { validationRules, unique } = this.parseValidationRules({ nodeDef, collectNodeDef })
+      const { validationRules, unique } = await this.parseValidationRules({ nodeDef, collectNodeDef })
       validations[NodeDefValidations.keys.expressions] = validationRules
       if (unique) {
         validations[NodeDefValidations.keys.unique] = true
@@ -359,7 +359,7 @@ export default class NodeDefsImportJob extends Job {
     // 3. applicable
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
     if (StringUtils.isNotBlank(relevantExpr)) {
-      const relevantExprConverted = CollectExpressionConverter.convert({
+      const relevantExprConverted = await CollectExpressionConverter.convert({
         survey: this.survey,
         nodeDefCurrent: nodeDef,
         expression: relevantExpr,
@@ -442,7 +442,7 @@ export default class NodeDefsImportJob extends Job {
 
     const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
 
-    const { defaultValues, importIssues } = parseDefaultValues({
+    const { defaultValues, importIssues } = await parseDefaultValues({
       survey: this.survey,
       nodeDef,
       collectDefaultValues,
@@ -454,12 +454,12 @@ export default class NodeDefsImportJob extends Job {
     return defaultValues
   }
 
-  parseValidationRules({ nodeDef, collectNodeDef }) {
+  async parseValidationRules({ nodeDef, collectNodeDef }) {
     const { defaultLanguage } = this.context
 
     const collectValidationRules = CollectSurvey.getElements(collectNodeDef)
 
-    const { validationRules, importIssues, unique } = parseValidationRules({
+    const { validationRules, importIssues, unique } = await parseValidationRules({
       survey: this.survey,
       nodeDef,
       collectValidationRules,
@@ -611,7 +611,7 @@ export default class NodeDefsImportJob extends Job {
   get survey() {
     const { survey } = this.context
     // dependency graph generation not necessary
-    return Survey.assocNodeDefs({ nodeDefs: this.nodeDefs, updateDependencyGraph: false })(survey)
+    return Survey.assocNodeDefsSimple({ nodeDefs: this.nodeDefs })(survey)
   }
 }
 

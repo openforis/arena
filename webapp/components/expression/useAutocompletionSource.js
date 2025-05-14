@@ -89,10 +89,10 @@ const getCompletions = ({ mode, i18n, token, variablesGroupedByParentEntity, inc
   return completions
 }
 
-const findNodeDefContext = ({ survey, nodeDefCurrent, nodeDefContextPath }) => {
+const findNodeDefContext = async ({ survey, nodeDefCurrent, nodeDefContextPath }) => {
   let nodeDefContext = null
   try {
-    nodeDefContext = NodeDefExpressionValidator.findReferencedNodeDefLast({
+    nodeDefContext = await NodeDefExpressionValidator.findReferencedNodeDefLast({
       survey,
       nodeDef: nodeDefCurrent,
       exprString: nodeDefContextPath,
@@ -103,7 +103,7 @@ const findNodeDefContext = ({ survey, nodeDefCurrent, nodeDefContextPath }) => {
   return nodeDefContext
 }
 
-const extractVariables = ({
+const extractVariables = async ({
   mode,
   i18n,
   survey,
@@ -131,7 +131,7 @@ const extractVariables = ({
       includeAnalysis,
     })
   }
-  const nodeDefContext = findNodeDefContext({ survey, nodeDefCurrent, nodeDefContextPath })
+  const nodeDefContext = await findNodeDefContext({ survey, nodeDefCurrent, nodeDefContextPath })
   if (!nodeDefContext) {
     return []
   }
@@ -153,7 +153,7 @@ export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent 
   const cycle = useSurveyCycleKey()
 
   return useCallback(
-    (context) => {
+    async (context) => {
       const matchingTokenBefore = context.matchBefore(/\w*/)
 
       if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
@@ -166,7 +166,7 @@ export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent 
 
       const nodeDefContextPath = variablePath.substring(0, variablePath.lastIndexOf('.'))
 
-      const variablesGroupedByParentEntity = extractVariables({
+      const variablesGroupedByParentEntity = await extractVariables({
         mode,
         i18n,
         survey,

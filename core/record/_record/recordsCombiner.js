@@ -139,7 +139,7 @@ const _replaceUpdatedNodesInEntities = ({
 }
 
 export const replaceUpdatedNodes =
-  ({ user, survey, recordSource, timezoneOffset, sideEffect = false }) =>
+  ({ user, survey, recordSource, categoryItemProvider, timezoneOffset, sideEffect = false }) =>
   async (recordTarget) => {
     const rootSource = RecordReader.getRootNode(recordSource)
     const rootTarget = RecordReader.getRootNode(recordTarget)
@@ -160,6 +160,7 @@ export const replaceUpdatedNodes =
       survey,
       record: updateResult.record,
       nodes: updateResult.nodes,
+      categoryItemProvider,
       timezoneOffset,
       sideEffect,
     })
@@ -400,7 +401,7 @@ const _mergeRecordsNodes = ({
 }
 
 export const mergeRecords =
-  ({ user, survey, recordSource, timezoneOffset, sideEffect = false }) =>
+  ({ user, survey, recordSource, categoryItemProvider, timezoneOffset, sideEffect = false }) =>
   async (recordTarget) => {
     const { cycle } = recordTarget
     const rootSource = RecordReader.getRootNode(recordSource)
@@ -432,6 +433,7 @@ export const mergeRecords =
       survey,
       record: updateResult.record,
       nodes: updateResult.nodes,
+      categoryItemProvider,
       timezoneOffset,
       sideEffect,
     })
