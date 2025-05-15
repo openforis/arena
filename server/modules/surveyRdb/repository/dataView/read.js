@@ -314,7 +314,7 @@ export const fetchViewData = async (params, client = db) => {
 export const countViewData = async (params, client = db) => {
   const { select, selectFields, queryParams } = _createViewDataQuery(params)
   const query = dbUtils.formatQuery(select, queryParams)
-  const countQuery = `SELECT COUNT(*) AS count FROM (${query})`
+  const countQuery = `SELECT COUNT(*) AS count FROM (${query}) AS count_query`
   const countResult = await client.one(countQuery)
   return { selectFields, count: Number(countResult.count) }
 }
