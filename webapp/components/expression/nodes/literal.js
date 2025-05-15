@@ -65,14 +65,14 @@ const _findNodeDefByName = ({ survey, name, variables }) => {
   for (const possibleNodeDefName of possibleNodeDefNames) {
     const nodeDef = Survey.findNodeDefByName(possibleNodeDefName)(survey)
     if (nodeDef) {
-      return nodeDef
+      return { nodeDef, codeField: true }
     }
   }
   const variable = _findVariableByName({ variables, name })
   if (variable) {
     const nodeDef = Survey.getNodeDefByUuid(variable.uuid)(survey)
     if (nodeDef) {
-      return nodeDef
+      return { nodeDef, codeField: false }
     }
   }
   return null
@@ -105,8 +105,9 @@ const Literal = (props) => {
   const lang = useLang()
   const survey = useSelector(SurveyState.getSurvey)
 
-  const nodeDef = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type, variables })
-  const literalSearchParams = nodeDef  ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
+  const { nodeDef, codeField } = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type, variables }) ?? {}
+  const literalSearchParams =
+    nodeDef && codeField ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
 
   const nodeValue = parseValue(nodeDef, A.propOr(null, 'raw', node))
   const nodeValueString = nodeValue ?? ''
@@ -197,6 +198,7 @@ Literal.propTypes = {
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
   type: PropTypes.string,
+  variables: PropTypes.array,
 }
 
 export default Literal
