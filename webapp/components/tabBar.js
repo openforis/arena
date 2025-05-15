@@ -27,14 +27,16 @@ const TabBar = (props) => {
 
   const [selectionState, setSelectionState] = useState(selection)
 
-  const tab = tabs[selectionState]
+  const actualSelection = Math.min(selectionState, tabs.length - 1)
+
+  const selectedTab = tabs[actualSelection]
 
   return (
     <div className={classNames('tab-bar', className, { 'no-tabs': !showTabs })}>
       {showTabs && (
         <TabBarButtons
           tabs={tabs}
-          selection={selectionState}
+          selection={actualSelection}
           onClick={(tabIndex) => {
             setSelectionState(tabIndex)
             if (onClick) {
@@ -46,7 +48,7 @@ const TabBar = (props) => {
 
       {renderer
         ? React.createElement(renderer, { ...props })
-        : React.createElement(tab.component, { ...tab.props, ...props })}
+        : React.createElement(selectedTab.component, { ...selectedTab.props, ...props })}
     </div>
   )
 }
