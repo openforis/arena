@@ -1,5 +1,6 @@
 import './tabBar.scss'
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
@@ -21,6 +22,19 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
     ))}
   </div>
 )
+
+const TabPropType = PropTypes.shape({
+  id: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.string,
+  disabled: PropTypes.bool,
+})
+
+TabBarButtons.propTypes = {
+  tabs: PropTypes.arrayOf(TabPropType).isRequired,
+  selection: PropTypes.number.isRequired,
+  onClick: PropTypes.func.isRequired,
+}
 
 const TabBar = (props) => {
   const { className = '', onClick = null, renderer = null, selection = 0, showTabs = true, tabs = [] } = props
@@ -51,6 +65,15 @@ const TabBar = (props) => {
         : React.createElement(selectedTab.component, { ...selectedTab.props, ...props })}
     </div>
   )
+}
+
+TabBar.propTypes = {
+  className: PropTypes.string,
+  onClick: PropTypes.func,
+  renderer: PropTypes.func,
+  selection: PropTypes.number,
+  showTabs: PropTypes.bool,
+  tabs: PropTypes.arrayOf(TabPropType).isRequired,
 }
 
 export default TabBar
