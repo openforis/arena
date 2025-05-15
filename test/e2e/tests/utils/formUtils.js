@@ -21,7 +21,7 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   const inputSelector = `${dropdownSelector} .dropdown__input`
 
   // wait for dropdown items to be ready
-  await page.waitForTimeout(5000)
+  await page.waitForTimeout(1000)
 
   const inputEl = await page.$(inputSelector)
 
@@ -55,7 +55,7 @@ const expectDropdownToBeDisabled = async ({ testId = null, parentSelector = '' }
 
 const expectDropdownValue = async ({ testId = null, parentSelector = '', value }) => {
   // wait for dropdown value to be set
-  await page.waitForTimeout(5000)
+  await page.waitForTimeout(1000)
 
   const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
   if (Objects.isEmpty(value)) {
