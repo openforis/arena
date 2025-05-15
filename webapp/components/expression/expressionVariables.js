@@ -250,3 +250,17 @@ export const getVariablesChildren = ({
     ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, includeThis: false })
     : variables
 }
+
+export const findVariableByName = ({ variables, name }) => {
+  const stack = [...variables]
+  while (stack.length) {
+    const variable = stack.pop()
+    if (variable.value === name) {
+      return variable
+    }
+    if (variable.options) {
+      stack.push(...variable.options)
+    }
+  }
+  return null
+}

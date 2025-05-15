@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,7 +25,7 @@ import { TestId } from '@webapp/utils/testId'
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
-import { Objects } from '@openforis/arena-core'
+import { findVariableByName } from '../expressionVariables'
 
 const isValueText = (nodeDef, value) =>
   nodeDef &&
@@ -43,32 +45,18 @@ const loadItems = async (params) => {
   return items
 }
 
-const _findVariableByName = ({ variables, name }) => {
-  const stack = [...variables]
-  while (stack.length) {
-    const variable = stack.pop()
-    if (variable.value === name) {
-      return variable
-    }
-    if (variable.options) {
-      stack.push(...variable.options)
-    }
-  }
-  return null
-}
-
 const _findNodeDefByName = ({ survey, name, variables }) => {
   if (Objects.isEmpty(name)) {
     return null
   }
-  const possibleNodeDefNames = [name, name.replace('_label', '')]
+  const possibleNodeDefNames = [name, StringUtils.removeSuffix('_label')(name)]
   for (const possibleNodeDefName of possibleNodeDefNames) {
     const nodeDef = Survey.findNodeDefByName(possibleNodeDefName)(survey)
     if (nodeDef) {
       return { nodeDef, isIdentifierField: true }
     }
   }
-  const variable = _findVariableByName({ variables, name })
+  const variable = findVariableByName({ variables, name })
   if (variable) {
     const nodeDef = Survey.getNodeDefByUuid(variable.uuid)(survey)
     if (nodeDef) {
