@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,15 +25,14 @@ import { TestId } from '@webapp/utils/testId'
 import { useAsyncGetRequest } from '../../hooks'
 import * as ExpressionParser from '../expressionParser'
 import { BinaryOperandType } from './binaryOperand'
-import { Objects } from '@openforis/arena-core'
+import { findVariableByName } from '../expressionVariables'
 
 const isValueText = (nodeDef, value) =>
-  nodeDef
-    ? StringUtils.isBlank(value) ||
-      ![NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(
-        NodeDef.getType(nodeDef)
-      )
-    : false
+  nodeDef &&
+  (StringUtils.isBlank(value) ||
+    ![NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(
+      NodeDef.getType(nodeDef)
+    ))
 
 const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? A.parse(value) : value)
 
@@ -44,50 +45,61 @@ const loadItems = async (params) => {
   return items
 }
 
-const _findNodeDefByName = ({ survey, name }) => {
+const _findNodeDefByName = ({ survey, name, variables }) => {
   if (Objects.isEmpty(name)) {
     return null
   }
-  const nodeDef = Survey.findNodeDefByName(name)(survey)
-  if (nodeDef) {
-    return nodeDef
+  const possibleNodeDefNames = [name, StringUtils.removeSuffix('_label')(name)]
+  for (const possibleNodeDefName of possibleNodeDefNames) {
+    const nodeDef = Survey.findNodeDefByName(possibleNodeDefName)(survey)
+    if (nodeDef) {
+      return { nodeDef, isIdentifierField: true }
+    }
   }
-  const nameWithoutSubfix = name.replace('_label', '')
-  return Survey.findNodeDefByName(nameWithoutSubfix)(survey)
+  const variable = findVariableByName({ variables, name })
+  if (variable) {
+    const nodeDef = Survey.getNodeDefByUuid(variable.uuid)(survey)
+    if (nodeDef) {
+      return { nodeDef, isIdentifierField: false }
+    }
+  }
+  return null
 }
 
-const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
+const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type, variables = [] }) => {
   if (!type || BinaryOperandType.isLeft(type)) {
-    return nodeDefCurrent
+    return { nodeDef: nodeDefCurrent, isIdentifierField: true }
   }
   if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
     const nodeLeftOperand = A.prop(BinaryOperandType.left, expressionNodeParent)
     if (Expression.isThis(nodeLeftOperand)) {
-      return nodeDefCurrent
+      return { nodeDef: nodeDefCurrent, isIdentifierField: true }
     }
     if (Expression.isIdentifier(nodeLeftOperand)) {
       const identifierName = A.prop('name', nodeLeftOperand)
       if (identifierName === Expression.thisVariable) {
-        return nodeDefCurrent
+        return { nodeDef: nodeDefCurrent, isIdentifierField: true }
       }
-      return _findNodeDefByName({ survey, name: identifierName })
+      return _findNodeDefByName({ survey, name: identifierName, variables })
     }
   }
   return null
 }
 
 const Literal = (props) => {
-  const { expressionNodeParent, node, nodeDefCurrent, onChange, type } = props
+  const { expressionNodeParent, node, nodeDefCurrent, onChange, type, variables = [] } = props
 
   const i18n = useI18n()
   const lang = useLang()
   const survey = useSelector(SurveyState.getSurvey)
 
-  const nodeDef = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type })
-  const literalSearchParams = nodeDef ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
+  const { nodeDef, isIdentifierField } =
+    _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type, variables }) ?? {}
+  const literalSearchParams =
+    nodeDef && isIdentifierField ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
 
   const nodeValue = parseValue(nodeDef, A.propOr(null, 'raw', node))
-  const nodeValueString = nodeValue || ''
+  const nodeValueString = nodeValue ?? ''
 
   const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
     '/api/expression/literal/item',
@@ -175,6 +187,7 @@ Literal.propTypes = {
   nodeDefCurrent: PropTypes.any,
   onChange: PropTypes.func.isRequired,
   type: PropTypes.string,
+  variables: PropTypes.array,
 }
 
 export default Literal
