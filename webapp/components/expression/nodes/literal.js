@@ -26,12 +26,11 @@ import { BinaryOperandType } from './binaryOperand'
 import { Objects } from '@openforis/arena-core'
 
 const isValueText = (nodeDef, value) =>
-  nodeDef
-    ? StringUtils.isBlank(value) ||
-      ![NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(
-        NodeDef.getType(nodeDef)
-      )
-    : false
+  nodeDef &&
+  (StringUtils.isBlank(value) ||
+    ![NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer].includes(
+      NodeDef.getType(nodeDef)
+    ))
 
 const parseValue = (nodeDef, value) => (isValueText(nodeDef, value) ? A.parse(value) : value)
 
@@ -44,19 +43,42 @@ const loadItems = async (params) => {
   return items
 }
 
-const _findNodeDefByName = ({ survey, name }) => {
+const _findVariableByName = ({ variables, name }) => {
+  const stack = [...variables]
+  while (stack.length) {
+    const variable = stack.pop()
+    if (variable.value === name) {
+      return variable
+    }
+    if (variable.options) {
+      stack.push(...variable.options)
+    }
+  }
+  return null
+}
+
+const _findNodeDefByName = ({ survey, name, variables }) => {
   if (Objects.isEmpty(name)) {
     return null
   }
-  const nodeDef = Survey.findNodeDefByName(name)(survey)
-  if (nodeDef) {
-    return nodeDef
+  const possibleNodeDefNames = [name, name.replace('_label', '')]
+  for (const possibleNodeDefName of possibleNodeDefNames) {
+    const nodeDef = Survey.findNodeDefByName(possibleNodeDefName)(survey)
+    if (nodeDef) {
+      return nodeDef
+    }
   }
-  const nameWithoutSubfix = name.replace('_label', '')
-  return Survey.findNodeDefByName(nameWithoutSubfix)(survey)
+  const variable = _findVariableByName({ variables, name })
+  if (variable) {
+    const nodeDef = Survey.getNodeDefByUuid(variable.uuid)(survey)
+    if (nodeDef) {
+      return nodeDef
+    }
+  }
+  return null
 }
 
-const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => {
+const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type, variables = [] }) => {
   if (!type || BinaryOperandType.isLeft(type)) {
     return nodeDefCurrent
   }
@@ -70,24 +92,24 @@ const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type }) => 
       if (identifierName === Expression.thisVariable) {
         return nodeDefCurrent
       }
-      return _findNodeDefByName({ survey, name: identifierName })
+      return _findNodeDefByName({ survey, name: identifierName, variables })
     }
   }
   return null
 }
 
 const Literal = (props) => {
-  const { expressionNodeParent, node, nodeDefCurrent, onChange, type } = props
+  const { expressionNodeParent, node, nodeDefCurrent, onChange, type, variables = [] } = props
 
   const i18n = useI18n()
   const lang = useLang()
   const survey = useSelector(SurveyState.getSurvey)
 
-  const nodeDef = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type })
-  const literalSearchParams = nodeDef ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
+  const nodeDef = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type, variables })
+  const literalSearchParams = nodeDef  ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
 
   const nodeValue = parseValue(nodeDef, A.propOr(null, 'raw', node))
-  const nodeValueString = nodeValue || ''
+  const nodeValueString = nodeValue ?? ''
 
   const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
     '/api/expression/literal/item',
