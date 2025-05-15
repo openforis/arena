@@ -65,14 +65,14 @@ const _findNodeDefByName = ({ survey, name, variables }) => {
   for (const possibleNodeDefName of possibleNodeDefNames) {
     const nodeDef = Survey.findNodeDefByName(possibleNodeDefName)(survey)
     if (nodeDef) {
-      return { nodeDef, codeField: true }
+      return { nodeDef, isIdentifierField: true }
     }
   }
   const variable = _findVariableByName({ variables, name })
   if (variable) {
     const nodeDef = Survey.getNodeDefByUuid(variable.uuid)(survey)
     if (nodeDef) {
-      return { nodeDef, codeField: false }
+      return { nodeDef, isIdentifierField: false }
     }
   }
   return null
@@ -80,17 +80,17 @@ const _findNodeDefByName = ({ survey, name, variables }) => {
 
 const _getNodeDef = ({ expressionNodeParent, nodeDefCurrent, survey, type, variables = [] }) => {
   if (!type || BinaryOperandType.isLeft(type)) {
-    return nodeDefCurrent
+    return { nodeDef: nodeDefCurrent, isIdentifierField: true }
   }
   if (BinaryOperandType.isRight(type) && Expression.isBinary(expressionNodeParent)) {
     const nodeLeftOperand = A.prop(BinaryOperandType.left, expressionNodeParent)
     if (Expression.isThis(nodeLeftOperand)) {
-      return nodeDefCurrent
+      return { nodeDef: nodeDefCurrent, isIdentifierField: true }
     }
     if (Expression.isIdentifier(nodeLeftOperand)) {
       const identifierName = A.prop('name', nodeLeftOperand)
       if (identifierName === Expression.thisVariable) {
-        return nodeDefCurrent
+        return { nodeDef: nodeDefCurrent, isIdentifierField: true }
       }
       return _findNodeDefByName({ survey, name: identifierName, variables })
     }
@@ -105,9 +105,10 @@ const Literal = (props) => {
   const lang = useLang()
   const survey = useSelector(SurveyState.getSurvey)
 
-  const { nodeDef, codeField } = _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type, variables }) ?? {}
+  const { nodeDef, isIdentifierField } =
+    _getNodeDef({ expressionNodeParent, nodeDefCurrent, survey, type, variables }) ?? {}
   const literalSearchParams =
-    nodeDef && codeField ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
+    nodeDef && isIdentifierField ? ExpressionParser.getLiteralSearchParams(survey, nodeDef, lang) : null
 
   const nodeValue = parseValue(nodeDef, A.propOr(null, 'raw', node))
   const nodeValueString = nodeValue ?? ''
