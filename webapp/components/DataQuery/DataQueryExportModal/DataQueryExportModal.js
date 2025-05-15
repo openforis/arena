@@ -1,6 +1,6 @@
 import './DataQueryExportModal.scss'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -38,11 +38,13 @@ export const DataQueryExportModal = (props) => {
   const { selectedOptionsByKey } = state
   const fileFormat = selectedOptionsByKey[dataExportOptions.fileFormat]
 
-  const availableOptions = useMemo(
-    () =>
-      isAggregateMode ? [] : [dataExportOptions.includeCategoryItemsLabels, dataExportOptions.expandCategoryItems],
-    [isAggregateMode]
-  )
+  const availableOptions = useMemo(() => {
+    const _options = [dataExportOptions.includeCategoryItemsLabels]
+    if (!isAggregateMode) {
+      _options.push(dataExportOptions.expandCategoryItems)
+    }
+    return _options
+  }, [isAggregateMode])
 
   const onExportClick = useCallback(async () => {
     try {
@@ -66,13 +68,6 @@ export const DataQueryExportModal = (props) => {
       const optionsUpdated = { ...statePrev.selectedOptionsByKey, [option]: value }
       return { ...statePrev, selectedOptionsByKey: optionsUpdated }
     })
-
-  useEffect(() => {
-    if (isAggregateMode) {
-      // no available export options, export directly
-      onExportClick()
-    }
-  }, [isAggregateMode, onExportClick])
 
   if (Objects.isEmpty(availableOptions)) return null
 
