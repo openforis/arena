@@ -107,7 +107,8 @@ const getCsvExportFields = ({
   return fields
 }
 
-const getCsvExportFieldsAgg = ({ survey, query }) => {
+const getCsvExportFieldsAgg = ({ survey, query, options = {} }) => {
+  const { includeCategoryItemsLabels = false } = options
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
@@ -115,7 +116,8 @@ const getCsvExportFieldsAgg = ({ survey, query }) => {
   // dimensions
   Query.getDimensions(query).forEach((dimension) => {
     const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(viewDataNodeDef.survey)
-    fields.push(new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name)
+    const dimensionColumn = new ColumnNodeDef(viewDataNodeDef, nodeDefDimension)
+    fields.push(...(includeCategoryItemsLabels ? dimensionColumn.names : [dimensionColumn.name]))
   })
   // measures
   Object.entries(Query.getMeasures(query)).forEach(([nodeDefUuid, aggFunctions]) => {

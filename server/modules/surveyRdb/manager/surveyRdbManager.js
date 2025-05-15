@@ -192,7 +192,7 @@ export const fetchViewDataAgg = async (params, client = db) => {
   )
 
   if (outputStream) {
-    const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query })
+    const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query, options })
     return DbUtils.stream({
       queryStream: result,
       client,
