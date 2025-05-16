@@ -81,7 +81,7 @@ export const propKeys = {
   taxonomyUuid: 'taxonomyUuid',
   vernacularNameLabels: 'vernacularNameLabels',
   visibleFields: 'visibleFields',
-  vernacularNameSelectionKept: 'ernacularNameSelectionKept',
+  vernacularNameSelectionKept: 'vernacularNameSelectionKept',
 
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
