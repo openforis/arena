@@ -533,12 +533,15 @@ export const fetchTaxonWithVernacularNamesByUuid = async (
   { surveyId, taxonomyUuid, taxonUuid, draft = false },
   client = db
 ) => {
-  const taxa = fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
+  const taxa = await fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
   return R.head(taxa)
 }
 
-export const fetchTaxonWithVernacularNamesByCode = async ({ surveyId, taxonomyUuid, code, draft }, client = db) => {
-  const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, code, draft, client)
+export const fetchTaxonWithVernacularNamesByCode = async (
+  { surveyId, taxonomyUuid, taxonCode, draft },
+  client = db
+) => {
+  const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, draft, client)
   const taxonUuid = Taxon.getUuid(taxon)
   if (!taxonUuid) return null
 
