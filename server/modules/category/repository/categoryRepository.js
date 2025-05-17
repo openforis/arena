@@ -543,7 +543,7 @@ export const fetchItemByCode = async ({ surveyId, categoryUuid, parentItemUuid, 
      WHERE l.category_uuid = $/categoryUuid/
        AND parent_uuid ${parentItemUuid ? '= $/parentItemUuid/' : ' IS NULL'}
        AND ${codeCol} = $/code/`,
-    { categoryUuid, parentItemUuid, code },
+    { categoryUuid, parentItemUuid, code: String(code) },
     itemDBTransformCallback({ draft })
   )
 }
