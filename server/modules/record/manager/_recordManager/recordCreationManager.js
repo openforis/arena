@@ -13,11 +13,13 @@ import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import * as RecordRepository from '../../repository/recordRepository'
 import * as NodeCreationManager from './nodeCreationManager'
 import { NodeRdbManager } from './nodeRDBManager'
 
 const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
@@ -94,6 +96,7 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
       entityDefUuid: NodeDef.getUuid(rootDef),
       valuesByDefUuid,
       categoryItemProvider,
+      taxonProvider,
       insertMissingNodes: true,
     })(record)
 

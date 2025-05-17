@@ -1,6 +1,6 @@
 import * as Survey from '@core/survey/survey'
 
-import * as CategoryRepository from '../repository/categoryRepository.js'
+import * as CategoryRepository from '../repository/categoryRepository'
 
 const getItemByCodePaths = async ({ survey, categoryUuid, codePaths }) => {
   const surveyId = Survey.getId(survey)

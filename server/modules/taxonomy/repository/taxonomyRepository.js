@@ -269,6 +269,7 @@ export const fetchTaxaWithVernacularNames = async (
   {
     surveyId,
     taxonomyUuid = null,
+    taxonUuid = null,
     draft = false,
     includeBigTaxonomies = true,
     backup = false,
@@ -281,16 +282,19 @@ export const fetchTaxaWithVernacularNames = async (
     ? []
     : await fetchTaxonomyUuidsExceedingMaxItems({ surveyId, draft }, client)
   const allTaxonomiesIncluded = includeBigTaxonomies || taxonomyUuidsExceedingMaxItems.length === 0
-  const whereCondtions = []
+  const whereConditions = []
   if (taxonomyUuid) {
-    whereCondtions.push('t.taxonomy_uuid = $/taxonomyUuid/')
+    whereConditions.push('t.taxonomy_uuid = $/taxonomyUuid/')
   }
   if (!allTaxonomiesIncluded) {
-    whereCondtions.push('t.taxonomy_uuid NOT IN ($/excludedTaxonomyUuids:csv/)')
+    whereConditions.push('t.taxonomy_uuid NOT IN ($/excludedTaxonomyUuids:csv/)')
   }
-  const whereCondition = DbUtils.getWhereClause(...whereCondtions)
+  if (taxonUuid) {
+    whereConditions.push('t.uuid = $/taxonUuid/')
+  }
+  const whereCondition = DbUtils.getWhereClause(...whereConditions)
 
-  const queryParams = { taxonomyUuid, limit, offset }
+  const queryParams = { taxonomyUuid, taxonUuid, limit, offset }
   if (!allTaxonomiesIncluded && taxonomyUuidsExceedingMaxItems.length > 0) {
     queryParams.excludedTaxonomyUuids = taxonomyUuidsExceedingMaxItems
   }
@@ -524,6 +528,22 @@ export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = d
     [uuid],
     (record) => dbTransformCallback(record, draft, true)
   )
+
+export const fetchTaxonWithVernacularNamesByUuid = async (
+  { surveyId, taxonomyUuid, taxonUuid, draft = false },
+  client = db
+) => {
+  const taxa = fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
+  return R.head(taxa)
+}
+
+export const fetchTaxonWithVernacularNamesByCode = async ({ surveyId, taxonomyUuid, code, draft }, client = db) => {
+  const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, code, draft, client)
+  const taxonUuid = Taxon.getUuid(taxon)
+  if (!taxonUuid) return null
+
+  return fetchTaxonWithVernacularNamesByUuid({ surveyId, taxonUuid, draft }, client)
+}
 
 // ============== UPDATE
 
