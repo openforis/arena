@@ -1225,14 +1225,17 @@ $t(common.cantUndoWarning)`,
   },
 
   expression: {
-    identifierNotFound: 'Attribute or entity "{{name}}" not found',
-    invalidAttributeValuePropertyName: 'Invalid attribute value property name: {{attributeName}}.{{propName}}',
-    invalidCategoryExtraProp: 'Invalid extra property name: {{propName}}',
-    invalid: 'Invalid expression: {{details}}',
-    missingFunctionParameters: 'Missing function parameters',
-    undefinedFunction: 'Undefined function: {{name}}',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
+    identifierNotFound: 'Attribute or entity "{{name}}" not found',
+    invalid: 'Invalid expression: {{details}}',
+    invalidAttributeValuePropertyName: 'Invalid attribute value property name: {{attributeName}}.{{propName}}',
+    invalidCategoryExtraProp: 'Invalid extra property name: {{propName}}',
+    invalidCategotyName: 'Invalid category name: {{name}}',
+    invalidTaxonomyName: 'Invalid taxonomy name: {{name}}',
+    invalidTaxonVernacularNameLanguageCode: 'Invalid taxon vernacular name language code: {{vernacularLangCode}}',
+    missingFunctionParameters: 'Missing function parameters',
+    undefinedFunction: 'Undefined function: {{name}}',
   },
 
   // ====== Help views
@@ -1298,6 +1301,8 @@ $t(common.appNameFull)
       recordOwnerRole: 'Returns the role (in the current survey) of the user owning the record',
       rowIndex: 'Returns the current table row (or form) index',
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+      taxonVernacularName:
+        'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
