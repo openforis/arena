@@ -12,7 +12,13 @@ import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 const Logger = Log.getLogger('Mobile API')
 
 const fetchSurvey = async ({ surveyId, cycle }) =>
-  SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, cycle, advanced: true })
+  SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    cycle,
+    advanced: true,
+    includeBigCategories: true,
+    includeBigTaxonomies: true,
+  })
 
 export const init = (app) => {
   // ====== READ - all survey data

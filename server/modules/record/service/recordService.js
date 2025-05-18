@@ -46,10 +46,12 @@ import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
 import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 const Logger = Log.getLogger('RecordService')
 
 const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 // RECORD
 export const createRecord = async ({ user, surveyId, recordToCreate }) => {
@@ -526,6 +528,7 @@ export const mergeRecords = async (
       survey,
       recordSource,
       categoryItemProvider,
+      taxonProvider,
       sideEffect: true,
     })(recordTarget)
 

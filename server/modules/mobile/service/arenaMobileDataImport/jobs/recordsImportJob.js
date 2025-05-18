@@ -16,12 +16,14 @@ import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as UserService from '@server/modules/user/service/userService'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
 }
 
 const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 const checkNodeIsValid = ({ nodes, node, nodeDef }) => {
   if (!nodeDef) {
@@ -232,7 +234,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       { surveyId, recordUuid: targetRecordUuid, fetchForUpdate: true },
       tx
     )
-    const recordUpdateParams = { survey, categoryItemProvider, recordSource: record, sideEffect: true }
+    const recordUpdateParams = { survey, categoryItemProvider, taxonProvider, recordSource: record, sideEffect: true }
     const { record: recordTargetUpdated, nodes: nodesUpdated } = merge
       ? await Record.mergeRecords(recordUpdateParams)(recordTarget)
       : await Record.replaceUpdatedNodes(recordUpdateParams)(recordTarget)

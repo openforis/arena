@@ -1,15 +1,15 @@
 import * as Survey from '@core/survey/survey'
 
-import * as CategoryRepository from '../repository/categoryRepository.js'
+import * as CategoryRepository from '../repository/categoryRepository'
 
-const getItemByCodePaths = async ({ survey, categoryUuid, codePaths }) => {
+const getItemByCodePaths = async ({ survey, categoryUuid, codePaths, draft = false }) => {
   const surveyId = Survey.getId(survey)
-  return CategoryRepository.fetchItemByCodePaths({ surveyId, categoryUuid, codePaths })
+  return CategoryRepository.fetchItemByCodePaths({ surveyId, categoryUuid, codePaths, draft })
 }
 
-const getItemByUuid = async ({ survey, categoryUuid, itemUuid }) => {
+const getItemByUuid = async ({ survey, categoryUuid, itemUuid, draft = false }) => {
   const surveyId = Survey.getId(survey)
-  return CategoryRepository.fetchItemByUuid({ surveyId, categoryUuid, uuid: itemUuid })
+  return CategoryRepository.fetchItemByUuid({ surveyId, categoryUuid, uuid: itemUuid, draft })
 }
 
 export const CategoryItemProviderDefault = {

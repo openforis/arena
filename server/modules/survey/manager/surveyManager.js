@@ -272,8 +272,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     includeDeleted = false,
     includeAnalysis = true,
     backup = false,
-    includeBigCategories = true,
-    includeBigTaxonomies = true,
+    includeBigCategories = false,
+    includeBigTaxonomies = false,
   },
   client = db
 ) => {
