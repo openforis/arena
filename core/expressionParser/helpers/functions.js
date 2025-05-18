@@ -26,6 +26,7 @@ export const functionNames = {
   recordOwnerRole: 'recordOwnerRole',
   sum: 'sum',
   taxonProp: 'taxonProp',
+  taxonVernacularName: 'taxonVernacularName',
   userEmail: 'userEmail',
   userIsRecordOwner: 'userIsRecordOwner',
   userName: 'userName',

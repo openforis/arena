@@ -548,11 +548,11 @@ export const fetchItemByCode = async ({ surveyId, categoryUuid, parentItemUuid, 
   )
 }
 
-export const fetchItemByCodePaths = async ({ surveyId, categoryUuid, codePaths }, client = db) => {
+export const fetchItemByCodePaths = async ({ surveyId, categoryUuid, codePaths, draft = false }, client = db) => {
   let currentItem = null
   for (const code of codePaths) {
     const parentItemUuid = currentItem ? CategoryItem.getUuid(currentItem) : null
-    currentItem = await fetchItemByCode({ surveyId, categoryUuid, parentItemUuid, code }, client)
+    currentItem = await fetchItemByCode({ surveyId, categoryUuid, parentItemUuid, code, draft }, client)
     if (!currentItem) {
       return null
     }

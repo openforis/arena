@@ -11,12 +11,14 @@ import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
 const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
@@ -55,6 +57,7 @@ export const validateNodesAndPersistValidation = async (
     user,
     survey,
     categoryItemProvider,
+    taxonProvider,
     record,
     nodes,
   })

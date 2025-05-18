@@ -183,6 +183,7 @@ const getOrCreateEntityByKeys =
     entityDefUuid,
     valuesByDefUuid,
     categoryItemProvider,
+    taxonProvider,
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
@@ -208,6 +209,7 @@ const getOrCreateEntityByKeys =
         record: updateResultEntity.record,
         nodes: updateResultEntity.nodes,
         categoryItemProvider,
+        taxonProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -224,7 +226,16 @@ const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
   (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
 
 const updateAttributesInEntityWithValues =
-  ({ user, survey, entity, valuesByDefUuid, categoryItemProvider, timezoneOffset, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entity,
+    valuesByDefUuid,
+    categoryItemProvider,
+    taxonProvider,
+    timezoneOffset,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -239,6 +250,7 @@ const updateAttributesInEntityWithValues =
         record: nodeUpdateResult.record,
         nodes: nodeUpdateResult.nodes,
         categoryItemProvider,
+        taxonProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -279,6 +291,7 @@ const updateAttributesWithValues =
     entityDefUuid,
     valuesByDefUuid,
     categoryItemProvider,
+    taxonProvider,
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
@@ -293,6 +306,7 @@ const updateAttributesWithValues =
       entityDefUuid,
       valuesByDefUuid,
       categoryItemProvider,
+      taxonProvider,
       timezoneOffset,
       insertMissingNodes,
       sideEffect,
@@ -306,6 +320,7 @@ const updateAttributesWithValues =
       entity,
       valuesByDefUuid,
       categoryItemProvider,
+      taxonProvider,
       timezoneOffset,
       sideEffect,
     })(updateResult.record)
@@ -316,7 +331,7 @@ const updateAttributesWithValues =
   }
 
 const deleteNodesInEntityByNodeDefUuid =
-  ({ user, survey, entity, nodeDefUuids, categoryItemProvider, sideEffect = false }) =>
+  ({ user, survey, entity, nodeDefUuids, categoryItemProvider, taxonProvider, sideEffect = false }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -332,6 +347,7 @@ const deleteNodesInEntityByNodeDefUuid =
       record,
       nodeUuids: nodeUuidsToDelete,
       categoryItemProvider,
+      taxonProvider,
       sideEffect,
     })
     return updateResult.merge(nodesDeleteUpdateResult)

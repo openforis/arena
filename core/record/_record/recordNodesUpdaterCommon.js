@@ -15,6 +15,7 @@ export const afterNodesUpdate = async ({
   record,
   nodes,
   categoryItemProvider,
+  taxonProvider,
   timezoneOffset,
   sideEffect = false,
 }) => {
@@ -28,6 +29,7 @@ export const afterNodesUpdate = async ({
     record,
     nodes,
     categoryItemProvider,
+    taxonProvider,
     timezoneOffset,
     sideEffect,
   })
@@ -40,6 +42,7 @@ export const afterNodesUpdate = async ({
     record: updateResult.record,
     nodes: updateResult.nodes,
     categoryItemProvider,
+    taxonProvider,
   })
   const recordValidationUpdated = A.pipe(
     Validation.getValidation,

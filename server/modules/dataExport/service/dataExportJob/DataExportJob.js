@@ -66,8 +66,6 @@ export default class DataExportJob extends Job {
           surveyId,
           cycle,
           includeAnalysis,
-          includeBigCategories: false,
-          includeBigTaxonomies: false,
         })
       : await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
           surveyId,

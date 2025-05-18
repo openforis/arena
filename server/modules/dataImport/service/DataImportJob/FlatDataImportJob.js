@@ -11,6 +11,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
@@ -20,6 +21,7 @@ import { DataImportFileReader } from './dataImportFileReader'
 const defaultErrorKey = 'error'
 
 const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 export default class FlatDataImportJob extends DataImportBaseJob {
   constructor(params, type = FlatDataImportJob.type) {
@@ -203,6 +205,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         entityDefUuid,
         valuesByDefUuid,
         categoryItemProvider,
+        taxonProvider,
         insertMissingNodes,
         sideEffect,
       })(this.currentRecord)
@@ -226,6 +229,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         valuesByDefUuid,
         sideEffect,
         categoryItemProvider,
+        taxonProvider,
       })(this.currentRecord)
 
       updateResult.merge(updateResultUpdateAttributes)

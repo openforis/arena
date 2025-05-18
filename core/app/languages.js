@@ -1,6 +1,6 @@
 import { LanguageCode, Languages, LanguagesISO639part2, Objects } from '@openforis/arena-core'
 
-const standards = {
+export const standards = {
   ISO_639_1: 'ISO_639_1',
   ISO_639_2: 'ISO_639_2',
 }
@@ -36,3 +36,7 @@ export const languageItemsSortedByEnLabel = languageCodes
   .sort((lang1, lang2) => lang1.label.localeCompare(lang2.label))
 
 export const languageCodesISO639part2 = Object.keys(LanguagesISO639part2)
+
+export const languageItemsISO639part2SortedByEnLabel = languageCodesISO639part2
+  .map((lang) => ({ value: lang, label: getLanguageISO639part2Label(lang) }))
+  .sort((lang1, lang2) => lang1.label.localeCompare(lang2.label))
