@@ -538,7 +538,7 @@ export const fetchTaxonWithVernacularNamesByUuid = async (
 }
 
 export const fetchTaxonWithVernacularNamesByCode = async (
-  { surveyId, taxonomyUuid, taxonCode, draft },
+  { surveyId, taxonomyUuid, taxonCode, draft = false },
   client = db
 ) => {
   const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, draft, client)
