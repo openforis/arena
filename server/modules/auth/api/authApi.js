@@ -58,6 +58,9 @@ export const init = (app) => {
         if (err) {
           return next(err)
         }
+        res.clearCookie('jwt')
+        res.clearCookie('sessionId')
+        res.clearCookie('sessionId.sig')
         Response.sendOk(res)
       })
     } catch (error) {

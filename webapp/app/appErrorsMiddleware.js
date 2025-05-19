@@ -4,6 +4,7 @@ import { ServiceErrorActions } from '@webapp/store/system'
 
 const ignoredUrlRegExps = [
   /^\/auth\/login$/, // login
+  /^\/auth\/user$/, // user (if not logged in or authorized)
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
 ]

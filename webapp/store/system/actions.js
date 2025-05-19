@@ -6,18 +6,24 @@ export const SYSTEM_INIT = 'system/init'
 export const SYSTEM_RESET = 'system/reset'
 
 export const initSystem = () => async (dispatch) => {
-  const { user, survey } = await API.fetchUserAndSurvey()
+  try {
+    const { user, survey } = await API.fetchLoggedInUserAndSurvey()
 
-  analytics.identify({
-    userId: user?.uuid,
-    properties: user,
-  })
+    analytics.identify({
+      userId: user?.uuid,
+      properties: user,
+    })
 
-  dispatch({ type: SYSTEM_INIT, user, survey })
+    dispatch({ type: SYSTEM_INIT, user, survey })
 
-  const activeJob = await API.fetchActiveJob()
-  if (activeJob) {
-    dispatch(showJobMonitor({ job: activeJob }))
+    if (user) {
+      const activeJob = await API.fetchActiveJob()
+      if (activeJob) {
+        dispatch(showJobMonitor({ job: activeJob }))
+      }
+    }
+  } catch (error) {
+    dispatch({ type: SYSTEM_INIT, user: null, survey: null })
   }
 }
 

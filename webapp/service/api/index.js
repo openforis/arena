@@ -1,4 +1,4 @@
-export { fetchUserAndSurvey } from './fetchUserAndSurvey'
+export { fetchLoggedInUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
   fetchCategories,
