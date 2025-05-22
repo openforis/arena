@@ -12,7 +12,13 @@ const getItemByUuid = async ({ survey, categoryUuid, itemUuid, draft = false }) 
   return CategoryRepository.fetchItemByUuid({ surveyId, categoryUuid, uuid: itemUuid, draft })
 }
 
+const getItems = async ({ survey, categoryUuid, parentItemUuid = null, draft = false }) => {
+  const surveyId = Survey.getId(survey)
+  return CategoryRepository.fetchItemsByParentUuid({ surveyId, categoryUuid, parentUuid: parentItemUuid, draft })
+}
+
 export const CategoryItemProviderDefault = {
   getItemByCodePaths,
   getItemByUuid,
+  getItems,
 }
