@@ -79,9 +79,9 @@ const _addOrUpdateAttribute =
 
 const _addEntityAndKeyValues =
   ({ user, survey, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
-  (record) => {
+  async (record) => {
     const updateResult = new RecordUpdateResult({ record })
-    const updateResultDescendants = CoreRecordNodesUpdater.createNodeAndDescendants({
+    const updateResultDescendants = await CoreRecordNodesUpdater.createNodeAndDescendants({
       user,
       survey,
       record,
@@ -122,7 +122,7 @@ const _addEntityAndKeyValues =
 
 const _getOrCreateEntityByKeys =
   ({ user, survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false }) =>
-  (record) => {
+  async (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
       return { entity: RecordReader.getRootNode(record), updateResult: null }
     }
@@ -164,7 +164,7 @@ const _getOrCreateEntityByKeys =
         keyValues: keyValuePairs,
       })
     }
-    const { entity: entityInserted, updateResult } = _addEntityAndKeyValues({
+    const { entity: entityInserted, updateResult } = await _addEntityAndKeyValues({
       user,
       survey,
       entityDef,
@@ -191,7 +191,7 @@ const getOrCreateEntityByKeys =
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
-    const { entity, updateResult: updateResultEntity } = _getOrCreateEntityByKeys({
+    const { entity, updateResult: updateResultEntity } = await _getOrCreateEntityByKeys({
       user,
       survey,
       entityDefUuid,
