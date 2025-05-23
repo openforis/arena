@@ -13,8 +13,6 @@ import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
 
-const textAreaRows = 3
-
 export const Input = React.forwardRef((props, ref) => {
   const {
     className: classNameProp = null,
@@ -29,6 +27,7 @@ export const Input = React.forwardRef((props, ref) => {
     onBlur = undefined,
     placeholder: placeholderProp = null,
     readOnly = false,
+    textAreaRows = 3,
     textTransformFunction = undefined,
     title: titleProp = null, // defaults to value
     type = 'text',
@@ -144,6 +143,7 @@ Input.propTypes = {
   onBlur: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
+  textAreaRows: PropTypes.number,
   textTransformFunction: PropTypes.func,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   type: PropTypes.oneOf(['text', 'number', 'password']),
