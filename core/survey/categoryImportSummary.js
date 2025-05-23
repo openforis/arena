@@ -4,6 +4,7 @@ export const keys = {
   items: 'items',
   filePath: 'filePath',
   fileFormat: 'fileFormat',
+  rowsCount: 'rowsCount',
 }
 
 export const keysItem = {
@@ -26,14 +27,17 @@ export const itemTypes = {
 
 // ===== SUMMARY
 
-export const newSummary = ({ items, filePath = null }) => ({
+export const newSummary = ({ items, rowsCount = 0, filePath = null }) => ({
   [keys.items]: items,
   [keys.filePath]: filePath,
+  [keys.rowsCount]: rowsCount,
 })
 
 export const getItems = R.propOr([], keys.items)
 
 export const getItemColumns = R.propOr({}, keysItem.columns)
+
+export const getRowsCount = R.propOr(0, keys.rowsCount)
 
 export const getFilePath = R.prop(keys.filePath)
 
