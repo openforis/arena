@@ -23,6 +23,7 @@ export const keys = {
 
 export const keysProps = {
   name: 'name',
+  designerNotes: 'designerNotes',
   itemExtraDef: 'itemExtraDef',
   reportingData: 'reportingData',
 }
@@ -40,6 +41,7 @@ const samplingUnitsPlanCategoryName = 'sampling_units_plan'
 // ====== READ
 export const { getProps, getPropsDraft, getPropsAndPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
+export const getDesignerNotes = ObjectUtils.getProp(keysProps.designerNotes, '')
 export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
 
