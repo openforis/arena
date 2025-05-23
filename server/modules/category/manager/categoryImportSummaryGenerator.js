@@ -48,12 +48,12 @@ const _getGeometryPointTypeColumnNames = ({ itemName }) => locationColumnsSuffix
 
 const _isGeometryPointType = ({ columnName, columnNames }) => {
   const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
-  if (locationColSuffix) {
-    const itemName = _getGeometryPointTypeItemName({ columnName })
-    const locationColumnNames = _getGeometryPointTypeColumnNames({ itemName })
-    return locationColumnNames.every((colName) => columnNames.includes(colName))
+  if (!locationColSuffix) {
+    return false
   }
-  return false
+  const itemName = _getGeometryPointTypeItemName({ columnName })
+  const locationColumnNames = _getGeometryPointTypeColumnNames({ itemName })
+  return locationColumnNames.every((colName) => columnNames.includes(colName))
 }
 
 const _extractColumnTypeByName = ({ columnName, columnPatterns, ignoreLabelsAndDescriptions = false }) => {
