@@ -143,7 +143,7 @@ Input.propTypes = {
   onBlur: PropTypes.func,
   placeholder: PropTypes.string,
   readOnly: PropTypes.bool,
-  textAreaRows: PropTypes.string,
+  textAreaRows: PropTypes.number,
   textTransformFunction: PropTypes.func,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   type: PropTypes.oneOf(['text', 'number', 'password']),
