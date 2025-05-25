@@ -96,6 +96,7 @@ const _determineDataType = ({ isExtra, isGeometryPointType }) => {
 export const createImportSummaryFromColumnNames = ({
   columnNames,
   defaultLang,
+  rowsCount = 0,
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
@@ -172,7 +173,7 @@ export const createImportSummaryFromColumnNames = ({
     return acc
   }, [])
 
-  const summary = CategoryImportSummary.newSummary({ items })
+  const summary = CategoryImportSummary.newSummary({ items, rowsCount })
 
   _validateSummary(summary)
 
@@ -186,10 +187,19 @@ export const createImportSummaryFromStream = async ({
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
-  const columnNames = await FlatDataReader.readHeadersFromStream({ stream, fileFormat })
+  let columnNames = []
+  let rowsCount = 0
+  const reader = FlatDataReader.createReaderFromStream({
+    stream,
+    fileFormat,
+    onHeaders: (headers) => (columnNames = headers),
+    onTotalChange: (total) => (rowsCount = total),
+  })
+  await reader.start()
   const summary = createImportSummaryFromColumnNames({
     columnNames,
     defaultLang,
+    rowsCount,
     codeColumnPattern,
     ignoreLabelsAndDescriptions,
   })
