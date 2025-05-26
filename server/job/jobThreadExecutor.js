@@ -1,7 +1,7 @@
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
-import ThreadsCache from '@server/threads/threadsCache'
 import ThreadManager from '@server/threads/threadManager'
+import ThreadsCache from '@server/threads/threadsCache'
 import DelayedDeleteCache from '@server/utils/DelayedDeleteCache'
 
 import { jobThreadMessageTypes } from './jobUtils'
