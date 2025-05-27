@@ -1,7 +1,8 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import React, { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
 import classNames from 'classnames'
+import PropTypes from 'prop-types'
 
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -24,7 +25,24 @@ const ModuleLink = (props) => {
     active,
   })
 
+  const dispatch = useDispatch()
   const i18n = useI18n()
+  const navigate = useNavigate()
+
+  const navigateToUri = useCallback(
+    (_dispatch, _getState) => {
+      navigate(uri)
+    },
+    [navigate, uri]
+  )
+
+  const onClick = useCallback(
+    (e) => {
+      e.preventDefault()
+      dispatch(navigateToUri)
+    },
+    [dispatch, navigateToUri]
+  )
 
   const testId = TestId.sidebar.moduleBtn(key)
 
@@ -50,11 +68,13 @@ const ModuleLink = (props) => {
   }
   return (
     <Link
-      to={{ pathname: uri }}
+      onClick={onClick}
+      // to={{ pathname: uri }}
       className={className}
       aria-disabled={disabled || active}
       data-testid={testId}
       id={`sidebar_btn_${key}`}
+      variant="text"
     >
       {linkContent}
     </Link>
