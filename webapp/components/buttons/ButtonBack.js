@@ -1,19 +1,19 @@
 import React from 'react'
-import { useNavigate } from 'react-router'
 import classNames from 'classnames'
 
+import { useNavigator } from '@webapp/app/useNavigator'
 import { Button } from './Button'
 
 export const ButtonBack = (props) => {
   const { className, label = 'common.back', ...otherProps } = props
 
-  const navigate = useNavigate()
+  const { navigateBack } = useNavigator()
 
   return (
     <Button
       {...otherProps}
       label={label}
-      onClick={() => navigate(-1)}
+      onClick={navigateBack}
       className={classNames('btn-secondary btn-back', className)}
     />
   )

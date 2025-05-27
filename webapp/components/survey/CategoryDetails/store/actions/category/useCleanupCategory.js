@@ -1,19 +1,22 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router'
 
+import { useNavigator } from '@webapp/app/useNavigator'
 import * as API from '@webapp/service/api'
 import { useSurveyId } from '@webapp/store/survey'
 
 import { State } from '../../state'
 
 export const useCleanupCategory = ({ setState }) => {
-  const navigate = useNavigate()
+  const { navigateBack } = useNavigator()
   const surveyId = useSurveyId()
 
-  return useCallback(async ({ categoryUuid }) => {
-    await API.cleanupCategory({ surveyId, categoryUuid })
-    setState(State.assocCleaned)
-    navigate(-1)
-    return true // returns true to notify the navigation to the previous page
-  }, [])
+  return useCallback(
+    async ({ categoryUuid }) => {
+      await API.cleanupCategory({ surveyId, categoryUuid })
+      setState(State.assocCleaned)
+      navigateBack()
+      return true // returns true to notify the navigation to the previous page
+    },
+    [navigateBack, setState, surveyId]
+  )
 }
