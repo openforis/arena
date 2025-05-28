@@ -136,8 +136,9 @@ export const KmlUploader = () => {
     <div
       className={classNames(`leaflet-top leaflet-right map-kml-uploader-wrapper`, { open })}
       onMouseLeave={onMouseLeave}
+      role="dialog"
     >
-      <span className="icon icon-upload2 icon-24px" title={title} onClick={onIconClick} />
+      <span className="icon icon-upload2 icon-24px" onClick={onIconClick} role="button" title={title} />
       <div className="kml-title">{title}</div>
       <label htmlFor="range">{i18n.t('kmlUploader.opacity')}</label>
       <input
