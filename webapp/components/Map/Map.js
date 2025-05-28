@@ -1,7 +1,7 @@
 import './Map.scss'
 
 import React from 'react'
-import { GeoJSON, MapContainer, ScaleControl } from 'react-leaflet'
+import { GeoJSON, MapContainer, ScaleControl, ZoomControl } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { ButtonSave } from '@webapp/components'
@@ -16,7 +16,7 @@ import { useMap } from './useMap'
 
 import { MapBaseLayerPeriodSelector } from './MapBaseLayerPeriodSelector'
 import { KmlUploader } from './KmlUploader'
-import { ShowZoomLevel } from './ShowZoomLevel'
+import { ZoomLevel } from './ZoomLevel'
 
 // start of workaround to show leaflet marker icon
 import L from 'leaflet'
@@ -52,8 +52,12 @@ export const Map = (props) => {
       {editable && <div className="location-edit-info">{i18n.t('mapView.locationEditInfo')}</div>}
 
       <MapContextProvider>
-        <MapContainer center={centerPositionLatLon} doubleClickZoom={false} zoom={INITIAL_ZOOM_LEVEL}>
-          <ScaleControl position="topleft" />
+        <MapContainer
+          center={centerPositionLatLon}
+          doubleClickZoom={false}
+          zoomControl={false}
+          zoom={INITIAL_ZOOM_LEVEL}
+        >
           <MapLayersControl layers={layers} />
           <MapMarker
             editable={editable}
@@ -69,7 +73,9 @@ export const Map = (props) => {
               <MapBaseLayerPeriodSelector />
             </>
           )}
-          <ShowZoomLevel />
+          <ScaleControl position="bottomright" />
+          <ZoomControl position="bottomright" />
+          <ZoomLevel />
           {/* <WmtsComponent /> */}
         </MapContainer>
       </MapContextProvider>
