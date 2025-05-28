@@ -5,11 +5,11 @@ import axios from 'axios'
 import * as Category from '@core/survey/category'
 
 import { JobActions } from '@webapp/store/app'
-import { useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId } from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 
-import { State } from '../../state'
 import { useRefreshCategory } from '../category/useRefreshCategory'
+import { State } from '../../state'
 
 export const useImportCategory = ({ setState }) => {
   const dispatch = useDispatch()
@@ -32,7 +32,9 @@ export const useImportCategory = ({ setState }) => {
         JobActions.showJobMonitor({
           job,
           onComplete: (jobCompleted) => {
-            refreshCategory({ category: jobCompleted.result.category })
+            const categoryUpdated = jobCompleted.result.category
+            refreshCategory({ category: categoryUpdated })
+            dispatch(SurveyActions.surveyCategoryUpdated(categoryUpdated))
             dispatch(FileUploadDialogActions.close())
           },
         })
