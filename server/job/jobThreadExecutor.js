@@ -1,5 +1,7 @@
 import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
+import { throttle } from '@core/functionsDefer'
+
 import ThreadManager from '@server/threads/threadManager'
 import ThreadsCache from '@server/threads/threadsCache'
 import DelayedDeleteCache from '@server/utils/DelayedDeleteCache'
@@ -7,6 +9,7 @@ import DelayedDeleteCache from '@server/utils/DelayedDeleteCache'
 import { jobThreadMessageTypes } from './jobUtils'
 
 const threadCleanupDelay = 1000 // 1 sec
+const notificationThrottleLimit = 500
 
 // keep active job summaries in a cache (used to get active job status)
 // items deletion is delayed: it can happen that the status of the job is requested after the job has complete.
@@ -60,7 +63,7 @@ export const executeJobThread = (job, onUpdate) => {
   const { type: jobType, params: jobParams, uuid: jobUuid } = job
 
   const thread = new ThreadManager('jobThread.js', { jobType, jobParams, jobUuid }, (job) => {
-    _notifyJobUpdate(job)
+    throttle(_notifyJobUpdate, 'jobThread_' + jobUuid, notificationThrottleLimit)(job)
     onUpdate?.(job)
   })
   const { user } = jobParams
