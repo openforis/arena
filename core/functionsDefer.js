@@ -37,22 +37,20 @@ export const throttle = (func, id, limit = 500) => {
     const runFunction = () => {
       func.apply(context, args)
       throttleLastRan[id] = Date.now()
-
       delete throttleTimeouts[id]
     }
 
-    const lastRun = throttleLastRan[id]
-    if (lastRun) {
-      clearTimeout(throttleTimeouts[id])
+    const prevTimeout = throttleTimeouts[id]
+    if (prevTimeout) {
+      clearTimeout(prevTimeout)
 
+      const lastRun = throttleLastRan[id]
       const timeSinceLastRun = Date.now() - lastRun
       const nextRunTimeout = limit - timeSinceLastRun
 
       if (nextRunTimeout > 0) {
         throttleTimeouts[id] = setTimeout(() => {
-          if (Date.now() - lastRun >= limit) {
-            runFunction()
-          }
+          runFunction()
         }, nextRunTimeout)
       } else {
         runFunction()
