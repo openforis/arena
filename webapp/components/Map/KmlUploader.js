@@ -1,16 +1,14 @@
 import './KmlUploader.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
-
-import { useI18n } from '@webapp/store/system'
-
+import shp from 'shpjs'
 import L from 'leaflet'
-
 require('./L.KML')
 
+import { useI18n } from '@webapp/store/system'
 import { ZipForEach } from '@webapp/utils/zipUtils'
-import shp from 'shpjs'
+import classNames from 'classnames'
 
 export const KmlUploader = () => {
   const map = useMap()
@@ -20,6 +18,7 @@ export const KmlUploader = () => {
   const [selectedFile, setSelectedFile] = useState()
   const [layers, setLayers] = useState([])
   const [opacity, setOpacity] = useState(50)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (selectedFile) {
@@ -34,6 +33,14 @@ export const KmlUploader = () => {
       }
     }
   }, [selectedFile])
+
+  const onIconClick = useCallback(() => {
+    setOpen(true)
+  }, [])
+
+  const onMouseLeave = useCallback(() => {
+    setOpen(false)
+  }, [])
 
   const processGeoJson = (file) => {
     const reader = new FileReader()
@@ -123,9 +130,15 @@ export const KmlUploader = () => {
     map.dragging.enable()
   }
 
+  const title = i18n.t('kmlUploader.title')
+
   return (
-    <div className="leaflet-bottom map-kml-uploader-wrapper">
-      <div className="kml-title">{i18n.t('kmlUploader.title')}</div>
+    <div
+      className={classNames(`leaflet-top leaflet-right map-kml-uploader-wrapper`, { open })}
+      onMouseLeave={onMouseLeave}
+    >
+      <span className="icon icon-upload2 icon-24px" title={title} onClick={onIconClick} />
+      <div className="kml-title">{title}</div>
       <label htmlFor="range">{i18n.t('kmlUploader.opacity')}</label>
       <input
         type="range"
