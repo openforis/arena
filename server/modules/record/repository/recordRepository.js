@@ -163,6 +163,29 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
   )
 }
 
+const determineOrderBy = ({ nodeDefKeys, sortBy, rootEntityTableAlias }) => {
+  const getNodeDefKeyColumnName = NodeDefTable.getColumnName
+  const getNodeDefKeyColAlias = NodeDef.getName
+
+  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, keyDef) => {
+    const colName = NodeDef.isCode(keyDef)
+      ? ColumnNodeDef.getCodeLabelColumnName(keyDef)
+      : getNodeDefKeyColumnName(keyDef)
+    acc[getNodeDefKeyColAlias(keyDef)] = colName
+    return acc
+  }, {})
+
+  const sortByColumnName = StringUtils.toSnakeCase(sortBy)
+
+  if (nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(sortByColumnName)) {
+    return `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[sortByColumnName]}`
+  }
+  if (sortBy === Record.keys.ownerName) {
+    return 'u.name'
+  }
+  return `r.${sortByColumnName}`
+}
+
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
@@ -183,15 +206,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
-  const getNodeDefKeyColumnName = NodeDefTable.getColumnName
-  const getNodeDefKeyColAlias = NodeDef.getName
-  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, keyDef) => {
-    const colName = NodeDef.isCode(keyDef)
-      ? ColumnNodeDef.getCodeLabelColumnName(keyDef)
-      : getNodeDefKeyColumnName(keyDef)
-    acc[getNodeDefKeyColAlias(keyDef)] = colName
-    return acc
-  }, {})
+
   const nodeDefKeysSelect = nodeDefKeys
     ?.flatMap((nodeDefKey) => {
       const colNames = NodeDefTable.getColumnNames(nodeDefKey)
@@ -219,7 +234,6 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
-  const sortByColumnName = StringUtils.toSnakeCase(sortBy)
 
   return client.map(
     `
@@ -255,11 +269,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
     ${whereCondition}
 
-    ORDER BY ${
-      nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(sortByColumnName)
-        ? `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[sortByColumnName]}`
-        : `r.${sortByColumnName}`
-    } ${sortOrder}
+    ORDER BY ${determineOrderBy({ nodeDefKeys, sortBy, rootEntityTableAlias })} ${sortOrder}
 
     ${limit ? 'LIMIT $/limit:value/' : ''}
 
