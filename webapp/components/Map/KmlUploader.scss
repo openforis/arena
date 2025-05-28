@@ -1,20 +1,33 @@
 @use '~@webapp/style/vars' as *;
 
 .map-kml-uploader-wrapper {
-  display: flexbox;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   pointer-events: all;
   margin-left: 1rem;
-  width: 250px;
-  height: 20px;
   background-color: rgba($white, 0.7);
   overflow: hidden;
+  position: absolute;
+  top: 70px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  z-index: 4;
 
-  &:hover {
+  .icon {
+    margin: 0.2rem;
+  }
+
+  &.open {
     height: 220px;
+    width: 260px;
     display: flex;
+    gap: 1rem;
+
+    .icon {
+      display: none;
+    }
   }
 
   .file-select-wrapper {
@@ -58,13 +71,13 @@
     color: #555;
   }
 
-  input:hover+label,
-  input:focus+label {
+  input:hover + label,
+  input:focus + label {
     transform: scale(1);
   }
 
   /* Adding an outline to the label on focus */
-  input:focus+label {
+  input:focus + label {
     outline: 1px solid #000;
     outline: -webkit-focus-ring-color auto 2px;
   }
