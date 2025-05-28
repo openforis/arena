@@ -119,6 +119,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         header: 'dataView.records.owner',
         hidden: true,
         renderItem: RecordOwnerColumn,
+        sortable: true,
         width: 'minmax(auto, 15rem)',
       },
       {
