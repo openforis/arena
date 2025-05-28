@@ -72,7 +72,7 @@ const _replaceUpdatedNodesInEntities = ({
   const metaTarget = Node.getMeta(entityTarget)
   if (!Objects.isEqual(metaSource, metaTarget)) {
     const entityTargetUpdated = A.pipe(Node.assocMeta(metaSource), Node.assocUpdated(true))(entityTarget)
-    updateResult.addNode(entityTargetUpdated)
+    updateResult.addNode(entityTargetUpdated, { sideEffect })
   }
 
   Survey.getNodeDefChildren(
@@ -102,7 +102,7 @@ const _replaceUpdatedNodesInEntities = ({
       RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
         const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
         delete newNodeToAdd[Node.keys.id] // clear internal id
-        updateResult.addNode(newNodeToAdd)
+        updateResult.addNode(newNodeToAdd, { sideEffect })
       })(recordSource)
     })
 
@@ -167,13 +167,21 @@ export const replaceUpdatedNodes =
     })
   }
 
+const _recalculateNodeHierarchy = ({ parentEntity, node }) => {
+  const parentEntityUuid = Node.getUuid(parentEntity)
+  node[Node.keys.parentUuid] = parentEntityUuid
+  const hierarchyUpdated = [...Node.getHierarchy(parentEntity), parentEntityUuid]
+  Objects.setInPath({ obj: node, path: [Node.keys.meta, Node.metaKeys.hierarchy], value: hierarchyUpdated })
+}
+
 const _addNodeToUpdateResult = ({
   updateResult,
   node,
   parentEntity: parentEntityParam = undefined,
   assignNewUuid = false,
+  sideEffect = false,
 }) => {
-  const newNodeToAdd = Node.assocCreated(true)(node)
+  const newNodeToAdd = sideEffect ? Node.setCreated(node) : Node.assocCreated(true)(node)
   if (assignNewUuid) {
     newNodeToAdd[Node.keys.uuid] = UUIDs.v4()
   }
@@ -181,11 +189,8 @@ const _addNodeToUpdateResult = ({
   newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
 
   const parentEntity = parentEntityParam ?? RecordReader.getNodeByUuid(Node.getParentUuid(node))(updateResult.record)
-  const parentEntityUuid = Node.getUuid(parentEntity)
-  newNodeToAdd[Node.keys.parentUuid] = parentEntityUuid
-  const hieararchyUpdated = [...Node.getHierarchy(parentEntity), parentEntityUuid]
-  Objects.setInPath({ obj: newNodeToAdd, path: [Node.keys.meta, Node.metaKeys.hierarchy], value: hieararchyUpdated })
-  updateResult.addNode(newNodeToAdd)
+  _recalculateNodeHierarchy({ node: newNodeToAdd, parentEntity })
+  updateResult.addNode(newNodeToAdd, { sideEffect })
 }
 
 const _mergeSingleAttributeValues = ({
@@ -300,17 +305,14 @@ const _cloneEntityAndDescendants = async ({ updateResult, recordSource, entitySo
       visitedChildSource === entitySource
         ? Node.getUuid(parentEntity)
         : newNodeUuidByOldUuid[oldParentUuid] ?? oldParentUuid
-    const hierarchyUpdated = Node.getHierarchy(visitedChildSource).map(
-      (ancestorUuid) => newNodeUuidByOldUuid[ancestorUuid] ?? ancestorUuid
-    )
     const nodeTarget = ObjectUtils.clone(visitedChildSource)
-    Node.removeFlags({ sideEffect: true })(nodeTarget)
-    nodeTarget[Node.keys.created] = true // consider it as new record, to allow RDB updates
+    const sideEffect = true
+    Node.removeFlags({ sideEffect })(nodeTarget)
+    nodeTarget[Node.keys.created] = true // consider it as new node, to allow RDB updates
     nodeTarget[Node.keys.uuid] = newUuid
     nodeTarget[Node.keys.parentUuid] = newParentEntityUuid
-    nodeTarget[Node.keys.meta][Node.metaKeys.hierarchy] = hierarchyUpdated
-
-    _addNodeToUpdateResult({ updateResult, node: nodeTarget })
+    // node hierarchy will be recalculated in _addNodeToUpdateResult
+    _addNodeToUpdateResult({ updateResult, node: nodeTarget, sideEffect })
   })(recordSource)
 }
 
