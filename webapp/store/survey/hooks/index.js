@@ -77,7 +77,7 @@ export const useNodeDefByName = (name) =>
   useSelector((state) => {
     if (!name) return null
     const survey = SurveyState.getSurvey(state)
-    return Survey.getNodeDefByName(name)(survey)
+    return Survey.findNodeDefByName(name)(survey)
   })
 
 export const useNodeDefsByUuids = (uuids) =>
@@ -91,7 +91,7 @@ export const useNodeDefsByNames = (names) =>
   useSelector((state) => {
     if (!names?.length) return []
     const survey = SurveyState.getSurvey(state)
-    return names.map((name) => Survey.getNodeDefByName(name)(survey))
+    return names.map((name) => Survey.findNodeDefByName(name)(survey)).filter(Boolean)
   }, Objects.isEqual)
 
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
