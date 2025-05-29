@@ -38,7 +38,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
           }}
           disabled={!canAddNode}
           iconClassName="icon-plus icon-10px icon-left"
-          label="surveyForm.nodeDefEntityForm.addNewEntity"
+          label="surveyForm:nodeDefEntityForm.addNewEntity"
           labelParams={{ name: nodeDefName }}
         />
       )}
@@ -46,7 +46,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
         <>
           <FormItem
             className="node-select-form-item"
-            label={selectedNode ? 'surveyForm.nodeDefEntityForm.selectedEntity' : 'surveyForm.nodeDefEntityForm.select'}
+            label={selectedNode ? 'surveyForm:nodeDefEntityForm.selectedEntity' : 'surveyForm:nodeDefEntityForm.select'}
             labelParams={{ name: nodeDefName }}
           >
             <select
@@ -77,7 +77,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
               onClick={() => {
                 dispatch(
                   DialogConfirmActions.showDialogConfirm({
-                    key: 'surveyForm.nodeDefEntityForm.confirmDelete',
+                    key: 'surveyForm:nodeDefEntityForm.confirmDelete',
                     onOk: () => {
                       onChange(null)
                       removeNode(nodeDef, selectedNode)

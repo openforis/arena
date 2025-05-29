@@ -44,7 +44,7 @@ const AddNodeDefButtons = (props) => {
             }}
             aria-disabled={disabled}
           >
-            {i18n.t(`surveyForm.addChildToTypes.${type}`)}
+            {i18n.t(`surveyForm:addChildToTypes.${type}`)}
             {NodeDefUIProps.getIconByType(type)}
           </button>
         )
@@ -68,7 +68,7 @@ const AddNodeDefPanel = (props) => {
 
         <div className="flex-center add-to-label">
           <span className="icon icon-plus icon-10px icon-left" />
-          {i18n.t('surveyForm.addChildTo', { nodeDefLabel })}
+          {i18n.t('surveyForm:addChildTo', { nodeDefLabel })}
         </div>
 
         <AddNodeDefButtons

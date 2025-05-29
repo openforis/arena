@@ -35,7 +35,7 @@ export const checkAndConfirmUpdateNode = ({ dispatch, getState, node, nodeDef, o
   if (dependentEnumeratedEntityDefsLabel) {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'surveyForm.confirmUpdateDependentEnumeratedEntities',
+        key: 'surveyForm:confirmUpdateDependentEnumeratedEntities',
         params: { entityDefs: dependentEnumeratedEntityDefsLabel },
         onOk: onOk,
       })

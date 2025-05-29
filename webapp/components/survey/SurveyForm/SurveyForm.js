@@ -46,7 +46,7 @@ const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
 
 const treeSelectViewModeItems = Object.keys(TreeSelectViewMode).map((mode) => ({
   key: mode,
-  label: `surveyForm.nodeDefsTreeSelectMode.${mode}`,
+  label: `surveyForm:nodeDefsTreeSelectMode.${mode}`,
 }))
 
 const SurveyForm = (props) => {

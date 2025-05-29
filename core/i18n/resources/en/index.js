@@ -3,6 +3,7 @@ import appErrors from './appErrors'
 import common from './common'
 import jobs from './jobs'
 import surveyCreate from './surveyCreate'
+import surveyForm from './surveyForm'
 
 export default {
   activityLog,
@@ -10,4 +11,5 @@ export default {
   common,
   jobs,
   surveyCreate,
+  surveyForm,
 }
