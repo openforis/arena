@@ -158,6 +158,10 @@ export const { assocValidation } = Validation
 export const { assocMeta, mergeMeta, assocChildApplicability, assocIsDefaultValueApplied } = NodeMeta
 
 export const assocCreated = R.assoc(keys.created)
+export const setCreated = (node) => {
+  node[keys.created] = true
+  return node
+}
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
 export const removeFlags =
