@@ -12,12 +12,21 @@ import * as RecordReader from './recordReader'
 import { updateAttributeValue } from './recordNodeValueUpdater'
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
 
-const findEntityByUuidOrKeys = ({ survey, record, entityDefUuid, parentEntity, uuid, keyValuesByDefUuid }) => {
-  const entityWithSameUuid = Records.getNodeByUuid(uuid)(record)
-  return (
-    entityWithSameUuid ??
-    Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
-  )
+const findEntityByUuidOrKeys = ({
+  survey,
+  record,
+  entityDefUuid,
+  parentEntity,
+  uuid = null,
+  keyValuesByDefUuid = null,
+}) => {
+  const entityWithSameUuid = uuid ? Records.getNodeByUuid(uuid)(record) : null
+  if (entityWithSameUuid) {
+    return entityWithSameUuid
+  }
+  return keyValuesByDefUuid
+    ? Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
+    : null
 }
 
 const _findNodeWithSameUuid = (nodeSearch, nodesArray) =>
@@ -294,7 +303,13 @@ const _mergeMultipleAttributes = ({
   }
 }
 
-const _cloneEntityAndDescendants = async ({ updateResult, recordSource, entitySource, parentEntity }) => {
+const _cloneEntityAndDescendants = async ({
+  updateResult,
+  recordSource,
+  entitySource,
+  parentEntity,
+  sideEffect = false,
+}) => {
   const newNodeUuidByOldUuid = {}
   RecordReader.visitDescendantsAndSelf(entitySource, (visitedChildSource) => {
     const oldUuid = Node.getUuid(visitedChildSource)
@@ -306,8 +321,7 @@ const _cloneEntityAndDescendants = async ({ updateResult, recordSource, entitySo
         ? Node.getUuid(parentEntity)
         : newNodeUuidByOldUuid[oldParentUuid] ?? oldParentUuid
     const nodeTarget = ObjectUtils.clone(visitedChildSource)
-    const sideEffect = true
-    Node.removeFlags({ sideEffect })(nodeTarget)
+    Node.removeFlags({ sideEffect: true })(nodeTarget)
     nodeTarget[Node.keys.created] = true // consider it as new node, to allow RDB updates
     nodeTarget[Node.keys.uuid] = newUuid
     nodeTarget[Node.keys.parentUuid] = newParentEntityUuid
@@ -324,6 +338,7 @@ const _mergeMultipleEntities = ({
   childrenSource,
   entityTarget,
   stack,
+  sideEffect = false,
 }) => {
   childrenSource.forEach((childSource) => {
     const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
@@ -345,7 +360,13 @@ const _mergeMultipleEntities = ({
       stack.push({ entitySource: childSource, entityTarget: childTarget })
     } else {
       // add new entity
-      _cloneEntityAndDescendants({ updateResult, recordSource, entitySource: childSource, parentEntity: entityTarget })
+      _cloneEntityAndDescendants({
+        updateResult,
+        recordSource,
+        entitySource: childSource,
+        parentEntity: entityTarget,
+        sideEffect,
+      })
     }
   })
 }
@@ -388,7 +409,16 @@ const _mergeRecordsNodes = ({
     }
   } else if (NodeDef.isEntity(childDef)) {
     // multiple entity
-    _mergeMultipleEntities({ updateResult, survey, recordSource, childrenSource, childDefUuid, entityTarget, stack })
+    _mergeMultipleEntities({
+      updateResult,
+      survey,
+      recordSource,
+      childrenSource,
+      childDefUuid,
+      entityTarget,
+      stack,
+      sideEffect,
+    })
   } else {
     // multiple attributes merge
     _mergeMultipleAttributes({
