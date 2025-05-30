@@ -40,14 +40,14 @@ export const throttle = (func, id, limit = 500) => {
       delete throttleTimeouts[id]
     }
 
+    const lastRun = throttleLastRan[id]
     const prevTimeout = throttleTimeouts[id]
-    if (prevTimeout) {
-      clearTimeout(prevTimeout)
-
-      const lastRun = throttleLastRan[id]
+    if (lastRun || prevTimeout) {
+      if (prevTimeout) {
+        clearTimeout(prevTimeout)
+      }
       const timeSinceLastRun = Date.now() - lastRun
       const nextRunTimeout = limit - timeSinceLastRun
-
       if (nextRunTimeout > 0) {
         throttleTimeouts[id] = setTimeout(() => {
           runFunction()
