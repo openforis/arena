@@ -75,7 +75,7 @@ export const ChainBasicProps = (props) => {
               <span>
                 {i18n.t('chainView.recordsInStepCount', {
                   recordsCount: recordsCountByStep[id],
-                  step: i18n.t(`surveyForm.step.${name}`),
+                  step: i18n.t(`surveyForm:step.${name}`),
                 })}
               </span>
             </div>

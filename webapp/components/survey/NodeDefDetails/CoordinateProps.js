@@ -28,17 +28,17 @@ const CoordinateProps = (props) => {
         <div className="display-flex">
           <Checkbox
             checked={NodeDef.isAccuracyIncluded(nodeDef)}
-            label="surveyForm.nodeDefCoordinate.accuracy"
+            label="surveyForm:nodeDefCoordinate.accuracy"
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAccuracy, value })}
           />
           <Checkbox
             checked={NodeDef.isAltitudeIncluded(nodeDef)}
-            label="surveyForm.nodeDefCoordinate.altitude"
+            label="surveyForm:nodeDefCoordinate.altitude"
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitude, value })}
           />
           <Checkbox
             checked={NodeDef.isAltitudeAccuracyIncluded(nodeDef)}
-            label="surveyForm.nodeDefCoordinate.altitudeAccuracy"
+            label="surveyForm:nodeDefCoordinate.altitudeAccuracy"
             onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.includeAltitudeAccuracy, value })}
           />
         </div>

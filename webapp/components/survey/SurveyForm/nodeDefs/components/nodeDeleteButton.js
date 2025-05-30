@@ -29,7 +29,7 @@ const NodeDeleteButton = (props) => {
     if (showConfirm) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'surveyForm.confirmNodeDelete',
+          key: 'surveyForm:confirmNodeDelete',
           params: { nodeDefType, nodeDefLabel },
           onOk: handleDelete,
         })

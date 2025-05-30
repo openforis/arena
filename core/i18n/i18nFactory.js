@@ -1,17 +1,20 @@
 import i18next from 'i18next'
-import { initReactI18next, Trans as i18nTrans } from 'react-i18next'
 import * as ProcessUtils from '@core/processUtils'
 
 import enTranslation from './resources/en'
+import mnTranslation from './resources/mn'
 
-export const Trans = i18nTrans
+const resources = {
+  en: enTranslation,
+  mn: mnTranslation,
+}
 
 const defaultLanguage = 'en'
 
-const namespaces = ['common', 'appErrors', 'jobs', 'surveyCreate']
+const namespaces = ['common', 'appErrors', 'jobs', 'surveyCreate', 'surveyForm']
 const defaultNamespace = 'common'
 
-const createParams = (lang) => ({
+const createParams = (lang = defaultLanguage) => ({
   fallbackLng: defaultLanguage,
   debug: ProcessUtils.isEnvDevelopment,
 
@@ -23,9 +26,7 @@ const createParams = (lang) => ({
   lng: lang,
   ns: namespaces,
   defaultNS: defaultNamespace,
-  resources: {
-    en: enTranslation,
-  },
+  resources,
 })
 
 export const createI18nAsync = (lang = defaultLanguage) => {
@@ -45,6 +46,6 @@ export const createI18nAsync = (lang = defaultLanguage) => {
 }
 
 const i18n = i18next.createInstance()
-i18n.use(initReactI18next).init(createParams(defaultLanguage))
+i18n.init(createParams())
 
 export default i18n

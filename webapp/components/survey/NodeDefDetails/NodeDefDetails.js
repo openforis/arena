@@ -105,7 +105,7 @@ const NodeDefDetails = (props) => {
             textTransformFunction={StringUtils.normalizeName}
           />
           <div className="attribute-selector">
-            {i18n.t(`surveyForm.addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
+            {i18n.t(`surveyForm:addChildToTypes.${nodeDefType}`)} {NodeDefUIProps.getIconByType(nodeDefType)}
           </div>
         </FormItem>
 

@@ -25,7 +25,7 @@ const NodeDefCodeCheckbox = (props) => {
     <div className="survey-form__node-def-code">
       {edit ? (
         <button type="button" className="btn btn-s deselectable" aria-disabled disabled>
-          {i18n.t('surveyForm.nodeDefCode.buttonCode')}
+          {i18n.t('surveyForm:nodeDefCode.buttonCode')}
         </button>
       ) : (
         items.map((item) => {

@@ -104,7 +104,7 @@ export const NodeDefEditButtonsMenu = (props) => {
           content: (
             <Button
               iconClassName={iconByAction[action]}
-              label={`surveyForm.${action}`}
+              label={`surveyForm:${action}`}
               labelParams={{ nodeDefLabel }}
               onClick={openEntitySelectDialog(action)}
               onMouseDown={(e) => e.stopPropagation()}
@@ -120,7 +120,7 @@ export const NodeDefEditButtonsMenu = (props) => {
           content: (
             <Button
               iconClassName="icon-loop2 icon-12px"
-              label="surveyForm.convert"
+              label="surveyForm:convert"
               labelParams={{ nodeDefLabel }}
               onClick={openConvertIntoDialog}
               onMouseDown={(e) => e.stopPropagation()}
@@ -137,7 +137,7 @@ export const NodeDefEditButtonsMenu = (props) => {
         key: 'node-delete',
         content: (
           <ButtonDelete
-            label="surveyForm.delete"
+            label="surveyForm:delete"
             labelParams={{ nodeDefLabel }}
             onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef))}
             onMouseDown={(e) => e.stopPropagation()}
