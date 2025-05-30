@@ -1,5 +1,6 @@
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -33,6 +34,16 @@ const sendUserSurvey = async (res, user, surveyId) => {
 }
 
 export const init = (app) => {
+  app.get('/api/version', async (_req, res, next) => {
+    try {
+      const packageJson = JSON.parse(await FileUtils.readFile('package.json'))
+      const { version } = packageJson
+      res.json({ version })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)
