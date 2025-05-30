@@ -1,6 +1,13 @@
+import detector from 'i18next-browser-languagedetector'
+import { initReactI18next, Trans as i18nTrans } from 'react-i18next'
+
 import i18n from '@core/i18n/i18nFactory'
 
-export const useI18n = () => i18n
+const browserI18n = i18n.use(detector).use(initReactI18next)
+browserI18n.changeLanguage(navigator.language)
 
-export const useLang = () => i18n.language
+export const useI18n = () => browserI18n
 
+export const useI18nTrans = () => i18nTrans
+
+export const useLang = () => browserI18n.language
