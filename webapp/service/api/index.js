@@ -1,3 +1,5 @@
+export { fetchVersion } from './generic'
+
 export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
