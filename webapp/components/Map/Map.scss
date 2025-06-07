@@ -35,12 +35,18 @@
       }
     }
 
-    .leaflet-control-layers.leaflet-control {
+    .leaflet-top.leaflet-right {
       z-index: 5;
     }
 
-    .leaflet-control-layers-toggle {
-      background-image: url('/img/map-layers-toggle.png');
+    .leaflet-control-container {
+      // layers control
+      .leaflet-control-layers-toggle {
+        background-image: url('/img/map-layers-toggle.png');
+      }
+      .leaflet-top.leaflet-right {
+        z-index: 6;
+      }
     }
 
     .leaflet-popup-content {

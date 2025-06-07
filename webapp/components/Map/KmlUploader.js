@@ -140,18 +140,6 @@ export const KmlUploader = () => {
     >
       <span className="icon icon-upload2 icon-24px" onClick={onIconClick} role="button" title={title} />
       <div className="kml-title">{title}</div>
-      <label htmlFor="range">{i18n.t('kmlUploader.opacity')}</label>
-      <input
-        type="range"
-        min="1"
-        max="100"
-        value={opacity}
-        onChange={rangeChangeHandler}
-        onMouseDown={rangeOnMouseDown}
-        onMouseUp={rangeOnMouseUp}
-        name="range"
-        id="range"
-      />
       <div className="file-select-wrapper">
         <div className="file-input">
           <label htmlFor="file">{i18n.t('kmlUploader.selectFile')}</label>
@@ -165,6 +153,22 @@ export const KmlUploader = () => {
           />
         </div>
       </div>
+      {selectedFile && (
+        <>
+          <label htmlFor="range">{i18n.t('kmlUploader.opacity')}</label>
+          <input
+            type="range"
+            min="1"
+            max="100"
+            value={opacity}
+            onChange={rangeChangeHandler}
+            onMouseDown={rangeOnMouseDown}
+            onMouseUp={rangeOnMouseUp}
+            name="range"
+            id="range"
+          />
+        </>
+      )}
     </div>
   )
 }
