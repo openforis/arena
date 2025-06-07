@@ -47,8 +47,8 @@ export const UpdateRecordsStepDropdown = ({ onRecordsUpdate, records }) => {
     const recordsToMoveUuids = recordsToMove.map(Record.getUuid)
     const count = recordsToMoveUuids.length
 
-    const stepFromLabel = i18n.t(`surveyForm.step.${stepFrom}`)
-    const stepToLabel = i18n.t(`surveyForm.step.${stepTo}`)
+    const stepFromLabel = i18n.t(`surveyForm:step.${stepFrom}`)
+    const stepToLabel = i18n.t(`surveyForm:step.${stepTo}`)
 
     if (count === 0) {
       dispatch(

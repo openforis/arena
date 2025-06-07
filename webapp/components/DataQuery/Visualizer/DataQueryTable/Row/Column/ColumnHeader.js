@@ -33,7 +33,7 @@ const getColLabelKey = ({ columnName, nodeDef }) => {
   const field = getFieldByViewColumnName({ columnName, nodeDef })
   const fieldCamelized = A.camelize(field)
   const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
-  return `surveyForm.${nodeDefTypePrefix}.${fieldCamelized}`
+  return `surveyForm:${nodeDefTypePrefix}.${fieldCamelized}`
 }
 
 const ColumnHeader = (props) => {

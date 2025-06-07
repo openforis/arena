@@ -59,7 +59,7 @@ const NodeDefCodeDropdown = (props) => {
             if (item) onItemAdd(item)
             else onItemRemove(item)
           }}
-          placeholder={autocomplete ? i18n.t('surveyForm.nodeDefCode.typeCodeOrLabel') : undefined}
+          placeholder={autocomplete ? i18n.t('surveyForm:nodeDefCode.typeCodeOrLabel') : undefined}
           readOnly={entryDisabled}
           selection={Objects.isEmpty(selectedItems) ? null : R.head(selectedItems)}
           testId={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
