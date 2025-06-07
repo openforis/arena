@@ -111,7 +111,7 @@ const AttributesSelector = (props) => {
       )}
       {visibleChildDefs.length > 0 && (
         <ExpansionPanel buttonLabel={NodeDef.getLabel(nodeDefContext, lang)} showHeader={showLabel}>
-          {onAttributesSelection && visibleChildDefs.length > minDefsToShowSelectAll && (
+          {canSelectAttributes && onAttributesSelection && visibleChildDefs.length > minDefsToShowSelectAll && (
             <Checkbox
               checked={allSelected}
               indeterminate={allSelectionIndeterminate}

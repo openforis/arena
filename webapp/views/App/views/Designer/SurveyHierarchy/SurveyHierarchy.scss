@@ -1,6 +1,7 @@
 @use '~@webapp/style/vars' as *;
 
-.survey-hierarchy {
+.app__container .app-module > .survey-hierarchy {
+  overflow: hidden; // scrollbars managed in .category__levels
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -13,9 +14,12 @@
   }
 
   .survey-hierarchy__center {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    height: 100%;
+    display: flex;
+    flex: 1;
+
+    .survey-hierarchy__tree {
+      flex: 1;
+    }
 
     .survey-hierarchy__attributes {
       height: 100%;
@@ -23,6 +27,12 @@
       .node-defs-selector {
         width: 20rem;
       }
+    }
+  }
+
+  .attributes-selector {
+    .expansion-panel__content {
+      overflow-y: auto;
     }
   }
 }
