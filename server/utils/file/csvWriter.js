@@ -1,12 +1,13 @@
 import { Transform } from 'json2csv'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
+import { CsvField } from './csvField'
 
 const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
   const options = { ...FlatDataWriterUtils.defaultOptions, ...optionsParam }
   const { objectTransformer = null } = options
   const transform = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)
-  const opts = { fields, transforms: [transform] }
+  const opts = { fields: CsvField.getNames(fields), transforms: [transform] }
   const transformOpts = {
     objectMode: true,
     highWaterMark: 512,
