@@ -49,7 +49,9 @@ export const useSortEditor = ({ query }) => {
   const [variables, setVariables] = useState([])
   useEffect(() => {
     if (survey && entityDef && attributeDefUuids && lang) {
-      setVariables(getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }))
+      getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }).then((_variables) => [
+        setVariables(_variables),
+      ])
     }
   }, [survey, cycle, entityDef, attributeDefUuids, lang])
 
