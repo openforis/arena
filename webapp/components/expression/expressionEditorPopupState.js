@@ -3,8 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 
-import { useLang } from '@webapp/store/system'
-import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'
@@ -45,7 +44,7 @@ export const useExpressionEditorPopupState = (props) => {
 
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const editorType = type.length === 1 ? type[0] : null
 
   // An encoding trick. Newlines can only appear in a textarea,

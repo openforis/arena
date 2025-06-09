@@ -9,10 +9,12 @@ const resources = {
   mn: mnTranslation,
 }
 
-const defaultLanguage = 'en'
+export const defaultLanguage = 'en'
 
 const namespaces = ['common', 'appErrors', 'jobs', 'surveyCreate', 'surveyForm']
 const defaultNamespace = 'common'
+
+export const supportedLanguages = Object.keys(resources)
 
 const createParams = (lang = defaultLanguage) => ({
   fallbackLng: defaultLanguage,
@@ -27,6 +29,7 @@ const createParams = (lang = defaultLanguage) => ({
   ns: namespaces,
   defaultNS: defaultNamespace,
   resources,
+  supportedLngs: supportedLanguages,
 })
 
 export const createI18nAsync = (lang = defaultLanguage) => {
