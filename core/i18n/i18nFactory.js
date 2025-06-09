@@ -3,10 +3,12 @@ import * as ProcessUtils from '@core/processUtils'
 
 import enTranslation from './resources/en'
 import mnTranslation from './resources/mn'
+import ruTranslation from './resources/ru'
 
 const resources = {
   en: enTranslation,
   mn: mnTranslation,
+  ru: ruTranslation,
 }
 
 export const defaultLanguage = 'en'
