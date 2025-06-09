@@ -126,11 +126,8 @@ export const getItemValidation = (item) =>
 
 // ====== ITEMS extra def
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
-export const getItemExtraDefKeys = (category) => {
-  const itemExtraDef = getItemExtraDef(category)
-  return Object.keys(itemExtraDef)
-}
 export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
+export const getItemExtraDefKeys = (category) => getItemExtraDefsArray(category).map(ExtraPropDef.getName)
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
