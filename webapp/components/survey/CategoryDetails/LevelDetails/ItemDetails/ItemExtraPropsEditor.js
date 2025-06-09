@@ -85,6 +85,13 @@ GeometryPointExtraPropEditor.propTypes = {
   validation: PropTypes.object,
 }
 
+const extraPropValueToInputValue = (value) => {
+  if (A.isEmpty(value)) {
+    return ''
+  }
+  return typeof value === 'object' ? JSON.stringify(value) : value
+}
+
 export const ItemExtraPropsEditor = (props) => {
   const { item, itemExtraDefsArray, readOnly, updateProp, validation } = props
 
@@ -106,7 +113,7 @@ export const ItemExtraPropsEditor = (props) => {
         ) : (
           <FormItem label={key} key={key}>
             <Input
-              value={CategoryItem.getExtraProp(key)(item)}
+              value={extraPropValueToInputValue(CategoryItem.getExtraProp(key)(item))}
               numberFormat={dataType === ExtraPropDef.dataTypes.number ? NumberFormats.decimal() : null}
               readOnly={readOnly}
               validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
