@@ -124,7 +124,7 @@ const UserEdit = () => {
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
       {canEditSystemAdmin && (
-        <FormItem label="authGroups.systemAdmin.label">
+        <FormItem label="auth:authGroups.systemAdmin.label">
           <Checkbox
             checked={systemAdmin}
             onChange={(value) => {
@@ -138,7 +138,7 @@ const UserEdit = () => {
         </FormItem>
       )}
       {canEditSurveyManager && !systemAdmin && (
-        <FormItem label="authGroups.surveyManager.label">
+        <FormItem label="auth:authGroups.surveyManager.label">
           <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
         </FormItem>
       )}
