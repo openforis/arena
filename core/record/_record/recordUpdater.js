@@ -20,7 +20,7 @@ import * as RecordReader from './recordReader'
  * @returns {object} - The updated record.
  */
 export const mergeNodes =
-  (nodes, { removeFlags = false, sideEffect = false } = {}) =>
+  (nodes, { removeFlags = false, removeDirtyFlag = true, sideEffect = false } = {}) =>
   (record) => {
     let recordUpdated = sideEffect ? record : { ...record }
     if (!(keys.nodes in recordUpdated)) {
@@ -43,7 +43,7 @@ export const mergeNodes =
 
         if (toBeAdded) {
           // Remove "updated" and "created" flags (used by Survey RDB generation)
-          const nodeUpdated = removeFlags ? Node.removeFlags({ sideEffect })(n) : n
+          const nodeUpdated = removeFlags ? Node.removeFlags({ sideEffect, removeDirtyFlag })(n) : n
           recordUpdated = Records.addNode(nodeUpdated, { sideEffect })(recordUpdated)
         }
       }
