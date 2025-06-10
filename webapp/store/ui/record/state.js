@@ -49,7 +49,8 @@ export const assocRecordEditLocked = A.assoc(keys.recordEditLocked)
 const _updateRecord = (fn) => (recordState) =>
   A.pipe(A.prop(keys.recordEdit), fn, (record) => A.assoc(keys.recordEdit, record)(recordState))(recordState)
 
-export const mergeRecordNodes = (nodes) => _updateRecord(Record.mergeNodes(nodes, { removeFlags: true }))
+export const mergeRecordNodes = (nodes, { removeDirtyFlag = true }) =>
+  _updateRecord(Record.mergeNodes(nodes, { removeFlags: true, removeDirtyFlag }))
 
 export const deleteRecordNode = (node) => _updateRecord(Record.deleteNode(node))
 
