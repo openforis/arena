@@ -4,17 +4,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 export const stateKey = 'nodeDefs'
 
-const dirtyKey = 'dirty'
-
 // ====== UPDATE
 
 export const assocNodeDef = (nodeDef, dirty = false) => R.assoc(NodeDef.getUuid(nodeDef), { ...nodeDef, dirty })
 
 export const mergeNodeDefs = R.mergeLeft
-
-export const assocDirty = R.assoc(dirtyKey, true)
-
-export const dissocDirty = R.dissoc(dirtyKey)
 
 // ====== DELETE
 

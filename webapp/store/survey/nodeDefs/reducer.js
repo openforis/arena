@@ -1,5 +1,3 @@
-import * as A from '@core/arena'
-
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
 import { SystemActions } from '@webapp/store/system'
@@ -27,28 +25,17 @@ const actionHandlers = {
   [NodeDefsActions.nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
   [NodeDefsActions.nodeDefsDelete]: (state, { nodeDefUuids }) => NodeDefsState.dissocNodeDefs(nodeDefUuids)(state),
 
-  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef, dirty = false }) => {
-    let stateUpdated = NodeDefsState.assocNodeDef(nodeDef, dirty)(state)
-    if (dirty) {
-      stateUpdated = NodeDefsState.assocDirty(stateUpdated)
-    } else {
-      stateUpdated = NodeDefsState.dissocDirty(stateUpdated)
-    }
-    return stateUpdated
-  },
+  [NodeDefsActions.nodeDefUpdate]: (state, { nodeDef, dirty = false }) =>
+    NodeDefsState.assocNodeDef(nodeDef, dirty)(state),
 
-  [NodeDefsActions.nodeDefSave]: (state, { nodeDef }) =>
-    A.pipe(NodeDefsState.assocNodeDef(nodeDef), NodeDefsState.dissocDirty)(state),
+  [NodeDefsActions.nodeDefSave]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
   [NodeDefsActions.nodeDefsUpdate]: (state, { nodeDefs }) => NodeDefsState.mergeNodeDefs(nodeDefs)(state),
 
-  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) => {
-    let stateUpdated = isNodeDefNew
+  [NodeDefsActions.nodeDefPropsUpdateCancel]: (state, { nodeDef, nodeDefOriginal, isNodeDefNew }) =>
+    isNodeDefNew
       ? NodeDefsState.dissocNodeDef(nodeDef)(state) // Remove node def from state
-      : NodeDefsState.assocNodeDef(nodeDefOriginal)(state) // Restore original version of node def
-    stateUpdated = NodeDefsState.dissocDirty(stateUpdated)
-    return stateUpdated
-  },
+      : NodeDefsState.assocNodeDef(nodeDefOriginal)(state), // Restore original version of node def
 }
 
 export default exportReducer(actionHandlers)
