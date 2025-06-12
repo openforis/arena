@@ -13,6 +13,7 @@ import { LabelWithTooltip } from '../form/LabelWithTooltip'
 
 const TreeItemPropTypes = PropTypes.shape({
   key: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
   icon: PropTypes.any,
   items: PropTypes.array,
   label: PropTypes.string.isRequired,
@@ -21,10 +22,11 @@ const TreeItemPropTypes = PropTypes.shape({
 
 const TreeItemView = (props) => {
   const { item } = props
-  const { key, icon, label, items, testId } = item
+  const { key, disabled, icon, label, items, testId } = item
   return (
     <MuiTreeItem
       key={key}
+      disabled={disabled}
       itemId={key}
       label={
         <div className="tree-item-label display-flex">
@@ -47,6 +49,7 @@ TreeItemView.propTypes = {
 
 export const TreeView = (props) => {
   const {
+    disableSelection,
     items,
     expadedItemKeys = undefined,
     onExpandedItemKeysChange = undefined,
@@ -80,6 +83,7 @@ export const TreeView = (props) => {
 
   return (
     <SimpleTreeView
+      disableSelection={disableSelection}
       expandedItems={expadedItemKeys}
       onExpandedItemsChange={onExpandedItemsChange}
       onSelectedItemsChange={onSelectedItemsChange}
@@ -93,6 +97,7 @@ export const TreeView = (props) => {
 }
 
 TreeView.propTypes = {
+  disableSelection: PropTypes.bool,
   expadedItemKeys: PropTypes.array,
   items: PropTypes.arrayOf(TreeItemPropTypes).isRequired,
   onExpandedItemKeysChange: PropTypes.func,

@@ -238,8 +238,8 @@ export const DataImportFlatDataView = () => {
                   nodeDefLabelType={nodeDefLabelType}
                   nodeDefUuidActive={selectedNodeDefUuid}
                   includeMultipleAttributes
+                  isNodeDefIncluded={() => dataImportType !== importTypes.insertNewRecords}
                   onSelect={onNodeDefSelect}
-                  isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />
                 <NodeDefLabelSwitch
                   allowedLabelTypes={allowedLabelTypes}

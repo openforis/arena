@@ -12,7 +12,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { SurveyState, useSurvey } from '@webapp/store/survey'
+import { SurveyState, useSurvey, useIsSurveyDirty } from '@webapp/store/survey'
 import {
   SurveyFormActions,
   SurveyFormState,
@@ -38,7 +38,6 @@ import { FormPagesEditButtons } from './components/FormPageEditButtons'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
-import { useIsSurveyDirty } from '@webapp/store/survey/hooks'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
   Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>
@@ -203,8 +202,9 @@ const SurveyForm = (props) => {
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
               <NodeDefTreeSelect
-                isDisabled={(nodeDefArg) =>
-                  surveyIsDirty || notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
+                disableSelection={surveyIsDirty}
+                isNodeDefIncluded={(nodeDefArg) =>
+                  !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
                 }
                 nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
                 onlyPages={viewOnlyPages}

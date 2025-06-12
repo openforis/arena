@@ -8,7 +8,8 @@ import { useBuildTreeData } from './useBuildEntityTreeData'
 export const useNodeDefTreeSelect = (props) => {
   const {
     getLabelSuffix,
-    isDisabled,
+    isNodeDefDisabled,
+    isNodeDefIncluded,
     nodeDefLabelType,
     nodeDefUuidActive,
     includeMultipleAttributes,
@@ -26,7 +27,8 @@ export const useNodeDefTreeSelect = (props) => {
     includeMultipleAttributes,
     includeSingleAttributes,
     includeSingleEntities,
-    isDisabled,
+    isNodeDefDisabled,
+    isNodeDefIncluded,
   })
   const rootItemKey = treeItems[0]?.key
 
