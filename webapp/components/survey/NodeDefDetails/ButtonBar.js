@@ -99,6 +99,7 @@ const ButtonBar = (props) => {
       )}
       {!NodeDef.isRoot(nodeDef) && !NodeDef.isTemporary(nodeDef) && (
         <ButtonDelete
+          disabled={dirty}
           testId={TestId.nodeDefDetails.deleteBtn}
           onClick={() => dispatch(NodeDefsActions.removeNodeDef(nodeDef, navigate))}
         />

@@ -58,6 +58,7 @@ $sidebarPopupMenuBgColor: color.adjust($blue, $lightness: 40%);
     }
 
     &.active {
+      opacity: 1;
       border-right-color: $blue;
       background: linear-gradient(to left, rgba($blue, 0.1) 0%, rgba($blue, 0.04) 50%, transparent 80%);
 
