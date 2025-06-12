@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 import { useLocation } from 'react-router'
 
 import { SidebarActions, useIsSidebarOpened } from '@webapp/service/storage/sidebar'
-import { useSurveyInfo } from '@webapp/store/survey'
+import { useIsSurveyDirty, useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import Version from './Version'
@@ -14,6 +14,7 @@ const SideBar = () => {
   const { pathname } = useLocation()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
+  const surveyIsDirty = useIsSurveyDirty()
   const isSideBarOpened = useIsSidebarOpened()
   const element = useRef(null)
 
@@ -28,7 +29,13 @@ const SideBar = () => {
           <span className={`icon icon-16px ${isSideBarOpened ? 'icon-arrow-left2' : 'icon-menu'}`} />
         </button>
       </div>
-      <Modules user={user} surveyInfo={surveyInfo} pathname={pathname} sideBarOpened={isSideBarOpened} />
+      <Modules
+        user={user}
+        surveyInfo={surveyInfo}
+        surveyIsDirty={surveyIsDirty}
+        pathname={pathname}
+        sideBarOpened={isSideBarOpened}
+      />
 
       {isSideBarOpened && <Version />}
     </div>
