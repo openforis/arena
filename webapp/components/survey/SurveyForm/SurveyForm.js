@@ -216,6 +216,7 @@ const SurveyForm = (props) => {
               {edit && (
                 <div className="display-flex sidebar-bottom-bar">
                   <ButtonGroup
+                    disabled={surveyIsDirty}
                     items={treeSelectViewModeItems}
                     onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
                     selectedItemKey={treeSelectViewMode}

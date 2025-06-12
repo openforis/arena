@@ -11,7 +11,7 @@ import { FileFormats } from '@core/fileFormats'
 
 import { TreeSelectViewMode } from '@webapp/model'
 import { JobActions } from '@webapp/store/app'
-import { NodeDefsActions, SurveyActions, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { NodeDefsActions, SurveyActions, useIsSurveyDirty, useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import {
   SurveyFormActions,
@@ -44,6 +44,7 @@ const FormHeader = (props) => {
 
   const surveyId = useSurveyId()
   const surveyCycleKey = useSurveyCycleKey()
+  const surveyIsDirty = useIsSurveyDirty()
   const nodeDefLabelType = useNodeDefLabelType()
   const nodeDefPage = useNodeDefPage()
   const showPageNavigation = useShowPageNavigation()
@@ -71,6 +72,7 @@ const FormHeader = (props) => {
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
         <Button
+          disabled={surveyIsDirty}
           iconClassName="icon-stack icon-12px"
           onClick={() => dispatch(SurveyFormActions.toggleFormPageNavigation())}
           size="small"
@@ -112,6 +114,7 @@ const FormHeader = (props) => {
         {edit && canEditSurvey && (
           <ButtonMenu
             className="btn-menu-advanced"
+            disabled={surveyIsDirty}
             iconClassName="icon-cog icon-14px"
             label="common.advancedFunctions"
             items={[
