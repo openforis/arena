@@ -2,15 +2,17 @@ import './Breadcrumbs.scss'
 
 import React from 'react'
 import { useLocation } from 'react-router'
+import { Link } from 'react-router-dom'
 
 import * as AppModules from '@webapp/app/appModules'
 
 import { useI18n } from '@webapp/store/system'
-import { Link } from 'react-router-dom'
+import { useIsSurveyDirty } from '@webapp/store/survey'
 
 export const Breadcrumbs = () => {
   const location = useLocation()
   const i18n = useI18n()
+  const surveyIsDirty = useIsSurveyDirty()
 
   const { pathname } = location
   const pathParts = pathname.split('/')
@@ -30,7 +32,12 @@ export const Breadcrumbs = () => {
         {isLast && <span key={module.key}>{pathName}</span>}
         {!isLast && (
           <>
-            <Link type="button" className="btn-transparent" to={AppModules.appModuleUri(module)}>
+            <Link
+              aria-disabled={surveyIsDirty}
+              type="button"
+              className="btn-transparent"
+              to={AppModules.appModuleUri(module)}
+            >
               {pathName}
             </Link>
             <span className="separator">&nbsp;&nbsp;&#47;&nbsp;&nbsp;</span>
