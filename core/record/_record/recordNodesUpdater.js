@@ -3,6 +3,7 @@ import {
   RecordUpdater as CoreRecordUpdater,
   RecordNodesUpdater as CoreRecordNodesUpdater,
   RecordUpdateResult,
+  NodeValues,
 } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -32,40 +33,91 @@ const getKeyValuePairs = ({ survey, entityDef, valuesByDefUuid }) => {
     .join(',')
 }
 
+const _findCategoryItemUuidByAttribute = async ({
+  survey,
+  categoryItemProvider,
+  record,
+  parentNode,
+  attributeDef,
+  value,
+}) => {
+  const valueItemUuid = NodeValues.getValueItemUuid(value)
+  if (valueItemUuid) {
+    return valueItemUuid
+  }
+  const code = NodeValues.getValueCode(value)
+  if (Objects.isEmpty(code)) {
+    return null
+  }
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({
+    nodeDef: attributeDef,
+    code,
+    record,
+    parentNode,
+  })(survey)
+  if (itemUuid) {
+    return itemUuid
+  }
+  const categoryUuid = NodeDef.getCategoryUuid(attributeDef)
+  const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, attributeDef)(record)
+  const codePaths = parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), code] : [code]
+  const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
+  return item ? item.uuid : null
+}
+
 const _valueAdapterByType = {
-  [NodeDef.nodeDefType.code]: ({ survey, record, parentNode, attributeDef, value }) => {
-    if (value[Node.valuePropsCode.itemUuid]) {
+  [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, record, parentNode, attributeDef, value }) => {
+    if (NodeValues.getValueItemUuid(value)) {
       return value
     }
-    const code = value[Node.valuePropsCode.code]
-    if (!code) {
-      return null
-    }
-    const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({
-      nodeDef: attributeDef,
-      code,
+    const itemUuid = await _findCategoryItemUuidByAttribute({
+      survey,
+      categoryItemProvider,
       record,
       parentNode,
-    })(survey)
+      attributeDef,
+      value,
+    })
     if (!itemUuid) {
       const attributeName = NodeDef.getName(attributeDef)
-      throw new SystemError('validationErrors.dataImport.invalidCode', { attributeName, code })
+      throw new SystemError('validationErrors.dataImport.invalidCode', {
+        attributeName,
+        code: NodeValues.getValueCode(value),
+      })
     }
     return Node.newNodeValueCode({ itemUuid })
   },
 }
 
-const _adaptValue = ({ survey, record, parentNode, attributeDef, value }) => {
+const _adaptValue = async ({
+  survey,
+  categoryItemProvider,
+  taxonProvider,
+  record,
+  parentNode,
+  attributeDef,
+  value,
+}) => {
   const valueAdapter = _valueAdapterByType[NodeDef.getType(attributeDef)]
-  return valueAdapter ? valueAdapter({ survey, record, parentNode, attributeDef, value }) : value
+  return valueAdapter
+    ? valueAdapter({ survey, categoryItemProvider, taxonProvider, record, parentNode, attributeDef, value })
+    : value
 }
 
 const _addOrUpdateAttribute =
-  ({ survey, entity, attributeDef, value: valueParam, sideEffect = false }) =>
-  (record) => {
+  ({ survey, categoryItemProvider, taxonProvider, entity, attributeDef, value: valueParam, sideEffect = false }) =>
+  async (record) => {
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
-    const value = _adaptValue({ survey, record, parentNode: entity, attributeDef, value: valueParam })
+    const value = await _adaptValue({
+      survey,
+      categoryItemProvider,
+      taxonProvider,
+      record,
+      parentNode: entity,
+      attributeDef,
+      value: valueParam,
+    })
 
     if (!attribute || NodeDef.isMultipleAttribute(attributeDef)) {
       // create new attribute
@@ -78,12 +130,23 @@ const _addOrUpdateAttribute =
   }
 
 const _addEntityAndKeyValues =
-  ({ user, survey, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    categoryItemProvider,
+    taxonProvider,
+    entityDef,
+    parentNode,
+    keyValuesByDefUuid,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
     const updateResultDescendants = await CoreRecordNodesUpdater.createNodeAndDescendants({
       user,
       survey,
+      categoryItemProvider,
+      taxonProvider,
       record,
       parentNode,
       nodeDef: entityDef,
@@ -96,7 +159,7 @@ const _addEntityAndKeyValues =
     )
 
     const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
-    keyDefs.forEach((keyDef) => {
+    for (const keyDef of keyDefs) {
       const keyValue = keyValuesByDefUuid[NodeDef.getUuid(keyDef)]
 
       if (Objects.isEmpty(keyValue)) {
@@ -105,8 +168,9 @@ const _addEntityAndKeyValues =
         })
       }
 
-      const keyAttributeUpdateResult = _addOrUpdateAttribute({
+      const keyAttributeUpdateResult = await _addOrUpdateAttribute({
         survey,
+        categoryItemProvider,
         entity,
         attributeDef: keyDef,
         value: keyValue,
@@ -116,12 +180,21 @@ const _addEntityAndKeyValues =
       if (keyAttributeUpdateResult) {
         updateResult.merge(keyAttributeUpdateResult)
       }
-    })
+    }
     return { entity, updateResult }
   }
 
 const _getOrCreateEntityByKeys =
-  ({ user, survey, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    categoryItemProvider,
+    taxonProvider,
+    entityDefUuid,
+    valuesByDefUuid,
+    insertMissingNodes,
+    sideEffect = false,
+  }) =>
   async (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
       return { entity: RecordReader.getRootNode(record), updateResult: null }
@@ -145,7 +218,6 @@ const _getOrCreateEntityByKeys =
         keyValues: keyValuePairs,
       })
     }
-
     // insert missing entity node (with keys)
     const entityParentDef = Survey.getNodeDefParent(entityDef)(survey)
     const entityParent = NodeDef.isRoot(entityParentDef)
@@ -167,6 +239,8 @@ const _getOrCreateEntityByKeys =
     const { entity: entityInserted, updateResult } = await _addEntityAndKeyValues({
       user,
       survey,
+      categoryItemProvider,
+      taxonProvider,
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
@@ -194,6 +268,8 @@ const getOrCreateEntityByKeys =
     const { entity, updateResult: updateResultEntity } = await _getOrCreateEntityByKeys({
       user,
       survey,
+      categoryItemProvider,
+      taxonProvider,
       entityDefUuid,
       valuesByDefUuid,
       insertMissingNodes,
@@ -270,8 +346,10 @@ const updateAttributesInEntityWithValues =
           nodeDefUuid: attributeDefUuid,
         })(currentRecord)
 
-        const attributeUpdateResult = _addOrUpdateAttribute({
+        const attributeUpdateResult = await _addOrUpdateAttribute({
           survey,
+          categoryItemProvider,
+          taxonProvider,
           entity: attributeParentEntity,
           attributeDef,
           value,
