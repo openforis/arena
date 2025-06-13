@@ -26,6 +26,7 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
+import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -120,6 +121,10 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
+
+      <FormItem label="userView.preferredUILanguage.label">
+        <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
+      </FormItem>
 
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 

@@ -100,11 +100,13 @@ export const {
   getPrefSurveyCycle,
   getPrefSurveyLang,
   getPrefSurveyCurrentCycle,
+  getPrefLanguage,
   assocPrefSurveyCurrent,
   assocPrefSurveyCycle,
   assocPrefSurveyLang,
   assocPrefSurveyCurrentAndCycle,
   deletePrefSurvey,
+  assocPrefLanguage,
 } = UserPrefs
 
 // PROPS

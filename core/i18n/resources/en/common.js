@@ -998,6 +998,10 @@ Copy the invitation link to the clipboard?`,
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
     maxSurveysUserCanCreate: 'Max surveys user can create',
+    preferredUILanguage: {
+      label: 'Preferred UI language',
+      auto: 'Automatically detected ({{detectedLanguage}})',
+    },
   },
 
   userPasswordChangeView: {

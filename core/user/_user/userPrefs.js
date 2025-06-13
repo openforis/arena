@@ -10,6 +10,7 @@ import { keys } from './userKeys'
 export const keysPrefs = {
   surveys: 'surveys',
   current: 'current',
+  language: 'language',
 }
 
 export const keysSurveyPrefs = {
@@ -22,6 +23,7 @@ const getPrefs = R.propOr({}, keys.prefs)
 const pathSurveyCurrent = [keys.prefs, keysPrefs.surveys, keysPrefs.current]
 const surveyPrefsPath = ({ surveyId }) => [keys.prefs, keysPrefs.surveys, String(surveyId)]
 const surveyPrefPath = ({ surveyId, key }) => [...surveyPrefsPath({ surveyId }), key]
+const pathLanguage = [keys.prefs, keysPrefs.language]
 
 const surveyCyclePrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.cycle })
 const surveyLangPrefPath = (surveyId) => surveyPrefPath({ surveyId, key: keysSurveyPrefs.language })
@@ -54,6 +56,8 @@ export const getPrefSurveyCurrentLanguage = (user) => {
   return getPrefSurveyLang(surveyId)(user)
 }
 
+export const getPrefLanguage = R.path(pathLanguage)
+
 // ====== UPDATE
 export const assocPrefSurveyCycle = (surveyId, cycle) => R.assocPath(surveyCyclePrefPath(surveyId), cycle)
 export const assocPrefSurveyLang = ({ surveyId, lang }) => R.assocPath(surveyLangPrefPath(surveyId), lang)
@@ -67,6 +71,8 @@ export const assocPrefSurveyCurrent = (surveyId) => (user) =>
 
 export const assocPrefSurveyCurrentAndCycle = (surveyId, cycle) =>
   R.pipe(assocPrefSurveyCurrent(surveyId), assocPrefSurveyCycle(surveyId, cycle))
+
+export const assocPrefLanguage = ({ lang }) => (lang ? R.assocPath(pathLanguage, lang) : R.dissocPath(pathLanguage))
 
 // ====== DELETE
 export const deletePrefSurvey = (surveyId) => (user) => {
