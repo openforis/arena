@@ -72,7 +72,7 @@ export const assocPrefSurveyCurrent = (surveyId) => (user) =>
 export const assocPrefSurveyCurrentAndCycle = (surveyId, cycle) =>
   R.pipe(assocPrefSurveyCurrent(surveyId), assocPrefSurveyCycle(surveyId, cycle))
 
-export const assocPrefLanguage = ({ lang }) => (lang ? R.assocPath(pathLanguage, lang) : R.dissocPath(pathLanguage))
+export const assocPrefLanguage = ({ lang }) => R.assocPath(pathLanguage, lang)
 
 // ====== DELETE
 export const deletePrefSurvey = (surveyId) => (user) => {
