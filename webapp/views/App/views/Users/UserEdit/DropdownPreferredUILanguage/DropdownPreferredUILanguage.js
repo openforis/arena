@@ -43,7 +43,7 @@ export const DropdownPreferredUILanguage = (props) => {
         const userUpdated = User.assocPrefLanguage({ lang: languageToSet })(user)
         dispatch(UserActions.updateUserPrefs({ user: userUpdated }))
 
-        if (User.isEqual(currentUser, user)) {
+        if (User.isEqual(currentUser)(user)) {
           i18n.changeLanguage(languageToSet ?? defaultLanguage)
         }
         onChange(userUpdated)
