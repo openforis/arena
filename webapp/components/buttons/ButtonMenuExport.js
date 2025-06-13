@@ -31,8 +31,11 @@ export const ButtonMenuExport = (props) => {
 
   const items = exportFormats.map((fileFormat) => {
     let onClick
-    if (excelExportDisabled) {
-      onClick = () => notifyWarning({ key: 'common.exportToExcelTooManyItems' })
+    if (fileFormat === FileFormats.xlsx && excelExportDisabled) {
+      onClick = () => {
+        notifyWarning({ key: 'common.exportToExcelTooManyItems' })
+        return false // Prevents the navigating to href
+      }
     } else if (onClickProp) {
       onClick = () => onClickProp({ fileFormat })
     }

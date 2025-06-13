@@ -109,3 +109,5 @@ export const useSurveyHasFileAttributes = () =>
     const fileDefs = Survey.findDescendants({ filterFn: NodeDef.isFile })(survey)
     return fileDefs.length > 0
   })
+
+export const useIsSurveyDirty = () => useSelector(SurveyStatusState.isDirty)

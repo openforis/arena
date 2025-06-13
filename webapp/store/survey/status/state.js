@@ -5,6 +5,7 @@ export const stateKey = 'status'
 
 const keys = {
   fetched: 'fetched',
+  dirty: 'dirty',
   draft: 'draft',
   includeAnalysis: 'includeAnalysis',
   validate: 'validate',
@@ -13,6 +14,8 @@ const keys = {
 const getStatus = A.pipe(SurveyState.getSurvey, A.propOr({}, stateKey))
 
 export const isFetched = A.pipe(getStatus, A.propOr(false, keys.fetched))
+
+export const isDirty = A.pipe(getStatus, A.propOr(false, keys.dirty))
 
 export const isDraft = A.pipe(getStatus, A.propOr(false, keys.draft))
 
@@ -27,6 +30,10 @@ export const isFetchedWithSameParams =
     draft === isDraft(state) &&
     includeAnalysis === isIncludeAnalysis(state) &&
     validate === isValidate(state)
+
+// ====== UPDATE
+export const assocDirty = A.assoc(keys.dirty, true)
+export const dissocDirty = A.dissoc(keys.dirty)
 
 export const assocDefsFetched = ({ draft, includeAnalysis, validate }) =>
   A.pipe(

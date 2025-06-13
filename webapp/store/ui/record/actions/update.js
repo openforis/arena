@@ -49,17 +49,17 @@ const _updateNodeDebounced = (node, file, delay) => {
 
 export const updateNode =
   (nodeDef, node, value, file = null, meta = {}, refData = null) =>
-  (dispatch, getState) => {
-    const onOk = () => {
+  async (dispatch, getState) => {
+    const onOk = async () => {
       const nodeToUpdate = A.pipe(
         A.dissoc(Node.keys.placeholder),
         Node.assocValue(value),
         Node.mergeMeta(meta),
         NodeRefData.assocRefData(refData),
-        A.assoc(Node.keys.dirty, true)
+        Node.assocDirty(true)
       )(node)
-
-      dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
+      const removeDirtyFlag = false
+      await dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }, removeDirtyFlag))
       dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
     }
     checkAndConfirmUpdateNode({ dispatch, getState, node, nodeDef, onOk })

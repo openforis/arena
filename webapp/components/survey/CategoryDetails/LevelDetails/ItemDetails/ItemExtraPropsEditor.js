@@ -85,15 +85,22 @@ GeometryPointExtraPropEditor.propTypes = {
   validation: PropTypes.object,
 }
 
+const extraPropValueToInputValue = (value) => {
+  if (A.isEmpty(value)) {
+    return ''
+  }
+  return typeof value === 'object' ? JSON.stringify(value) : value
+}
+
 export const ItemExtraPropsEditor = (props) => {
-  const { item, itemExtraDefs, readOnly, updateProp, validation } = props
+  const { item, itemExtraDefsArray, readOnly, updateProp, validation } = props
 
   const i18n = useI18n()
 
   return (
     <fieldset className="extra-props">
       <legend>{i18n.t('extraProp.label_plural')}</legend>
-      {Object.entries(itemExtraDefs).map(([key, { dataType }]) =>
+      {itemExtraDefsArray.map(({ dataType, name: key }) =>
         dataType === ExtraPropDef.dataTypes.geometryPoint ? (
           <GeometryPointExtraPropEditor
             key={key}
@@ -106,7 +113,7 @@ export const ItemExtraPropsEditor = (props) => {
         ) : (
           <FormItem label={key} key={key}>
             <Input
-              value={CategoryItem.getExtraProp(key)(item)}
+              value={extraPropValueToInputValue(CategoryItem.getExtraProp(key)(item))}
               numberFormat={dataType === ExtraPropDef.dataTypes.number ? NumberFormats.decimal() : null}
               readOnly={readOnly}
               validation={Validation.getFieldValidation(`${CategoryItem.keysProps.extra}_${key}`)(validation)}
@@ -124,7 +131,7 @@ export const ItemExtraPropsEditor = (props) => {
 
 ItemExtraPropsEditor.propTypes = {
   item: PropTypes.object,
-  itemExtraDefs: PropTypes.object.isRequired,
+  itemExtraDefsArray: PropTypes.array.isRequired,
   readOnly: PropTypes.bool,
   updateProp: PropTypes.func.isRequired,
   validation: PropTypes.object,

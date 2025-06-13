@@ -9,7 +9,7 @@ import ModuleLink from '../ModuleLink'
 import SubModules from '../SubModules'
 
 const Module = forwardRef((props, ref) => {
-  const { isOver = false, module, pathname, onMouseEnter, sideBarOpened = false, surveyInfo } = props
+  const { disabled = false, isOver = false, module, pathname, onMouseEnter, sideBarOpened = false, surveyInfo } = props
 
   const isModuleHome = SideBarModule.isHome(module)
   const isSurveySelectionRequired = SideBarModule.isSurveySelectionRequired(module)
@@ -18,22 +18,16 @@ const Module = forwardRef((props, ref) => {
   // All modules except home require the survey
   const disabledRequiredSurvey = isSurveySelectionRequired && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
   // Module home is disabled when page is on dashboard, other modules are disabled when there's no active survey
-  const disabledModule = isModuleHome ? active : disabledRequiredSurvey
+  const disabledModule = disabled || (isModuleHome ? active : disabledRequiredSurvey)
   // Link to home is disabled when page is on dashboard, other root module links are always disabled
-  const disabledModuleLink = isModuleHome ? active : true
+  const disabledModuleLink = disabled || (isModuleHome ? active : true)
 
   return (
     <div
       className={`sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
       data-testid={TestId.sidebar.module(SideBarModule.getKey(module))}
       ref={ref}
-      onMouseEnter={
-        isModuleHome || sideBarOpened
-          ? null
-          : () => {
-              onMouseEnter(module)
-            }
-      }
+      onMouseEnter={isModuleHome || sideBarOpened ? null : () => onMouseEnter(module)}
       aria-disabled={disabledModule}
     >
       <ModuleLink
@@ -45,10 +39,10 @@ const Module = forwardRef((props, ref) => {
 
       {sideBarOpened && (
         <SubModules
+          disabled={disabledModule || disabledRequiredSurvey}
           module={module}
           pathname={pathname}
           sideBarOpened={sideBarOpened}
-          disabled={disabledRequiredSurvey}
         />
       )}
     </div>
@@ -56,6 +50,7 @@ const Module = forwardRef((props, ref) => {
 })
 
 Module.propTypes = {
+  disabled: PropTypes.bool,
   surveyInfo: PropTypes.object,
   module: PropTypes.object,
   pathname: PropTypes.string,

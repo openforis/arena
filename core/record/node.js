@@ -35,10 +35,11 @@ const flagKeys = {
   created: 'created',
   updated: 'updated',
   deleted: 'deleted',
-  dirty: 'dirty', // Modified by the user but not persisted yet
 }
-
 const flagKeysArray = Object.keys(flagKeys)
+
+const dirtyFlag = 'dirty'
+const flagKeysIncludingDirty = [...flagKeysArray, dirtyFlag]
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -105,7 +106,7 @@ export const isPlaceholder = R.propEq(keys.placeholder, true)
 export const isCreated = R.propEq(keys.created, true)
 export const isUpdated = R.propEq(keys.updated, true)
 export const isDeleted = R.propEq(keys.deleted, true)
-export const isDirty = R.propEq(keys.dirty, true)
+export const isDirty = R.propEq(dirtyFlag, true)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const { isEqual } = ObjectUtils
 
@@ -164,16 +165,18 @@ export const setCreated = (node) => {
 }
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
+export const assocDirty = R.assoc(dirtyFlag)
 export const removeFlags =
-  ({ sideEffect = false } = {}) =>
+  ({ removeDirtyFlag = true, sideEffect = false } = {}) =>
   (node) => {
+    const keysToRemove = removeDirtyFlag ? flagKeysIncludingDirty : flagKeysArray
     if (sideEffect) {
-      flagKeysArray.forEach((key) => {
+      keysToRemove.forEach((key) => {
         delete node[key]
       })
       return node
     } else {
-      return R.omit(flagKeysArray)(node)
+      return R.omit(keysToRemove)(node)
     }
   }
 

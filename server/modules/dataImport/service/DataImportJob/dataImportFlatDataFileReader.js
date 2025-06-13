@@ -83,6 +83,17 @@ const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName 
   return TaxonVernacularName.getUuid(vernacularNameObj)
 }
 
+const findCategoryItemUuid = async ({ survey, categoryItemProvider, nodeDef, code }) => {
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+  if (itemUuid) {
+    return itemUuid
+  }
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const codePaths = [code] // only first level items are supported at this stage
+  const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
+  return item ? item.uuid : null
+}
+
 const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
@@ -91,12 +102,12 @@ const valueConverterByNodeDefType = {
     }
     return String(booleanTrueValues.includes(String(val).toLocaleLowerCase()))
   },
-  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
+  [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
-      const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+      const itemUuid = await findCategoryItemUuid({ survey, categoryItemProvider, nodeDef, code })
       if (!itemUuid) {
         const attributeName = NodeDef.getName(nodeDef)
         throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
@@ -206,6 +217,8 @@ const _validateHeaders =
  * @param {!string} [params.stream] - File stream to be read.
  * @param {!string} [params.fileFormat] - Format of the input file (csv or xlsx).
  * @param {!object} [params.survey] - The survey object.
+ * @param {!object} [params.categoryItemProvider] - The category item provider module.
+ * @param {!object} [params.taxonProvider] - The taxon provider module.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
@@ -219,6 +232,8 @@ const createReaderFromStream = ({
   stream,
   fileFormat,
   survey,
+  categoryItemProvider,
+  taxonProvider,
   cycle,
   nodeDefUuid,
   onRowItem,
@@ -273,7 +288,8 @@ const createReaderFromStream = ({
 
       // prepare attribute values
       const errors = []
-      const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, valueTemp]) => {
+      const valuesByDefUuid = {}
+      for (const [nodeDefUuid, valueTemp] of Object.entries(valuesByDefUuidTemp)) {
         const headers = valueTemp._headers
         delete valueTemp._headers
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -281,14 +297,12 @@ const createReaderFromStream = ({
         try {
           const nodeValue = Objects.isEmpty(valueTemp)
             ? null
-            : valueConverter({ survey, nodeDef, value: valueTemp, headers })
-          acc[nodeDefUuid] = nodeValue
+            : await valueConverter({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers })
+          valuesByDefUuid[nodeDefUuid] = nodeValue
         } catch (error) {
           errors.push(error)
         }
-        return acc
-      }, {})
-
+      }
       await onRowItem({ row, valuesByDefUuid, errors })
     },
     onTotalChange,

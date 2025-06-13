@@ -14,6 +14,8 @@ import SystemError from '@core/systemError'
 import BatchPersister from '@server/db/batchPersister'
 import * as FileXml from '@server/utils/file/fileXml'
 import Job from '@server/job/job'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordManager from '../../../../record/manager/recordManager'
 import * as ActivityLogManager from '../../../../activityLog/manager/activityLogManager'
@@ -21,6 +23,9 @@ import * as ActivityLogManager from '../../../../activityLog/manager/activityLog
 import * as CollectRecord from '../model/collectRecord'
 import * as CollectSurvey from '../model/collectSurvey'
 import * as CollectAttributeValueExtractor from './collectAttributeValueExtractor'
+
+const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 const evaluateApplicability = async ({ survey, childDef, record, node }) => {
   let applicable = true
@@ -203,6 +208,8 @@ export default class RecordsImportJob extends Job {
           const valueAndMeta = NodeDef.isAttribute(nodeDef)
             ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
                 survey,
+                categoryItemProvider,
+                taxonProvider,
                 nodeDef,
                 record: recordUpdated,
                 node: nodeToInsert,
