@@ -85,7 +85,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
       const name = User.getName(user)
-      await Mailer.sendEmail({ to: email, msgKey: 'emails.userResetPassword', msgParams: { url, name }, lang })
+      await Mailer.sendEmail({ to: email, msgKey: 'emails:userResetPassword', msgParams: { url, name }, lang })
       return { uuid }
     })
   } catch (error) {
@@ -136,7 +136,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
 
     await Mailer.sendEmail({
       to: systemAdminEmails,
-      msgKey: 'emails.userAccessRequest',
+      msgKey: 'emails:userAccessRequest',
       msgParams: { ...props, country, email, serverUrl },
     })
     return { requestInserted }
@@ -400,7 +400,7 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
         surveyLabel: Survey.getDefaultLabel(surveyInfo),
       }
       const lang = User.getLang(user)
-      await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
+      await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails:userDeleted', msgParams, lang })
     }
   })
 

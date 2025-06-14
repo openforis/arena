@@ -39,7 +39,7 @@ export const ImagePreview = ({ path, onLoadComplete = null, file = null }) => {
         />
       )}
       {error && (
-        <span className="icon error icon-warning" title={i18n.t('surveyForm.nodeDefFile.errorLoadingPreview')} />
+        <span className="icon error icon-warning" title={i18n.t('surveyForm:nodeDefFile.errorLoadingPreview')} />
       )}
     </div>
   )

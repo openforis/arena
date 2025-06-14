@@ -74,7 +74,7 @@ const TaxonProps = (props) => {
   }, [onTaxonomySelect, surveyId, taxonomyToEdit, taxonomyUuid])
 
   const visibleFieldsLabelFunction = (fields) =>
-    fields.map((field) => i18n.t(`surveyForm.nodeDefTaxon.${field}`)).join(', ')
+    fields.map((field) => i18n.t(`surveyForm:nodeDefTaxon.${field}`)).join(', ')
 
   return (
     <>
@@ -101,7 +101,7 @@ const TaxonProps = (props) => {
         </div>
       </FormItem>
 
-      <FormItem label="surveyForm.nodeDefTaxon.visibleFields">
+      <FormItem label="surveyForm:nodeDefTaxon.visibleFields">
         <Dropdown
           items={visibleFieldsDropdownItems}
           itemLabel={visibleFieldsLabelFunction}
@@ -113,12 +113,12 @@ const TaxonProps = (props) => {
 
       <LabelsEditor
         formLabelKey="taxonomy.vernacularNameLabel"
-        placeholder="surveyForm.nodeDefTaxon.vernacularName"
+        placeholder="surveyForm:nodeDefTaxon.vernacularName"
         labels={NodeDef.getVernacularNameLabels(nodeDef)}
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.vernacularNameLabels, value })}
       />
 
-      <FormItem label="surveyForm.nodeDefTaxon.vernacularNameSelectionKept">
+      <FormItem label="surveyForm:nodeDefTaxon.vernacularNameSelectionKept">
         <Checkbox
           checked={NodeDef.isVernacularNameSelectionKept(nodeDef)}
           validation={Validation.getFieldValidation(NodeDef.propKeys.vernacularNameSelectionKept)(validation)}

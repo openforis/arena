@@ -998,6 +998,10 @@ Copy the invitation link to the clipboard?`,
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
     removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
     maxSurveysUserCanCreate: 'Max surveys user can create',
+    preferredUILanguage: {
+      label: 'Preferred UI language',
+      auto: 'Automatically detected ({{detectedLanguage}})',
+    },
   },
 
   userPasswordChangeView: {
@@ -1090,7 +1094,7 @@ Copy the invitation link to the clipboard?`,
 It can be simple text or Markdown language (https://www.markdownguide.org).`,
     sendInvitation: 'Send invitation',
     surveyNotPublishedWarning: `**Warning**: survey is not published.
-      Users can be invited only with the roles of ***$t(authGroups.systemAdmin.label)*** and ***$t(authGroups.surveyAdmin.label)***.
+      Users can be invited only with the roles of ***$t(auth:authGroups.systemAdmin.label)*** and ***$t(auth:authGroups.surveyAdmin.label)***.
       If you want to invite users with other roles you should first publish the survey.`,
     typeEmail: 'Type an email address, then press the Add button',
   },
@@ -1484,128 +1488,6 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
 
   languagesEditor: {
     languages: 'Language(s)',
-  },
-
-  surveyForm: {
-    subPage: 'Sub page',
-    addChildTo: 'Add to {{nodeDefLabel}}',
-    addChildToTitle: 'Add new node to {{nodeDefLabel}}',
-    addChildToTypes: {
-      boolean: 'Boolean',
-      code: 'Code',
-      coordinate: 'Coordinate',
-      date: 'Date',
-      decimal: 'Decimal',
-      geo: 'Geospatial',
-      entity: 'Table or form',
-      file: 'File',
-      integer: 'Integer',
-      taxon: 'Taxon',
-      text: 'Text',
-      time: 'Time',
-      // layout elments
-      formHeader: 'Form Header',
-    },
-    clone: `Clone '{{nodeDefLabel}}'`,
-    compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
-    confirmUpdateDependentEnumeratedEntities: `If you continue, some enumerated entities ({{entityDefs}}) will be re-enumerated,  
-deleting the existing values inserted into them (if any).  
-Continue?`,
-    convert: `Convert '{{nodeDefLabel}}'`,
-    delete: `Delete '{{nodeDefLabel}}'`,
-    edit: `Edit '{{nodeDefLabel}}'`,
-    schemaSummary_csv: 'Schema summary (CSV)',
-    schemaSummary_xlsx: 'Schema summary (Excel)',
-    hidePages: 'Hide pages',
-    showPages: 'Show pages',
-    move: `Move '{{nodeDefLabel}}'`,
-    movePageUp: 'Move page up',
-    movePageDown: 'Move page down',
-    formEditActions: {
-      preview: 'Preview',
-    },
-    formEntryActions: {
-      confirmDemote: 'Are sure you want to demote this record to {{name}}?',
-      confirmPromote: `Are sure you want to **promote this record to {{name}}**?  
-You won't be able to edit it anymore`,
-      confirmPromoteWithErrors: `**This record contains errors**.  
-$t(surveyForm.formEntryActions.confirmPromote)`,
-      confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
-      closePreview: 'Close preview',
-      demoteTo: 'Demote to {{stepPrev}}',
-      promoteTo: 'Promote to {{stepNext}}',
-      step: 'Step {{id}} ({{name}})',
-    },
-    nodeDefEditFormActions: {
-      columns: 'Columns',
-      confirmConvert: 'Convert the attribute "{{name}}" into "{{toType}}"?',
-      confirmDelete:
-        'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
-    },
-    nodeDefCode: {
-      buttonCode: 'Button code',
-      code: '$t(common.code)',
-      label: '$t(common.label)',
-      typeCodeOrLabel: 'Type code or label',
-    },
-    nodeDefBoolean: {
-      labelValue: {
-        trueFalse: {
-          true: '$t(common.true)',
-          false: '$t(common.false)',
-        },
-        yesNo: {
-          true: '$t(common.yes)',
-          false: '$t(common.no)',
-        },
-      },
-    },
-    nodeDefCoordinate: {
-      coordinate: 'Coordinate',
-      srs: 'SRS',
-      x: 'X',
-      y: 'Y',
-      showOnMap: 'Show on map',
-      accuracy: 'Accuracy',
-      altitude: 'Altitude',
-      altitudeAccuracy: 'Altitude accuracy',
-    },
-    nodeDefGeo: {
-      confirmDelete: 'Delete this Geospatial value?',
-      geoJSON: 'GeoJSON',
-      invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
-    },
-    nodeDefEntityForm: {
-      addNewEntity: 'Add new {{name}}',
-      confirmDelete: 'Are you sure you want to delete this entity?',
-      select: 'Select a {{name}}:',
-      selectedEntity: 'Selected {{name}}:',
-    },
-    nodeDefTaxon: {
-      code: '$t(common.code)',
-      scientificName: 'Scientific name',
-      vernacularName: 'Vernacular name',
-      vernacularNameSelectionKept: 'Vernacular name selection kept',
-      visibleFields: 'Visible fields',
-    },
-    nodeDefFile: {
-      errorLoadingPreview: 'Error loading preview',
-      fileUuid: 'File uuid',
-      fileName: 'File name',
-    },
-    nodeDefsTreeSelectMode: {
-      allNodeDefs: 'All nodes',
-      onlyPages: 'Only pages',
-    },
-    step: {
-      entry: 'Entry',
-      cleansing: 'Cleansing',
-      analysis: 'Analysis',
-    },
-    confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
-    exportLabels_csv: 'Export labels to CSV',
-    exportLabels_xlsx: 'Export labels to Excel',
-    importLabels: 'Import labels from Excel or CSV',
   },
 
   taxonomy: {
@@ -2012,120 +1894,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     valueType: {
       constant: 'Constant',
       expression: 'Expression',
-    },
-  },
-
-  // ====== Auth
-
-  authGroups: {
-    systemAdmin: {
-      label: 'System administrator',
-      label_plural: 'System administrators',
-      description: 'OF Arena system administrators',
-    },
-    surveyManager: {
-      label: 'Survey manager',
-      label_plural: 'Survey managers',
-      description: 'OF Arena survey managers',
-    },
-    surveyAdmin: {
-      label: 'Survey administrator',
-      label_plural: 'Survey administrators',
-      description: 'Full rights',
-    },
-    surveyEditor: {
-      label: 'Survey editor',
-      label_plural: 'Survey editors',
-      description: 'Can edit survey, records, invite users',
-    },
-    dataEditor: {
-      label: 'Data editor',
-      label_plural: 'Data editors',
-      description: 'Can edit records in data entry step',
-    },
-    dataCleanser: {
-      label: 'Data cleanser',
-      label_plural: 'Data cleansers',
-      description: 'Can edit records in data cleansing step',
-    },
-    dataAnalyst: {
-      label: 'Data analyst',
-      label_plural: 'Data analysts',
-      description: 'Can edit records in data analysis step',
-    },
-    surveyGuest: {
-      label: 'Survey guest',
-      label_plural: 'Survey guests',
-      description: 'Can view records',
-    },
-  },
-
-  emails: {
-    signature: `<p>Thank you,<br>
-      $t(common.appNameFull) platform
-      </p>`,
-    temporaryMsg: '<p><i>This link is only valid for the next 7 days. Please do not share it with anyone else.</i></p>',
-    userInviteCommon: `<p>You have been invited by {{invitingUserName}} to join the $t(common.appNameFull) survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
-      {{-message}}
-      <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
-        <ul>{{groupPermissions}}</ul>
-      </p>`,
-    userInvite: {
-      subject: 'You have been invited to $t(common.appNameFull)!',
-      body: `<p>Hello,</p>
-             $t(emails.userInviteCommon)
-             <p><a href="{{urlResetPassword}}">Click here to complete your registration to $t(common.appNameFull)</a></p>
-             <p>If it doesn't work, please copy and paste the following link in your browser: {{urlResetPassword}}</p>
-             $t(emails.temporaryMsg)
-             <p><i>You have received this email because {{invitingUserName}} invited you to access $t(common.appNameFull) through {{serverUrl}}. If you are not the recipient, please ignore it.</i></p>
-             <p>After you have completed the registration, you can access directly $t(common.appNameFull) with this link: <a href="{{serverUrl}}">{{serverUrl}}</a></p>
-             <p>$t(common.raiseTicketInSupportForum)</p>
-             $t(emails.signature)`,
-    },
-    userInviteExistingUser: {
-      subject: `You have been invited to join the survey '{{surveyLabel}}' in $t(common.appNameFull)!`,
-      body: `<p>Hello,</p>
-             $t(emails.userInviteCommon)
-             <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
-             <p>If it doesn't work, please copy and paste the following link in your browser: {{serverUrl}}</p>
-             $t(emails.signature)`,
-    },
-    userAccessRequest: {
-      subject: '$t(common.appNameFull) - User Access Request',
-      body: `<p>Hello,</p>
-      <p>The following user has requested access to $t(common.appNameFull).</p>
-      <p>
-        <ul>
-          <li>$t(accessRequestView.fields.email): {{email}}</li>
-          <li>$t(accessRequestView.fields.props.firstName): {{firstName}}</li>
-          <li>$t(accessRequestView.fields.props.lastName): {{lastName}}</li>
-          <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
-          <li>$t(accessRequestView.fields.props.country): {{country}}</li>
-          <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
-          <li>$t(accessRequestView.fields.props.surveyName): {{surveyName}}</li>
-        </ul>
-      </p>
-      <p>Please evaluate this request and get back to the user as soon as possible.</p>
-      <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
-      $t(emails.signature)`,
-    },
-    userInviteRepeatConfirmation:
-      'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
-    userResetPassword: {
-      subject: '$t(common.appNameFull). Password reset',
-      body: `<p>Hello {{name}},</p>
-             <p>You recently requested to reset your password for your $t(common.appNameFull) account. Click the link below to reset it.</p>
-             <p><a href="{{url}}">Reset your password</a></p>
-             $t(emails.temporaryMsg)
-             <p>If you did not request a password reset, please ignore this email or let us know.<br/>This password reset link is only valid for the next 7 days.</p>
-             $t(emails.signature)`,
-    },
-    userDeleted: {
-      subject: `You have been removed from the survey {{surveyLabel}} in $t(common.appNameFull)`,
-      body: `<p>Hello {{name}},</p>
-      <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
-      <p>If you want to have access again to that survey, please contact the survey administrator.</p>
-      $t(emails.signature)`,
     },
   },
   urls: {

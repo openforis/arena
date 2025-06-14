@@ -37,7 +37,7 @@ const RecordEntryButtons = (props) => {
   const canDemote = useAuthCanDemoteRecord(record) && !noHeader
   const canEdit = useAuthCanEditRecord(record)
 
-  const getStepLabel = (_step) => i18n.t(`surveyForm.step.${RecordStep.getName(_step)}`)
+  const getStepLabel = (_step) => i18n.t(`surveyForm:step.${RecordStep.getName(_step)}`)
 
   return (
     <>
@@ -68,21 +68,21 @@ const RecordEntryButtons = (props) => {
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
-                  key: 'surveyForm.formEntryActions.confirmDemote',
+                  key: 'surveyForm:formEntryActions.confirmDemote',
                   params: { name: getStepLabel(stepPrev) },
                   onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepPrev), navigate)),
                 })
               )
             }
             size="small"
-            title="surveyForm.formEntryActions.demoteTo"
+            title="surveyForm:formEntryActions.demoteTo"
             titleParams={{ stepPrev: getStepLabel(stepPrev) }}
             variant="text"
           />
         )}
 
         <span>
-          {i18n.t('surveyForm.formEntryActions.step', {
+          {i18n.t('surveyForm:formEntryActions.step', {
             id: RecordStep.getId(step),
             name: getStepLabel(step),
           })}
@@ -94,14 +94,14 @@ const RecordEntryButtons = (props) => {
             onClick={() =>
               dispatch(
                 DialogConfirmActions.showDialogConfirm({
-                  key: `surveyForm.formEntryActions.confirmPromote${valid ? '' : 'WithErrors'}`,
+                  key: `surveyForm:formEntryActions.confirmPromote${valid ? '' : 'WithErrors'}`,
                   params: { name: getStepLabel(stepNext) },
                   onOk: () => dispatch(RecordActions.updateRecordStep(RecordStep.getId(stepNext), navigate)),
                 })
               )
             }
             size="small"
-            title="surveyForm.formEntryActions.promoteTo"
+            title="surveyForm:formEntryActions.promoteTo"
             titleParams={{ stepNext: getStepLabel(stepNext) }}
             variant="text"
           />
@@ -126,7 +126,7 @@ const FormEntryActions = (props) => {
       {preview ? (
         <Button
           iconClassName="icon-eye-blocked icon-12px"
-          label="surveyForm.formEntryActions.closePreview"
+          label="surveyForm:formEntryActions.closePreview"
           onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
           size="small"
           testId={TestId.surveyForm.previewCloseBtn}

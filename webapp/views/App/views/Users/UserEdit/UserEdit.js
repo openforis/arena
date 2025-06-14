@@ -26,6 +26,7 @@ import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
+import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -121,10 +122,14 @@ const UserEdit = () => {
         </FormItem>
       )}
 
+      <FormItem label="userView.preferredUILanguage.label">
+        <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
+      </FormItem>
+
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
       {canEditSystemAdmin && (
-        <FormItem label="authGroups.systemAdmin.label">
+        <FormItem label="auth:authGroups.systemAdmin.label">
           <Checkbox
             checked={systemAdmin}
             onChange={(value) => {
@@ -138,7 +143,7 @@ const UserEdit = () => {
         </FormItem>
       )}
       {canEditSurveyManager && !systemAdmin && (
-        <FormItem label="authGroups.surveyManager.label">
+        <FormItem label="auth:authGroups.surveyManager.label">
           <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
         </FormItem>
       )}

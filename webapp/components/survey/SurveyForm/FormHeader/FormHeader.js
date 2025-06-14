@@ -76,7 +76,7 @@ const FormHeader = (props) => {
           iconClassName="icon-stack icon-12px"
           onClick={() => dispatch(SurveyFormActions.toggleFormPageNavigation())}
           size="small"
-          title={`surveyForm.${showPageNavigation ? 'hide' : 'show'}Pages`}
+          title={`surveyForm:${showPageNavigation ? 'hide' : 'show'}Pages`}
           variant="text"
         >
           <span className={`icon icon-${showPageNavigation ? 'shrink2' : 'enlarge2'} icon-12px`} />
@@ -85,7 +85,7 @@ const FormHeader = (props) => {
         {edit && canEditDef && treeViewMode === TreeSelectViewMode.onlyPages && (
           <Button
             iconClassName="icon-plus icon-12px"
-            label="surveyForm.subPage"
+            label="surveyForm:subPage"
             onClick={() => {
               const propsNodeDef = {
                 [NodeDefLayout.keys.layout]: NodeDefLayout.newLayout(
@@ -136,7 +136,7 @@ const FormHeader = (props) => {
                 content: (
                   <ButtonDownload
                     href={`/api/survey/${surveyId}/labels`}
-                    label={`surveyForm.exportLabels_${fileFormat}`}
+                    label={`surveyForm:exportLabels_${fileFormat}`}
                     requestParams={{ fileFormat }}
                     variant="text"
                   />
@@ -146,7 +146,7 @@ const FormHeader = (props) => {
                 key: 'labels-import',
                 content: (
                   <OpenFileUploadDialogButton
-                    label="surveyForm.importLabels"
+                    label="surveyForm:importLabels"
                     accept=".csv,.xlsx"
                     onOk={({ files }) => onLabelsImportFileSelected(files[0])}
                     variant="text"

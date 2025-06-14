@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
-import { useI18n, useLang } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 import * as Survey from '@core/survey/survey'
-import { useSurvey, useSurveyLangs } from '@webapp/store/survey'
+import { useSurvey, useSurveyLangs, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { useOnUpdate } from '@webapp/components/hooks'
@@ -41,7 +41,7 @@ const useNodeDef = ({ item, survey }) => {
 }
 
 const useNodeDefPath = ({ item, survey }) => {
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const nodeDef = useNodeDef({ item, survey })
   const nodeDefPathParts = []
   Survey.visitAncestorsAndSelf(nodeDef, (def) => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang)))(survey)

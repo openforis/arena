@@ -47,13 +47,13 @@ export const useUsersListColumns = () => {
       },
       {
         key: 'is-system-admin',
-        header: 'authGroups.systemAdmin.label',
+        header: 'auth:authGroups.systemAdmin.label',
         width: '12rem',
         renderItem: ({ item }) => User.isSystemAdmin(item) && <span className="icon icon-checkmark" />,
       },
       {
         key: 'is-survey-manager',
-        header: 'authGroups.surveyManager.label',
+        header: 'auth:authGroups.surveyManager.label',
         width: '11rem',
         renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
       },

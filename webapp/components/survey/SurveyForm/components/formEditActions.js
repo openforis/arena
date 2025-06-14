@@ -15,7 +15,7 @@ const FormEditActions = () => {
       <Button
         disabled={surveyIsDirty}
         iconClassName="icon-eye icon-12px"
-        label="surveyForm.formEditActions.preview"
+        label="surveyForm:formEditActions.preview"
         onClick={() => dispatch(RecordActions.createRecord({ preview: true }))}
         size="small"
         testId={TestId.surveyForm.previewOpenBtn}
