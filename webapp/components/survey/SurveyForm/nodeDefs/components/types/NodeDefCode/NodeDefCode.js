@@ -96,20 +96,23 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete ? (
-    <NodeDefCodeDropdown
-      canEditRecord={canEditRecord}
-      edit={edit}
-      entryDataQuery={entryDataQuery}
-      itemLabelFunction={itemLabelFunction}
-      items={items}
-      nodeDef={nodeDef}
-      onItemAdd={onItemAdd}
-      onItemRemove={onItemRemove}
-      readOnly={readOnly}
-      selectedItems={selectedItems}
-    />
-  ) : (
+  if (NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete) {
+    return (
+      <NodeDefCodeDropdown
+        canEditRecord={canEditRecord}
+        edit={edit}
+        entryDataQuery={entryDataQuery}
+        itemLabelFunction={itemLabelFunction}
+        items={items}
+        nodeDef={nodeDef}
+        onItemAdd={onItemAdd}
+        onItemRemove={onItemRemove}
+        readOnly={readOnly}
+        selectedItems={selectedItems}
+      />
+    )
+  }
+  return (
     <NodeDefCodeCheckbox
       canEditRecord={canEditRecord}
       edit={edit}

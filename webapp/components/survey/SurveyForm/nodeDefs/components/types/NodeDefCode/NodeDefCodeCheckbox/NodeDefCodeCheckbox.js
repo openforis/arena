@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { ArrayUtils } from '@core/arrayUtils'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import { useI18n } from '@webapp/store/system'
@@ -23,30 +24,36 @@ const NodeDefCodeCheckbox = (props) => {
 
   return (
     <div className="survey-form__node-def-code">
-      {edit ? (
-        <button type="button" className="btn btn-s deselectable" aria-disabled disabled>
-          {i18n.t('surveyForm:nodeDefCode.buttonCode')}
-        </button>
-      ) : (
-        items.map((item) => {
-          const selected = Boolean(selectedItems.find(CategoryItem.isEqual(item)))
-          return (
+      {edit
+        ? ArrayUtils.fromNumberOfElements(2).map((index) => (
             <button
-              key={CategoryItem.getUuid(item)}
+              key={`node-def-checbox_example_${index}`}
               type="button"
-              className={`btn btn-s code-checkbox-btn deselectable${selected ? ' active' : ''}`}
-              aria-disabled={disabled}
-              disabled={disabled}
-              onClick={() => {
-                if (selected) onItemRemove(item)
-                else onItemAdd(item)
-              }}
+              className="btn btn-s deselectable"
+              aria-disabled
+              disabled
             >
-              {itemLabelFunction(item)}
+              {i18n.t(`surveyForm:nodeDefCode.option`, { value: index + 1 })}
             </button>
-          )
-        })
-      )}
+          ))
+        : items.map((item) => {
+            const selected = Boolean(selectedItems.find(CategoryItem.isEqual(item)))
+            return (
+              <button
+                key={CategoryItem.getUuid(item)}
+                type="button"
+                className={`btn btn-s code-checkbox-btn deselectable${selected ? ' active' : ''}`}
+                aria-disabled={disabled}
+                disabled={disabled}
+                onClick={() => {
+                  if (selected) onItemRemove(item)
+                  else onItemAdd(item)
+                }}
+              >
+                {itemLabelFunction(item)}
+              </button>
+            )
+          })}
     </div>
   )
 }
