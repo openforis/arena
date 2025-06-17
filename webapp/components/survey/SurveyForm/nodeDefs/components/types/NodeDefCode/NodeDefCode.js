@@ -98,10 +98,18 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
-  if (readOnly || !canEditRecord) {
+  if (!edit && (readOnly || !canEditRecord)) {
     const nodesValueSummary = nodes
       .map((node) =>
-        NodeValueFormatter.format({ survey, nodeDef, node, value: Node.getValue(node), showLabel: true, lang })
+        NodeValueFormatter.format({
+          survey,
+          cycle: surveyCycleKey,
+          nodeDef,
+          node,
+          value: Node.getValue(node),
+          showLabel: true,
+          lang,
+        })
       )
       .join(', ')
     return <span className="value-preview">{nodesValueSummary}</span>
