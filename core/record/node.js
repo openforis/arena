@@ -209,7 +209,16 @@ export const hasUserInputValue = (node) => !isValueBlank(node) && !isDefaultValu
 // Code
 export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
-export const newNodeValueCode = ({ itemUuid }) => ({ [valuePropsCode.itemUuid]: itemUuid })
+export const newNodeValueCode = ({ itemUuid, code }) => {
+  const value = {}
+  if (itemUuid) {
+    value[valuePropsCode.itemUuid] = itemUuid
+  }
+  if (Objects.isNotEmpty(code)) {
+    value[valuePropsCode.code] = code
+  }
+  return value
+}
 
 // Coordinate
 const _getValuePropNumber = ({ node, prop }) => {
