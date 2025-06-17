@@ -18,6 +18,7 @@ import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/h
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
 import { useItems } from './store'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
 const NodeDefCode = (props) => {
   const {
@@ -44,7 +45,8 @@ const NodeDefCode = (props) => {
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
-  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
+  const itemsNeeded = !readOnly && canEditRecord
+  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded })
   const [selectedItems, setSelectedItems] = useState([])
   const autocomplete = typeof items === 'function'
 
@@ -95,6 +97,18 @@ const NodeDefCode = (props) => {
         : CategoryItem.getLabel(lang)(item),
     [lang, nodeDef, surveyCycleKey]
   )
+
+  if (readOnly || !canEditRecord) {
+    return (
+      <span>
+        {nodes
+          .map((node) =>
+            NodeValueFormatter.format({ survey, nodeDef, node, value: Node.getValue(node), showLabel: true, lang })
+          )
+          .join(', ')}
+      </span>
+    )
+  }
 
   if (NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete) {
     return (
