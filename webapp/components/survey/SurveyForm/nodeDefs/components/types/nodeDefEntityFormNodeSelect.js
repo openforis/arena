@@ -61,7 +61,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
               <option value="placeholder" disabled hidden={true}>
                 {i18n.t('common.select')}
               </option>
-              {nodeKeysLabelValues.map((n, index) => (
+              {nodes.map((n, index) => (
                 <option
                   key={Node.getUuid(n)}
                   value={Node.getUuid(n)}
