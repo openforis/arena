@@ -10,8 +10,8 @@ const fillInput = async (id, value) => {
   await page.fill(selector, value)
 }
 
-const getCodeValuePreviewSelector = ({ testId = null, parentSelector = '' }) =>
-  `${parentSelector} ${testId ? getSelector(testId, '.code-value-preview') : '.code-value-preview'} .dropdown`
+const getValuePreviewSelector = ({ testId = null, parentSelector = '' }) =>
+  `${parentSelector} ${testId ? getSelector(testId, '.value-preview') : '.value-preview'}`
 
 const getDropdownSelector = ({ testId = null, parentSelector = '' }) =>
   `${parentSelector} ${testId ? getSelector(testId, '.dropdown-wrapper') : '.dropdown-wrapper'} .dropdown`
@@ -50,6 +50,14 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   }
 }
 
+const expectValuePreviewToBe = async ({ testId, parentSelector = '', value }) => {
+  const valuePreviewEl = await page.$(getValuePreviewSelector({ testId, parentSelector }))
+  await expect(valuePreviewEl).not.toBeNull()
+  const valuePreviewElText = await valuePreviewEl.innerText()
+  const expectedText = Objects.isEmpty(value) ? '' : value
+  await expect(valuePreviewElText).toBe(expectedText)
+}
+
 const expectDropdownToBeDisabled = async ({ testId = null, parentSelector = '' }) => {
   const selector = `${getDropdownSelector({ testId, parentSelector })}.dropdown--is-disabled`
   const dropdownEl = await page.$(selector)
@@ -71,10 +79,7 @@ const expectDropdownValue = async ({ testId = null, parentSelector = '', value }
       await expect(dropdownValue).toBe(value)
     }
   } else {
-    const valuePreviewEl = await page.$(getCodeValuePreviewSelector({ testId, parentSelector }))
-    const valuePreviewElText = await valuePreviewEl.innerText()
-    const expectedText = Objects.isEmpty(value) ? '' : value
-    await expect(valuePreviewElText).toBe(expectedText)
+    await expectValuePreviewToBe({ testId, parentSelector, value })
   }
 }
 

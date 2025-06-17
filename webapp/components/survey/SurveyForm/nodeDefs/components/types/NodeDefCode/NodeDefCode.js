@@ -99,15 +99,12 @@ const NodeDefCode = (props) => {
   )
 
   if (readOnly || !canEditRecord) {
-    return (
-      <span className="code-value-preview">
-        {nodes
-          .map((node) =>
-            NodeValueFormatter.format({ survey, nodeDef, node, value: Node.getValue(node), showLabel: true, lang })
-          )
-          .join(', ')}
-      </span>
-    )
+    const nodesValueSummary = nodes
+      .map((node) =>
+        NodeValueFormatter.format({ survey, nodeDef, node, value: Node.getValue(node), showLabel: true, lang })
+      )
+      .join(', ')
+    return <span className="value-preview">{nodesValueSummary}</span>
   }
 
   if (NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete) {
