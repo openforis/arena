@@ -100,7 +100,7 @@ const NodeDefCode = (props) => {
 
   if (readOnly || !canEditRecord) {
     return (
-      <span>
+      <span className="code-value-preview">
         {nodes
           .map((node) =>
             NodeValueFormatter.format({ survey, nodeDef, node, value: Node.getValue(node), showLabel: true, lang })
