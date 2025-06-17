@@ -10,6 +10,9 @@ const fillInput = async (id, value) => {
   await page.fill(selector, value)
 }
 
+const getValuePreviewSelector = ({ testId = null, parentSelector = '' }) =>
+  `${parentSelector} ${testId ? getSelector(testId, '.value-preview') : '.value-preview'}`
+
 const getDropdownSelector = ({ testId = null, parentSelector = '' }) =>
   `${parentSelector} ${testId ? getSelector(testId, '.dropdown-wrapper') : '.dropdown-wrapper'} .dropdown`
 
@@ -47,6 +50,14 @@ const selectDropdownItem = async ({ testId = null, parentSelector = '', value = 
   }
 }
 
+const expectValuePreviewToBe = async ({ testId, parentSelector = '', value }) => {
+  const valuePreviewEl = await page.$(getValuePreviewSelector({ testId, parentSelector }))
+  await expect(valuePreviewEl).not.toBeNull()
+  const valuePreviewElText = await valuePreviewEl.innerText()
+  const expectedText = Objects.isEmpty(value) ? '' : value
+  await expect(valuePreviewElText).toBe(expectedText)
+}
+
 const expectDropdownToBeDisabled = async ({ testId = null, parentSelector = '' }) => {
   const selector = `${getDropdownSelector({ testId, parentSelector })}.dropdown--is-disabled`
   const dropdownEl = await page.$(selector)
@@ -57,13 +68,18 @@ const expectDropdownValue = async ({ testId = null, parentSelector = '', value }
   // wait for dropdown value to be set
   await page.waitForTimeout(1000)
 
-  const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
-  if (Objects.isEmpty(value)) {
-    await expect(dropdownValueEl).toBeNull()
+  const dropdownEl = await page.$(getDropdownSelector({ testId, parentSelector }))
+  if (dropdownEl) {
+    const dropdownValueEl = await page.$(getDropdownValueSelector({ testId, parentSelector }))
+    if (Objects.isEmpty(value)) {
+      await expect(dropdownValueEl).toBeNull()
+    } else {
+      await expect(dropdownValueEl).not.toBeNull()
+      const dropdownValue = await dropdownValueEl.innerText()
+      await expect(dropdownValue).toBe(value)
+    }
   } else {
-    await expect(dropdownValueEl).not.toBeNull()
-    const dropdownValue = await dropdownValueEl.innerText()
-    await expect(dropdownValue).toBe(value)
+    await expectValuePreviewToBe({ testId, parentSelector, value })
   }
 }
 

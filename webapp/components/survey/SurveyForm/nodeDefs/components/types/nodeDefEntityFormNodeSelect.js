@@ -10,8 +10,8 @@ import { Button, ButtonDelete } from '@webapp/components/buttons'
 
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { useI18n } from '@webapp/store/system'
-import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
+import { useNodeKeysLabelValues } from '@webapp/store/ui/surveyForm'
 
 import { TestId } from '@webapp/utils/testId'
 
@@ -24,6 +24,8 @@ const NodeDefEntityFormNodeSelect = (props) => {
   const dispatch = useDispatch()
 
   const nodeDefName = NodeDef.getLabel(nodeDef, lang)
+
+  const nodeKeysLabelValues = useNodeKeysLabelValues(nodeDef, nodes)
 
   return (
     <div className="survey-form__node-def-entity-form-header">
@@ -65,7 +67,7 @@ const NodeDefEntityFormNodeSelect = (props) => {
                   value={Node.getUuid(n)}
                   data-testid={TestId.entities.form.nodeSelectOption(index)}
                 >
-                  {dispatch(SurveyFormActions.getNodeKeyLabelValues(nodeDef, n))}
+                  {nodeKeysLabelValues[index]}
                 </option>
               ))}
             </select>

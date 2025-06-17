@@ -55,10 +55,10 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
   },
   nodeDefCode: {
-    buttonCode: 'Button code',
     code: '$t(common.code)',
     label: '$t(common.label)',
     typeCodeOrLabel: 'Type code or label',
+    option: 'Option {{value}}',
   },
   nodeDefBoolean: {
     labelValue: {

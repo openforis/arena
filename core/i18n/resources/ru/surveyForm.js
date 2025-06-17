@@ -52,10 +52,10 @@ export default {
       'Вы уверены, что хотите безвозвратно удалить это определение узла: {{ name }}?\n\n$t(common.cantUndoWarning)',
   },
   nodeDefCode: {
-    buttonCode: 'Код кнопки',
     code: '$t(common.code)',
     label: '$t(common.label)',
     typeCodeOrLabel: 'Введите код или метку',
+    option: 'Вариант {{value}}',
   },
   nodeDefBoolean: {
     labelValue: {

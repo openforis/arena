@@ -55,10 +55,10 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
       'Та энэ зангилааны тодорхойлолтыг бүрмөсөн устгахдаа итгэлтэй байна уу: {{ name }}?\n\n$t(common.cantUndoWarning)',
   },
   nodeDefCode: {
-    buttonCode: 'Товчлуурын код',
     code: '$t(common.code)',
     label: '$t(common.label)',
     typeCodeOrLabel: 'Код эсвэл шошго бичнэ үү',
+    option: 'Сонголт {{value}}',
   },
   nodeDefBoolean: {
     labelValue: {
