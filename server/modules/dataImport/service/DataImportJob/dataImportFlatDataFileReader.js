@@ -112,7 +112,7 @@ const valueConverterByNodeDefType = {
         const attributeName = NodeDef.getName(nodeDef)
         throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
       }
-      return Node.newNodeValueCode({ itemUuid })
+      return Node.newNodeValueCode({ itemUuid, code })
     }
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
     return { [Node.valuePropsCode.code]: code }

@@ -37,7 +37,9 @@ const extractCategoryItemCodeFromValue = ({ survey, value }) => {
   if (itemUuid) {
     const item = Survey.getCategoryItemByUuid(itemUuid)(survey)
     // item can be missing if category is big (not preloaded)
-    return item ? CategoryItems.getCode(item) : null
+    if (item) {
+      return CategoryItems.getCode(item)
+    }
   }
   return getValueCode(value)
 }
