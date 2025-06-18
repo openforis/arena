@@ -59,8 +59,10 @@ const _findCategoryItemUuidByAttribute = async ({
     return itemUuid
   }
   const categoryUuid = NodeDef.getCategoryUuid(attributeDef)
-  const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, attributeDef)(record)
-  const codePaths = parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), code] : [code]
+  const ancestorCodes = RecordReader.getAncestorCodeAttributeCodes({ survey, parentNode, nodeDef: attributeDef })(
+    record
+  )
+  const codePaths = [...ancestorCodes, code]
   const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
   return item ? item.uuid : null
 }
