@@ -1,9 +1,9 @@
-import './ShowZoomLevel.scss'
+import './ZoomLevel.scss'
 
 import React, { useEffect, useState } from 'react'
 import { useMap } from 'react-leaflet'
 
-export const ShowZoomLevel = () => {
+export const ZoomLevel = () => {
   const map = useMap()
   const [zoomLevel, setZoomLevel] = useState()
 
@@ -15,5 +15,5 @@ export const ShowZoomLevel = () => {
     setZoomLevel(map.getZoom())
   })
 
-  return <div className="leaflet-bottom show-zoom-level">{zoomLevel}</div>
+  return <span className="zoom-level">{zoomLevel}</span>
 }

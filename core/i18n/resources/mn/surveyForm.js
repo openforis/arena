@@ -1,0 +1,121 @@
+export default {
+  subPage: 'Дэд хуудас',
+  addChildTo: '{{nodeDefLabel}}-д нэмэх',
+  addChildToTitle: '{{nodeDefLabel}}-д шинэ зангилаа нэмэх',
+  addChildToTypes: {
+    boolean: 'Буль',
+    code: 'Код',
+    coordinate: 'Координат',
+    date: 'Огноо',
+    decimal: 'Бутархай',
+    geo: 'Газарзүйн',
+    entity: 'Хүснэгт эсвэл маягт',
+    file: 'Файл',
+    integer: 'Бүхэл тоо',
+    taxon: 'Таксон',
+    text: 'Текст',
+    time: 'Цаг',
+    // layout elements
+    formHeader: 'Маягтын толгой',
+  },
+  clone: `'{{nodeDefLabel}}'-ийг хувилах`,
+  compressFormItems: `'{{nodeDefLabel}}'-ийн маягтын элементүүдийг шахах`,
+  confirmUpdateDependentEnumeratedEntities: `Хэрэв та үргэлжлүүлбэл зарим тоолсон субъектүүд ({{entityDefs}}) дахин тоологдож,  
+тэдгээрт оруулсан утгуудыг (хэрэв байгаа бол) устгах болно.  
+Үргэлжлүүлэх үү?`,
+  convert: `'{{nodeDefLabel}}'-ийг хөрвүүлэх`,
+  delete: `'{{nodeDefLabel}}'-ийг устгах`,
+  edit: `'{{nodeDefLabel}}'-ийг засварлах`,
+  schemaSummary_csv: 'Схем товчлол (CSV)',
+  schemaSummary_xlsx: 'Схем товчлол (Excel)',
+  hidePages: 'Хуудсуудыг нуух',
+  showPages: 'Хуудсуудыг харуулах',
+  move: `'{{nodeDefLabel}}'-ийг зөөх`,
+  movePageUp: 'Хуудсыг дээш зөөх',
+  movePageDown: 'Хуудсыг доош зөөх',
+  formEditActions: {
+    preview: 'Урьдчилан харах',
+  },
+  formEntryActions: {
+    confirmDemote: 'Та энэ бичлэгийг {{name}} руу бууруулахдаа итгэлтэй байна уу?',
+    confirmPromote: `Та энэ бичлэгийг **{{name}} руу дэвшүүлэхдээ** итгэлтэй байна уу?  
+Та үүнийг дахин засварлах боломжгүй болно`,
+    confirmPromoteWithErrors: `**Энэ бичлэг алдаатай байна**.  
+$t(surveyForm.formEntryActions.confirmPromote)`,
+    confirmDelete: 'Та энэ бичлэгийг устгахдаа итгэлтэй байна уу?\n\n$t(common.cantUndoWarning)',
+    closePreview: 'Урьдчилан харахыг хаах',
+    demoteTo: '{{stepPrev}} руу бууруулах',
+    promoteTo: '{{stepNext}} руу дэвшүүлэх',
+    step: 'Алхам {{id}} ({{name}})',
+  },
+  nodeDefEditFormActions: {
+    columns: 'Баганууд',
+    confirmConvert: '{{name}} шинжийг "{{toType}}" болгон хөрвүүлэх үү?',
+    confirmDelete:
+      'Та энэ зангилааны тодорхойлолтыг бүрмөсөн устгахдаа итгэлтэй байна уу: {{ name }}?\n\n$t(common.cantUndoWarning)',
+  },
+  nodeDefCode: {
+    code: '$t(common.code)',
+    label: '$t(common.label)',
+    typeCodeOrLabel: 'Код эсвэл шошго бичнэ үү',
+    option: 'Сонголт {{value}}',
+  },
+  nodeDefBoolean: {
+    labelValue: {
+      trueFalse: {
+        true: '$t(common.true)',
+        false: '$t(common.false)',
+      },
+      yesNo: {
+        true: '$t(common.yes)',
+        false: '$t(common.no)',
+      },
+    },
+  },
+  nodeDefCoordinate: {
+    coordinate: 'Координат',
+    srs: 'ТЗС',
+    x: 'X',
+    y: 'Y',
+    showOnMap: 'Газрын зураг дээр харуулах',
+    accuracy: 'Нарийвчлал',
+    altitude: 'Өндөр',
+    altitudeAccuracy: 'Өндрийн нарийвчлал',
+  },
+  nodeDefGeo: {
+    confirmDelete: 'Энэ Газарзүйн утгыг устгах уу?',
+    geoJSON: 'GeoJSON',
+    invalidGeoJsonFileUploaded: 'Буруу GeoJSON файл байршуулсан',
+  },
+  nodeDefEntityForm: {
+    addNewEntity: 'Шинэ {{name}} нэмэх',
+    confirmDelete: 'Та энэ субьектийг устгахдаа итгэлтэй байна уу?',
+    select: '{{name}} сонгох:',
+    selectedEntity: 'Сонгогдсон {{name}}:',
+  },
+  nodeDefTaxon: {
+    code: '$t(common.code)',
+    scientificName: 'Шинжлэх ухааны нэр',
+    vernacularName: 'Нутгийн нэр',
+    vernacularNameSelectionKept: 'Нутгийн нэр сонгосон хэвээр',
+    visibleFields: 'Харагдах талбарууд',
+  },
+  nodeDefFile: {
+    errorLoadingPreview: 'Урьдчилан харах ачаалж чадсангүй',
+    fileUuid: 'Файлын uuid',
+    fileName: 'Файлын нэр',
+  },
+  nodeDefsTreeSelectMode: {
+    allNodeDefs: 'Бүх зангилаа',
+    onlyPages: 'Зөвхөн хуудсууд',
+  },
+  step: {
+    entry: 'Оролт',
+    cleansing: 'Цэвэрлэгээ',
+    analysis: 'Шинжилгээ',
+  },
+  confirmNodeDelete: 'Та энэ {{nodeDefType}} -ийг ({{nodeDefLabel}}) устгахдаа итгэлтэй байна уу?',
+  exportLabels_csv: 'Шошгуудыг CSV руу экспортлох',
+  exportLabels_xlsx: 'Шошгуудыг Excel руу экспортлох',
+  importLabels: 'Шошгуудыг Excel эсвэл CSV-ээс импортлох',
+}

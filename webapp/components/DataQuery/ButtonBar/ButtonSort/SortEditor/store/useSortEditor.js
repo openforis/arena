@@ -7,8 +7,7 @@ import * as Expression from '@core/expressionParser/expression'
 
 import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
 
-import { useLang } from '@webapp/store/system'
-import { useNodeDefByUuid, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const getVariables = async ({ survey, cycle, entityDef, attributeDefUuids, lang }) => {
   const variables = await ExpressionVariables.getVariables({
@@ -39,7 +38,7 @@ export const useSortEditor = ({ query }) => {
     ? Query.getDimensions(query)
     : Query.getAttributeDefUuids(query)
 
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const entityDef = useNodeDefByUuid(entityDefUuid)
@@ -49,7 +48,9 @@ export const useSortEditor = ({ query }) => {
   const [variables, setVariables] = useState([])
   useEffect(() => {
     if (survey && entityDef && attributeDefUuids && lang) {
-      setVariables(getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }))
+      getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }).then((_variables) => [
+        setVariables(_variables),
+      ])
     }
   }, [survey, cycle, entityDef, attributeDefUuids, lang])
 

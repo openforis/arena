@@ -110,6 +110,10 @@ export default class ColumnNodeDef {
     return this._types
   }
 
+  get jsTypes() {
+    return this.types.map((type) => SQL.getJsTypeBySqlType(type))
+  }
+
   get codeLabelColumn() {
     return NodeDef.isCode(this.nodeDef) ? `${NodeDef.getName(this.nodeDef)}${columnSuffixCodeLabel}` : null
   }

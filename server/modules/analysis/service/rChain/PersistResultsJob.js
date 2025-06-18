@@ -5,10 +5,13 @@ import * as Record from '@core/record/record'
 import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/FlatDataImportJob'
 import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import FileZip from '@server/utils/file/fileZip'
 
 import { RecordsProvider } from './RecordsProvider'
 import { FileFormats } from '@core/fileFormats'
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 export default class PersistResultsJob extends FlatDataImportJob {
   constructor(params) {
@@ -57,6 +60,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
       stream,
       fileFormat: FileFormats.csv,
       survey,
+      categoryItemProvider,
       cycle,
       nodeDefUuid,
       onRowItem: async (item) => this.onRowItem(item),

@@ -10,16 +10,18 @@ import { SurveyState } from '@webapp/store/survey'
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
 
-export const recordNodesUpdate = (nodes) => (dispatch, getState) => {
-  const state = getState()
-  const record = RecordState.getRecord(state)
-  // Hide app loader on record create
-  if (A.isEmpty(Record.getNodes(record))) {
-    dispatch(LoaderActions.hideLoader())
-  }
+export const recordNodesUpdate =
+  (nodes, removeDirtyFlag = true) =>
+  (dispatch, getState) => {
+    const state = getState()
+    const record = RecordState.getRecord(state)
+    // Hide app loader on record create
+    if (A.isEmpty(Record.getNodes(record))) {
+      dispatch(LoaderActions.hideLoader())
+    }
 
-  dispatch({ type: ActionTypes.nodesUpdate, nodes: nodes })
-}
+    dispatch({ type: ActionTypes.nodesUpdate, nodes, removeDirtyFlag })
+  }
 
 export const checkAndConfirmUpdateNode = ({ dispatch, getState, node, nodeDef, onOk }) => {
   const state = getState()
@@ -35,9 +37,9 @@ export const checkAndConfirmUpdateNode = ({ dispatch, getState, node, nodeDef, o
   if (dependentEnumeratedEntityDefsLabel) {
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'surveyForm.confirmUpdateDependentEnumeratedEntities',
+        key: 'surveyForm:confirmUpdateDependentEnumeratedEntities',
         params: { entityDefs: dependentEnumeratedEntityDefsLabel },
-        onOk: onOk,
+        onOk,
       })
     )
   } else {

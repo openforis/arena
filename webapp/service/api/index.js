@@ -1,4 +1,5 @@
 export { fetchLoggedInUserAndSurvey } from './fetchUserAndSurvey'
+export { fetchVersion } from './generic'
 
 export {
   fetchCategories,

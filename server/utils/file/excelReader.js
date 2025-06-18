@@ -5,7 +5,7 @@ const extractRowsFromExcelStream = async ({ stream }) => {
   await workbook.xlsx.read(stream)
 
   // read only first worksheet
-  const worksheet = workbook.getWorksheet(1)
+  const worksheet = workbook.worksheets[0]
 
   if (!worksheet) return []
 

@@ -35,7 +35,7 @@ const getNodeDefAvailableChildren = ({
   includeMultipleAttributes,
   includeSingleAttributes,
   includeSingleEntities,
-  isDisabled,
+  isNodeDefIncluded,
 }) => {
   const pageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getUuid(nodeDef) })
   const parentPageNode = getPageNode({ record, pagesUuidMap, nodeDefUuid: NodeDef.getParentUuid(nodeDef) })
@@ -76,7 +76,7 @@ const getNodeDefAvailableChildren = ({
       )
     : childrenFiltered
 
-  return visibleChildren.filter((childDef) => !isDisabled(childDef) && !hidden)
+  return visibleChildren.filter((childDef) => !hidden && isNodeDefIncluded(childDef))
 }
 
 export const useBuildTreeData = ({
@@ -86,7 +86,8 @@ export const useBuildTreeData = ({
   includeMultipleAttributes,
   includeSingleAttributes,
   includeSingleEntities,
-  isDisabled,
+  isNodeDefDisabled,
+  isNodeDefIncluded,
 }) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
@@ -107,6 +108,7 @@ export const useBuildTreeData = ({
     const suffix = getLabelSuffix(nodeDef)
     return {
       key: NodeDef.getUuid(nodeDef),
+      disabled: isNodeDefDisabled(nodeDef),
       icon: showIcons ? NodeDefUIProps.getIconByNodeDef(nodeDef, true) : undefined,
       label: `${nodeDefLabel}${suffix}`,
       testId: TestId.surveyForm.pageLinkBtn(NodeDef.getName(nodeDef)),
@@ -140,7 +142,7 @@ export const useBuildTreeData = ({
       includeMultipleAttributes,
       includeSingleAttributes,
       includeSingleEntities,
-      isDisabled,
+      isNodeDefIncluded,
     })
     if (children.length > 0) {
       const childrenItems = children.map((childDef) => ({

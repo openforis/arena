@@ -12,7 +12,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Record from '@core/record/record'
 
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
-import { SurveyState, useSurvey } from '@webapp/store/survey'
+import { SurveyState, useSurvey, useIsSurveyDirty } from '@webapp/store/survey'
 import {
   SurveyFormActions,
   SurveyFormState,
@@ -46,7 +46,7 @@ const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
 
 const treeSelectViewModeItems = Object.keys(TreeSelectViewMode).map((mode) => ({
   key: mode,
-  label: `surveyForm.nodeDefsTreeSelectMode.${mode}`,
+  label: `surveyForm:nodeDefsTreeSelectMode.${mode}`,
 }))
 
 const SurveyForm = (props) => {
@@ -81,6 +81,7 @@ const SurveyForm = (props) => {
 
   const isSideBarOpened = useIsSidebarOpened()
   const survey = useSurvey()
+  const surveyIsDirty = useIsSurveyDirty()
   const treeSelectViewMode = useTreeSelectViewMode()
   const viewOnlyPages = treeSelectViewMode === TreeSelectViewMode.onlyPages
   const selectedNodeDefUuid = useActiveNodeDefUuid()
@@ -201,7 +202,10 @@ const SurveyForm = (props) => {
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
               <NodeDefTreeSelect
-                isDisabled={(nodeDefArg) => notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))}
+                disableSelection={surveyIsDirty}
+                isNodeDefIncluded={(nodeDefArg) =>
+                  !notAvailablePageEntityDefsUuids.includes(NodeDef.getUuid(nodeDefArg))
+                }
                 nodeDefUuidActive={viewOnlyPages ? NodeDef.getUuid(activePageNodeDef) : selectedNodeDefUuid}
                 onlyPages={viewOnlyPages}
                 includeMultipleAttributes={!viewOnlyPages}
@@ -212,6 +216,7 @@ const SurveyForm = (props) => {
               {edit && (
                 <div className="display-flex sidebar-bottom-bar">
                   <ButtonGroup
+                    disabled={surveyIsDirty}
                     items={treeSelectViewModeItems}
                     onChange={(mode) => dispatch(SurveyFormActions.setTreeSelectViewMode(mode))}
                     selectedItemKey={treeSelectViewMode}

@@ -18,6 +18,7 @@ import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/h
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
 import { useItems } from './store'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 
 const NodeDefCode = (props) => {
   const {
@@ -44,7 +45,8 @@ const NodeDefCode = (props) => {
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
-  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
+  const itemsNeeded = !readOnly && canEditRecord
+  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded })
   const [selectedItems, setSelectedItems] = useState([])
   const autocomplete = typeof items === 'function'
 
@@ -96,20 +98,40 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete ? (
-    <NodeDefCodeDropdown
-      canEditRecord={canEditRecord}
-      edit={edit}
-      entryDataQuery={entryDataQuery}
-      itemLabelFunction={itemLabelFunction}
-      items={items}
-      nodeDef={nodeDef}
-      onItemAdd={onItemAdd}
-      onItemRemove={onItemRemove}
-      readOnly={readOnly}
-      selectedItems={selectedItems}
-    />
-  ) : (
+  if (!edit && (readOnly || !canEditRecord)) {
+    const nodesValueSummary = nodes
+      .map((node) =>
+        NodeValueFormatter.format({
+          survey,
+          cycle: surveyCycleKey,
+          nodeDef,
+          node,
+          value: Node.getValue(node),
+          showLabel: true,
+          lang,
+        })
+      )
+      .join(', ')
+    return <span className="value-preview">{nodesValueSummary}</span>
+  }
+
+  if (NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete) {
+    return (
+      <NodeDefCodeDropdown
+        canEditRecord={canEditRecord}
+        edit={edit}
+        entryDataQuery={entryDataQuery}
+        itemLabelFunction={itemLabelFunction}
+        items={items}
+        nodeDef={nodeDef}
+        onItemAdd={onItemAdd}
+        onItemRemove={onItemRemove}
+        readOnly={readOnly}
+        selectedItems={selectedItems}
+      />
+    )
+  }
+  return (
     <NodeDefCodeCheckbox
       canEditRecord={canEditRecord}
       edit={edit}

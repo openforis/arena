@@ -12,8 +12,8 @@ import * as DateUtils from '@core/dateUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Expression from '@core/expressionParser/expression'
 
-import { SurveyState } from '@webapp/store/survey'
-import { useI18n, useLang } from '@webapp/store/system'
+import { SurveyState, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 import Dropdown from '@webapp/components/form/Dropdown'
@@ -90,7 +90,7 @@ const Literal = (props) => {
   const { expressionNodeParent, node, nodeDefCurrent, onChange, type, variables = [] } = props
 
   const i18n = useI18n()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const survey = useSelector(SurveyState.getSurvey)
 
   const { nodeDef, isIdentifierField } =
@@ -148,7 +148,7 @@ const Literal = (props) => {
             onChange={onChangeValue}
             items={['true', 'false'].map((value) => ({
               key: value,
-              label: i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
+              label: i18n.t(`surveyForm:nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
             }))}
           />
         )

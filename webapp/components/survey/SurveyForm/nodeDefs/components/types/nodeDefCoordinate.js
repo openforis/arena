@@ -166,7 +166,7 @@ const NodeDefCoordinate = (props) => {
       disabled={edit}
       iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
-      title="surveyForm.nodeDefCoordinate.showOnMap"
+      title="surveyForm:nodeDefCoordinate.showOnMap"
       variant="text"
     />
   ) : null
@@ -193,11 +193,11 @@ const NodeDefCoordinate = (props) => {
   return (
     <div className={classNames('survey-form__node-def-coordinate', { 'with-map': canUseMap })}>
       <div className="form-items">
-        <FormItem label="surveyForm.nodeDefCoordinate.x">{xInput}</FormItem>
-        <FormItem label="surveyForm.nodeDefCoordinate.y">{yInput}</FormItem>
+        <FormItem label="surveyForm:nodeDefCoordinate.x">{xInput}</FormItem>
+        <FormItem label="surveyForm:nodeDefCoordinate.y">{yInput}</FormItem>
         <FormItem label="common.srs">{srsDropdown}</FormItem>
         {additionalFields.map((additionalField, index) => (
-          <FormItem key={additionalField} label={`surveyForm.nodeDefCoordinate.${additionalField}`}>
+          <FormItem key={additionalField} label={`surveyForm:nodeDefCoordinate.${additionalField}`}>
             {additionalInputFields[index]}
           </FormItem>
         ))}

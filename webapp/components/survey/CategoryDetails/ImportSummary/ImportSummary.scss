@@ -13,37 +13,47 @@
 
   .modal-body {
     padding-top: 0;
+
+    .table,
+    .table__content {
+      height: 100%;
+    }
+
+    .table {
+      .table__row-header,
+      .table__row {
+        grid-template-columns: 50px 1fr 20rem 14rem;
+
+        .column__extra-def {
+          width: 100%;
+          overflow: inherit;
+        }
+      }
+
+      .table__row > div:not(:first-child):not(:last-child) {
+        justify-self: left;
+        padding: 0 1rem;
+      }
+    }
   }
 
   .modal-footer {
     padding-top: 1rem;
     position: relative;
+    height: 2rem;
 
-    .btn-close {
+    .btn-import {
       position: absolute;
-      left: 0;
     }
-  }
 
-  .table,
-  .table__content {
-    height: 100%;
-  }
+    .total-items {
+      position: absolute;
+      right: 0;
+      height: 2rem;
 
-  .table {
-    .table__row-header,
-    .table__row {
-      grid-template-columns: 50px 1fr 20rem 14rem;
-
-      .column__extra-def {
-        width: 100%;
-        overflow: inherit;
+      .form-label {
+        white-space: nowrap;
       }
-    }
-
-    .table__row > div:not(:first-child):not(:last-child) {
-      justify-self: left;
-      padding: 0 1rem;
     }
   }
 }

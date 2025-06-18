@@ -132,6 +132,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       stream,
       fileFormat,
       survey,
+      categoryItemProvider,
+      taxonProvider,
       cycle,
       nodeDefUuid,
       includeFiles,

@@ -3,6 +3,7 @@ import ExcelJS from 'exceljs'
 import { Objects } from '@openforis/arena-core'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
+import { CsvField } from './csvField'
 
 const headerCellStyle = { font: { bold: true } }
 
@@ -37,9 +38,13 @@ export const writeItemsToStream = async ({
     },
   })
 
-  worksheet.columns = (fields ?? Object.keys(items[0])).map((field) => ({
+  const actualFields = fields ?? Object.keys(items[0])
+  const fieldNames = CsvField.getNames(actualFields)
+
+  worksheet.columns = fieldNames.map((field) => ({
     header: field,
     key: field,
+    type: field?.type ?? 'string',
   }))
 
   // set style to header row
@@ -52,15 +57,24 @@ export const writeItemsToStream = async ({
     const transformedItem = itemTransformer(item)
     const row = worksheet.addRow(transformedItem)
     // apply border style
-    row.eachCell({ includeEmpty: true }, (cell) => {
+    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
       cell.border = cellBorder
+      // convert number fields to actual numbers
+      if (cell.value) {
+        const field = actualFields[colNumber - 1] // colNumber starts from 1
+        const fieldType = CsvField.getType(field)
+        if (fieldType === 'number') {
+          cell.value = Number(cell.value)
+        }
+      }
     })
   })
 
+  // set column widths based on the content
   worksheet.columns.forEach((column) => {
     let maxLength = 0
-    column['eachCell']({ includeEmpty: true }, (cell) => {
-      const columnLength = cell.value ? cell.value.toString().length : 10
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value?.toString().length ?? 10
       if (columnLength > maxLength) {
         maxLength = columnLength
       }

@@ -40,7 +40,7 @@ const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, 
     urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
-  await Mailer.sendEmail({ to: email, msgKey: 'emails.userInvite', msgParams, i18n })
+  await Mailer.sendEmail({ to: email, msgKey: 'emails:userInvite', msgParams, i18n })
 }
 
 const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
@@ -134,7 +134,7 @@ const _inviteUser = async (
       serverUrl,
       surveyName: Survey.getName(surveyInfo),
       surveyLabel: Survey.getLabel(surveyInfo, lang),
-      groupLabel: `$t(authGroups.${groupName}.label)`,
+      groupLabel: `$t(auth:authGroups.${groupName}.label)`,
       groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
       message: messageParam,
     }
@@ -152,7 +152,7 @@ const _inviteUser = async (
         // Add user to group (accept automatically the invitation)
         await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
         // Send email
-        await Mailer.sendEmail({ to: email, msgKey: 'emails.userInviteExistingUser', msgParams: emailParams, lang })
+        await Mailer.sendEmail({ to: email, msgKey: 'emails:userInviteExistingUser', msgParams: emailParams, lang })
       } else if (repeatInvitation) {
         // User has a pending invitation still
         await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)

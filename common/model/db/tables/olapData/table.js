@@ -30,7 +30,8 @@ export default class TableOlapData extends TableSurveyRdb {
   }
 
   get attributeDefsForColumns() {
-    const attributeDefs = []
+    const sortedAttributeDefs = []
+    const attributeDefsByUuid = {}
     Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
       const defs = Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef: ancestorDef,
@@ -44,9 +45,15 @@ export default class TableOlapData extends TableSurveyRdb {
               includedAttributeTypes.includes(NodeDef.getType(nodeDef)))) ||
           (NodeDef.isAnalysis(nodeDef) && includedAnalysisAttributeTypes.includes(NodeDef.getType(nodeDef)))
       )
-      attributeDefs.unshift(...filteredDefs)
+      filteredDefs.forEach((nodeDef) => {
+        const uuid = NodeDef.getUuid(nodeDef)
+        if (!attributeDefsByUuid[uuid]) {
+          attributeDefsByUuid[uuid] = nodeDef
+          sortedAttributeDefs.unshift(nodeDef)
+        }
+      })
     })(this._survey)
-    return attributeDefs
+    return sortedAttributeDefs
     //.sort((nodeDefA, nodeDefB) => NodeDef.getId(nodeDefA) - NodeDef.getId(nodeDefB))
   }
 

@@ -9,8 +9,7 @@ import * as User from '@core/user/user'
 import * as Survey from '@core/survey/survey'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import { useSurveyCycleKey, useSurveyInfo } from '@webapp/store/survey'
-import { useLang } from '@webapp/store/system'
+import { useIsSurveyDirty, useSurveyCycleKey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanEditSurvey, UserActions, useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
@@ -31,10 +30,11 @@ import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 const Header = () => {
   const dispatch = useDispatch()
   const user = useUser()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const appSaving = useIsAppSaving()
   const isSideBarOpen = useIsSidebarOpened()
   const surveyInfo = useSurveyInfo()
+  const surveyIsDirty = useIsSurveyDirty()
   const surveyCycleKey = useSurveyCycleKey()
   const canEditSurvey = useAuthCanEditSurvey()
 
@@ -64,6 +64,7 @@ const Header = () => {
         {Survey.isValid(surveyInfo) && (
           <>
             <Link
+              aria-disabled={surveyIsDirty}
               data-testid={TestId.header.surveyTitle}
               to={appModuleUri(homeModules.surveyInfo)}
               className="btn-s btn-transparent"
@@ -91,6 +92,7 @@ const Header = () => {
       <button
         className="app-header__btn-user"
         data-testid={TestId.header.userBtn}
+        disabled={surveyIsDirty}
         onClick={(event) => {
           event.preventDefault()
           event.stopPropagation()

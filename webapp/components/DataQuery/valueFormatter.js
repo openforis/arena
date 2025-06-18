@@ -8,7 +8,7 @@ import * as DateUtils from '@core/dateUtils'
 
 const formatters = {
   [NodeDef.nodeDefType.boolean]: ({ value, i18n, nodeDef }) =>
-    i18n.t(`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
+    i18n.t(`surveyForm:nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
   [NodeDef.nodeDefType.code]: ({ value, label }) => label ?? value,
   [NodeDef.nodeDefType.date]: ({ value }) => DateUtils.format(DateUtils.parseISO(value), DateUtils.formats.dateDefault),
   [NodeDef.nodeDefType.decimal]: ({ survey, nodeDef, value }) => {

@@ -1,0 +1,121 @@
+export default {
+  subPage: 'Sub page',
+  addChildTo: 'Add to {{nodeDefLabel}}',
+  addChildToTitle: 'Add new node to {{nodeDefLabel}}',
+  addChildToTypes: {
+    boolean: 'Boolean',
+    code: 'Code',
+    coordinate: 'Coordinate',
+    date: 'Date',
+    decimal: 'Decimal',
+    geo: 'Geospatial',
+    entity: 'Table or form',
+    file: 'File',
+    integer: 'Integer',
+    taxon: 'Taxon',
+    text: 'Text',
+    time: 'Time',
+    // layout elments
+    formHeader: 'Form Header',
+  },
+  clone: `Clone '{{nodeDefLabel}}'`,
+  compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+  confirmUpdateDependentEnumeratedEntities: `If you continue, some enumerated entities ({{entityDefs}}) will be re-enumerated,  
+deleting the existing values inserted into them (if any).  
+Continue?`,
+  convert: `Convert '{{nodeDefLabel}}'`,
+  delete: `Delete '{{nodeDefLabel}}'`,
+  edit: `Edit '{{nodeDefLabel}}'`,
+  schemaSummary_csv: 'Schema summary (CSV)',
+  schemaSummary_xlsx: 'Schema summary (Excel)',
+  hidePages: 'Hide pages',
+  showPages: 'Show pages',
+  move: `Move '{{nodeDefLabel}}'`,
+  movePageUp: 'Move page up',
+  movePageDown: 'Move page down',
+  formEditActions: {
+    preview: 'Preview',
+  },
+  formEntryActions: {
+    confirmDemote: 'Are sure you want to demote this record to {{name}}?',
+    confirmPromote: `Are sure you want to **promote this record to {{name}}**?  
+You won't be able to edit it anymore`,
+    confirmPromoteWithErrors: `**This record contains errors**.  
+$t(surveyForm.formEntryActions.confirmPromote)`,
+    confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
+    closePreview: 'Close preview',
+    demoteTo: 'Demote to {{stepPrev}}',
+    promoteTo: 'Promote to {{stepNext}}',
+    step: 'Step {{id}} ({{name}})',
+  },
+  nodeDefEditFormActions: {
+    columns: 'Columns',
+    confirmConvert: 'Convert the attribute "{{name}}" into "{{toType}}"?',
+    confirmDelete:
+      'Are you sure you want to permanently delete this node definition: {{ name }}?\n\n$t(common.cantUndoWarning)',
+  },
+  nodeDefCode: {
+    code: '$t(common.code)',
+    label: '$t(common.label)',
+    typeCodeOrLabel: 'Type code or label',
+    option: 'Option {{value}}',
+  },
+  nodeDefBoolean: {
+    labelValue: {
+      trueFalse: {
+        true: '$t(common.true)',
+        false: '$t(common.false)',
+      },
+      yesNo: {
+        true: '$t(common.yes)',
+        false: '$t(common.no)',
+      },
+    },
+  },
+  nodeDefCoordinate: {
+    coordinate: 'Coordinate',
+    srs: 'SRS',
+    x: 'X',
+    y: 'Y',
+    showOnMap: 'Show on map',
+    accuracy: 'Accuracy',
+    altitude: 'Altitude',
+    altitudeAccuracy: 'Altitude accuracy',
+  },
+  nodeDefGeo: {
+    confirmDelete: 'Delete this Geospatial value?',
+    geoJSON: 'GeoJSON',
+    invalidGeoJsonFileUploaded: 'Invalid GeoJSON file uploaded',
+  },
+  nodeDefEntityForm: {
+    addNewEntity: 'Add new {{name}}',
+    confirmDelete: 'Are you sure you want to delete this entity?',
+    select: 'Select a {{name}}:',
+    selectedEntity: 'Selected {{name}}:',
+  },
+  nodeDefTaxon: {
+    code: '$t(common.code)',
+    scientificName: 'Scientific name',
+    vernacularName: 'Vernacular name',
+    vernacularNameSelectionKept: 'Vernacular name selection kept',
+    visibleFields: 'Visible fields',
+  },
+  nodeDefFile: {
+    errorLoadingPreview: 'Error loading preview',
+    fileUuid: 'File uuid',
+    fileName: 'File name',
+  },
+  nodeDefsTreeSelectMode: {
+    allNodeDefs: 'All nodes',
+    onlyPages: 'Only pages',
+  },
+  step: {
+    entry: 'Entry',
+    cleansing: 'Cleansing',
+    analysis: 'Analysis',
+  },
+  confirmNodeDelete: 'Are you sure you want to delete this {{nodeDefType}} ({{nodeDefLabel}})?',
+  exportLabels_csv: 'Export labels to CSV',
+  exportLabels_xlsx: 'Export labels to Excel',
+  importLabels: 'Import labels from Excel or CSV',
+}

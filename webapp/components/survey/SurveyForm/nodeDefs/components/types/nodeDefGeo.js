@@ -71,7 +71,7 @@ const NodeDefGeo = (props) => {
         dispatch(NotificationActions.hideNotification())
         updateNode(nodeDef, node, geoJson)
       } else {
-        dispatch(NotificationActions.notifyWarning({ key: 'surveyForm.nodeDefGeo.invalidGeoJsonFileUploaded' }))
+        dispatch(NotificationActions.notifyWarning({ key: 'surveyForm:nodeDefGeo.invalidGeoJsonFileUploaded' }))
       }
     },
     [dispatch, node, nodeDef, updateNode]
@@ -82,7 +82,7 @@ const NodeDefGeo = (props) => {
   }, [nodeDefName, valueText])
 
   const onClearValueClick = useCallback(async () => {
-    if (await confirm({ key: 'surveyForm.nodeDefGeo.confirmDelete' })) {
+    if (await confirm({ key: 'surveyForm:nodeDefGeo.confirmDelete' })) {
       updateNode(nodeDef, node, null)
     }
   }, [confirm, node, nodeDef, updateNode])
@@ -99,7 +99,7 @@ const NodeDefGeo = (props) => {
       disabled={edit}
       iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
-      title="surveyForm.nodeDefCoordinate.showOnMap"
+      title="surveyForm:nodeDefCoordinate.showOnMap"
       variant="text"
     />
   ) : null
@@ -128,7 +128,7 @@ const NodeDefGeo = (props) => {
             <ExpansionPanel buttonLabel="common.info" startClosed>
               <GeoPolygonInfo geoJson={value} />
             </ExpansionPanel>
-            <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
+            <ExpansionPanel buttonLabel="surveyForm:nodeDefGeo.geoJSON" startClosed>
               <Input disabled inputType="textarea" value={valueText} />
             </ExpansionPanel>
           </>

@@ -71,90 +71,104 @@ const CategoryDetails = (props) => {
     <>
       <div className="category">
         <div className="category__header">
-          <FormItem label="categoryEdit.categoryName">
-            <Input
-              id={TestId.categoryDetails.categoryName}
-              value={Category.getName(category)}
-              validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
-              onChange={(value) =>
-                Actions.updateCategoryProp({ key: Category.keysProps.name, value: StringUtils.normalizeName(value) })
-              }
-              readOnly={readOnly}
-            />
-          </FormItem>
+          <div className="row">
+            <FormItem label="categoryEdit.categoryName">
+              <Input
+                id={TestId.categoryDetails.categoryName}
+                value={Category.getName(category)}
+                validation={Validation.getFieldValidation(Category.keysProps.name)(validation)}
+                onChange={(value) =>
+                  Actions.updateCategoryProp({ key: Category.keysProps.name, value: StringUtils.normalizeName(value) })
+                }
+                readOnly={readOnly}
+              />
+            </FormItem>
 
-          {!readOnly && (
-            <OpenFileUploadDialogButton
-              className="import-btn"
-              label="common.import"
-              accept={allowedImportExtensions}
-              onOk={({ files, onUploadProgress }) =>
-                Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
-              }
-            />
-          )}
-          <ButtonMenuExport
-            className="export-btn"
-            excelExportDisabled={excelExportDisabled}
-            href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
-            testId={TestId.categoryDetails.exportBtn}
-          />
-          {!readOnly && (
-            <ButtonMenu
-              className="date-import-template-menu-btn"
-              label="categoryEdit.templateForImport"
-              iconClassName="icon-download2 icon-14px"
-              items={Object.keys(templateTypes).flatMap((templateType) =>
-                templateFileFormats.map((fileFormat) => ({
-                  key: `data-import-template-${templateType}-${fileFormat}`,
-                  content: (
-                    <ButtonDownload
-                      href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
-                      requestParams={{
-                        fileFormat,
-                        generic: templateType === templateTypes.genericDataImport,
-                        samplingPointData: templateType === templateTypes.samplingPointDataImport,
-                      }}
-                      label={`categoryEdit.templateFor_${templateType}_${fileFormat}`}
-                      variant="text"
-                    />
-                  ),
-                }))
-              )}
-              variant="outlined"
-            />
-          )}
+            {!readOnly && (
+              <>
+                <OpenFileUploadDialogButton
+                  className="import-btn"
+                  label="common.import"
+                  accept={allowedImportExtensions}
+                  onOk={({ files, onUploadProgress }) =>
+                    Actions.uploadCategory({ categoryUuid, file: files[0], onUploadProgress })
+                  }
+                />
+                <ButtonMenu
+                  className="date-import-template-menu-btn"
+                  label="categoryEdit.templateForImport"
+                  iconClassName="icon-download2 icon-14px"
+                  items={Object.keys(templateTypes).flatMap((templateType) =>
+                    templateFileFormats.map((fileFormat) => ({
+                      key: `data-import-template-${templateType}-${fileFormat}`,
+                      content: (
+                        <ButtonDownload
+                          href={`/api/survey/${surveyId}/categories/${categoryUuid}/import-template/`}
+                          requestParams={{
+                            fileFormat,
+                            generic: templateType === templateTypes.genericDataImport,
+                            samplingPointData: templateType === templateTypes.samplingPointDataImport,
+                          }}
+                          label={`categoryEdit.templateFor_${templateType}_${fileFormat}`}
+                          variant="text"
+                        />
+                      ),
+                    }))
+                  )}
+                  variant="outlined"
+                />
+                <ButtonMenu
+                  iconClassName="icon-cog icon-14px"
+                  items={[
+                    ...(!Category.isReportingData(category)
+                      ? [
+                          {
+                            key: 'convert-to-report-data-category',
+                            label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
+                            onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
+                          },
+                        ]
+                      : []),
+                    {
+                      key: 'extra-props-editor',
+                      label: 'extraProp.editor.title',
+                      onClick: Actions.toggleEditExtraPropertiesPanel,
+                    },
+                  ]}
+                />
+              </>
+            )}
+          </div>
 
-          {Category.isReportingData(category) && (
-            <Checkbox
-              checked
-              className="reporting-data-checkbox"
-              disabled={readOnly}
-              label="categoryEdit.reportingData"
-              onChange={Actions.convertToSimpleCategory}
+          <div className="row">
+            <FormItem info="common.designerNotesInfo" label="common.designerNotes">
+              <Input
+                inputType="textarea"
+                onChange={(value) => Actions.updateCategoryProp({ key: Category.keysProps.designerNotes, value })}
+                readOnly={readOnly}
+                textAreaRows={2}
+                validation={Validation.getFieldValidation(Category.keysProps.designerNotes)(validation)}
+                value={Category.getDesignerNotes(category)}
+              />
+            </FormItem>
+
+            <ButtonMenuExport
+              className="export-btn"
+              excelExportDisabled={excelExportDisabled}
+              href={`/api/survey/${surveyId}/categories/${categoryUuid}/export/`}
+              testId={TestId.categoryDetails.exportBtn}
             />
-          )}
-          {!readOnly && (
-            <ButtonMenu
-              iconClassName="icon-cog icon-14px"
-              items={[
-                ...(!Category.isReportingData(category)
-                  ? [
-                      {
-                        key: 'convert-to-report-data-category',
-                        label: 'categoryEdit.convertToReportingDataCategory.buttonLabel',
-                        onClick: () => Actions.convertToReportingDataCategory({ categoryUuid, onCategoryUpdate }),
-                      },
-                    ]
-                  : []),
-                {
-                  key: 'extra-props-editor',
-                  label: 'extraProp.editor.title',
-                  onClick: Actions.toggleEditExtraPropertiesPanel,
-                },
-              ]}
-            />
-          )}
+
+            {Category.isReportingData(category) && (
+              <Checkbox
+                checked
+                className="reporting-data-checkbox"
+                disabled={readOnly}
+                label="categoryEdit.reportingData"
+                onChange={Actions.convertToSimpleCategory}
+              />
+            )}
+          </div>
         </div>
 
         {editingItemExtraDefs && (

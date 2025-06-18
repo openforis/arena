@@ -15,10 +15,11 @@ export const ButtonDownload = forwardRef((props, ref) => {
   } = props
 
   const onClick = useCallback(async () => {
+    let onClickResult
     if (onClickProp) {
-      await onClickProp()
+      onClickResult = await onClickProp()
     }
-    if (href) {
+    if (href && onClickResult !== false) {
       const url = `${href}${requestParams ? `?${new URLSearchParams(requestParams)}` : ''}`
       window.open(url, '_blank')
     }
@@ -32,6 +33,6 @@ export const ButtonDownload = forwardRef((props, ref) => {
 ButtonDownload.propTypes = {
   ...Button.propTypes,
   href: PropTypes.string, // specify href, onClick or both
-  onClick: PropTypes.func, // specify href, onClick or both
+  onClick: PropTypes.func, // specify href, onClick or both. If onClick is specified and returns false, href will not be used
   requestParams: PropTypes.object,
 }

@@ -92,7 +92,7 @@ export const insertNode = async (
   let recordUpdated = record
 
   if (NodeDef.isEntity(nodeDef)) {
-    const descendantsCreateResult = RecordNodesUpdater.createDescendants({
+    const descendantsCreateResult = await RecordNodesUpdater.createDescendants({
       user,
       survey,
       record,

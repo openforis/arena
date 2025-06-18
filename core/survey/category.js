@@ -23,6 +23,7 @@ export const keys = {
 
 export const keysProps = {
   name: 'name',
+  designerNotes: 'designerNotes',
   itemExtraDef: 'itemExtraDef',
   reportingData: 'reportingData',
 }
@@ -40,6 +41,7 @@ const samplingUnitsPlanCategoryName = 'sampling_units_plan'
 // ====== READ
 export const { getProps, getPropsDraft, getPropsAndPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getName = ObjectUtils.getProp(keysProps.name, '')
+export const getDesignerNotes = ObjectUtils.getProp(keysProps.designerNotes, '')
 export const isReportingData = ObjectUtils.getProp(keysProps.reportingData, false)
 export const { getValidation } = Validation
 
@@ -124,11 +126,8 @@ export const getItemValidation = (item) =>
 
 // ====== ITEMS extra def
 export const getItemExtraDef = ObjectUtils.getProp(keysProps.itemExtraDef, {})
-export const getItemExtraDefKeys = (category) => {
-  const itemExtraDef = getItemExtraDef(category)
-  return Object.keys(itemExtraDef)
-}
 export const getItemExtraDefsArray = R.pipe(getItemExtraDef, ExtraPropDef.extraDefsToArray)
+export const getItemExtraDefKeys = (category) => getItemExtraDefsArray(category).map(ExtraPropDef.getName)
 
 export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.itemExtraDef, extraDef)
 
