@@ -235,6 +235,15 @@ export const getAncestorCodeAttributes =
     return result
   }
 
+const getNodeCategoryItemCode = (node) => {
+  const item = NodeRefData.getCategoryItem(node)
+  if (item) {
+    return CategoryItem.getCode(item)
+  }
+  const value = Node.getValue(node)
+  return NodeValues.getValueCode(value)
+}
+
 // Returns the ancestor code attribute codes, in top-down order
 export const getAncestorCodeAttributeCodes =
   ({ survey, parentNode, nodeDef }) =>
@@ -245,8 +254,7 @@ export const getAncestorCodeAttributeCodes =
       parentNode,
       nodeDef,
       visitor: (visitedCodeAttribute) => {
-        const item = NodeRefData.getCategoryItem(visitedCodeAttribute)
-        const code = CategoryItem.getCode(item)
+        const code = getNodeCategoryItemCode(visitedCodeAttribute)
         result.unshift(code)
       },
     })(record)
