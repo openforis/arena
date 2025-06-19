@@ -128,4 +128,6 @@ const isValueEqual = ({ survey, nodeDef, value, valueSearch, record = null, pare
 
 export const NodeValues = {
   isValueEqual,
+  getValueCode,
+  getValueItemUuid,
 }
