@@ -66,10 +66,8 @@ const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey 
   return DateUtils.format(dateObj, formatTo)
 }
 
-const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName }) => {
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-  if (!taxon || Objects.isEmpty(vernacularName)) return null
+const extractVernacularNameUuid = ({ taxon, vernacularName }) => {
+  if (Objects.isEmpty(vernacularName)) return null
 
   // match vernacular names with language specified (e.g. "Mahogany (eng)") or simple ones, like "Mahogany"
   const regExp = /^([^(]+)(\s\(([^)]+)\))?$/
@@ -92,6 +90,14 @@ const findCategoryItemUuid = async ({ survey, categoryItemProvider, nodeDef, cod
   const codePaths = [code] // only first level items are supported at this stage
   const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
   return item ? item.uuid : null
+}
+
+const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  return (
+    Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey) ??
+    (await taxonProvider.getTaxonByCode({ survey, taxonomyUuid, taxonCode }))
+  )
 }
 
 const valueConverterByNodeDefType = {
@@ -144,14 +150,13 @@ const valueConverterByNodeDefType = {
     }
   },
   [NodeDef.nodeDefType.integer]: numericValueConverter,
-  [NodeDef.nodeDefType.taxon]: ({ survey, nodeDef, value, headers }) => {
-    const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  [NodeDef.nodeDefType.taxon]: async ({ survey, taxonProvider, nodeDef, value, headers }) => {
     const taxonCode = value[Node.valuePropsTaxon.code]
-    const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
+    const taxon = await findTaxon({ survey, taxonProvider, nodeDef, taxonCode })
     if (!taxon) {
-      throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
+      throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value: taxonCode, headers })
     }
-    const { uuid: taxonUuid } = taxon
+    const taxonUuid = Taxon.getUuid(taxon)
     const vernacularName = value[Node.valuePropsTaxon.vernacularName]
     const scientificName = value[Node.valuePropsTaxon.scientificName]
 
@@ -162,7 +167,7 @@ const valueConverterByNodeDefType = {
         [Node.valuePropsTaxon.vernacularName]: vernacularName,
       }
     }
-    const vernacularNameUuid = extractVernacularNameUuid({ vernacularName, nodeDef, taxonCode, survey })
+    const vernacularNameUuid = extractVernacularNameUuid({ taxon, vernacularName })
     const nodeValue = Node.newNodeValueTaxon({ taxonUuid })
     if (vernacularNameUuid) {
       nodeValue[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
