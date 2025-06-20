@@ -299,6 +299,7 @@ export const findChildByKeyValues =
             nodeDef: keyDef,
             record,
             parentNode: sibling,
+            attribute: keyAttribute,
             value: keyAttributeValue,
             valueSearch: keyAttributeValueSearch,
           })
