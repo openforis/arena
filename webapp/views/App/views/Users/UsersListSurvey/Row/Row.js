@@ -14,7 +14,7 @@ import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/
 import { Button, ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
-import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
+import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 const Row = (props) => {
   const { onEditSurveyUserExtraProps, row: userListItem } = props
@@ -76,7 +76,7 @@ const Row = (props) => {
               showLabel={false}
               variant="text"
             />
-            <CopyInvitationLinkButton email={email} userUuid={userUuid} />
+            <CopyPasswordResetLinkButton email={email} messageType="invitation" userUuid={userUuid} />
           </>
         )}
       </div>

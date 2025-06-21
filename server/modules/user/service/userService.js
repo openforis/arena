@@ -264,15 +264,17 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
 
 export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
 
-export const fetchResetPasswordUrl = async ({ serverUrl, surveyId, userUuid }) => {
-  const survey = await SurveyManager.fetchSurveyById({ surveyId })
-  const surveyUuid = Survey.getUuid(survey)
-  const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-    surveyUuid,
-    userUuid,
-  })
-  if (!invitation) {
-    throw new SystemError('appErrors:userNotInvitedToSurvey')
+export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = null }) => {
+  if (surveyId) {
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
+    const surveyUuid = Survey.getUuid(survey)
+    const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+      surveyUuid,
+      userUuid,
+    })
+    if (!invitation) {
+      throw new SystemError('appErrors:userNotInvitedToSurvey')
+    }
   }
   const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
