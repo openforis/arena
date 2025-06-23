@@ -18,8 +18,9 @@ const _putCategoryProp =
 
     setState((statePrev) => {
       const categoryPrev = State.getCategory(statePrev)
+      // update UI state only when category comes from the last update performed server side
       const stateUpdated =
-        !State.isDirty(statePrev) || Objects.isEqual(category, categoryPrev)
+        !State.isDirty(statePrev) || isCategoryPropsEqual(category, categoryPrev)
           ? A.pipe(State.assocCategory({ category }), State.dissocDirty)(statePrev)
           : statePrev
       const onCategoryUpdate = State.getOnCategoryUpdate(stateUpdated)
@@ -47,4 +48,9 @@ export const useUpdateCategoryProp = ({ setState }) => {
       return A.pipe(State.assocDirty, State.assocCategoryProp({ key, value }))(statePrev)
     })
   }, [])
+}
+
+const isCategoryPropsEqual = (category1, category2) => {
+  const prepareItemToCompare = A.omit(Category.keys.validation)
+  return Objects.isEqual(prepareItemToCompare(category1), prepareItemToCompare(category2))
 }

@@ -19,6 +19,7 @@ export const keys = {
   itemsCount: 'itemsCount', // available only in data entry
   published: ObjectUtils.keys.published,
   levelsCount: 'levelsCount', // populated only on fetch
+  validation: Validation.keys.validation,
 }
 
 export const keysProps = {
