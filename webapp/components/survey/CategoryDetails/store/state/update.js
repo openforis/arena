@@ -10,6 +10,10 @@ import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import { keys } from './keys'
 import { getCategory, getItems, getImportSummary } from './read'
 
+export const assocDirty = A.assoc(keys.dirty, true)
+
+export const dissocDirty = A.dissoc(keys.dirty)
+
 export const assocCategory = ({ category }) => A.assoc(keys.category, category)
 
 export const assocCategoryProp =

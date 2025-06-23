@@ -7,6 +7,8 @@ import * as StringUtils from '@core/stringUtils'
 
 import { keys } from './keys'
 
+export const isDirty = (state) => !!A.prop(keys.dirty)(state)
+
 export const getCategory = A.prop(keys.category)
 
 export const getFileFormat = A.prop(keys.fileFormat)
