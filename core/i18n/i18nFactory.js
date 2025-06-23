@@ -2,11 +2,13 @@ import i18next from 'i18next'
 import * as ProcessUtils from '@core/processUtils'
 
 import enTranslation from './resources/en'
+import esTranslation from './resources/es'
 import mnTranslation from './resources/mn'
 import ruTranslation from './resources/ru'
 
 const resources = {
   en: enTranslation,
+  es: esTranslation,
   mn: mnTranslation,
   ru: ruTranslation,
 }
