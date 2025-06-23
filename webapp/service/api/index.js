@@ -92,6 +92,7 @@ export { getCurrentInstance, createInstance, terminateInstance } from './rStudio
 export {
   createAccessRequest,
   acceptAccessRequest,
+  fetchSurveyUserResetPasswordUrl,
   fetchUser,
   fetchUserResetPasswordUrl,
   fetchUserName,

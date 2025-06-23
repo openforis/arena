@@ -232,6 +232,17 @@ export const init = (app) => {
     }
   )
 
+  app.get('/user/:userUuid/resetpasswordurl', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, userUuid } = Request.getParams(req)
+      const serverUrl = Request.getServerUrl(req)
+      const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+      res.json(url)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/user/:userUuid/profilePicture', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
     try {
       const { userUuid } = Request.getParams(req)
