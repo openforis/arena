@@ -138,9 +138,6 @@ const CategoryDetails = (props) => {
                 />
               </>
             )}
-            <div className="loading-icon-wrapper" title="Persisting data...">
-              {State.isDirty(state) && <span className="icon icon-spinner" />}
-            </div>
           </div>
 
           <div className="row">
