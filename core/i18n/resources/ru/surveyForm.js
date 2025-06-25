@@ -38,7 +38,7 @@ export default {
     confirmDemote: 'Вы уверены, что хотите понизить статус этой записи до {{name}}?',
     confirmPromote:
       'Вы уверены, что хотите **повысить статус этой записи до {{name}}**?\nВы больше не сможете ее редактировать',
-    confirmPromoteWithErrors: '**Эта запись содержит ошибки**.\n$t(surveyForm.formEntryActions.confirmPromote)',
+    confirmPromoteWithErrors: '**Эта запись содержит ошибки**.\n$t(surveyForm:formEntryActions.confirmPromote)',
     confirmDelete: 'Вы уверены, что хотите удалить эту запись?\n\n$t(common.cantUndoWarning)',
     closePreview: 'Закрыть предварительный просмотр',
     demoteTo: 'Понизить до {{stepPrev}}',

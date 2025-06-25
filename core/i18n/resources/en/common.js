@@ -1506,7 +1506,7 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       taxaNotImported: 'Taxa not imported',
       family: 'Family',
       genus: 'Genus',
-      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
+      scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
     },
     taxaCount: 'Taxa count',
