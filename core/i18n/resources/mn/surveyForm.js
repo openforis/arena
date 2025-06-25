@@ -41,9 +41,9 @@ export default {
     confirmDemote: 'Та энэ бичлэгийг {{name}}-д буулгахыг хүсч байгаадаа итгэлтэй байна уу?',
     confirmPromote: `Та энэ бичлэгийг **{{name}}-д дэвшүүлэхийг** хүсч байгаадаа итгэлтэй байна уу? 
 Та үүнийг дахин засах боломжгүй болно`,
-    confirmPromoteWithErrors: `**Энэ бичлэгт алдаа байна**. 
-Дэвшүүлэхийг баталгаажуулах`,
-    confirmDelete: 'Та энэ бичлэгийг устгахыг хүсч байгаадаа итгэлтэй байна уу?\n\nБуцаах боломжгүй анхааруулга',
+    confirmPromoteWithErrors: `**Энэ бичлэг алдаатай байна**.  
+$t(surveyForm:formEntryActions.confirmPromote)`,
+    confirmDelete: 'Та энэ бичлэгийг устгахдаа итгэлтэй байна уу?\n\n$t(common.cantUndoWarning)',
     closePreview: 'Урьдчилан харахыг хаах',
     demoteTo: '{{stepPrev}}-д буулгах',
     promoteTo: '{{stepNext}}-д дэвшүүлэх',
