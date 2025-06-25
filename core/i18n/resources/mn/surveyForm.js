@@ -41,7 +41,7 @@ export default {
     confirmPromote: `Та энэ бичлэгийг **{{name}} руу дэвшүүлэхдээ** итгэлтэй байна уу?  
 Та үүнийг дахин засварлах боломжгүй болно`,
     confirmPromoteWithErrors: `**Энэ бичлэг алдаатай байна**.  
-$t(surveyForm.formEntryActions.confirmPromote)`,
+$t(surveyForm:formEntryActions.confirmPromote)`,
     confirmDelete: 'Та энэ бичлэгийг устгахдаа итгэлтэй байна уу?\n\n$t(common.cantUndoWarning)',
     closePreview: 'Урьдчилан харахыг хаах',
     demoteTo: '{{stepPrev}} руу бууруулах',

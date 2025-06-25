@@ -1277,7 +1277,7 @@ export default {
       taxaNotImported: 'Таксоны не импортированы',
       family: 'Семейство',
       genus: 'Род',
-      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
+      scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
     },
     taxaCount: 'Количество таксонов',
