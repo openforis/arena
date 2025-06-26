@@ -2,11 +2,13 @@ import i18next from 'i18next'
 import * as ProcessUtils from '@core/processUtils'
 
 import enTranslation from './resources/en'
+import esTranslation from './resources/es'
 import mnTranslation from './resources/mn'
 import ruTranslation from './resources/ru'
 
 const resources = {
   en: enTranslation,
+  es: esTranslation,
   mn: mnTranslation,
   ru: ruTranslation,
 }
@@ -16,7 +18,11 @@ export const defaultLanguage = 'en'
 const namespaces = ['auth', 'common', 'appErrors', 'emails', 'jobs', 'surveyCreate', 'surveyForm']
 const defaultNamespace = 'common'
 
-export const supportedLanguages = Object.keys(resources)
+const experimentalLanguages = ['es', 'ru']
+
+export const supportedLanguages = Object.keys(resources).filter(
+  (lang) => ProcessUtils.ENV.experimentalFeatures || !experimentalLanguages.includes(lang)
+)
 
 const createParams = (lang = defaultLanguage) => ({
   fallbackLng: defaultLanguage,
