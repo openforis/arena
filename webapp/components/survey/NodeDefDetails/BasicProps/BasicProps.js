@@ -197,14 +197,16 @@ const BasicProps = (props) => {
         disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner || cyclesKeysParent.length <= 1}
         onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
       >
-        <Checkbox
-          checked={includedInClone}
-          disabled={includeInCloneDisabled}
-          label="nodeDefEdit.basicProps.includedInClonedData"
-          onChange={(value) =>
-            Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
-          }
-        />
+        {!NodeDef.isLayoutElement(nodeDef) && (
+          <Checkbox
+            checked={includedInClone}
+            disabled={includeInCloneDisabled}
+            label="nodeDefEdit.basicProps.includedInClonedData"
+            onChange={(value) =>
+              Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
+            }
+          />
+        )}
       </CyclesSelector>
 
       {NodeDef.isVirtual(nodeDef) && (
