@@ -18,7 +18,11 @@ export const defaultLanguage = 'en'
 const namespaces = ['auth', 'common', 'appErrors', 'emails', 'jobs', 'surveyCreate', 'surveyForm']
 const defaultNamespace = 'common'
 
-export const supportedLanguages = Object.keys(resources)
+const experimentalLanguages = ['es', 'ru']
+
+export const supportedLanguages = Object.keys(resources).filter(
+  (lang) => ProcessUtils.ENV.experimentalFeatures || !experimentalLanguages.includes(lang)
+)
 
 const createParams = (lang = defaultLanguage) => ({
   fallbackLng: defaultLanguage,
