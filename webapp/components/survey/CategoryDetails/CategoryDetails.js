@@ -35,7 +35,7 @@ const templateFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
 const templateTypes = {
   specificDataImport: 'specificDataImport',
-  genericDataImport: 'genericDatImport',
+  genericDataImport: 'genericDataImport',
   samplingPointDataImport: 'samplingPointDataImport',
 }
 
