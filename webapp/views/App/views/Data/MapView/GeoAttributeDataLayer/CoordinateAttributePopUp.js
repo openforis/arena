@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
-import { Objects, PointFactory } from '@openforis/arena-core'
+import { PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -117,7 +117,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const generateGeoJsonWithName = useCallback(() => {
     const geojson = generateGeoJson()
-    return Objects.setInPath({ obj: geojson, path: ['properties', 'name'], value: path })
+    return GeoJsonUtils.setFeatureName({ feature: geojson, name: path })
   }, [generateGeoJson, path])
 
   const onEarthMapButtonClick = useCallback(() => {

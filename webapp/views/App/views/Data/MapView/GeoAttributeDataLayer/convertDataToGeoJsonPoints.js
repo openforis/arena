@@ -3,24 +3,21 @@ import { latLngBounds } from 'leaflet'
 import { PointFactory, Points } from '@openforis/arena-core'
 
 import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
+import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatter'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
-
-import { ValueFormatter } from '@webapp/components/DataQuery'
 
 const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }) => {
   const recordUuid = dataItem[TableDataNodeDef.columnSet.recordUuid]
   const recordOwnerUuid = dataItem[TableDataNodeDef.columnSet.recordOwnerUuid]
   const parentUuid = dataItem[parentEntityColumn.name]
   const key = `${recordUuid}-${parentUuid}`
-  const ancestorsKeys = ancestorsKeysColumns.map((column) => {
-    const ancestorDef = column.nodeDef
-    const rawValue = dataItem[column.name]
-    const label = dataItem[`${column.name}_label`]
-    return ValueFormatter.format({ value: rawValue, label, i18n, nodeDef: ancestorDef })
-  })
+  const ancestorsKeys = ancestorsKeysColumns.map((column) =>
+    DataQueryValueFormatter.formatDataItemKey({ i18n, nodeDef: column.nodeDef, dataItem })
+  )
 
   return {
     key,

@@ -1,12 +1,12 @@
 import area from '@turf/area'
+import turfBboxPolygon from '@turf/bbox-polygon'
 import turfCentroid from '@turf/centroid'
 import turfCircle from '@turf/circle'
 import turfDestination from '@turf/destination'
-import length from '@turf/length'
-import turfBboxPolygon from '@turf/bbox-polygon'
 import { point as turfPoint } from '@turf/helpers'
+import length from '@turf/length'
 
-import { PointFactory } from '@openforis/arena-core'
+import { Objects, PointFactory } from '@openforis/arena-core'
 
 const Type = {
   Feature: 'Feature',
@@ -160,6 +160,9 @@ const featureCollection = ({ features }) => ({
   features,
 })
 
+const setFeatureName = ({ feature, name }) =>
+  Objects.setInPath({ obj: feature, path: ['properties', 'name'], value: name })
+
 export const GeoJsonUtils = {
   area,
   bboxPolygon,
@@ -174,4 +177,5 @@ export const GeoJsonUtils = {
   rectangle,
   circle,
   featureCollection,
+  setFeatureName,
 }

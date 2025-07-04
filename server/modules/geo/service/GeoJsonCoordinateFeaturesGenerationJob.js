@@ -1,11 +1,13 @@
 import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
+import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatter'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
+import i18n from '@core/i18n/i18nFactory'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -28,6 +30,11 @@ const generateLocationGeoJson = ({ survey, longitude, latitude }) => {
     return GeoJsonUtils.rectangle({ latitude, longitude })
   }
 }
+
+const extractKeys = ({ survey, ancestorKeyDefs, dataItem }) =>
+  ancestorKeyDefs.map((ancestorDef) =>
+    DataQueryValueFormatter.formatDataItemKey({ i18n, survey, nodeDef: ancestorDef, dataItem })
+  )
 
 export class GeoJsonCoordinateFeaturesGenerationJob extends Job {
   constructor(params) {
@@ -58,15 +65,18 @@ export class GeoJsonCoordinateFeaturesGenerationJob extends Job {
       attributeDefUuids: [...ancestorKeyDefs.map(NodeDef.getUuid), attributeDefUuid],
     })
 
-    const rows = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query })
+    const dataItems = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query })
     const features = []
-    rows.forEach((row) => {
-      const pointStr = row[NodeDef.getName(attributeDef)]
+    dataItems.forEach((dataItem) => {
+      const pointStr = dataItem[NodeDef.getName(attributeDef)]
       const point = Points.parse(pointStr)
       const pointLatLng = Points.toLatLong(point, srsIndex)
       if (pointLatLng) {
         const { x: longitude, y: latitude } = pointLatLng
-        features.push(generateLocationGeoJson({ survey, longitude, latitude }))
+        const feature = generateLocationGeoJson({ survey, ancestorKeyDefs, longitude, latitude })
+        const name = extractKeys({ survey, ancestorKeyDefs, dataItem })
+        GeoJsonUtils.setFeatureName({ feature, name })
+        features.push(feature)
       }
     })
     const geoJson = GeoJsonUtils.featureCollection({ features })
