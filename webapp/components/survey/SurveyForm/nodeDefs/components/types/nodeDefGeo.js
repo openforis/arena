@@ -11,7 +11,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, ButtonDownload, ButtonIconDelete, ExpansionPanel, Map, PanelRight } from '@webapp/components'
+import { Button, ButtonDownload, ButtonIconDelete, ExpansionPanel, MapContainer, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
 import { GeoPolygonInfo } from '@webapp/components/geo/GeoPolygonInfo'
@@ -89,7 +89,7 @@ const NodeDefGeo = (props) => {
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <Map editable={!entryDisabled} geoJson={Node.getValue(node)} showOptions={false} />
+      <MapContainer editable={!entryDisabled} geoJson={Node.getValue(node)} showOptions={false} />
     </PanelRight>
   ) : null
 

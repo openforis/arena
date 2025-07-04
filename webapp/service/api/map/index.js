@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { MapUtils } from '@core/map/mapUtils'
-import { periodTypes } from '@webapp/components/Map/baseLayers'
+import { periodTypes } from '@webapp/components/MapContainer/baseLayers'
 
 const monthlyPeriodsDateStart = new Date(2020, 7)
 const biannualPeriodsDateStart = new Date(2015, 11)
