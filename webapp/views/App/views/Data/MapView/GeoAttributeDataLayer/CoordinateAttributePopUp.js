@@ -3,14 +3,13 @@ import './CoordinateAttributePopUp.scss'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
-import circleToPolygon from 'circle-to-polygon'
-import L from 'leaflet'
 
 import { Objects, PointFactory } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { Button, ButtonIconEdit } from '@webapp/components'
 import Markdown from '@webapp/components/markdown'
@@ -20,7 +19,6 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
-import { GeoUtils } from '@webapp/utils/geoUtils'
 
 import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
@@ -107,15 +105,13 @@ export const CoordinateAttributePopUp = (props) => {
       const isCircle = SamplingPolygon.isCircle(samplingPolygon)
       if (isCircle) {
         const radius = SamplingPolygon.getRadius(samplingPolygon)
-        return circleToPolygon([longitude, latitude], radius)
+        return GeoJsonUtils.circle({ longitude, latitude, radius })
       } else {
-        const bounds = GeoUtils.generateBounds({ latitude, longitude, ...samplingPolygon })
-        return L.rectangle(bounds).toGeoJSON()
+        return GeoJsonUtils.rectangle({ latitude, longitude, ...samplingPolygon })
       }
     } else {
       // default 100mx100m square
-      const bounds = GeoUtils.generateBounds({ latitude, longitude })
-      return L.rectangle(bounds).toGeoJSON()
+      return GeoJsonUtils.rectangle({ latitude, longitude })
     }
   }, [latitude, longitude, surveyInfo])
 

@@ -6,9 +6,9 @@ import { ColumnNodeDef, TableDataNodeDef } from '@common/model/db'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { ValueFormatter } from '@webapp/components/DataQuery'
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 const extractCommonProperties = ({ dataItem, parentEntityColumn, ancestorsKeysColumns, i18n }) => {
   const recordUuid = dataItem[TableDataNodeDef.columnSet.recordUuid]

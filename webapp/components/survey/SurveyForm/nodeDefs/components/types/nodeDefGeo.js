@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { RecordState } from '@webapp/store/ui/record'
 
@@ -23,7 +24,6 @@ import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import { downloadTextToFile } from '@webapp/utils/domUtils'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
