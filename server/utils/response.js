@@ -17,6 +17,7 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  json: 'application/json',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
 }

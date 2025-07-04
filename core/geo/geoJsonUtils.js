@@ -155,6 +155,11 @@ const circle = ({
   return turfCircle(centerPoint, radius, options)
 }
 
+const featureCollection = ({ features }) => ({
+  type: 'FeatureCollection',
+  features,
+})
+
 export const GeoJsonUtils = {
   area,
   bboxPolygon,
@@ -168,4 +173,5 @@ export const GeoJsonUtils = {
   validateFeature,
   rectangle,
   circle,
+  featureCollection,
 }
