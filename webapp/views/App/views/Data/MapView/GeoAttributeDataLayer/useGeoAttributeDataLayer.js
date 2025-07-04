@@ -53,8 +53,18 @@ export const useGeoAttributeDataLayer = (props) => {
     [attributeDef, lang, survey]
   )
 
+  const attributeDefUuid = NodeDef.getUuid(attributeDef)
+  const layerId = `layer-selector-${attributeDefUuid}`
+  const layerEarthMapButtonId = `geo-attribute-layer-earth-map-btn-${attributeDefUuid}`
+
   // add icon close to layer name
-  const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
+  const layerName = `
+    <div id="${layerId}" class="layer-selector-row">
+      <span>${layerInnerName}
+        <span class='layer-icon' style="border-color: ${markersColor}"></span>
+      </span>
+      <button id="${layerEarthMapButtonId}" />
+    </div>`
 
   // on layer add, create query and fetch data
   useMapLayerAdd({
@@ -62,11 +72,17 @@ export const useGeoAttributeDataLayer = (props) => {
     callback: () => {
       const query = Query.create({
         entityDefUuid: NodeDef.getUuid(nodeDefParent),
-        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), NodeDef.getUuid(attributeDef)],
+        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), attributeDefUuid],
       })
       setState((statePrev) => ({ ...statePrev, query }))
     },
   })
+
+  const earthMapButton = document.getElementById(layerEarthMapButtonId)
+
+  useEffect(() => {
+    earthMapButton?.addEventListener('click', () => {})
+  }, [earthMapButton])
 
   const {
     data: dataFetchedTemp,

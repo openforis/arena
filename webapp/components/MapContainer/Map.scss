@@ -47,6 +47,10 @@
       .leaflet-top.leaflet-right {
         z-index: 6;
       }
+
+      .layer-selector-row {
+        display: flex;
+      }
     }
 
     .leaflet-popup-content {
