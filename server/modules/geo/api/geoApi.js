@@ -123,7 +123,7 @@ export const init = (app) => {
     }
   })
 
-  app.get(
+  app.post(
     `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,
     AuthMiddleware.requireMapUsePermission,
     async (req, res, next) => {

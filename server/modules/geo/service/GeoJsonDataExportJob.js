@@ -36,9 +36,9 @@ const extractKeys = ({ survey, ancestorKeyDefs, dataItem }) =>
     DataQueryValueFormatter.formatDataItemKey({ i18n, survey, nodeDef: ancestorDef, dataItem })
   )
 
-export class GeoJsonCoordinateFeaturesGenerationJob extends Job {
+export class GeoJsonDataExportJob extends Job {
   constructor(params) {
-    super(GeoJsonCoordinateFeaturesGenerationJob.type, params)
+    super(GeoJsonDataExportJob.type, params)
   }
 
   async onStart() {
@@ -93,4 +93,4 @@ export class GeoJsonCoordinateFeaturesGenerationJob extends Job {
   }
 }
 
-GeoJsonCoordinateFeaturesGenerationJob.type = 'GeoJsonCoordinateFeaturesGenerationJob'
+GeoJsonDataExportJob.type = 'GeoJsonDataExportJob'

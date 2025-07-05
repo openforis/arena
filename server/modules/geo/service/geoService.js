@@ -1,9 +1,9 @@
 import * as JobManager from '@server/job/jobManager'
 
-import { GeoJsonCoordinateFeaturesGenerationJob } from './GeoJsonCoordinateFeaturesGenerationJob'
+import { GeoJsonDataExportJob } from './GeoJsonDataExportJob'
 
 const startGeoJsonCoordinateFeaturesGenerationJob = ({ user, surveyId, cycle, attributeDefUuid }) => {
-  const job = new GeoJsonCoordinateFeaturesGenerationJob({ user, surveyId, cycle, attributeDefUuid })
+  const job = new GeoJsonDataExportJob({ user, surveyId, cycle, attributeDefUuid })
   return JobManager.enqueueJob(job)
 }
 

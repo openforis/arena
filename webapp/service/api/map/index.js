@@ -96,3 +96,18 @@ export const fetchMapWmtsCapabilities = async ({ surveyId, url }) => {
     return null
   }
 }
+
+export const startGeoAttributeJsonDataExport = async ({ surveyId, attributeDefUuid }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/geo/geojsondata/${attributeDefUuid}/start-export`)
+  return job
+}
+
+export const getGeoJsonDataDownloadUrl = ({ surveyId, tempFileName }) =>
+  `${window.location.origin}/api/survey/${surveyId}/geo/geojsondata/download/${tempFileName}`
+
+export const getEarthMapJsonDownloadUrl = (downloadUrl) =>
+  `https://earthmap.org/?aoi=global&export=download&fetchJson=${encodeURIComponent(downloadUrl)}`
+
+export const getEarthMapPolygonUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`

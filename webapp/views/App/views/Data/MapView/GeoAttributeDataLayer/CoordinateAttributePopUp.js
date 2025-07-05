@@ -19,12 +19,11 @@ import { ButtonNext } from '@webapp/components/buttons/ButtonNext'
 import { useSurvey, useSurveyPreferredLang, useSurveyInfo } from '@webapp/store/survey'
 import { useUserName } from '@webapp/store/user/hooks'
 import { useI18n } from '@webapp/store/system'
+import * as API from '@webapp/service/api'
 
 import { useElevation } from '../common/useElevation'
 import { LocationSummaryGenerator } from '../common/locationSummaryGenerator'
 import { WhispMenuButton } from './WhispMenuButton'
-
-const getEarthMapUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`
 
 // Builds the path to an attribute like ANCESTOR_ENTITY_LABEL_0 [ANCESTOR_ENTITY_0_KEYS] -> ANCESTOR_ENTITY_LABEL_1 [ANCESTOR_ENTITY_1_KEYS] ...
 // E.g. Cluster [123] -> Plot [4].
@@ -122,7 +121,7 @@ export const CoordinateAttributePopUp = (props) => {
 
   const onEarthMapButtonClick = useCallback(() => {
     const geojson = generateGeoJsonWithName()
-    const url = getEarthMapUrl(geojson)
+    const url = API.getEarthMapPolygonUrl(geojson)
     window.open(url, 'EarthMap')
   }, [generateGeoJsonWithName])
 

@@ -47,6 +47,8 @@ export default {
   DataSummaryExportJob: 'Data Summary Export',
   ZipCreationJob: 'ZIP File Creation',
   CSVDataExtraction: 'Data Extraction',
+  // geo
+  GeoJsonDataExportJob: 'GeoJson Data Export',
   // import arena survey
   ArenaImportJob: 'Arena import',
   ArenaSurveyReaderJob: 'Arena Survey Reader',
