@@ -15,7 +15,7 @@ export const omit = _curry2((names, object) => {
     return acc
   }, {})
   const result = {}
-  for (var prop in object) {
+  for (let prop in object) {
     if (!exclusionByName[prop]) {
       result[prop] = object[prop]
     }
