@@ -141,12 +141,13 @@ export const init = (app) => {
 
   app.get(`${uriPrefix}geojsondata/download/:tempFileName`, async (req, res) => {
     const { tempFileName } = Request.getParams(req)
-    if (!isUuid(FileUtils.getBaseName(tempFileName))) {
+    const filePath = FileUtils.tempFilePath(tempFileName)
+    if (!isUuid(FileUtils.getBaseName(tempFileName)) || !FileUtils.exists(filePath)) {
       throw new Error(`Invalid temp file name: ${tempFileName}`)
     }
     Response.sendFile({
       contentType: Response.contentTypes.json,
-      path: FileUtils.tempFilePath(tempFileName),
+      path: filePath,
       res,
     })
   })
