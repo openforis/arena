@@ -11,7 +11,7 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
-import { Map } from '@webapp/components/Map'
+import { MapContainer } from '@webapp/components/MapContainer'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
@@ -104,7 +104,7 @@ const MapWrapper = () => {
 
   return (
     <>
-      <Map layers={layers} />
+      <MapContainer layers={layers} />
       {editingRecordUuid && (
         <RecordEditModal
           initialState={lastRecordEditModalState}

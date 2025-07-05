@@ -14,7 +14,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, Map, PanelRight } from '@webapp/components'
+import { Button, MapContainer, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
@@ -150,7 +150,7 @@ const NodeDefCoordinate = (props) => {
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <Map
+      <MapContainer
         editable={!entryDisabled}
         markerPoint={value}
         markerTitle={nodeDefLabel}

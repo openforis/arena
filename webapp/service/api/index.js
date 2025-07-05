@@ -62,7 +62,16 @@ export {
   deleteDataQuerySummary,
 } from './dataQuery'
 export { fetchActiveJob } from './job'
-export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export {
+  fetchAvailableMapPeriods,
+  fetchElevation,
+  testMapApiKey,
+  fetchMapWmtsCapabilities,
+  startGeoAttributeJsonDataExport,
+  getGeoJsonDataDownloadUrl,
+  getEarthMapJsonDownloadUrl,
+  getEarthMapPolygonUrl,
+} from './map'
 export {
   fetchSurveyFull,
   fetchSurveys,

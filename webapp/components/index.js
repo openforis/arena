@@ -33,7 +33,7 @@ import Table from './Table'
 export { Dropzone, ExpansionPanel, ImageProgressive, Markdown, LoadingBar, PanelRight, ProgressBar, Stepper, Table }
 
 export { Alert } from './Alert'
-export { Map } from './Map'
+export { MapContainer } from './MapContainer'
 export { Modal, ModalBody, ModalHeader, ModalFooter } from './modal'
 export { RadioButtonGroup } from './RadioButtonGroup'
 export { ResizableModal } from './ResizableModal'

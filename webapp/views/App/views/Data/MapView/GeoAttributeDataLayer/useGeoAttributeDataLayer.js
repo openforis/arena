@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { useMap } from 'react-leaflet'
 
 import { Objects } from '@openforis/arena-core'
@@ -11,13 +12,51 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { useDataQuery } from '@webapp/components/DataQuery/store'
 import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { JobActions } from '@webapp/store/app'
+import * as API from '@webapp/service/api'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 import { convertDataToGeoJsonPoints } from './convertDataToGeoJsonPoints'
 import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
+const onGeoJsonDataExportComplete =
+  ({ surveyId }) =>
+  (jobCompleted) => {
+    const { tempFileName } = jobCompleted.result
+    const downloadUrl = API.getGeoJsonDataDownloadUrl({
+      surveyId,
+      tempFileName,
+    })
+    const earthMapUrl = API.getEarthMapJsonDownloadUrl(downloadUrl)
+    window.open(earthMapUrl, '_blank')
+  }
+
+const buildLayerNameComponent = ({
+  layerInnerName,
+  layerEarthMapButtonId,
+  markersColor,
+}) => `<div class="layer-selector-row">
+      <span class="layer-selector-name">${layerInnerName}</span>
+      <span class="layer-selector-button-bar">
+        <button id="${layerEarthMapButtonId}" class="layer-selector-earth-map-btn" title="Earth Map">
+          <img height="14" width="14" src="/img/of_earth_map_icon_small.png" />
+        </button>
+        <span class='layer-icon' style="border-color: ${markersColor}"></span>
+      </span>
+    </div>`
+
 export const useGeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
+
+  const attributeDefUuid = NodeDef.getUuid(attributeDef)
+
+  const dispatch = useDispatch()
+  const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
+  const survey = useSurvey()
+  const map = useMap()
+
+  const surveyId = Survey.getId(survey)
 
   const [state, setState] = useState({
     query: Query.create(),
@@ -26,10 +65,6 @@ export const useGeoAttributeDataLayer = (props) => {
     points: [],
     pointIndexByDataIndex: [],
   })
-  const i18n = useI18n()
-  const lang = useSurveyPreferredLang()
-  const survey = useSurvey()
-  const map = useMap()
 
   const nodeDefParent = useMemo(
     () => Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey),
@@ -53,8 +88,24 @@ export const useGeoAttributeDataLayer = (props) => {
     [attributeDef, lang, survey]
   )
 
+  const onEarthMapButtonClick = useCallback(async () => {
+    const job = await API.startGeoAttributeJsonDataExport({
+      surveyId,
+      attributeDefUuid,
+    })
+    dispatch(
+      JobActions.showJobMonitor({
+        autoHide: true,
+        job,
+        onComplete: onGeoJsonDataExportComplete({ surveyId }),
+      })
+    )
+  }, [attributeDefUuid, dispatch, surveyId])
+
+  const layerEarthMapButtonId = `geo-attribute-layer-earth-map-btn-${attributeDefUuid}`
+
   // add icon close to layer name
-  const layerName = `${layerInnerName}<div class='layer-icon' style="border-color: ${markersColor}" />`
+  const layerName = buildLayerNameComponent({ layerInnerName, layerEarthMapButtonId, markersColor })
 
   // on layer add, create query and fetch data
   useMapLayerAdd({
@@ -62,11 +113,17 @@ export const useGeoAttributeDataLayer = (props) => {
     callback: () => {
       const query = Query.create({
         entityDefUuid: NodeDef.getUuid(nodeDefParent),
-        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), NodeDef.getUuid(attributeDef)],
+        attributeDefUuids: [...ancestorsKeyAttributes.map(NodeDef.getUuid), attributeDefUuid],
       })
       setState((statePrev) => ({ ...statePrev, query }))
     },
   })
+
+  const earthMapButton = document.getElementById(layerEarthMapButtonId)
+
+  useEffect(() => {
+    earthMapButton?.addEventListener('click', onEarthMapButtonClick)
+  }, [earthMapButton, onEarthMapButtonClick])
 
   const {
     data: dataFetchedTemp,

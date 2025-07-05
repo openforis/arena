@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { MapUtils } from '@core/map/mapUtils'
-import { periodTypes } from '@webapp/components/Map/baseLayers'
+import { periodTypes } from '@webapp/components/MapContainer/baseLayers'
 
 const monthlyPeriodsDateStart = new Date(2020, 7)
 const biannualPeriodsDateStart = new Date(2015, 11)
@@ -96,3 +96,16 @@ export const fetchMapWmtsCapabilities = async ({ surveyId, url }) => {
     return null
   }
 }
+
+export const startGeoAttributeJsonDataExport = async ({ surveyId, attributeDefUuid }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/geo/geojsondata/${attributeDefUuid}/start-export`)
+  return data
+}
+
+export const getGeoJsonDataDownloadUrl = ({ surveyId, tempFileName }) =>
+  `${window.location.origin}/api/survey/${surveyId}/geo/geojsondata/download/${tempFileName}`
+
+export const getEarthMapJsonDownloadUrl = (downloadUrl) =>
+  `https://earthmap.org/?aoi=global&export=download&fetchJson=${encodeURIComponent(downloadUrl)}`
+
+export const getEarthMapPolygonUrl = (geojson) => `https://earthmap.org/?aoi=global&polygon=${JSON.stringify(geojson)}`

@@ -11,6 +11,7 @@ import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import DataExportJob from '@server/modules/dataExport/service/dataExportJob'
 import DataSummaryExportJob from '@server/modules/dataExport/service/DataSummaryExportJob'
+import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExportJob'
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
@@ -35,6 +36,7 @@ const jobClasses = [
   DataImportValidationJob,
   DataExportJob,
   DataSummaryExportJob,
+  GeoJsonDataExportJob,
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,

@@ -3,7 +3,7 @@ import { Marker, Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
+import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 
 const ClusteredPointsPopup = (props) => {
   const { clusteredPoints, openPopupOfPoint, pointLabelFunction } = props

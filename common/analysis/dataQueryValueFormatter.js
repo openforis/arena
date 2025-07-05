@@ -33,6 +33,14 @@ const format = ({ i18n, survey, nodeDef, value, label }) => {
   return NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value.map(formatValue).join(', ') : formatValue(value)
 }
 
-export const ValueFormatter = {
+const formatDataItemKey = ({ i18n, survey, nodeDef, dataItem }) => {
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const rawValue = dataItem[nodeDefName]
+  const label = dataItem[`${nodeDefName}_label`]
+  return DataQueryValueFormatter.format({ i18n, survey, nodeDef, value: rawValue, label })
+}
+
+export const DataQueryValueFormatter = {
   format,
+  formatDataItemKey,
 }

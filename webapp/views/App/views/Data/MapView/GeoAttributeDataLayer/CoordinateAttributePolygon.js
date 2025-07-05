@@ -5,7 +5,7 @@ import L from 'leaflet'
 
 import * as Survey from '@core/survey/survey'
 import * as SamplingPolygon from '@core/survey/SamplingPolygon'
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
+import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { GeoUtils } from '@webapp/utils/geoUtils'
 
