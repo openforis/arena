@@ -95,6 +95,7 @@ export const useGeoAttributeDataLayer = (props) => {
     })
     dispatch(
       JobActions.showJobMonitor({
+        autoHide: true,
         job,
         onComplete: onGeoJsonDataExportComplete({ surveyId }),
       })
