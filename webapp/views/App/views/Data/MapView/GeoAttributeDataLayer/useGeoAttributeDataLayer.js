@@ -31,6 +31,20 @@ const onGeoJsonDataExportComplete =
     window.open(earthMapUrl, '_blank')
   }
 
+const buildLayerNameComponent = ({
+  layerInnerName,
+  layerEarthMapButtonId,
+  markersColor,
+}) => `<div class="layer-selector-row">
+      <span class="layer-selector-name">${layerInnerName}</span>
+      <span class="layer-selector-button-bar">
+        <button id="${layerEarthMapButtonId}" class="layer-selector-earth-map-btn" title="Earth Map">
+          <img height="14" width="14" src="/img/of_earth_map_icon_small.png" />
+        </button>
+        <span class='layer-icon' style="border-color: ${markersColor}"></span>
+      </span>
+    </div>`
+
 export const useGeoAttributeDataLayer = (props) => {
   const { attributeDef, markersColor, editingRecordUuid } = props
 
@@ -90,13 +104,7 @@ export const useGeoAttributeDataLayer = (props) => {
   const layerEarthMapButtonId = `geo-attribute-layer-earth-map-btn-${attributeDefUuid}`
 
   // add icon close to layer name
-  const layerName = `
-    <div class="layer-selector-row">
-      <span>${layerInnerName}
-        <span class='layer-icon' style="border-color: ${markersColor}"></span>
-      </span>
-      <button id="${layerEarthMapButtonId}" />
-    </div>`
+  const layerName = buildLayerNameComponent({ layerInnerName, layerEarthMapButtonId, markersColor })
 
   // on layer add, create query and fetch data
   useMapLayerAdd({

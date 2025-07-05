@@ -98,10 +98,8 @@ export const fetchMapWmtsCapabilities = async ({ surveyId, url }) => {
 }
 
 export const startGeoAttributeJsonDataExport = async ({ surveyId, attributeDefUuid }) => {
-  const {
-    data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/geo/geojsondata/${attributeDefUuid}/start-export`)
-  return job
+  const { data } = await axios.post(`/api/survey/${surveyId}/geo/geojsondata/${attributeDefUuid}/start-export`)
+  return data
 }
 
 export const getGeoJsonDataDownloadUrl = ({ surveyId, tempFileName }) =>
