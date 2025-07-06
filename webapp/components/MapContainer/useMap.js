@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { PointFactory, Points } from '@openforis/arena-core'
 
 import { useSurveySrsIndex } from '@webapp/store/survey'
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 const calculateActualCenterPoint = ({ centerPoint, geoJson, markerPoint, srsIndex }) => {
   if (markerPoint && Points.isValid(markerPoint, srsIndex)) {
