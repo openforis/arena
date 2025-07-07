@@ -12552,6 +12552,11 @@ react-is@^18.3.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.3.1.tgz#e83557dc12eae63a99e003a46388b1dcbb44db7e"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
 
+react-leaflet-ruler@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/react-leaflet-ruler/-/react-leaflet-ruler-1.0.7.tgz#c8742688c2a722a7e5c1bf43c37d00e38e1521ae"
+  integrity sha512-VMydtw6rEpEcsKsZkIHqCVdbTienvJoQ5wrGxvKq/2mLXv4fx7hVeBIASb/IOuB+5UuxZFOp8UUuBwE+sJyAQA==
+
 react-leaflet@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/react-leaflet/-/react-leaflet-4.2.1.tgz#c300e9eccaf15cb40757552e181200aa10b94780"

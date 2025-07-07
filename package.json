@@ -174,6 +174,7 @@
     "react-grid-layout": "^1.4.4",
     "react-i18next": "^15.0.1",
     "react-leaflet": "^4.2.1",
+    "react-leaflet-ruler": "^1.0.7",
     "react-modal-resizable-draggable": "^0.1.6",
     "react-number-format": "^5.3.1",
     "react-redux": "^9.1.2",
