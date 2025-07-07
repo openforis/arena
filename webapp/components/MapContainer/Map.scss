@@ -69,6 +69,13 @@
           }
         }
       }
+
+      .leaflet-ruler {
+        background-image: url('/img/ruler-icon-24x24.png');
+        top: 40px;
+        height: 34px;
+        width: 34px;
+      }
     }
 
     .leaflet-popup-content {

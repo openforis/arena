@@ -6,13 +6,14 @@
   justify-content: center;
   pointer-events: all;
   margin-left: 1rem;
-  background-color: rgba($white, 0.7);
+  background-color: $white;
   overflow: hidden;
   position: absolute;
   top: 70px;
-  right: 14px;
+  right: 12px;
   width: 30px;
   height: 30px;
+  border-radius: 4px;
   z-index: 4;
 
   .icon {

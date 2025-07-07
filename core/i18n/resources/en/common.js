@@ -879,6 +879,10 @@ Merge cannot be performed.`,
       showControlPoints: `Control points`,
       showPlotReferencePoint: `Plot reference point`,
     },
+    rulerTooltip: `Press the button to start measuring distances.
+- click multiple times to measure paths
+- double click or press ESC button to finish measuring
+- press the button again to hide measurements`,
     samplingPointDataLayerName: 'Sampling point data - level {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
