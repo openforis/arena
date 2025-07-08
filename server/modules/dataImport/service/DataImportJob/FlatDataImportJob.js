@@ -171,6 +171,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     }
 
     this.incrementProcessedItems()
+    if (this.processed % 1000 === 0) {
+      this.logDebug(`${this.processed} items processed`)
+    }
 
     errors.forEach((error) => {
       this._addError(error.key || error.toString(), error.params)
@@ -192,7 +195,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         : nodeDef
       const entityDefUuid = NodeDef.getUuid(ancestorMultipleEntityDef)
 
-      // when importing files, do not do side effect on record: it's necessary to keep track of update/deleted file uuids (see updateFilesSummary function)
+      // when importing files, do not do side effect on record: it's necessary to keep track of updated/deleted file uuids (see updateFilesSummary function)
       const sideEffect = !includeFiles
 
       const updateResult = new RecordUpdateResult({ record: this.currentRecord })
