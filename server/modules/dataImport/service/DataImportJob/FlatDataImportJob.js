@@ -12,6 +12,7 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
@@ -48,6 +49,12 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     await this.dataImportFileReader.init()
   }
 
+  async calculatTotalItems() {
+    const { filePath, fileFormat } = this.context
+
+    this.total = await FlatDataReader.calculateTotalRowsFromFile({ filePath, fileFormat })
+  }
+
   async execute() {
     super.execute()
 
@@ -55,6 +62,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const { abortOnErrors, dryRun } = context
 
     this.validateParameters()
+
+    await this.calculatTotalItems()
 
     await this.fetchRecordsSummary()
 
@@ -138,7 +147,6 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       nodeDefUuid,
       includeFiles,
       onRowItem: async (item) => this.onRowItem(item),
-      onTotalChange: (total) => (this.total = total),
     })
   }
 
