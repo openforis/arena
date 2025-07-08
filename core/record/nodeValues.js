@@ -10,7 +10,11 @@ import * as NodeRefData from '@core/record/nodeRefData'
 const singlePropValueEqualComparator = ({ value, valueSearch }) =>
   value === valueSearch || String(value) === String(valueSearch)
 
-const getValueCode = (value) => String(typeof value === 'object' ? value[Node.valuePropsCode.code] : value)
+const getValueCode = (value) => {
+  const code = typeof value === 'object' ? value[Node.valuePropsCode.code] : value
+  return Objects.isEmpty(code) ? null : String(code)
+}
+
 const getValueItemUuid = (value) => value[Node.valuePropsCode.itemUuid]
 
 const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode, value }) => {
