@@ -121,3 +121,10 @@ export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.c
 
   return result
 }
+
+export const calculateTotalRowsFromFile = async ({ filePath, fileFormat }) => {
+  let result = 0
+  const reader = createReaderFromFile({ filePath, fileFormat, onTotalChange: (total) => (result = total) })
+  await reader.start()
+  return result
+}
