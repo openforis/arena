@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import { CategoryItems, DateFormats, Dates, Objects } from '@openforis/arena-core'
 
-import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -11,7 +10,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 const singlePropValueEqualComparator = ({ value, valueSearch }) =>
   value === valueSearch || String(value) === String(valueSearch)
 
-const getValueCode = (value) => (StringUtils.isString(value) ? value : value[Node.valuePropsCode.code])
+const getValueCode = (value) => String(typeof value === 'object' ? value[Node.valuePropsCode.code] : value)
 const getValueItemUuid = (value) => value[Node.valuePropsCode.itemUuid]
 
 const extractCategoryItemUuidFromValue = ({ survey, nodeDef, record, parentNode, value }) => {
