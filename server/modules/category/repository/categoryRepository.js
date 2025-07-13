@@ -308,7 +308,7 @@ export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = 
     [uuid],
     (def) => DB.transformCallback(def, draft, true, backup)
   )
-  return backup || draft || item.published ? item : null
+  return item && (backup || draft || item.published) ? item : null
 }
 
 export const countItemsBySurveyId = async ({ surveyId }, client = db) => {
