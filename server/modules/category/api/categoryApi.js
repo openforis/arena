@@ -346,7 +346,7 @@ export const init = (app) => {
       try {
         const { surveyId, levelIndex = 0 } = Request.getParams(req)
 
-        const count = await CategoryService.countSamplingPointData({ surveyId, levelIndex })
+        const count = await CategoryService.countSamplingPointData({ surveyId, levelIndex: Number(levelIndex) })
         res.json({ count })
       } catch (error) {
         next(error)
@@ -361,7 +361,12 @@ export const init = (app) => {
       try {
         const { surveyId, levelIndex = 0, limit = null, offset = null } = Request.getParams(req)
 
-        const items = await CategoryService.fetchSamplingPointData({ surveyId, levelIndex, limit, offset })
+        const items = await CategoryService.fetchSamplingPointData({
+          surveyId,
+          levelIndex: Number(levelIndex),
+          limit,
+          offset,
+        })
         res.json({ items })
       } catch (error) {
         next(error)
