@@ -16,9 +16,10 @@ import * as DB from '../../../db'
 import { db } from '../../../db/db'
 import * as DbUtils from '../../../db/dbUtils'
 
-import * as Category from '../../../../core/survey/category'
-import * as CategoryLevel from '../../../../core/survey/categoryLevel'
-import * as CategoryItem from '../../../../core/survey/categoryItem'
+import { ArrayUtils } from '@core/arrayUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryExportRepository from './categoryExportRepository'
 
 const itemDBTransformCallback =
@@ -387,26 +388,28 @@ export const fetchItemsByParentUuid = async (
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
-export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) =>
-  client.one(
+export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return client.one(
     `SELECT COUNT(i.*) 
-     FROM ${getSurveyDBSchema(surveyId)}.category_item i
-       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+     FROM ${schema}.category_item i
+       JOIN ${schema}.category_level l 
          ON l.uuid = i.level_uuid
      WHERE l.category_uuid = $/categoryUuid/
        AND l.index = $/levelIndex/`,
     { categoryUuid, levelIndex },
     (row) => Number(row.count)
   )
+}
 
 export const fetchItemsByLevelIndex = async (
   { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
   client = db
 ) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
 
   // join category_item table to get ancestors codes
-  const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
+  const ancestorLevelIndexes = levelIndex > 0 ? ArrayUtils.fromNumberOfElements(levelIndex) : []
   const codesSelectFields = ancestorLevelIndexes.map((ancestorLevelIdx) =>
     DbUtils.getPropColCombined(
       CategoryItem.keysProps.code,
