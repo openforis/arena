@@ -87,11 +87,13 @@ export const init = (app) => {
     const { lat, lng } = Request.getParams(req)
     let elevation = null
     for (const urlPattern of elevationApiUrls) {
-      if (!Objects.isEmpty(elevation)) return
       try {
         const url = urlPattern({ lat, lng })
         const { data } = await axios.get(url, { timeout: 10000 })
         elevation = data?.results?.[0]?.elevation
+        if (!Objects.isEmpty(elevation)) {
+          break
+        }
       } catch (error) {
         // ignore it
       }
