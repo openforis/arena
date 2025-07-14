@@ -21,8 +21,8 @@ import { useOnEditedRecordDataFetched } from './useOnEditedRecordDataFetched'
 
 const onGeoJsonDataExportComplete =
   ({ surveyId }) =>
-  (jobCompleted) => {
-    const { tempFileName } = jobCompleted.result
+  (job) => {
+    const { tempFileName } = job.result
     const downloadUrl = API.getGeoJsonDataDownloadUrl({
       surveyId,
       tempFileName,
@@ -89,17 +89,8 @@ export const useGeoAttributeDataLayer = (props) => {
   )
 
   const onEarthMapButtonClick = useCallback(async () => {
-    const job = await API.startGeoAttributeJsonDataExport({
-      surveyId,
-      attributeDefUuid,
-    })
-    dispatch(
-      JobActions.showJobMonitor({
-        autoHide: true,
-        job,
-        onComplete: onGeoJsonDataExportComplete({ surveyId }),
-      })
-    )
+    const job = await API.startGeoAttributeJsonDataExport({ surveyId, attributeDefUuid })
+    dispatch(JobActions.showJobMonitor({ autoHide: true, job, onComplete: onGeoJsonDataExportComplete({ surveyId }) }))
   }, [attributeDefUuid, dispatch, surveyId])
 
   const layerEarthMapButtonId = `geo-attribute-layer-earth-map-btn-${attributeDefUuid}`

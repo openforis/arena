@@ -3,7 +3,7 @@ import { ncp } from 'ncp'
 import { join, sep } from 'path'
 
 import * as ProcessUtils from '../../../core/processUtils'
-import { uuidv4 } from '../../../core/uuid'
+import { isUuid, uuidv4 } from '../../../core/uuid'
 
 const dirSeparator = '/'
 
@@ -109,3 +109,9 @@ export const tempFilePath = (fileName, subfolderName = null) =>
     : join(ProcessUtils.ENV.tempFolder, fileName)
 export const newTempFilePath = () => tempFilePath(newTempFileName())
 export const newTempFolderPath = () => tempFilePath(newTempFolderName())
+export const checkIsValidTempFileName = (tempFileName) => {
+  if (!tempFileName || !isUuid(getBaseName(tempFileName)) || !exists(tempFilePath(tempFileName))) {
+    throw new Error(`Invalid temp file name: ${tempFileName}`)
+  }
+  return true
+}
