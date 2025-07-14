@@ -23,6 +23,7 @@ import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPubli
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
+import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
   ArenaImportJob,
@@ -48,6 +49,7 @@ const jobClasses = [
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
   TaxonomyImportJob,
+  VaidationReportGenerationJob,
 ]
 
 const jobClassesByType = ObjectUtils.toIndexedObj(jobClasses, 'type')

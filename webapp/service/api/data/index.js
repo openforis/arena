@@ -174,3 +174,16 @@ export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUui
   } = await axios.post(uri, { dryRun: preview, surveyId, sourceRecordUuid, targetRecordUuid })
   return { record, nodesCreated, nodesUpdated }
 }
+
+// ==== Validation Report
+export const startValidationReportGeneration = async ({ surveyId, cycle, recordUuid, lang }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/validationReport/start-export`, {
+    cycle,
+    recordUuid,
+    lang,
+  })
+  return data
+}
+
+export const getValidationReportDownloadUrl = ({ surveyId, tempFileName }) =>
+  `${window.location.origin}/api/survey/${surveyId}/validationReport/download?${new URLSearchParams({ tempFileName })}`
