@@ -26,7 +26,7 @@ export default {
     clone: 'Clonar',
     close: 'Cerrar',
     cloneFrom: 'Clonar de',
-    cnt: 'Conde',
+    cnt: 'Contar',
     code: 'Código',
     collapse: 'Colapsar',
     convert: 'Convertir',
