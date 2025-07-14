@@ -53,6 +53,8 @@ export {
   downloadExportedDataSummaryUrl,
   startRecordsCloneJob,
   mergeRecords,
+  startValidationReportGeneration,
+  getValidationReportDownloadUrl,
 } from './data'
 export {
   insertDataQuerySummary,

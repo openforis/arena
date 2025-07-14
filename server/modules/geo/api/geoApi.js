@@ -4,7 +4,6 @@ import xmljs from 'xml-js'
 import { Objects } from '@openforis/arena-core'
 
 import { MapUtils } from '@core/map/mapUtils'
-import { isUuid } from '@core/uuid'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
@@ -143,10 +142,11 @@ export const init = (app) => {
 
   app.get(`${uriPrefix}geojsondata/download/:tempFileName`, async (req, res) => {
     const { tempFileName } = Request.getParams(req)
+
+    FileUtils.checkIsValidTempFileName(tempFileName)
+
     const filePath = FileUtils.tempFilePath(tempFileName)
-    if (!isUuid(FileUtils.getBaseName(tempFileName)) || !FileUtils.exists(filePath)) {
-      throw new Error(`Invalid temp file name: ${tempFileName}`)
-    }
+
     Response.sendFile({
       contentType: Response.contentTypes.json,
       path: filePath,

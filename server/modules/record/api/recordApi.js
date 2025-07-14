@@ -4,6 +4,7 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -16,6 +17,7 @@ import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
@@ -296,11 +298,39 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/export', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+  app.post(
+    '/survey/:surveyId/validationReport/start-export',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      await RecordService.exportValidationReportToFlatData({ res, surveyId, cycle, lang, recordUuid, fileFormat })
+        const job = RecordService.startValidationReportGenerationJob({
+          user,
+          surveyId,
+          cycle,
+          lang,
+          recordUuid,
+          fileFormat,
+        })
+        res.json(JobUtils.jobToJSON(job))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get('/survey/:surveyId/validationReport/download', async (req, res, next) => {
+    try {
+      const { surveyId, cycle, tempFileName, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+
+      FileUtils.checkIsValidTempFileName(tempFileName)
+
+      const survey = await SurveyService.fetchSurveyById({ surveyId })
+      const outputName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport', fileFormat })
+      const filePath = FileUtils.tempFilePath(tempFileName)
+      Response.sendFile({ name: outputName, fileFormat, path: filePath, res })
     } catch (error) {
       next(error)
     }
