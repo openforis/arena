@@ -292,7 +292,7 @@ export const init = (app) => {
 
       const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
 
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
