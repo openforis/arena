@@ -9,6 +9,11 @@ const getChain = (state) => {
   return chainState.chain
 }
 
+const getLastUpdateTime = (state) => {
+  const chainState = getChainState(state)
+  return chainState.lastUpdateTime
+}
+
 const getRecordsCountByStep = (state) => {
   const chainState = getChainState(state)
   return chainState.recordsCountByStep
@@ -25,6 +30,7 @@ const hasRecordsToProcess = (state) => {
 
 export const ChainState = {
   getChain,
+  getLastUpdateTime,
   getRecordsCountByStep,
   hasRecordsToProcess,
 }

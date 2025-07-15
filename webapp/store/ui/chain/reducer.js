@@ -22,9 +22,10 @@ const actionHandlers = {
 
   [ChainActionTypes.chainReset]: reset,
 
-  [ChainActionTypes.chainUpdate]: (state, { chain }) => ({
+  [ChainActionTypes.chainUpdate]: (state, { chain, lastUpdateTime }) => ({
     ...state,
     chain,
+    lastUpdateTime,
   }),
 
   [ChainActionTypes.chainRecordsCountUpdate]: (state, { recordsCountByStep }) => ({
