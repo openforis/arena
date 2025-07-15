@@ -17,7 +17,7 @@ const action =
     const { data: chainUpdated } = await axios.put(`/api/survey/${surveyId}/chain`, { chain })
     const lastUpdateTimeState = ChainState.getLastUpdateTime(state)
     if (lastUpdateTime === lastUpdateTimeState) {
-      dispatch({ type: ChainActionTypes.chainUpdate, chain: chainUpdated })
+      dispatch({ type: ChainActionTypes.chainUpdate, chain: chainUpdated, lastUpdateTime })
     }
     dispatch(AppSavingActions.hideAppSaving())
   }
@@ -28,7 +28,7 @@ export const updateChain =
     const state = getState()
     const chainPrev = ChainState.getChain(state)
     const lastUpdateTime = Date.now()
-    dispatch({ type: ChainActionTypes.chainUpdate, chain, lastUpdateTime })
+    await dispatch({ type: ChainActionTypes.chainUpdate, chain, lastUpdateTime })
 
     if (Chain.checkChangeRequiresSurveyPublish({ chainPrev, chainNext: chain })) {
       dispatch(SurveyActions.metaUpdated())
