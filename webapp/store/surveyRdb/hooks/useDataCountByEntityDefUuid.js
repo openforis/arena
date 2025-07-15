@@ -2,12 +2,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import { debounce } from '@core/functionsDefer'
 
 import * as SurveyRdbApi from '@webapp/service/api/surveyRdb'
 import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
 export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   const survey = useSurvey()
+  const surveyId = Survey.getId(survey)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const canHaveData = Survey.canHaveData(surveyInfo)
   const cycle = useSurveyCycleKey()
 
   const [dataCountByEntityDefUuid, setDataCountsByEntityDefUuid] = useState({})
@@ -27,21 +31,20 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   }, [cycle, nodeDefs, survey])
 
   const updateCounts = useCallback(async () => {
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
+    if (canHaveData) {
       setDataCountsByEntityDefUuid(
         await SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
-          surveyId: Survey.getId(survey),
+          surveyId,
           cycle,
           entityDefUuids,
         })
       )
     }
-  }, [survey, cycle, entityDefUuids])
+  }, [surveyId, cycle, canHaveData, entityDefUuids])
 
   useEffect(() => {
-    updateCounts()
-  }, [updateCounts])
+    debounce(updateCounts, `data-counts-update-${surveyId}`, 2000)()
+  }, [surveyId, updateCounts])
 
   return dataCountByEntityDefUuid
 }
