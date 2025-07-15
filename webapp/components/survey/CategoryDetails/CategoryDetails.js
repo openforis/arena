@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { useParams } from 'react-router'
 import classNames from 'classnames'
 
+import { FileFormats } from '@core/fileFormats'
 import * as StringUtils from '@core/stringUtils'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -25,7 +26,6 @@ import ImportSummary from './ImportSummary'
 import LevelDetails from './LevelDetails'
 
 import { State, useActions, useLocalState } from './store'
-import { FileFormats } from '@core/fileFormats'
 
 const MAX_LEVELS = 5
 
