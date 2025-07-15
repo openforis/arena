@@ -80,19 +80,30 @@ export default class VaidationReportGenerationJob extends Job {
       'record_date_created',
       'record_date_modified',
     ]
-    await RecordManager.getValidationReportAsStream({
-      surveyId,
-      cycle,
-      recordUuid,
-      processor: async (dbStream) =>
-        FlatDataWriter.writeItemsStreamToStream({
-          stream: dbStream,
-          outputStream,
-          fields,
-          options: { objectTransformer },
-          fileFormat,
-        }),
-    })
+
+    this.total = await RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid }, this.tx)
+
+    await RecordManager.getValidationReportAsStream(
+      {
+        surveyId,
+        cycle,
+        recordUuid,
+        processor: async (dbStream) => {
+          this.dbStream = dbStream
+          await FlatDataWriter.writeItemsStreamToStream({
+            stream: dbStream,
+            outputStream,
+            fields,
+            options: { objectTransformer },
+            fileFormat,
+            onData: () => {
+              this.incrementProcessedItems()
+            },
+          })
+        },
+      },
+      this.tx
+    )
 
     this.setContext({ tempFileName })
   }
@@ -100,6 +111,11 @@ export default class VaidationReportGenerationJob extends Job {
   generateResult() {
     const { tempFileName } = this.context
     return { tempFileName }
+  }
+
+  async cancel() {
+    await super.cancel()
+    this.dbStream?.destroy()
   }
 }
 
