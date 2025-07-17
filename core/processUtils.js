@@ -76,6 +76,8 @@ const ENV = {
   fileStorageAwsS3BucketRegion: process.env.FILE_STORAGE_AWS_S3_BUCKET_REGION,
   // Job queue
   jobQueueConcurrency: process.env.JOB_QUEUE_CONCURRENCY || 3,
+  // WHISP
+  whispApiKey: process.env.WHISP_API_KEY,
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
 }
