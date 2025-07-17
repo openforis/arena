@@ -282,7 +282,7 @@ export const init = (app) => {
   )
 
   app.get(
-    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-info',
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
     async (req, res, next) => {
       let tempFilePath

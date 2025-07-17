@@ -148,6 +148,17 @@ const NodeDefCoordinate = (props) => {
     />
   ))
 
+  const mapTriggerButton = canShowMap ? (
+    <Button
+      className="map-trigger-btn btn-transparent"
+      disabled={edit}
+      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
+      onClick={toggleShowMap}
+      title="surveyForm:nodeDefCoordinate.showOnMap"
+      variant="text"
+    />
+  ) : null
+
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
       <MapContainer
@@ -158,17 +169,6 @@ const NodeDefCoordinate = (props) => {
         showOptions={false}
       />
     </PanelRight>
-  ) : null
-
-  const mapTriggerButton = canShowMap ? (
-    <Button
-      className="map-trigger-btn btn-transparent"
-      disabled={edit}
-      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
-      onClick={toggleShowMap}
-      title="surveyForm:nodeDefCoordinate.showOnMap"
-      variant="text"
-    />
   ) : null
 
   if (renderType === NodeDefLayout.renderType.tableBody) {

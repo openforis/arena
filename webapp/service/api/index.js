@@ -34,6 +34,8 @@ export {
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 export {
+  getRecordNodeFileUrl,
+  fetchRecordsNodeFileExifInfo,
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
