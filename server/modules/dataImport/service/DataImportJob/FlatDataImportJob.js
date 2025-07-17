@@ -55,6 +55,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.total = await FlatDataReader.calculateTotalRowsFromFile({ filePath, fileFormat })
   }
 
+  shouldCalculatedTotalItems() {
+    return true
+  }
+
   async execute() {
     super.execute()
 
@@ -63,7 +67,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     this.validateParameters()
 
-    await this.calculatTotalItems()
+    if (this.shouldCalculatedTotalItems()) {
+      await this.calculatTotalItems()
+    }
 
     await this.fetchRecordsSummary()
 
