@@ -1,3 +1,5 @@
+import exifr from 'exifr'
+
 import { Objects } from '@openforis/arena-core'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -33,6 +35,15 @@ import {
   requireRecordsEditPermission,
   requireRecordsExportPermission,
 } from '../../auth/authApiMiddleware'
+
+const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
+  const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
+  const fileUuid = Node.getFileUuid(node)
+  const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
+  const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+  return { fileName, file, contentStream }
+}
 
 export const init = (app) => {
   // ==== CREATE
@@ -261,15 +272,32 @@ export const init = (app) => {
       try {
         const { surveyId, nodeUuid } = Request.getParams(req)
 
-        const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-        const fileUuid = Node.getFileUuid(node)
-        const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-        const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-        const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
         setContentTypeFile({ res, fileName, fileSize: RecordFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
         next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-info',
+    requireRecordViewPermission,
+    async (req, res, next) => {
+      let tempFilePath
+      try {
+        const { surveyId, nodeUuid } = Request.getParams(req)
+        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        ;({ tempFilePath } = await FileUtils.writeStreamToTempFile(contentStream))
+        const info = await exifr.parse(tempFilePath)
+        res.json(info)
+      } catch (error) {
+        next(error)
+      } finally {
+        if (tempFilePath) {
+          FileUtils.deleteFile(tempFilePath)
+        }
       }
     }
   )
