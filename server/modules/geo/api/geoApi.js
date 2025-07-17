@@ -4,6 +4,7 @@ import xmljs from 'xml-js'
 import { Objects } from '@openforis/arena-core'
 
 import { MapUtils } from '@core/map/mapUtils'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
@@ -113,12 +114,20 @@ export const init = (app) => {
   })
 
   app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
-    const geojson = Request.getBody(req)
-    const url = `${whispApiUrl}geojson`
     try {
+      const geojson = Request.getBody(req)
+      const url = `${whispApiUrl}geojson`
+      const apiKey = ProcessUtils.ENV.whispApiKey
+      if (!apiKey) {
+        throw new Error('WHISP API key not specified')
+      }
+      const headers = {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json',
+      }
       const {
         data: { token },
-      } = await axios.post(url, geojson)
+      } = await axios.post(url, geojson, { headers })
       res.json(token)
     } catch (error) {
       next(error)
