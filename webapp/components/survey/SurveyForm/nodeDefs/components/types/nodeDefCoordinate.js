@@ -184,7 +184,6 @@ NodeDefCoordinate.propTypes = {
   canEditRecord: PropTypes.bool.isRequired,
   edit: PropTypes.bool.isRequired,
   entry: PropTypes.bool.isRequired,
-  insideTable: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.array.isRequired,
   readOnly: PropTypes.bool,
