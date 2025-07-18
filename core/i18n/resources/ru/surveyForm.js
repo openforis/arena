@@ -101,6 +101,7 @@ export default {
     errorLoadingPreview: 'Ошибка загрузки предварительного просмотра',
     fileUuid: 'UUID файла',
     fileName: 'Имя файла',
+    locationInformationNotFound: 'Информация о местоположении не найдена в файле',
   },
   nodeDefsTreeSelectMode: {
     allNodeDefs: 'Все узлы',

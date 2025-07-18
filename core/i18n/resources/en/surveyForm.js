@@ -104,6 +104,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
     errorLoadingPreview: 'Error loading preview',
     fileUuid: 'File uuid',
     fileName: 'File name',
+    locationInformationNotFound: 'Location information not found in the file',
   },
   nodeDefsTreeSelectMode: {
     allNodeDefs: 'All nodes',

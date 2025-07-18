@@ -1,7 +1,7 @@
 import './nodeDefFile.scss'
 
 import React, { useCallback, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { PointFactory, Points } from '@openforis/arena-core'
@@ -11,16 +11,15 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
 import UploadButton from '@webapp/components/form/uploadButton'
-import { Button, ButtonDownload } from '@webapp/components/buttons'
+import { ButtonDownload } from '@webapp/components/buttons'
 import { TooltipNew } from '@webapp/components/TooltipNew'
-import { MapContainer } from '@webapp/components/MapContainer'
-import PanelRight from '@webapp/components/PanelRight'
-import { useAuthCanUseMap } from '@webapp/store/user/hooks'
-import { RecordState } from '@webapp/store/ui/record'
+
+import { NotificationActions } from '@webapp/store/ui'
 import * as API from '@webapp/service/api'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 import { ImagePreview } from './ImagePreview'
+import { MapTriggerButton } from '../mapTriggerButton'
 
 const FileInput = (props) => {
   const { surveyInfo, nodeDef, node, readOnly, edit, canEditRecord, updateNode, removeNode, insideTable, lang } = props
@@ -29,9 +28,7 @@ const FileInput = (props) => {
 
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang)
 
-  const canUseMap = useAuthCanUseMap()
-  const noHeader = useSelector(RecordState.hasNoHeader)
-  const canShowMap = canUseMap && !noHeader
+  const dispatch = useDispatch()
 
   const [fileUploaded, setFileUploaded] = useState(null)
   const [showMap, setShowMap] = useState(false)
@@ -73,29 +70,14 @@ const FileInput = (props) => {
     if (Points.isValid(point)) {
       setImageFileMarkerPoint(point)
       toggleShowMap()
+    } else {
+      dispatch(NotificationActions.notifyWarning({ key: 'surveyForm:nodeDefFile.locationInformationNotFound' }))
     }
-  }, [surveyId, node, toggleShowMap])
+  }, [surveyId, node, toggleShowMap, dispatch])
 
   const downloadButton = (
     <ButtonDownload href={fileUrl} label={fileName} title={isImage ? undefined : fileName} className="btn-s ellipsis" />
   )
-
-  const mapTriggerButton = canShowMap ? (
-    <Button
-      className="map-trigger-btn btn-transparent"
-      disabled={edit}
-      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
-      onClick={onShowOnMapClick}
-      title="surveyForm:nodeDefCoordinate.showOnMap"
-      variant="text"
-    />
-  ) : null
-
-  const mapPanelRight = showMap ? (
-    <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <MapContainer editable={false} markerPoint={imageFileMarkerPoint} markerTitle={fileName} showOptions={false} />
-    </PanelRight>
-  ) : null
 
   return (
     <div className="survey-form__node-def-file">
@@ -119,8 +101,17 @@ const FileInput = (props) => {
                 >
                   {downloadButton}
                 </TooltipNew>
-                {mapTriggerButton}
-                {mapPanelRight}
+                <MapTriggerButton
+                  disabled={edit}
+                  insideTable={insideTable}
+                  showMap={showMap}
+                  onClick={onShowOnMapClick}
+                  mapMarkerPoint={imageFileMarkerPoint}
+                  mapMarkerTitle={fileName}
+                  onPanelClose={toggleShowMap}
+                  panelHeader={nodeDefLabel}
+                  title="surveyForm:nodeDefCoordinate.showOnMap"
+                />
               </>
             )
           }
