@@ -15,7 +15,7 @@ export const MapTriggerButton = (props) => {
     insideTable = false,
     showMap = false,
     onClick = null,
-    onMapMarkerPointChange = null,
+    onMapMarkerPointChange: onMapMarkerPointChangeProp = null,
     mapMarkerEditable = false,
     mapMarkerPoint = null,
     mapMarkerTitle = null,
@@ -33,6 +33,14 @@ export const MapTriggerButton = (props) => {
   }, [showMapInternal])
 
   const onClickDefault = toggleShowMap
+
+  const onMapMarkerPointChange = useCallback(
+    (markerPoint) => {
+      onMapMarkerPointChangeProp?.(markerPoint)
+      toggleShowMap()
+    },
+    [onMapMarkerPointChangeProp, toggleShowMap]
+  )
 
   const button = canShowMap ? (
     <Button

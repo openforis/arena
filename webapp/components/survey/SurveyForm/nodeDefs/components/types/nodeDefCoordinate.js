@@ -1,6 +1,6 @@
 import './nodeDefCoordinate.scss'
 
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
@@ -14,7 +14,6 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, MapContainer, PanelRight } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
@@ -23,29 +22,17 @@ import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
+import { MapTriggerButton } from '../mapTriggerButton'
 
 const numberFormat = NumberFormats.decimal({ decimalScale: 12 })
 
 const NodeDefCoordinate = (props) => {
-  const {
-    canEditRecord,
-    edit,
-    entry,
-    insideTable = false,
-    nodeDef,
-    nodes,
-    readOnly = false,
-    renderType,
-    surveyInfo,
-    updateNode,
-  } = props
+  const { canEditRecord, edit, entry, nodeDef, nodes, readOnly = false, renderType, surveyInfo, updateNode } = props
 
   const lang = useSurveyPreferredLang()
   const canUseMap = useAuthCanUseMap()
   const noHeader = useSelector(RecordState.hasNoHeader)
   const canShowMap = canUseMap && !noHeader
-
-  const [showMap, setShowMap] = useState(false)
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -102,12 +89,9 @@ const NodeDefCoordinate = (props) => {
   const handleLocationOnMapChanged = useCallback(
     (markerPointUpdated) => {
       handleValueChange(markerPointUpdated)
-      setShowMap(false)
     },
     [handleValueChange]
   )
-
-  const toggleShowMap = useCallback(() => setShowMap(!showMap), [showMap, setShowMap])
 
   const xInput = (
     <Input
@@ -149,26 +133,16 @@ const NodeDefCoordinate = (props) => {
   ))
 
   const mapTriggerButton = canShowMap ? (
-    <Button
-      className="map-trigger-btn btn-transparent"
+    <MapTriggerButton
       disabled={edit}
-      iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
-      onClick={toggleShowMap}
+      header={nodeDefLabel}
+      mapMarkerEditable={true}
+      mapMarkerPoint={value}
+      mapMarkerTitle={nodeDefLabel}
+      onMapMarkerPointChange={handleLocationOnMapChanged}
+      panelHeader={nodeDefLabel}
       title="surveyForm:nodeDefCoordinate.showOnMap"
-      variant="text"
     />
-  ) : null
-
-  const mapPanelRight = showMap ? (
-    <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <MapContainer
-        editable={!entryDisabled}
-        markerPoint={value}
-        markerTitle={nodeDefLabel}
-        onMarkerPointChange={handleLocationOnMapChanged}
-        showOptions={false}
-      />
-    </PanelRight>
   ) : null
 
   if (renderType === NodeDefLayout.renderType.tableBody) {
@@ -185,7 +159,6 @@ const NodeDefCoordinate = (props) => {
         {srsDropdown}
         {additionalInputFields}
         {mapTriggerButton}
-        {mapPanelRight}
       </div>
     )
   }
@@ -203,7 +176,6 @@ const NodeDefCoordinate = (props) => {
         ))}
       </div>
       {mapTriggerButton}
-      {mapPanelRight}
     </div>
   )
 }
