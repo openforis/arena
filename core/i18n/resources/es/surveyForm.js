@@ -104,6 +104,7 @@ Confirmar promoción`,
     errorLoadingPreview: 'Error al cargar la vista previa',
     fileUuid: 'Uuid del archivo',
     fileName: 'Nombre del archivo',
+    locationInformationNotFound: 'Información de ubicación no encontrada en el archivo',
   },
   nodeDefsTreeSelectMode: {
     allNodeDefs: 'Todos los nodos',

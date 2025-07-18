@@ -2,6 +2,8 @@ import axios from 'axios'
 
 import { Query } from '@common/model/query'
 
+import * as Node from '@core/record/node'
+
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD
@@ -24,6 +26,15 @@ export const fetchRecordsSummary = async ({ surveyId, cycle, recordUuid = null, 
 export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
+}
+
+// ==== RECORD FILE
+export const getRecordNodeFileUrl = ({ surveyId, node }) =>
+  `/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`
+
+export const fetchRecordsNodeFileExifInfo = async ({ surveyId, node }) => {
+  const { data: info } = await axios.get(`${getRecordNodeFileUrl({ surveyId, node })}-exif`)
+  return info
 }
 
 // ==== DATA IMPORT

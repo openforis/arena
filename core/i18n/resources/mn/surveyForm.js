@@ -105,6 +105,7 @@ $t(surveyForm:formEntryActions.confirmPromote)`,
     errorLoadingPreview: 'Урьдчилан харахыг ачаалахад алдаа гарлаа',
     fileUuid: 'Файлын uuid',
     fileName: 'Файлын нэр',
+    locationInformationNotFound: 'Байршлын мэдээлэл файл дотор олдсонгүй',
   },
   nodeDefsTreeSelectMode: {
     allNodeDefs: 'Бүх зангилаа',

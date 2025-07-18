@@ -115,3 +115,15 @@ export const checkIsValidTempFileName = (tempFileName) => {
   }
   return true
 }
+export const writeStreamToTempFile = async (inputStream) =>
+  new Promise((resolve, reject) => {
+    const tempFilePath = newTempFilePath()
+    const writeStream = createWriteStream(tempFilePath)
+    inputStream.pipe(writeStream)
+    writeStream.on('close', () => {
+      resolve({ tempFilePath })
+    })
+    writeStream.on('error', (error) => {
+      reject(error)
+    })
+  })
