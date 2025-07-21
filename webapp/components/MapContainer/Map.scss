@@ -72,9 +72,12 @@
 
       .leaflet-ruler {
         background-image: url('/img/ruler-icon-24x24.png');
-        top: 40px;
+        position: absolute;
+        top: 100px;
+        right: 0;
         height: 34px;
         width: 34px;
+        z-index: 5;
       }
     }
 
