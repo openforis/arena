@@ -129,10 +129,13 @@ const getVariablesFromAncestors = ({
 }
 
 const getThisVariable = ({ mode, variables, nodeDefCurrent }) => {
-  if (mode === Expression.modes.sql) return variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  if (mode === Expression.modes.sql) {
+    return variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  }
   return {
-    ...getJsVariables(nodeDefCurrent),
+    ...getJsVariables(nodeDefCurrent)[0],
     label: `this (${NodeDef.getName(nodeDefCurrent)})`,
+    nodeDefType: NodeDef.getType(nodeDefCurrent),
     value: Expression.thisVariable,
   }
 }
