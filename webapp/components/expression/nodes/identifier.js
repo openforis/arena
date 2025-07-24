@@ -24,13 +24,15 @@ const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
       (variable) => !!variable.options || (variablesFilterFn?.(variable) ?? defaultVariablesFilterFunction(variable))
     )
 
+  const filterOptions = (options) => filterVariables(options).filter((variable) => variable.uuid !== thisVariable?.uuid)
+
   const variablesUpdated = filterVariables(variables)
 
   return variablesUpdated.reduce((groupsAcc, group) => {
     const groupUpdated = { ...group }
     const prevOptions = group.options
     if (prevOptions) {
-      const optionsFiltered = filterVariables(prevOptions)
+      const optionsFiltered = filterOptions(prevOptions)
       groupUpdated.options = optionsFiltered
       if (optionsFiltered.length === 0) {
         return groupsAcc
