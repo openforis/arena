@@ -1193,6 +1193,7 @@ export default {
       },
       maxFileSize: 'Tamaño máximo de archivo (Mb)',
       numberOfFiles: 'Vaya a Validaciones para cambiar el número mínimo y máximo de archivos.',
+      showGeotagInformation: 'Mostrar información de geoetiqueta',
     },
     mobileProps: {
       title: 'Aplicación móvil',

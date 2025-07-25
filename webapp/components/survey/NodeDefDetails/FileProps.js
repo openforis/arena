@@ -7,6 +7,7 @@ import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 
+import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import ButtonGroup from '@webapp/components/form/buttonGroup'
 
@@ -72,7 +73,16 @@ const FileProps = (props) => {
         />
       </FormItem>
       <FormItem label="nodeDefEdit.fileProps.fileType">
-        <ButtonGroup selectedItemKey={NodeDef.getFileType(nodeDef)} onChange={selectFileType} items={fileTypes} />
+        <div className="form-item_body">
+          <ButtonGroup selectedItemKey={NodeDef.getFileType(nodeDef)} onChange={selectFileType} items={fileTypes} />
+          {NodeDef.canShowGeotagInformation(nodeDef) && (
+            <Checkbox
+              checked={NodeDef.isGeotagInformationShown(nodeDef)}
+              label="nodeDefEdit.fileProps.showGeotagInformation"
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.geotagInformationShown, value })}
+            />
+          )}
+        </div>
       </FormItem>
     </>
   )

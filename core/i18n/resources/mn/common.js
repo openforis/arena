@@ -1391,6 +1391,7 @@ $t(common.appNameFull)
       },
       maxFileSize: 'Хамгийн их файлын хэмжээ (МБ)',
       numberOfFiles: 'Хамгийн бага болон хамгийн их файлын тоог өөрчлөхийн тулд Баталгаажуулалт руу орно уу.',
+      showGeotagInformation: 'Газарзүйн мэдээллийг харуулах',
     },
     mobileProps: {
       title: 'Мобайл апп',

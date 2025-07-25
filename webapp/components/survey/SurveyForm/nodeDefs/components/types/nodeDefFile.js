@@ -101,17 +101,19 @@ const FileInput = (props) => {
                 >
                   {downloadButton}
                 </TooltipNew>
-                <MapTriggerButton
-                  disabled={edit}
-                  insideTable={insideTable}
-                  showMap={showMap}
-                  onClick={onShowOnMapClick}
-                  mapMarkerPoint={imageFileMarkerPoint}
-                  mapMarkerTitle={fileName}
-                  onPanelClose={toggleShowMap}
-                  panelHeader={nodeDefLabel}
-                  title="surveyForm:nodeDefCoordinate.showOnMap"
-                />
+                {NodeDef.isGeotagInformationShown(nodeDef) && (
+                  <MapTriggerButton
+                    disabled={edit}
+                    insideTable={insideTable}
+                    showMap={showMap}
+                    onClick={onShowOnMapClick}
+                    mapMarkerPoint={imageFileMarkerPoint}
+                    mapMarkerTitle={fileName}
+                    onPanelClose={toggleShowMap}
+                    panelHeader={nodeDefLabel}
+                    title="surveyForm:nodeDefCoordinate.showOnMap"
+                  />
+                )}
               </>
             )
           }
