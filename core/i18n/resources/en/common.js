@@ -1405,6 +1405,7 @@ E.g. this.region = region_attribute_name
       },
       maxFileSize: 'Max. file size (Mb)',
       numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
+      showGeotagInformation: 'Show geotag information',
     },
     mobileProps: {
       title: 'Mobile App',
