@@ -6,6 +6,8 @@ import * as Node from '@core/record/node'
 
 import { objectToFormData } from '../utils/apiUtils'
 
+const dataUploadTimeout = 1000 * 60 * 10 // 10 minutes
+
 // ==== RECORD
 export const createRecordFromSamplingPointDataItem = async ({ surveyId, itemUuid }) => {
   const { data: recordUuid } = await axios.post(`/api/survey/${surveyId}/record/fromspditem`, { itemUuid })
@@ -48,7 +50,10 @@ export const startCollectRecordsImportJob = async ({
 } = {}) => {
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, {
+    timeout: dataUploadTimeout,
+    onUploadProgress,
+  })
   const { job } = data
   return job
 }
@@ -81,7 +86,10 @@ export const startDataImportFromCsvJob = async ({
     deleteExistingEntities,
     abortOnErrors,
   })
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, {
+    timeout: dataUploadTimeout,
+    onUploadProgress,
+  })
   const { job } = data
   return job
 }
@@ -100,7 +108,10 @@ export const startDataImportFromArenaJob = async ({
     dryRun,
     conflictResolutionStrategy,
   })
-  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
+  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, {
+    onUploadProgress,
+    timeout: dataUploadTimeout,
+  })
   const { job } = data
   return job
 }

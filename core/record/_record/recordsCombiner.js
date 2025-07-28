@@ -48,14 +48,16 @@ const _replaceAttributeValueIfModifiedAfter = ({
 }) => {
   const sourceDateModified = Node.getDateModified(attrSource)
   const targetDateModified = Node.getDateModified(attrTarget)
-  if (Dates.isAfter(sourceDateModified, targetDateModified)) {
+  const valueSource = Node.getValue(attrSource)
+  const valueTarget = Node.getValue(attrTarget)
+  if (Objects.isEmpty(valueTarget) || Dates.isAfter(sourceDateModified, targetDateModified)) {
     const attributeUpdateResult = updateAttributeValue({
       survey,
       record: recordTarget,
       entity: entityTarget,
       attributeDef: attrDef,
       attribute: attrTarget,
-      value: Node.getValue(attrSource),
+      value: valueSource,
       dateModified: sourceDateModified,
       sideEffect,
     })
