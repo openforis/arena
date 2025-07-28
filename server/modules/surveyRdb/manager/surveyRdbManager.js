@@ -204,6 +204,25 @@ export const fetchViewDataAgg = async (params, client = db) => {
   return result
 }
 
+export const fetchOlapData = async (params, client = db) => {
+  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, outputStream = null, options = {} } = params
+  const { fileFormat = FileFormats.csv } = options
+
+   // Fetch data
+   const result = await DataViewRepository.fetchViewDataAgg(
+    {
+      survey,
+      cycle,
+      query,
+      recordOwnerUuid,
+      limit,
+      offset,
+      stream: Boolean(outputStream),
+    },
+    client
+  )
+}
+
 const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search }) => {
   if (recordUuids) return recordUuids
 
