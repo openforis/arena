@@ -4,8 +4,8 @@ import React from 'react'
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { useI18n, useLang } from '@webapp/store/system'
-import { useSurvey } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { Button, ButtonIconDelete, ButtonIconEditOrView } from '@webapp/components/buttons'
@@ -18,7 +18,7 @@ const Row = (props) => {
   const { state, Actions } = useLocalState(props)
 
   const survey = useSurvey()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const i18n = useI18n()
 
   const taxonomy = State.getTaxonomy(state)

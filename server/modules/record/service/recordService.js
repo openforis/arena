@@ -8,45 +8,46 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as A from '@core/arena'
-import SystemError from '@core/systemError'
-import * as PromiseUtils from '@core/promiseUtils'
+import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
-import * as Record from '@core/record/record'
+import * as PromiseUtils from '@core/promiseUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
-import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
+import * as Record from '@core/record/record'
 import * as RecordFile from '@core/record/recordFile'
-import * as Authorizer from '@core/auth/authorizer'
-import * as ValidationResult from '@core/validation/validationResult'
-import i18n from '@core/i18n/i18nFactory'
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+import SystemError from '@core/systemError'
 import * as Validation from '@core/validation/validation'
-import { ValidationUtils } from '@core/validation/validationUtils'
-import { FileFormats } from '@core/fileFormats'
 
-import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
-import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import { db } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
+import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
+import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
-import { db } from '@server/db/db'
 
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as FileService from './fileService'
 
-import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
-import RecordsCloneJob from './recordsCloneJob'
-import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
-import SelectedRecordsExportJob from './selectedRecordsExportJob'
-import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
-import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
+import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
+import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
+import RecordsCloneJob from './recordsCloneJob'
+import SelectedRecordsExportJob from './selectedRecordsExportJob'
+import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
+import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
+import VaidationReportGenerationJob from './validationReportGenerationJob'
 
 const Logger = Log.getLogger('RecordService')
+
+const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 // RECORD
 export const createRecord = async ({ user, surveyId, recordToCreate }) => {
@@ -251,88 +252,16 @@ export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSoc
 // VALIDATION REPORT
 export const { fetchValidationReport, countValidationReportItems } = RecordManager
 
-export const exportValidationReportToFlatData = async ({
-  res,
-  surveyId,
-  cycle,
-  lang,
-  recordUuid = null,
-  fileFormat = FileFormats.xlsx,
-}) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
-
-  const fileName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport', fileFormat })
-  Response.setContentTypeFile({ res, fileName, fileFormat })
-
-  const objectTransformer = (item) => {
-    const nodeDef = RecordValidationReportItem.getNodeDef(survey)(item)
-    const name = NodeDef.getName(nodeDef)
-    const label = NodeDef.getLabel(nodeDef, lang)
-    const path = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.name })(item)
-    const pathLabels = RecordValidationReportItem.getPath({ survey, lang, labelType: NodeDef.NodeDefLabelTypes.label })(
-      item
-    )
-    const validation = RecordValidationReportItem.getValidation(item)
-
-    const errors = ValidationUtils.getJointMessage({
-      i18n,
-      survey,
-      showKeys: false,
-      severity: ValidationResult.severity.error,
-    })(validation)
-
-    const warnings = ValidationUtils.getJointMessage({
-      i18n,
-      survey,
-      showKeys: false,
-      severity: ValidationResult.severity.warning,
-    })(validation)
-
-    return {
-      path,
-      path_labels: pathLabels,
-      name,
-      label,
-      errors,
-      warnings,
-      record_step: RecordValidationReportItem.getRecordStep(item),
-      record_cycle: Number(RecordValidationReportItem.getRecordCycle(item)) + 1,
-      record_owner_name: RecordValidationReportItem.getRecordOwnerName(item),
-      record_date_created: DateUtils.formatDateTimeExport(RecordValidationReportItem.getRecordDateCreated(item)),
-      record_date_modified: DateUtils.formatDateTimeExport(RecordValidationReportItem.getRecordDateModified(item)),
-    }
-  }
-  const fields = [
-    'path',
-    'path_labels',
-    'name',
-    'label',
-    'errors',
-    'warnings',
-    'record_step',
-    'record_cycle',
-    'record_owner_name',
-    'record_date_created',
-    'record_date_modified',
-  ]
-  await RecordManager.getValidationReportAsStream({
-    surveyId,
-    cycle,
-    recordUuid,
-    processor: async (dbStream) =>
-      FlatDataWriter.writeItemsStreamToStream({
-        stream: dbStream,
-        outputStream: res,
-        fields,
-        options: { objectTransformer },
-        fileFormat,
-      }),
-  })
-}
-
 // RECORDS CLONE
 export const startRecordsCloneJob = ({ user, surveyId, cycleFrom, cycleTo, recordsUuids }) => {
   const job = new RecordsCloneJob({ user, surveyId, cycleFrom, cycleTo, recordsUuids })
+  JobManager.enqueueJob(job)
+  return job
+}
+
+// Validation Report
+export const startValidationReportGenerationJob = ({ user, surveyId, cycle, lang, recordUuid, fileFormat }) => {
+  const job = new VaidationReportGenerationJob({ user, surveyId, cycle, lang, recordUuid, fileFormat })
   JobManager.enqueueJob(job)
   return job
 }
@@ -485,7 +414,7 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   if (nodesArray.length === 0) return
 
-  for await (const node of nodesArray) {
+  for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
       await nodesDeleteBatchPersister.addItem(node)
     } else if (Node.isCreated(node)) {
@@ -522,6 +451,8 @@ export const mergeRecords = async (
     const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
       survey,
       recordSource,
+      categoryItemProvider,
+      taxonProvider,
       sideEffect: true,
     })(recordTarget)
 

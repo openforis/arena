@@ -1,0 +1,18 @@
+@use '~@webapp/style/vars' as *;
+
+.map-options {
+  button {
+    background-color: rgba($white, 0.7);
+    color: black;
+  }
+  .popup {
+    width: 16rem;
+    padding: 1rem;
+    background-color: white;
+
+    .form-item {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

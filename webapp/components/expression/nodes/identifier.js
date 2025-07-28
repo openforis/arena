@@ -1,35 +1,42 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { Dropdown } from '@webapp/components/form'
 
-const findVariableByValue = ({ variables, value }) => variables.find((variable) => variable.value === value)
+import { findVariableByName } from '../expressionVariables'
 
 const getSelectedVariable = ({ variables, node }) => {
   if (!node) return null
   const value = node.type === Expression.types.ThisExpression ? Expression.thisVariable : node.name
-  const variable = findVariableByValue({ variables, value })
-  if (!A.isEmpty(variable)) return variable
-
-  const options = variables.reduce((optionsAggregator, group) => [...optionsAggregator, ...(group.options || [])], [])
-  return findVariableByValue({ variables: options, value: node.name })
+  return findVariableByName({ variables, name: value })
 }
 
 const defaultVariablesFilterFunction = (variable) => variable.nodeDefType !== NodeDef.nodeDefType.entity
 
 const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
-  const filterVariables = (variables) => variables.filter(variablesFilterFn ?? defaultVariablesFilterFunction)
+  const thisVariable = variables.find((variable) => variable.value === Expression.thisVariable)
+
+  const filterVariables = (_vars) =>
+    _vars.filter(
+      (variable) => !!variable.options || (variablesFilterFn?.(variable) ?? defaultVariablesFilterFunction(variable))
+    )
+
+  const filterOptions = (options) => filterVariables(options).filter((variable) => variable.uuid !== thisVariable?.uuid)
 
   const variablesUpdated = filterVariables(variables)
 
   return variablesUpdated.reduce((groupsAcc, group) => {
     const groupUpdated = { ...group }
-    if (group.options) {
-      groupUpdated.options = filterVariables(group.options)
+    const prevOptions = group.options
+    if (prevOptions) {
+      const optionsFiltered = filterOptions(prevOptions)
+      groupUpdated.options = optionsFiltered
+      if (optionsFiltered.length === 0) {
+        return groupsAcc
+      }
     }
     return [...groupsAcc, groupUpdated]
   }, [])

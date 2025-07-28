@@ -56,7 +56,7 @@ const NodeDefEditButtons = (props) => {
     >
       {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (
         <div className="survey-form__node-def-edit-page-props">
-          {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
+          {i18n.t('surveyForm:nodeDefEditFormActions.columns')}
           <input
             value={NodeDefLayout.getColumnsNo(surveyCycleKey)(nodeDef)}
             type="number"
@@ -84,7 +84,7 @@ const NodeDefEditButtons = (props) => {
         onClick={() => navigate(`${appModuleUri(designerModules.nodeDef)}${NodeDef.getUuid(nodeDef)}/`)}
         size="small"
         testId={TestId.surveyForm.nodeDefEditBtn(nodeDefName)}
-        title="surveyForm.edit"
+        title="surveyForm:edit"
         titleParams={{ nodeDefLabel }}
         variant="text"
       />
@@ -97,7 +97,7 @@ const NodeDefEditButtons = (props) => {
           onClick={() => dispatch(NodeDefsActions.compressFormItems(nodeDef))}
           onMouseDown={(e) => e.stopPropagation()}
           size="small"
-          title="surveyForm.compressFormItems"
+          title="surveyForm:compressFormItems"
           titleParams={{ nodeDefLabel }}
           variant="text"
         />
@@ -110,7 +110,7 @@ const NodeDefEditButtons = (props) => {
           onMouseDown={(e) => e.stopPropagation()}
           size="small"
           testId={TestId.surveyForm.nodeDefAddChildToBtn(nodeDefName)}
-          title="surveyForm.addChildToTitle"
+          title="surveyForm:addChildToTitle"
           titleParams={{ nodeDefLabel }}
           variant="text"
         />

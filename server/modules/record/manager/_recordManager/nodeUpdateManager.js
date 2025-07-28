@@ -11,10 +11,15 @@ import * as ObjectUtils from '@core/objectUtils'
 import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
 
 const logger = Log.getLogger('NodeUpdateManager')
+
+const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 const _createUpdateResult = (record, node = null, nodes = {}) => {
   if (!node && R.isEmpty(nodes)) {
@@ -176,11 +181,13 @@ export const updateNodesDependents = async (
   { user, survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
   tx
 ) => {
-  const { record: recordUpdatedDependents, nodes: allNodesUpdated } = Record.updateNodesDependents({
+  const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
     user,
     survey,
     record,
     nodes,
+    categoryItemProvider,
+    taxonProvider,
     timezoneOffset,
     logger,
     sideEffect,

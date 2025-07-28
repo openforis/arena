@@ -11,6 +11,7 @@ import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import DataExportJob from '@server/modules/dataExport/service/dataExportJob'
 import DataSummaryExportJob from '@server/modules/dataExport/service/DataSummaryExportJob'
+import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExportJob'
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
@@ -22,6 +23,7 @@ import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPubli
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
+import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
   ArenaImportJob,
@@ -35,6 +37,7 @@ const jobClasses = [
   DataImportValidationJob,
   DataExportJob,
   DataSummaryExportJob,
+  GeoJsonDataExportJob,
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,
@@ -46,6 +49,7 @@ const jobClasses = [
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
   TaxonomyImportJob,
+  VaidationReportGenerationJob,
 ]
 
 const jobClassesByType = ObjectUtils.toIndexedObj(jobClasses, 'type')

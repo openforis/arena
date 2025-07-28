@@ -8,6 +8,7 @@ import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
 import { CallIsNotEmptyEditor } from './callIsNotEmptyEditor'
 import { CallTaxonPropEditor } from './callTaxonPropEditor'
+import { CallTaxonVernacularNameEditor } from './callTaxonVernacularNameEditor'
 import { CallUserPropEditor } from './callUserPropEditor'
 
 const { functionNames } = Expression
@@ -54,6 +55,10 @@ export const functions = {
   [functionNames.taxonProp]: {
     label: 'taxonProp(...)',
     component: CallTaxonPropEditor,
+  },
+  [functionNames.taxonVernacularName]: {
+    label: 'taxonVernacularName(...)',
+    component: CallTaxonVernacularNameEditor,
   },
   [functionNames.recordCycle]: {
     callee: functionNames.recordCycle,

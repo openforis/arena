@@ -99,7 +99,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   }
 
   const listWithCounts = []
-  for await (const recordSummary of list) {
+  for (const recordSummary of list) {
     const recordUuid = Record.getUuid(recordSummary)
     const { count: filesCount, total: filesSize } = await FileRepository.fetchCountAndTotalFilesSize(
       { surveyId, recordUuid },
@@ -193,14 +193,21 @@ export const fetchRecordAndNodesByUuid = async (
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
-const fetchNodeRefData = async ({ surveyId, node, isCode }, client) => {
+const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
+  const surveyId = Survey.getId(survey)
   if (isCode) {
     const categoryItemUuid = Node.getCategoryItemUuid(node)
     const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: categoryItemUuid }, client)
+    if (!categoryItem) {
+      return null
+    }
     return { [NodeRefData.keys.categoryItem]: categoryItem }
   } else {
     const taxonUuid = Node.getTaxonUuid(node)
     const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, taxonUuid, false, client)
+    if (!taxon) {
+      return null
+    }
     const vernacularNameUuid = Node.getVernacularNameUuid(node)
     const vernacularName = vernacularNameUuid
       ? await TaxonomyRepository.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, false, client)
@@ -215,8 +222,7 @@ const fetchNodeRefData = async ({ surveyId, node, isCode }, client) => {
 }
 
 export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesTaxonomies = true }, client = db) => {
-  const surveyId = Survey.getId(survey)
-  for await (const node of nodes) {
+  for (const node of nodes) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const isCode = NodeDef.isCode(nodeDef)
     const isTaxon = NodeDef.isTaxon(nodeDef)
@@ -230,8 +236,10 @@ export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesT
         (isCode && Category.isBigCategory(category)) ||
         (isTaxon && Taxonomy.isBigTaxonomy(taxonomy))
       ) {
-        const refData = await fetchNodeRefData({ surveyId, node, isCode }, client)
-        node[NodeRefData.keys.refData] = refData
+        const refData = await fetchNodeRefData({ survey, node, isCode }, client)
+        if (refData) {
+          node[NodeRefData.keys.refData] = refData
+        }
       }
     }
   }

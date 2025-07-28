@@ -1,0 +1,152 @@
+@import 'leaflet/dist/leaflet.css';
+
+.panel-right {
+  &.map-panel > * {
+    padding-top: 0;
+    padding-bottom: 10px;
+  }
+}
+
+.map-wrapper {
+  height: 100%;
+
+  .location-edit-info,
+  .button-bar {
+    height: 2rem;
+    text-align: center;
+  }
+
+  .leaflet-container {
+    width: 100%;
+    height: 100%;
+
+    .leaflet-pane {
+      z-index: unset;
+
+      &.leaflet-tooltip-pane {
+        z-index: 100;
+      }
+      &.leaflet-marker-pane {
+        z-index: 400;
+      }
+
+      &.leaflet-popup-pane {
+        z-index: 600;
+      }
+    }
+
+    .leaflet-top.leaflet-right {
+      z-index: 5;
+    }
+
+    .leaflet-control-container {
+      // layers control
+      .leaflet-control-layers-toggle {
+        background-image: url('/img/map-layers-toggle.png');
+      }
+      .leaflet-top.leaflet-right {
+        z-index: 6;
+      }
+
+      .layer-selector-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        .layer-selector-name {
+          flex: 1;
+          max-width: 15rem;
+        }
+
+        .layer-selector-button-bar {
+          width: 2rem;
+
+          .layer-selector-earth-map-btn {
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            border: none;
+          }
+        }
+      }
+
+      .leaflet-ruler {
+        background-image: url('/img/ruler-icon-24x24.png');
+        position: absolute;
+        top: 100px;
+        right: 0;
+        height: 34px;
+        width: 34px;
+        z-index: 5;
+      }
+    }
+
+    .leaflet-popup-content {
+      width: 210px;
+
+      ul {
+        margin-block-start: 0;
+        padding-inline-start: 20px;
+      }
+    }
+    .leaflet-control-layers-base,
+    .leaflet-control-layers-overlays {
+      label {
+        padding: 0.3rem;
+      }
+    }
+
+    .leaflet-control-layers-overlays {
+      label span,
+      label span span {
+        display: flex;
+        column-gap: 5px;
+        vertical-align: middle;
+      }
+
+      label span span {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .leaflet-control-layers-selector {
+        margin-top: 0;
+        top: 0;
+      }
+
+      .layer-icon {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border-style: solid;
+        border-width: 2px;
+      }
+    }
+
+    .leaflet-control-attribution svg {
+      display: none !important;
+    }
+  }
+
+  &.editable {
+    .leaflet-container {
+      height: calc(100% - 4rem);
+    }
+  }
+
+  .leaflet-div-icon {
+    background: none !important;
+    border: none !important;
+  }
+
+  .cluster-marker {
+    color: #fff;
+    border-radius: 50%;
+    padding: 10px;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

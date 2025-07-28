@@ -56,7 +56,7 @@ export const fetchFilesStatistics = async ({ surveyId }) => {
 export const cleanupAllSurveysFilesProps = async () => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
   let count = 0
-  for await (const surveyId of surveyIds) {
+  for (const surveyId of surveyIds) {
     const cleanedFiles = await FileManager.cleanupSurveyFilesProps({ surveyId })
     count += cleanedFiles
   }

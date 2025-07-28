@@ -85,7 +85,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
       const url = `${serverUrl}/guest/resetPassword/${uuid}`
       const lang = User.getLang(user)
       const name = User.getName(user)
-      await Mailer.sendEmail({ to: email, msgKey: 'emails.userResetPassword', msgParams: { url, name }, lang })
+      await Mailer.sendEmail({ to: email, msgKey: 'emails:userResetPassword', msgParams: { url, name }, lang })
       return { uuid }
     })
   } catch (error) {
@@ -136,7 +136,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
 
     await Mailer.sendEmail({
       to: systemAdminEmails,
-      msgKey: 'emails.userAccessRequest',
+      msgKey: 'emails:userAccessRequest',
       msgParams: { ...props, country, email, serverUrl },
     })
     return { requestInserted }
@@ -264,15 +264,17 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
 
 export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
 
-export const fetchResetPasswordUrl = async ({ serverUrl, surveyId, userUuid }) => {
-  const survey = await SurveyManager.fetchSurveyById({ surveyId })
-  const surveyUuid = Survey.getUuid(survey)
-  const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-    surveyUuid,
-    userUuid,
-  })
-  if (!invitation) {
-    throw new SystemError('appErrors:userNotInvitedToSurvey')
+export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = null }) => {
+  if (surveyId) {
+    const survey = await SurveyManager.fetchSurveyById({ surveyId })
+    const surveyUuid = Survey.getUuid(survey)
+    const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
+      surveyUuid,
+      userUuid,
+    })
+    if (!invitation) {
+      throw new SystemError('appErrors:userNotInvitedToSurvey')
+    }
   }
   const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
@@ -400,14 +402,14 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
         surveyLabel: Survey.getDefaultLabel(surveyInfo),
       }
       const lang = User.getLang(user)
-      await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails.userDeleted', msgParams, lang })
+      await Mailer.sendEmail({ to: User.getEmail(userToDelete), msgKey: 'emails:userDeleted', msgParams, lang })
     }
   })
 
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
   Logger.info(`IDs of surveys to be deleted (if without any activity): ${surveyIds}`)
-  for await (const surveyId of surveyIds) {
+  for (const surveyId of surveyIds) {
     const activityLogsCount = await ActivityLogManager.count({ surveyId }, client)
     // delete survey only if it is brand new
     if (activityLogsCount < 5) {
@@ -423,7 +425,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
     const usersWithExpiredInvitationEmails = usersWithExpiredInvitation.map(User.getEmail)
     const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
     Logger.debug(`deleting users: ${usersWithExpiredInvitationEmails} ${usersWithExpiredInvitationUuids}`)
-    for await (const user of usersWithExpiredInvitation) {
+    for (const user of usersWithExpiredInvitation) {
       const userUuid = User.getUuid(user)
       const userEmail = User.getEmail(user)
       try {

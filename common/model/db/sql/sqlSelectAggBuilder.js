@@ -54,9 +54,9 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
     const columnDimension = new ColumnNodeDef(this._viewDataNodeDef, nodeDefDimension)
     columnDimension.names.forEach((columnName, columnIndex) => {
       const paramName = `dimension_field_${index}_${columnIndex}`
-      const selectField = `$/${paramName}:name/`
-      this.select(selectField)
-      this.groupBy(selectField)
+      const selectFields = [`$/${paramName}:name/`]
+      this.select(...selectFields)
+      this.groupBy(...selectFields)
       this.addParams({ [paramName]: columnName })
     })
     return this

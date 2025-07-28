@@ -32,7 +32,7 @@ const NodeDefBoolean = (props) => {
             key={value}
             checked={checked}
             disabled={edit || !canEditRecord || readOnly}
-            label={`surveyForm.nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`}
+            label={`surveyForm:nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`}
             onChange={() => updateNode(nodeDef, node, checked ? null : value)}
             size="small"
             value={value}

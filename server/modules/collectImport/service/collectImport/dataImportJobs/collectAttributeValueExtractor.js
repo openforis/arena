@@ -1,10 +1,13 @@
 import * as R from 'ramda'
 
+import { Objects } from '@openforis/arena-core'
+
 import * as NumberUtils from '@core/numberUtils'
 import * as DateUtils from '@core/dateUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 
 import * as Record from '@core/record/record'
@@ -14,7 +17,6 @@ import * as RecordFile from '@core/record/recordFile'
 import * as FileManager from '../../../../record/manager/fileManager'
 import * as CollectSurvey from '../model/collectSurvey'
 import * as CollectRecord from '../model/collectRecord'
-import { Objects } from '@openforis/arena-core'
 
 const { nodeDefType } = NodeDef
 
@@ -23,30 +25,62 @@ const extractTextValueAndMeta = (collectNode, collectNodeField = 'value') => {
   return value ? { value } : null
 }
 
-const extractCodeValueAndMeta = (survey, nodeDef, record, node) => (collectNode) => {
-  const code = CollectRecord.getTextValue('code')(collectNode)
+const findCategoryItemUuidAndCodeHierarchy = async ({
+  survey,
+  categoryItemProvider,
+  nodeDef,
+  code,
+  record,
+  parentNode,
+}) => {
+  const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy({
+    nodeDef,
+    code,
+    record,
+    parentNode,
+  })(survey)
+  if (itemUuid) {
+    return { itemUuid, hierarchyCode }
+  }
+  const codePaths = []
+  const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+  if (parentCodeAttribute) {
+    codePaths.push(...Node.getHierarchyCode(parentCodeAttribute))
+  }
+  codePaths.push(code)
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
+  return item
+    ? { itemUuid: item.uuid, hierarchyCode: CategoryItem.getCodesHierarchy(item) }
+    : { itemUuid: null, hierarchyCode: null }
+}
 
-  if (code) {
+const extractCodeValueAndMeta =
+  ({ survey, categoryItemProvider, nodeDef, record, node }) =>
+  async (collectNode) => {
+    const code = CollectRecord.getTextValue('code')(collectNode)
+    if (Objects.isEmpty(code)) {
+      return null
+    }
     const parentNode = Record.getParentNode(node)(record)
-    const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy({
+    const { itemUuid, hierarchyCode } = await findCategoryItemUuidAndCodeHierarchy({
+      survey,
+      categoryItemProvider,
       nodeDef,
       code,
       record,
       parentNode,
-    })(survey)
-
-    return itemUuid
-      ? {
-          value: Node.newNodeValueCode({ itemUuid }),
-          meta: {
-            [Node.metaKeys.hierarchyCode]: hierarchyCode,
-          },
-        }
-      : null
+    })
+    if (!itemUuid) {
+      return null
+    }
+    return {
+      value: Node.newNodeValueCode({ itemUuid }),
+      meta: {
+        [Node.metaKeys.hierarchyCode]: hierarchyCode,
+      },
+    }
   }
-
-  return null
-}
 
 const extractCoordinateValueAndMeta = ({ nodeDef, collectNode }) => {
   const { x, y, srs, accuracy, altitude } = CollectRecord.getTextValues(collectNode)
@@ -108,15 +142,27 @@ const extractFileValueAndMeta = (survey, node, collectSurveyFileZip, collectNode
   return null
 }
 
-const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
-  const {
-    code: taxonCode,
-    scientific_name: scientificName,
-    vernacular_name: vernacularName,
-  } = CollectRecord.getTextValues(collectNode)
+const findTaxonUuid = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
   const taxonUuid = Survey.getTaxonUuid(nodeDef, taxonCode)(survey)
+  if (taxonUuid) return taxonUuid
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxon = await taxonProvider.getTaxonByCode({ survey, taxonomyUuid, taxonCode })
+  return taxon ? Taxon.getUuid(taxon) : null
+}
 
-  if (taxonUuid) {
+const extractTaxonValueAndMeta =
+  ({ survey, taxonProvider, nodeDef }) =>
+  async (collectNode) => {
+    const {
+      code: taxonCode,
+      scientific_name: scientificName,
+      vernacular_name: vernacularName,
+    } = CollectRecord.getTextValues(collectNode)
+
+    const taxonUuid = await findTaxonUuid({ survey, taxonProvider, nodeDef, taxonCode })
+    if (!taxonUuid) {
+      return null
+    }
     const value = {
       [Node.valuePropsTaxon.taxonUuid]: taxonUuid,
     }
@@ -139,9 +185,6 @@ const extractTaxonValueAndMeta = (survey, nodeDef) => (collectNode) => {
     }
   }
 
-  return null
-}
-
 const extractTimeValueAndMeta = (collectNode) => {
   const { hour, minute } = CollectRecord.getTextValues(collectNode)
 
@@ -153,21 +196,24 @@ const extractTimeValueAndMeta = (collectNode) => {
 
 const valueAndMetaExtractorByType = {
   [nodeDefType.boolean]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
-  [nodeDefType.code]: ({ collectNode, survey, nodeDef, record, node }) =>
-    extractCodeValueAndMeta(survey, nodeDef, record, node)(collectNode),
+  [nodeDefType.code]: ({ collectNode, survey, categoryItemProvider, nodeDef, record, node }) =>
+    extractCodeValueAndMeta({ survey, categoryItemProvider, nodeDef, record, node })(collectNode),
   [nodeDefType.coordinate]: ({ collectNode, nodeDef }) => extractCoordinateValueAndMeta({ nodeDef, collectNode }),
   [nodeDefType.date]: ({ collectNode }) => extractDateValueAndMeta(collectNode),
   [nodeDefType.decimal]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.file]: ({ collectNode, survey, node, collectSurveyFileZip, collectNodeDef, tx }) =>
     extractFileValueAndMeta(survey, node, collectSurveyFileZip, collectNodeDef, tx)(collectNode),
   [nodeDefType.integer]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
-  [nodeDefType.taxon]: ({ collectNode, survey, nodeDef }) => extractTaxonValueAndMeta(survey, nodeDef)(collectNode),
+  [nodeDefType.taxon]: async ({ collectNode, survey, taxonProvider, nodeDef }) =>
+    extractTaxonValueAndMeta({ survey, taxonProvider, nodeDef })(collectNode),
   [nodeDefType.text]: ({ collectNode, collectNodeField }) => extractTextValueAndMeta(collectNode, collectNodeField),
   [nodeDefType.time]: ({ collectNode }) => extractTimeValueAndMeta(collectNode),
 }
 
 export const extractAttributeValueAndMeta = async ({
   survey,
+  categoryItemProvider,
+  taxonProvider,
   nodeDef,
   record,
   node, // Arena items
@@ -187,6 +233,8 @@ export const extractAttributeValueAndMeta = async ({
     collectNodeDef,
     collectNodeField,
     survey,
+    categoryItemProvider,
+    taxonProvider,
     nodeDef,
     record,
     node,

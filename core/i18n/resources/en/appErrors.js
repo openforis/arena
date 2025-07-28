@@ -10,7 +10,7 @@ export default {
     emptyHeaders: 'Empty headers found',
   },
   dataExport: {
-    excelMaxCellsLimitExceeded: 'Error exporting data. Try to export the data using CSV format.',
+    excelMaxCellsLimitExceeded: 'Error exporting data (too many items). Try to export data using CSV format.',
     noRecordsMatchingSearchCriteria: 'No records matching search criteria',
   },
   dataImport: {
@@ -18,6 +18,7 @@ export default {
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
   expression: {
+    identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',

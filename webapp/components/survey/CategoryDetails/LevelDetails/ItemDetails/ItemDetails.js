@@ -2,7 +2,6 @@ import './itemDetails.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
@@ -35,7 +34,7 @@ const ItemDetails = (props) => {
 
   const category = State.getCategory(state)
   const categoryUuid = Category.getUuid(category)
-  const itemExtraDefs = Category.getItemExtraDef(category)
+  const itemExtraDefsArray = Category.getItemExtraDefsArray(category)
   const validation = Category.getItemValidation(item)(category)
   const { published: disabled } = item
 
@@ -47,8 +46,8 @@ const ItemDetails = (props) => {
   const active = itemUuid === itemActiveUuid
   const leaf = active && State.isItemActiveLeaf({ levelIndex })(state)
   const extraPropsEditorVisible =
-    !R.isEmpty(itemExtraDefs) &&
-    (levelIsLast || !Category.isReportingData(category) || Object.entries(itemExtraDefs).length > 1)
+    itemExtraDefsArray.length > 0 &&
+    (levelIsLast || !Category.isReportingData(category) || itemExtraDefsArray.length > 1)
 
   const Actions = useActions({ setState })
 
@@ -133,7 +132,7 @@ const ItemDetails = (props) => {
           {extraPropsEditorVisible && (
             <ItemExtraPropsEditor
               item={item}
-              itemExtraDefs={itemExtraDefs}
+              itemExtraDefsArray={itemExtraDefsArray}
               readOnly={readOnly}
               updateProp={updateProp}
               validation={validation}

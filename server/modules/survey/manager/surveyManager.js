@@ -245,13 +245,13 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
   ])
 
   let survey = R.pipe(
-    Survey.assocNodeDefs({ nodeDefs }),
+    Survey.assocNodeDefsSimple({ nodeDefs }),
     Survey.assocCategories(categories),
     Survey.assocTaxonomies(ObjectUtils.toUuidIndexedObj(taxonomies))
   )(surveyDb)
 
   if (Objects.isEmpty(dependencies)) {
-    survey = Survey.buildAndAssocDependencyGraph(survey)
+    survey = await Survey.buildAndAssocDependencyGraph(survey)
   } else {
     survey = Survey.assocDependencyGraph(dependencies)(survey)
   }
@@ -272,8 +272,8 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     includeDeleted = false,
     includeAnalysis = true,
     backup = false,
-    includeBigCategories = true,
-    includeBigTaxonomies = true,
+    includeBigCategories = false,
+    includeBigTaxonomies = false,
   },
   client = db
 ) => {
@@ -394,7 +394,7 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     const surveyInfoPrev = Survey.getSurveyInfo(await fetchSurveyById({ surveyId, draft: true }, t))
     const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
 
-    for await (const [key, value] of Object.entries(props)) {
+    for (const [key, value] of Object.entries(props)) {
       const valuePrev = propsPrev[key]
 
       if (!R.equals(value, valuePrev)) {
@@ -478,7 +478,7 @@ export const deleteSurvey = async (surveyId, { deleteUserPrefs = true } = {}, cl
 export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) =>
   client.tx(async (t) => {
     const surveyIds = await SurveyRepository.fetchTemporarySurveyIds({ olderThan24Hours }, t)
-    for await (const surveyId of surveyIds) {
+    for (const surveyId of surveyIds) {
       await deleteSurvey(surveyId, { deleteUserPrefs: true }, t)
     }
     return surveyIds.length

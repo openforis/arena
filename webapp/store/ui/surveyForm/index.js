@@ -8,6 +8,8 @@ export {
   useDependentEnumeratedEntityDefs,
   useIsEditingNodeDefInFullScreen,
   useNodeDefLabelType,
+  useNodeKeyLabelValues,
+  useNodeKeysLabelValues,
   useNodeDefPage,
   useShowPageNavigation,
   usePagesUuidMap,

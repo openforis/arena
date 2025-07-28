@@ -83,9 +83,9 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
       return true
     }
 
-    for await (const cycle of cyclesPrev) {
+    for (const cycle of cyclesPrev) {
       let entityDefIndex = 0
-      for await (const entityDefNext of entityDefsNext) {
+      for (const entityDefNext of entityDefsNext) {
         const entityDefPrev = entityDefsPrev[entityDefIndex]
         const tableNext = new TableOlapData({
           survey: surveyNext,
@@ -112,12 +112,17 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
   }
 
   async execute() {
-    const { survey, surveyId, baseUnitDef, tx } = this
+    const { survey, surveyId, chain, baseUnitDef, tx } = this
 
     const cycles = Survey.getCycleKeys(survey)
 
     // drop existing tables
     await SurveyRdbManager.dropOlapDataTablesAndViews(surveyId, tx)
+
+    if (!chain || !baseUnitDef) {
+      // do not create tables
+      return
+    }
 
     // Get multiple entity definitions
     const entityDefs = Survey.getOlapDataTableEntityDefs(survey)

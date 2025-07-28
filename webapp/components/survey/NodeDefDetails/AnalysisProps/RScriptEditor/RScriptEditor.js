@@ -7,11 +7,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { useLang } from '@webapp/store/system'
-
 import { FormItem } from '@webapp/components/form/Input'
 import { ScriptEditor } from '@webapp/components/ScriptEditor'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import * as API from '@webapp/service/api'
 
 const RScriptEditor = (props) => {
@@ -20,7 +18,7 @@ const RScriptEditor = (props) => {
   const { state, Actions, nodeDef } = props
   const survey = useSurvey()
 
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
 
   const nodeDefItems = Survey.getNodeDefsArray(survey).map((_nodeDef) => {
     const parent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(_nodeDef))(survey)

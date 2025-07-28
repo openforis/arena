@@ -10,6 +10,9 @@ import * as Validation from '@core/validation/validation'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
 import { DataImportJobRecordProvider } from './recordProvider'
@@ -17,6 +20,9 @@ import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportFileReader } from './dataImportFileReader'
 
 const defaultErrorKey = 'error'
+
+const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 export default class FlatDataImportJob extends DataImportBaseJob {
   constructor(params, type = FlatDataImportJob.type) {
@@ -43,6 +49,16 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     await this.dataImportFileReader.init()
   }
 
+  async calculatTotalItems() {
+    const { filePath, fileFormat } = this.context
+
+    this.total = await FlatDataReader.calculateTotalRowsFromFile({ filePath, fileFormat })
+  }
+
+  shouldCalculatedTotalItems() {
+    return true
+  }
+
   async execute() {
     super.execute()
 
@@ -50,6 +66,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const { abortOnErrors, dryRun } = context
 
     this.validateParameters()
+
+    if (this.shouldCalculatedTotalItems()) {
+      await this.calculatTotalItems()
+    }
 
     await this.fetchRecordsSummary()
 
@@ -127,11 +147,12 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       stream,
       fileFormat,
       survey,
+      categoryItemProvider,
+      taxonProvider,
       cycle,
       nodeDefUuid,
       includeFiles,
       onRowItem: async (item) => this.onRowItem(item),
-      onTotalChange: (total) => (this.total = total),
     })
   }
 
@@ -164,6 +185,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     }
 
     this.incrementProcessedItems()
+    if (this.processed % 1000 === 0) {
+      this.logDebug(`${this.processed} items processed`)
+    }
 
     errors.forEach((error) => {
       this._addError(error.key || error.toString(), error.params)
@@ -185,7 +209,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         : nodeDef
       const entityDefUuid = NodeDef.getUuid(ancestorMultipleEntityDef)
 
-      // when importing files, do not do side effect on record: it's necessary to keep track of update/deleted file uuids (see updateFilesSummary function)
+      // when importing files, do not do side effect on record: it's necessary to keep track of updated/deleted file uuids (see updateFilesSummary function)
       const sideEffect = !includeFiles
 
       const updateResult = new RecordUpdateResult({ record: this.currentRecord })
@@ -199,6 +223,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         survey,
         entityDefUuid,
         valuesByDefUuid,
+        categoryItemProvider,
+        taxonProvider,
         insertMissingNodes,
         sideEffect,
       })(this.currentRecord)
@@ -221,6 +247,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         entity,
         valuesByDefUuid,
         sideEffect,
+        categoryItemProvider,
+        taxonProvider,
       })(this.currentRecord)
 
       updateResult.merge(updateResultUpdateAttributes)

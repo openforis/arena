@@ -29,7 +29,7 @@ export default class RecordCheckJob extends Job {
 
     this.total = R.length(recordsUuidAndCycle)
 
-    for await (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
+    for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
       const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
 
       const { requiresCheck } = surveyAndNodeDefs
@@ -171,7 +171,7 @@ export default class RecordCheckJob extends Job {
     // 4a. Persist nodes
     // this.logDebug('persisting nodes')
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
-    for await (const node of allUpdatedNodesArray) {
+    for (const node of allUpdatedNodesArray) {
       if (Node.isCreated(node)) {
         await this.nodesBatchInserter.addItem(node, tx)
       } else if (Node.isUpdated(node)) {
@@ -202,10 +202,10 @@ export default class RecordCheckJob extends Job {
   async _insertMissingSingleNodes({ survey, nodeDefAddedUuids, record, sideEffect = false }) {
     const nodesUpdated = {}
     let recordUpdated = { ...record }
-    for await (const nodeDefUuid of nodeDefAddedUuids) {
+    for (const nodeDefUuid of nodeDefAddedUuids) {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(recordUpdated)
-      for await (const parentNode of parentNodes) {
+      for (const parentNode of parentNodes) {
         const { record: recordUpdatedNodeInsert, nodes } = await _insertMissingSingleNode({
           survey,
           childDef: nodeDef,

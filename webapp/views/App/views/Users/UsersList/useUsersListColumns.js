@@ -10,6 +10,8 @@ import { ButtonIconEdit } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
+import { CopyPasswordResetLinkButton } from '../UsersListSurvey/Row/CopyResetPasswordLinkButton'
+
 export const useUsersListColumns = () => {
   const navigate = useNavigate()
   const i18n = useI18n()
@@ -47,13 +49,13 @@ export const useUsersListColumns = () => {
       },
       {
         key: 'is-system-admin',
-        header: 'authGroups.systemAdmin.label',
+        header: 'auth:authGroups.systemAdmin.label',
         width: '12rem',
         renderItem: ({ item }) => User.isSystemAdmin(item) && <span className="icon icon-checkmark" />,
       },
       {
         key: 'is-survey-manager',
-        header: 'authGroups.surveyManager.label',
+        header: 'auth:authGroups.surveyManager.label',
         width: '11rem',
         renderItem: ({ item }) => User.isSurveyManager(item) && <span className="icon icon-checkmark" />,
       },
@@ -72,13 +74,6 @@ export const useUsersListColumns = () => {
         sortable: true,
       },
       {
-        key: 'user-edit',
-        width: '40px',
-        renderItem: ({ item }) => (
-          <ButtonIconEdit disabled={!User.hasAccepted(item)} onClick={() => goToUserDetails(item)} />
-        ),
-      },
-      {
         key: User.keys.surveysCountDraft,
         header: 'usersView.surveysDraft',
         hidden: true,
@@ -91,6 +86,23 @@ export const useUsersListColumns = () => {
         hidden: true,
         renderItem: ({ item }) => User.getSurveysCountPublished(item),
         width: '12rem',
+      },
+      {
+        key: User.keys.resetPasswordUuid,
+        header: 'usersView.passwordResetLink',
+        hidden: true,
+        renderItem: ({ item }) =>
+          User.getResetPasswordUuid(item) ? (
+            <CopyPasswordResetLinkButton email={User.getEmail(item)} userUuid={User.getUuid(item)} />
+          ) : null,
+        width: '10rem',
+      },
+      {
+        key: 'user-edit',
+        width: '40px',
+        renderItem: ({ item }) => (
+          <ButtonIconEdit disabled={!User.hasAccepted(item)} onClick={() => goToUserDetails(item)} />
+        ),
       },
     ],
     [goToUserDetails, i18n]

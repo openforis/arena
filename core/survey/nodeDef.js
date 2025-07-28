@@ -77,14 +77,17 @@ export const propKeys = {
   // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
+
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
   vernacularNameLabels: 'vernacularNameLabels',
   visibleFields: 'visibleFields',
+  vernacularNameSelectionKept: 'vernacularNameSelectionKept',
 
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
   fileType: 'fileType',
+  geotagInformationShown: 'geotagInformationShown',
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
@@ -283,6 +286,7 @@ export const getMaxNumberDecimalDigits = (nodeDef) => {
 export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
+export const isGeotagInformationShown = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
@@ -291,6 +295,7 @@ export const getVisibleFields = (nodeDef) => {
   const visibleFieldsDefault = visibleFieldsDefaultByType[getType(nodeDef)]
   return getProp(propKeys.visibleFields, visibleFieldsDefault)(nodeDef)
 }
+export const isVernacularNameSelectionKept = ObjectUtils.isPropTrue(propKeys.vernacularNameSelectionKept)
 // text
 export const getTextInputType = getProp(propKeys.textInputType, textInputTypes.singleLine)
 export const getTextTransform = getProp(propKeys.textTransform, textTransformValues.none)
@@ -677,6 +682,26 @@ export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
 export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
   !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
+export const canHaveMobileProps = (cycle) => (nodeDef) =>
+  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
+  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
+
+  const defaultValues = getDefaultValues(nodeDef)
+  if (defaultValues.length === 0) return true
+
+  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
+  return (
+    defaultValues.length === autoIncrementalDefaultValues.length &&
+    autoIncrementalDefaultValues.every((defaultValue, index) =>
+      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
+    )
+  )
+}
+
+export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fileTypeValues.image
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
   // clear hidden in mobile if not applicable
@@ -702,23 +727,8 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   if (!canBeExcludedInClone(nodeDefUpdated) && isExcludedInClone(nodeDefUpdated)) {
     nodeDefUpdated = assocExcludedInClone(false)(nodeDefUpdated)
   }
+  if (!canShowGeotagInformation(nodeDefUpdated) && isGeotagInformationShown(nodeDefUpdated)) {
+    nodeDefUpdated = ObjectUtils.setProp(propKeys.geotagInformationShown, false)(nodeDefUpdated)
+  }
   return nodeDefUpdated
-}
-
-export const canHaveMobileProps = (cycle) => (nodeDef) =>
-  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
-
-export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
-  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
-
-  const defaultValues = getDefaultValues(nodeDef)
-  if (defaultValues.length === 0) return true
-
-  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
-  return (
-    defaultValues.length === autoIncrementalDefaultValues.length &&
-    autoIncrementalDefaultValues.every((defaultValue, index) =>
-      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
-    )
-  )
 }

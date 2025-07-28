@@ -170,7 +170,7 @@ const NodeDefTaxon = (props) => {
         }
         const fieldLabelKey =
           (field === vernacularName ? NodeDef.getVernacularNameLabel(lang)(nodeDef) : null) ||
-          `surveyForm.nodeDefTaxon.${field}`
+          `surveyForm:nodeDefTaxon.${field}`
         return (
           <FormItem key={field} label={fieldLabelKey}>
             {inputField}

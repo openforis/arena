@@ -129,10 +129,13 @@ const getVariablesFromAncestors = ({
 }
 
 const getThisVariable = ({ mode, variables, nodeDefCurrent }) => {
-  if (mode === Expression.modes.sql) return variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  if (mode === Expression.modes.sql) {
+    return variables.find((variable) => variable.uuid === nodeDefCurrent.uuid)
+  }
   return {
-    ...getJsVariables(nodeDefCurrent),
+    ...getJsVariables(nodeDefCurrent)[0],
     label: `this (${NodeDef.getName(nodeDefCurrent)})`,
+    nodeDefType: NodeDef.getType(nodeDefCurrent),
     value: Expression.thisVariable,
   }
 }
@@ -189,7 +192,7 @@ const _sortVariables = ({ nodeDefCurrent, variables }) => {
   })
 }
 
-export const getVariables = ({
+export const getVariables = async ({
   survey: surveyParam,
   cycle,
   nodeDefContext,
@@ -201,7 +204,7 @@ export const getVariables = ({
   excludeCurrentNodeDef = false,
   includeAnalysis = false,
 }) => {
-  const survey = Survey.buildAndAssocDependencyGraph(surveyParam)
+  const survey = await Survey.buildAndAssocDependencyGraph(surveyParam)
   const lang = Survey.getLanguage(langPreferred)(Survey.getSurveyInfo(survey))
 
   const variables = getVariablesFromAncestors({
@@ -249,4 +252,18 @@ export const getVariablesChildren = ({
   return groupByParent
     ? getVariablesGroupedByParentUuid({ variables, survey, nodeDefCurrent, includeThis: false })
     : variables
+}
+
+export const findVariableByName = ({ variables, name }) => {
+  const stack = [...variables]
+  while (stack.length) {
+    const variable = stack.pop()
+    if (variable.value === name) {
+      return variable
+    }
+    if (variable.options) {
+      stack.push(...variable.options)
+    }
+  }
+  return null
 }

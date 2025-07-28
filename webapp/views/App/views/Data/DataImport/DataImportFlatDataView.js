@@ -98,8 +98,8 @@ export const DataImportFlatDataView = () => {
       if (selectedNodeDef && !NodeDef.isRoot(selectedNodeDef)) {
         _options.push('deleteExistingEntities')
       }
-      return _options
     }
+    return _options
   }, [isSystemAdmin, selectedNodeDef])
 
   const fileAccept = useMemo(
@@ -238,8 +238,8 @@ export const DataImportFlatDataView = () => {
                   nodeDefLabelType={nodeDefLabelType}
                   nodeDefUuidActive={selectedNodeDefUuid}
                   includeMultipleAttributes
+                  isNodeDefIncluded={() => dataImportType !== importTypes.insertNewRecords}
                   onSelect={onNodeDefSelect}
-                  isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />
                 <NodeDefLabelSwitch
                   allowedLabelTypes={allowedLabelTypes}

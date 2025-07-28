@@ -127,11 +127,13 @@ class RecordsUpdateThread extends Thread {
       cycle,
       draft,
       advanced: true,
+      includeBigCategories: false,
+      includeBigTaxonomies: false,
     })
 
     // If in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
     const dependencyGraph = draft
-      ? Survey.buildDependencyGraph(surveyDb)
+      ? await Survey.buildDependencyGraph(surveyDb)
       : await SurveyManager.fetchDependencies(surveyId)
 
     const survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)

@@ -37,6 +37,7 @@ export const getAuthGroupExtraProp = (prop) => R.pipe(getAuthGroupExtraProps, R.
 export const getLastLoginTime = R.prop(keys.lastLoginTime)
 export const getSurveysCountDraft = R.prop(keys.surveysCountDraft)
 export const getSurveysCountPublished = R.prop(keys.surveysCountPublished)
+export const getResetPasswordUuid = R.prop(keys.resetPasswordUuid)
 
 // ====== UPDATE
 export const assocProp = R.assoc
@@ -100,11 +101,13 @@ export const {
   getPrefSurveyCycle,
   getPrefSurveyLang,
   getPrefSurveyCurrentCycle,
+  getPrefLanguage,
   assocPrefSurveyCurrent,
   assocPrefSurveyCycle,
   assocPrefSurveyLang,
   assocPrefSurveyCurrentAndCycle,
   deletePrefSurvey,
+  assocPrefLanguage,
 } = UserPrefs
 
 // PROPS

@@ -27,7 +27,7 @@ export default class FilesImportJob extends Job {
 
       this.total = filesSummaries.length
 
-      for await (const fileSummary of filesSummaries) {
+      for (const fileSummary of filesSummaries) {
         let file = { ...fileSummary }
 
         file = RecordFile.cleanupInvalidProps(file)
@@ -143,7 +143,7 @@ export default class FilesImportJob extends Job {
     if (Objects.isEmpty(filesToDeleteByUuid)) return
 
     const filesToDeleteArray = Object.values(filesToDeleteByUuid)
-    for await (const file of filesToDeleteArray) {
+    for (const file of filesToDeleteArray) {
       const fileUuid = RecordFile.getUuid(file)
       if (!updatedFilesByUuid[fileUuid]) {
         if (!dryRun) {

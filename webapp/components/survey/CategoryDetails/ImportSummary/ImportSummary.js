@@ -5,13 +5,14 @@ import PropTypes from 'prop-types'
 
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 
-import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { Button } from '@webapp/components/buttons'
+import { FormItem } from '@webapp/components/form/Input'
+import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
+
+import { State, useActions } from '../store'
 
 import TableHeader from './TableHeader'
 import TableRow from './TableRow'
-
-import { State, useActions } from '../store'
 
 const ImportSummary = (props) => {
   const { state, setState } = props
@@ -50,11 +51,14 @@ const ImportSummary = (props) => {
       </ModalBody>
       <ModalFooter>
         <Button
-          className="modal-footer__item"
+          className="modal-footer__item btn-import"
           onClick={() => Actions.importCategory({ state })}
           iconClassName="icon-upload2 icon-12px"
           label="common.import"
         />
+        <FormItem className="total-items" label="common.totalItems">
+          {CategoryImportSummary.getRowsCount(importSummary)}
+        </FormItem>
       </ModalFooter>
     </Modal>
   )

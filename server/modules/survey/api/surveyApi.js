@@ -181,8 +181,6 @@ export const init = (app) => {
           draft,
           advanced,
           includeAnalysis,
-          includeBigCategories: false,
-          includeBigTaxonomies: false,
           validate,
         }),
         UserService.updateUserPrefs(user),

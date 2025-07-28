@@ -66,10 +66,8 @@ const extractDateOrTime = ({ value, allowedFormats, formatTo, headers, errorKey 
   return DateUtils.format(dateObj, formatTo)
 }
 
-const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName }) => {
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-  if (!taxon || Objects.isEmpty(vernacularName)) return null
+const extractVernacularNameUuid = ({ taxon, vernacularName }) => {
+  if (Objects.isEmpty(vernacularName)) return null
 
   // match vernacular names with language specified (e.g. "Mahogany (eng)") or simple ones, like "Mahogany"
   const regExp = /^([^(]+)(\s\(([^)]+)\))?$/
@@ -83,6 +81,25 @@ const extractVernacularNameUuid = ({ survey, nodeDef, taxonCode, vernacularName 
   return TaxonVernacularName.getUuid(vernacularNameObj)
 }
 
+const findCategoryItemUuid = async ({ survey, categoryItemProvider, nodeDef, code }) => {
+  const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+  if (itemUuid) {
+    return itemUuid
+  }
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  const codePaths = [code] // only first level items are supported at this stage
+  const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
+  return item ? item.uuid : null
+}
+
+const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  return (
+    Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey) ??
+    (await taxonProvider.getTaxonByCode({ survey, taxonomyUuid, taxonCode }))
+  )
+}
+
 const valueConverterByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
@@ -91,17 +108,17 @@ const valueConverterByNodeDefType = {
     }
     return String(booleanTrueValues.includes(String(val).toLocaleLowerCase()))
   },
-  [NodeDef.nodeDefType.code]: ({ survey, nodeDef, value }) => {
+  [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
 
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     if (Category.isFlat(category) || !NodeDef.getParentCodeDefUuid(nodeDef)) {
-      const { itemUuid } = Survey.getCategoryItemUuidAndCodeHierarchy({ nodeDef, code })(survey)
+      const itemUuid = await findCategoryItemUuid({ survey, categoryItemProvider, nodeDef, code })
       if (!itemUuid) {
         const attributeName = NodeDef.getName(nodeDef)
         throw new SystemError('validationErrors.dataImport.invalidCode', { code, attributeName })
       }
-      return Node.newNodeValueCode({ itemUuid })
+      return Node.newNodeValueCode({ itemUuid, code })
     }
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
     return { [Node.valuePropsCode.code]: code }
@@ -133,14 +150,13 @@ const valueConverterByNodeDefType = {
     }
   },
   [NodeDef.nodeDefType.integer]: numericValueConverter,
-  [NodeDef.nodeDefType.taxon]: ({ survey, nodeDef, value, headers }) => {
-    const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  [NodeDef.nodeDefType.taxon]: async ({ survey, taxonProvider, nodeDef, value, headers }) => {
     const taxonCode = value[Node.valuePropsTaxon.code]
-    const taxon = Survey.getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
+    const taxon = await findTaxon({ survey, taxonProvider, nodeDef, taxonCode })
     if (!taxon) {
-      throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value, headers })
+      throw new SystemError('validationErrors.dataImport.invalidTaxonCode', { value: taxonCode, headers })
     }
-    const { uuid: taxonUuid } = taxon
+    const taxonUuid = Taxon.getUuid(taxon)
     const vernacularName = value[Node.valuePropsTaxon.vernacularName]
     const scientificName = value[Node.valuePropsTaxon.scientificName]
 
@@ -151,7 +167,7 @@ const valueConverterByNodeDefType = {
         [Node.valuePropsTaxon.vernacularName]: vernacularName,
       }
     }
-    const vernacularNameUuid = extractVernacularNameUuid({ vernacularName, nodeDef, taxonCode, survey })
+    const vernacularNameUuid = extractVernacularNameUuid({ taxon, vernacularName })
     const nodeValue = Node.newNodeValueTaxon({ taxonUuid })
     if (vernacularNameUuid) {
       nodeValue[Node.valuePropsTaxon.vernacularNameUuid] = vernacularNameUuid
@@ -206,6 +222,8 @@ const _validateHeaders =
  * @param {!string} [params.stream] - File stream to be read.
  * @param {!string} [params.fileFormat] - Format of the input file (csv or xlsx).
  * @param {!object} [params.survey] - The survey object.
+ * @param {!object} [params.categoryItemProvider] - The category item provider module.
+ * @param {!object} [params.taxonProvider] - The taxon provider module.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!string} [params.nodeDefUuid] - The UUID of the node definition where data will be imported.
  * @param {!Function} [params.onRowItem] - Function invoked when a row is read.
@@ -219,6 +237,8 @@ const createReaderFromStream = ({
   stream,
   fileFormat,
   survey,
+  categoryItemProvider,
+  taxonProvider,
   cycle,
   nodeDefUuid,
   onRowItem,
@@ -273,7 +293,8 @@ const createReaderFromStream = ({
 
       // prepare attribute values
       const errors = []
-      const valuesByDefUuid = Object.entries(valuesByDefUuidTemp).reduce((acc, [nodeDefUuid, valueTemp]) => {
+      const valuesByDefUuid = {}
+      for (const [nodeDefUuid, valueTemp] of Object.entries(valuesByDefUuidTemp)) {
         const headers = valueTemp._headers
         delete valueTemp._headers
         const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -281,14 +302,12 @@ const createReaderFromStream = ({
         try {
           const nodeValue = Objects.isEmpty(valueTemp)
             ? null
-            : valueConverter({ survey, nodeDef, value: valueTemp, headers })
-          acc[nodeDefUuid] = nodeValue
+            : await valueConverter({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers })
+          valuesByDefUuid[nodeDefUuid] = nodeValue
         } catch (error) {
           errors.push(error)
         }
-        return acc
-      }, {})
-
+      }
       await onRowItem({ row, valuesByDefUuid, errors })
     },
     onTotalChange,

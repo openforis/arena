@@ -100,14 +100,19 @@ const getCsvExportFields = ({
           expandCategoryItems,
         })
       } else {
-        return columnNodeDef.names
+        const { names, jsTypes } = columnNodeDef
+        return names.map((name, index) => {
+          const type = jsTypes[index]
+          return { name, type }
+        })
       }
     })
   )
   return fields
 }
 
-const getCsvExportFieldsAgg = ({ survey, query }) => {
+const getCsvExportFieldsAgg = ({ survey, query, options = {} }) => {
+  const { includeCategoryItemsLabels = false } = options
   const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
 
@@ -115,7 +120,8 @@ const getCsvExportFieldsAgg = ({ survey, query }) => {
   // dimensions
   Query.getDimensions(query).forEach((dimension) => {
     const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(viewDataNodeDef.survey)
-    fields.push(new ColumnNodeDef(viewDataNodeDef, nodeDefDimension).name)
+    const dimensionColumn = new ColumnNodeDef(viewDataNodeDef, nodeDefDimension)
+    fields.push(...(includeCategoryItemsLabels ? dimensionColumn.names : [dimensionColumn.name]))
   })
   // measures
   Object.entries(Query.getMeasures(query)).forEach(([nodeDefUuid, aggFunctions]) => {
@@ -158,6 +164,9 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
 const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNamesGenerator }) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  if (Objects.isEmpty(nodeDefCols)) {
+    return { transformer: null } // No file columns
+  }
   const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
   const transformer = (obj) => {
     nodeDefFileCols.forEach((nodeDef) => {
@@ -205,7 +214,9 @@ const getCsvObjectTransformer = ({
       query,
       uniqueFileNamesGenerator,
     })
-    transformers.push(transformer)
+    if (transformer) {
+      transformers.push(transformer)
+    }
   }
   return { transformers }
 }

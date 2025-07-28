@@ -2,7 +2,7 @@
 
 $borderColor: $greyBorder;
 
-.app__container .app-module>.category {
+.app__container .app-module > .category {
   overflow: hidden; // scrollbars managed in .category__levels
 }
 
@@ -17,16 +17,30 @@ $borderColor: $greyBorder;
 
 .category__header {
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  flex-direction: column;
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 
   .form-item {
-    width: 25rem;
+    width: 30rem;
+
+    .form-label {
+      white-space: nowrap;
+    }
+
+    .input-text {
+      width: 18rem;
+    }
   }
 
   .btn {
     display: flex;
     align-items: center;
+    height: 2rem;
   }
 
   .date-import-template-menu-btn {

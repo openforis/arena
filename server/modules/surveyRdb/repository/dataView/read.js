@@ -184,25 +184,7 @@ const _dbTransformCallbackSelect =
     return rowUpdated
   }
 
-/**
- * Runs a select query on a data view associated to an entity node definition.
- *
- * @param {!object} params - The query parameters.
- * @param {!Survey} [params.survey] - The survey.
- * @param {!string} [params.cycle] - The survey cycle.
- * @param {!Query} [params.query] - The Query to execute.
- * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
- * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
- * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
- * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
- * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
- */
-export const fetchViewData = async (params, client = db) => {
+const _createViewDataQuery = (params) => {
   const {
     survey,
     cycle,
@@ -288,15 +270,59 @@ export const fetchViewData = async (params, client = db) => {
     queryBuilder.addParams({ offset })
   }
 
+  const { selectFields } = queryBuilder
   const select = queryBuilder.build()
   const queryParams = queryBuilder.params
+
+  return { select, selectFields, queryParams }
+}
+
+/**
+ * Runs a select query on a data view associated to an entity node definition.
+ *
+ * @param {!object} params - The query parameters.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {!Query} [params.query] - The Query to execute.
+ * @param {boolean} [params.columnNodeDefs=false] - Whether to select only columnNodes.
+ * @param {boolean} [params.includeFileAttributeDefs=true] - Whether to include file attribute column node defs.
+ * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
+ * @param {number} [params.offset=null] - The query offset.
+ * @param {number} [params.limit=null] - The query limit.
+ * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client=db] - The database client.
+ *
+ * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
+ */
+export const fetchViewData = async (params, client = db) => {
+  const { survey, query, stream = false } = params
+
+  const editMode = Query.isModeRawEdit(query)
+  const nodeDef = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
+  const nodeDefCols = Survey.getNodeDefsByUuids(Query.getAttributeDefUuids(query))(survey)
+
+  const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
+
+  const { select, queryParams } = _createViewDataQuery(params)
 
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
 }
 
-export const runCount = async ({ surveyId, cycle, tableName, filter = null, recordOwnerUuid = null }, client = db) => {
+export const countViewData = async (params, client = db) => {
+  const { select, selectFields, queryParams } = _createViewDataQuery(params)
+  const query = dbUtils.formatQuery(select, queryParams)
+  const countQuery = `SELECT COUNT(*) AS count FROM (${query}) AS count_query`
+  const countResult = await client.one(countQuery)
+  return { selectFields, count: Number(countResult.count) }
+}
+
+export const countDataTableRows = async (
+  { surveyId, cycle, tableName, filter = null, recordOwnerUuid = null },
+  client = db
+) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
 
@@ -361,7 +387,7 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
     nodeDefsUnique
   )
 
-  return runCount({ surveyId, cycle: Record.getCycle(record), tableName, filter }, client)
+  return countDataTableRows({ surveyId, cycle: Record.getCycle(record), tableName, filter }, client)
 }
 
 export const isRecordUniqueByKeys = async ({ survey, record }, client = db) => {

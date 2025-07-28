@@ -6,7 +6,7 @@ import * as SurveyManager from '../manager/surveyManager'
 
 /**
  * Generates the survey dependency graph and stores it in the metadata of the survey.
- * (It requires the survey to be set in the context or it loads it with "published" props)
+ * (It requires the survey to be set in the context or it loads it with "published" props).
  */
 export default class SurveyDependencyGraphsGenerationJob extends Job {
   constructor(params) {
@@ -22,7 +22,7 @@ export default class SurveyDependencyGraphsGenerationJob extends Job {
         this.tx
       ))
 
-    const graph = Survey.buildDependencyGraph(survey)
+    const graph = await Survey.buildDependencyGraph(survey)
 
     await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, this.tx)
   }

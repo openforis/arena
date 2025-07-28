@@ -16,10 +16,16 @@ import * as DB from '../../../db'
 import { db } from '../../../db/db'
 import * as DbUtils from '../../../db/dbUtils'
 
-import * as Category from '../../../../core/survey/category'
-import * as CategoryLevel from '../../../../core/survey/categoryLevel'
-import * as CategoryItem from '../../../../core/survey/categoryItem'
+import { ArrayUtils } from '@core/arrayUtils'
+import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryExportRepository from './categoryExportRepository'
+
+const itemDBTransformCallback =
+  ({ draft = true } = {}) =>
+  (def) =>
+    DB.transformCallback(def, draft, true)
 
 // ============== CREATE
 
@@ -54,7 +60,7 @@ export const insertItem = async (surveyId, item, client = db) =>
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
-    (def) => dbTransformCallback(def, true, true)
+    itemDBTransformCallback()
   )
 
 export const insertItems = async ({ surveyId, items, backup = false }, client = db) => {
@@ -285,7 +291,7 @@ export const fetchItemsByLevelParentAndCode = async (
      ORDER BY i.id
     `,
     { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) },
-    (def) => DB.transformCallback(def, draft, true)
+    itemDBTransformCallback({ draft })
   )
 
   return draft ? items : R.filter((item) => item.published)(items)
@@ -303,7 +309,7 @@ export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = 
     [uuid],
     (def) => DB.transformCallback(def, draft, true, backup)
   )
-  return backup || draft || item.published ? item : null
+  return item && (backup || draft || item.published) ? item : null
 }
 
 export const countItemsBySurveyId = async ({ surveyId }, client = db) => {
@@ -378,32 +384,32 @@ export const fetchItemsByParentUuid = async (
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
-  const items = await client.map(select, { categoryUuid, search, limit }, (def) =>
-    dbTransformCallback(def, draft, true)
-  )
+  const items = await client.map(select, { categoryUuid, search, limit }, itemDBTransformCallback({ draft }))
   return draft ? items : R.filter((item) => item.published)(items)
 }
 
-export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) =>
-  client.one(
+export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return client.one(
     `SELECT COUNT(i.*) 
-     FROM ${getSurveyDBSchema(surveyId)}.category_item i
-       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+     FROM ${schema}.category_item i
+       JOIN ${schema}.category_level l 
          ON l.uuid = i.level_uuid
      WHERE l.category_uuid = $/categoryUuid/
        AND l.index = $/levelIndex/`,
     { categoryUuid, levelIndex },
     (row) => Number(row.count)
   )
+}
 
 export const fetchItemsByLevelIndex = async (
   { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
   client = db
 ) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
 
   // join category_item table to get ancestors codes
-  const ancestorLevelIndexes = levelIndex > 0 ? [...Array(levelIndex).keys()] : []
+  const ancestorLevelIndexes = levelIndex > 0 ? ArrayUtils.fromNumberOfElements(levelIndex) : []
   const codesSelectFields = ancestorLevelIndexes.map((ancestorLevelIdx) =>
     DbUtils.getPropColCombined(
       CategoryItem.keysProps.code,
@@ -433,7 +439,7 @@ export const fetchItemsByLevelIndex = async (
     ${limit ? `LIMIT $/limit/` : ''}
     ${A.isNull(offset) ? '' : 'OFFSET $/offset/'}`,
     { categoryUuid, levelIndex, limit, offset },
-    (item) => dbTransformCallback(item, draft, true)
+    itemDBTransformCallback({ draft })
   )
 }
 
@@ -528,6 +534,34 @@ export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories
 }
 
 export const { codeJointField, cumulativeAreaField, generateCategoryExportStream } = CategoryExportRepository
+
+export const fetchItemByCode = async ({ surveyId, categoryUuid, parentItemUuid, code, draft = false }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
+  return client.oneOrNone(
+    `SELECT i.* 
+     FROM ${schema}.category_item i
+       JOIN ${schema}.category_level l 
+         ON l.uuid = i.level_uuid
+     WHERE l.category_uuid = $/categoryUuid/
+       AND parent_uuid ${parentItemUuid ? '= $/parentItemUuid/' : ' IS NULL'}
+       AND ${codeCol} = $/code/`,
+    { categoryUuid, parentItemUuid, code: String(code) },
+    itemDBTransformCallback({ draft })
+  )
+}
+
+export const fetchItemByCodePaths = async ({ surveyId, categoryUuid, codePaths, draft = false }, client = db) => {
+  let currentItem = null
+  for (const code of codePaths) {
+    const parentItemUuid = currentItem ? CategoryItem.getUuid(currentItem) : null
+    currentItem = await fetchItemByCode({ surveyId, categoryUuid, parentItemUuid, code, draft }, client)
+    if (!currentItem) {
+      return null
+    }
+  }
+  return currentItem
+}
 
 // ============== UPDATE
 

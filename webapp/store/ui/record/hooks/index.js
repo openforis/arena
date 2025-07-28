@@ -45,7 +45,7 @@ const useNodesCount = ({ parentNodeUuid, nodeDefUuid, countType }) =>
       const record = RecordState.getRecord(state)
       if (!record) return undefined
       const parentNode = Records.getNodeByUuid(parentNodeUuid)(record)
-      return Nodes.getChildrenCount({ parentNode, nodeDef, countType })
+      return Nodes.getChildrenMinOrMaxCount({ parentNode, nodeDef, countType })
     }
     // count is constant value (backward compatibility)
     return Number(count)

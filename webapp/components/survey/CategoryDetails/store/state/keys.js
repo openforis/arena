@@ -1,4 +1,5 @@
 export const keys = {
+  dirty: 'dirty',
   category: 'category',
   editingItemExtraDefs: 'editingItemExtraDefs',
   fileFormat: 'fileFormat',

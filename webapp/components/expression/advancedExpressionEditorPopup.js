@@ -77,11 +77,11 @@ const AdvancedExpressionEditorPopup = (props) => {
   )
 
   const validateEditorValue = useCallback(
-    (value) => {
+    async (value) => {
       const newErrorMessage =
         value === ''
           ? null
-          : NodeDefExpressionValidator.validate({
+          : await NodeDefExpressionValidator.validate({
               survey,
               nodeDefCurrent,
               exprString: value,
@@ -97,9 +97,9 @@ const AdvancedExpressionEditorPopup = (props) => {
   )
 
   const onEditorChange = useCallback(
-    (value) => {
+    async (value) => {
       const valueTrimmed = value.trim()
-      const valid = validateEditorValue(valueTrimmed)
+      const valid = await validateEditorValue(valueTrimmed)
       if (valid && valueTrimmed !== query) {
         updateDraftQuery(valueTrimmed)
       }

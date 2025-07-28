@@ -10,9 +10,15 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+
 import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
+
+const categoryItemProvider = CategoryItemProviderDefault
+const taxonProvider = TaxonProviderDefault
 
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
@@ -47,7 +53,14 @@ export const validateNodesAndPersistValidation = async (
   tx
 ) => {
   // 1. validate node values
-  const nodesValueValidation = await RecordValidator.validateNodes({ user, survey, record, nodes })
+  const nodesValueValidation = await RecordValidator.validateNodes({
+    user,
+    survey,
+    categoryItemProvider,
+    taxonProvider,
+    record,
+    nodes,
+  })
   const nodesValueValidationsByUuid = Validation.getFieldValidations(nodesValueValidation)
   // 1.a. workaround: always define value field validation even when validation is valid to allow cleaning up errors later
   Object.entries(nodesValueValidationsByUuid).forEach(([nodeUuid, nodeValueValidation]) => {
@@ -110,7 +123,7 @@ export const validateRecordsUniquenessAndPersistValidation = async (
     },
     t
   )
-  for await (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
+  for (const [recordUuid, nodesValidation] of Object.entries(validationByRecord)) {
     const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, t)
     await mergeAndPersistValidation({ survey, record, nodesValidation }, t)
   }

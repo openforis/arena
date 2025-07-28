@@ -1,6 +1,7 @@
 import { create } from './create'
 
 import {
+  isDirty,
   getCategory,
   getFileFormat,
   getImportSummary,
@@ -16,6 +17,8 @@ import {
 } from './read'
 
 import {
+  assocDirty,
+  dissocDirty,
   assocCategory,
   assocCategoryProp,
   assocLevelProp,
@@ -40,6 +43,7 @@ import {
 export const State = {
   create,
 
+  isDirty,
   getCategory,
   getFileFormat,
   getImportSummary,
@@ -53,6 +57,8 @@ export const State = {
   isCleaned,
   isEditingItemExtraDefs,
 
+  assocDirty,
+  dissocDirty,
   assocCategory,
   assocCategoryProp,
   assocLevelProp,

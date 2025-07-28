@@ -6,9 +6,11 @@ import Queue from '@core/queue'
 
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '../node'
+import * as NodeRefData from '../nodeRefData'
 import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
@@ -47,6 +49,7 @@ export const visitAncestorsAndSelf =
 
 /**
  * Returns the list of ancestors from the given node to the root entity.
+ * @param node
  */
 export const getAncestorsAndSelf = (node) => (record) => {
   const ancestors = []
@@ -115,6 +118,10 @@ export const findDescendantOrSelf = (node, filterFn) => (record) => Records.find
 /**
  * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
  * the single entities, if any, down to the correct parent node.
+ * @param root0
+ * @param root0.survey
+ * @param root0.parentNode
+ * @param root0.nodeDefUuid
  */
 export const getNodeParentInDescendantSingleEntities =
   ({ survey, parentNode, nodeDefUuid }) =>
@@ -151,6 +158,7 @@ export const getNodeParentInDescendantSingleEntities =
 
 /**
  * Returns true if a node and all its ancestors are applicable.
+ * @param node
  */
 export const isNodeApplicable = (node) => (record) => {
   if (Node.isRoot(node)) {
@@ -174,6 +182,11 @@ export const isNodeApplicable = (node) => (record) => {
  *   nodeCtx, //context node
  *   nodeDef, //node definition
  * }.
+ * @param survey
+ * @param node
+ * @param dependencyType
+ * @param includeSelf
+ * @param filterFn
  */
 export const getDependentNodePointers =
   (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
@@ -185,6 +198,68 @@ export const getDependentCodeAttributes = (node) => (record) => Records.getDepen
 
 export const getParentCodeAttribute = (_survey, parentNode, nodeDef) => (record) =>
   Records.getParentCodeAttribute({ parentNode, nodeDef })(record)
+
+// Visits the ancestor code attributes in bottom-up order
+export const visitAncestorCodeAttributes =
+  ({ survey, parentNode, nodeDef, visitor }) =>
+  (record) => {
+    const visitedNodeUuids = new Set() // avoid cycles
+    let currentParentCodeAttribute = Records.getParentCodeAttribute({ parentNode, nodeDef })(record)
+    while (currentParentCodeAttribute && !visitedNodeUuids.has(Node.getUuid(currentParentCodeAttribute))) {
+      visitedNodeUuids.add(Node.getUuid(currentParentCodeAttribute))
+      visitor(currentParentCodeAttribute)
+      const parentCodeAttributeNodeDef = SurveyNodeDefs.getNodeDefByUuid(
+        Node.getNodeDefUuid(currentParentCodeAttribute)
+      )(survey)
+      const ancestorNode = Records.getParent(currentParentCodeAttribute)(record)
+      currentParentCodeAttribute = Records.getParentCodeAttribute({
+        parentNode: ancestorNode,
+        nodeDef: parentCodeAttributeNodeDef,
+      })(record)
+    }
+  }
+
+// Returns the ancestor code attributes, in top-down order
+export const getAncestorCodeAttributes =
+  ({ survey, parentNode, nodeDef }) =>
+  (record) => {
+    const result = []
+    visitAncestorCodeAttributes({
+      survey,
+      parentNode,
+      nodeDef,
+      visitor: (visitedCodeAttribute) => {
+        result.unshift(visitedCodeAttribute)
+      },
+    })(record)
+    return result
+  }
+
+const getNodeCategoryItemCode = (node) => {
+  const item = NodeRefData.getCategoryItem(node)
+  if (item) {
+    return CategoryItem.getCode(item)
+  }
+  const value = Node.getValue(node)
+  return NodeValues.getValueCode(value)
+}
+
+// Returns the ancestor code attribute codes, in top-down order
+export const getAncestorCodeAttributeCodes =
+  ({ survey, parentNode, nodeDef }) =>
+  (record) => {
+    const result = []
+    visitAncestorCodeAttributes({
+      survey,
+      parentNode,
+      nodeDef,
+      visitor: (visitedCodeAttribute) => {
+        const code = getNodeCategoryItemCode(visitedCodeAttribute)
+        result.unshift(code)
+      },
+    })(record)
+    return result
+  }
 
 // ====== Keys
 
@@ -224,6 +299,7 @@ export const findChildByKeyValues =
             nodeDef: keyDef,
             record,
             parentNode: sibling,
+            attribute: keyAttribute,
             value: keyAttributeValue,
             valueSearch: keyAttributeValueSearch,
           })

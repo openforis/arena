@@ -2,15 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import * as CategoryItem from '@core/survey/categoryItem'
-import * as Taxon from '@core/survey/taxon'
-
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
-import * as NodeRefData from '@core/record/nodeRefData'
-
 import { SurveyState } from '@webapp/store/survey'
-import { RecordState } from '@webapp/store/ui/record'
 import * as SurveyFormState from './state'
 
 /**
@@ -97,36 +89,4 @@ export const updateNodeDefLabelType = () => (dispatch, getState) => {
         ? NodeDef.NodeDefLabelTypes.name
         : NodeDef.NodeDefLabelTypes.label,
   })
-}
-
-// ==== utils
-
-const _getNodeValueString = ({ nodeDef, node, lang }) => {
-  if (NodeDef.isCode(nodeDef)) {
-    const categoryItem = NodeRefData.getCategoryItem(node)
-    return categoryItem ? CategoryItem.getLabel(lang)(categoryItem) : ''
-  }
-  if (NodeDef.isTaxon(nodeDef)) {
-    const taxon = NodeRefData.getTaxon(node)
-    return taxon ? Taxon.getCode(taxon) : ''
-  }
-  return Node.getValue(node, '')
-}
-
-export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (_dispatch, getState) => {
-  const state = getState()
-
-  const survey = SurveyState.getSurvey(state)
-  const lang = SurveyState.getSurveyPreferredLang(state)
-  const record = RecordState.getRecord(state)
-  const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
-
-  const getNodeDefKeyLabelValue = (nodeDefKey) => {
-    const label = NodeDef.getLabel(nodeDefKey, lang)
-    const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
-    const value = _getNodeValueString({ nodeDef: nodeDefKey, node: nodeKey, lang })
-    return `${label}: ${value}`
-  }
-
-  return nodeDefKeys.map(getNodeDefKeyLabelValue).join(', ')
 }

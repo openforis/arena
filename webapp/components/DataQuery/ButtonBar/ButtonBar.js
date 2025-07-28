@@ -10,7 +10,6 @@ import { Query } from '@common/model/query'
 import { Switch } from '@webapp/components'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
 import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import { ButtonMenuExport } from '@webapp/components/buttons/ButtonMenuExport'
 import { FormItem } from '@webapp/components/form/Input'
 import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
@@ -115,15 +114,7 @@ const ButtonBar = (props) => {
         <div>
           <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
           <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
-          {selectedMode === modes.aggregate ? (
-            <ButtonMenuExport
-              disabled={queryChangeDisabled}
-              label="common.export"
-              onClick={(options) => dispatch(DataExplorerActions.exportQueryData(options))}
-            />
-          ) : (
-            <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
-          )}
+          <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
           {State.isPanelExportShown(state) && <DataQueryExportModal onClose={Actions.togglePanelExport} />}
         </div>
       )}

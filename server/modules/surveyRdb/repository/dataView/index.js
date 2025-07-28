@@ -5,7 +5,8 @@ export {
   isRecordUniqueByUniqueNodes,
   fetchViewData,
   fetchRecordsCountByRootNodesValue,
-  runCount,
+  countDataTableRows,
+  countViewData,
 } from './read'
 
 export { countViewDataAgg, fetchViewDataAgg } from './readAgg'

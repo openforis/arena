@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -7,11 +7,10 @@ import * as Expression from '@core/expressionParser/expression'
 
 import * as ExpressionVariables from '@webapp/components/expression/expressionVariables'
 
-import { useLang } from '@webapp/store/system'
-import { useNodeDefByUuid, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useNodeDefByUuid, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-const getVariables = ({ survey, cycle, entityDef, attributeDefUuids, lang }) => {
-  const variables = ExpressionVariables.getVariables({
+const getVariables = async ({ survey, cycle, entityDef, attributeDefUuids, lang }) => {
+  const variables = await ExpressionVariables.getVariables({
     survey,
     cycle,
     nodeDefContext: entityDef,
@@ -39,15 +38,26 @@ export const useSortEditor = ({ query }) => {
     ? Query.getDimensions(query)
     : Query.getAttributeDefUuids(query)
 
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const entityDef = useNodeDefByUuid(entityDefUuid)
 
   const [draft, setDraft] = useState(false)
   const [sortDraft, setSortDraft] = useState(sort)
-  const [variables] = useState(getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }))
-  const variablesAvailable = variables.filter(({ value }) => !Sort.containsVariable(value)(sortDraft))
+  const [variables, setVariables] = useState([])
+  useEffect(() => {
+    if (survey && entityDef && attributeDefUuids && lang) {
+      getVariables({ survey, cycle, entityDef, attributeDefUuids, lang }).then((_variables) => [
+        setVariables(_variables),
+      ])
+    }
+  }, [survey, cycle, entityDef, attributeDefUuids, lang])
+
+  const variablesAvailable = useMemo(
+    () => variables.filter(({ value }) => !Sort.containsVariable(value)(sortDraft)),
+    [sortDraft, variables]
+  )
 
   return {
     draft,

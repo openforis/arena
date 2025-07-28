@@ -68,7 +68,7 @@ const afterNodeDefUpdate = async (
   const nodeDefDependents = Survey.getNodeDefsByUuids(nodeDefsDependentsUuids)(surveyUpdated)
   const nodeDefsDependentByUuid = ObjectUtils.toUuidIndexedObj(nodeDefDependents)
 
-  surveyUpdated = Survey.addNodeDefsDependencies({
+  surveyUpdated = await Survey.addNodeDefsDependencies({
     ...updatedNodeDefsNotDeleted,
     ...nodeDefsDependentByUuid,
   })(surveyUpdated)
@@ -124,7 +124,7 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
       t
     )
 
-    const surveyUpdated = Survey.assocNodeDefs({ nodeDefs })(survey)
+    const surveyUpdated = Survey.assocNodeDefsSimple({ nodeDefs })(survey)
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefs: nodeDefs[0], nodeDefsUpdated: nodeDefs }, t)
   })

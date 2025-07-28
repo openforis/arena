@@ -33,6 +33,9 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
   return variablesPrevCalculations
 }
 
+const isNodeDefIncludedAsDimension = (nodeDef) =>
+  NodeDef.isKey(nodeDef) || NodeDef.isBoolean(nodeDef) || NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
+
 const NodeDefsSelectorAggregate = (props) => {
   const {
     dimensions,
@@ -96,12 +99,7 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
-              filterFunction={(nodeDef) =>
-                NodeDef.isKey(nodeDef) ||
-                NodeDef.isCode(nodeDef) ||
-                NodeDef.isTaxon(nodeDef) ||
-                (olap && NodeDef.isBoolean(nodeDef))
-              }
+              filterFunction={isNodeDefIncludedAsDimension}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}

@@ -7,7 +7,7 @@ import { Numbers } from '@openforis/arena-core'
 
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { FormItem } from '../form/Input'
 import { ButtonIconInfo } from '../buttons'
@@ -31,7 +31,7 @@ export const GeoPolygonInfo = (props) => {
     [areaInUnit]
   )
 
-  const perimeterInMeters = useMemo(() => GeoJsonUtils.perimeter(geoJson), [geoJson])
+  const perimeterInMeters = useMemo(() => GeoJsonUtils.perimeterInKm(geoJson) * 1000, [geoJson])
 
   const perimeterInUnit = useCallback(
     (unit) => `${formatNumber(metersToUnit(unit)(perimeterInMeters))} ${abbreviationByUnit[unit]}`,

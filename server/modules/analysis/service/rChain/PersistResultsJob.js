@@ -1,14 +1,14 @@
-import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 
 import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/FlatDataImportJob'
 import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import FileZip from '@server/utils/file/fileZip'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 import { RecordsProvider } from './RecordsProvider'
 import { FileFormats } from '@core/fileFormats'
+
+const categoryItemProvider = CategoryItemProviderDefault
 
 export default class PersistResultsJob extends FlatDataImportJob {
   constructor(params) {
@@ -17,20 +17,18 @@ export default class PersistResultsJob extends FlatDataImportJob {
 
   async onStart() {
     const { surveyId, tx } = this
-    const { nodeDefUuid, filePath } = this.context
-    await super.onStart()
 
-    // survey is fetched after onStart is called
-    const { survey } = this.context
+    this.setContext({ includeFiles: true }) // use it to make onStart initialize the dataImportFileReader
+
+    await super.onStart()
 
     this.recordsProvider = new RecordsProvider({ surveyId, tx })
 
-    this.fileZip = new FileZip(filePath)
-    await this.fileZip.init()
+    this.stream = await this.dataImportFileReader.getCsvFileStream()
+  }
 
-    const entityDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const zipEntryName = `${NodeDef.getName(entityDef)}.csv`
-    this.stream = await this.fileZip.getEntryStream(zipEntryName)
+  shouldCalculatedTotalItems() {
+    return false
   }
 
   async fetchSurvey() {
@@ -57,6 +55,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
       stream,
       fileFormat: FileFormats.csv,
       survey,
+      categoryItemProvider,
       cycle,
       nodeDefUuid,
       onRowItem: async (item) => this.onRowItem(item),

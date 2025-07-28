@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -149,13 +150,10 @@ export const CallCategoryItemPropEditor = (props) => {
         <Dropdown
           disabled={!categoryUuid}
           items={Category.getItemExtraDefKeys(category)}
-          itemLabel={(item) => item}
-          itemValue={(item) => item}
+          itemLabel={A.identity}
+          itemValue={A.identity}
           onChange={(item) => {
-            setState((statePrev) => ({
-              ...statePrev,
-              extraPropKey: item,
-            }))
+            setState((statePrev) => ({ ...statePrev, extraPropKey: item }))
           }}
           selection={extraPropKey}
         />

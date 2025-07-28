@@ -1,0 +1,10 @@
+@use '~@webapp/style/vars' as *;
+
+.zoom-level {
+  background-color: rgba($color: $white, $alpha: 0.4);
+  position: absolute;
+  bottom: 80px;
+  right: 44px;
+  height: 2rem;
+  font-size: 20px;
+}
