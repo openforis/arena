@@ -37,7 +37,7 @@ const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
   nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
 
-const _replaceAttributeValueIfModifiedAfter = ({
+const _replaceAttributeValueIfEmptyOrModified = ({
   survey,
   attrDef,
   recordTarget,
@@ -48,14 +48,16 @@ const _replaceAttributeValueIfModifiedAfter = ({
 }) => {
   const sourceDateModified = Node.getDateModified(attrSource)
   const targetDateModified = Node.getDateModified(attrTarget)
-  if (Dates.isAfter(sourceDateModified, targetDateModified)) {
+  const valueSource = Node.getValue(attrSource)
+  const valueTarget = Node.getValue(attrTarget)
+  if (Objects.isEmpty(valueTarget) || Dates.isAfter(sourceDateModified, targetDateModified)) {
     const attributeUpdateResult = updateAttributeValue({
       survey,
       record: recordTarget,
       entity: entityTarget,
       attributeDef: attrDef,
       attribute: attrTarget,
-      value: Node.getValue(attrSource),
+      value: valueSource,
       dateModified: sourceDateModified,
       sideEffect,
     })
@@ -120,7 +122,7 @@ const _replaceUpdatedNodesInEntities = ({
     _getNodesArrayIntersection(childrenSource, childrenTarget).forEach((childSource) => {
       const childTargetToUpdate = _findNodeWithSameUuid(childSource, childrenTarget)
       if (NodeDef.isAttribute(childDef)) {
-        const attrUpdateResult = _replaceAttributeValueIfModifiedAfter({
+        const attrUpdateResult = _replaceAttributeValueIfEmptyOrModified({
           survey,
           attrDef: childDef,
           recordTarget: updateResult.record,
@@ -226,7 +228,7 @@ const _mergeSingleAttributeValues = ({
   ) {
     return null
   }
-  return _replaceAttributeValueIfModifiedAfter({
+  return _replaceAttributeValueIfEmptyOrModified({
     survey,
     attrDef: childDef,
     recordTarget: record,
