@@ -8,11 +8,11 @@ import * as Survey from '@core/survey/survey'
 
 import { db } from '@server/db/db'
 
-const _getSelectQuery = ({ survey, cycle, query }) => {
+const _getSelectQuery = ({ survey, cycle, query, baseUnitDef }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
 
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const table = new TableOlapData({ survey, cycle, entityDef })
+  const table = new TableOlapData({ survey, cycle, baseUnitDef, entityDef })
 
   const queryBuilder = new SqlSelectOlapBuilder({ table, entityDef })
 
@@ -38,8 +38,8 @@ const _getSelectQuery = ({ survey, cycle, query }) => {
   return { select: queryBuilder.build(), queryParams: queryBuilder.params }
 }
 
-export const selectFromOlapDataTable = async ({ survey, cycle, query, baseUnitDef, entityDef }, client = db) => {
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query })
+export const fetchOlapData = async ({ survey, cycle, query, baseUnitDef, entityDef }, client = db) => {
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, baseUnitDef })
 
   const table = new TableOlapData({ survey, cycle, baseUnitDef, entityDef })
   const dimensionUuids = Query.getDimensions(query)

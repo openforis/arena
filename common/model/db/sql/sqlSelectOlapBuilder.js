@@ -3,10 +3,9 @@ import * as Survey from '@core/survey/survey'
 import SqlSelectBuilder from './sqlSelectBuilder'
 
 class SqlSelectOlapBuilder extends SqlSelectBuilder {
-  constructor({ table, entityDef }) {
+  constructor({ table }) {
     super()
     this._table = table
-    this._entityDef = entityDef
   }
 
   _selectNodeDef({ nodeDefUuid }) {
@@ -23,8 +22,9 @@ class SqlSelectOlapBuilder extends SqlSelectBuilder {
     const { survey } = table
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const columnName = table.getColumnNameByAttributeDef(nodeDef)
-    this.select(`SUM(${columnName} AS ${columnName}`)
-    this.select(`SUM(${columnName})/${SqlSelectOlapBuilder.areaAlias} AS ${columnName}_ha`)
+    const columnNameToDecimal = `CAST(${columnName} AS DECIMAL)`
+    this.select(`SUM(${columnNameToDecimal}) AS ${columnName}`)
+    this.select(`SUM(${columnNameToDecimal})/${SqlSelectOlapBuilder.areaAlias} AS ${columnName}_ha`)
     this.groupBy(columnName)
     return this
   }

@@ -29,6 +29,18 @@ export default class TableOlapData extends TableSurveyRdb {
     this._baseUnitDef = baseUnitDef
   }
 
+  get survey() {
+    return this._survey
+  }
+
+  get entityDef() {
+    return this._entityDef
+  }
+
+  get baseUnitDef() {
+    return this._baseUnitDef
+  }
+
   getColumnNameByAttributeDef = (attributeDef) => {
     return NodeDef.getName(attributeDef)
   }

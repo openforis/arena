@@ -83,7 +83,7 @@ export const fetchViewData = async (params) => {
     })
   }
   if (Query.isModeOlap(parsedQuery)) {
-    // TODO
+    return SurveyRdbManager.fetchOlapData({ survey, cycle, query, limit, offset, outputStream, options })
   }
   return SurveyRdbManager.fetchViewData({
     survey,
