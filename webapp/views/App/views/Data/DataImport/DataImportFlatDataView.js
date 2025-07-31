@@ -64,6 +64,7 @@ export const DataImportFlatDataView = () => {
     cycle: canSelectCycle ? null : surveyCycle,
     dataImportType: null,
     file: null,
+    fileValidationSuccessful: false,
     jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedNodeDefUuid: null,
@@ -78,6 +79,7 @@ export const DataImportFlatDataView = () => {
     cycle,
     dataImportType,
     file,
+    fileValidationSuccessful,
     fileFormat,
     jobCompleted,
     nodeDefLabelType,
@@ -182,9 +184,15 @@ export const DataImportFlatDataView = () => {
   const onJobCompletedDialogClose = useCallback(() => {
     if (JobSerialized.isSucceeded(jobCompleted)) {
       setState((statePrev) => {
-        const stateNext = { ...statePrev, jobCompleted: null }
-        if (JobSerialized.isSucceeded(jobCompleted) && !JobSerialized.getResult(jobCompleted).dryRun) {
-          stateNext.file = null
+        const stateNext = { ...statePrev, jobCompleted: null, fileValidationSuccessful: false }
+        if (JobSerialized.isSucceeded(jobCompleted)) {
+          if (JobSerialized.getResult(jobCompleted).dryRun) {
+            // file validated successfully
+            stateNext.fileValidationSuccessful = true
+          } else {
+            // file imported successfully: reset selected file
+            stateNext.file = null
+          }
         }
         return stateNext
       })
@@ -310,7 +318,7 @@ export const DataImportFlatDataView = () => {
                 disabled={!file}
                 showConfirm
                 startFunction={API.startDataImportFromCsvJob}
-                startFunctionParams={importStartParams}
+                startFunctionParams={{ ...importStartParams, skipFileValidation: fileValidationSuccessful }}
                 strongConfirm={deleteExistingEntities}
                 strongConfirmRequiredText={deleteExistingEntities ? 'update' : null}
                 onUploadComplete={onImportJobStart}

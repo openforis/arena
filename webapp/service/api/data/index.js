@@ -64,6 +64,7 @@ export const startDataImportFromCsvJob = async ({
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
   includeFiles = false,
+  skipFileValidation = false,
   deleteExistingEntities = false,
   abortOnErrors = true,
   onUploadProgress,
@@ -78,6 +79,7 @@ export const startDataImportFromCsvJob = async ({
     insertMissingNodes,
     updateRecordsInAnalysis,
     includeFiles,
+    skipFileValidation,
     deleteExistingEntities,
     abortOnErrors,
   })

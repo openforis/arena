@@ -29,6 +29,7 @@ export const startFlatDataImportJob = ({
   insertMissingNodes = false,
   updateRecordsInAnalysis = false,
   includeFiles = false,
+  skipFileValidation = false,
   deleteExistingEntities = false,
   abortOnErrors = true,
 }) => {
@@ -44,6 +45,7 @@ export const startFlatDataImportJob = ({
     insertMissingNodes,
     updateRecordsInAnalysis,
     includeFiles,
+    skipFileValidation,
     deleteExistingEntities,
     abortOnErrors,
   }

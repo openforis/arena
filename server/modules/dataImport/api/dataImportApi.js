@@ -43,6 +43,7 @@ export const init = (app) => {
         insertMissingNodes,
         updateRecordsInAnalysis,
         includeFiles,
+        skipFileValidation,
         deleteExistingEntities,
         abortOnErrors,
       } = Request.getParams(req)
@@ -60,6 +61,7 @@ export const init = (app) => {
         insertMissingNodes,
         updateRecordsInAnalysis,
         includeFiles,
+        skipFileValidation,
         deleteExistingEntities,
         abortOnErrors,
       })
