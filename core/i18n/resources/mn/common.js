@@ -1796,8 +1796,10 @@ $t(common.cantUndoWarning)`,
     },
 
     userAccessRequest: {
+      countryRequired: 'Улс шаардлагатай',
       emailRequired: '$t(validationErrors.user.emailRequired)',
       firstNameRequired: 'Нэр шаардлагатай',
+      institutionRequired: 'Байгууллага шаардлагатай',
       lastNameRequired: 'Овог шаардлагатай',
       purposeRequired: 'Зорилго шаардлагатай',
       surveyNameRequired: 'Судалгааны нэр шаардлагатай',

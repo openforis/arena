@@ -1568,8 +1568,10 @@ export default {
         'Restablecimiento de contraseña no permitido: el usuario ha sido invitado a una encuesta pero la invitación aún no ha sido aceptada',
     },
     userAccessRequest: {
+      countryRequired: 'País es obligatorio',
       emailRequired: '$t(validationErrors.user.emailRequired)',
       firstNameRequired: 'El nombre es obligatorio',
+      institution: 'Institución es obligatorio',
       lastNameRequired: 'El apellido es obligatorio',
       purposeRequired: 'El propósito es obligatorio',
       surveyNameRequired: 'El nombre de la encuesta es obligatorio',

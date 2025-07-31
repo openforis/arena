@@ -1810,8 +1810,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     userAccessRequest: {
+      countryRequired: 'Country is required',
       emailRequired: '$t(validationErrors.user.emailRequired)',
       firstNameRequired: 'First name is required',
+      institutionRequired: 'Institution is required',
       lastNameRequired: 'Last name is required',
       purposeRequired: 'Purpose is required',
       surveyNameRequired: 'Survey name is required',
