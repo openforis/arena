@@ -125,6 +125,8 @@ export const canImportRecords = (user, surveyInfo) =>
 
 export const canAnalyzeRecords = _hasSurveyPermission(permissions.recordAnalyse)
 
+export const canLockChain = (user, surveyInfo) => User.isSystemAdmin(user)
+
 export const canUpdateRecordsStep = canAnalyzeRecords
 
 // ======

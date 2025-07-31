@@ -16,6 +16,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { Checkbox } from '@webapp/components/form'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { ChainRStudioFieldset } from './ChainRStudioFieldset'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 export const ChainBasicProps = (props) => {
   const { updateChain } = props
@@ -23,6 +24,7 @@ export const ChainBasicProps = (props) => {
   const i18n = useI18n()
   const chain = useChain()
   const survey = useSurvey()
+  const isSurveyAdmin = useUserIsSystemAdmin()
 
   const [existsAnotherChainWithSamplingDesign, setExistsAnotherChainWithSamplingDesign] = useState(false)
 
@@ -82,7 +84,13 @@ export const ChainBasicProps = (props) => {
           ))}
         </div>
       </FormItem>
-
+      <FormItem label="chainView.locked" className="sampling-design-form-item">
+        <Checkbox
+          checked={Chain.isLocked(chain)}
+          onChange={(value) => updateChain(Chain.assocLocked(value)(chain))}
+          disabled={samplingDesignDisabled}
+        />
+      </FormItem>
       <ChainRStudioFieldset updateChain={updateChain} />
     </div>
   )

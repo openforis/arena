@@ -33,6 +33,7 @@ export const keysProps = {
   statisticalAnalysis: 'statisticalAnalysis',
   resultsBackFromRStudio: 'resultsBackFromRStudio',
   includeEntitiesWithoutData: 'includeEntitiesWithoutData',
+  locked: 'locked',
 }
 
 export const statusExec = {
@@ -67,6 +68,7 @@ export const getSamplingDesign = ObjectUtils.getProp(keysProps.samplingDesign, {
 export const getStatisticalAnalysis = ObjectUtils.getProp(keysProps.statisticalAnalysis, {})
 export const isResultsBackFromRStudio = ObjectUtils.getProp(keysProps.resultsBackFromRStudio, true)
 export const isIncludeEntitiesWithoutData = ObjectUtils.getProp(keysProps.includeEntitiesWithoutData, false)
+export const isLocked = ObjectUtils.isPropTrue(keysProps.locked)
 
 // ====== UPDATE
 export const assocHasSamplingDesign = (value) => ObjectUtils.setProp(keysProps.hasSamplingDesign, value)
@@ -118,6 +120,8 @@ export const updateStatisticalAnalysis = (updateFn) => (chain) => {
   const getStatisticalAnalysisUpdated = updateFn(statisticalAnalysis)
   return assocStatisticalAnalysis(getStatisticalAnalysisUpdated)(chain)
 }
+
+export const assocLocked = (value) => ObjectUtils.setProp(keysProps.locked, value)
 
 // ====== CHECK
 export const isDraft = R.ifElse(R.pipe(getDateExecuted, R.isNil), R.always(true), (chain) =>

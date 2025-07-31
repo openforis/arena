@@ -30,6 +30,7 @@ export const useAuthCanEditSurveyOwner = () => Authorizer.canEditSurveyOwner(use
 
 // ====== Auth / Analysis
 export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(), useSurveyInfo())
+export const useAuthCanLockChain = () => Authorizer.canLockChain(useUser(), useSurveyInfo())
 
 // ====== Auth / Records
 export const useAuthCanCreateRecord = () => Authorizer.canCreateRecord(useUser(), useSurveyInfo())
