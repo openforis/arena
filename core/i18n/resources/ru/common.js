@@ -1807,8 +1807,10 @@ $t(common.cantUndoWarning)`,
     },
 
     userAccessRequest: {
+      countryRequired: 'Страна обязательна',
       emailRequired: '$t(validationErrors.user.emailRequired)',
       firstNameRequired: 'Имя обязательно',
+      institutionRequired: 'Учреждение обязательна',
       lastNameRequired: 'Фамилия обязательна',
       purposeRequired: 'Цель обязательна',
       surveyNameRequired: 'Название опроса обязательно',

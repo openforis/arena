@@ -160,9 +160,11 @@ export const ValidatorErrorKeys = {
   },
 
   userAccessRequest: {
+    countryRequired: 'validationErrors.userAccessRequest.countryRequired',
     emailRequired: 'validationErrors.userAccessRequest.emailRequired',
     emailInvalid: 'validationErrors.userAccessRequest.emailInvalid',
     firstNameRequired: 'validationErrors.userAccessRequest.firstNameRequired',
+    institutionRequired: 'validationErrors.userAccessRequest.institutionRequired',
     lastNameRequired: 'validationErrors.userAccessRequest.lastNameRequired',
     purposeRequired: 'validationErrors.userAccessRequest.purposeRequired',
     surveyNameRequired: 'validationErrors.userAccessRequest.surveyNameRequired',
