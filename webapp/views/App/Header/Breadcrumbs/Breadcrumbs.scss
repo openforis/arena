@@ -1,4 +1,8 @@
 .breadcrumbs {
   margin-left: 20px;
   display: flex;
+
+  .breadcrumbs-item {
+    white-space: nowrap;
+  }
 }

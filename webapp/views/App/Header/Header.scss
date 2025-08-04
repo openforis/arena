@@ -31,6 +31,10 @@
   font-weight: 600;
   color: color.adjust($black, $lightness: 20%);
 
+  .cycle-selector {
+    width: 8rem;
+  }
+
   .survey-preferred-language {
     margin-left: 10px;
     .dropdown {
