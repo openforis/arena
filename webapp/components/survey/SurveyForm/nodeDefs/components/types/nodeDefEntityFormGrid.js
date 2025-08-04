@@ -46,13 +46,13 @@ const NodeDefEntityFormGrid = (props) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeUuid = Node.getUuid(node)
 
-  // on node change, scroll inner container to top
+  // on node def or node change, scroll inner container to top
   useEffect(() => {
     const innerContainer = gridRef.current?.elementRef?.current
     if (innerContainer) {
       innerContainer.scrollTop = 0
     }
-  }, [nodeUuid])
+  }, [nodeDef, nodeUuid])
 
   const onChangeLayout = useCallback(
     (layout) => {
