@@ -1,4 +1,13 @@
 // ====== Chain
-export { create, countChains, fetchChains, fetchChain, updateChain, updateChainStatusExec, deleteChain } from './chain'
+export {
+  create,
+  countChains,
+  fetchChains,
+  fetchChain,
+  fetchChainWithSamplingDesign,
+  updateChain,
+  updateChainStatusExec,
+  deleteChain,
+} from './chain'
 
 export { cleanChains } from './chainsCleanManager'

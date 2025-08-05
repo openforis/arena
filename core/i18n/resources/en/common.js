@@ -749,6 +749,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       mode: {
         label: 'Mode:',
         aggregate: 'Aggregate',
+        olap: 'OLAP',
         raw: 'Raw',
         rawEdit: 'Raw edit',
       },
