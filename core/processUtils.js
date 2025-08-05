@@ -38,6 +38,7 @@ const ENV = {
   pgPort,
   pgDatabase,
   pgSsl: isTrue(process.env.PGSSL),
+  pgSslAllowUnauthorized: isTrue(process.env.PGSSL_ALLOW_UNAUTHORIZED),
   // EMAIL
   emailService: process.env.EMAIL_SERVICE || 'sendgrid',
   emailAuthUser: process.env.EMAIL_AUTH_USER,
