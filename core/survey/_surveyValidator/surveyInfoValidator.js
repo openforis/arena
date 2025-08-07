@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import * as Survey from '@core/survey/survey'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -8,12 +6,12 @@ import * as SurveyCyclesValidator from './surveyCyclesValidator'
 
 const { infoKeys } = Survey
 
-const validateSurveyNameUniqueness = (surveyInfos) => (_propName, survey) =>
-  !R.isEmpty(surveyInfos) && R.find((s) => s.id !== survey.id, surveyInfos)
-    ? { key: Validation.messageKeys.nameDuplicate }
-    : null
+const validateSurveyNameUniqueness =
+  (surveyInfos = null) =>
+  (_propName, survey) =>
+    surveyInfos?.find((s) => s.id !== survey.id) ? { key: Validation.messageKeys.nameDuplicate } : null
 
-const getSurveyNameValidations = ({ surveyInfos, required = true }) => [
+export const getSurveyNameValidations = ({ surveyInfos = null, required = true } = {}) => [
   ...(required ? [Validator.validateRequired(Validation.messageKeys.nameRequired)] : []),
   Validator.validateMinLength({ minLength: 6 }),
   Validator.validateName(Validation.messageKeys.nameInvalid),
