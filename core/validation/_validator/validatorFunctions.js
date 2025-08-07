@@ -39,7 +39,8 @@ export const validateName =
   (errorKey, errorParams = {}) =>
   (propName, item) => {
     const prop = getProp(propName)(item)
-    return prop && !validNameRegex.test(prop) ? { key: errorKey, params: errorParams } : null
+    const params = { ...errorParams, name: prop }
+    return prop && !validNameRegex.test(prop) ? { key: errorKey, params } : null
   }
 
 export const validateNumber =
