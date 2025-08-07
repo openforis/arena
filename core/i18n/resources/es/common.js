@@ -569,8 +569,15 @@ export default {
     },
     jobs: {
       ArenaDataImportJob: {
-        importCompleteSuccessfully:
-          'Importación de datos de Arena Mobile completada:\n        - {{processed}} registros procesados\n        - {{insertedRecords}} registros creados\n        - {{updatedRecords}} registros actualizados\n        - {{skippedRecords}} registros omitidos',
+        importCompleteSuccessfully: `Importación de datos de Arena Mobile completada:
+{{summary}}`,
+        importSummaryItem: {
+          processed: 'registros procesados',
+          insertedRecords: 'registros creados',
+          updatedRecords: 'registros actualizados',
+          skippedRecords: 'registros omitidos',
+          missingFiles: 'archivos faltantes',
+        },
       },
       CollectDataImportJob: {
         importCompleteSuccessfully:

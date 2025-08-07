@@ -644,10 +644,14 @@ $t(common.cantUndoWarning)`,
     jobs: {
       ArenaDataImportJob: {
         importCompleteSuccessfully: `Импорт данных Arena Mobile завершен:
-        - {{processed}} записей обработано
-        - {{insertedRecords}} записей создано
-        - {{updatedRecords}} записей обновлено
-        - {{skippedRecords}} записей пропущено`,
+{{summary}}`,
+        importSummaryItem: {
+          processed: 'обработано записей',
+          insertedRecords: 'создано записей',
+          updatedRecords: 'обновлено записей',
+          skippedRecords: 'пропущено записей',
+          missingFiles: 'отсутствующие файлы',
+        },
       },
       CollectDataImportJob: {
         importCompleteSuccessfully: `Импорт данных Collect завершен:
