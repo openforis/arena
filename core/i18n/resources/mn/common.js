@@ -642,11 +642,15 @@ $t(common.cantUndoWarning)`,
     },
     jobs: {
       ArenaDataImportJob: {
-        importCompleteSuccessfully: `Арена Мобайл өгөгдлийн импорт амжилттай боллоо:
-        - {{processed}} бичлэг боловсруулагдсан
-        - {{insertedRecords}} бичлэг үүсгэгдсэн
-        - {{updatedRecords}} бичлэг шинэчлэгдсэн
-        - {{skippedRecords}} бичлэг алгассан`,
+        importCompleteSuccessfully: `Arena Mobile өгөгдөл импортлолт амжилттай боллоо:
+{{summary}}`,
+        importSummaryItem: {
+          processed: 'боловсруулсан бичлэг',
+          insertedRecords: 'үүсгэсэн бичлэг',
+          updatedRecords: 'шинэчилсэн бичлэг',
+          skippedRecords: 'алгассан бичлэг',
+          missingFiles: 'байхгүй файлууд',
+        },
       },
       CollectDataImportJob: {
         importCompleteSuccessfully: `Цуглуулгын өгөгдлийн импорт амжилттай боллоо:

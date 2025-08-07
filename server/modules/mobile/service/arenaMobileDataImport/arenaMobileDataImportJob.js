@@ -67,9 +67,7 @@ export default class ArenaMobileDataImportJob extends Job {
   }
 
   generateResult() {
-    // get result from records import job
-    const recordsImportJob = this.innerJobs[0]
-    return recordsImportJob?.result || {}
+    return this.combineInnerJobsResults()
   }
 }
 

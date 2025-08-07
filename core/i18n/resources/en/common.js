@@ -645,10 +645,14 @@ $t(common.cantUndoWarning)`,
     jobs: {
       ArenaDataImportJob: {
         importCompleteSuccessfully: `Arena Mobile data import complete:
-        - {{processed}} records processed
-        - {{insertedRecords}} records created
-        - {{updatedRecords}} records updated
-        - {{skippedRecords}} records skipped`,
+{{summary}}`,
+        importSummaryItem: {
+          processed: 'records processed',
+          insertedRecords: 'records created',
+          updatedRecords: 'records updated',
+          skippedRecords: 'records skipped',
+          missingFiles: 'files missing',
+        },
       },
       CollectDataImportJob: {
         importCompleteSuccessfully: `Collect data import complete:
