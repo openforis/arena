@@ -23,6 +23,29 @@ const fileMaxSize = 1000 // 1 GB
 const acceptedFileExtensions = ['zip']
 const fileAccept = { '': acceptedFileExtensions.map((ext) => `.${ext}`) } // workaround to accept extensions containing special characters
 
+const missingFilesSummaryItemKey = 'missingFiles'
+const importSummaryItemKeys = [
+  'processed',
+  'insertedRecords',
+  'updatedRecords',
+  'skippedRecords',
+  missingFilesSummaryItemKey,
+]
+const importSummaryItemKeysExcludedIfEmpty = [missingFilesSummaryItemKey]
+
+const generateImportSummary = ({ result, i18n }) =>
+  Object.entries(result)
+    .filter(
+      ([key, value]) =>
+        importSummaryItemKeys.includes(key) && (!importSummaryItemKeysExcludedIfEmpty.includes(key) || value > 0)
+    )
+    .reduce((acc, [summaryItemKey, summaryItemValue]) => {
+      const summaryItemLabel = i18n.t(`dataImportView.jobs.ArenaDataImportJob.importSummaryItem.${summaryItemKey}`)
+      acc.push(`- ${summaryItemLabel}: ${summaryItemValue}`)
+      return acc
+    }, [])
+    .join('\n')
+
 export const DataImportArenaView = () => {
   const i18n = useI18n()
   const surveyId = useSurveyId()
@@ -34,26 +57,27 @@ export const DataImportArenaView = () => {
   const [conflictResolutionStrategy, setConflictResolutionStrategy] = useState(ConflictResolutionStrategy.skipExisting)
   const [file, setFile] = useState(null)
 
-  const onImportJobStart = useCallback(
-    (job) => {
+  const onImportJobComplete = useCallback(
+    async (jobCompleted) => {
+      setFile(null)
+      const result = JobSerialized.getResult(jobCompleted)
+      const summary = generateImportSummary({ result, i18n })
       dispatch(
-        JobActions.showJobMonitor({
-          job,
-          autoHide: true,
-          onComplete: async (jobCompleted) => {
-            setFile(null)
-            const { processed, insertedRecords, skippedRecords, updatedRecords } = JobSerialized.getResult(jobCompleted)
-            dispatch(
-              NotificationActions.notifyInfo({
-                key: 'dataImportView.jobs.ArenaDataImportJob.importCompleteSuccessfully',
-                params: { processed, insertedRecords, skippedRecords, updatedRecords },
-              })
-            )
-          },
+        NotificationActions.notifyInfo({
+          key: 'dataImportView.jobs.ArenaDataImportJob.importCompleteSuccessfully',
+          params: { summary },
+          autoHide: false,
         })
       )
     },
-    [dispatch]
+    [dispatch, i18n]
+  )
+
+  const onImportJobStart = useCallback(
+    (job) => {
+      dispatch(JobActions.showJobMonitor({ job, autoHide: true, onComplete: onImportJobComplete }))
+    },
+    [dispatch, onImportJobComplete]
   )
 
   const onFilesDrop = useCallback(async (files) => {
