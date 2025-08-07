@@ -50,10 +50,9 @@ export const getFileContentAsStream = async ({ surveyId, fileUuid }) => {
   return response.Body
 }
 
-export const deleteFiles = async ({ surveyId, fileUuids }) =>
-  Promise.all(
-    fileUuids.map(async (fileUuid) => {
-      const command = new DeleteObjectCommand(createCommandParams({ surveyId, fileUuid }))
-      return s3Client.send(command)
-    })
-  )
+export const deleteFiles = async ({ surveyId, fileUuids }) => {
+  for (const fileUuid of fileUuids) {
+    const command = new DeleteObjectCommand(createCommandParams({ surveyId, fileUuid }))
+    await s3Client.send(command)
+  }
+}
