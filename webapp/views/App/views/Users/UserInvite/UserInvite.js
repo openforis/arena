@@ -39,7 +39,8 @@ const UserInviteComponent = () => {
   const selectedGroup = groups.find((group) => group.uuid === selectedGroupUuid)
   const systemAdminGroup = groups.find(AuthGroup.isSystemAdminGroup)
   const selectedGroupName = AuthGroup.getName(selectedGroup)
-  const isSelectedGroupSystemAdmin = AuthGroup.isEqual(systemAdminGroup)(selectedGroup)
+  const isSelectedGroupSystemAdmin =
+    selectedGroup && systemAdminGroup && AuthGroup.isEqual(systemAdminGroup)(selectedGroup)
 
   const onGroupChange = useCallback(
     (group) => {
