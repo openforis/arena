@@ -4,11 +4,25 @@
   margin: auto;
   padding: 1rem;
   display: grid;
-  grid-row-gap: 0;
+  grid-row-gap: 0.4rem;
   width: 50rem;
+
+  .form-item-container,
+  .profile-picture,
+  .expansion-panel {
+    justify-self: center;
+  }
 
   .profile-picture {
     margin-bottom: 20px;
+  }
+
+  .dropdown-user-title {
+    width: 10rem;
+  }
+
+  .form-input-container {
+    max-width: 20rem;
     justify-self: center;
   }
 

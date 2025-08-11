@@ -5,7 +5,7 @@ import ValidationTooltip from '../validationTooltip'
 import { SimpleTextInput } from './SimpleTextInput'
 
 export const SimpleTextInputWithValidation = (props) => {
-  const { validation, className, ...rest } = props
+  const { validation = undefined, className = undefined, ...rest } = props
 
   return (
     <ValidationTooltip validation={validation} className={className}>

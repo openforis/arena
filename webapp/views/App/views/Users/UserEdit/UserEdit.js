@@ -92,14 +92,17 @@ const UserEdit = () => {
       )}
       {!canEdit && userUuid && <ProfilePicture userUuid={userUuid} />}
 
-      <DropdownUserTitle
-        disabled={!canEdit}
-        user={userToUpdate}
-        onChange={onUpdate}
-        validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
-      />
+      <FormItem label="user.title">
+        <DropdownUserTitle
+          disabled={!canEdit}
+          user={userToUpdate}
+          onChange={onUpdate}
+          validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
+        />
+      </FormItem>
 
       <SimpleTextInputWithValidation
+        className="form-input-container"
         disabled={!canEditName}
         maxLength={User.nameMaxLength}
         onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
@@ -110,6 +113,7 @@ const UserEdit = () => {
 
       {canViewEmail && (
         <SimpleTextInputWithValidation
+          className="form-input-container"
           disabled={!canEditEmail}
           onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
           label="common.email"
