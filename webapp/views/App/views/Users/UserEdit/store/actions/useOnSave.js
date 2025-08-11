@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router'
 import axios from 'axios'
 
 import * as A from '@core/arena'
@@ -13,9 +14,11 @@ import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webap
 import { useSurveyId } from '@webapp/store/survey'
 
 import { validateUserEdit } from './validate'
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserToUpdateOriginal = null }) => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { hideSurveyGroup } = useQuery()
   const user = useUser()
   const surveyId = useSurveyId()
@@ -46,15 +49,20 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
         formData.append('file', profilePicture)
       }
 
-      await axios.put(
-        editingSelf || hideSurveyGroup
-          ? `/api/user/${userToUpdateUuid}`
-          : `/api/survey/${surveyId}/user/${userToUpdateUuid}`,
-        formData
-      )
-
-      if (editingSelf) {
-        dispatch(UserActions.setUser({ user: userToUpdate }))
+      if (userToUpdateUuid) {
+        await axios.put(
+          editingSelf || hideSurveyGroup
+            ? `/api/user/${userToUpdateUuid}`
+            : `/api/survey/${surveyId}/user/${userToUpdateUuid}`,
+          formData
+        )
+        if (editingSelf) {
+          dispatch(UserActions.setUser({ user: userToUpdate }))
+        }
+      } else {
+        const userCreated = await axios.post('/api/user')
+        const userCreatedUuid = User.getUuid(userCreated)
+        navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}`)
       }
 
       dispatch(
@@ -67,7 +75,7 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
     } finally {
       dispatch(LoaderActions.hideLoader())
     }
-  }, [dispatch, hideSurveyGroup, setUserToUpdateOriginal, surveyId, user, userToUpdate])
+  }, [dispatch, hideSurveyGroup, navigate, setUserToUpdateOriginal, surveyId, user, userToUpdate])
 
   return useCallback(async () => {
     const userUpdatedValidated = await validateUserEdit(userToUpdate)

@@ -190,6 +190,10 @@ export const userModules = {
     key: 'user',
     path: 'user',
   },
+  userNew: {
+    key: 'userNew',
+    path: 'userNew',
+  },
   userPasswordChange: {
     key: 'userPasswordChange',
     path: 'userPasswordChange',
@@ -201,10 +205,6 @@ export const userModules = {
   usersAccessRequest: {
     key: 'usersAccessRequest',
     path: 'usersAccessRequest',
-  },
-  userNew: {
-    key: 'userNew',
-    path: 'userNew',
   },
 }
 
