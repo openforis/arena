@@ -23,6 +23,7 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
   const saveUser = useCallback(async () => {
     const editingSelf = User.isEqual(user)(userToUpdate)
     const userToUpdateUuid = User.getUuid(userToUpdate)
+    const profilePictureSet = User.isProfilePictureSet(userToUpdate)
     const profilePicture = User.getProfilePicture(userToUpdate)
 
     try {
@@ -36,11 +37,12 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
         [User.keys.props]: User.getProps(userToUpdate),
         [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
         [User.keys.authGroupExtraProps]: User.getAuthGroupExtraProps(userToUpdate),
+        [User.keys.profilePictureSet]: profilePictureSet,
       }
 
       formData.append('user', A.stringify(userData))
 
-      if (profilePicture) {
+      if (profilePictureSet) {
         formData.append('file', profilePicture)
       }
 

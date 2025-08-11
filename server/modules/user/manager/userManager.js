@@ -365,6 +365,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     const name = User.getName(userToUpdateModified)
     const email = User.getEmail(userToUpdateModified)
     const props = User.getProps(userToUpdateModified)
+    const profilePictureSet = User.isProfilePictureSet(userToUpdate)
 
     return UserRepository.updateUser(
       {
@@ -372,6 +373,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
         name,
         email,
         profilePicture,
+        profilePictureSet,
         props,
       },
       t

@@ -365,14 +365,17 @@ export const countSystemAdministrators = async (client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>
+export const updateUser = async (
+  { userUuid, name, email, profilePictureSet = false, profilePicture = null, props = {} },
+  client = db
+) =>
   client.one(
     `
     UPDATE "user" u
     SET
     name = $1,
     email = $2,
-    profile_picture = COALESCE($3, profile_picture),
+    ${profilePictureSet ? 'profile_picture = $3,' : ``}
     props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${columnsCommaSeparated}`,

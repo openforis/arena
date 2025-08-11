@@ -1,23 +1,29 @@
 import './ProfilePictureEditor.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import AvatarEditor from 'react-avatar-editor'
 
 import * as FileTypes from '@webapp/utils/fileTypes'
 
-import { useFileDrop } from '@webapp/components/hooks'
+import { useConfirm, useFileDrop } from '@webapp/components/hooks'
 import { useProfilePicture } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
 import UploadButton from '@webapp/components/form/uploadButton'
+import { ButtonIconDelete } from '@webapp/components'
 
 const profilePicturePlaceholderImg = '/img/user-profile-picture-default.png'
+
+const width = 200
+const height = 200
+const border = 10
 
 const ProfilePictureEditor = (props) => {
   const { userUuid, onPictureUpdate } = props
 
   const i18n = useI18n()
+  const confirm = useConfirm()
 
   const initialProfilePicture = useProfilePicture(userUuid)
 
@@ -43,7 +49,7 @@ const ProfilePictureEditor = (props) => {
     setRotate(0)
   }
 
-  const onImageChange = () => {
+  const onImageChange = useCallback(() => {
     if (settingInitialPicture) {
       setSettingInitialPicture(false)
     } else if (avatarRef.current) {
@@ -51,25 +57,49 @@ const ProfilePictureEditor = (props) => {
       const canvas = avatarRef.current.getImageScaledToCanvas()
       canvas.toBlob(onPictureUpdate, 'image/webp', 0.6)
     }
-  }
+  }, [onPictureUpdate, settingInitialPicture])
+
+  const onImageDeleted = useCallback(() => {
+    setImage(profilePicturePlaceholderImg)
+    onPictureUpdate(null)
+  }, [onPictureUpdate])
+
+  const onDeleteClick = useCallback(() => {
+    confirm({ key: 'userView.remove', onOk: onImageDeleted })
+  }, [confirm, onImageDeleted])
 
   return (
     <>
       <div ref={dropRef} className="profile-picture-editor">
         {image && (
-          <AvatarEditor
-            ref={avatarRef}
-            image={image}
-            onImageChange={onImageChange}
-            onImageReady={onImageChange}
-            onLoadSuccess={resetSliders}
-            width={220}
-            height={220}
-            border={10}
-            color={[255, 255, 255]}
-            scale={scale}
-            rotate={rotate}
-          />
+          <>
+            {image === profilePicturePlaceholderImg && (
+              <div
+                className="profile-picture-placeholder-wrapper"
+                style={{ height: height + border * 2, width: width + border * 2 }}
+              >
+                <img className="profile-picture-placeholder-img" height={height} width={width} src={image} />
+              </div>
+            )}
+            {image !== profilePicturePlaceholderImg && (
+              <div>
+                <AvatarEditor
+                  ref={avatarRef}
+                  image={image}
+                  onImageChange={onImageChange}
+                  onImageReady={onImageChange}
+                  onLoadSuccess={resetSliders}
+                  width={width}
+                  height={height}
+                  border={border}
+                  color={[255, 255, 255]}
+                  scale={scale}
+                  rotate={rotate}
+                />
+                <ButtonIconDelete onClick={onDeleteClick} />
+              </div>
+            )}
+          </>
         )}
 
         <div>
