@@ -27,6 +27,7 @@ import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
+import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -77,18 +78,17 @@ const UserEdit = () => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingSameUser = User.isEqual(user)(userToUpdate)
+  const surveyGroupsVisible = userUuid && !hideSurveyGroup
 
   return (
     <div className="user-edit" key={userUuid}>
-      {canEdit ? (
+      {canEdit && (
         <ProfilePictureEditor
           userUuid={userUuid}
           onPictureUpdate={(profilePicture) => onUpdateProfilePicture({ profilePicture })}
-          enabled
         />
-      ) : (
-        <ProfilePicture userUuid={userUuid} />
       )}
+      {!canEdit && userUuid && <ProfilePicture userUuid={userUuid} />}
 
       <FormItem label="user.title">
         <DropdownUserTitle
@@ -158,7 +158,7 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      {!hideSurveyGroup && (
+      {surveyGroupsVisible && (
         <>
           {!systemAdmin && (
             <FormItem label="usersView.roleInCurrentSurvey">
@@ -181,6 +181,8 @@ const UserEdit = () => {
           </ExpansionPanel>
         </>
       )}
+      {!userUuid && <UserPasswordSetForm />}
+
       {editingSameUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
         <fieldset className="map-api-keys">
@@ -215,11 +217,11 @@ const UserEdit = () => {
 
           {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
 
-          {!hideSurveyGroup && invitationExpired && (
+          {surveyGroupsVisible && invitationExpired && (
             <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
           )}
 
-          {!hideSurveyGroup && canRemove && (
+          {surveyGroupsVisible && canRemove && (
             <ButtonDelete
               onClick={onRemove}
               className="btn-s btn-danger btn-remove-user"

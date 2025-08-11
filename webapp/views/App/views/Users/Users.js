@@ -22,38 +22,43 @@ const Users = () => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
 
-  const modules = useMemo(
-    () => [
-      ...(Authorizer.canViewAllUsers(user)
-        ? [
-            {
-              component: UsersList,
-              path: userModules.users.path,
-            },
-          ]
-        : []),
-      ...(Objects.isNotEmpty(surveyInfo) &&
+  const modules = useMemo(() => {
+    const _modules = []
+    if (Authorizer.canViewAllUsers(user)) {
+      _modules.push({
+        component: UsersList,
+        path: userModules.users.path,
+      })
+    }
+    if (Authorizer.canCreateUsers(user)) {
+      _modules.push({
+        component: UserEdit,
+        path: userModules.userNew.path,
+      })
+    }
+    if (
+      Objects.isNotEmpty(surveyInfo) &&
       Authorizer.canViewSurveyUsers(user, surveyInfo) &&
       !Survey.isTemplate(surveyInfo)
-        ? [
-            {
-              component: UsersListSurvey,
-              path: userModules.usersSurvey.path,
-            },
-            {
-              component: UserInvite,
-              path: userModules.userInvite.path,
-            },
-          ]
-        : []),
-      ...(Authorizer.canViewUsersAccessRequests(user)
-        ? [
-            {
-              component: UsersAccessRequest,
-              path: userModules.usersAccessRequest.path,
-            },
-          ]
-        : []),
+    ) {
+      _modules.push(
+        {
+          component: UsersListSurvey,
+          path: userModules.usersSurvey.path,
+        },
+        {
+          component: UserInvite,
+          path: userModules.userInvite.path,
+        }
+      )
+    }
+    if (Authorizer.canViewUsersAccessRequests(user)) {
+      _modules.push({
+        component: UsersAccessRequest,
+        path: userModules.usersAccessRequest.path,
+      })
+    }
+    _modules.push(
       {
         component: UserEdit,
         path: `${userModules.user.path}/:userUuid`,
@@ -61,10 +66,11 @@ const Users = () => {
       {
         component: UserPasswordChange,
         path: userModules.userPasswordChange.path,
-      },
-    ],
-    [surveyInfo, user]
-  )
+      }
+    )
+    return _modules
+  }, [surveyInfo, user])
+
   return <ModuleSwitch moduleRoot={appModules.users} moduleDefault={userModules.usersSurvey} modules={modules} />
 }
 

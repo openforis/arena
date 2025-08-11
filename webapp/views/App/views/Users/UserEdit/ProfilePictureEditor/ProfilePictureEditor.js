@@ -13,14 +13,28 @@ import { useI18n } from '@webapp/store/system'
 import UploadButton from '@webapp/components/form/uploadButton'
 import { ButtonIconDelete } from '@webapp/components'
 
-const profilePicturePlaceholderImg = '/img/user-profile-picture-default.png'
+const profilePicturePlaceholderImgSrc = '/img/user-profile-picture-default.png'
 
 const width = 200
 const height = 200
 const border = 10
 
+const ProfilePicturePlaceholder = () => (
+  <div
+    className="profile-picture-placeholder-wrapper"
+    style={{ height: height + border * 2, width: width + border * 2 }}
+  >
+    <img
+      className="profile-picture-placeholder-img"
+      height={height}
+      width={width}
+      src={profilePicturePlaceholderImgSrc}
+    />
+  </div>
+)
+
 const ProfilePictureEditor = (props) => {
-  const { userUuid, onPictureUpdate } = props
+  const { onPictureUpdate, userUuid = null } = props
 
   const i18n = useI18n()
   const confirm = useConfirm()
@@ -31,7 +45,7 @@ const ProfilePictureEditor = (props) => {
   const avatarRef = useRef(null)
 
   const [settingInitialPicture, setSettingInitialPicture] = useState(false)
-  const [image, setImage] = useState(profilePicturePlaceholderImg)
+  const [image, setImage] = useState(profilePicturePlaceholderImgSrc)
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
 
@@ -60,7 +74,7 @@ const ProfilePictureEditor = (props) => {
   }, [onPictureUpdate, settingInitialPicture])
 
   const onImageDeleted = useCallback(() => {
-    setImage(profilePicturePlaceholderImg)
+    setImage(profilePicturePlaceholderImgSrc)
     onPictureUpdate(null)
   }, [onPictureUpdate])
 
@@ -73,15 +87,8 @@ const ProfilePictureEditor = (props) => {
       <div ref={dropRef} className="profile-picture-editor">
         {image && (
           <>
-            {image === profilePicturePlaceholderImg && (
-              <div
-                className="profile-picture-placeholder-wrapper"
-                style={{ height: height + border * 2, width: width + border * 2 }}
-              >
-                <img className="profile-picture-placeholder-img" height={height} width={width} src={image} />
-              </div>
-            )}
-            {image !== profilePicturePlaceholderImg && (
+            {image === profilePicturePlaceholderImgSrc && <ProfilePicturePlaceholder />}
+            {image !== profilePicturePlaceholderImgSrc && (
               <div>
                 <AvatarEditor
                   ref={avatarRef}
@@ -159,7 +166,7 @@ const ProfilePictureEditor = (props) => {
 }
 
 ProfilePictureEditor.propTypes = {
-  userUuid: PropTypes.string.isRequired,
+  userUuid: PropTypes.string,
   onPictureUpdate: PropTypes.func.isRequired,
 }
 

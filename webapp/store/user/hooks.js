@@ -78,7 +78,7 @@ export const useAuthCanViewUsersAccessRequests = () => Authorizer.canViewUsersAc
 export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser())
 
 // ====== Profile picture
-export const useProfilePicture = (userUuid, forceUpdateKey) => {
+export const useProfilePicture = (forceUpdateKey, userUuid = null) => {
   const [profilePicture, setProfilePicture] = useState(null)
 
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
@@ -89,7 +89,9 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
   )
 
   useEffect(() => {
-    fetchUserProfilePicture()
+    if (userUuid) {
+      fetchUserProfilePicture()
+    }
   }, [userUuid, forceUpdateKey])
 
   useEffect(() => {

@@ -202,6 +202,10 @@ export const userModules = {
     key: 'usersAccessRequest',
     path: 'usersAccessRequest',
   },
+  userNew: {
+    key: 'userNew',
+    path: 'userNew',
+  },
 }
 
 export const analysisModules = {
