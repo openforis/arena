@@ -30,4 +30,8 @@ export const keys = {
 
   // used in user update to determine if profile picture is to be persisted
   profilePictureSet: 'profilePictureSet',
+
+  // used when creating a new user
+  newPassword: 'newPassword',
+  confirmPassword: 'confirmPassword',
 }

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -28,6 +29,7 @@ import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/U
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
 import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
+import { SimpleTextInputWithValidation } from '@webapp/components/form/SimpleTextInputWithValidation'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -90,41 +92,37 @@ const UserEdit = () => {
       )}
       {!canEdit && userUuid && <ProfilePicture userUuid={userUuid} />}
 
-      <FormItem label="user.title">
-        <DropdownUserTitle
-          disabled={!canEdit}
-          user={userToUpdate}
-          onChange={onUpdate}
-          validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
-        />
-      </FormItem>
+      <DropdownUserTitle
+        disabled={!canEdit}
+        user={userToUpdate}
+        onChange={onUpdate}
+        validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
+      />
 
-      <FormItem label="common.name">
-        <Input
-          disabled={!canEditName}
-          placeholder={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
-          value={User.getName(userToUpdate)}
-          validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
-          maxLength={User.nameMaxLength}
-          onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
-        />
-      </FormItem>
+      <SimpleTextInputWithValidation
+        disabled={!canEditName}
+        maxLength={User.nameMaxLength}
+        onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
+        label={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
+        validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
+        value={User.getName(userToUpdate)}
+      />
 
       {canViewEmail && (
-        <FormItem label="common.email">
-          <Input
-            disabled={!canEditEmail}
-            placeholder="common.email"
-            value={User.getEmail(userToUpdate)}
-            validation={Validation.getFieldValidation(User.keys.email)(validation)}
-            onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
-          />
-        </FormItem>
+        <SimpleTextInputWithValidation
+          disabled={!canEditEmail}
+          onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
+          label="common.email"
+          validation={Validation.getFieldValidation(User.keys.email)(validation)}
+          value={User.getEmail(userToUpdate)}
+        />
       )}
 
-      <FormItem label="userView.preferredUILanguage.label">
-        <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
-      </FormItem>
+      {userUuid && (
+        <FormItem label="userView.preferredUILanguage.label">
+          <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
+        </FormItem>
+      )}
 
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
@@ -181,7 +179,13 @@ const UserEdit = () => {
           </ExpansionPanel>
         </>
       )}
-      {!userUuid && <UserPasswordSetForm />}
+      {!userUuid && (
+        <UserPasswordSetForm
+          form={userToUpdate}
+          onFieldChange={(fieldKey) => (value) => onUpdate(A.assoc(fieldKey)(value)(userToUpdate))}
+          validation={validation}
+        />
+      )}
 
       {editingSameUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
@@ -209,11 +213,13 @@ const UserEdit = () => {
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
-          <Button
-            iconClassName="icon-pencil"
-            label="userPasswordChangeView.changePassword"
-            onClick={() => navigate(appModuleUri(userModules.userPasswordChange))}
-          />
+          {userUuid && (
+            <Button
+              iconClassName="icon-pencil"
+              label="userPasswordChangeView.changePassword"
+              onClick={() => navigate(appModuleUri(userModules.userPasswordChange))}
+            />
+          )}
 
           {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
 

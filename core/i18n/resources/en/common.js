@@ -1018,6 +1018,8 @@ Copy the reset password link to the clipboard?`,
       label: 'Preferred UI language',
       auto: 'Automatically detected ({{detectedLanguage}})',
     },
+    newPassword: 'Password',
+    confirmPassword: 'Confirm password',
   },
 
   userPasswordChangeView: {
