@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+
+import { Objects } from '@openforis/arena-core'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
@@ -20,50 +22,50 @@ const Users = () => {
   const user = useUser()
   const surveyInfo = useSurveyInfo()
 
-  return (
-    <ModuleSwitch
-      moduleRoot={appModules.users}
-      moduleDefault={userModules.usersSurvey}
-      modules={[
-        ...(Authorizer.canViewAllUsers(user)
-          ? [
-              {
-                component: UsersList,
-                path: userModules.users.path,
-              },
-            ]
-          : []),
-        ...(Authorizer.canViewSurveyUsers(user, surveyInfo) && !Survey.isTemplate(surveyInfo)
-          ? [
-              {
-                component: UsersListSurvey,
-                path: userModules.usersSurvey.path,
-              },
-              {
-                component: UserInvite,
-                path: userModules.userInvite.path,
-              },
-            ]
-          : []),
-        ...(Authorizer.canViewUsersAccessRequests(user)
-          ? [
-              {
-                component: UsersAccessRequest,
-                path: userModules.usersAccessRequest.path,
-              },
-            ]
-          : []),
-        {
-          component: UserEdit,
-          path: `${userModules.user.path}/:userUuid`,
-        },
-        {
-          component: UserPasswordChange,
-          path: userModules.userPasswordChange.path,
-        },
-      ]}
-    />
+  const modules = useMemo(
+    () => [
+      ...(Authorizer.canViewAllUsers(user)
+        ? [
+            {
+              component: UsersList,
+              path: userModules.users.path,
+            },
+          ]
+        : []),
+      ...(Objects.isNotEmpty(surveyInfo) &&
+      Authorizer.canViewSurveyUsers(user, surveyInfo) &&
+      !Survey.isTemplate(surveyInfo)
+        ? [
+            {
+              component: UsersListSurvey,
+              path: userModules.usersSurvey.path,
+            },
+            {
+              component: UserInvite,
+              path: userModules.userInvite.path,
+            },
+          ]
+        : []),
+      ...(Authorizer.canViewUsersAccessRequests(user)
+        ? [
+            {
+              component: UsersAccessRequest,
+              path: userModules.usersAccessRequest.path,
+            },
+          ]
+        : []),
+      {
+        component: UserEdit,
+        path: `${userModules.user.path}/:userUuid`,
+      },
+      {
+        component: UserPasswordChange,
+        path: userModules.userPasswordChange.path,
+      },
+    ],
+    [surveyInfo, user]
   )
+  return <ModuleSwitch moduleRoot={appModules.users} moduleDefault={userModules.usersSurvey} modules={modules} />
 }
 
 export default Users
