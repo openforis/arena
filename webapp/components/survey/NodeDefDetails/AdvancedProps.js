@@ -39,7 +39,7 @@ const AdvancedProps = (props) => {
                 validation={Validation.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.readOnly, value })}
               />
-              {NodeDef.canBeHidden(nodeDef) && (
+              {(NodeDef.canBeHidden(nodeDef) || NodeDef.isHidden(nodeDef)) && ( // show "hidden" checkbox control in case the attribute was set as hidden but it's not read-only anymore
                 <FormItem label="nodeDefEdit.advancedProps.hidden">
                   <Checkbox
                     checked={NodeDef.isHidden(nodeDef)}
