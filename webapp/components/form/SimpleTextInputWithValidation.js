@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import { SimpleTextInput } from './SimpleTextInput'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -20,4 +21,11 @@ export const SimpleTextInputWithValidation = (props) => {
       <SimpleTextInput {...inputFieldParams} />
     </FormItemWithValidation>
   )
+}
+
+SimpleTextInputWithValidation.propTypes = {
+  ...SimpleTextInput.propTypes,
+  label: PropTypes.string,
+  labelParams: PropTypes.object,
+  validation: PropTypes.object,
 }
