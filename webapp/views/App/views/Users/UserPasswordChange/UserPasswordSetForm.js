@@ -24,12 +24,15 @@ export const UserPasswordSetForm = (props) => {
 
   return availableFormKeys.map((key) => (
     <div key={key}>
-      <FormItemWithValidation hideLabelInMobile label={`${labelKeyPrefix}.${key}`}>
+      <FormItemWithValidation
+        hideLabelInMobile
+        label={`${labelKeyPrefix}.${key}`}
+        validation={Validation.getFieldValidation(key)(validation)}
+      >
         <PasswordInput
           autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
           label={isMobile ? `${labelKeyPrefix}.${key}` : undefined}
           onChange={(value) => onFieldChange(key)(value)}
-          validation={Validation.getFieldValidation(key)(validation)}
           value={form[key]}
         />
       </FormItemWithValidation>

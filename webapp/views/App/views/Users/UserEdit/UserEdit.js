@@ -1,6 +1,6 @@
 import './UserEdit.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
@@ -29,7 +29,7 @@ import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/U
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
 import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
-import { SimpleTextInputWithValidation } from '@webapp/components/form/SimpleTextInputWithValidation'
+import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -69,6 +69,8 @@ const UserEdit = () => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const canUseMap = useAuthCanUseMap()
 
+  const onNameChange = useCallback((value) => onUpdate(User.assocName(value)(userToUpdate)), [onUpdate, userToUpdate])
+
   if (!ready) return null
 
   const validation = canEdit ? User.getValidation(userToUpdate) : null
@@ -99,16 +101,16 @@ const UserEdit = () => {
           validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
         />
       </FormItem>
-      <SimpleTextInputWithValidation
+      <FormItemWithInput
         disabled={!canEditName}
         maxLength={User.nameMaxLength}
-        onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
+        onChange={onNameChange}
         label={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
         validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
         value={User.getName(userToUpdate)}
       />
       {canViewEmail && (
-        <SimpleTextInputWithValidation
+        <FormItemWithInput
           disabled={!canEditEmail}
           onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
           label="common.email"

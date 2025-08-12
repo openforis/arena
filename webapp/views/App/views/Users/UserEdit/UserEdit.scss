@@ -13,6 +13,10 @@
     justify-self: center;
   }
 
+  .dropdown-user-title {
+    width: 10rem;
+  }
+
   .form-item {
     height: auto;
     width: 100%;
@@ -22,7 +26,8 @@
       width: 100%;
     }
 
-    .tooltip {
+    .tooltip,
+    .tooltip-error {
       &:hover {
         cursor: default;
       }
@@ -39,15 +44,16 @@
 
     &.mobile {
       display: flex;
+
+      .tooltip,
+      .tooltip-error {
+        width: 100%;
+      }
     }
   }
 
   .profile-picture {
     margin-bottom: 20px;
-  }
-
-  .dropdown-user-title {
-    width: 10rem;
   }
 
   .form-input-container {
