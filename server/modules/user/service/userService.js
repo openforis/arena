@@ -288,9 +288,19 @@ export const insertUser = async ({ user, userToInsert, profilePicture = null }) 
   const status = User.userStatus.ACCEPTED
   const passwordPlain = User.getPassword(userToInsert)
   const passwordEncrypted = passwordPlain ? UserPasswordUtils.encryptPassword(passwordPlain) : null
+  const name = User.getName(userToInsert)
   const title = User.getTitle(userToInsert)
   const group = await AuthManager.fetchGroupByName({ name: AuthGroup.groupNames.surveyManager })
-  return UserManager.insertUser({ user, email, password: passwordEncrypted, status, group, title, profilePicture })
+  return UserManager.insertUser({
+    user,
+    email,
+    password: passwordEncrypted,
+    status,
+    group,
+    name,
+    title,
+    profilePicture,
+  })
 }
 
 // ====== UPDATE

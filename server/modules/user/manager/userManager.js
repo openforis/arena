@@ -84,17 +84,11 @@ export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, cli
       await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t)
 
       if (AuthGroup.isSurveyGroup(groupToAdd)) {
-        await ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.userInvite,
-          {
-            [ActivityLog.keysContent.uuid]: userUuid,
-            [ActivityLog.keysContent.groupUuid]: groupUuid,
-          },
-          false,
-          t
-        )
+        const logContent = {
+          [ActivityLog.keysContent.uuid]: userUuid,
+          [ActivityLog.keysContent.groupUuid]: groupUuid,
+        }
+        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userInvite, logContent, false, t)
       }
     })
   })
@@ -106,6 +100,7 @@ export const insertUser = async (
     password,
     status,
     group,
+    name = null,
     title = null,
     profilePicture = null,
     surveyInfo = null,
@@ -121,6 +116,7 @@ export const insertUser = async (
         email,
         password,
         status,
+        name,
         title,
         profilePicture,
         surveyId,
@@ -128,9 +124,8 @@ export const insertUser = async (
       },
       t
     )
-    if (surveyInfo) {
-      await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
-    }
+    await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
+
     // accept user access request (if any)
     await UserAccessRequestRepository.updateUserAccessRequestStatus(
       { email, status: UserAccessRequest.status.ACCEPTED, userUuid: User.getUuid(user) },
