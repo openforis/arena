@@ -60,7 +60,7 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
           dispatch(UserActions.setUser({ user: userToUpdate }))
         }
       } else {
-        const userCreated = await axios.post('/api/user')
+        const userCreated = await axios.post('/api/user', formData)
         const userCreatedUuid = User.getUuid(userCreated)
         navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}`)
       }

@@ -318,7 +318,7 @@ export const init = (app) => {
 
   // ==== UPDATE
 
-  const _updateUser = async (req, res) => {
+  const _insertOrUpdateUser = async (req, res) => {
     const body = Request.getBody(req)
     const { user: userToUpdateString } = body
     const userToUpdate = A.parse(userToUpdateString)
@@ -330,16 +330,18 @@ export const init = (app) => {
 
     const { surveyId } = Request.getParams(req)
     const user = Request.getUser(req)
-    const fileReq = Request.getFile(req)
+    const profilePicture = Request.getFile(req)
 
-    const updatedUser = await UserService.updateUser(user, surveyId, userToUpdate, fileReq)
+    const updatedUser = User.getUuid(userToUpdate)
+      ? await UserService.updateUser(user, surveyId, userToUpdate, profilePicture)
+      : await UserService.insertUser({ user, userToInsert: userToUpdate, profilePicture })
 
     res.json(updatedUser)
   }
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _updateUser(req, res)
+      await _insertOrUpdateUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -347,7 +349,15 @@ export const init = (app) => {
 
   app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _updateUser(req, res)
+      await _insertOrUpdateUser(req, res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/user', AuthMiddleware.requireUserCreatePermission, async (req, res, next) => {
+    try {
+      await _insertOrUpdateUser(req, res)
     } catch (error) {
       next(error)
     }

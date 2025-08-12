@@ -91,7 +91,6 @@ const UserEdit = () => {
         />
       )}
       {!canEdit && userUuid && <ProfilePicture userUuid={userUuid} />}
-
       <FormItem label="user.title">
         <DropdownUserTitle
           disabled={!canEdit}
@@ -100,7 +99,6 @@ const UserEdit = () => {
           validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
         />
       </FormItem>
-
       <SimpleTextInputWithValidation
         className="form-input-container"
         disabled={!canEditName}
@@ -110,7 +108,6 @@ const UserEdit = () => {
         validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
         value={User.getName(userToUpdate)}
       />
-
       {canViewEmail && (
         <SimpleTextInputWithValidation
           className="form-input-container"
@@ -121,33 +118,36 @@ const UserEdit = () => {
           value={User.getEmail(userToUpdate)}
         />
       )}
-
       {userUuid && (
         <FormItem label="userView.preferredUILanguage.label">
           <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
         </FormItem>
       )}
-
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
-
-      {canEditSystemAdmin && (
-        <FormItem label="auth:authGroups.systemAdmin.label">
-          <Checkbox
-            checked={systemAdmin}
-            onChange={(value) => {
-              const userUpdated = value
-                ? User.assocAuthGroup(systemAdminGroup)(userToUpdate)
-                : User.dissocAuthGroup(systemAdminGroup)(userToUpdate)
-              onUpdate(userUpdated)
-            }}
-            disabled={!canEdit}
-          />
-        </FormItem>
-      )}
-      {canEditSurveyManager && !systemAdmin && (
-        <FormItem label="auth:authGroups.surveyManager.label">
-          <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
-        </FormItem>
+      {(canEditSystemAdmin || (canEditSurveyManager && !systemAdmin)) && (
+        <div className="form-input-container">
+          {canEditSystemAdmin && (
+            <Checkbox
+              checked={systemAdmin}
+              label="auth:authGroups.systemAdmin.label"
+              onChange={(value) => {
+                const userUpdated = value
+                  ? User.assocAuthGroup(systemAdminGroup)(userToUpdate)
+                  : User.dissocAuthGroup(systemAdminGroup)(userToUpdate)
+                onUpdate(userUpdated)
+              }}
+              disabled={!canEdit}
+            />
+          )}
+          {canEditSurveyManager && !systemAdmin && (
+            <Checkbox
+              checked={surveyManager}
+              label="auth:authGroups.surveyManager.label"
+              onChange={onSurveyManagerChange}
+              disabled={!canEdit}
+            />
+          )}
+        </div>
       )}
       {canEditMaxSurveys && !systemAdmin && surveyManager && (
         <FormItem label="userView.maxSurveysUserCanCreate">
@@ -190,7 +190,6 @@ const UserEdit = () => {
           validation={validation}
         />
       )}
-
       {editingSameUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
         <fieldset className="map-api-keys">
@@ -214,7 +213,6 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
-
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
           {userUuid && (

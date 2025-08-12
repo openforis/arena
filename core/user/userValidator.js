@@ -7,16 +7,24 @@ import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidat
 export const validateEmail = Validator.validateEmail({ errorKey: Validation.messageKeys.user.emailInvalid })
 
 export const validateUser = async (user) => {
+  const newUser = !User.getUuid(user)
   const propsValidations = {
     [`${User.keys.props}.${User.keysProps.title}`]: [
       Validator.validateRequired(Validation.messageKeys.user.titleRequired),
     ],
     [User.keys.name]: [Validator.validateRequired(Validation.messageKeys.nameRequired)],
     [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
-    [User.keys.authGroupsUuids]: [Validator.validateRequired(Validation.messageKeys.user.groupRequired)],
   }
-  if (!User.getUuid(user)) {
-    Object.assign(propsValidations, UserPasswordChangeFormValidator.getPropsValidations({ includeOldPassword: false }))
+  if (newUser) {
+    // new user
+    Object.assign(
+      propsValidations,
+      UserPasswordChangeFormValidator.getPropsValidations({ passwordRequired: false, includeOldPassword: false })
+    )
+  } else {
+    propsValidations[User.keys.authGroupsUuids] = [
+      Validator.validateRequired(Validation.messageKeys.user.groupRequired),
+    ]
   }
   return Validator.validate(user, propsValidations)
 }

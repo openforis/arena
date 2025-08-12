@@ -56,15 +56,15 @@ export const importNewUser = async (
   )
 
 export const insertUser = async (
-  { email, password, status, surveyId = null, surveyCycleKey = null, title = null },
+  { email, password, status, title = null, profilePicture = null, surveyId = null, surveyCycleKey = null },
   client = db
 ) =>
   client.one(
     `
-    INSERT INTO "user" AS u (email, password, status, prefs, props)
-    VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+    INSERT INTO "user" AS u (email, password, status, prefs, props, profile_picture)
+    VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6)
     RETURNING ${columnsCommaSeparated}`,
-    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), User.newProps({ title })],
+    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), User.newProps({ title }), profilePicture],
     camelize
   )
 

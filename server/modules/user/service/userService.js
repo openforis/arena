@@ -280,6 +280,18 @@ export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = nu
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
 }
 
+// ====== INSERT
+
+export const insertUser = async ({ user, userToInsert, profilePicture = null }) => {
+  const email = User.getEmail(userToInsert)
+  const status = User.userStatus.ACCEPTED
+  const passwordPlain = User.getPassword(userToInsert)
+  const passwordEncrypted = passwordPlain ? UserPasswordUtils.encryptPassword(passwordPlain) : null
+  const title = User.getTitle(userToInsert)
+  const group = await AuthManager.fetchGroupByName({ name: AuthGroup.groupNames.surveyManager })
+  return UserManager.insertUser({ user, email, password: passwordEncrypted, status, group, title, profilePicture })
+}
+
 // ====== UPDATE
 
 const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {

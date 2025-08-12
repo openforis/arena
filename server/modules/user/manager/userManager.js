@@ -100,35 +100,42 @@ export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, cli
   })
 
 export const insertUser = async (
-  { user, surveyInfo, surveyCycleKey, email, password, status, group, title },
+  {
+    user,
+    email,
+    password,
+    status,
+    group,
+    title = null,
+    profilePicture = null,
+    surveyInfo = null,
+    surveyCycleKey = null,
+  },
   client = db
 ) =>
   client.tx(async (t) => {
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+    const surveyId = surveyInfo ? Survey.getIdSurveyInfo(surveyInfo) : null
 
     const newUser = await UserRepository.insertUser(
       {
-        surveyId,
-        surveyCycleKey,
         email,
         password,
         status,
         title,
+        profilePicture,
+        surveyId,
+        surveyCycleKey,
       },
       t
     )
-    await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
-
+    if (surveyInfo) {
+      await addUserToGroup({ user, surveyInfo, group, userToAdd: newUser }, t)
+    }
     // accept user access request (if any)
     await UserAccessRequestRepository.updateUserAccessRequestStatus(
-      {
-        email,
-        status: UserAccessRequest.status.ACCEPTED,
-        userUuid: User.getUuid(user),
-      },
+      { email, status: UserAccessRequest.status.ACCEPTED, userUuid: User.getUuid(user) },
       t
     )
-
     return newUser
   })
 
