@@ -70,7 +70,7 @@ const insertUser = async ({ dispatch, navigate, formData, userToUpdate, setUserT
   } = await axios.post('/api/user', formData)
   if (userCreated) {
     const userCreatedUuid = User.getUuid(userCreated)
-    navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}?hideSurveyGroup=true`)
+    navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}?hideSurveyGroup=true`, { replace: true })
     return true
   } else {
     const userToUpdateValidated = Validation.assocValidation(validation)(userToUpdate)

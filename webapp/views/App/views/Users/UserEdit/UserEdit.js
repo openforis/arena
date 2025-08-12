@@ -100,7 +100,6 @@ const UserEdit = () => {
         />
       </FormItem>
       <SimpleTextInputWithValidation
-        className="form-input-container"
         disabled={!canEditName}
         maxLength={User.nameMaxLength}
         onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
@@ -110,7 +109,6 @@ const UserEdit = () => {
       />
       {canViewEmail && (
         <SimpleTextInputWithValidation
-          className="form-input-container"
           disabled={!canEditEmail}
           onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
           label="common.email"
@@ -152,6 +150,8 @@ const UserEdit = () => {
       {canEditMaxSurveys && !systemAdmin && surveyManager && (
         <FormItem label="userView.maxSurveysUserCanCreate">
           <Input
+            className="max-surveys-input"
+            maxLength={3}
             numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
             type="number"
             value={User.getMaxSurveys(userToUpdate)}

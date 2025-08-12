@@ -5,12 +5,41 @@
   padding: 1rem;
   display: grid;
   grid-row-gap: 0.4rem;
-  width: 50rem;
 
+  .form-item,
   .form-item-container,
   .profile-picture,
   .expansion-panel {
     justify-self: center;
+  }
+
+  .form-item {
+    height: auto;
+    width: 100%;
+    max-width: 40rem;
+
+    .input-text {
+      width: 100%;
+    }
+
+    .tooltip {
+      &:hover {
+        cursor: default;
+      }
+    }
+
+    .form-input-container {
+      justify-self: unset;
+      max-width: 30rem;
+    }
+
+    .form-label {
+      white-space: nowrap;
+    }
+
+    &.mobile {
+      display: flex;
+    }
   }
 
   .profile-picture {
@@ -24,17 +53,6 @@
   .form-input-container {
     max-width: 20rem;
     justify-self: center;
-  }
-
-  .form-item {
-    height: auto;
-    grid-template-columns: 0.3fr 0.7fr;
-
-    .tooltip {
-      &:hover {
-        cursor: default;
-      }
-    }
   }
 
   .map-api-keys {
@@ -64,6 +82,10 @@
     .btn-add {
       justify-self: center;
     }
+  }
+
+  .max-surveys-input {
+    width: 5rem;
   }
 }
 

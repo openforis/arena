@@ -1,21 +1,23 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
-import ValidationTooltip from '../validationTooltip'
 import { SimpleTextInput } from './SimpleTextInput'
+import { useIsMobile } from '../hooks/useIsMobile'
+import { FormItemWithValidation } from './FormItemWithValidation'
 
 export const SimpleTextInputWithValidation = (props) => {
-  const { validation = undefined, className = undefined, ...rest } = props
+  const { label, labelParams, validation, ...rest } = props
+
+  const isMobile = useIsMobile()
+
+  const inputFieldParams = { ...rest }
+
+  if (isMobile) {
+    Object.assign(inputFieldParams, { label, labelParams })
+  }
 
   return (
-    <ValidationTooltip validation={validation} className={className}>
-      <SimpleTextInput {...rest} />
-    </ValidationTooltip>
+    <FormItemWithValidation hideLabelInMobile label={label} labelParams={labelParams} validation={validation}>
+      <SimpleTextInput {...inputFieldParams} />
+    </FormItemWithValidation>
   )
-}
-
-SimpleTextInputWithValidation.propTypes = {
-  ...SimpleTextInput.propTypes,
-  className: PropTypes.string,
-  validation: PropTypes.object,
 }
