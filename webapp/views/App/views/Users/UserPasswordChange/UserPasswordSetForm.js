@@ -33,7 +33,7 @@ export const UserPasswordSetForm = (props) => {
           autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
           label={isMobile ? `${labelKeyPrefix}.${key}` : undefined}
           onChange={(value) => onFieldChange(key)(value)}
-          value={form[key]}
+          value={form[key] ?? ''}
         />
       </FormItemWithValidation>
       {key === UserPasswordChangeForm.keys.newPassword && (

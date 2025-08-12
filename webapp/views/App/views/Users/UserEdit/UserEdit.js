@@ -71,6 +71,11 @@ const UserEdit = () => {
 
   const onNameChange = useCallback((value) => onUpdate(User.assocName(value)(userToUpdate)), [onUpdate, userToUpdate])
 
+  const onPasswordFormFieldChange = useCallback(
+    (fieldKey) => (value) => onUpdate(A.assoc(fieldKey)(value)(userToUpdate)),
+    [onUpdate, userToUpdate]
+  )
+
   if (!ready) return null
 
   const validation = canEdit ? User.getValidation(userToUpdate) : null
@@ -186,11 +191,7 @@ const UserEdit = () => {
         </>
       )}
       {!userUuid && (
-        <UserPasswordSetForm
-          form={userToUpdate}
-          onFieldChange={(fieldKey) => (value) => onUpdate(A.assoc(fieldKey)(value)(userToUpdate))}
-          validation={validation}
-        />
+        <UserPasswordSetForm form={userToUpdate} onFieldChange={onPasswordFormFieldChange} validation={validation} />
       )}
       {editingSameUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
