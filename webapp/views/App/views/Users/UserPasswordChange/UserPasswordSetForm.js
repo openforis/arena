@@ -8,7 +8,7 @@ import { FormItemWithValidation } from '@webapp/components/form/FormItemWithVali
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 
 export const UserPasswordSetForm = (props) => {
-  const { form, onFieldChange, passwordChange = false, validation = null } = props
+  const { form, onFieldChange, passwordChange = false, validation = undefined } = props
 
   const isMobile = useIsMobile()
 
@@ -32,7 +32,7 @@ export const UserPasswordSetForm = (props) => {
         <PasswordInput
           autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
           label={isMobile ? `${labelKeyPrefix}.${key}` : undefined}
-          onChange={(value) => onFieldChange(key)(value)}
+          onChange={onFieldChange(key)}
           value={form[key] ?? ''}
         />
       </FormItemWithValidation>
