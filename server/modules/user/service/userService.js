@@ -44,9 +44,9 @@ const Logger = Log.getLogger('UserService')
 export const insertSystemAdminUserIfNotExisting = async (client = db) =>
   client.tx(async (t) => {
     Logger.debug('checking if admin users exist...')
-    const aminsCount = await UserManager.countSystemAdministrators(t)
-    if (aminsCount > 0) {
-      Logger.info(`${aminsCount} admin users found; skipping admin user insert`)
+    const adminsCount = await UserManager.countSystemAdministrators(t)
+    if (adminsCount > 0) {
+      Logger.info(`${adminsCount} admin users found; skipping admin user insert`)
       return null
     }
     const throwError = (details) => {
@@ -250,6 +250,7 @@ export const {
   exportUserAccessRequestsIntoStream,
   fetchUsers,
   fetchUserByUuid,
+  fetchUserByEmail,
   fetchUserByUuidWithPassword,
   fetchUsersBySurveyId,
   fetchUserProfilePicture,

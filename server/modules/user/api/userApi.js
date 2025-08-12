@@ -322,21 +322,23 @@ export const init = (app) => {
     const body = Request.getBody(req)
     const { user: userToUpdateString } = body
     const userToUpdate = A.parse(userToUpdateString)
-    const validation = await UserValidator.validateUser(userToUpdate)
+    const newUser = !User.getUuid(userToUpdate)
+    const userWithSameEmail = newUser ? await UserService.fetchUserByEmail(User.getEmail(userToUpdate)) : null
+    const validation = await UserValidator.validateUser(userToUpdate, userWithSameEmail)
 
-    if (!Validation.isValid(validation)) {
-      throw new SystemError('appErrors:userInvalid')
+    if (Validation.isValid(validation)) {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const profilePicture = Request.getFile(req)
+
+      const updatedUser = newUser
+        ? await UserService.insertUser({ user, userToInsert: userToUpdate, profilePicture })
+        : await UserService.updateUser(user, surveyId, userToUpdate, profilePicture)
+
+      res.json({ user: updatedUser })
+    } else {
+      res.json({ validation })
     }
-
-    const { surveyId } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const profilePicture = Request.getFile(req)
-
-    const updatedUser = User.getUuid(userToUpdate)
-      ? await UserService.updateUser(user, surveyId, userToUpdate, profilePicture)
-      : await UserService.insertUser({ user, userToInsert: userToUpdate, profilePicture })
-
-    res.json(updatedUser)
   }
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {

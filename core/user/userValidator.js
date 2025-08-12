@@ -2,18 +2,25 @@ import * as User from '@core/user/user'
 import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+
 import { UserPasswordChangeFormValidator } from './userPasswordChangeFormValidator'
 
 export const validateEmail = Validator.validateEmail({ errorKey: Validation.messageKeys.user.emailInvalid })
 
-export const validateUser = async (user) => {
+export const validateUser = async (user, userWithSameEmail = null) => {
   const newUser = !User.getUuid(user)
   const propsValidations = {
     [`${User.keys.props}.${User.keysProps.title}`]: [
       Validator.validateRequired(Validation.messageKeys.user.titleRequired),
     ],
     [User.keys.name]: [Validator.validateRequired(Validation.messageKeys.nameRequired)],
-    [User.keys.email]: [Validator.validateRequired(Validation.messageKeys.user.emailRequired), validateEmail],
+    [User.keys.email]: [
+      Validator.validateRequired(Validation.messageKeys.user.emailRequired),
+      validateEmail,
+      ...(newUser && userWithSameEmail
+        ? [Validator.validateItemPropUniqueness(Validation.messageKeys.user.emailDuplicate)([userWithSameEmail])]
+        : []),
+    ],
   }
   if (newUser) {
     // new user

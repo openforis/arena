@@ -12,11 +12,80 @@ import { useQuery } from '@webapp/components/hooks'
 import { useUser, UserActions } from '@webapp/store/user'
 import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyId } from '@webapp/store/survey'
-
-import { validateUserEdit } from './validate'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
-export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserToUpdateOriginal = null }) => {
+import { validateUserEdit } from './validate'
+
+const prepareFormData = ({ userToUpdate }) => {
+  const formData = new FormData()
+
+  const profilePictureSet = User.isProfilePictureSet(userToUpdate)
+  const profilePicture = User.getProfilePicture(userToUpdate)
+
+  const userData = {
+    [User.keys.uuid]: User.getUuid(userToUpdate),
+    [User.keys.name]: User.getName(userToUpdate),
+    [User.keys.email]: User.getEmail(userToUpdate),
+    [User.keys.props]: User.getProps(userToUpdate),
+    [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
+    [User.keys.authGroupExtraProps]: User.getAuthGroupExtraProps(userToUpdate),
+    [User.keys.profilePictureSet]: profilePictureSet,
+  }
+
+  formData.append('user', A.stringify(userData))
+
+  if (profilePictureSet) {
+    formData.append('file', profilePicture)
+  }
+  return formData
+}
+
+const updateUser = async ({ dispatch, formData, user, userToUpdate, setUserToUpdate, hideSurveyGroup, surveyId }) => {
+  const userToUpdateUuid = User.getUuid(userToUpdate)
+  const editingSelf = User.isEqual(user)(userToUpdate)
+  const {
+    data: { user: userUpdated, validation },
+  } = await axios.put(
+    editingSelf || hideSurveyGroup
+      ? `/api/user/${userToUpdateUuid}`
+      : `/api/survey/${surveyId}/user/${userToUpdateUuid}`,
+    formData
+  )
+  if (userUpdated) {
+    if (editingSelf) {
+      dispatch(UserActions.setUser({ user: userToUpdate }))
+    }
+    return true
+  } else {
+    const userToUpdateValidated = Validation.assocValidation(validation)(userToUpdate)
+    setUserToUpdate(userToUpdateValidated)
+    dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave' }))
+    return false
+  }
+}
+
+const insertUser = async ({ dispatch, navigate, formData, userToUpdate, setUserToUpdate }) => {
+  const {
+    data: { user: userCreated, validation },
+  } = await axios.post('/api/user', formData)
+  if (userCreated) {
+    const userCreatedUuid = User.getUuid(userCreated)
+    navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}?hideSurveyGroup=true`)
+    return true
+  } else {
+    const userToUpdateValidated = Validation.assocValidation(validation)(userToUpdate)
+    setUserToUpdate(userToUpdateValidated)
+    dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotSave' }))
+    return false
+  }
+}
+
+export const useOnSave = ({
+  userToUpdate,
+  setUserToUpdate,
+  userToUpdateOriginal = null,
+  setUserToUpdateOriginal = null,
+}) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { hideSurveyGroup } = useQuery()
@@ -24,58 +93,40 @@ export const useOnSave = ({ userToUpdate, userToUpdateOriginal = null, setUserTo
   const surveyId = useSurveyId()
 
   const saveUser = useCallback(async () => {
-    const editingSelf = User.isEqual(user)(userToUpdate)
-    const userToUpdateUuid = User.getUuid(userToUpdate)
-    const profilePictureSet = User.isProfilePictureSet(userToUpdate)
-    const profilePicture = User.getProfilePicture(userToUpdate)
-
     try {
       dispatch(LoaderActions.showLoader())
+      const userToUpdateUuid = User.getUuid(userToUpdate)
 
-      const formData = new FormData()
-      const userData = {
-        [User.keys.uuid]: userToUpdateUuid,
-        [User.keys.name]: User.getName(userToUpdate),
-        [User.keys.email]: User.getEmail(userToUpdate),
-        [User.keys.props]: User.getProps(userToUpdate),
-        [User.keys.authGroupsUuids]: User.getAuthGroupsUuids(userToUpdate),
-        [User.keys.authGroupExtraProps]: User.getAuthGroupExtraProps(userToUpdate),
-        [User.keys.profilePictureSet]: profilePictureSet,
-      }
+      const formData = prepareFormData({ userToUpdate })
 
-      formData.append('user', A.stringify(userData))
-
-      if (profilePictureSet) {
-        formData.append('file', profilePicture)
-      }
+      let updateSuccessfull = false
 
       if (userToUpdateUuid) {
-        await axios.put(
-          editingSelf || hideSurveyGroup
-            ? `/api/user/${userToUpdateUuid}`
-            : `/api/survey/${surveyId}/user/${userToUpdateUuid}`,
-          formData
-        )
-        if (editingSelf) {
-          dispatch(UserActions.setUser({ user: userToUpdate }))
-        }
-      } else {
-        const userCreated = await axios.post('/api/user', formData)
-        const userCreatedUuid = User.getUuid(userCreated)
-        navigate(`${appModuleUri(userModules.user)}${userCreatedUuid}`)
-      }
-
-      dispatch(
-        NotificationActions.notifyInfo({
-          key: 'usersView.updateUserConfirmation',
-          params: { name: User.getName(userToUpdate) },
+        updateSuccessfull = await updateUser({
+          dispatch,
+          formData,
+          user,
+          userToUpdate,
+          setUserToUpdate,
+          hideSurveyGroup,
+          surveyId,
         })
-      )
-      setUserToUpdateOriginal?.(userToUpdate)
+      } else {
+        updateSuccessfull = await insertUser({ dispatch, formData, navigate, userToUpdate, setUserToUpdate })
+      }
+      if (updateSuccessfull) {
+        dispatch(
+          NotificationActions.notifyInfo({
+            key: 'usersView.updateUserConfirmation',
+            params: { name: User.getName(userToUpdate) },
+          })
+        )
+        setUserToUpdateOriginal?.(userToUpdate)
+      }
     } finally {
       dispatch(LoaderActions.hideLoader())
     }
-  }, [dispatch, hideSurveyGroup, navigate, setUserToUpdateOriginal, surveyId, user, userToUpdate])
+  }, [dispatch, hideSurveyGroup, navigate, setUserToUpdate, setUserToUpdateOriginal, surveyId, user, userToUpdate])
 
   return useCallback(async () => {
     const userUpdatedValidated = await validateUserEdit(userToUpdate)

@@ -1799,6 +1799,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     user: {
+      emailDuplicate: 'User with same email already exists',
       emailRequired: 'Email is required',
       emailInvalid: 'Email is invalid',
       emailNotFound: 'Email not found',

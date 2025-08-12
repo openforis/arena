@@ -118,7 +118,7 @@ const UserEdit = () => {
           value={User.getEmail(userToUpdate)}
         />
       )}
-      {userUuid && (
+      {userUuid && editingSameUser && (
         <FormItem label="userView.preferredUILanguage.label">
           <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
         </FormItem>
