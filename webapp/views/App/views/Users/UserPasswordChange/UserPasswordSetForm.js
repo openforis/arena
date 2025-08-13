@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
@@ -8,8 +8,9 @@ import { FormItemWithValidation } from '@webapp/components/form/FormItemWithVali
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 
 export const UserPasswordSetForm = (props) => {
-  const { form, onFieldChange, passwordChange = false, validation = undefined } = props
+  const { form: formProp, onFieldChange: onFieldChangeProp, passwordChange = false, validation = undefined } = props
 
+  const [form, setForm] = useState(formProp)
   const isMobile = useIsMobile()
 
   const availableFormKeys = useMemo(
@@ -18,6 +19,14 @@ export const UserPasswordSetForm = (props) => {
         (key) => passwordChange || key !== UserPasswordChangeForm.keys.oldPassword
       ),
     [passwordChange]
+  )
+
+  const onFieldChange = useCallback(
+    (key) => (value) => {
+      setForm((prevForm) => ({ ...prevForm, [key]: value }))
+      onFieldChangeProp?.(key)(value)
+    },
+    [onFieldChangeProp]
   )
 
   const labelKeyPrefix = passwordChange ? 'userPasswordChangeView' : 'userView'

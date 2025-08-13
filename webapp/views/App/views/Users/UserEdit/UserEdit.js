@@ -87,7 +87,8 @@ const UserEdit = () => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingSameUser = User.isEqual(user)(userToUpdate)
-  const surveyGroupsVisible = userUuid && !hideSurveyGroup
+  const newUser = !userUuid
+  const surveyGroupsVisible = !newUser && !hideSurveyGroup
 
   return (
     <div className="user-edit" key={userUuid}>
@@ -154,12 +155,11 @@ const UserEdit = () => {
           )}
         </div>
       )}
-      {canEditMaxSurveys && !systemAdmin && surveyManager && (
+      {canEditMaxSurveys && !systemAdmin && (surveyManager || newUser) && (
         <FormItem label="userView.maxSurveysUserCanCreate">
           <Input
             className="max-surveys-input"
-            maxLength={3}
-            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
+            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false, maxLength: 3 })}
             type="number"
             value={User.getMaxSurveys(userToUpdate)}
             validation={Validation.getFieldValidation(User.keysProps.maxSurveys)(validation)}
