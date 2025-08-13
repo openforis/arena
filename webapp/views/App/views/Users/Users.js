@@ -4,6 +4,7 @@ import { Objects } from '@openforis/arena-core'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import { appModules, userModules } from '@webapp/app/appModules'
 
@@ -52,7 +53,7 @@ const Users = () => {
         }
       )
     }
-    if (Authorizer.canViewUsersAccessRequests(user)) {
+    if (ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)) {
       _modules.push({
         component: UsersAccessRequest,
         path: userModules.usersAccessRequest.path,
