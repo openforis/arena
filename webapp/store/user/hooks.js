@@ -68,6 +68,7 @@ export const useAuthCanExportRecords = () => Authorizer.canExportRecords(useUser
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
 
 // ====== Auth / Users
+export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>

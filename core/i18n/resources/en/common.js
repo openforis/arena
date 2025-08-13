@@ -305,6 +305,7 @@ Do you want to proceed?`,
     user: 'User Profile',
     userPasswordChange: 'Change password',
     userInvite: 'Invite user',
+    userNew: 'New User',
     usersSurvey: 'Users list',
     usersList: 'Users list (all)',
 

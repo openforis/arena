@@ -272,6 +272,7 @@ export default {
     user: 'Perfil de usuario',
     userPasswordChange: 'Cambiar contraseña',
     userInvite: 'Invitar usuario',
+    userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
     usersList: 'Lista de usuarios (todos)',
     analysis: 'Análisis',
