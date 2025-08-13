@@ -1,4 +1,4 @@
-export const integer = ({ allowNegative = true, allowZero = true, maxLength = undefined } = {}) => ({
+export const integer = ({ allowNegative = true, allowZero = true, maxLength = 16 } = {}) => ({
   allowNegative,
   decimalScale: 0,
   isAllowed:
@@ -8,7 +8,7 @@ export const integer = ({ allowNegative = true, allowZero = true, maxLength = un
           (allowZero || valueObj.value !== '0') && (!maxLength || valueObj.formattedValue.length <= maxLength),
 })
 
-export const decimal = ({ decimalScale = 6, maxLength = undefined } = {}) => ({
+export const decimal = ({ decimalScale = 6, maxLength = 32 } = {}) => ({
   ...(Number.isNaN(decimalScale) ? {} : { decimalScale }),
   decimalSeparator: '.',
   isAllowed: !maxLength ? undefined : (valueObj) => !maxLength || valueObj.formattedValue.length <= maxLength,
