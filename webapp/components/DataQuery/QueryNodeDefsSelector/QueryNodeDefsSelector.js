@@ -16,6 +16,8 @@ const QueryNodeDefsSelector = (props) => {
 
   const query = DataExplorerSelectors.useQuery()
   const modeAggregate = Query.isModeAggregate(query)
+  const modeOlap = Query.isModeOlap(query)
+  const mode = Query.getMode(query)
 
   const survey = useSurvey()
   const hierarchy = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
@@ -24,15 +26,15 @@ const QueryNodeDefsSelector = (props) => {
   const onChangeEntity = useCallback(
     (entityDefUuid) => {
       let newQuery = Query.create({ entityDefUuid })
-      if (modeAggregate) {
-        newQuery = Query.assocMode(Query.modes.aggregate)(newQuery)
+      if (modeAggregate || modeOlap) {
+        newQuery = Query.assocMode(mode)(newQuery)
       }
       onChangeQuery(newQuery)
     },
-    [modeAggregate, onChangeQuery]
+    [mode, modeAggregate, modeOlap, onChangeQuery]
   )
 
-  return modeAggregate ? (
+  return modeAggregate || modeOlap ? (
     <NodeDefsSelectorAggregate
       nodeDefLabelType={nodeDefLabelType}
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
@@ -41,6 +43,7 @@ const QueryNodeDefsSelector = (props) => {
       onChangeEntity={onChangeEntity}
       onChangeMeasures={(measuresUpdate) => onChangeQuery(Query.assocMeasures(measuresUpdate)(query))}
       onChangeDimensions={(dimensionsUpdate) => onChangeQuery(Query.assocDimensions(dimensionsUpdate)(query))}
+      olap={modeOlap}
       showAnalysisAttributes
     />
   ) : (

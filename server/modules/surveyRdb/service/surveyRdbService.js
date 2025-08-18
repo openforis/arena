@@ -70,31 +70,33 @@ export const fetchViewData = async (params) => {
   const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
-  const data = Query.isModeAggregate(parsedQuery)
-    ? await SurveyRdbManager.fetchViewDataAgg({
-        survey,
-        cycle,
-        query,
-        recordOwnerUuid,
-        offset,
-        limit,
-        outputStream,
-        options,
-      })
-    : await SurveyRdbManager.fetchViewData({
-        survey,
-        cycle,
-        query,
-        columnNodeDefs,
-        recordOwnerUuid,
-        offset,
-        limit,
-        outputStream,
-        addCycle,
-        ...options,
-      })
-
-  return data
+  if (Query.isModeAggregate(parsedQuery)) {
+    return SurveyRdbManager.fetchViewDataAgg({
+      survey,
+      cycle,
+      query,
+      recordOwnerUuid,
+      offset,
+      limit,
+      outputStream,
+      options,
+    })
+  }
+  if (Query.isModeOlap(parsedQuery)) {
+    return SurveyRdbManager.fetchOlapData({ survey, cycle, query, limit, offset, outputStream, options })
+  }
+  return SurveyRdbManager.fetchViewData({
+    survey,
+    cycle,
+    query,
+    columnNodeDefs,
+    recordOwnerUuid,
+    offset,
+    limit,
+    outputStream,
+    addCycle,
+    ...options,
+  })
 }
 
 /**

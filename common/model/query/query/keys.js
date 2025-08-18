@@ -15,6 +15,7 @@ export const modes = {
   raw: 'raw',
   rawEdit: 'rawEdit',
   aggregate: 'aggregate',
+  olap: 'olap',
 }
 
 export const displayTypes = {
