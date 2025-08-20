@@ -1,14 +1,17 @@
-export const integer = ({ allowNegative = true, allowZero = true } = {}) => ({
+export const integer = ({ allowNegative = true, allowZero = true, maxLength = 16 } = {}) => ({
   allowNegative,
   decimalScale: 0,
-  isAllowed: (valueObj) => allowZero || valueObj.value !== '0',
-  maxLength: 16,
+  isAllowed:
+    allowZero && !maxLength
+      ? undefined
+      : (valueObj) =>
+          (allowZero || valueObj.value !== '0') && (!maxLength || valueObj.formattedValue.length <= maxLength),
 })
 
-export const decimal = ({ decimalScale = 6 } = {}) => ({
+export const decimal = ({ decimalScale = 6, maxLength = 32 } = {}) => ({
   ...(Number.isNaN(decimalScale) ? {} : { decimalScale }),
   decimalSeparator: '.',
-  maxLength: 16,
+  isAllowed: !maxLength ? undefined : (valueObj) => !maxLength || valueObj.formattedValue.length <= maxLength,
 })
 
 const _limit = ({ value, max, min = '00' }) => {

@@ -10,8 +10,7 @@ import * as API from '@webapp/service/api'
 
 import { Button, ButtonBack } from '@webapp/components'
 import { useNotifyInfo } from '@webapp/components/hooks'
-import { PasswordInput, PasswordStrengthChecker } from '@webapp/components/form'
-import ValidationTooltip from '@webapp/components/validationTooltip'
+import { UserPasswordSetForm } from './UserPasswordSetForm'
 
 const defaultState = { form: UserPasswordChangeForm.newForm(), validation: {} }
 
@@ -42,25 +41,12 @@ const UserPasswordChange = () => {
 
   return (
     <div className="user-change-password">
-      {Object.values(UserPasswordChangeForm.keys).map((key) => (
-        <div key={key}>
-          <ValidationTooltip
-            validation={Validation.getFieldValidation(key)(validation)}
-            className="form-input-container"
-          >
-            <PasswordInput
-              autoComplete={key === UserPasswordChangeForm.keys.oldPassword ? 'password' : 'new-password'}
-              label={`userPasswordChangeView.${key}`}
-              onChange={setStateProp(key)}
-              value={form[key]}
-            />
-          </ValidationTooltip>
-
-          {key === UserPasswordChangeForm.keys.newPassword && (
-            <PasswordStrengthChecker password={UserPasswordChangeForm.getNewPassword(form)} />
-          )}
-        </div>
-      ))}
+      <UserPasswordSetForm
+        form={form}
+        onFieldChange={(key) => (value) => setStateProp(key)(value)}
+        passwordChange
+        validation={validation}
+      />
 
       <div className="button-bar">
         <ButtonBack />

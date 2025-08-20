@@ -68,6 +68,7 @@ export const useAuthCanExportRecords = () => Authorizer.canExportRecords(useUser
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
 
 // ====== Auth / Users
+export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>
@@ -78,7 +79,7 @@ export const useAuthCanViewUsersAccessRequests = () => Authorizer.canViewUsersAc
 export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser())
 
 // ====== Profile picture
-export const useProfilePicture = (userUuid, forceUpdateKey) => {
+export const useProfilePicture = (forceUpdateKey, userUuid = null) => {
   const [profilePicture, setProfilePicture] = useState(null)
 
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
@@ -89,7 +90,9 @@ export const useProfilePicture = (userUuid, forceUpdateKey) => {
   )
 
   useEffect(() => {
-    fetchUserProfilePicture()
+    if (userUuid) {
+      fetchUserProfilePicture()
+    }
   }, [userUuid, forceUpdateKey])
 
   useEffect(() => {

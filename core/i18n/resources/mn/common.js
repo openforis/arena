@@ -304,6 +304,7 @@ export default {
     user: 'Хэрэглэгчийн профайл',
     userPasswordChange: 'Нууц үг солих',
     userInvite: 'Хэрэглэгч урих',
+    userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
 

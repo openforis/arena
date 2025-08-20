@@ -3,23 +3,62 @@
 .user-edit {
   margin: auto;
   padding: 1rem;
-  grid-row-gap: 0;
-  width: 50rem;
+  display: grid;
+  grid-row-gap: 0.4rem;
 
-  .profile-picture {
-    margin-bottom: 20px;
+  .form-item,
+  .form-item-container,
+  .profile-picture,
+  .expansion-panel {
     justify-self: center;
+  }
+
+  .dropdown-user-title {
+    width: 10rem;
   }
 
   .form-item {
     height: auto;
-    grid-template-columns: 0.3fr 0.7fr;
+    width: 100%;
+    max-width: 40rem;
 
-    .tooltip {
+    .input-text {
+      width: 100%;
+    }
+
+    .tooltip,
+    .tooltip-error {
       &:hover {
         cursor: default;
       }
     }
+
+    .form-input-container {
+      justify-self: unset;
+      max-width: 30rem;
+    }
+
+    .form-label {
+      white-space: nowrap;
+    }
+
+    &.mobile {
+      display: flex;
+
+      .tooltip,
+      .tooltip-error {
+        width: 100%;
+      }
+    }
+  }
+
+  .profile-picture {
+    margin-bottom: 20px;
+  }
+
+  .form-input-container {
+    max-width: 20rem;
+    justify-self: center;
   }
 
   .map-api-keys {
@@ -49,6 +88,10 @@
     .btn-add {
       justify-self: center;
     }
+  }
+
+  .max-surveys-input {
+    width: 5rem;
   }
 }
 

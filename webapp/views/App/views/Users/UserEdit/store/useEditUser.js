@@ -17,12 +17,17 @@ import * as API from '@webapp/service/api'
 
 import { useActions } from './actions'
 
-const getEditCapabilities = ({ user, userToUpdate, surveyInfo, ready }) => {
-  const isUserAcceptPending = !User.hasAccepted(userToUpdate)
-  const canEditUser = ready && !isUserAcceptPending && Authorizer.canEditUser(user, surveyInfo, userToUpdate)
+const getEditCapabilities = ({ user, surveyInfo, ready, userToUpdate = null }) => {
+  const userToUpdateUuid = User.getUuid(userToUpdate)
+  const newUser = !userToUpdateUuid
+  const isUserAcceptPending = userToUpdate && !User.hasAccepted(userToUpdate)
+  const canEditUser =
+    ready &&
+    ((newUser && Authorizer.canCreateUsers(user)) ||
+      (userToUpdate && !isUserAcceptPending && Authorizer.canEditUser(user, surveyInfo, userToUpdate)))
   const canEditName = canEditUser
-  const canEditEmail = canEditUser && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate)
-  const canEditGroup = canEditUser && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)
+  const canEditEmail = canEditUser && (!userToUpdate || Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate))
+  const canEditGroup = canEditUser && (!userToUpdate || Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate))
   const canRemove = Authorizer.canRemoveUser(user, surveyInfo, userToUpdate)
   const canEdit = canEditName || canEditEmail || canEditGroup
   const canEditSystemAdmin = User.isSystemAdmin(user)
@@ -58,7 +63,7 @@ export const useEditUser = ({ userUuid }) => {
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
 
-  const ready = !R.isEmpty(userToUpdate)
+  const ready = !userUuid || !R.isEmpty(userToUpdate)
   const dirty = !R.equals(userToUpdate, userToUpdateOriginal)
   const editCapabilities = getEditCapabilities({ user, userToUpdate, surveyInfo, ready })
 
@@ -70,7 +75,9 @@ export const useEditUser = ({ userUuid }) => {
   })
 
   useEffect(() => {
-    onGetUser()
+    if (userUuid) {
+      onGetUser()
+    }
   }, [userUuid])
 
   const onSurveyAuthGroupChange = (surveyGroupNew) => {

@@ -190,6 +190,10 @@ export const userModules = {
     key: 'user',
     path: 'user',
   },
+  userNew: {
+    key: 'userNew',
+    path: 'userNew',
+  },
   userPasswordChange: {
     key: 'userPasswordChange',
     path: 'userPasswordChange',

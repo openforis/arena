@@ -11,7 +11,15 @@
   }
 
   .btn-upload {
-    padding: 0;
+    padding: 0.2rem;
+  }
+
+  .profile-picture-placeholder-wrapper {
+    border: $profilePictureBorder;
+
+    .profile-picture-placeholder-img {
+      margin: 10px;
+    }
   }
 }
 

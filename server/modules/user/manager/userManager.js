@@ -13,7 +13,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as Validation from '@core/validation/validation'
 import * as Survey from '@core/survey/survey'
 import * as DateUtils from '@core/dateUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
@@ -53,7 +52,7 @@ export const {
 export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
-const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo }, client = db) => {
+const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = null }, client = db) => {
   const groupsToAdd = []
   if (
     (AuthGroup.isSurveyManagerGroup(group) || AuthGroup.getName(group) === groupNames.surveyAdmin) &&
@@ -66,7 +65,7 @@ const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo }, c
     groupsToAdd.push(group)
   } else if (AuthGroup.isSystemAdminGroup(group) && User.isSystemAdmin(user) && !User.isSystemAdmin(userToAdd)) {
     groupsToAdd.push(User.getSystemAdminGroup(user))
-  } else if (AuthGroup.isSurveyManagerGroup(group)) {
+  } else if (AuthGroup.isSurveyManagerGroup(group) && surveyInfo) {
     // accepting user access request
     // when adding user to survey manager group, make him survey admin of the specified survey
     groupsToAdd.push(Survey.getAuthGroupAdmin(surveyInfo))
@@ -79,41 +78,48 @@ export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, cli
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
     const userUuid = User.getUuid(userToAdd)
     const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)
-    await PromiseUtils.each(groupsToAdd, async (groupToAdd) => {
-      const groupUuid = groupToAdd.uuid
+    for (const groupToAdd of groupsToAdd) {
+      const groupUuid = AuthGroup.getUuid(groupToAdd)
       await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t)
 
       if (AuthGroup.isSurveyGroup(groupToAdd)) {
-        await ActivityLogRepository.insert(
-          user,
-          surveyId,
-          ActivityLog.type.userInvite,
-          {
-            [ActivityLog.keysContent.uuid]: userUuid,
-            [ActivityLog.keysContent.groupUuid]: groupUuid,
-          },
-          false,
-          t
-        )
+        const logContent = {
+          [ActivityLog.keysContent.uuid]: userUuid,
+          [ActivityLog.keysContent.groupUuid]: groupUuid,
+        }
+        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userInvite, logContent, false, t)
       }
-    })
+    }
   })
 
 export const insertUser = async (
-  { user, surveyInfo, surveyCycleKey, email, password, status, group, title },
+  {
+    user,
+    email,
+    password,
+    status,
+    group,
+    name = null,
+    title = null,
+    profilePicture = null,
+    surveyInfo = null,
+    surveyCycleKey = null,
+  },
   client = db
 ) =>
   client.tx(async (t) => {
-    const surveyId = Survey.getIdSurveyInfo(surveyInfo)
+    const surveyId = surveyInfo ? Survey.getIdSurveyInfo(surveyInfo) : null
 
     const newUser = await UserRepository.insertUser(
       {
-        surveyId,
-        surveyCycleKey,
         email,
         password,
         status,
+        name,
         title,
+        profilePicture,
+        surveyId,
+        surveyCycleKey,
       },
       t
     )
@@ -121,14 +127,9 @@ export const insertUser = async (
 
     // accept user access request (if any)
     await UserAccessRequestRepository.updateUserAccessRequestStatus(
-      {
-        email,
-        status: UserAccessRequest.status.ACCEPTED,
-        userUuid: User.getUuid(user),
-      },
+      { email, status: UserAccessRequest.status.ACCEPTED, userUuid: User.getUuid(user) },
       t
     )
-
     return newUser
   })
 
@@ -365,6 +366,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     const name = User.getName(userToUpdateModified)
     const email = User.getEmail(userToUpdateModified)
     const props = User.getProps(userToUpdateModified)
+    const profilePictureSet = User.isProfilePictureSet(userToUpdate)
 
     return UserRepository.updateUser(
       {
@@ -372,6 +374,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
         name,
         email,
         profilePicture,
+        profilePictureSet,
         props,
       },
       t

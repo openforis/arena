@@ -303,6 +303,7 @@ export default {
     user: 'Профиль пользователя',
     userPasswordChange: 'Сменить пароль',
     userInvite: 'Пригласить пользователя',
+    userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
     usersList: 'Список пользователей (все)',
 
