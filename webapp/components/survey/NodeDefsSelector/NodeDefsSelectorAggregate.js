@@ -33,12 +33,16 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
   return variablesPrevCalculations
 }
 
+const isNodeDefIncludedAsDimension = (nodeDef) =>
+  NodeDef.isKey(nodeDef) || NodeDef.isBoolean(nodeDef) || NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
+
 const NodeDefsSelectorAggregate = (props) => {
   const {
     dimensions,
     measures,
     nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
     nodeDefUuidEntity = null,
+    olap = false,
     onChangeEntity,
     onChangeMeasures,
     onChangeDimensions,
@@ -95,12 +99,7 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.dimension" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
-              filterFunction={(nodeDef) =>
-                NodeDef.isBoolean(nodeDef) ||
-                NodeDef.isCode(nodeDef) ||
-                NodeDef.isTaxon(nodeDef) ||
-                NodeDef.isKey(nodeDef)
-              }
+              filterFunction={isNodeDefIncludedAsDimension}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={dimensions}
@@ -114,8 +113,8 @@ const NodeDefsSelectorAggregate = (props) => {
           <ExpansionPanel buttonLabel="common.measure" buttonLabelParams={{ count: 2 }}>
             <AttributesSelector
               filterTypes={[NodeDef.nodeDefType.decimal, NodeDef.nodeDefType.integer]}
-              filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef)}
-              includeEntityFrequencySelector
+              filterFunction={(nodeDef) => !NodeDef.isKey(nodeDef) && (!olap || NodeDef.isAnalysis(nodeDef))}
+              includeEntityFrequencySelector={!olap}
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}
               nodeDefUuidsAttributes={measuresNodeDefUuids}
@@ -155,6 +154,7 @@ NodeDefsSelectorAggregate.propTypes = {
   measures: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidEntity: PropTypes.string,
+  olap: PropTypes.bool,
   onChangeEntity: PropTypes.func.isRequired,
   onChangeMeasures: PropTypes.func.isRequired,
   onChangeDimensions: PropTypes.func.isRequired,
