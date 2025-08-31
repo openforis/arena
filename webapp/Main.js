@@ -1,3 +1,5 @@
+import '@fontsource/noto-sans'
+
 import './utils/polyfill/polyfill'
 import './style/main.scss'
 

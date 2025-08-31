@@ -2251,6 +2251,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.1.1.tgz#1a5b1959a528e374e8037c4396c3e825d6cf4a83"
   integrity sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==
 
+"@fontsource/noto-sans@^5.2.7":
+  version "5.2.7"
+  resolved "https://registry.yarnpkg.com/@fontsource/noto-sans/-/noto-sans-5.2.7.tgz#cd11c60592b68263c633bc31a3eb9e733af3d94b"
+  integrity sha512-mTpMSMft6Nb+ZSF4DSiJVYnLzKCRjHNFieZ/swuxSDQK+v1hjUeDTBxLHKUdfmC+ZPg6TUEWw4oRq2ltnDbSjQ==
+
 "@godaddy/terminus@^4.12.1":
   version "4.12.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.12.1.tgz#c4fdc280a4ac9655d4734250e22299a4ad46c54c"
