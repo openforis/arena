@@ -14,7 +14,7 @@ RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN echo -e "scripts-prepend-node
     @openforis:registry=https://npm.pkg.github.com\n\
     always-auth=true\n\
     //npm.pkg.github.com/:_authToken=$NPM_TOKEN\n" > /app/.npmrc \
-    && yarn install --frozen-lockfile \
+    && yarn install --ignore-scripts --frozen-lockfile \
     && yarn build \
     && rm -f /app/.npmrc
 
