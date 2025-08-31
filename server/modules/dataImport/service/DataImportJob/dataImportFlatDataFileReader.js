@@ -123,11 +123,19 @@ const valueConverterByNodeDefType = {
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
     return { [Node.valuePropsCode.code]: code }
   },
-  [NodeDef.nodeDefType.coordinate]: ({ value }) => {
+  [NodeDef.nodeDefType.coordinate]: ({ nodeDef, value }) => {
     const srsId = StringUtils.removePrefix(Srs.idPrefix)(value[Node.valuePropsCoordinate.srs])
     const x = value[Node.valuePropsCoordinate.x]
     const y = value[Node.valuePropsCoordinate.y]
-    return Node.newNodeValueCoordinate({ x, y, srsId })
+    const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef)
+    const additionalValuesByField = additionalFields.reduce((acc, field) => {
+      const fieldValue = value[field]
+      if (fieldValue !== undefined) {
+        acc[field] = fieldValue
+      }
+      return acc
+    }, {})
+    return Node.newNodeValueCoordinate({ x, y, srsId, ...additionalValuesByField })
   },
   [NodeDef.nodeDefType.date]: ({ value, headers }) =>
     extractDateOrTime({
