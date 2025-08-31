@@ -16,13 +16,10 @@ RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN echo -e "scripts-prepend-node
     //npm.pkg.github.com/:_authToken=$NPM_TOKEN\n" > /app/.npmrc \
     && yarn install --ignore-scripts --frozen-lockfile \
     && yarn build \
-    && rm -f /app/.npmrc
+    && rm -f /app/.npmrc \
+    && npm install pm2 -g \
+    && ln -s dist/server.js .
 
-RUN npm install pm2 -g
-
-# Startup
-
-RUN ln -s dist/server.js .
 CMD ["pm2-runtime", "server.js"]
 
 #############################################################
