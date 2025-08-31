@@ -96,7 +96,7 @@ const _determineDataType = ({ isExtra, isGeometryPointType }) => {
 export const createImportSummaryFromColumnNames = ({
   columnNames,
   defaultLang,
-  rowsCount = 0,
+  itemsCount = 0,
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
@@ -173,7 +173,7 @@ export const createImportSummaryFromColumnNames = ({
     return acc
   }, [])
 
-  const summary = CategoryImportSummary.newSummary({ items, rowsCount })
+  const summary = CategoryImportSummary.newSummary({ items, itemsCount })
 
   _validateSummary(summary)
 
@@ -199,7 +199,7 @@ export const createImportSummaryFromStream = async ({
   const summary = createImportSummaryFromColumnNames({
     columnNames,
     defaultLang,
-    rowsCount,
+    itemsCount: rowsCount - 1, // exclude header row
     codeColumnPattern,
     ignoreLabelsAndDescriptions,
   })
