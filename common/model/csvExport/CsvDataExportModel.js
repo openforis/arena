@@ -1,6 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as StringUtils from '@core/stringUtils'
 
 const columnDataType = {
   boolean: 'boolean',
@@ -53,12 +54,15 @@ const columnsByNodeDefType = {
         dataType: columnDataType.text,
         valueProp: Node.valuePropsCoordinate.srs,
       },
-      ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
-        header: `${nodeDefName}_${field}`,
-        nodeDef,
-        dataType: columnDataType.numeric,
-        valueProp: field,
-      })),
+      ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => {
+        const fieldSuffix = StringUtils.toSnakeCase(field)
+        return {
+          header: `${nodeDefName}_${fieldSuffix}`,
+          nodeDef,
+          dataType: columnDataType.numeric,
+          valueProp: field,
+        }
+      }),
     ]
   },
   [NodeDef.nodeDefType.date]: ({ nodeDef }) => [getMainColumn({ nodeDef, dataType: columnDataType.text })],
