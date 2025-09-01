@@ -80,7 +80,7 @@ const NodeDefSwitch = (props) => {
   const { canEditDef, canEditRecord, edit, empty, entry, nodeDef, parentNode, renderType } = props
 
   const dispatch = useDispatch()
-  const elementRef = useRef(null)
+  const containerRef = useRef(null)
 
   const surveyInfo = useSurveyInfo()
   const surveyCycleKey = useSurveyCycleKey()
@@ -104,6 +104,8 @@ const NodeDefSwitch = (props) => {
   const applicable = parentNode ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode) : true
   const { canAddNode, nodes } = entryProps
 
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
   const mainClassNameSuffix = NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) ? '' : '-item'
   const mainClassName = 'survey-form__node-def-page' + mainClassNameSuffix
 
@@ -125,10 +127,18 @@ const NodeDefSwitch = (props) => {
 
   useEffect(() => {
     if (edit && !nodeDef.id) {
-      elementRef.current.scrollIntoView()
+      containerRef.current.scrollIntoView()
     }
     checkNodePlaceholder()
   }, [checkNodePlaceholder, edit, nodeDef])
+
+  // scroll to top on nodeDef change
+  useEffect(() => {
+    const containerEl = containerRef.current
+    if (containerEl) {
+      containerEl.scrollTop = 0
+    }
+  }, [nodeDefUuid])
 
   const _setIsHovering = useCallback(
     (isHovering) => {
@@ -165,7 +175,7 @@ const NodeDefSwitch = (props) => {
     <div
       className={className}
       data-testid={TestId.surveyForm.nodeDefWrapper(NodeDef.getName(nodeDef))}
-      ref={elementRef}
+      ref={containerRef}
       onMouseEnter={handleMouseEvents ? onMouseEnter : undefined}
       onMouseLeave={handleMouseEvents ? onMouseLeave : undefined}
       onMouseMove={handleMouseEvents ? onMouseEnter : undefined}
