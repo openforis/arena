@@ -56,15 +56,23 @@ export const importNewUser = async (
   )
 
 export const insertUser = async (
-  { email, password, status, surveyId = null, surveyCycleKey = null, title = null },
+  { email, password, status, name = null, title = null, profilePicture = null, surveyId = null, surveyCycleKey = null },
   client = db
 ) =>
   client.one(
     `
-    INSERT INTO "user" AS u (email, password, status, prefs, props)
-    VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+    INSERT INTO "user" AS u (email, password, status, name, prefs, props, profile_picture)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7)
     RETURNING ${columnsCommaSeparated}`,
-    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), User.newProps({ title })],
+    [
+      email,
+      password,
+      status,
+      name,
+      User.newPrefs({ surveyId, surveyCycleKey }),
+      User.newProps({ title }),
+      profilePicture,
+    ],
     camelize
   )
 
@@ -365,14 +373,17 @@ export const countSystemAdministrators = async (client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>
+export const updateUser = async (
+  { userUuid, name, email, profilePictureSet = false, profilePicture = null, props = {} },
+  client = db
+) =>
   client.one(
     `
     UPDATE "user" u
     SET
     name = $1,
     email = $2,
-    profile_picture = COALESCE($3, profile_picture),
+    ${profilePictureSet ? 'profile_picture = $3,' : ``}
     props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${columnsCommaSeparated}`,

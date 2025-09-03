@@ -44,9 +44,9 @@ const Logger = Log.getLogger('UserService')
 export const insertSystemAdminUserIfNotExisting = async (client = db) =>
   client.tx(async (t) => {
     Logger.debug('checking if admin users exist...')
-    const aminsCount = await UserManager.countSystemAdministrators(t)
-    if (aminsCount > 0) {
-      Logger.info(`${aminsCount} admin users found; skipping admin user insert`)
+    const adminsCount = await UserManager.countSystemAdministrators(t)
+    if (adminsCount > 0) {
+      Logger.info(`${adminsCount} admin users found; skipping admin user insert`)
       return null
     }
     const throwError = (details) => {
@@ -250,6 +250,7 @@ export const {
   exportUserAccessRequestsIntoStream,
   fetchUsers,
   fetchUserByUuid,
+  fetchUserByEmail,
   fetchUserByUuidWithPassword,
   fetchUsersBySurveyId,
   fetchUserProfilePicture,
@@ -280,12 +281,35 @@ export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = nu
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
 }
 
+// ====== INSERT
+
+export const insertUser = async ({ user, userToInsert, profilePicture = null }) => {
+  const email = User.getEmail(userToInsert)
+  const status = User.userStatus.ACCEPTED
+  const passwordPlain = User.getPassword(userToInsert)
+  const passwordEncrypted = passwordPlain ? UserPasswordUtils.encryptPassword(passwordPlain) : null
+  const name = User.getName(userToInsert)
+  const title = User.getTitle(userToInsert)
+  const group = await AuthManager.fetchGroupByName({ name: AuthGroup.groupNames.surveyManager })
+  return UserManager.insertUser({
+    user,
+    email,
+    password: passwordEncrypted,
+    status,
+    group,
+    name,
+    title,
+    profilePicture,
+  })
+}
+
 // ====== UPDATE
 
 const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
   const userToUpdateOld = await UserManager.fetchUserByUuid(User.getUuid(userToUpdate))
   const authGroupsNew = await AuthManager.fetchGroupsByUuids(User.getAuthGroupsUuids(userToUpdate))
 
+  const userToUpdateWasSurveyManager = User.isSurveyManager(userToUpdateOld)
   const userToUpdateWillBeSystemAdmin = authGroupsNew.some(AuthGroup.isSystemAdminGroup)
   const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
 
@@ -293,7 +317,7 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
     !User.isSystemAdmin(user) &&
     (userToUpdateWillBeSystemAdmin || // only system admins can assign system admin role
       User.isSystemAdmin(userToUpdateOld) || // only system admins can edit other system admins
-      (userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
+      (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
   ) {
     throw new UnauthorizedError(User.getName(user))
   }

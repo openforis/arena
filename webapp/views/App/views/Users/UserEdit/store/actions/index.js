@@ -9,7 +9,7 @@ export const useActions = ({ userToUpdate, setUserToUpdate, userToUpdateOriginal
   onGetUser: useGetUser({ setUserToUpdate, setUserToUpdateOriginal }),
   onUpdate: useOnUpdate({ userToUpdate, setUserToUpdate }),
   onUpdateProfilePicture: useOnUpdateProfilePicture({ userToUpdate, setUserToUpdate }),
-  onSave: useOnSave({ userToUpdate, userToUpdateOriginal, setUserToUpdateOriginal }),
+  onSave: useOnSave({ userToUpdate, setUserToUpdate, userToUpdateOriginal, setUserToUpdateOriginal }),
   onRemove: useOnRemove({ userToUpdate, setUserToUpdate }),
   onInviteRepeat: useOnInviteRepeat({ userToInvite: userToUpdate, setUserToUpdate }),
 })

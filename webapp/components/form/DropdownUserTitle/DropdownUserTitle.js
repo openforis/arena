@@ -18,6 +18,7 @@ const DropdownUserTitle = (props) => {
 
   return (
     <Dropdown
+      className="dropdown-user-title"
       disabled={disabled}
       placeholder={i18n.t('user.title')}
       onChange={(item) => onChange(User.assocTitle(item?.value)(user))}

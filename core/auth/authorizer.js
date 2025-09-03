@@ -180,6 +180,8 @@ const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
     // user to update has an auth group in the same survey
     _hasAuthGroupForSurvey({ user: userToUpdate, surveyInfo }))
 
+export const canCreateUsers = (user) => User.isSystemAdmin(user)
+
 export const canEditUser = (user, surveyInfo, userToUpdate) =>
   User.hasAccepted(userToUpdate) &&
   (User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate))
@@ -194,6 +196,7 @@ export const canRemoveUser = (user, surveyInfo, userToRemove) =>
   !User.isSystemAdmin(userToRemove) &&
   _hasUserEditAccess(user, surveyInfo, userToRemove)
 
+export const canEditUserSurveyManager = (user) => User.isSystemAdmin(user)
 export const canEditUserMaxSurveys = (user) => User.isSystemAdmin(user)
 
 // USER ACCESS REQUESTS
