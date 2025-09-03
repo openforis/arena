@@ -34,7 +34,8 @@ const NodeDefEntityFormGrid = (props) => {
 
   const dispatch = useDispatch()
 
-  const gridRef = useRef(null)
+  const editContainerRef = useRef(null)
+  const entryContainerRef = useRef(null)
 
   const survey = useSelector(SurveyState.getSurvey)
   const cycle = useSelector(SurveyState.getSurveyCycleKey)
@@ -45,14 +46,15 @@ const NodeDefEntityFormGrid = (props) => {
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeUuid = Node.getUuid(node)
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
   // on node def or node change, scroll inner container to top
   useEffect(() => {
-    const innerContainer = gridRef.current?.elementRef?.current
+    const innerContainer = editContainerRef.current?.elementRef?.current ?? entryContainerRef.current
     if (innerContainer) {
       innerContainer.scrollTop = 0
     }
-  }, [nodeDef, nodeUuid])
+  }, [nodeDefUuid, nodeUuid])
 
   const onChangeLayout = useCallback(
     (layout) => {
@@ -184,7 +186,7 @@ const NodeDefEntityFormGrid = (props) => {
         className={classNames('survey-form__node-def-entity-form-grid', { mounted: !!mountedRef.current })}
         onDragStop={onChangeLayout}
         onResizeStop={onChangeLayout}
-        ref={gridRef}
+        ref={editContainerRef}
         useCSSTransforms={false}
       >
         {visibleNodeDefsComponents}
@@ -195,6 +197,7 @@ const NodeDefEntityFormGrid = (props) => {
   return (
     <div
       className="survey-form__node-def-entity-form-grid-entry"
+      ref={entryContainerRef}
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
       {visibleNodeDefsComponents}

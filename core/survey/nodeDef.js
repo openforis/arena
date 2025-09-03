@@ -509,6 +509,7 @@ export const assocLabel =
     assocLabels({ ...getLabels(nodeDef), [lang]: label })(nodeDef)
 
 export const assocDescriptions = (descriptions) => assocProp({ key: propKeys.descriptions, value: descriptions })
+export const assocHidden = (hidden) => assocProp({ key: propKeys.hidden, value: hidden })
 
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
 export const cloneIntoEntityDef =
@@ -666,6 +667,7 @@ export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
 
 export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
+export const canBeHidden = (nodeDef) => isReadOnly(nodeDef)
 export const canBeHiddenInMobile = (nodeDef) =>
   !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
 
@@ -700,6 +702,10 @@ export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fi
 
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
+  // clear hidden if not applicable
+  if (!canBeHidden(nodeDefUpdated) && isHidden(nodeDefUpdated)) {
+    nodeDefUpdated = assocHidden(false)(nodeDefUpdated)
+  }
   // clear hidden in mobile if not applicable
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)

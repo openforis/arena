@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "2.1.46",
+  "version": "2.1.48",
   "license": "MIT",
   "engines": {
     "node": "^22.14.0",
@@ -106,11 +106,12 @@
     "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@fontsource/noto-sans": "^5.2.7",
     "@mui/material": "^6.0.0",
     "@mui/x-data-grid": "^7.14.0",
     "@mui/x-date-pickers": "^7.14.0",
     "@mui/x-tree-view": "^7.7.1",
-    "@openforis/arena-core": "^1.0.31",
+    "@openforis/arena-core": "^1.0.34",
     "@openforis/arena-server": "^0.1.45",
     "@reduxjs/toolkit": "^2.2.5",
     "@sendgrid/mail": "^8.1.3",
