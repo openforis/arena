@@ -56,8 +56,16 @@ const validateLevels = async ({ category, itemsCache, bigCategory }) => {
 
 // ====== ITEMS
 
+const codeToKey = (code) => (code ?? '').toLocaleLowerCase()
+
+const groupItemsByParentAndCode = (items) =>
+  ObjectUtils.groupByProps(CategoryItem.getParentUuid, (item) => codeToKey(CategoryItem.getCode(item)))(items)
+
+const getSiblingItems = ({ itemsByParentAndCode, item }) =>
+  R.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
+
 const validateItemCodeUniqueness = (itemsByParentAndCode) => (_propName, item) => {
-  const siblingItems = R.path([CategoryItem.getParentUuid(item), CategoryItem.getCode(item)])(itemsByParentAndCode)
+  const siblingItems = getSiblingItems({ itemsByParentAndCode, item })
   const isUnique = siblingItems?.length === 1
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
 }
@@ -183,7 +191,7 @@ const validateItemsAndDescendants = async ({
   const pushItems = (items) => {
     // Group sibling items by code to optimize item code uniqueness check
     // do it only one time for every sibling
-    const itemsByParentAndCode = ObjectUtils.groupByProps(CategoryItem.getParentUuid, CategoryItem.getCode)(items)
+    const itemsByParentAndCode = groupItemsByParentAndCode(items)
     items.forEach((item) => {
       item.itemsByParentAndCode = itemsByParentAndCode
       stack.push(item)
@@ -295,10 +303,7 @@ export const validateCategory = async ({
 
 export const validateItems = async ({ category, itemsToValidate, itemsCountByItemUuid }) => {
   const prevValidation = Category.getValidation(category)
-  const itemsByParentAndCode = ObjectUtils.groupByProps(
-    CategoryItem.getParentUuid,
-    CategoryItem.getCode
-  )(itemsToValidate)
+  const itemsByParentAndCode = groupItemsByParentAndCode(itemsToValidate)
   const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
   let itemsValidationUpdated = prevItemsValidation
 
