@@ -29,6 +29,7 @@ export const getPrefs = R.propOr({}, keys.prefs)
 export const getProps = R.propOr({}, keys.props)
 export const getProfilePicture = R.prop(keys.profilePicture)
 export const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
+export const isProfilePictureSet = R.propEq(keys.profilePictureSet, true)
 export const getStatus = R.prop(keys.status)
 export const { getValidation } = Validation
 export const getAuthGroupsUuids = R.propOr([], keys.authGroupsUuids)
@@ -46,6 +47,7 @@ export const { assocValidation } = Validation
 export const assocName = R.assoc(keys.name)
 export const assocInvitationExpired = R.assoc(keys.invitationExpired)
 export const assocProfilePicture = R.assoc(keys.profilePicture)
+export const assocProfilePictureSet = R.assoc(keys.profilePictureSet)
 
 // ====== CHECK
 export const isSystemAdmin = (user) => user && R.any(AuthGroup.isSystemAdminGroup)(getAuthGroups(user))

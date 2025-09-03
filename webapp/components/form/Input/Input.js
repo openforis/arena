@@ -19,6 +19,7 @@ export const Input = React.forwardRef((props, ref) => {
     disabled = false,
     id = null,
     inputType = 'input',
+    label = undefined,
     maxLength = null,
     name = undefined,
     numberFormat = null,
@@ -84,15 +85,15 @@ export const Input = React.forwardRef((props, ref) => {
           disabled={disabled || readOnly}
           className={className}
           customInput={TextField}
+          data-testid={id}
           getInputRef={(el) => {
             inputRef.current = el
           }}
           id={id}
-          data-testid={id}
           name={name}
-          onValueChange={onFormattedValueChange}
-          onFocus={onFocus}
           onBlur={onBlur}
+          onFocus={onFocus}
+          onValueChange={onFormattedValueChange}
           placeholder={placeholder}
           title={title}
           type={type}
@@ -106,6 +107,7 @@ export const Input = React.forwardRef((props, ref) => {
           disabled={disabled}
           id={id}
           inputRef={inputRef}
+          label={label}
           maxLength={maxLength}
           name={name}
           onBlur={onBlur}
@@ -129,6 +131,7 @@ Input.propTypes = {
   disabled: PropTypes.bool,
   id: PropTypes.string,
   inputType: PropTypes.oneOf(['input', 'textarea']),
+  label: PropTypes.string,
   maxLength: PropTypes.number,
   name: PropTypes.string,
   numberFormat: PropTypes.shape({

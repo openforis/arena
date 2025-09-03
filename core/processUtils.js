@@ -69,6 +69,7 @@ const ENV = {
   adminEmail: process.env.ADMIN_EMAIL,
   // - admin user password
   adminPassword: process.env.ADMIN_PASSWORD,
+  allowUserAccessRequest: isTrue(process.env.ALLOW_USER_ACCESS_REQUEST ?? 'true'),
   // FILE STORAGE
   fileStoragePath: process.env.FILE_STORAGE_PATH,
   fileStorageAwsAccessKey: process.env.FILE_STORAGE_AWS_ACCESS_KEY,

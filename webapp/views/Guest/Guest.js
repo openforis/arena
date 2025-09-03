@@ -1,6 +1,8 @@
 import './Guest.scss'
 import React from 'react'
 
+import * as ProcessUtils from '@core/processUtils'
+
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import { guestModules } from '@webapp/app/appModules'
 import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
@@ -34,37 +36,44 @@ const OfArenaBanner = () => (
   </div>
 )
 
-const Guest = () => (
-  <div className="guest__wrapper">
-    <div className="guest__bg" />
+const Guest = () => {
+  const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
+  return (
+    <div className="guest__wrapper">
+      <div className="guest__bg" />
 
-    <OfArenaLogo />
+      <OfArenaLogo />
 
-    <OfArenaBanner />
+      <OfArenaBanner />
 
-    <ModuleSwitch
-      moduleDefault={guestModules.login}
-      modules={[
-        {
-          component: ResetPassword,
-          path: `${guestModules.resetPassword.path}/*`,
-        },
-        {
-          component: ForgotPassword,
-          path: `${guestModules.forgotPassword.path}/*`,
-        },
-        {
-          component: AccessRequest,
-          path: `${guestModules.accessRequest.path}/*`,
-        },
-        // default to Login form
-        {
-          component: Login,
-          path: '*',
-        },
-      ]}
-    />
-  </div>
-)
+      <ModuleSwitch
+        moduleDefault={guestModules.login}
+        modules={[
+          {
+            component: ResetPassword,
+            path: `${guestModules.resetPassword.path}/*`,
+          },
+          {
+            component: ForgotPassword,
+            path: `${guestModules.forgotPassword.path}/*`,
+          },
+          ...(allowAccessRequest
+            ? [
+                {
+                  component: AccessRequest,
+                  path: `${guestModules.accessRequest.path}/*`,
+                },
+              ]
+            : []),
+          // default to Login form
+          {
+            component: Login,
+            path: '*',
+          },
+        ]}
+      />
+    </div>
+  )
+}
 
 export default Guest

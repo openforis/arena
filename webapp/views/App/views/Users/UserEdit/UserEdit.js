@@ -1,10 +1,11 @@
 import './UserEdit.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import { Objects } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -27,6 +28,8 @@ import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
 import { UserExtraPropsEditor } from './UserExtraPropsEditor'
 import { DropdownPreferredUILanguage } from './DropdownPreferredUILanguage'
+import { UserPasswordSetForm } from '../UserPasswordChange/UserPasswordSetForm'
+import { FormItemWithInput } from '@webapp/components/form/FormItemWithInput'
 
 const UserEdit = () => {
   const { userUuid } = useParams()
@@ -44,7 +47,9 @@ const UserEdit = () => {
     canSave,
     canViewEmail,
     canEditMaxSurveys,
+    canViewSystemAdmin,
     canEditSystemAdmin,
+    canViewSurveyManager,
     canEditSurveyManager,
     hideSurveyGroup,
 
@@ -66,6 +71,13 @@ const UserEdit = () => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const canUseMap = useAuthCanUseMap()
 
+  const onNameChange = useCallback((value) => onUpdate(User.assocName(value)(userToUpdate)), [onUpdate, userToUpdate])
+
+  const onPasswordFormFieldChange = useCallback(
+    (fieldKey) => (value) => onUpdate(A.assoc(fieldKey)(value)(userToUpdate)),
+    [onUpdate, userToUpdate]
+  )
+
   if (!ready) return null
 
   const validation = canEdit ? User.getValidation(userToUpdate) : null
@@ -77,19 +89,19 @@ const UserEdit = () => {
   const groupInCurrentSurvey = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToUpdate)
   const invitationExpired = User.isInvitationExpired(userToUpdate)
   const editingSameUser = User.isEqual(user)(userToUpdate)
+  const newUser = !userUuid
+  const surveyGroupsVisible = !newUser && !hideSurveyGroup
+  const surveyHasExtraProps = Objects.isNotEmpty(Survey.getUserExtraPropDefs(surveyInfo))
 
   return (
     <div className="user-edit" key={userUuid}>
-      {canEdit ? (
+      {canEdit && (
         <ProfilePictureEditor
           userUuid={userUuid}
           onPictureUpdate={(profilePicture) => onUpdateProfilePicture({ profilePicture })}
-          enabled
         />
-      ) : (
-        <ProfilePicture userUuid={userUuid} />
       )}
-
+      {!canEdit && userUuid && <ProfilePicture userUuid={userUuid} />}
       <FormItem label="user.title">
         <DropdownUserTitle
           disabled={!canEdit}
@@ -98,59 +110,61 @@ const UserEdit = () => {
           validation={Validation.getFieldValidation(User.keysProps.title)(validation)}
         />
       </FormItem>
-
-      <FormItem label="common.name">
-        <Input
-          disabled={!canEditName}
-          placeholder={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
-          value={User.getName(userToUpdate)}
-          validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
-          maxLength={User.nameMaxLength}
-          onChange={(value) => onUpdate(User.assocName(value)(userToUpdate))}
-        />
-      </FormItem>
-
+      <FormItemWithInput
+        disabled={!canEditName}
+        maxLength={User.nameMaxLength}
+        onChange={onNameChange}
+        label={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
+        validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
+        value={User.getName(userToUpdate)}
+      />
       {canViewEmail && (
-        <FormItem label="common.email">
-          <Input
-            disabled={!canEditEmail}
-            placeholder="common.email"
-            value={User.getEmail(userToUpdate)}
-            validation={Validation.getFieldValidation(User.keys.email)(validation)}
-            onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
-          />
+        <FormItemWithInput
+          disabled={!canEditEmail}
+          onChange={(value) => onUpdate(User.assocEmail(value)(userToUpdate))}
+          label="common.email"
+          validation={Validation.getFieldValidation(User.keys.email)(validation)}
+          value={User.getEmail(userToUpdate)}
+        />
+      )}
+      {userUuid && editingSameUser && (
+        <FormItem label="userView.preferredUILanguage.label">
+          <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
         </FormItem>
       )}
-
-      <FormItem label="userView.preferredUILanguage.label">
-        <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
-      </FormItem>
 
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
 
-      {canEditSystemAdmin && (
-        <FormItem label="auth:authGroups.systemAdmin.label">
-          <Checkbox
-            checked={systemAdmin}
-            onChange={(value) => {
-              const userUpdated = value
-                ? User.assocAuthGroup(systemAdminGroup)(userToUpdate)
-                : User.dissocAuthGroup(systemAdminGroup)(userToUpdate)
-              onUpdate(userUpdated)
-            }}
-            disabled={!canEdit}
-          />
-        </FormItem>
+      {(canViewSystemAdmin || (canViewSurveyManager && !systemAdmin)) && (
+        <div className="form-input-container">
+          {canViewSystemAdmin && (
+            <Checkbox
+              checked={systemAdmin}
+              disabled={!canEdit || !canEditSystemAdmin}
+              label="auth:authGroups.systemAdmin.label"
+              onChange={(value) => {
+                const userUpdated = value
+                  ? User.assocAuthGroup(systemAdminGroup)(userToUpdate)
+                  : User.dissocAuthGroup(systemAdminGroup)(userToUpdate)
+                onUpdate(userUpdated)
+              }}
+            />
+          )}
+          {canViewSurveyManager && !systemAdmin && (
+            <Checkbox
+              checked={surveyManager}
+              label="auth:authGroups.surveyManager.label"
+              onChange={onSurveyManagerChange}
+              disabled={!canEdit || !canEditSurveyManager}
+            />
+          )}
+        </div>
       )}
-      {canEditSurveyManager && !systemAdmin && (
-        <FormItem label="auth:authGroups.surveyManager.label">
-          <Checkbox checked={surveyManager} onChange={onSurveyManagerChange} disabled={!canEdit} />
-        </FormItem>
-      )}
-      {canEditMaxSurveys && !systemAdmin && surveyManager && (
+      {canEditMaxSurveys && !systemAdmin && (surveyManager || newUser) && (
         <FormItem label="userView.maxSurveysUserCanCreate">
           <Input
-            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false })}
+            className="max-surveys-input"
+            numberFormat={NumberFormats.integer({ allowNegative: false, allowZero: false, maxLength: 3 })}
             type="number"
             value={User.getMaxSurveys(userToUpdate)}
             validation={Validation.getFieldValidation(User.keysProps.maxSurveys)(validation)}
@@ -158,7 +172,7 @@ const UserEdit = () => {
           />
         </FormItem>
       )}
-      {!hideSurveyGroup && (
+      {surveyGroupsVisible && (
         <>
           {!systemAdmin && (
             <FormItem label="usersView.roleInCurrentSurvey">
@@ -172,14 +186,19 @@ const UserEdit = () => {
               />
             </FormItem>
           )}
-          <ExpansionPanel
-            buttonLabel="usersView.surveyExtraProp.label_other"
-            className="extra-props"
-            startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
-          >
-            <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
-          </ExpansionPanel>
+          {surveyHasExtraProps && (
+            <ExpansionPanel
+              buttonLabel="usersView.surveyExtraProp.label_other"
+              className="extra-props"
+              startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
+            >
+              <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
+            </ExpansionPanel>
+          )}
         </>
+      )}
+      {!userUuid && (
+        <UserPasswordSetForm form={userToUpdate} onFieldChange={onPasswordFormFieldChange} validation={validation} />
       )}
       {editingSameUser && hideSurveyGroup && canUseMap && (
         // show map api keys only when editing the current user
@@ -204,22 +223,23 @@ const UserEdit = () => {
           </FormItem>
         </fieldset>
       )}
-
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
-          <Button
-            iconClassName="icon-pencil"
-            label="userPasswordChangeView.changePassword"
-            onClick={() => navigate(appModuleUri(userModules.userPasswordChange))}
-          />
+          {userUuid && (
+            <Button
+              iconClassName="icon-pencil"
+              label="userPasswordChangeView.changePassword"
+              onClick={() => navigate(appModuleUri(userModules.userPasswordChange))}
+            />
+          )}
 
           {canEdit && <ButtonSave onClick={onSave} disabled={!canSave || !dirty} className="btn-save" />}
 
-          {!hideSurveyGroup && invitationExpired && (
+          {surveyGroupsVisible && invitationExpired && (
             <ButtonInvite onClick={onInviteRepeat} className="btn btn-invite" />
           )}
 
-          {!hideSurveyGroup && canRemove && (
+          {surveyGroupsVisible && canRemove && (
             <ButtonDelete
               onClick={onRemove}
               className="btn-s btn-danger btn-remove-user"

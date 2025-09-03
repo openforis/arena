@@ -27,4 +27,11 @@ export const keys = {
   // Used only in list view
   surveysCountDraft: 'surveysCountDraft',
   surveysCountPublished: 'surveysCountPublished',
+
+  // used in user update to determine if profile picture is to be persisted
+  profilePictureSet: 'profilePictureSet',
+
+  // used when creating a new user
+  newPassword: 'newPassword',
+  confirmPassword: 'confirmPassword',
 }

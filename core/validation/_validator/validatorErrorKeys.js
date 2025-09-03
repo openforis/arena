@@ -143,6 +143,7 @@ export const ValidatorErrorKeys = {
   },
 
   user: {
+    emailDuplicate: 'validationErrors.user.emailDuplicate',
     emailInvalid: 'validationErrors.user.emailInvalid',
     emailRequired: 'validationErrors.user.emailRequired',
     emailNotFound: 'validationErrors.user.emailNotFound',

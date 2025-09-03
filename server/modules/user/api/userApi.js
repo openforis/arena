@@ -318,28 +318,32 @@ export const init = (app) => {
 
   // ==== UPDATE
 
-  const _updateUser = async (req, res) => {
+  const _insertOrUpdateUser = async (req, res) => {
     const body = Request.getBody(req)
     const { user: userToUpdateString } = body
     const userToUpdate = A.parse(userToUpdateString)
-    const validation = await UserValidator.validateUser(userToUpdate)
+    const newUser = !User.getUuid(userToUpdate)
+    const userWithSameEmail = newUser ? await UserService.fetchUserByEmail(User.getEmail(userToUpdate)) : null
+    const validation = await UserValidator.validateUser(userToUpdate, userWithSameEmail)
 
-    if (!Validation.isValid(validation)) {
-      throw new SystemError('appErrors:userInvalid')
+    if (Validation.isValid(validation)) {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const profilePicture = Request.getFile(req)
+
+      const updatedUser = newUser
+        ? await UserService.insertUser({ user, userToInsert: userToUpdate, profilePicture })
+        : await UserService.updateUser(user, surveyId, userToUpdate, profilePicture)
+
+      res.json({ user: updatedUser })
+    } else {
+      res.json({ validation })
     }
-
-    const { surveyId } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const fileReq = Request.getFile(req)
-
-    const updatedUser = await UserService.updateUser(user, surveyId, userToUpdate, fileReq)
-
-    res.json(updatedUser)
   }
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _updateUser(req, res)
+      await _insertOrUpdateUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -347,7 +351,15 @@ export const init = (app) => {
 
   app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _updateUser(req, res)
+      await _insertOrUpdateUser(req, res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/user', AuthMiddleware.requireUserCreatePermission, async (req, res, next) => {
+    try {
+      await _insertOrUpdateUser(req, res)
     } catch (error) {
       next(error)
     }
