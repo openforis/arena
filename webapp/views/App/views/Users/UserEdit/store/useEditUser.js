@@ -30,8 +30,10 @@ const getEditCapabilities = ({ user, surveyInfo, ready, userToUpdate = null }) =
   const canEditGroup = canEditUser && (!userToUpdate || Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate))
   const canRemove = Authorizer.canRemoveUser(user, surveyInfo, userToUpdate)
   const canEdit = canEditName || canEditEmail || canEditGroup
-  const canEditSystemAdmin = User.isSystemAdmin(user)
-  const canEditSurveyManager = User.isSurveyManager(user)
+  const canViewSystemAdmin = User.isSystemAdmin(user)
+  const canEditSystemAdmin = canViewSystemAdmin && !User.isEqual(userToUpdate)(user)
+  const canViewSurveyManager = User.isSurveyManager(user)
+  const canEditSurveyManager = Authorizer.canEditUserSurveyManager(user)
   const canEditMaxSurveys = Authorizer.canEditUserMaxSurveys(user)
 
   const validation = User.getValidation(userToUpdate)
@@ -47,7 +49,9 @@ const getEditCapabilities = ({ user, surveyInfo, ready, userToUpdate = null }) =
     canSave,
     canViewEmail,
     canEditMaxSurveys,
+    canViewSystemAdmin,
     canEditSystemAdmin,
+    canViewSurveyManager,
     canEditSurveyManager,
   }
 }

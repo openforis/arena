@@ -309,6 +309,7 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
   const userToUpdateOld = await UserManager.fetchUserByUuid(User.getUuid(userToUpdate))
   const authGroupsNew = await AuthManager.fetchGroupsByUuids(User.getAuthGroupsUuids(userToUpdate))
 
+  const userToUpdateWasSurveyManager = User.isSurveyManager(userToUpdateOld)
   const userToUpdateWillBeSystemAdmin = authGroupsNew.some(AuthGroup.isSystemAdminGroup)
   const userToUpdateWillBeSurveyManager = authGroupsNew.some(AuthGroup.isSurveyManagerGroup)
 
@@ -316,7 +317,7 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate }) => {
     !User.isSystemAdmin(user) &&
     (userToUpdateWillBeSystemAdmin || // only system admins can assign system admin role
       User.isSystemAdmin(userToUpdateOld) || // only system admins can edit other system admins
-      (userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
+      (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager && !User.isSurveyManager(user))) // only a survey manager can assign the survey manager role
   ) {
     throw new UnauthorizedError(User.getName(user))
   }

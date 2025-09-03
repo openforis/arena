@@ -47,7 +47,9 @@ const UserEdit = () => {
     canSave,
     canViewEmail,
     canEditMaxSurveys,
+    canViewSystemAdmin,
     canEditSystemAdmin,
+    canViewSurveyManager,
     canEditSurveyManager,
     hideSurveyGroup,
 
@@ -89,6 +91,7 @@ const UserEdit = () => {
   const editingSameUser = User.isEqual(user)(userToUpdate)
   const newUser = !userUuid
   const surveyGroupsVisible = !newUser && !hideSurveyGroup
+  const surveyHasExtraProps = Objects.isNotEmpty(Survey.getUserExtraPropDefs(surveyInfo))
 
   return (
     <div className="user-edit" key={userUuid}>
@@ -129,12 +132,15 @@ const UserEdit = () => {
           <DropdownPreferredUILanguage user={userToUpdate} onChange={onUpdate} />
         </FormItem>
       )}
+
       <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
-      {(canEditSystemAdmin || (canEditSurveyManager && !systemAdmin)) && (
+
+      {(canViewSystemAdmin || (canViewSurveyManager && !systemAdmin)) && (
         <div className="form-input-container">
-          {canEditSystemAdmin && (
+          {canViewSystemAdmin && (
             <Checkbox
               checked={systemAdmin}
+              disabled={!canEdit || !canEditSystemAdmin}
               label="auth:authGroups.systemAdmin.label"
               onChange={(value) => {
                 const userUpdated = value
@@ -142,15 +148,14 @@ const UserEdit = () => {
                   : User.dissocAuthGroup(systemAdminGroup)(userToUpdate)
                 onUpdate(userUpdated)
               }}
-              disabled={!canEdit}
             />
           )}
-          {canEditSurveyManager && !systemAdmin && (
+          {canViewSurveyManager && !systemAdmin && (
             <Checkbox
               checked={surveyManager}
               label="auth:authGroups.surveyManager.label"
               onChange={onSurveyManagerChange}
-              disabled={!canEdit}
+              disabled={!canEdit || !canEditSurveyManager}
             />
           )}
         </div>
@@ -181,13 +186,15 @@ const UserEdit = () => {
               />
             </FormItem>
           )}
-          <ExpansionPanel
-            buttonLabel="usersView.surveyExtraProp.label_other"
-            className="extra-props"
-            startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
-          >
-            <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
-          </ExpansionPanel>
+          {surveyHasExtraProps && (
+            <ExpansionPanel
+              buttonLabel="usersView.surveyExtraProp.label_other"
+              className="extra-props"
+              startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
+            >
+              <UserAuthGroupExtraPropsEditor onChange={onSurveyExtraPropsChange} userToUpdate={userToUpdate} />
+            </ExpansionPanel>
+          )}
         </>
       )}
       {!userUuid && (
