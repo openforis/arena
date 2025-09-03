@@ -57,7 +57,7 @@ const ImportSummary = (props) => {
           label="common.import"
         />
         <FormItem className="total-items" label="common.totalItems">
-          {CategoryImportSummary.getRowsCount(importSummary)}
+          {CategoryImportSummary.getItemsCount(importSummary)}
         </FormItem>
       </ModalFooter>
     </Modal>

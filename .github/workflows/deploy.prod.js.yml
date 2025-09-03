@@ -80,8 +80,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          build-args: |
-            NPM_TOKEN=${{ secrets.NPM_TOKEN }}
+          secrets: |
+            "npm_token=${{ secrets.NPM_TOKEN }}"
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/arena:latest
