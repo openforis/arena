@@ -29,6 +29,9 @@ export default class FilesExportJob extends Job {
 
       // write each file content into a separate binary file
       for (const fileSummary of filesSummariesIncluded) {
+        if (this.isCanceled()) {
+          break
+        }
         const fileUuid = RecordFile.getUuid(fileSummary)
         const fileContentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
         archive.append(fileContentStream, { name: ExportFile.file({ fileUuid }) })
