@@ -27,7 +27,7 @@ const createCommandParams = ({ surveyId, fileUuid }) => ({
   Key: getFileKey({ surveyId, fileUuid }),
 })
 
-const _sendCommand = async (command) => await s3Client.send(command, { requestTimeout })
+const _sendCommand = async (command) => s3Client.send(command, { requestTimeout })
 
 export const checkCanAccessS3Bucket = async () => {
   const command = new HeadBucketCommand({ Bucket })
