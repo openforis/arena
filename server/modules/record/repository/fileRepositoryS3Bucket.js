@@ -8,6 +8,8 @@ import {
 
 import * as ProcessUtils from '@core/processUtils'
 
+const requestTimeout = 5 * 60 * 1000 // 5 minutes
+
 const Bucket = ProcessUtils.ENV.fileStorageAwsS3BucketName
 
 const s3Client = new S3Client({
@@ -25,11 +27,13 @@ const createCommandParams = ({ surveyId, fileUuid }) => ({
   Key: getFileKey({ surveyId, fileUuid }),
 })
 
+const _sendCommand = async (command) => await s3Client.send(command, { requestTimeout })
+
 export const checkCanAccessS3Bucket = async () => {
   const command = new HeadBucketCommand({ Bucket })
 
   try {
-    await s3Client.send(command)
+    await _sendCommand(command)
     return true
   } catch (error) {
     throw new Error(`Cannot access AWS S3 bucket: ${Bucket}; details: ${error}`)
@@ -41,18 +45,18 @@ export const uploadFileContent = async ({ surveyId, fileUuid, content }) => {
     ...createCommandParams({ surveyId, fileUuid }),
     Body: content,
   })
-  return s3Client.send(command)
+  return _sendCommand(command)
 }
 
 export const getFileContentAsStream = async ({ surveyId, fileUuid }) => {
   const command = new GetObjectCommand(createCommandParams({ surveyId, fileUuid }))
-  const response = await s3Client.send(command)
+  const response = await _sendCommand(command)
   return response.Body
 }
 
 export const deleteFiles = async ({ surveyId, fileUuids }) => {
   for (const fileUuid of fileUuids) {
     const command = new DeleteObjectCommand(createCommandParams({ surveyId, fileUuid }))
-    await s3Client.send(command)
+    await _sendCommand(command)
   }
 }
