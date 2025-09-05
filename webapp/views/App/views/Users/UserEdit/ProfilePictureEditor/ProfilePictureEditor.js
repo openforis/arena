@@ -40,7 +40,7 @@ const ProfilePictureEditor = (props) => {
   const i18n = useI18n()
   const confirm = useConfirm()
 
-  const initialProfilePicture = useProfilePicture(userUuid)
+  const initialProfilePicture = useProfilePicture({ userUuid })
 
   const dropRef = useRef(null)
   const avatarRef = useRef(null)
