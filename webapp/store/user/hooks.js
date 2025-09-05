@@ -79,7 +79,7 @@ export const useAuthCanViewUsersAccessRequests = () => Authorizer.canViewUsersAc
 export const useAuthCanViewAllUsers = () => Authorizer.canViewAllUsers(useUser())
 
 // ====== Profile picture
-export const useProfilePicture = (forceUpdateKey, userUuid = null) => {
+export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) => {
   const [profilePicture, setProfilePicture] = useState(null)
 
   const { data = null, dispatch: fetchUserProfilePicture } = useAsyncGetRequest(
