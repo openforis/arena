@@ -20,6 +20,7 @@ import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
+import SurveysListExportJob from '@server/modules/survey/service/SurveysListExportJob'
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
@@ -46,6 +47,7 @@ const jobClasses = [
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,
+  SurveysListExportJob,
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
   TaxonomyImportJob,
