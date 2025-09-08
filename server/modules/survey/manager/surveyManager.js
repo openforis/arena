@@ -363,7 +363,7 @@ export const fetchUserSurveysInfo = async ({
         filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }),
       })
     } catch (error) {
-      Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}`)
+      Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)
     }
     surveysWithCounts.push(surveyWithCounts)
     onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
