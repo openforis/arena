@@ -293,24 +293,22 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-export const fetchUserSurveysInfo = async (
-  {
-    user,
-    draft = true,
-    template = false,
-    offset,
-    limit,
-    lang,
-    search,
-    sortBy,
-    sortOrder,
-    includeCounts = false,
-    includeOwnerEmailAddress = false,
-    onlyOwn = false,
-    onProgress = null,
-  },
-  client = db
-) => {
+export const fetchUserSurveysInfo = async ({
+  user,
+  draft = true,
+  template = false,
+  offset,
+  limit,
+  lang,
+  search,
+  sortBy,
+  sortOrder,
+  includeCounts = false,
+  includeOwnerEmailAddress = false,
+  onlyOwn = false,
+  onProgress = null,
+  stopIfFunction = null,
+}) => {
   // check sortBy is valid
   if (sortBy && !Object.values(Survey.sortableKeys).includes(sortBy)) {
     throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
@@ -319,56 +317,58 @@ export const fetchUserSurveysInfo = async (
   if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
     throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
-  return client.tx(async (tx) => {
-    const surveys = (
-      await SurveyRepository.fetchUserSurveys({
-        user,
-        draft,
-        template,
-        offset,
-        limit,
-        lang,
-        search,
-        sortBy,
-        sortOrder,
-        includeOwnerEmailAddress,
-        onlyOwn,
+
+  const surveys = (
+    await SurveyRepository.fetchUserSurveys({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeOwnerEmailAddress,
+      onlyOwn,
+    })
+  ).map(assocSurveyInfo)
+
+  onProgress?.({ total: surveys.length, processed: 0 })
+
+  if (!includeCounts) {
+    return surveys
+  }
+  const surveysWithCounts = []
+  for (const survey of surveys) {
+    if (stopIfFunction?.()) {
+      break
+    }
+    const surveyId = Survey.getId(survey)
+    const surveyWithCounts = {
+      ...survey,
+      cycles: Survey.getCycleKeys(survey).length,
+      languages: Survey.getLanguages(survey).join('|'),
+    }
+    try {
+      const canHaveData = Survey.canHaveData(survey)
+      const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+      Object.assign(surveyWithCounts, {
+        nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
+        recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
+        recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
+        chainsCount: await ChainRepository.countChains({ surveyId }),
+        filesCount,
+        filesSize,
+        filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }),
       })
-    ).map(assocSurveyInfo)
-
-    onProgress?.({ total: surveys.length, processed: 0 })
-
-    if (!includeCounts) {
-      return surveys
+    } catch (error) {
+      Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}`)
     }
-    const surveysWithCounts = []
-    for (const survey of surveys) {
-      const surveyId = Survey.getId(survey)
-      const surveyWithCounts = {
-        ...survey,
-        cycles: Survey.getCycleKeys(survey).length,
-        languages: Survey.getLanguages(survey).join('|'),
-      }
-      try {
-        const canHaveData = Survey.canHaveData(survey)
-        const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
-        Object.assign(surveyWithCounts, {
-          nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
-          recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
-          recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
-          chainsCount: await ChainRepository.countChains({ surveyId }, tx),
-          filesCount,
-          filesSize,
-          filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
-        })
-      } catch (error) {
-        Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}`)
-      }
-      surveysWithCounts.push(surveyWithCounts)
-      onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
-    }
-    return surveysWithCounts
-  })
+    surveysWithCounts.push(surveyWithCounts)
+    onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
+  }
+  return surveysWithCounts
 }
 
 // ====== UPDATE

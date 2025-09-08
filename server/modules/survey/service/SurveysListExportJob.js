@@ -23,6 +23,7 @@ export default class SurveysListExportJob extends Job {
         this.total = total
         this.processed = processed
       },
+      stopIfFunction: () => this.isCanceled(),
     })
 
     this.total = items.length
