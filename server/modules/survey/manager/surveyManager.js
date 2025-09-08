@@ -18,6 +18,7 @@ import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import { db } from '@server/db/db'
+import * as Log from '@server/log/log'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
@@ -35,6 +36,8 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
+
+const Logger = Log.getLogger('SurveyManager')
 
 const assocSurveyInfo = (survey) => survey
 
@@ -304,6 +307,7 @@ export const fetchUserSurveysInfo = async (
     includeCounts = false,
     includeOwnerEmailAddress = false,
     onlyOwn = false,
+    onProgress = null,
   },
   client = db
 ) => {
@@ -332,26 +336,36 @@ export const fetchUserSurveysInfo = async (
       })
     ).map(assocSurveyInfo)
 
+    onProgress?.({ total: surveys.length, processed: 0 })
+
     if (!includeCounts) {
       return surveys
     }
     const surveysWithCounts = []
     for (const survey of surveys) {
       const surveyId = Survey.getId(survey)
-      const canHaveData = Survey.canHaveData(survey)
-      const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
-      surveysWithCounts.push({
+      const surveyWithCounts = {
         ...survey,
         cycles: Survey.getCycleKeys(survey).length,
         languages: Survey.getLanguages(survey).join('|'),
-        nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
-        recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
-        recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
-        chainsCount: await ChainRepository.countChains({ surveyId }, tx),
-        filesCount,
-        filesSize,
-        filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
-      })
+      }
+      try {
+        const canHaveData = Survey.canHaveData(survey)
+        const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
+        Object.assign(surveyWithCounts, {
+          nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
+          recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
+          recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
+          chainsCount: await ChainRepository.countChains({ surveyId }, tx),
+          filesCount,
+          filesSize,
+          filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
+        })
+      } catch (error) {
+        Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}`)
+      }
+      surveysWithCounts.push(surveyWithCounts)
+      onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
     }
     return surveysWithCounts
   })

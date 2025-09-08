@@ -12,13 +12,21 @@ export default class SurveysListExportJob extends Job {
 
   async execute() {
     const { user, draft, template } = this.context
+
     const items = await SurveyManager.fetchUserSurveysInfo({
       user,
       draft,
       template,
       includeCounts: true,
       includeOwnerEmailAddress: true,
+      onProgress: ({ total, processed }) => {
+        this.total = total
+        this.processed = processed
+      },
     })
+
+    this.total = items.length
+
     const fields = [
       'id',
       'uuid',
