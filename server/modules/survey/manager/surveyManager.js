@@ -335,25 +335,25 @@ export const fetchUserSurveysInfo = async (
     if (!includeCounts) {
       return surveys
     }
-    return Promise.all(
-      surveys.map(async (survey) => {
-        const surveyId = Survey.getId(survey)
-        const canHaveData = Survey.canHaveData(survey)
-        const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
-        return {
-          ...survey,
-          cycles: Survey.getCycleKeys(survey).length,
-          languages: Survey.getLanguages(survey).join('|'),
-          nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
-          recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
-          recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
-          chainsCount: await ChainRepository.countChains({ surveyId }, tx),
-          filesCount,
-          filesSize,
-          filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
-        }
+    const surveysWithCounts = []
+    for (const survey of surveys) {
+      const surveyId = Survey.getId(survey)
+      const canHaveData = Survey.canHaveData(survey)
+      const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
+      surveysWithCounts.push({
+        ...survey,
+        cycles: Survey.getCycleKeys(survey).length,
+        languages: Survey.getLanguages(survey).join('|'),
+        nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
+        recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
+        recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
+        chainsCount: await ChainRepository.countChains({ surveyId }, tx),
+        filesCount,
+        filesSize,
+        filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
       })
-    )
+    }
+    return surveysWithCounts
   })
 }
 
