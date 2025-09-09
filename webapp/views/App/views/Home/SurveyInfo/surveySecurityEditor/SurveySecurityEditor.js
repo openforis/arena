@@ -29,22 +29,38 @@ const isSecurityPropApplicable = (key) => (security) => {
 }
 
 const deleteNotApplicableSecurityProps = (security) => {
-  const securityUpdated = { ...security }
   const propsToClean = mobileSecurityProps
   propsToClean.forEach((propToClean) => {
-    if (!isSecurityPropApplicable(propToClean)(securityUpdated)) {
-      delete securityUpdated[propToClean]
+    if (!isSecurityPropApplicable(propToClean)(security)) {
+      delete security[propToClean]
     }
   })
-  return securityUpdated
+}
+
+const deleteSecurityPropsEqualToDefault = (security) => {
+  Object.keys(security).forEach((key) => {
+    if (security[key] === surveySecurityDefaults[key]) {
+      delete security[key]
+    }
+  })
 }
 
 export const SurveySecurityEditor = (props) => {
-  const { security = surveySecurityDefaults, onSecurityUpdate } = props
+  const { security: securityProp, onSecurityUpdate } = props
+
+  const security = useMemo(
+    () => ({
+      ...surveySecurityDefaults,
+      ...(securityProp ?? {}),
+    }),
+    [securityProp]
+  )
 
   const onPropUpdate = useCallback(
     (prop) => (value) => {
-      const securityUpdated = deleteNotApplicableSecurityProps({ ...security, [prop]: value })
+      const securityUpdated = { ...security, [prop]: value }
+      deleteNotApplicableSecurityProps(securityUpdated)
+      deleteSecurityPropsEqualToDefault(securityUpdated)
       onSecurityUpdate(securityUpdated)
     },
     [onSecurityUpdate, security]
