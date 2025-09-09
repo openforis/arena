@@ -20,12 +20,10 @@ const isSecurityPropApplicable = (key) => (security) => {
   if (!visibleInMobile) {
     return !mobileSecurityProps.includes(key)
   }
-  switch (key) {
-    case SurveySecurityProp.allowRecordsWithErrorsUploadFromMobile:
-      return isSecurityPropEnabled(SurveySecurityProp.allowRecordsUploadFromMobile)(security)
-    default:
-      return true
+  if (key === SurveySecurityProp.allowRecordsWithErrorsUploadFromMobile) {
+    return isSecurityPropEnabled(SurveySecurityProp.allowRecordsUploadFromMobile)(security)
   }
+  return true
 }
 
 const deleteNotApplicableSecurityProps = (security) => {
