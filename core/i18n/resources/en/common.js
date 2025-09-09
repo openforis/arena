@@ -470,6 +470,8 @@ If there are records associated to this cycle, they will be deleted.`,
         visibleInMobile: 'Visible in Arena Mobile',
         allowRecordsDownloadInMobile: 'Allow downloading records from server to Arena Mobile',
         allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
+        allowRecordsWithErrorsUploadFromMobile:
+          'Allow uploading records with validation errors from Arena Mobile to server',
       },
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',

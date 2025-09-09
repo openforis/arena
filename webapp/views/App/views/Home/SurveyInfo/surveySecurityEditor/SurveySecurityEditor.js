@@ -1,52 +1,81 @@
 import './SurveySecurityEditor.scss'
 
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'
 
 import { Checkbox } from '@webapp/components/form'
 
-const isSecurityPropEditingEnabled = (key) => (security) => {
-  const visibleInMobile = security[SurveySecurityProp.visibleInMobile] !== false
-  return (
-    visibleInMobile ||
-    ![SurveySecurityProp.allowRecordsDownloadInMobile, SurveySecurityProp.allowRecordsUploadFromMobile].includes(key)
-  )
+const mobileSecurityProps = [
+  SurveySecurityProp.allowRecordsDownloadInMobile,
+  SurveySecurityProp.allowRecordsUploadFromMobile,
+  SurveySecurityProp.allowRecordsWithErrorsUploadFromMobile,
+]
+
+const isSecurityPropEnabled = (key) => (security) => (security[key] ?? surveySecurityDefaults[key]) === true
+
+const isSecurityPropApplicable = (key) => (security) => {
+  const visibleInMobile = isSecurityPropEnabled(SurveySecurityProp.visibleInMobile)(security)
+  if (!visibleInMobile) {
+    return !mobileSecurityProps.includes(key)
+  }
+  if (key === SurveySecurityProp.allowRecordsWithErrorsUploadFromMobile) {
+    return isSecurityPropEnabled(SurveySecurityProp.allowRecordsUploadFromMobile)(security)
+  }
+  return true
 }
 
-const cleanupSecurity = (security) => {
-  const securityUpdated = { ...security }
-  const propsToClean = [
-    SurveySecurityProp.allowRecordsDownloadInMobile,
-    SurveySecurityProp.allowRecordsUploadFromMobile,
-  ]
+const deleteNotApplicableSecurityProps = (security) => {
+  const propsToClean = mobileSecurityProps
   propsToClean.forEach((propToClean) => {
-    if (!isSecurityPropEditingEnabled(propToClean)(securityUpdated)) {
-      delete securityUpdated[propToClean]
+    if (!isSecurityPropApplicable(propToClean)(security)) {
+      delete security[propToClean]
     }
   })
-  return securityUpdated
+}
+
+const deleteSecurityPropsEqualToDefault = (security) => {
+  Object.keys(security).forEach((key) => {
+    if (security[key] === surveySecurityDefaults[key]) {
+      delete security[key]
+    }
+  })
 }
 
 export const SurveySecurityEditor = (props) => {
-  const { security = surveySecurityDefaults, onSecurityUpdate } = props
+  const { security: securityProp, onSecurityUpdate } = props
+
+  const security = useMemo(
+    () => ({
+      ...surveySecurityDefaults,
+      ...(securityProp ?? {}),
+    }),
+    [securityProp]
+  )
 
   const onPropUpdate = useCallback(
     (prop) => (value) => {
-      const securityUpdated = cleanupSecurity({ ...security, [prop]: value })
+      const securityUpdated = { ...security, [prop]: value }
+      deleteNotApplicableSecurityProps(securityUpdated)
+      deleteSecurityPropsEqualToDefault(securityUpdated)
       onSecurityUpdate(securityUpdated)
     },
     [onSecurityUpdate, security]
   )
 
+  const applicableSecurityPropKeys = useMemo(
+    () => Object.values(SurveySecurityProp).filter((key) => isSecurityPropApplicable(key)(security)),
+    [security]
+  )
+
   return (
     <div className="survey-security-editor">
-      {Object.values(SurveySecurityProp).map((key) => (
+      {applicableSecurityPropKeys.map((key) => (
         <Checkbox
           key={key}
           checked={security[key]}
-          disabled={!isSecurityPropEditingEnabled(key)(security)}
+          disabled={!isSecurityPropApplicable(key)(security)}
           label={`homeView.surveyInfo.security.${key}`}
           onChange={onPropUpdate(key)}
         />
