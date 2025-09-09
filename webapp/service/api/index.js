@@ -85,6 +85,8 @@ export {
   updateSurveyConfigurationProp,
   updateSurveyOwner,
   updateSurveyProps,
+  startSurveysListExportJob,
+  getSurveyListExportedFileDownloadUrl,
 } from './survey'
 export {
   convertNodeDef,

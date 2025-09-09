@@ -39,6 +39,7 @@ export default {
   SurveyRdbCreationJob: 'Survey RDB Creation',
   SurveyUnpublishJob: 'Survey Unpublish',
   SurveyPropsUnpublishJob: 'Survey props upublish',
+  SurveysListExportJob: 'Surveys list export',
   TaxonomiesImportJob: 'Taxonomies Import',
   TaxonomiesValidationJob: 'Taxonomies Validation',
   TaxonomyImportJob: 'Taxonomy Import',

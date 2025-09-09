@@ -113,15 +113,32 @@ export const init = (app) => {
     }
   })
 
-  app.get('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+  // surveys list export
+  app.post('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { draft = true, template = false } = Request.getParams(req)
-      const date = DateUtils.nowFormatDefault()
-      const fileName = `arena_surveys_${date}.csv`
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+      const job = SurveyService.startSurveysListExport({ user, draft, template })
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
 
-      await SurveyService.exportSurveysList({ user, draft, template, outputStream: res })
+  // surveys list export (download generated zip file)
+  app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+    try {
+      const { tempFileName } = Request.getParams(req)
+      const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+      const date = DateUtils.nowFormatDefault()
+      const name = `arena_surveys_${date}.csv`
+
+      Response.sendFile({
+        res,
+        path: exportedFilePath,
+        name,
+        contentType: Response.contentTypes.csv,
+      })
     } catch (error) {
       next(error)
     }
