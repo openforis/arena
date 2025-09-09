@@ -63,3 +63,14 @@ export const updateSurveyProps = async ({ surveyId, props }) => {
   const { data } = await axios.put(`/api/survey/${surveyId}/info`, props)
   return data
 }
+
+// surveys list export
+export const startSurveysListExportJob = async ({ draft = true, template = false } = {}) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/surveys/export`, { draft, template })
+  return { job }
+}
+
+export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
+  `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
