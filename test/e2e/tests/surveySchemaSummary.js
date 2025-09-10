@@ -73,6 +73,8 @@ export default () =>
           'parentEntity',
           'label_en',
           'label_fr',
+          'description_en',
+          'description_fr',
           'type',
           'key',
           'categoryName',
