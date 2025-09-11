@@ -121,7 +121,7 @@ const valueConverterByNodeDefType = {
       return Node.newNodeValueCode({ itemUuid, code })
     }
     // cannot determine itemUuid for hiearachical category items at this stage; item can depend on selected parent item;
-    return { [Node.valuePropsCode.code]: code }
+    return Node.newNodeValueCode({ code })
   },
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef, value }) => {
     const srsId = StringUtils.removePrefix(Srs.idPrefix)(value[Node.valuePropsCoordinate.srs])
