@@ -209,7 +209,7 @@ export const hasUserInputValue = (node) => !isValueBlank(node) && !isDefaultValu
 // Code
 export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
-export const newNodeValueCode = ({ itemUuid, code }) => {
+export const newNodeValueCode = ({ itemUuid = null, code = null }) => {
   const value = {}
   if (itemUuid) {
     value[valuePropsCode.itemUuid] = itemUuid

@@ -6,11 +6,9 @@ import Queue from '@core/queue'
 
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Node from '../node'
-import * as NodeRefData from '../nodeRefData'
 import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
@@ -230,32 +228,6 @@ export const getAncestorCodeAttributes =
       nodeDef,
       visitor: (visitedCodeAttribute) => {
         result.unshift(visitedCodeAttribute)
-      },
-    })(record)
-    return result
-  }
-
-const getNodeCategoryItemCode = (node) => {
-  const item = NodeRefData.getCategoryItem(node)
-  if (item) {
-    return CategoryItem.getCode(item)
-  }
-  const value = Node.getValue(node)
-  return NodeValues.getValueCode(value)
-}
-
-// Returns the ancestor code attribute codes, in top-down order
-export const getAncestorCodeAttributeCodes =
-  ({ survey, parentNode, nodeDef }) =>
-  (record) => {
-    const result = []
-    visitAncestorCodeAttributes({
-      survey,
-      parentNode,
-      nodeDef,
-      visitor: (visitedCodeAttribute) => {
-        const code = getNodeCategoryItemCode(visitedCodeAttribute)
-        result.unshift(code)
       },
     })(record)
     return result
