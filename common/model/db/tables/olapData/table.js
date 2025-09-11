@@ -29,6 +29,22 @@ export default class TableOlapData extends TableSurveyRdb {
     this._baseUnitDef = baseUnitDef
   }
 
+  get survey() {
+    return this._survey
+  }
+
+  get entityDef() {
+    return this._entityDef
+  }
+
+  get baseUnitDef() {
+    return this._baseUnitDef
+  }
+
+  getColumnNameByAttributeDef = (attributeDef) => {
+    return NodeDef.getName(attributeDef)
+  }
+
   get attributeDefsForColumns() {
     const sortedAttributeDefs = []
     const attributeDefsByUuid = {}
@@ -64,7 +80,7 @@ export default class TableOlapData extends TableSurveyRdb {
       // base unit UUID
       this.baseUnitUuidColumnName,
       // attribute columns
-      ...this.attributeDefsForColumns.map(NodeDef.getName),
+      ...this.attributeDefsForColumns.map((attributeDef) => this.getColumnNameByAttributeDef(attributeDef)),
     ]
   }
 
@@ -85,6 +101,10 @@ export default class TableOlapData extends TableSurveyRdb {
 
   get baseUnitUuidColumnName() {
     return NodeDef.getName(this._baseUnitDef) + '_uuid'
+  }
+
+  get expFactorColumnName() {
+    return baseColumnSet.expFactor
   }
 
   get columnNamesAndTypes() {

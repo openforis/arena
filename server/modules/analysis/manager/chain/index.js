@@ -46,6 +46,11 @@ export const create = async ({ user, surveyId }) => {
 // ====== READ
 export const { countChains, fetchChains, fetchChain } = ChainRepository
 
+export const fetchChainWithSamplingDesign = async ({ surveyId }) => {
+  const chains = await ChainRepository.fetchChains({ surveyId })
+  return chains.find(Chain.hasSamplingDesign)
+}
+
 // ====== UPDATE
 export const { updateChain } = ChainRepository
 
