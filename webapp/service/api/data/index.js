@@ -4,6 +4,7 @@ import { Query } from '@common/model/query'
 
 import * as Node from '@core/record/node'
 
+import { FileUtils } from '@webapp/utils/fileUtils'
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD
@@ -94,14 +95,25 @@ export const startDataImportFromArenaJob = async ({
   onUploadProgress,
   dryRun = false,
 }) => {
-  const formData = objectToFormData({
+  let job = null
+  await FileUtils.readInChunks({
     file,
-    cycle,
-    dryRun,
-    conflictResolutionStrategy,
+    reader: async ({ chunk, totalChunks, content }) => {
+      const formData = objectToFormData({
+        file: content,
+        chunk,
+        totalChunks,
+        cycle,
+        dryRun,
+        conflictResolutionStrategy,
+      })
+      const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
+      onUploadProgress({ total: totalChunks, processed: chunk })
+      if (chunk === totalChunks) {
+        job = data.job
+      }
+    },
   })
-  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
-  const { job } = data
   return job
 }
 
