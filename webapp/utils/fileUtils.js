@@ -72,6 +72,22 @@ const determineFileFormatFromFileName = (fileName) => {
   return extension ? fileFormatByExtension[extension.toLocaleLowerCase()] : undefined
 }
 
+const readInChunks = async ({ file, reader, chunkSize = 1024 * 200, maxTryings = 10 }) => {
+  let endPointer = file.size
+  const totalChunks = Math.ceil(file.size / chunkSize)
+  for (let chunk = 0; chunk < endPointer; chunk += chunkSize) {
+    const content = file.slice(chunk, chunk + chunkSize)
+    for (let tryings = 1; tryings < maxTryings; tryings += 1) {
+      try {
+        await reader({ chunk, totalChunks, content })
+        break
+      } catch (error) {
+        // ignore it
+      }
+    }
+  }
+}
+
 export const FileUtils = {
   excelRowsLimit,
   getExtension,
@@ -79,4 +95,5 @@ export const FileUtils = {
   acceptByExtension,
   readAsText,
   determineFileFormatFromFileName,
+  readInChunks,
 }
