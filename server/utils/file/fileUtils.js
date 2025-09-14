@@ -34,7 +34,7 @@ export { join, sep }
 
 // ====== FILE
 
-export const readFile = async (path) => promises.readFile(path, { encoding: 'utf8' })
+export const readFile = async (path) => promises.readFile(path)
 
 export const readBinaryFile = async (path) => promises.readFile(path)
 
@@ -127,3 +127,25 @@ export const writeStreamToTempFile = async (inputStream) =>
       reject(error)
     })
   })
+
+const _getChunkFileName = ({ fileId, chunk }) => `${fileId}.part${chunk}`
+
+export const writeChunkToTempFile = async ({ filePath, fileId, chunk }) => {
+  const destFileName = _getChunkFileName({ fileId, chunk })
+  const destFilePath = tempFilePath(destFileName)
+  await copyFile(filePath, destFilePath)
+}
+
+export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+  const finalFilePath = newTempFilePath()
+  const writeStream = createWriteStream(finalFilePath)
+  for (var chunk = 1; chunk <= totalChunks; chunk += 1) {
+    const chunkFileName = _getChunkFileName({ fileId, chunk })
+    const chunkFilePath = tempFilePath(chunkFileName)
+    const chunkFileContent = await readFile(chunkFilePath)
+    writeStream.write(chunkFileContent)
+    await deleteFileAsync(chunkFilePath)
+  }
+  writeStream.end()
+  return finalFilePath
+}
