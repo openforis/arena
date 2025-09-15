@@ -48,7 +48,15 @@ export const ImportStartButton = (props) => {
     } else {
       await onStartConfirmed()
     }
-  }, [confirmMessageKey, confirmMessageParams, dispatch, onStartConfirmed, showConfirm, strongConfirmRequiredText])
+  }, [
+    confirmMessageKey,
+    confirmMessageParams,
+    dispatch,
+    onStartConfirmed,
+    showConfirm,
+    strongConfirm,
+    strongConfirmRequiredText,
+  ])
 
   return (
     <>

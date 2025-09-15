@@ -1,4 +1,4 @@
-import fs, { promises } from 'fs'
+import fs, { promises as fsp } from 'fs'
 import { ncp } from 'ncp'
 import { join, sep } from 'path'
 
@@ -9,11 +9,11 @@ const dirSeparator = '/'
 
 // ====== DIR
 
-export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
+export const mkdir = async (path) => fsp.mkdir(path, { recursive: true })
 
 export const rmdir = async (path) => {
   if (exists(path)) {
-    await promises.rm(path, { recursive: true })
+    await fsp.rm(path, { recursive: true })
   }
 }
 
@@ -34,15 +34,15 @@ export { join, sep }
 
 // ====== FILE
 
-export const readFile = async (path) => promises.readFile(path)
+export const readFile = async (path) => fsp.readFile(path, { encoding: 'utf-8' })
 
-export const readBinaryFile = async (path) => promises.readFile(path)
+export const readBinaryFile = async (path) => fsp.readFile(path)
 
-export const writeFile = async (path, data = '') => promises.writeFile(path, data)
+export const writeFile = async (path, data = '') => fsp.writeFile(path, data)
 
-export const appendFile = async (path, data = '') => promises.appendFile(path, data)
+export const appendFile = async (path, data = '') => fsp.appendFile(path, data)
 
-export const copyFile = async (src, dest) => promises.copyFile(src, dest)
+export const copyFile = async (src, dest) => fsp.copyFile(src, dest)
 
 export const { createWriteStream, createReadStream } = fs
 
@@ -98,7 +98,7 @@ export const getBaseName = (file) => {
 }
 
 export const deleteFile = (path) => fs.unlinkSync(path)
-export const deleteFileAsync = (path) => promises.unlink(path)
+export const deleteFileAsync = (path) => fsp.unlink(path)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`
@@ -128,7 +128,7 @@ export const writeStreamToTempFile = async (inputStream) =>
     })
   })
 
-const _getChunkFileName = ({ fileId, chunk }) => `${fileId}.part${chunk}`
+const _getChunkFileName = ({ fileId, chunk }) => `${fileId}_part${chunk}`
 
 export const writeChunkToTempFile = async ({ filePath, fileId, chunk }) => {
   const destFileName = _getChunkFileName({ fileId, chunk })

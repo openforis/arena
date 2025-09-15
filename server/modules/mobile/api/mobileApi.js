@@ -62,6 +62,9 @@ export const init = (app) => {
       } = Request.getParams(req)
 
       const requestFilePath = Request.getFilePath(req)
+      if (totalChunks) {
+        await FileUtils.writeChunkToTempFile({ filePath: requestFilePath, fileId, chunk })
+      }
       if (!totalChunks || chunk === totalChunks) {
         const filePath = totalChunks ? await FileUtils.mergeTempChunks({ fileId, totalChunks }) : requestFilePath
         const job = ArenaMobileImportService.startArenaMobileImportJob({
@@ -72,9 +75,9 @@ export const init = (app) => {
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } else if (totalChunks) {
-        await FileUtils.writeChunkToTempFile({ filePath: requestFilePath, fileId, chunk })
+        res.json({ chunkProcessing: true, chunk, totalChunks })
       } else {
-        res.json({ chunkProcessing: true })
+        throw new Error('Invalid chunk number')
       }
     } catch (e) {
       next(e)

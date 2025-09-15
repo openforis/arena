@@ -1,10 +1,13 @@
 import axios from 'axios'
 
+import { UUIDs } from '@openforis/arena-core'
+
 import { Query } from '@common/model/query'
 
 import * as Node from '@core/record/node'
 
-import { FileUtils } from '@webapp/utils/fileUtils'
+import { FileProcessor } from '@webapp/utils/FileProcessor'
+
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD
@@ -94,28 +97,30 @@ export const startDataImportFromArenaJob = async ({
   file,
   onUploadProgress,
   dryRun = false,
-}) => {
-  let job = null
-  await FileUtils.readInChunks({
-    file,
-    reader: async ({ chunk, totalChunks, content }) => {
-      const formData = objectToFormData({
-        file: content,
-        chunk,
-        totalChunks,
-        cycle,
-        dryRun,
-        conflictResolutionStrategy,
-      })
-      const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
-      onUploadProgress({ total: totalChunks, processed: chunk })
-      if (chunk === totalChunks) {
-        job = data.job
-      }
-    },
+}) =>
+  new Promise((resolve) => {
+    const fileId = UUIDs.v4()
+    const fileProcessor = new FileProcessor({
+      file,
+      chunkProcessor: async ({ chunk, totalChunks, content }) => {
+        const formData = objectToFormData({
+          file: content,
+          fileId,
+          chunk,
+          totalChunks,
+          cycle,
+          dryRun,
+          conflictResolutionStrategy,
+        })
+        const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
+        onUploadProgress({ total: totalChunks, processed: chunk })
+        if (chunk === totalChunks) {
+          resolve(data.job)
+        }
+      },
+    })
+    fileProcessor.start()
   })
-  return job
-}
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>
   `/api/survey/${surveyId}/data-import/flat-data/template`
