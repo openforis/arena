@@ -53,5 +53,5 @@ export class FileProcessor {
   }
 }
 
-FileProcessor.defaultChunkSize = 1024 * 1024 * 2 // 2MB
+FileProcessor.defaultChunkSize = 1024 * 1024 * 10 // 10MB
 FileProcessor.defaultMaxTryings = 5

@@ -3,6 +3,8 @@ import './ImportStartButton.scss'
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+import { UUIDs } from '@openforis/arena-core'
+
 import { ConflictResolutionStrategy } from '@common/dataImport'
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -58,10 +60,12 @@ export const DataImportArenaView = () => {
   const [cycle, setCycle] = useState(surveyCycle)
   const [conflictResolutionStrategy, setConflictResolutionStrategy] = useState(ConflictResolutionStrategy.skipExisting)
   const [file, setFile] = useState(null)
+  const [fileId, setFileId] = useState(null)
 
   const onImportJobComplete = useCallback(
     async (jobCompleted) => {
       setFile(null)
+      setFileId(null)
       const result = JobSerialized.getResult(jobCompleted)
       const summary = generateImportSummary({ result, i18n })
       dispatch(
@@ -88,6 +92,7 @@ export const DataImportArenaView = () => {
       return acceptedFileExtensions.includes(extension)
     })[0]
     setFile(_file)
+    setFileId(UUIDs.v4())
   }, [])
 
   return (
@@ -122,7 +127,7 @@ export const DataImportArenaView = () => {
           disabled={!file}
           showConfirm
           startFunction={API.startDataImportFromArenaJob}
-          startFunctionParams={{ surveyId, cycle, conflictResolutionStrategy, file }}
+          startFunctionParams={{ surveyId, cycle, conflictResolutionStrategy, file, fileId }}
           onUploadComplete={onImportJobStart}
         />
       </div>

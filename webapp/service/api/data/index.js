@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import { UUIDs } from '@openforis/arena-core'
-
 import { Query } from '@common/model/query'
 
 import * as Node from '@core/record/node'
@@ -95,12 +93,12 @@ export const startDataImportFromArenaJob = ({
   cycle,
   conflictResolutionStrategy,
   file,
+  fileId,
   onUploadProgress,
   dryRun = false,
 }) => {
   let fileProcessor = null
   const promise = new Promise((resolve) => {
-    const fileId = UUIDs.v4()
     fileProcessor = new FileProcessor({
       file,
       chunkProcessor: async ({ chunk, totalChunks, content }) => {
