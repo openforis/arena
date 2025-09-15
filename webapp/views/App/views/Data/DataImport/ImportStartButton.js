@@ -65,12 +65,13 @@ export const ImportStartButton = (props) => {
 
   const onUploadCancelClick = useCallback(() => {
     cancelRef.current?.()
+    setUploadProgressPercent(-1)
   }, [])
 
   return (
     <>
       {uploadProgressPercent >= 0 && (
-        <div>
+        <div className="container">
           <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
           {cancelRef.current && <ButtonIconCancel onClick={onUploadCancelClick} />}
         </div>
