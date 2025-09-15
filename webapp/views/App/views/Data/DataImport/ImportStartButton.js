@@ -23,21 +23,27 @@ export const ImportStartButton = (props) => {
 
   const dispatch = useDispatch()
   const cancelRef = useRef(null)
+  const uploadingRef = useRef(false)
   const [uploadProgressPercent, setUploadProgressPercent] = useState(-1)
 
-  const onUploadProgress = (progressEvent) => {
-    const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-    setUploadProgressPercent(percent)
-  }
+  const onUploadProgress = useCallback((progressEvent) => {
+    if (uploadingRef.current) {
+      const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+      setUploadProgressPercent(percent)
+    }
+  }, [])
 
   const onStartConfirmed = useCallback(async () => {
+    uploadingRef.current = true
+    setUploadProgressPercent(0)
     const startRes = startFunction({ ...startFunctionParams, onUploadProgress })
     const promise = startRes instanceof Promise ? startRes : startRes.promise
     cancelRef.current = startRes.cancel
     const result = await promise
+    uploadingRef.current = false
     setUploadProgressPercent(-1)
     onUploadComplete(result)
-  }, [onUploadComplete, startFunction, startFunctionParams])
+  }, [onUploadComplete, onUploadProgress, startFunction, startFunctionParams])
 
   const onStartClick = useCallback(async () => {
     if (showConfirm) {
@@ -65,6 +71,7 @@ export const ImportStartButton = (props) => {
 
   const onUploadCancelClick = useCallback(() => {
     cancelRef.current?.()
+    uploadingRef.current = false
     setUploadProgressPercent(-1)
   }, [])
 

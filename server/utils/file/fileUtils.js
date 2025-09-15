@@ -2,8 +2,8 @@ import fs, { promises as fsp } from 'fs'
 import { ncp } from 'ncp'
 import { join, sep } from 'path'
 
-import * as ProcessUtils from '../../../core/processUtils'
-import { isUuid, uuidv4 } from '../../../core/uuid'
+import * as ProcessUtils from '@core/processUtils'
+import { isUuid, uuidv4 } from '@core/uuid'
 
 const dirSeparator = '/'
 
