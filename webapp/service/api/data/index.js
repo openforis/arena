@@ -113,7 +113,7 @@ export const startDataImportFromArenaJob = async ({
           conflictResolutionStrategy,
         })
         const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
-        onUploadProgress({ total: totalChunks, processed: chunk })
+        onUploadProgress({ total: totalChunks, loaded: chunk })
         if (chunk === totalChunks) {
           resolve(data.job)
         }

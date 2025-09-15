@@ -8,7 +8,7 @@ import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyServi
 import * as JobUtils from '@server/job/jobUtils'
 import * as Log from '@server/log/log'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
-import * as FileUtils from '@server/utils/file/fileUtils'
+import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
 
 const Logger = Log.getLogger('Mobile API')
 
@@ -52,21 +52,10 @@ export const init = (app) => {
   app.post('/mobile/survey/:surveyId', AuthMiddleware.requireRecordCreatePermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const {
-        surveyId,
-        conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting,
-        // parameters used only when file is splitted into chunks
-        fileId = undefined,
-        chunk = undefined,
-        totalChunks = undefined,
-      } = Request.getParams(req)
+      const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
 
-      const requestFilePath = Request.getFilePath(req)
-      if (totalChunks) {
-        await FileUtils.writeChunkToTempFile({ filePath: requestFilePath, fileId, chunk })
-      }
-      if (!totalChunks || chunk === totalChunks) {
-        const filePath = totalChunks ? await FileUtils.mergeTempChunks({ fileId, totalChunks }) : requestFilePath
+      const filePath = await processChunkedFile({ req })
+      if (filePath) {
         const job = ArenaMobileImportService.startArenaMobileImportJob({
           user,
           filePath,
@@ -74,10 +63,8 @@ export const init = (app) => {
           conflictResolutionStrategy,
         })
         res.json({ job: JobUtils.jobToJSON(job) })
-      } else if (totalChunks) {
-        res.json({ chunkProcessing: true, chunk, totalChunks })
       } else {
-        throw new Error('Invalid chunk number')
+        res.json({ chunkProcessing: true })
       }
     } catch (e) {
       next(e)
