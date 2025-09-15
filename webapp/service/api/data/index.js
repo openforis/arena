@@ -90,17 +90,18 @@ export const startDataImportFromCsvJob = async ({
   return job
 }
 
-export const startDataImportFromArenaJob = async ({
+export const startDataImportFromArenaJob = ({
   surveyId,
   cycle,
   conflictResolutionStrategy,
   file,
   onUploadProgress,
   dryRun = false,
-}) =>
-  new Promise((resolve) => {
+}) => {
+  let fileProcessor = null
+  const promise = new Promise((resolve) => {
     const fileId = UUIDs.v4()
-    const fileProcessor = new FileProcessor({
+    fileProcessor = new FileProcessor({
       file,
       chunkProcessor: async ({ chunk, totalChunks, content }) => {
         const formData = objectToFormData({
@@ -121,6 +122,8 @@ export const startDataImportFromArenaJob = async ({
     })
     fileProcessor.start()
   })
+  return { promise, cancel: () => fileProcessor.stop() }
+}
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>
   `/api/survey/${surveyId}/data-import/flat-data/template`

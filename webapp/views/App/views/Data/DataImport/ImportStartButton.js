@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { Button, ProgressBar } from '@webapp/components'
 import { DialogConfirmActions } from '@webapp/store/ui'
+import { ButtonIconCancel } from '@webapp/components/buttons'
 
 export const ImportStartButton = (props) => {
   const {
@@ -21,6 +22,7 @@ export const ImportStartButton = (props) => {
   } = props
 
   const dispatch = useDispatch()
+  const cancelRef = useRef(null)
   const [uploadProgressPercent, setUploadProgressPercent] = useState(-1)
 
   const onUploadProgress = (progressEvent) => {
@@ -29,7 +31,10 @@ export const ImportStartButton = (props) => {
   }
 
   const onStartConfirmed = useCallback(async () => {
-    const result = await startFunction({ ...startFunctionParams, onUploadProgress })
+    const startRes = startFunction({ ...startFunctionParams, onUploadProgress })
+    const promise = startRes instanceof Promise ? startRes : startRes.promise
+    cancelRef.current = startRes.cancel
+    const result = await promise
     setUploadProgressPercent(-1)
     onUploadComplete(result)
   }, [onUploadComplete, startFunction, startFunctionParams])
@@ -58,9 +63,18 @@ export const ImportStartButton = (props) => {
     strongConfirmRequiredText,
   ])
 
+  const onUploadCancelClick = useCallback(() => {
+    cancelRef.current?.()
+  }, [])
+
   return (
     <>
-      {uploadProgressPercent >= 0 && <ProgressBar indeterminate={false} progress={uploadProgressPercent} />}
+      {uploadProgressPercent >= 0 && (
+        <div>
+          <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
+          {cancelRef.current && <ButtonIconCancel onClick={onUploadCancelClick} />}
+        </div>
+      )}
       <Button
         className={className}
         disabled={disabled || uploadProgressPercent >= 0}
