@@ -36,10 +36,12 @@ export const ImportStartButton = (props) => {
   const onStartConfirmed = useCallback(async () => {
     uploadingRef.current = true
     setUploadProgressPercent(0)
+
     const startRes = startFunction({ ...startFunctionParams, onUploadProgress })
     const promise = startRes instanceof Promise ? startRes : startRes.promise
     cancelRef.current = startRes.cancel
     const result = await promise
+
     uploadingRef.current = false
     setUploadProgressPercent(-1)
     onUploadComplete(result)
