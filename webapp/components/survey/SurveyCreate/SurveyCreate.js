@@ -29,6 +29,7 @@ import { SurveyType } from '@webapp/model'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
+import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
 
 const fileMaxSizeDefault = 1000 // 1GB
 const fileMaxSizeSystemAdmin = 2000 // 2GB
@@ -45,6 +46,11 @@ const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
     label: `surveyCreate:cloneFromType.${key}`,
   }))
 
+const dropzoneAcceptBySource = {
+  [importSources.arena]: { [contentTypes.zip]: ['.zip'] },
+  [importSources.collect]: { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] },
+}
+
 const SurveyCreate = (props) => {
   const { showImport = true, submitButtonLabel = 'surveyCreate:createSurvey', template = false } = props
 
@@ -53,10 +59,19 @@ const SurveyCreate = (props) => {
   const navigate = useNavigate()
   const isSystemAdmin = useUserIsSystemAdmin()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
-    useCreateSurvey({
-      template,
-    })
+  const {
+    newSurvey,
+    onUpdate,
+    onCreate,
+    onImport,
+    onImportJobStart,
+    onCreateTypeUpdate,
+    onFilesDrop,
+    onOptionChange,
+    onSourceChange,
+  } = useCreateSurvey({
+    template,
+  })
   const {
     createType,
     name,
@@ -215,17 +230,19 @@ const SurveyCreate = (props) => {
               </FormItem>
               <div className="row">
                 <Dropzone
-                  accept={
-                    source === importSources.arena
-                      ? { [contentTypes.zip]: ['.zip'] }
-                      : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
-                  }
+                  accept={dropzoneAcceptBySource[source]}
                   maxSize={fileMaxSize}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />
               </div>
               <div className="row">
+                <ImportStartButton
+                  className="btn-secondary"
+                  disabled={!file}
+                  startFunction={onImport}
+                  onUploadComplete={onImportJobStart}
+                />
                 <Button
                   className="btn-primary"
                   disabled={!file || uploading}

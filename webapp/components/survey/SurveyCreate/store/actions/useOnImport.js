@@ -1,60 +1,49 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
-import * as JobSerialized from '@common/job/jobSerialized'
-
-import * as Validation from '@core/validation/validation'
-
 import { objectToFormData } from '@webapp/service/api'
-import { SurveyActions } from '@webapp/store/survey'
-import { JobActions } from '@webapp/store/app'
-import { NotificationActions } from '@webapp/store/ui'
 
 import { importSources } from '../importSources'
+import { FileProcessor } from '@webapp/utils/FileProcessor'
 
 const urlBySource = {
   [importSources.collect]: '/api/survey/collect-import',
   [importSources.arena]: '/api/survey/arena-import',
 }
 
-export const useOnImport = ({ newSurvey, setNewSurvey }) => {
-  const dispatch = useDispatch()
+export const useOnImport = ({ newSurvey, setNewSurvey }) =>
+  useCallback(
+    ({ onUploadProgress }) => {
+      const { file, fileId, source, ...surveyObj } = newSurvey
 
-  return useCallback(async () => {
-    const { file, source, ...surveyObj } = newSurvey
+      // reset upload progress (hide progress bar)
+      setNewSurvey({ ...newSurvey, uploadProgressPercent: -1, uploading: true })
 
-    // reset upload progress (hide progress bar)
-    setNewSurvey({ ...newSurvey, uploadProgressPercent: -1, uploading: true })
+      let fileProcessor = null
+      const promise = new Promise((resolve, reject) => {
+        fileProcessor = new FileProcessor({
+          file,
+          chunkProcessor: async ({ chunk, totalChunks, content }) => {
+            const formData = objectToFormData({ file: content, fileId, survey: JSON.stringify(surveyObj) })
 
-    const formData = objectToFormData({ file, survey: JSON.stringify(surveyObj) })
+            const { data } = await axios.post(urlBySource[source], formData)
 
-    const onUploadProgress = (progressEvent) => {
-      const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-      setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
-    }
-    const { data } = await axios.post(urlBySource[source], formData, { onUploadProgress })
+            onUploadProgress({ total: totalChunks, loaded: chunk })
 
-    const { job, validation } = data
+            const uploadProgressPercent = Math.round((chunk / totalChunks) * 100)
+            setNewSurvey({ ...newSurvey, uploading: uploadProgressPercent < 100 })
 
-    if (job && (!validation || Validation.isValid(validation))) {
-      dispatch(
-        JobActions.showJobMonitor({
-          job: data.job,
-          onComplete: async (job) => {
-            const { surveyId } = JobSerialized.getResult(job)
-            dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
+            if (chunk === totalChunks) {
+              const { job, validation } = data
+              resolve({ job, validation })
+            }
+          },
+          onError: (error) => {
+            reject(error)
           },
         })
-      )
-    } else if (validation && !Validation.isValid(validation)) {
-      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
-
-      setNewSurvey({
-        ...newSurvey,
-        validation,
-        uploading: false,
       })
-    }
-  }, [dispatch, newSurvey, setNewSurvey])
-}
+      return { promise, fileProcessor }
+    },
+    [newSurvey, setNewSurvey]
+  )

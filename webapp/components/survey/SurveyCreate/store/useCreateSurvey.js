@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, UUIDs } from '@openforis/arena-core'
 
 import { SurveyType } from '@webapp/model'
 
@@ -31,7 +31,7 @@ const initialState = {
 export const useCreateSurvey = ({ template = false } = {}) => {
   const [newSurvey, setNewSurvey] = useState({ ...initialState, template })
 
-  const { onUpdate, onCreate, onImport } = useActions({
+  const { onUpdate, onCreate, onImport, onImportJobStart } = useActions({
     newSurvey,
     setNewSurvey,
   })
@@ -56,13 +56,13 @@ export const useCreateSurvey = ({ template = false } = {}) => {
   }
 
   const onSourceChange = (value) => {
-    const newSurveyUpdated = { ...newSurvey, source: value, file: null }
+    const newSurveyUpdated = { ...newSurvey, source: value, file: null, fileId: null }
     setNewSurvey(newSurveyUpdated)
   }
 
   const onFilesDrop = (files) => {
     const file = files[0]
-    setNewSurvey({ ...newSurvey, file })
+    setNewSurvey({ ...newSurvey, file, fileId: UUIDs.v4() })
   }
 
   return {
@@ -70,6 +70,7 @@ export const useCreateSurvey = ({ template = false } = {}) => {
     onUpdate,
     onCreate,
     onImport,
+    onImportJobStart,
     onCreateTypeUpdate,
     onFilesDrop,
     onOptionChange,
