@@ -120,7 +120,7 @@ export const startDataImportFromArenaJob = ({
     })
     fileProcessor.start()
   })
-  return { promise, cancel: () => fileProcessor.stop() }
+  return { promise, processor: fileProcessor }
 }
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>

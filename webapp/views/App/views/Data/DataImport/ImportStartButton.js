@@ -6,6 +6,17 @@ import { Button, ProgressBar } from '@webapp/components'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { ButtonIconCancel } from '@webapp/components/buttons'
 
+const stata = {
+  running: 'running',
+  stopped: 'stopped',
+  paused: 'paused',
+}
+
+const initialState = {
+  uploadProgressPercent: -1,
+  status: stata.stopped,
+}
+
 export const ImportStartButton = (props) => {
   const {
     className = 'btn-primary start-btn',
@@ -22,30 +33,36 @@ export const ImportStartButton = (props) => {
   } = props
 
   const dispatch = useDispatch()
-  const cancelRef = useRef(null)
   const uploadingRef = useRef(false)
-  const [uploadProgressPercent, setUploadProgressPercent] = useState(-1)
+  const processorRef = useRef(null)
+  const [state, setState] = useState(initialState)
+
+  const { status, uploadProgressPercent } = state
+
+  const reset = useCallback(() => {
+    uploadingRef.current = false
+    processorRef.current?.stop()
+    setState(initialState)
+  }, [])
 
   const onUploadProgress = useCallback((progressEvent) => {
     if (uploadingRef.current) {
       const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-      setUploadProgressPercent(percent)
+      setState((statePrev) => ({ ...statePrev, uploadProgressPercent: percent }))
     }
   }, [])
 
   const onStartConfirmed = useCallback(async () => {
     uploadingRef.current = true
-    setUploadProgressPercent(0)
+    setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
 
     const startRes = startFunction({ ...startFunctionParams, onUploadProgress })
-    const promise = startRes instanceof Promise ? startRes : startRes.promise
-    cancelRef.current = startRes.cancel
+    const promise = startRes.promise ?? startRes
+    processorRef.current = startRes.processor
     const result = await promise
-
-    uploadingRef.current = false
-    setUploadProgressPercent(-1)
     onUploadComplete(result)
-  }, [onUploadComplete, onUploadProgress, startFunction, startFunctionParams])
+    reset()
+  }, [onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
 
   const onStartClick = useCallback(async () => {
     if (showConfirm) {
@@ -72,9 +89,19 @@ export const ImportStartButton = (props) => {
   ])
 
   const onUploadCancelClick = useCallback(() => {
-    cancelRef.current?.()
+    reset()
+  }, [reset])
+
+  const onUploadPauseClick = useCallback(() => {
     uploadingRef.current = false
-    setUploadProgressPercent(-1)
+    setState((statePrev) => ({ ...statePrev, status: stata.paused }))
+    processorRef.current?.pause()
+  }, [])
+
+  const onUploadResumeClick = useCallback(() => {
+    uploadingRef.current = true
+    setState((statePrev) => ({ ...statePrev, status: stata.running }))
+    processorRef.current?.resume()
   }, [])
 
   return (
@@ -82,7 +109,26 @@ export const ImportStartButton = (props) => {
       {uploadProgressPercent >= 0 && (
         <div className="container">
           <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
-          {cancelRef.current && <ButtonIconCancel onClick={onUploadCancelClick} />}
+          {processorRef.current && (
+            <>
+              {status === stata.running ? (
+                <Button
+                  iconClassName="icon-pause icon-12px"
+                  onClick={onUploadPauseClick}
+                  showLabel={false}
+                  variant="text"
+                />
+              ) : (
+                <Button
+                  iconClassName="icon-play icon-12px"
+                  onClick={onUploadResumeClick}
+                  showLabel={false}
+                  variant="text"
+                />
+              )}
+              <ButtonIconCancel onClick={onUploadCancelClick} />
+            </>
+          )}
         </div>
       )}
       <Button

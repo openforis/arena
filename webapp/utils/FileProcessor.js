@@ -12,24 +12,36 @@ export class FileProcessor {
     this.chunkSize = chunkSize
     this.maxTryings = maxTryings
 
+    this._reset()
+  }
+
+  _reset() {
     this.running = false
-    this.currentChunkNumber = 0
     this.totalChunks = 0
+    this.currentChunkNumber = 0
   }
 
   start() {
     this.running = true
     this.totalChunks = Math.ceil(this.file.size / this.chunkSize)
+    this.currentChunkNumber = 1
     this._processNextChunk()
   }
 
   stop() {
+    this._reset()
+  }
+
+  pause() {
     this.running = false
   }
 
-  _processNextChunk() {
-    this.currentChunkNumber += 1
+  resume() {
+    this.running = true
+    this._processNextChunk()
+  }
 
+  _processNextChunk() {
     const { file, chunkProcessor, currentChunkNumber, totalChunks, chunkSize, maxTryings } = this
 
     const content = file.slice(
@@ -41,6 +53,7 @@ export class FileProcessor {
       processor: async () => chunkProcessor({ chunk: currentChunkNumber, totalChunks, content }),
       onSuccess: () => {
         if (this.running && this.currentChunkNumber < totalChunks) {
+          this.currentChunkNumber += 1
           this._processNextChunk()
         }
       },
