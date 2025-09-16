@@ -5,20 +5,25 @@ export const processChunkedFile = async ({ req }) => {
   const { fileId = undefined, chunk = undefined, totalChunks = undefined } = Request.getParams(req)
   const requestFilePath = Request.getFilePath(req)
 
-  if (totalChunks) {
+  const isSingleFile = !totalChunks
+
+  if (!isSingleFile) {
     await FileUtils.writeChunkToTempFile({ filePath: requestFilePath, fileId, chunk })
     await FileUtils.deleteFileAsync(requestFilePath)
   }
-  if (!totalChunks || chunk === totalChunks) {
-    if (totalChunks) {
-      // chunks complete: merge them into a single one and return that file path
-      return FileUtils.mergeTempChunks({ fileId, totalChunks })
-    }
-    // no file chunking: return request file path
+
+  const isChunkingComplete = totalChunks && chunk === totalChunks
+
+  if (isChunkingComplete) {
+    // All file chunks have been received; merge them and return the file path.
+    return FileUtils.mergeTempChunks({ fileId, totalChunks })
+  }
+  if (isSingleFile) {
+    // No file chunking was used; return the original file path.
     return requestFilePath
   }
-  if (totalChunks) {
-    // chunks not finished
+  if (Number(chunk) < Number(totalChunks)) {
+    // File chunks are still being uploaded; return null to indicate the process isn't complete.
     return null
   }
   throw new Error('Invalid chunk number')
