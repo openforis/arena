@@ -6,6 +6,7 @@ const ignoredUrlRegExps = [
   /^\/auth\/login$/, // login
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/export\/start$/, // data query export
+  /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
 ]
 
 const createAxiosMiddleware =

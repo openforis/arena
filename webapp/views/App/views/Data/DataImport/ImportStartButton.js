@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { Button, ProgressBar } from '@webapp/components'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { ButtonIconCancel } from '@webapp/components/buttons'
+import { useConfirmAsync } from '@webapp/components/hooks'
 
 const stata = {
   running: 'running',
@@ -14,6 +15,7 @@ const stata = {
 
 const initialState = {
   uploadProgressPercent: -1,
+  processedChunks: -1,
   status: stata.stopped,
 }
 
@@ -35,6 +37,7 @@ export const ImportStartButton = (props) => {
   const dispatch = useDispatch()
   const uploadingRef = useRef(false)
   const processorRef = useRef(null)
+  const confirm = useConfirmAsync()
   const [state, setState] = useState(initialState)
 
   const { status, uploadProgressPercent } = state
@@ -47,7 +50,8 @@ export const ImportStartButton = (props) => {
 
   const onUploadProgress = useCallback((progressEvent) => {
     if (uploadingRef.current) {
-      const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+      const { loaded: processedChunks, total } = progressEvent
+      const percent = Math.round((processedChunks / total) * 100)
       setState((statePrev) => ({ ...statePrev, uploadProgressPercent: percent }))
     }
   }, [])
@@ -56,13 +60,29 @@ export const ImportStartButton = (props) => {
     uploadingRef.current = true
     setState((statePrev) => ({ ...statePrev, status: stata.running, uploadProgressPercent: 0 }))
 
-    const startRes = startFunction({ ...startFunctionParams, onUploadProgress })
+    // when retrying, re-start from current chunk
+    const processorCurrentChunkNumber = processorRef.current?.currentChunkNumber
+    const startFromChunk = processorCurrentChunkNumber > 0 ? processorCurrentChunkNumber : 1
+
+    const startRes = startFunction({
+      ...startFunctionParams,
+      onUploadProgress,
+      startFromChunk,
+    })
     const promise = startRes.promise ?? startRes
     processorRef.current = startRes.processor
-    const result = await promise
-    onUploadComplete(result)
-    reset()
-  }, [onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
+    try {
+      const result = await promise
+      onUploadComplete(result)
+      reset()
+    } catch (error) {
+      if (await confirm({ key: 'try-again' })) {
+        await onStartConfirmed()
+      } else {
+        reset()
+      }
+    }
+  }, [confirm, onUploadComplete, onUploadProgress, reset, startFunction, startFunctionParams])
 
   const onStartClick = useCallback(async () => {
     if (showConfirm) {

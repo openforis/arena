@@ -6,11 +6,13 @@ export class FileProcessor {
     chunkProcessor,
     chunkSize = FileProcessor.defaultChunkSize,
     maxTryings = FileProcessor.defaultMaxTryings,
+    onError,
   }) {
     this.file = file
     this.chunkProcessor = chunkProcessor
     this.chunkSize = chunkSize
     this.maxTryings = maxTryings
+    this.onError = onError
 
     this._reset()
   }
@@ -21,10 +23,10 @@ export class FileProcessor {
     this.currentChunkNumber = 0
   }
 
-  start() {
+  start(startFromChunk = 1) {
     this.running = true
     this.totalChunks = Math.ceil(this.file.size / this.chunkSize)
-    this.currentChunkNumber = 1
+    this.currentChunkNumber = startFromChunk
     this._processNextChunk()
   }
 
@@ -39,6 +41,10 @@ export class FileProcessor {
   resume() {
     this.running = true
     this._processNextChunk()
+  }
+
+  onFail(error) {
+    this.onError?.(error)
   }
 
   _processNextChunk() {
@@ -58,7 +64,7 @@ export class FileProcessor {
         }
       },
       onFail: (error) => {
-        throw new Error('Cannot process file chunk', error)
+        this.onFail(new Error('Cannot process file chunk', error))
       },
       maxTryings,
     })

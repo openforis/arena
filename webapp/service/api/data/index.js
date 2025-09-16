@@ -96,9 +96,10 @@ export const startDataImportFromArenaJob = ({
   fileId,
   onUploadProgress,
   dryRun = false,
+  startFromChunk = 1,
 }) => {
   let fileProcessor = null
-  const promise = new Promise((resolve) => {
+  const promise = new Promise((resolve, reject) => {
     fileProcessor = new FileProcessor({
       file,
       chunkProcessor: async ({ chunk, totalChunks, content }) => {
@@ -112,13 +113,18 @@ export const startDataImportFromArenaJob = ({
           conflictResolutionStrategy,
         })
         const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
+
         onUploadProgress({ total: totalChunks, loaded: chunk })
+
         if (chunk === totalChunks) {
           resolve(data.job)
         }
       },
+      onError: (error) => {
+        reject(error)
+      },
     })
-    fileProcessor.start()
+    fileProcessor.start(startFromChunk)
   })
   return { promise, processor: fileProcessor }
 }
