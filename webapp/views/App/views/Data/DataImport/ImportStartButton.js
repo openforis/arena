@@ -76,7 +76,7 @@ export const ImportStartButton = (props) => {
       onUploadComplete(result)
       reset()
     } catch (error) {
-      if (await confirm({ key: 'try-again' })) {
+      if (await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })) {
         await onStartConfirmed()
       } else {
         reset()

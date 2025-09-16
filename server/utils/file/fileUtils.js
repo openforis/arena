@@ -139,7 +139,7 @@ export const writeChunkToTempFile = async ({ filePath, fileId, chunk }) => {
 export const mergeTempChunks = async ({ fileId, totalChunks }) => {
   const finalFilePath = newTempFilePath()
   const writeStream = createWriteStream(finalFilePath)
-  for (var chunk = 1; chunk <= totalChunks; chunk += 1) {
+  for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
     const chunkFileName = _getChunkFileName({ fileId, chunk })
     const chunkFilePath = tempFilePath(chunkFileName)
     const chunkFileContent = await readBinaryFile(chunkFilePath)

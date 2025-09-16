@@ -182,6 +182,10 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
+    uploadErrorConfirm: {
+      message: `Error during file upload: {{error}}.\n
+Try again?`,
+    },
     value: 'Value',
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
     view: 'View',

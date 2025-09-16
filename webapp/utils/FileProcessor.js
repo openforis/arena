@@ -4,9 +4,9 @@ export class FileProcessor {
   constructor({
     file,
     chunkProcessor,
+    onError,
     chunkSize = FileProcessor.defaultChunkSize,
     maxTryings = FileProcessor.defaultMaxTryings,
-    onError,
   }) {
     this.file = file
     this.chunkProcessor = chunkProcessor
@@ -64,7 +64,7 @@ export class FileProcessor {
         }
       },
       onFail: (error) => {
-        this.onFail(new Error('Cannot process file chunk', error))
+        this.onFail(error)
       },
       maxTryings,
     })
