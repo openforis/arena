@@ -140,7 +140,7 @@ export const ImportStartButton = (props) => {
                 />
               ) : (
                 <Button
-                  iconClassName="icon-play icon-12px"
+                  iconClassName="icon-play3 icon-12px"
                   onClick={onUploadResumeClick}
                   showLabel={false}
                   variant="text"
