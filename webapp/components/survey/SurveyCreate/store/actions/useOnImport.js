@@ -13,7 +13,7 @@ const urlBySource = {
 
 export const useOnImport = ({ newSurvey, setNewSurvey }) =>
   useCallback(
-    ({ onUploadProgress }) => {
+    ({ startFromChunk = 1, onUploadProgress }) => {
       const { file, fileId, source, ...surveyObj } = newSurvey
 
       // reset upload progress (hide progress bar)
@@ -24,14 +24,20 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
         fileProcessor = new FileProcessor({
           file,
           chunkProcessor: async ({ chunk, totalChunks, content }) => {
-            const formData = objectToFormData({ file: content, fileId, survey: JSON.stringify(surveyObj) })
+            const formData = objectToFormData({
+              file: content,
+              fileId,
+              chunk,
+              totalChunks,
+              survey: JSON.stringify(surveyObj),
+            })
 
             const { data } = await axios.post(urlBySource[source], formData)
 
             onUploadProgress({ total: totalChunks, loaded: chunk })
 
             const uploadProgressPercent = Math.round((chunk / totalChunks) * 100)
-            setNewSurvey({ ...newSurvey, uploading: uploadProgressPercent < 100 })
+            setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
 
             if (chunk === totalChunks) {
               const { job, validation } = data
@@ -43,7 +49,8 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
           },
         })
       })
-      return { promise, fileProcessor }
+      fileProcessor.start(startFromChunk)
+      return { promise, processor: fileProcessor }
     },
     [newSurvey, setNewSurvey]
   )

@@ -1,3 +1,5 @@
+import './ImportStartButton.scss'
+
 import React, { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
@@ -32,6 +34,7 @@ export const ImportStartButton = (props) => {
     startFunctionParams = {},
     strongConfirm = false,
     strongConfirmRequiredText = null,
+    testId = null,
   } = props
 
   const dispatch = useDispatch()
@@ -126,14 +129,15 @@ export const ImportStartButton = (props) => {
 
   return (
     <>
-      {uploadProgressPercent >= 0 && (
-        <div className="container">
-          <ProgressBar indeterminate={false} progress={uploadProgressPercent} />
+      {uploadProgressPercent >= 0 ? (
+        <div className="import-start-btn-progress-container">
+          <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey={'common.uploadingFile'} />
           {processorRef.current && (
             <>
               {status === stata.running ? (
                 <Button
                   iconClassName="icon-pause icon-12px"
+                  label="common.pause"
                   onClick={onUploadPauseClick}
                   showLabel={false}
                   variant="text"
@@ -141,6 +145,7 @@ export const ImportStartButton = (props) => {
               ) : (
                 <Button
                   iconClassName="icon-play3 icon-12px"
+                  label="common.resume"
                   onClick={onUploadResumeClick}
                   showLabel={false}
                   variant="text"
@@ -150,13 +155,15 @@ export const ImportStartButton = (props) => {
             </>
           )}
         </div>
+      ) : (
+        <Button
+          className={className}
+          disabled={disabled || uploadProgressPercent >= 0}
+          label={label}
+          onClick={onStartClick}
+          testId={testId}
+        />
       )}
-      <Button
-        className={className}
-        disabled={disabled || uploadProgressPercent >= 0}
-        label={label}
-        onClick={onStartClick}
-      />
     </>
   )
 }
@@ -173,4 +180,5 @@ ImportStartButton.propTypes = {
   startFunctionParams: PropTypes.object,
   strongConfirm: PropTypes.bool,
   strongConfirmRequiredText: PropTypes.string,
+  testId: PropTypes.string,
 }

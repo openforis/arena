@@ -1,4 +1,8 @@
-.container {
+.import-start-btn-progress-container {
   display: flex;
-  width: 100%;
+  width: 30rem;
+
+  .progress-bar {
+    flex: 1;
+  }
 }

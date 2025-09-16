@@ -24,7 +24,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox, Dropdown } from '@webapp/components/form'
-import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
+import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
@@ -206,11 +206,7 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.import && showImport && (
         <>
-          {uploading && uploadProgressPercent >= 0 ? (
-            <div className="row">
-              <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey="common.uploadingFile" />
-            </div>
-          ) : (
+          {(!uploading || uploadProgressPercent < 0) && (
             <>
               <div className="row">
                 <fieldset className="options-fieldset">
@@ -236,23 +232,17 @@ const SurveyCreate = (props) => {
                   droppedFiles={file ? [file] : []}
                 />
               </div>
-              <div className="row">
-                <ImportStartButton
-                  className="btn-secondary"
-                  disabled={!file}
-                  startFunction={onImport}
-                  onUploadComplete={onImportJobStart}
-                />
-                <Button
-                  className="btn-primary"
-                  disabled={!file || uploading}
-                  label="surveyCreate:startImport"
-                  onClick={onImport}
-                  testId={TestId.surveyCreate.startImportBtn}
-                />
-              </div>
             </>
           )}
+          <div className="row">
+            <ImportStartButton
+              className="btn-secondary"
+              disabled={!file}
+              startFunction={onImport}
+              testId={TestId.surveyCreate.startImportBtn}
+              onUploadComplete={onImportJobStart}
+            />
+          </div>
         </>
       )}
     </div>
