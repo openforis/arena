@@ -4,6 +4,8 @@ import { Query } from '@common/model/query'
 
 import * as Node from '@core/record/node'
 
+import { FileProcessor } from '@webapp/utils/FileProcessor'
+
 import { objectToFormData } from '../utils/apiUtils'
 
 // ==== RECORD
@@ -53,11 +55,13 @@ export const startCollectRecordsImportJob = async ({
   return job
 }
 
-export const startDataImportFromCsvJob = async ({
+export const startDataImportFromCsvJob = ({
   surveyId,
   cycle,
   nodeDefUuid,
   file,
+  fileId,
+  startFromChunk = 1,
   fileFormat,
   dryRun = false,
   insertNewRecords = false,
@@ -68,41 +72,82 @@ export const startDataImportFromCsvJob = async ({
   abortOnErrors = true,
   onUploadProgress,
 }) => {
-  const formData = objectToFormData({
-    cycle,
-    nodeDefUuid,
-    file,
-    fileFormat,
-    dryRun,
-    insertNewRecords,
-    insertMissingNodes,
-    updateRecordsInAnalysis,
-    includeFiles,
-    deleteExistingEntities,
-    abortOnErrors,
+  let fileProcessor = null
+  const promise = new Promise((resolve, reject) => {
+    fileProcessor = new FileProcessor({
+      file,
+      chunkProcessor: async ({ chunk, totalChunks, content }) => {
+        const formData = objectToFormData({
+          cycle,
+          nodeDefUuid,
+          file: content,
+          fileId,
+          chunk,
+          totalChunks,
+          fileFormat,
+          dryRun,
+          insertNewRecords,
+          insertMissingNodes,
+          updateRecordsInAnalysis,
+          includeFiles,
+          deleteExistingEntities,
+          abortOnErrors,
+        })
+        const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData)
+        onUploadProgress({ total: totalChunks, loaded: chunk })
+
+        if (chunk === totalChunks) {
+          resolve(data.job)
+        }
+      },
+      onError: (error) => {
+        reject(error)
+      },
+    })
+    fileProcessor.start(startFromChunk)
   })
-  const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, { onUploadProgress })
-  const { job } = data
-  return job
+  return { promise, processor: fileProcessor }
 }
 
-export const startDataImportFromArenaJob = async ({
+export const startDataImportFromArenaJob = ({
   surveyId,
   cycle,
   conflictResolutionStrategy,
   file,
+  fileId,
   onUploadProgress,
   dryRun = false,
+  startFromChunk = 1,
 }) => {
-  const formData = objectToFormData({
-    file,
-    cycle,
-    dryRun,
-    conflictResolutionStrategy,
+  let fileProcessor = null
+  const promise = new Promise((resolve, reject) => {
+    fileProcessor = new FileProcessor({
+      file,
+      chunkProcessor: async ({ chunk, totalChunks, content }) => {
+        const formData = objectToFormData({
+          file: content,
+          fileId,
+          chunk,
+          totalChunks,
+          cycle,
+          dryRun,
+          conflictResolutionStrategy,
+        })
+        const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
+
+        onUploadProgress({ total: totalChunks, loaded: chunk })
+
+        if (chunk === totalChunks) {
+          resolve(data.job)
+        }
+      },
+      onError: (error) => {
+        reject(error)
+      },
+    })
+    fileProcessor.start(startFromChunk)
   })
-  const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, { onUploadProgress })
-  const { job } = data
-  return job
+  return { promise, processor: fileProcessor }
 }
 
 export const getDataImportFromCsvTemplateUrl = ({ surveyId }) =>

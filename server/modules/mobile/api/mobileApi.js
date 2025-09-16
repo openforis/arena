@@ -1,12 +1,13 @@
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
-import * as Request from '../../../utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import * as Request from '@server/utils/request'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as JobUtils from '@server/job/jobUtils'
 import * as Log from '@server/log/log'
+import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 const Logger = Log.getLogger('Mobile API')
@@ -53,16 +54,18 @@ export const init = (app) => {
       const user = Request.getUser(req)
       const { surveyId, conflictResolutionStrategy = ConflictResolutionStrategy.skipExisting } = Request.getParams(req)
 
-      const filePath = Request.getFilePath(req)
-
-      const job = ArenaMobileImportService.startArenaMobileImportJob({
-        user,
-        filePath,
-        surveyId,
-        conflictResolutionStrategy,
-      })
-
-      res.json({ job: JobUtils.jobToJSON(job) })
+      const filePath = await processChunkedFile({ req })
+      if (filePath) {
+        const job = ArenaMobileImportService.startArenaMobileImportJob({
+          user,
+          filePath,
+          surveyId,
+          conflictResolutionStrategy,
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ chunkProcessing: true })
+      }
     } catch (e) {
       next(e)
     }
