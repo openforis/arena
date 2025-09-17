@@ -5,6 +5,7 @@ import { objectToFormData } from '@webapp/service/api'
 
 import { importSources } from '../importSources'
 import { FileProcessor } from '@webapp/utils/FileProcessor'
+import { Chunks } from '@webapp/utils/chunks'
 
 const urlBySource = {
   [importSources.collect]: '/api/survey/collect-import',
@@ -32,22 +33,20 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
               survey: JSON.stringify(surveyObj),
             })
 
-            const { data } = await axios.post(urlBySource[source], formData)
-
-            onUploadProgress({ total: totalChunks, loaded: chunk })
-
-            const uploadProgressPercent = Math.round((chunk / totalChunks) * 100)((prevNewSurvey) => ({
-              ...prevNewSurvey,
-              uploadProgressPercent,
-              uploading: uploadProgressPercent < 100,
-            }))
+            const { data } = await axios.post(urlBySource[source], formData, {
+              onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+            })
 
             if (chunk === totalChunks) {
+              setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
+
               const { job, validation } = data
               resolve({ job, validation })
             }
           },
           onError: (error) => {
+            setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
+
             reject(error)
           },
         })

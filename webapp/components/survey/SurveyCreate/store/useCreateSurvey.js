@@ -25,7 +25,6 @@ const initialState = {
   options: { includeData: false },
   source: importSources.arena,
   validation: {},
-  uploadProgressPercent: -1,
 }
 
 export const useCreateSurvey = ({ template = false } = {}) => {
@@ -37,32 +36,30 @@ export const useCreateSurvey = ({ template = false } = {}) => {
   })
 
   const onCreateTypeUpdate = (createType) => {
-    const newSurveyUpdated = { ...newSurvey, createType }
+    const newSurveyProps = { createType }
 
     switch (createType) {
       case createTypes.fromScratch:
         break
       default:
         // reset label and lang (they will be hidden)
-        newSurveyUpdated.label = ''
-        newSurveyUpdated.lang = 'en'
+        newSurveyProps.label = ''
+        newSurveyProps.lang = 'en'
     }
-    setNewSurvey(newSurveyUpdated)
+    setNewSurvey((surveyPrev) => ({ ...surveyPrev, ...newSurveyProps }))
   }
 
   const onOptionChange = ({ key, value }) => {
-    const newSurveyUpdated = Objects.assocPath({ obj: newSurvey, path: ['options', key], value })
-    setNewSurvey(newSurveyUpdated)
+    setNewSurvey((surveyPrev) => Objects.assocPath({ obj: surveyPrev, path: ['options', key], value }))
   }
 
   const onSourceChange = (value) => {
-    const newSurveyUpdated = { ...newSurvey, source: value, file: null, fileId: null }
-    setNewSurvey(newSurveyUpdated)
+    setNewSurvey((surveyPrev) => ({ ...surveyPrev, source: value, file: null, fileId: null }))
   }
 
   const onFilesDrop = (files) => {
     const file = files[0]
-    setNewSurvey({ ...newSurvey, file, fileId: UUIDs.v4() })
+    setNewSurvey((surveyPrev) => ({ ...surveyPrev, file, fileId: UUIDs.v4() }))
   }
 
   return {

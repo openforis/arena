@@ -86,7 +86,6 @@ const SurveyCreate = (props) => {
     options,
     file,
     uploading,
-    uploadProgressPercent,
   } = newSurvey
 
   // Redirect to dashboard on survey change
@@ -207,7 +206,7 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.import && showImport && (
         <>
-          {(!uploading || uploadProgressPercent < 0) && (
+          {!uploading && (
             <>
               <div className="row">
                 <fieldset className="options-fieldset">

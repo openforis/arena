@@ -5,6 +5,7 @@ import { Query } from '@common/model/query'
 import * as Node from '@core/record/node'
 
 import { FileProcessor } from '@webapp/utils/FileProcessor'
+import { Chunks } from '@webapp/utils/chunks'
 
 import { objectToFormData } from '../utils/apiUtils'
 
@@ -93,8 +94,9 @@ export const startDataImportFromCsvJob = ({
           deleteExistingEntities,
           abortOnErrors,
         })
-        const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData)
-        onUploadProgress({ total: totalChunks, loaded: chunk })
+        const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, {
+          onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+        })
 
         if (chunk === totalChunks) {
           resolve(data.job)
@@ -133,9 +135,9 @@ export const startDataImportFromArenaJob = ({
           dryRun,
           conflictResolutionStrategy,
         })
-        const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData)
-
-        onUploadProgress({ total: totalChunks, loaded: chunk })
+        const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, {
+          onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+        })
 
         if (chunk === totalChunks) {
           resolve(data.job)
