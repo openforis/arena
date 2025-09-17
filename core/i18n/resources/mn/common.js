@@ -406,6 +406,17 @@ $t(common.raiseTicketInSupportForum)
       activityLog: {
         title: 'Үйл ажиллагааны бүртгэл',
       },
+      deleteActivityLog: 'Үйлдлийн түүхийг цэвэрлэх',
+      deleteActivityLogConfirm: {
+        headerText: 'Энэхүү судалгааны үйлдлийн түүхийн БҮХ өгөгдлийг цэвэрлэх үү?',
+        message: `
+  - **{{surveyName}}** судалгааны үйлдлийн түүхийн БҮХ өгөгдөл устгагдана;\n\n
+  - судалгааны Мэдээллийн санд (DB) эзэлж буй зай багасна;\n\n
+  - энэ нь судалгааны оруулсан өгөгдөлд нөлөөлөхгүй;\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Баталгаажуулахын тулд энэхүү судалгааны нэрийг оруулна уу:',
+      },
       exportWithData: 'Экспорт + өгөгдөл (Нөөц)',
       exportWithDataNoActivityLog: 'Экспорт + өгөгдөл (ҮЙЛ АЖИЛЛАГААНЫ БҮРТГЭЛГҮЙ)',
       surveyPropUpdate: {

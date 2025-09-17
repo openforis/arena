@@ -62,12 +62,12 @@ const SurveyInfo = (props) => {
 
   const onDeleteActivityLogDataClick = useCallback(() => {
     confirm({
-      key: 'homeView.surveyInfo.deleteActivityLogDataConfirm.message',
+      key: 'homeView.surveyInfo.deleteActivityLogConfirm.message',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteActivityLog()),
-      headerText: 'homeView.surveyInfo.deleteActivityLogDataConfirm.headerText',
+      headerText: 'homeView.surveyInfo.deleteActivityLogConfirm.headerText',
       strongConfirm: true,
-      strongConfirmInputLabel: 'homeView.surveyInfo.deleteActivityLogDataConfirm.confirmName',
+      strongConfirmInputLabel: 'homeView.surveyInfo.deleteActivityLogConfirm.confirmName',
       strongConfirmRequiredText: surveyName,
     })
   }, [confirm, dispatch, surveyName])

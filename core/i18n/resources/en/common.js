@@ -465,7 +465,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
 If there are records associated to this cycle, they will be deleted.`,
       cycleForArenaMobile: 'Cycle for Arena Mobile',
       deleteActivityLog: 'Clear activity log',
-      deleteActivityLogDataConfirm: {
+      deleteActivityLogConfirm: {
         headerText: 'Clear ALL the activity log data for this survey?',
         message: `
   - ALL the activity log data for the survey **{{surveyName}}** will be deleted;\n\n
