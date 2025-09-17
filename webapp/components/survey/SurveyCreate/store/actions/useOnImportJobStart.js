@@ -9,7 +9,7 @@ import { SurveyActions } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 import { NotificationActions } from '@webapp/store/ui'
 
-export const useOnImportJobStart = ({ newSurvey, setNewSurvey }) => {
+export const useOnImportJobStart = ({ setNewSurvey }) => {
   const dispatch = useDispatch()
 
   return useCallback(
@@ -19,11 +19,7 @@ export const useOnImportJobStart = ({ newSurvey, setNewSurvey }) => {
       if (formHasErrors) {
         dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
 
-        setNewSurvey({
-          ...newSurvey,
-          validation,
-          uploading: false,
-        })
+        setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, validation, uploading: false }))
       } else if (job) {
         dispatch(
           JobActions.showJobMonitor({
@@ -36,6 +32,6 @@ export const useOnImportJobStart = ({ newSurvey, setNewSurvey }) => {
         )
       }
     },
-    [dispatch]
+    [dispatch, setNewSurvey]
   )
 }

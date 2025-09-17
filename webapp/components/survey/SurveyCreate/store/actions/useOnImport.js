@@ -17,7 +17,7 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
       const { file, fileId, source, ...surveyObj } = newSurvey
 
       // reset upload progress (hide progress bar)
-      setNewSurvey({ ...newSurvey, uploadProgressPercent: -1, uploading: true })
+      setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploadProgressPercent: -1, uploading: true }))
 
       let fileProcessor = null
       const promise = new Promise((resolve, reject) => {
@@ -36,8 +36,11 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
 
             onUploadProgress({ total: totalChunks, loaded: chunk })
 
-            const uploadProgressPercent = Math.round((chunk / totalChunks) * 100)
-            setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
+            const uploadProgressPercent = Math.round((chunk / totalChunks) * 100)((prevNewSurvey) => ({
+              ...prevNewSurvey,
+              uploadProgressPercent,
+              uploading: uploadProgressPercent < 100,
+            }))
 
             if (chunk === totalChunks) {
               const { job, validation } = data

@@ -65,6 +65,7 @@ const SurveyCreate = (props) => {
     onCreate,
     onImport,
     onImportJobStart,
+    onImportUploadCancel,
     onCreateTypeUpdate,
     onFilesDrop,
     onOptionChange,
@@ -238,9 +239,10 @@ const SurveyCreate = (props) => {
             <ImportStartButton
               className="btn-secondary"
               disabled={!file}
+              onCancel={onImportUploadCancel}
+              onUploadComplete={onImportJobStart}
               startFunction={onImport}
               testId={TestId.surveyCreate.startImportBtn}
-              onUploadComplete={onImportJobStart}
             />
           </div>
         </>

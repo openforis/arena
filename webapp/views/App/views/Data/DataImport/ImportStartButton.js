@@ -28,6 +28,7 @@ export const ImportStartButton = (props) => {
     confirmMessageParams,
     disabled = false,
     label = 'dataImportView.startImport',
+    onCancel = null,
     onUploadComplete,
     showConfirm = false,
     startFunction,
@@ -49,7 +50,8 @@ export const ImportStartButton = (props) => {
     uploadingRef.current = false
     processorRef.current?.stop()
     setState(initialState)
-  }, [])
+    onCancel?.()
+  }, [onCancel])
 
   const onUploadProgress = useCallback((progressEvent) => {
     if (uploadingRef.current) {
@@ -174,6 +176,7 @@ ImportStartButton.propTypes = {
   confirmMessageParams: PropTypes.object,
   disabled: PropTypes.bool,
   label: PropTypes.string,
+  onCancel: PropTypes.func,
   onUploadComplete: PropTypes.func.isRequired,
   showConfirm: PropTypes.bool,
   startFunction: PropTypes.func.isRequired,

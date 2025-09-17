@@ -31,7 +31,7 @@ const initialState = {
 export const useCreateSurvey = ({ template = false } = {}) => {
   const [newSurvey, setNewSurvey] = useState({ ...initialState, template })
 
-  const { onUpdate, onCreate, onImport, onImportJobStart } = useActions({
+  const { onUpdate, onCreate, onImport, onImportJobStart, onImportUploadCancel } = useActions({
     newSurvey,
     setNewSurvey,
   })
@@ -71,6 +71,7 @@ export const useCreateSurvey = ({ template = false } = {}) => {
     onCreate,
     onImport,
     onImportJobStart,
+    onImportUploadCancel,
     onCreateTypeUpdate,
     onFilesDrop,
     onOptionChange,
