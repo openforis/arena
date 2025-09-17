@@ -65,7 +65,7 @@ const SurveyInfo = (props) => {
       key: 'homeView.surveyInfo.deleteActivityLogDataConfirm.message',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteActivityLog()),
-      headerText: 'homeView.surveyInfo.deleteActivityLogDataConfirm.title',
+      headerText: 'homeView.surveyInfo.deleteActivityLogDataConfirm.headerText',
       strongConfirm: true,
       strongConfirmInputLabel: 'homeView.surveyInfo.deleteActivityLogDataConfirm.confirmName',
       strongConfirmRequiredText: surveyName,

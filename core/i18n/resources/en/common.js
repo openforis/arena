@@ -464,6 +464,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
       cycleForArenaMobile: 'Cycle for Arena Mobile',
+      deleteActivityLog: 'Delete ALL activity log',
+      deleteActivityLogDataConfirm: {
+        headerText: 'Delete ALL the activity log data for this survey?',
+        message: `This operation will delete ALL the activity log data for the survey **{{surveyName}}**.\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Enter this survey’s name to confirm:',
+      },
       fieldManualLink: 'Field manual link',
       editInfo: 'Edit info',
       viewInfo: 'View info',
