@@ -60,6 +60,18 @@ const SurveyInfo = (props) => {
     })
   }, [confirm, dispatch, surveyName])
 
+  const onDeleteActivityLogDataClick = useCallback(() => {
+    confirm({
+      key: 'homeView.surveyInfo.deleteActivityLogDataConfirm.message',
+      params: { surveyName },
+      onOk: () => dispatch(SurveyActions.deleteActivityLog()),
+      headerText: 'homeView.surveyInfo.deleteActivityLogDataConfirm.title',
+      strongConfirm: true,
+      strongConfirmInputLabel: 'homeView.surveyInfo.deleteActivityLogDataConfirm.confirmName',
+      strongConfirmRequiredText: surveyName,
+    })
+  }, [confirm, dispatch, surveyName])
+
   return (
     <>
       <div className="home-dashboard__survey-info">
@@ -144,6 +156,19 @@ const SurveyInfo = (props) => {
                       },
                     ]
                   : []),
+                {
+                  key: 'survey-delete-activity-log',
+                  content: (
+                    <Button
+                      className="btn-danger"
+                      iconClassName="icon-bin icon-12px icon-left"
+                      label="homeView.surveyInfo.deleteActivityLog"
+                      onClick={onDeleteActivityLogDataClick}
+                      variant="text"
+                      testId={TestId.dashboard.surveyDeleteActivityLogBtn}
+                    />
+                  ),
+                },
                 {
                   key: 'survey-info-delete',
                   content: (

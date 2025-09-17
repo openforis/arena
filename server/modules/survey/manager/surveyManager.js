@@ -498,4 +498,7 @@ export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) 
     return surveyIds.length
   })
 
+export const deleteAllActivityLog = async ({ surveyId }, client = db) =>
+  ActivityLogRepository.deleteAll({ surveyId }, client)
+
 export const { dropSurveySchema } = SurveyRepository
