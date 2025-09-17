@@ -406,6 +406,17 @@ $t(common.raiseTicketInSupportForum)
       activityLog: {
         title: 'Журнал активности',
       },
+      deleteActivityLog: 'Очистить журнал активности',
+      deleteActivityLogDataConfirm: {
+        headerText: 'Очистить ВСЕ данные журнала активности для этого опроса?',
+        message: `
+  - БУДУТ удалены ВСЕ данные журнала активности для опроса **{{surveyName}}**;\n\n
+  - место, занимаемое опросом в БД, будет сокращено;\n\n
+  - это не повлияет на введенные данные опроса;\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Введите название этого опроса для подтверждения:',
+      },
       exportWithData: 'Экспорт + данные (резервная копия)',
       exportWithDataNoActivityLog: 'Экспорт + данные (БЕЗ журнала активности)',
       surveyPropUpdate: {

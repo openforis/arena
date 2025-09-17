@@ -301,6 +301,15 @@ export const init = (app) => {
     res.json({ job: JobUtils.jobToJSON(job) })
   })
 
+  app.put('/survey/:surveyId/delete-activity-log', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+
+    const job = SurveyService.startDeleteActivityLogJob(user, surveyId)
+
+    res.json({ job: JobUtils.jobToJSON(job) })
+  })
+
   app.put('/survey/:surveyId/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)

@@ -17,6 +17,7 @@ import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistRe
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
+import SurveyDeleteActiviyLogJob from '@server/modules/survey/service/surveyDeleteActiviyLogJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
@@ -44,6 +45,7 @@ const jobClasses = [
   RecordsCloneJob,
   SelectedRecordsExportJob,
   SurveyCloneJob,
+  SurveyDeleteActiviyLogJob,
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,

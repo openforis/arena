@@ -360,6 +360,17 @@ export default {
       activityLog: {
         title: 'Registro de actividad',
       },
+      deleteActivityLog: 'Borrar registro de actividad',
+      deleteActivityLogConfirm: {
+        headerText: '¿Borrar TODOS los datos del registro de actividad de esta encuesta?',
+        message: `
+  - TODOS los datos del registro de actividad para la encuesta **{{surveyName}}** se eliminarán;\n\n
+  - el espacio ocupado por la encuesta en la BD se reducirá;\n\n
+  - no afectará a los datos de entrada de la encuesta;\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Escriba el nombre de esta encuesta para confirmar:',
+      },
       exportWithData: 'Exportar + datos (Copia de seguridad)',
       exportWithDataNoActivityLog: 'Exportar + datos (SIN registro de actividad)',
       surveyPropUpdate: {
