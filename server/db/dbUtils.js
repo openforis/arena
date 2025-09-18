@@ -204,3 +204,15 @@ export const dropUser = async (name, client = db) => await client.query(`DROP US
 
 // VACUUM (removes dead tuples)
 export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
+
+export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
+  client.one(
+    `SELECT 
+		SUM(pg_relation_size(pg_catalog.pg_class.oid)) as size
+    FROM pg_catalog.pg_class
+      JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
+    WHERE pg_catalog.pg_namespace.nspname = $1
+`,
+    [schema],
+    (row) => Number(row.size)
+  )

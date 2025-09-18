@@ -1,6 +1,13 @@
+import { Schemata } from '@openforis/arena-server'
+
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
+
+import * as FileService from '@server/modules/record/service/fileService'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
+import * as DbUtils from '@server/db/dbUtils'
 
 import * as SurveyManager from '../manager/surveyManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
@@ -12,6 +19,15 @@ import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
 import SurveysListExportJob from './SurveysListExportJob'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
+
+export const fetchAndAssocStorageInfo = async ({ survey }) => {
+  const surveyId = Survey.getId(survey)
+  const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const schemaTablesSize = await DbUtils.fetchSchemaTablesSize({ schema })
+  const dbStatistics = { usedSpace: schemaTablesSize }
+  return A.pipe(Survey.assocFilesStatistics(filesStatistics), Survey.assocDbStatistics(dbStatistics))(survey)
+}
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {

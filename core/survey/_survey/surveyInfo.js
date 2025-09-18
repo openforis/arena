@@ -30,7 +30,6 @@ export const keys = {
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
   fieldManualLinks: 'fieldManualLinks',
-  filesStatistics: 'filesStatistics',
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
@@ -40,8 +39,11 @@ export const keys = {
   srs: 'srs',
   steps: 'steps',
   template: 'template',
-  temporary: 'temporary',
   userExtraPropDefs: 'userExtraPropDefs',
+  // Temporary properties
+  dbStatistics: 'dbStatistics',
+  filesStatistics: 'filesStatistics',
+  temporary: 'temporary',
 }
 
 export const collectReportKeys = {
@@ -74,6 +76,8 @@ export const getOwnerUuid = R.propOr(null, keys.ownerUuid)
 export const getOwnerName = R.propOr('', keys.ownerName)
 
 export const isDraft = R.propEq(keys.draft, true)
+
+export const getDbStatistics = R.propOr({}, keys.dbStatistics)
 
 export const getFilesStatistics = R.propOr({}, keys.filesStatistics)
 
@@ -179,6 +183,8 @@ export const getUserExtraPropDefsArray = R.pipe(getUserExtraPropDefs, ExtraPropD
 
 // ====== UPDATE
 export const markDraft = R.assoc(keys.draft, true)
+
+export const assocDbStatistics = R.assoc(keys.dbStatistics)
 
 export const assocFilesStatistics = R.assoc(keys.filesStatistics)
 
