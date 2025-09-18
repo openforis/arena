@@ -440,10 +440,16 @@ $t(common.raiseTicketInSupportForum)
         `,
       },
       storageSummary: {
-        title: 'Хадгалах сангийн ашиглалт (файлууд)',
+        title: 'Хадгалалтын ашиглалт',
         availableSpace: 'Боломжтой ({{size}})',
         usedSpace: 'Ашиглагдсан ({{size}})',
-        usedSpaceOutOf: `Ашиглагдсан {{percent}}% ({{used}} / {{total}})`,
+        usedSpaceOutOf: `{{percent}}%-ийг ашигласан (нийт {{total}}-ээс {{used}})`,
+      },
+      storageSummaryDb: {
+        title: 'Хадгалалтын ашиглалт (Өгөгдлийн сан)',
+      },
+      storageSummaryFiles: {
+        title: 'Хадгалалтын ашиглалт (файлууд)',
       },
       samplingPointDataCompletion: {
         title: 'Түүвэрлэлтийн цэгийн өгөгдлийн гүйцэтгэл',

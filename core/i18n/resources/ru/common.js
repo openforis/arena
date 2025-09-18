@@ -440,10 +440,16 @@ $t(common.raiseTicketInSupportForum)
         `,
       },
       storageSummary: {
-        title: 'Использование хранилища (файлы)',
+        title: 'Использование хранилища',
         availableSpace: 'Доступно ({{size}})',
         usedSpace: 'Использовано ({{size}})',
         usedSpaceOutOf: `Использовано {{percent}}% ({{used}} из {{total}})`,
+      },
+      storageSummaryDb: {
+        title: 'Использование хранилища (База данных)',
+      },
+      storageSummaryFiles: {
+        title: 'Использование хранилища (файлы)',
       },
       samplingPointDataCompletion: {
         title: 'Завершение данных по точкам выборки',
