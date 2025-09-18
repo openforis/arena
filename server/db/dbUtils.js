@@ -216,3 +216,12 @@ export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
     [schema],
     (row) => Number(row.size)
   )
+
+export const fetchTableSize = async ({ schema, table }, client = db) =>
+  client.one(
+    `SELECT pg_relation_size('"'||table_schema||'"."'||table_name||'"') AS size
+    FROM information_schema.tables
+    WHERE table_schema = $1 AND table_name = $2`,
+    [schema, table],
+    (row) => Number(row.size)
+  )

@@ -41,6 +41,7 @@ export const keys = {
   template: 'template',
   userExtraPropDefs: 'userExtraPropDefs',
   // Temporary properties
+  activityLogSize: 'activityLogSize',
   dbStatistics: 'dbStatistics',
   filesStatistics: 'filesStatistics',
   temporary: 'temporary',
@@ -80,6 +81,8 @@ export const isDraft = R.propEq(keys.draft, true)
 export const getDbStatistics = R.propOr({}, keys.dbStatistics)
 
 export const getFilesStatistics = R.propOr({}, keys.filesStatistics)
+
+export const getActivityLogSize = R.propOr(-1, keys.activityLogSize)
 
 export const getLanguages = ObjectUtils.getProp(keys.languages, [])
 
@@ -187,6 +190,8 @@ export const markDraft = R.assoc(keys.draft, true)
 export const assocDbStatistics = R.assoc(keys.dbStatistics)
 
 export const assocFilesStatistics = R.assoc(keys.filesStatistics)
+
+export const assocActivityLogSize = R.assoc(keys.activityLogSize)
 
 export const assocSrs = (srs) => ObjectUtils.setProp(keys.srs, srs)
 

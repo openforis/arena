@@ -405,6 +405,7 @@ $t(common.raiseTicketInSupportForum)
       activeUsers: 'Идэвхтэй хэрэглэгчид',
       activityLog: {
         title: 'Үйл ажиллагааны бүртгэл',
+        size: '$t(homeView.dashboard.activityLog.title) хэмжээ: {{size}}',
       },
       deleteActivityLog: 'Үйлдлийн түүхийг цэвэрлэх',
       deleteActivityLogConfirm: {

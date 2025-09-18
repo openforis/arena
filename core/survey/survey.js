@@ -140,6 +140,7 @@ export const {
   getProps,
   getPropsDraft,
   // Temporary properties
+  getActivityLogSize,
   getDbStatistics,
   getFilesStatistics,
   isValid,
@@ -151,6 +152,7 @@ export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroup
 // UPDATE
 export const {
   assocAuthGroups,
+  assocActivityLogSize,
   assocDbStatistics,
   assocFilesStatistics,
   assocOwnerUuid,

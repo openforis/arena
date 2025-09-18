@@ -359,6 +359,7 @@ export default {
       activeUsers: 'Usuarios activos',
       activityLog: {
         title: 'Registro de actividad',
+        size: '$t(homeView.dashboard.activityLog.title) tamaño: {{size}}',
       },
       deleteActivityLog: 'Borrar registro de actividad',
       deleteActivityLogConfirm: {

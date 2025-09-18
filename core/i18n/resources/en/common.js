@@ -406,6 +406,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activeUsers: 'Active users',
       activityLog: {
         title: 'Activity log',
+        size: '$t(homeView.dashboard.activityLog.title) size: {{size}}',
       },
       exportWithData: 'Export + data (Backup)',
       exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',

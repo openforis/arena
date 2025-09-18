@@ -405,6 +405,7 @@ $t(common.raiseTicketInSupportForum)
       activeUsers: 'Активные пользователи',
       activityLog: {
         title: 'Журнал активности',
+        size: '$t(homeView.dashboard.activityLog.title) размер: {{size}}',
       },
       deleteActivityLog: 'Очистить журнал активности',
       deleteActivityLogDataConfirm: {
