@@ -430,10 +430,16 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
       },
       storageSummary: {
-        title: 'Storage use (files)',
+        title: 'Storage use',
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
         usedSpaceOutOf: `Used {{percent}}% ({{used}} out of {{total}})`,
+      },
+      storageSummaryDb: {
+        title: 'Storage use (DataBase)',
+      },
+      storageSummaryFiles: {
+        title: 'Storage use (files)',
       },
       samplingPointDataCompletion: {
         title: 'Sampling Point Data Completion',

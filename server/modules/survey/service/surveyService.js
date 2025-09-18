@@ -20,12 +20,14 @@ import { SurveyLabelsExport } from './surveyLabelsExport'
 import SurveysListExportJob from './SurveysListExportJob'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 
+const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
+
 export const fetchAndAssocStorageInfo = async ({ survey }) => {
   const surveyId = Survey.getId(survey)
   const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const schemaTablesSize = await DbUtils.fetchSchemaTablesSize({ schema })
-  const dbStatistics = { usedSpace: schemaTablesSize }
+  const dbStatistics = { usedSpace: schemaTablesSize, totalSpace: dbMaxAvailableSpace }
   return A.pipe(Survey.assocFilesStatistics(filesStatistics), Survey.assocDbStatistics(dbStatistics))(survey)
 }
 

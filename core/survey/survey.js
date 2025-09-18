@@ -139,6 +139,8 @@ export const {
   isTemplate,
   getProps,
   getPropsDraft,
+  // Temporary properties
+  getDbStatistics,
   getFilesStatistics,
   isValid,
   canHaveRecords,

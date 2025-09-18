@@ -1,0 +1,10 @@
+.storage-summary-container {
+  display: flex;
+  justify-content: space-around;
+
+  .storage-summary-item {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+  }
+}
