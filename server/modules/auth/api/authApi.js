@@ -10,7 +10,6 @@ import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
-import * as FileService from '../../record/service/fileService'
 
 const Logger = Log.getLogger('AuthAPI')
 
@@ -21,7 +20,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     let survey = await SurveyService.fetchSurveyById({ surveyId, draft: false, validate: false })
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
       survey = await SurveyService.fetchSurveyById({ surveyId, draft: true, validate: true })
-      survey = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+      survey = await SurveyService.fetchAndAssocStorageInfo({ survey })
     }
     sendResponse(res, user, survey)
   } catch (error) {

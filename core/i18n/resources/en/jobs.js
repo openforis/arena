@@ -27,6 +27,7 @@ export default {
   RecordsImportJob: 'Records Import',
   RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
   SamplingPointDataImportJob: 'Sampling Point Data Import',
+  SurveyActivityLogClearJob: 'Survey Activity Log Clear',
   SurveyCreatorJob: 'Survey Create',
   SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
   SurveyExportJob: 'Survey Export',

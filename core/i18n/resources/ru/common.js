@@ -131,7 +131,7 @@ export default {
     options: 'Опции',
     owner: 'Владелец',
     path: 'Путь',
-    pause: 'Пауза',
+    pause: 'Приостановить',
     preview: 'Режим предварительного просмотра',
     previous: 'Предыдущий',
     publish: 'Опубликовать',
@@ -405,6 +405,7 @@ $t(common.raiseTicketInSupportForum)
       activeUsers: 'Активные пользователи',
       activityLog: {
         title: 'Журнал активности',
+        size: '$t(homeView.dashboard.activityLog.title) размер: {{size}}',
       },
       deleteActivityLog: 'Очистить журнал активности',
       deleteActivityLogDataConfirm: {
@@ -440,10 +441,16 @@ $t(common.raiseTicketInSupportForum)
         `,
       },
       storageSummary: {
-        title: 'Использование хранилища (файлы)',
+        title: 'Использование хранилища',
         availableSpace: 'Доступно ({{size}})',
         usedSpace: 'Использовано ({{size}})',
         usedSpaceOutOf: `Использовано {{percent}}% ({{used}} из {{total}})`,
+      },
+      storageSummaryDb: {
+        title: 'Использование хранилища (База данных)',
+      },
+      storageSummaryFiles: {
+        title: 'Использование хранилища (файлы)',
       },
       samplingPointDataCompletion: {
         title: 'Завершение данных по точкам выборки',

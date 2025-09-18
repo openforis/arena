@@ -9,68 +9,74 @@
   top: 0px;
 }
 
-.activity-log__header {
-  width: calc(100% + 0px);
-  height: 35px;
-  left: -25px;
-  padding-left: 30px;
-  top: 10px;
+.activity-log__container {
   display: flex;
-  align-items: center;
-  background-color: $black;
-  color: $white;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.activity-log__messages {
+  flex-direction: column;
   flex: 1;
-  padding: 10px 0;
-  overflow-y: auto;
-  position: relative;
-  background-color: $white;
-}
+  height: 100%;
 
-.activity-log__message {
-  display: grid;
-  grid-template-columns: 1fr 120px;
-  align-items: center;
-  font-size: 0.8rem;
-  grid-column-gap: 10px;
-
-  &.item-deleted {
-    text-decoration: line-through;
-  }
-
-  &.highlighted {
-    animation-name: animate-highlight;
-    animation-duration: 4s;
-  }
-
-  &:after {
-    content: ' ';
-    width: 100%;
-    height: 1px;
-    margin: 8px 15%;
-    border-bottom: 1px dotted #d1d1dd;
-  }
-
-  .activity {
+  .activity-log__header {
+    width: calc(100% + 0px);
+    height: 35px;
+    left: -25px;
+    padding-left: 30px;
+    top: 10px;
     display: flex;
     align-items: center;
-
-    .profile-picture-thumbnail {
-      margin: 0 5px;
-      width: 25px;
-      height: 25px;
-      flex-shrink: 0;
-    }
+    background-color: $black;
+    color: $white;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.9rem;
   }
 
-  .date {
-    justify-self: right;
-    padding-right: 5px;
-    color: $blueDark;
+  .activity-log__messages {
+    flex: 1;
+    padding: 10px 0;
+    overflow-y: auto;
+    position: relative;
+    background-color: $white;
+    .activity-log__message {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      align-items: center;
+      font-size: 0.8rem;
+      grid-column-gap: 10px;
+
+      &.item-deleted {
+        text-decoration: line-through;
+      }
+
+      &.highlighted {
+        animation-name: animate-highlight;
+        animation-duration: 4s;
+      }
+
+      &:after {
+        content: ' ';
+        width: 100%;
+        height: 1px;
+        margin: 8px 15%;
+        border-bottom: 1px dotted #d1d1dd;
+      }
+
+      .activity {
+        display: flex;
+        align-items: center;
+
+        .profile-picture-thumbnail {
+          margin: 0 5px;
+          width: 25px;
+          height: 25px;
+          flex-shrink: 0;
+        }
+      }
+
+      .date {
+        justify-self: right;
+        padding-right: 5px;
+        color: $blueDark;
+      }
+    }
   }
 }
