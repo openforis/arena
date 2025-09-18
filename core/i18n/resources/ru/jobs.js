@@ -27,6 +27,7 @@ export default {
   RecordsImportJob: 'Импорт записей',
   RecordsUniquenessValidationJob: 'Валидация уникальности записей',
   SamplingPointDataImportJob: 'Импорт данных точек отбора проб',
+  SurveyActivityLogClearJob: 'Очистка журнала активности опроса',
   SurveyCreatorJob: 'Создание опроса',
   SurveyDependencyGraphsGenerationJob: 'Генерация графов зависимостей опроса',
   SurveyExportJob: 'Экспорт опроса',

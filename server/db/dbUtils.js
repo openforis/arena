@@ -201,3 +201,6 @@ export const createUser = async (name, password, client = db) =>
   client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
 
 export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)
+
+// VACUUM (removes dead tuples)
+export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)

@@ -11,7 +11,7 @@ import { SchemaSummary } from './schemaSummary'
 import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
 import SurveysListExportJob from './SurveysListExportJob'
-import SurveyDeleteActiviyLogJob from './surveyDeleteActiviyLogJob'
+import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -37,7 +37,7 @@ export const startUnpublishJob = (user, surveyId) => {
 export const startDeleteActivityLogJob = (user, surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
-  const job = new SurveyDeleteActiviyLogJob({ user, surveyId })
+  const job = new SurveyActivityLogClearJob({ user, surveyId })
 
   JobManager.enqueueJob(job)
 
