@@ -131,7 +131,7 @@ export default {
     options: 'Опции',
     owner: 'Владелец',
     path: 'Путь',
-    pause: 'Пауза',
+    pause: 'Приостановить',
     preview: 'Режим предварительного просмотра',
     previous: 'Предыдущий',
     publish: 'Опубликовать',
