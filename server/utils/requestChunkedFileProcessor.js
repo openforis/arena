@@ -9,7 +9,7 @@ const getFileContentOrPath = (req) => {
   const params = Request.getParams(req)
   const { file: fileContentBase64 } = params
   if (fileContentBase64) {
-    return Buffer.from(fileContentBase64, 'base64')
+    return { fileContent: Buffer.from(fileContentBase64, 'base64') }
   }
   throw new Error('Missing file content or path in request')
 }
