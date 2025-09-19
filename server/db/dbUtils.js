@@ -201,3 +201,27 @@ export const createUser = async (name, password, client = db) =>
   client.query(`CREATE USER "${name}" WITH LOGIN PASSWORD '${password}'`)
 
 export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)
+
+// VACUUM (removes dead tuples)
+export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
+
+export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
+  client.one(
+    `SELECT 
+		SUM(pg_relation_size(pg_catalog.pg_class.oid)) as size
+    FROM pg_catalog.pg_class
+      JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
+    WHERE pg_catalog.pg_namespace.nspname = $1
+`,
+    [schema],
+    (row) => Number(row.size)
+  )
+
+export const fetchTableSize = async ({ schema, table }, client = db) =>
+  client.one(
+    `SELECT pg_relation_size('"'||table_schema||'"."'||table_name||'"') AS size
+    FROM information_schema.tables
+    WHERE table_schema = $1 AND table_name = $2`,
+    [schema, table],
+    (row) => Number(row.size)
+  )

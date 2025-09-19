@@ -246,5 +246,10 @@ export const fetch = async ({
   )
 }
 
+export const fetchTableSize = async ({ surveyId }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return DbUtils.fetchTableSize({ schema, table: 'activity_log' }, client)
+}
+
 export const deleteAll = async ({ surveyId }, client = db) =>
   client.none(`DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.activity_log`)

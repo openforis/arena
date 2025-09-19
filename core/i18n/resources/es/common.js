@@ -359,6 +359,7 @@ export default {
       activeUsers: 'Usuarios activos',
       activityLog: {
         title: 'Registro de actividad',
+        size: '$t(homeView.dashboard.activityLog.title) tamaño: {{size}}',
       },
       deleteActivityLog: 'Borrar registro de actividad',
       deleteActivityLogConfirm: {
@@ -382,10 +383,16 @@ export default {
         main: '<title>Vamos a crear el primer atributo de {{surveyName}} </title>\n        \n        <p>Vaya a <linkWithIcon>Encuesta > Diseñador de formularios</linkWithIcon></p>\n        <br />\n        ',
       },
       storageSummary: {
-        title: 'Uso de almacenamiento (archivos)',
+        title: 'Uso del almacenamiento',
         availableSpace: 'Disponible ({{size}})',
         usedSpace: 'Usado ({{size}})',
-        usedSpaceOutOf: 'Usado {{percent}}% ({{used}} de {{total}})',
+        usedSpaceOutOf: `Usado {{percent}}% ({{used}} de {{total}})`,
+      },
+      storageSummaryDb: {
+        title: 'Uso del almacenamiento (Base de datos)',
+      },
+      storageSummaryFiles: {
+        title: 'Uso del almacenamiento (archivos)',
       },
       samplingPointDataCompletion: {
         title: 'Finalización de datos de puntos de muestreo',

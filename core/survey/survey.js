@@ -139,6 +139,9 @@ export const {
   isTemplate,
   getProps,
   getPropsDraft,
+  // Temporary properties
+  getActivityLogSize,
+  getDbStatistics,
   getFilesStatistics,
   isValid,
   canHaveRecords,
@@ -147,8 +150,16 @@ export const {
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocFilesStatistics, assocOwnerUuid, assocRDBInitilized, assocSrs, markDraft } =
-  SurveyInfo
+export const {
+  assocAuthGroups,
+  assocActivityLogSize,
+  assocDbStatistics,
+  assocFilesStatistics,
+  assocOwnerUuid,
+  assocRDBInitilized,
+  assocSrs,
+  markDraft,
+} = SurveyInfo
 
 // ====== READ nodeDefs
 export const {

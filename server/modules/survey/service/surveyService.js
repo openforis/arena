@@ -1,6 +1,14 @@
+import { Schemata } from '@openforis/arena-server'
+
+import * as A from '@core/arena'
+import * as Survey from '@core/survey/survey'
+
+import * as ActivityLogManager from '@server/modules/activityLog/manager/activityLogManager'
+import * as FileService from '@server/modules/record/service/fileService'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import * as JobManager from '@server/job/jobManager'
 import * as JobUtils from '@server/job/jobUtils'
+import * as DbUtils from '@server/db/dbUtils'
 
 import * as SurveyManager from '../manager/surveyManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
@@ -11,7 +19,23 @@ import { SchemaSummary } from './schemaSummary'
 import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
 import SurveysListExportJob from './SurveysListExportJob'
-import SurveyDeleteActiviyLogJob from './surveyDeleteActiviyLogJob'
+import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
+
+const dbMaxAvailableSpace = 1024 * 1024 * 1024 * 5 // 4GB
+
+export const fetchAndAssocStorageInfo = async ({ survey }) => {
+  const surveyId = Survey.getId(survey)
+  const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const schemaTablesSize = await DbUtils.fetchSchemaTablesSize({ schema })
+  const dbStatistics = { usedSpace: schemaTablesSize, totalSpace: dbMaxAvailableSpace }
+  const activityLogSize = await ActivityLogManager.fetchTableSize({ surveyId })
+  return A.pipe(
+    Survey.assocFilesStatistics(filesStatistics),
+    Survey.assocDbStatistics(dbStatistics),
+    Survey.assocActivityLogSize(activityLogSize)
+  )(survey)
+}
 
 // JOBS
 export const startPublishJob = (user, surveyId) => {
@@ -37,7 +61,7 @@ export const startUnpublishJob = (user, surveyId) => {
 export const startDeleteActivityLogJob = (user, surveyId) => {
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
-  const job = new SurveyDeleteActiviyLogJob({ user, surveyId })
+  const job = new SurveyActivityLogClearJob({ user, surveyId })
 
   JobManager.enqueueJob(job)
 

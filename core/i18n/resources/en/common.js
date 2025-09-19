@@ -406,6 +406,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activeUsers: 'Active users',
       activityLog: {
         title: 'Activity log',
+        size: '$t(homeView.dashboard.activityLog.title) size: {{size}}',
       },
       exportWithData: 'Export + data (Backup)',
       exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
@@ -430,10 +431,16 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
       },
       storageSummary: {
-        title: 'Storage use (files)',
+        title: 'Storage use',
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
         usedSpaceOutOf: `Used {{percent}}% ({{used}} out of {{total}})`,
+      },
+      storageSummaryDb: {
+        title: 'Storage use (DataBase)',
+      },
+      storageSummaryFiles: {
+        title: 'Storage use (files)',
       },
       samplingPointDataCompletion: {
         title: 'Sampling Point Data Completion',

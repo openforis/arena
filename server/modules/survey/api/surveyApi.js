@@ -16,7 +16,6 @@ import * as User from '../../../../core/user/user'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
-import * as FileService from '../../record/service/fileService'
 import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
@@ -163,9 +162,7 @@ export const init = (app) => {
   const _sendSurvey = async ({ survey, user, res }) => {
     let surveyUpdated = survey
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
-      const surveyId = Survey.getId(survey)
-      const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
-      surveyUpdated = Survey.assocFilesStatistics(filesStatistics)(survey)
+      surveyUpdated = await SurveyService.fetchAndAssocStorageInfo({ survey })
     }
     res.json({ survey: surveyUpdated })
   }
