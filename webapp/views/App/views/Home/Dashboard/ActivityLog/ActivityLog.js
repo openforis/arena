@@ -14,6 +14,8 @@ import Message from './Message'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { useI18n } from '@webapp/store/system'
 
+const minSizeToDisplayMessages = 1024 * 10 // 10KB
+
 const ActivityLog = () => {
   const i18n = useI18n()
   const surveyInfo = useSurveyInfo()
@@ -27,14 +29,16 @@ const ActivityLog = () => {
   return (
     <div className="activity-log__container">
       <h4 className="">{i18n.t('homeView.dashboard.activityLog.size', { size: activityLogSizeText })}</h4>
-      <div className="activity-log__messages">
-        {messages.length === 0 && <LoadingBar />}
-        {messages.map((message, index) => {
-          const setRef = (el) => (index === R.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null)
+      {(messages.length > 0 || activityLogSize > minSizeToDisplayMessages) && (
+        <div className="activity-log__messages">
+          {messages.length === 0 && <LoadingBar />}
+          {messages.map((message, index) => {
+            const setRef = (el) => (index === R.length(messages) - 10 ? setNextActivitiesFetchTrigger(el) : null)
 
-          return <Message setRef={setRef} key={ActivityLogMessage.getId(message)} message={message} />
-        })}
-      </div>
+            return <Message setRef={setRef} key={ActivityLogMessage.getId(message)} message={message} />
+          })}
+        </div>
+      )}
     </div>
   )
 }
