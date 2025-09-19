@@ -130,10 +130,16 @@ export const writeStreamToTempFile = async (inputStream) =>
 
 const _getChunkFileName = ({ fileId, chunk }) => `${fileId}_part${chunk}`
 
-export const writeChunkToTempFile = async ({ filePath, fileId, chunk }) => {
+export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
   const destFileName = _getChunkFileName({ fileId, chunk })
   const destFilePath = tempFilePath(destFileName)
-  await copyFile(filePath, destFilePath)
+  if (filePath) {
+    await copyFile(filePath, destFilePath)
+  } else if (fileContent) {
+    await writeFile(destFilePath, fileContent)
+  } else {
+    throw new Error('Missing file path or content')
+  }
 }
 
 export const mergeTempChunks = async ({ fileId, totalChunks }) => {
