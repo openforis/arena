@@ -1,10 +1,11 @@
 import axios from 'axios'
 
+import { FileProcessor } from '@openforis/arena-core'
+
 import { Query } from '@common/model/query'
 
 import * as Node from '@core/record/node'
 
-import { FileProcessor } from '@webapp/utils/FileProcessor'
 import { Chunks } from '@webapp/utils/chunks'
 
 import { objectToFormData } from '../utils/apiUtils'

@@ -1,15 +1,30 @@
 import * as Request from './request'
 import * as FileUtils from './file/fileUtils'
 
+const getFileContentOrPath = (req) => {
+  const filePath = Request.getFilePath(req)
+  if (filePath) {
+    return { filePath }
+  }
+  const params = Request.getParams(req)
+  const { file: fileContentBase64 } = params
+  if (fileContentBase64) {
+    return Buffer.from(fileContentBase64, 'base64')
+  }
+  throw new Error('Missing file content or path in request')
+}
+
 export const processChunkedFile = async ({ req }) => {
   const { fileId = undefined, chunk = undefined, totalChunks = undefined } = Request.getParams(req)
-  const requestFilePath = Request.getFilePath(req)
+  const { filePath, fileContent } = getFileContentOrPath(req)
 
   const isSingleFile = !totalChunks
 
   if (!isSingleFile) {
-    await FileUtils.writeChunkToTempFile({ filePath: requestFilePath, fileId, chunk })
-    await FileUtils.deleteFileAsync(requestFilePath)
+    await FileUtils.writeChunkToTempFile({ filePath, fileContent, fileId, chunk })
+    if (filePath) {
+      await FileUtils.deleteFileAsync(filePath)
+    }
   }
 
   const isChunkingComplete = totalChunks && chunk === totalChunks
@@ -20,7 +35,7 @@ export const processChunkedFile = async ({ req }) => {
   }
   if (isSingleFile) {
     // No file chunking was used; return the original file path.
-    return requestFilePath
+    return filePath
   }
   if (Number(chunk) < Number(totalChunks)) {
     // File chunks are still being uploaded; return null to indicate the process isn't complete.
