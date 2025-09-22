@@ -5,7 +5,16 @@ import { join, sep } from 'path'
 import * as ProcessUtils from '@core/processUtils'
 import { isUuid, uuidv4 } from '@core/uuid'
 
+import * as Log from '@server/log/log'
+
+const logger = Log.getLogger('FileUtils')
+
 const dirSeparator = '/'
+
+const encodings = {
+  utf8: 'utf-8',
+  base64: 'base64',
+}
 
 // ====== DIR
 
@@ -34,7 +43,7 @@ export { join, sep }
 
 // ====== FILE
 
-export const readFile = async (path) => fsp.readFile(path, { encoding: 'utf-8' })
+export const readFile = async (path) => fsp.readFile(path, { encoding: encodings.utf8 })
 
 export const readBinaryFile = async (path) => fsp.readFile(path)
 
@@ -148,8 +157,15 @@ export const mergeTempChunks = async ({ fileId, totalChunks, chunksAreText = fal
   for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
     const chunkFileName = _getChunkFileName({ fileId, chunk })
     const chunkFilePath = tempFilePath(chunkFileName)
-    const chunkFileContent = chunksAreText ? await readFile(chunkFilePath) : await readBinaryFile(chunkFilePath)
-    writeStream.write(chunkFileContent)
+    if (chunksAreText) {
+      const base64Content = await readFile(chunkFilePath)
+      const decodedBuffer = Buffer.from(base64Content, encodings.base64)
+      logger.debug(`==== processing chunk: ${chunk} = content: ${base64Content}`)
+      writeStream.write(decodedBuffer)
+    } else {
+      const chunkFileContent = await readBinaryFile(chunkFilePath)
+      writeStream.write(chunkFileContent)
+    }
     await deleteFileAsync(chunkFilePath)
   }
   writeStream.end()
