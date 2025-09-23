@@ -5,10 +5,6 @@ import { join, sep } from 'path'
 import * as ProcessUtils from '@core/processUtils'
 import { isUuid, uuidv4 } from '@core/uuid'
 
-import * as Log from '@server/log/log'
-
-const logger = Log.getLogger('FileUtils')
-
 const dirSeparator = '/'
 
 const encodings = {
@@ -151,21 +147,16 @@ export const writeChunkToTempFile = async ({ filePath = null, fileContent = null
   }
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks, chunksAreText = false }) => {
+export const mergeTempChunks = async ({ fileId, totalChunks }) => {
   const finalFilePath = newTempFilePath()
   const writeStream = createWriteStream(finalFilePath)
   for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
+    // extract temporary chunk content
     const chunkFileName = _getChunkFileName({ fileId, chunk })
     const chunkFilePath = tempFilePath(chunkFileName)
-    if (chunksAreText) {
-      const base64Content = await readFile(chunkFilePath)
-      const decodedBuffer = Buffer.from(base64Content, encodings.base64)
-      logger.debug(`==== processing chunk: ${chunk} = content: ${base64Content}`)
-      writeStream.write(decodedBuffer)
-    } else {
-      const chunkFileContent = await readBinaryFile(chunkFilePath)
-      writeStream.write(chunkFileContent)
-    }
+    const chunkFileContent = await readBinaryFile(chunkFilePath)
+    writeStream.write(chunkFileContent)
+    // delete temporary chunk
     await deleteFileAsync(chunkFilePath)
   }
   writeStream.end()

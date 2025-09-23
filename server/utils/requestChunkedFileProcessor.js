@@ -18,8 +18,6 @@ export const processChunkedFile = async ({ req }) => {
   const { fileId = undefined, chunk = undefined, totalChunks = undefined } = Request.getParams(req)
   const { filePath, fileContent } = getFileContentOrPath(req)
 
-  const chunksAreText = !!fileContent
-
   const isSingleFile = !totalChunks
 
   if (!isSingleFile) {
@@ -33,7 +31,7 @@ export const processChunkedFile = async ({ req }) => {
 
   if (isChunkingComplete) {
     // All file chunks have been received; merge them and return the file path.
-    return FileUtils.mergeTempChunks({ fileId, totalChunks, chunksAreText })
+    return FileUtils.mergeTempChunks({ fileId, totalChunks })
   }
   if (isSingleFile) {
     // No file chunking was used; return the original file path.
