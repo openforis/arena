@@ -203,7 +203,7 @@ export const createUser = async (name, password, client = db) =>
 export const dropUser = async (name, client = db) => await client.query(`DROP USER IF EXISTS "${name}"`)
 
 // VACUUM (removes dead tuples)
-export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
+export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM FULL ${schema}.${table}`)
 
 export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
   client.one(
