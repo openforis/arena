@@ -25,8 +25,8 @@ export default class ZipFileCreatorBaseJob extends Job {
     this.setContext({ archive, outputFileName, filePath: outputFilePath })
   }
 
-  async onEnd() {
-    await super.onEnd()
+  async beforeSuccess() {
+    await super.beforeSuccess()
     const { archive } = this.context
     await archive?.finalize()
   }
