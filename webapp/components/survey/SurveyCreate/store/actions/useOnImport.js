@@ -13,36 +13,33 @@ const urlBySource = {
   [importSources.arena]: '/api/survey/arena-import',
 }
 
-const uploadChunk = async ({ newSurvey, chunk, content, totalChunks, onUploadProgress }) => {
-  const { fileId, source, ...surveyObj } = newSurvey
-
-  const formData = objectToFormData({
-    file: content,
-    fileId,
-    chunk,
-    totalChunks,
-    survey: JSON.stringify(surveyObj),
-  })
-  const { data } = await axios.post(urlBySource[source], formData, {
-    onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
-  })
-  return { data, isComplete: chunk === totalChunks }
-}
-
 const createChunkProcessor =
-  ({ onUploadProgress, newSurvey, setNewSurvey, resolve }) =>
+  ({ onUploadProgress, newSurvey }) =>
   async ({ chunk, totalChunks, content }) => {
-    const { data, isComplete } = await uploadChunk({ newSurvey, chunk, content, totalChunks, onUploadProgress })
+    const { fileId, source, ...surveyObj } = newSurvey
 
-    if (isComplete) {
-      setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
-
-      const { job, validation } = data
-      resolve({ job, validation })
-    }
+    const formData = objectToFormData({
+      fileId,
+      file: content,
+      chunk,
+      totalChunks,
+      survey: JSON.stringify(surveyObj),
+    })
+    const { data } = await axios.post(urlBySource[source], formData, {
+      onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+    })
+    return data
   }
 
-const createChunkErrorHandler =
+const createOnCompleteHandler =
+  ({ setNewSurvey, resolve }) =>
+  (data) => {
+    setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
+    const { job, validation } = data
+    resolve({ job, validation })
+  }
+
+const createOnErrorHandler =
   ({ setNewSurvey, reject }) =>
   (error) => {
     setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
@@ -59,9 +56,10 @@ export const useOnImport = ({ newSurvey, setNewSurvey }) =>
 
       let fileProcessor = null
       const promise = new Promise((resolve, reject) => {
-        const chunkProcessor = createChunkProcessor({ onUploadProgress, newSurvey, setNewSurvey, resolve })
-        const onError = createChunkErrorHandler({ setNewSurvey, reject })
-        fileProcessor = new FileProcessor({ file, chunkProcessor, onError })
+        const chunkProcessor = createChunkProcessor({ onUploadProgress, newSurvey })
+        const onError = createOnErrorHandler({ setNewSurvey, reject })
+        const onComplete = createOnCompleteHandler({ setNewSurvey, resolve })
+        fileProcessor = new FileProcessor({ file, chunkProcessor, onError, onComplete })
       })
       fileProcessor.start(startFromChunk)
       return { promise, processor: fileProcessor }
