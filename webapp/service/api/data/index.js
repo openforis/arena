@@ -82,8 +82,8 @@ export const startDataImportFromCsvJob = ({
         const formData = objectToFormData({
           cycle,
           nodeDefUuid,
-          file: content,
           fileId,
+          file: content,
           chunk,
           totalChunks,
           fileFormat,
@@ -98,10 +98,10 @@ export const startDataImportFromCsvJob = ({
         const { data } = await axios.post(`/api/survey/${surveyId}/data-import/flat-data`, formData, {
           onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
         })
-
-        if (chunk === totalChunks) {
-          resolve(data.job)
-        }
+        return data
+      },
+      onComplete: (data) => {
+        resolve(data.job)
       },
       onError: (error) => {
         reject(error)
@@ -128,8 +128,8 @@ export const startDataImportFromArenaJob = ({
       file,
       chunkProcessor: async ({ chunk, totalChunks, content }) => {
         const formData = objectToFormData({
-          file: content,
           fileId,
+          file: content,
           chunk,
           totalChunks,
           cycle,
@@ -139,10 +139,10 @@ export const startDataImportFromArenaJob = ({
         const { data } = await axios.post(`/api/mobile/survey/${surveyId}`, formData, {
           onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
         })
-
-        if (chunk === totalChunks) {
-          resolve(data.job)
-        }
+        return data
+      },
+      onComplete: (data) => {
+        resolve(data.job)
       },
       onError: (error) => {
         reject(error)
