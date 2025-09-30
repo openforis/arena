@@ -4,10 +4,12 @@ import { ENV } from '@core/processUtils'
 const arenaAppId = 'arena'
 const arenaMobileId = 'arena-mobile'
 const arenaMobileExperimentsId = 'mam'
+const arenaMobile2Id = 'am'
 
 const appNameById = {
   [arenaAppId]: 'Arena',
   [arenaMobileId]: 'Arena Mobile',
+  [arenaMobile2Id]: 'Arena Mobile 2',
   [arenaMobileExperimentsId]: 'Arena Mobile Experiments',
 }
 
@@ -29,6 +31,7 @@ const getAppNameById = (appId) => appNameById[appId] ?? appId
 export const AppInfo = {
   arenaAppId,
   arenaMobileId,
+  arenaMobile2Id,
   keys,
   newAppInfo,
   getAppId,
