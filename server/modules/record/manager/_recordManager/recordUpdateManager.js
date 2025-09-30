@@ -4,8 +4,6 @@ import { NodePointers, Records, SurveyDependencyType } from '@openforis/arena-co
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as PromiseUtils from '@core/promiseUtils'
-
 import * as ObjectUtils from '@core/objectUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -129,12 +127,12 @@ export const deleteRecord = async (user, survey, record, client = db) =>
         t
       )
       const nodeDefsUnique = Survey.getNodeDefsRootUnique(survey)
-      await PromiseUtils.each(nodeDefsUnique, (nodeDefUnique) =>
-        RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+      for (const nodeDefUnique of nodeDefsUnique) {
+        await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
           { survey, record, nodeDefUniqueUuid: nodeDefUnique.uuid, excludeRecordFromCount: true },
           t
         )
-      )
+      }
     }
 
     const surveyId = Survey.getId(survey)
@@ -299,7 +297,7 @@ const _beforeNodeUpdate = async ({ survey, record, node }, t) => {
       { survey, record, excludeRecordFromCount: true },
       t
     )
-  } else if (NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))) {
+  } else if (NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) && NodeDef.isSingle(nodeDef)) {
     // Validate record uniqueness of records with same record unique nodes
     await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
       { survey, record, nodeDefUniqueUuid: nodeDefUuid, excludeRecordFromCount: true },
@@ -397,13 +395,11 @@ const _afterNodesUpdate = async ({ survey, record, nodes }, t) => {
       NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))
     )
   })
-  if (rootUniqueNodeDefsModified.length > 0) {
-    // for each modified node def, validate record uniqueness of records with same record unique nodes
-    await PromiseUtils.each(rootUniqueNodeDefsModified, async (nodeDefUnique) =>
-      RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
-        { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
-        t
-      )
+  // for each modified node def, validate record uniqueness of records with same record unique nodes
+  for (const nodeDefUnique of rootUniqueNodeDefsModified) {
+    await RecordValidationManager.validateRecordUniqueNodesUniquenessAndPersistValidation(
+      { survey, record, nodeDefUniqueUuid: NodeDef.getUuid(nodeDefUnique), excludeRecordFromCount: false },
+      t
     )
   }
   const surveyId = Survey.getId(survey)

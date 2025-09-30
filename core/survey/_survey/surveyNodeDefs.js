@@ -219,7 +219,10 @@ export const isNodeDefRootKey = (nodeDef) => (survey) =>
 export const getNodeDefsRootUnique = (survey) => {
   const nodeDefRoot = getNodeDefRoot(survey)
   return getNodeDefChildren(nodeDefRoot)(survey).filter(
-    (nodeDef) => NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) && !NodeDef.isDeleted(nodeDef)
+    (nodeDef) =>
+      NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) &&
+      !NodeDef.isDeleted(nodeDef) &&
+      NodeDef.isSingle(nodeDef)
   )
 }
 
