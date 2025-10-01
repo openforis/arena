@@ -70,7 +70,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, nodeDefRootUuid, nodeDefsDraft, client)
     : null
 
-  const summaryAttributeDefs = includeRootKeyValues
+  const summaryDefs = includeRootKeyValues
     ? await NodeDefRepository.fetchRootSummaryDefsBySurveyId(
         { surveyId, cycle, nodeDefRootUuid, draft: nodeDefsDraft },
         client
@@ -83,7 +83,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       cycle,
       nodeDefRoot,
       nodeDefKeys,
-      summaryAttributeDefs,
+      summaryDefs,
       offset,
       limit,
       sortBy,

@@ -163,27 +163,31 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
   )
 }
 
-const determineOrderBy = ({ nodeDefKeys, sortBy, rootEntityTableAlias }) => {
+const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
   const getNodeDefKeyColumnName = NodeDefTable.getColumnName
-  const getNodeDefKeyColAlias = NodeDef.getName
 
-  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, keyDef) => {
-    const colName = NodeDef.isCode(keyDef)
-      ? ColumnNodeDef.getCodeLabelColumnName(keyDef)
-      : getNodeDefKeyColumnName(keyDef)
-    acc[getNodeDefKeyColAlias(keyDef)] = colName
-    return acc
-  }, {})
+  const getColumnName = (nodeDef) => {
+    const colName = NodeDef.isCode(nodeDef)
+      ? ColumnNodeDef.getCodeLabelColumnName(nodeDef)
+      : getNodeDefKeyColumnName(nodeDef)
+    return colName
+  }
+
+  const nodeDefKeysColumnNames = nodeDefKeys?.map((nodeDef) => getColumnName(nodeDef))
+  const summaryDefsColumnNames = summaryDefs?.map((nodeDef) => getColumnName(nodeDef))
 
   const sortByColumnName = StringUtils.toSnakeCase(sortBy)
 
-  if (nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(sortByColumnName)) {
-    return `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[sortByColumnName]}`
+  if (nodeDefKeysColumnNames?.includes(sortByColumnName)) {
+    return `keys_obj -> '${sortByColumnName}'`
+  }
+  if (summaryDefsColumnNames?.includes(sortByColumnName)) {
+    return `summary_attributes_obj -> '${sortByColumnName}'`
   }
   if (sortBy === Record.keys.ownerName) {
-    return 'u.name'
+    return 'owner_name'
   }
-  return `r.${sortByColumnName}`
+  return sortByColumnName
 }
 
 const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
@@ -201,7 +205,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     surveyId,
     nodeDefRoot = null,
     nodeDefKeys = null,
-    summaryAttributeDefs = null,
+    summaryDefs = null,
     cycle = null,
     step = null,
     offset = 0,
@@ -232,7 +236,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   })
 
   const summaryAttributesJsonSelect = nodeDefsToJsonb({
-    nodeDefs: summaryAttributeDefs,
+    nodeDefs: summaryDefs,
     tableAlias: rootEntityTableAlias,
     alias: 'summary_attributes_obj',
   })
@@ -260,41 +264,44 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   return client.map(
     `
-    SELECT 
-      r.uuid, 
-      r.owner_uuid, 
-      r.cycle,
-      r.step, 
-      r.preview, 
-      r.merged_into_record_uuid, 
-      ${DbUtils.selectDate('r.date_created', 'date_created')}, 
-      ${DbUtils.selectDate('r.date_modified', 'date_modified')},
-      r.validation,
-      r.info,
-      s.uuid AS survey_uuid,
-      u.name as owner_name
-      ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
-      ${nodeDefKeysJsonSelect ? `, ${nodeDefKeysJsonSelect}` : ''}
-      ${summaryAttributesJsonSelect ? `, ${summaryAttributesJsonSelect}` : ''}
-    FROM ${getSchemaSurvey(surveyId)}.record r
-    -- GET SURVEY UUID
-    JOIN survey s
-      ON s.id = $/surveyId/
-    -- GET OWNER NAME
-    JOIN "user" u
-      ON r.owner_uuid = u.uuid
-      ${
-        nodeDefRoot && nodeDefKeys?.length > 0
-          ? `-- join with root entity table to get node key values 
-      LEFT OUTER JOIN
-        ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
-      ON r.uuid = ${rootEntityTableAlias}.record_uuid`
-          : ''
-      }
+    WITH records AS (
+      SELECT 
+        r.uuid, 
+        r.owner_uuid, 
+        r.cycle,
+        r.step, 
+        r.preview, 
+        r.merged_into_record_uuid, 
+        ${DbUtils.selectDate('r.date_created', 'date_created')}, 
+        ${DbUtils.selectDate('r.date_modified', 'date_modified')},
+        r.validation,
+        r.info,
+        s.uuid AS survey_uuid,
+        u.name as owner_name
+        ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
+        ${nodeDefKeysJsonSelect ? `, ${nodeDefKeysJsonSelect}` : ''}
+        ${summaryAttributesJsonSelect ? `, ${summaryAttributesJsonSelect}` : ''}
+      FROM ${getSchemaSurvey(surveyId)}.record r
+      -- GET SURVEY UUID
+      JOIN survey s
+        ON s.id = $/surveyId/
+      -- GET OWNER NAME
+      JOIN "user" u
+        ON r.owner_uuid = u.uuid
+        ${
+          nodeDefRoot && nodeDefKeys?.length > 0
+            ? `-- join with root entity table to get node key values 
+        LEFT OUTER JOIN
+          ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+        ON r.uuid = ${rootEntityTableAlias}.record_uuid`
+            : ''
+        }
 
-    ${whereCondition}
+      ${whereCondition}
+    )
+    SELECT * FROM records
 
-    ORDER BY ${determineOrderBy({ nodeDefKeys, sortBy, rootEntityTableAlias })} ${sortOrder}
+    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${sortOrder}
 
     ${limit ? 'LIMIT $/limit:value/' : ''}
 
