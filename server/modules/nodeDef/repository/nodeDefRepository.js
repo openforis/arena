@@ -5,6 +5,7 @@ import { DB, BaseProtocol, TableNodeDef, Schemata } from '@openforis/arena-serve
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as ServerDB from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -211,6 +212,22 @@ export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, 
     AND ${DbUtils.getPropColCombined('key', draft)} = $2
     ORDER BY id`,
     [nodeDefRootUuid, 'true'],
+    (row) => dbTransformCallback({ row, draft })
+  )
+
+export const fetchRootSummaryDefsBySurveyId = async (
+  { surveyId, nodeDefRootUuid, cycle, draft = false },
+  client = DB
+) =>
+  client.map(
+    `
+    SELECT ${nodeDefSelectFields}
+    FROM ${getSchemaSurvey(surveyId)}.node_def 
+    WHERE deleted IS NOT TRUE
+    AND parent_uuid = $/nodeDefRootUuid/
+    AND (${DbUtils.getPropColCombined('layout', draft, undefined, false)}) #>> '{$/cycle#/,${NodeDefLayout.keys.includedInMultipleEntitySummary}}' = 'true'
+    ORDER BY id`,
+    { nodeDefRootUuid, cycle },
     (row) => dbTransformCallback({ row, draft })
   )
 

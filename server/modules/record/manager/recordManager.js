@@ -63,14 +63,19 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefRoot = includeRootKeyValues
     ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
     : null
+
+  const nodeDefRootUuid = NodeDef.getUuid(nodeDefRoot)
+
   const nodeDefKeys = includeRootKeyValues
-    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-        surveyId,
-        NodeDef.getUuid(nodeDefRoot),
-        nodeDefsDraft,
+    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, nodeDefRootUuid, nodeDefsDraft, client)
+    : null
+
+  const summaryAttributeDefs = includeRootKeyValues
+    ? await NodeDefRepository.fetchRootSummaryDefsBySurveyId(
+        { surveyId, cycle, nodeDefRootUuid, draft: nodeDefsDraft },
         client
       )
-    : null
+    : []
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
     {
@@ -78,6 +83,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       cycle,
       nodeDefRoot,
       nodeDefKeys,
+      summaryAttributeDefs,
       offset,
       limit,
       sortBy,

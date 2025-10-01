@@ -186,11 +186,22 @@ const determineOrderBy = ({ nodeDefKeys, sortBy, rootEntityTableAlias }) => {
   return `r.${sortByColumnName}`
 }
 
+const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
+  if (!nodeDefs) return null
+  return `jsonb_build_object(${nodeDefs
+    .flatMap((nodeDef) => {
+      const colNames = NodeDefTable.getColumnNames(nodeDef)
+      return colNames.map((colName) => `'${colName}', ${tableAlias}.${colName}`)
+    })
+    .join(', ')}) AS ${alias}`
+}
+
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
     nodeDefRoot = null,
     nodeDefKeys = null,
+    summaryAttributeDefs = null,
     cycle = null,
     step = null,
     offset = 0,
@@ -213,6 +224,18 @@ export const fetchRecordsSummaryBySurveyId = async (
       return colNames.map((keyColName) => `${rootEntityTableAlias}.${keyColName} AS ${keyColName}`)
     })
     .join(', ')
+
+  const nodeDefKeysJsonSelect = nodeDefsToJsonb({
+    nodeDefs: nodeDefKeys,
+    tableAlias: rootEntityTableAlias,
+    alias: 'keys_obj',
+  })
+
+  const summaryAttributesJsonSelect = nodeDefsToJsonb({
+    nodeDefs: summaryAttributeDefs,
+    tableAlias: rootEntityTableAlias,
+    alias: 'summary_attributes_obj',
+  })
 
   const nodeDefKeysSelectSearch = nodeDefKeys
     ?.map((nodeDefKey) =>
@@ -251,6 +274,8 @@ export const fetchRecordsSummaryBySurveyId = async (
       s.uuid AS survey_uuid,
       u.name as owner_name
       ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
+      ${nodeDefKeysJsonSelect ? `, ${nodeDefKeysJsonSelect}` : ''}
+      ${summaryAttributesJsonSelect ? `, ${summaryAttributesJsonSelect}` : ''}
     FROM ${getSchemaSurvey(surveyId)}.record r
     -- GET SURVEY UUID
     JOIN survey s

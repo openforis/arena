@@ -213,6 +213,20 @@ export const getNodeDefRootKeys = (survey) => {
   return root ? getNodeDefKeys(root)(survey) : []
 }
 
+export const getSummaryDefs =
+  ({ nodeDef, cycle }) =>
+  (survey) =>
+    getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter((childDef) =>
+      NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(childDef)
+    )
+
+export const getRootSummaryDefs =
+  ({ cycle }) =>
+  (survey) => {
+    const root = getNodeDefRoot(survey)
+    return root ? getSummaryDefs({ nodeDef: root, cycle })(survey) : []
+  }
+
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
