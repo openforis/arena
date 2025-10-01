@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as StringUtils from '@core/stringUtils'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -38,6 +37,9 @@ const recordSelectFieldsArray = [
   ...dateColumns.map((dateCol) => DbUtils.selectDate(dateCol)),
 ]
 const recordSelectFields = recordSelectFieldsArray.join(', ')
+
+const recordKeysObjAlias = 'keys_obj'
+const recordSummaryAttributesObjAlias = 'summary_attributes_obj'
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -171,30 +173,39 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
 }
 
 const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
-  const getNodeDefKeyColumnName = NodeDefTable.getColumnName
+  const getColumnName = (nodeDef) =>
+    NodeDef.isCode(nodeDef)
+      ? // consider label for sorting if nodeDef is code
+        ColumnNodeDef.getCodeLabelColumnName(nodeDef)
+      : NodeDefTable.getColumnName(nodeDef)
 
-  const getColumnName = (nodeDef) => {
-    const colName = NodeDef.isCode(nodeDef)
-      ? ColumnNodeDef.getCodeLabelColumnName(nodeDef)
-      : getNodeDefKeyColumnName(nodeDef)
-    return colName
+  const getKeyOrSummaryDefCondition = ({ nodeDefs, objAlias }) => {
+    const nodeDefNames = nodeDefs?.map(NodeDef.getName)
+    if (nodeDefNames.includes(sortBy)) {
+      const nodeDef = nodeDefs.find((nodeDef) => NodeDef.getName(nodeDef) === sortBy)
+      if (nodeDef) {
+        const colName = getColumnName(nodeDef)
+        return `${objAlias} -> '${colName}'`
+      }
+    }
+    return null
   }
-
-  const nodeDefKeysColumnNames = nodeDefKeys?.map((nodeDef) => getColumnName(nodeDef))
-  const summaryDefsColumnNames = summaryDefs?.map((nodeDef) => getColumnName(nodeDef))
-
-  const sortByColumnName = StringUtils.toSnakeCase(sortBy)
-
-  if (nodeDefKeysColumnNames?.includes(sortByColumnName)) {
-    return `keys_obj -> '${sortByColumnName}'`
+  const keyCondition = getKeyOrSummaryDefCondition({ nodeDefs: nodeDefKeys, objAlias: recordKeysObjAlias })
+  if (keyCondition) {
+    return keyCondition
   }
-  if (summaryDefsColumnNames?.includes(sortByColumnName)) {
-    return `summary_attributes_obj -> '${sortByColumnName}'`
+  const summaryDefCondition = getKeyOrSummaryDefCondition({
+    nodeDefs: summaryDefs,
+    objAlias: recordSummaryAttributesObjAlias,
+  })
+  if (summaryDefCondition) {
+    return summaryDefCondition
   }
   if (sortBy === Record.keys.ownerName) {
     return 'owner_name'
   }
-  return sortByColumnName
+  // fallbacks to table columns
+  return sortBy
 }
 
 const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
@@ -228,8 +239,6 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
-  const keysObjAlias = 'keys_obj'
-  const summaryAttributesObjAlias = 'summary_attributes_obj'
 
   const nodeDefKeysSelect = nodeDefKeys
     ?.flatMap((nodeDefKey) => {
@@ -241,13 +250,13 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefKeysJsonSelect = nodeDefsToJsonb({
     nodeDefs: nodeDefKeys,
     tableAlias: rootEntityTableAlias,
-    alias: keysObjAlias,
+    alias: recordKeysObjAlias,
   })
 
   const summaryAttributesJsonSelect = nodeDefsToJsonb({
     nodeDefs: summaryDefs,
     tableAlias: rootEntityTableAlias,
-    alias: summaryAttributesObjAlias,
+    alias: recordSummaryAttributesObjAlias,
   })
 
   const getWhereConditionsByKeysOrSummaryDefs = ({ nodeDefs, objAlias }) =>
@@ -261,11 +270,11 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const nodeDefKeysWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
     nodeDefs: nodeDefKeys,
-    objAlias: keysObjAlias,
+    objAlias: recordKeysObjAlias,
   })
   const summaryDefsWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
     nodeDefs: summaryDefs,
-    objAlias: summaryAttributesObjAlias,
+    objAlias: recordSummaryAttributesObjAlias,
   })
 
   const recordsSelectWhereConditions = []
