@@ -202,7 +202,7 @@ const fetchAreaBasedEstimateNodeDefsOf = async (surveyId, nodeDefUuid, draft, cl
     (row) => dbTransformCallback({ row, draft })
   )
 
-export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = DB) =>
+export const fetchRootNodeDefKeysBySurveyId = async ({ surveyId, nodeDefRootUuid, draft }, client = DB) =>
   client.map(
     `
     SELECT ${nodeDefSelectFields}

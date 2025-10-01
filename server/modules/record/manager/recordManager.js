@@ -67,7 +67,10 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefRootUuid = NodeDef.getUuid(nodeDefRoot)
 
   const nodeDefKeys = includeRootKeyValues
-    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, nodeDefRootUuid, nodeDefsDraft, client)
+    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
+        { surveyId, nodeDefRootUuid, draft: nodeDefsDraft },
+        client
+      )
     : null
 
   const summaryDefs = includeRootKeyValues
@@ -142,15 +145,17 @@ export const countRecordsBySurveyId = async ({ surveyId, cycle, search, ownerUui
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
+  const nodeDefRootUuid = NodeDef.getUuid(nodeDefRoot)
   const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-    surveyId,
-    NodeDef.getUuid(nodeDefRoot),
-    nodeDefsDraft,
+    { surveyId, nodeDefRootUuid, draft: nodeDefsDraft },
     client
   )
-
+  const summaryDefs = await NodeDefRepository.fetchRootSummaryDefsBySurveyId(
+    { surveyId, nodeDefRootUuid, cycle, draft: nodeDefsDraft },
+    client
+  )
   return RecordRepository.countRecordsBySurveyId(
-    { surveyId, cycle, search, nodeDefKeys, nodeDefRoot, ownerUuid },
+    { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid },
     client
   )
 }

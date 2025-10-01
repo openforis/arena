@@ -109,11 +109,18 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 // ============== READ
 
 export const countRecordsBySurveyId = async (
-  { surveyId, cycle = null, nodeDefRoot, nodeDefKeys, search = null, ownerUuid = null },
+  { surveyId, cycle = null, nodeDefRoot, nodeDefKeys, summaryDefs, search = null, ownerUuid = null },
   client = db
 ) => {
   if (!A.isEmpty(search)) {
-    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, nodeDefRoot, nodeDefKeys, search })
+    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({
+      surveyId,
+      cycle,
+      nodeDefRoot,
+      nodeDefKeys,
+      summaryDefs,
+      search,
+    })
     return recordsWithSearch.length
   }
   return client.one(
@@ -221,6 +228,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
+  const keysObjAlias = 'keys_obj'
+  const summaryAttributesObjAlias = 'summary_attributes_obj'
 
   const nodeDefKeysSelect = nodeDefKeys
     ?.flatMap((nodeDefKey) => {
@@ -232,39 +241,52 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefKeysJsonSelect = nodeDefsToJsonb({
     nodeDefs: nodeDefKeys,
     tableAlias: rootEntityTableAlias,
-    alias: 'keys_obj',
+    alias: keysObjAlias,
   })
 
   const summaryAttributesJsonSelect = nodeDefsToJsonb({
     nodeDefs: summaryDefs,
     tableAlias: rootEntityTableAlias,
-    alias: 'summary_attributes_obj',
+    alias: summaryAttributesObjAlias,
   })
 
-  const nodeDefKeysSelectSearch = nodeDefKeys
-    ?.map((nodeDefKey) =>
-      NodeDefTable.getColumnNames(nodeDefKey)
-        .map((colName) => ` (${rootEntityTableAlias}.${colName})::text ilike '%$/search:value/%'`)
-        .join(' OR ')
-    )
-    .join(' OR ')
+  const getWhereConditionsByKeysOrSummaryDefs = ({ nodeDefs, objAlias }) =>
+    nodeDefs
+      .flatMap((nodeDef) =>
+        NodeDefTable.getColumnNames(nodeDef).map(
+          (colName) => ` (${objAlias} ->> '${colName}') ilike '%$/search:value/%'`
+        )
+      )
+      .join(' OR ')
+
+  const nodeDefKeysWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
+    nodeDefs: nodeDefKeys,
+    objAlias: keysObjAlias,
+  })
+  const summaryDefsWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
+    nodeDefs: summaryDefs,
+    objAlias: summaryAttributesObjAlias,
+  })
 
   const recordsSelectWhereConditions = []
-  if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
-  recordsSelectWhereConditions.push(`r.merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
-  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
-  if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
-  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
+  if (!includePreview) recordsSelectWhereConditions.push('preview = FALSE')
+  recordsSelectWhereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('cycle = $/cycle/')
+  if (!A.isNull(step)) recordsSelectWhereConditions.push('step = $/step/')
+  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('uuid IN ($/recordUuids:csv/)')
   if (!A.isEmpty(search))
-    recordsSelectWhereConditions.push(`(${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%')`)
-  if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('r.owner_uuid = $/ownerUuid/')
+    recordsSelectWhereConditions.push(
+      `(${nodeDefKeysWhereConditions})
+      OR (${summaryDefsWhereConditions}) 
+      OR (owner_name ilike '%$/search:value/%')`
+    )
+  if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('owner_uuid = $/ownerUuid/')
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
 
   return client.map(
-    `
-    WITH records AS (
+    `WITH records AS (
       SELECT 
         r.uuid, 
         r.owner_uuid, 
@@ -296,10 +318,10 @@ export const fetchRecordsSummaryBySurveyId = async (
         ON r.uuid = ${rootEntityTableAlias}.record_uuid`
             : ''
         }
-
-      ${whereCondition}
     )
     SELECT * FROM records
+    
+    ${whereCondition}
 
     ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${sortOrder}
 
