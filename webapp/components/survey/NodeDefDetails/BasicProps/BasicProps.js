@@ -60,6 +60,7 @@ const BasicProps = (props) => {
     entitySourceHierarchy,
     renderType,
     displayIn,
+    includeInMultipleEntitySummary,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
@@ -67,6 +68,7 @@ const BasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canIncludeInMultipleEntitySummary,
   } = useBasicProps(props)
 
   return (
@@ -189,6 +191,20 @@ const BasicProps = (props) => {
             ]}
           />
         </FormItem>
+      )}
+
+      {canIncludeInMultipleEntitySummary && (
+        <div className="form_row without-label">
+          <Checkbox
+            checked={includeInMultipleEntitySummary}
+            info={`nodeDefEdit.mobileAppProps.${NodeDefLayout.keys.includedInMultipleEntitySummary}.info`}
+            label={`nodeDefEdit.mobileAppProps.${NodeDefLayout.keys.includedInMultipleEntitySummary}.label`}
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
+            onChange={(value) =>
+              Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })
+            }
+          />
+        </div>
       )}
 
       <CyclesSelector
