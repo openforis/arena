@@ -1176,10 +1176,6 @@ export default {
       form: 'Formulario',
       formula: 'Fórmula',
       includedInClonedData: 'Incluido en los datos clonados',
-      includedInMultipleEntitySummary: {
-        label: 'Incluir en el resumen de entidades múltiples',
-        info: 'Si está marcado, el atributo será visible en la vista de resumen de la entidad',
-      },
       includedInRecordsList: {
         label: 'Incluir en la lista de registros',
         info: `Si está marcado, el atributo será visible en la lista de registros`,
@@ -1209,6 +1205,10 @@ export default {
       hiddenInMobile: {
         label: 'Oculto en Arena Mobile',
         info: 'Si está marcado, el atributo no será visible en AM',
+      },
+      includedInMultipleEntitySummary: {
+        label: 'Incluir en el resumen de entidades múltiples',
+        info: 'Si está marcado, el atributo será visible en la vista de resumen de la entidad',
       },
       includedInPreviousCycleLink: {
         label: 'Incluir en el enlace del ciclo anterior',

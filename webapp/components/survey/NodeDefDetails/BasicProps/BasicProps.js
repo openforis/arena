@@ -61,7 +61,7 @@ const BasicProps = (props) => {
     renderType,
     displayIn,
     includeInMultipleEntitySummary,
-    nodeDefParent,
+    parentIsRoot,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
@@ -194,18 +194,17 @@ const BasicProps = (props) => {
         </FormItem>
       )}
 
-      {canIncludeInMultipleEntitySummary && (
-        <div className="form_row without-label">
+      {canIncludeInMultipleEntitySummary && parentIsRoot && (
+        <FormItem label="nodeDefEdit.basicProps.includedInRecordsList.label">
           <Checkbox
             checked={includeInMultipleEntitySummary}
-            info={`nodeDefEdit.basicProps.${NodeDef.isRoot(nodeDefParent) ? 'includedInRecordsList' : 'includedInMultipleEntitySummary'}.info`}
-            label={`nodeDefEdit.basicProps.${NodeDef.isRoot(nodeDefParent) ? 'includedInRecordsList' : 'includedInMultipleEntitySummary'}.label`}
+            info="nodeDefEdit.basicProps.includedInRecordsList.info"
             validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
             onChange={(value) =>
               Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })
             }
           />
-        </div>
+        </FormItem>
       )}
 
       <CyclesSelector

@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 import { Checkbox } from '@webapp/components/form'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyCycleKey } from '@webapp/store/survey'
+import { useSurveyCycleKey, useIsNodeDefParentRoot } from '@webapp/store/survey'
 
 import { State } from './store'
 
@@ -18,11 +18,14 @@ export const MobileAppProps = (props) => {
   const readOnly = !useAuthCanEditSurvey()
 
   const cycle = useSurveyCycleKey()
+
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
+  const isNodeDefParentRoot = useIsNodeDefParentRoot(nodeDef)
 
   const canBeHiddenInMobile = NodeDef.canBeHiddenInMobile(nodeDef)
   const canIncludeInPreviousCycleLink = NodeDef.canIncludeInPreviousCycleLink(cycle)(nodeDef)
+  const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
   const createLayoutPropCheckbox = useCallback(
     ({ prop }) => (
@@ -41,6 +44,10 @@ export const MobileAppProps = (props) => {
   return (
     <div className="form mobile-props">
       {canBeHiddenInMobile && createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
+
+      {canIncludeInMultipleEntitySummary &&
+        !isNodeDefParentRoot &&
+        createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
 
       {canIncludeInPreviousCycleLink &&
         createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInPreviousCycleLink })}
