@@ -79,6 +79,7 @@ export const useNodeDefByUuid = (uuid) =>
     const survey = SurveyState.getSurvey(state)
     return Survey.getNodeDefByUuid(uuid)(survey)
   })
+
 export const useNodeDefByName = (name) =>
   useSelector((state) => {
     if (!name) return null
@@ -99,6 +100,13 @@ export const useNodeDefsByNames = (names) =>
     const survey = SurveyState.getSurvey(state)
     return names.map((name) => Survey.findNodeDefByName(name)(survey)).filter(Boolean)
   }, Objects.isEqual)
+
+export const useIsNodeDefParentRoot = (nodeDef) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    const root = Survey.getNodeDefRoot(survey)
+    return NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(root)
+  })
 
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
 
