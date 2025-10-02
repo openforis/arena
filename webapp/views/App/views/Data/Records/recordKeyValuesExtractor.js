@@ -40,7 +40,7 @@ const extractKeyOrSummaryValue = ({ nodeDef, record, categoryItemsByCodeDefUuid 
   if (NodeDef.isCode(nodeDef) && !categoryItemsByCodeDefUuid) {
     field = `${field}_label`
   }
-  const keysOrSummaryFields = { ...(record['keysObj'] ?? {}), ...(record['summaryAttributesObj'] ?? {}) }
+  const keysOrSummaryFields = { ...Record.getKeysObj(record), ...Record.getSummaryAttributesObj(record) }
   const value = keysOrSummaryFields[field]
   const cycle = Record.getCycle(record)
   const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
