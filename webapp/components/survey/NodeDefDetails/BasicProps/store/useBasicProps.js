@@ -75,6 +75,7 @@ export const useBasicProps = (props) => {
     renderType,
     displayIn,
     includeInMultipleEntitySummary,
+    nodeDefParent,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
