@@ -181,7 +181,7 @@ const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
 
   const getKeyOrSummaryDefCondition = ({ nodeDefs, objAlias }) => {
     const nodeDefNames = nodeDefs?.map(NodeDef.getName)
-    if (nodeDefNames.includes(sortBy)) {
+    if (nodeDefNames?.includes(sortBy)) {
       const nodeDef = nodeDefs.find((nodeDef) => NodeDef.getName(nodeDef) === sortBy)
       if (nodeDef) {
         const colName = getColumnName(nodeDef)
