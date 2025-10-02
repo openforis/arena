@@ -20,6 +20,10 @@ export const keys = {
   filesCount: 'filesCount',
   filesSize: 'filesSize',
   filesMissing: 'filesMissing',
+
+  // temporary properties
+  keysObj: 'keysObj',
+  summaryAttributesObj: 'summaryAttributesObj',
 }
 
 export const infoKeys = {

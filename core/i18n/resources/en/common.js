@@ -1389,6 +1389,14 @@ $t(common.appNameFull)
       form: 'Form',
       formula: 'Formula',
       includedInClonedData: 'Included in cloned data',
+      includedInMultipleEntitySummary: {
+        label: 'Include in multiple entity summary',
+        info: `If marked, the attribute will be visible in the entity summary view (in Arena Mobile)`,
+      },
+      includedInRecordsList: {
+        label: 'Include in records list',
+        info: `If marked, the attribute will be visible in records list`,
+      },
       key: 'Key',
       multiple: 'Multiple',
       ownPage: 'Its own page',
@@ -1415,10 +1423,6 @@ E.g. this.region = region_attribute_name
       hiddenInMobile: {
         label: 'Hidden in Arena Mobile',
         info: `If marked, the attribute won't be visible in AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Include in multiple entity summary',
-        info: `If marked, the attribute will be visible in the entity summary view`,
       },
       includedInPreviousCycleLink: {
         label: 'Include in previous cycle link',

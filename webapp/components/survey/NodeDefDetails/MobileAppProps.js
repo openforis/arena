@@ -22,7 +22,6 @@ export const MobileAppProps = (props) => {
   const validation = State.getValidation(state)
 
   const canBeHiddenInMobile = NodeDef.canBeHiddenInMobile(nodeDef)
-  const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
   const canIncludeInPreviousCycleLink = NodeDef.canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
   const createLayoutPropCheckbox = useCallback(
@@ -42,9 +41,6 @@ export const MobileAppProps = (props) => {
   return (
     <div className="form mobile-props">
       {canBeHiddenInMobile && createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
-
-      {canIncludeInMultipleEntitySummary &&
-        createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
 
       {canIncludeInPreviousCycleLink &&
         createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInPreviousCycleLink })}

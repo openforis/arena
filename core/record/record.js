@@ -111,3 +111,6 @@ export const { getValidation } = Validation
 export const getFilesCount = R.prop(keys.filesCount)
 export const getFilesSize = R.prop(keys.filesSize)
 export const getFilesMissing = R.prop(keys.filesMissing)
+
+export const getKeysObj = R.propOr({}, keys.keysObj)
+export const getSummaryAttributesObj = R.propOr({}, keys.summaryAttributesObj)

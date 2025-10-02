@@ -40,6 +40,12 @@ export const useNodeDefRootKeys = () => {
   return Survey.getNodeDefKeysSorted({ nodeDef: root, cycle })(survey)
 }
 
+export const useRootSummaryDefs = () => {
+  const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
+  return Survey.getRootSummaryDefs({ cycle })(survey)
+}
+
 export const useCategoryByName = (name) =>
   useSelector((state) => {
     if (!name) return null

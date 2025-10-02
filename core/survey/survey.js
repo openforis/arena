@@ -182,6 +182,8 @@ export const {
   getNodeDefSource,
   getNodeDefKeys,
   getNodeDefKeysSorted,
+  getSummaryDefs,
+  getRootSummaryDefs,
   isNodeDefRootKey,
   findNodeDef,
   findNodeDefByName,

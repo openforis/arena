@@ -17,7 +17,7 @@ import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionCol
 
 import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
-import { useSurveyHasFileAttributes } from '@webapp/store/survey/hooks'
+import { useRootSummaryDefs, useSurveyHasFileAttributes } from '@webapp/store/survey/hooks'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
@@ -27,6 +27,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
   const lang = useSurveyPreferredLang()
   const user = useUser()
   const nodeDefKeys = useNodeDefRootKeys()
+  const summaryDefs = useRootSummaryDefs()
   const hasFileAttributes = useSurveyHasFileAttributes()
 
   const onRecordEditButtonClick = useCallback(
@@ -58,7 +59,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         ),
         width: '3rem',
       },
-      ...nodeDefKeys.map((nodeDef) => ({
+      ...[...nodeDefKeys, ...summaryDefs].map((nodeDef) => ({
         key: NodeDef.getUuid(nodeDef),
         sortable: true,
         sortField: NodeDef.getName(nodeDef),
@@ -66,7 +67,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         renderItem: ({ item: record }) => {
           const name = NodeDef.getName(nodeDef)
           const uuid = NodeDef.getUuid(nodeDef)
-          const value = RecordKeyValuesExtractor.extractKeyValue({
+          const value = RecordKeyValuesExtractor.extractKeyOrSummaryValue({
             nodeDef,
             record,
             categoryItemsByCodeDefUuid,
@@ -169,5 +170,14 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         width: '80px',
       },
     ]
-  }, [categoryItemsByCodeDefUuid, hasFileAttributes, lang, nodeDefKeys, onRecordEditButtonClick, onRecordsUpdate, user])
+  }, [
+    categoryItemsByCodeDefUuid,
+    hasFileAttributes,
+    lang,
+    nodeDefKeys,
+    onRecordEditButtonClick,
+    onRecordsUpdate,
+    summaryDefs,
+    user,
+  ])
 }

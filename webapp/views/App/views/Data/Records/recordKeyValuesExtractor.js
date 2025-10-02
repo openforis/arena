@@ -1,4 +1,3 @@
-import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -35,13 +34,14 @@ const valueFormattersByType = {
     }),
 }
 
-const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid = null, lang = null }) => {
+const extractKeyOrSummaryValue = ({ nodeDef, record, categoryItemsByCodeDefUuid = null, lang = null }) => {
   const name = NodeDef.getName(nodeDef)
-  let keyField = name
+  let field = name
   if (NodeDef.isCode(nodeDef) && !categoryItemsByCodeDefUuid) {
-    keyField = `${keyField}_label`
+    field = `${field}_label`
   }
-  const value = record[A.camelize(keyField)]
+  const keysOrSummaryFields = { ...Record.getKeysObj(record), ...Record.getSummaryAttributesObj(record) }
+  const value = keysOrSummaryFields[field]
   const cycle = Record.getCycle(record)
   const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
   return value && formatter ? formatter({ cycle, nodeDef, value, categoryItemsByCodeDefUuid, lang }) : value
@@ -49,20 +49,20 @@ const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid = null, l
 
 const extractKeyValues = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
-  return nodeDefKeys.map((nodeDef) => extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang }))
+  return nodeDefKeys.map((nodeDef) => extractKeyOrSummaryValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang }))
 }
 
 const extractKeyValuesAndLabels = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   return nodeDefKeys.map((nodeDef) => {
     const label = NodeDef.getLabel(nodeDef, lang)
-    const keyValue = extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang })
+    const keyValue = extractKeyOrSummaryValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang })
     return `${label}=${keyValue}`
   })
 }
 
 export const RecordKeyValuesExtractor = {
-  extractKeyValue,
+  extractKeyOrSummaryValue,
   extractKeyValues,
   extractKeyValuesAndLabels,
 }

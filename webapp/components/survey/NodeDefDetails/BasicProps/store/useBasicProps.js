@@ -17,7 +17,7 @@ export const useBasicProps = (props) => {
   const { state } = props
 
   const survey = useSurvey()
-  const surveyCycleKey = useSurveyCycleKey()
+  const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
 
   const nodeDef = State.getNodeDef(state)
@@ -26,7 +26,7 @@ export const useBasicProps = (props) => {
   const displayAsEnabled = NodeDef.isDisplayAsEnabled(nodeDef)
   const displayInEnabled = NodeDef.isDisplayInEnabled(nodeDef)
   const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
-  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(surveyCycleKey)(nodeDef)
+  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(cycle)(nodeDef)
   const keyEditDisabled = useIsKeyEditDisabled({ nodeDef })
   const multipleEditDisabled = useIsMultipleEditDisabled({ nodeDef })
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef })
@@ -37,6 +37,7 @@ export const useBasicProps = (props) => {
     !hasAncestorExcludedInClone && !hasAncestorCodeDefsExcludedInClone && !NodeDef.isExcludedInClone(nodeDef)
   const includeInCloneDisabled =
     !NodeDef.canBeExcludedInClone(nodeDef) || hasAncestorExcludedInClone || hasAncestorCodeDefsExcludedInClone
+  const includeInMultipleEntitySummary = NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef)
 
   // Survey cycles
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -48,8 +49,8 @@ export const useBasicProps = (props) => {
     (nodeDefCurrent) => NodeDef.isEntity(nodeDefCurrent) && !NodeDef.isAnalysis(nodeDefCurrent)
   )(survey)
 
-  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)
-  const displayIn = NodeDefLayout.getDisplayIn(surveyCycleKey)(nodeDef)
+  const renderType = NodeDefLayout.getRenderType(cycle)(nodeDef)
+  const displayIn = NodeDefLayout.getDisplayIn(cycle)(nodeDef)
   const cyclesNodeDef = NodeDef.getCycles(nodeDef)
 
   const nodeDefParentLabel = NodeDef.getLabel(nodeDefParent, lang)
@@ -59,6 +60,7 @@ export const useBasicProps = (props) => {
     (NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
       ancestorMultipleEntityDef &&
       !NodeDef.isRoot(ancestorMultipleEntityDef))
+  const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
   return {
     nodeDef,
@@ -72,6 +74,8 @@ export const useBasicProps = (props) => {
     entitySourceHierarchy,
     renderType,
     displayIn,
+    includeInMultipleEntitySummary,
+    nodeDefParent,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
@@ -80,5 +84,6 @@ export const useBasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canIncludeInMultipleEntitySummary,
   }
 }
