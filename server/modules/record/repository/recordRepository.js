@@ -261,7 +261,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   const getWhereConditionsByKeysOrSummaryDefs = ({ nodeDefs, objAlias }) =>
     nodeDefs
-      .flatMap((nodeDef) =>
+      ?.flatMap((nodeDef) =>
         NodeDefTable.getColumnNames(nodeDef).map(
           (colName) => ` (${objAlias} ->> '${colName}') ilike '%$/search:value/%'`
         )
@@ -283,12 +283,13 @@ export const fetchRecordsSummaryBySurveyId = async (
   if (!A.isNull(cycle)) recordsSelectWhereConditions.push('cycle = $/cycle/')
   if (!A.isNull(step)) recordsSelectWhereConditions.push('step = $/step/')
   if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('uuid IN ($/recordUuids:csv/)')
-  if (!A.isEmpty(search))
-    recordsSelectWhereConditions.push(
-      `(${nodeDefKeysWhereConditions})
-      OR (${summaryDefsWhereConditions}) 
-      OR (owner_name ilike '%$/search:value/%')`
-    )
+  if (!A.isEmpty(search)) {
+    const searchConditions = []
+    if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
+    if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
+    searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
+    recordsSelectWhereConditions.push(searchConditions.join(' OR '))
+  }
   if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('owner_uuid = $/ownerUuid/')
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
