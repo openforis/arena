@@ -5,6 +5,7 @@ import { Dates, Objects } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import { AppInfo } from '@core/app/appInfo'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -205,7 +206,7 @@ const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
     return 'owner_name'
   }
   // fallbacks to table columns
-  return sortBy
+  return StringUtils.toSnakeCase(sortBy)
 }
 
 const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
