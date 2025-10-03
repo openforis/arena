@@ -16,14 +16,14 @@ import { LoadingBar } from '@webapp/components'
 import { useOnWebSocketEvent } from '@webapp/components/hooks'
 
 import HeaderLeft from './HeaderLeft'
-import { useNodeDefKeysCategoryItemsInLevel } from './useNodeDefKeysCategoryItemsInLevel'
+import { useNodeDefKeyAndSummaryCategoryItemsInLevel } from './useNodeDefKeyAndSummaryCategoryItemsInLevel'
 import { useColumns } from './useColumns'
 
 const Records = () => {
   const navigate = useNavigate()
   const cycle = useSurveyCycleKey()
   const nodeDefKeys = useNodeDefRootKeys()
-  const categoryItemsByCodeDefUuid = useNodeDefKeysCategoryItemsInLevel()
+  const categoryItemsByCodeDefUuid = useNodeDefKeyAndSummaryCategoryItemsInLevel()
 
   const navigateToRecord = useCallback(
     (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}?locked=true`),
