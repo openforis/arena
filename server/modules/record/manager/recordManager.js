@@ -46,7 +46,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit,
     sortBy,
     sortOrder,
-    cycle = null,
+    cycle: cycleParam = null,
     search = null,
     step = null,
     recordUuid = null,
@@ -73,6 +73,8 @@ export const fetchRecordsSummaryBySurveyId = async (
       )
     : null
 
+  // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
+  const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
   const summaryDefs = includeRootKeyValues
     ? await NodeDefRepository.fetchRootSummaryDefsBySurveyId(
         { surveyId, cycle, nodeDefRootUuid, draft: nodeDefsDraft },
@@ -83,7 +85,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
     {
       surveyId,
-      cycle,
+      cycle: cycleParam,
       nodeDefRoot,
       nodeDefKeys,
       summaryDefs,
