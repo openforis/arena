@@ -672,6 +672,7 @@ export const canBeHiddenInMobile = (nodeDef) =>
   !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
 
 export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
+  isAttribute(nodeDef) &&
   !isKey(nodeDef) &&
   !isMultiple(nodeDef) &&
   !isFile(nodeDef) &&
