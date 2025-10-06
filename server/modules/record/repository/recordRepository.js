@@ -112,7 +112,16 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 // ============== READ
 
 export const countRecordsBySurveyId = async (
-  { surveyId, cycle = null, nodeDefRoot, nodeDefKeys, summaryDefs, search = null, ownerUuid = null },
+  {
+    surveyId,
+    cycle = null,
+    nodeDefRoot,
+    nodeDefKeys,
+    summaryDefs,
+    search = null,
+    ownerUuid = null,
+    includeMerged = false,
+  },
   client = db
 ) => {
   if (!A.isEmpty(search)) {
@@ -126,14 +135,17 @@ export const countRecordsBySurveyId = async (
     })
     return recordsWithSearch.length
   }
+  const whereConditions = ['preview = FALSE']
+  if (cycle !== null) whereConditions.push('cycle = $/cycle/')
+  if (ownerUuid) whereConditions.push('owner_uuid = $/ownerUuid/')
+  whereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+
+  const whereConditionsJoint = whereConditions.map((condition) => `(${condition})`).join(' AND ')
+
   return client.one(
-    `
-        SELECT count(*) 
-        FROM ${getSchemaSurvey(surveyId)}.record 
-        WHERE preview = FALSE 
-          ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
-          ${ownerUuid ? 'AND owner_uuid = $/ownerUuid/' : ''}
-      `,
+    `SELECT count(*) 
+     FROM ${getSchemaSurvey(surveyId)}.record 
+     WHERE ${whereConditionsJoint}`,
     { cycle, ownerUuid },
     (row) => Number(row.count)
   )
@@ -144,7 +156,9 @@ export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, clien
     `
         SELECT COALESCE(info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}', '${AppInfo.arenaAppId}') AS created_with, count(*)
         FROM ${getSchemaSurvey(surveyId)}.record 
-        WHERE preview = FALSE 
+        WHERE 
+          preview = FALSE 
+          AND merged_into_record_uuid IS NULL
           ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
         GROUP BY created_with
       `,
@@ -160,7 +174,10 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
   const counts = await client.manyOrNone(
     `SELECT step, count(*)
     FROM ${getSchemaSurvey(surveyId)}.record 
-    WHERE preview = FALSE AND cycle = $1
+    WHERE 
+      preview = FALSE 
+      AND merged_into_record_uuid IS NULL 
+      AND cycle = $1
     GROUP BY step`,
     [cycle]
   )
@@ -415,6 +432,7 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
       r.cycle = $3     
     AND 
       r.preview = FALSE
+      AND r.merged_into_record_uuid IS NULL
     GROUP BY
       date_trunc('day', r.date_created)
     ORDER BY
@@ -437,10 +455,12 @@ export const fetchRecordCreatedCountsByDatesAndUser = async (surveyId, cycle, fr
     JOIN public.user u ON r.owner_uuid = u.uuid
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
-    AND 
-      r.cycle = $3     
-    AND 
-      r.preview = FALSE
+      AND 
+        r.cycle = $3     
+      AND 
+        r.preview = FALSE
+      AND 
+        r.merged_into_record_uuid IS NULL
     GROUP BY
       date_trunc('day', r.date_created),
       r.owner_uuid,
@@ -465,10 +485,12 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
     JOIN public.user u ON r.owner_uuid = u.uuid
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
-    AND 
-      r.cycle = $3     
-    AND 
-      r.preview = FALSE
+      AND 
+        r.cycle = $3     
+      AND 
+        r.preview = FALSE
+      AND 
+        r.merged_into_record_uuid IS NULL  
     GROUP BY
       r.owner_uuid,
       u.name,
