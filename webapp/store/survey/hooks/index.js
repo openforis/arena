@@ -101,11 +101,12 @@ export const useNodeDefsByNames = (names) =>
     return names.map((name) => Survey.findNodeDefByName(name)(survey)).filter(Boolean)
   }, Objects.isEqual)
 
-export const useIsNodeDefParentRoot = (nodeDef) =>
+export const useIsAncestorMultipleEntityRoot = (nodeDef) =>
   useSelector((state) => {
     const survey = SurveyState.getSurvey(state)
-    const root = Survey.getNodeDefRoot(survey)
-    return NodeDef.getParentUuid(nodeDef) === NodeDef.getUuid(root)
+    const rootDef = Survey.getNodeDefRoot(survey)
+    const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+    return NodeDef.isEqual(rootDef)(ancestorMultipleEntityDef)
   })
 
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)

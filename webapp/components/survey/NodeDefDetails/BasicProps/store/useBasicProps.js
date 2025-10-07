@@ -39,8 +39,10 @@ export const useBasicProps = (props) => {
     !NodeDef.canBeExcludedInClone(nodeDef) || hasAncestorExcludedInClone || hasAncestorCodeDefsExcludedInClone
   const includeInMultipleEntitySummary = NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef)
 
+  const rootDef = Survey.getNodeDefRoot(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const parentIsRoot = NodeDef.isRoot(nodeDefParent)
+  const ancestorMultipleEntity = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+  const ancestorMultipleEntityIsRoot = NodeDef.isEqual(rootDef)(ancestorMultipleEntity)
 
   // Survey cycles
   const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
@@ -77,7 +79,7 @@ export const useBasicProps = (props) => {
     renderType,
     displayIn,
     includeInMultipleEntitySummary,
-    parentIsRoot,
+    ancestorMultipleEntityIsRoot,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
