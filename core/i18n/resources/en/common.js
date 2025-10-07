@@ -1426,7 +1426,7 @@ E.g. this.region = region_attribute_name
       },
       includedInPreviousCycleLink: {
         label: 'Include in previous cycle link',
-        info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)"`,
+        info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)`,
       },
     },
     decimalProps: {
