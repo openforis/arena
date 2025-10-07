@@ -101,7 +101,7 @@ export const unescapeHtml = (text) => {
   try {
     const doc = new DOMParser().parseFromString(text, 'text/html')
     return doc.documentElement.textContent
-  } catch (_error) {
+  } catch (_) {
     // ignore the error
   }
   return text
