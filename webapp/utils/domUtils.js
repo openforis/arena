@@ -103,6 +103,6 @@ export const unescapeHtml = (text) => {
     return doc.documentElement.textContent
   } catch (_error) {
     // ignore the error
-    return text
   }
+  return text
 }
