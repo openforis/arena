@@ -102,8 +102,7 @@ export const unescapeHtml = (text) => {
     const doc = new DOMParser().parseFromString(text, 'text/html')
     return doc.documentElement.textContent
   } catch (ignored) {
-    // NOSONAR
     // ignore the error
+    return text
   }
-  return text
 }
