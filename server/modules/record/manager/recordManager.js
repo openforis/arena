@@ -18,6 +18,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
@@ -64,23 +65,18 @@ export const fetchRecordsSummaryBySurveyId = async (
     ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
     : null
 
-  const nodeDefRootUuid = NodeDef.getUuid(nodeDefRoot)
-
-  const nodeDefKeys = includeRootKeyValues
-    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-        { surveyId, nodeDefRootUuid, draft: nodeDefsDraft },
-        client
-      )
-    : null
-
-  // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
-  const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
-  const summaryDefs = includeRootKeyValues
-    ? await NodeDefRepository.fetchRootSummaryDefsBySurveyId(
-        { surveyId, cycle, nodeDefRootUuid, draft: nodeDefsDraft },
-        client
-      )
-    : []
+  let nodeDefKeys = null
+  let summaryDefs = null
+  if (includeRootKeyValues) {
+    // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
+    const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, cycle, draft: nodeDefsDraft },
+      client
+    )
+    summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+    nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  }
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
     {
@@ -142,20 +138,16 @@ export const fetchRecordSummary = async (
   return list[0]
 }
 
-export const countRecordsBySurveyId = async ({ surveyId, cycle, search, ownerUuid }, client = db) => {
+export const countRecordsBySurveyId = async ({ surveyId, cycle: cycleParam, search, ownerUuid }, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
-  const nodeDefRootUuid = NodeDef.getUuid(nodeDefRoot)
-  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-    { surveyId, nodeDefRootUuid, draft: nodeDefsDraft },
-    client
-  )
-  const summaryDefs = await NodeDefRepository.fetchRootSummaryDefsBySurveyId(
-    { surveyId, nodeDefRootUuid, cycle, draft: nodeDefsDraft },
-    client
-  )
+  const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  const summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+
   return RecordRepository.countRecordsBySurveyId(
     { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid },
     client

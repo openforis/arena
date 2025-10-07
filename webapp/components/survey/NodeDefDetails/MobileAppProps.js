@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 import { Checkbox } from '@webapp/components/form'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyCycleKey, useIsNodeDefParentRoot } from '@webapp/store/survey'
+import { useSurveyCycleKey, useIsAncestorMultipleEntityRoot } from '@webapp/store/survey'
 
 import { State } from './store'
 
@@ -21,7 +21,7 @@ export const MobileAppProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
-  const isNodeDefParentRoot = useIsNodeDefParentRoot(nodeDef)
+  const isAncestorMultipleEntityRoot = useIsAncestorMultipleEntityRoot(nodeDef)
 
   const canBeHiddenInMobile = NodeDef.canBeHiddenInMobile(nodeDef)
   const canIncludeInPreviousCycleLink = NodeDef.canIncludeInPreviousCycleLink(cycle)(nodeDef)
@@ -46,7 +46,7 @@ export const MobileAppProps = (props) => {
       {canBeHiddenInMobile && createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
 
       {canIncludeInMultipleEntitySummary &&
-        !isNodeDefParentRoot &&
+        !isAncestorMultipleEntityRoot &&
         createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
 
       {canIncludeInPreviousCycleLink &&

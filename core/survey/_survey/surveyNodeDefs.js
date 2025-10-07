@@ -216,7 +216,7 @@ export const getNodeDefRootKeys = (survey) => {
 export const getSummaryDefs =
   ({ nodeDef, cycle }) =>
   (survey) =>
-    getNodeDefChildrenSorted({ nodeDef, cycle })(survey).filter((childDef) =>
+    getNodeDefDescendantAttributesInSingleEntities({ nodeDef, cycle, sorted: true })(survey).filter((childDef) =>
       NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(childDef)
     )
 

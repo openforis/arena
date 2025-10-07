@@ -61,7 +61,7 @@ const BasicProps = (props) => {
     renderType,
     displayIn,
     includeInMultipleEntitySummary,
-    parentIsRoot,
+    ancestorMultipleEntityIsRoot,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
@@ -194,7 +194,7 @@ const BasicProps = (props) => {
         </FormItem>
       )}
 
-      {canIncludeInMultipleEntitySummary && parentIsRoot && (
+      {canIncludeInMultipleEntitySummary && ancestorMultipleEntityIsRoot && (
         <FormItem label="nodeDefEdit.basicProps.includedInRecordsList.label">
           <Checkbox
             checked={includeInMultipleEntitySummary}
