@@ -2,7 +2,6 @@ import './expressionEditorPopup.scss'
 
 import React, { useState, useCallback, useMemo } from 'react'
 import ReactCodeMirror from '@uiw/react-codemirror'
-import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
 import PropTypes from 'prop-types'
 
@@ -58,9 +57,8 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const codeMirrorExtensions = useMemo(
     () => [
-      javascript(),
       autocompletion({
-        closeOnBlur: true,
+        activateOnTyping: true,
         // add a carriage return after the label in the rendered item option
         addToOptions: [
           {
