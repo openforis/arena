@@ -1,5 +1,5 @@
 import './Notification.scss'
-import React from 'react'
+import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { CSSTransition } from 'react-transition-group'
 
@@ -11,9 +11,11 @@ const Notification = () => {
   const i18n = useI18n()
   const { messageParams, messageKey, severity, visible } = useNotification()
 
+  const nodeRef = useRef(null)
+
   return (
-    <CSSTransition in={visible} timeout={250} unmountOnExit>
-      <div className={`notification ${severity}`}>
+    <CSSTransition in={visible} nodeRef={nodeRef} timeout={250} unmountOnExit>
+      <div ref={nodeRef} className={`notification ${severity}`}>
         <button
           type="button"
           className="btn-s btn-transparent notification__btn-close"
