@@ -1,5 +1,5 @@
 import './Loader.scss'
-import { useRef } from 'react'
+import React, { useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 
 import { useLoader } from '@webapp/store/ui'
