@@ -69,9 +69,8 @@ export const KmlUploader = () => {
     const reader = new FileReader()
     reader.onload = async (e) => {
       const text = e.target.result
-      shp(text).then(function (data) {
-        geo.addData(data)
-      })
+      const data = await shp(text)
+      geo.addData(data)
     }
     reader.readAsArrayBuffer(file)
   }
