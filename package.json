@@ -37,7 +37,7 @@
     "watch:server": "cross-env NODE_ENV=development webpack --config webpack.config.server.babel.js --watch",
     "watch": "npm run build:server:dev && npm-run-all --parallel client:dev-server dev:server:nodemon watch:server",
     "start": "node dist/server.js",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
