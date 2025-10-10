@@ -156,8 +156,6 @@ export const useAutocompletionSource = ({ mode, nodeDefCurrent, isContextParent 
     async (context) => {
       const matchingTokenBefore = context.matchBefore(/\w*/)
 
-      if (matchingTokenBefore.from == matchingTokenBefore.to && !context.explicit) return null
-
       const value = context.state?.doc?.text?.[0] ?? ''
       const token = { ...matchingTokenBefore, value }
       const cursorPosition = context.pos

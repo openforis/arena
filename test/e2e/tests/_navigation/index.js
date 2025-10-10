@@ -32,7 +32,7 @@ export const gotoTemplateList = () =>
 
 // ==== Dashboard
 export const gotoSurveyInfo = () =>
-  test('Goto survey create', async () => {
+  test('Goto survey info', async () => {
     await page.goto(`${BASE_URL}/app/home/dashboard/`)
     await page.click(getSelector(TestId.dashboard.surveyInfoBtn, 'button'))
     expect(page.url()).toBe(`${BASE_URL}/app/home/surveyInfo/`)
@@ -74,6 +74,9 @@ const _gotoSubModule =
       ])
 
       expect(page.url()).toBe(`${BASE_URL}/app/${module}/${subModule}/`)
+
+      // wait for complete form rendering
+      await page.waitForTimeout(500)
     })
 
 export const gotoFormDesigner = _gotoSubModule('designer', 'formDesigner')
