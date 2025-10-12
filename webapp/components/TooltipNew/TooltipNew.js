@@ -5,10 +5,12 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { Tooltip } from '@mui/material'
 
+import { Objects } from '@openforis/arena-core'
+
 import { useI18n } from '@webapp/store/system'
+import * as DomUtils from '@webapp/utils/domUtils'
 
 import Markdown from '../markdown'
-import { Objects } from '@openforis/arena-core'
 
 export const TooltipNew = (props) => {
   const { children, className, isTitleMarkdown, title: titleProp, renderTitle } = props
@@ -18,7 +20,10 @@ export const TooltipNew = (props) => {
   const defaultTitleRenderer = useCallback(() => {
     if (Objects.isEmpty(titleProp)) return null
     const titleText = i18n.t(titleProp)
-    return isTitleMarkdown ? <Markdown source={titleText} /> : titleText
+    if (isTitleMarkdown) {
+      return <Markdown source={titleText} />
+    }
+    return DomUtils.unescapeHtml(titleText)
   }, [i18n, isTitleMarkdown, titleProp])
 
   const titleRenderer = renderTitle ?? defaultTitleRenderer

@@ -3,7 +3,7 @@ import './DataImportFlatDataView.scss'
 import React, { useCallback, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, UUIDs } from '@openforis/arena-core'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 
@@ -64,6 +64,7 @@ export const DataImportFlatDataView = () => {
     cycle: canSelectCycle ? null : surveyCycle,
     dataImportType: null,
     file: null,
+    fileId: null,
     jobCompleted: null,
     nodeDefLabelType: NodeDef.NodeDefLabelTypes.label,
     selectedNodeDefUuid: null,
@@ -140,6 +141,7 @@ export const DataImportFlatDataView = () => {
           deleteExistingEntities: false,
           dataImportType: value,
           file: null,
+          fileId: null,
         }
         if (value === importTypes.insertNewRecords) {
           const nodeDefRoot = Survey.getNodeDefRoot(survey)
@@ -159,7 +161,7 @@ export const DataImportFlatDataView = () => {
   const onFilesDrop = useCallback((files) => {
     const file = files[0]
     const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
-    setState((statePrev) => ({ ...statePrev, file, fileFormat }))
+    setState((statePrev) => ({ ...statePrev, file, fileFormat, fileId: UUIDs.v4() }))
   }, [])
 
   const onImportJobStart = useCallback(
@@ -185,6 +187,7 @@ export const DataImportFlatDataView = () => {
         const stateNext = { ...statePrev, jobCompleted: null }
         if (JobSerialized.isSucceeded(jobCompleted) && !JobSerialized.getResult(jobCompleted).dryRun) {
           stateNext.file = null
+          stateNext.fileId = null
         }
         return stateNext
       })
@@ -238,8 +241,8 @@ export const DataImportFlatDataView = () => {
                   nodeDefLabelType={nodeDefLabelType}
                   nodeDefUuidActive={selectedNodeDefUuid}
                   includeMultipleAttributes
+                  isNodeDefIncluded={() => dataImportType !== importTypes.insertNewRecords}
                   onSelect={onNodeDefSelect}
-                  isDisabled={() => dataImportType === importTypes.insertNewRecords}
                 />
                 <NodeDefLabelSwitch
                   allowedLabelTypes={allowedLabelTypes}

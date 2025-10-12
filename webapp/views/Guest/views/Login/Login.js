@@ -3,6 +3,8 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import * as ProcessUtils from '@core/processUtils'
+
 import { appModuleUri, guestModules } from '@webapp/app/appModules'
 
 import { useFormObject } from '@webapp/components/hooks'
@@ -18,6 +20,7 @@ const Login = () => {
   const email = useSelector(LoginState.getEmail)
   const i18n = useI18n()
   const dispatch = useDispatch()
+  const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
 
   const {
     object: formObject,
@@ -69,14 +72,15 @@ const Login = () => {
         </button>
       </div>
 
-      <Link
-        className="btn btn-s btn-transparent guest-login__btn-request-access"
-        to={appModuleUri(guestModules.accessRequest)}
-      >
-        <span className="icon icon-question icon-left icon-12px" />
-        {i18n.t('loginView.requestAccess')}
-      </Link>
-
+      {allowAccessRequest && (
+        <Link
+          className="btn btn-s btn-transparent guest-login__btn-request-access"
+          to={appModuleUri(guestModules.accessRequest)}
+        >
+          <span className="icon icon-question icon-left icon-12px" />
+          {i18n.t('loginView.requestAccess')}
+        </Link>
+      )}
       <Error error={error} />
     </form>
   )

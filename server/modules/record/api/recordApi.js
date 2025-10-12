@@ -1,9 +1,12 @@
+import exifr from 'exifr'
+
 import { Objects } from '@openforis/arena-core'
 
 import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -16,6 +19,7 @@ import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
+import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 import * as RecordService from '../service/recordService'
 import * as FileService from '../service/fileService'
 
@@ -31,6 +35,15 @@ import {
   requireRecordsEditPermission,
   requireRecordsExportPermission,
 } from '../../auth/authApiMiddleware'
+
+const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
+  const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
+  const fileUuid = Node.getFileUuid(node)
+  const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
+  const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+  return { fileName, file, contentStream }
+}
 
 export const init = (app) => {
   // ==== CREATE
@@ -259,15 +272,32 @@ export const init = (app) => {
       try {
         const { surveyId, nodeUuid } = Request.getParams(req)
 
-        const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-        const fileUuid = Node.getFileUuid(node)
-        const file = await FileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-        const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-        const contentStream = await FileService.fetchFileContentAsStream({ surveyId, fileUuid })
+        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
         setContentTypeFile({ res, fileName, fileSize: RecordFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
         next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
+    requireRecordViewPermission,
+    async (req, res, next) => {
+      let tempFilePath
+      try {
+        const { surveyId, nodeUuid } = Request.getParams(req)
+        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        ;({ tempFilePath } = await FileUtils.writeStreamToTempFile(contentStream))
+        const info = await exifr.parse(tempFilePath)
+        res.json(info)
+      } catch (error) {
+        next(error)
+      } finally {
+        if (tempFilePath) {
+          FileUtils.deleteFile(tempFilePath)
+        }
       }
     }
   )
@@ -290,17 +320,45 @@ export const init = (app) => {
 
       const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
 
-      res.json(count)
+      res.json({ count })
     } catch (error) {
       next(error)
     }
   })
 
-  app.get('/survey/:surveyId/validationReport/export', requireRecordListViewPermission, async (req, res, next) => {
-    try {
-      const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+  app.post(
+    '/survey/:surveyId/validationReport/start-export',
+    requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
-      await RecordService.exportValidationReportToFlatData({ res, surveyId, cycle, lang, recordUuid, fileFormat })
+        const job = RecordService.startValidationReportGenerationJob({
+          user,
+          surveyId,
+          cycle,
+          lang,
+          recordUuid,
+          fileFormat,
+        })
+        res.json(JobUtils.jobToJSON(job))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get('/survey/:surveyId/validationReport/download', async (req, res, next) => {
+    try {
+      const { surveyId, cycle, tempFileName, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+
+      FileUtils.checkIsValidTempFileName(tempFileName)
+
+      const survey = await SurveyService.fetchSurveyById({ surveyId })
+      const outputName = ExportFileNameGenerator.generate({ survey, cycle, fileType: 'ValidationReport', fileFormat })
+      const filePath = FileUtils.tempFilePath(tempFileName)
+      Response.sendFile({ name: outputName, fileFormat, path: filePath, res })
     } catch (error) {
       next(error)
     }

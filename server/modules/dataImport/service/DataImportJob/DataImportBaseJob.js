@@ -79,14 +79,17 @@ export default class DataImportBaseJob extends Job {
     this.currentRecord = recordUpdated
   }
 
-  async beforeSuccess() {
+  async flushBatchPersisters() {
     await this.nodesDeleteBatchPersister.flush()
     await this.nodesInsertBatchPersister.flush()
     await this.nodesUpdateBatchPersister.flush()
     await this.recordsDateModifiedBatchPersister.flush()
     await this.recordsValidationBatchPersister.flush()
     await this.rdbUpdatesBatchPersister.flush()
+  }
 
+  async beforeSuccess() {
+    await this.flushBatchPersisters()
     await super.beforeSuccess()
   }
 

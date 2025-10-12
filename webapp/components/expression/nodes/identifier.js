@@ -17,14 +17,26 @@ const getSelectedVariable = ({ variables, node }) => {
 const defaultVariablesFilterFunction = (variable) => variable.nodeDefType !== NodeDef.nodeDefType.entity
 
 const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
-  const filterVariables = (variables) => variables.filter(variablesFilterFn ?? defaultVariablesFilterFunction)
+  const thisVariable = variables.find((variable) => variable.value === Expression.thisVariable)
+
+  const filterVariables = (_vars) =>
+    _vars.filter(
+      (variable) => !!variable.options || (variablesFilterFn?.(variable) ?? defaultVariablesFilterFunction(variable))
+    )
+
+  const filterOptions = (options) => filterVariables(options).filter((variable) => variable.uuid !== thisVariable?.uuid)
 
   const variablesUpdated = filterVariables(variables)
 
   return variablesUpdated.reduce((groupsAcc, group) => {
     const groupUpdated = { ...group }
-    if (group.options) {
-      groupUpdated.options = filterVariables(group.options)
+    const prevOptions = group.options
+    if (prevOptions) {
+      const optionsFiltered = filterOptions(prevOptions)
+      groupUpdated.options = optionsFiltered
+      if (optionsFiltered.length === 0) {
+        return groupsAcc
+      }
     }
     return [...groupsAcc, groupUpdated]
   }, [])

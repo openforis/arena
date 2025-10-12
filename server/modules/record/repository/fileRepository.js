@@ -7,8 +7,6 @@ import * as RecordFile from '@core/record/recordFile'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { getSurveyDBSchema } from '../../survey/repository/surveySchemaRepositoryUtils'
-
 const SUMMARY_FIELDS = ['id', 'uuid', 'props']
 const SUMMARY_FIELDS_COMMA_SEPARATED = SUMMARY_FIELDS.join(', ')
 
@@ -21,7 +19,7 @@ export const insertFile = async (surveyId, file, client = db) => {
 
   return client.one(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.file (uuid, props, content)
+    INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.file (uuid, props, content)
     VALUES ($1, $2, $3)
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [uuid, props, content]
@@ -34,7 +32,7 @@ export const fetchFileSummariesBySurveyId = async (surveyId, client) =>
   client.manyOrNone(
     `
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
-    FROM ${getSurveyDBSchema(surveyId)}.file
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE ${NOT_DELETED_CONDITION}`
   )
 
@@ -42,7 +40,7 @@ export const fetchFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, cli
   client.map(
     `
     SELECT uuid
-    FROM ${getSurveyDBSchema(surveyId)}.file
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
     [recordUuids],
     (row) => row.uuid
@@ -52,7 +50,7 @@ export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
   client.map(
     `
     SELECT uuid
-    FROM ${getSurveyDBSchema(surveyId)}.file`,
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file`,
     [],
     (row) => row.uuid
   )
@@ -61,7 +59,7 @@ export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db
   client.map(
     `
     SELECT uuid
-    FROM ${getSurveyDBSchema(surveyId)}.file
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE content IS NOT NULL`,
     [],
     (row) => row.uuid
@@ -70,7 +68,7 @@ export const fetchFileUuidsOfFilesWithContent = async ({ surveyId }, client = db
 export const fetchFileAndContentByUuid = async (surveyId, uuid, client = db) =>
   client.one(
     `
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.file
+    SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
@@ -79,7 +77,7 @@ export const fetchFileSummaryByUuid = async (surveyId, uuid, client = db) =>
   client.oneOrNone(
     `
     SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED} 
-    FROM ${getSurveyDBSchema(surveyId)}.file
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
   )
@@ -88,7 +86,7 @@ export const fetchFileContentAsStream = async ({ surveyId, fileUuid }, client = 
   const row = await client.oneOrNone(
     `
     SELECT content
-    FROM ${getSurveyDBSchema(surveyId)}.file
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE uuid = $1`,
     [fileUuid]
   )
@@ -117,7 +115,7 @@ export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null 
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
   client.one(
     `
-    UPDATE ${getSurveyDBSchema(surveyId)}.file
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
     SET props = jsonb_set(props, '{${RecordFile.propKeys.deleted}}', 'true')
     WHERE uuid = $1
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
@@ -127,7 +125,7 @@ export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
 export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db) =>
   client.manyOrNone(
     `
-    UPDATE ${getSurveyDBSchema(surveyId)}.file
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
     SET props = jsonb_set(props, '{${RecordFile.propKeys.deleted}}', 'true')
     WHERE props ->> '${RecordFile.propKeys.recordUuid}' = $1 
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
@@ -137,7 +135,7 @@ export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db
 export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
   client.one(
     `
-    UPDATE ${getSurveyDBSchema(surveyId)}.file
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
     SET props = $2
     WHERE uuid = $1
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
@@ -147,7 +145,7 @@ export const updateFileProps = async (surveyId, fileUuid, props, client = db) =>
 export const clearAllSurveyFilesContent = async ({ surveyId }, client = db) =>
   client.none(
     `
-      UPDATE ${getSurveyDBSchema(surveyId)}.file
+      UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
       SET content = NULL
       WHERE content IS NOT NULL
       `
@@ -163,7 +161,7 @@ export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
   client.tx(async (t) => {
     const fileSummariesToClean = await t.manyOrNone(
       `SELECT ${SUMMARY_FIELDS_COMMA_SEPARATED}
-      FROM ${getSurveyDBSchema(surveyId)}.file
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.file
       WHERE ${NOT_DELETED_CONDITION} 
         AND (props ->> '${RecordFile.invalidPropKeys.fileName}') IS NOT NULL `
     )
@@ -178,15 +176,23 @@ export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
 export const deleteFileByUuid = async (surveyId, uuid, client = db) =>
   client.query(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.file
+    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE uuid = $1`,
     [uuid]
+  )
+
+export const deleteFilesByUuids = async (surveyId, uuids, client = db) =>
+  client.query(
+    `
+      DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
+      WHERE uuid IN ($1:csv)`,
+    [uuids]
   )
 
 export const deleteFilesByRecordUuids = async (surveyId, uuids, client = db) =>
   client.query(
     `
-    DELETE FROM ${getSurveyDBSchema(surveyId)}.file
+    DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE props ->> '${RecordFile.propKeys.recordUuid}' IN ($1:csv)`,
     [uuids]
   )

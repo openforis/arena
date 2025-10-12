@@ -24,11 +24,12 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import LanguageDropdown from '@webapp/components/form/languageDropdown'
 import { useOnUpdate } from '@webapp/components/hooks'
 import { Checkbox, Dropdown } from '@webapp/components/form'
-import { Button, Dropzone, ProgressBar, RadioButtonGroup } from '@webapp/components'
+import { Button, Dropzone, RadioButtonGroup } from '@webapp/components'
 import { SurveyType } from '@webapp/model'
 
 import { createTypes, importSources, useCreateSurvey } from './store'
 import { SurveyDropdown } from '../SurveyDropdown'
+import { ImportStartButton } from '@webapp/views/App/views/Data/DataImport/ImportStartButton'
 
 const fileMaxSizeDefault = 1000 // 1GB
 const fileMaxSizeSystemAdmin = 2000 // 2GB
@@ -45,6 +46,11 @@ const cloneFromTypeButtonGroupItems = Object.values(SurveyType)
     label: `surveyCreate:cloneFromType.${key}`,
   }))
 
+const dropzoneAcceptBySource = {
+  [importSources.arena]: { [contentTypes.zip]: ['.zip'] },
+  [importSources.collect]: { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] },
+}
+
 const SurveyCreate = (props) => {
   const { showImport = true, submitButtonLabel = 'surveyCreate:createSurvey', template = false } = props
 
@@ -53,10 +59,20 @@ const SurveyCreate = (props) => {
   const navigate = useNavigate()
   const isSystemAdmin = useUserIsSystemAdmin()
 
-  const { newSurvey, onUpdate, onCreate, onImport, onCreateTypeUpdate, onFilesDrop, onOptionChange, onSourceChange } =
-    useCreateSurvey({
-      template,
-    })
+  const {
+    newSurvey,
+    onUpdate,
+    onCreate,
+    onImport,
+    onImportJobStart,
+    onImportUploadCancel,
+    onCreateTypeUpdate,
+    onFilesDrop,
+    onOptionChange,
+    onSourceChange,
+  } = useCreateSurvey({
+    template,
+  })
   const {
     createType,
     name,
@@ -70,7 +86,6 @@ const SurveyCreate = (props) => {
     options,
     file,
     uploading,
-    uploadProgressPercent,
   } = newSurvey
 
   // Redirect to dashboard on survey change
@@ -191,11 +206,7 @@ const SurveyCreate = (props) => {
 
       {createType === createTypes.import && showImport && (
         <>
-          {uploading && uploadProgressPercent >= 0 ? (
-            <div className="row">
-              <ProgressBar indeterminate={false} progress={uploadProgressPercent} textKey="common.uploadingFile" />
-            </div>
-          ) : (
+          {!uploading && (
             <>
               <div className="row">
                 <fieldset className="options-fieldset">
@@ -215,27 +226,24 @@ const SurveyCreate = (props) => {
               </FormItem>
               <div className="row">
                 <Dropzone
-                  accept={
-                    source === importSources.arena
-                      ? { [contentTypes.zip]: ['.zip'] }
-                      : { [contentTypes.zip]: ['.collect', '.collect-backup', '.collect-data'] }
-                  }
+                  accept={dropzoneAcceptBySource[source]}
                   maxSize={fileMaxSize}
                   onDrop={onFilesDrop}
                   droppedFiles={file ? [file] : []}
                 />
               </div>
-              <div className="row">
-                <Button
-                  className="btn-primary"
-                  disabled={!file || uploading}
-                  label="surveyCreate:startImport"
-                  onClick={onImport}
-                  testId={TestId.surveyCreate.startImportBtn}
-                />
-              </div>
             </>
           )}
+          <div className="row">
+            <ImportStartButton
+              className="btn-secondary"
+              disabled={!file}
+              onCancel={onImportUploadCancel}
+              onUploadComplete={onImportJobStart}
+              startFunction={onImport}
+              testId={TestId.surveyCreate.startImportBtn}
+            />
+          </div>
         </>
       )}
     </div>

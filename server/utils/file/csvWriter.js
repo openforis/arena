@@ -2,12 +2,13 @@ import Stream from 'stream'
 import { StreamParser } from '@json2csv/plainjs'
 
 import { FlatDataWriterUtils } from './flatDataWriterUtils'
+import { CsvField } from './csvField'
 
 const getParserOptions = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
   const options = { ...FlatDataWriterUtils.defaultOptions, ...optionsParam }
   const { objectTransformer = null } = options
   const transform = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)
-  return { fields, transforms: [transform] }
+  return { fields: CsvField.getNames(fields), transforms: [transform] }
 }
 
 export const writeItemsToStream = ({

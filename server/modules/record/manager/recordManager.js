@@ -18,6 +18,7 @@ import * as ObjectUtils from '@core/objectUtils'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
@@ -46,7 +47,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     limit,
     sortBy,
     sortOrder,
-    cycle = null,
+    cycle: cycleParam = null,
     search = null,
     step = null,
     recordUuid = null,
@@ -63,21 +64,27 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefRoot = includeRootKeyValues
     ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
     : null
-  const nodeDefKeys = includeRootKeyValues
-    ? await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-        surveyId,
-        NodeDef.getUuid(nodeDefRoot),
-        nodeDefsDraft,
-        client
-      )
-    : null
+
+  let nodeDefKeys = null
+  let summaryDefs = null
+  if (includeRootKeyValues) {
+    // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
+    const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, cycle, draft: nodeDefsDraft },
+      client
+    )
+    summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+    nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  }
 
   const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
     {
       surveyId,
-      cycle,
+      cycle: cycleParam,
       nodeDefRoot,
       nodeDefKeys,
+      summaryDefs,
       offset,
       limit,
       sortBy,
@@ -131,20 +138,18 @@ export const fetchRecordSummary = async (
   return list[0]
 }
 
-export const countRecordsBySurveyId = async ({ surveyId, cycle, search, ownerUuid }, client = db) => {
+export const countRecordsBySurveyId = async ({ surveyId, cycle: cycleParam, search, ownerUuid }, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
   const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
-  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(
-    surveyId,
-    NodeDef.getUuid(nodeDefRoot),
-    nodeDefsDraft,
-    client
-  )
+  const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
+  const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  const summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
 
   return RecordRepository.countRecordsBySurveyId(
-    { surveyId, cycle, search, nodeDefKeys, nodeDefRoot, ownerUuid },
+    { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid },
     client
   )
 }
@@ -193,14 +198,21 @@ export const fetchRecordAndNodesByUuid = async (
 
 export { fetchNodeByUuid, fetchChildNodesByNodeDefUuids } from '../repository/nodeRepository'
 
-const fetchNodeRefData = async ({ surveyId, node, isCode }, client) => {
+const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
+  const surveyId = Survey.getId(survey)
   if (isCode) {
     const categoryItemUuid = Node.getCategoryItemUuid(node)
     const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: categoryItemUuid }, client)
+    if (!categoryItem) {
+      return null
+    }
     return { [NodeRefData.keys.categoryItem]: categoryItem }
   } else {
     const taxonUuid = Node.getTaxonUuid(node)
     const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, taxonUuid, false, client)
+    if (!taxon) {
+      return null
+    }
     const vernacularNameUuid = Node.getVernacularNameUuid(node)
     const vernacularName = vernacularNameUuid
       ? await TaxonomyRepository.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, false, client)
@@ -215,7 +227,6 @@ const fetchNodeRefData = async ({ surveyId, node, isCode }, client) => {
 }
 
 export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesTaxonomies = true }, client = db) => {
-  const surveyId = Survey.getId(survey)
   for (const node of nodes) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const isCode = NodeDef.isCode(nodeDef)
@@ -230,8 +241,10 @@ export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesT
         (isCode && Category.isBigCategory(category)) ||
         (isTaxon && Taxonomy.isBigTaxonomy(taxonomy))
       ) {
-        const refData = await fetchNodeRefData({ surveyId, node, isCode }, client)
-        node[NodeRefData.keys.refData] = refData
+        const refData = await fetchNodeRefData({ survey, node, isCode }, client)
+        if (refData) {
+          node[NodeRefData.keys.refData] = refData
+        }
       }
     }
   }

@@ -33,7 +33,8 @@ const actionHandlers = {
   [RecordActions.recordEditLock]: (state, { locked }) => RecordState.assocRecordEditLocked(locked)(state),
 
   // Node updates
-  [RecordActions.nodesUpdate]: (state, { nodes }) => RecordState.mergeRecordNodes(nodes)(state),
+  [RecordActions.nodesUpdate]: (state, { nodes, removeDirtyFlag = true }) =>
+    RecordState.mergeRecordNodes(nodes, { removeDirtyFlag })(state),
   [RecordActions.nodeDelete]: (state, { node }) => RecordState.deleteRecordNode(node)(state),
 
   // Validation updates

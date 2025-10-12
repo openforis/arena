@@ -18,6 +18,7 @@ export const keys = {
   invitedBy: 'invitedBy',
   invitedDate: 'invitedDate',
   lastLoginTime: 'lastLoginTime',
+  resetPasswordUuid: 'resetPasswordUuid',
 
   // Used only when editing user auth groups
   authGroupsUuids: 'authGroupsUuids',
@@ -26,4 +27,11 @@ export const keys = {
   // Used only in list view
   surveysCountDraft: 'surveysCountDraft',
   surveysCountPublished: 'surveysCountPublished',
+
+  // used in user update to determine if profile picture is to be persisted
+  profilePictureSet: 'profilePictureSet',
+
+  // used when creating a new user
+  newPassword: 'newPassword',
+  confirmPassword: 'confirmPassword',
 }

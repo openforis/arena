@@ -1,6 +1,7 @@
 import * as Survey from '@core/survey/survey'
 
 import * as Request from '@server/utils/request'
+import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
 
 import * as JobUtils from '@server/job/jobUtils'
 
@@ -11,17 +12,21 @@ export const init = (app) => {
 
   app.post('/survey/arena-import', async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
-      const filePath = Request.getFilePath(req)
-      const newSurveyParams = Request.getJsonParam(req, 'survey')
+      const filePath = await processChunkedFile({ req })
+      if (filePath) {
+        const user = Request.getUser(req)
+        const newSurveyParams = Request.getJsonParam(req, 'survey')
 
-      const { name, options } = newSurveyParams
+        const { name, options } = newSurveyParams
 
-      const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
+        const surveyInfoTarget = Survey.newSurvey({ ownerUuid: user.uuid, name })
 
-      const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget, options })
+        const job = ArenaImportService.startArenaImportJob({ user, filePath, surveyInfoTarget, options })
 
-      res.json({ job: JobUtils.jobToJSON(job) })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } else {
+        res.json({ chunkProcessing: true })
+      }
     } catch (error) {
       next(error)
     }

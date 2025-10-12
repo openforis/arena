@@ -7,6 +7,7 @@ import { Surveys } from '@openforis/arena-core'
 
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -15,9 +16,9 @@ import * as Survey from '@core/survey/survey'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
+import { useItems } from './store'
 import NodeDefCodeCheckbox from './NodeDefCodeCheckbox'
 import NodeDefCodeDropdown from './NodeDefCodeDropdown'
-import { useItems } from './store'
 
 const NodeDefCode = (props) => {
   const {
@@ -44,9 +45,11 @@ const NodeDefCode = (props) => {
   const readOnly = readOnlyProp || enumerator
   const singleNode = NodeDef.isSingle(nodeDef) || entryDataQuery
 
-  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery })
+  const itemsNeeded = !readOnly && canEditRecord
+  const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded })
   const [selectedItems, setSelectedItems] = useState([])
   const autocomplete = typeof items === 'function'
+  const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) ?? NodeDefLayout.renderType.dropdown
 
   // On items or nodes change, update selectedItems
   useEffect(() => {
@@ -96,20 +99,40 @@ const NodeDefCode = (props) => {
     [lang, nodeDef, surveyCycleKey]
   )
 
-  return NodeDefLayout.isRenderDropdown(surveyCycleKey)(nodeDef) || entryDataQuery || autocomplete ? (
-    <NodeDefCodeDropdown
-      canEditRecord={canEditRecord}
-      edit={edit}
-      entryDataQuery={entryDataQuery}
-      itemLabelFunction={itemLabelFunction}
-      items={items}
-      nodeDef={nodeDef}
-      onItemAdd={onItemAdd}
-      onItemRemove={onItemRemove}
-      readOnly={readOnly}
-      selectedItems={selectedItems}
-    />
-  ) : (
+  if (!edit && (readOnly || !canEditRecord)) {
+    const nodesValueSummary = nodes
+      .map((node) =>
+        NodeValueFormatter.format({
+          survey,
+          cycle: surveyCycleKey,
+          nodeDef,
+          node,
+          value: Node.getValue(node),
+          showLabel: true,
+          lang,
+        })
+      )
+      .join(', ')
+    return <span className="value-preview">{nodesValueSummary}</span>
+  }
+
+  if (renderType === NodeDefLayout.renderType.dropdown || entryDataQuery || autocomplete) {
+    return (
+      <NodeDefCodeDropdown
+        canEditRecord={canEditRecord}
+        edit={edit}
+        entryDataQuery={entryDataQuery}
+        itemLabelFunction={itemLabelFunction}
+        items={items}
+        nodeDef={nodeDef}
+        onItemAdd={onItemAdd}
+        onItemRemove={onItemRemove}
+        readOnly={readOnly}
+        selectedItems={selectedItems}
+      />
+    )
+  }
+  return (
     <NodeDefCodeCheckbox
       canEditRecord={canEditRecord}
       edit={edit}

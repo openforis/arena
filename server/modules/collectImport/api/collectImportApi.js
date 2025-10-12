@@ -13,30 +13,35 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as CollectImportService from '../service/collectImportService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
 
 export const init = (app) => {
   // CREATE
 
   app.post('/survey/collect-import', async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
-      const file = Request.getFile(req)
-      const newSurveyParam = Request.getJsonParam(req, 'survey')
+      const filePath = await processChunkedFile({ req })
+      if (filePath) {
+        const user = Request.getUser(req)
+        const newSurveyParam = Request.getJsonParam(req, 'survey')
 
-      const { options, ...newSurvey } = newSurveyParam
+        const { options, ...newSurvey } = newSurveyParam
 
-      const validation = await SurveyService.validateSurveyImportFromCollect({ newSurvey })
+        const validation = await SurveyService.validateSurveyImportFromCollect({ newSurvey })
 
-      if (Validation.isValid(validation)) {
-        const job = CollectImportService.startCollectImportJob({
-          user,
-          filePath: file.tempFilePath,
-          newSurvey,
-          options,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
+        if (Validation.isValid(validation)) {
+          const job = CollectImportService.startCollectImportJob({
+            user,
+            filePath,
+            newSurvey,
+            options,
+          })
+          res.json({ job: JobUtils.jobToJSON(job) })
+        } else {
+          res.json({ validation })
+        }
       } else {
-        res.json({ validation })
+        res.json({ chunkProcessing: true })
       }
     } catch (error) {
       next(error)

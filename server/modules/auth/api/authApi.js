@@ -1,5 +1,6 @@
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -9,7 +10,6 @@ import * as Log from '@server/log/log'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
-import * as FileService from '../../record/service/fileService'
 
 const Logger = Log.getLogger('AuthAPI')
 
@@ -20,7 +20,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     let survey = await SurveyService.fetchSurveyById({ surveyId, draft: false, validate: false })
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
       survey = await SurveyService.fetchSurveyById({ surveyId, draft: true, validate: true })
-      survey = Survey.assocFilesStatistics(await FileService.fetchFilesStatistics({ surveyId }))(survey)
+      survey = await SurveyService.fetchAndAssocStorageInfo({ survey })
     }
     sendResponse(res, user, survey)
   } catch (error) {
@@ -33,6 +33,16 @@ const sendUserSurvey = async (res, user, surveyId) => {
 }
 
 export const init = (app) => {
+  app.get('/api/version', async (_req, res, next) => {
+    try {
+      const packageJson = JSON.parse(await FileUtils.readFile('package.json'))
+      const { version } = packageJson
+      res.json({ version })
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/auth/user', async (req, res, next) => {
     try {
       const user = Request.getUser(req)

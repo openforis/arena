@@ -13,6 +13,7 @@ import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
+import { Schemata } from '@openforis/arena-server'
 
 export const tableName = 'activity_log'
 
@@ -244,3 +245,11 @@ export const fetch = async ({
     camelize
   )
 }
+
+export const fetchTableSize = async ({ surveyId }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  return DbUtils.fetchTableSize({ schema, table: 'activity_log' }, client)
+}
+
+export const deleteAll = async ({ surveyId }, client = db) =>
+  client.none(`DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.activity_log`)

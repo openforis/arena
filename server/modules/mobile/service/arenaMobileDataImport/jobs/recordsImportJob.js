@@ -9,7 +9,6 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as User from '@core/user/user'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
@@ -92,7 +91,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     if (this.total === 0) return
 
     // import records sequentially
-    await PromiseUtils.each(recordSummaries, async (recordSummary) => {
+    for (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
 
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
@@ -102,7 +101,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       await this.insertOrSkipRecord()
 
       this.incrementProcessedItems()
-    })
+    }
   }
 
   trackFileUuid = ({ node }) => {

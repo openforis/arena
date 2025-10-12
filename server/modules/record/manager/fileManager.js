@@ -162,4 +162,6 @@ export const {
   markRecordFilesAsDeleted,
   updateFileProps,
   cleanupSurveyFilesProps,
+  // DELETE
+  deleteFilesByUuids,
 } = FileRepository

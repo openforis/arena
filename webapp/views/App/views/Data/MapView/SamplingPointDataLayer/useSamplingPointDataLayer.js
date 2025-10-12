@@ -7,6 +7,7 @@ import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as PromiseUtils from '@core/promiseUtils'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { useIsMountedRef } from '@webapp/components/hooks'
 import * as API from '@webapp/service/api'
@@ -14,7 +15,6 @@ import * as API from '@webapp/service/api'
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { LoaderActions } from '@webapp/store/ui'
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import { useMapClusters, useMapLayerAdd } from '../common'
 

@@ -77,6 +77,7 @@ export const propKeys = {
   // Code
   categoryUuid: 'categoryUuid',
   parentCodeDefUuid: 'parentCodeDefUuid',
+
   // Taxon
   taxonomyUuid: 'taxonomyUuid',
   vernacularNameLabels: 'vernacularNameLabels',
@@ -86,6 +87,7 @@ export const propKeys = {
   // File
   maxFileSize: 'maxFileSize', // max file size in MB
   fileType: 'fileType',
+  geotagInformationShown: 'geotagInformationShown',
 
   // Coordinate
   allowOnlyDeviceCoordinate: 'allowOnlyDeviceCoordinate',
@@ -284,6 +286,7 @@ export const getMaxNumberDecimalDigits = (nodeDef) => {
 export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
+export const isGeotagInformationShown = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
 // taxon
 export const getTaxonomyUuid = getProp(propKeys.taxonomyUuid)
 export const getVernacularNameLabels = getProp(propKeys.vernacularNameLabels, {})
@@ -506,6 +509,7 @@ export const assocLabel =
     assocLabels({ ...getLabels(nodeDef), [lang]: label })(nodeDef)
 
 export const assocDescriptions = (descriptions) => assocProp({ key: propKeys.descriptions, value: descriptions })
+export const assocHidden = (hidden) => assocProp({ key: propKeys.hidden, value: hidden })
 
 export const dissocEnumerate = ObjectUtils.dissocProp(propKeys.enumerate)
 export const cloneIntoEntityDef =
@@ -663,20 +667,47 @@ export const canMultipleAttributeBeAggregated = (nodeDef) =>
   [nodeDefType.code, nodeDefType.decimal, nodeDefType.integer, nodeDefType.text].includes(getType(nodeDef))
 
 export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
+export const canBeHidden = (nodeDef) => isReadOnly(nodeDef)
 export const canBeHiddenInMobile = (nodeDef) =>
   !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
 
 export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
+  isAttribute(nodeDef) &&
   !isKey(nodeDef) &&
   !isMultiple(nodeDef) &&
   !isFile(nodeDef) &&
+  !isGeo(nodeDef) &&
   NodeDefLayout.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
 export const canIncludeInPreviousCycleLink = (cycle) => (nodeDef) =>
   !isKey(nodeDef) && NodeDefLayout.canIncludeInPreviousCycleLink(cycle)(nodeDef)
 
+export const canHaveMobileProps = (cycle) => (nodeDef) =>
+  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
+
+export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
+  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
+
+  const defaultValues = getDefaultValues(nodeDef)
+  if (defaultValues.length === 0) return true
+
+  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
+  return (
+    defaultValues.length === autoIncrementalDefaultValues.length &&
+    autoIncrementalDefaultValues.every((defaultValue, index) =>
+      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
+    )
+  )
+}
+
+export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fileTypeValues.image
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
+  // clear hidden if not applicable
+  if (!canBeHidden(nodeDefUpdated) && isHidden(nodeDefUpdated)) {
+    nodeDefUpdated = assocHidden(false)(nodeDefUpdated)
+  }
   // clear hidden in mobile if not applicable
   if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
     nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
@@ -700,23 +731,8 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   if (!canBeExcludedInClone(nodeDefUpdated) && isExcludedInClone(nodeDefUpdated)) {
     nodeDefUpdated = assocExcludedInClone(false)(nodeDefUpdated)
   }
+  if (!canShowGeotagInformation(nodeDefUpdated) && isGeotagInformationShown(nodeDefUpdated)) {
+    nodeDefUpdated = ObjectUtils.setProp(propKeys.geotagInformationShown, false)(nodeDefUpdated)
+  }
   return nodeDefUpdated
-}
-
-export const canHaveMobileProps = (cycle) => (nodeDef) =>
-  canBeHiddenInMobile(nodeDef) || canIncludeInMultipleEntitySummary(cycle)(nodeDef)
-
-export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
-  if (!isKey(nodeDef) || !isInteger(nodeDef)) return false
-
-  const defaultValues = getDefaultValues(nodeDef)
-  if (defaultValues.length === 0) return true
-
-  const autoIncrementalDefaultValues = createAutoIncrementalKeyDefaultValues({ nodeDef, nodeDefParent })
-  return (
-    defaultValues.length === autoIncrementalDefaultValues.length &&
-    autoIncrementalDefaultValues.every((defaultValue, index) =>
-      NodeDefExpression.isSimilarTo(defaultValue)(defaultValues[index])
-    )
-  )
 }

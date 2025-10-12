@@ -86,12 +86,12 @@ const propsUI = {
     icon: <span className="icon icon-location2 icon-left" />,
     defaultValue: { x: '', y: '', srs: '' },
     formFieldsFn: (nodeDef) => [
-      { field: valuePropsCoordinate.x, labelKey: 'surveyForm.nodeDefCoordinate.x' },
-      { field: valuePropsCoordinate.y, labelKey: 'surveyForm.nodeDefCoordinate.y' },
+      { field: valuePropsCoordinate.x, labelKey: 'surveyForm:nodeDefCoordinate.x' },
+      { field: valuePropsCoordinate.y, labelKey: 'surveyForm:nodeDefCoordinate.y' },
       { field: valuePropsCoordinate.srs, labelKey: 'common.srs' },
       ...NodeDef.getCoordinateAdditionalFields(nodeDef).map((field) => ({
         field,
-        labelKey: `surveyForm.nodeDefCoordinate.${field}`,
+        labelKey: `surveyForm:nodeDefCoordinate.${field}`,
       })),
     ],
   },
@@ -112,12 +112,12 @@ const propsUI = {
       { field: valuePropsTaxon.code, labelKey: 'common.code', tableColumnFlex: 2 },
       {
         field: valuePropsTaxon.scientificName,
-        labelKey: 'surveyForm.nodeDefTaxon.scientificName',
+        labelKey: 'surveyForm:nodeDefTaxon.scientificName',
         tableColumnFlex: 5,
       },
       {
         field: valuePropsTaxon.vernacularName,
-        labelKey: 'surveyForm.nodeDefTaxon.vernacularName',
+        labelKey: 'surveyForm:nodeDefTaxon.vernacularName',
         tableColumnFlex: 3,
       },
     ],

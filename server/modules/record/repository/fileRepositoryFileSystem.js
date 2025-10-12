@@ -37,10 +37,9 @@ export const getFileContentAsStream = ({ surveyId, fileUuid }) => {
   return FileUtils.createReadStream(filePath)
 }
 
-export const deleteFiles = async ({ surveyId, fileUuids }) =>
-  Promise.all(
-    fileUuids.map(async (fileUuid) => {
-      const filePath = getFilePath({ surveyId, fileUuid })
-      await FileUtils.deleteFileAsync(filePath)
-    })
-  )
+export const deleteFiles = async ({ surveyId, fileUuids }) => {
+  for (const fileUuid of fileUuids) {
+    const filePath = getFilePath({ surveyId, fileUuid })
+    await FileUtils.deleteFileAsync(filePath)
+  }
+}

@@ -18,6 +18,7 @@ export default {
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
   expression: {
+    identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',

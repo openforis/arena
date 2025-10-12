@@ -47,13 +47,14 @@ const NodeDefMultipleTableCell = (props) => {
     setNodeValues(nodeValuesUpdate)
   }, [nodes])
 
-  return showEditDialog ? (
-    ReactDOM.createPortal(
+  if (showEditDialog) {
+    return ReactDOM.createPortal(
       /* eslint-disable react/jsx-props-no-spreading */
       <NodeDefMultipleEditDialog {...props} onClose={() => setShowEditDialog(false)} />,
       document.body
     )
-  ) : (
+  }
+  return (
     <div className="survey-form__node-def-table-cell-body-multiple">
       <span className="values-summary">
         <LabelWithTooltip label={nodeValues} />

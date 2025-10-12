@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
+import * as ProcessUtils from '@core/processUtils'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
 
@@ -40,7 +41,7 @@ const UserPopupMenu = (props) => {
   const canCreateSurvey = useAuthCanCreateSurvey()
   const canCreateTemplate = useAuthCanCreateTemplate()
   const canEditTemplates = useAuthCanEditTemplates()
-  const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests()
+  const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests() && ProcessUtils.ENV.allowUserAccessRequest
   const canViewAllUsers = useAuthCanViewAllUsers()
 
   useEffect(() => {

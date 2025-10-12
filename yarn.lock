@@ -2251,6 +2251,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.1.1.tgz#1a5b1959a528e374e8037c4396c3e825d6cf4a83"
   integrity sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==
 
+"@fontsource/noto-sans@^5.2.7":
+  version "5.2.7"
+  resolved "https://registry.yarnpkg.com/@fontsource/noto-sans/-/noto-sans-5.2.7.tgz#cd11c60592b68263c633bc31a3eb9e733af3d94b"
+  integrity sha512-mTpMSMft6Nb+ZSF4DSiJVYnLzKCRjHNFieZ/swuxSDQK+v1hjUeDTBxLHKUdfmC+ZPg6TUEWw4oRq2ltnDbSjQ==
+
 "@godaddy/terminus@^4.12.1":
   version "4.12.1"
   resolved "https://registry.yarnpkg.com/@godaddy/terminus/-/terminus-4.12.1.tgz#c4fdc280a4ac9655d4734250e22299a4ad46c54c"
@@ -2811,10 +2816,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openforis/arena-core@^1.0.27":
-  version "1.0.27"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.27/73ef8af6cecaff0021b0558fa8668f91b8a66d4c#73ef8af6cecaff0021b0558fa8668f91b8a66d4c"
-  integrity sha512-JLfVuu7H5D6SoMtVVc+7bOqgQS3GJObUbcmDqEus7EC3jXs4kvudKdck+FyKRc4U6pOlU95OWXdyQEBCMbSW6A==
+"@openforis/arena-core@^1.0.44":
+  version "1.0.44"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.44/17f8797b851069bdaa1e47172b6d4e919f314728#17f8797b851069bdaa1e47172b6d4e919f314728"
+  integrity sha512-4PQKNOyXr7Mu3mj1QSKK2iaz2xnLd5EEgkPq6iio3SV2zSqFJ+gYSWh5z+hBmtrTVywqBOhV8WXb6FzUHFtbgA==
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
     bignumber.js "^9.1.2"
@@ -2843,10 +2848,10 @@
     proj4 "^2.15.0"
     uuid "^11.0.3"
 
-"@openforis/arena-server@^0.1.43":
-  version "0.1.43"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.43/3959d44257cfe7aa4d079498246e5486cb8c623e#3959d44257cfe7aa4d079498246e5486cb8c623e"
-  integrity sha512-M1rvADW6/E/5UY6eQbydOEbMM7V0a9YiPb/SS8IkYc9TmZsiem2FQyHRAT/+iESuxtA8hMldSpZjtF6XsThTuQ==
+"@openforis/arena-server@^0.1.45":
+  version "0.1.45"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.45/5aa7a99571fe66372f7f43fc5e66c555086aa59e#5aa7a99571fe66372f7f43fc5e66c555086aa59e"
+  integrity sha512-mbfEMOZee4L6L5lP9QwQRy4l1L/qr/AdbV87q1CYNgyApBz6Y+zJGbdLcey5Bf26HLJb2tXKdyqhRZQZVUudSw==
   dependencies:
     "@godaddy/terminus" "^4.12.1"
     "@openforis/arena-core" "^1.0.8"
@@ -3591,6 +3596,15 @@
     "@types/geojson" "^7946.0.10"
     tslib "^2.6.2"
 
+"@turf/bbox-polygon@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/bbox-polygon/-/bbox-polygon-7.2.0.tgz#5de355889d7b92647253ae7e42eddc1c7d032668"
+  integrity sha512-Aj4G1GAAy26fmOqMjUk0Z+Lcax5VQ9g1xYDbHLQWXvfTsaueBT+RzdH6XPnZ/seEEnZkio2IxE8V5af/osupgA==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/centroid@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@turf/centroid/-/centroid-7.1.0.tgz#7cd55ec0bab79b5fc0ef03a4870a8cbc75e6207f"
@@ -3600,6 +3614,26 @@
     "@turf/meta" "^7.1.0"
     "@types/geojson" "^7946.0.10"
     tslib "^2.6.2"
+
+"@turf/circle@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/circle/-/circle-7.2.0.tgz#42b3e62d024774a23d7d1e3ec8c577035ad6c120"
+  integrity sha512-1AbqBYtXhstrHmnW6jhLwsv7TtmT0mW58Hvl1uZXEDM1NCVXIR50yDipIeQPjrCuJ/Zdg/91gU8+4GuDCAxBGA==
+  dependencies:
+    "@turf/destination" "^7.2.0"
+    "@turf/helpers" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
+"@turf/destination@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/destination/-/destination-7.2.0.tgz#f27bc602a11f6c662444249f78429e1f26cc31be"
+  integrity sha512-8DUxtOO0Fvrh1xclIUj3d9C5WS20D21F5E+j+X9Q+ju6fcM4huOqTg5ckV1DN2Pg8caABEc5HEZJnGch/5YnYQ==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@turf/invariant" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/distance@^7.1.0":
   version "7.1.0"
@@ -3619,6 +3653,14 @@
     "@types/geojson" "^7946.0.10"
     tslib "^2.6.2"
 
+"@turf/helpers@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/helpers/-/helpers-7.2.0.tgz#5771308108c98d608eb8e7f16dcd0eb3fb8a3417"
+  integrity sha512-cXo7bKNZoa7aC7ydLmUR02oB3IgDe7MxiPuRz3cCtYQHn+BJ6h1tihmamYDWWUlPHgSNF0i3ATc4WmDECZafKw==
+  dependencies:
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
+
 "@turf/invariant@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-7.1.0.tgz#c90cffa093291316b597212396d68bf9e465cf2e"
@@ -3627,6 +3669,15 @@
     "@turf/helpers" "^7.1.0"
     "@types/geojson" "^7946.0.10"
     tslib "^2.6.2"
+
+"@turf/invariant@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@turf/invariant/-/invariant-7.2.0.tgz#ba5b377ea20ee8c45af0a4c9b8bf03aa1c43bd5d"
+  integrity sha512-kV4u8e7Gkpq+kPbAKNC21CmyrXzlbBgFjO1PhrHPgEdNqXqDawoZ3i6ivE3ULJj2rSesCjduUaC/wyvH/sNr2Q==
+  dependencies:
+    "@turf/helpers" "^7.2.0"
+    "@types/geojson" "^7946.0.10"
+    tslib "^2.8.1"
 
 "@turf/length@^7.1.0":
   version "7.1.0"
@@ -5469,9 +5520,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001517, caniuse-lite@^1.0.30001587, caniuse-lite@^1.0.30001646:
-  version "1.0.30001696"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001696.tgz"
-  integrity sha512-pDCPkvzfa39ehJtJ+OwGT/2yvT2SbjfHhiIW2LWOAcMQ7BzwxT/XuyUp4OTOd0XFWA6BKw0JalnBHgSi5DGJBQ==
+  version "1.0.30001733"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001733.tgz"
+  integrity sha512-e4QKw/O2Kavj2VQTKZWrwzkt3IxOmIlU6ajRb6LP64LHpBo1J67k2Hi4Vu/TgJWsNtynurfS0uK3MaUTCPfu5Q==
 
 chainsaw@~0.1.0:
   version "0.1.0"
@@ -5564,11 +5615,6 @@ ci-info@^3.2.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-3.8.0.tgz#81408265a5380c929f0bc665d62256628ce9ef91"
   integrity sha512-eXTggHWSooYhq49F2opQhuHWgzucfF2YgODK4e1566GQs5BIfP30B0oenwBJHfWxAs2fyPB1s7Mg949zLf61Yw==
-
-circle-to-polygon@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/circle-to-polygon/-/circle-to-polygon-2.2.0.tgz#ca4aec7b0536510fc99bf3e1dcef1d53a504a04e"
-  integrity sha512-yC9/bw6P0YmV2/oxm4DLrSgrzHhbz9H+vgUScmSFN5KilR/KFGVRbUi9a0mIYPsXK44HvnysVVi/iIysRJVvNw==
 
 cjs-module-lexer@^1.0.0:
   version "1.2.3"
@@ -7715,6 +7761,11 @@ execa@^7.0.0:
     signal-exit "^3.0.7"
     strip-final-newline "^3.0.0"
 
+exifr@^7.1.3:
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/exifr/-/exifr-7.1.3.tgz#f6218012c36dbb7d843222011b27f065fddbab6f"
+  integrity sha512-g/aje2noHivrRSLbAUtBPWFbxKdKhgj/xr1vATDdUXPOFYJlQ62Ft0oy+72V6XLIpDJfHs6gXLbBLAolqOXYRw==
+
 exit@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/exit/-/exit-0.1.2.tgz#0632638f8d877cc82107d30a0fff1a17cba1cd0c"
@@ -8835,6 +8886,13 @@ husky@^8.0.3:
   version "8.0.3"
   resolved "https://registry.yarnpkg.com/husky/-/husky-8.0.3.tgz#4936d7212e46d1dea28fef29bb3a108872cd9184"
   integrity sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==
+
+i18next-browser-languagedetector@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/i18next-browser-languagedetector/-/i18next-browser-languagedetector-8.1.0.tgz#e7fcc1084e9ca8fece329c8c05b000a6e25bd82e"
+  integrity sha512-mHZxNx1Lq09xt5kCauZ/4bsXOEA2pfpwSoU11/QTJB+pD94iONFwp+ohqi///PwiFvjFOxe1akYCdHyFo1ng5Q==
+  dependencies:
+    "@babel/runtime" "^7.23.2"
 
 i18next@^23.10.0:
   version "23.14.0"
@@ -12508,6 +12566,11 @@ react-is@^18.3.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.3.1.tgz#e83557dc12eae63a99e003a46388b1dcbb44db7e"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
 
+react-leaflet-ruler@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/react-leaflet-ruler/-/react-leaflet-ruler-1.0.7.tgz#c8742688c2a722a7e5c1bf43c37d00e38e1521ae"
+  integrity sha512-VMydtw6rEpEcsKsZkIHqCVdbTienvJoQ5wrGxvKq/2mLXv4fx7hVeBIASb/IOuB+5UuxZFOp8UUuBwE+sJyAQA==
+
 react-leaflet@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/react-leaflet/-/react-leaflet-4.2.1.tgz#c300e9eccaf15cb40757552e181200aa10b94780"
@@ -14400,6 +14463,11 @@ tslib@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
+
+tslib@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
+  integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
 tsutils@^3.21.0:
   version "3.21.0"

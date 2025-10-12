@@ -31,13 +31,15 @@
   font-weight: 600;
   color: color.adjust($black, $lightness: 20%);
 
-  .dropdown {
-    margin-left: 10px;
-    width: 9rem;
+  .cycle-selector {
+    width: 8rem;
   }
 
   .survey-preferred-language {
-    grid-template-columns: 150px 20px;
+    margin-left: 10px;
+    .dropdown {
+      width: 10rem;
+    }
   }
 
   .progress-bar {

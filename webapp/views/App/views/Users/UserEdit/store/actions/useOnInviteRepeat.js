@@ -39,7 +39,7 @@ export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true }) => {
         } else {
           dispatch(
             NotificationActions.notifyInfo({
-              key: 'emails.userInviteRepeatConfirmation',
+              key: 'emails:userInviteRepeatConfirmation',
               params: { email: UserInvite.getEmail(userInvite) },
             })
           )

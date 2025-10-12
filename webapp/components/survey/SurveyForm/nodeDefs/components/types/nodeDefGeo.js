@@ -8,10 +8,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import * as Node from '@core/record/node'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { Button, ButtonDownload, ButtonIconDelete, ExpansionPanel, Map, PanelRight } from '@webapp/components'
+import { Button, ButtonDownload, ButtonIconDelete, ExpansionPanel, MapContainer, PanelRight } from '@webapp/components'
 import { UploadButton } from '@webapp/components/form'
 import { Input } from '@webapp/components/form/Input'
 import { GeoPolygonInfo } from '@webapp/components/geo/GeoPolygonInfo'
@@ -23,7 +24,6 @@ import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import { downloadTextToFile } from '@webapp/utils/domUtils'
 import { FileUtils } from '@webapp/utils/fileUtils'
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
@@ -71,7 +71,7 @@ const NodeDefGeo = (props) => {
         dispatch(NotificationActions.hideNotification())
         updateNode(nodeDef, node, geoJson)
       } else {
-        dispatch(NotificationActions.notifyWarning({ key: 'surveyForm.nodeDefGeo.invalidGeoJsonFileUploaded' }))
+        dispatch(NotificationActions.notifyWarning({ key: 'surveyForm:nodeDefGeo.invalidGeoJsonFileUploaded' }))
       }
     },
     [dispatch, node, nodeDef, updateNode]
@@ -82,14 +82,14 @@ const NodeDefGeo = (props) => {
   }, [nodeDefName, valueText])
 
   const onClearValueClick = useCallback(async () => {
-    if (await confirm({ key: 'surveyForm.nodeDefGeo.confirmDelete' })) {
+    if (await confirm({ key: 'surveyForm:nodeDefGeo.confirmDelete' })) {
       updateNode(nodeDef, node, null)
     }
   }, [confirm, node, nodeDef, updateNode])
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <Map editable={!entryDisabled} geoJson={Node.getValue(node)} showOptions={false} />
+      <MapContainer editable={!entryDisabled} geoJson={Node.getValue(node)} showOptions={false} />
     </PanelRight>
   ) : null
 
@@ -99,7 +99,7 @@ const NodeDefGeo = (props) => {
       disabled={edit}
       iconClassName={`icon-map ${insideTable ? 'icon-14px' : 'icon-24px'}`}
       onClick={toggleShowMap}
-      title="surveyForm.nodeDefCoordinate.showOnMap"
+      title="surveyForm:nodeDefCoordinate.showOnMap"
       variant="text"
     />
   ) : null
@@ -128,7 +128,7 @@ const NodeDefGeo = (props) => {
             <ExpansionPanel buttonLabel="common.info" startClosed>
               <GeoPolygonInfo geoJson={value} />
             </ExpansionPanel>
-            <ExpansionPanel buttonLabel="surveyForm.nodeDefGeo.geoJSON" startClosed>
+            <ExpansionPanel buttonLabel="surveyForm:nodeDefGeo.geoJSON" startClosed>
               <Input disabled inputType="textarea" value={valueText} />
             </ExpansionPanel>
           </>

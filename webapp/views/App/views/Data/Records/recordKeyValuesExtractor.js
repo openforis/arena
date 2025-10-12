@@ -1,4 +1,5 @@
-import * as A from '@core/arena'
+import { Numbers, Objects, Points } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -21,6 +22,13 @@ const valueFormattersByType = {
     }
     return code
   },
+  [NodeDef.nodeDefType.coordinate]: ({ value, srsIndex }) => {
+    const point = Points.parse(value)
+    if (!point) return ''
+    const pointLatLon = Points.toLatLong(point, srsIndex)
+    if (!pointLatLon) return ''
+    return `${Numbers.roundToPrecision(point.y, 6)}, ${Numbers.roundToPrecision(point.x, 6)}`
+  },
   [NodeDef.nodeDefType.date]: ({ value }) =>
     DateUtils.convertDate({
       dateStr: value,
@@ -35,34 +43,45 @@ const valueFormattersByType = {
     }),
 }
 
-const extractKeyValue = ({ nodeDef, record, categoryItemsByCodeDefUuid = null, lang = null }) => {
+const extractKeyOrSummaryValue = ({ nodeDef, record, srsIndex, categoryItemsByCodeDefUuid = null, lang = null }) => {
   const name = NodeDef.getName(nodeDef)
-  let keyField = name
+  let field = name
   if (NodeDef.isCode(nodeDef) && !categoryItemsByCodeDefUuid) {
-    keyField = `${keyField}_label`
+    field = `${field}_label`
   }
-  const value = record[A.camelize(keyField)]
+  const keysOrSummaryFields = { ...Record.getKeysObj(record), ...Record.getSummaryAttributesObj(record) }
+  const value = keysOrSummaryFields[field]
+  if (Objects.isEmpty(value)) {
+    return ''
+  }
   const cycle = Record.getCycle(record)
   const formatter = valueFormattersByType[NodeDef.getType(nodeDef)]
-  return value && formatter ? formatter({ cycle, nodeDef, value, categoryItemsByCodeDefUuid, lang }) : value
+  if (!formatter) {
+    return String(value)
+  }
+  return formatter({ srsIndex, cycle, nodeDef, value, categoryItemsByCodeDefUuid, lang })
 }
 
 const extractKeyValues = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
-  return nodeDefKeys.map((nodeDef) => extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang }))
+  const srsIndex = Survey.getSRSIndex(survey)
+  return nodeDefKeys.map((nodeDef) =>
+    extractKeyOrSummaryValue({ srsIndex, nodeDef, record, categoryItemsByCodeDefUuid, lang })
+  )
 }
 
 const extractKeyValuesAndLabels = ({ survey, record, categoryItemsByCodeDefUuid, lang }) => {
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+  const srsIndex = Survey.getSRSIndex(survey)
   return nodeDefKeys.map((nodeDef) => {
     const label = NodeDef.getLabel(nodeDef, lang)
-    const keyValue = extractKeyValue({ nodeDef, record, categoryItemsByCodeDefUuid, lang })
+    const keyValue = extractKeyOrSummaryValue({ srsIndex, nodeDef, record, categoryItemsByCodeDefUuid, lang })
     return `${label}=${keyValue}`
   })
 }
 
 export const RecordKeyValuesExtractor = {
-  extractKeyValue,
+  extractKeyOrSummaryValue,
   extractKeyValues,
   extractKeyValuesAndLabels,
 }

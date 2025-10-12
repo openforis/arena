@@ -135,6 +135,7 @@ export const requireUserViewPermission = requireUserPermission(Authorizer.canVie
 export const requireUserNameViewPermission = requireUserPermission(Authorizer.canViewOtherUsersNameInSameSurvey)
 export const requireUsersAllViewPermission = requirePermission(Authorizer.canViewAllUsers)
 export const requireUserEditPermission = requireUserPermission(Authorizer.canEditUser)
+export const requireUserCreatePermission = requireUserPermission(Authorizer.canCreateUsers)
 export const requireUserRemovePermission = requireUserPermission(Authorizer.canRemoveUser)
 // User access requests
 export const requireCanViewAccessRequestsPermission = requirePermission(Authorizer.canViewUsersAccessRequests)

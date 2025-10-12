@@ -304,7 +304,7 @@ export const removeNodeDef =
     if (dispatch(_checkCanRemoveNodeDef(nodeDef))) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'surveyForm.nodeDefEditFormActions.confirmDelete',
+          key: 'surveyForm:nodeDefEditFormActions.confirmDelete',
           params: { name: NodeDef.getName(nodeDef) },
           okButtonLabel: 'common.delete',
           onOk: async () => {
@@ -343,7 +343,7 @@ export const convertNodeDef =
 
     dispatch(
       DialogConfirmActions.showDialogConfirm({
-        key: 'surveyForm.nodeDefEditFormActions.confirmConvert',
+        key: 'surveyForm:nodeDefEditFormActions.confirmConvert',
         params: { name: NodeDef.getName(nodeDef), toType: toTypeLabel },
         okButtonLabel: 'common.convert',
         onOk: async () => {

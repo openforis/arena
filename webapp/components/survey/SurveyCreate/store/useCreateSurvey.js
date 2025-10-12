@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Objects } from '@openforis/arena-core'
+import { Objects, UUIDs } from '@openforis/arena-core'
 
 import { SurveyType } from '@webapp/model'
 
@@ -25,44 +25,41 @@ const initialState = {
   options: { includeData: false },
   source: importSources.arena,
   validation: {},
-  uploadProgressPercent: -1,
 }
 
 export const useCreateSurvey = ({ template = false } = {}) => {
   const [newSurvey, setNewSurvey] = useState({ ...initialState, template })
 
-  const { onUpdate, onCreate, onImport } = useActions({
+  const { onUpdate, onCreate, onImport, onImportJobStart, onImportUploadCancel } = useActions({
     newSurvey,
     setNewSurvey,
   })
 
   const onCreateTypeUpdate = (createType) => {
-    const newSurveyUpdated = { ...newSurvey, createType }
+    const newSurveyProps = { createType }
 
     switch (createType) {
       case createTypes.fromScratch:
         break
       default:
         // reset label and lang (they will be hidden)
-        newSurveyUpdated.label = ''
-        newSurveyUpdated.lang = 'en'
+        newSurveyProps.label = ''
+        newSurveyProps.lang = 'en'
     }
-    setNewSurvey(newSurveyUpdated)
+    setNewSurvey((surveyPrev) => ({ ...surveyPrev, ...newSurveyProps }))
   }
 
   const onOptionChange = ({ key, value }) => {
-    const newSurveyUpdated = Objects.assocPath({ obj: newSurvey, path: ['options', key], value })
-    setNewSurvey(newSurveyUpdated)
+    setNewSurvey((surveyPrev) => Objects.assocPath({ obj: surveyPrev, path: ['options', key], value }))
   }
 
   const onSourceChange = (value) => {
-    const newSurveyUpdated = { ...newSurvey, source: value, file: null }
-    setNewSurvey(newSurveyUpdated)
+    setNewSurvey((surveyPrev) => ({ ...surveyPrev, source: value, file: null, fileId: null }))
   }
 
   const onFilesDrop = (files) => {
     const file = files[0]
-    setNewSurvey({ ...newSurvey, file })
+    setNewSurvey((surveyPrev) => ({ ...surveyPrev, file, fileId: UUIDs.v4() }))
   }
 
   return {
@@ -70,6 +67,8 @@ export const useCreateSurvey = ({ template = false } = {}) => {
     onUpdate,
     onCreate,
     onImport,
+    onImportJobStart,
+    onImportUploadCancel,
     onCreateTypeUpdate,
     onFilesDrop,
     onOptionChange,

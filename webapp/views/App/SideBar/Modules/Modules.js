@@ -7,7 +7,7 @@ import Module from './Module'
 import PopupMenu from './PopupMenu'
 
 const Modules = (props) => {
-  const { pathname = '', sideBarOpened = false, surveyInfo = null, user = null } = props
+  const { pathname = '', sideBarOpened = false, surveyInfo = null, surveyIsDirty = false, user = null } = props
 
   const [overSidebar, setOverSidebar] = useState(false)
   const moduleElementsByKeyRef = useRef({})
@@ -48,6 +48,7 @@ const Modules = (props) => {
         return (
           <Module
             key={key}
+            disabled={surveyIsDirty}
             surveyInfo={surveyInfo}
             module={module}
             pathname={pathname}
@@ -79,6 +80,7 @@ const Modules = (props) => {
 Modules.propTypes = {
   user: PropTypes.object,
   surveyInfo: PropTypes.object,
+  surveyIsDirty: PropTypes.bool,
   pathname: PropTypes.string,
   sideBarOpened: PropTypes.bool,
 }

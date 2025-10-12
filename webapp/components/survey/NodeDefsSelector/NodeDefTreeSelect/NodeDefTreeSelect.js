@@ -11,7 +11,9 @@ import { useNodeDefTreeSelect } from './useNodeDefTreeSelect'
 const NodeDefTreeSelect = (props) => {
   const {
     getLabelSuffix = () => '',
-    isDisabled = () => false,
+    disableSelection = false,
+    isNodeDefDisabled = () => false,
+    isNodeDefIncluded = () => true,
     includeMultipleAttributes = false,
     includeSingleAttributes = false,
     includeSingleEntities = false,
@@ -31,7 +33,8 @@ const NodeDefTreeSelect = (props) => {
     treeItems,
   } = useNodeDefTreeSelect({
     getLabelSuffix,
-    isDisabled,
+    isNodeDefDisabled,
+    isNodeDefIncluded,
     nodeDefLabelType,
     nodeDefUuidActive,
     includeMultipleAttributes,
@@ -62,6 +65,7 @@ const NodeDefTreeSelect = (props) => {
       )}
 
       <TreeView
+        disableSelection={disableSelection}
         expadedItemKeys={expandedNodeDefUuids}
         items={treeItems}
         onExpandedItemKeysChange={setExpandedNodeDefUuids}
@@ -73,8 +77,10 @@ const NodeDefTreeSelect = (props) => {
 }
 
 NodeDefTreeSelect.propTypes = {
+  disableSelection: PropTypes.bool,
   getLabelSuffix: PropTypes.func,
-  isDisabled: PropTypes.func,
+  isNodeDefDisabled: PropTypes.func,
+  isNodeDefIncluded: PropTypes.func,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidActive: PropTypes.string,
   includeMultipleAttributes: PropTypes.bool,

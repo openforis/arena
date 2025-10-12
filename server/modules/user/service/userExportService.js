@@ -10,7 +10,7 @@ const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
   const transformSurveyNames = (surveyNames) =>
     surveyNames
       ? Object.values(AuthGroup.groupNames).reduce(
-          (acc, groupName) => acc.replaceAll(groupName, i18n.t(`authGroups.${groupName}.label`)),
+          (acc, groupName) => acc.replaceAll(groupName, i18n.t(`auth:authGroups.${groupName}.label`)),
           surveyNames
         )
       : ''

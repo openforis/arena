@@ -51,7 +51,7 @@ export const useAcceptRequestPanel = (props) => {
     }
   }, [templateUuid])
 
-  const roleLabelFunction = (r) => i18n.t(`authGroups.${r}.label`)
+  const roleLabelFunction = (r) => i18n.t(`auth:authGroups.${r}.label`)
 
   const onUpdate = async ({ field, value }) => {
     const accessRequestAcceptUpdated = { ...accessRequestAccept, [field]: value }

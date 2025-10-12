@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { SurveyActions, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { SurveyActions, useIsSurveyDirty, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 import { Button } from './buttons'
@@ -14,6 +14,7 @@ const ButtonPublishSurvey = (props) => {
 
   const dispatch = useDispatch()
   const surveyInfo = useSurveyInfo()
+  const surveyIsDirty = useIsSurveyDirty()
   const lang = useSurveyPreferredLang()
 
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
@@ -21,7 +22,7 @@ const ButtonPublishSurvey = (props) => {
   return (
     <Button
       className={className}
-      disabled={disabled}
+      disabled={disabled || surveyIsDirty}
       iconClassName="icon-warning icon-left icon-10px"
       label="common.publish"
       onClick={() =>

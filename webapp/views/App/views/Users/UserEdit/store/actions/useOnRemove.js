@@ -8,15 +8,14 @@ import * as Survey from '@core/survey/survey'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
-import { useLang } from '@webapp/store/system'
-import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
+import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useConfirm } from '@webapp/components/hooks'
 
 export const useOnRemove = ({ userToUpdate }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const confirm = useConfirm()
-  const lang = useLang()
+  const lang = useSurveyPreferredLang()
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
 

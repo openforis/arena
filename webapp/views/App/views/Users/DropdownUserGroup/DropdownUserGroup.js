@@ -32,7 +32,7 @@ const DropdownUserGroup = (props) => {
       disabled={disabled}
       items={groups}
       itemValue={AuthGroup.keys.uuid}
-      itemLabel={(group) => i18n.t(`authGroups.${AuthGroup.getName(group)}.label_plural`)}
+      itemLabel={(group) => i18n.t(`auth:authGroups.${AuthGroup.getName(group)}.label_plural`)}
       onChange={(group) => onChange(group)}
       placeholder={i18n.t('common.group')}
       selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}

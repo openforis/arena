@@ -18,7 +18,7 @@ export default {
 
     return {
       email: ActivityLog.getTargetUserEmail(activityLog),
-      groupName: i18n.t(`authGroups.${groupName}.label`),
+      groupName: i18n.t(`auth:authGroups.${groupName}.label`),
     }
   },
 

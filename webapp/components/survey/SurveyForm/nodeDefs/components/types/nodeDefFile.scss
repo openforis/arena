@@ -2,7 +2,7 @@
 
 .survey-form__node-def-file {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   grid-column-gap: 0.5rem;
 
   .survey-form__node-def-file__tooltip-preview {

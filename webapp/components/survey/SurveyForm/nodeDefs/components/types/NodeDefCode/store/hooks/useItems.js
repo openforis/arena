@@ -55,7 +55,7 @@ const calculateItems = async (params) => {
     : []
 }
 
-export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) => {
+export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded = true }) => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
@@ -66,25 +66,29 @@ export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery }) =
 
   const itemsGetParams = useMemo(
     () => ({
+      itemsNeeded,
+      survey,
       categoryUuid,
+      levelIndex,
+      parentCategoryItemUuid,
       draft,
       edit,
       itemsCount,
       lang,
-      levelIndex,
-      parentCategoryItemUuid,
-      survey,
     }),
-    [categoryUuid, draft, edit, itemsCount, lang, levelIndex, parentCategoryItemUuid, survey]
+    [itemsNeeded, survey, categoryUuid, levelIndex, parentCategoryItemUuid, draft, edit, itemsCount, lang]
   )
 
-  const [items, setItems] = useState(getItemsFromSurveyIndex(itemsGetParams))
+  const initialItems = itemsNeeded ? getItemsFromSurveyIndex(itemsGetParams) : []
+  const [items, setItems] = useState(initialItems)
 
   useEffect(() => {
-    calculateItems(itemsGetParams).then((_items) => {
-      setItems(() => _items) // use a callback to prevent invoking items callback (when it's a function)
-    })
-  }, [itemsGetParams])
+    if (itemsNeeded) {
+      calculateItems(itemsGetParams).then((_items) => {
+        setItems(() => _items) // use a callback to prevent invoking items callback (when it's a function)
+      })
+    }
+  }, [itemsNeeded, itemsGetParams])
 
   const alwaysIncludeItemFunction = useCallback(
     () => entryDataQuery, // do not filter items when editing records from Data Explorer (entryDataQuery=true; record object is incomplete)

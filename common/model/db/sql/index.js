@@ -11,6 +11,19 @@ export const types = {
   geometryPoint: 'geometry(Point)',
 }
 
+const jsTypeBySqlType = {
+  [types.uuid]: 'string',
+  [types.varchar]: 'string',
+  [types.bigint]: 'number',
+  [types.decimal]: 'number',
+  [types.date]: 'string', // ISO date string
+  [types.time]: 'string', // ISO time string
+  [types.timeStamp]: 'string', // ISO timestamp string
+  [types.geometryPoint]: 'object', // GeoJSON Point object
+}
+
+export const getJsTypeBySqlType = (sqlType) => jsTypeBySqlType[sqlType] || 'unknown'
+
 /**
  * Generates an alias from the specified name, splitting it into words
  * and getting the first letter of each word, to make it more or less human readable,

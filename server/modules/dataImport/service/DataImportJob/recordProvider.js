@@ -19,7 +19,7 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   }
 }
 
-const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx }) => {
+const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback, currentRecord = null }) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
 
   // fetch record by root entity key values
@@ -104,6 +104,7 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, currentRecord, context, tx
   // avoid loading the same record multiple times
   if (Record.getUuid(currentRecord) !== recordUuid) {
     // fetch record
+    await flushCallback() // flush before fetching a record: nodes could have been inserted/updated/deleted before
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
 
     return {

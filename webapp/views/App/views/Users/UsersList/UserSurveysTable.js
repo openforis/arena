@@ -48,7 +48,7 @@ export const UserSurveysTable = (props) => {
               const surveyUuid = Survey.getUuid(surveyInfo)
               const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
               const authGroupName = AuthGroup.getName(authGroup)
-              const authGroupLabel = authGroupName ? i18n.t(`authGroups.${authGroupName}.label`) : ''
+              const authGroupLabel = authGroupName ? i18n.t(`auth:authGroups.${authGroupName}.label`) : ''
 
               return (
                 <div className="table__row" key={surveyUuid} style={{ gridTemplateColumns }}>

@@ -56,15 +56,23 @@ export const importNewUser = async (
   )
 
 export const insertUser = async (
-  { email, password, status, surveyId = null, surveyCycleKey = null, title = null },
+  { email, password, status, name = null, title = null, profilePicture = null, surveyId = null, surveyCycleKey = null },
   client = db
 ) =>
   client.one(
     `
-    INSERT INTO "user" AS u (email, password, status, prefs, props)
-    VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+    INSERT INTO "user" AS u (email, password, status, name, prefs, props, profile_picture)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7)
     RETURNING ${columnsCommaSeparated}`,
-    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), User.newProps({ title })],
+    [
+      email,
+      password,
+      status,
+      name,
+      User.newPrefs({ surveyId, surveyCycleKey }),
+      User.newProps({ title }),
+      profilePicture,
+    ],
     camelize
   )
 
@@ -144,13 +152,17 @@ const _usersSelectQuery = ({
   }
   const whereClause = DbUtils.getWhereClause(...whereConditions)
 
+  const finalSelectFields = [...selectFields, DbUtils.selectDate('us.last_login_time', 'last_login_time')]
+  if (includeSurveys) {
+    finalSelectFields.push(
+      `user_surveys.surveys AS surveys`,
+      DbUtils.selectDate('user_surveys.invited_date', 'invited_date')
+    )
+  }
+  const finalSelectFieldsJoint = finalSelectFields.join(', ')
+
   return `${getUsersSelectQueryPrefix({ includeSurveys })}
-    SELECT ${selectFields.join(', ')}, ${
-      includeSurveys
-        ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
-        : ''
-    }
-      ${DbUtils.selectDate('us.last_login_time', 'last_login_time')},
+    SELECT ${finalSelectFieldsJoint},
       EXISTS (
         SELECT * 
           FROM auth_group_user 
@@ -174,7 +186,12 @@ const _usersSelectQuery = ({
         FROM survey s
         WHERE s.owner_uuid = u.uuid
           AND NOT s.published
-      ) AS surveys_count_draft
+      ) AS surveys_count_draft,
+      (
+        SELECT urp.uuid
+        FROM user_reset_password urp
+        WHERE urp.user_uuid = u.uuid
+      ) AS reset_password_uuid
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
@@ -356,14 +373,17 @@ export const countSystemAdministrators = async (client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>
+export const updateUser = async (
+  { userUuid, name, email, profilePictureSet = false, profilePicture = null, props = {} },
+  client = db
+) =>
   client.one(
     `
     UPDATE "user" u
     SET
     name = $1,
     email = $2,
-    profile_picture = COALESCE($3, profile_picture),
+    ${profilePictureSet ? 'profile_picture = $3,' : ``}
     props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${columnsCommaSeparated}`,

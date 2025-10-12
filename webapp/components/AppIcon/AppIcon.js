@@ -7,6 +7,7 @@ import { useI18n } from '@webapp/store/system'
 const iconByAppId = {
   [AppInfo.arenaAppId]: 'of_arena_icon.png',
   [AppInfo.arenaMobileId]: 'of_arena_mobile_icon.png',
+  [AppInfo.arenaMobile2Id]: 'of_arena_mobile_2_icon_32x32.png',
 }
 const unknownAppIcon = 'question_mark_icon_20x20.png'
 

@@ -1,19 +1,24 @@
-import fs, { promises } from 'fs'
+import fs, { promises as fsp } from 'fs'
 import { ncp } from 'ncp'
 import { join, sep } from 'path'
 
-import * as ProcessUtils from '../../../core/processUtils'
-import { uuidv4 } from '../../../core/uuid'
+import * as ProcessUtils from '@core/processUtils'
+import { isUuid, uuidv4 } from '@core/uuid'
 
 const dirSeparator = '/'
 
+const encodings = {
+  utf8: 'utf-8',
+  base64: 'base64',
+}
+
 // ====== DIR
 
-export const mkdir = async (path) => promises.mkdir(path, { recursive: true })
+export const mkdir = async (path) => fsp.mkdir(path, { recursive: true })
 
 export const rmdir = async (path) => {
   if (exists(path)) {
-    await promises.rm(path, { recursive: true })
+    await fsp.rm(path, { recursive: true })
   }
 }
 
@@ -34,15 +39,15 @@ export { join, sep }
 
 // ====== FILE
 
-export const readFile = async (path) => promises.readFile(path, { encoding: 'utf8' })
+export const readFile = async (path) => fsp.readFile(path, { encoding: encodings.utf8 })
 
-export const readBinaryFile = async (path) => promises.readFile(path)
+export const readBinaryFile = async (path) => fsp.readFile(path)
 
-export const writeFile = async (path, data = '') => promises.writeFile(path, data)
+export const writeFile = async (path, data = '') => fsp.writeFile(path, data)
 
-export const appendFile = async (path, data = '') => promises.appendFile(path, data)
+export const appendFile = async (path, data = '') => fsp.appendFile(path, data)
 
-export const copyFile = async (src, dest) => promises.copyFile(src, dest)
+export const copyFile = async (src, dest) => fsp.copyFile(src, dest)
 
 export const { createWriteStream, createReadStream } = fs
 
@@ -98,7 +103,7 @@ export const getBaseName = (file) => {
 }
 
 export const deleteFile = (path) => fs.unlinkSync(path)
-export const deleteFileAsync = (path) => promises.unlink(path)
+export const deleteFileAsync = (path) => fsp.unlink(path)
 
 // ======= Temp Files
 export const newTempFileName = () => `${uuidv4()}.tmp`
@@ -109,3 +114,51 @@ export const tempFilePath = (fileName, subfolderName = null) =>
     : join(ProcessUtils.ENV.tempFolder, fileName)
 export const newTempFilePath = () => tempFilePath(newTempFileName())
 export const newTempFolderPath = () => tempFilePath(newTempFolderName())
+export const checkIsValidTempFileName = (tempFileName) => {
+  if (!tempFileName || !isUuid(getBaseName(tempFileName)) || !exists(tempFilePath(tempFileName))) {
+    throw new Error(`Invalid temp file name: ${tempFileName}`)
+  }
+  return true
+}
+export const writeStreamToTempFile = async (inputStream) =>
+  new Promise((resolve, reject) => {
+    const tempFilePath = newTempFilePath()
+    const writeStream = createWriteStream(tempFilePath)
+    inputStream.pipe(writeStream)
+    writeStream.on('close', () => {
+      resolve({ tempFilePath })
+    })
+    writeStream.on('error', (error) => {
+      reject(error)
+    })
+  })
+
+const _getChunkFileName = ({ fileId, chunk }) => `${fileId}_part${chunk}`
+
+export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
+  const destFileName = _getChunkFileName({ fileId, chunk })
+  const destFilePath = tempFilePath(destFileName)
+  if (filePath) {
+    await copyFile(filePath, destFilePath)
+  } else if (fileContent) {
+    await writeFile(destFilePath, fileContent)
+  } else {
+    throw new Error('Missing file path or content')
+  }
+}
+
+export const mergeTempChunks = async ({ fileId, totalChunks }) => {
+  const finalFilePath = newTempFilePath()
+  const writeStream = createWriteStream(finalFilePath)
+  for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
+    // extract temporary chunk content
+    const chunkFileName = _getChunkFileName({ fileId, chunk })
+    const chunkFilePath = tempFilePath(chunkFileName)
+    const chunkFileContent = await readBinaryFile(chunkFilePath)
+    writeStream.write(chunkFileContent)
+    // delete temporary chunk
+    await deleteFileAsync(chunkFilePath)
+  }
+  writeStream.end()
+  return finalFilePath
+}

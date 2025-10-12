@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 
 import * as User from '@core/user/user'
 import * as ProcessUtils from '@core/processUtils'
@@ -14,7 +15,7 @@ const RStudioCommands = {
 const RStudioApi = async ({ command }) =>
   axios.post(ProcessUtils.ENV.rStudioPoolServerURL, command, {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': Response.contentTypes.json,
       Authorization: ProcessUtils.ENV.rStudioPoolServiceKey,
     },
   })

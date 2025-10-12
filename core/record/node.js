@@ -35,10 +35,11 @@ const flagKeys = {
   created: 'created',
   updated: 'updated',
   deleted: 'deleted',
-  dirty: 'dirty', // Modified by the user but not persisted yet
 }
-
 const flagKeysArray = Object.keys(flagKeys)
+
+const dirtyFlag = 'dirty'
+const flagKeysIncludingDirty = [...flagKeysArray, dirtyFlag]
 
 export const keys = {
   id: ObjectUtils.keys.id,
@@ -105,7 +106,7 @@ export const isPlaceholder = R.propEq(keys.placeholder, true)
 export const isCreated = R.propEq(keys.created, true)
 export const isUpdated = R.propEq(keys.updated, true)
 export const isDeleted = R.propEq(keys.deleted, true)
-export const isDirty = R.propEq(keys.dirty, true)
+export const isDirty = R.propEq(dirtyFlag, true)
 export const isRoot = R.pipe(getParentUuid, R.isNil)
 export const { isEqual } = ObjectUtils
 
@@ -164,16 +165,18 @@ export const setCreated = (node) => {
 }
 export const assocDeleted = R.assoc(keys.deleted)
 export const assocUpdated = R.assoc(keys.updated)
+export const assocDirty = R.assoc(dirtyFlag)
 export const removeFlags =
-  ({ sideEffect = false } = {}) =>
+  ({ removeDirtyFlag = true, sideEffect = false } = {}) =>
   (node) => {
+    const keysToRemove = removeDirtyFlag ? flagKeysIncludingDirty : flagKeysArray
     if (sideEffect) {
-      flagKeysArray.forEach((key) => {
+      keysToRemove.forEach((key) => {
         delete node[key]
       })
       return node
     } else {
-      return R.omit(flagKeysArray)(node)
+      return R.omit(keysToRemove)(node)
     }
   }
 
@@ -206,7 +209,16 @@ export const hasUserInputValue = (node) => !isValueBlank(node) && !isDefaultValu
 // Code
 export const getCategoryItemUuid = _getValuePropRaw(valuePropsCode.itemUuid)
 
-export const newNodeValueCode = ({ itemUuid }) => ({ [valuePropsCode.itemUuid]: itemUuid })
+export const newNodeValueCode = ({ itemUuid = null, code = null }) => {
+  const value = {}
+  if (itemUuid) {
+    value[valuePropsCode.itemUuid] = itemUuid
+  }
+  if (Objects.isNotEmpty(code)) {
+    value[valuePropsCode.code] = code
+  }
+  return value
+}
 
 // Coordinate
 const _getValuePropNumber = ({ node, prop }) => {
@@ -238,9 +250,15 @@ export const newNodeValueCoordinate = ({
   return result
 }
 
+const _getDateTimePart = (separator) => (index) => (node) => {
+  const value = getValue(node)
+  if (R.isNil(value) || R.isEmpty(value) || !R.is(String, value)) return null
+  const part = value.split(separator)[index]
+  return Number(StringUtils.trim(part))
+}
+
 // Date
-const _getDatePart = (index) =>
-  R.pipe(R.partialRight(getValue, ['--']), R.split('-'), R.prop(index), StringUtils.trim, Number)
+const _getDatePart = _getDateTimePart('-')
 export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
@@ -250,7 +268,7 @@ export const getDateModified = R.prop(keys.dateModified)
 
 // File
 export const getFileName = _getValuePropRaw(valuePropsFile.fileName, '')
-export const getFileNameCalculated = _getValuePropRaw(valuePropsFile.fileNameCalculated, '')
+export const getFileNameCalculated = _getValuePropRaw(valuePropsFile.fileNameCalculated)
 export const getFileUuid = _getValuePropRaw(valuePropsFile.fileUuid)
 export const newNodeValueFile = ({ fileUuid, fileName }) => ({
   [valuePropsFile.fileUuid]: fileUuid,
@@ -266,8 +284,7 @@ export const getVernacularName = _getValuePropRaw(valuePropsTaxon.vernacularName
 export const newNodeValueTaxon = ({ taxonUuid }) => ({ [valuePropsTaxon.taxonUuid]: taxonUuid })
 
 // Time
-const _getTimePart = (index) =>
-  R.pipe(R.partialRight(getValue, [':']), R.split(':'), R.prop(index), StringUtils.trim, Number)
+const _getTimePart = _getDateTimePart(':')
 export const getTimeHour = _getTimePart(0)
 export const getTimeMinute = _getTimePart(1)
 

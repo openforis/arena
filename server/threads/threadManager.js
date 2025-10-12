@@ -50,11 +50,12 @@ export default class ThreadManager {
 
   messageHandlerWrapper(messageHandler) {
     return ({ user, msg }) => {
-      if (msg.type === Thread.messageTypes.error) {
+      const { type, error } = msg
+      if (type === Thread.messageTypes.error) {
         if (this.socketId) {
-          WebSocketServer.notifySocket(this.socketId, WebSocketEvent.threadError, msg.error)
+          WebSocketServer.notifySocket(this.socketId, WebSocketEvent.threadError, error)
         } else {
-          WebSocketServer.notifyUser(User.getUuid(user), WebSocketEvent.threadError, msg.error)
+          WebSocketServer.notifyUser(User.getUuid(user), WebSocketEvent.threadError, error)
         }
       } else {
         messageHandler(msg)
@@ -64,7 +65,7 @@ export default class ThreadManager {
 
   /**
    * Post a message to thread in worker pool.
-   * @param message
+   * @param {!object} message - Message to be sebt to the worker thread.
    */
   postMessage(message) {
     this.worker.postMessage(message)

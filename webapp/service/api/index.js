@@ -1,3 +1,5 @@
+export { fetchVersion } from './generic'
+
 export { fetchUserAndSurvey } from './fetchUserAndSurvey'
 
 export {
@@ -32,6 +34,8 @@ export {
 } from './taxonomies'
 export { fetchActivityLogs } from './activityLog'
 export {
+  getRecordNodeFileUrl,
+  fetchRecordsNodeFileExifInfo,
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
   startDataImportFromArenaJob,
@@ -51,6 +55,8 @@ export {
   downloadExportedDataSummaryUrl,
   startRecordsCloneJob,
   mergeRecords,
+  startValidationReportGeneration,
+  getValidationReportDownloadUrl,
 } from './data'
 export {
   insertDataQuerySummary,
@@ -60,7 +66,16 @@ export {
   deleteDataQuerySummary,
 } from './dataQuery'
 export { fetchActiveJob } from './job'
-export { fetchAvailableMapPeriods, fetchElevation, testMapApiKey, fetchMapWmtsCapabilities } from './map'
+export {
+  fetchAvailableMapPeriods,
+  fetchElevation,
+  testMapApiKey,
+  fetchMapWmtsCapabilities,
+  startGeoAttributeJsonDataExport,
+  getGeoJsonDataDownloadUrl,
+  getEarthMapJsonDownloadUrl,
+  getEarthMapPolygonUrl,
+} from './map'
 export {
   fetchSurveyFull,
   fetchSurveys,
@@ -70,6 +85,8 @@ export {
   updateSurveyConfigurationProp,
   updateSurveyOwner,
   updateSurveyProps,
+  startSurveysListExportJob,
+  getSurveyListExportedFileDownloadUrl,
 } from './survey'
 export {
   convertNodeDef,
@@ -90,6 +107,7 @@ export { getCurrentInstance, createInstance, terminateInstance } from './rStudio
 export {
   createAccessRequest,
   acceptAccessRequest,
+  fetchSurveyUserResetPasswordUrl,
   fetchUser,
   fetchUserResetPasswordUrl,
   fetchUserName,

@@ -27,4 +27,6 @@ export {
   useNodeDefsByUuids,
   useNodeDefLabel,
   useNodeDefRootKeys,
+  useIsAncestorMultipleEntityRoot,
+  useIsSurveyDirty,
 } from './hooks'

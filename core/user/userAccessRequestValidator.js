@@ -1,4 +1,5 @@
 import * as UserAccessRequest from '@core/user/userAccessRequest'
+import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -14,10 +15,15 @@ export const validateUserAccessRequest = async (userAccessRequest) =>
     [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.lastName}`]: [
       Validator.validateRequired(Validation.messageKeys.userAccessRequest.lastNameRequired),
     ],
+    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.country}`]: [
+      Validator.validateRequired(Validation.messageKeys.userAccessRequest.countryRequired),
+    ],
+    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.institution}`]: [
+      Validator.validateRequired(Validation.messageKeys.userAccessRequest.institutionRequired),
+    ],
     [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.purpose}`]: [
       Validator.validateRequired(Validation.messageKeys.userAccessRequest.purposeRequired),
     ],
-    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.surveyName}`]: [
-      Validator.validateRequired(Validation.messageKeys.userAccessRequest.surveyNameRequired),
-    ],
+    [`${UserAccessRequest.keys.props}.${UserAccessRequest.keysProps.surveyName}`]:
+      SurveyValidator.getSurveyNameValidations(),
   })

@@ -41,7 +41,7 @@ export const MapLayersControl = (props) => {
   )
 
   return (
-    <LayersControl position="topright">
+    <LayersControl autoZIndex position="topright">
       {baseLayers.reduce((acc, baseLayer, index) => {
         const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
 

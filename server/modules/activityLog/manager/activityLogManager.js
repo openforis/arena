@@ -79,4 +79,4 @@ export const fetch = async ({ user, surveyId, idGreaterThan, idLessThan, limit, 
   return ActivityLogRepository.fetch({ surveyInfo, activityTypes, idGreaterThan, idLessThan, limit, orderBy })
 }
 
-export const { count, fetchSimple, insert, insertMany } = ActivityLogRepository
+export const { count, fetchSimple, fetchTableSize, insert, insertMany, deleteAll } = ActivityLogRepository

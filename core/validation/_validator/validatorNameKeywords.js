@@ -5,6 +5,7 @@ const keywords = [
   'date_modified',
   'desc',
   'exp_factor_',
+  'for',
   'file',
   'id',
   'length',

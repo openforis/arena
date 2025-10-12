@@ -213,13 +213,30 @@ export const getNodeDefRootKeys = (survey) => {
   return root ? getNodeDefKeys(root)(survey) : []
 }
 
+export const getSummaryDefs =
+  ({ nodeDef, cycle }) =>
+  (survey) =>
+    getNodeDefDescendantAttributesInSingleEntities({ nodeDef, cycle, sorted: true })(survey).filter((childDef) =>
+      NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(childDef)
+    )
+
+export const getRootSummaryDefs =
+  ({ cycle }) =>
+  (survey) => {
+    const root = getNodeDefRoot(survey)
+    return root ? getSummaryDefs({ nodeDef: root, cycle })(survey) : []
+  }
+
 export const isNodeDefRootKey = (nodeDef) => (survey) =>
   NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
 export const getNodeDefsRootUnique = (survey) => {
   const nodeDefRoot = getNodeDefRoot(survey)
   return getNodeDefChildren(nodeDefRoot)(survey).filter(
-    (nodeDef) => NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) && !NodeDef.isDeleted(nodeDef)
+    (nodeDef) =>
+      NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) &&
+      !NodeDef.isDeleted(nodeDef) &&
+      NodeDef.isSingle(nodeDef)
   )
 }
 
