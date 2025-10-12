@@ -82,7 +82,7 @@ export const convertDataToGeoJsonPoints = ({ data, attributeDef, nodeDefParent, 
 
       const pointFeature = GeoJsonUtils.createPointFeature({ x, y, properties })
 
-      acc.bounds.extend([point.y, point.x])
+      acc.bounds.extend([y, x])
       acc.points.push(pointFeature)
       acc.pointIndexByDataIndex[index] = acc.points.length - 1
 
