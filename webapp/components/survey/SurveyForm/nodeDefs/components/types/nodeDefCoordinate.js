@@ -136,7 +136,7 @@ const NodeDefCoordinate = (props) => {
     <MapTriggerButton
       disabled={edit}
       header={nodeDefLabel}
-      mapMarkerEditable
+      mapMarkerEditable={!entryDisabled}
       mapMarkerPoint={value}
       mapMarkerTitle={nodeDefLabel}
       onMapMarkerPointChange={handleLocationOnMapChanged}
