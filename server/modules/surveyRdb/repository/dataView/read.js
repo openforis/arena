@@ -7,7 +7,7 @@ import { Objects } from '@openforis/arena-core'
 import { quote } from '@core/stringUtils'
 
 import { db } from '../../../../db/db'
-import * as dbUtils from '../../../../db/dbUtils'
+import * as DbUtils from '../../../../db/dbUtils'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
@@ -50,10 +50,7 @@ const columnTransformByNodeDefType = {
       .map((colName) => {
         if (colName === alias) {
           // not in stream mode: read default column as a geometry point string
-          const srsIdValue = `ST_SRID(${nameFull})`
-          const xValue = `ST_X(${nameFull})`
-          const yValue = `ST_Y(${nameFull})`
-          return `'SRID=EPSG:' || ${srsIdValue} || ';POINT(' || ${xValue} || ' ' || ${yValue} || ')' AS ${alias}`
+          return DbUtils.geometryPointColumnAsText({ qualifiedColName: nameFull, alias })
         }
         return `${viewAlias}.${colName} AS ${colName}`
       })
@@ -307,13 +304,13 @@ export const fetchViewData = async (params, client = db) => {
   const { select, queryParams } = _createViewDataQuery(params)
 
   return stream
-    ? new dbUtils.QueryStream(dbUtils.formatQuery(select, queryParams))
+    ? new DbUtils.QueryStream(DbUtils.formatQuery(select, queryParams))
     : client.map(select, queryParams, _dbTransformCallbackSelect({ viewDataNodeDef, nodeDefCols, editMode }))
 }
 
 export const countViewData = async (params, client = db) => {
   const { select, selectFields, queryParams } = _createViewDataQuery(params)
-  const query = dbUtils.formatQuery(select, queryParams)
+  const query = DbUtils.formatQuery(select, queryParams)
   const countQuery = `SELECT COUNT(*) AS count FROM (${query}) AS count_query`
   const countResult = await client.one(countQuery)
   return { selectFields, count: Number(countResult.count) }

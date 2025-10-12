@@ -231,7 +231,14 @@ const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
   return `jsonb_build_object(${nodeDefs
     .flatMap((nodeDef) => {
       const colNames = NodeDefTable.getColumnNames(nodeDef)
-      return colNames.map((colName) => `'${colName}', ${tableAlias}.${colName}`)
+      return colNames.map((colName) => {
+        const qualifiedColName = `${tableAlias}.${colName}`
+        if (NodeDef.isCoordinate(nodeDef) && colName === NodeDef.getName(nodeDef)) {
+          return `'${colName}', ${DbUtils.geometryPointColumnAsText({ qualifiedColName })}`
+        } else {
+          return `'${colName}', ${qualifiedColName}`
+        }
+      })
     })
     .join(', ')}) AS ${alias}`
 }

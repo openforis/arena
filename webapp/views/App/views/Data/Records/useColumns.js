@@ -17,7 +17,7 @@ import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionCol
 
 import { TestId } from '@webapp/utils/testId'
 import { useUser } from '@webapp/store/user'
-import { useRootSummaryDefs, useSurveyHasFileAttributes } from '@webapp/store/survey/hooks'
+import { useRootSummaryDefs, useSurveyHasFileAttributes, useSurveySrsIndex } from '@webapp/store/survey/hooks'
 
 import { RecordKeyValuesExtractor } from './recordKeyValuesExtractor'
 import { RecordDeleteButton } from './RecordDeleteButton'
@@ -25,6 +25,7 @@ import { RecordOwnerColumn } from './RecordOwnerColumn'
 
 export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate }) => {
   const lang = useSurveyPreferredLang()
+  const srsIndex = useSurveySrsIndex()
   const user = useUser()
   const nodeDefKeys = useNodeDefRootKeys()
   const summaryDefs = useRootSummaryDefs()
@@ -72,6 +73,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
             record,
             categoryItemsByCodeDefUuid,
             lang,
+            srsIndex,
           })
           return (
             <div key={uuid} data-testid={TestId.records.cellNodeDef(name)} data-value={value}>
@@ -177,6 +179,7 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
     nodeDefKeys,
     onRecordEditButtonClick,
     onRecordsUpdate,
+    srsIndex,
     summaryDefs,
     user,
   ])

@@ -55,6 +55,14 @@ export const selectDate = (field, fieldAlias = null) =>
 
 export const now = "timezone('UTC', now())"
 
+export const geometryPointColumnAsText = ({ qualifiedColName, alias = null }) => {
+  const srsIdValue = `ST_SRID(${qualifiedColName})`
+  const xValue = `ST_X(${qualifiedColName})`
+  const yValue = `ST_Y(${qualifiedColName})`
+  const suffix = alias ? ` AS ${alias}` : ''
+  return `'SRID=EPSG:' || ${srsIdValue} || ';POINT(' || ${xValue} || ' ' || ${yValue} || ')'${suffix}`
+}
+
 export const insertAllQueryBatch = (schema, table, cols, valuesByColumnName, fillValuesWithNulls = false) => {
   const columnSet = new pgp.helpers.ColumnSet(cols, {
     table: { schema, table },

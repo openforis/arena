@@ -15,7 +15,6 @@ const formatters = {
     const maxNumberDecimalDigits = Survey.getNodeDefMaxDecimalDigits(nodeDef)(survey)
     return Numbers.formatDecimal(value, maxNumberDecimalDigits)
   },
-
   [NodeDef.nodeDefType.entity]: ({ value }) => {
     // value is an integer (entity items count)
     return Numbers.formatInteger(value)
@@ -37,7 +36,7 @@ const formatDataItemKey = ({ i18n, survey, nodeDef, dataItem }) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const rawValue = dataItem[nodeDefName]
   const label = dataItem[`${nodeDefName}_label`]
-  return DataQueryValueFormatter.format({ i18n, survey, nodeDef, value: rawValue, label })
+  return format({ i18n, survey, nodeDef, value: rawValue, label })
 }
 
 export const DataQueryValueFormatter = {
