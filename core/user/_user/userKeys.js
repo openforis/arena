@@ -34,4 +34,7 @@ export const keys = {
   // used when creating a new user
   newPassword: 'newPassword',
   confirmPassword: 'confirmPassword',
+
+  // from user_access_request
+  accessRequestDateCreated: 'accessRequestDateCreated',
 }

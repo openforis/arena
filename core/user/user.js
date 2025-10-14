@@ -39,6 +39,7 @@ export const getLastLoginTime = R.prop(keys.lastLoginTime)
 export const getSurveysCountDraft = R.prop(keys.surveysCountDraft)
 export const getSurveysCountPublished = R.prop(keys.surveysCountPublished)
 export const getResetPasswordUuid = R.prop(keys.resetPasswordUuid)
+export const getAccessRequestDateCreated = R.prop(keys.accessRequestDateCreated)
 
 // ====== UPDATE
 export const assocProp = R.assoc
