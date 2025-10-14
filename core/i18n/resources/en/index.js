@@ -6,6 +6,7 @@ import emails from './emails'
 import jobs from './jobs'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
+import usersView from './usersView'
 
 export default {
   activityLog,
@@ -16,4 +17,5 @@ export default {
   jobs,
   surveyCreate,
   surveyForm,
+  usersView,
 }

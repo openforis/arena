@@ -17,7 +17,7 @@ export const TableHeaderLeft = (props) => {
     <div className="users__header-left">
       <TextInput
         className="users__header-left__input-search"
-        placeholder="usersView.filterPlaceholder"
+        placeholder="usersView:filterPlaceholder"
         defaultValue={search}
         onChange={handleSearch}
       />

@@ -14,13 +14,9 @@ const HeaderLeft = () => {
   return (
     <div>
       {canInvite && (
-        <Link
-          data-testid={TestId.userList.inviteBtn}
-          to={appModuleUri(userModules.userInvite)}
-          className="btn btn-s"
-        >
+        <Link data-testid={TestId.userList.inviteBtn} to={appModuleUri(userModules.userInvite)} className="btn btn-s">
           <span className="icon icon-user-plus icon-12px icon-left" />
-          {i18n.t('usersView.inviteUser')}
+          {i18n.t('usersView:inviteUser')}
         </Link>
       )}
     </div>
