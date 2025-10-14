@@ -42,7 +42,7 @@ export const useUsersListColumns = () => {
       },
       {
         key: 'status',
-        header: 'usersView.accepted',
+        header: 'usersView:accepted',
         width: '7rem',
         renderItem: ({ item }) => User.hasAccepted(item) && <span className="icon icon-checkmark" />,
         sortable: true,
@@ -61,35 +61,35 @@ export const useUsersListColumns = () => {
       },
       {
         key: 'last_login_time',
-        header: 'usersView.lastLogin',
+        header: 'usersView:lastLogin',
         width: '12rem',
         renderItem: ({ item }) => {
           const lastLoginTime = User.getLastLoginTime(item)
           if (lastLoginTime) {
             return DateUtils.convertDateTimeFromISOToDisplay(lastLoginTime)
           } else if (User.hasAccepted(item)) {
-            return i18n.t('usersView.moreThan30DaysAgo')
+            return i18n.t('usersView:moreThan30DaysAgo')
           }
         },
         sortable: true,
       },
       {
         key: User.keys.surveysCountDraft,
-        header: 'usersView.surveysDraft',
+        header: 'usersView:surveysDraft',
         hidden: true,
         renderItem: ({ item }) => User.getSurveysCountDraft(item),
         width: '10rem',
       },
       {
         key: User.keys.surveysCountPublished,
-        header: 'usersView.surveysPublished',
+        header: 'usersView:surveysPublished',
         hidden: true,
         renderItem: ({ item }) => User.getSurveysCountPublished(item),
         width: '12rem',
       },
       {
         key: User.keys.resetPasswordUuid,
-        header: 'usersView.passwordResetLink',
+        header: 'usersView:passwordResetLink',
         hidden: true,
         renderItem: ({ item }) =>
           User.getResetPasswordUuid(item) ? (

@@ -14,18 +14,18 @@ const messageTypes = {
 }
 
 const notificationKeyByMessageType = {
-  [messageTypes.passwordReset]: 'usersView.passwordResetLinkCopiedToClipboard',
-  [messageTypes.invitation]: 'usersView.invitationLinkCopiedToClipboard',
+  [messageTypes.passwordReset]: 'usersView:passwordResetLinkCopiedToClipboard',
+  [messageTypes.invitation]: 'usersView:invitationLinkCopiedToClipboard',
 }
 
 const confirmMessageKeyByMessageType = {
-  [messageTypes.passwordReset]: 'usersView.copyPasswordResetLinkConfirmMessage',
-  [messageTypes.invitation]: 'usersView.copyInvitationLinkConfirmMessage',
+  [messageTypes.passwordReset]: 'usersView:copyPasswordResetLinkConfirmMessage',
+  [messageTypes.invitation]: 'usersView:copyInvitationLinkConfirmMessage',
 }
 
 const titleKeyByMessageType = {
-  [messageTypes.passwordReset]: 'usersView.copyPasswordResetLink',
-  [messageTypes.invitation]: 'usersView.copyInvitationLink',
+  [messageTypes.passwordReset]: 'usersView:copyPasswordResetLink',
+  [messageTypes.invitation]: 'usersView:copyInvitationLink',
 }
 
 export const CopyPasswordResetLinkButton = (props) => {

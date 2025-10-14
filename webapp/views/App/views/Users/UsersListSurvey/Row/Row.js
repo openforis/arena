@@ -62,7 +62,7 @@ const Row = (props) => {
           <Button
             className="icon-invitation-expired"
             iconClassName="icon-crying icon-16px"
-            label="usersView.invitationExpiredClickToSendAgainTheInvitation"
+            label="usersView:invitationExpiredClickToSendAgainTheInvitation"
             onClick={handleResendInvitation}
             showLabel={false}
             variant="text"
@@ -88,7 +88,7 @@ const Row = (props) => {
       </div>
       <Button
         iconClassName="icon-cog"
-        title="usersView.editSurveyUserExtraPropsForUser"
+        title="usersView:editSurveyUserExtraPropsForUser"
         titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
         onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
         variant="text"

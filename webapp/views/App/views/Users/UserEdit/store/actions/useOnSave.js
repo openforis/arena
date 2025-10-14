@@ -117,7 +117,7 @@ export const useOnSave = ({
       if (updateSuccessfull) {
         dispatch(
           NotificationActions.notifyInfo({
-            key: 'usersView.updateUserConfirmation',
+            key: 'usersView:updateUserConfirmation',
             params: { name: User.getName(userToUpdate) },
           })
         )
@@ -135,7 +135,7 @@ export const useOnSave = ({
       if (userToUpdateOriginal && User.isSystemAdmin(userToUpdate) && !User.isSystemAdmin(userToUpdateOriginal)) {
         dispatch(
           DialogConfirmActions.showDialogConfirm({
-            key: 'usersView.confirmUserWillBeSystemAdmin',
+            key: 'usersView:confirmUserWillBeSystemAdmin',
             onOk: saveUser,
           })
         )
