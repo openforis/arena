@@ -176,7 +176,7 @@ const _usersSelectQuery = ({
           AND auth_group_user.user_uuid = u.uuid) 
       AS system_administrator,
       uar.props ->> '${UserAccessRequest.keysProps.country}' AS country,
-      ${DbUtils.selectDate('uar.date_created', 'access_request_date_created')},
+      ${DbUtils.selectDate('uar.date_created', 'access_request_date')},
       (
         SELECT COUNT(*) 
         FROM survey s

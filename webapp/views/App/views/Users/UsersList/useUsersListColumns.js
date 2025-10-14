@@ -79,7 +79,7 @@ export const useUsersListColumns = () => {
         hidden: true,
         width: '12rem',
         renderItem: ({ item }) => {
-          const date = User.getAccessRequestDateCreated(item)
+          const date = User.getAccessRequestDate(item)
           return date ? DateUtils.convertDateTimeFromISOToDisplay(date) : null
         },
       },
