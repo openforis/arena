@@ -2,6 +2,9 @@ import { db } from '@server/db/db'
 
 import camelize from 'camelize'
 
+import { Objects } from '@openforis/arena-core'
+
+import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Survey from '@core/survey/survey'
@@ -9,7 +12,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
-import { Objects } from '@openforis/arena-core'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
@@ -152,7 +154,10 @@ const _usersSelectQuery = ({
   }
   const whereClause = DbUtils.getWhereClause(...whereConditions)
 
-  const finalSelectFields = [...selectFields, DbUtils.selectDate('us.last_login_time', 'last_login_time')]
+  const finalSelectFields = [
+    ...selectFields.map(StringUtils.prependIfMissing('u.')),
+    DbUtils.selectDate('us.last_login_time', 'last_login_time'),
+  ]
   if (includeSurveys) {
     finalSelectFields.push(
       `user_surveys.surveys AS surveys`,
@@ -170,11 +175,8 @@ const _usersSelectQuery = ({
         WHERE auth_group.name = '${AuthGroup.groupNames.systemAdmin}' 
           AND auth_group_user.user_uuid = u.uuid) 
       AS system_administrator,
-      (
-        SELECT uar.props ->> '${UserAccessRequest.keysProps.country}'
-        FROM user_access_request uar
-        WHERE uar.email = u.email
-      ) AS country,
+      uar.props ->> '${UserAccessRequest.keysProps.country}' AS country,
+      ${DbUtils.selectDate('uar.date_created', 'access_request_date')},
       (
         SELECT COUNT(*) 
         FROM survey s
@@ -196,6 +198,8 @@ const _usersSelectQuery = ({
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
+    LEFT OUTER JOIN user_access_request uar
+      ON uar.email = u.email
     ${whereClause}
     ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
