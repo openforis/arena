@@ -23,7 +23,7 @@ const GenericStorageSummary = ({ statistics, titleKey }) => {
     <div className="storage-summary-item">
       <h4 className="dashboard-chart-header">{i18n.t(titleKey)}</h4>
       <div className="dashboard-chart-subtitle">
-        {i18n.t(`homeView.dashboard.storageSummary.usedSpaceOutOf`, {
+        {i18n.t(`homeView:dashboard.storageSummary.usedSpaceOutOf`, {
           percent: Math.floor(usePercent),
           used: usedLabel,
           total: totalLabel,
@@ -46,8 +46,8 @@ export const StorageSummary = () => {
 
   return (
     <div className="storage-summary-container">
-      <GenericStorageSummary statistics={filesStatistics} titleKey="homeView.dashboard.storageSummaryFiles.title" />
-      <GenericStorageSummary statistics={dbStatistics} titleKey="homeView.dashboard.storageSummaryDb.title" />
+      <GenericStorageSummary statistics={filesStatistics} titleKey="homeView:dashboard.storageSummaryFiles.title" />
+      <GenericStorageSummary statistics={dbStatistics} titleKey="homeView:dashboard.storageSummaryDb.title" />
     </div>
   )
 }

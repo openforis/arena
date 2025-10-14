@@ -90,7 +90,7 @@ const DailyRecordsByUser = () => {
 
   return (
     <>
-      <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.dailyRecordsByUser')}</h4>
+      <h4 className="dashboard-chart-header">{i18n.t('homeView:dashboard.dailyRecordsByUser')}</h4>
 
       <RecordsSummaryPeriodSelector />
 
@@ -101,7 +101,7 @@ const DailyRecordsByUser = () => {
           itemLabel={(user) => user.owner_name ?? user.owner_email}
           itemValue={(user) => user.owner_uuid}
           onChange={setSelectedUsers}
-          placeholder={i18n.t('homeView.dashboard.selectUsers')}
+          placeholder={i18n.t('homeView:dashboard.selectUsers')}
         />
       )}
       {dataKeys.length === 0 && <NoRecordsAddedInSelectedPeriod />}

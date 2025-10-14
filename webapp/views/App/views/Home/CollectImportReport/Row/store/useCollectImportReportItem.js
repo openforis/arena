@@ -30,8 +30,8 @@ const useTypeWithIcon = ({ item }) => {
     type,
     icon: _getTypeIcon(type),
     label: _isValidationRule(type)
-      ? i18n.t(`homeView.collectImportReport.exprType.validationRule`)
-      : i18n.t(`homeView.collectImportReport.exprType.${type}`),
+      ? i18n.t(`homeView:collectImportReport.exprType.validationRule`)
+      : i18n.t(`homeView:collectImportReport.exprType.${type}`),
   }
 }
 

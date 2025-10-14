@@ -10,10 +10,10 @@ const RowHeader = () => {
       <div>#</div>
       <div>{i18n.t('common.path')}</div>
       <div>{i18n.t('common.type')}</div>
-      <div>{i18n.t('homeView.collectImportReport.expression')}</div>
+      <div>{i18n.t('homeView:collectImportReport.expression')}</div>
       <div>{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
       <div>{i18n.t('common.message_plural')}</div>
-      <div>{i18n.t('homeView.collectImportReport.resolved')}</div>
+      <div>{i18n.t('homeView:collectImportReport.resolved')}</div>
       <div />
     </>
   )

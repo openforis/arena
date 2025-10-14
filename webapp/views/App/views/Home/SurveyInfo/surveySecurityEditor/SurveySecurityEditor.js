@@ -76,7 +76,7 @@ export const SurveySecurityEditor = (props) => {
           key={key}
           checked={security[key]}
           disabled={!isSecurityPropApplicable(key)(security)}
-          label={`homeView.surveyInfo.security.${key}`}
+          label={`homeView:surveyInfo.security.${key}`}
           onChange={onPropUpdate(key)}
         />
       ))}

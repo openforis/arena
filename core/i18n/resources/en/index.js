@@ -3,6 +3,7 @@ import appErrors from './appErrors'
 import auth from './auth'
 import common from './common'
 import emails from './emails'
+import homeView from './homeView'
 import jobs from './jobs'
 import surveyCreate from './surveyCreate'
 import surveyForm from './surveyForm'
@@ -14,6 +15,7 @@ export default {
   auth,
   common,
   emails,
+  homeView,
   jobs,
   surveyCreate,
   surveyForm,
