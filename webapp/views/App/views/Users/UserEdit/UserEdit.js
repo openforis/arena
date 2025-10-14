@@ -114,7 +114,7 @@ const UserEdit = () => {
         disabled={!canEditName}
         maxLength={User.nameMaxLength}
         onChange={onNameChange}
-        label={canEditName ? 'common.name' : 'usersView.notAcceptedYet'}
+        label={canEditName ? 'common.name' : 'usersView:notAcceptedYet'}
         validation={canEditName ? Validation.getFieldValidation(User.keys.name)(validation) : {}}
         value={User.getName(userToUpdate)}
       />
@@ -175,7 +175,7 @@ const UserEdit = () => {
       {surveyGroupsVisible && (
         <>
           {!systemAdmin && (
-            <FormItem label="usersView.roleInCurrentSurvey">
+            <FormItem label="usersView:roleInCurrentSurvey">
               <DropdownUserGroup
                 editingLoggedUser={User.isEqual(user)(userToUpdate)}
                 disabled={!canEditGroup}
@@ -188,7 +188,7 @@ const UserEdit = () => {
           )}
           {surveyHasExtraProps && (
             <ExpansionPanel
-              buttonLabel="usersView.surveyExtraProp.label_other"
+              buttonLabel="usersView:surveyExtraProp.label_other"
               className="extra-props"
               startClosed={Objects.isEmpty(User.getAuthGroupExtraProps(userToUpdate))}
             >

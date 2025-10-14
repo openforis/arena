@@ -38,7 +38,7 @@ export const SurveyUserExtraPropsEditor = (props) => {
   return (
     <PanelRight
       className="survey-user-extra-props"
-      header="usersView.editSurveyUserExtraPropsForUser"
+      header="usersView:editSurveyUserExtraPropsForUser"
       headerParams={{ userName: User.getName(userToUpdate) ?? User.getEmail(userToUpdate) }}
       onClose={onClose}
       width="55rem"

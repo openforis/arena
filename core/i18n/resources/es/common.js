@@ -854,41 +854,6 @@ export default {
     records: 'Registros',
     recordsCreatedWithMoreApps: 'Registros creados con más aplicaciones:',
   },
-  usersView: {
-    accepted: 'Aceptado',
-    confirmUserWillBeSystemAdmin: 'El usuario será un administrador del sistema. ¿Continuar?',
-    copyInvitationLink: 'Copiar enlace de invitación al portapapeles',
-    copyInvitationLinkConfirmMessage:
-      'Si el usuario invitado no ha recibido ningún correo electrónico en la dirección {{email}}, \npuede copiar el enlace de invitación al portapapeles y compartirlo con él de otras maneras.\n\n¿Copiar el enlace de invitación al portapapeles?',
-    copyPasswordResetLink: '¿Copiar enlace de restablecimiento de contraseña al portapapeles?',
-    copyPasswordResetLinkConfirmMessage:
-      'Si el usuario ha restablecido su contraseña pero no ha recibido ningún correo electrónico en la dirección {{email}}, \npuede copiar el enlace de restablecimiento de contraseña al portapapeles y compartirlo con él de otras maneras.\n\n¿Copiar el enlace de restablecimiento de contraseña al portapapeles?',
-    editSurveyUserExtraPropsForUser:
-      'Editar propiedades adicionales de usuario de la encuesta para el usuario "{{userName}}"',
-    inviteUser: 'Invitar',
-    invitationExpiredClickToSendAgainTheInvitation: 'Invitación caducada: haga clic para enviar la invitación de nuevo',
-    invitationLinkCopiedToClipboard: 'Enlace de invitación copiado en el portapapeles',
-    invitedBy: 'Invitado por',
-    invitedDate: 'Fecha de invitación',
-    lastLogin: 'Último inicio de sesión',
-    moreThan30DaysAgo: 'Hace más de 30 días',
-    notAcceptedYet: 'Invitación aún no aceptada',
-    passwordResetLinkCopiedToClipboard: 'Enlace de restablecimiento de contraseña copiado en el portapapeles',
-    passwordResetLink: 'Enlace de restablecimiento de contraseña',
-    roleInCurrentSurvey: 'Rol en la encuesta actual',
-    roleInSurvey: 'Rol en la encuesta',
-    filterPlaceholder: 'Filtrar por nombre o correo electrónico',
-    surveyName: 'Nombre de la encuesta',
-    surveyExtraProp: {
-      label: 'Propiedad extra de la encuesta',
-      label_other: 'Propiedades extra de la encuesta',
-    },
-    surveysDraft: 'Encuestas (borrador)',
-    surveysPublished: 'Encuestas (publicadas)',
-    updateUserConfirmation: 'El usuario {{name}} ha sido actualizado',
-    userNotInvitedToAnySurvey: 'Usuario no invitado a ninguna encuesta',
-    userSurveys: 'Encuestas de usuario',
-  },
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Aceptado',
