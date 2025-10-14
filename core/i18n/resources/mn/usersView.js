@@ -1,5 +1,6 @@
 export default {
   accepted: 'Хүлээн авсан',
+  accessRequestDate: 'Нэвтрэх хүсэлт гаргасан огноо',
   confirmUserWillBeSystemAdmin: 'Хэрэглэгч систем администратор болно. Үргэлжлүүлэх үү?',
   copyInvitationLink: 'Урилгын холбоосыг санах ойд хуулах',
   copyInvitationLinkConfirmMessage: `Хэрэв уригдсан хэрэглэгч {{email}} хаяг руу имэйл хүлээн аваагүй бол,

@@ -1,5 +1,6 @@
 export default {
   accepted: 'Aceptado',
+  accessRequestDate: 'Fecha de solicitud de acceso',
   confirmUserWillBeSystemAdmin: 'El usuario será un administrador del sistema. ¿Continuar?',
   copyInvitationLink: 'Copiar enlace de invitación al portapapeles',
   copyInvitationLinkConfirmMessage:

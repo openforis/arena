@@ -1,7 +1,6 @@
-/* eslint-disable camelcase */
-
 export default {
   accepted: 'Принято',
+  accessRequestDate: 'Дата запроса доступа',
   confirmUserWillBeSystemAdmin: 'Пользователь станет системным администратором. Продолжить?',
   copyInvitationLink: 'Скопировать ссылку-приглашение в буфер обмена',
   copyInvitationLinkConfirmMessage: `Если приглашенный пользователь не получил никаких писем на адрес {{email}},
