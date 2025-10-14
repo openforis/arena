@@ -1,5 +1,6 @@
 export default {
   accepted: 'Accepted',
+  accessRequestDate: 'Access request date',
   confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
   copyInvitationLink: 'Copy invitation link to clipboard',
   copyInvitationLinkConfirmMessage: `If the invited user hasn't received any emails at the address {{email}},
