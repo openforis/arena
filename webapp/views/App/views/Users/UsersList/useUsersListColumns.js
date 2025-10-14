@@ -74,6 +74,16 @@ export const useUsersListColumns = () => {
         sortable: true,
       },
       {
+        key: 'access_request_date_created',
+        header: 'usersView.accessRequestDate',
+        hidden: true,
+        width: '12rem',
+        renderItem: ({ item }) => {
+          const date = User.getAccessRequestDate(item)
+          return date ? DateUtils.convertDateTimeFromISOToDisplay(date) : null
+        },
+      },
+      {
         key: User.keys.surveysCountDraft,
         header: 'usersView:surveysDraft',
         hidden: true,
