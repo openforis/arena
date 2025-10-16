@@ -117,7 +117,10 @@ export default class RecordCheckJob extends Job {
     // this.logDebug(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes
-    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
+    let record = await RecordManager.fetchRecordAndNodesByUuid(
+      { surveyId, recordUuid, includeSurveyUuid: false, includeRecordUuid: false },
+      tx
+    )
     // this.logDebug(`record fetched`)
 
     // 2. remove deleted nodes
