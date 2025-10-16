@@ -85,7 +85,7 @@ export const getNodeSelectQuery = ({
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (!includeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect).map(
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect)).map(
     (field) => `n.${field}`
   )
 
