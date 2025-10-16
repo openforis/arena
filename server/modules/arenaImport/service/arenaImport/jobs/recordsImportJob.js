@@ -104,6 +104,9 @@ export default class RecordsImportJob extends Job {
     // insert nodes (add them to batch persister)
     const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
     for (const node of nodes) {
+      if (!Node.getRecordUuid(node)) {
+        node[Node.keys.recordUuid] = Record.getUuid(record)
+      }
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         await nodesBatchPersister.addItem(node)
