@@ -454,10 +454,10 @@ const deleteNodesInEntityByNodeDefUuid =
     const updateResult = new RecordUpdateResult({ record })
 
     const nodeUuidsToDelete = []
-    nodeDefUuids.forEach((nodeDefUuid) => {
+    for (const nodeDefUuid of nodeDefUuids) {
       const children = RecordReader.getNodeChildrenByDefUuid(entity, nodeDefUuid)(record)
       nodeUuidsToDelete.push(...children.map(Node.getUuid))
-    })
+    }
 
     const nodesDeleteUpdateResult = await deleteNodes({
       user,

@@ -41,13 +41,13 @@ const nodeKeyByColumnName = {}
 const dbTransformCallback = (node) => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
   // (do not camelize meta properties)
-  Object.entries(node).forEach(([columnName, value]) => {
+  for (const [columnName, value] of Object.entries(node)) {
     const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
     if (nodeKey !== columnName) {
       node[nodeKey] = value
       delete node[columnName]
     }
-  })
+  }
   // cast id to Number
   node.id = Number(node.id)
   return node
