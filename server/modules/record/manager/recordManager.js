@@ -178,7 +178,15 @@ const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
 }
 
 export const fetchRecordAndNodesByUuid = async (
-  { surveyId, recordUuid, draft = false, fetchForUpdate = true, includeRefData = true },
+  {
+    surveyId,
+    recordUuid,
+    draft = false,
+    fetchForUpdate = true,
+    includeRefData = true,
+    includeSurveyUuid = true,
+    includeRecordUuid = true,
+  },
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
@@ -189,7 +197,14 @@ export const fetchRecordAndNodesByUuid = async (
     await _fetchAndSetRecordOwner({ ownerUuid, record }, client)
   }
   const nodes = await NodeRepository.fetchNodesByRecordUuid(
-    { surveyId, recordUuid, includeRefData: fetchForUpdate || includeRefData, draft },
+    {
+      surveyId,
+      recordUuid,
+      includeRefData: fetchForUpdate || includeRefData,
+      includeSurveyUuid,
+      includeRecordUuid,
+      draft,
+    },
     client
   )
   const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)

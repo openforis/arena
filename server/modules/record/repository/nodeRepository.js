@@ -41,13 +41,13 @@ const nodeKeyByColumnName = {}
 const dbTransformCallback = (node) => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
   // (do not camelize meta properties)
-  Object.entries(node).forEach(([columnName, value]) => {
+  for (const [columnName, value] of Object.entries(node)) {
     const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
     if (nodeKey !== columnName) {
       node[nodeKey] = value
       delete node[columnName]
     }
-  })
+  }
   // cast id to Number
   node.id = Number(node.id)
   return node
@@ -68,27 +68,30 @@ const _getAncestorUuidSelectField = (ancestorDef) => {
  * @param {!object} params - The parameters.
  * @param {!number} [params.surveyId] - The survey ID.
  * @param {boolean} [params.includeRefData = true] - If true, category item and taxon item associated to the node value will be fetched.
- * @param {boolean} [params.draft = true] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
- * @param {boolean} [params.excludeRecordUuid = false] - If true, the record uuid won't be included in the fetch (useful when selecting by record_uuid to make the query faster).
+ * @param {boolean} [params.includeRecordUuid = true] - If true, the record uuid will be included in the fetch (useful when selecting by record_uuid to make the query faster).
+ * @param {boolean} [params.includeSurveyUuid = true] - If true, the survey uuid will be included in the fetch (useful when selecting by survey_uuid to make the query faster).
  * @param {boolean} [params.ancestorDef = null] - Ancestor entity definition used to populate the ancestorUuid field with the corresponding value in the node meta hierarchy.
+ * @param {boolean} [params.draft = true] - If true, draft category and taxonomy item props will be fetched, otherwise only published props.
  * @returns {Array} - List of fetched nodes.
  */
 export const getNodeSelectQuery = ({
   surveyId,
   includeRefData = true,
-  draft = true,
-  excludeRecordUuid = false,
+  includeRecordUuid = true,
   includeRecordInfo = false,
+  includeSurveyUuid = true,
   ancestorDef = null,
+  draft = true,
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (excludeRecordUuid ? R.without(['record_uuid'], tableColumnsSelect) : tableColumnsSelect).map(
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect)).map(
     (field) => `n.${field}`
   )
 
-  selectFields.push(`(SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})`)
-
+  if (includeSurveyUuid) {
+    selectFields.push(`(SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = ${surveyId})`)
+  }
   const fromParts = [`${schema}.node n`]
 
   if (includeRecordInfo) {
@@ -214,11 +217,11 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
 // ============== READ
 
 export const fetchNodesByRecordUuid = async (
-  { surveyId, recordUuid, includeRefData = true, draft = true },
+  { surveyId, recordUuid, includeRefData = true, includeSurveyUuid = true, includeRecordUuid = true, draft = true },
   client = db
 ) =>
   client.map(
-    `${getNodeSelectQuery({ surveyId, includeRefData, draft })}
+    `${getNodeSelectQuery({ surveyId, includeRefData, includeSurveyUuid, includeRecordUuid, draft })}
     WHERE n.record_uuid = $1
     ORDER BY n.date_created`,
     [recordUuid],
