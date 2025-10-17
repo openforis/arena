@@ -20,7 +20,7 @@ import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 
 import { TestId } from '@webapp/utils/testId'
 
-import DropdownUserGroup from '../DropdownUserGroup'
+import DropdownUserRole from '../DropdownUserRole'
 
 import { useInviteUser } from './store'
 
@@ -75,8 +75,8 @@ const UserInviteComponent = () => {
         </FormItem>
       )}
       {!isSelectedGroupSystemAdmin && (
-        <FormItem label="common.group">
-          <DropdownUserGroup
+        <FormItem label="common.role">
+          <DropdownUserRole
             validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
             groupUuid={selectedGroupUuid}
             onChange={onGroupChange}
