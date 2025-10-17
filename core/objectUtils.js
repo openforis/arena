@@ -93,8 +93,9 @@ export const setInPath =
     }
 
     let objCurrent = obj
-    pathArray.forEach((pathPart, i) => {
-      if (i === pathArray.length - 1) {
+    for (let index = 0; index < pathArray.length; index++) {
+      const pathPart = pathArray[index]
+      if (index === pathArray.length - 1) {
         objCurrent[pathPart] = value
       } else {
         if (!Object.prototype.hasOwnProperty.call(objCurrent, pathPart)) {
@@ -103,7 +104,7 @@ export const setInPath =
 
         objCurrent = objCurrent[pathPart]
       }
-    })
+    }
     return obj
   }
 

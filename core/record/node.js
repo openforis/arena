@@ -171,9 +171,9 @@ export const removeFlags =
   (node) => {
     const keysToRemove = removeDirtyFlag ? flagKeysIncludingDirty : flagKeysArray
     if (sideEffect) {
-      keysToRemove.forEach((key) => {
+      for (const key of keysToRemove) {
         delete node[key]
-      })
+      }
       return node
     } else {
       return R.omit(keysToRemove)(node)
