@@ -22,7 +22,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
-import DropdownUserGroup from '../DropdownUserGroup'
+import DropdownUserRole from '../DropdownUserRole'
 import ProfilePictureEditor from './ProfilePictureEditor'
 import { useEditUser } from './store'
 import { UserAuthGroupExtraPropsEditor } from './UserAuthGroupExtraPropsEditor/UserAuthGroupExtraPropsEditor'
@@ -176,7 +176,7 @@ const UserEdit = () => {
         <>
           {!systemAdmin && (
             <FormItem label="usersView:roleInCurrentSurvey">
-              <DropdownUserGroup
+              <DropdownUserRole
                 editingLoggedUser={User.isEqual(user)(userToUpdate)}
                 disabled={!canEditGroup}
                 validation={Validation.getFieldValidation(User.keys.authGroupsUuids)(validation)}

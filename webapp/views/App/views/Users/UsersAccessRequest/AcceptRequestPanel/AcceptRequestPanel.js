@@ -48,7 +48,7 @@ export const AcceptRequestPanel = (props) => {
       <FormItem label="usersAccessRequestView.acceptRequest.template">
         <Input value={templateLabel} disabled />
       </FormItem>
-      <FormItem label="usersAccessRequestView.acceptRequest.role">
+      <FormItem label="common.role">
         <Dropdown
           items={UserAccessRequestAccept.requestAcceptRoles}
           itemValue={A.identity}
