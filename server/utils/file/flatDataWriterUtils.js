@@ -8,9 +8,9 @@ const defaultObjectTransformer =
     const { removeNewLines = true } = options
     if (!removeNewLines) return obj
 
-    Object.entries(obj).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(obj)) {
       obj[key] = StringUtils.removeNewLines(value)
-    })
+    }
     return obj
   }
 
