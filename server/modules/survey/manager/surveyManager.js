@@ -293,6 +293,16 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
+const calculateFilesMissing = async ({ surveyId, draft }) => {
+  const nodeDefFileUuids = (await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, draft }))
+    .filter(NodeDef.isFile)
+    .map(NodeDef.getUuid)
+  if (Objects.isEmpty(nodeDefFileUuids)) {
+    return 0
+  }
+  return NodeRepository.countNodesWithMissingFile({ surveyId, nodeDefFileUuids })
+}
+
 export const fetchUserSurveysInfo = async ({
   user,
   draft = true,
@@ -353,6 +363,7 @@ export const fetchUserSurveysInfo = async ({
     try {
       const canHaveData = Survey.canHaveData(survey)
       const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+
       Object.assign(surveyWithCounts, {
         nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
         recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
@@ -360,7 +371,7 @@ export const fetchUserSurveysInfo = async ({
         chainsCount: await ChainRepository.countChains({ surveyId }),
         filesCount,
         filesSize,
-        filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }),
+        filesMissing: await calculateFilesMissing({ surveyId, draft }),
       })
     } catch (error) {
       Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)

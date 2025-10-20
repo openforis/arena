@@ -135,9 +135,10 @@ export const getNodeSelectQuery = ({
   return `SELECT ${selectFields.join(', ')} FROM ${fromParts.join(' ')}`
 }
 
-export const countNodesWithMissingFile = async ({ surveyId, recordUuid = null }, client = db) => {
+export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, recordUuid = null }, client = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereConditions = [
+    `n.node_def_uuid IN ($/nodeDefFileUuids:csv/)`,
     `n.value IS NOT NULL`,
     `(n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
   ]
@@ -147,12 +148,9 @@ export const countNodesWithMissingFile = async ({ surveyId, recordUuid = null },
   const whereClause = DbUtils.getWhereClause(...whereConditions)
   return client.one(
     `SELECT COUNT(n.*) 
-    FROM ${schema}.node n 
-      JOIN ${schema}.node_def nd 
-        ON n.node_def_uuid = nd.uuid 
-        AND nd.type = '${NodeDef.nodeDefType.file}'
+    FROM ${schema}.node n
     ${whereClause}`,
-    { recordUuid },
+    { recordUuid, nodeDefFileUuids },
     (row) => Number(row.count)
   )
 }
