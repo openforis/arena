@@ -1,4 +1,4 @@
-import { parse } from 'fast-csv'
+import { parse } from '@fast-csv/parse'
 
 import { SystemError } from '@openforis/arena-core'
 
