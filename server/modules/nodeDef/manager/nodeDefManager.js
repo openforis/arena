@@ -345,7 +345,7 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
       const descendants = Survey.getNodeDefDescendants({ nodeDef: nodeDefSource })(survey)
 
       const batchUpdates = []
-      descendants.forEach((nodeDefDescendant) => {
+      for (const nodeDefDescendant of descendants) {
         const descendantUpdated = rebuildDescendantNodeDefHierarchy({
           nodeDefOriginal: nodeDefSource,
           nodeDefUpdated,
@@ -365,9 +365,8 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
             t
           )
         )
-
         result[descendantUuid] = descendantUpdated
-      })
+      }
 
       // Perform all descendant updates in batch
       if (batchUpdates.length > 0) {
