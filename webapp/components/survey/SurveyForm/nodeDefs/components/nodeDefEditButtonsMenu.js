@@ -11,10 +11,7 @@ import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
 import { NodeDefConversionDialog } from './nodeDefConversionDialog'
 
-const actionsWithEntitySelection = {
-  clone: 'clone',
-  move: 'move',
-}
+const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
 
 const iconByAction = {
   [actionsWithEntitySelection.clone]: 'icon-copy',
@@ -23,11 +20,12 @@ const iconByAction = {
 
 const isEntitySelectableByAction = {
   [actionsWithEntitySelection.clone]: () => true,
-  [actionsWithEntitySelection.move]: ({ entityDefUuid, nodeDef }) => entityDefUuid !== NodeDef.getParentUuid(nodeDef),
+  [actionsWithEntitySelection.move]: ({ entityDefUuid, nodeDef }) =>
+    entityDefUuid !== NodeDef.getUuid(nodeDef) && entityDefUuid !== NodeDef.getParentUuid(nodeDef),
 }
 
 const availabilityByAction = {
-  [actionsWithEntitySelection.clone]: () => true,
+  [actionsWithEntitySelection.clone]: ({ nodeDef }) => NodeDef.isAttribute(nodeDef),
   [actionsWithEntitySelection.move]: ({ nodeDef }) => !NodeDef.isPublished(nodeDef),
 }
 
@@ -38,11 +36,7 @@ export const NodeDefEditButtonsMenu = (props) => {
   const navigate = useNavigate()
 
   const lang = useSurveyPreferredLang()
-  const [state, setState] = useState({
-    action: null,
-    entitySelectDialogOpen: false,
-    conversionDialogOpen: false,
-  })
+  const [state, setState] = useState({ action: null, entitySelectDialogOpen: false, conversionDialogOpen: false })
 
   const { entitySelectDialogOpen, conversionDialogOpen, action } = state
 
@@ -93,43 +87,42 @@ export const NodeDefEditButtonsMenu = (props) => {
 
   const menuItems = useMemo(() => {
     const _menuItems = []
-    if (NodeDef.isAttribute(nodeDef)) {
-      // items with entity selection (clone or move actions)
-      const availableActions = Object.keys(actionsWithEntitySelection).filter((action) =>
-        availabilityByAction[action]({ nodeDef })
-      )
-      _menuItems.push(
-        ...availableActions.map((action) => ({
-          key: `node-${action}`,
-          content: (
-            <Button
-              iconClassName={iconByAction[action]}
-              label={`surveyForm:${action}`}
-              labelParams={{ nodeDefLabel }}
-              onClick={openEntitySelectDialog(action)}
-              onMouseDown={(e) => e.stopPropagation()}
-              size="small"
-              variant="text"
-            />
-          ),
-        }))
-      )
-      if (!NodeDef.isPublished(nodeDef)) {
-        _menuItems.push({
-          key: 'node-convert',
-          content: (
-            <Button
-              iconClassName="icon-loop2 icon-12px"
-              label="surveyForm:convert"
-              labelParams={{ nodeDefLabel }}
-              onClick={openConvertIntoDialog}
-              onMouseDown={(e) => e.stopPropagation()}
-              size="small"
-              variant="text"
-            />
-          ),
-        })
-      }
+    // items with entity selection (clone or move actions)
+    const availableActions = Object.keys(actionsWithEntitySelection).filter((action) =>
+      availabilityByAction[action]({ nodeDef })
+    )
+    _menuItems.push(
+      ...availableActions.map((action) => ({
+        key: `node-${action}`,
+        content: (
+          <Button
+            iconClassName={iconByAction[action]}
+            label={`surveyForm:${action}`}
+            labelParams={{ nodeDefLabel }}
+            onClick={openEntitySelectDialog(action)}
+            onMouseDown={(e) => e.stopPropagation()}
+            size="small"
+            variant="text"
+          />
+        ),
+      }))
+    )
+    // convert action (only for attributes)
+    if (NodeDef.isAttribute(nodeDef) && !NodeDef.isPublished(nodeDef)) {
+      _menuItems.push({
+        key: 'node-convert',
+        content: (
+          <Button
+            iconClassName="icon-loop2 icon-12px"
+            label="surveyForm:convert"
+            labelParams={{ nodeDefLabel }}
+            onClick={openConvertIntoDialog}
+            onMouseDown={(e) => e.stopPropagation()}
+            size="small"
+            variant="text"
+          />
+        ),
+      })
     }
     // delete action
     if (!NodeDef.isRoot(nodeDef)) {
@@ -170,6 +163,4 @@ export const NodeDefEditButtonsMenu = (props) => {
   )
 }
 
-NodeDefEditButtonsMenu.propTypes = {
-  nodeDef: PropTypes.object.isRequired,
-}
+NodeDefEditButtonsMenu.propTypes = { nodeDef: PropTypes.object.isRequired }

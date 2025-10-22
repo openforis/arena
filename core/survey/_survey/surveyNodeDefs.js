@@ -386,10 +386,7 @@ export const getHierarchy =
       return array
     }
 
-    return {
-      root: h([], getNodeDefRoot(survey))[0],
-      length,
-    }
+    return { root: h([], getNodeDefRoot(survey))[0], length }
   }
 
 export const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
@@ -451,6 +448,13 @@ export const getNodeDefDescendantsAndSelf =
     })(survey)
     return descendants
   }
+
+export const getNodeDefDescendants =
+  ({ nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs } = {}) =>
+  (survey) =>
+    getNodeDefDescendantsAndSelf({ nodeDef, cycle, traverseMethod })(survey).filter(
+      (descendant) => !NodeDef.isEqual(nodeDef)(descendant)
+    )
 
 // OLAP
 const multipleEntityFilterFunction = (nodeDef) => NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)
