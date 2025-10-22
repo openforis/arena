@@ -291,13 +291,13 @@ const rebuildDescendantNodeDefHierarchy = ({ nodeDefOriginal, nodeDefUpdated, no
   return NodeDef.assocMetaHierarchy(updatedMetaHierarchy)(nodeDefDescendant)
 }
 
-const checkCanMoveNodeDef = ({ nodeDefSource, targetParentNodeDef }) => {
-  if (NodeDef.isEntity(nodeDefSource)) {
+const checkCanMoveNodeDef = ({ nodeDef, targetParentNodeDef }) => {
+  if (NodeDef.isEntity(nodeDef)) {
     // Validation: prevent moving an entity into itself or into one of its descendants
-    if (NodeDef.isEqual(nodeDefSource)(targetParentNodeDef)) {
+    if (NodeDef.isEqual(nodeDef)(targetParentNodeDef)) {
       throw new Error('Cannot move an entity into itself')
     }
-    if (NodeDef.isDescendantOf(nodeDefSource)(targetParentNodeDef)) {
+    if (NodeDef.isDescendantOf(nodeDef)(targetParentNodeDef)) {
       throw new Error('Cannot move an entity into one of its descendants')
     }
   }
@@ -325,7 +325,7 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     const nodeDefSource = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
 
-    checkCanMoveNodeDef(nodeDefSource, targetParentNodeDef)
+    checkCanMoveNodeDef({ nodeDef: nodeDefSource, targetParentNodeDef })
 
     // remove source node def from parent layout
     await addOrRemoveInParentLayout({ nodeDef: nodeDefSource, add: false })
