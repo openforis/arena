@@ -4,8 +4,9 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
@@ -16,6 +17,14 @@ const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
 const iconByAction = {
   [actionsWithEntitySelection.clone]: 'icon-copy',
   [actionsWithEntitySelection.move]: 'icon-arrow-up-right2',
+}
+
+const isEntityVisibleByAction = {
+  [actionsWithEntitySelection.move]: ({ cycle, entityDef, nodeDef }) =>
+    NodeDef.isAttribute(nodeDef) ||
+    (!NodeDef.isEqual(nodeDef)(entityDef) &&
+      !NodeDef.isDescendantOf(nodeDef)(entityDef) &&
+      !NodeDefLayout.isRenderTable(cycle)(entityDef)),
 }
 
 const isEntitySelectableByAction = {
@@ -36,6 +45,7 @@ export const NodeDefEditButtonsMenu = (props) => {
   const navigate = useNavigate()
 
   const lang = useSurveyPreferredLang()
+  const cycle = useSurveyCycleKey()
   const [state, setState] = useState({ action: null, entitySelectDialogOpen: false, conversionDialogOpen: false })
 
   const { entitySelectDialogOpen, conversionDialogOpen, action } = state
@@ -149,6 +159,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       <ButtonMenu className="btn-transparent" iconClassName="icon-menu icon-16px" items={menuItems} />
       {entitySelectDialogOpen && (
         <NodeDefEntitySelectorDialog
+          filterFn={(entityDef) => isEntityVisibleByAction[action]({ cycle, entityDef, nodeDef })}
           isEntitySelectable={(entityDefUuid) => isEntitySelectableByAction[action]({ entityDefUuid, nodeDef })}
           confirmButtonLabel={`nodeDefEdit.${action}Dialog.confirmButtonLabel`}
           currentNodeDef={nodeDef}
