@@ -20,8 +20,9 @@ export const writeItemsToStream = ({
   new Promise((resolve, reject) => {
     const fields = fieldsParam ?? Object.keys(items[0] ?? {})
     const transform = transformJsonToCsv({ fields, options })
-    transform.pipe(outputStream)
-    transform.on('error', reject).on('finish', resolve)
+      .pipe(outputStream)
+      .on('error', reject)
+      .on('finish', resolve)
 
     items.forEach((row) => transform.write(row))
     transform.end()
