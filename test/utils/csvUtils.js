@@ -8,7 +8,7 @@ export const parseCsvAsync = async (filePath) =>
   new Promise((resolve, reject) => {
     const csvContent = fs.readFileSync(filePath)
     const data = []
-    const stream = parse()
+    const stream = parse({ headers: true })
       .on('data', (row) => data.push(row))
       .on('error', (error) => reject(error))
       .on('end', () => resolve(data))
