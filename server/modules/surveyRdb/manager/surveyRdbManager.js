@@ -9,26 +9,27 @@ import * as Record from '@core/record/record'
 import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
+import * as Chain from '@common/analysis/chain'
+import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
+import { Query } from '@common/model/query'
+import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
+import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
+import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { StreamUtils } from '@server/utils/streamUtils'
+import * as ChainManager from '@server/modules/analysis/manager'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
-
-import { db } from '../../../db/db'
-import * as DbUtils from '../../../db/dbUtils'
-import * as FlatDataWriter from '../../../utils/file/flatDataWriter'
-
-import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '../../../../common/model/db'
-
-import { Query } from '../../../../common/model/query'
-import * as NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
 
 import * as DataTableInsertRepository from '../repository/dataTableInsertRepository'
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataTableRepository from '../repository/dataTable'
 import * as DataViewRepository from '../repository/dataView'
+import * as OlapDataRepository from '../repository/olapDataTable'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
 import { UniqueFileNamesGenerator } from './UniqueFileNamesGenerator'
-import { StreamUtils } from '@server/utils/streamUtils'
 
 // ==== DDL
 
@@ -55,6 +56,7 @@ export { createNodeKeysHierarchyView } from '../repository/nodeKeysHierarchyView
 export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } from '../repository/resultNode'
 
 export { createOlapDataTable, insertOlapData, clearOlapData } from '../repository/olapDataTable'
+export { createOlapAreaView } from '../repository/olapAreaView'
 
 const maxExcelCellsLimit = 1000000
 
@@ -119,42 +121,42 @@ export const fetchViewData = async (params, client = db) => {
     client
   )
 
-  if (outputStream) {
-    const fields = columnNodeDefs
-      ? null // all fields will be included in the CSV file
-      : SurveyRdbCsvExport.getCsvExportFields({
-          survey,
-          query,
-          addCycle,
-          includeCategoryItemsLabels,
-          expandCategoryItems,
-          includeInternalUuids,
-          includeDateCreated,
-        })
-    const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
-      survey,
-      query,
-      expandCategoryItems,
-      nullsToEmpty,
-      keepFileNamesUnique: true,
-      uniqueFileNamesGenerator,
-    })
-    await DbUtils.stream({
-      queryStream: result,
-      client,
-      processor: async (dbStream) =>
-        FlatDataWriter.writeItemsStreamToStream({
-          stream: dbStream,
-          fields,
-          options: {
-            objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
-          },
-          outputStream,
-          fileFormat,
-        }),
-    })
+  if (!outputStream) {
+    return result
   }
-  return result
+  const fields = columnNodeDefs
+    ? null // all fields will be included in the CSV file
+    : SurveyRdbCsvExport.getCsvExportFields({
+        survey,
+        query,
+        addCycle,
+        includeCategoryItemsLabels,
+        expandCategoryItems,
+        includeInternalUuids,
+        includeDateCreated,
+      })
+  const { transformers } = SurveyRdbCsvExport.getCsvObjectTransformer({
+    survey,
+    query,
+    expandCategoryItems,
+    nullsToEmpty,
+    keepFileNamesUnique: true,
+    uniqueFileNamesGenerator,
+  })
+  await DbUtils.stream({
+    queryStream: result,
+    client,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({
+        stream: dbStream,
+        fields,
+        options: {
+          objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
+        },
+        outputStream,
+        fileFormat,
+      }),
+  })
 }
 
 /**
@@ -191,16 +193,61 @@ export const fetchViewDataAgg = async (params, client = db) => {
     client
   )
 
-  if (outputStream) {
-    const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query, options })
-    return DbUtils.stream({
-      queryStream: result,
-      client,
-      processor: async (dbStream) =>
-        FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
-    })
+  if (!outputStream) {
+    return result
   }
-  return result
+  const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query, options })
+  return DbUtils.stream({
+    queryStream: result,
+    client,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
+  })
+}
+
+export const fetchOlapData = async (
+  { survey, cycle, query, limit, offset, outputStream = null, options = {} },
+  client = db
+) => {
+  const { fileFormat = FileFormats.csv } = options
+
+  const surveyId = Survey.getId(survey)
+  const chain = await ChainManager.fetchChainWithSamplingDesign({ surveyId })
+  const baseUnitDef = chain ? Survey.getBaseUnitNodeDef({ chain })(survey) : null
+  const chainStatisticalAnalysis = Chain.getStatisticalAnalysis(chain)
+  const reportingEntityDefUuid = chainStatisticalAnalysis
+    ? ChainStatisticalAnalysis.getEntityDefUuid(chainStatisticalAnalysis)
+    : null
+  const reportingEntityDef = reportingEntityDefUuid ? Survey.getNodeDefByUuid(reportingEntityDefUuid)(survey) : null
+
+  if (!chain || !reportingEntityDef) {
+    return null
+  }
+  // Fetch data
+  const result = await OlapDataRepository.fetchOlapData(
+    {
+      survey,
+      cycle,
+      query,
+      baseUnitDef,
+      entityDef: reportingEntityDef,
+      limit,
+      offset,
+      stream: Boolean(outputStream),
+    },
+    client
+  )
+
+  if (!outputStream) {
+    return result
+  }
+  const fields = SurveyRdbCsvExport.getCsvExportFieldsAgg({ survey, query, options })
+  return DbUtils.stream({
+    queryStream: result,
+    client,
+    processor: async (dbStream) =>
+      FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
+  })
 }
 
 const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search }) => {

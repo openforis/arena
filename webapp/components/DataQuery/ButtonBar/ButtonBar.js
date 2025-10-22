@@ -42,14 +42,16 @@ const modeButtonItems = [
     iconClassName: 'icon-sigma',
     label: 'dataView.dataQuery.mode.aggregate',
   },
+  {
+    key: modes.olap,
+    iconClassName: 'icon-sigma',
+    label: 'dataView.dataQuery.mode.olap',
+  },
 ]
 
-const uiModeByQueryMode = {
-  [modes.raw]: modes.raw,
+const getUiModeByQueryMode = (mode) =>
   // raw edit mode shown as "raw" in mode button group
-  [modes.rawEdit]: modes.raw,
-  [modes.aggregate]: modes.aggregate,
-}
+  mode === modes.rawEdit ? modes.raw : mode
 
 const ButtonBar = (props) => {
   const {
@@ -80,7 +82,7 @@ const ButtonBar = (props) => {
     },
     [onChangeQuery, query]
   )
-  const selectedMode = uiModeByQueryMode[Query.getMode(query)]
+  const selectedMode = getUiModeByQueryMode(Query.getMode(query))
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading

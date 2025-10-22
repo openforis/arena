@@ -142,6 +142,8 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
           async (entityDef) => {
             this.logDebug(`create OLAP table for entity def ${NodeDef.getName(entityDef)}`)
             await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx)
+            this.logDebug(`create OLAP area view for entity def ${NodeDef.getName(entityDef)}`)
+            await SurveyRdbManager.createOlapAreaView({ survey, cycle, baseUnitDef, entityDef }, tx)
             this.incrementProcessedItems()
           },
           stopIfFunction
