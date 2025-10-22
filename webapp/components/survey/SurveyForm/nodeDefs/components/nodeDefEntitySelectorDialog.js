@@ -15,9 +15,10 @@ export const NodeDefEntitySelectorDialog = (props) => {
   const {
     confirmButtonLabel,
     entitySelectLabel,
+    filterFn = undefined,
     currentNodeDef,
-    isEntitySelectable,
-    onChange: onChangeProp,
+    isEntitySelectable = undefined,
+    onChange: onChangeProp = undefined,
     onClose,
     onConfirm: onConfirmProp,
     title,
@@ -53,6 +54,7 @@ export const NodeDefEntitySelectorDialog = (props) => {
       <ModalBody>
         <FormItem label={entitySelectLabel}>
           <EntitySelector
+            filterFn={filterFn}
             hierarchy={Survey.getHierarchy()(survey)}
             nodeDefLabelType={NodeDef.NodeDefLabelTypes.labelAndName}
             nodeDefUuidEntity={selectedEntityDefUuid}
@@ -79,6 +81,7 @@ NodeDefEntitySelectorDialog.propTypes = {
   confirmButtonLabel: PropTypes.string.isRequired,
   currentNodeDef: PropTypes.object.isRequired,
   entitySelectLabel: PropTypes.string.isRequired,
+  filterFn: PropTypes.func,
   isEntitySelectable: PropTypes.func,
   onChange: PropTypes.func,
   onClose: PropTypes.func.isRequired,
