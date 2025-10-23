@@ -1,6 +1,9 @@
 @use '~@webapp/style/vars' as *;
 
-.MuiTextField-root.date-picker__text-field {
+.date-picker__text-field {
+  .MuiPickersInputBase-root {
+    height: 2rem;
+  }
   width: 10rem;
 
   input {

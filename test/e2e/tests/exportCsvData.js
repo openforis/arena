@@ -18,7 +18,6 @@ import { parseCsvAsync } from '../../utils/csvUtils'
 
 let extractedFolderName = ''
 
-/* eslint-disable camelcase */
 const {
   cluster_time,
   cluster_boolean,
