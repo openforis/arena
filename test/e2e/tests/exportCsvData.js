@@ -136,7 +136,7 @@ export default () =>
         plot_text: record.plot_text,
       }))
 
-      await expect(mockPlots.length).toBe(plotData.length)
+      await expect(plotData.length).toBe(mockPlots.length)
 
       await Promise.all(
         plotData.map(async (_plot) => {
@@ -157,7 +157,7 @@ export default () =>
 
       const mockTrees = records.flatMap((record) => record.trees)
 
-      await expect(mockTrees.length).toBe(treeData.length)
+      await expect(treeData.length).toBe(mockTrees.length)
 
       await Promise.all(
         treeData.map(async (_tree) => {
