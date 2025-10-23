@@ -1460,7 +1460,7 @@ $t(common.appNameFull)
     },
     moveDialog: {
       confirmButtonLabel: 'Шилжүүлэх',
-      title: 'Зангилааны тодорхойлолт "{{nodeDefName}}"-г шилжүүлэх',
+      title: '"{{parentNodeDefName}}" -аас "{{nodeDefName}}" зангилааны тодорхойлолтыг зөөж байна',
       entitySelectLabel: 'Шилжүүлэх объект:',
     },
     movedNodeDefinitionHasErrors: 'Таны шилжүүлсэн зангилааны тодорхойлолт "{{nodeDefName}}" алдаатай байна; засна уу.',

@@ -1480,7 +1480,7 @@ E.g. this.region = region_attribute_name
     },
     moveDialog: {
       confirmButtonLabel: 'Move',
-      title: 'Moving node definition "{{nodeDefName}}"',
+      title: 'Moving node definition "{{nodeDefName}}" from "{{parentNodeDefName}}"',
       entitySelectLabel: 'Entity to move into:',
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',

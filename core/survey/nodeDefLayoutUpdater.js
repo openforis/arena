@@ -185,7 +185,7 @@ export const initializeParentLayout = ({ survey, cycle, nodeDefParent }) => {
   })(nodeDefParent)
 }
 
-const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
+const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef, h: hParam = null, w: wParam = null }) => {
   const nodeDefParent = SurveyNodeDefs.getNodeDefParent(nodeDef)(survey)
 
   const layoutForCycle = NodeDefLayout.getLayoutCycle(cycle)(nodeDefParent)
@@ -217,7 +217,9 @@ const _addNodeDefInParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
   const minH = NodeDefLayoutSizes.getMinGridItemHeight({ nodeDef })
   const maxH = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef })
 
-  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w: 1, h: minH, minH, maxH })
+  const w = wParam ?? 1
+  const h = hParam ?? minH
+  const layoutChildrenUpdated = layoutChildrenPrev.concat({ i: nodeDefUuid, x: 0, y, w, h, minH, maxH })
   layoutForCycleUpdated[NodeDefLayout.keys.layoutChildren] = layoutChildrenUpdated
   return layoutForCycleUpdated
 }
@@ -261,10 +263,17 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
  * @param {!object} [params.nodeDef] - The node definition that has just been updated.
  * @param {Array.<string>} [params.cyclesAdded = []] - The survey cycles added to the nodeDef.
  * @param {Array.<string>} [params.cyclesDeleted = []] - The survey cycles removed from the nodeDef.
+ * @param {object} [params.layoutInParentByCycle = []] - The layout that needs to be kept when node def is added to the parent layout.
  *
  * @returns {object} - The updated parent node definition, if changed.
  * */
-export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDeleted = [] }) => {
+export const updateParentLayout = ({
+  survey,
+  nodeDef,
+  cyclesAdded = [],
+  cyclesDeleted = [],
+  layoutInParentByCycle = null,
+}) => {
   if (NodeDef.isRoot(nodeDef) || NodeDef.isVirtual(nodeDef)) {
     return null
   }
@@ -275,18 +284,22 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
   let nodeDefParentUpdated = { ...nodeDefParent }
 
   // update layout in added cycles
-  cyclesAdded.forEach((cycle) => {
+  for (const cycle of cyclesAdded) {
     nodeDefParentUpdated = _updateParentLayoutForCycle({
       survey: surveyUpdated,
       cycle,
       nodeDef,
-      updateFn: _addNodeDefInParentLayoutCycle,
+      updateFn: ({ survey, cycle, nodeDef }) => {
+        const layoutInParentToKeep = layoutInParentByCycle?.[cycle] ?? {}
+        const { h, w } = layoutInParentToKeep
+        return _addNodeDefInParentLayoutCycle({ survey, cycle, nodeDef, h, w })
+      },
     })
     surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDefParentUpdated)(surveyUpdated)
-  })
+  }
 
   // update layout of removed cycles
-  cyclesDeleted.forEach((cycle) => {
+  for (const cycle of cyclesDeleted) {
     nodeDefParentUpdated = _updateParentLayoutForCycle({
       survey: surveyUpdated,
       cycle,
@@ -294,7 +307,7 @@ export const updateParentLayout = ({ survey, nodeDef, cyclesAdded = [], cyclesDe
       updateFn: _removeNodeDefFromParentLayoutCycle,
     })
     surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDefParentUpdated)(surveyUpdated)
-  })
+  }
 
   // Update parent node def layout in DB (if changed)
   const nodeDefParentLayout = NodeDef.getLayout(nodeDefParent)

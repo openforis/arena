@@ -303,16 +303,69 @@ const checkCanMoveNodeDef = ({ nodeDef, targetParentNodeDef }) => {
   }
 }
 
+const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, t }) => {
+  const nodeDefsUpdatedByUuid = {}
+  const surveyId = Survey.getId(survey)
+  const descendants = Survey.getNodeDefDescendants({ nodeDef: nodeDefSource })(survey)
+
+  const batchUpdates = []
+  for (const nodeDefDescendant of descendants) {
+    const descendantUpdated = rebuildDescendantNodeDefHierarchy({
+      nodeDefOriginal: nodeDefSource,
+      nodeDefUpdated,
+      nodeDefDescendant,
+    })
+
+    const descendantUuid = NodeDef.getUuid(nodeDefDescendant)
+
+    batchUpdates.push(
+      NodeDefRepository.updateNodeDefProps(
+        {
+          surveyId,
+          nodeDefUuid: descendantUuid,
+          parentUuid: NodeDef.getParentUuid(nodeDefDescendant),
+          meta: NodeDef.getMeta(descendantUpdated),
+        },
+        t
+      )
+    )
+    nodeDefsUpdatedByUuid[descendantUuid] = descendantUpdated
+  }
+
+  // Perform all descendant updates in batch
+  if (batchUpdates.length > 0) {
+    await t.batch(batchUpdates)
+  }
+  return nodeDefsUpdatedByUuid
+}
+
+const getLayoutInParentEntityByCycles = ({ survey, nodeDef }) => {
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefSourceLayoutPrevByCycle = {}
+  const nodeDefSourceParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const cycles = NodeDef.getCycles(nodeDef)
+  for (const cycle of cycles) {
+    if (NodeDefLayout.isRenderTable(cycle)(nodeDef)) {
+      nodeDefSourceLayoutPrevByCycle[cycle] = NodeDefLayout.getLayoutChild({ cycle, childDefUuid: nodeDefUuid })(
+        nodeDefSourceParent
+      )
+    }
+  }
+  return nodeDefSourceLayoutPrevByCycle
+}
+
 export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const result = {}
 
-    const addOrRemoveInParentLayout = async ({ nodeDef, add = true }) => {
+    const addOrRemoveInParentLayout = async ({ nodeDef, add = true, layoutInParentByCycle = null }) => {
+      const cycles = NodeDef.getCycles(nodeDef)
       const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
         survey,
         nodeDef,
-        cyclesAdded: add ? NodeDef.getCycles(nodeDef) : [],
-        cyclesDeleted: add ? [] : NodeDef.getCycles(nodeDef),
+        cyclesAdded: add ? cycles : [],
+        cyclesDeleted: add ? [] : cycles,
+        layoutInParentByCycle,
       })
       if (parentUpdated) {
         await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
@@ -327,10 +380,10 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
 
     checkCanMoveNodeDef({ nodeDef: nodeDefSource, targetParentNodeDef })
 
-    // remove source node def from parent layout
+    const layoutInParentByCycle = getLayoutInParentEntityByCycles({ survey, nodeDef: nodeDefSource })
+
     await addOrRemoveInParentLayout({ nodeDef: nodeDefSource, add: false })
 
-    // update source node def parent uuid and meta
     let nodeDefUpdated = NodeDef.changeParentEntity({ targetParentNodeDef })(nodeDefSource)
 
     nodeDefUpdated = await NodeDefRepository.updateNodeDefProps(
@@ -342,40 +395,11 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
 
     // If moving an entity, update all descendants' meta hierarchy
     if (NodeDef.isEntity(nodeDefSource)) {
-      const descendants = Survey.getNodeDefDescendants({ nodeDef: nodeDefSource })(survey)
-
-      const batchUpdates = []
-      for (const nodeDefDescendant of descendants) {
-        const descendantUpdated = rebuildDescendantNodeDefHierarchy({
-          nodeDefOriginal: nodeDefSource,
-          nodeDefUpdated,
-          nodeDefDescendant,
-        })
-
-        const descendantUuid = NodeDef.getUuid(nodeDefDescendant)
-
-        batchUpdates.push(
-          NodeDefRepository.updateNodeDefProps(
-            {
-              surveyId,
-              nodeDefUuid: descendantUuid,
-              parentUuid: NodeDef.getParentUuid(nodeDefDescendant),
-              meta: NodeDef.getMeta(descendantUpdated),
-            },
-            t
-          )
-        )
-        result[descendantUuid] = descendantUpdated
-      }
-
-      // Perform all descendant updates in batch
-      if (batchUpdates.length > 0) {
-        await t.batch(batchUpdates)
-      }
+      await updateDescendantsLayout({ survey, nodeDefSource, nodeDefUpdated, t })
     }
 
     // add node def to target parent layout
-    await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true })
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true, layoutInParentByCycle })
 
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, nodeDefUpdated, false, t)
 

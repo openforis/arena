@@ -1469,7 +1469,7 @@ $t(common.appNameFull)
     },
     moveDialog: {
       confirmButtonLabel: 'Переместить',
-      title: 'Перемещение определения узла "{{nodeDefName}}"',
+      title: 'Перемещение определения узла "{{nodeDefName}}" из "{{parentNodeDefName}}"',
       entitySelectLabel: 'Сущность, в которую нужно переместить:',
     },
     movedNodeDefinitionHasErrors:
