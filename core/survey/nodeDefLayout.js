@@ -129,6 +129,13 @@ export const getLayoutChildrenCompressed =
     )
   }
 
+export const getLayoutChild =
+  ({ cycle, childDefUuid }) =>
+  (nodeDef) => {
+    const layoutChildren = getLayoutChildren(cycle)(nodeDef)
+    return layoutChildren.find((l) => l.i === childDefUuid)
+  }
+
 export const isHiddenWhenNotRelevant = (cycle) => getPropLayout(cycle, keys.hiddenWhenNotRelevant)
 
 export const isHiddenInMobile = (cycle) => getPropLayout(cycle, keys.hiddenInMobile)

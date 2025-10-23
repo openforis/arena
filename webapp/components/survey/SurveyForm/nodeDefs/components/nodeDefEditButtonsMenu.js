@@ -3,10 +3,11 @@ import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
+import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
-import { NodeDefsActions, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { NodeDefsActions, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
@@ -35,7 +36,25 @@ const isEntitySelectableByAction = {
 
 const availabilityByAction = {
   [actionsWithEntitySelection.clone]: ({ nodeDef }) => NodeDef.isAttribute(nodeDef),
-  [actionsWithEntitySelection.move]: ({ nodeDef }) => !NodeDef.isPublished(nodeDef),
+  [actionsWithEntitySelection.move]: ({ survey, cycle, nodeDef }) => {
+    if (NodeDef.isPublished(nodeDef)) return false
+
+    const availableEntityDefs = []
+    Survey.visitDescendantsAndSelf({
+      cycle,
+      visitorFn: (visitedNodeDef) => {
+        const visitedNodeDefUuid = NodeDef.getUuid(visitedNodeDef)
+        if (
+          NodeDef.isEntity(visitedNodeDef) &&
+          isEntityVisibleByAction[actionsWithEntitySelection.move]({ cycle, entityDef: visitedNodeDef, nodeDef }) &&
+          isEntitySelectableByAction[actionsWithEntitySelection.move]({ entityDefUuid: visitedNodeDefUuid, nodeDef })
+        ) {
+          availableEntityDefs.push(visitedNodeDef)
+        }
+      },
+    })(survey)
+    return availableEntityDefs.length > 0
+  },
 }
 
 export const NodeDefEditButtonsMenu = (props) => {
@@ -44,8 +63,9 @@ export const NodeDefEditButtonsMenu = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const lang = useSurveyPreferredLang()
+  const survey = useSurvey()
   const cycle = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
   const [state, setState] = useState({ action: null, entitySelectDialogOpen: false, conversionDialogOpen: false })
 
   const { entitySelectDialogOpen, conversionDialogOpen, action } = state
@@ -99,7 +119,7 @@ export const NodeDefEditButtonsMenu = (props) => {
     const _menuItems = []
     // items with entity selection (clone or move actions)
     const availableActions = Object.keys(actionsWithEntitySelection).filter((action) =>
-      availabilityByAction[action]({ nodeDef })
+      availabilityByAction[action]({ survey, cycle, nodeDef })
     )
     _menuItems.push(
       ...availableActions.map((action) => ({
@@ -150,7 +170,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       })
     }
     return _menuItems
-  }, [dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog])
+  }, [cycle, dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog, survey])
 
   if (menuItems.length === 0) return null
 
