@@ -25,6 +25,7 @@ export const NodeDefEntitySelectorDialog = (props) => {
   } = props
 
   const survey = useSurvey()
+  const parentNodeDef = Survey.getNodeDefParent(currentNodeDef)(survey)
 
   const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
 
@@ -49,7 +50,7 @@ export const NodeDefEntitySelectorDialog = (props) => {
       onClose={onClose}
       showCloseButton
       title={title}
-      titleParams={{ nodeDefName: NodeDef.getName(currentNodeDef) }}
+      titleParams={{ nodeDefName: NodeDef.getName(currentNodeDef), parentNodeDefName: NodeDef.getName(parentNodeDef) }}
     >
       <ModalBody>
         <FormItem label={entitySelectLabel}>

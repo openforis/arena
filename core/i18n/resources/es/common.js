@@ -1272,7 +1272,7 @@ export default {
     },
     moveDialog: {
       confirmButtonLabel: 'Mover',
-      title: 'Moviendo definición de nodo "{{nodeDefName}}"',
+      title: 'Moviendo la definición del nodo "{{nodeDefName}}" desde "{{parentNodeDefName}}"',
       entitySelectLabel: 'Entidad a la que mover:',
     },
     movedNodeDefinitionHasErrors:
