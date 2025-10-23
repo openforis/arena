@@ -2336,12 +2336,34 @@
     lodash.isfunction "^3.0.9"
     lodash.isnil "^4.0.0"
 
+"@fast-csv/format@5.0.5":
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@fast-csv/format/-/format-5.0.5.tgz#d5f06cd64eacd7c57899498bb2e39ba8441c52d5"
+  integrity sha512-0P9SJXXnqKdmuWlLaTelqbrfdgN37Mvrb369J6eNmqL41IEIZQmV4sNM4GgAK2Dz3aH04J0HKGDMJFkYObThTw==
+  dependencies:
+    lodash.escaperegexp "^4.1.2"
+    lodash.isboolean "^3.0.3"
+    lodash.isfunction "^3.0.9"
+    lodash.isnil "^4.0.0"
+
 "@fast-csv/parse@4.3.6":
   version "4.3.6"
   resolved "https://registry.yarnpkg.com/@fast-csv/parse/-/parse-4.3.6.tgz#ee47d0640ca0291034c7aa94039a744cfb019264"
   integrity sha512-uRsLYksqpbDmWaSmzvJcuApSEe38+6NQZBUsuAyMZKqHxH0g1wcJgsKUvN3WC8tewaqFjBMMGrkHmC+T7k8LvA==
   dependencies:
     "@types/node" "^14.0.1"
+    lodash.escaperegexp "^4.1.2"
+    lodash.groupby "^4.6.0"
+    lodash.isfunction "^3.0.9"
+    lodash.isnil "^4.0.0"
+    lodash.isundefined "^3.0.1"
+    lodash.uniq "^4.5.0"
+
+"@fast-csv/parse@5.0.5":
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/@fast-csv/parse/-/parse-5.0.5.tgz#d7b96de6eaf0bc36825963e294a49857db9806d1"
+  integrity sha512-M0IbaXZDbxfOnpVE5Kps/a6FGlILLhtLsvWd9qNH3d2TxNnpbNkFf3KD26OmJX6MHq7PdQAl5htStDwnuwHx6w==
+  dependencies:
     lodash.escaperegexp "^4.1.2"
     lodash.groupby "^4.6.0"
     lodash.isfunction "^3.0.9"
@@ -6077,7 +6099,7 @@ commander@^5.1.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
   integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
-commander@^6.1.0, commander@^6.2.0:
+commander@^6.2.0:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.1.tgz#0792eb682dfbc325999bb2b84fddddba110ac73c"
   integrity sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==
@@ -6539,37 +6561,12 @@ csstype@^3.0.2, csstype@^3.1.3:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.3.tgz#d80ff294d114fb0e6ac500fbf85b60137d7eff81"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
 
-csv-generate@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/csv-generate/-/csv-generate-4.5.0.tgz#5fbbb89bd9f8ce705871c9baf02e1d4bb4000fb3"
-  integrity sha512-aQr/vmOKyBSBHNwYhAoXw1+kUsPnMSwmYgpNoo36rIXoG1ecWILnvPGZeQ6oUjzrWknZAD3+jfpqYOBAl4x15A==
-
 csv-load-sync@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/csv-load-sync/-/csv-load-sync-2.3.1.tgz#847439a206154131bfc0a2905edb853d2c74870f"
   integrity sha512-oe8Ex/lwUwPY+7FGrGkfIHzihTNHJ9L3rLSZPLVoprT35Mk8DZ1MkLGsJWZjmMlseVyldLqFSWqFHtYsxr2jXQ==
   dependencies:
     check-more-types "^2.10.0"
-
-csv-parse@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-6.1.0.tgz#c642ec5b7fc57c1f477a07d179beb5ff0dfd5ed0"
-  integrity sha512-CEE+jwpgLn+MmtCpVcPtiCZpVtB6Z2OKPTr34pycYYoL7sxdOkXDdQ4lRiw6ioC0q6BLqhc6cKweCVvral8yhw==
-
-csv-stringify@^6.6.0:
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-6.6.0.tgz#d384859cfb71d0a4a73c5bcc36a4daf5440cb033"
-  integrity sha512-YW32lKOmIBgbxtu3g5SaiqWNwa/9ISQt2EcgOq0+RAIFufFp9is6tqNnKahqE5kuKvrnYAzs28r+s6pXJR8Vcw==
-
-csv@^6.4.1:
-  version "6.4.1"
-  resolved "https://registry.yarnpkg.com/csv/-/csv-6.4.1.tgz#c9a62130c025f8adb2a85a75d4c2608612995822"
-  integrity sha512-ajGosmTGnTwYyGl8STqZDu7R6LkDf3xL39XiOmliV/GufQeVUxHzTKIm4NOBCwmEuujK7B6isxs4Uqt9GcRCvA==
-  dependencies:
-    csv-generate "^4.5.0"
-    csv-parse "^6.1.0"
-    csv-stringify "^6.6.0"
-    stream-transform "^3.4.0"
 
 cwd@^0.10.0:
   version "0.10.0"
@@ -8369,6 +8366,14 @@ fast-csv@^4.3.1:
   dependencies:
     "@fast-csv/format" "4.3.5"
     "@fast-csv/parse" "4.3.6"
+
+fast-csv@^5.0.5:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/fast-csv/-/fast-csv-5.0.5.tgz#5f8cdd8c3d2bcd009344f9922e9edfccf4a32e71"
+  integrity sha512-9//QpogDIPln5Dc8e3Q3vbSSLXlTeU7z1JqsUOXZYOln8EIn/OOO8+NS2c3ukR6oYngDd3+P1HXSkby3kNV9KA==
+  dependencies:
+    "@fast-csv/format" "5.0.5"
+    "@fast-csv/parse" "5.0.5"
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
@@ -10664,15 +10669,6 @@ json-stable-stringify-without-jsonify@^1.0.1:
   resolved "https://registry.yarnpkg.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz#9db7b59496ad3f3cfef30a75142d2d930ad72651"
   integrity sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==
 
-json2csv@^5.0.7:
-  version "5.0.7"
-  resolved "https://registry.yarnpkg.com/json2csv/-/json2csv-5.0.7.tgz#f3a583c25abd9804be873e495d1e65ad8d1b54ae"
-  integrity sha512-YRZbUnyaJZLZUJSRi2G/MqahCyRv9n/ds+4oIetjDF3jWQA7AG7iSeKTiZiCNqtMZM7HDyt0e/W6lEnoGEmMGA==
-  dependencies:
-    commander "^6.1.0"
-    jsonparse "^1.3.1"
-    lodash.get "^4.4.2"
-
 json5@^1.0.1, json5@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.2.tgz#63d98d60f21b313b77c4d6da18bfa69d80e1d593"
@@ -10700,11 +10696,6 @@ jsonfile@^6.0.1:
     universalify "^2.0.0"
   optionalDependencies:
     graceful-fs "^4.1.6"
-
-jsonparse@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
-  integrity sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==
 
 "jsx-ast-utils@^2.4.1 || ^3.0.0", jsx-ast-utils@^3.3.5:
   version "3.3.5"
@@ -14659,11 +14650,6 @@ stream-shift@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.1.tgz#d7088281559ab2778424279b0877da3c392d5a3d"
   integrity sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==
-
-stream-transform@^3.4.0:
-  version "3.4.0"
-  resolved "https://registry.yarnpkg.com/stream-transform/-/stream-transform-3.4.0.tgz#38d562fbdad38c3b6cda959ad36751014bb26e18"
-  integrity sha512-QO3OGhKyeIV8p6eRQdG+W6WounFw519zk690hHCNfhgfP9bylVS+NTXsuBc7n+RsGn31UgFPGrWYIgoAbArKEw==
 
 streamroller@^3.1.5:
   version "3.1.5"
