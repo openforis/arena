@@ -43,13 +43,11 @@ const availabilityByAction = {
     Survey.visitDescendantsAndSelf({
       cycle,
       visitorFn: (visitedNodeDef) => {
+        const visitedNodeDefUuid = NodeDef.getUuid(visitedNodeDef)
         if (
           NodeDef.isEntity(visitedNodeDef) &&
           isEntityVisibleByAction[actionsWithEntitySelection.move]({ cycle, entityDef: visitedNodeDef, nodeDef }) &&
-          isEntitySelectableByAction[actionsWithEntitySelection.move]({
-            entityDefUuid: NodeDef.getUuid(visitedNodeDef),
-            nodeDef,
-          })
+          isEntitySelectableByAction[actionsWithEntitySelection.move]({ entityDefUuid: visitedNodeDefUuid, nodeDef })
         ) {
           availableEntityDefs.push(visitedNodeDef)
         }
@@ -172,7 +170,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       })
     }
     return _menuItems
-  }, [dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog])
+  }, [cycle, dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog, survey])
 
   if (menuItems.length === 0) return null
 
