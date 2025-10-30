@@ -21,6 +21,7 @@ const iconByAction = {
 }
 
 const isEntityVisibleByAction = {
+  [actionsWithEntitySelection.clone]: () => true,
   [actionsWithEntitySelection.move]: ({ cycle, entityDef, nodeDef }) =>
     NodeDef.isAttribute(nodeDef) ||
     (!NodeDef.isEqual(nodeDef)(entityDef) &&
