@@ -66,12 +66,7 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
       // add db update to batch
       batchUpdates.push(
         NodeDefRepository.updateNodeDefProps(
-          {
-            surveyId,
-            nodeDefUuid: descendantUuid,
-            parentUuid,
-            props: { [NodeDef.propKeys.cycles]: cyclesUpdated },
-          },
+          { surveyId, nodeDefUuid: descendantUuid, parentUuid, props: { [NodeDef.propKeys.cycles]: cyclesUpdated } },
           client
         )
       )
@@ -95,11 +90,7 @@ export const insertNodeDef = async (
 
     const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
 
-    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({
-      survey,
-      nodeDef,
-      cyclesAdded: [cycle],
-    })
+    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded: [cycle] })
     if (nodeDefParentUpdated) {
       await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)
     }
@@ -195,13 +186,7 @@ export const updateNodeDefProps = async (
 
     // update node def into db
     const nodeDef = await NodeDefRepository.updateNodeDefProps(
-      {
-        surveyId,
-        nodeDefUuid,
-        parentUuid,
-        props,
-        propsAdvanced,
-      },
+      { surveyId, nodeDefUuid, parentUuid, props, propsAdvanced },
       t
     )
     _addNodeDefUpdatedToSurvey(nodeDef)
@@ -215,12 +200,7 @@ export const updateNodeDefProps = async (
       if (NodeDef.isEntity(nodeDef)) {
         // Update nodeDef descendants cycles
         const nodeDefsCyclesUpdated = await _onAncestorCyclesUpdate(
-          {
-            survey: surveyUpdated,
-            nodeDefAncestor: nodeDef,
-            cycles,
-            cyclesPrev,
-          },
+          { survey: surveyUpdated, nodeDefAncestor: nodeDef, cycles, cyclesPrev },
           t
         )
         _addNodeDefsUpdatedToSurvey(nodeDefsCyclesUpdated)
@@ -228,12 +208,7 @@ export const updateNodeDefProps = async (
 
       // update layout
       _addNodeDefsUpdatedToSurvey(
-        NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({
-          survey: surveyUpdated,
-          nodeDefUuid,
-          cycles,
-          cyclesPrev,
-        })
+        NodeDefLayoutUpdater.updateLayoutOnCyclesUpdate({ survey: surveyUpdated, nodeDefUuid, cycles, cyclesPrev })
       )
     }
 
@@ -302,16 +277,95 @@ export const updateNodeDefProps = async (
     return nodeDefsUpdated
   })
 
+const rebuildDescendantNodeDefHierarchy = ({ nodeDefOriginal, nodeDefUpdated, nodeDefDescendant }) => {
+  const nodeDefUuid = NodeDef.getUuid(nodeDefUpdated)
+  const newMetaHierarchyFirstPart = [...NodeDef.getMetaHierarchy(nodeDefUpdated), nodeDefUuid]
+
+  // Find the position where the old hierarchy ends and append the remaining path
+  const oldHierarchyLength = NodeDef.getMetaHierarchy(nodeDefOriginal).length + 1 // +1 for the source node itself
+  const descendantOldHierarchy = NodeDef.getMetaHierarchy(nodeDefDescendant)
+  const remainingPath = descendantOldHierarchy.slice(oldHierarchyLength)
+
+  const updatedMetaHierarchy = [...newMetaHierarchyFirstPart, ...remainingPath]
+
+  return NodeDef.assocMetaHierarchy(updatedMetaHierarchy)(nodeDefDescendant)
+}
+
+const checkCanMoveNodeDef = ({ nodeDef, targetParentNodeDef }) => {
+  if (NodeDef.isEntity(nodeDef)) {
+    // Validation: prevent moving an entity into itself or into one of its descendants
+    if (NodeDef.isEqual(nodeDef)(targetParentNodeDef)) {
+      throw new Error('Cannot move an entity into itself')
+    }
+    if (NodeDef.isDescendantOf(nodeDef)(targetParentNodeDef)) {
+      throw new Error('Cannot move an entity into one of its descendants')
+    }
+  }
+}
+
+const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, t }) => {
+  const nodeDefsUpdatedByUuid = {}
+  const surveyId = Survey.getId(survey)
+  const descendants = Survey.getNodeDefDescendants({ nodeDef: nodeDefSource })(survey)
+
+  const batchUpdates = []
+  for (const nodeDefDescendant of descendants) {
+    const descendantUpdated = rebuildDescendantNodeDefHierarchy({
+      nodeDefOriginal: nodeDefSource,
+      nodeDefUpdated,
+      nodeDefDescendant,
+    })
+
+    const descendantUuid = NodeDef.getUuid(nodeDefDescendant)
+
+    batchUpdates.push(
+      NodeDefRepository.updateNodeDefProps(
+        {
+          surveyId,
+          nodeDefUuid: descendantUuid,
+          parentUuid: NodeDef.getParentUuid(nodeDefDescendant),
+          meta: NodeDef.getMeta(descendantUpdated),
+        },
+        t
+      )
+    )
+    nodeDefsUpdatedByUuid[descendantUuid] = descendantUpdated
+  }
+
+  // Perform all descendant updates in batch
+  if (batchUpdates.length > 0) {
+    await t.batch(batchUpdates)
+  }
+  return nodeDefsUpdatedByUuid
+}
+
+const getLayoutInParentEntityByCycles = ({ survey, nodeDef }) => {
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefSourceLayoutPrevByCycle = {}
+  const nodeDefSourceParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const cycles = NodeDef.getCycles(nodeDef)
+  for (const cycle of cycles) {
+    if (NodeDefLayout.isRenderTable(cycle)(nodeDef)) {
+      nodeDefSourceLayoutPrevByCycle[cycle] = NodeDefLayout.getLayoutChild({ cycle, childDefUuid: nodeDefUuid })(
+        nodeDefSourceParent
+      )
+    }
+  }
+  return nodeDefSourceLayoutPrevByCycle
+}
+
 export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
   client.tx(async (t) => {
     const result = {}
 
-    const addOrRemoveInParentLayout = async ({ nodeDef, add = true }) => {
+    const addOrRemoveInParentLayout = async ({ nodeDef, add = true, layoutInParentByCycle = null }) => {
+      const cycles = NodeDef.getCycles(nodeDef)
       const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
         survey,
         nodeDef,
-        cyclesAdded: add ? NodeDef.getCycles(nodeDef) : [],
-        cyclesDeleted: add ? [] : NodeDef.getCycles(nodeDef),
+        cyclesAdded: add ? cycles : [],
+        cyclesDeleted: add ? [] : cycles,
+        layoutInParentByCycle,
       })
       if (parentUpdated) {
         await _persistNodeDefLayout({ surveyId, nodeDef: parentUpdated }, t)
@@ -322,29 +376,30 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     const surveyId = Survey.getId(survey)
 
     const nodeDefSource = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-
-    // remove source node def from parent layout
-    await addOrRemoveInParentLayout({ nodeDef: nodeDefSource, add: false })
-
     const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
 
-    // update source node def parent uuid and meta
+    checkCanMoveNodeDef({ nodeDef: nodeDefSource, targetParentNodeDef })
+
+    const layoutInParentByCycle = getLayoutInParentEntityByCycles({ survey, nodeDef: nodeDefSource })
+
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefSource, add: false })
+
     let nodeDefUpdated = NodeDef.changeParentEntity({ targetParentNodeDef })(nodeDefSource)
 
     nodeDefUpdated = await NodeDefRepository.updateNodeDefProps(
-      {
-        surveyId,
-        nodeDefUuid,
-        parentUuid: targetParentNodeDefUuid,
-        meta: NodeDef.getMeta(nodeDefUpdated),
-      },
+      { surveyId, nodeDefUuid, parentUuid: targetParentNodeDefUuid, meta: NodeDef.getMeta(nodeDefUpdated) },
       t
     )
 
     result[nodeDefUuid] = nodeDefUpdated
 
+    // If moving an entity, update all descendants' meta hierarchy
+    if (NodeDef.isEntity(nodeDefSource)) {
+      await updateDescendantsLayout({ survey, nodeDefSource, nodeDefUpdated, t })
+    }
+
     // add node def to target parent layout
-    await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true })
+    await addOrRemoveInParentLayout({ nodeDef: nodeDefUpdated, add: true, layoutInParentByCycle })
 
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, nodeDefUpdated, false, t)
 

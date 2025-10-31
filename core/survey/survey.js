@@ -50,9 +50,7 @@ export const newSurvey = ({
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    [SurveyInfo.keys.cycles]: {
-      [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
-    },
+    [SurveyInfo.keys.cycles]: { [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle() },
     ...rest,
   },
   [SurveyInfo.keys.published]: published,
@@ -206,6 +204,7 @@ export const {
   traverseHierarchyItemSync,
   visitDescendantsAndSelf,
   findDescendants,
+  getNodeDefDescendants,
   getNodeDefDescendantsAndSelf,
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,

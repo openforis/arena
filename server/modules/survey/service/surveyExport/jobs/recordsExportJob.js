@@ -19,7 +19,14 @@ export default class RecordsExportJob extends Job {
       if (this.isCanceled()) break
 
       const recordUuid = record.uuid
-      const recordData = await RecordService.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false })
+      const recordData = await RecordService.fetchRecordAndNodesByUuid({
+        surveyId,
+        recordUuid,
+        fetchForUpdate: false,
+        includeRefData: false,
+        includeSurveyUuid: false,
+        includeRecordUuid: false,
+      })
       archive.append(JSON.stringify(recordData, null, 2), {
         name: ExportFile.record({ recordUuid }),
       })

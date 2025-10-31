@@ -142,6 +142,7 @@ export default {
     reset: 'Reiniciar',
     resume: 'Reanudar',
     retry: 'Reintentar',
+    role: 'Rol',
     save: 'Guardar',
     saveAndBack: 'Guardar y volver',
     saved: '¡Guardado!',
@@ -738,7 +739,6 @@ export default {
       surveyLabel: 'Etiqueta de encuesta',
       surveyLabelInitial: '(Cambie el nombre y la etiqueta de la encuesta según sea necesario)',
       surveyName: 'Nombre de la encuesta',
-      role: 'Rol',
       template: 'Plantilla',
     },
   },
@@ -1141,7 +1141,7 @@ export default {
     },
     moveDialog: {
       confirmButtonLabel: 'Mover',
-      title: 'Moviendo definición de nodo "{{nodeDefName}}"',
+      title: 'Moviendo la definición del nodo "{{nodeDefName}}" desde "{{parentNodeDefName}}"',
       entitySelectLabel: 'Entidad a la que mover:',
     },
     movedNodeDefinitionHasErrors:

@@ -15,15 +15,17 @@ export const NodeDefEntitySelectorDialog = (props) => {
   const {
     confirmButtonLabel,
     entitySelectLabel,
+    filterFn = undefined,
     currentNodeDef,
-    isEntitySelectable,
-    onChange: onChangeProp,
+    isEntitySelectable = undefined,
+    onChange: onChangeProp = undefined,
     onClose,
     onConfirm: onConfirmProp,
     title,
   } = props
 
   const survey = useSurvey()
+  const parentNodeDef = Survey.getNodeDefParent(currentNodeDef)(survey)
 
   const [selectedEntityDefUuid, setSelectedEntityDefUuid] = useState(null)
 
@@ -48,11 +50,12 @@ export const NodeDefEntitySelectorDialog = (props) => {
       onClose={onClose}
       showCloseButton
       title={title}
-      titleParams={{ nodeDefName: NodeDef.getName(currentNodeDef) }}
+      titleParams={{ nodeDefName: NodeDef.getName(currentNodeDef), parentNodeDefName: NodeDef.getName(parentNodeDef) }}
     >
       <ModalBody>
         <FormItem label={entitySelectLabel}>
           <EntitySelector
+            filterFn={filterFn}
             hierarchy={Survey.getHierarchy()(survey)}
             nodeDefLabelType={NodeDef.NodeDefLabelTypes.labelAndName}
             nodeDefUuidEntity={selectedEntityDefUuid}
@@ -79,6 +82,7 @@ NodeDefEntitySelectorDialog.propTypes = {
   confirmButtonLabel: PropTypes.string.isRequired,
   currentNodeDef: PropTypes.object.isRequired,
   entitySelectLabel: PropTypes.string.isRequired,
+  filterFn: PropTypes.func,
   isEntitySelectable: PropTypes.func,
   onChange: PropTypes.func,
   onClose: PropTypes.func.isRequired,

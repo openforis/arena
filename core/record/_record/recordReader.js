@@ -139,7 +139,7 @@ export const getNodeParentInDescendantSingleEntities =
 
     let currentParentNode = parentNode
 
-    hierarchyToVisit.forEach((descendantDefUuid) => {
+    for (const descendantDefUuid of hierarchyToVisit) {
       const nodeDefDescendant = SurveyNodeDefs.getNodeDefByUuid(descendantDefUuid)(survey)
       if (NodeDef.isSingleEntity(nodeDefDescendant)) {
         currentParentNode = getNodeChildByDefUuid(currentParentNode, descendantDefUuid)(record)
@@ -150,7 +150,7 @@ export const getNodeParentInDescendantSingleEntities =
           )}`
         )
       }
-    })
+    }
     return currentParentNode
   }
 

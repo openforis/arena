@@ -164,12 +164,13 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
 const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNamesGenerator }) => {
   const nodeDefUuidCols = Query.getAttributeDefUuids(query)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
-  if (Objects.isEmpty(nodeDefCols)) {
-    return { transformer: null } // No file columns
-  }
   const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
+  if (Objects.isEmpty(nodeDefFileCols)) {
+    // No file columns
+    return { transformer: null }
+  }
   const transformer = (obj) => {
-    nodeDefFileCols.forEach((nodeDef) => {
+    for (const nodeDef of nodeDefFileCols) {
       const fileUuidField = ColumnNodeDef.getFileUuidColumnName(nodeDef)
       const fileUuid = obj[fileUuidField]
       const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
@@ -178,7 +179,7 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
         const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
         obj[fileNameField] = uniqueFileName
       }
-    })
+    }
     return obj
   }
   return { transformer }

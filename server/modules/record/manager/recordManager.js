@@ -67,13 +67,11 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   let nodeDefKeys = null
   let summaryDefs = null
+  let survey = null
   if (includeRootKeyValues) {
     // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
     const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-      { surveyId, cycle, draft: nodeDefsDraft },
-      client
-    )
+    survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
     summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
     nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   }
@@ -105,6 +103,9 @@ export const fetchRecordsSummaryBySurveyId = async (
     }
   }
 
+  const nodeDefFiles = survey ? Survey.getNodeDefsArray(survey).filter(NodeDef.isFile) : []
+  const nodeDefFileUuids = nodeDefFiles.map(NodeDef.getUuid)
+
   const listWithCounts = []
   for (const recordSummary of list) {
     const recordUuid = Record.getUuid(recordSummary)
@@ -112,7 +113,9 @@ export const fetchRecordsSummaryBySurveyId = async (
       { surveyId, recordUuid },
       client
     )
-    const filesMissing = await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid }, client)
+    const filesMissing = R.isEmpty(nodeDefFileUuids)
+      ? 0
+      : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client)
 
     listWithCounts.push({
       ...recordSummary,
@@ -178,7 +181,15 @@ const _fetchAndSetRecordOwner = async ({ ownerUuid, record }, client = db) => {
 }
 
 export const fetchRecordAndNodesByUuid = async (
-  { surveyId, recordUuid, draft = false, fetchForUpdate = true, includeRefData = true },
+  {
+    surveyId,
+    recordUuid,
+    draft = false,
+    fetchForUpdate = true,
+    includeRefData = true,
+    includeSurveyUuid = true,
+    includeRecordUuid = true,
+  },
   client = db
 ) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
@@ -189,7 +200,14 @@ export const fetchRecordAndNodesByUuid = async (
     await _fetchAndSetRecordOwner({ ownerUuid, record }, client)
   }
   const nodes = await NodeRepository.fetchNodesByRecordUuid(
-    { surveyId, recordUuid, includeRefData: fetchForUpdate || includeRefData, draft },
+    {
+      surveyId,
+      recordUuid,
+      includeRefData: fetchForUpdate || includeRefData,
+      includeSurveyUuid,
+      includeRecordUuid,
+      draft,
+    },
     client
   )
   const indexedNodes = ObjectUtils.toUuidIndexedObj(nodes)

@@ -43,11 +43,12 @@ export default class RecordCheckJob extends Job {
   }
 
   _cleanSurveysCache(cycleToKeep) {
-    Object.keys(this.surveyAndNodeDefsByCycle).forEach((cycleInCache) => {
+    const cycles = Object.keys(this.surveyAndNodeDefsByCycle)
+    for (const cycleInCache of cycles) {
       if (cycleInCache !== cycleToKeep) {
         delete this.surveyAndNodeDefsByCycle[cycleInCache]
       }
-    })
+    }
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
@@ -67,7 +68,8 @@ export default class RecordCheckJob extends Job {
       const nodeDefUpdatedUuids = []
       const nodeDefDeletedUuids = []
 
-      Survey.getNodeDefsArray(survey).forEach((def) => {
+      const nodeDefs = Survey.getNodeDefsArray(survey)
+      for (const def of nodeDefs) {
         const nodeDefUuid = NodeDef.getUuid(def)
         if (NodeDef.isDeleted(def)) {
           nodeDefDeletedUuids.push(nodeDefUuid)
@@ -84,7 +86,7 @@ export default class RecordCheckJob extends Job {
           // Already existing node def but applicable or default values or validations have been updated
           nodeDefUpdatedUuids.push(nodeDefUuid)
         }
-      })
+      }
 
       const requiresCheck = nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
       if (requiresCheck) {
@@ -117,7 +119,10 @@ export default class RecordCheckJob extends Job {
     // this.logDebug(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes
-    let record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
+    let record = await RecordManager.fetchRecordAndNodesByUuid(
+      { surveyId, recordUuid, includeSurveyUuid: false, includeRecordUuid: false },
+      tx
+    )
     // this.logDebug(`record fetched`)
 
     // 2. remove deleted nodes
@@ -265,12 +270,12 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
   }
 
   // Include nodes associated to updated node defs
-  nodeDefUpdatedUuids.forEach((nodeDefUpdatedUuid) => {
+  for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
     const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
-    nodesToUpdatePartial.forEach((nodeUpdated) => {
+    for (const nodeUpdated of nodesToUpdatePartial) {
       nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
-    })
-  })
+    }
+  }
 
   return RecordManager.updateNodesDependents(
     { survey, record, nodes: nodesToUpdate, persistNodes: false, sideEffect: true },
@@ -282,13 +287,13 @@ const _clearRecordKeysValidation = (record) => {
   const validationRecord = Record.getValidation(record)
 
   const validationNodes = Object.values(Validation.getFieldValidations(validationRecord))
-  validationNodes.forEach((validationNode) => {
+  for (const validationNode of validationNodes) {
     Objects.dissocPath({
       obj: validationNode,
       path: [Validation.keys.fields, RecordValidation.keys.recordKeys],
       sideEffect: true,
     })
-  })
+  }
   return record
 }
 
@@ -298,13 +303,13 @@ const _validateNodes = async ({ user, survey, nodeDefAddedOrUpdatedUuids, record
   }
 
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
-  nodeDefAddedOrUpdatedUuids.forEach((nodeDefUuid) => {
+  for (const nodeDefUuid of nodeDefAddedOrUpdatedUuids) {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
-    parentNodes.forEach((parentNode) => {
+    for (const parentNode of parentNodes) {
       nodesToValidate[Node.getUuid(parentNode)] = parentNode
-    })
-  })
+    }
+  }
 
   // Record keys uniqueness must be validated after RDB generation
   await RecordManager.validateNodesAndPersistValidation({ user, survey, record, nodes: nodesToValidate }, tx)
