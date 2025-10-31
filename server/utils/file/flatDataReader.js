@@ -1,4 +1,4 @@
-import { parse as csvParser } from 'csv'
+import { parse } from '@fast-csv/parse'
 
 import { SystemError } from '@openforis/arena-core'
 
@@ -56,10 +56,7 @@ export const createReaderFromStream = ({
     }
   }
 
-  const parser =
-    fileFormat === FileFormats.csv
-      ? stream.pipe(csvParser({ relaxColumnCount: true, skipEmptyLines: true, skipRecordsWithEmptyValues: true }))
-      : null
+  const parser = fileFormat === FileFormats.csv ? stream.pipe(parse({ ignoreEmpty: true })) : null
 
   const start = async () => {
     let headers = null
@@ -119,5 +116,12 @@ export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.c
   })
   await reader.start()
 
+  return result
+}
+
+export const calculateTotalRowsFromFile = async ({ filePath, fileFormat }) => {
+  let result = 0
+  const reader = createReaderFromFile({ filePath, fileFormat, onTotalChange: (total) => (result = total) })
+  await reader.start()
   return result
 }

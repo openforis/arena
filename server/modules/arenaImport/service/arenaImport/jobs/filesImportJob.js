@@ -15,9 +15,11 @@ export default class FilesImportJob extends Job {
     this.insertedFileUuids = []
     this.updatedFileUuids = []
     this.deletedFileUuids = []
+    this.missingFileSummaries = []
   }
 
   async execute() {
+    const { surveyId } = this.context
     const filesSummaries = await this.fetchFilesSummaries()
 
     await this.checkFileUuidsAreValid(filesSummaries)
@@ -36,19 +38,20 @@ export default class FilesImportJob extends Job {
         const fileUuid = RecordFile.getUuid(fileSummary)
         const fileName = RecordFile.getName(fileSummary)
         const fileContent = await this.fetchFileContent({ fileName, fileUuid })
-        if (!fileContent) {
-          throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
+        if (fileContent) {
+          file = RecordFile.assocContent(fileContent)(file)
+
+          // update file size with actual file content length
+          file = RecordFile.assocSize(Buffer.byteLength(fileContent))(file)
+
+          await this.persistFile(file)
+        } else {
+          const recordUuid = RecordFile.getRecordUuid(fileSummary)
+          this.logWarn(`Survey ${surveyId} record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`)
+          this.missingFileSummaries.push(fileSummary)
         }
-        file = RecordFile.assocContent(fileContent)(file)
-
-        // update file size with actual file content length
-        file = RecordFile.assocSize(Buffer.byteLength(fileContent))(file)
-
-        await this.persistFile(file)
-
         this.incrementProcessedItems()
       }
-
       await this.deleteOrphanFiles()
     } else {
       this.logInfo('no files found')
@@ -161,6 +164,7 @@ export default class FilesImportJob extends Job {
       insertedFiles: this.insertedFileUuids.length,
       updatedFiles: this.updatedFileUuids.length,
       deletedFiles: this.deletedFileUuids.length,
+      missingFiles: this.missingFileSummaries.length,
     }
   }
 }

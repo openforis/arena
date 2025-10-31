@@ -9,12 +9,13 @@ import { _curry2 } from './internal/_curry2'
  * @returns {object} - A new object with properties from `names` not on it.
  */
 export const omit = _curry2((names, object) => {
-  const exclusionByName = names.reduce((acc, name) => {
+  const namesArray = Array.isArray(names) ? names : [names]
+  const exclusionByName = namesArray.reduce((acc, name) => {
     acc[name] = true
     return acc
   }, {})
   const result = {}
-  for (var prop in object) {
+  for (let prop in object) {
     if (!exclusionByName[prop]) {
       result[prop] = object[prop]
     }

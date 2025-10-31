@@ -1,15 +1,20 @@
 import axios from 'axios'
 import xmljs from 'xml-js'
 
-import { Objects, Promises } from '@openforis/arena-core'
+import { Objects } from '@openforis/arena-core'
 
 import { MapUtils } from '@core/map/mapUtils'
+import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SrsManager from '@server/modules/geo/manager/srsManager'
+import * as JobUtils from '@server/job/jobUtils'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { PlanetApi } from './planetApi'
+import { GeoService } from '../service/geoService'
 
 const uriPrefix = '/survey/:surveyId/geo/'
 const whispApiUrl = 'https://whisp.openforis.org/api/'
@@ -81,16 +86,18 @@ export const init = (app) => {
   app.get(`${uriPrefix}map/elevation`, AuthMiddleware.requireMapUsePermission, async (req, res) => {
     const { lat, lng } = Request.getParams(req)
     let elevation = null
-    await Promises.each(elevationApiUrls, async (urlPattern) => {
-      if (!Objects.isEmpty(elevation)) return
+    for (const urlPattern of elevationApiUrls) {
       try {
         const url = urlPattern({ lat, lng })
         const { data } = await axios.get(url, { timeout: 10000 })
         elevation = data?.results?.[0]?.elevation
+        if (!Objects.isEmpty(elevation)) {
+          break
+        }
       } catch (error) {
         // ignore it
       }
-    })
+    }
     res.json(elevation)
   })
 
@@ -107,15 +114,52 @@ export const init = (app) => {
   })
 
   app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
-    const geojson = Request.getBody(req)
-    const url = `${whispApiUrl}geojson`
     try {
+      const geojson = Request.getBody(req)
+      const url = `${whispApiUrl}geojson`
+      const apiKey = ProcessUtils.ENV.whispApiKey
+      if (!apiKey) {
+        throw new Error('WHISP API key not specified')
+      }
+      const headers = {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json',
+      }
       const {
         data: { token },
-      } = await axios.post(url, geojson)
+      } = await axios.post(url, geojson, { headers })
       res.json(token)
     } catch (error) {
       next(error)
     }
+  })
+
+  app.post(
+    `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,
+    AuthMiddleware.requireMapUsePermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, cycle, attributeDefUuid } = Request.getParams(req)
+        const job = GeoService.startGeoJsonCoordinateFeaturesGenerationJob({ user, surveyId, cycle, attributeDefUuid })
+        res.json(JobUtils.jobToJSON(job))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(`${uriPrefix}geojsondata/download/:tempFileName`, async (req, res) => {
+    const { tempFileName } = Request.getParams(req)
+
+    FileUtils.checkIsValidTempFileName(tempFileName)
+
+    const filePath = FileUtils.tempFilePath(tempFileName)
+
+    Response.sendFile({
+      contentType: Response.contentTypes.json,
+      path: filePath,
+      res,
+    })
   })
 }

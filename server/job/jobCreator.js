@@ -11,17 +11,21 @@ import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import DataExportJob from '@server/modules/dataExport/service/dataExportJob'
 import DataSummaryExportJob from '@server/modules/dataExport/service/DataSummaryExportJob'
+import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExportJob'
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
+import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
+import SurveysListExportJob from '@server/modules/survey/service/SurveysListExportJob'
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
+import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
   ArenaImportJob,
@@ -35,17 +39,21 @@ const jobClasses = [
   DataImportValidationJob,
   DataExportJob,
   DataSummaryExportJob,
+  GeoJsonDataExportJob,
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,
   SelectedRecordsExportJob,
   SurveyCloneJob,
+  SurveyActivityLogClearJob,
   SurveyExportJob,
   SurveyLabelsImportJob,
   SurveyPublishJob,
+  SurveysListExportJob,
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
   TaxonomyImportJob,
+  VaidationReportGenerationJob,
 ]
 
 const jobClassesByType = ObjectUtils.toIndexedObj(jobClasses, 'type')

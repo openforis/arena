@@ -57,14 +57,6 @@ const _onUpdateCategoryUuid = ({ nodeDef }) => {
   return NodeDef.mergeProps({ [NodeDef.propKeys.parentCodeDefUuid]: null })(nodeDef)
 }
 
-const _onUpdateReadOnly = ({ nodeDef, value: readOnly }) => {
-  if (!readOnly) {
-    // dissoc properties valid only when readOnly is true
-    return NodeDef.dissocProp(NodeDef.propKeys.hidden)(nodeDef)
-  }
-  return nodeDef
-}
-
 const _generateLabelFromName = (name) => {
   // name is in snake case
   const parts = name.split(/[_|-]/).filter(Boolean)
@@ -102,7 +94,6 @@ const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
   [NodeDef.propKeys.name]: _onUpdateName,
-  [NodeDef.propKeys.readOnly]: _onUpdateReadOnly,
   [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,
 }
 

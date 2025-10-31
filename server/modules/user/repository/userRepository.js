@@ -2,6 +2,9 @@ import { db } from '@server/db/db'
 
 import camelize from 'camelize'
 
+import { Objects } from '@openforis/arena-core'
+
+import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as Survey from '@core/survey/survey'
@@ -9,7 +12,6 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
-import { Objects } from '@openforis/arena-core'
 
 const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
 const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
@@ -56,15 +58,23 @@ export const importNewUser = async (
   )
 
 export const insertUser = async (
-  { email, password, status, surveyId = null, surveyCycleKey = null, title = null },
+  { email, password, status, name = null, title = null, profilePicture = null, surveyId = null, surveyCycleKey = null },
   client = db
 ) =>
   client.one(
     `
-    INSERT INTO "user" AS u (email, password, status, prefs, props)
-    VALUES ($1, $2, $3, $4::jsonb, $5::jsonb)
+    INSERT INTO "user" AS u (email, password, status, name, prefs, props, profile_picture)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7)
     RETURNING ${columnsCommaSeparated}`,
-    [email, password, status, User.newPrefs({ surveyId, surveyCycleKey }), User.newProps({ title })],
+    [
+      email,
+      password,
+      status,
+      name,
+      User.newPrefs({ surveyId, surveyCycleKey }),
+      User.newProps({ title }),
+      profilePicture,
+    ],
     camelize
   )
 
@@ -144,13 +154,20 @@ const _usersSelectQuery = ({
   }
   const whereClause = DbUtils.getWhereClause(...whereConditions)
 
+  const finalSelectFields = [
+    ...selectFields.map(StringUtils.prependIfMissing('u.')),
+    DbUtils.selectDate('us.last_login_time', 'last_login_time'),
+  ]
+  if (includeSurveys) {
+    finalSelectFields.push(
+      `user_surveys.surveys AS surveys`,
+      DbUtils.selectDate('user_surveys.invited_date', 'invited_date')
+    )
+  }
+  const finalSelectFieldsJoint = finalSelectFields.join(', ')
+
   return `${getUsersSelectQueryPrefix({ includeSurveys })}
-    SELECT ${selectFields.join(', ')}, ${
-      includeSurveys
-        ? `user_surveys.surveys AS surveys, ${DbUtils.selectDate('user_surveys.invited_date', 'invited_date')}, `
-        : ''
-    }
-      ${DbUtils.selectDate('us.last_login_time', 'last_login_time')},
+    SELECT ${finalSelectFieldsJoint},
       EXISTS (
         SELECT * 
           FROM auth_group_user 
@@ -158,11 +175,8 @@ const _usersSelectQuery = ({
         WHERE auth_group.name = '${AuthGroup.groupNames.systemAdmin}' 
           AND auth_group_user.user_uuid = u.uuid) 
       AS system_administrator,
-      (
-        SELECT uar.props ->> '${UserAccessRequest.keysProps.country}'
-        FROM user_access_request uar
-        WHERE uar.email = u.email
-      ) AS country,
+      uar.props ->> '${UserAccessRequest.keysProps.country}' AS country,
+      ${DbUtils.selectDate('uar.date_created', 'access_request_date')},
       (
         SELECT COUNT(*) 
         FROM survey s
@@ -174,11 +188,18 @@ const _usersSelectQuery = ({
         FROM survey s
         WHERE s.owner_uuid = u.uuid
           AND NOT s.published
-      ) AS surveys_count_draft
+      ) AS surveys_count_draft,
+      (
+        SELECT urp.uuid
+        FROM user_reset_password urp
+        WHERE urp.user_uuid = u.uuid
+      ) AS reset_password_uuid
     FROM "user" u
     ${includeSurveys ? `LEFT JOIN user_surveys ON user_surveys.user_uuid = u.uuid` : ''}
     LEFT OUTER JOIN us
       ON us.user_uuid = u.uuid
+    LEFT OUTER JOIN user_access_request uar
+      ON uar.email = u.email
     ${whereClause}
     ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
@@ -356,14 +377,17 @@ export const countSystemAdministrators = async (client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async ({ userUuid, name, email, profilePicture, props = {} }, client = db) =>
+export const updateUser = async (
+  { userUuid, name, email, profilePictureSet = false, profilePicture = null, props = {} },
+  client = db
+) =>
   client.one(
     `
     UPDATE "user" u
     SET
     name = $1,
     email = $2,
-    profile_picture = COALESCE($3, profile_picture),
+    ${profilePictureSet ? 'profile_picture = $3,' : ``}
     props = $5::jsonb
     WHERE u.uuid = $4
     RETURNING ${columnsCommaSeparated}`,

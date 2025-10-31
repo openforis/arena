@@ -1,4 +1,5 @@
 import * as Request from '@server/utils/request'
+import { processChunkedFile } from '@server/utils/requestChunkedFileProcessor'
 import * as JobUtils from '@server/job/jobUtils'
 
 import * as DataImportService from '../service/dataImportService'
@@ -46,25 +47,29 @@ export const init = (app) => {
         deleteExistingEntities,
         abortOnErrors,
       } = Request.getParams(req)
-      const filePath = Request.getFilePath(req)
 
-      const job = DataImportService.startFlatDataImportJob({
-        user,
-        surveyId,
-        filePath,
-        fileFormat,
-        cycle,
-        nodeDefUuid,
-        dryRun,
-        insertNewRecords,
-        insertMissingNodes,
-        updateRecordsInAnalysis,
-        includeFiles,
-        deleteExistingEntities,
-        abortOnErrors,
-      })
-      const jobSerialized = JobUtils.jobToJSON(job)
-      res.json({ job: jobSerialized })
+      const filePath = await processChunkedFile({ req })
+      if (filePath) {
+        const job = DataImportService.startFlatDataImportJob({
+          user,
+          surveyId,
+          filePath,
+          fileFormat,
+          cycle,
+          nodeDefUuid,
+          dryRun,
+          insertNewRecords,
+          insertMissingNodes,
+          updateRecordsInAnalysis,
+          includeFiles,
+          deleteExistingEntities,
+          abortOnErrors,
+        })
+        const jobSerialized = JobUtils.jobToJSON(job)
+        res.json({ job: jobSerialized })
+      } else {
+        res.json({ chunkProcessing: true })
+      }
     } catch (error) {
       next(error)
     }

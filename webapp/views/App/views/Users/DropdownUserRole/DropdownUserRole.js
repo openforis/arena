@@ -11,7 +11,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 import Dropdown from '@webapp/components/form/Dropdown'
 
-const DropdownUserGroup = (props) => {
+const DropdownUserRole = (props) => {
   const {
     disabled = false,
     editingLoggedUser = false, // True if user being edited is the logged one
@@ -32,9 +32,9 @@ const DropdownUserGroup = (props) => {
       disabled={disabled}
       items={groups}
       itemValue={AuthGroup.keys.uuid}
-      itemLabel={(group) => i18n.t(`auth:authGroups.${AuthGroup.getName(group)}.label_plural`)}
+      itemLabel={(group) => i18n.t(`auth:authGroups.${AuthGroup.getName(group)}.label`)}
       onChange={(group) => onChange(group)}
-      placeholder={i18n.t('common.group')}
+      placeholder={i18n.t('common.role')}
       selection={groups.find((group) => AuthGroup.getUuid(group) === groupUuid)}
       searchable={false}
       testId={TestId.userInvite.group}
@@ -43,7 +43,7 @@ const DropdownUserGroup = (props) => {
   )
 }
 
-DropdownUserGroup.propTypes = {
+DropdownUserRole.propTypes = {
   editingLoggedUser: PropTypes.any,
   groupUuid: PropTypes.any,
   disabled: PropTypes.bool,
@@ -52,4 +52,4 @@ DropdownUserGroup.propTypes = {
   showOnlySurveyGroups: PropTypes.bool,
 }
 
-export default DropdownUserGroup
+export default DropdownUserRole

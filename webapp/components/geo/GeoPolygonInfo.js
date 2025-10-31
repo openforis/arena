@@ -7,7 +7,7 @@ import { Numbers } from '@openforis/arena-core'
 
 import { NumberConversionUtils } from '@core/numberConversionUtils'
 
-import { GeoJsonUtils } from '@webapp/utils/geoJsonUtils'
+import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { FormItem } from '../form/Input'
 import { ButtonIconInfo } from '../buttons'

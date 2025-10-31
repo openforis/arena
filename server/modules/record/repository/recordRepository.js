@@ -3,9 +3,9 @@ import * as R from 'ramda'
 import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
-import * as StringUtils from '@core/stringUtils'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import { AppInfo } from '@core/app/appInfo'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -38,6 +38,9 @@ const recordSelectFieldsArray = [
   ...dateColumns.map((dateCol) => DbUtils.selectDate(dateCol)),
 ]
 const recordSelectFields = recordSelectFieldsArray.join(', ')
+
+const recordKeysObjAlias = 'keys_obj'
+const recordSummaryAttributesObjAlias = 'summary_attributes_obj'
 
 const dbTransformCallback =
   (surveyId, includeValidationFields = true) =>
@@ -109,21 +112,40 @@ export const insertRecordsInBatch = async ({ surveyId, records, userUuid }, clie
 // ============== READ
 
 export const countRecordsBySurveyId = async (
-  { surveyId, cycle = null, nodeDefRoot, nodeDefKeys, search = null, ownerUuid = null },
+  {
+    surveyId,
+    cycle = null,
+    nodeDefRoot,
+    nodeDefKeys,
+    summaryDefs,
+    search = null,
+    ownerUuid = null,
+    includeMerged = false,
+  },
   client = db
 ) => {
   if (!A.isEmpty(search)) {
-    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({ surveyId, cycle, nodeDefRoot, nodeDefKeys, search })
+    const recordsWithSearch = await fetchRecordsSummaryBySurveyId({
+      surveyId,
+      cycle,
+      nodeDefRoot,
+      nodeDefKeys,
+      summaryDefs,
+      search,
+    })
     return recordsWithSearch.length
   }
+  const whereConditions = ['preview = FALSE']
+  if (cycle !== null) whereConditions.push('cycle = $/cycle/')
+  if (ownerUuid) whereConditions.push('owner_uuid = $/ownerUuid/')
+  whereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+
+  const whereConditionsJoint = whereConditions.map((condition) => `(${condition})`).join(' AND ')
+
   return client.one(
-    `
-        SELECT count(*) 
-        FROM ${getSchemaSurvey(surveyId)}.record 
-        WHERE preview = FALSE 
-          ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
-          ${ownerUuid ? 'AND owner_uuid = $/ownerUuid/' : ''}
-      `,
+    `SELECT count(*) 
+     FROM ${getSchemaSurvey(surveyId)}.record 
+     WHERE ${whereConditionsJoint}`,
     { cycle, ownerUuid },
     (row) => Number(row.count)
   )
@@ -134,7 +156,9 @@ export const countRecordsGroupedByApp = async ({ surveyId, cycle = null }, clien
     `
         SELECT COALESCE(info #>> '{${Record.infoKeys.createdWith},${AppInfo.keys.appId}}', '${AppInfo.arenaAppId}') AS created_with, count(*)
         FROM ${getSchemaSurvey(surveyId)}.record 
-        WHERE preview = FALSE 
+        WHERE 
+          preview = FALSE 
+          AND merged_into_record_uuid IS NULL
           ${cycle !== null ? 'AND cycle = $/cycle/' : ''}
         GROUP BY created_with
       `,
@@ -150,7 +174,10 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
   const counts = await client.manyOrNone(
     `SELECT step, count(*)
     FROM ${getSchemaSurvey(surveyId)}.record 
-    WHERE preview = FALSE AND cycle = $1
+    WHERE 
+      preview = FALSE 
+      AND merged_into_record_uuid IS NULL 
+      AND cycle = $1
     GROUP BY step`,
     [cycle]
   )
@@ -163,27 +190,57 @@ export const countRecordsBySurveyIdGroupedByStep = async ({ surveyId, cycle }, c
   )
 }
 
-const determineOrderBy = ({ nodeDefKeys, sortBy, rootEntityTableAlias }) => {
-  const getNodeDefKeyColumnName = NodeDefTable.getColumnName
-  const getNodeDefKeyColAlias = NodeDef.getName
+const determineOrderBy = ({ nodeDefKeys, summaryDefs, sortBy }) => {
+  const getColumnName = (nodeDef) =>
+    NodeDef.isCode(nodeDef)
+      ? // consider label for sorting if nodeDef is code
+        ColumnNodeDef.getCodeLabelColumnName(nodeDef)
+      : NodeDefTable.getColumnName(nodeDef)
 
-  const nodeDefKeysColumnNamesByAlias = nodeDefKeys?.reduce((acc, keyDef) => {
-    const colName = NodeDef.isCode(keyDef)
-      ? ColumnNodeDef.getCodeLabelColumnName(keyDef)
-      : getNodeDefKeyColumnName(keyDef)
-    acc[getNodeDefKeyColAlias(keyDef)] = colName
-    return acc
-  }, {})
-
-  const sortByColumnName = StringUtils.toSnakeCase(sortBy)
-
-  if (nodeDefKeysColumnNamesByAlias && Object.keys(nodeDefKeysColumnNamesByAlias).includes(sortByColumnName)) {
-    return `${rootEntityTableAlias}.${nodeDefKeysColumnNamesByAlias[sortByColumnName]}`
+  const getKeyOrSummaryDefCondition = ({ nodeDefs, objAlias }) => {
+    const nodeDefNames = nodeDefs?.map(NodeDef.getName)
+    if (nodeDefNames?.includes(sortBy)) {
+      const nodeDef = nodeDefs.find((nodeDef) => NodeDef.getName(nodeDef) === sortBy)
+      if (nodeDef) {
+        const colName = getColumnName(nodeDef)
+        return `${objAlias} -> '${colName}'`
+      }
+    }
+    return null
+  }
+  const keyCondition = getKeyOrSummaryDefCondition({ nodeDefs: nodeDefKeys, objAlias: recordKeysObjAlias })
+  if (keyCondition) {
+    return keyCondition
+  }
+  const summaryDefCondition = getKeyOrSummaryDefCondition({
+    nodeDefs: summaryDefs,
+    objAlias: recordSummaryAttributesObjAlias,
+  })
+  if (summaryDefCondition) {
+    return summaryDefCondition
   }
   if (sortBy === Record.keys.ownerName) {
-    return 'u.name'
+    return 'owner_name'
   }
-  return `r.${sortByColumnName}`
+  // fallbacks to table columns
+  return StringUtils.toSnakeCase(sortBy)
+}
+
+const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
+  if (!nodeDefs) return null
+  return `jsonb_build_object(${nodeDefs
+    .flatMap((nodeDef) => {
+      const colNames = NodeDefTable.getColumnNames(nodeDef)
+      return colNames.map((colName) => {
+        const qualifiedColName = `${tableAlias}.${colName}`
+        if (NodeDef.isCoordinate(nodeDef) && colName === NodeDef.getName(nodeDef)) {
+          return `'${colName}', ${DbUtils.geometryPointColumnAsText({ qualifiedColName })}`
+        } else {
+          return `'${colName}', ${qualifiedColName}`
+        }
+      })
+    })
+    .join(', ')}) AS ${alias}`
 }
 
 export const fetchRecordsSummaryBySurveyId = async (
@@ -191,6 +248,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     surveyId,
     nodeDefRoot = null,
     nodeDefKeys = null,
+    summaryDefs = null,
     cycle = null,
     step = null,
     offset = 0,
@@ -214,62 +272,93 @@ export const fetchRecordsSummaryBySurveyId = async (
     })
     .join(', ')
 
-  const nodeDefKeysSelectSearch = nodeDefKeys
-    ?.map((nodeDefKey) =>
-      NodeDefTable.getColumnNames(nodeDefKey)
-        .map((colName) => ` (${rootEntityTableAlias}.${colName})::text ilike '%$/search:value/%'`)
-        .join(' OR ')
-    )
-    .join(' OR ')
+  const nodeDefKeysJsonSelect = nodeDefsToJsonb({
+    nodeDefs: nodeDefKeys,
+    tableAlias: rootEntityTableAlias,
+    alias: recordKeysObjAlias,
+  })
+
+  const summaryAttributesJsonSelect = nodeDefsToJsonb({
+    nodeDefs: summaryDefs,
+    tableAlias: rootEntityTableAlias,
+    alias: recordSummaryAttributesObjAlias,
+  })
+
+  const getWhereConditionsByKeysOrSummaryDefs = ({ nodeDefs, objAlias }) =>
+    nodeDefs
+      ?.flatMap((nodeDef) =>
+        NodeDefTable.getColumnNames(nodeDef).map(
+          (colName) => ` (${objAlias} ->> '${colName}') ilike '%$/search:value/%'`
+        )
+      )
+      .join(' OR ')
+
+  const nodeDefKeysWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
+    nodeDefs: nodeDefKeys,
+    objAlias: recordKeysObjAlias,
+  })
+  const summaryDefsWhereConditions = getWhereConditionsByKeysOrSummaryDefs({
+    nodeDefs: summaryDefs,
+    objAlias: recordSummaryAttributesObjAlias,
+  })
 
   const recordsSelectWhereConditions = []
-  if (!includePreview) recordsSelectWhereConditions.push('r.preview = FALSE')
-  recordsSelectWhereConditions.push(`r.merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
-  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('r.cycle = $/cycle/')
-  if (!A.isNull(step)) recordsSelectWhereConditions.push('r.step = $/step/')
-  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('r.uuid IN ($/recordUuids:csv/)')
-  if (!A.isEmpty(search))
-    recordsSelectWhereConditions.push(`(${nodeDefKeysSelectSearch} OR u.name ilike '%$/search:value/%')`)
-  if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('r.owner_uuid = $/ownerUuid/')
+  if (!includePreview) recordsSelectWhereConditions.push('preview = FALSE')
+  recordsSelectWhereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('cycle = $/cycle/')
+  if (!A.isNull(step)) recordsSelectWhereConditions.push('step = $/step/')
+  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('uuid IN ($/recordUuids:csv/)')
+  if (!A.isEmpty(search)) {
+    const searchConditions = []
+    if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
+    if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
+    searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
+    recordsSelectWhereConditions.push(searchConditions.join(' OR '))
+  }
+  if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('owner_uuid = $/ownerUuid/')
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
 
   return client.map(
-    `
-    SELECT 
-      r.uuid, 
-      r.owner_uuid, 
-      r.cycle,
-      r.step, 
-      r.preview, 
-      r.merged_into_record_uuid, 
-      ${DbUtils.selectDate('r.date_created', 'date_created')}, 
-      ${DbUtils.selectDate('r.date_modified', 'date_modified')},
-      r.validation,
-      r.info,
-      s.uuid AS survey_uuid,
-      u.name as owner_name
-      ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
-    FROM ${getSchemaSurvey(surveyId)}.record r
-    -- GET SURVEY UUID
-    JOIN survey s
-      ON s.id = $/surveyId/
-    -- GET OWNER NAME
-    JOIN "user" u
-      ON r.owner_uuid = u.uuid
-      ${
-        nodeDefRoot && nodeDefKeys?.length > 0
-          ? `-- join with root entity table to get node key values 
-      LEFT OUTER JOIN
-        ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
-      ON r.uuid = ${rootEntityTableAlias}.record_uuid`
-          : ''
-      }
-
+    `WITH records AS (
+      SELECT 
+        r.uuid, 
+        r.owner_uuid, 
+        r.cycle,
+        r.step, 
+        r.preview, 
+        r.merged_into_record_uuid, 
+        ${DbUtils.selectDate('r.date_created', 'date_created')}, 
+        ${DbUtils.selectDate('r.date_modified', 'date_modified')},
+        r.validation,
+        r.info,
+        s.uuid AS survey_uuid,
+        u.name as owner_name
+        ${nodeDefKeysSelect ? `, ${nodeDefKeysSelect}` : ''}
+        ${nodeDefKeysJsonSelect ? `, ${nodeDefKeysJsonSelect}` : ''}
+        ${summaryAttributesJsonSelect ? `, ${summaryAttributesJsonSelect}` : ''}
+      FROM ${getSchemaSurvey(surveyId)}.record r
+      -- GET SURVEY UUID
+      JOIN survey s
+        ON s.id = $/surveyId/
+      -- GET OWNER NAME
+      JOIN "user" u
+        ON r.owner_uuid = u.uuid
+        ${
+          nodeDefRoot && nodeDefKeys?.length > 0
+            ? `-- join with root entity table to get node key values 
+        LEFT OUTER JOIN
+          ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+        ON r.uuid = ${rootEntityTableAlias}.record_uuid`
+            : ''
+        }
+    )
+    SELECT * FROM records
+    
     ${whereCondition}
 
-    ORDER BY ${determineOrderBy({ nodeDefKeys, sortBy, rootEntityTableAlias })} ${sortOrder}
+    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${sortOrder}
 
     ${limit ? 'LIMIT $/limit:value/' : ''}
 
@@ -350,6 +439,7 @@ export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to,
       r.cycle = $3     
     AND 
       r.preview = FALSE
+      AND r.merged_into_record_uuid IS NULL
     GROUP BY
       date_trunc('day', r.date_created)
     ORDER BY
@@ -372,10 +462,12 @@ export const fetchRecordCreatedCountsByDatesAndUser = async (surveyId, cycle, fr
     JOIN public.user u ON r.owner_uuid = u.uuid
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
-    AND 
-      r.cycle = $3     
-    AND 
-      r.preview = FALSE
+      AND 
+        r.cycle = $3     
+      AND 
+        r.preview = FALSE
+      AND 
+        r.merged_into_record_uuid IS NULL
     GROUP BY
       date_trunc('day', r.date_created),
       r.owner_uuid,
@@ -400,10 +492,12 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
     JOIN public.user u ON r.owner_uuid = u.uuid
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
-    AND 
-      r.cycle = $3     
-    AND 
-      r.preview = FALSE
+      AND 
+        r.cycle = $3     
+      AND 
+        r.preview = FALSE
+      AND 
+        r.merged_into_record_uuid IS NULL  
     GROUP BY
       r.owner_uuid,
       u.name,

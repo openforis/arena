@@ -47,6 +47,38 @@
       .leaflet-top.leaflet-right {
         z-index: 6;
       }
+
+      .layer-selector-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        .layer-selector-name {
+          flex: 1;
+          max-width: 15rem;
+        }
+
+        .layer-selector-button-bar {
+          width: 2rem;
+
+          .layer-selector-earth-map-btn {
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            border: none;
+          }
+        }
+      }
+
+      .leaflet-ruler {
+        background-image: url('/img/ruler-icon-24x24.png');
+        position: absolute;
+        top: 100px;
+        right: 0;
+        height: 34px;
+        width: 34px;
+        z-index: 5;
+      }
     }
 
     .leaflet-popup-content {

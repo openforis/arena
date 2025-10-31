@@ -11,7 +11,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import Identifier from '../identifier'
 import { CallEditorPropTypes } from './callEditorPropTypes'
 
-const variablesFilterFn = (variable) => variable.root || variable.nodeDefType === NodeDef.nodeDefType.coordinate
+const variablesFilterFn = (variable) => variable.root || [NodeDef.nodeDefType.coordinate].includes(variable.nodeDefType)
 
 export const CallDistanceEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props

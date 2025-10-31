@@ -14,7 +14,7 @@ import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/
 import { Button, ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
-import { CopyInvitationLinkButton } from './CopyInvitationLinkButton'
+import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 const Row = (props) => {
   const { onEditSurveyUserExtraProps, row: userListItem } = props
@@ -62,7 +62,7 @@ const Row = (props) => {
           <Button
             className="icon-invitation-expired"
             iconClassName="icon-crying icon-16px"
-            label="usersView.invitationExpiredClickToSendAgainTheInvitation"
+            label="usersView:invitationExpiredClickToSendAgainTheInvitation"
             onClick={handleResendInvitation}
             showLabel={false}
             variant="text"
@@ -76,7 +76,7 @@ const Row = (props) => {
               showLabel={false}
               variant="text"
             />
-            <CopyInvitationLinkButton email={email} userUuid={userUuid} />
+            <CopyPasswordResetLinkButton email={email} messageType="invitation" userUuid={userUuid} />
           </>
         )}
       </div>
@@ -88,7 +88,7 @@ const Row = (props) => {
       </div>
       <Button
         iconClassName="icon-cog"
-        title="usersView.editSurveyUserExtraPropsForUser"
+        title="usersView:editSurveyUserExtraPropsForUser"
         titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
         onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
         variant="text"

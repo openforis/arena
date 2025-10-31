@@ -101,7 +101,9 @@ export const fetchValidationReport = async (
   )
 
 export const countValidationReportItems = async ({ surveyId, cycle, recordUuid = null }, client = db) =>
-  client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid })
+  client.one(`SELECT COUNT(*) FROM(${query({ surveyId, recordUuid })}) AS v`, { cycle, recordUuid }, (row) =>
+    Number(row.count)
+  )
 
 export const getValidationReportAsStream = ({ surveyId, cycle, recordUuid = null, processor }, client = db) => {
   const queryFormatted = DbUtils.formatQuery(query({ surveyId, recordUuid }), { cycle, recordUuid })

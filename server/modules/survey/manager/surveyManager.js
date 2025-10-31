@@ -18,6 +18,7 @@ import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import { db } from '@server/db/db'
+import * as Log from '@server/log/log'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as ChainRepository from '@server/modules/analysis/repository/chain'
@@ -35,6 +36,8 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as SurveyRepositoryUtils from '../repository/surveySchemaRepositoryUtils'
 import * as SurveyRepository from '../repository/surveyRepository'
+
+const Logger = Log.getLogger('SurveyManager')
 
 const assocSurveyInfo = (survey) => survey
 
@@ -290,23 +293,32 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
   return Survey.assocRefData({ categoryItemsRefData, taxaIndexRefData })(survey)
 }
 
-export const fetchUserSurveysInfo = async (
-  {
-    user,
-    draft = true,
-    template = false,
-    offset,
-    limit,
-    lang,
-    search,
-    sortBy,
-    sortOrder,
-    includeCounts = false,
-    includeOwnerEmailAddress = false,
-    onlyOwn = false,
-  },
-  client = db
-) => {
+const calculateFilesMissing = async ({ surveyId, draft }) => {
+  const nodeDefFileUuids = (await NodeDefRepository.fetchNodeDefsBySurveyId({ surveyId, draft }))
+    .filter(NodeDef.isFile)
+    .map(NodeDef.getUuid)
+  if (Objects.isEmpty(nodeDefFileUuids)) {
+    return 0
+  }
+  return NodeRepository.countNodesWithMissingFile({ surveyId, nodeDefFileUuids })
+}
+
+export const fetchUserSurveysInfo = async ({
+  user,
+  draft = true,
+  template = false,
+  offset,
+  limit,
+  lang,
+  search,
+  sortBy,
+  sortOrder,
+  includeCounts = false,
+  includeOwnerEmailAddress = false,
+  onlyOwn = false,
+  onProgress = null,
+  stopIfFunction = null,
+}) => {
   // check sortBy is valid
   if (sortBy && !Object.values(Survey.sortableKeys).includes(sortBy)) {
     throw new SystemError(`Invalid sortBy specified: ${sortBy}`)
@@ -315,46 +327,59 @@ export const fetchUserSurveysInfo = async (
   if (sortOrder && !['asc', 'desc'].includes(sortOrder.toLowerCase())) {
     throw new SystemError(`Invalid sortOrder specified: ${sortOrder}`)
   }
-  return client.tx(async (tx) => {
-    const surveys = (
-      await SurveyRepository.fetchUserSurveys({
-        user,
-        draft,
-        template,
-        offset,
-        limit,
-        lang,
-        search,
-        sortBy,
-        sortOrder,
-        includeOwnerEmailAddress,
-        onlyOwn,
-      })
-    ).map(assocSurveyInfo)
 
-    if (!includeCounts) {
-      return surveys
+  const surveys = (
+    await SurveyRepository.fetchUserSurveys({
+      user,
+      draft,
+      template,
+      offset,
+      limit,
+      lang,
+      search,
+      sortBy,
+      sortOrder,
+      includeOwnerEmailAddress,
+      onlyOwn,
+    })
+  ).map(assocSurveyInfo)
+
+  onProgress?.({ total: surveys.length, processed: 0 })
+
+  if (!includeCounts) {
+    return surveys
+  }
+  const surveysWithCounts = []
+  for (const survey of surveys) {
+    if (stopIfFunction?.()) {
+      break
     }
-    return Promise.all(
-      surveys.map(async (survey) => {
-        const surveyId = Survey.getId(survey)
-        const canHaveData = Survey.canHaveData(survey)
-        const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId }, tx)
-        return {
-          ...survey,
-          cycles: Survey.getCycleKeys(survey).length,
-          languages: Survey.getLanguages(survey).join('|'),
-          nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }, tx),
-          recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }, tx) : 0,
-          recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }, tx) : {},
-          chainsCount: await ChainRepository.countChains({ surveyId }, tx),
-          filesCount,
-          filesSize,
-          filesMissing: await NodeRepository.countNodesWithMissingFile({ surveyId }, tx),
-        }
+    const surveyId = Survey.getId(survey)
+    const surveyWithCounts = {
+      ...survey,
+      cycles: Survey.getCycleKeys(survey).length,
+      languages: Survey.getLanguages(survey).join('|'),
+    }
+    try {
+      const canHaveData = Survey.canHaveData(survey)
+      const { count: filesCount, total: filesSize } = await FileManager.fetchCountAndTotalFilesSize({ surveyId })
+
+      Object.assign(surveyWithCounts, {
+        nodeDefsCount: await NodeDefRepository.countNodeDefsBySurveyId({ surveyId, draft }),
+        recordsCount: canHaveData ? await RecordRepository.countRecordsBySurveyId({ surveyId }) : 0,
+        recordsCountByApp: canHaveData ? await RecordRepository.countRecordsGroupedByApp({ surveyId }) : {},
+        chainsCount: await ChainRepository.countChains({ surveyId }),
+        filesCount,
+        filesSize,
+        filesMissing: await calculateFilesMissing({ surveyId, draft }),
       })
-    )
-  })
+    } catch (error) {
+      Logger.error(`fetchUserSurveysInfo: error fetching counts for survey ${surveyId}: ${error}`)
+    }
+    surveysWithCounts.push(surveyWithCounts)
+    onProgress?.({ total: surveys.length, processed: surveysWithCounts.length })
+  }
+  return surveysWithCounts
 }
 
 // ====== UPDATE
@@ -483,5 +508,8 @@ export const deleteTemporarySurveys = async ({ olderThan24Hours }, client = db) 
     }
     return surveyIds.length
   })
+
+export const deleteAllActivityLog = async ({ surveyId }, client = db) =>
+  ActivityLogRepository.deleteAll({ surveyId }, client)
 
 export const { dropSurveySchema } = SurveyRepository

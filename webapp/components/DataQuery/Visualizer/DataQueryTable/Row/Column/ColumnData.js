@@ -3,9 +3,10 @@ import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
+import { DataQueryValueFormatter } from '@common/analysis/dataQueryValueFormatter'
+
 import { useSurvey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { ValueFormatter } from '../../../../valueFormatter'
 
 import { useColumn } from './store'
 
@@ -14,7 +15,7 @@ const getColValue = ({ survey, nodeDef, col, row, i18n }) => {
   if (Objects.isEmpty(value)) return ''
   const values = Array.isArray(value) ? value : [value]
   return values
-    .map((val) => ValueFormatter.format({ i18n, survey, nodeDef, value: val }))
+    .map((val) => DataQueryValueFormatter.format({ i18n, survey, nodeDef, value: val }))
     .filter((val) => !Objects.isEmpty(val))
     .join(', ')
 }

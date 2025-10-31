@@ -28,19 +28,19 @@ export const UserSurveysTable = (props) => {
   }
 
   if (surveys.length === 0) {
-    return <div>{i18n.t('usersView.userNotInvitedToAnySurvey')}</div>
+    return <div>{i18n.t('usersView:userNotInvitedToAnySurvey')}</div>
   }
 
   const gridTemplateColumns = '45rem 15rem'
 
   return (
     <fieldset className="users-surveys-fieldset">
-      <legend>{i18n.t('usersView.userSurveys')}</legend>
+      <legend>{i18n.t('usersView:userSurveys')}</legend>
       <div className="table">
         <div className="table__content">
           <div className="table__row-header" style={{ gridTemplateColumns }}>
-            <div className="table__cell">{i18n.t('usersView.surveyName')}</div>
-            <div className="table__cell">{i18n.t('usersView.roleInSurvey')}</div>
+            <div className="table__cell">{i18n.t('usersView:surveyName')}</div>
+            <div className="table__cell">{i18n.t('usersView:roleInSurvey')}</div>
           </div>
           <div className="table__rows">
             {surveys.map((survey) => {

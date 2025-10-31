@@ -14,6 +14,26 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 
 const NODES_INSERT_BATCH_SIZE = 10000
 
+/**
+ * Updates the record modified date using the max modified date of the nodes.
+ *
+ * @param {!object} record - The record object.
+ * @returns {object} - The modified record.
+ */
+const prepareRecordSummaryToStore = (record) => {
+  let maxDateModified = null
+  for (const node of Record.getNodesArray(record)) {
+    const nodeDateModified = Record.getDateModified(node)
+    if (!maxDateModified || nodeDateModified > maxDateModified) {
+      maxDateModified = nodeDateModified
+    }
+  }
+  if (maxDateModified) {
+    return Record.assocDateModified(maxDateModified)(record)
+  }
+  return record
+}
+
 export default class RecordsImportJob extends Job {
   constructor(params) {
     super(RecordsImportJob.type, params)
@@ -38,6 +58,7 @@ export default class RecordsImportJob extends Job {
     // import records sequentially
     for (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
+      this.logDebug(`importing record ${recordUuid}`)
 
       // insert activity log
       await ActivityLogManager.insert(
@@ -75,7 +96,7 @@ export default class RecordsImportJob extends Job {
   async insertOrSkipRecord({ record, nodesBatchPersister }) {
     const { survey, surveyId } = this.context
 
-    const recordSummary = this.prepareRecordSummaryToStore(record)
+    const recordSummary = prepareRecordSummaryToStore(record)
 
     // insert record
     await RecordManager.insertRecord(this.user, surveyId, recordSummary, true, this.tx)
@@ -83,22 +104,14 @@ export default class RecordsImportJob extends Job {
     // insert nodes (add them to batch persister)
     const nodes = Record.getNodesArray(record).sort((nodeA, nodeB) => nodeA.id - nodeB.id)
     for (const node of nodes) {
+      if (!Node.getRecordUuid(node)) {
+        node[Node.keys.recordUuid] = Record.getUuid(record)
+      }
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
         await nodesBatchPersister.addItem(node)
       }
     }
-  }
-
-  /**
-   * Updates the record modified date using the max modified date of the nodes.
-   *
-   * @param {!object} record - The record object.
-   * @returns {object} - The modified record.
-   */
-  prepareRecordSummaryToStore(record) {
-    const maxNodeModifiedDate = new Date(Math.max.apply(null, Record.getNodesArray(record).map(Record.getDateModified)))
-    return Record.assocDateModified(maxNodeModifiedDate)(record)
   }
 }
 

@@ -49,6 +49,14 @@ const _getRStudioCode = ({
   const zipFile = `./${token}.zip`
 
   return `
+  ${
+    // cleanup workspace (only remote instance)
+    isLocal
+      ? ''
+      : `rm(list = ls(all.names = TRUE));\r\n
+  unlink("./*", recursive = TRUE, force = TRUE);\r\n
+  unlink(".Rprofile", force = TRUE);\r\n`
+  }
   ${isLocal ? `setwd(Sys.getenv("HOME"));` : ''}\r\n
   url <- "${scriptUrl}";\r\n
   download.file(url,"${zipFile}" ${isLocal ? `, mode="wb"` : ''});\r\n

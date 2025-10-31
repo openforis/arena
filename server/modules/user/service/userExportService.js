@@ -28,6 +28,7 @@ const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
     'system_administrator',
     'surveys',
     'invited_date',
+    'access_request_date',
     'last_login_time',
   ]
 

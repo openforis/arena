@@ -60,6 +60,8 @@ const BasicProps = (props) => {
     entitySourceHierarchy,
     renderType,
     displayIn,
+    includeInMultipleEntitySummary,
+    ancestorMultipleEntityIsRoot,
     nodeDefParentLabel,
     enumerator,
     cyclesNodeDef,
@@ -67,6 +69,7 @@ const BasicProps = (props) => {
     includedInClone,
     includeInCloneDisabled,
     canHaveAutoIncrementalKey,
+    canIncludeInMultipleEntitySummary,
   } = useBasicProps(props)
 
   return (
@@ -191,20 +194,35 @@ const BasicProps = (props) => {
         </FormItem>
       )}
 
+      {canIncludeInMultipleEntitySummary && ancestorMultipleEntityIsRoot && (
+        <FormItem label="nodeDefEdit.basicProps.includedInRecordsList.label">
+          <Checkbox
+            checked={includeInMultipleEntitySummary}
+            info="nodeDefEdit.basicProps.includedInRecordsList.info"
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
+            onChange={(value) =>
+              Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })
+            }
+          />
+        </FormItem>
+      )}
+
       <CyclesSelector
         cyclesKeysSelectable={cyclesKeysParent}
         cyclesKeysSelected={cyclesNodeDef}
         disabled={NodeDef.isRoot(nodeDef) || !editingFromDesigner || cyclesKeysParent.length <= 1}
         onChange={(cycles) => Actions.setProp({ state, key: NodeDef.propKeys.cycles, value: cycles })}
       >
-        <Checkbox
-          checked={includedInClone}
-          disabled={includeInCloneDisabled}
-          label="nodeDefEdit.basicProps.includedInClonedData"
-          onChange={(value) =>
-            Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
-          }
-        />
+        {!NodeDef.isLayoutElement(nodeDef) && (
+          <Checkbox
+            checked={includedInClone}
+            disabled={includeInCloneDisabled}
+            label="nodeDefEdit.basicProps.includedInClonedData"
+            onChange={(value) =>
+              Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.excludedInClone, value: !value })
+            }
+          />
+        )}
       </CyclesSelector>
 
       {NodeDef.isVirtual(nodeDef) && (

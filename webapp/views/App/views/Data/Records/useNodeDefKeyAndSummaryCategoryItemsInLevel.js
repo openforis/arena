@@ -4,10 +4,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import * as API from '@webapp/service/api'
-import { useSurvey } from '@webapp/store/survey'
+import { useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
 
-export const useNodeDefKeysCategoryItemsInLevel = () => {
+export const useNodeDefKeyAndSummaryCategoryItemsInLevel = () => {
   const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
   const [result, setResult] = useState(null)
 
   useEffect(() => {
@@ -15,9 +16,11 @@ export const useNodeDefKeysCategoryItemsInLevel = () => {
     const requestCancelByNodeDefUuid = {}
 
     const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
+    const rootSummaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
+    const keyAndSummaryDefs = [...nodeDefKeys, ...rootSummaryDefs]
     const surveyId = Survey.getId(survey)
 
-    const nodeDefCodeKeys = nodeDefKeys.filter(NodeDef.isCode)
+    const nodeDefCodeKeys = keyAndSummaryDefs.filter(NodeDef.isCode)
     if (nodeDefCodeKeys.length === 0) {
       setResult({})
       return
@@ -50,7 +53,7 @@ export const useNodeDefKeysCategoryItemsInLevel = () => {
         cancel()
       })
     }
-  }, [survey])
+  }, [cycle, survey])
 
   return result
 }

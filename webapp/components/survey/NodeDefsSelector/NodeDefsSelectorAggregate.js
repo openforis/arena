@@ -96,7 +96,10 @@ const NodeDefsSelectorAggregate = (props) => {
             <AttributesSelector
               onToggleAttribute={onToggleDimension}
               filterFunction={(nodeDef) =>
-                NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isKey(nodeDef)
+                NodeDef.isBoolean(nodeDef) ||
+                NodeDef.isCode(nodeDef) ||
+                NodeDef.isTaxon(nodeDef) ||
+                NodeDef.isKey(nodeDef)
               }
               nodeDefLabelType={nodeDefLabelType}
               nodeDefUuidEntity={nodeDefUuidEntity}

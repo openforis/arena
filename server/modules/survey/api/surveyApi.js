@@ -16,7 +16,6 @@ import * as User from '../../../../core/user/user'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyService from '../service/surveyService'
-import * as FileService from '../../record/service/fileService'
 import * as UserService from '../../user/service/userService'
 import { ExportFileNameGenerator } from '@server/utils/exportFileNameGenerator'
 
@@ -113,15 +112,32 @@ export const init = (app) => {
     }
   })
 
-  app.get('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+  // surveys list export
+  app.post('/surveys/export', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { draft = true, template = false } = Request.getParams(req)
-      const date = DateUtils.nowFormatDefault()
-      const fileName = `arena_surveys_${date}.csv`
-      Response.setContentTypeFile({ res, fileName, contentType: Response.contentTypes.csv })
+      const job = SurveyService.startSurveysListExport({ user, draft, template })
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
 
-      await SurveyService.exportSurveysList({ user, draft, template, outputStream: res })
+  // surveys list export (download generated zip file)
+  app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
+    try {
+      const { tempFileName } = Request.getParams(req)
+      const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+      const date = DateUtils.nowFormatDefault()
+      const name = `arena_surveys_${date}.csv`
+
+      Response.sendFile({
+        res,
+        path: exportedFilePath,
+        name,
+        contentType: Response.contentTypes.csv,
+      })
     } catch (error) {
       next(error)
     }
@@ -146,9 +162,7 @@ export const init = (app) => {
   const _sendSurvey = async ({ survey, user, res }) => {
     let surveyUpdated = survey
     if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
-      const surveyId = Survey.getId(survey)
-      const filesStatistics = await FileService.fetchFilesStatistics({ surveyId })
-      surveyUpdated = Survey.assocFilesStatistics(filesStatistics)(survey)
+      surveyUpdated = await SurveyService.fetchAndAssocStorageInfo({ survey })
     }
     res.json({ survey: surveyUpdated })
   }
@@ -280,6 +294,15 @@ export const init = (app) => {
     const user = Request.getUser(req)
 
     const job = SurveyService.startUnpublishJob(user, surveyId)
+
+    res.json({ job: JobUtils.jobToJSON(job) })
+  })
+
+  app.put('/survey/:surveyId/delete-activity-log', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+
+    const job = SurveyService.startDeleteActivityLogJob(user, surveyId)
 
     res.json({ job: JobUtils.jobToJSON(job) })
   })

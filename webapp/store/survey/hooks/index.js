@@ -40,6 +40,12 @@ export const useNodeDefRootKeys = () => {
   return Survey.getNodeDefKeysSorted({ nodeDef: root, cycle })(survey)
 }
 
+export const useRootSummaryDefs = () => {
+  const survey = useSurvey()
+  const cycle = useSurveyCycleKey()
+  return Survey.getRootSummaryDefs({ cycle })(survey)
+}
+
 export const useCategoryByName = (name) =>
   useSelector((state) => {
     if (!name) return null
@@ -73,6 +79,7 @@ export const useNodeDefByUuid = (uuid) =>
     const survey = SurveyState.getSurvey(state)
     return Survey.getNodeDefByUuid(uuid)(survey)
   })
+
 export const useNodeDefByName = (name) =>
   useSelector((state) => {
     if (!name) return null
@@ -93,6 +100,14 @@ export const useNodeDefsByNames = (names) =>
     const survey = SurveyState.getSurvey(state)
     return names.map((name) => Survey.findNodeDefByName(name)(survey)).filter(Boolean)
   }, Objects.isEqual)
+
+export const useIsAncestorMultipleEntityRoot = (nodeDef) =>
+  useSelector((state) => {
+    const survey = SurveyState.getSurvey(state)
+    const rootDef = Survey.getNodeDefRoot(survey)
+    const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
+    return NodeDef.isEqual(rootDef)(ancestorMultipleEntityDef)
+  })
 
 export const useNodeDefLabel = (nodeDef, type) => NodeDef.getLabel(nodeDef, useSurveyPreferredLang(), type)
 

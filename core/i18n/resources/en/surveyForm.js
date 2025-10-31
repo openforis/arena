@@ -41,7 +41,7 @@ Continue?`,
     confirmPromote: `Are sure you want to **promote this record to {{name}}**?  
 You won't be able to edit it anymore`,
     confirmPromoteWithErrors: `**This record contains errors**.  
-$t(surveyForm.formEntryActions.confirmPromote)`,
+$t(surveyForm:formEntryActions.confirmPromote)`,
     confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
     closePreview: 'Close preview',
     demoteTo: 'Demote to {{stepPrev}}',
@@ -104,6 +104,7 @@ $t(surveyForm.formEntryActions.confirmPromote)`,
     errorLoadingPreview: 'Error loading preview',
     fileUuid: 'File uuid',
     fileName: 'File name',
+    locationInformationNotFound: 'Location information not found in the file',
   },
   nodeDefsTreeSelectMode: {
     allNodeDefs: 'All nodes',

@@ -47,9 +47,6 @@ const NodeDefMultipleTableCell = (props) => {
     setNodeValues(nodeValuesUpdate)
   }, [nodes])
 
-  if (nodes.every(Node.isValueBlank)) {
-    return null
-  }
   if (showEditDialog) {
     return ReactDOM.createPortal(
       /* eslint-disable react/jsx-props-no-spreading */

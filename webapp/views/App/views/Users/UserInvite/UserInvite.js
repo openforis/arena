@@ -1,6 +1,6 @@
 import './UserInvite.scss'
 
-import React from 'react'
+import React, { useCallback } from 'react'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Authorizer from '@core/auth/authorizer'
@@ -11,15 +11,16 @@ import * as Validator from '@core/validation/validator'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { useUser } from '@webapp/store/user'
+import { useUser, useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { Button, Markdown } from '@webapp/components'
+import { Checkbox } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import InputChipsText from '@webapp/components/form/InputChips/InputChipsText'
 
 import { TestId } from '@webapp/utils/testId'
 
-import DropdownUserGroup from '../DropdownUserGroup'
+import DropdownUserRole from '../DropdownUserRole'
 
 import { useInviteUser } from './store'
 
@@ -28,6 +29,7 @@ const UserInviteComponent = () => {
 
   const i18n = useI18n()
   const user = useUser()
+  const userIsSystemAdmin = useUserIsSystemAdmin()
   const surveyInfo = useSurveyInfo()
 
   const emails = UserInvite.getEmails(userInvite)
@@ -35,7 +37,24 @@ const UserInviteComponent = () => {
   const selectedGroupUuid = UserInvite.getGroupUuid(userInvite)
   const groups = Authorizer.getUserGroupsCanAssign({ user, surveyInfo })
   const selectedGroup = groups.find((group) => group.uuid === selectedGroupUuid)
+  const systemAdminGroup = groups.find(AuthGroup.isSystemAdminGroup)
   const selectedGroupName = AuthGroup.getName(selectedGroup)
+  const isSelectedGroupSystemAdmin =
+    selectedGroup && systemAdminGroup && AuthGroup.isEqual(systemAdminGroup)(selectedGroup)
+
+  const onGroupChange = useCallback(
+    (group) => {
+      onUpdate({ name: UserInvite.keys.groupUuid, value: AuthGroup.getUuid(group) })
+    },
+    [onUpdate]
+  )
+
+  const onSystemAdminChange = useCallback(
+    (selected) => {
+      onGroupChange(selected ? systemAdminGroup : null)
+    },
+    [onGroupChange, systemAdminGroup]
+  )
 
   return (
     <div className="user-invite form">
@@ -50,14 +69,21 @@ const UserInviteComponent = () => {
           textTransformFunction={(value) => value.trim().toLowerCase()}
         />
       </FormItem>
-      <FormItem label="common.group">
-        <DropdownUserGroup
-          validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
-          groupUuid={selectedGroupUuid}
-          onChange={(group) => onUpdate({ name: UserInvite.keys.groupUuid, value: AuthGroup.getUuid(group) })}
-        />
-      </FormItem>
-
+      {userIsSystemAdmin && (
+        <FormItem label="auth:authGroups.systemAdmin.label">
+          <Checkbox checked={isSelectedGroupSystemAdmin} onChange={onSystemAdminChange} />
+        </FormItem>
+      )}
+      {!isSelectedGroupSystemAdmin && (
+        <FormItem label="common.role">
+          <DropdownUserRole
+            validation={Validation.getFieldValidation(UserInvite.keys.groupUuid)(validation)}
+            groupUuid={selectedGroupUuid}
+            onChange={onGroupChange}
+            showOnlySurveyGroups
+          />
+        </FormItem>
+      )}
       {!Survey.isPublished(surveyInfo) && (
         <Markdown
           className="user-invite__warning-message"

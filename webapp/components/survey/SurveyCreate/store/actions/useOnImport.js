@@ -1,15 +1,10 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
-import * as JobSerialized from '@common/job/jobSerialized'
-
-import * as Validation from '@core/validation/validation'
+import { FileProcessor } from '@openforis/arena-core'
 
 import { objectToFormData } from '@webapp/service/api'
-import { SurveyActions } from '@webapp/store/survey'
-import { JobActions } from '@webapp/store/app'
-import { NotificationActions } from '@webapp/store/ui'
+import { Chunks } from '@webapp/utils/chunks'
 
 import { importSources } from '../importSources'
 
@@ -18,43 +13,56 @@ const urlBySource = {
   [importSources.arena]: '/api/survey/arena-import',
 }
 
-export const useOnImport = ({ newSurvey, setNewSurvey }) => {
-  const dispatch = useDispatch()
+const createChunkProcessor =
+  ({ onUploadProgress, newSurvey }) =>
+  async ({ chunk, totalChunks, content }) => {
+    const { fileId, source, ...surveyObj } = newSurvey
 
-  return useCallback(async () => {
-    const { file, source, ...surveyObj } = newSurvey
+    const formData = objectToFormData({
+      fileId,
+      file: content,
+      chunk,
+      totalChunks,
+      survey: JSON.stringify(surveyObj),
+    })
+    const { data } = await axios.post(urlBySource[source], formData, {
+      onUploadProgress: Chunks.onUploadProgress({ totalChunks, chunk, onUploadProgress }),
+    })
+    return data
+  }
 
-    // reset upload progress (hide progress bar)
-    setNewSurvey({ ...newSurvey, uploadProgressPercent: -1, uploading: true })
-
-    const formData = objectToFormData({ file, survey: JSON.stringify(surveyObj) })
-
-    const onUploadProgress = (progressEvent) => {
-      const uploadProgressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-      setNewSurvey({ ...newSurvey, uploadProgressPercent, uploading: uploadProgressPercent < 100 })
-    }
-    const { data } = await axios.post(urlBySource[source], formData, { onUploadProgress })
-
+const createOnCompleteHandler =
+  ({ setNewSurvey, resolve }) =>
+  (data) => {
+    setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
     const { job, validation } = data
+    resolve({ job, validation })
+  }
 
-    if (job && (!validation || Validation.isValid(validation))) {
-      dispatch(
-        JobActions.showJobMonitor({
-          job: data.job,
-          onComplete: async (job) => {
-            const { surveyId } = JobSerialized.getResult(job)
-            dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
-          },
-        })
-      )
-    } else if (validation && !Validation.isValid(validation)) {
-      dispatch(NotificationActions.notifyWarning({ key: 'common.formContainsErrorsCannotContinue' }))
+const createOnErrorHandler =
+  ({ setNewSurvey, reject }) =>
+  (error) => {
+    setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploading: false }))
+    reject(error)
+  }
 
-      setNewSurvey({
-        ...newSurvey,
-        validation,
-        uploading: false,
+export const useOnImport = ({ newSurvey, setNewSurvey }) =>
+  useCallback(
+    ({ startFromChunk = 1, onUploadProgress }) => {
+      const { file } = newSurvey
+
+      // reset upload progress (hide progress bar)
+      setNewSurvey((prevNewSurvey) => ({ ...prevNewSurvey, uploadProgressPercent: -1, uploading: true }))
+
+      let fileProcessor = null
+      const promise = new Promise((resolve, reject) => {
+        const chunkProcessor = createChunkProcessor({ onUploadProgress, newSurvey })
+        const onError = createOnErrorHandler({ setNewSurvey, reject })
+        const onComplete = createOnCompleteHandler({ setNewSurvey, resolve })
+        fileProcessor = new FileProcessor({ file, chunkProcessor, onError, onComplete })
       })
-    }
-  }, [dispatch, newSurvey, setNewSurvey])
-}
+      fileProcessor.start(startFromChunk)
+      return { promise, processor: fileProcessor }
+    },
+    [newSurvey, setNewSurvey]
+  )

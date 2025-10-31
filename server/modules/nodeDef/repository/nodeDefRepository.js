@@ -201,19 +201,6 @@ const fetchAreaBasedEstimateNodeDefsOf = async (surveyId, nodeDefUuid, draft, cl
     (row) => dbTransformCallback({ row, draft })
   )
 
-export const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = DB) =>
-  client.map(
-    `
-    SELECT ${nodeDefSelectFields}
-    FROM ${getSchemaSurvey(surveyId)}.node_def 
-    WHERE deleted IS NOT TRUE
-    AND parent_uuid = $1
-    AND ${DbUtils.getPropColCombined('key', draft)} = $2
-    ORDER BY id`,
-    [nodeDefRootUuid, 'true'],
-    (row) => dbTransformCallback({ row, draft })
-  )
-
 // ============== UPDATE
 
 export const updateNodeDefProps = async (

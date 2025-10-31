@@ -9,6 +9,8 @@ import {
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '../nodeRefData'
+import * as CategoryItem from '@core/survey/categoryItem'
 import SystemError from '@core/systemError'
 
 import * as RecordReader from './recordReader'
@@ -31,6 +33,36 @@ const getKeyValuePairs = ({ survey, entityDef, valuesByDefUuid }) => {
       return `${keyDefName}=${keyValue}`
     })
     .join(',')
+}
+
+const _getOrFetchCategoryItem = async ({ survey, categoryItemProvider, attribute }) => {
+  const refDataItem = NodeRefData.getCategoryItem(attribute)
+  if (refDataItem) {
+    return refDataItem
+  }
+  const value = Node.getValue(attribute)
+  const itemUuid = NodeValues.getValueItemUuid(value)
+  if (!itemUuid) {
+    return null
+  }
+  const itemInSurvey = Survey.getCategoryItemByUuid(itemUuid)(survey)
+  if (itemInSurvey) {
+    return itemInSurvey
+  }
+  const nodeDefUuid = Node.getNodeDefUuid(attribute)
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+  return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+}
+
+const _getCodeAttributeCode = async ({ survey, categoryItemProvider, attribute }) => {
+  const value = Node.getValue(attribute)
+  const code = NodeValues.getValueCode(value)
+  if (Objects.isNotEmpty(code)) {
+    return code
+  }
+  const item = await _getOrFetchCategoryItem({ survey, categoryItemProvider, attribute })
+  return item ? CategoryItem.getCode(item) : null
 }
 
 const _findCategoryItemUuidByAttribute = async ({
@@ -59,8 +91,16 @@ const _findCategoryItemUuidByAttribute = async ({
     return itemUuid
   }
   const categoryUuid = NodeDef.getCategoryUuid(attributeDef)
-  const parentCodeAttribute = RecordReader.getParentCodeAttribute(survey, parentNode, attributeDef)(record)
-  const codePaths = parentCodeAttribute ? [...Node.getHierarchyCode(parentCodeAttribute), code] : [code]
+  const ancestorCodeAttributes = RecordReader.getAncestorCodeAttributes({ survey, parentNode, nodeDef: attributeDef })(
+    record
+  )
+  const ancestorCodes = await Promise.all(
+    ancestorCodeAttributes.map((attribute) => _getCodeAttributeCode({ survey, categoryItemProvider, attribute }))
+  )
+  if (ancestorCodes.some(Objects.isEmpty)) {
+    return null
+  }
+  const codePaths = [...ancestorCodes, code]
   const item = await categoryItemProvider.getItemByCodePaths({ survey, categoryUuid, codePaths })
   return item ? item.uuid : null
 }
@@ -414,10 +454,10 @@ const deleteNodesInEntityByNodeDefUuid =
     const updateResult = new RecordUpdateResult({ record })
 
     const nodeUuidsToDelete = []
-    nodeDefUuids.forEach((nodeDefUuid) => {
+    for (const nodeDefUuid of nodeDefUuids) {
       const children = RecordReader.getNodeChildrenByDefUuid(entity, nodeDefUuid)(record)
       nodeUuidsToDelete.push(...children.map(Node.getUuid))
-    })
+    }
 
     const nodesDeleteUpdateResult = await deleteNodes({
       user,

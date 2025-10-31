@@ -22,10 +22,11 @@ export const writeItemsStreamToStream = async ({
   fields,
   options,
   fileFormat = FileFormats.csv,
+  onData = null,
 }) => {
   if (fileFormat === FileFormats.csv) {
     return CSVWriter.pipeDataStreamToStream({ stream, fields, options, outputStream })
   }
-  const items = await StreamUtils.readStreamToItems(stream)
+  const items = await StreamUtils.readStreamToItems({ stream, onData })
   return writeItemsToStream({ items, fields, options, fileFormat, outputStream })
 }

@@ -1,4 +1,4 @@
-import { useMapContextOptions } from '@webapp/components/Map/MapContext'
+import { useMapContextOptions } from '@webapp/components/MapContainer/MapContext'
 import { useEffect, useRef } from 'react'
 
 export const useLayerMarker = ({ key, popupOpen, setMarkerByKey }) => {

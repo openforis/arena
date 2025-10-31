@@ -146,9 +146,17 @@ export const generateSchemaSummaryItems = async ({ surveyId, cycle }) => {
       parentEntity: NodeDef.getName(Survey.getNodeDefParent(nodeDef)(survey)),
       // labels
       ...languages.reduce(
-        (labelsAcc, lang) => ({
-          ...labelsAcc,
+        (acc, lang) => ({
+          ...acc,
           [`label_${lang}`]: NodeDef.getLabel(nodeDef, lang, NodeDef.NodeDefLabelTypes.label, false),
+        }),
+        {}
+      ),
+      // descriptions
+      ...languages.reduce(
+        (acc, lang) => ({
+          ...acc,
+          [`description_${lang}`]: NodeDef.getDescription(lang)(nodeDef),
         }),
         {}
       ),

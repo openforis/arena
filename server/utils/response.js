@@ -17,6 +17,7 @@ const status = {
 
 export const contentTypes = {
   csv: 'text/csv',
+  json: 'application/json',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   zip: 'application/zip',
 }
@@ -26,6 +27,8 @@ const contentTypeByFileFormat = {
   [FileFormats.xlsx]: contentTypes.xlsx,
   [FileFormats.zip]: contentTypes.zip,
 }
+
+export const getContentTypeByFormat = (fileFormat) => contentTypeByFileFormat[fileFormat]
 
 export const sendOk = (res) => res.json({ status: status.ok })
 
@@ -56,7 +59,7 @@ export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType
     res.setHeader('Content-Length', fileSize)
   }
 
-  const finalContentType = contentType ?? contentTypeByFileFormat[fileFormat]
+  const finalContentType = contentType ?? getContentTypeByFormat(fileFormat)
   if (finalContentType) {
     res.setHeader('Content-Type', finalContentType)
     res.set('Content-Type', finalContentType)
@@ -72,7 +75,7 @@ export const sendFileContent = (res, fileName, content, fileSize) => {
 export const sendFile = ({ res, path: filePath, name = null, contentType = null, fileFormat = null, onEnd = null }) => {
   const fileSize = FileUtils.getFileSize(filePath)
   const fileName = name || path.basename(filePath)
-  const finalContentType = contentType ?? contentTypeByFileFormat[fileFormat]
+  const finalContentType = contentType ?? getContentTypeByFormat(fileFormat)
   setContentTypeFile({ res, fileName, fileSize, contentType: finalContentType })
   FileUtils.createReadStream(filePath)
     .on('end', async () => {

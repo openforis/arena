@@ -133,6 +133,7 @@ Do you want to proceed?`,
     options: 'Options',
     owner: 'Owner',
     path: 'Path',
+    pause: 'Pause',
     preview: 'Preview Mode',
     previous: 'Previous',
     publish: 'Publish',
@@ -158,7 +159,9 @@ Do you want to proceed?`,
     required: 'Required',
     requiredField: 'required field',
     reset: 'Reset',
+    resume: 'Resume',
     retry: 'Retry',
+    role: 'Role',
     save: 'Save',
     saveAndBack: 'Save & Back',
     saved: 'Saved!',
@@ -182,8 +185,12 @@ Do you want to proceed?`,
     undefinedName: 'Undefined name',
     unique: 'Unique',
     upload: 'Upload',
-    value: 'Value',
+    uploadErrorConfirm: {
+      message: `Error during file upload: {{error}}.\n
+Try again?`,
+    },
     uploadingFile: 'Uploading file ({{progressPercent}}%)',
+    value: 'Value',
     view: 'View',
     warning: 'Warning',
     warning_plural: 'Warnings',
@@ -305,6 +312,7 @@ Do you want to proceed?`,
     user: 'User Profile',
     userPasswordChange: 'Change password',
     userInvite: 'Invite user',
+    userNew: 'New User',
     usersSurvey: 'Users list',
     usersList: 'Users list (all)',
 
@@ -399,6 +407,7 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       activeUsers: 'Active users',
       activityLog: {
         title: 'Activity log',
+        size: '$t(homeView.dashboard.activityLog.title) size: {{size}}',
       },
       exportWithData: 'Export + data (Backup)',
       exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
@@ -423,10 +432,16 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         `,
       },
       storageSummary: {
-        title: 'Storage use (files)',
+        title: 'Storage use',
         availableSpace: 'Available ({{size}})',
         usedSpace: 'Used ({{size}})',
         usedSpaceOutOf: `Used {{percent}}% ({{used}} out of {{total}})`,
+      },
+      storageSummaryDb: {
+        title: 'Storage use (DataBase)',
+      },
+      storageSummaryFiles: {
+        title: 'Storage use (files)',
       },
       samplingPointDataCompletion: {
         title: 'Sampling Point Data Completion',
@@ -457,6 +472,17 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
       cycleForArenaMobile: 'Cycle for Arena Mobile',
+      deleteActivityLog: 'Clear activity log',
+      deleteActivityLogConfirm: {
+        headerText: 'Clear ALL the activity log data for this survey?',
+        message: `
+  - ALL the activity log data for the survey **{{surveyName}}** will be deleted;\n\n
+  - the space occupied in the DB by the survey will be reduced;\n\n
+  - it won't affect the survey's input data;\n\n
+  
+  $t(common.cantUndoWarning)`,
+        confirmName: 'Enter this survey’s name to confirm:',
+      },
       fieldManualLink: 'Field manual link',
       editInfo: 'Edit info',
       viewInfo: 'View info',
@@ -469,6 +495,8 @@ If there are records associated to this cycle, they will be deleted.`,
         visibleInMobile: 'Visible in Arena Mobile',
         allowRecordsDownloadInMobile: 'Allow downloading records from server to Arena Mobile',
         allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
+        allowRecordsWithErrorsUploadFromMobile:
+          'Allow uploading records with validation errors from Arena Mobile to server',
       },
       srsPlaceholder: 'Type code or label',
       unpublish: 'Unpublish and delete data',
@@ -645,10 +673,14 @@ $t(common.cantUndoWarning)`,
     jobs: {
       ArenaDataImportJob: {
         importCompleteSuccessfully: `Arena Mobile data import complete:
-        - {{processed}} records processed
-        - {{insertedRecords}} records created
-        - {{updatedRecords}} records updated
-        - {{skippedRecords}} records skipped`,
+{{summary}}`,
+        importSummaryItem: {
+          processed: 'records processed',
+          insertedRecords: 'records created',
+          updatedRecords: 'records updated',
+          skippedRecords: 'records skipped',
+          missingFiles: 'files missing',
+        },
       },
       CollectDataImportJob: {
         importCompleteSuccessfully: `Collect data import complete:
@@ -879,6 +911,10 @@ Merge cannot be performed.`,
       showControlPoints: `Control points`,
       showPlotReferencePoint: `Plot reference point`,
     },
+    rulerTooltip: `Press the button to start measuring distances.
+- click multiple times to measure paths
+- double click or press ESC button to finish measuring
+- press the button again to hide measurements`,
     samplingPointDataLayerName: 'Sampling point data - level {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
@@ -936,38 +972,6 @@ Merge cannot be performed.`,
     recordsCreatedWithMoreApps: 'Records created with more apps:',
   },
 
-  usersView: {
-    accepted: 'Accepted',
-    confirmUserWillBeSystemAdmin: 'User will be a system administrator. Continue?',
-    copyInvitationLink: 'Copy invitation link to clipboard',
-    copyInvitationLinkConfirmMessage: `If the invited user hasn't received any emails at the address {{email}},  
-you can copy the invitation link to the clipboard and share it with him in other ways.
-    
-Copy the invitation link to the clipboard?`,
-    editSurveyUserExtraPropsForUser: 'Edit survey user extra properties for user "{{userName}}"',
-    inviteUser: 'Invite',
-    invitationExpiredClickToSendAgainTheInvitation: 'Invitation expired: click to send again the invitation',
-    invitationLinkCopiedToClipboard: 'Invitation link copied to your clipboard',
-    invitedBy: 'Invited by',
-    invitedDate: 'Invited date',
-    lastLogin: 'Last login',
-    moreThan30DaysAgo: 'More than 30 days ago',
-    notAcceptedYet: 'Invitation not accepted yet',
-    roleInCurrentSurvey: 'Role in current survey',
-    roleInSurvey: 'Role in survey',
-    filterPlaceholder: 'Filter by name or email',
-    surveyName: 'Survey name',
-    surveyExtraProp: {
-      label: 'Survey extra property',
-      label_other: 'Survey extra properties',
-    },
-    surveysDraft: 'Surveys (draft)',
-    surveysPublished: 'Surveys (published)',
-    updateUserConfirmation: 'User {{name}} has been updated',
-    userNotInvitedToAnySurvey: `User not invited to any survey`,
-    userSurveys: 'User Surveys',
-  },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Accepted',
@@ -983,7 +987,6 @@ Copy the invitation link to the clipboard?`,
       surveyLabel: 'Survey label',
       surveyLabelInitial: '(Change survey name and label as needed)',
       surveyName: 'Survey Name',
-      role: 'Role',
       template: 'Template',
     },
   },
@@ -992,7 +995,8 @@ Copy the invitation link to the clipboard?`,
     scale: 'Scale',
     rotate: 'Rotate',
     dragAndDrop: 'Drop an image above or',
-    upload: 'click here to upload',
+    upload: 'Upload',
+    remove: 'Remove the profile picture?',
     sendNewInvitation: 'Send new invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
@@ -1002,6 +1006,8 @@ Copy the invitation link to the clipboard?`,
       label: 'Preferred UI language',
       auto: 'Automatically detected ({{detectedLanguage}})',
     },
+    newPassword: 'Password',
+    confirmPassword: 'Confirm password',
   },
 
   userPasswordChangeView: {
@@ -1344,6 +1350,10 @@ $t(common.appNameFull)
       form: 'Form',
       formula: 'Formula',
       includedInClonedData: 'Included in cloned data',
+      includedInRecordsList: {
+        label: 'Include in records list',
+        info: `If marked, the attribute will be visible in records list`,
+      },
       key: 'Key',
       multiple: 'Multiple',
       ownPage: 'Its own page',
@@ -1373,11 +1383,11 @@ E.g. this.region = region_attribute_name
       },
       includedInMultipleEntitySummary: {
         label: 'Include in multiple entity summary',
-        info: `If marked, the attribute will be visible in the entity summary view`,
+        info: `If marked, the attribute will be visible in the entity summary view (in Arena Mobile)`,
       },
       includedInPreviousCycleLink: {
         label: 'Include in previous cycle link',
-        info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)"`,
+        info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)`,
       },
     },
     decimalProps: {
@@ -1394,6 +1404,7 @@ E.g. this.region = region_attribute_name
       },
       maxFileSize: 'Max. file size (Mb)',
       numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
+      showGeotagInformation: 'Show geotag information',
     },
     mobileProps: {
       title: 'Mobile App',
@@ -1469,7 +1480,7 @@ E.g. this.region = region_attribute_name
     },
     moveDialog: {
       confirmButtonLabel: 'Move',
-      title: 'Moving node definition "{{nodeDefName}}"',
+      title: 'Moving node definition "{{nodeDefName}}" from "{{parentNodeDefName}}"',
       entitySelectLabel: 'Entity to move into:',
     },
     movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
@@ -1499,7 +1510,7 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       taxaNotImported: 'Taxa not imported',
       family: 'Family',
       genus: 'Genus',
-      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
+      scientificName: '$t(surveyForm:nodeDefTaxon.scientificName)',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
     },
     taxaCount: 'Taxa count',
@@ -1612,7 +1623,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: `Name "{{value}}" cannot be used: it's a reserved word`,
     nameInvalid:
-      'Name "{{name}}" is invalid: it must be maximum 40 characters long and contain only lowercase letters and numbers, starting with a letter, and only "-" and "_" symbols',
+      'Name "{{name}}" is invalid: it must be maximum 40 characters long and contain only lowercase letters, numbers and only "-" and "_" symbols, starting with a letter',
     nameRequired: 'Name is required',
     requiredField: '{{field}} is required',
     rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
@@ -1780,6 +1791,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     user: {
+      emailDuplicate: 'User with same email already exists',
       emailRequired: 'Email is required',
       emailInvalid: 'Email is invalid',
       emailNotFound: 'Email not found',
@@ -1798,8 +1810,10 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     },
 
     userAccessRequest: {
+      countryRequired: 'Country is required',
       emailRequired: '$t(validationErrors.user.emailRequired)',
       firstNameRequired: 'First name is required',
+      institutionRequired: 'Institution is required',
       lastNameRequired: 'Last name is required',
       purposeRequired: 'Purpose is required',
       surveyNameRequired: 'Survey name is required',

@@ -16,6 +16,7 @@ const getVariables = async ({ survey, cycle, entityDef, attributeDefUuids, lang 
     nodeDefContext: entityDef,
     mode: Expression.modes.sql,
     lang,
+    includeAnalysis: true,
   })
   if (Objects.isEmpty(attributeDefUuids)) return variables
 

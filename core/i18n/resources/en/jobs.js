@@ -27,6 +27,7 @@ export default {
   RecordsImportJob: 'Records Import',
   RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
   SamplingPointDataImportJob: 'Sampling Point Data Import',
+  SurveyActivityLogClearJob: 'Survey Activity Log Clear',
   SurveyCreatorJob: 'Survey Create',
   SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
   SurveyExportJob: 'Survey Export',
@@ -39,6 +40,7 @@ export default {
   SurveyRdbCreationJob: 'Survey RDB Creation',
   SurveyUnpublishJob: 'Survey Unpublish',
   SurveyPropsUnpublishJob: 'Survey props upublish',
+  SurveysListExportJob: 'Surveys list export',
   TaxonomiesImportJob: 'Taxonomies Import',
   TaxonomiesValidationJob: 'Taxonomies Validation',
   TaxonomyImportJob: 'Taxonomy Import',
@@ -47,6 +49,8 @@ export default {
   DataSummaryExportJob: 'Data Summary Export',
   ZipCreationJob: 'ZIP File Creation',
   CSVDataExtraction: 'Data Extraction',
+  // geo
+  GeoJsonDataExportJob: 'GeoJson Data Export',
   // import arena survey
   ArenaImportJob: 'Arena import',
   ArenaSurveyReaderJob: 'Arena Survey Reader',
@@ -64,4 +68,6 @@ export default {
   ChainExportJob: 'Chain Export',
   UsersExportJob: 'Users Export',
   ActivityLogExportJob: 'Activity Log Export',
+  // Validation Report
+  VaidationReportGenerationJob: 'Generate Validation Report',
 }

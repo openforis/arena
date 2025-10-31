@@ -101,7 +101,6 @@ export const getCodesHierarchy = (item) => [...getAncestorCodes(item), getCode(i
 
 export const normalizeCode = R.pipe(
   StringUtils.leftTrim,
-  R.toLower,
   R.replace(codeNotAllowedCharactersRegExp, '_'),
   R.slice(0, 40)
 )

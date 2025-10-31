@@ -50,9 +50,7 @@ export const newSurvey = ({
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
     [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    [SurveyInfo.keys.cycles]: {
-      [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle(),
-    },
+    [SurveyInfo.keys.cycles]: { [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle() },
     ...rest,
   },
   [SurveyInfo.keys.published]: published,
@@ -139,6 +137,9 @@ export const {
   isTemplate,
   getProps,
   getPropsDraft,
+  // Temporary properties
+  getActivityLogSize,
+  getDbStatistics,
   getFilesStatistics,
   isValid,
   canHaveRecords,
@@ -147,8 +148,16 @@ export const {
 export const { getAuthGroupByName, getAuthGroups, isAuthGroupAdmin, getAuthGroupAdmin } = SurveyInfo
 
 // UPDATE
-export const { assocAuthGroups, assocFilesStatistics, assocOwnerUuid, assocRDBInitilized, assocSrs, markDraft } =
-  SurveyInfo
+export const {
+  assocAuthGroups,
+  assocActivityLogSize,
+  assocDbStatistics,
+  assocFilesStatistics,
+  assocOwnerUuid,
+  assocRDBInitilized,
+  assocSrs,
+  markDraft,
+} = SurveyInfo
 
 // ====== READ nodeDefs
 export const {
@@ -171,6 +180,8 @@ export const {
   getNodeDefSource,
   getNodeDefKeys,
   getNodeDefKeysSorted,
+  getSummaryDefs,
+  getRootSummaryDefs,
   isNodeDefRootKey,
   findNodeDef,
   findNodeDefByName,
@@ -193,6 +204,7 @@ export const {
   traverseHierarchyItemSync,
   visitDescendantsAndSelf,
   findDescendants,
+  getNodeDefDescendants,
   getNodeDefDescendantsAndSelf,
   getNodeDefDescendantsInSingleEntities,
   getNodeDefDescendantAttributesInSingleEntities,

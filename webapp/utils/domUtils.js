@@ -96,3 +96,13 @@ export const htmlToString = (html) => {
     return html
   }
 }
+
+export const unescapeHtml = (text) => {
+  try {
+    const doc = new DOMParser().parseFromString(text, 'text/html')
+    return doc.documentElement.textContent
+  } catch (ignored) {
+    // ignore the error
+    return text
+  }
+}
