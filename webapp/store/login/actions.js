@@ -4,6 +4,7 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { SystemActions } from '@webapp/store/system'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
+import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
 export const loginEmailUpdate = 'login/email/update'
 export const loginErrorUpdate = 'login/error'
@@ -29,10 +30,11 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
 export const login = (email, password) =>
   _createAction(async (dispatch) => {
     const {
-      data: { message, user },
+      data: { message, user, authToken },
     } = await axios.post('/auth/login', { email, password })
 
     if (user) {
+      ApiConstants.setAuthToken(authToken)
       dispatch(setEmail(''))
       dispatch(SystemActions.initSystem())
     } else {
