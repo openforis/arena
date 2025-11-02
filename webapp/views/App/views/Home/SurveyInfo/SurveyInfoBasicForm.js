@@ -65,7 +65,7 @@ export const SurveyInfoBasicForm = (props) => {
       <LabelsEditor
         inputFieldIdPrefix={TestId.surveyInfo.surveyFieldManualLink()}
         readOnly={readOnly}
-        formLabelKey="homeView.surveyInfo.fieldManualLink"
+        formLabelKey="homeView:surveyInfo.fieldManualLink"
         languages={languages}
         labels={fieldManualLinks}
         onChange={setFieldManualLinks}
@@ -94,7 +94,7 @@ export const SurveyInfoBasicForm = (props) => {
       </FormItem>
 
       {cycleKeys.length > 1 && (
-        <FormItem label="homeView.surveyInfo.cycleForArenaMobile">
+        <FormItem label="homeView:surveyInfo.cycleForArenaMobile">
           <CycleSelector
             cycleKeys={cycleKeys}
             onChange={setDefaultCycleKey}

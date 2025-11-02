@@ -18,7 +18,7 @@ const HelperFirstTimeSurvey = () => {
     <div className="helper__first_time_help">
       <div className="helper__first_time_help__container with-background">
         <Trans
-          i18nKey="homeView.dashboard.surveyPropUpdate.main"
+          i18nKey="homeView:dashboard.surveyPropUpdate.main"
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
             title: <h2 />,
@@ -34,7 +34,7 @@ const HelperFirstTimeSurvey = () => {
 
       <div className="helper__first_time_help__container">
         <Trans
-          i18nKey="homeView.dashboard.surveyPropUpdate.secondary"
+          i18nKey="homeView:dashboard.surveyPropUpdate.secondary"
           values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
           components={{
             linkWithIcon: <LinkWithIcon to={appModuleUri(designerModules.formDesigner)} iconLeft="icon-quill" />,
@@ -56,7 +56,7 @@ const HelperWithoutAttributes = () => {
       <div className="helper__first_time_help">
         <div className="helper__first_time_help__container with-background">
           <Trans
-            i18nKey="homeView.dashboard.nodeDefCreate.main"
+            i18nKey="homeView:dashboard.nodeDefCreate.main"
             values={{ surveyName: Survey.getName(surveyInfo).toUpperCase() }}
             components={{
               title: <h2 />,

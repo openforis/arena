@@ -21,7 +21,7 @@ const RecordsSummaryPeriodSelector = () => {
 
   return (
     <div className="home-dashboard__records-period-selector">
-      <div>{i18n.t('homeView.recordsSummary.recordsAddedInTheLast')}</div>
+      <div>{i18n.t('homeView:recordsSummary.recordsAddedInTheLast')}</div>
       <div className="time-range">
         <span className="icon icon-calendar icon-12px icon-left" />
         <Dropdown
@@ -32,7 +32,7 @@ const RecordsSummaryPeriodSelector = () => {
           selection={timeRangeSelection}
         />
       </div>
-      {i18n.t('homeView.recordsSummary.fromToPeriod', {
+      {i18n.t('homeView:recordsSummary.fromToPeriod', {
         from: formatDate(from),
         to: formatDate(to),
       })}

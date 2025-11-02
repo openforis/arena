@@ -15,7 +15,7 @@ const HeaderLeft = (props) => {
     <header>
       <Checkbox
         checked={excludeResolved}
-        label="homeView.collectImportReport.excludeResolvedItems"
+        label="homeView:collectImportReport.excludeResolvedItems"
         onChange={(value) => setExcludeResolved(value)}
       />
       <ButtonDownload href={`/api/survey/${surveyId}/collect-import/report/export/`} label="common.exportToExcel" />

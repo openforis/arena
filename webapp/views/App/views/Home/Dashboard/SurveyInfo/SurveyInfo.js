@@ -38,36 +38,36 @@ const SurveyInfo = (props) => {
 
   const onDeleteClick = useCallback(() => {
     confirmDelete({
-      key: 'homeView.deleteSurveyDialog.deleteWarning',
+      key: 'homeView:deleteSurveyDialog.deleteWarning',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteSurvey(navigate)),
-      headerText: 'homeView.deleteSurveyDialog.confirmDelete',
+      headerText: 'homeView:deleteSurveyDialog.confirmDelete',
       strongConfirm: true,
-      strongConfirmInputLabel: 'homeView.deleteSurveyDialog.confirmName',
+      strongConfirmInputLabel: 'homeView:deleteSurveyDialog.confirmName',
       strongConfirmRequiredText: surveyName,
     })
   }, [dispatch, navigate, confirmDelete, surveyName])
 
   const onUnpublishClick = useCallback(() => {
     confirm({
-      key: 'homeView.surveyInfo.unpublishSurveyDialog.unpublishWarning',
+      key: 'homeView:surveyInfo.unpublishSurveyDialog.unpublishWarning',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.unpublishSurvey()),
-      headerText: 'homeView.surveyInfo.unpublishSurveyDialog.confirmUnpublish',
+      headerText: 'homeView:surveyInfo.unpublishSurveyDialog.confirmUnpublish',
       strongConfirm: true,
-      strongConfirmInputLabel: 'homeView.surveyInfo.unpublishSurveyDialog.confirmName',
+      strongConfirmInputLabel: 'homeView:surveyInfo.unpublishSurveyDialog.confirmName',
       strongConfirmRequiredText: surveyName,
     })
   }, [confirm, dispatch, surveyName])
 
   const onDeleteActivityLogDataClick = useCallback(() => {
     confirm({
-      key: 'homeView.surveyInfo.deleteActivityLogConfirm.message',
+      key: 'homeView:surveyInfo.deleteActivityLogConfirm.message',
       params: { surveyName },
       onOk: () => dispatch(SurveyActions.deleteActivityLog()),
-      headerText: 'homeView.surveyInfo.deleteActivityLogConfirm.headerText',
+      headerText: 'homeView:surveyInfo.deleteActivityLogConfirm.headerText',
       strongConfirm: true,
-      strongConfirmInputLabel: 'homeView.surveyInfo.deleteActivityLogConfirm.confirmName',
+      strongConfirmInputLabel: 'homeView:surveyInfo.deleteActivityLogConfirm.confirmName',
       strongConfirmRequiredText: surveyName,
     })
   }, [confirm, dispatch, surveyName])
@@ -92,7 +92,7 @@ const SurveyInfo = (props) => {
         <div>
           <Button
             iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
-            label={canEditSurvey ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo'}
+            label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
             onClick={() => navigate(appModuleUri(homeModules.surveyInfo))}
             size="small"
             testId={TestId.dashboard.surveyInfoBtn}
@@ -115,13 +115,13 @@ const SurveyInfo = (props) => {
                   ? [
                       {
                         key: 'survey-export-with-data',
-                        label: 'homeView.dashboard.exportWithData',
+                        label: 'homeView:dashboard.exportWithData',
                         onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
                         testId: TestId.dashboard.surveyExportWithDataBtn,
                       },
                       {
                         key: 'survey-export-without-data',
-                        label: 'homeView.dashboard.exportWithDataNoActivityLog',
+                        label: 'homeView:dashboard.exportWithDataNoActivityLog',
                         onClick: () =>
                           dispatch(SurveyActions.exportSurvey({ includeData: true, includeActivityLog: false })),
                         testId: TestId.dashboard.surveyExportWithDataNoActivityLogBtn,
@@ -147,7 +147,7 @@ const SurveyInfo = (props) => {
                         content: (
                           <Button
                             iconClassName="icon-eye-blocked icon-12px icon-left"
-                            label="homeView.surveyInfo.unpublish"
+                            label="homeView:surveyInfo.unpublish"
                             onClick={onUnpublishClick}
                             variant="text"
                             testId={TestId.dashboard.surveyUnpublishBtn}
@@ -162,7 +162,7 @@ const SurveyInfo = (props) => {
                     <Button
                       className="btn-danger"
                       iconClassName="icon-bin icon-12px icon-left"
-                      label="homeView.surveyInfo.deleteActivityLog"
+                      label="homeView:surveyInfo.deleteActivityLog"
                       onClick={onDeleteActivityLogDataClick}
                       variant="text"
                       testId={TestId.dashboard.surveyDeleteActivityLogBtn}
