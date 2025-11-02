@@ -39,38 +39,38 @@ const Dashboard = () => {
       tabItems.push(
         {
           key: 'recordsByUser',
-          label: 'homeView.dashboard.recordsByUser',
+          label: 'homeView:dashboard.recordsByUser',
           renderContent: () => <RecordsByUser />,
         },
         {
           key: 'totalRecords',
-          label: 'homeView.dashboard.totalRecords',
+          label: 'homeView:dashboard.totalRecords',
           renderContent: () => <TotalRecordsSummaryChart counts={recordsSummaryState.counts} />,
         }
       )
     }
     tabItems.push({
       key: 'dailyRecordsByUser',
-      label: 'homeView.dashboard.dailyRecordsByUser',
+      label: 'homeView:dashboard.dailyRecordsByUser',
       renderContent: () => <DailyRecordsByUser />,
     })
 
     if (canEditSurvey) {
       tabItems.push({
         key: 'storageSummary',
-        label: 'homeView.dashboard.storageSummary.title',
+        label: 'homeView:dashboard.storageSummary.title',
         renderContent: () => <StorageSummary />,
       })
       if (hasSamplingPointData) {
         tabItems.push({
           key: 'samplingPointDataCompletion',
-          label: 'homeView.dashboard.samplingPointDataCompletion.title',
+          label: 'homeView:dashboard.samplingPointDataCompletion.title',
           renderContent: () => <SamplingPointDataSummary />,
         })
       }
       tabItems.push({
         key: 'activityLog',
-        label: 'homeView.dashboard.activityLog.title',
+        label: 'homeView:dashboard.activityLog.title',
         renderContent: () => <ActivityLog />,
       })
     }

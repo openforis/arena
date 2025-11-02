@@ -28,7 +28,7 @@ const ActivityLog = () => {
 
   return (
     <div className="activity-log__container">
-      <h4 className="">{i18n.t('homeView.dashboard.activityLog.size', { size: activityLogSizeText })}</h4>
+      <h4 className="">{i18n.t('homeView:dashboard.activityLog.size', { size: activityLogSizeText })}</h4>
       {(messages.length > 0 || activityLogSize > minSizeToDisplayMessages) && (
         <div className="activity-log__messages">
           {messages.length === 0 && <LoadingBar />}

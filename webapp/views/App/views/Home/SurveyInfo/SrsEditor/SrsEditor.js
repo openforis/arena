@@ -39,7 +39,7 @@ const SrsEditor = (props) => {
       validation={validation}
       onChange={setSrs}
       readOnly={readOnly}
-      placeholder={i18n.t('homeView.surveyInfo.srsPlaceholder')}
+      placeholder={i18n.t('homeView:surveyInfo.srsPlaceholder')}
     />
   )
 }

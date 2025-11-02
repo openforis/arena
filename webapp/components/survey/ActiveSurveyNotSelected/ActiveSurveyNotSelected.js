@@ -11,7 +11,7 @@ export const ActiveSurveyNotSelected = () => {
   return (
     <div className="active-survey-not-selected">
       <Trans
-        i18nKey="homeView.dashboard.activeSurveyNotSelected"
+        i18nKey="homeView:dashboard.activeSurveyNotSelected"
         components={{
           title: <h2 />,
           label: <span />,
