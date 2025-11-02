@@ -13,22 +13,43 @@ const ignoredUrlRegExps = [
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
 ]
 
+const isUrlIgnored = (url) => ignoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
+
 let isRefreshingToken = false
 let failedRequestsQueue = []
 
-// Function to process the queue of failed requests once the token is refreshed
-const processQueue = (error = null, token = null) => {
-  failedRequestsQueue.forEach((prom) => {
+const setAuthorizationHeader = ({ config, authToken }) => {
+  config.headers = config.headers || {}
+  config.headers.Authorization = `Bearer ${authToken}`
+}
+
+const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
+  for (const failedRequest of failedRequestsQueue) {
+    const { resolve, reject, config } = failedRequest
     if (error) {
-      prom.reject(error)
-    } else {
-      // Update the access token for the retried request
-      prom.config.headers = prom.config.headers || {}
-      prom.config.headers.Authorization = `Bearer ${token}`
-      prom.resolve(axios.request(prom.config))
+      reject(error)
+    } else if (authToken) {
+      setAuthorizationHeader({ config, authToken })
+      resolve(axios.request(config))
     }
-  })
+  }
   failedRequestsQueue = []
+}
+
+const refreshAuthToken = async () => {
+  isRefreshingToken = true
+  try {
+    const response = await axios.post(tokenRefreshEndpoint, null, {
+      withCredentials: true, // Important if using HttpOnly cookies
+    })
+    const { authToken } = response.data
+    ApiConstants.setAuthToken(authToken)
+    return { authToken }
+  } catch (error) {
+    return { error }
+  } finally {
+    isRefreshingToken = false
+  }
 }
 
 const handleAuthorizationError = async ({ originalRequest }) => {
@@ -39,36 +60,21 @@ const handleAuthorizationError = async ({ originalRequest }) => {
     })
   }
 
-  isRefreshingToken = true
+  const { authToken, error } = await refreshAuthToken()
 
-  try {
-    // --- Token Refresh Request ---
-    const response = await axios.post(tokenRefreshEndpoint, null, {
-      withCredentials: true, // Important if using HttpOnly cookies
-    })
+  processFailedRequestsQueue({ authToken, error })
 
-    const newAuthToken = response.data.authToken
-    ApiConstants.setAuthToken(newAuthToken)
-
-    // Update the in-memory token (e.g., setAccessTokenInMemory(newAccessToken))
-    // The new refresh token would be set via HttpOnly cookie in the response
-
-    // --- Success: Retry Original Requests ---
-    isRefreshingToken = false
-    processQueue(null, newAuthToken)
-
+  if (authToken) {
     // Retry the original failed request
-    originalRequest.headers.Authorization = `Bearer ${newAuthToken}`
+    setAuthorizationHeader({ config: originalRequest, authToken })
     return axios.request(originalRequest)
-  } catch (refreshError) {
-    // --- Failure: Redirect to Login ---
-    isRefreshingToken = false
-    processQueue(refreshError) // Reject all queued requests
+  } else {
+    processFailedRequestsQueue({ error }) // Reject all queued requests
 
     // Log the user out and redirect to the login page
     // window.location.href = '/'
 
-    return Promise.reject(refreshError)
+    return Promise.reject(error)
   }
 }
 
@@ -96,7 +102,7 @@ const createAxiosMiddleware =
       if (error.response.status === 401 && url !== tokenRefreshEndpoint) {
         return handleAuthorizationError({ originalRequest })
       }
-      if (!axios.isCancel(error) && url && !ignoredUrlRegExps.some((urlRegExp) => urlRegExp.test(url))) {
+      if (!axios.isCancel(error) && url && !isUrlIgnored(url)) {
         dispatch(ServiceErrorActions.createServiceError({ error }))
       }
       return Promise.reject(error)
