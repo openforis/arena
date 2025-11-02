@@ -75,7 +75,7 @@ export const useUsersListColumns = () => {
       },
       {
         key: 'access_request_date_created',
-        header: 'usersView.accessRequestDate',
+        header: 'usersView:accessRequestDate',
         hidden: true,
         width: '12rem',
         renderItem: ({ item }) => {

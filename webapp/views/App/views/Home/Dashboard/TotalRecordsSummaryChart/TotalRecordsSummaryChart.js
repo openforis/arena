@@ -26,7 +26,7 @@ const TotalRecordsSummaryChart = (props) => {
 
   return (
     <>
-      <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.totalRecords')}</h4>
+      <h4 className="dashboard-chart-header">{i18n.t('homeView:dashboard.totalRecords')}</h4>
 
       <RecordsSummaryPeriodSelector />
 

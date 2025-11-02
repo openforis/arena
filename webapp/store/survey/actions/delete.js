@@ -28,7 +28,7 @@ export const deleteSurvey = (navigate) => async (dispatch, getState) => {
 
   await dispatch(
     NotificationActions.notifyInfo({
-      key: 'homeView.surveyDeleted',
+      key: 'homeView:surveyDeleted',
       params: { surveyName: Survey.getName(surveyInfo) },
     })
   )

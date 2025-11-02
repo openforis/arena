@@ -38,14 +38,14 @@ const SamplingPointDataSummary = () => {
       const value = valueByStep[step]
       if (value > 0) {
         dataItems.push({
-          name: i18n.t(`homeView.dashboard.step.${step}`),
+          name: i18n.t(`homeView:dashboard.step.${step}`),
           value,
           color: colorByStep[step],
         })
       }
     })
     dataItems.push({
-      name: i18n.t('homeView.dashboard.samplingPointDataCompletion.remainingItems'),
+      name: i18n.t('homeView:dashboard.samplingPointDataCompletion.remainingItems'),
       value: totalItems - dataEntry - dataCleansing - dataAnalysis,
       color: remainingItemsColor,
     })
@@ -65,7 +65,7 @@ const SamplingPointDataSummary = () => {
 
   return (
     <div className="dashboard-sampling-point-data-summary">
-      <h4 className="dashboard-chart-header">{i18n.t('homeView.dashboard.samplingPointDataCompletion.title')}</h4>
+      <h4 className="dashboard-chart-header">{i18n.t('homeView:dashboard.samplingPointDataCompletion.title')}</h4>
       <div className="internal-container">
         <PieChart data={data} />
       </div>
