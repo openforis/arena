@@ -15,7 +15,17 @@ const resources = {
 
 export const defaultLanguage = 'en'
 
-const namespaces = ['auth', 'common', 'appErrors', 'emails', 'jobs', 'surveyCreate', 'surveyForm']
+const namespaces = [
+  'auth',
+  'common',
+  'appErrors',
+  'emails',
+  'homeView',
+  'jobs',
+  'surveyCreate',
+  'surveyForm',
+  'usersView',
+]
 const defaultNamespace = 'common'
 
 const experimentalLanguages = ['ru']

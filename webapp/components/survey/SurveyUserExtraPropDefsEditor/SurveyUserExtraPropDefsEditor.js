@@ -48,7 +48,7 @@ export const SurveyUserExtraPropDefsEditor = (props) => {
     <ExtraPropDefsEditor
       availableDataTypes={[ExtraPropDef.dataTypes.number, ExtraPropDef.dataTypes.text]}
       extraPropDefs={userExtraPropDefsArray}
-      infoTextKey="homeView.surveyInfo.userExtraProps.info"
+      infoTextKey="homeView:surveyInfo.userExtraProps.info"
       onExtraPropDefDelete={onExtraPropDefDelete}
       onExtraPropDefUpdate={onExtraPropDefUpdate}
     />

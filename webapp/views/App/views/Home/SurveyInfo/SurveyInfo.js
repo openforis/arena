@@ -47,7 +47,7 @@ const SurveyInfo = () => {
     {
       key: 'basicInfo',
       component: SurveyInfoBasicForm,
-      label: 'homeView.surveyInfo.basic',
+      label: 'homeView:surveyInfo.basic',
       props: {
         getFieldValidation,
         setCycles,
@@ -66,7 +66,7 @@ const SurveyInfo = () => {
     tabs.push({
       key: 'sampleBasedInterpretation',
       component: SurveyInfoSampleBasedImageInterpretation,
-      label: 'homeView.surveyInfo.sampleBasedImageInterpretation',
+      label: 'homeView:surveyInfo.sampleBasedImageInterpretation',
       props: {
         getFieldValidation,
         sampleBasedImageInterpretationEnabled,
@@ -81,7 +81,7 @@ const SurveyInfo = () => {
       {
         key: 'extraProps',
         component: SurveyUserExtraPropDefsEditor,
-        label: 'homeView.surveyInfo.userExtraProps.title',
+        label: 'homeView:surveyInfo.userExtraProps.title',
         props: {
           extraPropDefs: userExtraPropDefs,
           onExtraPropDefsUpdate: setUserExtraPropDefs,
@@ -90,7 +90,7 @@ const SurveyInfo = () => {
       {
         key: 'security',
         component: SurveySecurityEditor,
-        label: 'homeView.surveyInfo.security.title',
+        label: 'homeView:surveyInfo.security.title',
         props: {
           security,
           onSecurityUpdate: setSecurity,
@@ -101,7 +101,7 @@ const SurveyInfo = () => {
       tabs.push({
         key: 'configuration',
         component: SurveyConfigurationEditor,
-        label: 'homeView.surveyInfo.configuration.title',
+        label: 'homeView:surveyInfo.configuration.title',
       })
     }
   }

@@ -8,27 +8,27 @@ export const useTimeRanges = ({ timeRange }) => {
   const timeRangeItems = [
     {
       value: timeRanges._2Weeks,
-      label: i18n.t('homeView.recordsSummary.week', { count: 2 }),
+      label: i18n.t('homeView:recordsSummary.week', { count: 2 }),
     },
     {
       value: timeRanges._1Month,
-      label: i18n.t('homeView.recordsSummary.month', { count: 1 }),
+      label: i18n.t('homeView:recordsSummary.month', { count: 1 }),
     },
     {
       value: timeRanges._3Months,
-      label: i18n.t('homeView.recordsSummary.month', { count: 3 }),
+      label: i18n.t('homeView:recordsSummary.month', { count: 3 }),
     },
     {
       value: timeRanges._6Months,
-      label: i18n.t('homeView.recordsSummary.month', { count: 6 }),
+      label: i18n.t('homeView:recordsSummary.month', { count: 6 }),
     },
     {
       value: timeRanges._1Year,
-      label: i18n.t('homeView.recordsSummary.year', { count: 1 }),
+      label: i18n.t('homeView:recordsSummary.year', { count: 1 }),
     },
     {
       value: timeRanges._5Years,
-      label: i18n.t('homeView.recordsSummary.year', { count: 5 }),
+      label: i18n.t('homeView:recordsSummary.year', { count: 5 }),
     },
   ]
   const timeRangeSelection = timeRangeItems.find(R.propEq('value', timeRange))

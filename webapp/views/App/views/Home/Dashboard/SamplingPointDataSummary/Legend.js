@@ -10,7 +10,7 @@ export const Legend = (props) => {
 
   return (
     <div className="legend">
-      <div>{i18n.t('homeView.dashboard.samplingPointDataCompletion.totalItems', { totalItems })}</div>
+      <div>{i18n.t('homeView:dashboard.samplingPointDataCompletion.totalItems', { totalItems })}</div>
       {data.map((dataItem, index) => {
         const { name, value } = dataItem
         const percent = Math.floor((value * 100) / totalItems)
