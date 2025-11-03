@@ -81,19 +81,14 @@ const handleAuthorizationError = async ({ originalRequest }) => {
 const createAxiosMiddleware =
   (axiosInstance) =>
   ({ dispatch }) => {
-    axiosInstance.interceptors.request.use(
-      (config) => {
-        const token = ApiConstants.getAuthToken()
-        // If a token exists, add it to the Authorization header
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`
-        }
-        return config
-      },
-      (error) => {
-        return Promise.reject(error)
+    axiosInstance.interceptors.request.use((config) => {
+      const token = ApiConstants.getAuthToken()
+      // If a token exists, add it to the Authorization header
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`
       }
-    )
+      return config
+    })
     axiosInstance.interceptors.response.use(null, async (error) => {
       const originalRequest = error.config ?? {}
       const { url } = originalRequest
