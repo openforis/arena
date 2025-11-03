@@ -6,6 +6,18 @@ arena.prepareQueryParams = function(query) {
   return(actualQuery)
 }
 
+
+arena.prepareQueryHeaders = function() {
+  headers <- list("Authorization" = cat0("Bearer ", arena.authToken))
+  return(headers)
+}
+
+arena.getCookie = function(resp, cookieName) {
+  respCookies <- httr::cookies(resp)
+  cookie <- respCookies[respCookies$name == cookieName, ]
+  return(cookie$value)
+}
+
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
   respJson = jsonlite::fromJSON(resp)
@@ -32,12 +44,12 @@ arena.getApiUrl = function(url) {
 }
 
 arena.get = function(url, query = NULL) {
-  resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query))
+  resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), headers = arena.prepareQueryHeaders())
   return(arena.parseResponse(resp))
 }
 
 arena.getToFile = function (url, query = NULL, file) {
-  httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), write_disk(file))
+  httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), write_disk(file), headers = arena.prepareQueryHeaders())
 }
 
 arena.getCSV = function (url, query = NULL) {
@@ -53,18 +65,18 @@ arena.getCSV = function (url, query = NULL) {
 }
 
 arena.post = function(url, body) {
-  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
+  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(body), headers = arena.prepareQueryHeaders())
   return(arena.parseResponse(resp))
 }
 
 arena.put = function(url, body) {
-  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
+  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(body), headers = arena.prepareQueryHeaders())
   return(arena.parseResponse(resp))
 }
 
 arena.putFile = function(url, filePath) {
   return(
-    arena.put(url, body = list('file' = httr::upload_file(filePath)))
+    arena.put(url, body = list('file' = httr::upload_file(filePath)), headers = arena.prepareQueryHeaders())
   )
 }
 
@@ -82,11 +94,11 @@ arena.login = function(tentative) {
   } else {
     enterEmailMessage <- "Username (email):"
   }
-  user <- rstudioapi::showPrompt(title = "Enter your username (email)", message = enterEmailMessage)
+  username <- rstudioapi::showPrompt(title = "Enter your username (email)", message = enterEmailMessage)
   
-  if (is.null(user)) return(FALSE)
+  if (is.null(username)) return(FALSE)
   
-  user <- trimws(tolower(user))
+  username <- trimws(tolower(username))
 
   password <- rstudioapi::askForPassword(prompt = "Enter your password:")
   if (is.null(password)) return(FALSE)
@@ -95,7 +107,7 @@ arena.login = function(tentative) {
 
   resp <- httr::POST(
     paste0(arena.host, 'auth/login'),
-    body = list(email = user, password = password)
+    body = list(email = username, password = password)
   )
   respParsed <- arena.parseResponse(resp)
   
@@ -113,7 +125,9 @@ arena.login = function(tentative) {
       return(FALSE)
     }
   } else {
-    print(paste('*** User', user, 'successfully logged in', sep = ' '))
+    arena.authToken <<- respParsed$authToken
+    arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')
+    print(paste('*** User', username, 'successfully logged in', sep = ' '))
     return(TRUE)
   }
 }
