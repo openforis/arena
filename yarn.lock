@@ -2839,11 +2839,27 @@
     proj4 "^2.19.10"
     uuid "^11.0.3"
 
+"@openforis/arena-core@^1.0.48":
+  version "1.0.48"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.48/bb13a3901398d66f2b997e63c5f25ea6414127c2#bb13a3901398d66f2b997e63c5f25ea6414127c2"
+  integrity sha512-BpL7EeAKTBd8qnbmXoAeSNhc0apUMcbl1FFQOIiouT804QNWusn1D/9uz0RUms8av71U2W9NsW8QalBj433KtQ==
+  dependencies:
+    "@jsep-plugin/regex" "^1.0.4"
+    bignumber.js "^9.3.1"
+    jsep "^1.4.0"
+    lodash.differencewith "^4.5.0"
+    lodash.frompairs "^4.0.1"
+    lodash.isequal "^4.5.0"
+    lodash.topairs "^4.3.0"
+    moment "^2.30.1"
+    proj4 "^2.19.10"
+    uuid "^11.0.3"
+
 "@openforis/arena-server@../arena-server":
   version "0.1.46"
   dependencies:
     "@godaddy/terminus" "^4.12.1"
-    "@openforis/arena-core" "../arena-core"
+    "@openforis/arena-core" "^1.0.48"
     bcryptjs "^2.4.3"
     compression "^1.7.5"
     cookie-parser "^1.4.7"

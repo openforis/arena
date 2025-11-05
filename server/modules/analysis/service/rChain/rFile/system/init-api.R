@@ -1,3 +1,14 @@
+arena.getApiUrl = function(url) {
+  apiUrl <- paste0(arena.host, 'api', url)
+  return(apiUrl)
+}
+
+arena.getCookie = function(resp, cookieName) {
+  respCookies <- httr::cookies(resp)
+  cookie <- respCookies[respCookies$name == cookieName, ]
+  return(cookie$value)
+}
+
 arena.prepareQueryParams = function(query) {
   actualQuery <- list(language = arena.preferredLanguage, token = arena.token)
   if (!is.null(query)) {
@@ -6,16 +17,14 @@ arena.prepareQueryParams = function(query) {
   return(actualQuery)
 }
 
-
-arena.prepareQueryHeaders = function() {
-  headers <- list("Authorization" = cat0("Bearer ", arena.authToken))
-  return(headers)
+arena.createHeadersConfig <- function() {
+  return(add_headers(
+    Authorization = paste("Bearer", arena.authToken)
+  ))
 }
-
-arena.getCookie = function(resp, cookieName) {
-  respCookies <- httr::cookies(resp)
-  cookie <- respCookies[respCookies$name == cookieName, ]
-  return(cookie$value)
+arena.prepareQueryHeaders = function() {
+  headers <- list("Authorization" = paste0("Bearer ", arena.authToken))
+  return(headers)
 }
 
 arena.parseResponse = function(resp) {
@@ -38,45 +47,86 @@ arena.parseResponse = function(resp) {
   return(respJson)
 }
 
-arena.getApiUrl = function(url) {
-  apiUrl <- paste0(arena.host, 'api', url)
-  return(apiUrl)
+arena.refreshAuthTokens = function() {
+  resp <- httr::POST(paste0(arena.host, "auth/token/refresh"), config = set_cookies(refreshToken = arena.authRefreshToken))
+  respParsed <- arena.parseResponse(resp)
+  
+  arena.authToken <<- respParsed$authToken
+  arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')  
 }
 
 arena.get = function(url, query = NULL) {
-  resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), headers = arena.prepareQueryHeaders())
+  requestUrl <- arena.getApiUrl(url)
+  requestQuery <- arena.prepareQueryParams(query)
+  requestHeaders <- arena.prepareQueryHeaders()
+  resp <- httr::GET(requestUrl, query = requestQuery, headers = requestHeaders)
+  if (resp$status == 401) {
+    arena.refreshAuthTokens()
+    requestHeaders <- arena.prepareQueryHeaders()
+    resp <- httr::GET(requestUrl, query = requestQuery, headers = requestHeaders)
+  }
   return(arena.parseResponse(resp))
 }
 
 arena.getToFile = function (url, query = NULL, file) {
-  httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), write_disk(file), headers = arena.prepareQueryHeaders())
+  requestUrl <- arena.getApiUrl(url)
+  requestQuery <- arena.prepareQueryParams(query)
+  requestHeaders <- arena.prepareQueryHeaders()
+  resp <- httr::GET(url = requestUrl, query = requestQuery, config = list(
+    write_disk(file, overwrite = TRUE),
+    arena.createHeadersConfig()
+  ))
+  if (resp$status == 401) {
+    arena.refreshAuthTokens()
+    requestHeaders <- arena.prepareQueryHeaders()
+    resp <- httr::GET(url = requestUrl, query = requestQuery, config = list(
+      write_disk(file, overwrite = TRUE),
+      arena.createHeadersConfig()
+    ))
+  }
 }
 
 arena.getCSV = function (url, query = NULL) {
-  tmp <- tempfile()
-  arena.getToFile(url, query, file = tmp)
-  if (file.info(tmp)$size > 0) {
-    content <- suppressWarnings(read.csv(tmp))
+  tmpFile <- tempfile()
+  arena.getToFile(url, query, file = tmpFile)
+  if (file.info(tmpFile)$size > 0) {
+    content <- suppressWarnings(read.csv(tmpFile))
   } else {
     content <- NULL
   }
-  rm(tmp)
+  rm(tmpFile)
   return(content)
 }
 
 arena.post = function(url, body) {
-  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(body), headers = arena.prepareQueryHeaders())
+  requestUrl <- arena.getApiUrl(url)
+  requestBody <- arena.prepareQueryParams(query)
+  requestHeaders <- arena.prepareQueryHeaders()
+  resp <- httr::POST(requestUrl, body = requestBody, headers = requestHeaders)
+  if (resp$status == 401) {
+    arena.refreshAuthTokens()
+    requestHeaders <- arena.prepareQueryHeaders()
+    resp <- httr::POST(requestUrl, body = requestBody, headers = requestHeaders)
+  }
   return(arena.parseResponse(resp))
 }
 
 arena.put = function(url, body) {
-  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(body), headers = arena.prepareQueryHeaders())
+  requestUrl <- arena.getApiUrl(url)
+  requestBody <- arena.prepareQueryParams(query)
+  requestHeaders <- arena.prepareQueryHeaders()
+  resp <- httr::PUT(requestUrl, body = requestBody, headers = requestHeaders)
+  if (resp$status == 401) {
+    arena.refreshAuthTokens()
+    requestHeaders <- arena.prepareQueryHeaders()
+    resp <- httr::PUT(requestUrl, body = requestBody, headers = requestHeaders)
+  }
   return(arena.parseResponse(resp))
 }
 
 arena.putFile = function(url, filePath) {
   return(
-    arena.put(url, body = list('file' = httr::upload_file(filePath)), headers = arena.prepareQueryHeaders())
+    arena.put(url, body = list('file' = httr::upload_file(filePath)))
   )
 }
 
@@ -99,12 +149,12 @@ arena.login = function(tentative) {
   if (is.null(username)) return(FALSE)
   
   username <- trimws(tolower(username))
-
+  
   password <- rstudioapi::askForPassword(prompt = "Enter your password:")
   if (is.null(password)) return(FALSE)
-
+  
   password <- trimws(password)
-
+  
   resp <- httr::POST(
     paste0(arena.host, 'auth/login'),
     body = list(email = username, password = password)
@@ -115,7 +165,7 @@ arena.login = function(tentative) {
     (respParsed$message == 'validationErrors.user.userNotFound') || 
     (respParsed$message == 'validationErrors.user.emailInvalid') || 
     (respParsed$message == 'Missing credentials')
-    )) 
+  )) 
   {
     if (tentative < 3) {
       print('*** Invalid email or password specified, try again')
