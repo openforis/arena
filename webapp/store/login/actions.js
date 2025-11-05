@@ -49,6 +49,7 @@ export const logout =
 
     await axios.post('/auth/logout')
 
+    ApiConstants.setAuthToken(null)
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())
 

@@ -64,15 +64,8 @@ export const init = (app) => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromUpdateThread(socketId)
 
-      req.logout((err) => {
-        if (err) {
-          return next(err)
-        }
-        res.clearCookie('jwt')
-        res.clearCookie('sessionId')
-        res.clearCookie('sessionId.sig')
-        Response.sendOk(res)
-      })
+      res.clearCookie('refreshToken')
+      Response.sendOk(res)
     } catch (error) {
       next(error)
     }
