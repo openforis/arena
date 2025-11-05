@@ -5,7 +5,7 @@ import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 
 const tokenRefreshEndpoint = '/auth/token/refresh'
 
-const ignoredUrlRegExps = [
+const errorIgnoredUrlRegExps = [
   /^\/auth\/login$/, // login
   /^\/auth\/user$/, // user (if not logged in or authorized)
   /^\/api\/surveyRdb\/\d+\/[\w-]+\/query$/, // data query
@@ -13,7 +13,7 @@ const ignoredUrlRegExps = [
   /^\/api\/mobile\/survey\/\d+$/, // data import (Arena format)
 ]
 
-const isUrlIgnored = (url) => ignoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
+const isErrorIgnoredUrlIgnored = (url) => errorIgnoredUrlRegExps.some((ignoredUrlRegExp) => ignoredUrlRegExp.test(url))
 
 let isRefreshingToken = false
 let failedRequestsQueue = []
@@ -97,7 +97,7 @@ const createAxiosMiddleware =
       if (error.response.status === 401 && url !== tokenRefreshEndpoint) {
         return handleAuthorizationError({ originalRequest })
       }
-      if (!axios.isCancel(error) && url && !isUrlIgnored(url)) {
+      if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {
         dispatch(ServiceErrorActions.createServiceError({ error }))
       }
       return Promise.reject(error)
