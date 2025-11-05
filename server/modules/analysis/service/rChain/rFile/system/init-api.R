@@ -22,10 +22,6 @@ arena.createHeadersConfig <- function() {
     Authorization = paste("Bearer", arena.authToken)
   ))
 }
-arena.prepareQueryHeaders = function() {
-  headers <- list("Authorization" = paste0("Bearer ", arena.authToken))
-  return(headers)
-}
 
 arena.parseResponse = function(resp) {
   resp <- httr::content(resp, as = "text")
@@ -49,40 +45,44 @@ arena.parseResponse = function(resp) {
 
 arena.refreshAuthTokens = function() {
   resp <- httr::POST(paste0(arena.host, "auth/token/refresh"), config = set_cookies(refreshToken = arena.authRefreshToken))
-  respParsed <- arena.parseResponse(resp)
-  
-  arena.authToken <<- respParsed$authToken
-  arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')  
+  if (resp$status == 200) {
+    respParsed <- arena.parseResponse(resp)
+
+    arena.authToken <<- respParsed$authToken
+    arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')  
+    return(TRUE)
+  }
+  return(FALSE)
+}
+
+arena._getInternal = function(url, query = NULL) {
+  resp <- httr::GET(arena.getApiUrl(url), query = arena.prepareQueryParams(query), arena.createHeadersConfig())
+  return(resp)
 }
 
 arena.get = function(url, query = NULL) {
-  requestUrl <- arena.getApiUrl(url)
-  requestQuery <- arena.prepareQueryParams(query)
-  requestHeaders <- arena.prepareQueryHeaders()
-  resp <- httr::GET(requestUrl, query = requestQuery, headers = requestHeaders)
-  if (resp$status == 401) {
-    arena.refreshAuthTokens()
-    requestHeaders <- arena.prepareQueryHeaders()
-    resp <- httr::GET(requestUrl, query = requestQuery, headers = requestHeaders)
+  resp <- arena._getInternal(url, query)
+  if (resp$status == 401 && arena.refreshAuthTokens()) {
+    resp <- arena._getInternal(url, query)
   }
   return(arena.parseResponse(resp))
 }
 
-arena.getToFile = function (url, query = NULL, file) {
-  requestUrl <- arena.getApiUrl(url)
-  requestQuery <- arena.prepareQueryParams(query)
-  requestHeaders <- arena.prepareQueryHeaders()
-  resp <- httr::GET(url = requestUrl, query = requestQuery, config = list(
+arena._getToFileInternal = function (url, query = NULL, file) {
+  resp <- httr::GET(
+    url = arena.getApiUrl(url), 
+    query = arena.prepareQueryParams(query), 
     write_disk(file, overwrite = TRUE),
     arena.createHeadersConfig()
-  ))
-  if (resp$status == 401) {
-    arena.refreshAuthTokens()
-    requestHeaders <- arena.prepareQueryHeaders()
-    resp <- httr::GET(url = requestUrl, query = requestQuery, config = list(
-      write_disk(file, overwrite = TRUE),
-      arena.createHeadersConfig()
-    ))
+  )
+  return(resp)
+ }
+
+
+arena.getToFile = function (url, query = NULL, file) {
+  resp <- arena._getToFileInternal(url, query, file)
+  if (resp$status == 401 && arena.refreshAuthTokens()) {
+    resp <- arena._getToFileInternal(url, query, file)
   }
 }
 
@@ -98,28 +98,28 @@ arena.getCSV = function (url, query = NULL) {
   return(content)
 }
 
+arena._postInternal = function(url, body) {
+  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(query), arena.createHeadersConfig())
+  return(resp)
+}
+
 arena.post = function(url, body) {
-  requestUrl <- arena.getApiUrl(url)
-  requestBody <- arena.prepareQueryParams(query)
-  requestHeaders <- arena.prepareQueryHeaders()
-  resp <- httr::POST(requestUrl, body = requestBody, headers = requestHeaders)
-  if (resp$status == 401) {
-    arena.refreshAuthTokens()
-    requestHeaders <- arena.prepareQueryHeaders()
-    resp <- httr::POST(requestUrl, body = requestBody, headers = requestHeaders)
+  resp <- arena._postInternal(url, body)
+  if (resp$status == 401 && arena.refreshAuthTokens()) {
+    resp <- arena._postInternal(url, body)
   }
   return(arena.parseResponse(resp))
 }
 
+arena._putInternal = function(url, body) {
+  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(query), arena.createHeadersConfig())
+  return(resp)
+}
+
 arena.put = function(url, body) {
-  requestUrl <- arena.getApiUrl(url)
-  requestBody <- arena.prepareQueryParams(query)
-  requestHeaders <- arena.prepareQueryHeaders()
-  resp <- httr::PUT(requestUrl, body = requestBody, headers = requestHeaders)
-  if (resp$status == 401) {
-    arena.refreshAuthTokens()
-    requestHeaders <- arena.prepareQueryHeaders()
-    resp <- httr::PUT(requestUrl, body = requestBody, headers = requestHeaders)
+  resp <- arena._putInternal(url, body)
+  if (resp$status == 401 && arena.refreshAuthTokens()) {
+    resp <- arena._putInternal(url, body)
   }
   return(arena.parseResponse(resp))
 }
@@ -130,8 +130,13 @@ arena.putFile = function(url, filePath) {
   )
 }
 
+arena._deleteInternal = function(url, body) {
+  resp <- httr::DELETE(arena.getApiUrl(url), body = arena.prepareQueryParams(body), arena.createHeadersConfig())
+  return(resp)
+}
+
 arena.delete = function(url, body) {
-  resp <- httr::DELETE(arena.getApiUrl(url), body = arena.prepareQueryParams(body))
+  resp <- arena._deleteInternal(url, body)
   return(arena.parseResponse(resp))
 }
 
