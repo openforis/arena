@@ -78,7 +78,6 @@ arena._getToFileInternal = function (url, query = NULL, file) {
   return(resp)
  }
 
-
 arena.getToFile = function (url, query = NULL, file) {
   resp <- arena._getToFileInternal(url, query, file)
   if (resp$status == 401 && arena.refreshAuthTokens()) {
@@ -99,7 +98,7 @@ arena.getCSV = function (url, query = NULL) {
 }
 
 arena._postInternal = function(url, body) {
-  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(query), arena.createHeadersConfig())
+  resp <- httr::POST(arena.getApiUrl(url), body = arena.prepareQueryParams(body), arena.createHeadersConfig())
   return(resp)
 }
 
@@ -112,7 +111,7 @@ arena.post = function(url, body) {
 }
 
 arena._putInternal = function(url, body) {
-  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(query), arena.createHeadersConfig())
+  resp <- httr::PUT(arena.getApiUrl(url), body = arena.prepareQueryParams(body), arena.createHeadersConfig())
   return(resp)
 }
 
