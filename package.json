@@ -1,6 +1,6 @@
 {
   "name": "open-foris-arena",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "license": "MIT",
   "engines": {
     "node": "^22.14.0",
