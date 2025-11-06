@@ -142,7 +142,7 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const nodeDefCodeCols = nodeDefCols.filter(NodeDef.isCode)
   return (obj) => {
-    nodeDefCodeCols.forEach((nodeDef) => {
+    for (const nodeDef of nodeDefCodeCols) {
       const values = obj[NodeDef.getName(nodeDef)]
       visitCategoryItems({
         survey,
@@ -156,7 +156,7 @@ const getCsvObjectTransformerExpandCategoryItems = ({ survey, query }) => {
           obj[colName] = values?.includes(code)
         },
       })
-    })
+    }
     return obj
   }
 }
@@ -167,7 +167,7 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
   const nodeDefFileCols = nodeDefCols.filter(NodeDef.isFile)
   if (Objects.isEmpty(nodeDefFileCols)) {
     // No file columns
-    return { transformer: null }
+    return null
   }
   const transformer = (obj) => {
     for (const nodeDef of nodeDefFileCols) {
@@ -182,15 +182,15 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
     }
     return obj
   }
-  return { transformer }
+  return transformer
 }
 
 const getCsvObjectTransformerNullsToEmpty = () => (obj) => {
-  Object.entries(obj).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(obj)) {
     if (A.isNull(value)) {
       obj[key] = ''
     }
-  })
+  }
   return obj
 }
 
@@ -210,7 +210,7 @@ const getCsvObjectTransformer = ({
     transformers.push(getCsvObjectTransformerNullsToEmpty())
   }
   if (keepFileNamesUnique && uniqueFileNamesGenerator) {
-    const { transformer } = getCsvObjectTransformerUniqueFileNames({
+    const transformer = getCsvObjectTransformerUniqueFileNames({
       survey,
       query,
       uniqueFileNamesGenerator,
