@@ -1,3 +1,5 @@
+import { ApiEndpoint } from '@openforis/arena-server'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -64,7 +66,7 @@ export const init = (app) => {
       const socketId = Request.getSocketId(req)
       RecordService.dissocSocketFromUpdateThread(socketId)
 
-      res.clearCookie('refreshToken')
+      res.clearCookie('refreshToken', { path: ApiEndpoint.auth.tokenRefresh() })
       Response.sendOk(res)
     } catch (error) {
       next(error)
