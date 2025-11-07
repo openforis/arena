@@ -19,8 +19,7 @@ let isRefreshingToken = false
 let failedRequestsQueue = []
 
 const setAuthorizationHeader = ({ config, authToken }) => {
-  config.headers = config.headers || {}
-  config.headers.Authorization = `Bearer ${authToken}`
+  config.headers = { ...config.headers, Authorization: `Bearer ${authToken}` }
 }
 
 const processFailedRequestsQueue = ({ error = null, authToken = null }) => {
