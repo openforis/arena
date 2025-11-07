@@ -19,7 +19,7 @@ arena.prepareQueryParams = function(query) {
 
 arena.createHeadersConfig <- function() {
   return(add_headers(
-    Authorization = paste("Bearer", arena.authToken)
+    Authorization = paste("Bearer", .arena.authToken)
   ))
 }
 
@@ -44,12 +44,12 @@ arena.parseResponse = function(resp) {
 }
 
 arena.refreshAuthTokens = function() {
-  resp <- httr::POST(paste0(arena.host, "auth/token/refresh"), config = set_cookies(refreshToken = arena.authRefreshToken))
+  resp <- httr::POST(paste0(arena.host, "auth/token/refresh"), config = set_cookies(refreshToken = .arena.authRefreshToken))
   if (resp$status == 200) {
     respParsed <- arena.parseResponse(resp)
 
-    arena.authToken <<- respParsed$authToken
-    arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')  
+    .arena.authToken <<- respParsed$authToken
+    .arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')  
     return(TRUE)
   }
   return(FALSE)
@@ -179,8 +179,8 @@ arena.login = function(tentative) {
       return(FALSE)
     }
   } else {
-    arena.authToken <<- respParsed$authToken
-    arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')
+    .arena.authToken <<- respParsed$authToken
+    .arena.authRefreshToken <<- arena.getCookie(resp, 'refreshToken')
     print(paste('*** User', username, 'successfully logged in', sep = ' '))
     return(TRUE)
   }
