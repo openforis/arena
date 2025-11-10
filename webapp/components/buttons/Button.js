@@ -42,8 +42,14 @@ export const Button = forwardRef((props, ref) => {
   const t = useI18nT({ unescapeHtml: true })
 
   const label = showLabel && labelProp ? t(labelProp, labelParams) : null
-  // use label as title when not showing label
-  const title = titleProp ? t(titleProp, titleParams) : !showLabel && labelProp ? t(labelProp, labelParams) : null
+
+  let title
+  if (titleProp) {
+    title = t(titleProp, titleParams)
+  } else if (!showLabel && labelProp) {
+    // use label as title when not showing label
+    title = t(labelProp, labelParams)
+  }
 
   const variant = active ? 'contained' : variantProp
 
