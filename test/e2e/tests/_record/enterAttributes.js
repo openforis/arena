@@ -79,7 +79,7 @@ const enterTime = async (nodeDef, value, parentSelector) => {
   await dateTimeCalendarBtnLocator.click()
 
   // select time using time picker
-  const timePickerSelector = '.MuiPickersPopper-root'
+  const timePickerSelector = '.MuiPickersLayout-root'
   const timePickerLocator = page.locator(timePickerSelector)
   await expect(await timePickerLocator.isVisible()).toBeTruthy()
 
