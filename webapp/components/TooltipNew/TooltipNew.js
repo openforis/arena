@@ -7,24 +7,24 @@ import { Tooltip } from '@mui/material'
 
 import { Objects } from '@openforis/arena-core'
 
-import { useI18n } from '@webapp/store/system'
-import * as DomUtils from '@webapp/utils/domUtils'
+import { useI18nT } from '@webapp/store/system'
 
 import Markdown from '../markdown'
 
 export const TooltipNew = (props) => {
   const { children, className, isTitleMarkdown, title: titleProp, renderTitle } = props
 
-  const i18n = useI18n()
+  const t = useI18nT()
+  const tUnescapeHtml = useI18nT({ unescapeHtml: true })
 
   const defaultTitleRenderer = useCallback(() => {
     if (Objects.isEmpty(titleProp)) return null
-    const titleText = i18n.t(titleProp)
+    const titleText = t(titleProp)
     if (isTitleMarkdown) {
       return <Markdown source={titleText} />
     }
-    return DomUtils.unescapeHtml(titleText)
-  }, [i18n, isTitleMarkdown, titleProp])
+    return tUnescapeHtml(titleText)
+  }, [isTitleMarkdown, t, tUnescapeHtml, titleProp])
 
   const titleRenderer = renderTitle ?? defaultTitleRenderer
 
