@@ -3,8 +3,10 @@ import { Button as MuiButton } from '@mui/material'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
-import { useI18n } from '@webapp/store/system'
 import { Objects } from '@openforis/arena-core'
+
+import { useI18nT } from '@webapp/store/system'
+
 import { TooltipNew } from '../TooltipNew'
 
 export const Button = forwardRef((props, ref) => {
@@ -37,14 +39,11 @@ export const Button = forwardRef((props, ref) => {
     ...otherProps
   } = props
 
-  const i18n = useI18n()
-  const label = showLabel && labelProp ? i18n.t(labelProp, labelParams) : null
+  const t = useI18nT({ unescapeHtml: true })
+
+  const label = showLabel && labelProp ? t(labelProp, labelParams) : null
   // use label as title when not showing label
-  const title = titleProp
-    ? i18n.t(titleProp, titleParams)
-    : !showLabel && labelProp
-      ? i18n.t(labelProp, labelParams)
-      : null
+  const title = titleProp ? t(titleProp, titleParams) : !showLabel && labelProp ? t(labelProp, labelParams) : null
 
   const variant = active ? 'contained' : variantProp
 
