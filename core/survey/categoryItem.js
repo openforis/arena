@@ -63,7 +63,7 @@ export const getLabel =
   (item) =>
     ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
 export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
-export const getIndex = ObjectUtils.getProp(keysProps.index)
+export const getIndex = (item) => Number(ObjectUtils.getProp(keysProps.index)(item))
 
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)

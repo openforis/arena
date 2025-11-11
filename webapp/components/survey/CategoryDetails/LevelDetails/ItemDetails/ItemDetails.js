@@ -70,6 +70,21 @@ const ItemDetails = (props) => {
     }
   }, [active])
 
+  const onMoveUpClick = useCallback(
+    async () => Actions.moveItem({ category, level, item, offset: -1 }),
+    [Actions, category, item, level]
+  )
+
+  const onMoveDownClick = useCallback(
+    async () => Actions.moveItem({ category, level, item, offset: 1 }),
+    [Actions, category, item, level]
+  )
+
+  const onDeleteClick = useCallback(
+    () => Actions.deleteItem({ category, level, item, leaf }),
+    [Actions, category, item, leaf, level]
+  )
+
   const prefixId = `category-level-${levelIndex}-item-${index}`
 
   return (
@@ -140,12 +155,29 @@ const ItemDetails = (props) => {
           )}
 
           {!readOnly && (
-            <ButtonDelete
-              testId={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
-              disabled={disabled}
-              onClick={() => Actions.deleteItem({ category, level, item, leaf })}
-              label="categoryEdit.deleteItem"
-            />
+            <div className="button-bar">
+              <Button
+                disabled={CategoryItem.getIndex(item) === 0}
+                className="move-up-btn"
+                iconClassName="icon-arrow-up2 icon-12px"
+                label="common.moveUp"
+                onClick={onMoveUpClick}
+                variant="outlined"
+              />
+              <Button
+                className="move-down-btn"
+                iconClassName="icon-arrow-down2 icon-12px"
+                label="common.moveDown"
+                onClick={onMoveDownClick}
+                variant="outlined"
+              />
+              <ButtonDelete
+                testId={TestId.categoryDetails.itemDeleteBtn(levelIndex, index)}
+                disabled={disabled}
+                onClick={onDeleteClick}
+                label="categoryEdit.deleteItem"
+              />
+            </div>
           )}
         </>
       ) : (

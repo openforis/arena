@@ -38,7 +38,7 @@ const _calculateItemsArray = ({ levelIndex }) =>
   A.pipe(
     getItems({ levelIndex }),
     R.values,
-    R.sort((a, b) => Number(a.id) - Number(b.id))
+    R.sort((a, b) => CategoryItem.getIndex(a) - CategoryItem.getIndex(b))
   )
 
 const _refreshItemsArray =
@@ -68,7 +68,11 @@ export const assocItemProp =
     const items = getItems({ levelIndex })(state)
     const item = A.prop(itemUuid, items)
     const itemUpdated = CategoryItem.assocProp({ key, value })(item)
-    return assocItem({ levelIndex, item: itemUpdated })(state)
+    let stateUpdated = assocItem({ levelIndex, item: itemUpdated })(state)
+    if (key === CategoryItem.keysProps.index) {
+      stateUpdated = _refreshItemsArray({ levelIndex })(stateUpdated)
+    }
+    return stateUpdated
   }
 
 const _resetNextLevelsByProp =

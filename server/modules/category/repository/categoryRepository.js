@@ -238,14 +238,39 @@ export const fetchItemsByCategoryUuid = async (
   { surveyId, categoryUuid, draft = false, backup = false, limit = null, offset = null },
   client = db
 ) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const indexPropKey = CategoryItem.keysProps.index
   const items = await client.map(
-    `
-      SELECT i.* 
-      FROM ${getSurveyDBSchema(surveyId)}.category_item i
-      JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
-        ON l.uuid = i.level_uuid
-        AND l.category_uuid = $/categoryUuid/
-     ORDER BY i.id
+    `SELECT
+      sq.*,
+      COALESCE(
+        (sq.props ->> '${indexPropKey}')::integer,
+        sq.row_num - 1
+      ) AS final_index,
+      sq.props || jsonb_build_object('${indexPropKey}', 
+        COALESCE(
+          (sq.props ->> '${indexPropKey}')::integer,
+          sq.row_num - 1
+        )
+      ) AS props,
+      sq.props_draft || jsonb_build_object('${indexPropKey}', 
+        COALESCE(
+          (sq.props_draft ->> '${indexPropKey}')::integer,
+          sq.row_num - 1
+        )
+      ) AS props_draft
+    FROM (
+      SELECT
+          i.*,
+          ROW_NUMBER() OVER (ORDER BY i.id) AS row_num
+      FROM
+          ${schema}.category_item i
+      JOIN
+          ${schema}.category_level l
+          ON l.uuid = i.level_uuid
+          AND l.category_uuid = $/categoryUuid/
+    ) AS sq
+    ORDER BY final_index
      ${offset ? 'OFFSET $/offset/' : ''}
      ${limit ? 'LIMIT $/limit/' : ''}
     `,
@@ -358,14 +383,37 @@ const _getSearchQueryParam = ({ searchValue }) =>
 const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
-  return `SELECT i.* 
-    FROM ${schema}.category_item i
-    JOIN ${schema}.category_level l 
-      ON l.uuid = i.level_uuid
-    WHERE l.category_uuid = $/categoryUuid/ 
-      AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
-      ${searchValueCondition}
-    ORDER BY i.id
+  const itemIndexProp = CategoryItem.keysProps.index
+  const propsColumn = draft ? 'props_draft' : 'props'
+  const indexCol = DbUtils.getPropColCombined(itemIndexProp, draft, 'i.')
+  return `WITH indexed_items AS (
+      -- 1. Subquery to calculate row number and determine the final index value
+      SELECT
+          i.*,
+          -- Calculate the 1-based row number based on the desired fallback order (i.id)
+          ROW_NUMBER() OVER (ORDER BY i.id) AS row_num,
+          -- Determine the final index: Use existing props index, or fallback to 0-based row_num
+          COALESCE(
+              (${indexCol})::integer,
+              ROW_NUMBER() OVER (ORDER BY i.id) - 1
+          ) AS final_sort_index
+      FROM
+          ${schema}.category_item i
+      JOIN
+          ${schema}.category_level l 
+          ON l.uuid = i.level_uuid
+      WHERE 
+          l.category_uuid = $/categoryUuid/ 
+          AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
+          ${searchValueCondition}
+    )
+    SELECT
+        ii.*,
+        ii.${propsColumn} || jsonb_build_object('${itemIndexProp}', ii.final_sort_index) AS ${propsColumn}
+    FROM 
+        indexed_items ii
+    ORDER BY 
+        ii.final_sort_index;
     ${limit ? 'LIMIT $/limit/' : ''}`
 }
 
