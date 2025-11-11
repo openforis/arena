@@ -7,7 +7,9 @@ import { State } from '../../state'
 
 const moveItemByOffset = ({ state, levelIndex, itemUuid, offset }) => {
   const items = State.getItemsArray({ levelIndex })(state)
-  const itemIndexPrev = items.findIndex((itm) => CategoryItem.getUuid(itm) === itemUuid)
+  const itemsIndexedByUuid = State.getItems({ levelIndex })(state)
+  const itemPrev = itemsIndexedByUuid[itemUuid]
+  const itemIndexPrev = CategoryItem.getIndex(itemPrev)
   const itemIndexNext = itemIndexPrev + offset
   const itemToReplace = items[itemIndexNext]
   if (!itemToReplace) {
