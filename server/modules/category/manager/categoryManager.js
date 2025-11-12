@@ -456,6 +456,7 @@ export const updateItemsProps = async (user, surveyId, categoryUuid, items, clie
       _newCategoryItemUpdateLogActivity(categoryUuid, item, CategoryItem.keys.props, CategoryItem.getProps(item), true)
     )
     await Promise.all([
+      markSurveyDraft(surveyId, t),
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
       CategoryRepository.updateItemsProps(surveyId, items, t),
     ])
@@ -489,6 +490,7 @@ export const updateItemsIndex = async ({ user, surveyId, categoryUuid, indexByUu
       }
     }
     await Promise.all([
+      markSurveyDraft(surveyId, t),
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
       CategoryRepository.updateItemsProps(surveyId, itemsUpdated, t),
     ])
