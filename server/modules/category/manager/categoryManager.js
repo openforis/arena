@@ -696,6 +696,12 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
 
 export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client = db) =>
   client.tx(async (t) => {
+    // Fetch the item before deletion to get its index and parent
+    const itemToDelete = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: itemUuid, draft: true }, t)
+    const deletedIndex = CategoryItem.getIndex(itemToDelete)
+    const parentUuid = CategoryItem.getParentUuid(itemToDelete)
+
+    // Delete the item
     const item = await CategoryRepository.deleteItem(surveyId, itemUuid, t)
     const levelUuid = CategoryItem.getLevelUuid(item)
     const code = CategoryItem.getCode(item)
@@ -705,9 +711,46 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
       [ActivityLog.keysContent.levelUuid]: levelUuid,
       [ActivityLog.keysContent.code]: code,
     }
+
+    // Update indexes of sibling items that come after the deleted item
+    const siblingItems = await CategoryRepository.fetchItemsByParentUuid(
+      { surveyId, categoryUuid, parentUuid, draft: true },
+      t
+    )
+
+    const itemsToUpdate = []
+    const logActivities = []
+
+    for (const siblingItem of siblingItems) {
+      const siblingIndex = CategoryItem.getIndex(siblingItem)
+      if (siblingIndex > deletedIndex) {
+        const newIndex = siblingIndex - 1
+        const itemUpdated = CategoryItem.assocProp({
+          key: CategoryItem.keysProps.index,
+          value: newIndex,
+        })(siblingItem)
+        itemsToUpdate.push(itemUpdated)
+        logActivities.push(
+          _newCategoryItemUpdateLogActivity(
+            categoryUuid,
+            itemUpdated,
+            CategoryItem.keys.props,
+            CategoryItem.getProps(itemUpdated),
+            true
+          )
+        )
+      }
+    }
+
     await Promise.all([
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemDelete, logContent, false, t),
+      ...(itemsToUpdate.length > 0
+        ? [
+            ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+            CategoryRepository.updateItemsProps(surveyId, itemsToUpdate, t),
+          ]
+        : []),
     ])
 
     return _afterItemUpdate({ surveyId, categoryUuid, prevItem: item }, t)
