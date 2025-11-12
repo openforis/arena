@@ -20,6 +20,7 @@ export {
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
   updateCategoryItemProp,
+  updateCategoryItemIndexes,
 } from './categories'
 export { fetchChains, getChainSummaryExportUrl } from './analysis'
 

@@ -461,6 +461,39 @@ export const updateItemsProps = async (user, surveyId, categoryUuid, items, clie
     ])
   })
 
+export const updateItemsIndex = async ({ user, surveyId, categoryUuid, indexByUuid, parentUuid = null }, client = db) =>
+  client.tx(async (t) => {
+    const items = await CategoryRepository.fetchItemsByParentUuid(
+      { surveyId, categoryUuid, parentUuid, draft: true },
+      t
+    )
+    const itemsByUuid = ObjectUtils.toUuidIndexedObj(items)
+    const indexByUuidEntries = Object.entries(indexByUuid)
+    const itemsUpdated = []
+    const logActivities = []
+    for (const [itemUuid, index] of indexByUuidEntries) {
+      const item = itemsByUuid[itemUuid]
+      const prevIndex = CategoryItem.getIndex(item)
+      if (prevIndex !== index) {
+        const itemUpdated = CategoryItem.assocProp({ key: CategoryItem.keysProps.index, value: index })(item)
+        itemsUpdated.push(itemUpdated)
+        logActivities.push(
+          _newCategoryItemUpdateLogActivity(
+            categoryUuid,
+            itemUpdated,
+            CategoryItem.keys.props,
+            CategoryItem.getProps(itemUpdated),
+            true
+          )
+        )
+      }
+    }
+    await Promise.all([
+      ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
+      CategoryRepository.updateItemsProps(surveyId, itemsUpdated, t),
+    ])
+  })
+
 export const cleanupCategory = async ({ user, surveyId, categoryUuid }, client = db) =>
   client.tx(async (t) => {
     const category = await _fetchCategory({ surveyId, categoryUuid }, t)

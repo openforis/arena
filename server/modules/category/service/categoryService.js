@@ -204,6 +204,7 @@ export const {
   convertCategoryToReportingData,
   updateLevelProp,
   updateItemProp,
+  updateItemsIndex,
 
   deleteCategory,
   deleteLevel,
