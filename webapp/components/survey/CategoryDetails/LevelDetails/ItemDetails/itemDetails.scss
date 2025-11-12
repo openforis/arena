@@ -91,5 +91,10 @@ $borderColor: $greyBorder;
   .button-bar {
     align-items: normal;
     justify-content: normal;
+
+    button {
+      margin: 0 0.4rem;
+      padding: 4px;
+    }
   }
 }
