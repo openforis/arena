@@ -413,7 +413,7 @@ const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, l
     FROM 
         indexed_items ii
     ORDER BY 
-        ii.final_sort_index;
+        ii.final_sort_index
     ${limit ? 'LIMIT $/limit/' : ''}`
 }
 

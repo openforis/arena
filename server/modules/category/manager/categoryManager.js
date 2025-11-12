@@ -229,12 +229,18 @@ export const insertCategory = async (
 
 export const insertItem = async (user, surveyId, categoryUuid, itemParam, client = db) =>
   client.tx(async (t) => {
+    const parentUuid = CategoryItem.getParentUuid(itemParam)
+    const itemsCountPrev = await CategoryRepository.countItemsByParentUuid(
+      { surveyId, categoryUuid, parentUuid, draft: true },
+      t
+    )
+    const itemToInsert = CategoryItem.assocProp({ key: CategoryItem.keysProps.index, value: itemsCountPrev })(itemParam)
     const logContent = {
-      ...itemParam,
+      ...itemToInsert,
       [ActivityLog.keysContent.categoryUuid]: categoryUuid,
     }
     const [item] = await Promise.all([
-      CategoryRepository.insertItem(surveyId, itemParam, t),
+      CategoryRepository.insertItem(surveyId, itemToInsert, t),
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryItemInsert, logContent, false, t),
     ])
