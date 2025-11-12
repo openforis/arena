@@ -1,6 +1,7 @@
 import './itemDetails.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
 import * as Category from '@core/survey/category'
@@ -18,7 +19,6 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { TestId } from '@webapp/utils/testId'
 
 import { State, useActions } from '../../store'
-import classNames from 'classnames'
 import { ItemExtraPropsEditor } from './ItemExtraPropsEditor'
 
 const ItemDetails = (props) => {
