@@ -209,4 +209,6 @@ export const {
   deleteCategory,
   deleteLevel,
   deleteItem,
+
+  initializeAllSurveysCategoryItemIndexes,
 } = CategoryManager

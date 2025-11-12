@@ -359,7 +359,7 @@ const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, item
   }, [])
 
   if (itemsUpdated.length > 0) {
-    await CategoryRepository.updateItemsProps(surveyId, itemsUpdated, t)
+    await CategoryRepository.updateItemsProps({ surveyId, items: itemsUpdated }, t)
   }
 }
 
@@ -464,7 +464,7 @@ export const updateItemsProps = async (user, surveyId, categoryUuid, items, clie
     await Promise.all([
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      CategoryRepository.updateItemsProps(surveyId, items, t),
+      CategoryRepository.updateItemsProps({ surveyId, items }, t),
     ])
   })
 
@@ -498,7 +498,7 @@ export const updateItemsIndex = async ({ user, surveyId, categoryUuid, indexByUu
     await Promise.all([
       markSurveyDraft(surveyId, t),
       ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-      CategoryRepository.updateItemsProps(surveyId, itemsUpdated, t),
+      CategoryRepository.updateItemsProps({ surveyId, items: itemsUpdated }, t),
     ])
   })
 
@@ -748,7 +748,7 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
       ...(itemsToUpdate.length > 0
         ? [
             ActivityLogRepository.insertMany(user, surveyId, logActivities, t),
-            CategoryRepository.updateItemsProps(surveyId, itemsToUpdate, t),
+            CategoryRepository.updateItemsProps({ surveyId, items: itemsToUpdate }, t),
           ]
         : []),
     ])
@@ -771,4 +771,53 @@ export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = d
     ActivityLogRepository.insertMany(user, surveyId, activities, t),
     CategoryRepository.deleteItems(surveyId, items.map(CategoryItem.getUuid), t),
   ])
+}
+
+const initializeCategoryItemsIndexes = async ({ surveyId, category, draft = true }, t) => {
+  const categoryUuid = Category.getUuid(category)
+  const levels = Category.getLevelsArray(category)
+
+  for (const level of levels) {
+    const levelIndex = CategoryLevel.getIndex(level)
+
+    const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, t)
+
+    const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid, items)
+
+    const itemsToUpdate = []
+
+    for (const groupItems of Object.values(itemsByParentUuid)) {
+      // Sort by ID to maintain consistent ordering
+      const sortedItems = R.sortBy((item) => item.id, groupItems)
+
+      sortedItems.forEach((item, index) => {
+        const itemUpdated = CategoryItem.assocProp({
+          key: CategoryItem.keysProps.index,
+          value: index,
+        })(item)
+        itemsToUpdate.push(itemUpdated)
+      })
+    }
+
+    if (itemsToUpdate.length > 0) {
+      await CategoryRepository.updateItemsProps({ surveyId, items: itemsToUpdate, draft }, t)
+    }
+  }
+}
+
+export const initializeAllSurveysCategoryItemIndexes = async () => {
+  const surveyIds = await SurveyRepository.fetchAllSurveyIds()
+
+  for (const surveyId of surveyIds) {
+    await db.tx(async (t) => {
+      const categories = await CategoryRepository.fetchCategoriesBySurveyId({ surveyId, draft: true }, t)
+
+      for (const category of categories) {
+        if (Category.isPublished(category)) {
+          await initializeCategoryItemsIndexes({ surveyId, category, draft: false }, t)
+        }
+        await initializeCategoryItemsIndexes({ surveyId, category, draft: true }, t)
+      }
+    })
+  }
 }

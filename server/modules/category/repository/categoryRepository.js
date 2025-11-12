@@ -644,14 +644,14 @@ export const updateLevelProp = async (surveyId, levelUuid, key, value, client = 
 export const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
   updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
-export const updateItemsProps = async (surveyId, items, client = db) => {
+export const updateItemsProps = async ({ surveyId, items, draftProps = true }, client = db) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
   await client.none(
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'category_item',
       { name: 'uuid', cast: 'uuid' },
-      [{ name: 'props_draft', cast: 'jsonb' }],
+      [{ name: draftProps ? 'props_draft' : 'props', cast: 'jsonb' }],
       values
     )
   )
