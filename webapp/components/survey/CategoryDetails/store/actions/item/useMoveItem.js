@@ -1,24 +1,24 @@
 import { useCallback } from 'react'
+import { useDispatch } from 'react-redux'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as API from '@webapp/service/api'
-import { AppSavingActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { LoaderActions } from '@webapp/store/ui'
 
 import { State } from '../../state'
-import { useDispatch } from 'react-redux'
 
 const sendUpdateIndexesRequest = async ({ dispatch, surveyId, categoryUuid, parentUuid, indexByUuid }) => {
-  dispatch(AppSavingActions.showAppSaving())
+  dispatch(LoaderActions.showLoader())
 
   await API.updateCategoryItemIndexes({ surveyId, categoryUuid, parentUuid, indexByUuid })
 
   dispatch(SurveyActions.metaUpdated())
 
-  dispatch(AppSavingActions.hideAppSaving())
+  dispatch(LoaderActions.hideLoader())
 }
 
 const moveItemByOffset = ({ dispatch, state, surveyId, categoryUuid, levelIndex, itemUuid, offset }) => {
