@@ -116,6 +116,25 @@ export const dissocItem = ({ levelIndex, itemUuid }) =>
     _refreshItemsArray({ levelIndex })
   )
 
+export const updateSiblingItemIndexesAfterDelete =
+  ({ levelIndex, deletedItemIndex }) =>
+  (state) => {
+    const items = getItems({ levelIndex })(state)
+    const itemsUpdated = {}
+    for (const [uuid, item] of Object.entries(items)) {
+      const itemIndex = CategoryItem.getIndex(item)
+      let itemUpdated = item
+      if (itemIndex > deletedItemIndex) {
+        itemUpdated = CategoryItem.assocProp({
+          key: CategoryItem.keysProps.index,
+          value: itemIndex - 1,
+        })(item)
+      }
+      itemsUpdated[uuid] = itemUpdated
+    }
+    return assocItems({ levelIndex, items: itemsUpdated })(state)
+  }
+
 export const assocFileFormat = ({ fileFormat }) => A.assoc(keys.fileFormat, fileFormat)
 
 export const assocImportSummary = ({ summary }) => A.assoc(keys.importSummary, summary)
