@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import * as A from '@core/arena'
 import * as Category from '@core/survey/category'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as StringUtils from '@core/stringUtils'
 
 import { keys } from './keys'
@@ -25,8 +24,8 @@ export const getItemActive =
   ({ levelIndex }) =>
   (state) => {
     const itemActiveUuid = R.path([keys.itemsActive, String(levelIndex)])(state)
-    const items = getItemsArray({ levelIndex })(state)
-    return items.find((item) => CategoryItem.getUuid(item) === itemActiveUuid)
+    const items = getItems({ levelIndex })(state)
+    return items[itemActiveUuid]
   }
 
 export const isItemActiveLeaf =

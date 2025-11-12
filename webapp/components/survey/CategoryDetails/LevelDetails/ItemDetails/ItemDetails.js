@@ -71,12 +71,12 @@ const ItemDetails = (props) => {
   }, [active])
 
   const onMoveUpClick = useCallback(
-    async () => Actions.moveItem({ category, level, item, offset: -1 }),
+    () => Actions.moveItem({ setItem, category, level, item, offset: -1 }),
     [Actions, category, item, level]
   )
 
   const onMoveDownClick = useCallback(
-    async () => Actions.moveItem({ category, level, item, offset: 1 }),
+    () => Actions.moveItem({ setItem, category, level, item, offset: 1 }),
     [Actions, category, item, level]
   )
 

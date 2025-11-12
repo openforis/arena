@@ -31,7 +31,7 @@ const moveItemByOffset = ({ dispatch, state, surveyId, categoryUuid, levelIndex,
   const itemToReplace = items[itemIndexNext]
   if (!itemToReplace) {
     // final index out of bounds
-    return state
+    return { stateUpdated: state, updated: false }
   }
   const itemToReplaceUuid = CategoryItem.getUuid(itemToReplace)
 
@@ -48,7 +48,7 @@ const moveItemByOffset = ({ dispatch, state, surveyId, categoryUuid, levelIndex,
 
   sendUpdateIndexesRequest({ dispatch, surveyId, categoryUuid, parentUuid, indexByUuid: updatedIndexByUuid })
 
-  return stateUpdated
+  return { stateUpdated, updated: true }
 }
 
 export const useMoveItem = ({ setState }) => {
@@ -56,13 +56,26 @@ export const useMoveItem = ({ setState }) => {
   const surveyId = useSurveyId()
 
   return useCallback(
-    async ({ category, level, item, offset }) => {
+    ({ setItem, category, level, item, offset }) => {
       const categoryUuid = Category.getUuid(category)
       const itemUuid = CategoryItem.getUuid(item)
       const levelIndex = CategoryLevel.getIndex(level)
-      setState((statePrev) =>
-        moveItemByOffset({ dispatch, state: statePrev, surveyId, categoryUuid, levelIndex, itemUuid, offset })
-      )
+      setState((statePrev) => {
+        const { stateUpdated, updated } = moveItemByOffset({
+          dispatch,
+          state: statePrev,
+          surveyId,
+          categoryUuid,
+          levelIndex,
+          itemUuid,
+          offset,
+        })
+        if (updated) {
+          const itemUpdated = State.getItemActive({ levelIndex })(stateUpdated)
+          setItem(itemUpdated)
+        }
+        return stateUpdated
+      })
     },
     [dispatch, setState, surveyId]
   )
