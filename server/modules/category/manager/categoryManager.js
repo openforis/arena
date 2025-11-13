@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 import * as pgPromise from 'pg-promise'
 
+import { Objects } from '@openforis/arena-core'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -781,12 +782,12 @@ const initializeCategoryItemsIndexes = async ({ surveyId, category, draft = true
     const levelIndex = CategoryLevel.getIndex(level)
 
     const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, t)
-    if (surveyId === 2) {
+    if (Number(surveyId) === 1) {
       console.log('--items', items)
     }
     const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid, items)
 
-    const itemsToUpdate = []
+    const indexByItemUuid = {}
 
     for (const groupItems of Object.values(itemsByParentUuid)) {
       // Sort by ID to maintain consistent ordering
@@ -794,23 +795,23 @@ const initializeCategoryItemsIndexes = async ({ surveyId, category, draft = true
 
       for (let index = 0; index < sortedItems.length; index++) {
         const item = sortedItems[index]
+        if (Number(surveyId) === 1) {
+          console.log('===item', JSON.stringify(item, null, 2))
+        }
         if ((draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))) {
-          if (surveyId === 2) {
-            console.log('===updating item', item)
+          if (Number(surveyId) === 1) {
+            console.log('===updating item', item, index)
           }
-          const itemUpdated = CategoryItem.assocProp({
-            key: CategoryItem.keysProps.index,
-            value: index,
-          })(item)
-          itemsToUpdate.push(itemUpdated)
+          indexByItemUuid[CategoryItem.getUuid(item)] = index
         }
       }
     }
 
-    if (itemsToUpdate.length > 0) {
-      console.log('--itemsToUpdate', itemsToUpdate.length)
-
-      await CategoryRepository.updateItemsProps({ surveyId, items: itemsToUpdate, draft }, t)
+    if (Objects.isNotEmpty(indexByItemUuid)) {
+      if (Number(surveyId) === 1) {
+        console.log('--itemsToUpdate', Object.entries(indexByItemUuid).length)
+      }
+      await CategoryRepository.updateItemsIndexes({ surveyId, indexByItemUuid, draftProps: draft }, t)
     }
   }
 }

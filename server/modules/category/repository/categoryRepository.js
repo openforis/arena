@@ -6,6 +6,7 @@ import { Objects, Strings } from '@openforis/arena-core'
 import { Schemata } from '@common/model/db'
 import {
   getSurveyDBSchema,
+  bulkUpdateSurveySchemaTableProp,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableRecords,
@@ -107,7 +108,7 @@ const _getFetchCategoriesAndLevelsQuery = ({
     // combine props and props_draft column into one
     return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
             'published', ${tableAlias}.props::text <> '{}',
-            'draft', ${tableAlias}.props_draft::text <> '{}',`
+            'draft', ${tableAlias}.props_draft::text <> '{}'`
   }
 
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft)
@@ -598,6 +599,15 @@ export const updateLevelProp = async (surveyId, levelUuid, key, value, client = 
 
 export const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
   updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
+
+export const updateItemsIndexes = async ({ surveyId, indexByItemUuid, draftProps = true }, client = db) => {
+  const updates = Object.entries(indexByItemUuid).map(([uuid, index]) => ({
+    recordUuid: uuid,
+    key: CategoryItem.keysProps.index,
+    value: index,
+  }))
+  await bulkUpdateSurveySchemaTableProp({ surveyId, tableName: 'category_item', updates, draftProps }, client)
+}
 
 export const updateItemsProps = async ({ surveyId, items, draftProps = true }, client = db) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])

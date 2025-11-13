@@ -9,6 +9,7 @@ import * as ProcessUtils from '@core/processUtils'
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
 import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as FileService from '@server/modules/record/service/fileService'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
@@ -66,11 +67,18 @@ export const run = async () => {
 
   await initializeCategoryItemIndexesIfNecessary({ logger, serviceRegistry })
 
+  // ====== System Admin user creation
+  await UserService.insertSystemAdminUserIfNotExisting()
+
+  // run files storage check after DB migrations
+  await FileService.checkFilesStorage()
+
+  // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info)
   await infoService.updateVersion()
 
-  // ====== System Admin user creation
-  await UserService.insertSystemAdminUserIfNotExisting()
+  // ====== Start server
+  await ArenaServer.start(arenaApp)
 
   // ====== Schedulers
   await TempFilesCleanup.init()
@@ -80,6 +88,5 @@ export const run = async () => {
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
 
-  // ====== Start server
-  await ArenaServer.start(arenaApp)
+  logger.info('server initialization complete; server started.')
 }
