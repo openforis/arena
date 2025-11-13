@@ -2825,45 +2825,27 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openforis/arena-core@^1.0.44":
-  version "1.0.44"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.44/17f8797b851069bdaa1e47172b6d4e919f314728#17f8797b851069bdaa1e47172b6d4e919f314728"
-  integrity sha512-4PQKNOyXr7Mu3mj1QSKK2iaz2xnLd5EEgkPq6iio3SV2zSqFJ+gYSWh5z+hBmtrTVywqBOhV8WXb6FzUHFtbgA==
+"@openforis/arena-core@^1.0.50":
+  version "1.0.50"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.50/d21e9ac50a615d0e23bca0cef219d3c7f5fa4040#d21e9ac50a615d0e23bca0cef219d3c7f5fa4040"
+  integrity sha512-kDXELIsy40IsXlQ2pxNqDqai29ym07Nrlyem3Ynw0lMhATNncBbV/u3hGR/q7YKsyMjJnJHhD4DrhUd5gN+YGw==
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
-    bignumber.js "^9.1.2"
+    bignumber.js "^9.3.1"
     jsep "^1.4.0"
     lodash.differencewith "^4.5.0"
     lodash.frompairs "^4.0.1"
     lodash.isequal "^4.5.0"
     lodash.topairs "^4.3.0"
     moment "^2.30.1"
-    proj4 "^2.15.0"
+    proj4 "^2.19.10"
     uuid "^11.0.3"
 
-"@openforis/arena-core@^1.0.8":
-  version "1.0.10"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.10/4bb87ca2611be7db54f54626426516c3967e6f40#4bb87ca2611be7db54f54626426516c3967e6f40"
-  integrity sha512-ZxwMh9PeiRphij1Ox9zNVyo+ijQ2zwXS+q5Shy4/ChHk1I1+2taKP6gXYOr0RC+pKrEmuYlfoNKnrvd+Al51nw==
-  dependencies:
-    "@jsep-plugin/regex" "^1.0.4"
-    bignumber.js "^9.1.2"
-    jsep "^1.4.0"
-    lodash.differencewith "^4.5.0"
-    lodash.frompairs "^4.0.1"
-    lodash.isequal "^4.5.0"
-    lodash.topairs "^4.3.0"
-    moment "^2.30.1"
-    proj4 "^2.15.0"
-    uuid "^11.0.3"
-
-"@openforis/arena-server@^0.1.45":
-  version "0.1.45"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/0.1.45/5aa7a99571fe66372f7f43fc5e66c555086aa59e#5aa7a99571fe66372f7f43fc5e66c555086aa59e"
-  integrity sha512-mbfEMOZee4L6L5lP9QwQRy4l1L/qr/AdbV87q1CYNgyApBz6Y+zJGbdLcey5Bf26HLJb2tXKdyqhRZQZVUudSw==
+"@openforis/arena-server@../arena-server":
+  version "0.1.46"
   dependencies:
     "@godaddy/terminus" "^4.12.1"
-    "@openforis/arena-core" "^1.0.8"
+    "@openforis/arena-core" "^1.0.50"
     bcryptjs "^2.4.3"
     compression "^1.7.5"
     connect-pg-simple "^10.0.0"
@@ -5167,10 +5149,10 @@ big.js@^5.2.2:
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
   integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
 
-bignumber.js@^9.1.2:
-  version "9.1.2"
-  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.2.tgz#b7c4242259c008903b13707983b5f4bbd31eda0c"
-  integrity sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==
+bignumber.js@^9.3.1:
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.3.1.tgz#759c5aaddf2ffdc4f154f7b493e1c8770f88c4d7"
+  integrity sha512-Ko0uX15oIUS7wJ3Rb30Fs6SkVbLmPBAKdlm7q9+ak9bbIeFf0MwuBsQV6z7+X768/cHsfg+WlysDWJcmthjsjQ==
 
 binary-extensions@^2.0.0:
   version "2.2.0"
@@ -12246,13 +12228,13 @@ proj4@^2.1.4:
     mgrs "1.0.0"
     wkt-parser "^1.3.1"
 
-proj4@^2.15.0:
-  version "2.15.0"
-  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.15.0.tgz#d77c9956861c8ed516071c4208d576cebe800eb5"
-  integrity sha512-LqCNEcPdI03BrCHxPLj29vsd5afsm+0sV1H/O3nTDKrv8/LA01ea1z4QADDMjUqxSXWnrmmQDjqFm1J/uZ5RLw==
+proj4@^2.19.10:
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.20.0.tgz#059656589434f2eff02070806a5779ad4fc70070"
+  integrity sha512-9Mj5kUxQ6xBE5IzzkQcm0cRUH21FNp+wFp0AK7gBdPsiIc1iNwgNyCS4Lp55sPJum9DO8UNepZxEzrGPmm8RAg==
   dependencies:
     mgrs "1.0.0"
-    wkt-parser "^1.4.0"
+    wkt-parser "^1.5.1"
 
 promise-inflight@^1.0.1:
   version "1.0.1"
@@ -15201,10 +15183,10 @@ wkt-parser@^1.3.1:
   resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.3.3.tgz#46b4e3032dd9c86907f7e630b57e3c6ea2bb772b"
   integrity sha512-ZnV3yH8/k58ZPACOXeiHaMuXIiaTk1t0hSUVisbO0t4RjA5wPpUytcxeyiN2h+LZRrmuHIh/1UlrR9e7DHDvTw==
 
-wkt-parser@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.4.0.tgz#7cca07a6ee5b4baf059b723e62d7fe95bc923bf5"
-  integrity sha512-qpwO7Ihds/YYDTi1aADFTI1Sm9YC/tTe3SHD24EeIlZxy7Ik6a1b4HOz7jAi0xdUAw487duqpo8OGu+Tf4nwlQ==
+wkt-parser@^1.5.1:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.5.2.tgz#a8eaf86ac2cc1d0a2e6a8082a930f5c7ebdb5771"
+  integrity sha512-1ZUiV1FTwSiSrgWzV9KXJuOF2BVW91KY/mau04BhnmgOdroRQea7Q0s5TVqwGLm0D2tZwObd/tBYXW49sSxp3Q==
 
 worker-farm@^1.7.0:
   version "1.7.0"

@@ -1,12 +1,14 @@
 import * as express from 'express'
 import morgan from 'morgan'
 
+import { ServiceRegistry, ServiceType } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
@@ -18,6 +20,17 @@ import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitati
 import { SwaggerInitializer } from './swaggerInitializer'
 
 const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
+
+const initializeCategoryItemIndexesIfNecessary = async ({ logger }) => {
+  const serviceRegistry = ServiceRegistry.getInstance()
+  const infoService = serviceRegistry.getService(ServiceType.info)
+  const versionInDb = await infoService.getVersion()
+  if (versionInDb === '2.0.0') {
+    logger.info('Initializing category item indexes...')
+    await CategoryService.initializeAllSurveysCategoryItemIndexes()
+    logger.info('Category item indexes initialized')
+  }
+}
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -52,7 +65,10 @@ export const run = async () => {
 
   SwaggerInitializer.init(app)
 
-  await ArenaServer.start(arenaApp)
+  await initializeCategoryItemIndexesIfNecessary({ logger })
+
+  const infoService = ServiceRegistry.getInstance().getService(ServiceType.info)
+  await infoService.updateVersion()
 
   // ====== System Admin user creation
   await UserService.insertSystemAdminUserIfNotExisting()
@@ -64,4 +80,7 @@ export const run = async () => {
   await RecordPreviewCleanup.init()
   // await SurveysFilesPropsCleanup.init()
   await ExpiredUserInvitationsCleanup.init()
+
+  // ====== Start server
+  await ArenaServer.start(arenaApp)
 }

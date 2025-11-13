@@ -3,15 +3,10 @@ import 'dotenv/config'
 import * as ProcessUtils from '@core/processUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FileService from '@server/modules/record/service/fileService'
-import * as CategoryService from '@server/modules/category/service/categoryService'
-
-import * as Log from '@server/log/log'
 
 import * as appCluster from './system/appCluster'
 
 const initialize = async () => {
-  const logger = Log.getLogger('Server')
-
   // recursively create temp folder
   await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
 
@@ -19,11 +14,6 @@ const initialize = async () => {
 
   // run files storage check after DB migrations
   await FileService.checkFilesStorage()
-
-  // initialize category item indexes (if not already set)
-  logger.info('Initializing category item indexes...')
-  await CategoryService.initializeAllSurveysCategoryItemIndexes()
-  logger.info('Category item indexes initialized')
 }
 
 initialize()
