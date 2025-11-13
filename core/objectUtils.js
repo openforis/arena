@@ -62,6 +62,7 @@ export const getAuthGroups = R.propOr([], keys.authGroups)
 
 export const isTemporary = isKeyTrue(keys.temporary)
 export const isPublished = isKeyTrue(keys.published)
+export const isDraft = isKeyTrue(keys.draft)
 
 // ====== CHECK
 const isBlank = (value) => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)

@@ -781,25 +781,35 @@ const initializeCategoryItemsIndexes = async ({ surveyId, category, draft = true
     const levelIndex = CategoryLevel.getIndex(level)
 
     const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, t)
-
+    if (surveyId === 2) {
+      console.log('--items', items)
+    }
     const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid, items)
 
     const itemsToUpdate = []
 
     for (const groupItems of Object.values(itemsByParentUuid)) {
       // Sort by ID to maintain consistent ordering
-      const sortedItems = R.sortBy((item) => item.id, groupItems)
+      const sortedItems = R.sortBy((item) => item.id)(groupItems)
 
-      sortedItems.forEach((item, index) => {
-        const itemUpdated = CategoryItem.assocProp({
-          key: CategoryItem.keysProps.index,
-          value: index,
-        })(item)
-        itemsToUpdate.push(itemUpdated)
-      })
+      for (let index = 0; index < sortedItems.length; index++) {
+        const item = sortedItems[index]
+        if ((draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))) {
+          if (surveyId === 2) {
+            console.log('===updating item', item)
+          }
+          const itemUpdated = CategoryItem.assocProp({
+            key: CategoryItem.keysProps.index,
+            value: index,
+          })(item)
+          itemsToUpdate.push(itemUpdated)
+        }
+      }
     }
 
     if (itemsToUpdate.length > 0) {
+      console.log('--itemsToUpdate', itemsToUpdate.length)
+
       await CategoryRepository.updateItemsProps({ surveyId, items: itemsToUpdate, draft }, t)
     }
   }
@@ -810,9 +820,9 @@ export const initializeAllSurveysCategoryItemIndexes = async () => {
 
   for (const surveyId of surveyIds) {
     await db.tx(async (t) => {
-      const categories = await CategoryRepository.fetchCategoriesBySurveyId({ surveyId, draft: true }, t)
+      const categoriesByUuid = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, t)
 
-      for (const category of categories) {
+      for (const category of Object.values(categoriesByUuid)) {
         if (Category.isPublished(category)) {
           await initializeCategoryItemsIndexes({ surveyId, category, draft: false }, t)
         }

@@ -1,7 +1,7 @@
 import * as express from 'express'
 import morgan from 'morgan'
 
-import { ServiceRegistry, ServiceType } from '@openforis/arena-core'
+import { ServiceType } from '@openforis/arena-core'
 import { ArenaServer } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
@@ -21,8 +21,7 @@ import { SwaggerInitializer } from './swaggerInitializer'
 
 const fileSizeLimit = 2 * 1024 * 1024 * 1024 // 2GB
 
-const initializeCategoryItemIndexesIfNecessary = async ({ logger }) => {
-  const serviceRegistry = ServiceRegistry.getInstance()
+const initializeCategoryItemIndexesIfNecessary = async ({ logger, serviceRegistry }) => {
   const infoService = serviceRegistry.getService(ServiceType.info)
   const versionInDb = await infoService.getVersion()
   if (versionInDb === '2.0.0') {
@@ -38,7 +37,7 @@ export const run = async () => {
   logger.info('server initialization start')
 
   const arenaApp = await ArenaServer.init({ fileSizeLimit })
-  const { express: app } = arenaApp
+  const { express: app, serviceRegistry } = arenaApp
 
   if (ProcessUtils.isEnvDevelopment) {
     app.use(morgan('dev'))
@@ -65,9 +64,9 @@ export const run = async () => {
 
   SwaggerInitializer.init(app)
 
-  await initializeCategoryItemIndexesIfNecessary({ logger })
+  await initializeCategoryItemIndexesIfNecessary({ logger, serviceRegistry })
 
-  const infoService = ServiceRegistry.getInstance().getService(ServiceType.info)
+  const infoService = serviceRegistry.getService(ServiceType.info)
   await infoService.updateVersion()
 
   // ====== System Admin user creation

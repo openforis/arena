@@ -54,6 +54,7 @@ export const {
   getUuid,
   isEqual,
   isPublished,
+  isDraft,
 } = ObjectUtils
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)

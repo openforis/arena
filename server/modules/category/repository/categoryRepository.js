@@ -106,7 +106,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
     }
     // combine props and props_draft column into one
     return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
-            'published', ${tableAlias}.props::text <> '{}'`
+            'published', ${tableAlias}.props::text <> '{}',
+            'draft', ${tableAlias}.props_draft::text <> '{}',`
   }
 
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft)
