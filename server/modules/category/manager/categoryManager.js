@@ -774,44 +774,38 @@ export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = d
   ])
 }
 
-const initializeCategoryItemsIndexes = async ({ surveyId, category, draft = true }, t) => {
+const shouldItemsIndexBeInitialized = (item) => item && Objects.isEmpty(CategoryItem.getIndex(item))
+
+export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category, draft = true }, client = db) => {
   const categoryUuid = Category.getUuid(category)
   const levels = Category.getLevelsArray(category)
 
   for (const level of levels) {
     const levelIndex = CategoryLevel.getIndex(level)
 
-    const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, t)
-    if (Number(surveyId) === 1) {
-      console.log('--items', items)
+    const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, client)
+    if (!shouldItemsIndexBeInitialized(items[0])) {
+      continue
     }
+
     const itemsByParentUuid = R.groupBy(CategoryItem.getParentUuid, items)
 
     const indexByItemUuid = {}
 
     for (const groupItems of Object.values(itemsByParentUuid)) {
       // Sort by ID to maintain consistent ordering
-      const sortedItems = R.sortBy((item) => item.id)(groupItems)
+      const sortedItems = R.sortBy(CategoryItem.getId)(groupItems)
 
       for (let index = 0; index < sortedItems.length; index++) {
         const item = sortedItems[index]
-        if (Number(surveyId) === 1) {
-          console.log('===item', JSON.stringify(item, null, 2))
-        }
         if ((draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))) {
-          if (Number(surveyId) === 1) {
-            console.log('===updating item', item, index)
-          }
           indexByItemUuid[CategoryItem.getUuid(item)] = index
         }
       }
     }
 
     if (Objects.isNotEmpty(indexByItemUuid)) {
-      if (Number(surveyId) === 1) {
-        console.log('--itemsToUpdate', Object.entries(indexByItemUuid).length)
-      }
-      await CategoryRepository.updateItemsIndexes({ surveyId, indexByItemUuid, draftProps: draft }, t)
+      await CategoryRepository.updateItemsIndexes({ surveyId, indexByItemUuid, draftProps: draft }, client)
     }
   }
 }
@@ -825,9 +819,9 @@ export const initializeAllSurveysCategoryItemIndexes = async () => {
 
       for (const category of Object.values(categoriesByUuid)) {
         if (Category.isPublished(category)) {
-          await initializeCategoryItemsIndexes({ surveyId, category, draft: false }, t)
+          await initializeSurveyCategoryItemsIndexes({ surveyId, category, draft: false }, t)
         }
-        await initializeCategoryItemsIndexes({ surveyId, category, draft: true }, t)
+        await initializeSurveyCategoryItemsIndexes({ surveyId, category, draft: true }, t)
       }
     })
   }

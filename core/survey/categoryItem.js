@@ -47,6 +47,7 @@ export const {
   getDescriptions,
   getExtra,
   getExtraProp,
+  getId,
   getLabels,
   getProps,
   getPropsDraft,
