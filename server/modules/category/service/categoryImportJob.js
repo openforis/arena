@@ -11,7 +11,6 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 import * as StringUtils from '@core/stringUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
@@ -185,7 +184,8 @@ export class CategoryImportInternalJob extends Job {
       return
     }
 
-    await PromiseUtils.each(levelNames, async (levelName, index) => {
+    for (let index = 0; index < levelNames.length; index++) {
+      const levelName = levelNames[index]
       const levelOld = levelsExisting[index]
       if (!levelOld) {
         // insert new level
@@ -208,13 +208,13 @@ export class CategoryImportInternalJob extends Job {
         )
         this.category = categoryUpdated
       }
-    })
+    }
 
     if (levelNames.length < levelsExisting.length) {
       // delete draft levels missing in imported file (starting from the last level)
       const levelsToDelete = levelsExisting.slice(levelNames.length).reverse()
 
-      await PromiseUtils.each(levelsToDelete, async (levelToDelete) => {
+      for (const levelToDelete of levelsToDelete) {
         this.category = await CategoryManager.deleteLevel(
           user,
           surveyId,
@@ -222,7 +222,7 @@ export class CategoryImportInternalJob extends Job {
           CategoryLevel.getUuid(levelToDelete),
           tx
         )
-      })
+      }
     }
   }
 
