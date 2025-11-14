@@ -2471,8 +2471,10 @@
     proj4 "^2.19.10"
     uuid "^11.0.3"
 
-"@openforis/arena-server@../arena-server":
-  version "0.1.46"
+"@openforis/arena-server@^1.0.1":
+  version "1.0.1"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-server/1.0.1/be40b944bb335cd867bb4b248395dd45588be699#be40b944bb335cd867bb4b248395dd45588be699"
+  integrity sha512-n3ifSF3VgbvVRQio/Ee+wYngM1CuJLa/VlaAH36KcdZv2J3Sq+p2jb3KXOabMPdej51c2iOeNoNfSRKilSTHFg==
   dependencies:
     "@godaddy/terminus" "^4.12.1"
     "@openforis/arena-core" "^1.0.50"
