@@ -776,7 +776,7 @@ export const deleteItems = async ({ user, surveyId, categoryUuid, items }, t = d
 
 const shouldItemsIndexBeInitialized = (item) => item && Objects.isEmpty(CategoryItem.getIndex(item))
 
-export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category, draft = true }, client = db) => {
+const _initializeSurveyCategoryItemsIndexesInternal = async ({ surveyId, category, draft = true }, client = db) => {
   const categoryUuid = Category.getUuid(category)
   const levels = Category.getLevelsArray(category)
 
@@ -810,6 +810,13 @@ export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category,
   }
 }
 
+export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category }, client = db) => {
+  if (Category.isPublished(category)) {
+    await _initializeSurveyCategoryItemsIndexesInternal({ surveyId, category, draft: false }, client)
+  }
+  await _initializeSurveyCategoryItemsIndexesInternal({ surveyId, category, draft: true }, client)
+}
+
 export const initializeAllSurveysCategoryItemIndexes = async () => {
   const surveyIds = await SurveyRepository.fetchAllSurveyIds()
 
@@ -818,10 +825,7 @@ export const initializeAllSurveysCategoryItemIndexes = async () => {
       const categoriesByUuid = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, t)
 
       for (const category of Object.values(categoriesByUuid)) {
-        if (Category.isPublished(category)) {
-          await initializeSurveyCategoryItemsIndexes({ surveyId, category, draft: false }, t)
-        }
-        await initializeSurveyCategoryItemsIndexes({ surveyId, category, draft: true }, t)
+        await initializeSurveyCategoryItemsIndexes({ surveyId, category }, t)
       }
     })
   }
