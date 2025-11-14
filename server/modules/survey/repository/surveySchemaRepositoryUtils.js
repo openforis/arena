@@ -32,7 +32,7 @@ export const markSurveyDraft = async (surveyId, client = db) =>
 export const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
   client.query(`
     UPDATE
-      ${getSurveyDBSchema(surveyId)}.${tableName}
+      ${Schemata.getSchemaSurvey(surveyId)}.${tableName}
     SET
       props = props || props_draft,
       props_draft = '{}'::jsonb
@@ -41,7 +41,7 @@ export const publishSurveySchemaTableProps = async (surveyId, tableName, client 
 export const unpublishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
   client.query(`
     UPDATE
-      ${getSurveyDBSchema(surveyId)}.${tableName}
+      ${Schemata.getSchemaSurvey(surveyId)}.${tableName}
     SET
       props_draft = props || props_draft,
       props = '{}'::jsonb
@@ -49,7 +49,7 @@ export const unpublishSurveySchemaTableProps = async (surveyId, tableName, clien
 
 export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
   client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
+    `UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${tableName}
      SET props_draft = props_draft || $1
      WHERE uuid = $2
      RETURNING *`,
@@ -64,7 +64,7 @@ export const bulkUpdateSurveySchemaTableProp = async (
   if (!updates || updates.length === 0) {
     return []
   }
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
 
   // 1. Generate the temporary table data (VALUES clause)
   // We map the input 'updates' to match the column set names if necessary
@@ -107,7 +107,7 @@ export const deleteSurveySchemaTableRecords = async (surveyId, tableName, record
   client.map(
     `
     DELETE 
-    FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.${tableName} 
     WHERE uuid IN ($1:csv) RETURNING *`,
     [recordUuids],
     (def) => dbTransformCallback(def, true)
@@ -120,4 +120,4 @@ export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordU
 
 export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
   client.none(`
-    UPDATE ${getSurveyDBSchema(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
