@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { CategoryItems, Objects } from '@openforis/arena-core'
+import { CategoryItems } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
@@ -65,10 +65,7 @@ export const getLabel =
   (item) =>
     ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
 export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
-export const getIndex = (item) => {
-  const index = ObjectUtils.getProp(keysProps.index)(item)
-  return Objects.isEmpty(index) ? NaN : Number(index)
-}
+export const getIndex = CategoryItems.getIndex
 
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
