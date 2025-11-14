@@ -2825,20 +2825,20 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openforis/arena-core@^1.0.44":
-  version "1.0.44"
-  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.44/17f8797b851069bdaa1e47172b6d4e919f314728#17f8797b851069bdaa1e47172b6d4e919f314728"
-  integrity sha512-4PQKNOyXr7Mu3mj1QSKK2iaz2xnLd5EEgkPq6iio3SV2zSqFJ+gYSWh5z+hBmtrTVywqBOhV8WXb6FzUHFtbgA==
+"@openforis/arena-core@^1.0.51":
+  version "1.0.51"
+  resolved "https://npm.pkg.github.com/download/@openforis/arena-core/1.0.51/dc1c2e438d485f046d5f0f8808b60cb15d112397#dc1c2e438d485f046d5f0f8808b60cb15d112397"
+  integrity sha512-Ai0b0zkLAAhMwGImx0m+bHOYmRiLdyiCqbTyFXqxkgo3cpCKtm36hr2moRAtn86ToVmTOOHosDeaIDGdjCywlA==
   dependencies:
     "@jsep-plugin/regex" "^1.0.4"
-    bignumber.js "^9.1.2"
+    bignumber.js "^9.3.1"
     jsep "^1.4.0"
     lodash.differencewith "^4.5.0"
     lodash.frompairs "^4.0.1"
     lodash.isequal "^4.5.0"
     lodash.topairs "^4.3.0"
     moment "^2.30.1"
-    proj4 "^2.15.0"
+    proj4 "^2.19.10"
     uuid "^11.0.3"
 
 "@openforis/arena-core@^1.0.8":
@@ -5171,6 +5171,11 @@ bignumber.js@^9.1.2:
   version "9.1.2"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.2.tgz#b7c4242259c008903b13707983b5f4bbd31eda0c"
   integrity sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==
+
+bignumber.js@^9.3.1:
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.3.1.tgz#759c5aaddf2ffdc4f154f7b493e1c8770f88c4d7"
+  integrity sha512-Ko0uX15oIUS7wJ3Rb30Fs6SkVbLmPBAKdlm7q9+ak9bbIeFf0MwuBsQV6z7+X768/cHsfg+WlysDWJcmthjsjQ==
 
 binary-extensions@^2.0.0:
   version "2.2.0"
@@ -12254,6 +12259,14 @@ proj4@^2.15.0:
     mgrs "1.0.0"
     wkt-parser "^1.4.0"
 
+proj4@^2.19.10:
+  version "2.20.0"
+  resolved "https://registry.yarnpkg.com/proj4/-/proj4-2.20.0.tgz#059656589434f2eff02070806a5779ad4fc70070"
+  integrity sha512-9Mj5kUxQ6xBE5IzzkQcm0cRUH21FNp+wFp0AK7gBdPsiIc1iNwgNyCS4Lp55sPJum9DO8UNepZxEzrGPmm8RAg==
+  dependencies:
+    mgrs "1.0.0"
+    wkt-parser "^1.5.1"
+
 promise-inflight@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
@@ -15205,6 +15218,11 @@ wkt-parser@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.4.0.tgz#7cca07a6ee5b4baf059b723e62d7fe95bc923bf5"
   integrity sha512-qpwO7Ihds/YYDTi1aADFTI1Sm9YC/tTe3SHD24EeIlZxy7Ik6a1b4HOz7jAi0xdUAw487duqpo8OGu+Tf4nwlQ==
+
+wkt-parser@^1.5.1:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/wkt-parser/-/wkt-parser-1.5.2.tgz#a8eaf86ac2cc1d0a2e6a8082a930f5c7ebdb5771"
+  integrity sha512-1ZUiV1FTwSiSrgWzV9KXJuOF2BVW91KY/mau04BhnmgOdroRQea7Q0s5TVqwGLm0D2tZwObd/tBYXW49sSxp3Q==
 
 worker-farm@^1.7.0:
   version "1.7.0"
