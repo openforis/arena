@@ -810,9 +810,9 @@ const groupItemsByParentUuid = (items) => {
   let shouldIndexesBeInitialized = false
   for (const item of items) {
     shouldIndexesBeInitialized = shouldIndexesBeInitialized || shouldItemIndexBeInitialized(item)
-    const groupedItems = itemsByParentUuid[CategoryItem.getParentUuid(item)] ?? []
-    groupedItems.push(item)
-    itemsByParentUuid[String(CategoryItem.getParentUuid(item))] = groupedItems
+    const parentUuidKey = String(CategoryItem.getParentUuid(item))
+    itemsByParentUuid[parentUuidKey] ??= []
+    itemsByParentUuid[parentUuidKey].push(item)
   }
   return { shouldIndexesBeInitialized, itemsByParentUuid }
 }
@@ -825,7 +825,7 @@ const _initializeSurveyCategoryItemsIndexesInternal = async ({ surveyId, categor
     const levelIndex = CategoryLevel.getIndex(level)
 
     const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, client)
-    var { shouldIndexesBeInitialized, itemsByParentUuid } = groupItemsByParentUuid(items)
+    const { shouldIndexesBeInitialized, itemsByParentUuid } = groupItemsByParentUuid(items)
     if (shouldIndexesBeInitialized) {
       const indexByItemUuid = {}
 
