@@ -19,6 +19,7 @@ import * as CategoryImportFlatDataParser from '../manager/categoryImportFlatData
 import * as CategoryImportJobParams from './categoryImportJobParams'
 import CategoryItemsUpdater from './categoryItemsUpdater'
 import { CategoryValidationJob } from './CategoryValidationJob'
+import * as CategoryService from './categoryService'
 
 export class CategoryImportInternalJob extends Job {
   constructor(params, type = 'CategoryImportInternalJob') {
@@ -70,10 +71,19 @@ export class CategoryImportInternalJob extends Job {
       if (await this.itemsUpdater.flush()) {
         this.incrementProcessedItems()
         this.logDebug(`${this.totalItemsInserted} items inserted`)
+        // 7. initialize category item indexes etc.
+        await this.afterCategoryImport()
       } else {
         this.setStatusFailed()
       }
     }
+  }
+
+  async afterCategoryImport() {
+    const { category: categoryPlain, surveyId, tx } = this
+    const categoryUuid = Category.getUuid(categoryPlain)
+    const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft: true }, tx)
+    await CategoryService.initializeSurveyCategoryItemsIndexes({ surveyId, category }, tx)
   }
 
   async logCategoryImportActivity() {
