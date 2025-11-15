@@ -26,9 +26,9 @@ const initializeCategoryItemIndexesIfNecessary = async ({ logger, serviceRegistr
   const infoService = serviceRegistry.getService(ServiceType.info)
   const versionInDb = await infoService.getVersion()
   if (versionInDb === '2.0.0') {
-    logger.info('Initializing category item indexes...')
     await CategoryService.initializeAllSurveysCategoryItemIndexes()
-    logger.info('Category item indexes initialized')
+  } else {
+    logger.info(`Category item indexes already initialized. App version in DB: ${versionInDb}`)
   }
 }
 
