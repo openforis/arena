@@ -5,7 +5,6 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as PromiseUtils from '@core/promiseUtils'
 
 /**
  * Inserts a category for each code list in the Collect survey.
@@ -25,12 +24,12 @@ export default class CategoriesImportJob extends Job {
     if (categoriesArray.length > 0) {
       this.total = categoriesArray.length
 
-      await PromiseUtils.each(categoriesArray, async (category) => {
+      for (const category of categoriesArray) {
         if (!this.isCanceled()) {
           await this._insertCategory({ category })
           this.incrementProcessedItems()
         }
-      })
+      }
       await CategoryManager.validateCategories(survey, this.tx)
     }
     this.setContext({ categories })
@@ -39,11 +38,11 @@ export default class CategoriesImportJob extends Job {
   async _insertCategory({ category }) {
     const { arenaSurveyFileZip: zipFile, backup, surveyId } = this.context
 
-    const categoryWithLevels = Category.assocLevelsArray(
-      Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(Category.getUuid(category)))
-    )(category)
+    const categoryUuid = Category.getUuid(category)
+    const levelsWithCategoryUuid = Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(categoryUuid))
+    const categoryWithLevels = Category.assocLevelsArray(levelsWithCategoryUuid)(category)
 
-    const categoryInserted = await CategoryService.insertCategory(
+    await CategoryService.insertCategory(
       {
         user: this.user,
         surveyId,
@@ -54,7 +53,7 @@ export default class CategoriesImportJob extends Job {
       },
       this.tx
     )
-    const categoryUuid = Category.getUuid(categoryInserted)
+
     let items = await ArenaSurveyFileZip.getCategoryItems(zipFile, categoryUuid)
     if (items.length > 0) {
       // category items in a single file
@@ -69,5 +68,6 @@ export default class CategoriesImportJob extends Job {
         partIndex = partIndex + 1
       }
     }
+    await CategoryService.initializeSurveyCategoryItemsIndexes({ surveyId, category: categoryWithLevels }, this.tx)
   }
 }

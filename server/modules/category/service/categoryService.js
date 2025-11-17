@@ -204,8 +204,12 @@ export const {
   convertCategoryToReportingData,
   updateLevelProp,
   updateItemProp,
+  updateItemsIndex,
 
   deleteCategory,
   deleteLevel,
   deleteItem,
+
+  initializeSurveyCategoryItemsIndexes,
+  initializeAllSurveysCategoryItemIndexes,
 } = CategoryManager

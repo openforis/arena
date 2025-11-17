@@ -6,6 +6,7 @@ import { Objects, Strings } from '@openforis/arena-core'
 import { Schemata } from '@common/model/db'
 import {
   getSurveyDBSchema,
+  bulkUpdateSurveySchemaTableProp,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableRecords,
@@ -106,7 +107,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
     }
     // combine props and props_draft column into one
     return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
-            'published', ${tableAlias}.props::text <> '{}'`
+            'published', ${tableAlias}.props::text <> '{}',
+            'draft', ${tableAlias}.props_draft::text <> '{}'`
   }
 
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft)
@@ -238,14 +240,16 @@ export const fetchItemsByCategoryUuid = async (
   { surveyId, categoryUuid, draft = false, backup = false, limit = null, offset = null },
   client = db
 ) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
   const items = await client.map(
     `
       SELECT i.* 
-      FROM ${getSurveyDBSchema(surveyId)}.category_item i
-      JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+      FROM ${schema}.category_item i
+      JOIN ${schema}.category_level l 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $/categoryUuid/
-     ORDER BY i.id
+     ORDER BY ${indexColumn}
      ${offset ? 'OFFSET $/offset/' : ''}
      ${limit ? 'LIMIT $/limit/' : ''}
     `,
@@ -283,12 +287,13 @@ export const fetchItemsByLevelParentAndCode = async (
   client = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
   const items = await client.map(
     `
       SELECT i.* 
       FROM ${schema}.category_item i
       WHERE ${getWhereConditionItemsWithLevelParentAndCode({ parentUuid, draft })}
-     ORDER BY i.id
+      ORDER BY ${indexColumn}
     `,
     { levelUuid, parentUuid, code: Strings.defaultIfEmpty('')(code) },
     itemDBTransformCallback({ draft })
@@ -358,6 +363,7 @@ const _getSearchQueryParam = ({ searchValue }) =>
 const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
+  const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
   return `SELECT i.* 
     FROM ${schema}.category_item i
     JOIN ${schema}.category_level l 
@@ -365,7 +371,7 @@ const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, l
     WHERE l.category_uuid = $/categoryUuid/ 
       AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
       ${searchValueCondition}
-    ORDER BY i.id
+    ORDER BY ${indexCol}
     ${limit ? 'LIMIT $/limit/' : ''}`
 }
 
@@ -493,12 +499,14 @@ const fetchCategoryUuidsExceedingMaxItems = async ({ surveyId, draft }, client) 
 }
 
 export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories = true }, client = db) => {
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const categoryUuidsExceedingMaxItems = includeBigCategories
     ? []
     : await fetchCategoryUuidsExceedingMaxItems({ surveyId, draft }, client)
   const allCategoriesIncluded = includeBigCategories || categoryUuidsExceedingMaxItems.length === 0
   const whereCondition = allCategoriesIncluded ? '' : 'WHERE l.category_uuid NOT IN ($1:csv)'
   const queryParams = allCategoriesIncluded ? [] : [categoryUuidsExceedingMaxItems]
+  const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.')
 
   return client.map(
     `
@@ -508,28 +516,18 @@ export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories
       i.props,
       i.props_draft,
       i.uuid,
-      i.level_uuid,
-      ROW_NUMBER () OVER (partition by i.parent_uuid order by i.id) AS index
+      i.level_uuid
     FROM
-       ${getSurveyDBSchema(surveyId)}.category_item i
+       ${schema}.category_item i
     JOIN
-       ${getSurveyDBSchema(surveyId)}.category_level l
+       ${schema}.category_level l
     ON
       i.level_uuid = l.uuid
     ${whereCondition}
-    ORDER BY l.category_uuid, i.id
+    ORDER BY l.category_uuid, ${indexColumn}
     `,
     queryParams,
-    (row) => {
-      const rowTransformed = dbTransformCallback(row, draft, true)
-      Objects.setInPath({
-        obj: rowTransformed,
-        path: [CategoryItem.keys.props, CategoryItem.keysProps.index],
-        value: Number(row.index),
-      })
-      delete rowTransformed['index']
-      return rowTransformed
-    }
+    (row) => dbTransformCallback(row, draft, true)
   )
 }
 
@@ -596,14 +594,23 @@ export const updateLevelProp = async (surveyId, levelUuid, key, value, client = 
 export const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
   updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
-export const updateItemsProps = async (surveyId, items, client = db) => {
+export const updateItemsIndexes = async ({ surveyId, indexByItemUuid, draftProps = true }, client = db) => {
+  const updates = Object.entries(indexByItemUuid).map(([uuid, index]) => ({
+    recordUuid: uuid,
+    key: CategoryItem.keysProps.index,
+    value: index,
+  }))
+  await bulkUpdateSurveySchemaTableProp({ surveyId, tableName: 'category_item', updates, draftProps }, client)
+}
+
+export const updateItemsProps = async ({ surveyId, items, draftProps = true }, client = db) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
   await client.none(
     DbUtils.updateAllQuery(
       getSurveyDBSchema(surveyId),
       'category_item',
       { name: 'uuid', cast: 'uuid' },
-      [{ name: 'props_draft', cast: 'jsonb' }],
+      [{ name: draftProps ? 'props_draft' : 'props', cast: 'jsonb' }],
       values
     )
   )
