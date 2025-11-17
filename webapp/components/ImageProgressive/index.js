@@ -82,11 +82,11 @@ const ImageProgressive = (props) => {
     // Cleanup function to revoke blob URLs
     return () => {
       mounted = false
-      createdBlobUrls.forEach((url) => {
-        if (url && url.startsWith('blob:')) {
+      for (const url of createdBlobUrls) {
+        if (url?.startsWith('blob:')) {
           URL.revokeObjectURL(url)
         }
-      })
+      }
     }
   }, [srcProp, altSrc]) // Re-fetch when src or altSrc changes
 

@@ -9,10 +9,7 @@ export const initSystem = () => async (dispatch) => {
   try {
     const { user, survey } = await API.fetchLoggedInUserAndSurvey()
 
-    analytics.identify({
-      userId: user?.uuid,
-      properties: user,
-    })
+    analytics.identify({ userId: user?.uuid, properties: user })
 
     dispatch({ type: SYSTEM_INIT, user, survey })
 
@@ -23,7 +20,7 @@ export const initSystem = () => async (dispatch) => {
       }
     }
   } catch (error) {
-    dispatch({ type: SYSTEM_INIT, user: null, survey: null })
+    dispatch({ type: SYSTEM_INIT, user: null, survey: null, errorMessage: String(error) })
   }
 }
 
