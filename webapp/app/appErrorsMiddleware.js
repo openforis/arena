@@ -73,7 +73,7 @@ const handleAuthorizationError = async ({ originalRequest }) => {
     // Log the user out and redirect to the login page
     // window.location.href = '/'
 
-    return Promise.reject(error)
+    throw error
   }
 }
 
@@ -99,7 +99,7 @@ const createAxiosMiddleware =
       if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {
         dispatch(ServiceErrorActions.createServiceError({ error }))
       }
-      return Promise.reject(error)
+      throw error
     })
 
     return (next) => (action) => next(action)
