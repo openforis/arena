@@ -2,7 +2,6 @@ import 'dotenv/config'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
-import * as FileService from '@server/modules/record/service/fileService'
 
 import * as appCluster from './system/appCluster'
 
@@ -11,9 +10,6 @@ const initialize = async () => {
   await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
 
   await appCluster.run()
-
-  // run files storage check after DB migrations
-  await FileService.checkFilesStorage()
 }
 
 initialize()

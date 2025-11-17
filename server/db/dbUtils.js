@@ -64,9 +64,8 @@ export const geometryPointColumnAsText = ({ qualifiedColName, alias = null }) =>
 }
 
 export const insertAllQueryBatch = (schema, table, cols, valuesByColumnName, fillValuesWithNulls = false) => {
-  const columnSet = new pgp.helpers.ColumnSet(cols, {
-    table: { schema, table },
-  })
+  const columnSet = createColumnSet({ schema, table, columns: cols })
+
   if (fillValuesWithNulls) {
     // fill values with nulls to prevent missing values runtime error
     valuesByColumnName.forEach((valuesByColNameItem) =>
@@ -111,9 +110,7 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
 
   const cols = [`?${idColumnName}`, ...updateCols]
 
-  const columnSet = new pgp.helpers.ColumnSet(cols, {
-    table: { schema, table },
-  })
+  const columnSet = createColumnSet({ schema, table, columns: cols })
 
   const valuesIndexedByCol = itemsValues.map((itemValues) => {
     const item = {}
@@ -233,3 +230,8 @@ export const fetchTableSize = async ({ schema, table }, client = db) =>
     [schema, table],
     (row) => Number(row.size)
   )
+
+export const createColumnSet = ({ columns, schema = null, table = null }) =>
+  new pgp.helpers.ColumnSet(columns, table ? { table: { schema, table } } : undefined)
+
+export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)

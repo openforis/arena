@@ -48,6 +48,7 @@ jobs:
           PGPASSWORD: arena
           SESSION_ID_COOKIE_SECRET: my-cookie-secret-key
           ADMIN_EMAIL: ${{secrets.ADMIN_EMAIL}}
+          ADMIN_PASSWORD: ${{secrets.ADMIN_PASSWORD}}
           SENDGRID_API_KEY: ${{secrets.SENDGRID_API_KEY}}
       - name: Wait for server to start
         run: while ! nc -z localhost 9090; do sleep 5; done;

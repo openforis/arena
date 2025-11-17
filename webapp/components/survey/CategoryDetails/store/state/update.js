@@ -38,7 +38,7 @@ const _calculateItemsArray = ({ levelIndex }) =>
   A.pipe(
     getItems({ levelIndex }),
     R.values,
-    R.sort((a, b) => Number(a.id) - Number(b.id))
+    R.sort((a, b) => CategoryItem.getIndex(a) - CategoryItem.getIndex(b))
   )
 
 const _refreshItemsArray =
@@ -68,7 +68,11 @@ export const assocItemProp =
     const items = getItems({ levelIndex })(state)
     const item = A.prop(itemUuid, items)
     const itemUpdated = CategoryItem.assocProp({ key, value })(item)
-    return assocItem({ levelIndex, item: itemUpdated })(state)
+    let stateUpdated = assocItem({ levelIndex, item: itemUpdated })(state)
+    if (key === CategoryItem.keysProps.index) {
+      stateUpdated = _refreshItemsArray({ levelIndex })(stateUpdated)
+    }
+    return stateUpdated
   }
 
 const _resetNextLevelsByProp =
@@ -111,6 +115,25 @@ export const dissocItem = ({ levelIndex, itemUuid }) =>
     R.dissocPath([keys.items, levelIndex, itemUuid]),
     _refreshItemsArray({ levelIndex })
   )
+
+export const updateSiblingItemIndexesAfterDelete =
+  ({ levelIndex, deletedItemIndex }) =>
+  (state) => {
+    const items = getItems({ levelIndex })(state)
+    const itemsUpdated = {}
+    for (const [uuid, item] of Object.entries(items)) {
+      const itemIndex = CategoryItem.getIndex(item)
+      let itemUpdated = item
+      if (itemIndex > deletedItemIndex) {
+        itemUpdated = CategoryItem.assocProp({
+          key: CategoryItem.keysProps.index,
+          value: itemIndex - 1,
+        })(item)
+      }
+      itemsUpdated[uuid] = itemUpdated
+    }
+    return assocItems({ levelIndex, items: itemsUpdated })(state)
+  }
 
 export const assocFileFormat = ({ fileFormat }) => A.assoc(keys.fileFormat, fileFormat)
 

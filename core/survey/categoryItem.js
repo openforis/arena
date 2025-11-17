@@ -47,6 +47,7 @@ export const {
   getDescriptions,
   getExtra,
   getExtraProp,
+  getId,
   getLabels,
   getProps,
   getPropsDraft,
@@ -54,6 +55,7 @@ export const {
   getUuid,
   isEqual,
   isPublished,
+  isDraft,
 } = ObjectUtils
 export const getLevelUuid = R.prop(keys.levelUuid)
 export const getParentUuid = R.prop(keys.parentUuid)
@@ -63,7 +65,7 @@ export const getLabel =
   (item) =>
     ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
 export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
-export const getIndex = ObjectUtils.getProp(keysProps.index)
+export const getIndex = CategoryItems.getIndex
 
 // ====== UPDATE
 export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
