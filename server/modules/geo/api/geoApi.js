@@ -4,7 +4,6 @@ import xmljs from 'xml-js'
 import { Objects } from '@openforis/arena-core'
 
 import { MapUtils } from '@core/map/mapUtils'
-import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
@@ -15,9 +14,9 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { PlanetApi } from './planetApi'
 import { GeoService } from '../service/geoService'
+import { WhishDataProcessor } from '../service/whishDataProcessor'
 
 const uriPrefix = '/survey/:surveyId/geo/'
-const whispApiUrl = 'https://whisp.openforis.org/api/'
 
 // free elevation API urls
 const elevationApiUrls = [
@@ -116,18 +115,7 @@ export const init = (app) => {
   app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
     try {
       const geojson = Request.getBody(req)
-      const url = `${whispApiUrl}geojson`
-      const apiKey = ProcessUtils.ENV.whispApiKey
-      if (!apiKey) {
-        throw new Error('WHISP API key not specified')
-      }
-      const headers = {
-        'x-api-key': apiKey,
-        'Content-Type': 'application/json',
-      }
-      const {
-        data: { token },
-      } = await axios.post(url, geojson, { headers })
+      const { token } = await WhishDataProcessor.generateData({ geojson })
       res.json(token)
     } catch (error) {
       next(error)
@@ -156,10 +144,6 @@ export const init = (app) => {
 
     const filePath = FileUtils.tempFilePath(tempFileName)
 
-    Response.sendFile({
-      contentType: Response.contentTypes.json,
-      path: filePath,
-      res,
-    })
+    Response.sendFile({ contentType: Response.contentTypes.json, path: filePath, res })
   })
 }
