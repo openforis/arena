@@ -7,7 +7,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
-import * as PromiseUtils from '@core/promiseUtils'
 import Queue from '@core/queue'
 import SystemError from '@core/systemError'
 
@@ -313,15 +312,13 @@ export default class RecordsImportJob extends Job {
       }
     })
 
-    return {
-      itemsToInsert,
-    }
+    return { itemsToInsert }
   }
 
   async _insertRecordNodes(record) {
-    await PromiseUtils.each(Object.values(Record.getNodes(record)), async (node) =>
+    for (const node of Record.getNodesArray(record)) {
       this.batchPersister.addItem(node, this.tx)
-    )
+    }
   }
 
   /**
