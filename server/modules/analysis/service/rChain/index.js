@@ -128,21 +128,18 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
       const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain, hideAreaBasedEstimate: false })(
         survey
       )
+      for (const nodeDef of analysisNodeDefsInEntity) {
+        const nodeDefUuid = NodeDef.getUuid(nodeDef)
+        const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-      if (analysisNodeDefsInEntity.length > 0) {
-        for (const nodeDef of analysisNodeDefsInEntity) {
-          const nodeDefUuid = NodeDef.getUuid(nodeDef)
-          const parentUuid = NodeDef.getParentUuid(nodeDef)
+        const scriptEntryName = getAnalysisNodeDefZipEntryName({ entity, nodeDef })
 
-          const scriptEntryName = getAnalysisNodeDefZipEntryName({ entity, nodeDef })
+        const script = getZipEntryAsText(scriptEntryName)
 
-          const script = getZipEntryAsText(scriptEntryName)
-
-          await NodeDefManager.updateNodeDefProps(
-            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
-            tx
-          )
-        }
+        await NodeDefManager.updateNodeDefProps(
+          { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
+          tx
+        )
       }
     }
   })
