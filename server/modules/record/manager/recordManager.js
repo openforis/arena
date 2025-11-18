@@ -342,6 +342,7 @@ export {
   mergeAndPersistValidation,
   updateRecordValidationsFromValues,
   validateNodesAndPersistValidation,
+  validateSortedNodesAndPersistValidation,
 } from './_recordManager/recordValidationManager'
 
 export {
