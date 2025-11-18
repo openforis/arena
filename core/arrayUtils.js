@@ -63,7 +63,7 @@ const removeItem =
   (array) =>
     removeItems({ items: [item], compareFn })(array)
 
-const fromNumberOfElements = (numOfElements) => Array.from(Array(numOfElements).keys())
+const fromNumberOfElements = (numOfElements) => Array.from(new Array(numOfElements).keys())
 
 const first = (array) => array?.[0]
 

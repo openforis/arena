@@ -6,7 +6,6 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
@@ -146,9 +145,7 @@ export const fetchViewData = async (params, client = db) => {
         FlatDataWriter.writeItemsStreamToStream({
           stream: dbStream,
           fields,
-          options: {
-            objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers),
-          },
+          options: { objectTransformer: Objects.isEmpty(transformers) ? undefined : A.pipe(...transformers) },
           outputStream,
           fileFormat,
         }),
@@ -179,15 +176,7 @@ export const fetchViewDataAgg = async (params, client = db) => {
 
   // Fetch data
   const result = await DataViewRepository.fetchViewDataAgg(
-    {
-      survey,
-      cycle,
-      query,
-      recordOwnerUuid,
-      limit,
-      offset,
-      stream: Boolean(outputStream),
-    },
+    { survey, cycle, query, recordOwnerUuid, limit, offset, stream: Boolean(outputStream) },
     client
   )
 
@@ -424,7 +413,7 @@ export const fetchEntitiesFileUuidsByCycle = async (
   const fileUuidsByCycle = {}
   let total = 0
 
-  await PromiseUtils.each(nodeDefs, async (nodeDefContext) => {
+  for (const nodeDefContext of nodeDefs) {
     const childrenFileDefs = (
       NodeDef.isEntity(nodeDefContext)
         ? Survey.getNodeDefDescendantAttributesInSingleEntities({ nodeDef: nodeDefContext })(survey)
@@ -459,7 +448,7 @@ export const fetchEntitiesFileUuidsByCycle = async (
         }
       })
     })
-  })
+  }
   return { fileUuidsByCycle, total }
 }
 
