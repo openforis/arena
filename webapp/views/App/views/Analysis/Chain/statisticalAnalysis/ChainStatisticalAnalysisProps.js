@@ -42,7 +42,7 @@ export const ChainStatisticalAnalysisProps = () => {
 
   const entitiesFilterFn = useCallback(
     (entityDef) => {
-      const childDefs = Survey.getNodeDefChildren(entityDef, true)(survey)
+      const childDefs = Survey.getNodeDefChildren({ nodeDef: entityDef })(survey)
       return childDefs.some(
         (childDef) =>
           NodeDef.getChainUuid(childDef) === chainUuid &&
