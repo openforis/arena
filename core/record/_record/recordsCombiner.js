@@ -86,7 +86,8 @@ const _replaceUpdatedNodesInEntities = ({
     updateResult.addNode(entityTargetUpdated, { sideEffect })
   }
 
-  Survey.getNodeDefChildren(entityDef, { includeAnalysis })(survey).forEach((childDef) => {
+  const childDefs = Survey.getNodeDefChildren({ nodeDef: entityDef, includeAnalysis })(survey)
+  for (const childDef of childDefs) {
     const childDefUuid = NodeDef.getUuid(childDef)
 
     const childrenSource = RecordReader.getNodeChildrenByDefUuidUnsorted(entitySource, childDefUuid)(recordSource)
@@ -142,7 +143,7 @@ const _replaceUpdatedNodesInEntities = ({
         updateResult.merge(childEntityUpdateResult)
       }
     })
-  })
+  }
   return updateResult
 }
 

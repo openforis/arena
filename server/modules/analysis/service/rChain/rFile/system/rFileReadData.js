@@ -63,7 +63,7 @@ export default class RFileReadData extends RFileSystem {
   async initMultipleAttributesData({ entityDef }) {
     const { chainUuid, survey, cycle } = this.rChain
 
-    const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, { includeAnalysis: false })(survey).filter(
+    const multipleAttrDefs = Survey.getNodeDefChildren({ nodeDef: entityDef, includeAnalysis: false })(survey).filter(
       NodeDef.isMultipleAttribute
     )
     for (const multipleAttrDef of multipleAttrDefs) {

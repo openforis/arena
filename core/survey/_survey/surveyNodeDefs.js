@@ -41,10 +41,12 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) => {
 }
 
 export const getNodeDefChildren =
-  (
+  ({
     nodeDef,
-    { includeAnalysis = true, includeLayoutElements = false, includeSamplingDefsWithoutSiblings = false } = {}
-  ) =>
+    includeAnalysis = true,
+    includeLayoutElements = false,
+    includeSamplingDefsWithoutSiblings = false,
+  } = {}) =>
   (survey) => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
     let childDefs = Surveys.getNodeDefChildren({
@@ -99,7 +101,7 @@ export const getNodeDefChildrenSorted =
 export const getNodeDefChildrenInOwnPage =
   ({ nodeDef, cycle, includeAnalysis = true, includeLayoutElements = false }) =>
   (survey) => {
-    const children = getNodeDefChildren(nodeDef, includeAnalysis, includeLayoutElements)(survey)
+    const children = getNodeDefChildren({ nodeDef, includeAnalysis, includeLayoutElements })(survey)
     const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
     const childrenIndex = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
     if (childrenIndex.length === 0) return childrenInOwnPage
@@ -134,7 +136,7 @@ export const getNodeDefDescendantsInSingleEntities =
             cycle,
             includeSamplingDefsWithoutSiblings,
           })(survey)
-        : getNodeDefChildren(entityDefCurrent, includeAnalysis, false, includeSamplingDefsWithoutSiblings)(survey)
+        : getNodeDefChildren({ nodeDef: entityDefCurrent, includeAnalysis, includeSamplingDefsWithoutSiblings })(survey)
 
       descendants.push(...(filterFn ? entityDefCurrentChildren.filter(filterFn) : entityDefCurrentChildren))
 
@@ -178,14 +180,14 @@ export const hasNodeDefChildrenEntities = (nodeDef) => (survey) => {
     return false
   }
 
-  return R.pipe(getNodeDefChildren(nodeDef), R.any(NodeDef.isEntity))(survey)
+  return R.pipe(getNodeDefChildren({ nodeDef }), R.any(NodeDef.isEntity))(survey)
 }
 
 export const getNodeDefChildByName = (nodeDef, childName) => (survey) =>
   SurveyNodeDefsIndex.hasNodeDefsIndexByName(survey)
     ? Surveys.getNodeDefByName({ survey, name: childName })
     : R.pipe(
-        getNodeDefChildren(nodeDef),
+        getNodeDefChildren({ nodeDef }),
         R.find((childDef) => childName === NodeDef.getName(childDef))
       )(survey)
 
@@ -203,7 +205,8 @@ export const getAreaBasedEstimatedOfNodeDef = (nodeDef) => (survey) =>
 
 const _nodeDefKeysFilter = (n) => NodeDef.isKey(n) && !NodeDef.isDeleted(n)
 
-export const getNodeDefKeys = (nodeDef) => (survey) => getNodeDefChildren(nodeDef)(survey).filter(_nodeDefKeysFilter)
+export const getNodeDefKeys = (nodeDef) => (survey) =>
+  getNodeDefChildren({ nodeDef })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefKeysSorted =
   ({ nodeDef, cycle }) =>
@@ -234,7 +237,7 @@ export const isNodeDefRootKey = (nodeDef) => (survey) =>
 
 export const getNodeDefsRootUnique = (survey) => {
   const nodeDefRoot = getNodeDefRoot(survey)
-  return getNodeDefChildren(nodeDefRoot)(survey).filter(
+  return getNodeDefChildren({ nodeDef: nodeDefRoot })(survey).filter(
     (nodeDef) =>
       NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef)) &&
       !NodeDef.isDeleted(nodeDef) &&
@@ -379,7 +382,7 @@ export const getHierarchy =
       if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
         const childDefsNotFiltered = cycle
           ? getNodeDefChildrenSorted({ nodeDef, cycle })(survey)
-          : getNodeDefChildren(nodeDef)(survey)
+          : getNodeDefChildren({ nodeDef })(survey)
         childDefs.push(...childDefsNotFiltered.filter(filterFn))
       }
       length += childDefs.length
@@ -491,7 +494,7 @@ export const getNodeDefCodeCandidateParents =
     visitAncestorsAndSelf(nodeDef, (nodeDefAncestor) => {
       if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
         const candidatesAncestor = R.pipe(
-          getNodeDefChildren(nodeDefAncestor),
+          getNodeDefChildren({ nodeDef: nodeDefAncestor }),
           R.reject(
             (n) =>
               // Reject multiple attributes

@@ -27,7 +27,7 @@ const _insertNodeDefRecursively = (surveyId, survey, t) => async (nodeDef) => {
   await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
 
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
-    const children = Survey.getNodeDefChildren(nodeDef)(survey)
+    const children = Survey.getNodeDefChildren({ nodeDef })(survey)
     // insert virtual node defs after source entity defs
     children.sort((nodeDefA, nodeDefB) => NodeDef.isVirtual(nodeDefA) - NodeDef.isVirtual(nodeDefB))
 

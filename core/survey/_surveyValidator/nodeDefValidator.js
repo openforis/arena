@@ -32,7 +32,7 @@ const validateTaxonomy = async (propName, nodeDef) =>
 
 const validateChildren = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
-    const children = Survey.getNodeDefChildren(nodeDef, { includeAnalysis: NodeDef.isAnalysis(nodeDef) })(survey)
+    const children = Survey.getNodeDefChildren({ nodeDef, includeAnalysis: NodeDef.isAnalysis(nodeDef) })(survey)
     if (R.isEmpty(children)) {
       return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
     }
@@ -43,7 +43,7 @@ const validateChildren = (survey) => (propName, nodeDef) => {
 
 const countKeyAttributes = (survey, nodeDefEntity) =>
   R.pipe(
-    Survey.getNodeDefChildren(nodeDefEntity, { includeAnalysis: NodeDef.isAnalysis(nodeDefEntity) }),
+    Survey.getNodeDefChildren({ nodeDef: nodeDefEntity, includeAnalysis: NodeDef.isAnalysis(nodeDefEntity) }),
     R.filter(NodeDef.isKey),
     R.length
   )(survey)

@@ -105,7 +105,9 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   }
 
   for (const nodeDefParent of baseUnitDescendantEntities) {
-    const childDefs = Survey.getNodeDefChildren(nodeDefParent, { includeSamplingDefsWithoutSiblings: true })(survey)
+    const childDefs = Survey.getNodeDefChildren({ nodeDef: nodeDefParent, includeSamplingDefsWithoutSiblings: true })(
+      survey
+    )
     const existingEntityAreaNodeDef = childDefs.find((childDef) =>
       isEntityAreaNodeDef({ nodeDef: childDef, nodeDefParent })
     )
