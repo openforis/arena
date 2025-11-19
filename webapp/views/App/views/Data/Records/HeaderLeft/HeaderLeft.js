@@ -168,9 +168,9 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
 
   const onValidateAllRecordsClick = useCallback(async () => {
     if (await confirm({ key: 'dataView.records.confirmValidateAllRecords' })) {
-      dispatch(RecordListActions.startRecordsValidation())
+      dispatch(RecordListActions.startRecordsValidation({ onRecordsUpdate }))
     }
-  }, [confirm, dispatch])
+  }, [confirm, dispatch, onRecordsUpdate])
 
   return (
     <div className="records__header-left">
