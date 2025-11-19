@@ -1,5 +1,4 @@
 import { ArrayUtils } from '@core/arrayUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
@@ -23,9 +22,9 @@ export default class TaxonomiesExportJob extends Job {
     this.total = taxonomies.length
 
     // for each taxonomy create a  `${taxonomy}.json` file with the taxa
-    await PromiseUtils.each(taxonomies, async (taxonomy) => {
+    for (const taxonomy of taxonomies) {
       await this.exportTaxonomy({ taxonomy })
-    })
+    }
   }
 
   async exportTaxonomy({ taxonomy }) {

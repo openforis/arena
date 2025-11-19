@@ -40,7 +40,7 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import FormHeader from './FormHeader'
 
 const hasChildrenInSamePage = ({ survey, surveyCycleKey, nodeDef }) =>
-  Survey.getNodeDefChildren(nodeDef)(survey).filter((childDef) =>
+  Survey.getNodeDefChildren({ nodeDef })(survey).filter((childDef) =>
     NodeDefLayout.isDisplayInParentPage(surveyCycleKey)(childDef)
   ).length > 0
 

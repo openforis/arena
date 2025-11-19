@@ -1,5 +1,4 @@
 import * as ProcessUtils from '@core/processUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -315,30 +314,29 @@ class RChain {
         analysisNodeDefs: this.analysisNodeDefs,
       })
 
-      await PromiseUtils.each(samplingDefs, async (nodeDef, index) => {
+      for (let index = 0; index < samplingDefs.length; index++) {
+        const nodeDef = samplingDefs[index]
         await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath })
-      })
+      }
 
       const entityPath = this.dirUser
       await FileUtils.mkdir(entityPath)
 
-      await PromiseUtils.each(
-        this._analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef)),
-        async (nodeDef) => {
-          await this._initNodeDefFile({ nodeDef, path: entityPath })
-          const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
+      const nonSamplingDefs = this._analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef))
+      for (const nodeDef of nonSamplingDefs) {
+        await this._initNodeDefFile({ nodeDef, path: entityPath })
+        const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
 
-          // at this moment we dont like to have the areaBasedEstimated files
-          const DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES = false
-          if (areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES) {
-            await this._initNodeDefFile({
-              nodeDef: areaBasedEstimated,
-              path: entityPath,
-              index: NodeDef.getChainIndex(nodeDef),
-            })
-          }
+        // at this moment we dont like to have the areaBasedEstimated files
+        const DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES = false
+        if (areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES) {
+          await this._initNodeDefFile({
+            nodeDef: areaBasedEstimated,
+            path: entityPath,
+            index: NodeDef.getChainIndex(nodeDef),
+          })
         }
-      )
+      }
     }
   }
 

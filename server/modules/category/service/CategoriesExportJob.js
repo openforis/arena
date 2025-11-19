@@ -1,4 +1,3 @@
-import * as PromiseUtils from '@core/promiseUtils'
 import * as Category from '@core/survey/category'
 
 import Job from '@server/job/job'
@@ -34,9 +33,10 @@ export default class CategoriesExportJob extends Job {
     await FileUtils.mkdir(FileUtils.tempFilePath(this.categoriesTempFolderName))
 
     // export categories one by one
-    await PromiseUtils.each(categories, async (category, index) => {
+    for (let index = 0; index < categories.length; index++) {
+      const category = categories[index]
       await this.exportCategory({ category, index })
-    })
+    }
   }
 
   async exportCategory({ category, index }) {

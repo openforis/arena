@@ -1,6 +1,5 @@
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
@@ -19,7 +18,7 @@ export default class UsersExportJob extends Job {
 
     this.total = users.length
 
-    await PromiseUtils.each(users, async (_user) => {
+    for (const _user of users) {
       const userUuid = User.getUuid(_user)
       const userData = await UserService.fetchUserByUuidWithPassword(userUuid)
       if (User.hasProfilePicture(userData)) {
@@ -29,7 +28,7 @@ export default class UsersExportJob extends Job {
         })
       }
       this.incrementProcessedItems()
-    })
+    }
 
     const userInvitations = await UserService.fetchUserInvitationsBySurveyUuid({ surveyUuid: Survey.getUuid(survey) })
     archive.append(JSON.stringify(userInvitations, null, 2), { name: ExportFile.userInvitations })

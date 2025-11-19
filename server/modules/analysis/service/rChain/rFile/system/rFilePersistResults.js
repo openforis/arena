@@ -1,4 +1,3 @@
-import * as PromiseUtils from '@core/promiseUtils'
 import * as ApiRoutes from '@common/apiRoutes'
 import * as NodeDef from '@core/survey/nodeDef'
 
@@ -42,12 +41,12 @@ export default class RFilePersistResults extends RFilePersistScriptsGeneric {
   async appendPersistScripts() {
     const { entitiesWithActiveQuantitativeVariables } = this.rChain
 
-    await PromiseUtils.each(entitiesWithActiveQuantitativeVariables, async (entity) => {
+    for (const entity of entitiesWithActiveQuantitativeVariables) {
       const dfResults = new DfResults(this.rChain, entity)
 
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
       await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults }))
       await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
-    })
+    }
   }
 }

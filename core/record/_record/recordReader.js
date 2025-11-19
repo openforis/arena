@@ -332,7 +332,7 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
 
   let siblingUniqueAttributes = []
   if (NodeDef.isEntity(nodeDef)) {
-    const nodeDefsUnique = SurveyNodeDefs.getNodeDefChildren(nodeDef)(survey).filter(_isNodeDefUnique)
+    const nodeDefsUnique = SurveyNodeDefs.getNodeDefChildren({ nodeDef })(survey).filter(_isNodeDefUnique)
 
     siblingUniqueAttributes = nodeDefsUnique.reduce((siblingsAcc, nodeDefUnique) => {
       if (NodeDef.isSingle(nodeDefUnique)) {
@@ -342,11 +342,7 @@ export const getAttributesUniqueDependent = ({ survey, record, node }) => {
       return siblingsAcc
     }, [])
   } else if (_isNodeDefUnique(nodeDef)) {
-    siblingUniqueAttributes = getAttributesUniqueSibling({
-      record,
-      attribute: node,
-      attributeDef: nodeDef,
-    })
+    siblingUniqueAttributes = getAttributesUniqueSibling({ record, attribute: node, attributeDef: nodeDef })
   }
   return ObjectUtils.toUuidIndexedObj(siblingUniqueAttributes)
 }

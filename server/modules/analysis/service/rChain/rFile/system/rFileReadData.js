@@ -1,6 +1,5 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as ApiRoutes from '@common/apiRoutes'
 import { CsvDataExportModel } from '@common/model/csvExport'
@@ -14,11 +13,7 @@ import {
   arenaDfColumnsAsNumeric,
 } from '../../rFunctions'
 
-const dataConversionTypes = {
-  asCharacter: 'asCharacter',
-  asLogical: 'asLogical',
-  asNumeric: 'asNumeric',
-}
+const dataConversionTypes = { asCharacter: 'asCharacter', asLogical: 'asLogical', asNumeric: 'asNumeric' }
 
 const conversionTypeByColumnDataType = {
   [CsvDataExportModel.columnDataType.boolean]: dataConversionTypes.asLogical,
@@ -47,7 +42,7 @@ export default class RFileReadData extends RFileSystem {
   async initEntitiesData() {
     const { chainUuid, survey, cycle, entities } = this.rChain
 
-    await PromiseUtils.each(entities, async (entityDef) => {
+    for (const entityDef of entities) {
       // Fetch entity data
       const dfName = NodeDef.getName(entityDef)
       const dataCSV = arenaGetCSV(
@@ -62,14 +57,16 @@ export default class RFileReadData extends RFileSystem {
       await this.appendContentToConvertDataTypes({ entityDef })
 
       await this.initMultipleAttributesData({ entityDef })
-    })
+    }
   }
 
   async initMultipleAttributesData({ entityDef }) {
     const { chainUuid, survey, cycle } = this.rChain
 
-    const multipleAttrDefs = Survey.getNodeDefChildren(entityDef, false)(survey).filter(NodeDef.isMultipleAttribute)
-    await PromiseUtils.each(multipleAttrDefs, async (multipleAttrDef) => {
+    const multipleAttrDefs = Survey.getNodeDefChildren({ nodeDef: entityDef, includeAnalysis: false })(survey).filter(
+      NodeDef.isMultipleAttribute
+    )
+    for (const multipleAttrDef of multipleAttrDefs) {
       const dfName = NodeDef.getName(multipleAttrDef)
       const dataCSV = arenaGetCSV(
         ApiRoutes.rChain.multipleAttributeData({
@@ -80,7 +77,7 @@ export default class RFileReadData extends RFileSystem {
         })
       )
       await this.appendContent(setVar(dfName, dataCSV))
-    })
+    }
   }
 
   async appendContentToConvertDataTypes({ entityDef }) {
