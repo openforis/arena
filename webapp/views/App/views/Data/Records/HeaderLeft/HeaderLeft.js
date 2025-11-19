@@ -166,6 +166,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
     )
   }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
 
+  const onValidateAllRecordsClick = useCallback(async () => {
+    if (await confirm({ key: 'dataView.records.confirmValidateAllRecords' })) {
+      dispatch(RecordListActions.startRecordsValidation())
+    }
+  }, [confirm, dispatch])
+
   return (
     <div className="records__header-left">
       {published && (
@@ -204,10 +210,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
             />
           )}
           {canAnalyzeRecords && (
-            <ButtonDownload
-              label="dataView.records.validateAll"
-              onClick={() => dispatch(RecordListActions.startRecordsValidation())}
-            />
+            <ButtonDownload label="dataView.records.validateAll" onClick={onValidateAllRecordsClick} />
           )}
           {published && canUpdateRecordsStep && selectedItemsCount > 0 && (
             <UpdateRecordsStepDropdown onRecordsUpdate={onRecordsUpdate} records={selectedItems} />

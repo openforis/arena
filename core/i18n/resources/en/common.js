@@ -666,6 +666,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
 - when merging will be confirmed, **the source record WILL BE DELETED**`,
       confirmUpdateRecordsStep: `Move the selected {{count}} record(s) from {{stepFrom}} to {{stepTo}}?`,
       confirmUpdateRecordOwner: `Change the owner of the selected record into {{ownerName}}?`,
+      confirmValidateAllRecords: `Re-validate all records?\n\nThis may take several minutes.`,
       deleteRecord: 'Delete record',
       demoteAllRecordsFromAnalysis: 'Analysis -> Cleansing',
       demoteAllRecordsFromCleansing: 'Cleansing -> Entry',

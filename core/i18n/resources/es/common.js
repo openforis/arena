@@ -580,6 +580,7 @@ export default {
         '### ¿Fusionar los registros seleccionados en uno?\n\n- el registro "fuente" se fusionará con el registro "destino":\n  - fuente: [{{sourceRecordKeys}}], modificado {{sourceRecordModifiedDate}};\n  - destino: [{{targetRecordKeys}}], modificado {{targetRecordModifiedDate}};\n\n- se mostrará una vista previa del resultado antes de realizar la fusión;\n\n- cuando se confirme la fusión, **el registro fuente SERÁ ELIMINADO**',
       confirmUpdateRecordsStep: '¿Mover el/los {{count}} registro(s) seleccionado(s) de {{stepFrom}} a {{stepTo}}?',
       confirmUpdateRecordOwner: '¿Cambiar el propietario del registro seleccionado a {{ownerName}}?',
+      confirmValidateAllRecords: `¿Volver a validar todos los registros?\n\nEsto puede tardar varios minutos.`,
       deleteRecord: 'Eliminar registro',
       demoteAllRecordsFromAnalysis: 'Análisis -> Limpieza',
       demoteAllRecordsFromCleansing: 'Limpieza -> Entrada',
