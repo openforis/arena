@@ -1,3 +1,1 @@
-import * as RecordListActions from './actions'
-
-export { RecordListActions }
+export * as RecordListActions from './actions'
