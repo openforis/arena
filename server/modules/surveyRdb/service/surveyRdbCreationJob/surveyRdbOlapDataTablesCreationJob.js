@@ -2,7 +2,6 @@ import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Chain from '@common/analysis/chain'
 import TableOlapData from '@common/model/db/tables/olapData/table'
@@ -133,22 +132,16 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
     // (break the loop if job is canceled)
     const stopIfFunction = () => this.isCanceled()
 
-    await PromiseUtils.each(
-      cycles,
-      async (cycle) => {
-        await PromiseUtils.each(
-          // TODO generate only reporting tables
-          entityDefs,
-          async (entityDef) => {
-            this.logDebug(`create OLAP table for entity def ${NodeDef.getName(entityDef)}`)
-            await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx)
-            this.incrementProcessedItems()
-          },
-          stopIfFunction
-        )
-      },
-      stopIfFunction
-    )
+    for (let index = 0; index < cycles.length && !stopIfFunction(); index++) {
+      const cycle = cycles[index]
+      // TODO generate only reporting tables
+      for (let index = 0; index < entityDefs.length && !stopIfFunction(); index++) {
+        const entityDef = entityDefs[index]
+        this.logDebug(`create OLAP table for entity def ${NodeDef.getName(entityDef)}`)
+        await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx)
+        this.incrementProcessedItems()
+      }
+    }
   }
 
   async fetchSurvey() {

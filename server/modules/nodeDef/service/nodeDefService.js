@@ -5,7 +5,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -13,13 +12,7 @@ import * as NodeDefManager from '../manager/nodeDefManager'
 
 const fetchSurvey = async ({ surveyId, cycle }, client = db) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    {
-      surveyId,
-      cycle,
-      draft: true,
-      advanced: true,
-      validate: false,
-    },
+    { surveyId, cycle, draft: true, advanced: true, validate: false },
     client
   )
 
@@ -68,10 +61,9 @@ const afterNodeDefUpdate = async (
   const nodeDefDependents = Survey.getNodeDefsByUuids(nodeDefsDependentsUuids)(surveyUpdated)
   const nodeDefsDependentByUuid = ObjectUtils.toUuidIndexedObj(nodeDefDependents)
 
-  surveyUpdated = await Survey.addNodeDefsDependencies({
-    ...updatedNodeDefsNotDeleted,
-    ...nodeDefsDependentByUuid,
-  })(surveyUpdated)
+  surveyUpdated = await Survey.addNodeDefsDependencies({ ...updatedNodeDefsNotDeleted, ...nodeDefsDependentByUuid })(
+    surveyUpdated
+  )
 
   const dependencyGraph = Survey.getDependencyGraph(surveyUpdated)
 
@@ -84,11 +76,7 @@ const afterNodeDefUpdate = async (
     nodeDefsDependentByUuid,
   })
 
-  return {
-    dependencyGraph,
-    nodeDefsUpdated: allUpdatedNodeDefs,
-    nodeDefsValidation,
-  }
+  return { dependencyGraph, nodeDefsUpdated: allUpdatedNodeDefs, nodeDefsValidation }
 }
 
 export const fetchNodeDef = async ({ surveyId, draft, advanced, nodeDefUuid }, client = db) =>
@@ -98,15 +86,7 @@ export const insertNodeDef = async ({ user, surveyId, cycle = Survey.cycleOneKey
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
 
-    const nodeDefsUpdated = await NodeDefManager.insertNodeDef(
-      {
-        user,
-        survey,
-        cycle,
-        nodeDef,
-      },
-      t
-    )
+    const nodeDefsUpdated = await NodeDefManager.insertNodeDef({ user, survey, cycle, nodeDef }, t)
     const surveyUpdated = Survey.assocNodeDef({ nodeDef })(survey)
 
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDef, nodeDefsUpdated }, t)
@@ -116,13 +96,7 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
 
-    await NodeDefManager.insertNodeDefsBatch(
-      {
-        surveyId,
-        nodeDefs,
-      },
-      t
-    )
+    await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs }, t)
 
     const surveyUpdated = Survey.assocNodeDefsSimple({ nodeDefs })(survey)
 
@@ -142,15 +116,7 @@ export const updateNodeDefProps = async (
     const surveyUpdated = Survey.removeNodeDefDependencies(nodeDefUuid)(survey)
 
     const nodeDefsUpdated = await NodeDefManager.updateNodeDefProps(
-      {
-        user,
-        survey,
-        nodeDefUuid,
-        parentUuid,
-        props,
-        propsAdvanced,
-        system,
-      },
+      { user, survey, nodeDefUuid, parentUuid, props, propsAdvanced, system },
       t
     )
     const nodeDef = nodeDefsUpdated[nodeDefUuid]
@@ -211,10 +177,10 @@ export const markNodeDefDeleted = async ({ user, surveyId, cycle, nodeDefUuid },
 export const markNodeDefsDeleted = async ({ user, surveyId, cycle, nodeDefUuids }, client = db) => {
   let response = { nodeDefsUpdated: {}, nodeDefsValidation: {} }
 
-  await PromiseUtils.each(nodeDefUuids, async (nodeDefUuid) => {
+  for (const nodeDefUuid of nodeDefUuids) {
     const _response = await markNodeDefDeleted({ user, surveyId, cycle, nodeDefUuid }, client)
     response = R.mergeDeepLeft(response, _response)
-  })
+  }
 
   return response
 }

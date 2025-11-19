@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -69,9 +68,9 @@ export default class RecordsUniquenessValidationJob extends Job {
       // 3. update records validation
       const validationDuplicate = RecordValidation.newValidationRecordDuplicate()
 
-      await PromiseUtils.each(rowsRecordsDuplicate, async (rowRecordDuplicate) => {
+      for (const rowRecordDuplicate of rowsRecordsDuplicate) {
         if (this.isCanceled()) {
-          return
+          break
         }
 
         // 2. for each duplicate node entity, update record validation
@@ -97,7 +96,7 @@ export default class RecordsUniquenessValidationJob extends Job {
 
         // 3. add record validation to batch update
         await this.addRecordValidationToBatchUpdate(recordUuid, validationRecordUpdated)
-      })
+      }
     }
 
     this.incrementProcessedItems()
