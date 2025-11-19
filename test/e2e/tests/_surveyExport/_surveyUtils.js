@@ -37,7 +37,7 @@ export const getNodeDefChildren = (nodeDef) => (survey) => {
   if (nodeDef.virtual) {
     // If nodeDef is virtual, get children from its source
     const entitySource = getNodeDefSource(nodeDef)(survey)
-    children.push(...getNodeDefChildren({ nodeDef: entitySource })(survey))
+    children.push(...getNodeDefChildren(entitySource)(survey))
   }
 
   const { uuid: nodeDefUuid } = nodeDef
