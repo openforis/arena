@@ -1,4 +1,4 @@
-import { PointFactory, Promises } from '@openforis/arena-core'
+import { PointFactory } from '@openforis/arena-core'
 
 import { CsvDataExportModel } from '@common/model/csvExport'
 
@@ -61,27 +61,15 @@ const extractDataImportTemplate = async ({ survey, cycle, nodeDefUuid, includeFi
     return { ...acc, [header]: value }
   }, {})
 
-  return {
-    template,
-    nodeDef,
-  }
+  return { template, nodeDef }
 }
 
 const exportDataImportTemplate = async ({ surveyId, cycle, nodeDefUuid, includeFiles, fileFormat, res }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
-  const { template, nodeDef } = await extractDataImportTemplate({
-    survey,
-    cycle,
-    nodeDefUuid,
-    includeFiles,
-  })
+  const { template, nodeDef } = await extractDataImportTemplate({ survey, cycle, nodeDefUuid, includeFiles })
 
-  setContentTypeFile({
-    res,
-    fileName: `data_import_template_${NodeDef.getName(nodeDef)}.${fileFormat}`,
-    fileFormat,
-  })
+  setContentTypeFile({ res, fileName: `data_import_template_${NodeDef.getName(nodeDef)}.${fileFormat}`, fileFormat })
 
   await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: [template] })
 }
@@ -103,7 +91,8 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fil
 
   const tempFilePaths = []
 
-  await Promises.each(multipleNodeDefUuids, async (nodeDefUuid, idx) => {
+  for (let idx = 0; idx < multipleNodeDefUuids.length; idx++) {
+    const nodeDefUuid = multipleNodeDefUuids[idx]
     const { template, nodeDef } = await extractDataImportTemplate({
       survey,
       cycle,
@@ -123,7 +112,7 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fil
 
     archiver.addFile(tempFilePath, zipEntryName)
     tempFilePaths.push(tempFilePath)
-  })
+  }
 
   await archiver.finalize()
 
@@ -131,7 +120,4 @@ const exportAllDataImportTemplates = async ({ surveyId, cycle, includeFiles, fil
   await Promise.all(tempFilePaths.map(FileUtils.deleteFileAsync))
 }
 
-export const DataImportTemplateService = {
-  exportDataImportTemplate,
-  exportAllDataImportTemplates,
-}
+export const DataImportTemplateService = { exportDataImportTemplate, exportAllDataImportTemplates }

@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import { Promises } from '@openforis/arena-core'
-
 import Job from '@server/job/job'
 
 import * as Survey from '@core/survey/survey'
@@ -44,15 +42,9 @@ export default class NodeDefsValidationJob extends Job {
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const cycleKeys = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(surveySummary)
 
-    await Promises.each(cycleKeys, async (cycle) => {
+    for (const cycle of cycleKeys) {
       const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        {
-          surveyId,
-          cycle,
-          draft: true,
-          advanced: true,
-          validate: true,
-        },
+        { surveyId, cycle, draft: true, advanced: true, validate: true },
         tx
       )
 
@@ -64,7 +56,7 @@ export default class NodeDefsValidationJob extends Job {
           errors[getNodeDefPath({ survey, nodeDef })] = Validation.getFieldValidations(nodeDefValidation)
         })
       )(survey)
-    })
+    }
 
     if (!R.isEmpty(errors)) {
       await this.setStatusFailed()

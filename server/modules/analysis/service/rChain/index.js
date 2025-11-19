@@ -1,5 +1,3 @@
-import * as PromiseUtils from '@core/promiseUtils'
-
 import { db } from '@server/db/db'
 
 import FileZip from '@server/utils/file/fileZip'
@@ -114,10 +112,7 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
       {
         surveyId,
         chainUuid,
-        fields: {
-          [TableChain.columnSet.scriptCommon]: scriptCommon,
-          [TableChain.columnSet.scriptEnd]: scriptEnd,
-        },
+        fields: { [TableChain.columnSet.scriptCommon]: scriptCommon, [TableChain.columnSet.scriptEnd]: scriptEnd },
       },
       tx
     )
@@ -129,27 +124,24 @@ export const persistUserScripts = async ({ user, surveyId, chainUuid, filePath }
 
     const entities = Survey.getAnalysisEntities({ chain })(survey)
 
-    await PromiseUtils.each(entities, async (entity) => {
+    for (const entity of entities) {
       const analysisNodeDefsInEntity = Survey.getAnalysisNodeDefs({ entity, chain, hideAreaBasedEstimate: false })(
         survey
       )
+      for (const nodeDef of analysisNodeDefsInEntity) {
+        const nodeDefUuid = NodeDef.getUuid(nodeDef)
+        const parentUuid = NodeDef.getParentUuid(nodeDef)
 
-      if (analysisNodeDefsInEntity.length > 0) {
-        await PromiseUtils.each(analysisNodeDefsInEntity, async (nodeDef) => {
-          const nodeDefUuid = NodeDef.getUuid(nodeDef)
-          const parentUuid = NodeDef.getParentUuid(nodeDef)
+        const scriptEntryName = getAnalysisNodeDefZipEntryName({ entity, nodeDef })
 
-          const scriptEntryName = getAnalysisNodeDefZipEntryName({ entity, nodeDef })
+        const script = getZipEntryAsText(scriptEntryName)
 
-          const script = getZipEntryAsText(scriptEntryName)
-
-          await NodeDefManager.updateNodeDefProps(
-            { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
-            tx
-          )
-        })
+        await NodeDefManager.updateNodeDefProps(
+          { user, survey, nodeDefUuid, parentUuid, propsAdvanced: { script }, markSurveyAsDraft: false },
+          tx
+        )
       }
-    })
+    }
   })
   await UserService.notifyActiveUsersAboutSurveyUpdate({ surveyId })
 }

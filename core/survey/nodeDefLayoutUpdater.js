@@ -8,7 +8,7 @@ import * as SurveyNodeDefs from './_survey/surveyNodeDefs'
 import { NodeDefLayoutSizes } from './nodeDefLayoutSizes'
 
 const _calculateChildPagesIndex = ({ survey, cycle, nodeDefParent }) => {
-  const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren(nodeDefParent)(survey).filter(
+  const childEntitiesInOwnPage = SurveyNodeDefs.getNodeDefChildren({ nodeDef: nodeDefParent })(survey).filter(
     (childDef) =>
       !NodeDef.isDeleted(childDef) && NodeDef.isEntity(childDef) && NodeDefLayout.isDisplayInOwnPage(cycle)(childDef)
   )
@@ -43,7 +43,7 @@ const _onEntityRenderTypeUpdate = ({ survey, surveyCycleKey, nodeDef }) =>
     if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDef)) {
       // render type changed from 'form' to 'table':
       // Assoc layout children
-      const nodeDefChildren = SurveyNodeDefs.getNodeDefChildren(nodeDef)(survey)
+      const nodeDefChildren = SurveyNodeDefs.getNodeDefChildren({ nodeDef })(survey)
 
       return NodeDefLayout.assocLayoutChildren(surveyCycleKey, nodeDefChildren.map(NodeDef.getUuid))(layout)
     }
@@ -82,11 +82,7 @@ export const updateLayoutProp =
 
     if (key === NodeDefLayout.keys.renderType && NodeDef.isEntity(nodeDef) && value !== renderTypePrev) {
       // entity render type changed
-      nodeDefUpdated = _onEntityRenderTypeUpdate({
-        survey: surveyUpdated,
-        surveyCycleKey,
-        nodeDef: nodeDefUpdated,
-      })
+      nodeDefUpdated = _onEntityRenderTypeUpdate({ survey: surveyUpdated, surveyCycleKey, nodeDef: nodeDefUpdated })
     }
     nodeDefsUpdated[nodeDefUuid] = nodeDefUpdated
 

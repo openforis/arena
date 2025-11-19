@@ -4,7 +4,6 @@ import { NodeDefExpressionValidator } from '@openforis/arena-core'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
-import * as PromiseUtils from '@core/promiseUtils'
 
 import * as Survey from '../survey'
 import * as NodeDef from '../nodeDef'
@@ -15,10 +14,7 @@ import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
 const { keys, keysPropsAdvanced, propKeys } = NodeDef
 
-const keysValidationFields = {
-  children: 'children',
-  keyAttributes: 'keyAttributes',
-}
+const keysValidationFields = { children: 'children', keyAttributes: 'keyAttributes' }
 
 const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using file attribute
 
@@ -36,7 +32,7 @@ const validateTaxonomy = async (propName, nodeDef) =>
 
 const validateChildren = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
-    const children = Survey.getNodeDefChildren(nodeDef, NodeDef.isAnalysis(nodeDef))(survey)
+    const children = Survey.getNodeDefChildren({ nodeDef, includeAnalysis: NodeDef.isAnalysis(nodeDef) })(survey)
     if (R.isEmpty(children)) {
       return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
     }
@@ -47,7 +43,7 @@ const validateChildren = (survey) => (propName, nodeDef) => {
 
 const countKeyAttributes = (survey, nodeDefEntity) =>
   R.pipe(
-    Survey.getNodeDefChildren(nodeDefEntity, NodeDef.isAnalysis(nodeDefEntity)),
+    Survey.getNodeDefChildren({ nodeDef: nodeDefEntity, includeAnalysis: NodeDef.isAnalysis(nodeDefEntity) }),
     R.filter(NodeDef.isKey),
     R.length
   )(survey)
@@ -163,10 +159,7 @@ const validateMaxFileSize = (_propName, nodeDef) => {
   const maxSize = NodeDef.getMaxFileSize(nodeDef)
 
   if (maxSize <= 0 || maxSize > MAX_FILE_SIZE_MAX) {
-    return {
-      key: Validation.messageKeys.nodeDefEdit.maxFileSizeInvalid,
-      params: { max: MAX_FILE_SIZE_MAX },
-    }
+    return { key: Validation.messageKeys.nodeDefEdit.maxFileSizeInvalid, params: { max: MAX_FILE_SIZE_MAX } }
   }
   return null
 }
@@ -246,9 +239,9 @@ export const validateNodeDefs = async (survey) => {
   const nodeDefs = Survey.getNodeDefs(survey)
 
   const nodeDefsValidation = []
-  await PromiseUtils.each(Object.values(nodeDefs), async (nodeDef) => {
+  for (const nodeDef of Object.values(nodeDefs)) {
     nodeDefsValidation.push(await validateNodeDef(survey, nodeDef))
-  })
+  }
 
   // exclude valid node def validations
   const fieldsValidation = Object.values(nodeDefs).reduce((fieldsValidationAcc, nodeDef, index) => {

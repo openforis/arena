@@ -4,7 +4,6 @@ import * as pgPromise from 'pg-promise'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as ObjectUtils from '@core/objectUtils'
-import * as PromiseUtils from '@core/promiseUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
 
@@ -103,11 +102,7 @@ const _validateSpecifiedCategoryItems = async ({ surveyId, categoryUuid, itemsTo
 
   const category = await _fetchCategory({ surveyId, categoryUuid }, client)
   const itemsCountByItemUuid = await CategoryRepository.fetchChildrenItemsCountByItemUuid(
-    {
-      surveyId,
-      categoryUuid,
-      draft,
-    },
+    { surveyId, categoryUuid, draft },
     client
   )
   const validation = await CategoryValidator.validateItems({ category, itemsToValidate, itemsCountByItemUuid })
@@ -240,10 +235,7 @@ export const insertItem = async (user, surveyId, categoryUuid, itemParam, client
       t
     )
     const itemToInsert = CategoryItem.assocProp({ key: CategoryItem.keysProps.index, value: itemsCountPrev })(itemParam)
-    const logContent = {
-      ...itemToInsert,
-      [ActivityLog.keysContent.categoryUuid]: categoryUuid,
-    }
+    const logContent = { ...itemToInsert, [ActivityLog.keysContent.categoryUuid]: categoryUuid }
     const [item] = await Promise.all([
       CategoryRepository.insertItem(surveyId, itemToInsert, t),
       markSurveyDraft(surveyId, t),
@@ -388,14 +380,7 @@ export const updateCategoryItemExtraDefItem = async (
     }
 
     return updateCategoryProp(
-      {
-        user,
-        surveyId,
-        categoryUuid,
-        key: Category.keysProps.itemExtraDef,
-        value: itemExtraDefsToStore,
-        system: true,
-      },
+      { user, surveyId, categoryUuid, key: Category.keysProps.itemExtraDef, value: itemExtraDefsToStore, system: true },
       t
     )
   })
@@ -420,10 +405,7 @@ export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, k
       ),
     ])
 
-    return {
-      level,
-      category: await _validateCategory({ surveyId, categoryUuid, validateItems: false }, t),
-    }
+    return { level, category: await _validateCategory({ surveyId, categoryUuid, validateItems: false }, t) }
   })
 
 const _newCategoryItemUpdateLogActivity = (categoryUuid, item, key, value, system) =>
@@ -528,7 +510,7 @@ export const cleanupCategory = async ({ user, surveyId, categoryUuid }, client =
     const levelsToCheck = levels.slice(1)
     levelsToCheck.reverse()
 
-    await PromiseUtils.each(levelsToCheck, async (level) => {
+    for (const level of levelsToCheck) {
       if (followingLevelIsNotEmpty) {
         if ((await CategoryRepository.countItemsByLevelUuid({ surveyId, levelUuid: level.uuid })) === 0) {
           await deleteLevel(user, surveyId, categoryUuid, level.uuid)
@@ -538,7 +520,7 @@ export const cleanupCategory = async ({ user, surveyId, categoryUuid }, client =
           followingLevelIsNotEmpty = false
         }
       }
-    })
+    }
     return { updated }
   })
 
@@ -594,9 +576,7 @@ export const convertCategoryToReportingData = async ({ user, surveyId, categoryU
         user,
         surveyId,
         ActivityLog.type.categoryConvertToReportingData,
-        {
-          [ActivityLog.keysContent.uuid]: categoryUuid,
-        },
+        { [ActivityLog.keysContent.uuid]: categoryUuid },
         false,
         t
       ),
@@ -687,9 +667,7 @@ export const replaceLevels = async (user, surveyId, category, levelNamesNew, cli
     const levelsNew = levelNamesNew.map((levelName, index) =>
       Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
     )
-    const logContent = {
-      [ActivityLog.keysContent.uuid]: categoryUuid,
-    }
+    const logContent = { [ActivityLog.keysContent.uuid]: categoryUuid }
     await Promise.all([
       CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
       ActivityLogRepository.insert(user, surveyId, ActivityLog.type.categoryLevelsDelete, logContent, true, t),
@@ -730,10 +708,7 @@ export const deleteItem = async (user, surveyId, categoryUuid, itemUuid, client 
       const siblingIndex = CategoryItem.getIndex(siblingItem)
       if (siblingIndex > deletedIndex) {
         const newIndex = siblingIndex - 1
-        const itemUpdated = CategoryItem.assocProp({
-          key: CategoryItem.keysProps.index,
-          value: newIndex,
-        })(siblingItem)
+        const itemUpdated = CategoryItem.assocProp({ key: CategoryItem.keysProps.index, value: newIndex })(siblingItem)
         itemsToUpdate.push(itemUpdated)
         logActivities.push(
           _newCategoryItemUpdateLogActivity(
